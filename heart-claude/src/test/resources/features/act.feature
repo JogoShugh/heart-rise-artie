@@ -1,4 +1,4 @@
-Feature: Act — submitting to an affordance
+Feature: Act — submitting to a known affordance
 
   Background:
     Given the service returns the following on enter:
@@ -53,3 +53,4 @@ Feature: Act — submitting to an affordance
     Then the "next-action" affordance has:
       | href                              | hash   |
       | https://example.com/resource/next | def456 |
+

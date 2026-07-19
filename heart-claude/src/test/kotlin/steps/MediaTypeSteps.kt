@@ -31,7 +31,7 @@ class MediaTypeSteps(private val ctx: ClientContext) {
 
     @When("the client parses the response")
     fun whenClientParses() {
-        ctx.fakeTransport.enqueue(ctx.enterBody, ctx.contentType)
+        ctx.enqueueEnterResponse()
         ctx.current = ctx.client.enter("https://example.com/")
     }
 
