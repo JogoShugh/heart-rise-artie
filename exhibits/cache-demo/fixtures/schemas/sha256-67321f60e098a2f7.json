@@ -1,0 +1,9 @@
+{
+  "title": "Thin Seedlings",
+  "type": "object",
+  "properties": {
+    "cellId": { "type": "string" },
+    "keepCount": { "type": "integer", "minimum": 1 }
+  },
+  "required": ["cellId", "keepCount"]
+}

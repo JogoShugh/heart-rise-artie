@@ -1,0 +1,22 @@
+# Dockerfile.origin
+#
+# Containerizes the existing fixture server (server.py) unchanged.
+# Fixtures are generated at container BUILD time, not at request time --
+# deliberate, since content-addressed data should be produced once and
+# then just served, not regenerated per-container-start (which would
+# produce different random `moisture` values and different resource
+# bytes on every restart, defeating the point of a stable demo).
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Debian slim images ship bash and coreutils (sha256sum) by default --
+# generate_fixtures.sh's Linux path uses sha256sum directly, no extra
+# packages needed.
+
+COPY generate_fixtures.sh server.py ./
+RUN chmod +x generate_fixtures.sh && ./generate_fixtures.sh
+
+EXPOSE 8080
+CMD ["python3", "server.py", "8080"]

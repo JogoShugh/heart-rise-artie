@@ -1,0 +1,9 @@
+{
+  "title": "Harvest",
+  "type": "object",
+  "properties": {
+    "cellId": { "type": "string" },
+    "yieldGrams": { "type": "number", "minimum": 0 }
+  },
+  "required": ["cellId"]
+}

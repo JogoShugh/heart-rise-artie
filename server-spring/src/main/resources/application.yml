@@ -1,0 +1,29 @@
+# application.yml
+#
+# Two separate connection URLs to the SAME database, on purpose:
+#   spring.r2dbc.url  -- what the app actually uses at runtime,
+#                        reactive/non-blocking, what CoroutineCrudRepository
+#                        talks to.
+#   spring.flyway.url -- Flyway itself doesn't speak R2DBC; it needs a
+#                        plain blocking JDBC URL to run migrations at
+#                        startup. This is a normal, common pattern for
+#                        R2DBC + Flyway together, not a mistake.
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:gardenbed}
+    username: ${DB_USER:artie}
+    password: ${DB_PASSWORD:artie}
+  flyway:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:gardenbed}
+    user: ${DB_USER:artie}
+    password: ${DB_PASSWORD:artie}
+    locations: classpath:db/migration
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.r2dbc: INFO
+    com.artie.gardenbed: DEBUG

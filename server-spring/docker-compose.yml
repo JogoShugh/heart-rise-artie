@@ -1,0 +1,33 @@
+# docker-compose.yml
+#
+# Postgres + the Spring backend, wired together. UNVERIFIED (no Docker
+# available in the environment this was written in) -- see README.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gardenbed
+      POSTGRES_USER: artie
+      POSTGRES_PASSWORD: artie
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U artie -d gardenbed"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: gardenbed
+      DB_USER: artie
+      DB_PASSWORD: artie
+    ports:
+      - "8080:8080"

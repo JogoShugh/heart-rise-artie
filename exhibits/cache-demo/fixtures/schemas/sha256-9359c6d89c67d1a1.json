@@ -1,0 +1,9 @@
+{
+  "title": "Transplant",
+  "type": "object",
+  "properties": {
+    "fromCellId": { "type": "string" },
+    "toCellId": { "type": "string" }
+  },
+  "required": ["fromCellId", "toCellId"]
+}
