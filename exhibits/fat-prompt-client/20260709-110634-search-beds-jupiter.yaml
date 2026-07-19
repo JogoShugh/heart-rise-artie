@@ -1,0 +1,270 @@
+- timestamp: "2026-07-09T15:06:46Z"
+  friendly: "July 9, 2026 at 11:06 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/api/beds?search=jupiter",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/api/beds?search=jupiter"
+          }
+        },
+        "_embedded": {
+          "results": [
+            {
+              "name": "Jupiter Bed - Cell 4 (EMPTY)",
+              "_links": {
+                "details": {
+                  "href": "/api/beds/jupiter/cells/4"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:16:16Z"
+  friendly: "July 9, 2026 at 11:16 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/api/beds/jupiter/cells/4",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "bedId": "jupiter",
+        "cellId": "bed-1-cell-4",
+        "status": "EMPTY",
+        "_links": {
+          "self": {
+            "href": "/api/beds/jupiter/cells/4"
+          },
+          "up": {
+            "href": "/api/beds/jupiter"
+          }
+        },
+        "_forms": {
+          "sowSeed": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/api/beds/jupiter/cells/4/sow"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "cropType",
+                "seedCount"
+              ],
+              "properties": {
+                "cropType": {
+                  "type": "string"
+                },
+                "seedCount": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:17:22Z"
+  friendly: "July 9, 2026 at 11:17 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/api/beds/jupiter/cells/4/sow",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "cropType": "tomato",
+        "seedCount": 4
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/api/beds/jupiter/cells/4"
+          }
+        },
+        "message": "Action executed. Resource state has changed."
+      }
+    }
+- timestamp: "2026-07-09T15:17:47Z"
+  friendly: "July 9, 2026 at 11:17 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/api/beds/jupiter/cells/4",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "bedId": "jupiter",
+        "cellId": "bed-1-cell-4",
+        "status": "PLANTED",
+        "_links": {
+          "self": {
+            "href": "/api/beds/jupiter/cells/4"
+          },
+          "up": {
+            "href": "/api/beds/jupiter"
+          }
+        },
+        "_forms": {
+          "waterCell": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/api/beds/jupiter/cells/4/water"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "volumeMl"
+              ],
+              "properties": {
+                "volumeMl": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:19:15Z"
+  friendly: "July 9, 2026 at 11:19 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/api/beds/jupiter/cells/4/water",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "volumeMl": 5
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/api/beds/jupiter/cells/4"
+          }
+        },
+        "message": "Action executed. Resource state has changed."
+      }
+    }
+- timestamp: "2026-07-09T15:19:57Z"
+  friendly: "July 9, 2026 at 11:19 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/api/beds/jupiter/cells/4",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "bedId": "jupiter",
+        "cellId": "bed-1-cell-4",
+        "status": "PLANTED",
+        "_links": {
+          "self": {
+            "href": "/api/beds/jupiter/cells/4"
+          },
+          "up": {
+            "href": "/api/beds/jupiter"
+          }
+        },
+        "_forms": {
+          "waterCell": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/api/beds/jupiter/cells/4/water"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "volumeMl"
+              ],
+              "properties": {
+                "volumeMl": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
