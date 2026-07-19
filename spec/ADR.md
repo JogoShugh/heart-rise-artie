@@ -111,3 +111,22 @@ Decisions recorded in the order they were made.
 **Decision:** `Transport` interface injected into `ArtieClient`; `ServerResponse` is an internal type never surfacing on `HeartRiseClient`.
 
 **Rationale:** The agent calling `httpClient.get()` before calling `client.enter()` is a transport leak. The caller should not know or care how the client obtains a server response — that may be HTTP today, AMQP tomorrow, or an in-memory fake in tests. The `FakeTransport` in the test package queues pre-canned responses; the feature file step definitions configure it and call `client.enter()`. Transport is fully pluggable without any change to the `HeartRiseClient` interface or the agent code.
+
+---
+
+## 9. Replacing `Accept-Profile; param:detail=hash` with content-addressed URLs + `Prefer`
+
+**Context:** SPEC.md 0.2 specified a single custom negotiation mechanism — `Accept-Profile: <heart-rise>; param:detail=hash` — to control both which dialect a response used (implicitly always jbadeau's `_forms`) and whether schema bodies were suppressed for a warm client. Three parallel exploration efforts produced conflicting answers about how caching should actually work: `exhibits/cache-demo` tried bare content-addressed URLs (hash-in-URL, single dialect, its own design writeup overclaimed a dual-dialect version that was never actually built); `server-spring` built and *verified*, against a real captured request log, both real dialects (jbadeau `_forms` and Amundsen's real HAL-FORMS `_templates`) plus RFC 7240 `Prefer: embed=schemas` for inline-vs-pointer rendering, layered over content-addressed `Layer 2`/`Layer 3` URLs.
+
+**Options considered:**
+- Keep `detail=hash` as specified, add dual-dialect support as a separate, additional axis on top of it
+- Adopt `exhibits/cache-demo`'s bare content-addressed URL scheme as-is
+- Adopt `server-spring`'s verified mechanism: `Accept` for dialect, `Prefer: embed=schemas` for rendering, content-addressed URLs for Layer 2/3 caching
+
+**Decision:** The third option. `detail=hash` is removed from the spec entirely (SPEC.md §6.4, 0.3). Dialect selection moves to plain `Accept` (§6.1); rendering detail moves to `Prefer`/`Preference-Applied` (§6.4); caching moves from a bespoke client-side fingerprint registry to ordinary HTTP caching of content-addressed URLs (§6.5–6.6).
+
+**Rationale:** Only `server-spring`'s version is backed by a real, live-captured proof — real `Date` headers, real `Cache-Control`/`Vary`/`Preference-Applied` response headers, a documented and fixed real bug (an earlier version silently collapsed Layer 2 into Layer 1, defeating cross-resource cache sharing), and a verification pipeline (`render_journal.py`) that was itself tested against deliberately-broken data to confirm it can report failure, not just success. `exhibits/cache-demo`'s writeup made the same dual-dialect claim but the code never matched it — kept as a labelled exhibit, not used as a spec source. Standard `Accept`/`Prefer` also does less work than a custom `Accept-Profile` parameter for the same job: any RFC 7234-compliant cache, not just a purpose-built client, benefits from Layer 2/3 immutability for free.
+
+**Trade-off accepted knowingly:** 0.2's hash fingerprint deliberately excluded `description`, `enum`, `minimum`, etc. so cosmetic schema edits wouldn't invalidate the client's cache. Real content addressing can't preserve that property — a trustworthy "this URL is proof the content can't have changed" claim requires hashing every byte, so a `description` edit now mints a new URL like any other content change would. Confirmed explicitly before making this change (see SPEC.md §6.5).
+
+**Open question carried forward, not resolved here:** whether 428 (stale manifest hash) still has a distinct role once Layer 2/3 URLs can't go stale by construction, or collapses into 409/404 — see SPEC.md §12.
