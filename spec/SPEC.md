@@ -21,6 +21,8 @@
 
 - **HAL-FORMS is the L0 on-ramp; HAL Schema Forms is the reference dialect (§6.1, §6.2, §6.10.6).** Decided 2026-10-04. HAL-FORMS has no field that points to a separately addressed properties fragment, and its common toolchains generate the bytes, so the layering and content addressing of L1–L3 do not fit it. Rather than extend HAL-FORMS, 0.5 serves it at L0 only. Every rung, L0 to L6, is defined for HAL Schema Forms.
 
+- **The affordance-set link has a name (§6.1).** Decided 2026-10-04. At L1 and L2, Layer 1 links to its affordance set under the link relation `https://github.com/jogoshugh/heart-rise/rels/forms`. A server MAY write it in HAL's CURIE short form; a client MUST expand CURIEs before matching. 0.4 drew the link as `_links.forms` without naming it, so two conformant implementations could disagree.
+
 **Changes since 0.3:**
 
 - **Introduced the L0–L6 conformance ladder (§6.10)** as the normative structure for incremental adoption, with sequence diagrams per rung. L0 — everything embedded, zero headers — is an on-ramp, explicitly *not* conformance (§6.10.1).
@@ -213,6 +215,17 @@ A H.E.A.R.T. response is organised into three layers. Whether those layers arriv
 | **3 — Schema** | Per-field definition for one affordance (JSON Schema, or a HAL-FORMS `properties` fragment) | Content-addressed URL, same scheme as Layer 2 | `public, max-age=31536000, immutable` | None |
 
 `immutable` is RFC 8246. Support outside browser caches is uneven; the year-long `max-age` carries most of the benefit regardless, and the content address makes staleness meaningless by construction.
+
+**The affordance-set link relation (decided for 0.5).** At L1 and L2, Layer 1 SHALL link to its affordance set under the link relation type `https://github.com/jogoshugh/heart-rise/rels/forms`. An extension relation is a URI under RFC 8288 §2.1.2, and this one sits in the same namespace as the profile URIs above. A server MAY write it in HAL's CURIE short form, declaring the prefix in `_links.curies`:
+
+```json
+"_links": {
+  "curies":   [{ "name": "hr", "href": "https://github.com/jogoshugh/heart-rise/rels/{rel}", "templated": true }],
+  "hr:forms": { "href": "/affordance-sets/sha256-…", "type": "application/hal+json" }
+}
+```
+
+A client SHALL expand a CURIE key through `curies` before comparing it, so the full URI and any prefix that expands to it are the same relation. A link under any other name is not the affordance set. The diagrams' `_links.forms` is shorthand for this relation.
 
 **Resource (Layer 1).** Domain data for the current state. SHALL be revalidated on every request (`ETag`/`If-None-Match`); this layer changes, so it is never content-addressed. It carries the affordance set either inline (L0) or by link (L1+).
 

@@ -36,7 +36,7 @@ Feature: L1, and the L3 sharing property seen from the client
 
       id: 2
       _links:
-        http://api.example.org/rels/forms: {href: "{set:planted-l1}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted-l1}"}
       """
     And the client works at rung L1
     When the client enters "http://garden.test/beds/2"

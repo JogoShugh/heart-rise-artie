@@ -35,7 +35,7 @@ class LayerSteps(private val ctx: ClientContext) {
     @Given("bed {int} links to affordance set {string}")
     fun bedLinks(bed: Int, set: String) {
         val body = """{"id":$bed,"_links":{"self":{"href":"/beds/$bed"},""" +
-            """"http://api.example.org/rels/forms":{"href":"${ctx.expand("{set:$set}")}"}}}"""
+            """"https://github.com/jogoshugh/heart-rise/rels/forms":{"href":"${ctx.expand("{set:$set}")}"}}}"""
         val headers = mapOf(
             "Content-Type" to listOf("application/hal+json"),
             "ETag" to listOf("\"seq-1.hsf.L2\""),

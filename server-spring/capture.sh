@@ -34,10 +34,10 @@ curl -s -H "Accept: $HSF" -H "Accept-Profile: $HSF_PROFILE" "$BASE/beds/1" > "$R
 curl -s -D "$RUN_DIR/01-bed1-headers.txt" -H "Accept: $HSF" -H "Accept-Profile: $HSF_PROFILE" -H "Prefer: $L2" \
      "$BASE/beds/1" > "$RUN_DIR/01-bed1-empty.json"
 
-SOWSEED_SET_URL=$(jq -r '._links["http://api.example.org/rels/forms"].href' < "$RUN_DIR/01-bed1-empty.json")
+SOWSEED_SET_URL=$(jq -r '._links["hr:forms"].href' < "$RUN_DIR/01-bed1-empty.json")
 echo "$SOWSEED_SET_URL" > "$RUN_DIR/01-set-url.txt"
 # L1: a different set, with schemas embedded, at a different address.
-SOWSEED_L1_SET_URL=$(curl -s -H "Accept: $HSF" -H "Prefer: $L1" "$BASE/beds/1" | jq -r '._links["http://api.example.org/rels/forms"].href')
+SOWSEED_L1_SET_URL=$(curl -s -H "Accept: $HSF" -H "Prefer: $L1" "$BASE/beds/1" | jq -r '._links["hr:forms"].href')
 echo "$SOWSEED_L1_SET_URL" > "$RUN_DIR/01-set-l1-url.txt"
 
 curl -s "$BASE$SOWSEED_SET_URL" > "$RUN_DIR/01-set-pointer.json"
@@ -61,9 +61,9 @@ echo "sowSeed captured"
 curl -s -H "Accept: $HALFORMS" "$BASE/beds/2" > "$RUN_DIR/02-bed2-halforms.json"
 curl -s -H "Accept: $HSF" -H "Prefer: $L2" "$BASE/beds/1" > "$RUN_DIR/02-bed1-planted.json"
 
-WATERCELL_SET_URL=$(jq -r '._links["http://api.example.org/rels/forms"].href' < "$RUN_DIR/02-bed1-planted.json")
+WATERCELL_SET_URL=$(jq -r '._links["hr:forms"].href' < "$RUN_DIR/02-bed1-planted.json")
 echo "$WATERCELL_SET_URL" > "$RUN_DIR/02-set-url.txt"
-WATERCELL_L1_SET_URL=$(curl -s -H "Accept: $HSF" -H "Prefer: $L1" "$BASE/beds/1" | jq -r '._links["http://api.example.org/rels/forms"].href')
+WATERCELL_L1_SET_URL=$(curl -s -H "Accept: $HSF" -H "Prefer: $L1" "$BASE/beds/1" | jq -r '._links["hr:forms"].href')
 
 curl -s "$BASE$WATERCELL_SET_URL" > "$RUN_DIR/02-set-pointer.json"
 curl -s "$BASE$WATERCELL_L1_SET_URL" > "$RUN_DIR/02-set-embedded.json"
@@ -85,7 +85,7 @@ echo "waterCell captured"
 
 curl -s -H "Accept: $HSF" -H "Prefer: $L1" "$BASE/beds/3" > "$RUN_DIR/03-bed3-pointer.json"
 
-HARVEST_SET_URL=$(jq -r '._links["http://api.example.org/rels/forms"].href' < "$RUN_DIR/03-bed3-pointer.json")
+HARVEST_SET_URL=$(jq -r '._links["hr:forms"].href' < "$RUN_DIR/03-bed3-pointer.json")
 echo "$HARVEST_SET_URL" > "$RUN_DIR/03-set-url.txt"
 
 curl -s "$BASE$HARVEST_SET_URL" > "$RUN_DIR/03-set-embedded.json"
@@ -94,8 +94,8 @@ echo "harvest captured"
 
 # ---------- cross-bed sharing proof ----------
 
-curl -s -H "Accept: $HSF" -H "Prefer: $L2" "$BASE/beds/1" | jq -r '._links["http://api.example.org/rels/forms"].href' > "$RUN_DIR/04-bed1-forms-href.txt"
-curl -s -H "Accept: $HSF" -H "Prefer: $L2" "$BASE/beds/3" | jq -r '._links["http://api.example.org/rels/forms"].href' > "$RUN_DIR/04-bed3-forms-href.txt"
+curl -s -H "Accept: $HSF" -H "Prefer: $L2" "$BASE/beds/1" | jq -r '._links["hr:forms"].href' > "$RUN_DIR/04-bed1-forms-href.txt"
+curl -s -H "Accept: $HSF" -H "Prefer: $L2" "$BASE/beds/3" | jq -r '._links["hr:forms"].href' > "$RUN_DIR/04-bed3-forms-href.txt"
 
 echo "cross-bed proof captured"
 

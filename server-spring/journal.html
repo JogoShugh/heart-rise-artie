@@ -151,11 +151,11 @@ TRUNCATE garden_bed_event, garden_bed_snapshot, garden_bed RESTART IDENTITY CASC
 <span class="c">-- ...reinsert seed beds and events...</span>
 SQL</pre></div>
     <div class="specimen"><div class="specimen-label output">output</div><pre>TRUNCATE TABLE
-INSERT 0 3
-INSERT 0 6
+INSERT 0 4
+INSERT 0 7
  setval 
 --------
-      3
+      4
 (1 row)</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
@@ -214,7 +214,12 @@ moistureLevel: 0
 _links:
   self:
     href: /beds/1
-  &quot;http://api.example.org/rels/forms&quot;:
+  curies:
+    -
+      name: hr
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      templated: true
+  &quot;hr:forms&quot;:
     href: /affordance-sets/sha256-f670940f88273f51
     type: &quot;application/hal+json&quot;
     profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;</pre></div>

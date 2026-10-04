@@ -54,7 +54,7 @@ has since changed.
 | L3 sharing property | **Done**: two clients behind one shared cache, two beds in one state, one set fetch, fake and live (seed bed 4). The concrete-profile counter-case (one set per bed, two fetches, one schema fetch) is checked against the scripted server |
 | L5: speak both dialects | **Done**. ARTIE reads HAL-FORMS at L0 (`_templates`, properties mapped to JSON Schema) and refuses to be set above L0 in it. Live: both dialects show the same act targets on all four seeded beds, and a full cycle runs over HAL-FORMS |
 | RISE | **Missing** |
-| Rel name of the Layer 1 link to the set | **Open** `[AUTHOR]`. SPEC draws `_links.forms` but names no rel; server and client both use `http://api.example.org/rels/forms` |
+| Rel name of the Layer 1 link to the set | **Done** (decided for 0.5). `https://github.com/jogoshugh/heart-rise/rels/forms`; server-spring sends the `hr:forms` CURIE, ARTIE expands CURIEs (`forms-link.feature`) |
 
 ## exhibits/cache-demo
 

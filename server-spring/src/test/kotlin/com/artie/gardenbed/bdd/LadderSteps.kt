@@ -59,6 +59,22 @@ class LadderSteps(private val http: HttpWorld) {
     fun noAffordanceSetLink() =
         assertFalse(http.last.json.path("_links").has(FORMS_REL), "unexpected forms link in ${http.last.json}")
 
+    @Then("the response declares curie {string} as {string}")
+    fun declaresCurie(name: String, href: String) {
+        val curie = http.last.json.path("_links").path("curies").firstOrNull { it.path("name").asText() == name }
+        assertEquals(href, curie?.path("href")?.asText(), "curies: ${http.last.json.path("_links").path("curies")}")
+        assertTrue(curie?.path("templated")?.asBoolean() == true, "curie $name is not templated")
+    }
+
+    @Then("the response links to its affordance set under {string}")
+    fun setLinkUnder(rel: String) {
+        val href = http.last.json.path("_links").path(rel).path("href").asText()
+        assertTrue(href.startsWith("/affordance-sets/sha256-"), "no set link under $rel in ${http.last.json}")
+    }
+
+    @Then("the response has no link under {string}")
+    fun noLinkUnder(rel: String) = assertFalse(http.last.json.path("_links").has(rel), "found $rel")
+
     @Then("the response has no inline forms")
     fun noInlineForms() = assertFalse(http.last.json.has("_forms"), "unexpected _forms in ${http.last.json}")
 

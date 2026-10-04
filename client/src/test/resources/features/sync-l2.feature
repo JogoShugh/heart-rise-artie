@@ -38,7 +38,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       status: PLANTED
       _links:
         self: {href: /beds/2}
-        http://api.example.org/rels/forms: {href: "{set:planted}", type: application/hal+json}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", type: application/hal+json}
       """
     And the client works at rung L2
 
@@ -66,7 +66,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       status: PLANTED
       _links:
         self: {href: /beds/3}
-        http://api.example.org/rels/forms: {href: "{set:planted}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     And the client enters "http://garden.test/beds/3"
@@ -116,7 +116,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
 
       id: 5
       _links:
-        http://api.example.org/rels/forms: {href: "{set:two-waterings}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:two-waterings}"}
       """
     When the client enters "http://garden.test/beds/5"
     Then the client sent these requests:
@@ -136,7 +136,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       id: 2
       _links:
         self: {href: /beds/2}
-        http://api.example.org/rels/forms: {href: "{set:planted}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     And the client acts on "waterCell" with:
@@ -165,7 +165,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
 
       id: 8
       _links:
-        http://api.example.org/rels/forms: {href: /affordance-sets/sha256-0000000000000000}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: /affordance-sets/sha256-0000000000000000}
       """
     When the client tries to enter "http://garden.test/beds/8"
     Then the client raised an error mentioning "does not hash to"

@@ -63,7 +63,9 @@ class HttpWorld(private val client: WebTestClient) {
         // SPEC §6.1: the dialect is picked by media type alone.
         const val HAL_SCHEMA_FORMS_ACCEPT = "application/hal+json"
         const val HAL_FORMS_ACCEPT = "application/prs.hal-forms+json"
-        const val FORMS_REL = "http://api.example.org/rels/forms"
+        // SPEC §6.1 (0.5): the rel is https://github.com/jogoshugh/heart-rise/rels/forms;
+        // server-spring sends it in its HAL CURIE short form.
+        const val FORMS_REL = "hr:forms"
 
         fun acceptFor(dialect: String): String = when (dialect) {
             "hal-schema-forms" -> HAL_SCHEMA_FORMS_ACCEPT

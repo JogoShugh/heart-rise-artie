@@ -51,7 +51,7 @@ curl -s -H "Accept: $HALFORMS" "$BASE/beds/2" | yq -p json
 echo "== jbadeau dialect: GET bed-1 (EMPTY, pointer only) =="
 curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | yq -p json
 
-SOWSEED_SET_URL=$(curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | jq -r '._links["http://api.example.org/rels/forms"].href')
+SOWSEED_SET_URL=$(curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | jq -r '._links["hr:forms"].href')
 echo "== captured sowSeed affordance-set href: $SOWSEED_SET_URL =="
 
 echo "== GET sowSeed affordance-set (schema as \$id pointer) =="
@@ -81,7 +81,7 @@ curl -s -X POST "$BASE/beds/1/actions/sow-seed" \
 echo "== jbadeau dialect: GET bed-1 (PLANTED, pointer only) =="
 curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | yq -p json
 
-WATERCELL_SET_URL=$(curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | jq -r '._links["http://api.example.org/rels/forms"].href')
+WATERCELL_SET_URL=$(curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | jq -r '._links["hr:forms"].href')
 echo "== captured waterCell affordance-set href: $WATERCELL_SET_URL =="
 
 echo "== GET waterCell affordance-set (schema as \$id pointer) =="
@@ -109,10 +109,10 @@ curl -s -X POST "$BASE/beds/1/actions/water-cell" \
 # ---------- cross-bed sharing proof ----------
 
 echo "== bed-1 forms href (should now match bed-3's -- both READY_TO_HARVEST) =="
-curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | jq -r '._links["http://api.example.org/rels/forms"].href'
+curl -s -H "Accept: $JBADEAU" "$BASE/beds/1" | jq -r '._links["hr:forms"].href'
 
 echo "== bed-3 forms href (seeded READY_TO_HARVEST) =="
-curl -s -H "Accept: $JBADEAU" "$BASE/beds/3" | jq -r '._links["http://api.example.org/rels/forms"].href'
+curl -s -H "Accept: $JBADEAU" "$BASE/beds/3" | jq -r '._links["hr:forms"].href'
 
 # ---------- harvest (bed-2, seeded READY_TO_HARVEST after 2 waterings... actually PLANTED, see note) ----------
 # Note: bed-2's seed data is 1 sow + 2 waterings of 200ml each = 40 growth
@@ -122,7 +122,7 @@ curl -s -H "Accept: $JBADEAU" "$BASE/beds/3" | jq -r '._links["http://api.exampl
 echo "== jbadeau dialect: GET bed-3 (READY_TO_HARVEST, pointer only) =="
 curl -s -H "Accept: $JBADEAU" "$BASE/beds/3" | yq -p json
 
-HARVEST_SET_URL=$(curl -s -H "Accept: $JBADEAU" "$BASE/beds/3" | jq -r '._links["http://api.example.org/rels/forms"].href')
+HARVEST_SET_URL=$(curl -s -H "Accept: $JBADEAU" "$BASE/beds/3" | jq -r '._links["hr:forms"].href')
 echo "== captured harvest affordance-set href: $HARVEST_SET_URL =="
 
 echo "== GET harvest affordance-set with Prefer: embed=schemas -- properties genuinely empty, not a bug =="
