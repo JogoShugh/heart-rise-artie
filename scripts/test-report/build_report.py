@@ -193,6 +193,21 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
 </section>
 
 <section>
+  <div class="eyebrow">The ladder</div>
+  <h2>L0 to L6: where each rung is proven</h2>
+  <p class="muted">Server = server-spring. Client = ARTIE. "Live" means against server-spring and Postgres in Docker. HAL Schema Forms is the reference dialect for every rung; HAL-FORMS is the L0 on-ramp (SPEC 0.5 decision).</p>
+  <div class="tbl"><table><thead><tr><th>Rung</th><th>Server</th><th>Client</th></tr></thead><tbody>
+    <tr><td>L0 collapsed</td><td><code>rendering-ladder.feature</code>, journal 01</td><td><code>sync-l0.feature</code>; live full cycle at L0</td></tr>
+    <tr><td>L1 set fetch</td><td><code>rendering-ladder.feature</code></td><td><code>l1-and-sharing.feature</code>; live full cycle at L1</td></tr>
+    <tr><td>L2 schema fetch</td><td><code>rendering-ladder.feature</code>, live hash check</td><td><code>sync-l2.feature</code> (cache, 304, hash check); live full cycle and 304 at L2</td></tr>
+    <tr><td>L3 caching proof</td><td><code>templated-targets.feature</code>, journal 04</td><td><code>l1-and-sharing.feature</code> incl. the concrete-profile counter-case; live: two clients, one cache, one set fetch</td></tr>
+    <tr><td>L4 errors</td><td><code>conditional-acts.feature</code>, <code>layer1-revalidation.feature</code>, journal 06</td><td><code>conditional-acts.feature</code>; live 412 and 422</td></tr>
+    <tr><td>L5 cross-dialect</td><td><code>cross-dialect.feature</code> incl. the on-ramp guard</td><td><code>hal-forms-on-ramp.feature</code>; live: same acts in both dialects on 4 beds, full cycle over HAL-FORMS</td></tr>
+    <tr><td>L6 reasoning</td><td>n/a</td><td><code>reason-l6.feature</code> with a scripted reasoner and the Claude request shape; the real-model scenario has not been run (no API key here)</td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
   <div class="eyebrow">What changed to get here</div>
   <h2>Changes in this pass: SPEC 0.4 conformance, one step at a time</h2>
   <p class="muted">Each step started with a Gherkin feature in <code>server-spring/src/test/resources/features/</code>. The bdd-gates log (<code>.claude/tdd-events.log</code>) shows each one failing before the fix and passing after; the git pre-commit check refuses a commit that skips that order.</p>
@@ -207,6 +222,8 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
     <li><b>Client C1 · real wire format.</b> ARTIE parsed a format no SPEC version defines. It now reads 0.4 <code>_forms</code>, checks <code>Link: rel="profile"</code>, and holds the ETag.</li>
     <li><b>Client C2 · conditional acts.</b> <code>If-Match</code> on every act; templates expanded by the <code>[0.5]</code> rule only; <code>412</code>, <code>409</code>, <code>428</code> and <code>422</code> each handled their own way.</li>
     <li><b>Client C3 · real HTTP.</b> <code>HttpTransport</code> and live scenarios against server-spring. The second live run found a server bug: the first snapshot (event 5) answered <code>500</code> after its event was committed. Fixed, with a Postgres test.</li>
+    <li><b>Spec decision.</b> HAL-FORMS is the L0 on-ramp; HAL Schema Forms is the reference dialect for L0–L6.</li>
+    <li><b>Client L1, L3, L5, L6.</b> L1 walk; L3 shared-cache proof and its concrete counter-case; ARTIE reads HAL-FORMS; the Reason step, whose choice is checked against the manifest and schema before anything is sent.</li>
     <li><b>Client C4 · L2 walk.</b> Layer 1, set, schemas, through an HTTP cache that serves immutable layers without a request and revalidates Layer 1 to <code>304</code>. Bytes that do not hash to their address are refused.</li>
   </ul>
 </section>
@@ -303,7 +320,8 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
   <h2>What this baseline does not cover</h2>
   <ul class="plain">
     <li>The server's Cucumber suite uses <code>@WebFluxTest</code>, but production runs Spring MVC on Tomcat. The live journal and ARTIE's live scenarios exercise the real stack; the in-process suite does not.</li>
-    <li>ARTIE has no Reason step (L6) and no RISE yet. It fetches schemas one after another, not in parallel.</li>
+    <li>L6 has not been run against a real model: no <code>ANTHROPIC_API_KEY</code> in this environment. <code>./gradlew llmTest</code> runs it when one is set.</li>
+    <li>RISE is not implemented. ARTIE fetches schemas one after another, not in parallel.</li>
     <li>HAL-FORMS is served at L0 only. Its Layer 2/3 addressing needs a SPEC decision first; see <code>spec/CONFORMANCE-GAPS.md</code>.</li>
     <li>The cache-demo exhibit still uses its own 0.3-era fixtures (<code>{{bedId}}</code>, no <code>Prefer</code>). It demonstrates the caching mechanism, not 0.4 conformance.</li>
     <li>The Docker build of <code>Dockerfile.origin</code> was verified on 3 Oct, before the fixed random seed. The cache-demo run above used the local <code>server.py</code> with the regenerated fixtures.</li>
