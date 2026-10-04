@@ -40,10 +40,10 @@ has since changed.
 | L0 parse of an embedded response | **Done** (C1) for the 0.4 wire format: `_forms` with `_links.target`, `method`, `contentType`, `schema`; targets resolved against the entry URL. Tested against `FakeTransport` |
 | Reject an affordance absent from the manifest before any I/O | **Done**, with no network call (strengthened 2026-10-04) |
 | Never construct a URI (`act(rel, payload)` has no URL parameter) | **Done**, enforced by the type signature |
-| Hold the Layer 1 `ETag` and send `If-Match` on acts | **Partly there** (C1). The `ETag` is held; `If-Match` comes in C2 |
-| Handle `409` / `412` / `428` on separate paths | **Missing** |
+| Hold the Layer 1 `ETag` and send `If-Match` on acts | **Done** (C2). The held value is sent unchanged; an act with no ETag held is refused locally |
+| Handle `409` / `412` / `428` on separate paths | **Done** (C2). `412` re-syncs and drops the act; `409` re-syncs and reports; `428` re-syncs and resends once; `422` reports the server's violations. Each is its own `ActRefused` type |
 | Send `Prefer`; walk L1/L2; HTTP cache | **Missing** |
-| RFC 6570 template expansion | **Missing** |
+| RFC 6570 template expansion | **Done** (C2). Level 1, by the `[0.5]` rule only; an unresolvable variable is refused before any request |
 | `Accept` / `Accept-Profile` negotiation | **Done** (C1). Sends `Accept: application/hal+json` and `Accept-Profile` |
 | Read the profile from `Link: rel="profile"` | **Done** (C1). A response that does not name the hal-schema-forms profile is refused |
 | A real HTTP transport (talking to server-spring) | **Missing** |

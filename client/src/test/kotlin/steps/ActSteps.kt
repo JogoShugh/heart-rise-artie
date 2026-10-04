@@ -78,8 +78,18 @@ class ActSteps(private val ctx: ClientContext) {
         assertTrue(required.orEmpty().contains(field), "required: $required")
     }
 
+    /** Reads the client's own view, which a refusal's re-sync may have replaced. */
     @Then("the client holds the ETag {string}")
-    fun holdsETag(etag: String) = assertEquals("\"$etag\"", ctx.current.etag)
+    fun holdsETag(etag: String) = assertEquals("\"$etag\"", ctx.client.current?.etag)
+
+    @Then("the client's current manifest is empty")
+    fun manifestEmpty() = assertTrue(ctx.client.current?.affordances.orEmpty().isEmpty())
+
+    @Then("the client raised a {string} refusal")
+    fun raisedRefusal(kind: String) {
+        val error = assertNotNull(ctx.lastError, "expected a refusal, none was raised")
+        assertEquals(kind, error::class.simpleName, "raised: $error")
+    }
 
     private fun payload(yaml: String): JsonObject =
         Json.parseToJsonElement(jsonMapper.writeValueAsString(yamlMapper.readTree(yaml))).jsonObject

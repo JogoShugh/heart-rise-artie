@@ -1,5 +1,6 @@
 package heart
 
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
@@ -24,12 +25,21 @@ object HeartResponseParser {
         }
         val root = Json.parseToJsonElement(response.body).jsonObject
         val forms = root[FORMS]?.jsonObject.orEmpty().mapValues { (rel, form) -> form(rel, form.jsonObject, url) }
+        // An act's response comes from the action URL; its self link says which resource it is.
+        val self = root[LINKS]?.jsonObject?.get("self")?.jsonObject?.get("href")?.jsonPrimitive?.content
         return HeartRepresentation(
-            url = url,
+            url = self?.let { URI(url).resolve(it).toString() } ?: url,
             state = JsonObject(root.filterKeys { it != FORMS && it != LINKS }),
             affordances = forms,
             etag = response.header("ETag"),
         )
+    }
+
+    /** The `violations` list of a 422 body, or its `error` text, or nothing. */
+    fun violations(response: HeartResponse): List<String> {
+        val body = runCatching { Json.parseToJsonElement(response.body).jsonObject }.getOrNull() ?: return emptyList()
+        val listed = (body["violations"] as? JsonArray)?.map { it.jsonPrimitive.content }
+        return listed ?: listOfNotNull(body["error"]?.jsonPrimitive?.content)
     }
 
     private fun form(rel: String, obj: JsonObject, base: String): AffordanceForm {

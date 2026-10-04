@@ -44,6 +44,13 @@ class HttpSteps(private val ctx: ClientContext) {
         assertTrue(extra.isEmpty(), "unexpected requests: ${extra.map { "${it.method} ${it.url}" }}")
     }
 
+    /** Each row is "METHOD url", in the order the client sent them. */
+    @Then("the client sent these requests after entering:")
+    fun requestsAfterEnter(expected: List<String>) {
+        val sent = ctx.transport.requests.drop(ctx.requestsAfterEnter).map { "${it.method} ${it.url}" }
+        assertEquals(expected, sent)
+    }
+
     private fun lastRequestTo(method: String, url: String): HeartRequest =
         ctx.transport.requests.lastOrNull { it.method == method && it.url == url }
             ?: error("no $method $url among ${ctx.transport.requests.map { "${it.method} ${it.url}" }}")
