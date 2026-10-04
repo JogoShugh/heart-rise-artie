@@ -26,8 +26,8 @@ has since changed.
 | L4 `428` missing `If-Match` | **Done** (step 3) | `conditional-acts.feature` |
 | `422` on schema failure | **Done** (step 3). Wrong-typed fields are `422` too; a body that is not JSON is `400` | `ActBodyBinder` |
 | `[0.5]` evaluation order 428→412→409→422 | **Done** (step 3). Bodies bind after the checks, not via `@Valid` | `GardenBedController.act` |
-| L5: both dialects, one legality source | **Done** | `allowedAffordances` shared; `RequestDtoMetadataTest` |
-| L5: HAL-FORMS Layer 2/3 addressing | **Missing.** HAL-FORMS is inline only, with no content-addressed layers | `buildHalFormsResponse` |
+| L5: both dialects, one legality source | **Done**, now checked over HTTP in all three states | `cross-dialect.feature`, `RequestDtoMetadataTest` |
+| L5: HAL-FORMS Layer 2/3 addressing | **Open: needs a spec decision.** HAL-FORMS is inline only. HAL-FORMS has no schema-pointer mechanism, so an L2 `_templates` set needs a wire format SPEC does not define yet (see step 6 below). HAL-FORMS stays at L0 and ignores `Prefer` | `buildHalFormsResponse` |
 | §6.1 `Accept-Profile` / `Link: rel="profile"` | **Done** (step 4). `Link` names the composite profile and the parent; `Accept-Profile` picks the dialect when `Accept` leaves it open; unknown profiles fall back to the default; `406` only for an unsatisfiable `Accept`. The media-type `profile` parameter is gone from Layers 1 and 2 | `profile-negotiation.feature`, `Negotiation` |
 | `Preference-Applied` | **Done** (step 1). Echoes `forms=cid` or `forms=cid, schema=cid`; absent at L0 | `Rung.preferenceApplied` |
 | Digest length | 16 hex chars. Allowed for a closed-world demo server (§6.5); production would need the full digest | `take(16)` |
@@ -73,7 +73,16 @@ The order follows the ladder: each step can be shown on its own.
 5. **Template variable naming:** rename `{bedId}` to `{id}`, or add `bedId`
    to Layer 1.
 6. **HAL-FORMS Layer 2/3,** if L5 is meant to cover addressing as well as
-   legality.
+   legality. `[AUTHOR]` decision needed first: §6.1 names a HAL-FORMS
+   Layer 3 "properties fragment", but HAL-FORMS has no field that points
+   to one. Options: (a) a `_templates` entry carries a link such as
+   `_links.properties` to the fragment; (b) HAL-FORMS stays an L0-only
+   dialect and §6.2's "serve L0, L1, L2" applies per server, not per
+   dialect.
+
+Steps 1-5 are done (2026-10-04). Each has a feature file under
+`server-spring/src/test/resources/features/` that was seen failing before
+the fix.
 
 Live evidence: `server-spring/capture.sh` and `journal.html` still exercise
 the 0.3 wire format (`embed=schemas`, unconditional POSTs). They are
