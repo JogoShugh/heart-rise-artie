@@ -20,7 +20,7 @@ has since changed.
 | Layer 1 `304` on `If-None-Match` | **Done** (step 2). Spring's built-in conditional GET; an ETag from another rung gets `200` | same |
 | Strong, per-variant `ETag` (§6.1, `[0.5]`) | **Done** (step 2). `"seq-N.hsf.L2"`; `If-Match` accepts any variant of the current state version | `StateETag` |
 | L3: templated profile, sharing | **Done** for jsonschema; cross-bed proof passes | journal entry 04 |
-| `[0.5]` template variable = Layer 1 property | **Gap.** The template uses `{bedId}` but Layer 1 has `id` | `buildForms` vs `buildBedBody` |
+| `[0.5]` template variable = Layer 1 property | **Done** (step 5). `/beds/{id}/actions/...`; expanding it from Layer 1 reaches the act | `templated-targets.feature` |
 | L4 `412` stale write | **Done** | `StaleWriteConflict`, journal entry 06 |
 | L4 `409` illegal transition | **Done**. Now checked against the manifest before the body is read | `checkPreconditions` |
 | L4 `428` missing `If-Match` | **Done** (step 3) | `conditional-acts.feature` |
@@ -56,7 +56,7 @@ This exhibit demonstrates the L2/L3 caching *property*: shared sets fetched once
 `304` revalidation, and server-log verification. Its fixtures do not follow the
 0.4 wire format: sets use `schemaRef.href`, not `schema.$id`, there are no
 `_forms`, and there is no `Prefer` negotiation. It is evidence for §6.6/§10.5 as
-a mechanism, not a conformance test.
+a mechanism, not a conformance test. Its fixtures still use `{bedId}`.
 
 ## Suggested order to close the server gaps
 

@@ -116,14 +116,15 @@ object JsonSchemaDialectSupport {
     // ---------------------------------------------------------------
 
     /** Builds the `_forms` map for a given list of affordance names.
-     *  Target hrefs are LEFT AS URI TEMPLATES (`/beds/{bedId}/actions/...`,
+     *  Target hrefs are LEFT AS URI TEMPLATES (`/beds/{id}/actions/...`,
      *  `templated: true`) rather than resolved to a real bed id -- this
      *  is what makes the affordance-set resource genuinely
      *  bed-agnostic: the exact same bytes serve every bed currently in
      *  this status, real HTTP caches included, since nothing about the
      *  URL or body varies by which bed asked. The client expands
-     *  `{bedId}` itself before POSTing, exactly the same as any other
-     *  RFC 6570 URI Template in a HAL link. */
+     *  `{id}` itself before POSTing. Per the [0.5] rule in SPEC §6.9.1
+     *  the variable is named for the Layer 1 property it resolves from:
+     *  the bed body's top-level `id`. */
     private fun buildForms(names: List<String>, embedSchemas: Boolean): Map<String, Any?> =
         names.associateWith { name ->
             val id = schemaIdFor(name)
@@ -139,7 +140,7 @@ object JsonSchemaDialectSupport {
             mapOf(
                 "_links" to mapOf(
                     "target" to mapOf(
-                        "href" to "/beds/{bedId}/actions/${actionPath(name)}",
+                        "href" to "/beds/{id}/actions/${actionPath(name)}",
                         "templated" to true
                     )
                 ),
@@ -179,7 +180,7 @@ object JsonSchemaDialectSupport {
 
     /** Only used by buildBedBody's L0 (collapse-everything)
      *  path, where the response is already specific to one bed and
-     *  resolving `{bedId}` for convenience costs no sharing benefit --
+     *  resolving `{id}` for convenience costs no sharing benefit --
      *  the standalone affordance-set resource above never calls this. */
     private fun resolvedFormsForBed(status: GardenBedStatus, bedId: Long, embedSchemas: Boolean): Map<String, Any?> {
         val forms = buildForms(allowedAffordances(status), embedSchemas)
@@ -190,7 +191,7 @@ object JsonSchemaDialectSupport {
             val links = e["_links"] as Map<String, Any?>
             @Suppress("UNCHECKED_CAST")
             val target = links["target"] as Map<String, Any?>
-            val href = (target["href"] as String).replace("{bedId}", bedId.toString())
+            val href = (target["href"] as String).replace("{id}", bedId.toString())
             e + ("_links" to mapOf("target" to mapOf("href" to href)))
         }
         return mapOf("_forms" to resolved)

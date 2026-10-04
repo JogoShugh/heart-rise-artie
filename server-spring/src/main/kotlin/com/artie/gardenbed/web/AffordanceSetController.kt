@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController
  * the whole point: `?bedId=2` and `?bedId=5` are different URLs to any
  * real HTTP cache, so nothing would have actually been shared across
  * beds despite the hash-named path. Fixed by leaving `target.href` as
- * a real URI Template (`/beds/{bedId}/actions/...`, `templated: true`)
- * in the response body instead -- the client expands `{bedId}` itself
+ * a real URI Template (`/beds/{id}/actions/...`, `templated: true`)
+ * in the response body instead -- the client expands `{id}` itself
  * before POSTing, same as any other RFC 6570 URI Template in a HAL
  * link. That's what makes this resource genuinely bed-agnostic: the
  * bytes are identical no matter which bed asked, so the URL alone is
