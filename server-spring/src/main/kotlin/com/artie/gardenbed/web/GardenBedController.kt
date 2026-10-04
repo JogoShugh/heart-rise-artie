@@ -23,18 +23,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 
-/** [etagTag] is the dialect's part of the Layer 1 ETag (see StateETag). */
-private enum class Dialect(val etagTag: String) { HALFORMS("hf"), JSONSCHEMA("hsf") }
-
-private fun negotiateDialect(acceptHeader: String?): Dialect {
-    val accept = acceptHeader ?: ""
-    return when {
-        accept.contains(JBADEAU_PROFILE) -> Dialect.JSONSCHEMA
-        accept.contains("application/prs.hal-forms+json") -> Dialect.HALFORMS
-        else -> Dialect.HALFORMS
-    }
-}
-
 /** SPEC §6.1/§6.2: Layer 1 is revalidated on every request, never stored fresh. */
 private const val LAYER1_CACHE_CONTROL = "no-cache"
 
@@ -60,11 +48,12 @@ class GardenBedController(
     @GetMapping("/{id}")
     suspend fun getBed(
         @PathVariable id: Long,
-        @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?,
+        @RequestHeader headers: HttpHeaders,
         @RequestHeader("Prefer", required = false) prefer: String?
     ): ResponseEntity<Any> {
+        val dialect = Negotiation.dialect(headers)
         val state = service.currentState(id)
-        return renderState(state, negotiateDialect(accept), prefer)
+        return renderState(state, dialect, prefer)
     }
 
     /**
@@ -81,15 +70,16 @@ class GardenBedController(
     suspend fun getBedAsOf(
         @PathVariable id: Long,
         @RequestParam asOf: String,
-        @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?
+        @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
+        val dialect = Negotiation.dialect(headers)
         val instant = try {
             Instant.parse(asOf)
         } catch (e: java.time.format.DateTimeParseException) {
             throw MalformedAsOfException("'$asOf' is not a valid ISO-8601 instant, e.g. 2026-07-05T00:00:00Z")
         }
         val state = service.stateAt(id, instant)
-        return renderState(state, negotiateDialect(accept))
+        return renderState(state, dialect)
     }
 
     /** The raw event log for a bed -- what actually happened, in
@@ -116,13 +106,15 @@ class GardenBedController(
         @PathVariable id: Long,
         @RequestBody(required = false) body: String?,
         @RequestHeader(HttpHeaders.IF_MATCH, required = false) ifMatch: String?,
-        @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?
+        @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
+        // Negotiate before acting, so a 406 never follows a write.
+        val dialect = Negotiation.dialect(headers)
         val updated = act(id, ifMatch, "sowSeed") {
             val request = binder.bind(body, SowSeedRequest::class.java)
             service.sowSeed(id, request.seedType, request.depthCm)
         }
-        return renderState(updated, negotiateDialect(accept))
+        return renderState(updated, dialect)
     }
 
     @PostMapping("/{id}/actions/water-cell")
@@ -130,23 +122,25 @@ class GardenBedController(
         @PathVariable id: Long,
         @RequestBody(required = false) body: String?,
         @RequestHeader(HttpHeaders.IF_MATCH, required = false) ifMatch: String?,
-        @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?
+        @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
+        val dialect = Negotiation.dialect(headers)
         val updated = act(id, ifMatch, "waterCell") {
             val request = binder.bind(body, WaterCellRequest::class.java)
             service.waterCell(id, request.milliliters)
         }
-        return renderState(updated, negotiateDialect(accept))
+        return renderState(updated, dialect)
     }
 
     @PostMapping("/{id}/actions/harvest")
     suspend fun harvest(
         @PathVariable id: Long,
         @RequestHeader(HttpHeaders.IF_MATCH, required = false) ifMatch: String?,
-        @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?
+        @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
+        val dialect = Negotiation.dialect(headers)
         val (updated, result) = act(id, ifMatch, "harvest") { service.harvest(id) }
-        val rendered = renderState(updated, negotiateDialect(accept))
+        val rendered = renderState(updated, dialect)
         return ResponseEntity.status(rendered.statusCode)
             .headers(rendered.headers)
             .header("X-Harvest-Yield-Grams", result.yieldGrams.toString())
@@ -204,23 +198,22 @@ class GardenBedController(
         }
     }
 
-    /** The jsonschema (jbadeau/hal-schema-forms) dialect: pointer-only,
-     *  zero inline field data, built from the already-complete
+    /** The hal-schema-forms (jbadeau) dialect, built from
      *  JsonSchemaDialectSupport rather than Spring HATEOAS's native
-     *  machinery (which only knows how to render halforms). This is
-     *  the piece that was designed but not connected -- now wired in. */
+     *  machinery (which only knows how to render HAL-FORMS). The profile
+     *  goes in Link rel="profile", not a media-type parameter (§6.1). */
     private fun buildJsonSchemaResponse(state: GardenBedState, etag: String, rung: Rung): ResponseEntity<Any> {
         val body = JsonSchemaDialectSupport.buildBedBody(state, rung)
 
         val builder = ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType("application/hal+json;profile=\"$JBADEAU_PROFILE\""))
+            .contentType(MediaType.parseMediaType(Dialect.JSONSCHEMA.mediaType))
             .eTag(etag)
             .header(HttpHeaders.CACHE_CONTROL, LAYER1_CACHE_CONTROL)
-            // Prefer changes the Layer 1 body (collapsed vs. linked), so
-            // it is listed in Vary alongside Accept -- otherwise a cache
-            // could serve one rung's response to a client at another.
-            // Layer 1 only: Layers 2 and 3 never vary (SPEC §6.1).
-            .header(HttpHeaders.VARY, "${HttpHeaders.ACCEPT}, Prefer")
+            .header(HttpHeaders.LINK, Negotiation.profileLinks(Dialect.JSONSCHEMA))
+            // Every header that can change this body is listed, so a cache
+            // never serves one rung or dialect to a client that asked for
+            // another. Layer 1 only: Layers 2 and 3 never vary (SPEC §6.1).
+            .header(HttpHeaders.VARY, "${HttpHeaders.ACCEPT}, Prefer, ${Negotiation.ACCEPT_PROFILE}")
 
         // Preference-Applied confirms what was actually honored (RFC 7240):
         // a client cannot always tell from the payload alone whether an
@@ -305,7 +298,9 @@ class GardenBedController(
             .contentType(MediaTypes.HAL_FORMS_JSON)
             .eTag(etag)
             .header(HttpHeaders.CACHE_CONTROL, LAYER1_CACHE_CONTROL)
-            .header(HttpHeaders.VARY, HttpHeaders.ACCEPT)
+            .header(HttpHeaders.LINK, Negotiation.profileLinks(Dialect.HALFORMS))
+            // HAL-FORMS is always L0 here, so Prefer cannot change it.
+            .header(HttpHeaders.VARY, "${HttpHeaders.ACCEPT}, ${Negotiation.ACCEPT_PROFILE}")
             .body(model)
     }
 
@@ -333,6 +328,11 @@ class GardenBedController(
     @ExceptionHandler(InvalidTransitionException::class)
     fun handleInvalidTransition(e: InvalidTransitionException): ResponseEntity<Map<String, String>> =
         ResponseEntity.status(HttpStatus.CONFLICT).body(mapOf("error" to (e.message ?: "invalid transition")))
+
+    @ExceptionHandler(NotAcceptableException::class)
+    fun handleNotAcceptable(e: NotAcceptableException): ResponseEntity<Map<String, String>> =
+        ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).contentType(MediaType.APPLICATION_JSON)
+            .body(mapOf("error" to (e.message ?: "not acceptable")))
 
     @ExceptionHandler(PreconditionRequiredException::class)
     fun handlePreconditionRequired(e: PreconditionRequiredException): ResponseEntity<Map<String, String>> =

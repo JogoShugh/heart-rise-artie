@@ -40,7 +40,7 @@ class AffordanceSetController {
             ?: return ResponseEntity.notFound().build()
 
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType("application/hal+json;profile=\"$JBADEAU_PROFILE\""))
+            .contentType(MediaType.parseMediaType(Dialect.JSONSCHEMA.mediaType))
             .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
             .body(body)
     }

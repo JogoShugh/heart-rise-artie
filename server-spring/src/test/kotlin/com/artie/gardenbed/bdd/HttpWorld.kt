@@ -60,8 +60,8 @@ class HttpWorld(private val client: WebTestClient) {
     }
 
     companion object {
-        const val HAL_SCHEMA_FORMS_ACCEPT =
-            "application/hal+json;profile=\"https://github.com/jbadeau/hal-schema-forms\""
+        // SPEC §6.1: the dialect is picked by media type alone.
+        const val HAL_SCHEMA_FORMS_ACCEPT = "application/hal+json"
         const val HAL_FORMS_ACCEPT = "application/prs.hal-forms+json"
         const val FORMS_REL = "http://api.example.org/rels/forms"
 

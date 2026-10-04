@@ -28,7 +28,7 @@ has since changed.
 | `[0.5]` evaluation order 428→412→409→422 | **Done** (step 3). Bodies bind after the checks, not via `@Valid` | `GardenBedController.act` |
 | L5: both dialects, one legality source | **Done** | `allowedAffordances` shared; `RequestDtoMetadataTest` |
 | L5: HAL-FORMS Layer 2/3 addressing | **Missing.** HAL-FORMS is inline only, with no content-addressed layers | `buildHalFormsResponse` |
-| §6.1 `Accept-Profile` / `Link: rel="profile"` | **Missing.** Still uses the withdrawn media-type `profile` parameter | `contentType(... ;profile=...)` |
+| §6.1 `Accept-Profile` / `Link: rel="profile"` | **Done** (step 4). `Link` names the composite profile and the parent; `Accept-Profile` picks the dialect when `Accept` leaves it open; unknown profiles fall back to the default; `406` only for an unsatisfiable `Accept`. The media-type `profile` parameter is gone from Layers 1 and 2 | `profile-negotiation.feature`, `Negotiation` |
 | `Preference-Applied` | **Done** (step 1). Echoes `forms=cid` or `forms=cid, schema=cid`; absent at L0 | `Rung.preferenceApplied` |
 | Digest length | 16 hex chars. Allowed for a closed-world demo server (§6.5); production would need the full digest | `take(16)` |
 | L6 | n/a (server) | |
@@ -45,6 +45,7 @@ has since changed.
 | Send `Prefer`; walk L1/L2; HTTP cache | **Missing** |
 | RFC 6570 template expansion | **Missing** |
 | `Accept` / `Accept-Profile` negotiation | **Missing** |
+| Read the profile from `Link: rel="profile"` | **Gap.** `HeartResponseParser` still requires the withdrawn `profile` parameter in `Content-Type`, so it would reject server-spring's responses since step 4 |
 | A real HTTP transport (talking to server-spring) | **Missing** |
 | L6 Reason step | **Missing.** No resolver, scripted or LLM |
 | RISE | **Missing** |

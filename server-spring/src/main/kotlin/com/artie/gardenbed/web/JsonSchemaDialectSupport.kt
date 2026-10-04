@@ -227,7 +227,9 @@ object JsonSchemaDialectSupport {
                 "self" to mapOf("href" to "/beds/$bedId"),
                 "http://api.example.org/rels/forms" to mapOf(
                     "href" to "/affordance-sets/sha256-$hash",
-                    "type" to "application/hal+json;profile=\"$JBADEAU_PROFILE\""
+                    "type" to Dialect.JSONSCHEMA.mediaType,
+                    // HAL's own link hint; replaces the withdrawn media-type parameter (§6.1).
+                    "profile" to Dialect.JSONSCHEMA.profile
                 )
             )
         }
@@ -298,6 +300,3 @@ object JsonSchemaDialectSupport {
         else -> affordanceName
     }
 }
-
-/** The one negotiation constant shared by both dialects' media types. */
-const val JBADEAU_PROFILE = "https://github.com/jbadeau/hal-schema-forms"
