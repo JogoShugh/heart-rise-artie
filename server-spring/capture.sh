@@ -21,24 +21,7 @@ rm -rf "$RUN_DIR"
 mkdir -p "$RUN_DIR"
 
 echo "== resetting database to seed state =="
-docker compose exec -T postgres psql -U artie -d gardenbed > "$RUN_DIR/00-reset-output.txt" <<'SQL'
-TRUNCATE garden_bed_event, garden_bed_snapshot, garden_bed RESTART IDENTITY CASCADE;
-
-INSERT INTO garden_bed (id, label) VALUES
-    (1, 'bed-1'),
-    (2, 'bed-2'),
-    (3, 'bed-3');
-
-INSERT INTO garden_bed_event (garden_bed_id, sequence_no, event_type, payload, occurred_at) VALUES
-    (2, 1, 'SeedSown', '{"seedType": "tomato", "depthCm": 3}'::jsonb, now() - INTERVAL '5 days'),
-    (2, 2, 'CellWatered', '{"milliliters": 200}'::jsonb, now() - INTERVAL '4 days'),
-    (2, 3, 'CellWatered', '{"milliliters": 200}'::jsonb, now() - INTERVAL '2 days'),
-    (3, 1, 'SeedSown', '{"seedType": "basil", "depthCm": 1}'::jsonb, now() - INTERVAL '12 days'),
-    (3, 2, 'CellWatered', '{"milliliters": 500}'::jsonb, now() - INTERVAL '10 days'),
-    (3, 3, 'CellWatered', '{"milliliters": 500}'::jsonb, now() - INTERVAL '7 days');
-
-SELECT setval('garden_bed_id_seq', 3, true);
-SQL
+./reset-db.sh > "$RUN_DIR/00-reset-output.txt"
 
 curl -s -H "Accept: $HALFORMS" "$BASE/beds/1" | jq -r '.status' > "$RUN_DIR/00-bed1-status.txt"
 echo "reset done -- bed-1 status: $(cat "$RUN_DIR/00-bed1-status.txt")"

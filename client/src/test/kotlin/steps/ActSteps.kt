@@ -22,13 +22,13 @@ class ActSteps(private val ctx: ClientContext) {
     // Cucumber matches step text, not the Given/When keyword: one annotation serves both.
     @When("the client enters {string}")
     fun enter(url: String) {
-        ctx.current = ctx.client.enter(url)
+        ctx.current = ctx.client.enter(ctx.url(url))
         ctx.requestsAfterEnter = ctx.transport.requests.size
     }
 
     @When("the client tries to enter {string}")
     fun tryEnter(url: String) {
-        ctx.lastError = runCatching { ctx.client.enter(url) }.exceptionOrNull()
+        ctx.lastError = runCatching { ctx.client.enter(ctx.url(url)) }.exceptionOrNull()
     }
 
     @When("the client acts on {string} with:")

@@ -84,3 +84,18 @@ val logBddRun by tasks.registering {
 kotlin {
     jvmToolchain(22)
 }
+
+// Runs only the @live scenarios, against a running server-spring
+// (ARTIE_BASE_URL, default http://localhost:8080). Not part of check:
+// the gates' green-to-stop check must not need a server.
+val liveTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "Runs the @live Cucumber scenarios against a running server-spring."
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    systemProperty("cucumber.filter.tags", "@live")
+    environment("ARTIE_BASE_URL", System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080")
+    outputs.upToDateWhen { false }
+}
+

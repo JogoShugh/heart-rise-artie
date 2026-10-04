@@ -76,6 +76,13 @@ dependencies {
     testImplementation("io.cucumber:cucumber-spring")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
     testImplementation("org.junit.platform:junit-platform-suite")
+    // EventStore against real Postgres: R2DBC insert/update rules and the
+    // UNIQUE constraint only show up on a real database. Skipped without Docker.
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:junit-jupiter")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:r2dbc")
+
     // bdd-gates: the domain/web boundary as a failing test.
     testImplementation("com.lemonappdev:konsist:0.17.3")
 }

@@ -9,6 +9,8 @@ import com.artie.gardenbed.repository.GardenBedSnapshotRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
+import org.slf4j.LoggerFactory
+import org.springframework.dao.DataAccessException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -31,6 +33,8 @@ class EventStore(
          *  this demo (in a real system with real event volume, this
          *  would be much larger -- hundreds or thousands). */
         const val SNAPSHOT_INTERVAL = 5
+
+        private val log = LoggerFactory.getLogger(EventStore::class.java)
     }
 
     suspend fun nextSequenceNo(bedId: Long): Int =
@@ -45,16 +49,9 @@ class EventStore(
      * one INSERT succeeds; the other hits the constraint and this
      * throws ConcurrentAppendException.
      *
-     * MODERATE CONFIDENCE FLAG: catching `DataIntegrityViolationException`
-     * specifically to detect the unique-constraint conflict assumes
-     * Spring Data R2DBC's exception translation is active for this
-     * repository call, which is the normal default -- but I have not
-     * run this against a real Postgres instance to confirm the R2DBC
-     * postgres driver's constraint-violation exception actually gets
-     * translated into that specific Spring type rather than some
-     * other R2DBC-specific exception class. If append() isn't
-     * correctly converting real conflicts into ConcurrentAppendException,
-     * this is the first place to look.
+     * The R2DBC driver's constraint violation does arrive as Spring's
+     * `DataIntegrityViolationException`: verified against real Postgres
+     * by EventStorePostgresTest.
      */
     suspend fun append(event: GardenBedEvent) {
         try {
@@ -65,7 +62,14 @@ class EventStore(
                     "by a concurrent write. Re-read current state and retry."
             )
         }
-        maybeSnapshot(event.gardenBedId)
+        // The event is committed. The snapshot is a disposable cache, so a
+        // failure here must not turn a write that happened into an error the
+        // client would read as "not written" (and might retry).
+        try {
+            maybeSnapshot(event.gardenBedId)
+        } catch (e: DataAccessException) {
+            log.warn("snapshot for bed ${event.gardenBedId} skipped; state still folds from events", e)
+        }
     }
 
     /** Loads current state: snapshot (if any) + fold only the events
@@ -123,13 +127,7 @@ class EventStore(
         val allEvents = events.findByGardenBedIdOrderBySequenceNoAsc(bedId).map(codec::decode).toList()
         val state = GardenBedProjector.project(GardenBedState.empty(bedId, ""), allEvents)
 
-        snapshots.save(
-            GardenBedSnapshotRow(
-                gardenBedId = bedId,
-                sequenceNo = latest.sequenceNo,
-                state = objectMapper.toJson(state)
-            )
-        )
+        snapshots.upsert(bedId, latest.sequenceNo, objectMapper.toJson(state))
     }
 
     private fun readSnapshotState(row: GardenBedSnapshotRow): GardenBedState =

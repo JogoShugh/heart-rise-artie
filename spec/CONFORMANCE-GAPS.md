@@ -32,6 +32,8 @@ has since changed.
 | `Preference-Applied` | **Done** (step 1). Echoes `forms=cid` or `forms=cid, schema=cid`; absent at L0 | `Rung.preferenceApplied` |
 | Digest length | 16 hex chars. Allowed for a closed-world demo server (§6.5); production would need the full digest | `take(16)` |
 | L6 | n/a (server) | |
+| Snapshot write on real Postgres | **Fixed** (C3). The first snapshot (event 5) threw after the event was committed, so the act returned `500` for a write that happened. Now an upsert, and best-effort | `EventStorePostgresTest` |
+| Tests run the production web stack | **Gap.** Production runs Spring MVC on Tomcat (`starter-hateoas` brings `starter-web`, and Boot prefers servlet). The Cucumber suite uses `@WebFluxTest`. The live journal and ARTIE's live scenarios do exercise the real stack | `docker compose logs app`: "Tomcat started" |
 
 ## client/ (ARTIE, the deterministic Kotlin client)
 
@@ -46,7 +48,7 @@ has since changed.
 | RFC 6570 template expansion | **Done** (C2). Level 1, by the `[0.5]` rule only; an unresolvable variable is refused before any request |
 | `Accept` / `Accept-Profile` negotiation | **Done** (C1). Sends `Accept: application/hal+json` and `Accept-Profile` |
 | Read the profile from `Link: rel="profile"` | **Done** (C1). A response that does not name the hal-schema-forms profile is refused |
-| A real HTTP transport (talking to server-spring) | **Missing** |
+| A real HTTP transport (talking to server-spring) | **Done** (C3). `HttpTransport` on `java.net.http`; `live-server.feature` runs sow, water, harvest, a stale write, and a 422 against server-spring + Postgres (`scripts/live-client-check.sh`) |
 | L6 Reason step | **Missing.** No resolver, scripted or LLM |
 | RISE | **Missing** |
 
