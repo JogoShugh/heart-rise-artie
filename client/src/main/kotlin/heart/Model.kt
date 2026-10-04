@@ -11,6 +11,10 @@ const val REQUIRED = "required"
 const val HAL_SCHEMA_FORMS_PROFILE = "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
 const val HAL_JSON = "application/hal+json"
 
+/** The Layer 1 link to the affordance set. SPEC draws it as `_links.forms` but
+ *  registers no rel name; this is the one server-spring uses (see CONFORMANCE-GAPS.md). */
+const val FORMS_REL = "http://api.example.org/rels/forms"
+
 /**
  * One affordance from the manifest. [target] is absolute when the server
  * sent a plain href, and an RFC 6570 template when [templated] is true.

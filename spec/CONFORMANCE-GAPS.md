@@ -44,13 +44,14 @@ has since changed.
 | Never construct a URI (`act(rel, payload)` has no URL parameter) | **Done**, enforced by the type signature |
 | Hold the Layer 1 `ETag` and send `If-Match` on acts | **Done** (C2). The held value is sent unchanged; an act with no ETag held is refused locally |
 | Handle `409` / `412` / `428` on separate paths | **Done** (C2). `412` re-syncs and drops the act; `409` re-syncs and reports; `428` re-syncs and resends once; `422` reports the server's violations. Each is its own `ActRefused` type |
-| Send `Prefer`; walk L1/L2; HTTP cache | **Missing** |
+| Send `Prefer`; walk L1/L2; HTTP cache | **Done** (C4). `Rung` picks the `Prefer` header; the walk follows Layer 1, the set, then each schema `$id` once; `CachingTransport` serves immutable layers without a request and revalidates Layer 1 with `If-None-Match`; `ContentAddressCheck` refuses bytes that do not hash to their address. Live at L0 and L2. Fetches are sequential, not parallel |
 | RFC 6570 template expansion | **Done** (C2). Level 1, by the `[0.5]` rule only; an unresolvable variable is refused before any request |
 | `Accept` / `Accept-Profile` negotiation | **Done** (C1). Sends `Accept: application/hal+json` and `Accept-Profile` |
 | Read the profile from `Link: rel="profile"` | **Done** (C1). A response that does not name the hal-schema-forms profile is refused |
 | A real HTTP transport (talking to server-spring) | **Done** (C3). `HttpTransport` on `java.net.http`; `live-server.feature` runs sow, water, harvest, a stale write, and a 422 against server-spring + Postgres (`scripts/live-client-check.sh`) |
 | L6 Reason step | **Missing.** No resolver, scripted or LLM |
 | RISE | **Missing** |
+| Rel name of the Layer 1 link to the set | **Open** `[AUTHOR]`. SPEC draws `_links.forms` but names no rel; server and client both use `http://api.example.org/rels/forms` |
 
 ## exhibits/cache-demo
 

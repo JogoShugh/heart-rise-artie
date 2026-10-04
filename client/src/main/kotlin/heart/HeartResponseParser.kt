@@ -24,16 +24,23 @@ object HeartResponseParser {
             "response from $url does not name the profile $HAL_SCHEMA_FORMS_PROFILE (Link profiles: $profiles)"
         }
         val root = Json.parseToJsonElement(response.body).jsonObject
-        val forms = root[FORMS]?.jsonObject.orEmpty().mapValues { (rel, form) -> form(rel, form.jsonObject, url) }
         // An act's response comes from the action URL; its self link says which resource it is.
-        val self = root[LINKS]?.jsonObject?.get("self")?.jsonObject?.get("href")?.jsonPrimitive?.content
+        val self = linkHref(root, "self")
         return HeartRepresentation(
             url = self?.let { URI(url).resolve(it).toString() } ?: url,
             state = JsonObject(root.filterKeys { it != FORMS && it != LINKS }),
-            affordances = forms,
+            affordances = forms(root, url),
             etag = response.header("ETag"),
+            formsLink = linkHref(root, FORMS_REL)?.let { URI(url).resolve(it).toString() },
         )
     }
+
+    /** The `_forms` of a Layer 1 body (L0) or of a Layer 2 affordance set (L1, L2). */
+    fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> =
+        root[FORMS]?.jsonObject.orEmpty().mapValues { (rel, form) -> form(rel, form.jsonObject, base) }
+
+    private fun linkHref(root: JsonObject, rel: String): String? =
+        root[LINKS]?.jsonObject?.get(rel)?.jsonObject?.get("href")?.jsonPrimitive?.content
 
     /** The `violations` list of a 422 body, or its `error` text, or nothing. */
     fun violations(response: HeartResponse): List<String> {

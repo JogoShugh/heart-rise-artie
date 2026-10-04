@@ -20,12 +20,12 @@ class HttpSteps(private val ctx: ClientContext) {
 
     @Given("the service answers {word} {string} with:")
     fun serviceAnswers(method: String, url: String, raw: String) {
-        ctx.transport.respond(method, url, parseResponse(raw))
+        ctx.transport.respond(method, ctx.expand(url), parseResponse(ctx.expand(raw)))
     }
 
     @Then("the client sent {word} {string} with headers:")
     fun clientSent(method: String, url: String, headers: Map<String, String>) {
-        val request = lastRequestTo(method, url)
+        val request = lastRequestTo(method, ctx.expand(url))
         headers.forEach { (name, value) -> assertEquals(value, request.header(name), "$name on $method $url") }
     }
 
@@ -48,7 +48,7 @@ class HttpSteps(private val ctx: ClientContext) {
     @Then("the client sent these requests after entering:")
     fun requestsAfterEnter(expected: List<String>) {
         val sent = ctx.transport.requests.drop(ctx.requestsAfterEnter).map { "${it.method} ${it.url}" }
-        assertEquals(expected, sent)
+        assertEquals(expected.map(ctx::expand), sent)
     }
 
     private fun lastRequestTo(method: String, url: String): HeartRequest =

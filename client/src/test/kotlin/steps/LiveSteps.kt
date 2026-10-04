@@ -36,6 +36,13 @@ class LiveSteps(private val ctx: ClientContext) {
         assertEquals(ctx.second.current?.etag, mine)
     }
 
+    @Then("the wire carried {int} requests, the last answered {int}")
+    fun wireCarried(count: Int, lastStatus: Int) {
+        val log = ctx.wireLog.exchanges.map { (request, status) -> "${request.method} ${request.url} -> $status" }
+        assertEquals(count, log.size, "wire: $log")
+        assertEquals(lastStatus, ctx.wireLog.exchanges.last().second, "wire: $log")
+    }
+
     private companion object {
         val yamlMapper = ObjectMapper(YAMLFactory())
         val jsonMapper = ObjectMapper()
