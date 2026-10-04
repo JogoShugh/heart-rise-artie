@@ -25,7 +25,8 @@ import kotlinx.serialization.json.JsonElement
  * server's own authoritative request log via GET /__stats.
  */
 
-const val BASE_URL = "http://localhost:8080"
+// Override with ARTIE_BASE_URL when 8080 is taken locally.
+val BASE_URL: String = System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080"
 
 private val json = Json { ignoreUnknownKeys = true }
 

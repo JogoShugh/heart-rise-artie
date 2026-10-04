@@ -220,7 +220,7 @@ A H.E.A.R.T. content address is a deterministic identifier for the *actual bytes
 
 **Scope of "the body" for Layer 2:** the affordance set's canonical, never-embedded form — schema fields as pointers (`{"$id": "..."}"`), not inlined. This is what makes embedding (§6.4) a rendering choice rather than an identity change: two requests for the same Layer 2 resource, one plain and one with `Prefer: embed=schemas`, share one hash and one URL, because the hash is computed over the pointer form regardless of which rendering is actually served.
 
-**Scope of "the body" for Layer 3:** the schema's own raw content, verbatim — the full JSON Schema document, or the full HAL-FORMS `properties` fragment.
+**Scope of "the body" for Layer 3:** the schema's full content, nothing stripped — the full JSON Schema document, or the full HAL-FORMS `properties` fragment — canonicalized as above. The server serves exactly those canonical bytes, so a client can verify the address by hashing the response body.
 
 **Output:** Lowercase hexadecimal digest, used directly as the final URL path segment: `/affordance-sets/sha256-{digest}`, `/schemas/sha256-{digest}` (a server MAY truncate the digest for URL readability, e.g. 16 hex characters, at the cost of collision resistance below full SHA-256 — production use SHOULD use the full digest).
 

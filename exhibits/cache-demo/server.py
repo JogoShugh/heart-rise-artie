@@ -114,7 +114,7 @@ class ThreadingHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
 if __name__ == "__main__":
     if not os.path.isdir(FIXTURES_DIR):
         print(f"No fixtures/ directory found at {FIXTURES_DIR}.")
-        print("Run ./generate_fixtures.sh first.")
+        print("Run `gradle generateFixtures` in kotlin-client/ first.")
         sys.exit(1)
 
     with ThreadingHTTPServer(("0.0.0.0", PORT), Handler) as httpd:

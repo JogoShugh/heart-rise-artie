@@ -4,17 +4,20 @@ import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotBlank
 
+// Request DTOs use `var`, not `val`: Spring HATEOAS marks a property with
+// no setter as readOnly, and HAL-FORMS then tells clients the field can't
+// be filled in (Spring HATEOAS #1310). Guarded by RequestDtoMetadataTest.
 data class SowSeedRequest(
     @field:NotBlank
-    val seedType: String = "",
+    var seedType: String = "",
 
     @field:Min(1) @field:Max(10)
-    val depthCm: Int? = null
+    var depthCm: Int? = null
 )
 
 data class WaterCellRequest(
     @field:Min(1) @field:Max(1000)
-    val milliliters: Int = 0
+    var milliliters: Int = 0
 )
 
 data class HarvestResult(

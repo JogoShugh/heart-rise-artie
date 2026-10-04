@@ -1,6 +1,10 @@
 package com.artie.gardenbed.web
 
 import com.artie.gardenbed.domain.GardenBedStatus
+import com.apicatalog.jcs.JsonCanonicalizer
+import jakarta.json.Json
+import jakarta.json.JsonValue
+import java.io.StringReader
 import java.security.MessageDigest
 
 /**
@@ -47,7 +51,7 @@ object JsonSchemaDialectSupport {
     // Layer 3: individual schemas
     // ---------------------------------------------------------------
 
-    private val canonicalSchemas: Map<String, String> = mapOf(
+    private val rawSchemas: Map<String, String> = mapOf(
         "sowSeed" to """
             {
               "title": "Sow Seed",
@@ -80,10 +84,17 @@ object JsonSchemaDialectSupport {
         """.trimIndent()
     )
 
-    private val schemaHashes: Map<String, String> =
-        canonicalSchemas.mapValues { (_, body) -> sha256Hex(body).take(16) }
+    /** RFC 8785 (JCS) canonical form of each raw schema above -- per
+     *  SPEC.md §6.5 this, not the hand-indented literal, is what gets
+     *  hashed AND served, so the URL is a true content address of
+     *  exactly the bytes SchemaController returns. */
+    private val canonicalSchemas: Map<String, String> =
+        rawSchemas.mapValues { (_, raw) -> String(canonicalBytesOfJsonText(raw), Charsets.UTF_8) }
 
-    /** hash (no "sha256-" prefix) -> raw schema body, for SchemaController. */
+    private val schemaHashes: Map<String, String> =
+        canonicalSchemas.mapValues { (_, body) -> sha256Hex(body.toByteArray(Charsets.UTF_8)).take(16) }
+
+    /** hash (no "sha256-" prefix) -> canonical schema body, for SchemaController. */
     val schemasByHash: Map<String, String> =
         schemaHashes.entries.associate { (name, hash) -> hash to canonicalSchemas.getValue(name) }
 
@@ -151,7 +162,7 @@ object JsonSchemaDialectSupport {
         }
 
     private val setHashByStatus: Map<GardenBedStatus, String> =
-        canonicalSetBodyByStatus.mapValues { (_, body) -> sha256Hex(canonicalJson(body)).take(16) }
+        canonicalSetBodyByStatus.mapValues { (_, body) -> sha256Hex(canonicalBytes(body)).take(16) }
 
     /** hash (no "sha256-" prefix) -> status, for AffordanceSetController. */
     val statusByHash: Map<String, GardenBedStatus> =
@@ -159,13 +170,29 @@ object JsonSchemaDialectSupport {
 
     fun affordanceSetHashFor(status: GardenBedStatus): String = setHashByStatus.getValue(status)
 
-    /** The standalone /affordance-sets/{hash} resource's body -- always
-     *  templated, genuinely identical bytes for every bed sharing this
-     *  status. This IS what gets hashed; there is no separate
-     *  "canonical" vs "served" distinction anymore, because nothing
-     *  about this resource varies per bed at all. */
+    /** The standalone /affordance-sets/{hash} resource's body as a
+     *  tree -- always templated, identical for every bed sharing this
+     *  status. Callers that SERVE it must use affordanceSetJson below,
+     *  not serialize this map themselves: a plain Jackson write keeps
+     *  insertion order, so its bytes would not match the hash. */
     fun affordanceSetBody(status: GardenBedStatus, embedSchemas: Boolean): Map<String, Any?> =
         mapOf("_forms" to buildForms(allowedAffordances(status), embedSchemas))
+
+    private val canonicalSetJsonByStatus: Map<GardenBedStatus, String> =
+        canonicalSetBodyByStatus.mapValues { (_, body) -> String(canonicalBytes(body), Charsets.UTF_8) }
+
+    private val embeddedSetJsonByStatus: Map<GardenBedStatus, String> =
+        GardenBedStatus.entries.associateWith { status ->
+            String(canonicalBytes(affordanceSetBody(status, embedSchemas = true)), Charsets.UTF_8)
+        }
+
+    /** The exact bytes to serve at /affordance-sets/{hash}, as JCS
+     *  canonical JSON. The pointer form (embedSchemas = false) is
+     *  byte-for-byte what was hashed, so its URL is a true content
+     *  address (SPEC.md §6.5). The embedded form is a rendering of the
+     *  same identity (§6.4) and shares its URL. */
+    fun affordanceSetJson(status: GardenBedStatus, embedSchemas: Boolean): String =
+        if (embedSchemas) embeddedSetJsonByStatus.getValue(status) else canonicalSetJsonByStatus.getValue(status)
 
     /** Only used by buildBedBody's embed=true (collapse-everything)
      *  path, where the response is already specific to one bed and
@@ -242,17 +269,52 @@ object JsonSchemaDialectSupport {
     // Helpers
     // ---------------------------------------------------------------
 
-    private fun sha256Hex(input: String): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(input.toByteArray(Charsets.UTF_8))
+    private fun sha256Hex(input: ByteArray): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(input)
         return digest.joinToString("") { "%02x".format(it) }
     }
 
-    /** Deterministic JSON serialization for hashing -- Jackson preserves
-     *  Map insertion order, and buildForms/allowedAffordances always
-     *  produce keys in the same fixed order per status, so this is
-     *  stable across runs. */
-    private fun canonicalJson(value: Any?): String =
-        com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(value)
+    /** Converts a plain Kotlin object graph (Map/List/String/Int/Long/
+     *  Double/Boolean/null) into a Jakarta JSON-P `JsonValue` tree, since
+     *  that's the type titanium-jcs's `JsonCanonicalizer` actually
+     *  consumes. */
+    private fun toJson(value: Any?): JsonValue = when (value) {
+        null -> JsonValue.NULL
+        is JsonValue -> value
+        is String -> Json.createValue(value)
+        is Int -> Json.createValue(value)
+        is Long -> Json.createValue(value)
+        is Double -> Json.createValue(value)
+        is Boolean -> if (value) JsonValue.TRUE else JsonValue.FALSE
+        is Map<*, *> -> {
+            val b = Json.createObjectBuilder()
+            for ((k, v) in value) b.add(k as String, toJson(v))
+            b.build()
+        }
+        is List<*> -> {
+            val b = Json.createArrayBuilder()
+            for (v in value) b.add(toJson(v))
+            b.build()
+        }
+        else -> throw IllegalArgumentException("Unsupported value type for JCS canonicalization: ${value::class}")
+    }
+
+    /** RFC 8785 (JCS) canonical UTF-8 bytes of a plain Kotlin object
+     *  graph -- recursively sorted keys, no insignificant whitespace, per
+     *  SPEC.md §6.5. This is what actually gets hashed for Layer 2
+     *  (affordance-sets); replaces the old plain-Jackson `canonicalJson`,
+     *  which was deterministic only because Map insertion order happened
+     *  to be stable here, not because it was actually canonical. */
+    private fun canonicalBytes(value: Any?): ByteArray =
+        JsonCanonicalizer.canonize(toJson(value)).toByteArray(Charsets.UTF_8)
+
+    /** RFC 8785 (JCS) canonical UTF-8 bytes of a raw JSON text string --
+     *  used for Layer 3 (schemas), which arrive as hand-written literals
+     *  rather than programmatically-built trees. */
+    private fun canonicalBytesOfJsonText(raw: String): ByteArray =
+        Json.createReader(StringReader(raw)).use { reader ->
+            JsonCanonicalizer.canonize(reader.readValue()).toByteArray(Charsets.UTF_8)
+        }
 
     private fun parseSchemaBody(raw: String): Any {
         val mapper = com.fasterxml.jackson.databind.ObjectMapper()

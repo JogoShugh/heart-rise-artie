@@ -179,9 +179,9 @@ _links:
   self:
     href: /beds/1
   &quot;http://api.example.org/rels/forms&quot;:
-    href: /affordance-sets/sha256-32d1a9c09cdc35d5
+    href: /affordance-sets/sha256-14707229191a4566
     type: &quot;application/hal+json;profile=\&quot;https://github.com/jbadeau/hal-schema-forms\&quot;&quot;</pre></div>
-    <div class="verdict ok"><span class="verdict-mark">Correct</span><p>No <code>_forms</code> anywhere. Just state and a typed link — captured href: <code>/affordance-sets/sha256-32d1a9c09cdc35d5</code></p></div>
+    <div class="verdict ok"><span class="verdict-mark">Correct</span><p>No <code>_forms</code> anywhere. Just state and a typed link — captured href: <code>/affordance-sets/sha256-14707229191a4566</code></p></div>
 
     <p class="entry-narrative">Following that pointer, once as a bare pointer, once with <code>Prefer: embed=schemas</code>:</p>
     <div class="specimen"><div class="specimen-label output">output (embedded variant)</div><pre>_forms:
@@ -190,27 +190,27 @@ _links:
       target:
         href: /beds/{bedId}/actions/sow-seed
         templated: true
-    method: POST
     contentType: application/json
+    method: POST
     schema:
-      title: &quot;Sow Seed&quot;
-      type: object
+      &quot;$id&quot;: /schemas/sha256-4ed779d47421af87
       properties:
+        depthCm:
+          maximum: 10
+          minimum: 1
+          type: number
         seedType:
           type: string
-        depthCm:
-          type: number
-          minimum: 1
-          maximum: 10
       required:
         - seedType
-      &quot;$id&quot;: /schemas/sha256-331e85b33a65d20f</pre></div>
+      title: &quot;Sow Seed&quot;
+      type: object</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
       <p><code>target.href</code> is a literal, unresolved URI Template (<code>/beds/{bedId}/actions/sow-seed</code>) — byte-identical for every EMPTY bed, real HTTP caches included.</p>
     </div>
 
-    <div class="specimen"><div class="specimen-label">input</div><pre>curl /schemas/sha256-331e85b33a65d20f</pre></div>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl /schemas/sha256-4ed779d47421af87</pre></div>
     <div class="specimen"><div class="specimen-label output">output — headers</div><pre>Cache-Control: public, max-age=31536000, immutable</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
@@ -239,14 +239,13 @@ _templates:
     properties:
       -
         name: milliliters
-        readOnly: true
         min: 1
         max: 1000
         type: number
     target: /beds/2/actions/water-cell</pre></div>
-    <div class="verdict bug">
-      <span class="verdict-mark">FAIL — regression detected</span>
-      <p>readOnly: true detected on: <strong>milliliters</strong>. Check whether the request DTOs' properties were changed back from <code>var</code> to <code>val</code>.</p>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>Every input field renders writable. If this had regressed to <code>val</code>, this check would fail loudly instead of silently shipping a form nobody can fill in.</p>
     </div>
   </section>
 
@@ -260,13 +259,13 @@ _templates:
       target:
         href: /beds/{bedId}/actions/harvest
         templated: true
-    method: POST
     contentType: application/json
+    method: POST
     schema:
-      title: Harvest
-      type: object
+      &quot;$id&quot;: /schemas/sha256-7ab6ce2f03278bdf
       properties: {}
-      &quot;$id&quot;: /schemas/sha256-b30293aa6152ce67</pre></div>
+      title: Harvest
+      type: object</pre></div>
     <div class="verdict ok"><span class="verdict-mark">Correct, not a bug</span><p><code>harvest()</code> in the service layer takes no body. Empty <code>properties</code> reports the truth.</p></div>
   </section>
 
@@ -275,8 +274,8 @@ _templates:
     <p class="entry-sub">what all three layers exist to prove</p>
     <p class="entry-narrative">Bed-1 reached <strong>READY_TO_HARVEST</strong> the long way — sown, watered, grown. Bed-3 arrived at the identical status from seed data. Neither bed knows about the other.</p>
     <div class="hash-pair">
-      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-2790650e730e9a9c</div></div>
-      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-2790650e730e9a9c</div></div>
+      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-6cf6b57da8c330d4</div></div>
+      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-6cf6b57da8c330d4</div></div>
     </div>
     <div class="seal-row"><div class="seal">verified<br>match</div><div class="seal-text"><h3>Identical, not merely similar.</h3><p>Two independently-arrived-at beds, one shared, cached resource.</p></div></div>
   </section>
@@ -301,14 +300,12 @@ _templates:
     properties:
       -
         name: depthCm
-        readOnly: true
         min: 1
         max: 10
         type: number
       -
         name: seedType
         regex: &quot;^(?=\\s*\\S).*$&quot;
-        readOnly: true
         required: true
         type: text
     target: /beds/2/actions/sow-seed</pre></div>

@@ -5,14 +5,14 @@ import heart.HeartRepresentation
 import heart.HeartRiseClient
 
 class ClientContext {
-    private val fakeTransport = FakeTransport()
-    val client: HeartRiseClient = ArtieClient(fakeTransport)
+    val transport = FakeTransport()
+    val client: HeartRiseClient = ArtieClient(transport)
     lateinit var current: HeartRepresentation
     var contentType: String = ""
     var enterBody: String = ""
     var actBody: String = ""
     var lastError: Throwable? = null
 
-    fun enqueueEnterResponse() = fakeTransport.enqueue(enterBody, contentType)
-    fun enqueueActResponse() = fakeTransport.enqueue(actBody, contentType)
+    fun enqueueEnterResponse() = transport.enqueue(enterBody, contentType)
+    fun enqueueActResponse() = transport.enqueue(actBody, contentType)
 }

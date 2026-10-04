@@ -34,12 +34,14 @@ class AffordanceSetController {
     suspend fun getAffordanceSet(
         @PathVariable hash: String,
         @RequestHeader("Prefer", required = false) prefer: String?
-    ): ResponseEntity<Any> {
+    ): ResponseEntity<String> {
         val status = JsonSchemaDialectSupport.statusByHash[hash]
             ?: return ResponseEntity.notFound().build()
 
         val embed = prefer?.contains("embed=schemas") == true
-        val body = JsonSchemaDialectSupport.affordanceSetBody(status, embed)
+        // Serve the canonical string, never a Map for Jackson to write:
+        // the hash in the URL covers these exact bytes (SPEC.md §6.5).
+        val body = JsonSchemaDialectSupport.affordanceSetJson(status, embed)
 
         val builder = ResponseEntity.ok()
             .contentType(MediaType.parseMediaType("application/hal+json;profile=\"$JBADEAU_PROFILE\""))

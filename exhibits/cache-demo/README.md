@@ -14,23 +14,36 @@ resource (ETag, always revalidated)
 ## Layout
 
 ```
-generate_fixtures.sh   -- builds fixtures/ with real sha256-based content addressing
 server.py               -- stdlib-only static server with correct cache headers + /__stats
-kotlin-client/           -- Ktor + coroutines client that walks all three levels
+kotlin-client/           -- Ktor + coroutines client that walks all three levels;
+                            also where GenerateFixtures.kt (the `generateFixtures`
+                            Gradle task) builds fixtures/ with real sha256-over-
+                            RFC-8785-canonical-JSON content addressing
 ```
 
 ## Running it
 
-**1. Generate the fixtures** (pure bash + `sha256sum`, no deps):
+**1. Generate the fixtures**, from `kotlin-client/`:
 
 ```bash
-./generate_fixtures.sh
+cd kotlin-client
+gradle generateFixtures    # or ./gradlew generateFixtures, if you have a wrapper
 ```
 
-This creates `fixtures/resources/bed-1.json` .. `bed-12.json`, each pointing
-at one of four affordance-sets (sizes 1, 2, 3, and 10), deliberately shared
-across multiple beds. Check `fixtures/manifest.txt` to see exactly which
-bed maps to which set and hash.
+This creates `fixtures/resources/bed-1.json` .. `bed-12.json` at the repo
+root (the task pins its working directory there regardless of where you run
+`gradle` from), each pointing at one of four affordance-sets (sizes 1, 2,
+3, and 10), deliberately shared across multiple beds. Check
+`fixtures/manifest.txt` to see exactly which bed maps to which set and
+hash.
+
+Layer 2 (affordance-sets) and Layer 3 (schemas) hashes are real SHA-256,
+truncated to 16 hex chars, computed over each body's RFC 8785 JSON
+Canonicalization Scheme (JCS) form — recursively sorted keys, no
+insignificant whitespace — via `com.apicatalog:titanium-jcs`, per
+SPEC.md §6.5. That's what makes the address a genuine content address: the
+same logical JSON always hashes the same regardless of how it was
+constructed, and the bytes on disk are exactly the bytes that were hashed.
 
 **2. Start the server** (pure Python 3 stdlib, no deps):
 
@@ -47,6 +60,13 @@ ground truth for whatever the client claims.
 ```bash
 cd kotlin-client
 ./gradlew run    # or: gradle run, if you don't want the wrapper
+```
+
+If port 8080 is taken, start the server on another port and point the
+client at it:
+
+```bash
+ARTIE_BASE_URL=http://localhost:18080 gradle run
 ```
 
 (No `gradlew` wrapper jar is checked in here — run `gradle wrapper` once
@@ -80,18 +100,26 @@ registry into ordinary HTTP caching — the client never had to be told
 
 ## Notes / things worth verifying on your machine
 
-- I built and dry-ran `generate_fixtures.sh` and `server.py` in a sandbox
-  and confirmed real sha256 hashing, correct sharing across beds, and
-  correct 200/304/immutable header behavior via `curl`. I could not run
-  the Kotlin client end-to-end here (no network egress in this
-  environment, and no local JVM/Gradle), so give the Ktor `HttpCache`
-  behavior a first real run and watch for surprises — in particular,
-  confirm your Ktor version's `HttpCache` plugin honors `max-age` for
-  skip-the-network behavior the way I've assumed (RFC 7234-compliant
-  caches should, but worth confirming against whatever Ktor version
-  Gradle resolves).
-- `sha256sum | cut -c1-16` gives you 16 hex chars (64 bits) of the real
-  hash for readable filenames — for anything beyond a demo, use the full
-  digest to avoid collision risk at scale.
+- Verified end to end on 2026-10-03 (macOS, Docker Desktop, JDK 21):
+  `docker build -f Dockerfile.origin` succeeds (the Gradle stage resolves
+  `titanium-jcs` and `jakarta.json` and lands `fixtures/` where
+  `server.py` expects it), and the Kotlin client run against that
+  container reports ALL CHECKS PASSED: every content-addressed path
+  requested exactly once, and bed-1 revalidated as `[200, 304]`. So the
+  resolved Ktor `HttpCache` honors `max-age`/`immutable` as assumed.
+- Every affordance-set/schema filename is the true first-16-hex-chars
+  SHA-256 of its own file's bytes, and keys come out recursively sorted
+  with no insignificant whitespace (JCS working as intended).
+- Gradle 8.13/8.14 cannot run on JDK 25. Use JDK 17 or 21 for
+  `generateFixtures` and `run`.
+- SHA-256 truncated to 16 hex chars (64 bits) gives readable filenames for
+  a demo; SPEC.md §6.5 explicitly allows this but recommends the full
+  digest for production use, to keep full collision resistance at scale.
+- `Jcs`/titanium-jcs's canonicalization is number-format-sensitive per
+  RFC 8785 (ECMAScript-style number-to-string rules) — the schema/set
+  builders in `GenerateFixtures.kt` intentionally use `Int` for whole
+  numbers (`5`, not `5.0`) and `Double` only where the source data is
+  actually fractional (`0.5`), to keep output matching what a human
+  reading the original JSON Schema would expect.
 - The server's in-memory request log resets every time you restart it —
   restart the server between client runs if you want a clean count.

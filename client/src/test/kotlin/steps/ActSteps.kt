@@ -52,6 +52,11 @@ class ActSteps(private val ctx: ClientContext) {
         assertNotNull(ctx.lastError, "Expected an error but none was raised")
     }
 
+    @Then("no request was submitted to the service")
+    fun thenNoRequestSubmitted() {
+        assertTrue(ctx.transport.submits.isEmpty(), "Expected no submit, but got ${ctx.transport.submits}")
+    }
+
     @Then("the manifest affordances are:")
     fun thenManifestAffordances(entries: List<ManifestEntry>) {
         entries.forEach { (rel, present) ->

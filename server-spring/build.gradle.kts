@@ -48,6 +48,19 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
 
+    // RFC 8785 JSON Canonicalization Scheme, used by JsonSchemaDialectSupport
+    // to compute Layer 2/3 content addresses per SPEC.md §6.5 -- previously
+    // this used plain Jackson serialization relying on Map insertion order,
+    // which is deterministic in practice here but not actually canonical
+    // (no recursive key-sorting, no JCS number normalization). titanium-jcs
+    // operates on Jakarta JSON-P's JsonValue tree, not plain Kotlin objects
+    // or Jackson's, so we bring both the API (titanium-jcs depends on it as
+    // `provided`, which Maven does not propagate) and a runtime
+    // implementation to build/parse JsonValue trees.
+    implementation("com.apicatalog:titanium-jcs:1.0.0")
+    implementation("jakarta.json:jakarta.json-api:2.0.1")
+    runtimeOnly("org.glassfish:jakarta.json:2.0.1")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")

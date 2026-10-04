@@ -63,7 +63,7 @@
 //
 //    @Test
 //    fun `execute with invalid payload throws exception`() {
-//        val invalidArgs = UniformArgs(buildJsonObject {
+//        val invalidArgs = buildJsonObject {
 //            put("plantCultivar", "Kale")
 //        })
 //
@@ -95,10 +95,9 @@ data class SowSeedRequest(
     val count: Int
 )
 
-// Extension to match your test style
-fun SowSeedRequest.toUniformArgs() = UniformArgs(
-    Json.encodeToJsonElement(this).jsonObject
-)
+// HeartTool now takes its args as a plain JsonObject (the UniformArgs
+// wrapper it used to take is gone), so encode the request to one.
+fun SowSeedRequest.toArgs(): JsonObject = Json.encodeToJsonElement(this).jsonObject
 
 class HeartToolTests {
     private lateinit var tool: HeartTool
@@ -157,17 +156,17 @@ class HeartToolTests {
     @Test
     fun `execute with concrete data class returns success`() = runBlocking {
         // This now tests the FULL pipeline: Validation -> Ktor -> Response Mapping
-        val result = tool.execute(SowSeedRequest(plantCultivar = "Kale", count = 5).toUniformArgs())
-        assertEquals("success", result.data["status"]?.jsonPrimitive?.content)
+        val result = tool.execute(SowSeedRequest(plantCultivar = "Kale", count = 5).toArgs())
+        assertEquals("success", result["status"]?.jsonPrimitive?.content)
     }
 
     @Test
     fun `execute with invalid payload throws exception`() {
         // This tests that the validator catches LLM hallucination before the network call
-        val invalidArgs = UniformArgs(buildJsonObject {
+        val invalidArgs = buildJsonObject {
             put("plantCultivar", "Kale")
             // missing "count"
-        })
+        }
 
         assertThrows<IllegalArgumentException> {
             runBlocking { tool.execute(invalidArgs) }

@@ -25,3 +25,4 @@ Feature: Act — rejection of unknown affordances
       value: hello
       """
     Then the client raises an error
+    And no request was submitted to the service
