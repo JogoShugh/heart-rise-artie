@@ -27,5 +27,11 @@ class BedSteps(private val beds: InMemoryBeds, private val store: InMemoryEventS
         events.forEach { store.append(it) }
     }
 
+    /** A concurrent writer: appends straight to the store, bypassing HTTP. */
+    @Given("someone else waters bed {long} with {int} ml")
+    fun someoneElseWaters(id: Long, milliliters: Int) = runBlocking {
+        store.append(GardenBedEvent.CellWatered(id, store.nextSequenceNo(id), milliliters))
+    }
+
     private fun sown(id: Long) = GardenBedEvent.SeedSown(id, 1, "basil", 2)
 }

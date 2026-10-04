@@ -27,7 +27,7 @@ class LadderSteps(private val http: HttpWorld) {
 
     @When("the client follows the affordance-set link")
     fun followAffordanceSetLink() {
-        http.get(affordanceSetHref(lastBedResponse()))
+        http.get(affordanceSetHref(http.lastLayer1()))
     }
 
     @When("the client follows the same affordance-set link with Prefer {string}")
@@ -93,8 +93,6 @@ class LadderSteps(private val http: HttpWorld) {
         val (first, second) = http.exchanges.takeLast(2)
         assertArrayEquals(first.bytes, second.bytes, "${String(first.bytes)} vs ${String(second.bytes)}")
     }
-
-    private fun lastBedResponse(): Exchange = http.exchanges.last { it.path.startsWith("/beds/") }
 
     private fun affordanceSetHref(exchange: Exchange): String {
         val href = exchange.json.path("_links").path(FORMS_REL).path("href").asText()

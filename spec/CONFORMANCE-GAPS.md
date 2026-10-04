@@ -16,9 +16,9 @@ has since changed.
 | §6.5: L1 and L2 sets have different addresses | **Done** (step 1) | registry keyed by (status, `SetRendering`); `ContentAddressHttpTest` |
 | §6.1: Layer 2/3 send no `Vary` | **Done** (step 1) | `AffordanceSetController` ignores `Prefer` |
 | §6.5: address = SHA-256 of the served bytes | **Done** (2026-10-04) | `ContentAddressHttpTest` |
-| Layer 1 `Cache-Control: no-cache` | **Missing.** No header is set | `GardenBedController.kt` |
-| Layer 1 `304` on `If-None-Match` | **Missing** | no `IF_NONE_MATCH` handling anywhere |
-| Strong, per-variant `ETag` (§6.1, `[0.5]`) | **Partly there.** `"seq-N"` is strong and is a state version, but it is identical across dialects and rungs | `etagFor()` |
+| Layer 1 `Cache-Control: no-cache` | **Done** (step 2), also on `304` | `layer1-revalidation.feature` |
+| Layer 1 `304` on `If-None-Match` | **Done** (step 2). Spring's built-in conditional GET; an ETag from another rung gets `200` | same |
+| Strong, per-variant `ETag` (§6.1, `[0.5]`) | **Done** (step 2). `"seq-N.hsf.L2"`; `If-Match` accepts any variant of the current state version | `StateETag` |
 | L3: templated profile, sharing | **Done** for jsonschema; cross-bed proof passes | journal entry 04 |
 | `[0.5]` template variable = Layer 1 property | **Gap.** The template uses `{bedId}` but Layer 1 has `id` | `buildForms` vs `buildBedBody` |
 | L4 `412` stale write | **Done** | `StaleWriteConflict`, journal entry 06 |

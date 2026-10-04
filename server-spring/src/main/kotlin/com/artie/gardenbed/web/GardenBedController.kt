@@ -22,7 +22,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
 
-private enum class Dialect { HALFORMS, JSONSCHEMA }
+/** [etagTag] is the dialect's part of the Layer 1 ETag (see StateETag). */
+private enum class Dialect(val etagTag: String) { HALFORMS("hf"), JSONSCHEMA("hsf") }
 
 private fun negotiateDialect(acceptHeader: String?): Dialect {
     val accept = acceptHeader ?: ""
@@ -33,12 +34,8 @@ private fun negotiateDialect(acceptHeader: String?): Dialect {
     }
 }
 
-/** The ETag is now the event sequence number itself, not a derived
- *  timestamp -- a more precise concurrency token than before, since
- *  it's the exact same number the event store's UNIQUE constraint
- *  enforces at the database level. "If-Match: seq-5" means "only
- *  proceed if this bed's last event is still exactly #5." */
-private fun etagFor(state: GardenBedState): String = "\"seq-${state.lastSequenceNo}\""
+/** SPEC §6.1/§6.2: Layer 1 is revalidated on every request, never stored fresh. */
+private const val LAYER1_CACHE_CONTROL = "no-cache"
 
 /** Single source of truth now lives in JsonSchemaDialectSupport --
  *  delegating here keeps every existing call site in this file
@@ -152,23 +149,30 @@ class GardenBedController(private val service: GardenBedService) {
             throw StaleWriteConflict(e.message ?: "concurrent write conflict")
         }
 
+    /** [0.5] precondition scope: the act's If-Match is checked against
+     *  the owning bed's state version, accepting an ETag from any
+     *  dialect or rung (see StateETag). */
     private suspend fun checkIfMatch(id: Long, ifMatch: String?) {
         if (ifMatch == null) return
         val current = service.currentState(id)
-        if (etagFor(current) != ifMatch) {
+        if (!StateETag.matchesStateVersion(ifMatch, current.lastSequenceNo)) {
             throw StaleWriteConflict(
-                "If-Match $ifMatch does not match current ETag ${etagFor(current)} for bed $id"
+                "If-Match $ifMatch does not match state version seq-${current.lastSequenceNo} for bed $id"
             )
         }
     }
 
+    /** Spring answers a matching If-None-Match with 304 from the ETag set
+     *  here, copying these headers onto it, so the 304 also says no-cache. */
     private fun renderState(state: GardenBedState, dialect: Dialect, prefer: String? = null): ResponseEntity<Any> {
         val allowed = allowedAffordances(state.status)
-        val etag = etagFor(state)
+        // HAL-FORMS has no Layer 2/3 addressing yet, so it is always L0.
+        val rung = if (dialect == Dialect.JSONSCHEMA) Rung.fromPrefer(prefer) else Rung.L0
+        val etag = StateETag.of(state.lastSequenceNo, dialect.etagTag, rung)
 
         return when (dialect) {
             Dialect.HALFORMS -> buildHalFormsResponse(state, allowed, etag)
-            Dialect.JSONSCHEMA -> buildJsonSchemaResponse(state, allowed, etag, prefer)
+            Dialect.JSONSCHEMA -> buildJsonSchemaResponse(state, etag, rung)
         }
     }
 
@@ -177,18 +181,13 @@ class GardenBedController(private val service: GardenBedService) {
      *  JsonSchemaDialectSupport rather than Spring HATEOAS's native
      *  machinery (which only knows how to render halforms). This is
      *  the piece that was designed but not connected -- now wired in. */
-    private fun buildJsonSchemaResponse(
-        state: GardenBedState,
-        allowed: List<String>,
-        etag: String,
-        prefer: String?
-    ): ResponseEntity<Any> {
-        val rung = Rung.fromPrefer(prefer)
+    private fun buildJsonSchemaResponse(state: GardenBedState, etag: String, rung: Rung): ResponseEntity<Any> {
         val body = JsonSchemaDialectSupport.buildBedBody(state, rung)
 
         val builder = ResponseEntity.ok()
             .contentType(MediaType.parseMediaType("application/hal+json;profile=\"$JBADEAU_PROFILE\""))
             .eTag(etag)
+            .header(HttpHeaders.CACHE_CONTROL, LAYER1_CACHE_CONTROL)
             // Prefer changes the Layer 1 body (collapsed vs. linked), so
             // it is listed in Vary alongside Accept -- otherwise a cache
             // could serve one rung's response to a client at another.
@@ -277,6 +276,7 @@ class GardenBedController(private val service: GardenBedService) {
         return ResponseEntity.ok()
             .contentType(MediaTypes.HAL_FORMS_JSON)
             .eTag(etag)
+            .header(HttpHeaders.CACHE_CONTROL, LAYER1_CACHE_CONTROL)
             .header(HttpHeaders.VARY, HttpHeaders.ACCEPT)
             .body(model)
     }
