@@ -145,7 +145,33 @@ def check_templated_href(filename: str, forms_key: str, action_name: str) -> tup
     entry = doc.get(forms_key, {}).get(action_name, {})
     href = entry.get("_links", {}).get("target", {}).get("href", "")
     templated = entry.get("_links", {}).get("target", {}).get("templated", False)
-    return ("{bedId}" in href and templated is True, href)
+    # SPEC [0.5] §6.9.1: the variable names the Layer 1 property it resolves from.
+    return ("{id}" in href and templated is True, href)
+
+
+def header_value(filename: str, name: str) -> str:
+    for line in read_text(filename).splitlines():
+        if line.lower().startswith(name.lower() + ":"):
+            return line.split(":", 1)[1].strip()
+    return ""
+
+
+def check_l0_collapsed() -> tuple[bool, str]:
+    """L0 (no Prefer): the sowSeed form arrives inline with its full schema."""
+    doc = read_json("01-bed1-l0.json")
+    schema = doc.get("_forms", {}).get("sowSeed", {}).get("schema", {})
+    return ("properties" in schema, ", ".join(sorted(schema.get("properties", {}).keys())))
+
+
+def check_l2_linked() -> tuple[bool, str]:
+    doc = read_json("01-bed1-empty.json")
+    return ("_forms" not in doc and read_text("01-set-url.txt").startswith("/affordance-sets/sha256-"),
+            read_text("01-set-url.txt"))
+
+
+def check_profile_link() -> tuple[bool, str]:
+    link = header_value("01-bed1-headers.txt", "Link")
+    return ('<https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"' in link, link)
 
 
 def check_point_in_time() -> tuple[bool, str]:
@@ -194,23 +220,39 @@ SQL</pre></div>
 def entry_01() -> str:
     set_url = esc(read_text("01-set-url.txt"))
     schema_url = esc(read_text("01-schema-url.txt"))
+    l1_url = esc(read_text("01-set-l1-url.txt"))
+    l0_ok, l0_fields = check_l0_collapsed()
+    l2_ok, _ = check_l2_linked()
+    profile_ok, link = check_profile_link()
     templated_ok, href = check_templated_href("01-set-pointer.json", "_forms", "sowSeed")
     cache_ok, cache_val = check_cache_control("01-schema-headers.txt")
     return f'''
   <section class="entry" id="sow">
     <div class="entry-head"><span class="entry-num">01</span><h2 class="entry-title">Planting bed-1 — sowSeed</h2></div>
     <p class="entry-sub">layer 1 → layer 2 → layer 3, captured live</p>
-    <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. The hal-schema-forms dialect returns the minimal layer-1 view first — state, plus one pointer.</p>
-    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json;profile="https://github.com/jbadeau/hal-schema-forms"' \\
+    <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. With no <code>Prefer</code> header (rung L0) everything arrives in one response: state, the form, and its full schema.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json' \\
+     -H 'Accept-Profile: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;' \\
      http://localhost:8080/beds/1</pre></div>
-    <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("01-bed1-empty.json")}</pre></div>
-    <div class="verdict ok"><span class="verdict-mark">Correct</span><p>No <code>_forms</code> anywhere. Just state and a typed link — captured href: <code>{set_url}</code></p></div>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("01-bed1-l0.json")}</pre></div>
+    {verdict_html(l0_ok,
+        f"L0 is collapsed: the <code>sowSeed</code> form is inline with its full schema (fields: {esc(l0_fields)}).",
+        "Expected the sowSeed form inline with a full schema when no Prefer is sent (SPEC §6.4).")}
 
-    <p class="entry-narrative">Following that pointer, once as a bare pointer, once with <code>Prefer: embed=schemas</code>:</p>
-    <div class="specimen"><div class="specimen-label output">output (embedded variant)</div><pre>{yaml_block("01-set-embedded.json")}</pre></div>
+    <p class="entry-narrative">The same request with <code>Prefer: forms=cid, schema=cid</code> (rung L2) returns state plus one link:</p>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("01-bed1-empty.json")}</pre></div>
+    {verdict_html(l2_ok,
+        f"No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>{set_url}</code>",
+        "Expected no inline _forms and an /affordance-sets/sha256-... link at L2.")}
+    {verdict_html(profile_ok,
+        f"The response names its profile in a header, not a media-type parameter: <code>Link: {esc(link)}</code>",
+        f"Expected Link: &lt;.../heart-rise/hal-schema-forms&gt;; rel=\"profile\". Got: <code>{esc(link)}</code>")}
+
+    <p class="entry-narrative">At <code>Prefer: forms=cid</code> (rung L1) the link points somewhere else: <code>{l1_url}</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
+    <div class="specimen"><div class="specimen-label output">output (L1 set, schemas embedded)</div><pre>{yaml_block("01-set-embedded.json")}</pre></div>
     {verdict_html(templated_ok,
         f"<code>target.href</code> is a literal, unresolved URI Template (<code>{esc(href)}</code>) — byte-identical for every EMPTY bed, real HTTP caches included.",
-        f"Expected target.href to contain the literal string {{bedId}} with templated:true; actually got <code>{esc(href)}</code>. This bed's affordance-set is no longer bed-agnostic.")}
+        f"Expected target.href to contain the literal string {{id}} with templated:true; actually got <code>{esc(href)}</code>. This bed's affordance-set is no longer bed-agnostic.")}
 
     <div class="specimen"><div class="specimen-label">input</div><pre>curl {schema_url}</pre></div>
     <div class="specimen"><div class="specimen-label output">output — headers</div><pre>Cache-Control: {esc(cache_val)}</pre></div>
@@ -227,7 +269,7 @@ def entry_02() -> str:
     <div class="entry-head"><span class="entry-num">02</span><h2 class="entry-title">Watering bed-1 — waterCell</h2></div>
     <p class="entry-sub">the halforms dialect's writable-field check</p>
     <p class="entry-narrative">After sowing, bed-1 is <strong>PLANTED</strong> and watering is the only legal action. This entry checks the HAL-FORMS dialect specifically for a known historical fault: Kotlin <code>val</code> properties (getter-only, no setter) can cause Spring HATEOAS's reflection-based property inspection to mark a field <code>readOnly: true</code> — confirmed against a real, open Spring HATEOAS GitHub issue (#1310) rather than assumed.</p>
-    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json, application/prs.hal-forms+json' \\
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/prs.hal-forms+json' \\
      http://localhost:8080/beds/2</pre></div>
     <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("02-bed2-halforms.json")}</pre></div>
     {verdict_html(not bug_present,
@@ -279,17 +321,24 @@ def entry_05() -> str:
 
 
 def entry_06() -> str:
-    stale_ok, stale_code = check_status("06-stale-status.txt", "412")
-    invalid_ok, invalid_code = check_status("06-invalid-status.txt", "409")
-    notfound_ok, notfound_code = check_status("06-notfound-status.txt", "404")
-    all_ok = stale_ok and invalid_ok and notfound_ok
-    detail_ok = f"Stale write → <strong>{stale_code}</strong>, illegal transition → <strong>{invalid_code}</strong>, unknown schema → <strong>{notfound_code}</strong> — three different problems, three different, correct codes."
-    detail_bug = f"Expected 412/409/404. Actually got {stale_code}/{invalid_code}/{notfound_code}."
+    expected = [
+        ("06-missing-status.txt", "428", "act without If-Match"),
+        ("06-stale-status.txt", "412", "stale If-Match"),
+        ("06-invalid-status.txt", "409", "act not in the manifest"),
+        ("06-schema-status.txt", "422", "body fails the schema"),
+        ("06-notfound-status.txt", "404", "unknown schema"),
+        ("06-revalidate-status.txt", "304", "Layer 1 revalidation, nothing changed"),
+    ]
+    results = [(label, want, read_text(f)) for f, want, label in expected]
+    all_ok = all(got == want for _, want, got in results)
+    listing = ", ".join(f"{esc(label)} → <strong>{esc(got)}</strong>" for label, _, got in results)
+    detail_ok = f"{listing}. Each problem has its own code."
+    detail_bug = f"Expected {'/'.join(w for _, w, _ in results)}. Got: {listing}."
     return f'''
   <section class="entry" id="errors">
-    <div class="entry-head"><span class="entry-num">06</span><h2 class="entry-title">Three ways to fail, correctly</h2></div>
+    <div class="entry-head"><span class="entry-num">06</span><h2 class="entry-title">Ways to fail, correctly</h2></div>
     <p class="entry-sub">distinct failure modes, distinct status codes, checked live</p>
-    <p class="entry-narrative">A stale write, an illegal transition, and an unknown resource are three genuinely different problems.</p>
+    <p class="entry-narrative">A missing precondition, a stale write, an illegal transition, a bad body, and an unknown resource are different problems. SPEC 0.4 gives each its own code, and checks acts in that order.</p>
     {verdict_html(all_ok, detail_ok, detail_bug)}
   </section>'''
 

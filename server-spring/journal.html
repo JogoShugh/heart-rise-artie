@@ -166,8 +166,9 @@ INSERT 0 6
   <section class="entry" id="sow">
     <div class="entry-head"><span class="entry-num">01</span><h2 class="entry-title">Planting bed-1 — sowSeed</h2></div>
     <p class="entry-sub">layer 1 → layer 2 → layer 3, captured live</p>
-    <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. The hal-schema-forms dialect returns the minimal layer-1 view first — state, plus one pointer.</p>
-    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json;profile="https://github.com/jbadeau/hal-schema-forms"' \
+    <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. With no <code>Prefer</code> header (rung L0) everything arrives in one response: state, the form, and its full schema.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json' \
+     -H 'Accept-Profile: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;' \
      http://localhost:8080/beds/1</pre></div>
     <div class="specimen"><div class="specimen-label output">output</div><pre>id: 1
 label: bed-1
@@ -178,17 +179,60 @@ moistureLevel: 0
 _links:
   self:
     href: /beds/1
-  &quot;http://api.example.org/rels/forms&quot;:
-    href: /affordance-sets/sha256-14707229191a4566
-    type: &quot;application/hal+json;profile=\&quot;https://github.com/jbadeau/hal-schema-forms\&quot;&quot;</pre></div>
-    <div class="verdict ok"><span class="verdict-mark">Correct</span><p>No <code>_forms</code> anywhere. Just state and a typed link — captured href: <code>/affordance-sets/sha256-14707229191a4566</code></p></div>
-
-    <p class="entry-narrative">Following that pointer, once as a bare pointer, once with <code>Prefer: embed=schemas</code>:</p>
-    <div class="specimen"><div class="specimen-label output">output (embedded variant)</div><pre>_forms:
+_forms:
   sowSeed:
     _links:
       target:
-        href: /beds/{bedId}/actions/sow-seed
+        href: /beds/1/actions/sow-seed
+    method: POST
+    contentType: application/json
+    schema:
+      properties:
+        depthCm:
+          maximum: 10
+          minimum: 1
+          type: number
+        seedType:
+          type: string
+      required:
+        - seedType
+      title: &quot;Sow Seed&quot;
+      type: object
+      &quot;$id&quot;: /schemas/sha256-4ed779d47421af87</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>L0 is collapsed: the <code>sowSeed</code> form is inline with its full schema (fields: depthCm, seedType).</p>
+    </div>
+
+    <p class="entry-narrative">The same request with <code>Prefer: forms=cid, schema=cid</code> (rung L2) returns state plus one link:</p>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>id: 1
+label: bed-1
+status: EMPTY
+cropName: null
+growthPoints: 0
+moistureLevel: 0
+_links:
+  self:
+    href: /beds/1
+  &quot;http://api.example.org/rels/forms&quot;:
+    href: /affordance-sets/sha256-f670940f88273f51
+    type: &quot;application/hal+json&quot;
+    profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>/affordance-sets/sha256-f670940f88273f51</code></p>
+    </div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>The response names its profile in a header, not a media-type parameter: <code>Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://github.com/jogoshugh/heart-rise&gt;; rel=&quot;profile&quot;</code></p>
+    </div>
+
+    <p class="entry-narrative">At <code>Prefer: forms=cid</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-ccaf11d46fc8ad56</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
+    <div class="specimen"><div class="specimen-label output">output (L1 set, schemas embedded)</div><pre>_forms:
+  sowSeed:
+    _links:
+      target:
+        href: /beds/{id}/actions/sow-seed
         templated: true
     contentType: application/json
     method: POST
@@ -207,7 +251,7 @@ _links:
       type: object</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
-      <p><code>target.href</code> is a literal, unresolved URI Template (<code>/beds/{bedId}/actions/sow-seed</code>) — byte-identical for every EMPTY bed, real HTTP caches included.</p>
+      <p><code>target.href</code> is a literal, unresolved URI Template (<code>/beds/{id}/actions/sow-seed</code>) — byte-identical for every EMPTY bed, real HTTP caches included.</p>
     </div>
 
     <div class="specimen"><div class="specimen-label">input</div><pre>curl /schemas/sha256-4ed779d47421af87</pre></div>
@@ -222,7 +266,7 @@ _links:
     <div class="entry-head"><span class="entry-num">02</span><h2 class="entry-title">Watering bed-1 — waterCell</h2></div>
     <p class="entry-sub">the halforms dialect's writable-field check</p>
     <p class="entry-narrative">After sowing, bed-1 is <strong>PLANTED</strong> and watering is the only legal action. This entry checks the HAL-FORMS dialect specifically for a known historical fault: Kotlin <code>val</code> properties (getter-only, no setter) can cause Spring HATEOAS's reflection-based property inspection to mark a field <code>readOnly: true</code> — confirmed against a real, open Spring HATEOAS GitHub issue (#1310) rather than assumed.</p>
-    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json, application/prs.hal-forms+json' \
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/prs.hal-forms+json' \
      http://localhost:8080/beds/2</pre></div>
     <div class="specimen"><div class="specimen-label output">output</div><pre>id: 2
 label: bed-2
@@ -257,7 +301,7 @@ _templates:
   harvest:
     _links:
       target:
-        href: /beds/{bedId}/actions/harvest
+        href: /beds/{id}/actions/harvest
         templated: true
     contentType: application/json
     method: POST
@@ -274,8 +318,8 @@ _templates:
     <p class="entry-sub">what all three layers exist to prove</p>
     <p class="entry-narrative">Bed-1 reached <strong>READY_TO_HARVEST</strong> the long way — sown, watered, grown. Bed-3 arrived at the identical status from seed data. Neither bed knows about the other.</p>
     <div class="hash-pair">
-      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-6cf6b57da8c330d4</div></div>
-      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-6cf6b57da8c330d4</div></div>
+      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-56b905a805efd55a</div></div>
+      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-56b905a805efd55a</div></div>
     </div>
     <div class="seal-row"><div class="seal">verified<br>match</div><div class="seal-text"><h3>Identical, not merely similar.</h3><p>Two independently-arrived-at beds, one shared, cached resource.</p></div></div>
   </section>
@@ -316,12 +360,12 @@ _templates:
   </section>
 
   <section class="entry" id="errors">
-    <div class="entry-head"><span class="entry-num">06</span><h2 class="entry-title">Three ways to fail, correctly</h2></div>
+    <div class="entry-head"><span class="entry-num">06</span><h2 class="entry-title">Ways to fail, correctly</h2></div>
     <p class="entry-sub">distinct failure modes, distinct status codes, checked live</p>
-    <p class="entry-narrative">A stale write, an illegal transition, and an unknown resource are three genuinely different problems.</p>
+    <p class="entry-narrative">A missing precondition, a stale write, an illegal transition, a bad body, and an unknown resource are different problems. SPEC 0.4 gives each its own code, and checks acts in that order.</p>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
-      <p>Stale write → <strong>412</strong>, illegal transition → <strong>409</strong>, unknown schema → <strong>404</strong> — three different problems, three different, correct codes.</p>
+      <p>act without If-Match → <strong>428</strong>, stale If-Match → <strong>412</strong>, act not in the manifest → <strong>409</strong>, body fails the schema → <strong>422</strong>, unknown schema → <strong>404</strong>, Layer 1 revalidation, nothing changed → <strong>304</strong>. Each problem has its own code.</p>
     </div>
   </section>
 

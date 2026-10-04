@@ -25,7 +25,7 @@ Feature: Conditional acts and the error model (L4)
     Then the response status is 409
     And bed 2 is still at state version 1
 
-  Scenario Outline: A body that fails the schema is refused with 422
+  Scenario Outline: A body that fails the schema is refused with 422: <body>
     Given a client got bed 2 as hal-schema-forms with Prefer ""
     When the client posts <body> to water-cell on bed 2 using the ETag it holds
     Then the response status is 422
@@ -44,7 +44,7 @@ Feature: Conditional acts and the error model (L4)
     Then the response status is 400
     And bed 2 is still at state version 1
 
-  Scenario Outline: The first failing check decides the status
+  Scenario Outline: The first failing check decides the status: <action>, If-Match <if-match>, <body> gives <status>
     When a client posts <body> to <action> on bed 2 with If-Match <if-match>
     Then the response status is <status>
 

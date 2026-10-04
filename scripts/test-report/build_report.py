@@ -5,8 +5,10 @@ JUnit XML, the cache-demo run log, the live hash check, and journal.html.
 Does not run anything itself. Before running it:
   - ./gradlew test in server-spring, client, exhibits/koog-first-pass
   - save the cache-demo client's output to cache-demo.log (next to this file)
-  - save the curl | shasum check of live content-addressed URLs to live-hash.txt
-  - server-spring/demo.sh, for journal.html and run/
+  - in server-spring: docker compose up --build -d, ./capture.sh, then
+    python3 render_journal.py, for run/ and journal.html (demo.sh does the
+    same and then opens the journal in a browser)
+  - live-hash.sh (next to this file), with the server still up
 
 Usage: python3 scripts/test-report/build_report.py [input_dir]
 input_dir holds the two logs and receives test-report.html; defaults to
@@ -89,7 +91,7 @@ set_pointer = (REPO / "server-spring/run/01-set-pointer.json").read_text().strip
 set_url = (REPO / "server-spring/run/01-set-url.txt").read_text().strip()
 
 suites = [
-    ("server-spring", "JUnit 5 + WebTestClient", spring),
+    ("server-spring", "Cucumber + JUnit 5 + WebTestClient", spring),
     ("client", "Cucumber + JUnit 5", client),
     ("koog-first-pass", "JUnit 5 + Ktor MockEngine", koog),
 ]
@@ -185,32 +187,35 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
 
 <section>
   <div class="eyebrow">What changed to get here</div>
-  <h2>Fixes made in this pass</h2>
+  <h2>Changes in this pass: SPEC 0.4 conformance, one step at a time</h2>
+  <p class="muted">Each step started with a Gherkin feature in <code>server-spring/src/test/resources/features/</code>. The bdd-gates log (<code>.claude/tdd-events.log</code>) shows each one failing before the fix and passing after; the git pre-commit check refuses a commit that skips that order.</p>
   <ul class="plain">
-    <li><b>Affordance-set URLs now match the bytes served.</b> The server used to hash the canonical JSON but send Jackson's output, which has keys in a different order. It now sends the canonical string. (SPEC §6.5)</li>
-    <li><b>HAL-FORMS fields are fillable again.</b> <code>depthCm</code> and <code>milliliters</code> were marked <code>readOnly: true</code> because the request DTOs used <code>val</code>. They now use <code>var</code>.</li>
-    <li><b>Client test tightened.</b> The "unknown action" test used to pass even if the client called the network. It now also checks that no request was sent.</li>
-    <li><b>Koog exhibit compiles again.</b> Its tests used a removed <code>UniformArgs</code> wrapper, so they were updated to pass a plain <code>JsonObject</code>.</li>
-    <li><b>The test that copied production code is gone.</b> It was replaced by real HTTP checks.</li>
-    <li><b>Cache-demo fixtures regenerated.</b> They are now canonical JSON from a fixed random seed, so regenerating gives identical files.</li>
+    <li><b>Gates installed.</b> Claude Code hooks block production edits without a feature change, log every test run, run Detekt after each edit, and keep the build green before a turn ends. Konsist tests guard the domain boundary (server) and the Transport boundary (client).</li>
+    <li><b>Step 1 · rendering ladder.</b> No <code>Prefer</code> now returns L0: everything in one response. <code>forms=cid</code> gives L1, <code>forms=cid, schema=cid</code> gives L2. L1 and L2 sets have different addresses, and Layer 2 no longer sends <code>Vary</code>. (§6.4, §6.5)</li>
+    <li><b>Step 2 · Layer 1 caching.</b> <code>Cache-Control: no-cache</code>, ETags like <code>"seq-1.hsf.L2"</code> that differ per dialect and rung, and <code>304</code> on revalidation. Before, an L1 ETag revalidated an L2 request: a wrong cache hit. (§6.1, §6.2)</li>
+    <li><b>Step 3 · conditional acts.</b> An act without <code>If-Match</code> gets <code>428</code>; a bad body gets <code>422</code>, not <code>400</code>; checks run in the order 428, 412, 409, 422. (§6.2)</li>
+    <li><b>Step 4 · profiles.</b> <code>Link: rel="profile"</code> on every Layer 1 response; <code>Accept-Profile</code> negotiation; <code>406</code> for an unsatisfiable <code>Accept</code>; the media-type <code>profile</code> parameter is gone. (§6.1)</li>
+    <li><b>Step 5 · templates.</b> <code>{{bedId}}</code> became <code>{{id}}</code>, the Layer 1 property it resolves from. Before, a rule-following client posted to <code>/beds/actions/water-cell</code> and got <code>404</code>. (§6.9.1)</li>
+    <li><b>L5 guard.</b> Both dialects offer the same acts in every state, now checked over HTTP.</li>
   </ul>
 </section>
 
 <!-- 1. server-spring -->
 <section>
   <div class="eyebrow">Suite 1 · server-spring · {tally(spring)[0]} / {tally(spring)[1]}</div>
-  <h2>Server: content addresses and form metadata</h2>
+  <h2>Server: SPEC 0.4 conformance scenarios, content addresses, form metadata</h2>
+  <p class="muted"><code>RunCucumberTest</code> rows are Gherkin scenarios. They run the real controllers and the real <code>GardenBedService</code> against an in-memory event store, so no database is needed.</p>
   {table(spring)}
   <div class="example">
-    <h3>Example: each affordance-set URL is the sha256 of the bytes served at it</h3>
+    <h3>Example: the first failing check decides the status code</h3>
     <dl>
-      <dt>Rule</dt><dd>SPEC §6.5: the hash in <code>/affordance-sets/sha256-…</code> identifies the actual bytes at that URL. A client or cache can verify a response by hashing it.</dd>
-      <dt>How</dt><dd><code>@WebFluxTest</code> starts only the two controllers, with no database. For each of the 3 bed statuses, the test GETs the URL over the test HTTP client, hashes the raw response body, and compares that hash to the URL. It doesn't reuse any production hashing code, so the test can't agree with a bug just because both share the same helper.</dd>
-      <dt>Real data</dt><dd>From the live capture, <code>{esc(set_url)}</code> serves:<pre><code>{esc(set_pointer)}</code></pre>The keys are sorted (<code>contentType</code> before <code>method</code>) with no whitespace. That is the RFC 8785 canonical form.</dd>
+      <dt>Rule</dt><dd>SPEC 0.5 §6.2: a server checks an act in a fixed order and returns the first failure: <code>428</code> no <code>If-Match</code>, <code>412</code> stale <code>If-Match</code>, <code>409</code> act not in the current manifest, <code>422</code> body fails the schema. The order matters because <code>412</code> tells a client to discard its act, while <code>422</code> says the act itself was malformed.</dd>
+      <dt>How</dt><dd>Bed 2 is PLANTED, at state version 1. Each row sends a request that is wrong in its own way <i>and</i> in every later way: the <code>sow-seed</code> rows are illegal for a planted bed and also carry an empty <code>seedType</code>. Only the evaluation order can pick the code.</dd>
+      <dt>Before</dt><dd>The first run after writing this feature failed 9 scenarios. Rows 1-3 got <code>400</code> instead of <code>428</code>, <code>412</code> and <code>409</code>: Spring's <code>@Valid @RequestBody</code> validated the body before the handler ever looked at <code>If-Match</code>. An act with no <code>If-Match</code> at all went through with <code>200</code>.</dd>
+      <dt>After</dt><dd><code>GardenBedController.act()</code> checks the precondition and the manifest first. The body is bound and validated afterwards, by <code>ActBodyBinder</code>. All rows pass.</dd>
     </dl>
-    {code("server-spring/src/test/kotlin/com/artie/gardenbed/web/ContentAddressHttpTest.kt", "fun `each affordance-set URL", "    }")}
-    <p class="redgreen">Before the fix, this test failed (line 54). The server was sending Jackson's insertion-order JSON, and those bytes hashed to <code>dd9a1964d19f5485</code>, not the <code>14707229191a4566</code> in the URL.</p>
-    <p class="redgreen ok">The fix: <code>AffordanceSetController</code> now returns <code>JsonSchemaDialectSupport.affordanceSetJson(...)</code>, the canonical string, instead of a Map. The test passes.</p>
+    {code("server-spring/src/test/resources/features/conditional-acts.feature", "Scenario Outline: The first failing check", None, 13)}
+    {code("server-spring/src/main/kotlin/com/artie/gardenbed/web/GardenBedController.kt", "/** [0.5] precondition scope", "    }")}
   </div>
 </section>
 
@@ -218,7 +223,6 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
 <section>
   <div class="eyebrow">Suite 2 · client (the real ARTIE) · {tally(client)[0]} / {tally(client)[1]}</div>
   <h2>Client: enter, act, and refusing unknown actions</h2>
-  <p class="muted">Cucumber names Scenario Outline rows "Example #1.1" and so on. Those rows come from <code>media_type.feature</code>.</p>
   {table(client)}
   <div class="example">
     <h3>Example: acting on an action absent from the manifest raises an error</h3>
@@ -270,18 +274,17 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
 <section>
   <div class="eyebrow">Suite 5 · server-spring live (Docker: Postgres + app) · {j_ok + live_match} / {j_ok + j_bug + len(live)}</div>
   <h2>Live server: journal verdicts and served-byte hashes</h2>
-  <p><code>demo.sh</code> builds and starts the stack, resets the database, records a real HTTP walkthrough in <code>run/</code>, and renders <code>journal.html</code>. The journal's verdicts are computed from that captured data. Separately, each content-addressed URL in the capture was fetched again with <code>curl</code> and its body hashed with <code>shasum</code>.</p>
+  <p><code>docker compose up --build</code> starts Postgres and the app. <code>capture.sh</code> resets the database, records a real HTTP walkthrough in <code>run/</code> using the 0.4 wire format, and <code>render_journal.py</code> computes each journal verdict from that captured data. Then <code>live-hash.sh</code> fetches every content-addressed URL in the capture again and hashes the body with <code>shasum</code>.</p>
   <div class="tbl"><table><thead><tr><th>Result</th><th>URL</th><th>sha256 of served body (16 hex)</th></tr></thead><tbody>{"".join(f'<tr><td><span class="st {"pass" if r[-1]=="MATCH" else "fail"}">{"PASS" if r[-1]=="MATCH" else "FAIL"}</span></td><td><code>{esc(r[0])}</code></td><td><code>{esc(r[1].removeprefix("served="))}</code></td></tr>' for r in live)}</tbody></table></div>
   <p class="muted">Journal: {j_ok} correct, {j_bug} failing, across entries {", ".join(esc(n + " " + t) for n, t in j_entries)}.</p>
   <div class="example">
-    <h3>Example: journal entry 02 — the watering form must be fillable</h3>
+    <h3>Example: journal entry 06 — each failure gets its own code, against Postgres</h3>
     <dl>
-      <dt>Rule</dt><dd>In the HAL-FORMS dialect, a field marked <code>readOnly: true</code> tells clients not to fill it in. If <code>milliliters</code> can't be filled in, the agent can't water the bed.</dd>
-      <dt>Cause</dt><dd>Spring HATEOAS reads a Kotlin <code>val</code> (getter but no setter) as read-only (Spring HATEOAS issue #1310).</dd>
-      <dt>Before</dt><dd>The journal committed in July already showed this entry as <b>FAIL — regression detected</b>, and the first run in this pass reproduced it. The new unit test <code>RequestDtoMetadataTest</code> failed for both DTOs: <code>WaterCellRequest.milliliters is readOnly</code> and <code>SowSeedRequest.depthCm is readOnly</code>. The second one was never covered by the journal.</dd>
-      <dt>After</dt><dd>With the DTOs changed to <code>var</code>, the unit test passes, no captured response contains <code>readOnly</code>, and journal entry 02 shows Correct.</dd>
+      <dt>Rule</dt><dd>The same rule as the Suite 1 example, now checked on the real stack: Spring Boot over R2DBC and Postgres, in Docker.</dd>
+      <dt>How</dt><dd><code>capture.sh</code> sends six requests. An act with no <code>If-Match</code>; one with a stale tag; a <code>sow-seed</code> on a bed that is ready to harvest, with that bed's current ETag; a <code>water-cell</code> with 0 ml and a current ETag; a request for an unknown schema; and a revalidation of bed 2 with the ETag just received. Each status code is saved to a file in <code>run/</code>.</dd>
+      <dt>Result</dt><dd><code>428</code>, <code>412</code>, <code>409</code>, <code>422</code>, <code>404</code>, <code>304</code>. The journal computes its verdict by comparing those files to the expected codes.</dd>
     </dl>
-    {code("server-spring/src/main/kotlin/com/artie/gardenbed/web/dto/Dtos.kt", "// Request DTOs use", None, 16)}
+    {code("server-spring/render_journal.py", "def entry_06", "    ]")}
   </div>
 </section>
 
@@ -289,10 +292,12 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
   <div class="eyebrow">Limits</div>
   <h2>What this baseline does not cover</h2>
   <ul class="plain">
-    <li>The client suite runs against a fake transport, not a real server. No test yet runs <code>client/</code> against <code>server-spring</code>.</li>
+    <li>The client suite runs against a fake transport, not a real server. No test yet runs <code>client/</code> against <code>server-spring</code>. Its parser still expects the withdrawn <code>profile</code> parameter in <code>Content-Type</code>, so it would reject the server's responses since step 4.</li>
+    <li>HAL-FORMS is served at L0 only. Its Layer 2/3 addressing needs a SPEC decision first; see <code>spec/CONFORMANCE-GAPS.md</code>.</li>
+    <li>The cache-demo exhibit still uses its own 0.3-era fixtures (<code>{{bedId}}</code>, no <code>Prefer</code>). It demonstrates the caching mechanism, not 0.4 conformance.</li>
     <li>The Docker build of <code>Dockerfile.origin</code> was verified on 3 Oct, before the fixed random seed. The cache-demo run above used the local <code>server.py</code> with the regenerated fixtures.</li>
     <li><code>server-node</code> has no tests.</li>
-    <li>There are no BDD gates yet. That layer comes next.</li>
+    <li>The bdd-gates pre-commit check runs only after <code>git config core.hooksPath .githooks</code>. Until then, commits in this pass ran it by hand first.</li>
   </ul>
 </section>
 

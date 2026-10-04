@@ -19,7 +19,7 @@ Feature: Rendering ladder L0 to L2
     Then the response embeds the "waterCell" form with its full schema
     And the response has no Preference-Applied header
 
-  Scenario Outline: L1 and L2 link to an affordance set rendered for their rung
+  Scenario Outline: L1 and L2 link to an affordance set rendered for their rung: Prefer <prefer>
     When a client gets bed 2 with Prefer "<prefer>"
     Then the response status is 200
     And the response has no inline forms
@@ -38,7 +38,7 @@ Feature: Rendering ladder L0 to L2
     And a client gets bed 2 with Prefer "forms=cid, schema=cid"
     Then the two affordance-set links differ
 
-  Scenario Outline: Each affordance set is immutable, does not vary, and hashes to its own address
+  Scenario Outline: Each affordance set is immutable, does not vary, and hashes to its own address: Prefer <prefer>
     When a client gets bed 2 with Prefer "<prefer>"
     And the client follows the affordance-set link
     Then the response Cache-Control is "public, max-age=31536000, immutable"

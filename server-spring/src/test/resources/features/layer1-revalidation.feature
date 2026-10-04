@@ -8,7 +8,7 @@ Feature: Layer 1 revalidation
   Background:
     Given bed 2 is PLANTED
 
-  Scenario Outline: Layer 1 is no-cache with a strong ETag per dialect and rung
+  Scenario Outline: Layer 1 is no-cache with a strong ETag per dialect and rung: <dialect>, Prefer "<prefer>"
     When a client gets bed 2 as <dialect> with Prefer "<prefer>"
     Then the response status is 200
     And the response Cache-Control is "no-cache"
@@ -21,7 +21,7 @@ Feature: Layer 1 revalidation
       | hal-schema-forms | forms=cid, schema=cid | "seq-1.hsf.L2" |
       | hal-forms        |                       | "seq-1.hf.L0"  |
 
-  Scenario Outline: Unchanged state revalidates to 304 with no body
+  Scenario Outline: Unchanged state revalidates to 304 with no body: <dialect>, Prefer "<prefer>"
     Given a client got bed 2 as <dialect> with Prefer "<prefer>"
     When the client revalidates bed 2 with the ETag it holds
     Then the response status is 304
@@ -48,7 +48,7 @@ Feature: Layer 1 revalidation
     Then the response status is 200
     And the response ETag is "seq-1.hsf.L2"
 
-  Scenario Outline: An act accepts an If-Match from any variant of the current state
+  Scenario Outline: An act accepts an If-Match from any variant of the current state: <dialect>, Prefer "<prefer>"
     Given a client got bed 2 as <dialect> with Prefer "<prefer>"
     When the client waters bed 2 with 100 ml using the ETag it holds
     Then the response status is 200

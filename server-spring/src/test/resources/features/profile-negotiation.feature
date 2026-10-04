@@ -9,7 +9,7 @@ Feature: Dialect and profile negotiation
   Background:
     Given bed 2 is PLANTED
 
-  Scenario Outline: Accept and Accept-Profile pick the dialect and its profile
+  Scenario Outline: Accept and Accept-Profile pick the dialect and its profile: Accept "<accept>", Accept-Profile "<accept-profile>"
     When a client gets bed 2 with Accept "<accept>" and Accept-Profile "<accept-profile>"
     Then the response status is 200
     And the response Content-Type is "<content-type>"
@@ -38,7 +38,7 @@ Feature: Dialect and profile negotiation
     When a client gets bed 2 with Accept "application/hal+json" and Accept-Profile ""
     Then the response links to profile "https://github.com/jogoshugh/heart-rise"
 
-  Scenario Outline: Layer 1 varies on every header that picks its representation
+  Scenario Outline: Layer 1 varies on every header that picks its representation: <accept>
     When a client gets bed 2 with Accept "<accept>" and Accept-Profile ""
     Then the response Vary lists "<vary>"
 

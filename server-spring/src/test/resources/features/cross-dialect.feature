@@ -3,7 +3,7 @@ Feature: Cross-dialect legality (L5)
   Forms, gives different bytes but the same answer to "which acts are
   legal right now". Both renderings come from one source of truth (§6.2).
 
-  Scenario Outline: Both dialects offer the same acts in every state
+  Scenario Outline: Both dialects offer the same acts in every state: <status>
     Given bed 2 is <status>
     When a client gets bed 2 as hal-forms with Prefer ""
     And a client gets bed 2 as hal-schema-forms with Prefer ""

@@ -5,7 +5,7 @@ Feature: Templated affordance targets
   every conformant client expands a template to the same URI. That URI
   is where the server accepts the act.
 
-  Scenario Outline: Every template variable resolves from Layer 1
+  Scenario Outline: Every template variable resolves from Layer 1: <status>
     Given bed 2 is <status>
     When a client gets bed 2 with Prefer "forms=cid, schema=cid"
     And the client follows the affordance-set link
