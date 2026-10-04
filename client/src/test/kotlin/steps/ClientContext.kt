@@ -3,6 +3,7 @@ package steps
 import heart.ArtieClient
 import heart.CachingTransport
 import heart.ContentAddressCheck
+import heart.Dialect
 import heart.HeartRepresentation
 import heart.HeartRiseClient
 import heart.HttpTransport
@@ -20,12 +21,13 @@ class ClientContext {
     val transport = FakeTransport()
     var baseUrl: String? = null
     var rung: Rung = Rung.L0
+    var dialect: Dialect = Dialect.HAL_SCHEMA_FORMS
 
     /** Everything that reached the wire (below each client's cache), live or fake. */
     val wireLog: RecordingTransport by lazy { RecordingTransport(if (baseUrl != null) HttpTransport() else transport) }
     private val wire: Transport get() = wireLog
     val cache: CachingTransport by lazy { CachingTransport(ContentAddressCheck(wire)) }
-    val client: HeartRiseClient by lazy { ArtieClient(cache, rung) }
+    val client: HeartRiseClient by lazy { ArtieClient(cache, rung, dialect) }
 
     /** When true, the second client sits behind the first client's cache, as two
      *  clients behind one shared cache do in SPEC §6.10.4's diagram. */
@@ -33,11 +35,15 @@ class ClientContext {
 
     /** Another client: a concurrent writer, or a neighbour behind a shared cache. */
     val second: HeartRiseClient by lazy {
-        ArtieClient(if (shareCache) cache else CachingTransport(ContentAddressCheck(wire)), rung)
+        ArtieClient(if (shareCache) cache else CachingTransport(ContentAddressCheck(wire)), rung, dialect)
     }
 
     lateinit var current: HeartRepresentation
     var lastError: Throwable? = null
+
+    /** A fresh client with its own cache, on the same wire. */
+    fun newClient(dialect: Dialect, rung: Rung = Rung.L0): HeartRiseClient =
+        ArtieClient(CachingTransport(ContentAddressCheck(wire)), rung, dialect)
 
     /** How many requests the client had sent when it finished entering. */
     var requestsAfterEnter = 0

@@ -17,7 +17,14 @@ import java.net.URI
 class ArtieClient(
     private val transport: Transport,
     private val rung: Rung = Rung.L0,
+    private val dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
 ) : HeartRiseClient {
+    init {
+        require(rung <= dialect.maxRung) {
+            "$dialect is served at ${dialect.maxRung} only (SPEC §6.1); rung $rung is not available in it"
+        }
+    }
+
     override var current: HeartRepresentation? = null
         private set
 
@@ -39,12 +46,12 @@ class ArtieClient(
             HeartRequest(
                 form.method,
                 target,
-                mapOf("Content-Type" to form.contentType, "Accept" to HAL_JSON, "If-Match" to etag),
+                mapOf("Content-Type" to form.contentType, "Accept" to dialect.mediaType, "If-Match" to etag),
                 payload.toString(),
             ),
         )
         if (response.status in SUCCESS) {
-            return HeartResponseParser.parse(response, target).also { current = it }
+            return HeartResponseParser.parse(response, target, dialect).also { current = it }
         }
         if (response.status == PRECONDITION_REQUIRED && resendAllowed) {
             sync(held.url)
@@ -75,11 +82,11 @@ class ArtieClient(
      */
     private fun sync(url: String): HeartRepresentation {
         val headers = buildMap {
-            put("Accept", HAL_JSON)
-            put("Accept-Profile", "<$HAL_SCHEMA_FORMS_PROFILE>")
+            put("Accept", dialect.mediaType)
+            put("Accept-Profile", "<${dialect.profile}>")
             rung.prefer?.let { put("Prefer", it) }
         }
-        val layer1 = HeartResponseParser.parse(transport.send(HeartRequest("GET", url, headers)), url)
+        val layer1 = HeartResponseParser.parse(transport.send(HeartRequest("GET", url, headers)), url, dialect)
         val synced = layer1.formsLink?.let { link -> layer1.withAffordances(fetchSet(link)) } ?: layer1
         return synced.also { current = it }
     }

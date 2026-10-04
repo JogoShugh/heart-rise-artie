@@ -1,0 +1,87 @@
+Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
+  SPEC §6.1 (0.5 decision), §6.10.6. HAL-FORMS is served at L0 only. ARTIE
+  can speak it: it asks by media type and profile, reads _templates, and
+  turns each template's inline properties into the same JSON Schema model
+  it uses for HAL Schema Forms, so the rest of the client, and the Reason
+  step, see one shape whichever dialect it came from. A lone template is
+  keyed "default", as the HAL-FORMS spec says it should be; ARTIE keeps
+  the server's key as the affordance name rather than guess another.
+
+  Background:
+    Given the service answers GET "http://garden.test/beds/1" with:
+      """
+      200 OK
+      Content-Type: application/prs.hal-forms+json
+      ETag: "seq-0.hf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+
+      id: 1
+      status: EMPTY
+      _links:
+        self: {href: /beds/1}
+      _templates:
+        default:
+          method: POST
+          target: /beds/1/actions/sow-seed
+          properties:
+            - {name: depthCm, type: number, min: 1, max: 10, prompt: Depth in cm}
+            - {name: seedType, type: text, required: true, regex: "^(?=\\s*\\S).*$"}
+      """
+    And the client works in dialect hal-forms
+
+  Scenario: The client asks for HAL-FORMS by media type and profile, never with Prefer
+    When the client enters "http://garden.test/beds/1"
+    Then the client sent GET "http://garden.test/beds/1" with headers:
+      | Accept         | application/prs.hal-forms+json                       |
+      | Accept-Profile | <https://github.com/jogoshugh/heart-rise/hal-forms> |
+    And that request had no "Prefer" header
+
+  Scenario: The template is an affordance named by its key, with a resolved target
+    When the client enters "http://garden.test/beds/1"
+    Then the manifest offers exactly "default"
+    And the "default" affordance is POST to "http://garden.test/beds/1/actions/sow-seed"
+    And the resource state contains:
+      | key    | value |
+      | status | EMPTY |
+
+  Scenario Outline: HAL-FORMS properties become JSON Schema: <property> has <keyword>
+    When the client enters "http://garden.test/beds/1"
+    Then the "<property>" field in the "default" schema has the "<keyword>" keyword
+    Examples:
+      | property | keyword     |
+      | depthCm  | minimum     |
+      | depthCm  | maximum     |
+      | depthCm  | description |
+      | depthCm  | type        |
+      | seedType | pattern     |
+
+  Scenario: Required properties are carried into the schema
+    When the client enters "http://garden.test/beds/1"
+    Then the "default" schema marks "seedType" as required
+
+  Scenario: An act from a HAL-FORMS manifest is conditional like any other
+    Given the service answers POST "http://garden.test/beds/1/actions/sow-seed" with:
+      """
+      200 OK
+      Content-Type: application/prs.hal-forms+json
+      ETag: "seq-1.hf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+
+      id: 1
+      status: PLANTED
+      _templates: {}
+      """
+    When the client enters "http://garden.test/beds/1"
+    And the client acts on "default" with:
+      """yaml
+      seedType: basil
+      """
+    Then the client sent POST "http://garden.test/beds/1/actions/sow-seed" with headers:
+      | If-Match     | "seq-0.hf.L0"                  |
+      | Content-Type | application/json               |
+      | Accept       | application/prs.hal-forms+json |
+    And the client holds the ETag "seq-1.hf.L0"
+
+  Scenario: A HAL-FORMS client cannot be set to a rung above L0
+    When the client is set to rung L2
+    Then the client raised an error mentioning "L0 only"

@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 import java.net.URI
 
 /**
- * Reads a hal-schema-forms Layer 1 response (SPEC §6.1). The profile must be
+ * Reads a Layer 1 response in either dialect (SPEC §6.1). The profile must be
  * named in `Link: rel="profile"`; the old media-type parameter is not
  * accepted. Plain target hrefs are resolved against the URL the response
  * came from; templated ones are kept as templates for the act to expand.
@@ -18,18 +18,18 @@ object HeartResponseParser {
 
     private val profileLink = Regex("""<([^>]*)>\s*;\s*rel="?profile"?""")
 
-    fun parse(response: HeartResponse, url: String): HeartRepresentation {
+    fun parse(response: HeartResponse, url: String, dialect: Dialect = Dialect.HAL_SCHEMA_FORMS): HeartRepresentation {
         val profiles = profileLink.findAll(response.header("Link").orEmpty()).map { it.groupValues[1] }.toList()
-        require(HAL_SCHEMA_FORMS_PROFILE in profiles) {
-            "response from $url does not name the profile $HAL_SCHEMA_FORMS_PROFILE (Link profiles: $profiles)"
+        require(dialect.profile in profiles) {
+            "response from $url does not name the profile ${dialect.profile} (Link profiles: $profiles)"
         }
         val root = Json.parseToJsonElement(response.body).jsonObject
         // An act's response comes from the action URL; its self link says which resource it is.
         val self = linkHref(root, "self")
         return HeartRepresentation(
             url = self?.let { URI(url).resolve(it).toString() } ?: url,
-            state = JsonObject(root.filterKeys { it != FORMS && it != LINKS }),
-            affordances = forms(root, url),
+            state = JsonObject(root.filterKeys { it !in setOf(FORMS, LINKS, HalFormsTemplates.TEMPLATES) }),
+            affordances = if (dialect == Dialect.HAL_FORMS) HalFormsTemplates.forms(root, url) else forms(root, url),
             etag = response.header("ETag"),
             formsLink = linkHref(root, FORMS_REL)?.let { URI(url).resolve(it).toString() },
         )

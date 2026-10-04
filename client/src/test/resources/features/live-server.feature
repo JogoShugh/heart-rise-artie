@@ -60,6 +60,38 @@ Feature: ARTIE against the real server
     Then the wire carried 4 requests, the last answered 200
     And the two clients hold the same affordance-set link
 
+  Scenario Outline: L5: both dialects show the same legal acts on bed <bed>
+    Then on bed <bed> a hal-schema-forms client and a hal-forms client see the same act targets
+
+    Examples:
+      | bed |
+      | 1   |
+      | 2   |
+      | 3   |
+      | 4   |
+
+  Scenario: Bed 1 through a full cycle at the HAL-FORMS on-ramp
+    Given the client works in dialect hal-forms
+    When the client enters "/beds/1"
+    And the client acts on "default" with:
+      """yaml
+      seedType: basil
+      """
+    Then the resource state contains:
+      | key    | value   |
+      | status | PLANTED |
+    When the client acts on "default" with:
+      """yaml
+      milliliters: 500
+      """
+    And the client acts on "default" with:
+      """yaml
+      {}
+      """
+    Then the resource state contains:
+      | key    | value |
+      | status | EMPTY |
+
   Scenario: Someone else writes first: the act is refused as stale and dropped
     Given the client enters "/beds/2"
     And a second client enters "/beds/2"
