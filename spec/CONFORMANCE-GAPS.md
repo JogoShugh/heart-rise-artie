@@ -49,7 +49,7 @@ has since changed.
 | `Accept` / `Accept-Profile` negotiation | **Done** (C1). Sends `Accept: application/hal+json` and `Accept-Profile` |
 | Read the profile from `Link: rel="profile"` | **Done** (C1). A response that does not name the hal-schema-forms profile is refused |
 | A real HTTP transport (talking to server-spring) | **Done** (C3). `HttpTransport` on `java.net.http`; `live-server.feature` runs sow, water, harvest, a stale write, and a 422 against server-spring + Postgres (`scripts/live-client-check.sh`) |
-| L6 Reason step | **Missing.** No resolver, scripted or LLM |
+| L6 Reason step | **Done** (L6). `Reasoner` sees offers (name and schema, no URI or method) and returns `Act` or `Clarify`; `ArtieAgent` checks the selection against the manifest and the schema (`SchemaCheck`) before anything is sent, and records rejections. `ClaudeReasoner` keeps tool and system prompt as a cached prefix and the manifest last (§6.8); checked against the scripted transport. A real-model scenario (`@llm`, `./gradlew llmTest`) needs `ANTHROPIC_API_KEY` and has not been run |
 | L1 walk (set with embedded schemas) | **Done**: fake and live (`l1-and-sharing.feature`, live full cycle at L1) |
 | L3 sharing property | **Done**: two clients behind one shared cache, two beds in one state, one set fetch, fake and live (seed bed 4). The concrete-profile counter-case (one set per bed, two fetches, one schema fetch) is checked against the scripted server |
 | L5: speak both dialects | **Done**. ARTIE reads HAL-FORMS at L0 (`_templates`, properties mapped to JSON Schema) and refuses to be set above L0 in it. Live: both dialects show the same act targets on all four seeded beds, and a full cycle runs over HAL-FORMS |

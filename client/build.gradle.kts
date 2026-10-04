@@ -99,3 +99,15 @@ val liveTest by tasks.registering(Test::class) {
     outputs.upToDateWhen { false }
 }
 
+
+// Runs only the @llm scenarios: a real model behind the Reason step. Needs
+// ANTHROPIC_API_KEY in the environment and costs a few API calls; not part of check.
+val llmTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "Runs the @llm Cucumber scenarios against the Claude API."
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    systemProperty("cucumber.filter.tags", "@llm")
+    outputs.upToDateWhen { false }
+}
