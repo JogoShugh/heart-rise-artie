@@ -3,7 +3,8 @@ Feature: ARTIE against the real server
   The same client code, over real HTTP, against server-spring and Postgres.
   Run with `./gradlew liveTest` while the server is up (see
   scripts/live-client-check.sh, which resets the seed data first).
-  Seed data: bed 1 EMPTY, bed 2 PLANTED, bed 3 READY_TO_HARVEST.
+  Seed data: bed 1 EMPTY, bed 2 PLANTED, bed 3 READY_TO_HARVEST, bed 4
+  PLANTED (read only, so beds 2 and 4 share a state).
   Assertions avoid exact ETag values, and every scenario leaves its bed in
   the state it found it (1 ml adds no growth), so the suite can run again
   without a reset.
@@ -41,6 +42,7 @@ Feature: ARTIE against the real server
     Examples:
       | rung |
       | L0   |
+      | L1   |
       | L2   |
 
   Scenario: At L2 a re-sync of an unchanged bed is one request, answered 304
@@ -49,6 +51,14 @@ Feature: ARTIE against the real server
     And the client enters "/beds/3"
     Then the wire carried 4 requests, the last answered 304
     And the manifest offers exactly "harvest"
+
+  Scenario: L3: two clients behind one shared cache, two beds in one state, one set fetch
+    Given the client works at rung L2
+    And the second client shares the client's cache
+    When the client enters "/beds/2"
+    And a second client enters "/beds/4"
+    Then the wire carried 4 requests, the last answered 200
+    And the two clients hold the same affordance-set link
 
   Scenario: Someone else writes first: the act is refused as stale and dropped
     Given the client enters "/beds/2"

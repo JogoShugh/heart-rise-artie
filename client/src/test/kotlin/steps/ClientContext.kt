@@ -27,8 +27,14 @@ class ClientContext {
     val cache: CachingTransport by lazy { CachingTransport(ContentAddressCheck(wire)) }
     val client: HeartRiseClient by lazy { ArtieClient(cache, rung) }
 
-    /** Another, independent client with its own cache: a concurrent writer. */
-    val second: HeartRiseClient by lazy { ArtieClient(CachingTransport(ContentAddressCheck(wire)), rung) }
+    /** When true, the second client sits behind the first client's cache, as two
+     *  clients behind one shared cache do in SPEC §6.10.4's diagram. */
+    var shareCache = false
+
+    /** Another client: a concurrent writer, or a neighbour behind a shared cache. */
+    val second: HeartRiseClient by lazy {
+        ArtieClient(if (shareCache) cache else CachingTransport(ContentAddressCheck(wire)), rung)
+    }
 
     lateinit var current: HeartRepresentation
     var lastError: Throwable? = null

@@ -50,6 +50,8 @@ has since changed.
 | Read the profile from `Link: rel="profile"` | **Done** (C1). A response that does not name the hal-schema-forms profile is refused |
 | A real HTTP transport (talking to server-spring) | **Done** (C3). `HttpTransport` on `java.net.http`; `live-server.feature` runs sow, water, harvest, a stale write, and a 422 against server-spring + Postgres (`scripts/live-client-check.sh`) |
 | L6 Reason step | **Missing.** No resolver, scripted or LLM |
+| L1 walk (set with embedded schemas) | **Done**: fake and live (`l1-and-sharing.feature`, live full cycle at L1) |
+| L3 sharing property | **Done**: two clients behind one shared cache, two beds in one state, one set fetch, fake and live (seed bed 4). The concrete-profile counter-case (one set per bed, two fetches, one schema fetch) is checked against the scripted server |
 | RISE | **Missing** |
 | Rel name of the Layer 1 link to the set | **Open** `[AUTHOR]`. SPEC draws `_links.forms` but names no rel; server and client both use `http://api.example.org/rels/forms` |
 
