@@ -1,0 +1,23 @@
+{
+  "stack": "gradle-kotlin",
+  "prodPatterns": [
+    "server-spring/src/main/kotlin/*.kt",
+    "client/src/main/kotlin/*.kt"
+  ],
+  "prodExcludePatterns": [],
+  "featurePatterns": [
+    "server-spring/src/test/resources/features/*.feature",
+    "client/src/test/resources/features/*.feature"
+  ],
+  "lintPatterns": [
+    "server-spring/*.kt",
+    "server-spring/*.kts",
+    "client/*.kt",
+    "client/*.kts"
+  ],
+  "lintCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd server-spring && ./gradlew detekt --console=plain -q) && (cd client && ./gradlew detekt --console=plain -q)",
+  "checkCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd server-spring && ./gradlew check --console=plain) && (cd client && ./gradlew check --console=plain)",
+  "bddCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd server-spring && ./gradlew test --console=plain) && (cd client && ./gradlew test --console=plain)",
+  "bddLogging": "native",
+  "bddRawCommandRegex": ""
+}

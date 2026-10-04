@@ -10,11 +10,11 @@ has since changed.
 
 | Rung / rule | Status | Evidence |
 |---|---|---|
-| L0: no `Prefer` returns everything embedded | **Gap.** No `Prefer` currently returns the pointer form (0.3 default) | `GardenBedController.kt` `wantsEmbeddedSchemas` |
-| L1 `Prefer: forms=cid` | **Missing.** Only `embed=schemas` is recognised | same |
-| L2 `Prefer: forms=cid, schema=cid` | **Partly there.** The pointer form exists but is the default, not opt-in | `JsonSchemaDialectSupport.buildBedBody` |
-| §6.5: L1 and L2 sets have different addresses | **Gap.** The embedded and pointer renderings share one URL (0.3 rule) | `AffordanceSetController` serves both forms at one hash |
-| §6.1: Layer 2/3 send no `Vary` | **Gap.** The affordance-set response sends `Vary: Prefer` | `AffordanceSetController.kt` |
+| L0: no `Prefer` returns everything embedded | **Done** (step 1) | `rendering-ladder.feature` |
+| L1 `Prefer: forms=cid` | **Done** (step 1) | `Rung.fromPrefer`, `rendering-ladder.feature` |
+| L2 `Prefer: forms=cid, schema=cid` | **Done** (step 1) | same |
+| §6.5: L1 and L2 sets have different addresses | **Done** (step 1) | registry keyed by (status, `SetRendering`); `ContentAddressHttpTest` |
+| §6.1: Layer 2/3 send no `Vary` | **Done** (step 1) | `AffordanceSetController` ignores `Prefer` |
 | §6.5: address = SHA-256 of the served bytes | **Done** (2026-10-04) | `ContentAddressHttpTest` |
 | Layer 1 `Cache-Control: no-cache` | **Missing.** No header is set | `GardenBedController.kt` |
 | Layer 1 `304` on `If-None-Match` | **Missing** | no `IF_NONE_MATCH` handling anywhere |
@@ -29,7 +29,7 @@ has since changed.
 | L5: both dialects, one legality source | **Done** | `allowedAffordances` shared; `RequestDtoMetadataTest` |
 | L5: HAL-FORMS Layer 2/3 addressing | **Missing.** HAL-FORMS is inline only, with no content-addressed layers | `buildHalFormsResponse` |
 | §6.1 `Accept-Profile` / `Link: rel="profile"` | **Missing.** Still uses the withdrawn media-type `profile` parameter | `contentType(... ;profile=...)` |
-| `Preference-Applied` | **Partly there.** Echoed for `embed=schemas` only | `GardenBedController.kt` |
+| `Preference-Applied` | **Done** (step 1). Echoes `forms=cid` or `forms=cid, schema=cid`; absent at L0 | `Rung.preferenceApplied` |
 | Digest length | 16 hex chars. Allowed for a closed-world demo server (§6.5); production would need the full digest | `take(16)` |
 | L6 | n/a (server) | |
 
@@ -73,6 +73,10 @@ The order follows the ladder: each step can be shown on its own.
    to Layer 1.
 6. **HAL-FORMS Layer 2/3,** if L5 is meant to cover addressing as well as
    legality.
+
+Live evidence: `server-spring/capture.sh` and `journal.html` still exercise
+the 0.3 wire format (`embed=schemas`, unconditional POSTs). They are
+refreshed against 0.4 once the server steps are in.
 
 The client work starts once step 1 is in: a real HTTP transport that
 walks L0→L2 against server-spring is the first test of ARTIE against a

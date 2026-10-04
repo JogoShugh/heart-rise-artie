@@ -1,6 +1,10 @@
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 plugins {
     kotlin("jvm") version "2.3.0"
     kotlin("plugin.serialization") version "2.3.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 group = "heart"
@@ -23,10 +27,45 @@ dependencies {
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.0")
     testImplementation(kotlin("reflect"))
     testImplementation("io.cucumber:cucumber-picocontainer:$cucumberVersion")
+    // bdd-gates: the client's architecture boundary as a failing test.
+    testImplementation("com.lemonappdev:konsist:0.17.3")
 }
 
 tasks.test {
     useJUnitPlatform()
+    finalizedBy(logBddRun)
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    // Existing code predates the gate; the baseline freezes its findings so
+    // only new violations fail. Shrink it as code is touched; never grow it.
+    baseline = file("detekt-baseline.xml")
+}
+
+// bdd-gates: records "BDD_RUN PASS|FAIL" after every test run, including failed ones.
+// The log lives at the repo root, one level up from this build. The Cucumber engine
+// is discovered through junit-platform.properties, so its XML carries the engine's name.
+val logBddRun by tasks.registering {
+    group = "verification"
+    description = "Appends a BDD_RUN fact to ../.claude/tdd-events.log for the pre-commit TDD-ordering check."
+    doLast {
+        val resultFile = file("build/test-results/test/TEST-io.cucumber.junit.platform.engine.CucumberTestEngine.xml")
+        val logFile = file("../.claude/tdd-events.log")
+        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+        logFile.parentFile.mkdirs()
+        if (!resultFile.exists()) {
+            // No result file means compilation or discovery failed: still red.
+            logFile.appendText("$timestamp BDD_RUN FAIL module=client reason=no-results\n")
+            return@doLast
+        }
+        val xml = resultFile.readText()
+        fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
+        val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
+        logFile.appendText(
+            "$timestamp BDD_RUN $status module=client total=${attr("tests")} failures=${attr("failures")} errors=${attr("errors")}\n",
+        )
+    }
 }
 
 kotlin {

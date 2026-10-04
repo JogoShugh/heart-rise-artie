@@ -1,8 +1,12 @@
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 plugins {
     id("org.springframework.boot") version "3.3.4"
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("jvm") version "2.0.20"
     kotlin("plugin.spring") version "2.0.20"
+    id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 group = "com.artie"
@@ -64,6 +68,16 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
+    // bdd-gates: Gherkin scenarios drive the SPEC conformance work. Cucumber 7
+    // fails undefined steps by default; keep it that way so a new scenario goes red.
+    testImplementation(platform("io.cucumber:cucumber-bom:7.18.0"))
+    testImplementation("io.cucumber:cucumber-java")
+    testImplementation("io.cucumber:cucumber-spring")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    testImplementation("org.junit.platform:junit-platform-suite")
+    // bdd-gates: the domain/web boundary as a failing test.
+    testImplementation("com.lemonappdev:konsist:0.17.3")
 }
 
 kotlin {
@@ -72,4 +86,48 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    // Existing code predates the gate; the baseline freezes its findings so
+    // only new violations fail. Shrink it as code is touched; never grow it.
+    baseline = file("detekt-baseline.xml")
+}
+
+// detekt 1.23.8 is built against Kotlin 2.0.21. Spring's dependency-management
+// plugin would otherwise force the project's Kotlin version onto detekt's
+// own classpath and break it.
+configurations.matching { it.name == "detekt" }.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") useVersion("2.0.21")
+    }
+}
+
+// bdd-gates: records "BDD_RUN PASS|FAIL" after every test run, including failed ones.
+// The log lives at the repo root, one level up from this build.
+val logBddRun by tasks.registering {
+    group = "verification"
+    description = "Appends a BDD_RUN fact to ../.claude/tdd-events.log for the pre-commit TDD-ordering check."
+    doLast {
+        val resultFile = file("build/test-results/test/TEST-com.artie.gardenbed.bdd.RunCucumberTest.xml")
+        val logFile = file("../.claude/tdd-events.log")
+        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+        logFile.parentFile.mkdirs()
+        if (!resultFile.exists()) {
+            // No result file means compilation or discovery failed: still red.
+            logFile.appendText("$timestamp BDD_RUN FAIL module=server-spring reason=no-results\n")
+            return@doLast
+        }
+        val xml = resultFile.readText()
+        fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
+        val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
+        logFile.appendText(
+            "$timestamp BDD_RUN $status module=server-spring total=${attr("tests")} failures=${attr("failures")} errors=${attr("errors")}\n",
+        )
+    }
+}
+
+tasks.test {
+    finalizedBy(logBddRun)
 }

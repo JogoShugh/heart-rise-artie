@@ -5,7 +5,6 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -30,28 +29,19 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class AffordanceSetController {
 
+    /** One address, one representation (SPEC 0.4 §6.1, §6.5): the L1 and
+     *  L2 renderings live at different hashes, so this never reads
+     *  Prefer and never sends Vary. */
     @GetMapping("/affordance-sets/sha256-{hash}")
-    suspend fun getAffordanceSet(
-        @PathVariable hash: String,
-        @RequestHeader("Prefer", required = false) prefer: String?
-    ): ResponseEntity<String> {
-        val status = JsonSchemaDialectSupport.statusByHash[hash]
-            ?: return ResponseEntity.notFound().build()
-
-        val embed = prefer?.contains("embed=schemas") == true
+    suspend fun getAffordanceSet(@PathVariable hash: String): ResponseEntity<String> {
         // Serve the canonical string, never a Map for Jackson to write:
         // the hash in the URL covers these exact bytes (SPEC.md §6.5).
-        val body = JsonSchemaDialectSupport.affordanceSetJson(status, embed)
+        val body = JsonSchemaDialectSupport.affordanceSetsByHash[hash]
+            ?: return ResponseEntity.notFound().build()
 
-        val builder = ResponseEntity.ok()
+        return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType("application/hal+json;profile=\"$JBADEAU_PROFILE\""))
             .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
-            .header(HttpHeaders.VARY, "Prefer")
-
-        if (embed) {
-            builder.header("Preference-Applied", "embed=schemas")
-        }
-
-        return builder.body(body)
+            .body(body)
     }
 }

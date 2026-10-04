@@ -50,11 +50,11 @@ class JsonSchemaDialectSupportTest {
 
     @Test
     fun `every affordance-set's served JSON hashes to its own URL and is canonical`() {
-        for (status in GardenBedStatus.entries) {
-            val hash = JsonSchemaDialectSupport.affordanceSetHashFor(status)
-            assertEquals(status, JsonSchemaDialectSupport.statusByHash[hash])
+        for (status in GardenBedStatus.entries) for (rendering in SetRendering.entries) {
+            val hash = JsonSchemaDialectSupport.affordanceSetHashFor(status, rendering)
+            val served = JsonSchemaDialectSupport.affordanceSetJson(status, rendering)
+            assertEquals(served, JsonSchemaDialectSupport.affordanceSetsByHash[hash])
 
-            val served = JsonSchemaDialectSupport.affordanceSetJson(status, embedSchemas = false)
             assertEquals(hash, sha256Hex16(served.toByteArray(Charsets.UTF_8)))
             // JCS sorts keys: "contentType" must come before "method",
             // the reverse of the order buildForms inserts them in.

@@ -1,5 +1,6 @@
 package com.artie.gardenbed.web
 
+import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.apicatalog.jcs.JsonCanonicalizer
 import jakarta.json.Json
@@ -21,29 +22,25 @@ import java.security.MessageDigest
  * at the same time should point at the SAME `/affordance-sets/{hash}`
  * URL, fetched once, cached everywhere.
  *
- * The three layers, now actually three layers:
+ * The three layers, per SPEC 0.4 §6.4 (see Rung):
  *
  *   GET /beds/{id}                  -- mutable, ETag-revalidated.
- *       Default: minimal -- just a pointer to the affordance-set.
- *       Prefer: embed=schemas -> collapses ALL THREE layers into one
- *           response (the RFC 7240 "give me everything, save me the
- *           round trips" case) -- forms AND their full schema bodies,
- *           all inline.
+ *       No Prefer (L0): collapses ALL THREE layers into one response --
+ *           forms AND their full schema bodies, all inline.
+ *       Prefer: forms=cid (L1) or forms=cid, schema=cid (L2): state
+ *           plus a link to that rung's affordance set.
  *
- *   GET /affordance-sets/sha256-{hash}  -- immutable. Identity (the
- *       hash) is based on WHICH affordances are in the set and what
- *       they target -- NOT on whether schemas are embedded, since
- *       embedding is a rendering choice, not a change of identity.
- *       Default: forms present, schema = {"$id": ...} (pointer).
- *       Prefer: embed=schemas -> schema bodies expanded fully inline.
+ *   GET /affordance-sets/sha256-{hash}  -- immutable, never negotiates.
+ *       The L1 set embeds schema bodies; the L2 set carries only each
+ *       schema's $id. Different bytes, so different addresses (§6.5).
  *
- *   GET /schemas/sha256-{hash}      -- immutable, unchanged from the
- *       previous correction. A real sha256 of the schema's own bytes.
+ *   GET /schemas/sha256-{hash}      -- immutable. A real sha256 of the
+ *       schema's own canonical bytes.
  *
  * Because this domain's affordances are fully determined by
- * GardenBedStatus (a 3-value enum), there are exactly 3 possible
- * affordance-sets, ever -- computed once, at class-init, same as the
- * individual schemas.
+ * GardenBedStatus (a 3-value enum), there are exactly 6 possible
+ * affordance-sets, ever (3 statuses x 2 renderings) -- computed once,
+ * at class-init, same as the individual schemas.
  */
 object JsonSchemaDialectSupport {
 
@@ -152,49 +149,35 @@ object JsonSchemaDialectSupport {
             )
         }
 
-    /** The CANONICAL (never-embedded) form of each status's affordance
-     *  set -- this, and only this, is what gets hashed. Embedding is a
-     *  rendering choice made later, at request time, and must never
-     *  change a set's identity. */
-    private val canonicalSetBodyByStatus: Map<GardenBedStatus, Map<String, Any?>> =
-        GardenBedStatus.entries.associateWith { status ->
-            mapOf("_forms" to buildForms(allowedAffordances(status), embedSchemas = false))
-        }
+    /** One Layer 2 resource per (status, rendering). SPEC 0.4 §6.5: the
+     *  L1 set (schemas embedded) and the L2 set (schema pointers) are
+     *  different bytes, so each gets its own address. Both are always
+     *  templated, so every bed in one status shares them. */
+    private data class SetKey(val status: GardenBedStatus, val rendering: SetRendering)
 
-    private val setHashByStatus: Map<GardenBedStatus, String> =
-        canonicalSetBodyByStatus.mapValues { (_, body) -> sha256Hex(canonicalBytes(body)).take(16) }
+    /** JCS canonical JSON for each set: these exact bytes are hashed AND served. */
+    private val setJsonByKey: Map<SetKey, String> =
+        GardenBedStatus.entries.flatMap { status -> SetRendering.entries.map { SetKey(status, it) } }
+            .associateWith { key ->
+                val embed = key.rendering == SetRendering.EMBEDDED_SCHEMAS
+                val body = mapOf("_forms" to buildForms(allowedAffordances(key.status), embed))
+                String(canonicalBytes(body), Charsets.UTF_8)
+            }
 
-    /** hash (no "sha256-" prefix) -> status, for AffordanceSetController. */
-    val statusByHash: Map<String, GardenBedStatus> =
-        setHashByStatus.entries.associate { (status, hash) -> hash to status }
+    private val setHashByKey: Map<SetKey, String> =
+        setJsonByKey.mapValues { (_, json) -> sha256Hex(json.toByteArray(Charsets.UTF_8)).take(16) }
 
-    fun affordanceSetHashFor(status: GardenBedStatus): String = setHashByStatus.getValue(status)
+    /** hash (no "sha256-" prefix) -> canonical set JSON, for AffordanceSetController. */
+    val affordanceSetsByHash: Map<String, String> =
+        setHashByKey.entries.associate { (key, hash) -> hash to setJsonByKey.getValue(key) }
 
-    /** The standalone /affordance-sets/{hash} resource's body as a
-     *  tree -- always templated, identical for every bed sharing this
-     *  status. Callers that SERVE it must use affordanceSetJson below,
-     *  not serialize this map themselves: a plain Jackson write keeps
-     *  insertion order, so its bytes would not match the hash. */
-    fun affordanceSetBody(status: GardenBedStatus, embedSchemas: Boolean): Map<String, Any?> =
-        mapOf("_forms" to buildForms(allowedAffordances(status), embedSchemas))
+    fun affordanceSetHashFor(status: GardenBedStatus, rendering: SetRendering): String =
+        setHashByKey.getValue(SetKey(status, rendering))
 
-    private val canonicalSetJsonByStatus: Map<GardenBedStatus, String> =
-        canonicalSetBodyByStatus.mapValues { (_, body) -> String(canonicalBytes(body), Charsets.UTF_8) }
+    fun affordanceSetJson(status: GardenBedStatus, rendering: SetRendering): String =
+        setJsonByKey.getValue(SetKey(status, rendering))
 
-    private val embeddedSetJsonByStatus: Map<GardenBedStatus, String> =
-        GardenBedStatus.entries.associateWith { status ->
-            String(canonicalBytes(affordanceSetBody(status, embedSchemas = true)), Charsets.UTF_8)
-        }
-
-    /** The exact bytes to serve at /affordance-sets/{hash}, as JCS
-     *  canonical JSON. The pointer form (embedSchemas = false) is
-     *  byte-for-byte what was hashed, so its URL is a true content
-     *  address (SPEC.md §6.5). The embedded form is a rendering of the
-     *  same identity (§6.4) and shares its URL. */
-    fun affordanceSetJson(status: GardenBedStatus, embedSchemas: Boolean): String =
-        if (embedSchemas) embeddedSetJsonByStatus.getValue(status) else canonicalSetJsonByStatus.getValue(status)
-
-    /** Only used by buildBedBody's embed=true (collapse-everything)
+    /** Only used by buildBedBody's L0 (collapse-everything)
      *  path, where the response is already specific to one bed and
      *  resolving `{bedId}` for convenience costs no sharing benefit --
      *  the standalone affordance-set resource above never calls this. */
@@ -218,41 +201,28 @@ object JsonSchemaDialectSupport {
     // ---------------------------------------------------------------
 
     /**
-     * Default: minimal. Just state plus a pointer to the affordance-set
-     * -- no per-affordance detail at all. `type` on the link closes the
-     * discovery gap (same fix discussed for HAL-FORMS's own §6 example
-     * earlier) so a client knows what it'll get before fetching.
-     *
-     * `Prefer: embed=schemas` collapses all three layers into one
-     * response -- forms AND fully expanded schemas, inline, no further
-     * requests needed at all. This is the RFC 7240 "return=representation,
-     * save me the round trips" case, just spanning two hops instead of
-     * one.
+     * SPEC 0.4 §6.4. L0, the default: all three layers collapsed --
+     * state, forms, and full schemas inline, one hop. L1 and L2: state
+     * plus a link to the affordance set rendered for that rung. `type`
+     * on the link tells a client what it will get before fetching.
      */
-    fun buildBedBody(
-        bedId: Long,
-        label: String,
-        status: String,
-        cropName: String?,
-        growthPoints: Int,
-        moistureLevel: Int,
-        gardenBedStatus: GardenBedStatus,
-        embedSchemas: Boolean = false
-    ): Map<String, Any?> {
+    fun buildBedBody(state: GardenBedState, rung: Rung = Rung.L0): Map<String, Any?> {
+        val bedId = state.id
         val base = mutableMapOf<String, Any?>(
             "id" to bedId,
-            "label" to label,
-            "status" to status,
-            "cropName" to cropName,
-            "growthPoints" to growthPoints,
-            "moistureLevel" to moistureLevel
+            "label" to state.label,
+            "status" to state.status.name,
+            "cropName" to state.cropName,
+            "growthPoints" to state.growthPoints,
+            "moistureLevel" to state.moistureLevel
         )
 
-        if (embedSchemas) {
+        val rendering = rung.setRendering
+        if (rendering == null) {
             base["_links"] = mapOf("self" to mapOf("href" to "/beds/$bedId"))
-            base.putAll(resolvedFormsForBed(gardenBedStatus, bedId, embedSchemas = true))
+            base.putAll(resolvedFormsForBed(state.status, bedId, embedSchemas = true))
         } else {
-            val hash = affordanceSetHashFor(gardenBedStatus)
+            val hash = affordanceSetHashFor(state.status, rendering)
             base["_links"] = mapOf(
                 "self" to mapOf("href" to "/beds/$bedId"),
                 "http://api.example.org/rels/forms" to mapOf(

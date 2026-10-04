@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongParameterList:JsonSchemaDialectSupport.kt$JsonSchemaDialectSupport$( bedId: Long, label: String, status: String, cropName: String?, growthPoints: Int, moistureLevel: Int, gardenBedStatus: GardenBedStatus, embedSchemas: Boolean = false )</ID>
+    <ID>MagicNumber:Dtos.kt$SowSeedRequest$10</ID>
+    <ID>MagicNumber:Dtos.kt$WaterCellRequest$1000</ID>
+    <ID>MagicNumber:GardenBedService.kt$GardenBedService$4</ID>
+    <ID>MagicNumber:GardenBedState.kt$GardenBedProjector$100</ID>
+    <ID>MagicNumber:GardenBedState.kt$GardenBedProjector$5</ID>
+    <ID>MagicNumber:JsonSchemaDialectSupport.kt$JsonSchemaDialectSupport$16</ID>
+    <ID>MaxLineLength:EventStore.kt$EventStore$val seed = if (canUseSnapshot) readSnapshotState(snapshot!!).copy(label = label) else GardenBedState.empty(bedId, label)</ID>
+    <ID>SpreadOperator:GardenBedApplication.kt$(*args)</ID>
+    <ID>SwallowedException:EventStore.kt$EventStore$e: DataIntegrityViolationException</ID>
+    <ID>SwallowedException:GardenBedController.kt$GardenBedController$e: ConcurrentAppendException</ID>
+    <ID>TooManyFunctions:GardenBedController.kt$GardenBedController</ID>
+    <ID>TooManyFunctions:JsonSchemaDialectSupport.kt$JsonSchemaDialectSupport</ID>
+    <ID>UnusedParameter:GardenBedController.kt$GardenBedController$allowed: List&lt;String&gt;</ID>
+    <ID>WildcardImport:GardenBedController.kt$import org.springframework.web.bind.annotation.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

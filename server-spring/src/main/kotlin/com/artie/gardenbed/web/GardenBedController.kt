@@ -33,13 +33,6 @@ private fun negotiateDialect(acceptHeader: String?): Dialect {
     }
 }
 
-/** RFC 7240's own extension mechanism: any token is legal on Prefer,
- *  not just the two the RFC itself defines (return=minimal/
- *  representation). "embed=schemas" is our own token, same pattern
- *  PostgREST uses for its handling/timezone/count preferences. */
-private fun wantsEmbeddedSchemas(preferHeader: String?): Boolean =
-    preferHeader?.contains("embed=schemas") == true
-
 /** The ETag is now the event sequence number itself, not a derived
  *  timestamp -- a more precise concurrency token than before, since
  *  it's the exact same number the event store's UNIQUE constraint
@@ -190,35 +183,22 @@ class GardenBedController(private val service: GardenBedService) {
         etag: String,
         prefer: String?
     ): ResponseEntity<Any> {
-        val embed = wantsEmbeddedSchemas(prefer)
-
-        val body = JsonSchemaDialectSupport.buildBedBody(
-            bedId = state.id,
-            label = state.label,
-            status = state.status.name,
-            cropName = state.cropName,
-            growthPoints = state.growthPoints,
-            moistureLevel = state.moistureLevel,
-            gardenBedStatus = state.status,
-            embedSchemas = embed
-        )
+        val rung = Rung.fromPrefer(prefer)
+        val body = JsonSchemaDialectSupport.buildBedBody(state, rung)
 
         val builder = ResponseEntity.ok()
             .contentType(MediaType.parseMediaType("application/hal+json;profile=\"$JBADEAU_PROFILE\""))
             .eTag(etag)
-            // Prefer changes the response body (embedded vs. pointer-only),
-            // so per RFC 7240 it MUST be listed in Vary alongside Accept --
-            // otherwise a cache could serve one client's embedded response
-            // to another client that never asked for it.
+            // Prefer changes the Layer 1 body (collapsed vs. linked), so
+            // it is listed in Vary alongside Accept -- otherwise a cache
+            // could serve one rung's response to a client at another.
+            // Layer 1 only: Layers 2 and 3 never vary (SPEC §6.1).
             .header(HttpHeaders.VARY, "${HttpHeaders.ACCEPT}, Prefer")
 
-        // Preference-Applied confirms what was actually honored -- per
-        // RFC 7240, necessary specifically because a client can't always
-        // tell just from the payload whether an optional preference was
-        // applied or silently ignored.
-        if (embed) {
-            builder.header("Preference-Applied", "embed=schemas")
-        }
+        // Preference-Applied confirms what was actually honored (RFC 7240):
+        // a client cannot always tell from the payload alone whether an
+        // optional preference was applied or silently ignored.
+        rung.preferenceApplied?.let { builder.header("Preference-Applied", it) }
 
         return builder.body(body)
     }

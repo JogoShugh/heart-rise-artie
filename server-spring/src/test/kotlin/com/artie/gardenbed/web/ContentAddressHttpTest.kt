@@ -27,9 +27,8 @@ class ContentAddressHttpTest {
         MessageDigest.getInstance("SHA-256").digest(bytes)
             .joinToString("") { "%02x".format(it) }.take(16)
 
-    private fun fetchBytes(path: String, prefer: String? = null): ByteArray {
+    private fun fetchBytes(path: String): ByteArray {
         val body = client.get().uri(path)
-            .headers { h -> if (prefer != null) h.set("Prefer", prefer) }
             .exchange()
             .expectStatus().isOk
             .expectHeader().valueEquals("Cache-Control", "public, max-age=31536000, immutable")
@@ -48,25 +47,27 @@ class ContentAddressHttpTest {
 
     @Test
     fun `each affordance-set URL is the sha256 of the bytes served at it`() {
-        for (status in GardenBedStatus.entries) {
-            val hash = JsonSchemaDialectSupport.affordanceSetHashFor(status)
+        for (status in GardenBedStatus.entries) for (rendering in SetRendering.entries) {
+            val hash = JsonSchemaDialectSupport.affordanceSetHashFor(status, rendering)
             val served = fetchBytes("/affordance-sets/sha256-$hash")
             assertEquals(
                 hash, sha256Hex16(served),
-                "$status affordance-set bytes don't hash to their own URL: ${String(served)}"
+                "$status/$rendering affordance-set bytes don't hash to their own URL: ${String(served)}"
             )
         }
     }
 
     @Test
-    fun `embedding schemas changes the rendering but not the URL`() {
-        val hash = JsonSchemaDialectSupport.affordanceSetHashFor(GardenBedStatus.EMPTY)
-        val plain = String(fetchBytes("/affordance-sets/sha256-$hash"))
-        val embedded = String(fetchBytes("/affordance-sets/sha256-$hash", prefer = "embed=schemas"))
+    fun `L1 and L2 renderings are different bytes at different URLs`() {
+        val l1 = JsonSchemaDialectSupport.affordanceSetHashFor(GardenBedStatus.EMPTY, SetRendering.EMBEDDED_SCHEMAS)
+        val l2 = JsonSchemaDialectSupport.affordanceSetHashFor(GardenBedStatus.EMPTY, SetRendering.SCHEMA_POINTERS)
+        val embedded = String(fetchBytes("/affordance-sets/sha256-$l1"))
+        val pointers = String(fetchBytes("/affordance-sets/sha256-$l2"))
 
-        // Pointer form carries only the schema's $id; embedded form also
-        // carries the schema body. Same URL serves both (§6.4, §6.5).
-        assert(!plain.contains("\"properties\"")) { "plain form should not inline schema bodies: $plain" }
-        assert(embedded.contains("\"properties\"")) { "embedded form should inline schema bodies: $embedded" }
+        // SPEC 0.4 §6.5: one address, one representation. The L1 set inlines
+        // schema bodies; the L2 set carries only each schema's $id.
+        assert(l1 != l2) { "L1 and L2 sets share address $l1" }
+        assert(embedded.contains("\"properties\"")) { "L1 set should inline schema bodies: $embedded" }
+        assert(!pointers.contains("\"properties\"")) { "L2 set should not inline schema bodies: $pointers" }
     }
 }
