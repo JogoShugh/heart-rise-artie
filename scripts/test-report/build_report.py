@@ -9,6 +9,7 @@ Does not run anything itself. Before running it:
     python3 render_journal.py, for run/ and journal.html (demo.sh does the
     same and then opens the journal in a browser)
   - live-hash.sh (next to this file), with the server still up
+  - scripts/live-client-check.sh, for client/build/test-results/liveTest
 
 Usage: python3 scripts/test-report/build_report.py [input_dir]
 input_dir holds the two logs and receives test-report.html; defaults to
@@ -22,9 +23,9 @@ SCRATCH = Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().p
 esc = html.escape
 
 
-def junit(project):
+def junit(project, task="test"):
     cases = []
-    for f in sorted(glob.glob(str(REPO / project / "build/test-results/test/*.xml"))):
+    for f in sorted(glob.glob(str(REPO / project / f"build/test-results/{task}/*.xml"))):
         suite = ET.parse(f).getroot()
         for tc in suite.iter("testcase"):
             failed = tc.find("failure") is not None or tc.find("error") is not None
@@ -35,6 +36,7 @@ def junit(project):
                 "time": float(tc.get("time", 0)),
                 "status": "fail" if failed else "skip" if skipped else "pass",
                 "ts": suite.get("timestamp", ""),
+                "suite": suite.get("name", ""),
             })
     return cases
 
@@ -73,8 +75,12 @@ def tally(cases):
 
 # ---- collect ----------------------------------------------------------
 spring = junit("server-spring")
-client = junit("client")
+# The @live scenarios show as skipped in the plain run; they are counted in client_live.
+client = [c for c in junit("client") if c["status"] != "skip"]
 koog = junit("exhibits/koog-first-pass")
+# @live scenarios only; the rest of that run is skipped by its tag filter.
+# liveTest also re-runs the plain JUnit classes; only the Cucumber scenarios count here.
+client_live = [c for c in junit("client", "liveTest") if c["status"] != "skip" and "Cucumber" in c["suite"]]
 
 cache_log = (SCRATCH / "cache-demo.log").read_text()
 cache_checks = [(m.group(1), m.group(2).strip()) for m in re.finditer(r"^\s+(PASS|FAIL)\s+(.*)$", cache_log, re.M)]
@@ -104,10 +110,11 @@ summary_rows = "".join(
     f'<tr><td>{esc(n)}</td><td>{esc(kind)}</td><td class="num">{tally(c)[0]} / {tally(c)[1]}</td></tr>'
     for n, kind, c in suites)
 summary_rows += f'<tr><td>cache-demo</td><td>end-to-end run vs. server log</td><td class="num">{cache_pass} / {len(cache_checks)}</td></tr>'
+summary_rows += f'<tr><td>client live</td><td>ARTIE over HTTP vs. server-spring + Postgres</td><td class="num">{tally(client_live)[0]} / {tally(client_live)[1]}</td></tr>'
 summary_rows += f'<tr><td>server-spring live</td><td>journal verdicts</td><td class="num">{j_ok} / {j_ok + j_bug}</td></tr>'
 summary_rows += f'<tr><td>server-spring live</td><td>served bytes vs. URL hash</td><td class="num">{live_match} / {len(live)}</td></tr>'
-grand_ok = total_pass + cache_pass + j_ok + live_match
-grand = total + len(cache_checks) + j_ok + j_bug + len(live)
+grand_ok = total_pass + cache_pass + j_ok + live_match + tally(client_live)[0]
+grand = total + len(cache_checks) + j_ok + j_bug + len(live) + len(client_live)
 
 run_ts = max(c["ts"] for c in all_cases)
 
@@ -176,7 +183,7 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
 <header style="display:grid;gap:12px">
   <div class="eyebrow">~/repos/artie · baseline · results from run at {esc(run_ts)} UTC</div>
   <h1>Test baseline</h1>
-  <div class="big"><b>{grand_ok} / {grand}</b><span class="muted">checks passing across 3 test suites and 3 live checks</span></div>
+  <div class="big"><b>{grand_ok} / {grand}</b><span class="muted">checks passing across 3 test suites and 4 live checks</span></div>
   <p class="muted">Every count, name and status on this page was read from result files by a script: JUnit XML from Gradle, the cache-demo run log, a live hash check against the running Spring server, and the verdicts in <code>journal.html</code>. The explanations were written by hand. Each code excerpt is copied from the current source, with its file and line number.</p>
 </header>
 
@@ -197,6 +204,10 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
     <li><b>Step 4 · profiles.</b> <code>Link: rel="profile"</code> on every Layer 1 response; <code>Accept-Profile</code> negotiation; <code>406</code> for an unsatisfiable <code>Accept</code>; the media-type <code>profile</code> parameter is gone. (§6.1)</li>
     <li><b>Step 5 · templates.</b> <code>{{bedId}}</code> became <code>{{id}}</code>, the Layer 1 property it resolves from. Before, a rule-following client posted to <code>/beds/actions/water-cell</code> and got <code>404</code>. (§6.9.1)</li>
     <li><b>L5 guard.</b> Both dialects offer the same acts in every state, now checked over HTTP.</li>
+    <li><b>Client C1 · real wire format.</b> ARTIE parsed a format no SPEC version defines. It now reads 0.4 <code>_forms</code>, checks <code>Link: rel="profile"</code>, and holds the ETag.</li>
+    <li><b>Client C2 · conditional acts.</b> <code>If-Match</code> on every act; templates expanded by the <code>[0.5]</code> rule only; <code>412</code>, <code>409</code>, <code>428</code> and <code>422</code> each handled their own way.</li>
+    <li><b>Client C3 · real HTTP.</b> <code>HttpTransport</code> and live scenarios against server-spring. The second live run found a server bug: the first snapshot (event 5) answered <code>500</code> after its event was committed. Fixed, with a Postgres test.</li>
+    <li><b>Client C4 · L2 walk.</b> Layer 1, set, schemas, through an HTTP cache that serves immutable layers without a request and revalidates Layer 1 to <code>304</code>. Bytes that do not hash to their address are refused.</li>
   </ul>
 </section>
 
@@ -222,18 +233,17 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
 <!-- 2. client -->
 <section>
   <div class="eyebrow">Suite 2 · client (the real ARTIE) · {tally(client)[0]} / {tally(client)[1]}</div>
-  <h2>Client: enter, act, and refusing unknown actions</h2>
+  <h2>Client: sync at L0 and L2, conditional acts, refusals, the cache</h2>
+  <p class="muted">These scenarios run against a scripted server written as raw HTTP responses. The same client code runs against the real server in <code>live-server.feature</code> (summary row "client live").</p>
   {table(client)}
   <div class="example">
-    <h3>Example: acting on an action absent from the manifest raises an error</h3>
+    <h3>Example: a stale act is dropped, not resent</h3>
     <dl>
-      <dt>Rule</dt><dd>This is H.E.A.R.T.'s core guarantee: the agent can only act on what the server offered. Here, the server offered <code>transition</code> and the caller asks for <code>nonexistent</code>.</dd>
-      <dt>How</dt><dd>A fake transport returns one canned response for <code>enter</code>. The test then calls <code>act("nonexistent", …)</code> and checks two things: an error was raised, and the fake transport recorded zero submits.</dd>
-      <dt>Why both</dt><dd>The fake transport throws when its queue is empty. So "an error was raised" alone would also pass if the client had wrongly tried the network. The second check closes that gap.</dd>
+      <dt>Rule</dt><dd>SPEC §6.3: on <code>412</code> the client re-syncs and discards the pending act. The user's intent may mean something else now, so resending it could overwrite someone else's write.</dd>
+      <dt>How</dt><dd>The scripted server answers the act with <code>412</code>, then answers the re-sync GET with a newer bed. The scenario checks the exact requests the client sent after entering: one POST, one GET, and no second POST. It also checks that the client now holds the newer ETag.</dd>
+      <dt>Mutation check</dt><dd>Treating <code>412</code> like <code>428</code> (re-sync, then resend) made this scenario fail, because the resent act was not in the new manifest. The change was reverted. The same rule passes live: <code>live-server.feature</code> has a second client write first, and ARTIE gets <code>StaleAct</code> from the real server.</dd>
     </dl>
-    {code("client/src/test/resources/features/act-unknown.feature", "Scenario:", None, 8)}
-    {code("client/src/main/kotlin/heart/ArtieClient.kt", "override fun act", "    }")}
-    <p class="redgreen">Mutation check: I temporarily made <code>act</code> call the transport before checking the manifest. The scenario failed with <code>Expected no submit, but got [POST https://example.com/nonexistent]</code>. I then restored the original code.</p>
+    {code("client/src/test/resources/features/conditional-acts.feature", "Scenario: 412 means the world moved", None, 34)}
   </div>
 </section>
 
@@ -292,7 +302,8 @@ ul.plain {{ margin: 0; padding-left: 18px; font-size: 0.95rem; }}
   <div class="eyebrow">Limits</div>
   <h2>What this baseline does not cover</h2>
   <ul class="plain">
-    <li>The client suite runs against a fake transport, not a real server. No test yet runs <code>client/</code> against <code>server-spring</code>. Its parser still expects the withdrawn <code>profile</code> parameter in <code>Content-Type</code>, so it would reject the server's responses since step 4.</li>
+    <li>The server's Cucumber suite uses <code>@WebFluxTest</code>, but production runs Spring MVC on Tomcat. The live journal and ARTIE's live scenarios exercise the real stack; the in-process suite does not.</li>
+    <li>ARTIE has no Reason step (L6) and no RISE yet. It fetches schemas one after another, not in parallel.</li>
     <li>HAL-FORMS is served at L0 only. Its Layer 2/3 addressing needs a SPEC decision first; see <code>spec/CONFORMANCE-GAPS.md</code>.</li>
     <li>The cache-demo exhibit still uses its own 0.3-era fixtures (<code>{{bedId}}</code>, no <code>Prefer</code>). It demonstrates the caching mechanism, not 0.4 conformance.</li>
     <li>The Docker build of <code>Dockerfile.origin</code> was verified on 3 Oct, before the fixed random seed. The cache-demo run above used the local <code>server.py</code> with the regenerated fixtures.</li>
