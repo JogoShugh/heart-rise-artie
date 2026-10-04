@@ -33,7 +33,7 @@ has since changed.
 | Digest length | 16 hex chars. Allowed for a closed-world demo server (§6.5); production would need the full digest | `take(16)` |
 | L6 | n/a (server) | |
 | Snapshot write on real Postgres | **Fixed** (C3). The first snapshot (event 5) threw after the event was committed, so the act returned `500` for a write that happened. Now an upsert, and best-effort | `EventStorePostgresTest` |
-| Tests run the production web stack | **Gap.** Production runs Spring MVC on Tomcat (`starter-hateoas` brings `starter-web`, and Boot prefers servlet). The Cucumber suite uses `@WebFluxTest`. The live journal and ARTIE's live scenarios do exercise the real stack | `docker compose logs app`: "Tomcat started" |
+| Tests run the production web stack | **Done**. Production now runs WebFlux on Netty, like the Cucumber suite: `spring-boot-starter-web` is excluded from the HATEOAS starter. `runtime-stack.feature` fails if a servlet stack returns. Journal, content addresses and ARTIE live all pass on Netty |
 
 ## client/ (ARTIE, the deterministic Kotlin client)
 
