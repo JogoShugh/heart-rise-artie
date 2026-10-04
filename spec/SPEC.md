@@ -17,6 +17,10 @@
 7. **Explaining absence (§12).** Proposes a concrete mechanism: an optional, content-addressed `heart:unavailable` resource linked from Layer 2 and fetched only on demand.
 8. **`cid` token name (§6.4).** Flags that `forms=cid` reads as a multiformats CID, which §12 is still deciding whether to adopt. Proposes `forms=link, schema=link` as an alternative.
 
+**Decided for 0.5 by the author** (no longer proposals):
+
+- **HAL-FORMS is the L0 on-ramp; HAL Schema Forms is the reference dialect (§6.1, §6.2, §6.10.6).** Decided 2026-10-04. HAL-FORMS has no field that points to a separately addressed properties fragment, and its common toolchains generate the bytes, so the layering and content addressing of L1–L3 do not fit it. Rather than extend HAL-FORMS, 0.5 serves it at L0 only. Every rung, L0 to L6, is defined for HAL Schema Forms.
+
 **Changes since 0.3:**
 
 - **Introduced the L0–L6 conformance ladder (§6.10)** as the normative structure for incremental adoption, with sequence diagrams per rung. L0 — everything embedded, zero headers — is an on-ramp, explicitly *not* conformance (§6.10.1).
@@ -192,6 +196,8 @@ Uses the `_templates` key. Amundsen's inline `properties` array (`name`, `type`,
 
 A server SHOULD support both dialects for the same resource, generated from one shared source of truth for "which affordances are currently legal" — the two dialects MUST NOT be allowed to drift into disagreeing about that. Dialect is an orthogonal axis to the layering ladder, not a rung above it (§6.10.6).
 
+**The two dialects do not have equal reach (decided for 0.5).** HAL Schema Forms is the *reference dialect*: every rung, L0 to L6, is defined for it, and compliance (§6.2) is judged in it. HAL-FORMS is the *on-ramp dialect*: it is served at L0 only, collapsed, with its inline `properties`. A server SHALL ignore `forms=cid` and `schema=cid` for a HAL-FORMS response and SHALL NOT list them in `Preference-Applied`. The reason is structural. HAL-FORMS has no field that points to a separately addressed properties fragment, so L1–L3 would need a wire format HAL-FORMS does not define. And the toolchains that make HAL-FORMS attractive (Spring HATEOAS and others) generate its bytes, which makes canonical, content-addressed bytes hard to guarantee. HAL-FORMS's strength is that those toolchains give a server L0 for free; that is the role it keeps. The `heart-rise/hal-forms` profile therefore names "HAL-FORMS at L0, with H.E.A.R.T. legality and the L4 error model".
+
 **`Vary` applies to Layer 1 only.** A server that varies its Layer 1 response by `Accept`, `Prefer`, or `Accept-Profile` SHALL send `Vary: Accept, Prefer, Accept-Profile` as applicable. Layer 2 and Layer 3 are content-addressed and therefore have exactly one representation each; they never negotiate, and SHALL NOT send `Vary`. Dialect, profile, and rendering are all baked into the bytes, and so into the address (§6.5). Layer 1 `ETag` values SHALL differ across dialects and across rungs, since these are different representations of that resource.
 
 `[0.5]` Layer 1 `ETag` values SHALL be **strong** validators. `If-Match` uses strong comparison (RFC 9110 §13.1.1), so a weak `ETag` can never satisfy the precondition that §6.3 makes mandatory. A server SHOULD build each `ETag` from two parts: a *state version* that changes only when the resource's state changes, and a *variant tag* for the dialect and rung (for example `"seq-5.hsf.L2"`). The client treats the whole value as opaque. Only the server reads the parts. §6.2 says how it uses them.
@@ -220,7 +226,7 @@ A H.E.A.R.T. response is organised into three layers. Whether those layers arriv
 
 A H.E.A.R.T. compliant server SHALL:
 
-- Serve L0, L1, and L2 renderings on request, per §6.4 and §6.10 — a server that can only produce the collapsed L0 rendering is **not compliant** (§6.10.1)
+- Serve L0, L1, and L2 renderings of the reference dialect (HAL Schema Forms) on request, per §6.4 and §6.10 — a server that can only produce the collapsed L0 rendering is **not compliant** (§6.10.1). A server MAY additionally serve HAL-FORMS, at L0 only (§6.1)
 - Default to the L0 collapsed rendering when no `Prefer` header is sent
 - Vary the affordance set based on current domain state
 - Serve Layer 2 and Layer 3 at content-addressed URLs computed per §6.5, with `max-age=31536000, immutable` and the cacheability directive required by §6.9.4
@@ -613,6 +619,8 @@ sequenceDiagram
     Client->>Server: GET /beds/2<br/>Accept: application/hal+json<br/>Accept-Profile: heart-rise/hal-schema-forms
     Server-->>Client: 200 OK<br/>_forms (jsonschema dialect)<br/>Link: rel="profile"
 ```
+
+Under the 0.5 decision (§6.1), L5 compares the reference dialect at any rung with HAL-FORMS at L0. What must agree is the legality decision, not the layering.
 
 L5 demonstrates §6.1's central claim: the `heart-rise` semantics add layering and addressing without owning the wire format. The same legality decision — which transitions are available on bed 2 right now — is rendered twice, and the two renderings MUST agree on that decision while agreeing on nothing else about their structure.
 

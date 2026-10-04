@@ -15,3 +15,15 @@ Feature: Cross-dialect legality (L5)
       | EMPTY            | /beds/2/actions/sow-seed       |
       | PLANTED          | /beds/2/actions/water-cell     |
       | READY_TO_HARVEST | /beds/2/actions/harvest        |
+
+  Scenario Outline: HAL-FORMS is the L0 on-ramp: it ignores layering preferences: Prefer "<prefer>"
+    Given bed 2 is PLANTED
+    When a client gets bed 2 as hal-forms with Prefer "<prefer>"
+    Then the response carries its forms under "_templates"
+    And the response has no Preference-Applied header
+    And the response ETag is "seq-1.hf.L0"
+
+    Examples:
+      | prefer                |
+      | forms=cid             |
+      | forms=cid, schema=cid |
