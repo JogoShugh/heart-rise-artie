@@ -1,56 +1,66 @@
-Feature: Act — submitting to a known affordance
+Feature: Act: submit a form the manifest offers
+  SPEC §6.3, §6.8. The client sends the act to the target the server gave,
+  with the payload as JSON, and the response becomes the new state and
+  manifest.
 
   Background:
-    Given the service returns the following on enter:
-      """yaml
-      status: initial
+    Given the service answers GET "http://garden.test/beds/1" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-0.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 1
+      status: EMPTY
       _forms:
-        transition:
-          href: https://example.com/resource
+        sowSeed:
+          _links:
+            target: {href: /beds/1/actions/sow-seed}
           method: POST
-          hash: abc123
-          _schema:
+          contentType: application/json
+          schema:
             type: object
             properties:
-              value:
-                type: string
-            required: [value]
+              seedType: {type: string}
+            required: [seedType]
       """
-    And acting on "transition" returns:
-      """yaml
-      status: transitioned
+    And the service answers POST "http://garden.test/beds/1/actions/sow-seed" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 1
+      status: PLANTED
       _forms:
-        next-action:
-          href: https://example.com/resource/next
+        waterCell:
+          _links:
+            target: {href: /beds/1/actions/water-cell}
           method: POST
-          hash: def456
-          _schema:
+          contentType: application/json
+          schema:
             type: object
             properties:
-              note:
-                type: string
-            required: [note]
+              milliliters: {type: integer}
+            required: [milliliters]
       """
-    And the Content-Type declares the H.E.A.R.T. dual profile
-    When the client enters the service
-    And the client acts on "transition" with:
+    When the client enters "http://garden.test/beds/1"
+    And the client acts on "sowSeed" with:
       """yaml
-      value: hello
+      seedType: basil
       """
+
+  Scenario: The act goes to the resolved target, with the payload as JSON
+    Then the client sent POST "http://garden.test/beds/1/actions/sow-seed" with headers:
+      | Content-Type | application/json |
+    And that request had the JSON body {"seedType":"basil"}
 
   Scenario: Resource state reflects the transition
     Then the resource state contains:
-      | key    | value        |
-      | status | transitioned |
+      | key    | value   |
+      | status | PLANTED |
 
   Scenario: Manifest reflects the transition
-    Then the manifest affordances are:
-      | rel         | present |
-      | next-action | true    |
-      | transition  | false   |
-
-  Scenario: New affordance fields are accessible
-    Then the "next-action" affordance has:
-      | href                              | hash   |
-      | https://example.com/resource/next | def456 |
-
+    Then the manifest offers exactly "waterCell"

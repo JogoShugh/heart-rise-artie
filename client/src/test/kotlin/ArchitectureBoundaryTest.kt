@@ -9,7 +9,10 @@ import org.junit.jupiter.api.Test
  */
 class ArchitectureBoundaryTest {
 
-    private val forbiddenPrefixes = listOf("java.net", "io.ktor", "okhttp3", "org.apache.hc")
+    // java.net.URI is plain data (resolving targets); the HTTP clients are I/O.
+    private val forbiddenPrefixes = listOf(
+        "java.net.http", "java.net.Socket", "java.net.URL", "io.ktor", "okhttp3", "org.apache.hc",
+    )
 
     @Test
     fun `only Transport implementations import network libraries`() {

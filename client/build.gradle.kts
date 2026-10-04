@@ -36,6 +36,11 @@ tasks.test {
     finalizedBy(logBddRun)
 }
 
+// Red includes "does not compile": finalize the compile tasks too, so that
+// failure is logged. Gradle runs logBddRun once, after whichever ran.
+tasks.named("compileKotlin") { finalizedBy(logBddRun) }
+tasks.named("compileTestKotlin") { finalizedBy(logBddRun) }
+
 detekt {
     buildUponDefaultConfig = true
     // Existing code predates the gate; the baseline freezes its findings so
@@ -54,6 +59,14 @@ val logBddRun by tasks.registering {
         val logFile = file("../.claude/tdd-events.log")
         val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
         logFile.parentFile.mkdirs()
+        // A compile failure stops the build before tests run, which leaves the
+        // previous run's XML in place. Log it as red instead of reading stale results.
+        val compileFailed = listOf("compileKotlin", "compileTestKotlin")
+            .any { tasks.named(it).get().state.failure != null }
+        if (compileFailed) {
+            logFile.appendText("$timestamp BDD_RUN FAIL module=client reason=compile\n")
+            return@doLast
+        }
         if (!resultFile.exists()) {
             // No result file means compilation or discovery failed: still red.
             logFile.appendText("$timestamp BDD_RUN FAIL module=client reason=no-results\n")

@@ -1,28 +1,31 @@
-Feature: Act — rejection of unknown affordances
+Feature: Act: refuse an affordance the manifest does not offer
+  SPEC §6.3, §6.8. The client acts only on what the current manifest offers.
+  Anything else is refused before any request is sent.
 
   Background:
-    Given the service returns the following on enter:
-      """yaml
-      status: initial
-      _forms:
-        transition:
-          href: https://example.com/resource
-          method: POST
-          hash: abc123
-          _schema:
-            type: object
-            properties:
-              value:
-                type: string
-            required: [value]
+    Given the service answers GET "http://garden.test/beds/1" with:
       """
-    And the Content-Type declares the H.E.A.R.T. dual profile
-    And the client enters the service
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-0.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 1
+      status: EMPTY
+      _forms:
+        sowSeed:
+          _links:
+            target: {href: /beds/1/actions/sow-seed}
+          method: POST
+          contentType: application/json
+          schema: {type: object}
+      """
+    And the client enters "http://garden.test/beds/1"
 
   Scenario: Acting on an affordance absent from the manifest raises an error
-    When the client attempts to act on "nonexistent" with:
+    When the client tries to act on "harvest" with:
       """yaml
-      value: hello
+      note: hello
       """
-    Then the client raises an error
-    And no request was submitted to the service
+    Then the client raised an error mentioning "harvest"
+    And the client sent no request after entering

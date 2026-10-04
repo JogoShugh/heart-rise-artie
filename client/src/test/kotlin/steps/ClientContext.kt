@@ -8,11 +8,8 @@ class ClientContext {
     val transport = FakeTransport()
     val client: HeartRiseClient = ArtieClient(transport)
     lateinit var current: HeartRepresentation
-    var contentType: String = ""
-    var enterBody: String = ""
-    var actBody: String = ""
     var lastError: Throwable? = null
 
-    fun enqueueEnterResponse() = transport.enqueue(enterBody, contentType)
-    fun enqueueActResponse() = transport.enqueue(actBody, contentType)
+    /** How many requests the client had sent when it finished entering. */
+    var requestsAfterEnter = 0
 }

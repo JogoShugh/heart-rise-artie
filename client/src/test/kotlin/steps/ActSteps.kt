@@ -2,74 +2,90 @@ package steps
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import io.cucumber.java.en.And
-import io.cucumber.java.en.Given
+import heart.PROPERTIES
+import heart.REQUIRED
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+/** Steps for entering a service, reading what came back, and acting on it. */
 class ActSteps(private val ctx: ClientContext) {
 
-    private val yamlMapper = ObjectMapper(YAMLFactory())
-    private val jsonMapper = ObjectMapper()
-
-    @Given("the service returns the following on enter:")
-    fun givenEnterResponse(body: String) {
-        ctx.enterBody = bodyToString(body)
+    // Cucumber matches step text, not the Given/When keyword: one annotation serves both.
+    @When("the client enters {string}")
+    fun enter(url: String) {
+        ctx.current = ctx.client.enter(url)
+        ctx.requestsAfterEnter = ctx.transport.requests.size
     }
 
-    @And("acting on {string} returns:")
-    fun givenActResponse(@Suppress("UNUSED_PARAMETER") rel: String, body: String) {
-        ctx.actBody = bodyToString(body)
+    @When("the client tries to enter {string}")
+    fun tryEnter(url: String) {
+        ctx.lastError = runCatching { ctx.client.enter(url) }.exceptionOrNull()
     }
 
-    @When("the client enters the service")
-    fun whenClientEnters() {
-        ctx.enqueueEnterResponse()
-        ctx.current = ctx.client.enter("https://example.com/")
+    @When("the client acts on {string} with:")
+    fun act(rel: String, yaml: String) {
+        ctx.current = ctx.client.act(rel, payload(yaml))
     }
 
-    @And("the client acts on {string} with:")
-    fun whenClientActs(rel: String, body: String) {
-        ctx.enqueueActResponse()
-        val payload = createPayload(body)
-        ctx.current = ctx.client.act(rel, payload)
+    @When("the client tries to act on {string} with:")
+    fun tryAct(rel: String, yaml: String) {
+        ctx.lastError = runCatching { ctx.client.act(rel, payload(yaml)) }.exceptionOrNull()
     }
 
-    @When("the client attempts to act on {string} with:")
-    fun whenClientAttemptsAct(rel: String, body: String) {
-        val payload = createPayload(body)
-        ctx.lastError = runCatching { ctx.client.act(rel, payload) }.exceptionOrNull()
+    @Then("the client raised an error mentioning {string}")
+    fun raisedError(text: String) {
+        val error = assertNotNull(ctx.lastError, "expected an error, none was raised")
+        assertTrue(error.message.orEmpty().contains(text), "error was: ${error.message}")
     }
 
-    @Then("the client raises an error")
-    fun thenClientRaisesError() {
-        assertNotNull(ctx.lastError, "Expected an error but none was raised")
+    @Then("the resource state contains:")
+    fun stateContains(entries: List<StateEntry>) = entries.forEach { (key, expected) ->
+        assertEquals(expected, ctx.current.state[key]?.jsonPrimitive?.content, "state[$key]")
     }
 
-    @Then("no request was submitted to the service")
-    fun thenNoRequestSubmitted() {
-        assertTrue(ctx.transport.submits.isEmpty(), "Expected no submit, but got ${ctx.transport.submits}")
+    @Then("the resource state does not contain the key {string}")
+    fun stateLacks(key: String) = assertFalse(ctx.current.state.containsKey(key), "state has $key")
+
+    @Then("the manifest offers exactly {string}")
+    fun manifestOffers(rels: String) =
+        assertEquals(rels.split(',').map { it.trim() }.toSet(), ctx.current.affordances.keys)
+
+    @Then("the {string} affordance is {word} to {string}")
+    fun affordanceTarget(rel: String, method: String, url: String) {
+        val form = assertNotNull(ctx.current.affordance(rel), "no $rel")
+        assertEquals(method, form.method)
+        assertEquals(url, form.target)
     }
 
-    @Then("the manifest affordances are:")
-    fun thenManifestAffordances(entries: List<ManifestEntry>) {
-        entries.forEach { (rel, present) ->
-            if (present)
-                assertTrue(ctx.current.containsAffordance(rel), "Expected '$rel' in manifest")
-            else
-                assertFalse(ctx.current.containsAffordance(rel), "Expected '$rel' absent from manifest")
-        }
+    @Then("the {string} field in the {string} schema has the {string} keyword")
+    fun schemaKeyword(property: String, rel: String, keyword: String) {
+        val props = ctx.current.affordance(rel)?.schema?.get(PROPERTIES)?.jsonObject ?: error("no $rel properties")
+        assertTrue(props[property]?.jsonObject?.containsKey(keyword) == true, "$property lacks $keyword")
     }
 
-    private fun createPayload(body: String): JsonObject = Json.parseToJsonElement(
-        bodyToString(body)
-    ).jsonObject
+    @Then("the {string} schema marks {string} as required")
+    fun schemaRequired(rel: String, field: String) {
+        val required = ctx.current.affordance(rel)?.schema?.get(REQUIRED)?.jsonArray?.map { it.jsonPrimitive.content }
+        assertTrue(required.orEmpty().contains(field), "required: $required")
+    }
 
-    private fun bodyToString(body: String): String = jsonMapper.writeValueAsString(yamlMapper.readTree(body))
+    @Then("the client holds the ETag {string}")
+    fun holdsETag(etag: String) = assertEquals("\"$etag\"", ctx.current.etag)
+
+    private fun payload(yaml: String): JsonObject =
+        Json.parseToJsonElement(jsonMapper.writeValueAsString(yamlMapper.readTree(yaml))).jsonObject
+
+    private companion object {
+        val yamlMapper = ObjectMapper(YAMLFactory())
+        val jsonMapper = ObjectMapper()
+    }
 }
