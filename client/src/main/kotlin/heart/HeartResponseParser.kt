@@ -31,13 +31,32 @@ object HeartResponseParser {
             state = JsonObject(root.filterKeys { it !in setOf(FORMS, LINKS, HalFormsTemplates.TEMPLATES) }),
             affordances = if (dialect == Dialect.HAL_FORMS) HalFormsTemplates.forms(root, url) else forms(root, url),
             etag = response.header("ETag"),
-            formsLink = linkHref(root, FORMS_REL)?.let { URI(url).resolve(it).toString() },
+            formsLink = formsHref(root)?.let { URI(url).resolve(it).toString() },
         )
     }
 
     /** The `_forms` of a Layer 1 body (L0) or of a Layer 2 affordance set (L1, L2). */
     fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> =
         root[FORMS]?.jsonObject.orEmpty().mapValues { (rel, form) -> form(rel, form.jsonObject, base) }
+
+    /** The href of the link whose rel, after CURIE expansion, is FORMS_REL. */
+    private fun formsHref(root: JsonObject): String? {
+        val links = root[LINKS]?.jsonObject ?: return null
+        val curies = (links["curies"] as? JsonArray).orEmpty().map { it.jsonObject }
+            .associate { it["name"]?.jsonPrimitive?.content to it["href"]?.jsonPrimitive?.content }
+        return links.keys.firstOrNull { expandRel(it, curies) == FORMS_REL }?.let { linkHref(root, it) }
+    }
+
+    /**
+     * HAL CURIEs: "hr:forms" with a curies entry {name: hr, href: ".../rels/{rel}"}
+     * names ".../rels/forms". A key that is already a URI, or whose prefix has
+     * no curies entry, is returned unchanged.
+     */
+    fun expandRel(key: String, curies: Map<String?, String?>): String {
+        val prefix = key.substringBefore(':', "")
+        val template = curies[prefix] ?: return key
+        return template.replace("{rel}", key.substringAfter(':'))
+    }
 
     private fun linkHref(root: JsonObject, rel: String): String? =
         root[LINKS]?.jsonObject?.get(rel)?.jsonObject?.get("href")?.jsonPrimitive?.content

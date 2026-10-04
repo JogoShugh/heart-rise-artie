@@ -226,7 +226,12 @@ object JsonSchemaDialectSupport {
             val hash = affordanceSetHashFor(state.status, rendering)
             base["_links"] = mapOf(
                 "self" to mapOf("href" to "/beds/$bedId"),
-                "http://api.example.org/rels/forms" to mapOf(
+                // SPEC §6.1 (0.5): the rel is $HEART_RISE_PROFILE/rels/forms. HAL's CURIE
+                // short form "hr:forms" names the same rel; clients expand it.
+                "curies" to listOf(
+                    mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
+                ),
+                "hr:forms" to mapOf(
                     "href" to "/affordance-sets/sha256-$hash",
                     "type" to Dialect.JSONSCHEMA.mediaType,
                     // HAL's own link hint; replaces the withdrawn media-type parameter (§6.1).

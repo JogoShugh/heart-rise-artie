@@ -11,9 +11,9 @@ const val REQUIRED = "required"
 const val HAL_SCHEMA_FORMS_PROFILE = "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
 const val HAL_JSON = "application/hal+json"
 
-/** The Layer 1 link to the affordance set. SPEC draws it as `_links.forms` but
- *  registers no rel name; this is the one server-spring uses (see CONFORMANCE-GAPS.md). */
-const val FORMS_REL = "http://api.example.org/rels/forms"
+/** SPEC §6.1 (0.5): the rel of the Layer 1 link to the affordance set. A server
+ *  may write it as a HAL CURIE ("hr:forms"); see HeartResponseParser.expandRel. */
+const val FORMS_REL = "https://github.com/jogoshugh/heart-rise/rels/forms"
 
 /**
  * One affordance from the manifest. [target] is absolute when the server

@@ -55,3 +55,9 @@ Feature: Rendering ladder L0 to L2
     And the client follows the affordance-set link
     And the client follows the same affordance-set link with Prefer "forms=cid"
     Then both affordance-set responses have identical bytes
+
+  Scenario: The affordance-set link is named by the heart-rise rel, in its hr: short form
+    When a client gets bed 2 with Prefer "forms=cid, schema=cid"
+    Then the response declares curie "hr" as "https://github.com/jogoshugh/heart-rise/rels/{rel}"
+    And the response links to its affordance set under "hr:forms"
+    And the response has no link under "http://api.example.org/rels/forms"
