@@ -1,10 +1,21 @@
 # H.E.A.R.T. + R.I.S.E. Protocol Suite
 ## With ARTIE Reference Client Implementation
 
-**Version:** 0.4 — Working Draft
-**Status:** §6.4–6.7 verified end-to-end against a live server (see ADR); remainder pre-implementation.
+**Version:** 0.5 — Working Draft (proposed revisions to 0.4; each marked `[0.5]` inline)
+**Status:** The 0.3 caching mechanism (content-addressed Layer 2/3, `Prefer: embed=schemas`) is verified end-to-end against a live server (see ADR and `scripts/test-report/`). The 0.4 changes to that mechanism — inverted `Prefer` default, `forms=cid`/`schema=cid`, per-rung Layer 2 addresses, `Accept-Profile`/`Link: rel="profile"`, mandatory `If-Match`/`428` — are **not yet implemented**. See `spec/CONFORMANCE-GAPS.md`.
 **Author:** Joshua Gough
-**Date:** August 2026
+**Date:** October 2026 (0.4: August 2026)
+
+**Proposed in 0.5** (editor's proposals; none is accepted until the author removes its `[0.5]` marker):
+
+1. **Status line corrected (front matter).** 0.4 said §6.4–6.7 were verified against a live server. What was verified is the 0.3 mechanism; 0.4 inverted it. The claim now says exactly what was tested.
+2. **Precondition scope and strong validators (§6.1, §6.2, §6.3).** 0.4 requires `If-Match` to carry the Layer 1 `ETag`, but the act is sent to a *different* URI (the affordance target), and 0.4 also requires Layer 1 `ETag`s to differ per dialect and rung. Read literally under RFC 9110 §13.1.1, the precondition would be evaluated against the wrong resource and could never match. 0.5 defines the precondition's scope explicitly and requires strong validators.
+3. **Evaluation order (§6.2).** With conditional acts mandatory, "the resource moved since sync" is a `412`, not a `409`. 0.5 fixes the order servers check in — `428`, then `412`, then `409`, then `422` — so each code has exactly one meaning.
+4. **Layer 3 scope (§6.5).** 0.4 says Layer 3 is hashed over the schema "verbatim", which contradicts the canonicalization step two paragraphs earlier. 0.5 says the canonical bytes are both hashed and served.
+5. **Template variable resolution (§6.9.1).** 0.4 says every variable must be "resolvable from Layer 1" without saying how. 0.5 makes the rule mechanical: a variable name is a top-level Layer 1 property name.
+6. **RISE answers (§7.2).** Proposes answers to both `[AUTHOR]` questions: RISE requires the originator's source server to reach L2, and the envelope is a body member, since every RISE request is a state-changing `POST`.
+7. **Explaining absence (§12).** Proposes a concrete mechanism: an optional, content-addressed `heart:unavailable` resource linked from Layer 2 and fetched only on demand.
+8. **`cid` token name (§6.4).** Flags that `forms=cid` reads as a multiformats CID, which §12 is still deciding whether to adopt. Proposes `forms=link, schema=link` as an alternative.
 
 **Changes since 0.3:**
 
@@ -183,6 +194,8 @@ A server SHOULD support both dialects for the same resource, generated from one 
 
 **`Vary` applies to Layer 1 only.** A server that varies its Layer 1 response by `Accept`, `Prefer`, or `Accept-Profile` SHALL send `Vary: Accept, Prefer, Accept-Profile` as applicable. Layer 2 and Layer 3 are content-addressed and therefore have exactly one representation each; they never negotiate, and SHALL NOT send `Vary`. Dialect, profile, and rendering are all baked into the bytes, and so into the address (§6.5). Layer 1 `ETag` values SHALL differ across dialects and across rungs, since these are different representations of that resource.
 
+`[0.5]` Layer 1 `ETag` values SHALL be **strong** validators. `If-Match` uses strong comparison (RFC 9110 §13.1.1), so a weak `ETag` can never satisfy the precondition that §6.3 makes mandatory. A server SHOULD build each `ETag` from two parts: a *state version* that changes only when the resource's state changes, and a *variant tag* for the dialect and rung (for example `"seq-5.hsf.L2"`). The client treats the whole value as opaque. Only the server reads the parts. §6.2 says how it uses them.
+
 **The `heart-rise` profile is dialect-independent in substance, dialect-specific in identifier.** The layering model, content addressing, ladder, and Sync-Reason-Act cycle it adds are one shared set of semantics; connegp's negotiation model is simply what forces that one concept to be exposed as two concrete, negotiable URIs rather than one. It never replaces or modifies either base dialect's own structure; it only adds: the three-layer content-addressing model (§6.1, §6.5), `Prefer`-based layering negotiation (§6.4), the conformance ladder (§6.10), and the Sync-Reason-Act processing model (§6.8). A server already serving either base dialect can adopt H.E.A.R.T. compliance incrementally, one rung at a time, without changing its dialect's own wire format.
 
 A H.E.A.R.T. response is organised into three layers. Whether those layers arrive collapsed into one response or as separately-addressed resources is determined by the client's `Prefer` header (§6.4) and by the rung the server has reached (§6.10):
@@ -241,6 +254,17 @@ Notes on the changes:
 
 The critical distinction, and the one §6.10.5 exists to demonstrate: **412 means the world moved under a valid intent; 409 means the intent was never valid here.** A client that retries on 412 corrupts state. A client that treats 409 as transient loops forever.
 
+`[0.5]` **Precondition scope.** An act is sent to an affordance target (for example `/beds/2/actions/water-cell`), not to the Layer 1 URI that issued the `ETag`. RFC 9110 evaluates `If-Match` against the *target* resource's current representation, and an action endpoint has no representation of its own. H.E.A.R.T. therefore defines the scope: every affordance target belongs to exactly one *owning resource*, namely the Layer 1 resource whose affordance set listed it. The server SHALL evaluate `If-Match` on an act against the owning resource's **state version**. It SHALL accept any `ETag` it issued for that state version, whatever dialect or rung the `ETag` came from. This is a deliberate, stated narrowing of RFC 9110's per-target semantics, and it is the only reading under which the per-dialect `ETag`s of §6.1 and the mandatory `If-Match` of §6.3 can both hold.
+
+`[0.5]` **Evaluation order.** A server SHALL check a state-changing request in this order and return the first failure:
+
+1. No `If-Match` header: `428`.
+2. `If-Match` does not match the owning resource's current state version: `412`.
+3. The affordance is not in the owning resource's current affordance set: `409`.
+4. The body fails schema validation: `422`.
+
+Under this order, a resource that moved between sync and act always yields `412`, because its state version changed. So `409` reaches a client only when it acted on a fresh precondition but outside the manifest that went with it. That is a client defect or a server-side legality bug, never a race. The `409` row of the table above should be read with that narrower meaning. Its phrase "the resource moved since sync" applies only to servers that do not require `If-Match`, which 0.4 no longer permits.
+
 ### 6.3 Compliant Client Behaviour
 
 A H.E.A.R.T. compliant client SHALL:
@@ -282,6 +306,8 @@ This is inverted from 0.3, which made the pointer form the default and required 
 
 A server SHALL echo `Preference-Applied` listing the tokens it honoured. A client SHALL treat the absence of a token from `Preference-Applied` as meaning that layer arrived embedded, and SHALL NOT fail on it.
 
+> `[0.5]` **Token value naming.** `cid` invites the reading "multiformats Content Identifier", a specific self-describing format that §12 has not adopted, and probably will not adopt, as the address syntax. If §12 settles on bare `sha256-` paths, `forms=link, schema=link` says what the token does (deliver this layer by link) without implying a format. `[AUTHOR]` — rename, or keep `cid` and state that it means "content-addressed", not "CID".
+
 > **Registration status.** `forms`, `schema`, `behaviour`, and `domain` (below) are none of them in IANA's Preferences registry (which holds `respond-async`, `return`, `wait`, `handling`, `depth-noroot`). RFC 7240 permits unregistered preference tokens and requires that a server which does not understand one ignore it — which is precisely the degradation behaviour relied on throughout this section — but registration SHOULD accompany media type registration (§12).
 
 > **Withdrawn: `embed=schemas` and the cache-seeding requirement.** 0.4's earlier draft required clients to seed their HTTP cache from embedded bodies, with content-address verification, because embedding was the opt-in and a client using it would never warm its cache. Under the inverted default this problem dissolves for conforming clients: a client that wants caching sends `forms=cid, schema=cid` and gets ordinary HTTP caching with no bespoke logic at all. Seeding is now permitted but never required, and a client that does seed SHALL still verify the content address over the received bytes before storing (§6.5) — an unverified seed would let a `no-cache` Layer 1 response poison a shared, year-long, immutable cache entry.
@@ -317,7 +343,7 @@ This reverses 0.3's rule that a Layer 2 resource has one canonical address regar
 
 The cost is that L1 and L2 clients do not share affordance-set cache entries. They still share all Layer 3 entries, and each shares fully with its own rung. Given that a deployment will typically standardise on one rung, this is a small loss for a large gain in integrity. `[AUTHOR]` — confirm; this is the one place where 0.4 overturns a stated 0.3 property rather than clarifying it.
 
-**Scope of "the body" for Layer 3:** the schema's own raw content, verbatim.
+**Scope of "the body" for Layer 3:** the schema's own full content, with nothing stripped. `[0.5]` It is canonicalized as above, and the server serves exactly those canonical bytes. 0.4 said "verbatim", which contradicts the canonicalization step: a hand-formatted schema served as written does not hash to its own address. The rule is the same for both layers. **The address is the SHA-256 of the response body, byte for byte**, so any client or cache can verify an address by hashing what it received.
 
 **Output:** Lowercase hexadecimal digest, used directly as the final URL path segment: `/affordance-sets/sha256-{digest}`, `/schemas/sha256-{digest}`.
 
@@ -381,7 +407,9 @@ A compliant agent implementation SHALL therefore:
 
 #### 6.9.1 Two conformant profiles
 
-**Templated profile.** Affordance `href` values are RFC 6570 URI Templates whose variables are resolved by the client from Layer 1 — typically the resource identifier and any path context. The Layer 2 body contains no instance identity. Where a server uses templates it SHALL restrict itself to RFC 6570 **Level 1** (simple string expansion) unless it declares otherwise, and SHALL name variables such that every variable is resolvable from the Layer 1 representation the client already holds; a template referencing a variable the client cannot resolve is non-compliant. Expansion is performed by deterministic client code, never by the Reason step (§6.8).
+**Templated profile.** Affordance `href` values are RFC 6570 URI Templates whose variables are resolved by the client from Layer 1 — typically the resource identifier and any path context. The Layer 2 body contains no instance identity. Where a server uses templates it SHALL restrict itself to RFC 6570 **Level 1** (simple string expansion) unless it declares otherwise, and SHALL name variables such that every variable is resolvable from the Layer 1 representation the client already holds; a template referencing a variable the client cannot resolve is non-compliant.
+
+`[0.5]` **Resolution rule.** A template variable resolves to the Layer 1 top-level property of the same name, which must be a string or a number, matched exactly and case-sensitively. No other lookup is defined. For example, `{id}` resolves from `"id": 2`. `{bedId}` does not resolve unless Layer 1 has a `bedId` property. Without this rule, "resolvable" depends on the client guessing a mapping, and two conformant clients could expand one template to two different URIs. Expansion is performed by deterministic client code, never by the Reason step (§6.8).
 
 **Concrete profile.** Affordance `href` values are fully-resolved URIs containing instance identity. The Layer 2 body is specific to the resource that produced it.
 
@@ -650,7 +678,11 @@ The envelope SHALL embed sufficient information for the recipient to construct a
 
 Note that `template-schema` presumes the originator reached L2 — an L0 or L1 originator has no schema URL to send, only an embedded schema body. Such an originator either inlines the template schema in the envelope, at cost, or does not use RISE. `[AUTHOR]` — should RISE simply require L2, which would make the ladder's rungs load-bearing for §7 as well as §6?
 
+`[0.5]` **Proposed answer: yes, but scoped to the server.** RISE SHALL require that the server which issued the template affordance supports L2. It SHALL NOT require that the originator *operated* at L2. An originator that synced at L0 can still obtain the schema URL with one extra `Prefer: forms=cid, schema=cid` request at envelope-construction time. This keeps the L0 client on-ramp intact, because the client never has to climb. The ladder becomes load-bearing only for servers that offer RISE templates, and those servers are already past L0 to claim compliance (§6.10.1).
+
 > **Unresolved: wire binding.** 0.3 did not specify where the envelope travels — request body member, a custom header, or a link relation in the outbound representation — and neither does this draft, because the choice has consequences the author should make rather than the editor. A body member is simplest but excludes bodyless methods; a header requires structured-field encoding (RFC 8941) and a header registration; a link relation keeps it hypermedia-native but adds a round trip. Two independent implementations cannot interoperate until this is fixed. `[AUTHOR]` — which binding?
+
+> `[0.5]` **Proposed answer: a body member, `_rise`, at the top level of the request body.** Every RISE request starts asynchronous work, so it is a state-changing transition. Under §6.3 that means it is a `POST` carrying `If-Match`, and it always has a body. The objection that a body member "excludes bodyless methods" therefore does not apply. A body member also puts the envelope inside the same schema-validated payload as the rest of the act, so the affordance's own schema can declare it, and it needs no header registration and no RFC 8941 encoding. The schema SHALL NOT require `_rise`: the same affordance can then be used synchronously or asynchronously, and an originator that omits `_rise` gets a synchronous response.
 
 ### 7.3 RISE Request Behaviour
 
@@ -941,6 +973,8 @@ ARTIE interacts correctly with both reference domains from bookmark entry with n
 - Whether RISE requires L2 (§7.2). If it does, the ladder becomes load-bearing beyond §6 and the on-ramp story gets more complicated; if it does not, an L0 originator must inline template schemas in the envelope.
 - Whether a multiformats/CID-style identifier — with a multicodec prefix declaring "JSON Schema" versus "HAL-FORMS fragment", and possibly the rung — is worth adopting over a bare `sha256-` prefix plus a dialect-named path segment.
 - **Explaining absence.** Constraining the candidate set prevents the illegal call but leaves the agent with nothing to say when a user asks *why* they cannot harvest — and models confabulate rather than declining to answer. `409` covers the exercised path, not the unexercised one. Options: an optional `heart:unavailable` block carrying rel names plus human-readable reasons; a separate content-addressed "explanations" resource fetched only on demand; or explicit non-support. The tension is that the first re-inflates the payload the ladder just deflated, and it would need its own rung. `[AUTHOR]` — worth an early decision, because it affects the Layer 2 schema at every rung.
+
+  `[0.5]` **Proposed:** the second option, specified. A Layer 2 affordance set MAY carry one link, `heart:unavailable`, to a separate content-addressed resource. That resource lists rel names absent in this state, each with a short reason, for example `{"harvest": "Crop not ready; growthPoints below 100"}`. It is a function of state alone, like the affordance set, so it is shared, cacheable and immutable on the same terms (§6.9). The client fetches it only when a user asks *why*, so the per-turn payload does not change. Reasons SHALL NOT include instance identifiers, for the reasons in §6.9.4. The resource is a reference for answering the user, not a manifest: a client SHALL NOT act on any rel name it finds there.
 - Whether RISE poll mode should be defined as a profile over MCP's `io.modelcontextprotocol/tasks` extension rather than as a parallel mechanism (§7.7).
 - The RISE envelope wire binding (§7.2) — blocking for interoperability.
 - Whether core rel names should be full URIs rather than CURIEs (§7.5).

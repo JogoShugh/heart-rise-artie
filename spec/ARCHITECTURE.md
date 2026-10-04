@@ -1,5 +1,12 @@
 # ARTIE — Executive Summary
 
+> **Out of date as of SPEC 0.4 (August 2026).** This summary describes the 0.2 design, whose
+> mechanisms have since been withdrawn: a hash-keyed client registry, `param:detail=hash`, and
+> warm/cold `Accept-Profile` parameters. The core idea below still holds: act only on what the
+> current response offers. For the mechanism, read `spec/SPEC.md` §6.4–6.10 (the conformance
+> ladder and content-addressed HTTP caching, with no bespoke registry). For what is actually
+> built, read `spec/CONFORMANCE-GAPS.md`.
+
 - **Core idea:**
     * ARTIE holds no static, pre-declared tool list.
     * At any turn, its entire universe of possible actions is exactly what the server included in its *most recent* response:

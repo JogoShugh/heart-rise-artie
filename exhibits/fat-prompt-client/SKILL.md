@@ -5,6 +5,10 @@ description: Use this skill whenever the user asks to interact with a H.E.A.R.T.
 
 # ARTIE — H.E.A.R.T. Reference Client
 
+> **Exhibit, frozen at SPEC 0.2.** This skill drove the July 2026 sessions recorded in this
+> folder. Its hash, `Accept-Profile` and `param:detail=hash` instructions predate SPEC 0.4 and
+> are not current protocol. See `spec/SPEC.md`.
+
 ## Status
 
 Fat-prompt prototype. You (the assistant) execute the entire H.E.A.R.T.

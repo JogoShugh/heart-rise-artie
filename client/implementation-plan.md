@@ -3,6 +3,14 @@
 **Based on:** SPEC.md v0.2 Working Draft (updated June 2026)  
 **Date:** June 2026
 
+> **Superseded in part by SPEC 0.4/0.5.** Slices 2 and 4–9 (hash canonicalization in the
+> client, the fingerprint registry, profile-header construction, warm/cold sync) target the
+> 0.2 registry design. SPEC 0.4 replaces that design with content-addressed URLs and a plain
+> RFC 9111 HTTP cache, so the client no longer computes or compares hashes. Slices 14–15 now
+> follow the 0.4 error model (`409`/`412`/`428`). The replacement plan is organized by ladder
+> rung, following SPEC §9.3. See `spec/CONFORMANCE-GAPS.md` for current status and the
+> suggested order.
+
 ---
 
 ## Part 1 — Real-World Assessment
