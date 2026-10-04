@@ -9,7 +9,8 @@ import com.artie.gardenbed.service.InvalidTransitionException
 import com.artie.gardenbed.web.dto.GardenBedDto
 import com.artie.gardenbed.web.dto.SowSeedRequest
 import com.artie.gardenbed.web.dto.WaterCellRequest
-import jakarta.validation.Valid
+import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.validation.Validator
 import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.Link
 import org.springframework.hateoas.MediaTypes
@@ -49,7 +50,12 @@ class MalformedAsOfException(message: String) : RuntimeException(message)
 
 @RestController
 @RequestMapping("/beds")
-class GardenBedController(private val service: GardenBedService) {
+class GardenBedController(
+    private val service: GardenBedService,
+    objectMapper: ObjectMapper,
+    validator: Validator,
+) {
+    private val binder = ActBodyBinder(objectMapper, validator)
 
     @GetMapping("/{id}")
     suspend fun getBed(
@@ -102,27 +108,34 @@ class GardenBedController(private val service: GardenBedService) {
         return ResponseEntity.ok(body)
     }
 
+    // Act bodies arrive as raw text and are bound inside act(), after the
+    // precondition and legality checks (see ActBodyBinder).
+
     @PostMapping("/{id}/actions/sow-seed")
     suspend fun sowSeed(
         @PathVariable id: Long,
-        @Valid @RequestBody body: SowSeedRequest,
+        @RequestBody(required = false) body: String?,
         @RequestHeader(HttpHeaders.IF_MATCH, required = false) ifMatch: String?,
         @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?
     ): ResponseEntity<Any> {
-        checkIfMatch(id, ifMatch)
-        val updated = mapConcurrencyConflict { service.sowSeed(id, body.seedType, body.depthCm) }
+        val updated = act(id, ifMatch, "sowSeed") {
+            val request = binder.bind(body, SowSeedRequest::class.java)
+            service.sowSeed(id, request.seedType, request.depthCm)
+        }
         return renderState(updated, negotiateDialect(accept))
     }
 
     @PostMapping("/{id}/actions/water-cell")
     suspend fun waterCell(
         @PathVariable id: Long,
-        @Valid @RequestBody body: WaterCellRequest,
+        @RequestBody(required = false) body: String?,
         @RequestHeader(HttpHeaders.IF_MATCH, required = false) ifMatch: String?,
         @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?
     ): ResponseEntity<Any> {
-        checkIfMatch(id, ifMatch)
-        val updated = mapConcurrencyConflict { service.waterCell(id, body.milliliters) }
+        val updated = act(id, ifMatch, "waterCell") {
+            val request = binder.bind(body, WaterCellRequest::class.java)
+            service.waterCell(id, request.milliliters)
+        }
         return renderState(updated, negotiateDialect(accept))
     }
 
@@ -132,8 +145,7 @@ class GardenBedController(private val service: GardenBedService) {
         @RequestHeader(HttpHeaders.IF_MATCH, required = false) ifMatch: String?,
         @RequestHeader(HttpHeaders.ACCEPT, required = false) accept: String?
     ): ResponseEntity<Any> {
-        checkIfMatch(id, ifMatch)
-        val (updated, result) = mapConcurrencyConflict { service.harvest(id) }
+        val (updated, result) = act(id, ifMatch, "harvest") { service.harvest(id) }
         val rendered = renderState(updated, negotiateDialect(accept))
         return ResponseEntity.status(rendered.statusCode)
             .headers(rendered.headers)
@@ -149,17 +161,33 @@ class GardenBedController(private val service: GardenBedService) {
             throw StaleWriteConflict(e.message ?: "concurrent write conflict")
         }
 
+    /** SPEC [0.5] §6.2 evaluation order: 428, then 412, then 409, then
+     *  (inside [block], via the binder) 422. The first failure wins. */
+    private suspend fun <T> act(id: Long, ifMatch: String?, affordance: String, block: suspend () -> T): T {
+        checkPreconditions(id, ifMatch, affordance)
+        return mapConcurrencyConflict(block)
+    }
+
     /** [0.5] precondition scope: the act's If-Match is checked against
      *  the owning bed's state version, accepting an ETag from any
-     *  dialect or rung (see StateETag). */
-    private suspend fun checkIfMatch(id: Long, ifMatch: String?) {
-        if (ifMatch == null) return
-        val current = service.currentState(id)
-        if (!StateETag.matchesStateVersion(ifMatch, current.lastSequenceNo)) {
-            throw StaleWriteConflict(
-                "If-Match $ifMatch does not match state version seq-${current.lastSequenceNo} for bed $id"
-            )
+     *  dialect or rung (see StateETag). Reads state only when If-Match
+     *  is present, so a 428 costs no store read. */
+    private suspend fun checkPreconditions(id: Long, ifMatch: String?, affordance: String) {
+        val failure = if (ifMatch == null) {
+            PreconditionRequiredException("$affordance on bed $id needs If-Match with the bed's current ETag")
+        } else {
+            val current = service.currentState(id)
+            when {
+                !StateETag.matchesStateVersion(ifMatch, current.lastSequenceNo) -> StaleWriteConflict(
+                    "If-Match $ifMatch does not match state version seq-${current.lastSequenceNo} for bed $id"
+                )
+                affordance !in allowedAffordances(current.status) -> InvalidTransitionException(
+                    "$affordance is not in bed $id's current affordance set (status ${current.status})"
+                )
+                else -> null
+            }
         }
+        failure?.let { throw it }
     }
 
     /** Spring answers a matching If-None-Match with 304 from the ETag set
@@ -305,6 +333,20 @@ class GardenBedController(private val service: GardenBedService) {
     @ExceptionHandler(InvalidTransitionException::class)
     fun handleInvalidTransition(e: InvalidTransitionException): ResponseEntity<Map<String, String>> =
         ResponseEntity.status(HttpStatus.CONFLICT).body(mapOf("error" to (e.message ?: "invalid transition")))
+
+    @ExceptionHandler(PreconditionRequiredException::class)
+    fun handlePreconditionRequired(e: PreconditionRequiredException): ResponseEntity<Map<String, String>> =
+        ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
+            .body(mapOf("error" to (e.message ?: "If-Match required")))
+
+    @ExceptionHandler(UnprocessableContentException::class)
+    fun handleUnprocessable(e: UnprocessableContentException): ResponseEntity<Map<String, Any>> =
+        ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
+            .body(mapOf("error" to (e.message ?: "schema failure"), "violations" to e.violations))
+
+    @ExceptionHandler(MalformedActBodyException::class)
+    fun handleMalformedBody(e: MalformedActBodyException): ResponseEntity<Map<String, String>> =
+        ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "malformed body")))
 
     @ExceptionHandler(StaleWriteConflict::class)
     fun handleStaleWrite(e: StaleWriteConflict): ResponseEntity<Map<String, String>> =

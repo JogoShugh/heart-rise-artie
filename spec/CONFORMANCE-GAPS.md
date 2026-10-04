@@ -22,10 +22,10 @@ has since changed.
 | L3: templated profile, sharing | **Done** for jsonschema; cross-bed proof passes | journal entry 04 |
 | `[0.5]` template variable = Layer 1 property | **Gap.** The template uses `{bedId}` but Layer 1 has `id` | `buildForms` vs `buildBedBody` |
 | L4 `412` stale write | **Done** | `StaleWriteConflict`, journal entry 06 |
-| L4 `409` illegal transition | **Done** | `InvalidTransitionException` handler |
-| L4 `428` missing `If-Match` | **Missing.** `If-Match` is optional; with no header the write proceeds | `checkIfMatch` returns early on null |
-| `422` on schema failure | **Gap.** Bean validation failures fall through to WebFlux's default `400` | no handler for `WebExchangeBindException` |
-| `[0.5]` evaluation order 428→412→409→422 | **Gap.** `@Valid` runs before `checkIfMatch`, so `422`/`400` wins over `412` | method parameter binding order |
+| L4 `409` illegal transition | **Done**. Now checked against the manifest before the body is read | `checkPreconditions` |
+| L4 `428` missing `If-Match` | **Done** (step 3) | `conditional-acts.feature` |
+| `422` on schema failure | **Done** (step 3). Wrong-typed fields are `422` too; a body that is not JSON is `400` | `ActBodyBinder` |
+| `[0.5]` evaluation order 428→412→409→422 | **Done** (step 3). Bodies bind after the checks, not via `@Valid` | `GardenBedController.act` |
 | L5: both dialects, one legality source | **Done** | `allowedAffordances` shared; `RequestDtoMetadataTest` |
 | L5: HAL-FORMS Layer 2/3 addressing | **Missing.** HAL-FORMS is inline only, with no content-addressed layers | `buildHalFormsResponse` |
 | §6.1 `Accept-Profile` / `Link: rel="profile"` | **Missing.** Still uses the withdrawn media-type `profile` parameter | `contentType(... ;profile=...)` |
