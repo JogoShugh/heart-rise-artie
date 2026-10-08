@@ -9,6 +9,7 @@ import com.artie.gardenbed.eventstore.EventStore
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
 import com.artie.gardenbed.service.GardenBedService
 import com.fasterxml.jackson.databind.ObjectMapper
+import kotlinx.coroutines.flow.asFlow
 import org.mockito.Mockito.mock
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
@@ -56,18 +57,21 @@ class InMemoryBeds {
 
     fun reset() = labels.clear()
 
-    fun add(id: Long) {
-        labels[id] = "Bed $id"
+    fun add(id: Long, label: String = "Bed $id") {
+        labels[id] = label
     }
 
     fun label(id: Long): String = labels.getValue(id)
 
     val repository: GardenBedAggregateRepository = mock(GardenBedAggregateRepository::class.java) { invocation ->
-        if (invocation.method.name == "findById") {
-            val id = invocation.arguments[0] as Long
-            labels[id]?.let { GardenBedAggregate(id = id, label = it) }
-        } else {
-            null
+        when (invocation.method.name) {
+            "findById" -> {
+                val id = invocation.arguments[0] as Long
+                labels[id]?.let { GardenBedAggregate(id = id, label = it) }
+            }
+            "findAll" -> labels.entries.sortedBy { it.key }
+                .map { (id, label) -> GardenBedAggregate(id = id, label = label) }.asFlow()
+            else -> null
         }
     }
 }

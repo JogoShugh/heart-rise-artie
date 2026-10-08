@@ -7,6 +7,7 @@ import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.eventstore.EventStore
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
 import com.artie.gardenbed.web.dto.HarvestResult
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -21,6 +22,12 @@ class GardenBedService(
 
     private suspend fun requireAggregate(id: Long): GardenBedAggregate =
         aggregates.findById(id) ?: throw BedNotFoundException(id)
+
+    /** Beds whose label contains [name], ignoring case, in id order. A null name matches every bed. */
+    suspend fun findBeds(name: String?): List<GardenBedAggregate> =
+        aggregates.findAll().toList()
+            .filter { name == null || it.label.contains(name, ignoreCase = true) }
+            .sortedBy { it.id }
 
     suspend fun currentState(id: Long): GardenBedState {
         val bed = requireAggregate(id)

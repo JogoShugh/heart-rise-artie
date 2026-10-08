@@ -30,7 +30,25 @@ class ArtieClient(
 
     override fun enter(url: String): HeartRepresentation = sync(url)
 
-    override fun act(rel: String, payload: JsonObject): HeartRepresentation = act(rel, payload, resendAllowed = true)
+    /**
+     * A GET form is safe (RFC 9110 §9.2.1): its target, filled from the form's
+     * fields, is synced like any resource, with no body and no If-Match.
+     * Every other method is a state-changing act.
+     */
+    override fun act(rel: String, payload: JsonObject): HeartRepresentation {
+        val held = current ?: error("enter a service before acting")
+        val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
+        if (form.method == "GET") return sync(targetOf(form, held, payload))
+        return act(rel, payload, resendAllowed = true)
+    }
+
+    /** Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI. */
+    override fun follow(rel: String, title: String): HeartRepresentation {
+        val held = current ?: error("enter a service before following a link")
+        val link = held.links(rel).firstOrNull { it.title == title }
+            ?: error("No '$rel' link titled '$title' in ${held.url}")
+        return sync(link.href)
+    }
 
     /**
      * One act and its refusal handling (SPEC §6.3). 428 is the only refusal

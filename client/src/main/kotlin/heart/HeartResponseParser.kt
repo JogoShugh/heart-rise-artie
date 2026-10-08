@@ -29,15 +29,32 @@ object HeartResponseParser {
         val root = Json.parseToJsonElement(response.body).jsonObject
         // An act's response comes from the action URL; its self link says which resource it is.
         val self = linkHref(root, "self")
-        val formsLink = formsLinkObject(root)
         return HeartRepresentation(
             url = self?.let { URI(url).resolve(it).toString() } ?: url,
             state = JsonObject(root.filterKeys { it !in setOf(FORMS, LINKS, HalFormsTemplates.TEMPLATES) }),
             affordances = if (dialect == Dialect.HAL_FORMS) HalFormsTemplates.forms(root, url) else forms(root, url),
             etag = response.header("ETag"),
-            formsLink = formsLink?.get("href")?.jsonPrimitive?.content
-                ?.let { URI(url).resolve(it).toString() },
-            formsIntegrity = formsLink?.get("integrity")?.jsonPrimitive?.content,
+            forms = formsLinkObject(root)?.let { link(it, url) },
+            linksByRel = links(root, url),
+        )
+    }
+
+    /** Every link but `curies`, by the rel the server wrote. A rel with one link or an array of them. */
+    private fun links(root: JsonObject, base: String): Map<String, List<HeartLink>> =
+        root[LINKS]?.jsonObject.orEmpty().filterKeys { it != "curies" }.mapValues { (_, value) ->
+            when (value) {
+                is JsonArray -> value.mapNotNull { (it as? JsonObject)?.let { obj -> link(obj, base) } }
+                is JsonObject -> listOfNotNull(link(value, base))
+                else -> emptyList()
+            }
+        }
+
+    private fun link(obj: JsonObject, base: String): HeartLink? {
+        val href = obj["href"]?.jsonPrimitive?.content ?: return null
+        return HeartLink(
+            href = URI(base).resolve(href).toString(),
+            title = obj["title"]?.jsonPrimitive?.content,
+            integrity = obj["integrity"]?.jsonPrimitive?.content,
         )
     }
 

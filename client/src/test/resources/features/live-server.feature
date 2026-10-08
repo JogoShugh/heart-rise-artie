@@ -114,3 +114,34 @@ Feature: ARTIE against the real server
       """
     Then the client raised a "InvalidPayload" refusal
     And the client raised an error mentioning "milliliters"
+
+  Scenario Outline: From the bookmark alone at rung <rung>: search by name, follow the result, act
+    Given the client works at rung <rung>
+    When the client enters "/"
+    Then the manifest offers exactly "searchBeds, getBed"
+    When the client acts on "searchBeds" with:
+      """yaml
+      name: BED-2
+      """
+    And the client follows the "item" link titled "bed-2"
+    Then the manifest offers exactly "waterCell"
+    When the client acts on "waterCell" with:
+      """yaml
+      milliliters: 1
+      """
+    Then the resource state contains:
+      | key    | value   |
+      | status | PLANTED |
+
+    Examples:
+      | rung |
+      | L0   |
+      | L2   |
+
+  Scenario: From the bookmark alone: look a bed up by its id
+    When the client enters "/"
+    And the client acts on "getBed" with:
+      """yaml
+      id: 3
+      """
+    Then the manifest offers exactly "harvest"

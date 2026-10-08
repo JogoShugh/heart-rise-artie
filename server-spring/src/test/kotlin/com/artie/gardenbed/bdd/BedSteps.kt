@@ -15,6 +15,12 @@ class BedSteps(private val beds: InMemoryBeds, private val store: InMemoryEventS
         store.reset()
     }
 
+    @Given("bed {long} is {word} and named {string}")
+    fun bedIsNamed(id: Long, status: String, label: String) {
+        bedIs(id, status)
+        beds.add(id, label)
+    }
+
     @Given("bed {long} is {word}")
     fun bedIs(id: Long, status: String) = runBlocking {
         beds.add(id)
