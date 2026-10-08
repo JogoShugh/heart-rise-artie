@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.security.MessageDigest
+import java.util.Base64
 
 /** Steps for SPEC §6.4/§6.10.1-6.10.3: which layers arrive where, at each rung. */
 class LadderSteps(private val http: HttpWorld) {
@@ -25,9 +26,21 @@ class LadderSteps(private val http: HttpWorld) {
         http.get("/beds/$id", mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT, "Prefer" to prefer))
     }
 
+    /** The integrity value of the link the last fetch followed (HAL-SCHEMA-FORMS-HR Rule 2). */
+    private var expectedIntegrity: String? = null
+
     @When("the client follows the affordance-set link")
     fun followAffordanceSetLink() {
-        http.get(affordanceSetHref(http.lastLayer1()))
+        val layer1 = http.lastLayer1()
+        expectedIntegrity = layer1.json.path("_links").path(FORMS_REL).path("integrity").asText(null)
+        http.get(affordanceSetHref(layer1))
+    }
+
+    @When("the client follows the {string} schema reference")
+    fun followSchemaReference(name: String) {
+        val schema = http.last.json.path("_forms").path(name).path("schema")
+        expectedIntegrity = schema.path("hr:integrity").asText(null)
+        http.get(schema.path("\$ref").asText())
     }
 
     @When("the client follows the same affordance-set link with Prefer {string}")
@@ -47,13 +60,24 @@ class LadderSteps(private val http: HttpWorld) {
         assertTrue(schema.has("properties"), "no inline schema body for $name in ${http.last.json}")
     }
 
-    @Then("the {string} form points to its schema by \$id only")
+    @Then("the {string} form points to its schema by \$ref and integrity")
     fun formPointsToSchema(name: String) {
         val schema = http.last.json.path("_forms").path(name).path("schema")
-        val fields = schema.fieldNames().asSequence().toList()
-        assertEquals(listOf("\$id"), fields, "expected a pointer-only schema for $name in ${http.last.json}")
-        assertTrue(schema.path("\$id").asText().startsWith("/schemas/sha256-"))
+        val fields = schema.fieldNames().asSequence().toSet()
+        assertEquals(setOf("\$ref", "hr:integrity"), fields, "no schema reference for $name in ${http.last.json}")
+        assertTrue(schema.path("\$ref").asText().startsWith("/schemas/"))
+        assertTrue(schema.path("hr:integrity").asText().startsWith("sha256-"))
     }
+
+    @Then("the response body matches the integrity of the link that led to it")
+    fun bodyMatchesIntegrity() {
+        val expected = checkNotNull(expectedIntegrity) { "the link that led here carried no integrity" }
+        assertEquals(expected, "sha256-" + base64Sha256(http.last.bytes), "for ${http.last.path}")
+    }
+
+    @Then("the response Repr-Digest matches its body")
+    fun reprDigestMatches() =
+        assertEquals("sha-256=:${base64Sha256(http.last.bytes)}:", http.last.headers.getFirst("Repr-Digest"))
 
     @Then("the response has no affordance-set link")
     fun noAffordanceSetLink() =
@@ -109,6 +133,9 @@ class LadderSteps(private val http: HttpWorld) {
         val (first, second) = http.exchanges.takeLast(2)
         assertArrayEquals(first.bytes, second.bytes, "${String(first.bytes)} vs ${String(second.bytes)}")
     }
+
+    private fun base64Sha256(bytes: ByteArray): String =
+        Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bytes))
 
     private fun affordanceSetHref(exchange: Exchange): String {
         val href = exchange.json.path("_links").path(FORMS_REL).path("href").asText()

@@ -2,7 +2,7 @@ package steps
 
 import heart.ArtieClient
 import heart.CachingTransport
-import heart.ContentAddressCheck
+import heart.IntegrityCheck
 import heart.Dialect
 import heart.HeartRepresentation
 import heart.HeartRiseClient
@@ -26,7 +26,7 @@ class ClientContext {
     /** Everything that reached the wire (below each client's cache), live or fake. */
     val wireLog: RecordingTransport by lazy { RecordingTransport(if (baseUrl != null) HttpTransport() else transport) }
     private val wire: Transport get() = wireLog
-    val cache: CachingTransport by lazy { CachingTransport(ContentAddressCheck(wire)) }
+    val cache: CachingTransport by lazy { CachingTransport(IntegrityCheck(wire)) }
     val client: HeartRiseClient by lazy { ArtieClient(cache, rung, dialect) }
 
     /** When true, the second client sits behind the first client's cache, as two
@@ -35,7 +35,7 @@ class ClientContext {
 
     /** Another client: a concurrent writer, or a neighbour behind a shared cache. */
     val second: HeartRiseClient by lazy {
-        ArtieClient(if (shareCache) cache else CachingTransport(ContentAddressCheck(wire)), rung, dialect)
+        ArtieClient(if (shareCache) cache else CachingTransport(IntegrityCheck(wire)), rung, dialect)
     }
 
     lateinit var current: HeartRepresentation
@@ -43,16 +43,18 @@ class ClientContext {
 
     /** A fresh client with its own cache, on the same wire. */
     fun newClient(dialect: Dialect, rung: Rung = Rung.L0): HeartRiseClient =
-        ArtieClient(CachingTransport(ContentAddressCheck(wire)), rung, dialect)
+        ArtieClient(CachingTransport(IntegrityCheck(wire)), rung, dialect)
 
     /** How many requests the client had sent when it finished entering. */
     var requestsAfterEnter = 0
 
-    /** Content addresses minted by the scenario, by name:
-     *  "set:planted" -> "/affordance-sets/sha256-...". */
+    /** Addresses and integrity values minted by the scenario, by name:
+     *  "set:planted" -> "/affordance-sets/sha256-...",
+     *  "integrity:set:planted" -> "sha256-<Base64>". */
     val addresses = mutableMapOf<String, String>()
 
-    /** Replaces {set:name} and {schema:name} with the addresses minted so far.
+    /** Replaces {set:name} and {schema:name} with the addresses minted so far,
+     *  and {integrity:set:name} and {integrity:schema:name} with their integrity values.
      *  URI templates like {id} are left alone. */
     fun expand(text: String): String =
         ADDRESS.replace(text) { match ->
@@ -65,6 +67,6 @@ class ClientContext {
         else pathOrUrl
 
     private companion object {
-        val ADDRESS = Regex("""\{((?:set|schema):[^}]+)}""")
+        val ADDRESS = Regex("""\{((?:integrity:)?(?:set|schema):[^}]+)}""")
     }
 }

@@ -7,6 +7,7 @@ import jakarta.json.Json
 import jakarta.json.JsonValue
 import java.io.StringReader
 import java.security.MessageDigest
+import java.util.Base64
 
 /**
  * REBUILT A SECOND TIME after a real, caught mistake: the first
@@ -97,6 +98,11 @@ object JsonSchemaDialectSupport {
 
     private fun schemaIdFor(name: String): String = "/schemas/sha256-${schemaHashes.getValue(name)}"
 
+    /** Subresource Integrity value of each schema's served bytes: full digest, never truncated
+     *  (HAL-SCHEMA-FORMS-HR Rule 2). The URL is only the server's name for the schema. */
+    private val schemaIntegrity: Map<String, String> =
+        canonicalSchemas.mapValues { (_, body) -> integrityOf(body) }
+
     // ---------------------------------------------------------------
     // Shared: which affordances exist for a given status. Single
     // source of truth -- both dialects (halforms via GardenBedController,
@@ -134,7 +140,8 @@ object JsonSchemaDialectSupport {
                     .toMutableMap()
                     .apply { put("\$id", id) }
             } else {
-                mapOf("\$id" to id)
+                // HAL-SCHEMA-FORMS-HR Rule 3: a reference, pinned by the schema's integrity.
+                mapOf("\$ref" to id, "hr:integrity" to schemaIntegrity.getValue(name))
             }
 
             mapOf(
@@ -174,6 +181,8 @@ object JsonSchemaDialectSupport {
 
     fun affordanceSetHashFor(status: GardenBedStatus, rendering: SetRendering): String =
         setHashByKey.getValue(SetKey(status, rendering))
+
+    private val setIntegrityByKey: Map<SetKey, String> = setJsonByKey.mapValues { (_, json) -> integrityOf(json) }
 
     fun affordanceSetJson(status: GardenBedStatus, rendering: SetRendering): String =
         setJsonByKey.getValue(SetKey(status, rendering))
@@ -235,7 +244,9 @@ object JsonSchemaDialectSupport {
                     "href" to "/affordance-sets/sha256-$hash",
                     "type" to Dialect.JSONSCHEMA.mediaType,
                     // HAL's own link hint; replaces the withdrawn media-type parameter (§6.1).
-                    "profile" to Dialect.JSONSCHEMA.profile
+                    "profile" to Dialect.JSONSCHEMA.profile,
+                    // HAL-SCHEMA-FORMS-HR Rule 2: what the set's bytes must hash to.
+                    "integrity" to setIntegrityByKey.getValue(SetKey(state.status, rendering))
                 )
             )
         }
@@ -251,6 +262,17 @@ object JsonSchemaDialectSupport {
         val digest = MessageDigest.getInstance("SHA-256").digest(input)
         return digest.joinToString("") { "%02x".format(it) }
     }
+
+    private fun sha256Base64(body: String): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(body.toByteArray(Charsets.UTF_8))
+        return Base64.getEncoder().encodeToString(digest)
+    }
+
+    /** W3C Subresource Integrity syntax, for links and schema references. */
+    private fun integrityOf(body: String): String = "sha256-${sha256Base64(body)}"
+
+    /** RFC 9530 Repr-Digest for a Layer 2 or Layer 3 body, in RFC 8941 byte-sequence syntax. */
+    fun reprDigestOf(body: String): String = "sha-256=:${sha256Base64(body)}:"
 
     /** Converts a plain Kotlin object graph (Map/List/String/Int/Long/
      *  Double/Boolean/null) into a Jakarta JSON-P `JsonValue` tree, since

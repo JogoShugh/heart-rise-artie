@@ -9,7 +9,7 @@ import java.time.Duration
 /**
  * The real wire: java.net.http, no third-party HTTP stack. Sends exactly
  * the headers ARTIE built and returns status, every header, and the body
- * as text. It follows no redirects and keeps no cache of its own.
+ * bytes as received. It follows no redirects and keeps no cache of its own.
  */
 class HttpTransport(
     private val http: HttpClient = HttpClient.newBuilder()
@@ -22,7 +22,7 @@ class HttpTransport(
         val body = request.body?.let { HttpRequest.BodyPublishers.ofString(it) } ?: HttpRequest.BodyPublishers.noBody()
         val builder = HttpRequest.newBuilder(URI(request.url)).method(request.method, body)
         request.headers.forEach { (name, value) -> builder.header(name, value) }
-        val response = http.send(builder.build(), HttpResponse.BodyHandlers.ofString())
+        val response = http.send(builder.build(), HttpResponse.BodyHandlers.ofByteArray())
         return HeartResponse(response.statusCode(), response.headers().map(), response.body())
     }
 

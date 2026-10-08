@@ -11,8 +11,8 @@ import java.net.URI
  * affordance name and field values) and the wire (SPEC §6.8). It never
  * builds a URI of its own; targets come from the manifest, and templates
  * are expanded from Layer 1 by the one [0.5] rule (see UriTemplate).
- * For caching and content-address checks, give it a transport built as
- * CachingTransport(ContentAddressCheck(wire)).
+ * For caching and integrity checks, give it a transport built as
+ * CachingTransport(IntegrityCheck(wire)). It treats every URI as opaque.
  */
 class ArtieClient(
     private val transport: Transport,
@@ -77,8 +77,10 @@ class ArtieClient(
     /**
      * SPEC §6.7. At L0 one GET. At L1/L2 a walk: Layer 1, then the
      * affordance set it links to, then each schema the set points to by
-     * `$id`, each URL once. The transport's HTTP cache makes a URL already
-     * held cost nothing; reasoning waits until the manifest is complete.
+     * `$ref` (or an older server's `$id`), each URL once. Each fetch carries
+     * the integrity value of the link it follows, checked below the cache.
+     * The transport's HTTP cache makes a URL already held cost nothing;
+     * reasoning waits until the manifest is complete.
      */
     private fun sync(url: String): HeartRepresentation {
         val headers = buildMap {
@@ -87,26 +89,35 @@ class ArtieClient(
             rung.prefer?.let { put("Prefer", it) }
         }
         val layer1 = HeartResponseParser.parse(transport.send(HeartRequest("GET", url, headers)), url, dialect)
-        val synced = layer1.formsLink?.let { link -> layer1.withAffordances(fetchSet(link)) } ?: layer1
+        val synced = layer1.formsLink?.let { link ->
+            layer1.withAffordances(fetchSet(link, layer1.formsIntegrity))
+        } ?: layer1
         return synced.also { current = it }
     }
 
-    private fun fetchSet(link: String): Map<String, AffordanceForm> {
-        val forms = HeartResponseParser.forms(fetchJson(link), link)
+    private fun fetchSet(link: String, integrity: String?): Map<String, AffordanceForm> {
+        val forms = HeartResponseParser.forms(fetchJson(link, integrity), link)
         val schemas = mutableMapOf<String, JsonObject>()
         return forms.mapValues { (_, form) ->
-            val pointer = form.schema.takeIf { it.keys == setOf(SCHEMA_ID) }?.get(SCHEMA_ID)?.jsonPrimitive?.content
+            val pointer = schemaPointer(form.schema)
             if (pointer == null) {
                 form
             } else {
                 val schemaUrl = URI(link).resolve(pointer).toString()
-                form.copy(schema = schemas.getOrPut(schemaUrl) { fetchJson(schemaUrl) })
+                val pin = form.schema[SCHEMA_INTEGRITY]?.jsonPrimitive?.content
+                form.copy(schema = schemas.getOrPut(schemaUrl) { fetchJson(schemaUrl, pin) })
             }
         }
     }
 
-    private fun fetchJson(url: String): JsonObject {
-        val response = transport.send(HeartRequest("GET", url, mapOf("Accept" to "$HAL_JSON, application/json")))
+    /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3), or an older server's lone `$id`. */
+    private fun schemaPointer(schema: JsonObject): String? =
+        schema[SCHEMA_REF]?.jsonPrimitive?.content
+            ?: schema.takeIf { it.keys == setOf(SCHEMA_ID) }?.get(SCHEMA_ID)?.jsonPrimitive?.content
+
+    private fun fetchJson(url: String, integrity: String?): JsonObject {
+        val accept = mapOf("Accept" to "$HAL_JSON, application/json")
+        val response = transport.send(HeartRequest("GET", url, accept, integrity = integrity))
         check(response.status in SUCCESS) { "GET $url answered ${response.status}" }
         return Json.parseToJsonElement(response.body).jsonObject
     }
@@ -114,6 +125,8 @@ class ArtieClient(
     private companion object {
         val SUCCESS = 200..299
         const val SCHEMA_ID = "\$id"
+        const val SCHEMA_REF = "\$ref"
+        const val SCHEMA_INTEGRITY = "hr:integrity"
         const val CONFLICT = 409
         const val PRECONDITION_FAILED = 412
         const val UNPROCESSABLE = 422

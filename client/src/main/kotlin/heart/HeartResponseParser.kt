@@ -26,12 +26,15 @@ object HeartResponseParser {
         val root = Json.parseToJsonElement(response.body).jsonObject
         // An act's response comes from the action URL; its self link says which resource it is.
         val self = linkHref(root, "self")
+        val formsLink = formsLinkObject(root)
         return HeartRepresentation(
             url = self?.let { URI(url).resolve(it).toString() } ?: url,
             state = JsonObject(root.filterKeys { it !in setOf(FORMS, LINKS, HalFormsTemplates.TEMPLATES) }),
             affordances = if (dialect == Dialect.HAL_FORMS) HalFormsTemplates.forms(root, url) else forms(root, url),
             etag = response.header("ETag"),
-            formsLink = formsHref(root)?.let { URI(url).resolve(it).toString() },
+            formsLink = formsLink?.get("href")?.jsonPrimitive?.content
+                ?.let { URI(url).resolve(it).toString() },
+            formsIntegrity = formsLink?.get("integrity")?.jsonPrimitive?.content,
         )
     }
 
@@ -39,12 +42,12 @@ object HeartResponseParser {
     fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> =
         root[FORMS]?.jsonObject.orEmpty().mapValues { (rel, form) -> form(rel, form.jsonObject, base) }
 
-    /** The href of the link whose rel, after CURIE expansion, is FORMS_REL. */
-    private fun formsHref(root: JsonObject): String? {
+    /** The link object whose rel, after CURIE expansion, is FORMS_REL. */
+    private fun formsLinkObject(root: JsonObject): JsonObject? {
         val links = root[LINKS]?.jsonObject ?: return null
         val curies = (links["curies"] as? JsonArray).orEmpty().map { it.jsonObject }
             .associate { it["name"]?.jsonPrimitive?.content to it["href"]?.jsonPrimitive?.content }
-        return links.keys.firstOrNull { expandRel(it, curies) == FORMS_REL }?.let { linkHref(root, it) }
+        return links.keys.firstOrNull { expandRel(it, curies) == FORMS_REL }?.let { links[it] as? JsonObject }
     }
 
     /**

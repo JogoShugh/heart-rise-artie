@@ -42,6 +42,7 @@ class AffordanceSetController {
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(Dialect.JSONSCHEMA.mediaType))
             .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
+            .header("Repr-Digest", JsonSchemaDialectSupport.reprDigestOf(body))
             .body(body)
     }
 }

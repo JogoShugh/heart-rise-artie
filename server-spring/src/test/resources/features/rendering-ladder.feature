@@ -31,7 +31,7 @@ Feature: Rendering ladder L0 to L2
     Examples:
       | prefer                | schema rendering                    |
       | forms=cid             | embeds its full schema              |
-      | forms=cid, schema=cid | points to its schema by $id only    |
+      | forms=cid, schema=cid | points to its schema by $ref and integrity |
 
   Scenario: L1 and L2 affordance sets have different addresses
     When a client gets bed 2 with Prefer "forms=cid"
@@ -49,6 +49,29 @@ Feature: Rendering ladder L0 to L2
       | prefer                |
       | forms=cid             |
       | forms=cid, schema=cid |
+
+  Scenario Outline: The affordance-set link carries the integrity of the bytes it leads to: Prefer <prefer>
+    SPEC §6.5 and HAL-SCHEMA-FORMS-HR Rule 2: a client checks Layer 2 against
+    the link that led to it, never against the URL. Repr-Digest is the
+    optional extra (Rule 4).
+    When a client gets bed 2 with Prefer "<prefer>"
+    And the client follows the affordance-set link
+    Then the response body matches the integrity of the link that led to it
+    And the response Repr-Digest matches its body
+
+    Examples:
+      | prefer                |
+      | forms=cid             |
+      | forms=cid, schema=cid |
+
+  Scenario: Each schema reference carries the integrity of the schema it leads to
+    When a client gets bed 2 with Prefer "forms=cid, schema=cid"
+    And the client follows the affordance-set link
+    And the client follows the "waterCell" schema reference
+    Then the response status is 200
+    And the response body matches the integrity of the link that led to it
+    And the response Repr-Digest matches its body
+    And the response Cache-Control is "public, max-age=31536000, immutable"
 
   Scenario: Layer 2 ignores Prefer: one address, one representation
     When a client gets bed 2 with Prefer "forms=cid, schema=cid"

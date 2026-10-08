@@ -1,10 +1,12 @@
 Feature: Sync at L2: walk three layers through an HTTP cache
   SPEC §6.3, §6.5, §6.6, §6.7. A client at L2 sends Prefer: forms=cid,
   schema=cid. Layer 1 links to an affordance set, and the set points to
-  each schema by $id. The client follows those links through an ordinary
+  each schema by $ref. The client follows those links through an ordinary
   HTTP cache: content-addressed layers are immutable, so a URL already
   held is never fetched again, and Layer 1 is revalidated with
-  If-None-Match. Bytes that do not hash to their address are refused.
+  If-None-Match. URIs are opaque: the client checks bytes only against the
+  integrity value of the link that led to them, and against Repr-Digest
+  when the server sends it (HAL-SCHEMA-FORMS-HR Rules 2 and 4).
 
   Background:
     Given the service serves schema "water" at its content address:
@@ -23,7 +25,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
             target: {href: "/beds/{id}/actions/water-cell", templated: true}
           method: POST
           contentType: application/json
-          schema: {$id: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
       """
     And the service answers GET "http://garden.test/beds/2" with:
       """
@@ -38,7 +40,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       status: PLANTED
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", type: application/hal+json}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", type: application/hal+json, integrity: "{integrity:set:planted}"}
       """
     And the client works at rung L2
 
@@ -94,7 +96,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
     And the last request had header "If-None-Match" set to "\"seq-1.hsf.L2\""
     And the manifest offers exactly "waterCell"
 
-  Scenario: Two affordances that share one schema fetch it once
+  Scenario: Two affordances that share one schema fetch it once (an older server's $id pointer is still read)
     Given the service serves affordance set "two-waterings" at its content address:
       """yaml
       _forms:
@@ -147,26 +149,64 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       | If-Match | "seq-1.hsf.L2" |
     And the client holds the ETag "seq-2.hsf.L2"
 
-  Scenario: Bytes that do not hash to their address are refused, and not cached
-    Given the service answers GET "http://garden.test/affordance-sets/sha256-0000000000000000" with:
+  Scenario: The client reads nothing from a URL, even one shaped like a hash
+    Given the service serves affordance set "odd-name" at "/affordance-sets/sha256-0000000000000000":
+      """yaml
+      _forms:
+        waterCell:
+          _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
+          method: POST
+          schema: {type: object}
       """
-      200 OK
-      Content-Type: application/hal+json
-      Cache-Control: public, max-age=31536000, immutable
+    And bed 8 links to affordance set "odd-name" with integrity "{integrity:set:odd-name}"
+    When the client enters "http://garden.test/beds/8"
+    Then the manifest offers exactly "waterCell"
+    And the cache holds "http://garden.test/affordance-sets/sha256-0000000000000000"
 
+  Scenario: A set whose bytes do not match the link's integrity is refused, and not cached
+    Given the service serves affordance set "planted-v2" at "/forms/planted":
+      """yaml
       _forms: {}
       """
-    And the service answers GET "http://garden.test/beds/8" with:
-      """
-      200 OK
-      Content-Type: application/hal+json
-      ETag: "seq-1.hsf.L2"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+    And bed 9 links to affordance set "planted-v2" with integrity "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+    When the client tries to enter "http://garden.test/beds/9"
+    Then the client raised an error mentioning "integrity"
+    And the cache holds nothing for "http://garden.test/forms/planted"
 
-      id: 8
-      _links:
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: /affordance-sets/sha256-0000000000000000}
+  Scenario: A schema whose bytes do not match its hr:integrity is refused, and not cached
+    Given the service serves affordance set "wrong-schema-pin" at its content address:
+      """yaml
+      _forms:
+        waterCell:
+          _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
+          method: POST
+          schema: {$ref: "{schema:water}", "hr:integrity": "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="}
       """
-    When the client tries to enter "http://garden.test/beds/8"
-    Then the client raised an error mentioning "does not hash to"
-    And the cache holds nothing for "http://garden.test/affordance-sets/sha256-0000000000000000"
+    And bed 10 links to affordance set "wrong-schema-pin" with integrity "{integrity:set:wrong-schema-pin}"
+    When the client tries to enter "http://garden.test/beds/10"
+    Then the client raised an error mentioning "integrity"
+    And the cache holds nothing for "http://garden.test{schema:water}"
+
+  Scenario: A Repr-Digest that disagrees with the bytes is refused, and not cached
+    Given the service serves affordance set "liar" at "/forms/liar" with Repr-Digest "sha-256=:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=:":
+      """yaml
+      _forms: {}
+      """
+    And bed 11 links to affordance set "liar" with integrity "{integrity:set:liar}"
+    When the client tries to enter "http://garden.test/beds/11"
+    Then the client raised an error mentioning "Repr-Digest"
+    And the cache holds nothing for "http://garden.test/forms/liar"
+
+  Scenario: A Repr-Digest that matches, in RFC 8941 syntax, is accepted
+    Given the service serves affordance set "honest" at "/forms/honest" with its own Repr-Digest:
+      """yaml
+      _forms:
+        waterCell:
+          _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
+          method: POST
+          schema: {type: object}
+      """
+    And bed 12 links to affordance set "honest" with integrity "{integrity:set:honest}"
+    When the client enters "http://garden.test/beds/12"
+    Then the manifest offers exactly "waterCell"
+    And the cache holds "http://garden.test/forms/honest"

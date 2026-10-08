@@ -27,6 +27,7 @@ class SchemaController {
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType("application/schema+json"))
             .header(HttpHeaders.CACHE_CONTROL, "public, max-age=31536000, immutable")
+            .header("Repr-Digest", JsonSchemaDialectSupport.reprDigestOf(schema))
             .body(schema)
     }
 }

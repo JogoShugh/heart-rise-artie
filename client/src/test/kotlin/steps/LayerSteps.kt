@@ -10,6 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import java.security.MessageDigest
+import java.util.Base64
 
 /** Steps for SPEC §6.5-6.7: content-addressed layers, the rung, and the cache. */
 class LayerSteps(private val ctx: ClientContext) {
@@ -25,6 +26,24 @@ class LayerSteps(private val ctx: ClientContext) {
     @Given("the service serves affordance set {string} at its content address:")
     fun servesSet(name: String, yaml: String) = serveAddressed("set", "/affordance-sets", name, yaml)
 
+    @Given("the service serves affordance set {string} at {string}:")
+    fun servesSetAt(name: String, path: String, yaml: String) = serve("set", name, path, json(yaml))
+
+    @Given("the service serves affordance set {string} at {string} with Repr-Digest {string}:")
+    fun servesSetWithDigest(name: String, path: String, digest: String, yaml: String) =
+        serve("set", name, path, json(yaml), digest)
+
+    @Given("the service serves affordance set {string} at {string} with its own Repr-Digest:")
+    fun servesSetWithOwnDigest(name: String, path: String, yaml: String) {
+        val body = json(yaml)
+        serve("set", name, path, body, "sha-256=:${base64Sha256(body)}:")
+    }
+
+    /** A Layer 1 response at L2 whose only manifest is a link to [set] carrying [integrity]. */
+    @Given("bed {int} links to affordance set {string} with integrity {string}")
+    fun bedLinksWithIntegrity(bed: Int, set: String, integrity: String) =
+        serveBed(bed, """{"href":"${ctx.expand("{set:$set}")}","integrity":"${ctx.expand(integrity)}"}""")
+
     @Given("bed {int} and bed {int} both link to affordance set {string}")
     fun bothLink(first: Int, second: Int, set: String) {
         bedLinks(first, set)
@@ -33,9 +52,11 @@ class LayerSteps(private val ctx: ClientContext) {
 
     /** A Layer 1 response at L2 whose only manifest is the link to [set]. */
     @Given("bed {int} links to affordance set {string}")
-    fun bedLinks(bed: Int, set: String) {
+    fun bedLinks(bed: Int, set: String) = serveBed(bed, """{"href":"${ctx.expand("{set:$set}")}"}""")
+
+    private fun serveBed(bed: Int, link: String) {
         val body = """{"id":$bed,"_links":{"self":{"href":"/beds/$bed"},""" +
-            """"https://github.com/jogoshugh/heart-rise/rels/forms":{"href":"${ctx.expand("{set:$set}")}"}}}"""
+            """"https://github.com/jogoshugh/heart-rise/rels/forms":$link}}"""
         val headers = mapOf(
             "Content-Type" to listOf("application/hal+json"),
             "ETag" to listOf("\"seq-1.hsf.L2\""),
@@ -63,21 +84,37 @@ class LayerSteps(private val ctx: ClientContext) {
     fun lastRequestHeader(name: String, value: String) =
         assertEquals(value, ctx.transport.requests.last().header(name))
 
-    @Then("the cache holds nothing for {string}")
-    fun cacheLacks(url: String) = assertFalse(ctx.cache.holds(url), "cache holds $url")
+    @Then("the cache holds {string}")
+    fun cacheHolds(url: String) = assertTrue(ctx.cache.holds(ctx.expand(url)), "cache lacks $url")
 
-    /** Mints the address from the exact bytes served, the way a server must (§6.5). */
+    @Then("the cache holds nothing for {string}")
+    fun cacheLacks(url: String) = assertFalse(ctx.cache.holds(ctx.expand(url)), "cache holds $url")
+
+    /** Mints the address from the exact bytes served, the way the reference server names them (§6.5). */
     private fun serveAddressed(kind: String, prefix: String, name: String, yaml: String) {
-        val body = jsonMapper.writeValueAsString(yamlMapper.readTree(ctx.expand(yaml)))
+        val body = json(yaml)
         val hash = MessageDigest.getInstance("SHA-256").digest(body.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }.take(ADDRESS_HEX)
-        val path = "$prefix/sha256-$hash"
+        serve(kind, name, "$prefix/sha256-$hash", body)
+    }
+
+    /** Serves [body] at [path] as an immutable layer and records its address and integrity value. */
+    private fun serve(kind: String, name: String, path: String, body: String, reprDigest: String? = null) {
         ctx.addresses["$kind:$name"] = path
-        val headers = mapOf(
-            "Content-Type" to listOf("application/json"),
-            "Cache-Control" to listOf("public, max-age=31536000, immutable"),
-        )
+        ctx.addresses["integrity:$kind:$name"] = "sha256-${base64Sha256(body)}"
+        val headers = buildMap {
+            put("Content-Type", listOf("application/json"))
+            put("Cache-Control", listOf("public, max-age=31536000, immutable"))
+            reprDigest?.let { put("Repr-Digest", listOf(it)) }
+        }
         ctx.transport.respond("GET", "http://garden.test$path", HeartResponse(OK, headers, body))
+    }
+
+    private fun json(yaml: String): String = jsonMapper.writeValueAsString(yamlMapper.readTree(ctx.expand(yaml)))
+
+    private fun base64Sha256(body: String): String {
+        val digest = MessageDigest.getInstance("SHA-256").digest(body.toByteArray(Charsets.UTF_8))
+        return Base64.getEncoder().encodeToString(digest)
     }
 
     private companion object {
