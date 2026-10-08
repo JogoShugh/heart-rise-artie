@@ -698,7 +698,12 @@ A H.E.A.R.T. service SHALL have a **service index**: one resource whose URI is t
 - Lookup and search are **GET forms**. Their targets are templates filled from the form's own fields (HAL Schema Forms), with RFC 6570 form-style query expansion (`{?name}`) where the value belongs in the query. A GET form is safe (RFC 9110 §9.2.1): the client sends no body and no `If-Match`, and treats the target like any resource it syncs.
 - A collection lists its members under the IANA `item` relation (RFC 6573), each with a `title`. A client chooses a member by relation and title; it never builds a member's URI.
 
-The reference server's index offers `searchBeds` (`/beds{?name}`, a case-insensitive match on part of the bed's name) and `getBed` (`/beds/{id}`). It is served in HAL Schema Forms only: HAL-FORMS has no way to fill a target from a field, so a HAL-FORMS client starts from a bed's URI.
+The index is served in both dialects, with the same form names:
+
+- **HAL Schema Forms:** `searchBeds` targets `/beds{?name}` and `getBed` targets `/beds/{id}`, each template filled from the form's own field.
+- **HAL-FORMS:** a target cannot be templated, so a field can never reach the path. A GET template instead puts its fields in the query string (the HTML mutate-action-URL algorithm, form-urlencoded), so both templates target `/beds`: `searchBeds` gives `/beds?name=…` and `getBed` gives `/beds?id=…`.
+
+`GET /beds` filters by `name` (part of the label, case ignored) and `id`, and answers in the dialect negotiated. A server whose resources are reachable only by path, not by query, cannot offer a HAL-FORMS lookup; that is a constraint on server design, not on the client.
 
 ## 7. R.I.S.E. Requirements
 

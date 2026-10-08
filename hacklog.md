@@ -200,7 +200,8 @@ scenarios pass from "/" alone.
 
 Still open from this work:
 
-- **HAL-FORMS:** no index; a HAL-FORMS client still starts at a bed URI.
+- **HAL-FORMS:** done (`82202d5`). The index is served in HAL-FORMS with
+  query GET templates (`/beds?name=`, `/beds?id=`); live from "/" alone.
 - **L6:** the reasoner is offered forms only, not links, so an agent cannot
   yet choose "follow the item titled X" by itself.
 - **Pagination:** search returns every match in one representation.
