@@ -12,7 +12,7 @@
 2. **Precondition scope and strong validators (§6.1, §6.2, §6.3).** 0.4 requires `If-Match` to carry the Layer 1 `ETag`, but the act is sent to a *different* URI (the affordance target), and 0.4 also requires Layer 1 `ETag`s to differ per dialect and rung. Read literally under RFC 9110 §13.1.1, the precondition would be evaluated against the wrong resource and could never match. 0.5 defines the precondition's scope explicitly and requires strong validators.
 3. **Evaluation order (§6.2).** With conditional acts mandatory, "the resource moved since sync" is a `412`, not a `409`. 0.5 fixes the order servers check in — `428`, then `412`, then `409`, then `422` — so each code has exactly one meaning.
 4. **Layer 3 scope (§6.5).** 0.4 says Layer 3 is hashed over the schema "verbatim", which contradicts the canonicalization step two paragraphs earlier. 0.5 says the canonical bytes are both hashed and served.
-5. **Template variable resolution (§6.9.1).** 0.4 says every variable must be "resolvable from Layer 1" without saying how. 0.5 makes the rule mechanical: a variable name is a top-level Layer 1 property name.
+5. **Template variable resolution (§6.9.1).** Superseded: decided below as declared template pointers.
 6. **RISE answers (§7.2).** Proposes answers to both `[AUTHOR]` questions: RISE requires the originator's source server to reach L2, and the envelope is a body member, since every RISE request is a state-changing `POST`.
 7. **Explaining absence (§12).** Proposes a concrete mechanism: an optional, content-addressed `heart:unavailable` resource linked from Layer 2 and fetched only on demand.
 8. **`cid` token name (§6.4).** Flags that `forms=cid` reads as a multiformats CID, which §12 is still deciding whether to adopt. Proposes `forms=link, schema=link` as an alternative.
@@ -22,6 +22,12 @@
 - **HAL-FORMS is the L0 on-ramp; HAL Schema Forms is the reference dialect (§6.1, §6.2, §6.10.6).** Decided 2026-10-04. HAL-FORMS has no field that points to a separately addressed properties fragment, and its common toolchains generate the bytes, so the layering and content addressing of L1–L3 do not fit it. Rather than extend HAL-FORMS, 0.5 serves it at L0 only. Every rung, L0 to L6, is defined for HAL Schema Forms.
 
 - **The affordance-set link has a name (§6.1).** Decided 2026-10-04. At L1 and L2, Layer 1 links to its affordance set under the link relation `https://github.com/jogoshugh/heart-rise/rels/forms`. A server MAY write it in HAL's CURIE short form; a client MUST expand CURIEs before matching. 0.4 drew the link as `_links.forms` without naming it, so two conformant implementations could disagree.
+
+- **A H.E.A.R.T. profile of HAL Schema Forms (`spec/HAL-SCHEMA-FORMS-HR.md`).** Decided 2026-10-08. Affordance sets stay. The additions they need are written as a differences-only profile of HAL Schema Forms, each taken from an existing standard. L0 responses use none of them and stay valid upstream HAL Schema Forms.
+
+- **Declared template pointers (§6.9.1).** Decided 2026-10-08. A form declares where each template variable comes from in `hr:templatePointers` (JSON Hyper-Schema's `templatePointers`; RFC 6901 pointers). This replaces proposal 5, whose rule appeared nowhere in the representation.
+
+- **Opaque URIs; integrity from the linking representation (§6.5).** Decided 2026-10-08. The client no longer reads a digest from a URL path. Links carry Subresource Integrity values; `Repr-Digest` is optional.
 
 **Changes since 0.3:**
 
@@ -362,9 +368,15 @@ This reverses 0.3's rule that a Layer 2 resource has one canonical address regar
 
 The cost is that L1 and L2 clients do not share affordance-set cache entries. They still share all Layer 3 entries, and each shares fully with its own rung. Given that a deployment will typically standardise on one rung, this is a small loss for a large gain in integrity. `[AUTHOR]` — confirm; this is the one place where 0.4 overturns a stated 0.3 property rather than clarifying it.
 
-**Scope of "the body" for Layer 3:** the schema's own full content, with nothing stripped. `[0.5]` It is canonicalized as above, and the server serves exactly those canonical bytes. 0.4 said "verbatim", which contradicts the canonicalization step: a hand-formatted schema served as written does not hash to its own address. The rule is the same for both layers. **The address is the SHA-256 of the response body, byte for byte**, so any client or cache can verify an address by hashing what it received.
+**Scope of "the body" for Layer 3:** the schema's own full content, with nothing stripped. `[0.5]` It is canonicalized as above, and the server serves exactly those canonical bytes. 0.4 said "verbatim", which contradicts the canonicalization step: a hand-formatted schema served as written does not hash to its own address. The rule is the same for both layers. **The address is the SHA-256 of the response body, byte for byte.**
 
 **Output:** Lowercase hexadecimal digest, used directly as the final URL path segment: `/affordance-sets/sha256-{digest}`, `/schemas/sha256-{digest}`.
+
+**URIs are opaque to the client (revised 2026-10-08).** The hash-shaped path is the server's own naming. It gives the server one URL per distinct body, which is what makes `immutable` caching safe. A client SHALL NOT read a hash, or any other meaning, from a URI (W3C *Architecture of the World Wide Web* §2.5: "Agents making use of URIs SHOULD NOT attempt to infer properties of the referenced resource"). Earlier drafts had the client verify bytes against the digest in the path; that is withdrawn.
+
+**Integrity comes from the linking representation.** The Layer 1 link to an affordance set carries an `integrity` value, and each Layer 2 schema reference carries `hr:integrity`, both in W3C Subresource Integrity syntax with the full, untruncated digest. The client hashes the body exactly as received, before parsing, and refuses, without caching it, any response whose bytes do not match. Layer 1 is revalidated on every visit, so each layer vouches for the next. The rules are in `spec/HAL-SCHEMA-FORMS-HR.md` (Rules 2 and 3).
+
+**`Repr-Digest` is optional.** A server SHOULD send `Repr-Digest` (RFC 9530) on Layer 2 and Layer 3 responses. A client SHOULD check it when present and SHALL NOT require it: the header shows the bytes arrived intact, but a response cannot vouch for itself against substitution.
 
 **Digest truncation.** A server MAY truncate the digest for readability (e.g. 16 hex characters). The 0.3 text framed this as a straight readability/collision trade, which understates it. Under content addressing a collision does not merely waste a cache slot — it causes the wrong schema to be served under a URL another party's content minted, silently. At 64 bits, birthday collisions become practically reachable at scale, and second-preimage resistance is entirely absent against any party who can influence schema content. Truncated digests are acceptable **only** for closed-world development and demonstration servers where all content is authored by one trusted party. Production servers SHALL use the full digest.
 
@@ -428,7 +440,9 @@ A compliant agent implementation SHALL therefore:
 
 **Templated profile.** Affordance `href` values are RFC 6570 URI Templates whose variables are resolved by the client from Layer 1 — typically the resource identifier and any path context. The Layer 2 body contains no instance identity. Where a server uses templates it SHALL restrict itself to RFC 6570 **Level 1** (simple string expansion) unless it declares otherwise, and SHALL name variables such that every variable is resolvable from the Layer 1 representation the client already holds; a template referencing a variable the client cannot resolve is non-compliant.
 
-`[0.5]` **Resolution rule.** A template variable resolves to the Layer 1 top-level property of the same name, which must be a string or a number, matched exactly and case-sensitively. No other lookup is defined. For example, `{id}` resolves from `"id": 2`. `{bedId}` does not resolve unless Layer 1 has a `bedId` property. Without this rule, "resolvable" depends on the client guessing a mapping, and two conformant clients could expand one template to two different URIs. Expansion is performed by deterministic client code, never by the Reason step (§6.8).
+**Resolution rule (revised 2026-10-08).** Each form declares where its template variables come from, in `hr:templatePointers`: an object mapping each variable name to a JSON Pointer (RFC 6901) into the owning Layer 1 representation. The keyword's shape and meaning are taken from JSON Hyper-Schema's `templatePointers`. For example, `"hr:templatePointers": {"id": "/id"}` fills `{id}` from `"id": 2`. A variable with no pointer comes from a form field of the same name (HAL Schema Forms), and failing that from the Layer 1 top-level property of the same name (the JSON Hyper-Schema default). The value must be a string or a number; anything else stops the act before a request is sent. A server SHOULD declare a pointer for every variable that does not come from a form field. The full rule is in `spec/HAL-SCHEMA-FORMS-HR.md` (Rule 1). Expansion is performed by deterministic client code, never by the Reason step (§6.8).
+
+This replaces 0.5's proposed undeclared rule, under which the same-name lookup was the only mechanism and appeared nowhere in the representation.
 
 **Concrete profile.** Affordance `href` values are fully-resolved URIs containing instance identity. The Layer 2 body is specific to the resource that produced it.
 

@@ -27,9 +27,13 @@ Other tensions the Fielding review recorded (no action decided):
 - **Typed relations:** action names (`waterCell`, HAL-FORMS `default`) are not
   standardized relations. L6 Reason covers the gap by reading names.
 
-## 2026-10-08: Repr-Digest plan (draft, not started)
+## 2026-10-08: Repr-Digest plan (replaced)
 
-Status: **draft plan, waiting for the author's go.** Nothing has changed in
+Status: **replaced the same day** by link integrity (Subresource Integrity
+style), with `Repr-Digest` optional. See `spec/HAL-SCHEMA-FORMS-HR.md` Rule 2
+and SPEC §6.5. Kept as history; the corrections below still hold.
+
+Original status: **draft plan, waiting for the author's go.** Nothing has changed in
 the spec or the code. This plan resolves the Rule 4 tension listed above.
 
 ### Source
@@ -144,3 +148,18 @@ does not support.
 
 Follow-up, separate: pin the digest in the link (correction 7), as a rule in
 the HAL Schema Forms fork.
+
+## 2026-10-08: decisions
+
+- **Fork:** keep affordance sets; write a differences-only H.E.A.R.T. profile
+  of HAL Schema Forms (`spec/HAL-SCHEMA-FORMS-HR.md`).
+- **Template pointers:** forms declare `hr:templatePointers` (JSON Hyper-Schema
+  `templatePointers`, RFC 6901 pointers). A variable with no pointer and no
+  field falls back to the Hyper-Schema same-name default.
+- **Integrity:** the client never reads a digest from a URL. The Layer 1 link
+  carries `integrity`; each Layer 2 schema `$ref` carries `hr:integrity`
+  (Subresource Integrity syntax, full digest). `Repr-Digest` is sent by the
+  server and checked by the client when present, never required.
+- **Vocabulary:** say resource or representation, never "page".
+
+Work in progress follows `~/.claude/plans/functional-cuddling-hearth.md`.

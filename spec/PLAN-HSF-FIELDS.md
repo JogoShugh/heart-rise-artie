@@ -1,7 +1,10 @@
 # Plan: fill targets from form fields, as HAL Schema Forms does
 
-Status: **draft plan, not started.** Written 2026-10-05. Nothing in the spec or
-the code has changed yet. The questions in section 7 need answers first.
+Status: **superseded 2026-10-08.** Kept as history. The author chose to keep
+affordance sets and write a H.E.A.R.T. profile of HAL Schema Forms instead:
+see `spec/HAL-SCHEMA-FORMS-HR.md`. Template variables are now bound by declared
+`hr:templatePointers` (JSON Hyper-Schema), not by `readOnly` fields, so option
+B below is not being built.
 
 ## 1. The problem
 
