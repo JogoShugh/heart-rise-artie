@@ -10,7 +10,7 @@ import java.net.URI
  * ARTIE's deterministic core: everything between a selection (an
  * affordance name and field values) and the wire (SPEC §6.8). It never
  * builds a URI of its own; targets come from the manifest, and templates
- * are expanded from Layer 1 by the one [0.5] rule (see UriTemplate).
+ * are expanded as each form declares (HAL-SCHEMA-FORMS-HR Rule 1, see UriTemplate).
  * For caching and integrity checks, give it a transport built as
  * CachingTransport(IntegrityCheck(wire)). It treats every URI as opaque.
  */
@@ -41,7 +41,7 @@ class ArtieClient(
         val held = current ?: error("enter a service before acting")
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
         val etag = held.etag ?: error("no ETag held for ${held.url}; an act needs If-Match")
-        val target = targetOf(form, held)
+        val target = targetOf(form, held, payload)
         val response = transport.send(
             HeartRequest(
                 form.method,
@@ -69,9 +69,10 @@ class ArtieClient(
             else -> UnexpectedResponse(rel, response.status)
         }
 
-    private fun targetOf(form: AffordanceForm, held: HeartRepresentation): String {
+    private fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
         if (!form.templated) return form.target
-        return URI(held.url).resolve(UriTemplate.expand(form.target, held.state)).toString()
+        val expanded = UriTemplate.expand(form.target, held.state, form.templatePointers, fields)
+        return URI(held.url).resolve(expanded).toString()
     }
 
     /**

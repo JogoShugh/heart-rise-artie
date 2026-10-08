@@ -18,6 +18,8 @@ const val FORMS_REL = "https://github.com/jogoshugh/heart-rise/rels/forms"
 /**
  * One affordance from the manifest. [target] is absolute when the server
  * sent a plain href, and an RFC 6570 template when [templated] is true.
+ * [templatePointers] maps template variables to JSON Pointers into the
+ * owning resource's state (HAL-SCHEMA-FORMS-HR Rule 1).
  */
 data class AffordanceForm(
     val rel: String,
@@ -26,4 +28,5 @@ data class AffordanceForm(
     val method: String,
     val contentType: String,
     val schema: JsonObject,
+    val templatePointers: Map<String, String> = emptyMap(),
 )

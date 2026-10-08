@@ -1,8 +1,10 @@
 Feature: Conditional acts and the four refusals
   SPEC §6.3, §6.8, §6.9.1 and the [0.5] rules. Every act carries the ETag
   the client holds in If-Match, unchanged. A templated target is expanded
-  from Layer 1 by one rule only: {name} takes the top-level property of
-  that name. Each refusal has its own handling:
+  from Layer 1 as the form declares (HAL-SCHEMA-FORMS-HR Rule 1): a
+  variable takes the value its hr:templatePointers JSON Pointer names, and
+  with no pointer, the top-level property of the same name (the JSON
+  Hyper-Schema default). Each refusal has its own handling:
     412  the world moved: re-sync and drop the act, never resend it
     409  not legal here: re-sync and report; no retry
     428  the server wants a precondition: re-sync, then resend once with it
@@ -54,7 +56,149 @@ Feature: Conditional acts and the four refusals
       | Accept       | application/hal+json |
     And the client holds the ETag "seq-2.hsf.L0"
 
-  Scenario: A template variable with no matching Layer 1 property is refused before any request
+  Scenario: A template pointer fills a variable whose name differs from the property
+    Given the service answers GET "http://garden.test/beds/7" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      _forms:
+        waterCell:
+          _links:
+            target: {href: "/beds/{bedId}/actions/water-cell", templated: true}
+          "hr:templatePointers": {bedId: /id}
+          method: POST
+          schema: {type: object}
+      """
+    And the service answers POST "http://garden.test/beds/7/actions/water-cell" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-2.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      _links:
+        self: {href: /beds/7}
+      """
+    And the client enters "http://garden.test/beds/7"
+    When the client acts on "waterCell" with:
+      """yaml
+      milliliters: 100
+      """
+    Then the client sent POST "http://garden.test/beds/7/actions/water-cell" with headers:
+      | If-Match | "seq-1.hsf.L0" |
+
+  Scenario: A template pointer reaches into nested state
+    Given the service answers GET "http://garden.test/beds/7" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      garden: {name: north, bed: 12}
+      _forms:
+        waterCell:
+          _links:
+            target: {href: "/gardens/{garden}/beds/{bed}/water", templated: true}
+          "hr:templatePointers": {garden: /garden/name, bed: /garden/bed}
+          method: POST
+          schema: {type: object}
+      """
+    And the service answers POST "http://garden.test/gardens/north/beds/12/water" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-2.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      """
+    And the client enters "http://garden.test/beds/7"
+    When the client acts on "waterCell" with:
+      """yaml
+      milliliters: 100
+      """
+    Then the client sent POST "http://garden.test/gardens/north/beds/12/water" with headers:
+      | If-Match | "seq-1.hsf.L0" |
+
+  Scenario: A variable with no pointer is filled from the form field of that name, as HAL Schema Forms says
+    Given the service answers GET "http://garden.test/beds/7" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      _forms:
+        waterCell:
+          _links:
+            target: {href: "/beds/{bedId}/cells/{cell}/water", templated: true}
+          "hr:templatePointers": {bedId: /id}
+          method: POST
+          schema: {type: object}
+      """
+    And the service answers POST "http://garden.test/beds/7/cells/B3/water" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-2.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      """
+    And the client enters "http://garden.test/beds/7"
+    When the client acts on "waterCell" with:
+      """yaml
+      cell: B3
+      milliliters: 100
+      """
+    Then the client sent POST "http://garden.test/beds/7/cells/B3/water" with headers:
+      | If-Match | "seq-1.hsf.L0" |
+
+  Scenario Outline: A template pointer that does not lead to a string or number is refused before any request: <pointer>
+    Given the service answers GET "http://garden.test/beds/7" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      garden: {name: north}
+      tags: [shady]
+      active: true
+      _forms:
+        waterCell:
+          _links:
+            target: {href: "/beds/{bedId}/actions/water-cell", templated: true}
+          "hr:templatePointers": {bedId: "<pointer>"}
+          method: POST
+          schema: {type: object}
+      """
+    And the client enters "http://garden.test/beds/7"
+    When the client tries to act on "waterCell" with:
+      """yaml
+      milliliters: 100
+      """
+    Then the client raised an error mentioning "{bedId}"
+    And the client sent no request after entering
+
+    Examples:
+      | pointer  |
+      | /nowhere |
+      | /garden  |
+      | /tags    |
+      | /active  |
+      | id       |
+
+  Scenario: A template variable with neither a pointer nor a matching Layer 1 property is refused before any request
     Given the service answers GET "http://garden.test/beds/7" with:
       """
       200 OK

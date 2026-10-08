@@ -128,9 +128,9 @@ object JsonSchemaDialectSupport {
      *  bed-agnostic: the exact same bytes serve every bed currently in
      *  this status, real HTTP caches included, since nothing about the
      *  URL or body varies by which bed asked. The client expands
-     *  `{id}` itself before POSTing. Per the [0.5] rule in SPEC §6.9.1
-     *  the variable is named for the Layer 1 property it resolves from:
-     *  the bed body's top-level `id`. */
+     *  `{id}` itself before POSTing, from the JSON Pointer the form
+     *  declares in `hr:templatePointers` (HAL-SCHEMA-FORMS-HR Rule 1,
+     *  SPEC §6.9.1): `/id`, the bed body's top-level `id`. */
     private fun buildForms(names: List<String>, embedSchemas: Boolean): Map<String, Any?> =
         names.associateWith { name ->
             val id = schemaIdFor(name)
@@ -151,6 +151,7 @@ object JsonSchemaDialectSupport {
                         "templated" to true
                     )
                 ),
+                TEMPLATE_POINTERS to mapOf("id" to "/id"),
                 "method" to "POST",
                 "contentType" to "application/json",
                 "schema" to schema
@@ -201,7 +202,8 @@ object JsonSchemaDialectSupport {
             @Suppress("UNCHECKED_CAST")
             val target = links["target"] as Map<String, Any?>
             val href = (target["href"] as String).replace("{id}", bedId.toString())
-            e + ("_links" to mapOf("target" to mapOf("href" to href)))
+            // A concrete target needs no pointers: L0 stays plain HAL Schema Forms.
+            (e - TEMPLATE_POINTERS) + ("_links" to mapOf("target" to mapOf("href" to href)))
         }
         return mapOf("_forms" to resolved)
     }
@@ -320,6 +322,8 @@ object JsonSchemaDialectSupport {
         val mapper = com.fasterxml.jackson.databind.ObjectMapper()
         return mapper.readValue(raw, Any::class.java)
     }
+
+    private const val TEMPLATE_POINTERS = "hr:templatePointers"
 
     private fun actionPath(affordanceName: String): String = when (affordanceName) {
         "sowSeed" -> "sow-seed"

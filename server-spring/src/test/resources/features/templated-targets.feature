@@ -1,15 +1,16 @@
 Feature: Templated affordance targets
-  SPEC §6.9.1 and its [0.5] resolution rule. Layer 2 hrefs are RFC 6570
+  SPEC §6.9.1 and HAL-SCHEMA-FORMS-HR Rule 1. Layer 2 hrefs are RFC 6570
   Level 1 templates, so one affordance set serves every bed in a state.
-  Each variable names a top-level Layer 1 property, matched exactly, so
-  every conformant client expands a template to the same URI. That URI
+  Each form declares, in hr:templatePointers, a JSON Pointer into Layer 1
+  for every variable, so every conformant client expands a template to
+  the same URI, and the URI never depends on a client guessing. That URI
   is where the server accepts the act.
 
-  Scenario Outline: Every template variable resolves from Layer 1: <status>
+  Scenario Outline: Every template variable has a declared pointer that resolves in Layer 1: <status>
     Given bed 2 is <status>
     When a client gets bed 2 with Prefer "forms=cid, schema=cid"
     And the client follows the affordance-set link
-    Then every target is a template whose variables are top-level properties of bed 2
+    Then every target is a template whose variables each have a template pointer into bed 2
 
     Examples:
       | status           |
@@ -21,7 +22,7 @@ Feature: Templated affordance targets
     Given bed 2 is PLANTED
     And a client got bed 2 as hal-schema-forms with Prefer "forms=cid, schema=cid"
     When the client follows the affordance-set link
-    And the client expands the "waterCell" target from bed 2 and posts {"milliliters": 100} with the ETag it holds
+    And the client expands "waterCell" from bed 2 by its template pointers and posts {"milliliters": 100} with its ETag
     Then the response status is 200
 
   Scenario: Two beds in the same state share one affordance set

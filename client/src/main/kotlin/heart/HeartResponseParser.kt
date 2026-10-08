@@ -18,6 +18,9 @@ object HeartResponseParser {
 
     private val profileLink = Regex("""<([^>]*)>\s*;\s*rel="?profile"?""")
 
+    /** HAL-SCHEMA-FORMS-HR Rule 1. */
+    private const val TEMPLATE_POINTERS = "hr:templatePointers"
+
     fun parse(response: HeartResponse, url: String, dialect: Dialect = Dialect.HAL_SCHEMA_FORMS): HeartRepresentation {
         val profiles = profileLink.findAll(response.header("Link").orEmpty()).map { it.groupValues[1] }.toList()
         require(dialect.profile in profiles) {
@@ -82,6 +85,8 @@ object HeartResponseParser {
             method = obj["method"]?.jsonPrimitive?.content ?: error("affordance '$rel' has no method"),
             contentType = obj["contentType"]?.jsonPrimitive?.content ?: "application/json",
             schema = obj["schema"]?.jsonObject ?: error("affordance '$rel' has no schema"),
+            templatePointers = (obj[TEMPLATE_POINTERS] as? JsonObject).orEmpty()
+                .mapValues { (_, pointer) -> pointer.jsonPrimitive.content },
         )
     }
 }
