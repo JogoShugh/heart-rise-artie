@@ -14,10 +14,9 @@ Waiting on the author:
 - **L6 real-model run:** needs `ANTHROPIC_API_KEY`. Until then, L6 is proven
   only by scripted reasoners, not by inference.
 - **RISE:** not built.
-- **Rule 4 tension (Fielding review):** `ContentAddressCheck` recognises a
-  content-addressed URL by its `/sha256-` path shape. That reads meaning from
-  URL structure. Possible fix: carry the digest in an RFC 9530 `Repr-Digest`
-  header instead of relying on the path.
+- **Rule 4 tension (Fielding review):** resolved 2026-10-08. The client no
+  longer reads the `/sha256-` path; integrity comes from the linking
+  representation (see the 2026-10-08 entries below).
 
 Other tensions the Fielding review recorded (no action decided):
 
@@ -163,3 +162,30 @@ the HAL Schema Forms fork.
 - **Vocabulary:** say resource or representation, never "page".
 
 Work in progress follows `~/.claude/plans/functional-cuddling-hearth.md`.
+
+## 2026-10-08: done
+
+All four phases of the plan are committed locally:
+
+1. Docs: `spec/HAL-SCHEMA-FORMS-HR.md`, SPEC §6.5 and §6.9.1.
+2. Link integrity: `IntegrityCheck` replaces `ContentAddressCheck`; the
+   server sends `integrity`, `$ref` + `hr:integrity`, and `Repr-Digest`.
+3. `hr:templatePointers` on every shared form; the client fills variables
+   from pointers, then fields, then the same-named property.
+4. Live check: 12 @live scenarios pass against the Docker server. Journal
+   and `server-spring/run/` recaptured (`capture.sh` now follows `$ref`);
+   all 10 journal verdicts ok.
+
+Still open:
+
+- **Fielding review artifact:** correct the Rule 6 verdict and mark the
+  Rule 4 tension resolved. Needs the author's OK to republish.
+- **Not regenerated:** `exhibits/cache-demo/` (its own fixtures and server)
+  and `scripts/test-report/` still show the old link shape. Both are
+  historical exhibits; regenerate if they are shown publicly.
+- **Integrity on old links:** a link with no `integrity` is still followed,
+  unchecked except by `Repr-Digest`. The fork says a server SHALL send it;
+  the client could refuse links without it once every server does.
+- **Later fork rules:** form names as link relations; error format
+  (`vnd.error` or `violations`); the entry point.
+- **EVAL-L6**, the L6 real-model run, and RISE are unchanged from above.

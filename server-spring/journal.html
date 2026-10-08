@@ -220,19 +220,20 @@ _links:
       href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
       templated: true
   &quot;hr:forms&quot;:
-    href: /affordance-sets/sha256-f670940f88273f51
+    href: /affordance-sets/sha256-26b50c4c0d57e752
     type: &quot;application/hal+json&quot;
-    profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;</pre></div>
+    profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;
+    integrity: &quot;sha256-JrUMTA1X51JjsBf9u6zdrVLl3oPDqV4ONhoRMEmlWa0=&quot;</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
-      <p>No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>/affordance-sets/sha256-f670940f88273f51</code></p>
+      <p>No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>/affordance-sets/sha256-26b50c4c0d57e752</code></p>
     </div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
       <p>The response names its profile in a header, not a media-type parameter: <code>Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://github.com/jogoshugh/heart-rise&gt;; rel=&quot;profile&quot;</code></p>
     </div>
 
-    <p class="entry-narrative">At <code>Prefer: forms=cid</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-ccaf11d46fc8ad56</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
+    <p class="entry-narrative">At <code>Prefer: forms=cid</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-d0961aaaff4916e5</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
     <div class="specimen"><div class="specimen-label output">output (L1 set, schemas embedded)</div><pre>_forms:
   sowSeed:
     _links:
@@ -240,6 +241,8 @@ _links:
         href: /beds/{id}/actions/sow-seed
         templated: true
     contentType: application/json
+    &quot;hr:templatePointers&quot;:
+      id: /id
     method: POST
     schema:
       &quot;$id&quot;: /schemas/sha256-4ed779d47421af87
@@ -309,6 +312,8 @@ _templates:
         href: /beds/{id}/actions/harvest
         templated: true
     contentType: application/json
+    &quot;hr:templatePointers&quot;:
+      id: /id
     method: POST
     schema:
       &quot;$id&quot;: /schemas/sha256-7ab6ce2f03278bdf
@@ -323,8 +328,8 @@ _templates:
     <p class="entry-sub">what all three layers exist to prove</p>
     <p class="entry-narrative">Bed-1 reached <strong>READY_TO_HARVEST</strong> the long way — sown, watered, grown. Bed-3 arrived at the identical status from seed data. Neither bed knows about the other.</p>
     <div class="hash-pair">
-      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-56b905a805efd55a</div></div>
-      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-56b905a805efd55a</div></div>
+      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-42b2f7c8d6cd5ae6</div></div>
+      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-42b2f7c8d6cd5ae6</div></div>
     </div>
     <div class="seal-row"><div class="seal">verified<br>match</div><div class="seal-text"><h3>Identical, not merely similar.</h3><p>Two independently-arrived-at beds, one shared, cached resource.</p></div></div>
   </section>

@@ -44,7 +44,7 @@ curl -s "$BASE$SOWSEED_SET_URL" > "$RUN_DIR/01-set-pointer.json"
 curl -s "$BASE$SOWSEED_L1_SET_URL" > "$RUN_DIR/01-set-embedded.json"
 curl -sI "$BASE$SOWSEED_SET_URL" > "$RUN_DIR/01-set-headers.txt"
 
-SOWSEED_SCHEMA_URL=$(jq -r '._forms.sowSeed.schema."$id"' < "$RUN_DIR/01-set-pointer.json")
+SOWSEED_SCHEMA_URL=$(jq -r '._forms.sowSeed.schema."$ref"' < "$RUN_DIR/01-set-pointer.json")
 echo "$SOWSEED_SCHEMA_URL" > "$RUN_DIR/01-schema-url.txt"
 
 curl -s "$BASE$SOWSEED_SCHEMA_URL" > "$RUN_DIR/01-schema.json"
@@ -69,7 +69,7 @@ curl -s "$BASE$WATERCELL_SET_URL" > "$RUN_DIR/02-set-pointer.json"
 curl -s "$BASE$WATERCELL_L1_SET_URL" > "$RUN_DIR/02-set-embedded.json"
 curl -sI "$BASE$WATERCELL_SET_URL" > "$RUN_DIR/02-set-headers.txt"
 
-WATERCELL_SCHEMA_URL=$(jq -r '._forms.waterCell.schema."$id"' < "$RUN_DIR/02-set-pointer.json")
+WATERCELL_SCHEMA_URL=$(jq -r '._forms.waterCell.schema."$ref"' < "$RUN_DIR/02-set-pointer.json")
 echo "$WATERCELL_SCHEMA_URL" > "$RUN_DIR/02-schema-url.txt"
 
 curl -s "$BASE$WATERCELL_SCHEMA_URL" > "$RUN_DIR/02-schema.json"

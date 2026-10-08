@@ -16,11 +16,12 @@ has since changed.
 | §6.5: L1 and L2 sets have different addresses | **Done** (step 1) | registry keyed by (status, `SetRendering`); `ContentAddressHttpTest` |
 | §6.1: Layer 2/3 send no `Vary` | **Done** (step 1) | `AffordanceSetController` ignores `Prefer` |
 | §6.5: address = SHA-256 of the served bytes | **Done** (2026-10-04) | `ContentAddressHttpTest` |
+| §6.5 (2026-10-08): `integrity` on the forms link; L2 schema is `$ref` + `hr:integrity`; `Repr-Digest` on Layers 2 and 3 | **Done** (2026-10-08) | `rendering-ladder.feature`, journal |
 | Layer 1 `Cache-Control: no-cache` | **Done** (step 2), also on `304` | `layer1-revalidation.feature` |
 | Layer 1 `304` on `If-None-Match` | **Done** (step 2). Spring's built-in conditional GET; an ETag from another rung gets `200` | same |
 | Strong, per-variant `ETag` (§6.1, `[0.5]`) | **Done** (step 2). `"seq-N.hsf.L2"`; `If-Match` accepts any variant of the current state version | `StateETag` |
 | L3: templated profile, sharing | **Done** for jsonschema; cross-bed proof passes | journal entry 04 |
-| `[0.5]` template variable = Layer 1 property | **Done** (step 5). `/beds/{id}/actions/...`; expanding it from Layer 1 reaches the act | `templated-targets.feature` |
+| §6.9.1 (2026-10-08): every template variable declared in `hr:templatePointers` | **Done** (2026-10-08). `{"id": "/id"}` on every shared form; L0's concrete forms carry none | `templated-targets.feature` |
 | L4 `412` stale write | **Done** | `StaleWriteConflict`, journal entry 06 |
 | L4 `409` illegal transition | **Done**. Now checked against the manifest before the body is read | `checkPreconditions` |
 | L4 `428` missing `If-Match` | **Done** (step 3) | `conditional-acts.feature` |
@@ -44,7 +45,7 @@ has since changed.
 | Never construct a URI (`act(rel, payload)` has no URL parameter) | **Done**, enforced by the type signature |
 | Hold the Layer 1 `ETag` and send `If-Match` on acts | **Done** (C2). The held value is sent unchanged; an act with no ETag held is refused locally |
 | Handle `409` / `412` / `428` on separate paths | **Done** (C2). `412` re-syncs and drops the act; `409` re-syncs and reports; `428` re-syncs and resends once; `422` reports the server's violations. Each is its own `ActRefused` type |
-| Send `Prefer`; walk L1/L2; HTTP cache | **Done** (C4). `Rung` picks the `Prefer` header; the walk follows Layer 1, the set, then each schema `$id` once; `CachingTransport` serves immutable layers without a request and revalidates Layer 1 with `If-None-Match`; `ContentAddressCheck` refuses bytes that do not hash to their address. Live at L0 and L2. Fetches are sequential, not parallel |
+| Send `Prefer`; walk L1/L2; HTTP cache | **Done** (C4). `Rung` picks the `Prefer` header; the walk follows Layer 1, the set, then each schema `$ref` (or an older server's `$id`) once; `CachingTransport` serves immutable layers without a request and revalidates Layer 1 with `If-None-Match`; `IntegrityCheck`, below the cache, refuses bytes that do not match the link's `integrity` or a `Repr-Digest`, and reads nothing from the URL (2026-10-08). Templates fill from `hr:templatePointers`, then form fields, then the same-named property. Live at L0, L1 and L2. Fetches are sequential, not parallel |
 | RFC 6570 template expansion | **Done** (C2). Level 1, by the `[0.5]` rule only; an unresolvable variable is refused before any request |
 | `Accept` / `Accept-Profile` negotiation | **Done** (C1). Sends `Accept: application/hal+json` and `Accept-Profile` |
 | Read the profile from `Link: rel="profile"` | **Done** (C1). A response that does not name the hal-schema-forms profile is refused |
