@@ -189,3 +189,18 @@ Still open:
 - **Later fork rules:** form names as link relations; error format
   (`vnd.error` or `violations`); the entry point.
 - **EVAL-L6**, the L6 real-model run, and RISE are unchanged from above.
+
+## 2026-10-08: entry point
+
+Done (`88f0a2c`): `GET /` is the service index, with `searchBeds`
+(`/beds{?name}`) and `getBed` (`/beds/{id}`) GET forms. `GET /beds?name=`
+lists beds under `item`, titled by label. ARTIE submits GET forms safely
+and follows links by relation and title. SPEC §6.11. Live: three new
+scenarios pass from "/" alone.
+
+Still open from this work:
+
+- **HAL-FORMS:** no index; a HAL-FORMS client still starts at a bed URI.
+- **L6:** the reasoner is offered forms only, not links, so an agent cannot
+  yet choose "follow the item titled X" by itself.
+- **Pagination:** search returns every match in one representation.

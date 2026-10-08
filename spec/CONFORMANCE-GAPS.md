@@ -21,6 +21,7 @@ has since changed.
 | Layer 1 `304` on `If-None-Match` | **Done** (step 2). Spring's built-in conditional GET; an ETag from another rung gets `200` | same |
 | Strong, per-variant `ETag` (§6.1, `[0.5]`) | **Done** (step 2). `"seq-N.hsf.L2"`; `If-Match` accepts any variant of the current state version | `StateETag` |
 | L3: templated profile, sharing | **Done** for jsonschema; cross-bed proof passes | journal entry 04 |
+| §6.11 (2026-10-08): service index at `/`; `searchBeds` and `getBed` GET forms; search results as `item` links | **Done** (2026-10-08). HAL Schema Forms only | `service-index.feature`, live "From the bookmark alone" |
 | §6.9.1 (2026-10-08): every template variable declared in `hr:templatePointers` | **Done** (2026-10-08). `{"id": "/id"}` on every shared form; L0's concrete forms carry none | `templated-targets.feature` |
 | L4 `412` stale write | **Done** | `StaleWriteConflict`, journal entry 06 |
 | L4 `409` illegal transition | **Done**. Now checked against the manifest before the body is read | `checkPreconditions` |

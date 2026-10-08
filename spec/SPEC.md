@@ -689,6 +689,17 @@ Note that the diagram shows L6 running against an L0 sync. That is intentional: 
 
 ---
 
+### 6.11 Entry Point (added 2026-10-08)
+
+A H.E.A.R.T. service SHALL have a **service index**: one resource whose URI is the only thing a client needs to know in advance ("A REST API should be entered with no prior knowledge beyond the initial URI", Fielding, 2008). Every other resource SHALL be reachable from it by links and forms alone.
+
+- The index is a Layer 1 resource: `Cache-Control: no-cache` with an `ETag`, the profile named in `Link: rel="profile"`.
+- It carries its forms inline at every rung and ignores `Prefer`: it is one small resource, so there is nothing to share.
+- Lookup and search are **GET forms**. Their targets are templates filled from the form's own fields (HAL Schema Forms), with RFC 6570 form-style query expansion (`{?name}`) where the value belongs in the query. A GET form is safe (RFC 9110 §9.2.1): the client sends no body and no `If-Match`, and treats the target like any resource it syncs.
+- A collection lists its members under the IANA `item` relation (RFC 6573), each with a `title`. A client chooses a member by relation and title; it never builds a member's URI.
+
+The reference server's index offers `searchBeds` (`/beds{?name}`, a case-insensitive match on part of the bed's name) and `getBed` (`/beds/{id}`). It is served in HAL Schema Forms only: HAL-FORMS has no way to fill a target from a field, so a HAL-FORMS client starts from a bed's URI.
+
 ## 7. R.I.S.E. Requirements
 
 R.I.S.E. is a specialisation of H.E.A.R.T. for asynchronous reciprocal interaction. It is not a separate protocol. It extends the H.E.A.R.T. media type with a standard vocabulary of async rel names.
