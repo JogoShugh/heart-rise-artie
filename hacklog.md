@@ -26,3 +26,121 @@ Other tensions the Fielding review recorded (no action decided):
   W3C draft.
 - **Typed relations:** action names (`waterCell`, HAL-FORMS `default`) are not
   standardized relations. L6 Reason covers the gap by reading names.
+
+## 2026-10-08: Repr-Digest plan (draft, not started)
+
+Status: **draft plan, waiting for the author's go.** Nothing has changed in
+the spec or the code. This plan resolves the Rule 4 tension listed above.
+
+### Source
+
+External feedback asked for the following:
+
+- ARTIE treats every URI as opaque. The client removes any logic that reads
+  `sha256-`, a CID (`Qm…`) or other meaning from a path.
+- The client checks the integrity of Layer 2 (affordance sets) and Layer 3
+  (schemas) only through the RFC 9530 `Repr-Digest` response header.
+- The client hashes the raw response bytes before any JSON parsing and before
+  the payload reaches the L6 reasoner.
+- The cache key stays the full URI the server gave. The client never uses the
+  computed hash as a key.
+- A missing header or a mismatched digest on a Layer 2 or Layer 3 fetch
+  throws at once. There is no fallback.
+
+The direction is right, and it matches the fix already proposed above. The
+feedback has defects, corrected below.
+
+### Corrections to the feedback
+
+1. **Header syntax.** RFC 9530 values are RFC 8941 dictionaries whose values
+   are byte sequences, wrapped in colons:
+   `Repr-Digest: sha-256=:89+HpTM6JCwYAPdrnKgSLgjEIBviGDlcJGT6bUY+fO4=:`.
+   The feedback's form (`sha-256=Value=`, no colons) is not valid. A client
+   built to it would reject a correct server.
+2. **Example hashes.** `ValidBase64HashOfPayload=` is a placeholder and can
+   never pass. The real SHA-256 of `{"action":"water"}` (18 bytes, no trailing
+   newline) is `89+HpTM6JCwYAPdrnKgSLgjEIBviGDlcJGT6bUY+fO4=`.
+3. **Compare bytes, not strings.** Decode the header's byte sequence and
+   compare it to the computed digest. This avoids false mismatches from
+   padding or encoding variants.
+4. **Which fetches need a digest.** With opaque URIs, the transport cannot
+   tell a Layer 2 or Layer 3 fetch from a Layer 1 fetch. The caller knows: it
+   followed the `hr:forms` link (Layer 2) or a schema `$ref` (Layer 3). That
+   caller marks the request as needing a digest. The check layer requires the
+   header only on marked requests, and verifies any `Repr-Digest` that is
+   present on other responses.
+5. **Raw bytes.** `HeartResponse.body` is a `String` today, and
+   `ContentAddressCheck` re-encodes it as UTF-8. The response must carry a
+   `ByteArray`, so the hash covers the bytes as received. Per RFC 9530,
+   `Repr-Digest` covers the representation data, including any content
+   coding. Hash before any decompression.
+6. **The server must change too.** The feedback covers only the client. The
+   server must send `Repr-Digest` on Layer 2 and Layer 3 responses, or the
+   live-server scenarios fail. SPEC §6.5 needs new text.
+7. **Security is weaker, and that should be said.** A digest in the same
+   response only detects corruption, because the server vouches for its own
+   bytes. Today the linking resource names the hash in the URL, so a
+   substituted file fails the check. That pinning is lost. To get it back
+   without reading URLs, the link can carry the expected digest as a link
+   property, as HTML's `integrity` attribute does (a fork rule). This is a
+   separate follow-up.
+
+Already true, no change needed:
+
+- The cache key is the full URL (`CachingTransport.entries[request.url]`).
+- The check sits below the cache, so rejected bytes are never stored.
+- The server may keep `/sha256-…` paths. That is the server's own naming, and
+  the client never reads it.
+
+### Feature (corrected)
+
+```gherkin
+Feature: RFC 9530 Repr-Digest verification for opaque URIs
+
+  Rule: The client never reads a URI to check integrity
+
+    Scenario Outline: ARTIE checks a Layer 2 or Layer 3 payload only by its header
+      Given the Layer 1 resource links to "<href>"
+      When ARTIE fetches "<href>" as a Layer 2 or Layer 3 resource
+      And the server answers 200 with body '{"action":"water"}'
+      And the server sends Repr-Digest "<digest>"
+      Then ARTIE <outcome>
+
+      Examples:
+        | href                | digest                                                  | outcome                                          |
+        | /schemas/xyz-123    | sha-256=:89+HpTM6JCwYAPdrnKgSLgjEIBviGDlcJGT6bUY+fO4=: | accepts the payload and caches it under the URL  |
+        | /ipfs/QmYwAPJzg5    | sha-256=:89+HpTM6JCwYAPdrnKgSLgjEIBviGDlcJGT6bUY+fO4=: | accepts the payload and caches it under the URL  |
+        | /schemas/sha256-abc | sha-256=:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=: | refuses with IntegrityException and caches nothing |
+        | /any-opaque-path    | (none)                                                  | refuses with StrictHeartException and caches nothing |
+        | /any-opaque-path    | md5=:1B2M2Y8AsgTpgAmY7PhCfg==:                          | refuses with StrictHeartException and caches nothing |
+
+    Scenario: A refused payload never reaches the reasoner
+```
+
+The last example row covers a header that names only an algorithm the client
+does not support.
+
+### Work, in order (under the gates)
+
+1. Feature file first: the scenarios above. Rewrite the `sync-l2.feature`
+   scenario "Bytes that do not hash to their address are refused" to use the
+   header.
+2. Client:
+   - `HeartResponse` carries `ByteArray`, with `body` as UTF-8 text derived
+     from it.
+   - `HeartRequest` carries a "digest required" marker. The Layer 2 and
+     Layer 3 fetch paths set it.
+   - Replace `ContentAddressCheck` with `ReprDigestCheck`. Delete the
+     `/sha256-` regex.
+   - Parse the RFC 8941 dictionary. Support `sha-256` and `sha-512`. Use
+     `MessageDigest` and compare decoded bytes.
+   - Add `IntegrityException` (mismatch) and `StrictHeartException` (missing
+     or unsupported). Remove `ContentAddressMismatch`.
+3. Server (`server-spring`): send `Repr-Digest` on `/affordance-sets/…` and
+   `/schemas/…`, computed from the exact bytes written.
+4. Spec: rewrite SPEC §6.5 (integrity by `Repr-Digest`; URIs are opaque to
+   the client). Update `CONFORMANCE-GAPS.md`.
+5. Run every gate and the live-server run. Commit locally.
+
+Follow-up, separate: pin the digest in the link (correction 7), as a rule in
+the HAL Schema Forms fork.
