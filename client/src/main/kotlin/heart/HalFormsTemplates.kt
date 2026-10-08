@@ -30,6 +30,29 @@ object HalFormsTemplates {
         "readOnly" to "readOnly",
     )
 
+    /**
+     * Where a GET, HEAD or DELETE template goes: its target with the query
+     * replaced by the fields, form-urlencoded (the HTML mutate-action-URL
+     * algorithm the HAL-FORMS spec names). A space becomes "+".
+     */
+    fun getTarget(target: String, fields: JsonObject): String {
+        val query = fields.entries.mapNotNull { (name, value) ->
+            (value as? JsonPrimitive)?.let { "${formEncode(name)}=${formEncode(it.content)}" }
+        }.joinToString("&")
+        return target.substringBefore('?') + if (query.isEmpty()) "" else "?$query"
+    }
+
+    /** application/x-www-form-urlencoded: letters, digits and "*-._" stay, a space is "+", the rest is %XX. */
+    private fun formEncode(text: String): String =
+        text.toByteArray(Charsets.UTF_8).joinToString("") { byte ->
+            val c = byte.toInt().toChar()
+            when {
+                byte >= 0 && (c.isLetterOrDigit() || c in "*-._") -> c.toString()
+                c == ' ' -> "+"
+                else -> "%%%02X".format(byte)
+            }
+        }
+
     fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> =
         root[TEMPLATES]?.jsonObject.orEmpty().mapValues { (rel, template) -> form(rel, template.jsonObject, base) }
 

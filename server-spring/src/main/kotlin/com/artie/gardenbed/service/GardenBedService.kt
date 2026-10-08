@@ -23,10 +23,11 @@ class GardenBedService(
     private suspend fun requireAggregate(id: Long): GardenBedAggregate =
         aggregates.findById(id) ?: throw BedNotFoundException(id)
 
-    /** Beds whose label contains [name], ignoring case, in id order. A null name matches every bed. */
-    suspend fun findBeds(name: String?): List<GardenBedAggregate> =
+    /** Beds whose label contains [name], ignoring case, and whose id is [id], in id order. Null matches all. */
+    suspend fun findBeds(name: String?, id: Long? = null): List<GardenBedAggregate> =
         aggregates.findAll().toList()
             .filter { name == null || it.label.contains(name, ignoreCase = true) }
+            .filter { id == null || it.id == id }
             .sortedBy { it.id }
 
     suspend fun currentState(id: Long): GardenBedState {

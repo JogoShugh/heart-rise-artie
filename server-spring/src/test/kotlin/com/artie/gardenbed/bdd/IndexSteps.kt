@@ -20,6 +20,34 @@ class IndexSteps(private val http: HttpWorld) {
         http.get(path, mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT))
     }
 
+    @When("a client gets the service index as {word}")
+    fun getIndexAs(dialect: String) {
+        http.get("/", mapOf("Accept" to HttpWorld.acceptFor(dialect)))
+    }
+
+    @When("a client gets {string} as {word}")
+    fun getPathAs(path: String, dialect: String) {
+        http.get(path, mapOf("Accept" to HttpWorld.acceptFor(dialect)))
+    }
+
+    @Then("the index offers HAL-FORMS GET template {string} with target {string} and required property {string}")
+    fun offersHalFormsTemplate(name: String, target: String, property: String) {
+        val template = http.last.json.path("_templates").path(name)
+        assertEquals("GET", template.path("method").asText(), "method of $name in ${http.last.json}")
+        assertEquals(target, template.path("target").asText())
+        val found = template.path("properties").firstOrNull { it.path("name").asText() == property }
+        assertTrue(found != null && found.path("required").asBoolean(), "$name has no required property $property")
+    }
+
+    @Then("the two indexes offer the same form names")
+    fun sameFormNames() {
+        val (hsf, hf) = http.exchanges.takeLast(2)
+        val hsfNames = hsf.json.path("_forms").fieldNames().asSequence().toSet()
+        val hfNames = hf.json.path("_templates").fieldNames().asSequence().toSet()
+        assertTrue(hsfNames.isNotEmpty(), "no forms in ${hsf.json}")
+        assertEquals(hsfNames, hfNames)
+    }
+
     @Then("the response has an ETag")
     fun hasETag() = assertNotNull(http.last.headers.eTag, "no ETag")
 

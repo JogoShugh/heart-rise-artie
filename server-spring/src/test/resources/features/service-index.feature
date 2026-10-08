@@ -38,3 +38,38 @@ Feature: Service index: one bookmark reaches every bed
     And the client fills the "getBed" form with id 2 and follows it
     Then the response status is 200
     And the response is bed 2
+
+  Scenario: Beds can also be looked up by id in the query, which lists exactly that bed
+    When a client gets "/beds?id=2"
+    Then the response status is 200
+    And the response lists the items "/beds/2" titled "South border"
+
+  Scenario: HAL-FORMS is a first-class entry point: the same two forms, as query GET templates
+    HAL-FORMS cannot put a field into a target's path, but a GET template
+    puts its fields in the query string (the HTML mutate-action-URL
+    algorithm), so lookup by id uses /beds?id= instead of /beds/{id}.
+    When a client gets the service index as hal-forms
+    Then the response status is 200
+    And the response Content-Type is "application/prs.hal-forms+json"
+    And the response links to profile "https://github.com/jogoshugh/heart-rise/hal-forms"
+    And the response Cache-Control is "no-cache"
+    And the response has an ETag
+    And the index offers HAL-FORMS GET template "searchBeds" with target "/beds" and required property "name"
+    And the index offers HAL-FORMS GET template "getBed" with target "/beds" and required property "id"
+
+  Scenario Outline: Search answers in the dialect asked for: <dialect>
+    When a client gets "/beds?name=herb" as <dialect>
+    Then the response status is 200
+    And the response Content-Type is "<media type>"
+    And the response links to profile "https://github.com/jogoshugh/heart-rise/<dialect>"
+    And the response lists the items "/beds/3" titled "Herb spiral"
+
+    Examples:
+      | dialect          | media type                     |
+      | hal-schema-forms | application/hal+json           |
+      | hal-forms        | application/prs.hal-forms+json |
+
+  Scenario: Both dialects' indexes offer the same forms
+    When a client gets the service index
+    And a client gets the service index as hal-forms
+    Then the two indexes offer the same form names

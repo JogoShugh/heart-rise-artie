@@ -145,3 +145,33 @@ Feature: ARTIE against the real server
       id: 3
       """
     Then the manifest offers exactly "harvest"
+
+  Scenario: From the bookmark alone in HAL-FORMS: search by name, follow the result, act
+    Given the client works in dialect hal-forms
+    When the client enters "/"
+    Then the manifest offers exactly "searchBeds, getBed"
+    When the client acts on "searchBeds" with:
+      """yaml
+      name: BED-2
+      """
+    And the client follows the "item" link titled "bed-2"
+    Then the manifest offers exactly "default"
+    When the client acts on "default" with:
+      """yaml
+      milliliters: 1
+      """
+    Then the resource state contains:
+      | key    | value   |
+      | status | PLANTED |
+
+  Scenario: From the bookmark alone in HAL-FORMS: look a bed up by its id through the query
+    Given the client works in dialect hal-forms
+    When the client enters "/"
+    And the client acts on "getBed" with:
+      """yaml
+      id: 3
+      """
+    And the client follows the "item" link titled "bed-3"
+    Then the resource state contains:
+      | key    | value            |
+      | status | READY_TO_HARVEST |

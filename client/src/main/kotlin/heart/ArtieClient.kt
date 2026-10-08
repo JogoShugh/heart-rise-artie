@@ -38,8 +38,14 @@ class ArtieClient(
     override fun act(rel: String, payload: JsonObject): HeartRepresentation {
         val held = current ?: error("enter a service before acting")
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
-        if (form.method == "GET") return sync(targetOf(form, held, payload))
-        return act(rel, payload, resendAllowed = true)
+        if (form.method != "GET") return act(rel, payload, resendAllowed = true)
+        // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
+        // template a target; it puts the fields in the query (mutate-action-URL).
+        val target = when (dialect) {
+            Dialect.HAL_FORMS -> HalFormsTemplates.getTarget(form.target, payload)
+            Dialect.HAL_SCHEMA_FORMS -> targetOf(form, held, payload)
+        }
+        return sync(target)
     }
 
     /** Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI. */
