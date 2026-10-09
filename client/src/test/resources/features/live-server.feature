@@ -45,6 +45,7 @@ Feature: ARTIE against the real server
       | L1   |
       | L2   |
 
+  @needs-L2
   Scenario: At L2 a re-sync of an unchanged bed is one request, answered 304
     Given the client works at rung L2
     When the client enters "/beds/3"
@@ -52,6 +53,7 @@ Feature: ARTIE against the real server
     Then the wire carried 4 requests, the last answered 304
     And the manifest offers exactly "harvest"
 
+  @needs-L2
   Scenario: L3: two clients behind one shared cache, two beds in one state, one set fetch
     Given the client works at rung L2
     And the second client shares the client's cache
@@ -163,6 +165,22 @@ Feature: ARTIE against the real server
     Then the resource state contains:
       | key    | value   |
       | status | PLANTED |
+
+  Scenario: The client discovers the rung the server serves, works at it, and acts
+    The server is started with HEART_MAX_RUNG at L0, L1 or L2 (L2 by
+    default); the same variable tells this scenario what to expect.
+    Given the client works at rung L2
+    When the client discovers "/"
+    And the client enters "/beds/2"
+    Then the client asked for the rung the server serves when it entered "/beds/2"
+    And the current representation is at the rung the server serves
+    And the manifest offers exactly "waterCell"
+    When the client acts on "waterCell" with:
+      """yaml
+      milliliters: 1
+      """
+    Then the current representation is at the rung the server serves
+    And the manifest offers exactly "waterCell"
 
   Scenario: From the bookmark alone in HAL-FORMS: look a bed up by its id through the query
     Given the client works in dialect hal-forms

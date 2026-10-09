@@ -22,7 +22,7 @@ class LayerSteps(private val ctx: ClientContext) {
     }
 
     @When("the client discovers {string}")
-    fun discovers(url: String) = ctx.client.discover(url)
+    fun discovers(url: String) = ctx.client.discover(ctx.url(url))
 
     @Then("that request asked for {string}")
     fun askedFor(prefer: String) = assertEquals(prefer, ctx.transport.requests.last().header("Prefer"))

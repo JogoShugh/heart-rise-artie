@@ -29,5 +29,7 @@ services:
       DB_NAME: gardenbed
       DB_USER: artie
       DB_PASSWORD: artie
+      # SPEC §6.11.1: the highest rung served. HEART_MAX_RUNG=L0 docker compose up -d
+      HEART_MAX_RUNG: ${HEART_MAX_RUNG:-L2}
     ports:
       - "8080:8080"

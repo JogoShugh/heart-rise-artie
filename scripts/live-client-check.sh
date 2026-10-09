@@ -4,6 +4,7 @@
 #   2. Resets the seed data.
 #   3. Runs `./gradlew liveTest` in client/.
 # Leaves the stack running; stop it with `docker compose down` in server-spring/.
+# Set HEART_MAX_RUNG to the rung the server was started at (L2 by default).
 # Opens nothing on screen.
 set -euo pipefail
 

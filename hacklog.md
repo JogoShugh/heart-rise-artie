@@ -206,6 +206,31 @@ Still open from this work:
   yet choose "follow the item titled X" by itself.
 - **Pagination:** search returns every match in one representation.
 
+## 2026-10-09: declaring and discovering the rung
+
+Done (SPEC §6.11.1), one commit per phase:
+
+1. Spec: `Preference-Applied` is the per-response truth of the rung; the
+   service index is also served as `application/json-home`, with link hints
+   `formats` (each dialect, its profile in `links`), `accept-prefer` and
+   `precondition-req`. Built on draft-nottingham-json-home and
+   draft-ietf-httpapi-link-hint rather than a format of our own.
+2. Client: `appliedRung` from `Preference-Applied`; no header is L0.
+3. Server: the JSON Home index, and `heart.max-rung` (`HEART_MAX_RUNG`,
+   also passed through `docker-compose.yml`) to cap the rung served. A
+   capped server answers higher requests at its cap, picks the matching
+   ETag for acts, and declares only what it serves.
+4. Client: `discover(url)` reads the home document and asks for the best
+   dialect and rung offered, up to its own. HAL-FORMS-only servers get
+   HAL-FORMS at L0. No home document: the client keeps its settings.
+5. Live: the real server run at L0, L1 and L2
+   (`HEART_MAX_RUNG=L1 scripts/live-client-check.sh` after restarting the
+   app with the same variable). 16, 16 and 18 scenarios pass; the two
+   L2-caching scenarios are tagged `@needs-L2` and skipped below L2.
+
+Not done: the journal (`capture.sh`) does not show the home document yet;
+the Fielding review does not mention discovery.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

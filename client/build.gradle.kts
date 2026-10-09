@@ -94,8 +94,12 @@ val liveTest by tasks.registering(Test::class) {
     testClassesDirs = sourceSets["test"].output.classesDirs
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
-    systemProperty("cucumber.filter.tags", "@live")
+    // HEART_MAX_RUNG names the rung the server was started at (SPEC §6.11.1).
+    // Scenarios that test L2 caching (@needs-L2) are skipped below it.
+    val servedRung = System.getenv("HEART_MAX_RUNG") ?: "L2"
+    systemProperty("cucumber.filter.tags", if (servedRung == "L2") "@live" else "@live and not @needs-L2")
     environment("ARTIE_BASE_URL", System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080")
+    environment("HEART_MAX_RUNG", servedRung)
     outputs.upToDateWhen { false }
 }
 
