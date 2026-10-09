@@ -29,7 +29,11 @@ import java.security.MessageDigest
  * The index ignores `Prefer`: its forms are inline at every rung.
  */
 @RestController
-class ServiceIndexController(private val service: GardenBedService, objectMapper: ObjectMapper) {
+class ServiceIndexController(
+    private val service: GardenBedService,
+    private val objectMapper: ObjectMapper,
+    private val limits: ServingLimits,
+) {
 
     private val indexBodies: Map<Dialect, String> = mapOf(
         Dialect.JSONSCHEMA to objectMapper.writeValueAsString(SCHEMA_FORMS_INDEX),
@@ -38,6 +42,7 @@ class ServiceIndexController(private val service: GardenBedService, objectMapper
 
     @GetMapping("/")
     fun index(@RequestHeader headers: HttpHeaders): ResponseEntity<String> {
+        if (Negotiation.wantsJsonHome(headers)) return homeDocument()
         val dialect = Negotiation.dialect(headers)
         val body = indexBodies.getValue(dialect)
         return layer1(dialect).eTag("\"index-${dialect.etagTag}-${sha256Hex(body).take(ETAG_HEX)}\"").body(body)
@@ -64,6 +69,22 @@ class ServiceIndexController(private val service: GardenBedService, objectMapper
             ),
         )
         return layer1(dialect).body(body)
+    }
+
+    /**
+     * SPEC §6.11.1: the index as a JSON Home document (draft-nottingham-json-home).
+     * Its link hints (draft-ietf-httpapi-link-hint) declare what this server
+     * serves: both dialects with their profiles, the `Prefer` values honoured
+     * up to [ServingLimits.maxRung] (none at L0), and that acts need If-Match.
+     */
+    private fun homeDocument(): ResponseEntity<String> {
+        val body = objectMapper.writeValueAsString(home(limits.maxRung))
+        return ResponseEntity.ok()
+            .contentType(MediaType.parseMediaType(Negotiation.JSON_HOME))
+            .header(HttpHeaders.CACHE_CONTROL, "no-cache")
+            .header(HttpHeaders.VARY, HttpHeaders.ACCEPT)
+            .eTag("\"index-home-${sha256Hex(body).take(ETAG_HEX)}\"")
+            .body(body)
     }
 
     private fun layer1(dialect: Dialect): ResponseEntity.BodyBuilder = ResponseEntity.ok()
@@ -145,6 +166,38 @@ class ServiceIndexController(private val service: GardenBedService, objectMapper
         /** A HAL-FORMS GET template: its properties become the query string of `/beds`. */
         fun halFormsTemplate(title: String, property: Map<String, Any>): Map<String, Any> =
             mapOf("title" to title, "method" to "GET", "target" to "/beds", "properties" to listOf(property))
+
+        const val SPEC_URL = "https://github.com/jogoshugh/heart-rise/spec"
+        const val VARS = "https://github.com/jogoshugh/heart-rise/vars"
+
+        /** Each dialect, with its heart-rise profile in the format object's `links` (link-hint `formats`). */
+        val FORMATS: Map<String, Any> =
+            Dialect.entries.associate { it.mediaType to mapOf("links" to mapOf("profile" to it.profile)) }
+
+        fun home(maxRung: Rung): Map<String, Any> {
+            val acceptPrefer = maxRung.preferenceApplied?.split(",")?.map { it.trim() }
+            val itemHints = buildMap<String, Any> {
+                put("allow", listOf("GET"))
+                put("formats", FORMATS)
+                acceptPrefer?.let { put("accept-prefer", it) }
+                put("precondition-req", listOf("etag"))
+            }
+            return mapOf(
+                "api" to mapOf("title" to TITLE, "links" to mapOf("describedBy" to SPEC_URL)),
+                "resources" to mapOf(
+                    "item" to mapOf(
+                        "hrefTemplate" to "/beds/{id}",
+                        "hrefVars" to mapOf("id" to "$VARS/bed-id"),
+                        "hints" to itemHints,
+                    ),
+                    "collection" to mapOf(
+                        "hrefTemplate" to "/beds{?name,id}",
+                        "hrefVars" to mapOf("name" to "$VARS/bed-name", "id" to "$VARS/bed-id"),
+                        "hints" to mapOf("allow" to listOf("GET"), "formats" to FORMATS),
+                    ),
+                ),
+            )
+        }
 
         fun sha256Hex(text: String): String =
             MessageDigest.getInstance("SHA-256").digest(text.toByteArray(Charsets.UTF_8))

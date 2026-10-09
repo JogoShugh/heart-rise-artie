@@ -23,6 +23,11 @@ spring:
 server:
   port: 8080
 
+# SPEC §6.11.1: the highest rung served (L0, L1 or L2). Set HEART_MAX_RUNG
+# to stand up a server that is earlier on the ladder.
+heart:
+  max-rung: ${HEART_MAX_RUNG:L2}
+
 logging:
   level:
     org.springframework.r2dbc: INFO

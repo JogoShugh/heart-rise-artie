@@ -5,6 +5,7 @@ import com.artie.gardenbed.web.AffordanceSetController
 import com.artie.gardenbed.web.GardenBedController
 import com.artie.gardenbed.web.SchemaController
 import com.artie.gardenbed.web.ServiceIndexController
+import com.artie.gardenbed.web.ServingLimits
 import io.cucumber.spring.CucumberContextConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
@@ -20,5 +21,5 @@ import org.springframework.context.annotation.Import
         SchemaController::class,
     ],
 )
-@Import(HateoasConfig::class, InMemoryGardenBedsConfig::class, HttpWorld::class)
+@Import(HateoasConfig::class, InMemoryGardenBedsConfig::class, HttpWorld::class, ServingLimits::class)
 class CucumberSpringConfig

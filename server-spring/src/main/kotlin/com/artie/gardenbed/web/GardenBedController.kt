@@ -45,6 +45,7 @@ class GardenBedController(
     private val service: GardenBedService,
     objectMapper: ObjectMapper,
     validator: Validator,
+    private val limits: ServingLimits,
 ) {
     private val binder = ActBodyBinder(objectMapper, validator)
 
@@ -202,9 +203,10 @@ class GardenBedController(
         return StateETag.of(state.lastSequenceNo, dialect.etagTag, rungFor(dialect, headers.getFirst(PREFER)))
     }
 
-    /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. */
+    /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. No rung
+     *  above the server's cap is served (SPEC §6.11.1). */
     private fun rungFor(dialect: Dialect, prefer: String?): Rung =
-        if (dialect == Dialect.JSONSCHEMA) Rung.fromPrefer(prefer) else Rung.L0
+        if (dialect == Dialect.JSONSCHEMA) limits.cap(Rung.fromPrefer(prefer)) else Rung.L0
 
     /** Spring answers a matching If-None-Match with 304 from the ETag set
      *  here, copying these headers onto it, so the 304 also says no-cache. */

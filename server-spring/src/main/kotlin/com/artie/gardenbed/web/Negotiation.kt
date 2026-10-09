@@ -48,6 +48,18 @@ object Negotiation {
         }
     }
 
+    /**
+     * SPEC §6.11.1: true when `Accept` ranks the JSON Home media type above
+     * both dialects, so the service index answers as a home document.
+     */
+    fun wantsJsonHome(headers: HttpHeaders): Boolean {
+        val accepted = ranked(headers.getFirst(HttpHeaders.ACCEPT).orEmpty().lowercase()).filter { it.q > 0 }
+        val home = accepted.firstOrNull { it.value == JSON_HOME } ?: return false
+        return accepted.none { r ->
+            Dialect.entries.any { it.mediaType == r.value } && (r.q > home.q || r.q == home.q && r.index < home.index)
+        }
+    }
+
     /** The Link header for a Layer 1 response in [dialect]: the concrete
      *  profile, then the parent for hierarchy discovery (§6.1). */
     fun profileLinks(dialect: Dialect): String =
@@ -72,4 +84,5 @@ object Negotiation {
         }
 
     const val ACCEPT_PROFILE = "Accept-Profile"
+    const val JSON_HOME = "application/json-home"
 }
