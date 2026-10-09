@@ -234,3 +234,62 @@ target means the form document's own address; GET, HEAD and DELETE put
 fields in the query (mutate-action-URL), so a field never reaches the path;
 `_htarget` and `_hsource` are query parameters on a standalone form
 document's address, set by the server.
+
+### Rule 1: protocol independence (parked 2026-10-09)
+
+Fielding's Rule 1, verbatim: "A REST API should not be dependent on any
+single communication protocol, though its successful mapping to a given
+protocol may be dependent on the availability of metadata, choice of
+methods, etc. In general, any protocol element that uses a URI for
+identification must allow any URI scheme to be used for the sake of that
+identification. [Failure here implies that identification is not separated
+from interaction.]"
+
+What it asks: that the API's definition (media types, relations,
+processing rules) not depend on HTTP, and that links allow any URI scheme.
+It does not ask a server to speak more than one protocol. A client follows
+the schemes it can dereference; a link in any other scheme is a choice it
+cannot take, as in a browser.
+
+Where H.E.A.R.T. falls short today (review verdict: Tension):
+
+1. SPEC §6 is written directly in HTTP terms (`ETag`, `If-Match`, `Prefer`,
+   412, 409). There is no protocol-free layer.
+2. ARTIE's only transport is `HttpTransport`; a non-HTTP link would fail
+   confusingly rather than be refused as unsupported.
+3. The spec never says a link may use any scheme.
+
+Plan, if taken up:
+
+1. Split SPEC §6 into a protocol-free core and an HTTP binding. Core:
+   resources, representations, the three layers, affordances, state
+   versions, and four refusals (precondition required, stale, not legal
+   now, invalid input). The HTTP binding keeps today's text: 428, 412, 409,
+   422, `ETag`, `If-Match`, `Prefer`, `Cache-Control`.
+2. Any URI scheme for links: one sentence in the spec; ARTIE picks a
+   transport by scheme; an unsupported scheme refuses that link or form
+   before any request (Gherkin first).
+3. Optional: name Layers 2 and 3 with RFC 6920 `ni:` URIs
+   (`ni:///sha-256;...`), fetched over HTTP through RFC 6920's
+   `/.well-known/ni/` mapping or any other way. Reading the hash from an
+   `ni:` URI is licensed by that scheme's own specification (the exception
+   W3C AWWW §2.5 allows), unlike the private `/sha256-` path pattern.
+4. Not needed: shipping a second protocol. A mapping table in an appendix
+   shows the core binds elsewhere.
+
+Second-protocol notes:
+
+- **CoAP (RFC 7252; HTTP mapping RFC 8075)** is the serious example of REST
+  off HTTP. `ETag`, `If-Match` (4.12 on failure), `Max-Age` and `Accept`
+  map directly. Gaps: no `Prefer` (rung would need a new option or a URI
+  query), no `immutable`, no header-style profile links.
+- **AMQP:** addresses name message destinations, not resources with
+  representations. Request-reply is possible (reply-to, correlation-id),
+  but a resource binding would mostly tunnel HTTP. Better fit: RISE's
+  asynchronous completion notices. An OASIS effort to carry HTTP semantics
+  over AMQP may exist; status not verified.
+- **Historic:** HTML `<form method="post" action="mailto:...">` and `ftp:`
+  links show hypertext indifferent to the scheme.
+
+With plan items 1 and 2, Rule 1 would be Supports; item 3 would make it a
+showcase.
