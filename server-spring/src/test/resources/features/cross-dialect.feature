@@ -25,5 +25,5 @@ Feature: Cross-dialect legality (L5)
 
     Examples:
       | prefer                |
-      | forms=cid             |
-      | forms=cid, schema=cid |
+      | forms=link              |
+      | forms=link, schema=link |

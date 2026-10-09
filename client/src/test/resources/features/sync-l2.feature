@@ -1,6 +1,6 @@
 Feature: Sync at L2: walk three layers through an HTTP cache
-  SPEC §6.3, §6.5, §6.6, §6.7. A client at L2 sends Prefer: forms=cid,
-  schema=cid. Layer 1 links to an affordance set, and the set points to
+  SPEC §6.3, §6.5, §6.6, §6.7. A client at L2 sends Prefer: forms=link,
+  schema=link. Layer 1 links to an affordance set, and the set points to
   each schema by $ref. The client follows those links through an ordinary
   HTTP cache: content-addressed layers are immutable, so a URL already
   held is never fetched again, and Layer 1 is revalidated with
@@ -51,7 +51,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       | GET http://garden.test{set:planted}   |
       | GET http://garden.test{schema:water}  |
     And the client sent GET "http://garden.test/beds/2" with headers:
-      | Prefer | forms=cid, schema=cid |
+      | Prefer | forms=link, schema=link |
     And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
     And the client holds the ETag "seq-1.hsf.L2"
 
@@ -127,7 +127,10 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       | GET http://garden.test{schema:water}       |
     And the manifest offers exactly "waterCell, waterAgain"
 
-  Scenario: An act at L2 expands the set's template from Layer 1 and carries the L2 ETag
+  Scenario: An act at L2 expands the set's template from Layer 1 and repeats the headers it synced with
+    HTTP is stateless: the act carries the same Accept, Accept-Profile and
+    Prefer as the sync, so the server can select the representation the
+    If-Match names and compare the whole entity-tag (RFC 9110 §13.1.1).
     Given the service answers POST "http://garden.test/beds/2/actions/water-cell" with:
       """
       200 OK
@@ -146,8 +149,13 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       milliliters: 100
       """
     Then the client sent POST "http://garden.test/beds/2/actions/water-cell" with headers:
-      | If-Match | "seq-1.hsf.L2" |
+      | If-Match       | "seq-1.hsf.L2"                                              |
+      | Accept         | application/hal+json                                        |
+      | Accept-Profile | <https://github.com/jogoshugh/heart-rise/hal-schema-forms> |
+      | Prefer         | forms=link, schema=link                                     |
     And the client holds the ETag "seq-2.hsf.L2"
+    And the manifest offers exactly "waterCell"
+    And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
 
   Scenario: The client reads nothing from a URL, even one shaped like a hash
     Given the service serves affordance set "odd-name" at "/affordance-sets/sha256-0000000000000000":

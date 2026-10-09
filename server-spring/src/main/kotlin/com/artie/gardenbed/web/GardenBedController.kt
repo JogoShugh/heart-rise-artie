@@ -26,6 +26,9 @@ import java.time.Instant
 /** SPEC §6.1/§6.2: Layer 1 is revalidated on every request, never stored fresh. */
 private const val LAYER1_CACHE_CONTROL = "no-cache"
 
+/** RFC 7240. An act repeats the Prefer it synced with, so it selects the same representation. */
+private const val PREFER = "Prefer"
+
 /** Single source of truth now lives in JsonSchemaDialectSupport --
  *  delegating here keeps every existing call site in this file
  *  unchanged while guaranteeing both dialects can never drift apart
@@ -110,11 +113,11 @@ class GardenBedController(
     ): ResponseEntity<Any> {
         // Negotiate before acting, so a 406 never follows a write.
         val dialect = Negotiation.dialect(headers)
-        val updated = act(id, ifMatch, "sowSeed") {
+        val updated = act(id, ifMatch, "sowSeed", headers) {
             val request = binder.bind(body, SowSeedRequest::class.java)
             service.sowSeed(id, request.seedType, request.depthCm)
         }
-        return renderState(updated, dialect)
+        return renderState(updated, dialect, headers.getFirst(PREFER))
     }
 
     @PostMapping("/{id}/actions/water-cell")
@@ -125,11 +128,11 @@ class GardenBedController(
         @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
         val dialect = Negotiation.dialect(headers)
-        val updated = act(id, ifMatch, "waterCell") {
+        val updated = act(id, ifMatch, "waterCell", headers) {
             val request = binder.bind(body, WaterCellRequest::class.java)
             service.waterCell(id, request.milliliters)
         }
-        return renderState(updated, dialect)
+        return renderState(updated, dialect, headers.getFirst(PREFER))
     }
 
     @PostMapping("/{id}/actions/harvest")
@@ -139,8 +142,8 @@ class GardenBedController(
         @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
         val dialect = Negotiation.dialect(headers)
-        val (updated, result) = act(id, ifMatch, "harvest") { service.harvest(id) }
-        val rendered = renderState(updated, dialect)
+        val (updated, result) = act(id, ifMatch, "harvest", headers) { service.harvest(id) }
+        val rendered = renderState(updated, dialect, headers.getFirst(PREFER))
         return ResponseEntity.status(rendered.statusCode)
             .headers(rendered.headers)
             .header("X-Harvest-Yield-Grams", result.yieldGrams.toString())
@@ -155,25 +158,34 @@ class GardenBedController(
             throw StaleWriteConflict(e.message ?: "concurrent write conflict")
         }
 
-    /** SPEC [0.5] §6.2 evaluation order: 428, then 412, then 409, then
+    /** SPEC §6.2 evaluation order: 428, then 412, then 409, then
      *  (inside [block], via the binder) 422. The first failure wins. */
-    private suspend fun <T> act(id: Long, ifMatch: String?, affordance: String, block: suspend () -> T): T {
-        checkPreconditions(id, ifMatch, affordance)
+    private suspend fun <T> act(
+        id: Long,
+        ifMatch: String?,
+        affordance: String,
+        headers: HttpHeaders,
+        block: suspend () -> T,
+    ): T {
+        checkPreconditions(id, ifMatch, affordance, headers)
         return mapConcurrencyConflict(block)
     }
 
-    /** [0.5] precondition scope: the act's If-Match is checked against
-     *  the owning bed's state version, accepting an ETag from any
-     *  dialect or rung (see StateETag). Reads state only when If-Match
-     *  is present, so a 428 costs no store read. */
-    private suspend fun checkPreconditions(id: Long, ifMatch: String?, affordance: String) {
+    /** SPEC §6.2 precondition: an action's selected representation is its
+     *  owning bed's, chosen by this request's own Accept, Accept-Profile and
+     *  Prefer. If-Match is compared, whole, with that representation's
+     *  current ETag: strong comparison (RFC 9110 §13.1.1). Reads state only
+     *  when If-Match is present, so a 428 costs no store read. */
+    private suspend fun checkPreconditions(id: Long, ifMatch: String?, affordance: String, headers: HttpHeaders) {
         val failure = if (ifMatch == null) {
             PreconditionRequiredException("$affordance on bed $id needs If-Match with the bed's current ETag")
         } else {
             val current = service.currentState(id)
+            val selected = selectedETag(current, headers)
             when {
-                !StateETag.matchesStateVersion(ifMatch, current.lastSequenceNo) -> StaleWriteConflict(
-                    "If-Match $ifMatch does not match state version seq-${current.lastSequenceNo} for bed $id"
+                !StateETag.matches(ifMatch, selected) -> StaleWriteConflict(
+                    "If-Match $ifMatch does not match $selected, the current ETag of the representation " +
+                        "these request headers select for bed $id"
                 )
                 affordance !in allowedAffordances(current.status) -> InvalidTransitionException(
                     "$affordance is not in bed $id's current affordance set (status ${current.status})"
@@ -184,12 +196,21 @@ class GardenBedController(
         failure?.let { throw it }
     }
 
+    /** The ETag of the bed representation [headers] select, at [state]. */
+    private fun selectedETag(state: GardenBedState, headers: HttpHeaders): String {
+        val dialect = Negotiation.dialect(headers)
+        return StateETag.of(state.lastSequenceNo, dialect.etagTag, rungFor(dialect, headers.getFirst(PREFER)))
+    }
+
+    /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. */
+    private fun rungFor(dialect: Dialect, prefer: String?): Rung =
+        if (dialect == Dialect.JSONSCHEMA) Rung.fromPrefer(prefer) else Rung.L0
+
     /** Spring answers a matching If-None-Match with 304 from the ETag set
      *  here, copying these headers onto it, so the 304 also says no-cache. */
     private fun renderState(state: GardenBedState, dialect: Dialect, prefer: String? = null): ResponseEntity<Any> {
         val allowed = allowedAffordances(state.status)
-        // HAL-FORMS has no Layer 2/3 addressing yet, so it is always L0.
-        val rung = if (dialect == Dialect.JSONSCHEMA) Rung.fromPrefer(prefer) else Rung.L0
+        val rung = rungFor(dialect, prefer)
         val etag = StateETag.of(state.lastSequenceNo, dialect.etagTag, rung)
 
         return when (dialect) {

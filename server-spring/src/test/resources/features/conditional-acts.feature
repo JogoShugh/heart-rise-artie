@@ -1,6 +1,8 @@
 Feature: Conditional acts and the error model (L4)
   SPEC §6.2, §6.10.5. Every act must carry If-Match. The server checks an
-  act in a fixed order and returns the first failure ([0.5] §6.2):
+  act in a fixed order and returns the first failure (§6.2). These requests
+  send no Accept or Prefer, so they select the default representation,
+  HAL-FORMS at L0, whose ETag is "seq-N.hf.L0":
   428 no If-Match, 412 stale If-Match, 409 affordance not in the current
   manifest, 422 body fails the schema. A refused act changes nothing.
 
@@ -51,8 +53,9 @@ Feature: Conditional acts and the error model (L4)
     Examples: each row breaks every later check too, so only the order picks the code
       | action     | if-match       | body                 | status |
       | sow-seed   | none           | {"seedType": ""}     | 428    |
-      | sow-seed   | "seq-0.hsf.L0" | {"seedType": ""}     | 412    |
-      | sow-seed   | "seq-1.hsf.L0" | {"seedType": ""}     | 409    |
+      | sow-seed   | "seq-0.hf.L0"  | {"seedType": ""}     | 412    |
+      | sow-seed   | "seq-1.hf.L0"  | {"seedType": ""}     | 409    |
       | harvest    | "seq-1.hf.L0"  | {}                   | 409    |
-      | water-cell | "seq-1.hsf.L2" | {"milliliters": 0}   | 422    |
-      | water-cell | "seq-1.hsf.L2" | {"milliliters": 100} | 200    |
+      | water-cell | "seq-1.hsf.L2" | {"milliliters": 100} | 412    |
+      | water-cell | "seq-1.hf.L0"  | {"milliliters": 0}   | 422    |
+      | water-cell | "seq-1.hf.L0"  | {"milliliters": 100} | 200    |

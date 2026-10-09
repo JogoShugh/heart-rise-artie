@@ -7,11 +7,12 @@ BASE="${ARTIE_BASE_URL:-http://localhost:8080}"
 HSF='application/hal+json'
 HSF_PROFILE='<https://github.com/jogoshugh/heart-rise/hal-schema-forms>'
 HALFORMS='application/prs.hal-forms+json'
-L1='forms=cid'
-L2='forms=cid, schema=cid'
+L1='forms=link'
+L2='forms=link, schema=link'
 
 # Layer 1 ETag of a bed, as a client would hold it after a GET. SPEC 0.4
-# §6.3: every act carries it in If-Match.
+# §6.3: every act carries it in If-Match, with the same Accept it was
+# fetched with, so the server selects the representation it names.
 etag_of() {
   curl -s -o /dev/null -D - -H "Accept: $HSF" "$BASE/beds/$1" | tr -d '\r' | awk -F': ' 'tolower($1)=="etag"{print $2}'
 }
@@ -50,7 +51,7 @@ echo "$SOWSEED_SCHEMA_URL" > "$RUN_DIR/01-schema-url.txt"
 curl -s "$BASE$SOWSEED_SCHEMA_URL" > "$RUN_DIR/01-schema.json"
 curl -sI "$BASE$SOWSEED_SCHEMA_URL" > "$RUN_DIR/01-schema-headers.txt"
 
-curl -s -X POST "$BASE/beds/1/actions/sow-seed" -H "If-Match: $(etag_of 1)" \
+curl -s -X POST "$BASE/beds/1/actions/sow-seed" -H "Accept: $HSF" -H "If-Match: $(etag_of 1)" \
      -H "Content-Type: application/json" -d '{"seedType": "basil", "depthCm": 2}' \
      > "$RUN_DIR/01-sow-response.json"
 
@@ -75,7 +76,7 @@ echo "$WATERCELL_SCHEMA_URL" > "$RUN_DIR/02-schema-url.txt"
 curl -s "$BASE$WATERCELL_SCHEMA_URL" > "$RUN_DIR/02-schema.json"
 curl -sI "$BASE$WATERCELL_SCHEMA_URL" > "$RUN_DIR/02-schema-headers.txt"
 
-curl -s -X POST "$BASE/beds/1/actions/water-cell" -H "If-Match: $(etag_of 1)" \
+curl -s -X POST "$BASE/beds/1/actions/water-cell" -H "Accept: $HSF" -H "If-Match: $(etag_of 1)" \
      -H "Content-Type: application/json" -d '{"milliliters": 500}' \
      > "$RUN_DIR/02-water-response.json"
 
@@ -117,11 +118,11 @@ curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/beds/2/actions/water-cell"
      -H "Content-Type: application/json" -H 'If-Match: "seq-999.hsf.L0"' -d '{"milliliters": 100}' \
      > "$RUN_DIR/06-stale-status.txt"
 
-curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/beds/3/actions/sow-seed" -H "If-Match: $(etag_of 3)" \
+curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/beds/3/actions/sow-seed" -H "Accept: $HSF" -H "If-Match: $(etag_of 3)" \
      -H "Content-Type: application/json" -d '{"seedType": "tomato"}' \
      > "$RUN_DIR/06-invalid-status.txt"
 
-curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/beds/2/actions/water-cell" -H "If-Match: $(etag_of 2)" \
+curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/beds/2/actions/water-cell" -H "Accept: $HSF" -H "If-Match: $(etag_of 2)" \
      -H "Content-Type: application/json" -d '{"milliliters": 0}' \
      > "$RUN_DIR/06-schema-status.txt"
 

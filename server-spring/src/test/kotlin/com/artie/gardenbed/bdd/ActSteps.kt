@@ -15,8 +15,9 @@ class ActSteps(private val http: HttpWorld, private val beds: InMemoryBeds, priv
 
     @When("the client posts {} to {word} on bed {long} using the ETag it holds")
     fun postWithHeldETag(body: String, action: String, id: Long) {
-        val etag = checkNotNull(http.lastLayer1().headers.eTag) { "client holds no ETag" }
-        http.post("/beds/$id/actions/$action", body, mapOf("If-Match" to etag))
+        val layer1 = http.lastLayer1()
+        val etag = checkNotNull(layer1.headers.eTag) { "client holds no ETag" }
+        http.post("/beds/$id/actions/$action", body, http.negotiationHeaders(layer1) + ("If-Match" to etag))
     }
 
     /** `none` sends no If-Match at all. */

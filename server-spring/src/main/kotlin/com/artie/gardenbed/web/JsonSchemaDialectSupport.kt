@@ -28,7 +28,7 @@ import java.util.Base64
  *   GET /beds/{id}                  -- mutable, ETag-revalidated.
  *       No Prefer (L0): collapses ALL THREE layers into one response --
  *           forms AND their full schema bodies, all inline.
- *       Prefer: forms=cid (L1) or forms=cid, schema=cid (L2): state
+ *       Prefer: forms=link (L1) or forms=link, schema=link (L2): state
  *           plus a link to that rung's affordance set.
  *
  *   GET /affordance-sets/sha256-{hash}  -- immutable, never negotiates.

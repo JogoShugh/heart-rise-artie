@@ -30,13 +30,21 @@ class RevalidationSteps(private val http: HttpWorld) {
     }
 
     @When("the client waters bed {long} with {int} ml using the ETag it holds")
-    fun waterWithHeldETag(id: Long, milliliters: Int) {
-        val accept = http.lastLayer1().requestHeaders.getValue("Accept")
-        http.post(
-            "/beds/$id/actions/water-cell",
-            """{"milliliters": $milliliters}""",
-            mapOf("Accept" to accept, "If-Match" to heldETag()),
-        )
+    fun waterWithHeldETag(id: Long, milliliters: Int) =
+        water(id, milliliters, http.negotiationHeaders(http.lastLayer1()))
+
+    @When("the client waters bed {long} with {int} ml using the ETag and headers it synced with")
+    fun waterAsSynced(id: Long, milliliters: Int) = waterWithHeldETag(id, milliliters)
+
+    @When("the client waters bed {long} with {int} ml using the ETag it holds but Prefer {string}")
+    fun waterWithOtherPrefer(id: Long, milliliters: Int, prefer: String) {
+        val synced = http.negotiationHeaders(http.lastLayer1()) - "Prefer"
+        water(id, milliliters, if (prefer.isBlank()) synced else synced + ("Prefer" to prefer))
+    }
+
+    private fun water(id: Long, milliliters: Int, negotiation: Map<String, String>) {
+        val headers = negotiation + ("If-Match" to heldETag())
+        http.post("/beds/$id/actions/water-cell", """{"milliliters": $milliliters}""", headers)
     }
 
     @Then("the response ETag is {string}")

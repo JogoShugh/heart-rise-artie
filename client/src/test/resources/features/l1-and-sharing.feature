@@ -44,7 +44,7 @@ Feature: L1, and the L3 sharing property seen from the client
       | GET http://garden.test/beds/2           |
       | GET http://garden.test{set:planted-l1}  |
     And the client sent GET "http://garden.test/beds/2" with headers:
-      | Prefer | forms=cid |
+      | Prefer | forms=link |
     And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
 
   Scenario: Two clients behind one shared cache, two beds in one state: one set fetch (templated server)

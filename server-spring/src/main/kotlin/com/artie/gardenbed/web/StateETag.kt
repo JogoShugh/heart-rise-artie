@@ -1,27 +1,22 @@
 package com.artie.gardenbed.web
 
 /**
- * SPEC §6.1 and §6.2 `[0.5]`: a Layer 1 ETag has two parts. The state
- * version is the bed's last event sequence number, the same number the
- * event store's UNIQUE constraint enforces. The variant tag names the
- * dialect and rung, so each representation of one state has its own
- * strong validator: `"seq-5.hsf.L2"`. Clients treat the value as opaque;
- * only this server reads the parts back.
+ * SPEC §6.1 and §6.2: a Layer 1 ETag names one representation of one state:
+ * the bed's last event sequence number (the number the event store's UNIQUE
+ * constraint enforces), the dialect, and the rung, as in `"seq-5.hsf.L2"`.
+ * Each representation of a state has its own strong validator, as RFC 9110
+ * §8.8.1 requires. Clients treat the value as opaque.
  */
 object StateETag {
-    private val issued = Regex("^\"seq-(\\d+)\\.[a-z]+\\.L\\d\"$")
 
     fun of(stateVersion: Int, dialectTag: String, rung: Rung): String =
         "\"seq-$stateVersion.$dialectTag.${rung.name}\""
 
     /**
-     * True when any entity-tag in an If-Match value was issued by this
-     * server for [stateVersion], whatever its dialect or rung (the [0.5]
-     * precondition scope). Weak tags (`W/"..."`) never match: If-Match
-     * uses strong comparison (RFC 9110 §13.1.1).
+     * RFC 9110 §13.1.1: `*` matches any current representation; otherwise
+     * some listed entity-tag must equal [current] by strong comparison,
+     * character for character. A weak tag (`W/"..."`) never equals a strong one.
      */
-    fun matchesStateVersion(ifMatch: String, stateVersion: Int): Boolean =
-        ifMatch.split(',')
-            .mapNotNull { issued.matchEntire(it.trim())?.groupValues?.get(1)?.toInt() }
-            .any { it == stateVersion }
+    fun matches(ifMatch: String, current: String): Boolean =
+        ifMatch.trim() == "*" || ifMatch.split(',').any { it.trim() == current }
 }

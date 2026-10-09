@@ -77,9 +77,11 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       seedType: basil
       """
     Then the client sent POST "http://garden.test/beds/1/actions/sow-seed" with headers:
-      | If-Match     | "seq-0.hf.L0"                  |
-      | Content-Type | application/json               |
-      | Accept       | application/prs.hal-forms+json |
+      | If-Match       | "seq-0.hf.L0"                                        |
+      | Content-Type   | application/json                                     |
+      | Accept         | application/prs.hal-forms+json                       |
+      | Accept-Profile | <https://github.com/jogoshugh/heart-rise/hal-forms> |
+    And that request had no "Prefer" header
     And the client holds the ETag "seq-1.hf.L0"
 
   Scenario: A HAL-FORMS client cannot be set to a rung above L0

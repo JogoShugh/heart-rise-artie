@@ -204,7 +204,7 @@ _forms:
       <p>L0 is collapsed: the <code>sowSeed</code> form is inline with its full schema (fields: depthCm, seedType).</p>
     </div>
 
-    <p class="entry-narrative">The same request with <code>Prefer: forms=cid, schema=cid</code> (rung L2) returns state plus one link:</p>
+    <p class="entry-narrative">The same request with <code>Prefer: forms=link, schema=link</code> (rung L2) returns state plus one link:</p>
     <div class="specimen"><div class="specimen-label output">output</div><pre>id: 1
 label: bed-1
 status: EMPTY
@@ -233,7 +233,7 @@ _links:
       <p>The response names its profile in a header, not a media-type parameter: <code>Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://github.com/jogoshugh/heart-rise&gt;; rel=&quot;profile&quot;</code></p>
     </div>
 
-    <p class="entry-narrative">At <code>Prefer: forms=cid</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-d0961aaaff4916e5</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
+    <p class="entry-narrative">At <code>Prefer: forms=link</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-d0961aaaff4916e5</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
     <div class="specimen"><div class="specimen-label output">output (L1 set, schemas embedded)</div><pre>_forms:
   sowSeed:
     _links:

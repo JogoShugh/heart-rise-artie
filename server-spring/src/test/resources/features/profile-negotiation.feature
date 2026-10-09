@@ -52,7 +52,7 @@ Feature: Dialect and profile negotiation
     Then the response status is 406
 
   Scenario: The affordance-set link names its profile, not a media-type parameter
-    When a client gets bed 2 with Prefer "forms=cid"
+    When a client gets bed 2 with Prefer "forms=link"
     Then the affordance-set link has type "application/hal+json" and profile "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
     When the client follows the affordance-set link
     Then the response Content-Type is "application/hal+json"

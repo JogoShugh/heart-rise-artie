@@ -28,6 +28,18 @@ class ArtieClient(
     override var current: HeartRepresentation? = null
         private set
 
+    /**
+     * The headers that select a representation: sent on every sync and every
+     * act. HTTP is stateless, so an act repeats them; the server then selects
+     * the same representation and compares If-Match with its ETag, whole
+     * (RFC 9110 §13.1.1).
+     */
+    private val negotiation: Map<String, String> = buildMap {
+        put("Accept", dialect.mediaType)
+        put("Accept-Profile", "<${dialect.profile}>")
+        rung.prefer?.let { put("Prefer", it) }
+    }
+
     override fun enter(url: String): HeartRepresentation = sync(url)
 
     /**
@@ -70,13 +82,11 @@ class ArtieClient(
             HeartRequest(
                 form.method,
                 target,
-                mapOf("Content-Type" to form.contentType, "Accept" to dialect.mediaType, "If-Match" to etag),
+                negotiation + mapOf("Content-Type" to form.contentType, "If-Match" to etag),
                 payload.toString(),
             ),
         )
-        if (response.status in SUCCESS) {
-            return HeartResponseParser.parse(response, target, dialect).also { current = it }
-        }
+        if (response.status in SUCCESS) return sync(target, response)
         if (response.status == PRECONDITION_REQUIRED && resendAllowed) {
             sync(held.url)
             return act(rel, payload, resendAllowed = false)
@@ -105,15 +115,12 @@ class ArtieClient(
      * `$ref` (or an older server's `$id`), each URL once. Each fetch carries
      * the integrity value of the link it follows, checked below the cache.
      * The transport's HTTP cache makes a URL already held cost nothing;
-     * reasoning waits until the manifest is complete.
+     * reasoning waits until the manifest is complete. An act's response is
+     * Layer 1 too ([received]), and is completed the same way.
      */
-    private fun sync(url: String): HeartRepresentation {
-        val headers = buildMap {
-            put("Accept", dialect.mediaType)
-            put("Accept-Profile", "<${dialect.profile}>")
-            rung.prefer?.let { put("Prefer", it) }
-        }
-        val layer1 = HeartResponseParser.parse(transport.send(HeartRequest("GET", url, headers)), url, dialect)
+    private fun sync(url: String, received: HeartResponse? = null): HeartRepresentation {
+        val response = received ?: transport.send(HeartRequest("GET", url, negotiation))
+        val layer1 = HeartResponseParser.parse(response, url, dialect)
         val synced = layer1.formsLink?.let { link ->
             layer1.withAffordances(fetchSet(link, layer1.formsIntegrity))
         } ?: layer1

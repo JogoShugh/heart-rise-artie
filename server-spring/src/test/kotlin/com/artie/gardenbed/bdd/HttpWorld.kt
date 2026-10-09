@@ -45,6 +45,11 @@ class HttpWorld(private val client: WebTestClient) {
         )
 
     /** The latest response from a bed resource (Layer 1), whatever came after it. */
+    /** The negotiation headers a request was sent with. HTTP is stateless: an act
+     *  repeats them so the server can select the representation its If-Match names. */
+    fun negotiationHeaders(exchange: Exchange): Map<String, String> =
+        exchange.requestHeaders.filterKeys { it in setOf("Accept", "Accept-Profile", "Prefer") }
+
     fun lastLayer1(): Exchange = exchanges.last { it.path.startsWith("/beds/") && !it.path.contains("/actions/") }
 
     private fun record(

@@ -239,7 +239,7 @@ def entry_01() -> str:
         f"L0 is collapsed: the <code>sowSeed</code> form is inline with its full schema (fields: {esc(l0_fields)}).",
         "Expected the sowSeed form inline with a full schema when no Prefer is sent (SPEC §6.4).")}
 
-    <p class="entry-narrative">The same request with <code>Prefer: forms=cid, schema=cid</code> (rung L2) returns state plus one link:</p>
+    <p class="entry-narrative">The same request with <code>Prefer: forms=link, schema=link</code> (rung L2) returns state plus one link:</p>
     <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("01-bed1-empty.json")}</pre></div>
     {verdict_html(l2_ok,
         f"No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>{set_url}</code>",
@@ -248,7 +248,7 @@ def entry_01() -> str:
         f"The response names its profile in a header, not a media-type parameter: <code>Link: {esc(link)}</code>",
         f"Expected Link: &lt;.../heart-rise/hal-schema-forms&gt;; rel=\"profile\". Got: <code>{esc(link)}</code>")}
 
-    <p class="entry-narrative">At <code>Prefer: forms=cid</code> (rung L1) the link points somewhere else: <code>{l1_url}</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
+    <p class="entry-narrative">At <code>Prefer: forms=link</code> (rung L1) the link points somewhere else: <code>{l1_url}</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
     <div class="specimen"><div class="specimen-label output">output (L1 set, schemas embedded)</div><pre>{yaml_block("01-set-embedded.json")}</pre></div>
     {verdict_html(templated_ok,
         f"<code>target.href</code> is a literal, unresolved URI Template (<code>{esc(href)}</code>) — byte-identical for every EMPTY bed, real HTTP caches included.",

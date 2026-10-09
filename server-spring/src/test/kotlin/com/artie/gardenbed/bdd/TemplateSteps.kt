@@ -40,7 +40,8 @@ class TemplateSteps(private val http: HttpWorld) {
         val form = http.last.json.path("_forms").path(affordance)
         val href = form.path("_links").path("target").path("href").asText()
         val etag = checkNotNull(layer1.headers.eTag) { "client holds no ETag" }
-        http.post(expand(href, form.path("hr:templatePointers"), layer1.json), body, mapOf("If-Match" to etag))
+        val headers = http.negotiationHeaders(layer1) + ("If-Match" to etag)
+        http.post(expand(href, form.path("hr:templatePointers"), layer1.json), body, headers)
     }
 
     @Then("the two affordance-set links are identical")

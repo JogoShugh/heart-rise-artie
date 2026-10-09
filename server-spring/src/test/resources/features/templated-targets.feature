@@ -8,7 +8,7 @@ Feature: Templated affordance targets
 
   Scenario Outline: Every template variable has a declared pointer that resolves in Layer 1: <status>
     Given bed 2 is <status>
-    When a client gets bed 2 with Prefer "forms=cid, schema=cid"
+    When a client gets bed 2 with Prefer "forms=link, schema=link"
     And the client follows the affordance-set link
     Then every target is a template whose variables each have a template pointer into bed 2
 
@@ -20,7 +20,7 @@ Feature: Templated affordance targets
 
   Scenario: The expanded template is the URI the act is accepted at
     Given bed 2 is PLANTED
-    And a client got bed 2 as hal-schema-forms with Prefer "forms=cid, schema=cid"
+    And a client got bed 2 as hal-schema-forms with Prefer "forms=link, schema=link"
     When the client follows the affordance-set link
     And the client expands "waterCell" from bed 2 by its template pointers and posts {"milliliters": 100} with its ETag
     Then the response status is 200
@@ -28,6 +28,6 @@ Feature: Templated affordance targets
   Scenario: Two beds in the same state share one affordance set
     Given bed 1 is PLANTED
     And bed 3 is PLANTED
-    When a client gets bed 1 with Prefer "forms=cid, schema=cid"
-    And a client gets bed 3 with Prefer "forms=cid, schema=cid"
+    When a client gets bed 1 with Prefer "forms=link, schema=link"
+    And a client gets bed 3 with Prefer "forms=link, schema=link"
     Then the two affordance-set links are identical
