@@ -20,6 +20,9 @@ class LayerSteps(private val ctx: ClientContext) {
         ctx.rung = Rung.valueOf(rung)
     }
 
+    @Then("the current representation is at rung {word}")
+    fun currentAt(rung: String) = assertEquals(Rung.valueOf(rung), ctx.client.appliedRung)
+
     @Given("the service serves schema {string} at its content address:")
     fun servesSchema(name: String, yaml: String) = serveAddressed("schema", "/schemas", name, yaml)
 

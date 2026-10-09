@@ -28,6 +28,9 @@ class ArtieClient(
     override var current: HeartRepresentation? = null
         private set
 
+    override var appliedRung: Rung? = null
+        private set
+
     /**
      * The headers that select a representation: sent on every sync and every
      * act. HTTP is stateless, so an act repeats them; the server then selects
@@ -124,6 +127,7 @@ class ArtieClient(
         val synced = layer1.formsLink?.let { link ->
             layer1.withAffordances(fetchSet(link, layer1.formsIntegrity))
         } ?: layer1
+        appliedRung = Rung.applied(response.header("Preference-Applied"))
         return synced.also { current = it }
     }
 
