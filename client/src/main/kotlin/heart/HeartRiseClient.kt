@@ -9,6 +9,13 @@ interface HeartRiseClient {
     /** The rung [current] arrived at, from its Preference-Applied header (SPEC §6.11.1). Null before enter(). */
     val appliedRung: Rung?
 
+    /**
+     * Reads the service index at [url] as a JSON Home document (SPEC §6.11.1)
+     * and from then on asks for the best dialect and rung it offers, up to
+     * the client's own. Without a home document the client's settings stand.
+     */
+    fun discover(url: String)
+
     fun enter(url: String): HeartRepresentation
     fun act(rel: String, payload: JsonObject): HeartRepresentation
 

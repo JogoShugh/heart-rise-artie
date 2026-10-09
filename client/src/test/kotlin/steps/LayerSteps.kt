@@ -6,6 +6,7 @@ import heart.HeartResponse
 import heart.Rung
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -19,6 +20,12 @@ class LayerSteps(private val ctx: ClientContext) {
     fun worksAt(rung: String) {
         ctx.rung = Rung.valueOf(rung)
     }
+
+    @When("the client discovers {string}")
+    fun discovers(url: String) = ctx.client.discover(url)
+
+    @Then("that request asked for {string}")
+    fun askedFor(prefer: String) = assertEquals(prefer, ctx.transport.requests.last().header("Prefer"))
 
     @Then("the current representation is at rung {word}")
     fun currentAt(rung: String) = assertEquals(Rung.valueOf(rung), ctx.client.appliedRung)

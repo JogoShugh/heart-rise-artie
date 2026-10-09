@@ -99,3 +99,91 @@ Feature: Which rung a response is at, and which rung to ask for
       | GET http://garden.test/beds/2         |
       | GET http://garden.test{set:planted-l1} |
     And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
+
+  Scenario Outline: The client asks for the best the home document offers, up to its own rung: <server>
+    The service index's JSON Home representation declares the dialects
+    (formats) and the Prefer values honoured (accept-prefer). The client
+    prefers HAL Schema Forms, and asks for no rung above the one it is set to.
+    Given the service answers GET "http://garden.test/" with:
+      """
+      200 OK
+      Content-Type: application/json-home
+
+      resources:
+        item:
+          hrefTemplate: "/beds/{id}"
+          hints:
+            formats: <formats>
+            <accept-prefer>
+      """
+    When the client discovers "http://garden.test/"
+    And the client tries to enter "http://garden.test/beds/2"
+    Then the client sent GET "http://garden.test/beds/2" with headers:
+      | Accept | <accept> |
+    And that request <prefer>
+
+    Examples:
+      | server               | formats                                                         | accept-prefer                            | accept                         | prefer                                   |
+      | L2, both dialects    | {application/hal+json: {}, application/prs.hal-forms+json: {}} | accept-prefer: [forms=link, schema=link] | application/hal+json           | asked for "forms=link, schema=link"      |
+      | L1                   | {application/hal+json: {}, application/prs.hal-forms+json: {}} | accept-prefer: [forms=link]              | application/hal+json           | asked for "forms=link"                   |
+      | L0, HAL Schema Forms | {application/hal+json: {}}                                      |                                          | application/hal+json           | had no "Prefer" header                   |
+      | L0, HAL-FORMS only   | {application/prs.hal-forms+json: {}}                            |                                          | application/prs.hal-forms+json | had no "Prefer" header                   |
+
+  Scenario: A client set to L1 asks for L1 even when the server offers L2
+    Given the client works at rung L1
+    And the service answers GET "http://garden.test/" with:
+      """
+      200 OK
+      Content-Type: application/json-home
+
+      resources:
+        item:
+          hints:
+            formats: {application/hal+json: {}}
+            accept-prefer: [forms=link, schema=link]
+      """
+    When the client discovers "http://garden.test/"
+    And the client tries to enter "http://garden.test/beds/2"
+    Then that request asked for "forms=link"
+
+  Scenario: With no home document, the client keeps its own settings
+    Given the service answers GET "http://garden.test/" with:
+      """
+      406 Not Acceptable
+      """
+    When the client discovers "http://garden.test/"
+    And the client tries to enter "http://garden.test/beds/2"
+    Then the client sent GET "http://garden.test/beds/2" with headers:
+      | Accept | application/hal+json    |
+      | Prefer | forms=link, schema=link |
+
+  Scenario: The home document promised L2, but the response is L0: the response wins
+    Given the service answers GET "http://garden.test/" with:
+      """
+      200 OK
+      Content-Type: application/json-home
+
+      resources:
+        item:
+          hints:
+            formats: {application/hal+json: {}}
+            accept-prefer: [forms=link, schema=link]
+      """
+    And the service answers GET "http://garden.test/beds/2" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      _forms:
+        waterCell:
+          _links: {target: {href: /beds/2/actions/water-cell}}
+          method: POST
+          schema: {type: object}
+      """
+    When the client discovers "http://garden.test/"
+    And the client enters "http://garden.test/beds/2"
+    Then the current representation is at rung L0
+    And the manifest offers exactly "waterCell"

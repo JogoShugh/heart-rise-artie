@@ -31,16 +31,26 @@ class ArtieClient(
     override var appliedRung: Rung? = null
         private set
 
+    /** The dialect and rung asked for: the client's own ([dialect], [rung]), or less if discovery found less. */
+    private var asking: Pair<Dialect, Rung> = dialect to rung
+
     /**
      * The headers that select a representation: sent on every sync and every
      * act. HTTP is stateless, so an act repeats them; the server then selects
      * the same representation and compares If-Match with its ETag, whole
      * (RFC 9110 §13.1.1).
      */
-    private val negotiation: Map<String, String> = buildMap {
-        put("Accept", dialect.mediaType)
-        put("Accept-Profile", "<${dialect.profile}>")
-        rung.prefer?.let { put("Prefer", it) }
+    private val negotiation: Map<String, String>
+        get() = buildMap {
+            val (dialect, rung) = asking
+            put("Accept", dialect.mediaType)
+            put("Accept-Profile", "<${dialect.profile}>")
+            rung.prefer?.let { put("Prefer", it) }
+        }
+
+    override fun discover(url: String) {
+        val response = transport.send(HeartRequest("GET", url, mapOf("Accept" to HomeDocument.MEDIA_TYPE)))
+        HomeDocument.offer(response)?.let { asking = HomeDocument.choose(it, dialect, rung) }
     }
 
     override fun enter(url: String): HeartRepresentation = sync(url)
@@ -56,7 +66,7 @@ class ArtieClient(
         if (form.method != "GET") return act(rel, payload, resendAllowed = true)
         // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
         // template a target; it puts the fields in the query (mutate-action-URL).
-        val target = when (dialect) {
+        val target = when (asking.first) {
             Dialect.HAL_FORMS -> HalFormsTemplates.getTarget(form.target, payload)
             Dialect.HAL_SCHEMA_FORMS -> targetOf(form, held, payload)
         }
@@ -123,7 +133,7 @@ class ArtieClient(
      */
     private fun sync(url: String, received: HeartResponse? = null): HeartRepresentation {
         val response = received ?: transport.send(HeartRequest("GET", url, negotiation))
-        val layer1 = HeartResponseParser.parse(response, url, dialect)
+        val layer1 = HeartResponseParser.parse(response, url, asking.first)
         val synced = layer1.formsLink?.let { link ->
             layer1.withAffordances(fetchSet(link, layer1.formsIntegrity))
         } ?: layer1
@@ -146,11 +156,6 @@ class ArtieClient(
         }
     }
 
-    /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3), or an older server's lone `$id`. */
-    private fun schemaPointer(schema: JsonObject): String? =
-        schema[SCHEMA_REF]?.jsonPrimitive?.content
-            ?: schema.takeIf { it.keys == setOf(SCHEMA_ID) }?.get(SCHEMA_ID)?.jsonPrimitive?.content
-
     private fun fetchJson(url: String, integrity: String?): JsonObject {
         val accept = mapOf("Accept" to "$HAL_JSON, application/json")
         val response = transport.send(HeartRequest("GET", url, accept, integrity = integrity))
@@ -159,6 +164,11 @@ class ArtieClient(
     }
 
     private companion object {
+        /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3), or an older server's lone `$id`. */
+        fun schemaPointer(schema: JsonObject): String? =
+            schema[SCHEMA_REF]?.jsonPrimitive?.content
+                ?: schema.takeIf { it.keys == setOf(SCHEMA_ID) }?.get(SCHEMA_ID)?.jsonPrimitive?.content
+
         val SUCCESS = 200..299
         const val SCHEMA_ID = "\$id"
         const val SCHEMA_REF = "\$ref"
