@@ -205,3 +205,32 @@ Still open from this work:
 - **L6:** the reasoner is offered forms only, not links, so an agent cannot
   yet choose "follow the item titled X" by itself.
 - **Pagination:** search returns every match in one representation.
+
+## Ideas parked
+
+Not planned. Kept so they are not re-derived.
+
+### HAL-FORMS beyond L0 (parked 2026-10-08)
+
+Decision: HAL-FORMS stays the L0 on-ramp (SPEC "Decided for 0.5"). Two
+alternatives were considered and parked:
+
+- **A H.E.A.R.T. profile of HAL-FORMS.** Add a templated `target`,
+  `hr:templatePointers` and `integrity` on the forms link, as the HAL Schema
+  Forms profile does. That would make L1 possible: one shared, cached forms
+  document per state. L3 would also need a schema reference, at which point
+  it is HAL Schema Forms by another name. Cost: Spring HATEOAS cannot
+  produce the additions, so the server would build the bytes by hand and
+  lose the off-the-shelf tooling that is HAL-FORMS's reason to be here.
+- **Propose a templated `target` upstream.** HAL-FORMS already templates a
+  property's `value`, so a templated `target` is a natural extension. If
+  accepted, L1 would be plain HAL-FORMS and toolchains could follow. Cost: a
+  short proposal and waiting on the spec's authors. How active the
+  HAL-FORMS repository is has not been checked.
+
+Facts these rest on (HAL-FORMS spec, checked 2026-10-08): `target` has no
+`templated` flag; `templated` applies only to a property's `value`; an absent
+target means the form document's own address; GET, HEAD and DELETE put
+fields in the query (mutate-action-URL), so a field never reaches the path;
+`_htarget` and `_hsource` are query parameters on a standalone form
+document's address, set by the server.
