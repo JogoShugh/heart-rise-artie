@@ -11,15 +11,16 @@ has since changed.
 | Rung / rule | Status | Evidence |
 |---|---|---|
 | L0: no `Prefer` returns everything embedded | **Done** (step 1) | `rendering-ladder.feature` |
-| L1 `Prefer: forms=cid` | **Done** (step 1) | `Rung.fromPrefer`, `rendering-ladder.feature` |
-| L2 `Prefer: forms=cid, schema=cid` | **Done** (step 1) | same |
+| L1 `Prefer: forms=link` | **Done** (step 1) | `Rung.fromPrefer`, `rendering-ladder.feature` |
+| L2 `Prefer: forms=link, schema=link` | **Done** (step 1) | same |
 | §6.5: L1 and L2 sets have different addresses | **Done** (step 1) | registry keyed by (status, `SetRendering`); `ContentAddressHttpTest` |
 | §6.1: Layer 2/3 send no `Vary` | **Done** (step 1) | `AffordanceSetController` ignores `Prefer` |
 | §6.5: address = SHA-256 of the served bytes | **Done** (2026-10-04) | `ContentAddressHttpTest` |
 | §6.5 (2026-10-08): `integrity` on the forms link; L2 schema is `$ref` + `hr:integrity`; `Repr-Digest` on Layers 2 and 3 | **Done** (2026-10-08) | `rendering-ladder.feature`, journal |
 | Layer 1 `Cache-Control: no-cache` | **Done** (step 2), also on `304` | `layer1-revalidation.feature` |
 | Layer 1 `304` on `If-None-Match` | **Done** (step 2). Spring's built-in conditional GET; an ETag from another rung gets `200` | same |
-| Strong, per-variant `ETag` (§6.1, `[0.5]`) | **Done** (step 2). `"seq-N.hsf.L2"`; `If-Match` accepts any variant of the current state version | `StateETag` |
+| Strong, per-variant `ETag` (§6.1) | **Done** (step 2). `"seq-N.hsf.L2"` | `StateETag` |
+| §6.3 (2026-10-08): acts repeat their negotiation headers; `If-Match` compared whole with the selected representation's `ETag`, `*` matches | **Done** (2026-10-08). No narrowing of RFC 9110 | `layer1-revalidation.feature`, `conditional-acts.feature`, client `sync-l2.feature` |
 | L3: templated profile, sharing | **Done** for jsonschema; cross-bed proof passes | journal entry 04 |
 | §6.11 (2026-10-08): service index at `/`; `searchBeds` and `getBed` GET forms; search results as `item` links | **Done** (2026-10-08), in both dialects: HAL-FORMS uses query GET templates (`/beds?name=`, `/beds?id=`) | `service-index.feature`, `hal-forms-on-ramp.feature`, live "From the bookmark alone" (L0, L2, HAL-FORMS) |
 | §6.9.1 (2026-10-08): every template variable declared in `hr:templatePointers` | **Done** (2026-10-08). `{"id": "/id"}` on every shared form; L0's concrete forms carry none | `templated-targets.feature` |
@@ -31,7 +32,7 @@ has since changed.
 | L5: both dialects, one legality source | **Done**, now checked over HTTP in all three states | `cross-dialect.feature`, `RequestDtoMetadataTest` |
 | L5: HAL-FORMS Layer 2/3 addressing | **Not required** (decided for 0.5): HAL-FORMS is the L0 on-ramp; it ignores `Prefer` | `buildHalFormsResponse` |
 | §6.1 `Accept-Profile` / `Link: rel="profile"` | **Done** (step 4). `Link` names the composite profile and the parent; `Accept-Profile` picks the dialect when `Accept` leaves it open; unknown profiles fall back to the default; `406` only for an unsatisfiable `Accept`. The media-type `profile` parameter is gone from Layers 1 and 2 | `profile-negotiation.feature`, `Negotiation` |
-| `Preference-Applied` | **Done** (step 1). Echoes `forms=cid` or `forms=cid, schema=cid`; absent at L0 | `Rung.preferenceApplied` |
+| `Preference-Applied` | **Done** (step 1). Echoes `forms=link` or `forms=link, schema=link`; absent at L0 | `Rung.preferenceApplied` |
 | Digest length | 16 hex chars. Allowed for a closed-world demo server (§6.5); production would need the full digest | `take(16)` |
 | L6 | n/a (server) | |
 | Snapshot write on real Postgres | **Fixed** (C3). The first snapshot (event 5) threw after the event was committed, so the act returned `500` for a write that happened. Now an upsert, and best-effort | `EventStorePostgresTest` |
@@ -70,7 +71,7 @@ a mechanism, not a conformance test. Its fixtures still use `{bedId}`.
 
 The order follows the ladder: each step can be shown on its own.
 
-1. **L0 default + `forms=cid`/`schema=cid` + per-rung addresses.** This is
+1. **L0 default + `forms=link`/`schema=link` + per-rung addresses.** This is
    one change to `Prefer` parsing and to the affordance-set registry, which
    is keyed by (status, rung). Drop `Vary` on Layer 2.
 2. **Layer 1 caching:** `Cache-Control: no-cache`, `304` on
