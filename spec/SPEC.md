@@ -209,7 +209,7 @@ Uses the `_templates` key. Amundsen's inline `properties` array (`name`, `type`,
 
 A server SHOULD support both dialects for the same resource, generated from one shared source of truth for "which affordances are currently legal" — the two dialects MUST NOT be allowed to drift into disagreeing about that. Dialect is an orthogonal axis to the layering ladder, not a rung above it (§6.10.6).
 
-**The two dialects do not have equal reach (decided for 0.5).** HAL Schema Forms is the *reference dialect*: every rung, L0 to L6, is defined for it, and compliance (§6.2) is judged in it. HAL-FORMS is the *on-ramp dialect*: it is served at L0 only, collapsed, with its inline `properties`. A server SHALL ignore `forms=cid` and `schema=cid` for a HAL-FORMS response and SHALL NOT list them in `Preference-Applied`. The reason is structural. HAL-FORMS has no field that points to a separately addressed properties fragment, so L1–L3 would need a wire format HAL-FORMS does not define. And the toolchains that make HAL-FORMS attractive (Spring HATEOAS and others) generate its bytes, which makes canonical, content-addressed bytes hard to guarantee. HAL-FORMS's strength is that those toolchains give a server L0 for free; that is the role it keeps. The `heart-rise/hal-forms` profile therefore names "HAL-FORMS at L0, with H.E.A.R.T. legality and the L4 error model".
+**The two dialects do not have equal reach (decided for 0.5).** HAL Schema Forms is the *reference dialect*: every rung, L0 to L6, is defined for it, and compliance (§6.2) is judged in it. HAL-FORMS is the *on-ramp dialect*: it is served at L0 only, collapsed, with its inline `properties`. A server SHALL ignore `forms=link` and `schema=link` for a HAL-FORMS response and SHALL NOT list them in `Preference-Applied`. The reason is structural. HAL-FORMS has no field that points to a separately addressed properties fragment, so L1–L3 would need a wire format HAL-FORMS does not define. And the toolchains that make HAL-FORMS attractive (Spring HATEOAS and others) generate its bytes, which makes canonical, content-addressed bytes hard to guarantee. HAL-FORMS's strength is that those toolchains give a server L0 for free; that is the role it keeps. The `heart-rise/hal-forms` profile therefore names "HAL-FORMS at L0, with H.E.A.R.T. legality and the L4 error model".
 
 **`Vary` applies to Layer 1 only.** A server that varies its Layer 1 response by `Accept`, `Prefer`, or `Accept-Profile` SHALL send `Vary: Accept, Prefer, Accept-Profile` as applicable. Layer 2 and Layer 3 are content-addressed and therefore have exactly one representation each; they never negotiate, and SHALL NOT send `Vary`. Dialect, profile, and rendering are all baked into the bytes, and so into the address (§6.5). Layer 1 `ETag` values SHALL differ across dialects and across rungs, since these are different representations of that resource.
 
@@ -333,7 +333,7 @@ This is inverted from 0.3, which made the pointer form the default and required 
 |---|---|---|---|---|
 | *(none)* | state + affordance set + full schemas | — | 1 | L0 |
 | `Prefer: forms=link` | state + link to affordance set | affordances with embedded schemas | 2 | L1 |
-| `Prefer: forms=link, schema=link` | state + link to affordance set | affordances with schema `$id` pointers | 3 | L2 |
+| `Prefer: forms=link, schema=link` | state + link to affordance set | affordances with schema `$ref` pointers | 3 | L2 |
 | `Prefer: schema=link` | state + affordance set with schema pointers | — | 2 | permitted; see below |
 
 `Prefer: schema=link` alone is legal and a server MAY honour it: the affordance set stays inline in Layer 1 while its schemas become separately-addressed. This is useful where the set is small and volatile but the schemas are large and stable. It is not a named rung because it is a combination rather than a step, and ARTIE is not required to exercise it.
@@ -714,6 +714,46 @@ The index is served in both dialects, with the same form names:
 
 `GET /beds` filters by `name` (part of the label, case ignored) and `id`, and answers in the dialect negotiated. A server whose resources are reachable only by path, not by query, cannot offer a HAL-FORMS lookup; that is a constraint on server design, not on the client.
 
+#### 6.11.1 Declaring what a server serves (added 2026-10-09)
+
+Many servers will start at L0, and some will stay there. A client should be able to learn what a server serves before it asks, and should always know what it actually received. H.E.A.R.T. invents nothing for either; it uses two existing mechanisms.
+
+**Per response, `Preference-Applied` is the truth (RFC 7240).** A server SHALL list in `Preference-Applied` the layering tokens it honoured (§6.4). A client SHALL take the rung of a response from that header, not from what it asked for or what was declared: no header means L0, `forms=link` means L1, `forms=link, schema=link` means L2. A server that does not implement the ladder at all sends no `Preference-Applied` and is therefore read as L0, which is correct.
+
+**Up front, the service index is also served as a JSON Home document.** `GET /` with `Accept: application/json-home` returns a home document (draft-nottingham-json-home), an ordinary third representation of the index chosen by `Accept`, with `Vary: Accept`. It names the resources a client can start from by link relation and carries resource hints (draft-ietf-httpapi-link-hint) that state what the server serves:
+
+```json
+{
+  "api": {
+    "title": "Garden beds",
+    "links": { "describedBy": "https://github.com/jogoshugh/heart-rise/spec" }
+  },
+  "resources": {
+    "item": {
+      "hrefTemplate": "/beds/{id}",
+      "hrefVars": { "id": "https://github.com/jogoshugh/heart-rise/vars/bed-id" },
+      "hints": {
+        "allow": ["GET"],
+        "formats": {
+          "application/hal+json": { "links": { "profile": "https://github.com/jogoshugh/heart-rise/hal-schema-forms" } },
+          "application/prs.hal-forms+json": { "links": { "profile": "https://github.com/jogoshugh/heart-rise/hal-forms" } }
+        },
+        "accept-prefer": ["forms=link", "schema=link"],
+        "precondition-req": ["etag"]
+      }
+    }
+  }
+}
+```
+
+- `formats` lists the dialects, each with its `heart-rise` profile in the format object's `links` member, which the hint defines for this purpose.
+- `accept-prefer` lists the layering preferences the server honours: both for L2, `forms=link` alone for L1, and the hint is absent at L0. It applies to the reference dialect only; HAL-FORMS is L0 in every case (§6.1).
+- `precondition-req: ["etag"]` declares that acts need `If-Match` (§6.2).
+
+A client that reads the home document SHOULD ask for the highest dialect and rung that both it and the server support. Hints are advisory: a client SHALL NOT fail because a response does not match them, and SHALL follow `Preference-Applied`. A server that offers no home document answers `406` or another representation; a client then uses its configured dialect and rung and relies on `Preference-Applied`.
+
+> **Standards footing.** JSON Home and HTTP Link Hints are Internet-Drafts, not RFCs. JSON Home is served in production by OpenStack Keystone; it is still the published design for an API's entry document and its capability hints, and preferable to a `heart`-specific format. `/.well-known/api-catalog` (RFC 9727) could point to the index from the host name; that is parked (hack log), as are per-resource `Link: rel="alternate"` lists (connegp "list profiles"). OPTIONS was considered and rejected: its response has no defined body and is not cacheable.
+
 ## 7. R.I.S.E. Requirements
 
 R.I.S.E. is a specialisation of H.E.A.R.T. for asynchronous reciprocal interaction. It is not a separate protocol. It extends the H.E.A.R.T. media type with a standard vocabulary of async rel names.
@@ -1020,7 +1060,7 @@ ARTIE interacts correctly with both reference domains from bookmark entry with n
 
 ## 12. Open Questions
 
-**Resolved or superseded in 0.4:** the `Vary: Accept` cache-key question (dissolved — content-addressed layers do not negotiate, §6.1); registry persistence (it is an ordinary HTTP cache, §6.6); the status of `428` (restored with its RFC 6585 meaning now that acts are conditional, §6.2); whether `behaviour`/`domain` should move off `Accept-Profile` (resolved — moved to `Prefer` tokens, since `Accept-Profile` has no parameter extension point under connegp, §6.4); the private `profile` media-type parameter (resolved — replaced by `Accept-Profile`/`Link: rel="profile"` per connegp, §6.1).
+**Resolved or superseded in 0.4:** the `Vary: Accept` cache-key question (dissolved — content-addressed layers do not negotiate, §6.1); registry persistence (it is an ordinary HTTP cache, §6.6); how a server declares which rungs it serves (resolved 2026-10-09 — a JSON Home representation of the service index, with `Preference-Applied` as the per-response truth, §6.11.1); the status of `428` (restored with its RFC 6585 meaning now that acts are conditional, §6.2); whether `behaviour`/`domain` should move off `Accept-Profile` (resolved — moved to `Prefer` tokens, since `Accept-Profile` has no parameter extension point under connegp, §6.4); the private `profile` media-type parameter (resolved — replaced by `Accept-Profile`/`Link: rel="profile"` per connegp, §6.1).
 
 **Recommended for closure:**
 
@@ -1038,7 +1078,6 @@ ARTIE interacts correctly with both reference domains from bookmark entry with n
 - Whether RISE poll mode should be defined as a profile over MCP's `io.modelcontextprotocol/tasks` extension rather than as a parallel mechanism (§7.7).
 - The RISE envelope wire binding (§7.2) — blocking for interoperability.
 - Whether core rel names should be full URIs rather than CURIEs (§7.5).
-- Whether the ladder needs a formal advertisement mechanism — a way for a server to declare which rungs it supports without a client probing for them. `Preference-Applied` reveals it reactively, one request at a time; a `heart:conformance` link from the entry point would reveal it up front. The latter is more useful and slightly less hypermedia-pure.
 - **Tracking connegp and PROF-IETF status (new).** Two foundations §6.1 now depends on are moving targets: connegp's §13.2 Feature at Risk covering response-side `Link: rel="profile"`, and the not-yet-submitted PROF-IETF Internet-Draft covering `Accept-Profile` itself (§8.6). Revisit this section when either publishes — a PROF-IETF submission in particular could change `Accept-Profile`'s syntax out from under §6.1's examples.
 - IANA registration path: media type(s), the `forms`/`schema`/`behaviour`/`domain` preference tokens, the core link relation types, and (pending PROF-IETF's own submission) whatever registry it establishes for profile URIs. One workstream, not several.
 - Formal rel name vocabulary governance; versioning strategy for the core media type.
@@ -1090,5 +1129,7 @@ The last row is where the ladder earns its place architecturally rather than mer
 | draft-kelly-json-hal | `application/hal+json` | §8.2 — expired Internet-Draft |
 | HAL Schema Forms (jbadeau) | `_forms` dialect | §6.1, §8.2 |
 | HAL-FORMS (Amundsen) | `application/prs.hal-forms+json`, `_templates` dialect | §6.1, §8.3 — `prs.` vanity tree |
+| draft-nottingham-json-home | `application/json-home`, the home document | §6.11.1 — Internet-Draft |
+| draft-ietf-httpapi-link-hint | Resource hints `formats`, `accept-prefer`, `precondition-req` | §6.11.1 — Internet-Draft (httpapi WG) |
 
 > **Editorial note (added on import, October 2026).** The source text of 0.4 ended partway through the RFC 8941 row ("Structured Fiel…"). That row and every row after it were reconstructed from references made elsewhere in this document. They are not the author's original wording.

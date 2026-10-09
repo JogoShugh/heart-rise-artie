@@ -293,3 +293,24 @@ Second-protocol notes:
 
 With plan items 1 and 2, Rule 1 would be Supports; item 3 would make it a
 showcase.
+
+### Discovery beyond the home document (parked 2026-10-09)
+
+Decided instead: `Preference-Applied` as the per-response truth, and a JSON
+Home representation of the service index for declaring what a server serves
+(SPEC §6.11.1). Parked:
+
+- **`/.well-known/api-catalog` (RFC 9727).** A fixed, standard address on a
+  host that lists its APIs as a link set; `service-desc` would point to `/`
+  and `service-doc` to the spec. It would let an agent given only a host
+  name find the entry point. Cheap, but adoption is tiny (API Evangelist
+  counted four real providers in May 2026), and ARTIE is always given an
+  entry URI today.
+- **Per-resource alternates (connegp "list profiles").** Each bed response
+  carries `Link: <...>; rel="alternate"; type="..."; formats="<profile>"`
+  for the other dialect, the way an HTML page names its feeds. Useful to a
+  browser-like client that lands on a resource without the index.
+
+Rejected: OPTIONS (no defined response body, not cacheable); RFC 2295
+`Alternates` and 300 (experimental, never implemented); Client Hints
+`Accept-CH` (the server asking the client, the wrong direction).
