@@ -228,8 +228,10 @@ Done (SPEC §6.11.1), one commit per phase:
    app with the same variable). 16, 16 and 18 scenarios pass; the two
    L2-caching scenarios are tagged `@needs-L2` and skipped below L2.
 
-Not done: the journal (`capture.sh`) does not show the home document yet;
-the Fielding review does not mention discovery.
+Journal entry 07 shows the home document and `Preference-Applied` from
+servers started at L2, L1 and L0 (`HEART_MAX_RUNG=L1 ./capture.sh home`
+adds one level without clearing `run/`); all 11 verdicts ok. The Fielding
+review covers discovery (Rule 6 and the scoreboard).
 
 ## Ideas parked
 

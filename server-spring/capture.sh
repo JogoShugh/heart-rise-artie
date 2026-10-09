@@ -18,6 +18,25 @@ etag_of() {
 }
 
 RUN_DIR="run"
+
+# SPEC §6.11.1: what the running server declares in its JSON Home index, and
+# what it applies when asked for L2. HEART_MAX_RUNG names the rung the server
+# was started at, so captures from servers at L0, L1 and L2 sit side by side.
+# `./capture.sh home` captures only this, without clearing run/.
+capture_home() {
+  local rung="${HEART_MAX_RUNG:-L2}"
+  curl -s -D "$RUN_DIR/07-home-$rung-headers.txt" -H "Accept: application/json-home" "$BASE/" > "$RUN_DIR/07-home-$rung.json"
+  curl -s -o /dev/null -D "$RUN_DIR/07-bed2-$rung-headers.txt" -H "Accept: $HSF" -H "Accept-Profile: $HSF_PROFILE" \
+       -H "Prefer: $L2" "$BASE/beds/2"
+  echo "home document captured for a server at $rung"
+}
+
+if [ "${1:-}" = "home" ]; then
+  mkdir -p "$RUN_DIR"
+  capture_home
+  exit 0
+fi
+
 rm -rf "$RUN_DIR"
 mkdir -p "$RUN_DIR"
 
@@ -134,5 +153,9 @@ curl -s -o /dev/null -w "%{http_code}" "$BASE/schemas/sha256-0000000000000000" \
      > "$RUN_DIR/06-notfound-status.txt"
 
 echo "error cases captured"
+
+# ---------- what the server serves ----------
+
+capture_home
 echo
 echo "All data captured to $RUN_DIR/. Now run: python3 render_journal.py"

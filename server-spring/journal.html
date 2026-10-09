@@ -379,6 +379,57 @@ _templates:
     </div>
   </section>
 
+  <section class="entry" id="home">
+    <div class="entry-head"><span class="entry-num">07</span><h2 class="entry-title">Saying what the server serves</h2></div>
+    <p class="entry-sub">the service index as JSON Home, and Preference-Applied on every response</p>
+    <p class="entry-narrative">Many servers start at L0. Asked for <code>application/json-home</code>, the service index lists the dialects and the <code>Prefer</code> values it honours, as standard link hints. Every bed response then says, in <code>Preference-Applied</code>, what it really is. Captured from the server started with <code>HEART_MAX_RUNG</code> at each level, each asked for L2.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H "Accept: application/json-home" http://localhost:8080/
+curl -I -H "Accept: application/hal+json" -H "Prefer: forms=link, schema=link" http://localhost:8080/beds/2</pre></div>
+    <div class="specimen"><div class="specimen-label output">output (server at L2)</div><pre>api:
+  title: &quot;Garden beds&quot;
+  links:
+    describedBy: &quot;https://github.com/jogoshugh/heart-rise/spec&quot;
+resources:
+  item:
+    hrefTemplate: /beds/{id}
+    hrefVars:
+      id: &quot;https://github.com/jogoshugh/heart-rise/vars/bed-id&quot;
+    hints:
+      allow:
+        - GET
+      formats:
+        &quot;application/prs.hal-forms+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-forms&quot;
+        &quot;application/hal+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;
+      accept-prefer:
+        - &quot;forms=link&quot;
+        - &quot;schema=link&quot;
+      precondition-req:
+        - etag
+  collection:
+    hrefTemplate: &quot;/beds{?name,id}&quot;
+    hrefVars:
+      name: &quot;https://github.com/jogoshugh/heart-rise/vars/bed-name&quot;
+      id: &quot;https://github.com/jogoshugh/heart-rise/vars/bed-id&quot;
+    hints:
+      allow:
+        - GET
+      formats:
+        &quot;application/prs.hal-forms+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-forms&quot;
+        &quot;application/hal+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>server at L2: declares <strong>forms=link, schema=link</strong>, applies <strong>forms=link, schema=link</strong>, ETag &quot;seq-3.hsf.L2&quot;; server at L1: declares <strong>forms=link</strong>, applies <strong>forms=link</strong>, ETag &quot;seq-3.hsf.L1&quot;; server at L0: declares <strong>nothing</strong>, applies <strong>nothing</strong>, ETag &quot;seq-3.hsf.L0&quot;. Each server declares exactly what it applies, and the ETag names the rung served.</p>
+    </div>
+  </section>
+
   <div class="colophon">
     <h3>Colophon</h3>
     <p>This file is generated, not hand-written. <code>capture.sh</code> resets the database and runs the real HTTP walkthrough against a live instance of <code>spring-artie-backend</code>, saving every response to <code>run/</code>. <code>render_journal.py</code> reads those files, fills this fixed narrative template with the real values, and computes each verdict banner by inspecting the actual data — a hash comparison that fails will render a fail banner here, not a stale claim of success.</p>

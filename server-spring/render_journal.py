@@ -343,12 +343,45 @@ def entry_06() -> str:
   </section>'''
 
 
+def entry_07() -> str:
+    """SPEC §6.11.1: each captured server's JSON Home hints against what it applied."""
+    expected_prefer = {"L0": [], "L1": ["forms=link"], "L2": ["forms=link", "schema=link"]}
+    rungs = [r for r in ("L2", "L1", "L0") if (RUN / f"07-home-{r}.json").exists()]
+    rows, all_ok = [], bool(rungs)
+    for rung in rungs:
+        hints = read_json(f"07-home-{rung}.json").get("resources", {}).get("item", {}).get("hints", {})
+        declared = hints.get("accept-prefer", [])
+        applied = header_value(f"07-bed2-{rung}-headers.txt", "Preference-Applied")
+        etag = header_value(f"07-bed2-{rung}-headers.txt", "ETag")
+        ok = (declared == expected_prefer[rung]
+              and applied == ", ".join(expected_prefer[rung])
+              and etag.endswith(f'.hsf.{rung}"'))
+        all_ok = all_ok and ok
+        rows.append(f"server at {rung}: declares <strong>{esc(', '.join(declared) or 'nothing')}</strong>, "
+                    f"applies <strong>{esc(applied or 'nothing')}</strong>, ETag {esc(etag)}")
+    listing = "; ".join(rows) or "no home document captured"
+    first = rungs[0] if rungs else "L2"
+    home_block = yaml_block(f"07-home-{first}.json") if rungs else ""
+    return f'''
+  <section class="entry" id="home">
+    <div class="entry-head"><span class="entry-num">07</span><h2 class="entry-title">Saying what the server serves</h2></div>
+    <p class="entry-sub">the service index as JSON Home, and Preference-Applied on every response</p>
+    <p class="entry-narrative">Many servers start at L0. Asked for <code>application/json-home</code>, the service index lists the dialects and the <code>Prefer</code> values it honours, as standard link hints. Every bed response then says, in <code>Preference-Applied</code>, what it really is. Captured from the server started with <code>HEART_MAX_RUNG</code> at each level, each asked for L2.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H "Accept: application/json-home" http://localhost:8080/
+curl -I -H "Accept: application/hal+json" -H "Prefer: forms=link, schema=link" http://localhost:8080/beds/2</pre></div>
+    <div class="specimen"><div class="specimen-label output">output (server at {first})</div><pre>{home_block}</pre></div>
+    {verdict_html(all_ok,
+        f"{listing}. Each server declares exactly what it applies, and the ETag names the rung served.",
+        f"Declared and applied rungs disagree, or nothing was captured: {listing}.")}
+  </section>'''
+
+
 CSS = Path("template_style.css").read_text() if Path("template_style.css").exists() else ""
 
 
 def main():
     entries_html = "\n".join([
-        entry_00(), entry_01(), entry_02(), entry_03(), entry_04(), entry_05(), entry_06()
+        entry_00(), entry_01(), entry_02(), entry_03(), entry_04(), entry_05(), entry_06(), entry_07()
     ])
 
     template = Path("journal_template.html").read_text()
