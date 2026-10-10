@@ -109,11 +109,12 @@ A server using this profile SHALL send `integrity` on the Layer 1 link to an
 affordance set, and `hr:integrity` on every Layer 2 schema reference. The
 digest is always the full digest, never truncated.
 
-**URIs stay opaque.** A server may name content-addressed resources by their
-hash (for example `/schemas/sha256-db7bab9848b1b240`). That is the server's
-own naming. A client SHALL NOT read a hash, or any other meaning, from a URI.
-The expected digest comes only from the integrity value in the linking
-document.
+**The client reads nothing from a URI.** A server may name content-addressed
+resources by their hash (for example `/schemas/sha256-db7bab9848b1b240`), or
+any other way. That is the server's own naming, and this profile defines no
+paths (Fielding's Rule 4: no fixed resource names). A client SHALL NOT read a
+hash, or any other meaning, from a URI. The expected digest comes only from
+the integrity value in the linking document.
 
 **Why the linking document.** Layer 1 is revalidated on every visit, so the
 client has just confirmed it is current. Each layer then vouches for the next:

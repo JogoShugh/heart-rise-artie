@@ -233,6 +233,17 @@ servers started at L2, L1 and L0 (`HEART_MAX_RUNG=L1 ./capture.sh home`
 adds one level without clearing `run/`); all 11 verdicts ok. The Fielding
 review covers discovery (Rule 6 and the scoreboard).
 
+## 2026-10-09: URI opacity is not a REST rule
+
+SPEC §6.5 no longer prescribes the `/affordance-sets/sha256-{digest}` path
+format; it is the reference server's choice, given as an example. The
+requirement is one URL per distinct body, `immutable`, never reused. The
+reason the client reads nothing from a URL is Rule 4 (no fixed names in the
+API), not opacity: Fielding says REST does not require opaque URIs and
+encourages readable ones. The W3C opacity advice stays as supporting Web
+guidance only. `/.well-known/ni` (RFC 6920) naming was considered and not
+taken: it adds a fixed name and makes the URLs unreadable.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.
