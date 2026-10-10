@@ -257,6 +257,29 @@ live, because the seed data fits on one page.
 
 Not planned. Kept so they are not re-derived.
 
+### Old exhibits (marked historical 2026-10-09)
+
+`exhibits/cache-demo/` and `scripts/test-report/` show the early-October
+design and carry a "Historical" note. They are evidence of that design,
+not of the current one. To bring them up to date, if we decide to:
+
+1. `exhibits/cache-demo/kotlin-client/GenerateFixtures.kt`: emit
+   `{"$ref": ..., "hr:integrity": "sha256-<base64>"}` schema references and
+   an `integrity` member on the Layer 1 forms link (full SHA-256, Base64,
+   over the canonical bytes). Regenerate `fixtures/`.
+2. `ArtieCacheDemo.kt`: stop reading the hash from the URL; check each
+   body against the integrity value of the link that led to it, before
+   caching, and refuse a link without one. Follow `$ref`, not `$id`.
+3. `server.py`: optionally send `Repr-Digest: sha-256=:<base64>:`. Paths
+   may stay hash-shaped; nothing may depend on them.
+4. Rerun the demo, then `scripts/test-report/build_report.py` against
+   fresh JUnit XML, the new `cache-demo.log`, a fresh `live-hash.txt`
+   (rewrite `live-hash.sh` to check integrity values, not path hashes) and
+   the current journal. Remove the Historical notes.
+
+Simpler alternative: delete both, since the journal and live suites prove
+the same things; git history keeps them.
+
 ### Real-model runs and EVAL-L6 (parked 2026-10-09)
 
 No real model is used yet. Parked:
