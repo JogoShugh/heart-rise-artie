@@ -248,6 +248,19 @@ taken: it adds a fixed name and makes the URLs unreadable.
 
 Not planned. Kept so they are not re-derived.
 
+### Real-model runs and EVAL-L6 (parked 2026-10-09)
+
+No real model is used yet. Parked:
+
+- **The L6 real-model run.** The `@llm` scenario in `reason-l6.feature`
+  puts Claude behind the Reason step; it needs `ANTHROPIC_API_KEY` and has
+  never been run. L6 stays tested with a scripted reasoner only.
+- **EVAL-L6** (`spec/EVAL-L6.md`): the evaluation across five domains and
+  renamed actions, and its open questions.
+
+Pick up by running the `@llm` scenario once, reading the transcript, then
+deciding the EVAL-L6 questions.
+
 ### RISE (set aside 2026-10-09)
 
 All RISE work (SPEC §7) is on hold until H.E.A.R.T. is finished. Nothing
