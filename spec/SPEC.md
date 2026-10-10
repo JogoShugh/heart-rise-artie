@@ -838,7 +838,7 @@ In the HAL Schema Forms dialect these are CURIEs and the representation SHALL in
 
 HAL-FORMS `_templates` keys are template names rather than link relations, so the prefix is conventional there rather than normative — but SHOULD be used identically, so that one shared source of truth (§6.2) can emit both without a naming translation layer.
 
-`[AUTHOR]` — the alternative is full URIs everywhere and no CURIE machinery. Verbose on the wire, but removes a whole class of "the prefix wasn't defined" bugs and one dialect-specific special case.
+**CURIEs stay (decided 2026-10-09).** A server MAY write a relation as a CURIE or as its full URI; a client SHALL expand CURIEs before matching, and SHALL treat a CURIE whose prefix is not declared as an unknown relation. Full URIs everywhere was considered: it removes the "prefix not defined" class of bugs, but CURIEs are ordinary HAL, generic HAL servers already emit them, and a missing prefix only hides a link rather than misleading the client.
 
 Domain-specific rel names SHALL be defined in domain profiles layered on the core vocabulary. Domain rel names SHALL NOT be added to the core vocabulary.
 
