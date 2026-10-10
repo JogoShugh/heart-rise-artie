@@ -2,12 +2,17 @@ package steps
 
 import heart.ArtieClient
 import heart.CachingTransport
+import heart.EventLog
+import heart.EventSink
+import heart.EventSinks
 import heart.IntegrityCheck
 import heart.Dialect
 import heart.HeartRepresentation
 import heart.HeartRiseClient
 import heart.HttpTransport
 import heart.Rung
+import heart.Trace
+import heart.TraceContextTransport
 import heart.Transport
 import heart.UserAgentTransport
 
@@ -31,7 +36,7 @@ class ClientContext {
     val wireLog: RecordingTransport by lazy { RecordingTransport(if (baseUrl != null) HttpTransport() else transport) }
     private val wire: Transport get() = wireLog
     val cache: CachingTransport by lazy { CachingTransport(IntegrityCheck(wire)) }
-    val client: HeartRiseClient by lazy { ArtieClient(named("first", cache), rung, dialect, allowUncheckedLinks) }
+    val client: HeartRiseClient by lazy { build("first", cache, rung, dialect) }
 
     /** When true, the second client sits behind the first client's cache, as two
      *  clients behind one shared cache do in SPEC §6.10.4's diagram. */
@@ -40,7 +45,7 @@ class ClientContext {
     /** Another client: a concurrent writer, or a neighbour behind a shared cache. */
     val second: HeartRiseClient by lazy {
         val transport = if (shareCache) cache else CachingTransport(IntegrityCheck(wire))
-        ArtieClient(named("second", transport), rung, dialect, allowUncheckedLinks)
+        build("second", transport, rung, dialect)
     }
 
     lateinit var current: HeartRepresentation
@@ -48,19 +53,32 @@ class ClientContext {
 
     /** A fresh client with its own cache, on the same wire. */
     fun newClient(dialect: Dialect, rung: Rung = Rung.L0): HeartRiseClient =
-        ArtieClient(
-            named("client-${++clients}", CachingTransport(IntegrityCheck(wire))),
-            rung, dialect, allowUncheckedLinks,
-        )
+        build("client-${++clients}", CachingTransport(IntegrityCheck(wire)), rung, dialect)
+
+    /** Where each client's event log goes: off unless ARTIE_EVENTS or ARTIE_EVENTS_URL
+     *  is set, or a scenario sets it. */
+    var eventSink: EventSink = EventSinks.fromEnvironment(System.getenv(), HttpTransport())
+
+    /** Every client built in this scenario, so each can say it is done when the scenario ends. */
+    val created = mutableListOf<HeartRiseClient>()
 
     /** Names the scenario in each client's User-Agent; LiveSteps sets it from the scenario name. */
     var scenario = "scenario"
     private var clients = 0
 
-    /** Each client names itself outermost, above its own cache, so a second
-     *  client behind a shared cache keeps its own name on the wire. */
-    private fun named(who: String, next: Transport): Transport =
-        UserAgentTransport("${UserAgentTransport.DEFAULT} ($scenario; $who)", next)
+    /**
+     * Composes a client as production would: it names itself and carries its
+     * trace context outermost, above its own cache, so a second client behind
+     * a shared cache keeps its own name and trace on the wire. Its event log
+     * shares the trace, so each event points at the request it is about.
+     */
+    private fun build(who: String, next: Transport, rung: Rung, dialect: Dialect): HeartRiseClient {
+        val agent = "${UserAgentTransport.DEFAULT} ($scenario; $who)"
+        val trace = Trace()
+        val transport = UserAgentTransport(agent, TraceContextTransport(trace, next))
+        val events = EventLog(eventSink, trace, agent)
+        return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events).also { created += it }
+    }
 
     /** How many requests the client had sent when it finished entering. */
     var requestsAfterEnter = 0

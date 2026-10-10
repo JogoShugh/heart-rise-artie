@@ -18,6 +18,7 @@ internal class SharedLayers(
     private val transport: Transport,
     /** Follow links that carry no integrity value (older servers only). */
     private val allowUncheckedLinks: Boolean,
+    private val decisions: DecisionLog,
 ) {
 
     /**
@@ -55,11 +56,19 @@ internal class SharedLayers(
      * without one is refused before any request.
      */
     fun json(url: String, integrity: String?): JsonObject {
-        if (integrity == null && !allowUncheckedLinks) {
-            throw IntegrityException("$url was linked without an integrity value; refused (HAL-SCHEMA-FORMS-HR Rule 2)")
-        }
         val accept = mapOf("Accept" to "$HAL_JSON, application/json")
-        val response = transport.send(HeartRequest("GET", url, accept, integrity = integrity))
+        val response = try {
+            if (integrity == null && !allowUncheckedLinks) {
+                throw IntegrityException(
+                    "$url was linked without an integrity value; refused (HAL-SCHEMA-FORMS-HR Rule 2)",
+                )
+            }
+            transport.send(HeartRequest("GET", url, accept, integrity = integrity))
+        } catch (refused: IntegrityException) {
+            decisions.integrityRefused(url, integrity, refused.message)
+            throw refused
+        }
+        integrity?.let { decisions.integrityChecked(url, it) }
         check(response.status in SUCCESS) { "GET $url answered ${response.status}" }
         return Json.parseToJsonElement(response.body).jsonObject
     }

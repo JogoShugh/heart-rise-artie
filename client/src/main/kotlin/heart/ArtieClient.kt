@@ -20,6 +20,8 @@ class ArtieClient(
     private val dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
     /** Follow forms links and schema references that carry no integrity value (older servers only). */
     allowUncheckedLinks: Boolean = false,
+    /** Where ARTIE reports its decisions; off by default. */
+    events: EventLog = EventLog.OFF,
 ) : HeartRiseClient {
     init {
         require(rung <= dialect.maxRung) {
@@ -27,7 +29,8 @@ class ArtieClient(
         }
     }
 
-    private val layers = SharedLayers(transport, allowUncheckedLinks)
+    private val decisions = DecisionLog(events)
+    private val layers = SharedLayers(transport, allowUncheckedLinks, decisions)
 
     override var current: HeartRepresentation? = null
         private set
@@ -66,7 +69,11 @@ class ArtieClient(
      */
     override fun act(rel: String, payload: JsonObject): HeartRepresentation {
         val held = current ?: error("enter a service before acting")
-        val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
+        val form = held.affordance(rel)
+            ?: run {
+                decisions.absent("affordance", rel, held.url)
+                error("No affordance '$rel' in current manifest")
+            }
         if (form.method != "GET") return act(rel, payload, resendAllowed = true)
         // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
         // template a target; it puts the fields in the query (mutate-action-URL).
@@ -81,9 +88,14 @@ class ArtieClient(
     override fun follow(rel: String, title: String?): HeartRepresentation {
         val held = current ?: error("enter a service before following a link")
         val link = held.links(rel).firstOrNull { it.title == title }
-            ?: error("No '$rel' link titled '$title' in ${held.url}")
+            ?: run {
+                decisions.absent("link", rel, held.url)
+                error("No '$rel' link titled '$title' in ${held.url}")
+            }
         return sync(link.href)
     }
+
+    override fun done() = decisions.done()
 
     override fun describe(rel: String): String? {
         val held = current ?: error("enter a service before describing a form")
@@ -107,30 +119,34 @@ class ArtieClient(
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
         val etag = held.etag ?: error("no ETag held for ${held.url}; an act needs If-Match")
         val target = targetOf(form, held, payload)
-        val response = transport.send(
-            HeartRequest(
-                form.method,
-                target,
-                negotiation + mapOf("Content-Type" to form.contentType, "If-Match" to etag),
-                payload.toString(),
-            ),
+        val request = HeartRequest(
+            form.method,
+            target,
+            negotiation + mapOf("Content-Type" to form.contentType, "If-Match" to etag),
+            payload.toString(),
         )
+        val response = transport.send(request)
+        decisions.actSent(rel, request, held.url, response.status)
         if (response.status in SUCCESS) return sync(target, response)
         if (response.status == PRECONDITION_REQUIRED && resendAllowed) {
             sync(held.url)
+            decisions.actRefused(rel, target, response, "re-synced and resent once")
             return act(rel, payload, resendAllowed = false)
         }
-        throw refusal(rel, response, held)
+        throw refusal(rel, target, response, held)
     }
 
     /** 412 and 409 re-sync first, so the client never keeps a manifest the server has refused. */
-    private fun refusal(rel: String, response: HeartResponse, held: HeartRepresentation): ActRefused =
-        when (response.status) {
-            PRECONDITION_FAILED -> StaleAct(rel).also { sync(held.url) }
-            CONFLICT -> IllegalTransition(rel).also { sync(held.url) }
-            UNPROCESSABLE -> InvalidPayload(rel, HeartResponseParser.violations(response))
-            else -> UnexpectedResponse(rel, response.status)
+    private fun refusal(rel: String, target: String, response: HeartResponse, held: HeartRepresentation): ActRefused {
+        val (refused, outcome) = when (response.status) {
+            PRECONDITION_FAILED -> StaleAct(rel).also { sync(held.url) } to "discarded after re-sync"
+            CONFLICT -> IllegalTransition(rel).also { sync(held.url) } to "re-synced and reported"
+            UNPROCESSABLE -> InvalidPayload(rel, HeartResponseParser.violations(response)) to "reported"
+            else -> UnexpectedResponse(rel, response.status) to "reported"
         }
+        decisions.actRefused(rel, target, response, outcome)
+        return refused
+    }
 
 
     /**
@@ -150,6 +166,8 @@ class ArtieClient(
         // SPEC §6.11.1: the rung comes from Preference-Applied, read before any
         // link is followed. At L0 (no header) there is no set, whatever the body links.
         val applied = Rung.applied(response.header("Preference-Applied"))
+        decisions.rung(url, response.header("Preference-Applied"), applied)
+        decisions.forms(url, layer1.formsLink, applied)
         val synced = layer1.formsLink?.takeIf { applied != Rung.L0 }?.let { link ->
             layer1.withManifest(layers.manifest(link, layer1.formsIntegrity))
         } ?: layer1

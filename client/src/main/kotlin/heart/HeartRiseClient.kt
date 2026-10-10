@@ -38,4 +38,7 @@ interface HeartRiseClient {
      * explanation does not name it: the client never infers a reason.
      */
     fun explain(rel: String): String?
+
+    /** Says the client has finished, in its event log, so a watcher can close what it was waiting for. */
+    fun done()
 }
