@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
+import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.Instant
@@ -189,7 +190,8 @@ class GardenBedController(
                         "these request headers select for bed $id"
                 )
                 affordance !in allowedAffordances(current.status) -> InvalidTransitionException(
-                    "$affordance is not in bed $id's current affordance set (status ${current.status})"
+                    "$affordance is not in bed $id's current affordance set (status ${current.status})",
+                    rel = affordance,
                 )
                 else -> null
             }
@@ -349,8 +351,11 @@ class GardenBedController(
         ResponseEntity.status(HttpStatus.NOT_FOUND).body(mapOf("error" to (e.message ?: "not found")))
 
     @ExceptionHandler(InvalidTransitionException::class)
-    fun handleInvalidTransition(e: InvalidTransitionException): ResponseEntity<Map<String, String>> =
-        ResponseEntity.status(HttpStatus.CONFLICT).body(mapOf("error" to (e.message ?: "invalid transition")))
+    fun handleInvalidTransition(e: InvalidTransitionException): ResponseEntity<ProblemDetail> =
+        Problems.respond(
+            HttpStatus.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
+            e.message, listOfNotNull(e.rel?.let { "rel" to it }).toMap(),
+        )
 
     @ExceptionHandler(NotAcceptableException::class)
     fun handleNotAcceptable(e: NotAcceptableException): ResponseEntity<Map<String, String>> =
@@ -358,20 +363,21 @@ class GardenBedController(
             .body(mapOf("error" to (e.message ?: "not acceptable")))
 
     @ExceptionHandler(PreconditionRequiredException::class)
-    fun handlePreconditionRequired(e: PreconditionRequiredException): ResponseEntity<Map<String, String>> =
-        ResponseEntity.status(HttpStatus.PRECONDITION_REQUIRED)
-            .body(mapOf("error" to (e.message ?: "If-Match required")))
+    fun handlePreconditionRequired(e: PreconditionRequiredException): ResponseEntity<ProblemDetail> =
+        Problems.respond(HttpStatus.PRECONDITION_REQUIRED, "precondition-required", "If-Match is required", e.message)
 
     @ExceptionHandler(UnprocessableContentException::class)
-    fun handleUnprocessable(e: UnprocessableContentException): ResponseEntity<Map<String, Any>> =
-        ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
-            .body(mapOf("error" to (e.message ?: "schema failure"), "violations" to e.violations))
+    fun handleUnprocessable(e: UnprocessableContentException): ResponseEntity<ProblemDetail> =
+        Problems.respond(
+            HttpStatus.UNPROCESSABLE_ENTITY, "invalid-input", "The body does not match the form's schema",
+            e.message, mapOf("violations" to e.violations),
+        )
 
     @ExceptionHandler(MalformedActBodyException::class)
     fun handleMalformedBody(e: MalformedActBodyException): ResponseEntity<Map<String, String>> =
         ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("error" to (e.message ?: "malformed body")))
 
     @ExceptionHandler(StaleWriteConflict::class)
-    fun handleStaleWrite(e: StaleWriteConflict): ResponseEntity<Map<String, String>> =
-        ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).body(mapOf("error" to (e.message ?: "stale write")))
+    fun handleStaleWrite(e: StaleWriteConflict): ResponseEntity<ProblemDetail> =
+        Problems.respond(HttpStatus.PRECONDITION_FAILED, "stale", "The act is stale: the state has changed", e.message)
 }

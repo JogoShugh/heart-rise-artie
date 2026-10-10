@@ -328,7 +328,31 @@ Feature: Conditional acts and the four refusals
       | POST http://garden.test/beds/2/actions/water-cell |
     And the client holds the ETag "seq-2.hsf.L0"
 
-  Scenario: 422 means the body is wrong: report the reasons, no re-sync, no retry
+  Scenario: 422 as RFC 9457 problem details: each reason is reported with its JSON Pointer
+    SPEC §6.2 (2026-10-10). Members the client does not know, such as
+    instance, are ignored.
+    Given the service answers POST "http://garden.test/beds/2/actions/water-cell" with:
+      """
+      422 Unprocessable Content
+      Content-Type: application/problem+json
+
+      type: https://github.com/jogoshugh/heart-rise/problems/invalid-input
+      title: The body does not match the form's schema
+      status: 422
+      instance: /incidents/7
+      violations:
+        - {pointer: /milliliters, message: must be at least 1}
+      """
+    When the client tries to act on "waterCell" with:
+      """yaml
+      milliliters: 0
+      """
+    Then the client raised a "InvalidPayload" refusal
+    And the client raised an error mentioning "/milliliters: must be at least 1"
+    And the client sent these requests after entering:
+      | POST http://garden.test/beds/2/actions/water-cell |
+
+  Scenario: 422 from an older server with a plain body: report the reasons, no re-sync, no retry
     Given the service answers POST "http://garden.test/beds/2/actions/water-cell" with:
       """
       422 Unprocessable Content

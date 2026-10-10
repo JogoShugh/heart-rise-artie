@@ -87,9 +87,15 @@ object HeartResponseParser {
     /** The `violations` list of a 422 body, or its `error` text, or nothing. */
     fun violations(response: HeartResponse): List<String> {
         val body = runCatching { Json.parseToJsonElement(response.body).jsonObject }.getOrNull() ?: return emptyList()
-        val listed = (body["violations"] as? JsonArray)?.map { it.jsonPrimitive.content }
+        // RFC 9457 (SPEC §6.2): each violation is {pointer, message}. An older server sent strings.
+        val listed = (body["violations"] as? JsonArray)?.map { item ->
+            (item as? JsonObject)?.let { pointerMessage(it) } ?: item.jsonPrimitive.content
+        }
         return listed ?: listOfNotNull(body["error"]?.jsonPrimitive?.content)
     }
+
+    private fun pointerMessage(violation: JsonObject): String =
+        "${violation["pointer"]?.jsonPrimitive?.content}: ${violation["message"]?.jsonPrimitive?.content}"
 
     private fun form(rel: String, obj: JsonObject, base: String): AffordanceForm {
         val target = obj[LINKS]?.jsonObject?.get("target")?.jsonObject ?: error("affordance '$rel' has no target link")

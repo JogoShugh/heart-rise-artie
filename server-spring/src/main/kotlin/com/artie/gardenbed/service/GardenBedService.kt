@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service
 import java.time.Instant
 
 class BedNotFoundException(id: Long) : RuntimeException("No garden bed with id $id")
-class InvalidTransitionException(message: String) : RuntimeException(message)
+/** 409. [rel] is the act the client tried, when the refusing check knows it. */
+class InvalidTransitionException(message: String, val rel: String? = null) : RuntimeException(message)
 
 @Service
 class GardenBedService(
