@@ -14,7 +14,7 @@
 4. **Layer 3 scope (§6.5).** Decided 2026-10-09; see below.
 5. **Template variable resolution (§6.9.1).** Superseded: decided below as declared template pointers.
 6. **RISE answers (§7.2).** *Set aside 2026-10-09: all RISE work is on hold until H.E.A.R.T. is finished (hack log).*** Proposes answers to both `[AUTHOR]` questions: RISE requires the originator's source server to reach L2, and the envelope is a body member, since every RISE request is a state-changing `POST`.
-7. **Explaining absence (§12).** Proposes a concrete mechanism: an optional, content-addressed `heart:unavailable` resource linked from Layer 2 and fetched only on demand.
+7. **Explaining absence (§12).** Decided 2026-10-10; see below and §6.12.
 8. **`cid` token name (§6.4).** Decided 2026-10-08; see below.
 
 **Decided for 0.5 by the author** (no longer proposals):
@@ -39,6 +39,14 @@
 - **Separate L1 and L2 affordance-set addresses (§6.5), and the composite profile URIs (§6.1).** Confirmed 2026-10-09. Each rendering of a set has its own immutable URL, so a cache never serves one rung's bytes to another. Clients negotiate `heart-rise/hal-schema-forms` or `heart-rise/hal-forms`; the bare `heart-rise` URI is listed as their parent and never negotiated alone.
 
 - **Opaque URIs; integrity from the linking representation (§6.5).** Decided 2026-10-08. The client no longer reads a digest from a URL path. Links carry Subresource Integrity values; `Repr-Digest` is optional.
+
+- **Layer 1 is never fresh; the client says so on every request (§6.3, §6.7).** Decided 2026-10-10. A client sends the RFC 9111 request directive `Cache-Control: no-cache` on every Layer 1 request, so every cache on the path, its own and any shared one, revalidates with the origin whatever the stored response said. Safety comes from `If-Match`; revalidation keeps the client accurate.
+
+- **Refusals are RFC 9457 problem details (§6.2).** Decided 2026-10-10. `428`, `412`, `409` and `422` carry `application/problem+json` with a `type` URI for each refusal.
+
+- **Forms are named by link relations, and describe themselves (§6.1, §6.8).** Decided 2026-10-10. A form's key is a link relation, usually a CURIE such as `garden:water`. Each form carries a `title` and a `description`, each field carries JSON Schema annotations, and the relation's URI identifies a descriptor in an ALPS profile document the client may fetch for more. HAL-FORMS at L0 keeps its template names.
+
+- **Explaining absence (§6.12).** Decided 2026-10-10. An affordance set MAY link, with `integrity`, to a resource that lists the acts absent in this state and why. The client fetches it only when asked why, and never acts on it.
 
 **Changes since 0.3:**
 
@@ -228,8 +236,8 @@ A H.E.A.R.T. response is organised into three layers. Whether those layers arriv
 | Layer | Content | Identity when separate | `Cache-Control` when separate | Revalidation |
 |---|---|---|---|---|
 | **1 — Resource** | Domain state, plus either the embedded affordance set or a link to it | Stable resource URL | `no-cache` | ETag every request; `304` if unchanged |
-| **2 — Affordance Set** | The dialect's manifest (`_forms` or `_templates`) for the current state | Content-addressed URL: `sha256-{hash}` of the bytes actually served | `public, max-age=31536000, immutable` (but see §6.9.4) | None — the URL is proof of content |
-| **3 — Schema** | Per-field definition for one affordance (JSON Schema, or a HAL-FORMS `properties` fragment) | Content-addressed URL, same scheme as Layer 2 | `public, max-age=31536000, immutable` | None |
+| **2 — Affordance Set** | The dialect's manifest (`_forms` or `_templates`) for the current state | One URL per distinct body, never reused (§6.5) | `public, max-age=31536000, immutable` (but see §6.9.4) | None — the URL names one body, and the linking `integrity` value verifies it |
+| **3 — Schema** | Per-field definition for one affordance (JSON Schema, or a HAL-FORMS `properties` fragment) | One URL per distinct body, as Layer 2 | `public, max-age=31536000, immutable` | None |
 
 `immutable` is RFC 8246. Support outside browser caches is uneven; the year-long `max-age` carries most of the benefit regardless, and the content address makes staleness meaningless by construction.
 
@@ -244,9 +252,11 @@ A H.E.A.R.T. response is organised into three layers. Whether those layers arriv
 
 A client SHALL expand a CURIE key through `curies` before comparing it, so the full URI and any prefix that expands to it are the same relation. A link under any other name is not the affordance set. The diagrams' `_links.forms` is shorthand for this relation.
 
-**Resource (Layer 1).** Domain data for the current state. SHALL be revalidated on every request (`ETag`/`If-None-Match`); this layer changes, so it is never content-addressed. It carries the affordance set either inline (L0) or by link (L1+).
+**Resource (Layer 1).** Domain data for the current state. SHALL be revalidated on every request (`ETag`/`If-None-Match`); this layer changes, so it is never content-addressed. It is never fresh, for any length of time: the state can change the moment after it was read, so no `Cache-Control` a response carries makes it safe to reuse unchecked. The client says so itself on every request (§6.3). It carries the affordance set either inline (L0) or by link (L1+).
 
 **Affordance Set (Layer 2).** The complete set of transitions currently legal on the resource, in whichever dialect was negotiated. Each affordance entry SHALL contain, at minimum: a `rel`/name, a target `href` (which MAY be a URI Template — see §6.9), an HTTP method, and either an inline schema or a schema-by-reference pointer, depending on `Prefer` (§6.4).
+
+**Forms are named by link relations (decided 2026-10-10).** In the reference dialect, a form's key in `_forms` is a link relation type (RFC 8288), usually written as a CURIE such as `garden:water` and expanded through `_links.curies` exactly as a link's key is. A client compares form names only after expansion. Each form SHOULD carry a `title` and a `description`, and each schema property SHOULD carry the JSON Schema annotations `title`, `description` and, where useful, `examples` (`spec/HAL-SCHEMA-FORMS-HR.md`, Rules 5 and 6). The relation URI SHOULD identify a descriptor in an ALPS profile document (§8.5) that says, in prose, what the act does, the state it leads to, and when it is offered. A client fetches that document only when it wants more than the inline text, and caches it as HTTP allows. It is a reference, never a manifest: presence of a descriptor there does not make an act legal. HAL-FORMS at L0 keeps its template names, which its toolchains fix.
 
 > Whether a Layer 2 body is shared across resources in the same state, or minted per resource, follows entirely from the `href` choice. §6.9 sets out both profiles and what each costs. The L3 caching proof (§6.10.4) holds only under the templated profile.
 
@@ -288,6 +298,26 @@ Notes on the changes:
 - 0.3 deprecated `428` as having no remaining trigger. Making acts conditional gives it back its RFC 6585 meaning exactly — *this server requires the request to be conditional* — which is a better outcome than deletion. §12's recommendation to remove it is withdrawn.
 - `422` is named "Unprocessable Content" in RFC 9110; 0.3's "Unprocessable Entity" is the older RFC 4918 name for the same code.
 
+**Error bodies (decided 2026-10-10).** A server SHALL send each refusal in the table above as an RFC 9457 problem details object, `application/problem+json`, with `type`, `title` and `status`. The `type` is a URI that names the refusal, so a client tells refusals apart by `type` and status, never by reading `title` or `detail`. H.E.A.R.T. defines four, under `https://github.com/jogoshugh/heart-rise/problems/`:
+
+| Status | `type` (suffix) | Extension members |
+|---|---|---|
+| `428` | `precondition-required` | none |
+| `412` | `stale` | none |
+| `409` | `not-offered` | `rel`: the relation the client acted on |
+| `422` | `invalid-input` | `violations`: an array of `{"pointer", "message"}`, each `pointer` an RFC 6901 JSON Pointer into the request body |
+
+```http
+HTTP/1.1 422 Unprocessable Content
+Content-Type: application/problem+json
+
+{"type": "https://github.com/jogoshugh/heart-rise/problems/invalid-input",
+ "title": "The body does not match the form's schema", "status": 422,
+ "violations": [{"pointer": "/milliliters", "message": "must be at least 1"}]}
+```
+
+A server MAY add other members RFC 9457 allows, such as `detail` and `instance`. A client SHALL NOT fail on a member it does not know, and SHALL still act on the status code when a body is absent or is not a problem details object.
+
 The critical distinction, and the one §6.10.5 exists to demonstrate: **412 means the world moved under a valid intent; 409 means the intent was never valid here.** A client that retries on 412 corrupts state. A client that treats 409 as transient loops forever.
 
 **Precondition scope (decided 2026-10-08).** An act is sent to an affordance target (for example `/beds/2/actions/water-cell`), not to the Layer 1 URI that issued the `ETag`. RFC 9110 evaluates `If-Match` against the *selected representation* of the target resource, and the origin server decides what that is (RFC 9110 §3.2). H.E.A.R.T. decides it this way: every affordance target belongs to exactly one *owning resource*, the Layer 1 resource whose affordance set listed it, and an act's selected representation is the owning resource's representation chosen by **the act's own** `Accept`, `Accept-Profile` and `Prefer`.
@@ -314,12 +344,13 @@ A H.E.A.R.T. compliant client SHALL:
 - Declare its rung by sending the corresponding `Prefer` tokens, or none at all (§6.4, §6.10)
 - Rely on ordinary HTTP caching for Layer 2/3 — an RFC 9111-compliant cache is sufficient, with no fingerprint-comparison logic. A client operating at L0 or L1 SHALL NOT expect the caching properties of §10.5; they are a consequence of the rung it chose not to climb
 - Expand URI Templates per RFC 6570 where a server supplies them, resolving variables from Layer 1 (§6.9.1)
-- Always revalidate Layer 1 (send `If-None-Match` once an `ETag` is held)
-- **Send `If-Match` carrying the current Layer 1 `ETag` on every state-changing transition**, and never submit an act derived from a manifest it has not revalidated in the current cycle
+- Always revalidate Layer 1: send the request directive `Cache-Control: no-cache` (RFC 9111 §5.2.1.4) on every Layer 1 request, and `If-None-Match` once an `ETag` is held, whatever `Cache-Control` the stored response carried (revised 2026-10-10). The directive binds every cache on the path, the client's own and any shared cache, so none of them may answer from storage without checking with the origin. A `304` then reuses the stored body
+- **Send `If-Match` carrying the current Layer 1 `ETag` on every state-changing transition**, and never submit an act derived from a manifest it has not revalidated in the current cycle. The cycle is the sync that produced the manifest: an act made right after that sync needs no second read, because `If-Match` makes the server refuse it (`412`) if the state moved in between. Revalidation keeps the client accurate; `If-Match` keeps the state safe
 - Reason only over affordances present in the current affordance set
 - Populate form fields within the constraints declared by the schema
 - Never construct a URI from prior knowledge — including never guessing a content-addressed URL; it must come from a Layer 1 or Layer 2 link. Note that a content address is computable by anyone who can reconstruct the bytes, so this is a conformance rule, not a security property (§6.5, §6.9.5)
-- On `409`, re-sync and re-derive intent before retrying. On `412`, re-sync and **discard the pending act**. On `428`, re-issue conditionally
+- On `409`, re-sync and re-derive intent before retrying. On `412`, re-sync and **discard the pending act**. On `428`, re-issue conditionally. Tell refusals apart by status and problem `type` (§6.2), never by reading prose
+- Compare form names, like link relations, only after expanding CURIEs (§6.1)
 
 ### 6.4 Content Negotiation
 
@@ -417,7 +448,7 @@ The sync step is the first step of every Sync-Reason-Act cycle. Its shape depend
 
 **At L1 and L2** sync is a walk. The sync step SHALL:
 
-- Fetch Layer 1 (always revalidated; expect `304` if state has not changed)
+- Fetch Layer 1 with `Cache-Control: no-cache` (always revalidated; expect `304` if state has not changed)
 - Follow Layer 1's link to Layer 2 — a normal GET, satisfied from the HTTP cache if this exact content-addressed URL was seen before, from the network otherwise
 - At L2, for each affordance needing its schema, follow the Layer 3 pointer — likewise cache-or-network, fetched in parallel since none depend on each other
 - Deduplicate by URL before fanning out — two affordances sharing one schema URL MUST NOT both trigger a network request; resolve to one in-flight fetch per unique URL
@@ -435,7 +466,7 @@ A `304` on Layer 1 proves the Layer 1 representation is unchanged, which include
 
 **Act.** Deterministic client code — not the model — resolves the target URI, expands any URI Template (§6.9.1), attaches `If-Match` from the Layer 1 `ETag`, and submits. Receive the next resource state and manifest. Restart the cycle.
 
-**Reason and Act are separated normatively.** The Reason step's entire output is a *selection*: an affordance name and a set of field values, validated against the declared schema; or a link to follow, named by its relation and title; or a question for the user. The reasoner is shown each link of the current representation by relation and title only, never its `href` (added 2026-10-09). It SHALL NOT emit a URI, a method, a header, or a precondition. Everything between the selection and the wire is deterministic. This confines inference to one step with a closed output space, and is what makes §10.3's structural-hallucination claim checkable rather than aspirational — a model that cannot express a URI cannot hallucinate one. §6.10.7 demonstrates the boundary.
+**Reason and Act are separated normatively.** The Reason step's entire output is a *selection*: an affordance name and a set of field values, validated against the declared schema; or a link to follow, named by its relation and title; or a question for the user. The reasoner is shown each link of the current representation by relation and title only, never its `href` (added 2026-10-09). It is shown each form by its relation, `title`, `description` and schema, field annotations included, and never its target or method; it MAY ask for a relation's ALPS descriptor (§6.1) or for the explanation of absent acts (§6.12), which deterministic code fetches (added 2026-10-10). It SHALL NOT emit a URI, a method, a header, or a precondition. Everything between the selection and the wire is deterministic. This confines inference to one step with a closed output space, and is what makes §10.3's structural-hallucination claim checkable rather than aspirational — a model that cannot express a URI cannot hallucinate one. §6.10.7 demonstrates the boundary.
 
 **Context window scope.** The H.E.A.R.T. constraint applies to domain knowledge, not to conversation history. The current resource state and manifest SHALL be present in the context window. Conversation history is managed by the agent framework separately.
 
@@ -762,6 +793,29 @@ A client that reads the home document SHOULD ask for the highest dialect and run
 
 > **Standards footing.** JSON Home and HTTP Link Hints are Internet-Drafts, not RFCs. JSON Home is served in production by OpenStack Keystone; it is still the published design for an API's entry document and its capability hints, and preferable to a `heart`-specific format. `/.well-known/api-catalog` (RFC 9727) could point to the index from the host name; that is parked (hack log), as are per-resource `Link: rel="alternate"` lists (connegp "list profiles"). OPTIONS was considered and rejected: its response has no defined body and is not cacheable.
 
+### 6.12 Explaining absence (added 2026-10-10)
+
+Business rules are enforced by leaving acts out of the manifest (§6.2). That prevents an illegal call, but leaves an agent nothing to say when a user asks why an act is not offered, and a model will invent a reason rather than decline. This section gives the server a place to say why.
+
+An affordance set MAY carry one link under the relation `https://github.com/jogoshugh/heart-rise/rels/unavailable` (`hr:unavailable`), with `integrity` (`spec/HAL-SCHEMA-FORMS-HR.md`, Rule 2). At L1 and L2 the link is in the affordance set's `_links`; at L0, where the set is embedded, it is in Layer 1's `_links`. Its target lists the acts absent in this state, each by its full relation URI, with a title and a short reason:
+
+```json
+{
+  "unavailable": [
+    { "rel": "https://garden.example/profiles/garden#harvest",
+      "title": "Harvest the bed",
+      "reason": "The crop is not ready: growth is below 100 points." }
+  ]
+}
+```
+
+The rules:
+
+- The resource is a function of state alone, like the affordance set, so it is shared, served `immutable` at one URL per distinct body (§6.5), and cached on the same terms (§6.9). Reasons SHALL NOT include instance identifiers, for the reasons in §6.9.4.
+- A client fetches it only when a user, or its reasoner, asks why an act is not offered, so the per-turn payload does not change. It verifies the bytes against the link's `integrity` before using them.
+- It is a reference for answering the user, not a manifest. A client SHALL NOT act on any relation it finds there.
+- A server that sends no such link has said nothing about why; the client SHALL NOT infer a reason from absence alone.
+
 ## 7. R.I.S.E. Requirements
 
 > **On hold (2026-10-09).** RISE is set aside until H.E.A.R.T. is finished. Nothing in this section is implemented, and its open questions and `[0.5]` proposals stay as written. See the hack log.
@@ -915,7 +969,7 @@ The honest summary: **tool search wins on cost, H.E.A.R.T. wins on legality, and
 
 ### 8.5 ALPS
 
-H.E.A.R.T. rel names serve a similar purpose to ALPS descriptors — a semantic vocabulary for transitions. H.E.A.R.T. does not require ALPS compliance but does not preclude it. A domain profile MAY reference an ALPS document as its vocabulary definition.
+H.E.A.R.T. rel names serve a similar purpose to ALPS descriptors — a semantic vocabulary for transitions. Since 2026-10-10 the two are joined: a form's relation URI SHOULD identify a descriptor in an ALPS profile document, for example `https://garden.example/profiles/garden#water`, whose `doc` says what the act does, the state it leads to, and when it is offered, and whose `type` (`safe`, `unsafe`, `idempotent`) agrees with the form's method (§6.1). One document describes every relation in a domain, so a client that fetches it once can cache it. ALPS describes; it never grants. Which acts are legal is still only what the current manifest offers.
 
 ### 8.6 W3C Content Negotiation by Profile
 
@@ -1072,19 +1126,13 @@ ARTIE interacts correctly with both reference domains from bookmark entry with n
 
 **Resolved or superseded in 0.4:** the `Vary: Accept` cache-key question (dissolved — content-addressed layers do not negotiate, §6.1); registry persistence (it is an ordinary HTTP cache, §6.6); separate affordance-set addresses for L1 and L2 (confirmed 2026-10-09, §6.5); the composite profile URIs `heart-rise/hal-schema-forms` and `heart-rise/hal-forms`, with the bare `heart-rise` URI as a parent never negotiated alone (confirmed 2026-10-09, §6.1); whether to adopt a multiformats/CID-style identifier for content addresses (closed 2026-10-09 — naming is the server's own, and the protocol defines no paths, §6.5); how a server declares which rungs it serves (resolved 2026-10-09 — a JSON Home representation of the service index, with `Preference-Applied` as the per-response truth, §6.11.1); the status of `428` (restored with its RFC 6585 meaning now that acts are conditional, §6.2); whether `behaviour`/`domain` should move off `Accept-Profile` (resolved — moved to `Prefer` tokens, since `Accept-Profile` has no parameter extension point under connegp, §6.4); the private `profile` media-type parameter (resolved — replaced by `Accept-Profile`/`Link: rel="profile"` per connegp, §6.1).
 
-**Recommended for closure:**
-
-- **Digest truncation.** Recommend closing as: full digest in production, truncation permitted only for closed-world demonstration servers (§6.5).
+**Closed 2026-10-10:** digest truncation (the full digest travels in each link's `integrity` value, so the length of a server's own naming no longer matters; §6.5 keeps the production rule for servers that name by digest); whether core relation names should be full URIs rather than CURIEs (decided 2026-10-09: a server MAY write either, a client expands CURIEs, §7.5); explaining absence (decided, §6.12); the error body format (RFC 9457 problem details, §6.2); form names (link relations, §6.1).
 
 **Genuinely open:**
 
 - Whether RISE requires L2 (§7.2). If it does, the ladder becomes load-bearing beyond §6 and the on-ramp story gets more complicated; if it does not, an L0 originator must inline template schemas in the envelope.
-- **Explaining absence.** Constraining the candidate set prevents the illegal call but leaves the agent with nothing to say when a user asks *why* they cannot harvest — and models confabulate rather than declining to answer. `409` covers the exercised path, not the unexercised one. Options: an optional `heart:unavailable` block carrying rel names plus human-readable reasons; a separate content-addressed "explanations" resource fetched only on demand; or explicit non-support. The tension is that the first re-inflates the payload the ladder just deflated, and it would need its own rung. `[AUTHOR]` — worth an early decision, because it affects the Layer 2 schema at every rung.
-
-  `[0.5]` **Proposed:** the second option, specified. A Layer 2 affordance set MAY carry one link, `heart:unavailable`, to a separate content-addressed resource. That resource lists rel names absent in this state, each with a short reason, for example `{"harvest": "Crop not ready; growthPoints below 100"}`. It is a function of state alone, like the affordance set, so it is shared, cacheable and immutable on the same terms (§6.9). The client fetches it only when a user asks *why*, so the per-turn payload does not change. Reasons SHALL NOT include instance identifiers, for the reasons in §6.9.4. The resource is a reference for answering the user, not a manifest: a client SHALL NOT act on any rel name it finds there.
 - Whether RISE poll mode should be defined as a profile over MCP's `io.modelcontextprotocol/tasks` extension rather than as a parallel mechanism (§7.7).
 - The RISE envelope wire binding (§7.2) — blocking for interoperability.
-- Whether core rel names should be full URIs rather than CURIEs (§7.5).
 - **Tracking connegp and PROF-IETF status (new).** Two foundations §6.1 now depends on are moving targets: connegp's §13.2 Feature at Risk covering response-side `Link: rel="profile"`, and the not-yet-submitted PROF-IETF Internet-Draft covering `Accept-Profile` itself (§8.6). Revisit this section when either publishes — a PROF-IETF submission in particular could change `Accept-Profile`'s syntax out from under §6.1's examples.
 - IANA registration path: media type(s), the `forms`/`schema`/`behaviour`/`domain` preference tokens, the core link relation types, and (pending PROF-IETF's own submission) whatever registry it establishes for profile URIs. One workstream, not several.
 - Formal rel name vocabulary governance; versioning strategy for the core media type.
@@ -1138,5 +1186,9 @@ The last row is where the ladder earns its place architecturally rather than mer
 | HAL-FORMS (Amundsen) | `application/prs.hal-forms+json`, `_templates` dialect | §6.1, §8.3 — `prs.` vanity tree |
 | draft-nottingham-json-home | `application/json-home`, the home document | §6.11.1 — Internet-Draft |
 | draft-ietf-httpapi-link-hint | Resource hints `formats`, `accept-prefer`, `precondition-req` | §6.11.1 — Internet-Draft (httpapi WG) |
+| RFC 9457 | Problem details for HTTP APIs | §6.2 — refusal bodies |
+| RFC 6901 | JSON Pointer | §6.2 (`violations`), profile Rule 1 |
+| ALPS (draft-amundsen-richardson-foster-alps) | Profile documents describing each relation | §6.1, §8.5 — Internet-Draft |
+| W3C Subresource Integrity | `integrity` on links | §6.5, §6.12 |
 
 > **Editorial note (added on import, October 2026).** The source text of 0.4 ended partway through the RFC 8941 row ("Structured Fiel…"). That row and every row after it were reconstructed from references made elsewhere in this document. They are not the author's original wording.

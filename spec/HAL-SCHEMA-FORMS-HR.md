@@ -1,6 +1,6 @@
 # HAL Schema Forms, H.E.A.R.T. profile
 
-**Status:** draft, 2026-10-08. Differences only.
+**Status:** draft, 2026-10-08; Rules 6 and 7 added 2026-10-10. Differences only.
 
 **Profile:** `https://github.com/jogoshugh/heart-rise/hal-schema-forms`
 
@@ -16,7 +16,10 @@ The additions exist for one reason. H.E.A.R.T. shares one Layer 2 affordance
 set among every resource in the same state, and caches it for a year (SPEC
 §6.9). A shared set cannot contain instance identity, and the client must be
 able to trust bytes it will keep for a year. Upstream has no way to express
-either, so this profile adds two keywords, and nothing else, for that purpose.
+either, so this profile adds two keywords for that purpose. It also names
+forms by link relation and asks them to describe themselves, so a client, or
+the reasoner behind it, knows what each act means without prior knowledge
+(Rules 6 and 7).
 
 Each addition is taken from an existing standard. Nothing here is a new
 mechanism.
@@ -27,6 +30,9 @@ mechanism.
 | `integrity`, `hr:integrity` | W3C Subresource Integrity (the `integrity` attribute) |
 | Schema by `$ref` | JSON Schema `$ref` |
 | `Repr-Digest` | RFC 9530 |
+| Form names as relations | RFC 8288 link relation types; HAL CURIEs |
+| Relation descriptions | ALPS profile documents |
+| Refusal bodies | RFC 9457 problem details |
 
 The `hr:` prefix is the HAL CURIE the server declares in `_links.curies`,
 expanding to `https://github.com/jogoshugh/heart-rise/rels/{rel}`.
@@ -158,10 +164,56 @@ Every form and every schema property SHOULD have a `title` and a
 `description`, with units where they apply. Every schema SHOULD declare
 `$schema`.
 
+## Rule 6: form names are link relations
+
+A form's key in `_forms` is a link relation type (RFC 8288), written either as
+a full URI or as a CURIE declared in `_links.curies`, exactly as a link's key
+is. A client expands a CURIE before comparing names, so `garden:water` and the
+URI it expands to are the same form.
+
+```json
+"_links": {
+  "curies": [{ "name": "garden", "href": "/profiles/garden#{rel}", "templated": true }]
+},
+"_forms": {
+  "garden:water": {
+    "title": "Water the bed",
+    "description": "Adds water to every cell. A planted bed becomes watered.",
+    "_links": { "target": { "href": "/beds/{id}/actions/water-cell", "templated": true } },
+    "hr:templatePointers": { "id": "/id" },
+    "method": "POST",
+    "contentType": "application/json",
+    "schema": { "$ref": "/schemas/sha256-…", "hr:integrity": "sha256-…" }
+  }
+}
+```
+
+A relative CURIE `href` is resolved against the representation's own URL, so
+the expanded relation is always an absolute URI. The relation URI SHOULD
+identify a descriptor in an ALPS profile document (SPEC §8.5). That document
+says in prose what the act does, the state it leads to, and when it is
+offered, and its descriptor `type` (`safe`, `unsafe`, `idempotent`) agrees
+with the form's method. A client fetches it only when it wants more than the
+inline text. It describes; it never makes an act legal.
+
+Upstream names forms with plain strings. An upstream client that compares the
+key as a plain string still works with the CURIE as written.
+
+## Rule 7: forms describe themselves
+
+For forms in an affordance set this strengthens Rule 5. Each form SHALL carry
+a `title` and SHOULD carry a `description`. Each schema property SHOULD carry
+the JSON Schema annotations `title` and `description`, and `examples` where a
+typical value helps, with units in the description where they apply.
+Annotations change no validation result.
+
+Text is part of the bytes, so it is covered by the set's or the schema's
+`integrity` value like everything else, and it is cached with them. It SHALL
+NOT include instance identifiers (SPEC §6.9.4).
+
 ## Not covered here
 
-- Form names as link relations (CURIE names for forms). Proposed, not
-  adopted.
-- The error format (`application/vnd.error+json` or the current
-  `violations` body). Open.
+- Refusal bodies are RFC 9457 problem details; the four `type` URIs and the
+  `violations` member are in SPEC §6.2.
+- Explaining absent acts (`hr:unavailable`) is in SPEC §6.12.
 - `If-Match` scope for acts. See SPEC §6.3.
