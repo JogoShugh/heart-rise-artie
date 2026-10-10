@@ -79,6 +79,62 @@ Feature: L6: the Reason step picks; deterministic code acts
     And the Claude request contains no URI from the manifest
     And the Claude reasoner selected "waterCell" with {"milliliters": 300}
 
+  Scenario: The reasoner is shown each link by relation and title, never its href, and the agent follows its choice
+    Rule 6: a transition is a choice the representation offers, and a link
+    is one. The reasoner names a link by relation and title; ARTIE follows it.
+    Given the service answers GET "http://garden.test/beds?name=border" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      count: 2
+      _links:
+        self: {href: "/beds?name=border"}
+        item:
+          - {href: /beds/1, title: North border}
+          - {href: /beds/2, title: South border}
+      """
+    And the reasoner will follow the "item" link titled "South border"
+    When the agent handles "water the south border" at "http://garden.test/beds?name=border"
+    Then the reasoner was shown the links "item: North border, item: South border" and no URI
+    And the agent followed the link to "http://garden.test/beds/2"
+    And the manifest offers exactly "waterCell"
+
+  Scenario: A link the representation does not offer is rejected before any request
+    Given the service answers GET "http://garden.test/beds?name=border" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      count: 1
+      _links:
+        item: [{href: /beds/1, title: North border}]
+      """
+    And the reasoner will follow the "item" link titled "Herb spiral"
+    When the agent handles "water the herb spiral" at "http://garden.test/beds?name=border"
+    Then the agent rejected the selection because "no item link titled Herb spiral"
+    And the client sent no request after entering
+
+  Scenario: The Claude reasoner is shown links without their hrefs, and can choose to follow one
+    Given the service answers GET "http://garden.test/beds?name=border" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      count: 2
+      _links:
+        item:
+          - {href: /beds/1, title: North border}
+          - {href: /beds/2, title: South border}
+      """
+    And the Claude API will answer with a tool call following the "item" link titled "South border"
+    When the Claude reasoner reasons about "water the south border" over the manifest of "http://garden.test/beds?name=border"
+    Then the Claude request shows the link "item" titled "South border" and no href
+    And the Claude reasoner chose to follow the "item" link titled "South border"
+
   @llm
   Scenario: A real model picks the act from the manifest
     Given the reasoner is Claude, using the ANTHROPIC_API_KEY environment variable

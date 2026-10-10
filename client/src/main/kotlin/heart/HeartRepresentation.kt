@@ -14,7 +14,8 @@ class HeartRepresentation(
     val affordances: Map<String, AffordanceForm>,
     val etag: String?,
     val forms: HeartLink? = null,
-    private val linksByRel: Map<String, List<HeartLink>> = emptyMap(),
+    /** Every link but `curies`, by the relation the server wrote. */
+    val linksByRel: Map<String, List<HeartLink>> = emptyMap(),
 ) {
     /** The Layer 2 address, if the manifest arrived by link. */
     val formsLink: String? get() = forms?.href

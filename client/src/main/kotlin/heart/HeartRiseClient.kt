@@ -20,5 +20,5 @@ interface HeartRiseClient {
     fun act(rel: String, payload: JsonObject): HeartRepresentation
 
     /** Follows the [rel] link in the current representation whose title is [title]. */
-    fun follow(rel: String, title: String): HeartRepresentation
+    fun follow(rel: String, title: String?): HeartRepresentation
 }

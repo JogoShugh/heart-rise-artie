@@ -4,6 +4,7 @@ import heart.ArtieAgent
 import heart.ClaudeReasoner
 import heart.Decision
 import heart.HeartResponse
+import heart.LinkOffer
 import heart.Offer
 import heart.Reasoner
 import heart.Selection
@@ -24,9 +25,11 @@ import kotlin.test.assertTrue
 /** A reasoner that returns a scripted selection and records what it was shown. */
 class ScriptedReasoner(private val answer: Selection) : Reasoner {
     val shown = mutableListOf<List<Offer>>()
+    val shownLinks = mutableListOf<List<LinkOffer>>()
 
-    override fun reason(intent: String, state: JsonObject, offers: List<Offer>): Selection {
+    override fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection {
         shown += offers
+        shownLinks += links
         return answer
     }
 }
@@ -40,6 +43,11 @@ class ReasonSteps(private val ctx: ClientContext) {
     @Given("the reasoner will select {string} with {}")
     fun willSelect(affordance: String, fields: String) {
         reasoner = ScriptedReasoner(Selection.Act(affordance, Json.parseToJsonElement(fields).jsonObject))
+    }
+
+    @Given("the reasoner will follow the {string} link titled {string}")
+    fun willFollow(rel: String, title: String) {
+        reasoner = ScriptedReasoner(Selection.Follow(rel, title))
     }
 
     @Given("the reasoner will ask {string}")
@@ -56,6 +64,7 @@ class ReasonSteps(private val ctx: ClientContext) {
     @When("the agent handles {string} at {string}")
     fun handle(intent: String, url: String) {
         decision = agent().handle(intent, ctx.url(url))
+        ctx.client.current?.let { ctx.current = it }
         ctx.requestsAfterEnter = ctx.transport.requests.count { it.method == "GET" }
     }
 
@@ -72,6 +81,16 @@ class ReasonSteps(private val ctx: ClientContext) {
         assertFalse(text.contains("/beds/") || text.contains("POST"), "offers leaked a URI or method: $text")
     }
 
+    @Then("the reasoner was shown the links {string} and no URI")
+    fun shownLinks(expected: String) {
+        val links = (reasoner as ScriptedReasoner).shownLinks.single()
+        assertEquals(expected, links.joinToString { "${it.rel}: ${it.title}" })
+        assertFalse(links.toString().contains("/beds"), "links leaked a URI: $links")
+    }
+
+    @Then("the agent followed the link to {string}")
+    fun followed(url: String) = assertEquals(url, assertIs<Decision.Followed>(decision).result.url)
+
     @Then("the agent acted")
     fun acted() = assertIs<Decision.Acted>(decision)
 
@@ -86,7 +105,7 @@ class ReasonSteps(private val ctx: ClientContext) {
 
     @Then("the reasoner selected {string} with milliliters {int}")
     fun selectedLive(affordance: String, milliliters: Int) {
-        val chosen = assertIs<Decision.Selected>(decision).selection
+        val chosen = assertIs<Selection.Act>(assertIs<Decision.Selected>(decision).selection)
         assertEquals(affordance, chosen.affordance)
         assertEquals(milliliters, chosen.fields["milliliters"]?.jsonPrimitive?.int)
     }
@@ -105,7 +124,8 @@ class ReasonSteps(private val ctx: ClientContext) {
     fun claudeReasons(intent: String, url: String) {
         val synced = ctx.client.enter(ctx.url(url))
         val offers = synced.affordances.values.map { Offer(it.rel, it.schema) }
-        selection = ClaudeReasoner(ctx.transport, "test-key").reason(intent, synced.state, offers)
+        val links = synced.linksByRel.flatMap { (rel, list) -> list.map { LinkOffer(rel, it.title) } }
+        selection = ClaudeReasoner(ctx.transport, "test-key").reason(intent, synced.state, offers, links)
     }
 
     @Then("the Claude request has a system prompt and one {string} tool, both marked for prompt caching")
@@ -126,6 +146,25 @@ class ReasonSteps(private val ctx: ClientContext) {
         val positions = listOf("<state>", "<offers>", "<intent>").map { text.indexOf(it) }
         assertTrue(positions.all { it >= 0 } && positions == positions.sorted(), "order $positions in: $text")
     }
+
+    @Given("the Claude API will answer with a tool call following the {string} link titled {string}")
+    fun claudeFollows(rel: String, title: String) {
+        val body = """{"id":"msg_1","type":"message","role":"assistant","content":[""" +
+            """{"type":"tool_use","id":"t1","name":"select","input":""" +
+            """{"action":"follow","rel":"$rel","title":"$title"}}],"stop_reason":"tool_use"}"""
+        ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
+    }
+
+    @Then("the Claude request shows the link {string} titled {string} and no href")
+    fun claudeShowsLink(rel: String, title: String) {
+        val raw = ctx.transport.requests.last { it.url == ClaudeReasoner.ENDPOINT }.body.orEmpty()
+        assertTrue(raw.contains(rel) && raw.contains(title), raw)
+        assertFalse(raw.contains("/beds/1") || raw.contains("/beds/2") || raw.contains("href"), raw)
+    }
+
+    @Then("the Claude reasoner chose to follow the {string} link titled {string}")
+    fun claudeFollowed(rel: String, title: String) =
+        assertEquals(Selection.Follow(rel, title), selection)
 
     @Then("the Claude request contains no URI from the manifest")
     fun claudeNoUri() {
