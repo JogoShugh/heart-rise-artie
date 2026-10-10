@@ -797,12 +797,12 @@ A client that reads the home document SHOULD ask for the highest dialect and run
 
 Business rules are enforced by leaving acts out of the manifest (§6.2). That prevents an illegal call, but leaves an agent nothing to say when a user asks why an act is not offered, and a model will invent a reason rather than decline. This section gives the server a place to say why.
 
-An affordance set MAY carry one link under the relation `https://github.com/jogoshugh/heart-rise/rels/unavailable` (`hr:unavailable`), with `integrity` (`spec/HAL-SCHEMA-FORMS-HR.md`, Rule 2). At L1 and L2 the link is in the affordance set's `_links`; at L0, where the set is embedded, it is in Layer 1's `_links`. Its target lists the acts absent in this state, each by its full relation URI, with a title and a short reason:
+An affordance set MAY carry one link under the relation `https://github.com/jogoshugh/heart-rise/rels/unavailable` (`hr:unavailable`), with `integrity` (`spec/HAL-SCHEMA-FORMS-HR.md`, Rule 2). At L1 and L2 the link is in the affordance set's `_links`; at L0, where the set is embedded, it is in Layer 1's `_links`. Its target lists the acts absent in this state, each by its relation (a URI reference, resolved against the target's own URL), with a title and a short reason:
 
 ```json
 {
   "unavailable": [
-    { "rel": "https://garden.example/profiles/garden#harvest",
+    { "rel": "/profiles/garden#harvest",
       "title": "Harvest the bed",
       "reason": "The crop is not ready: growth is below 100 points." }
   ]

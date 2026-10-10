@@ -1,5 +1,7 @@
 package com.artie.gardenbed.web
 
+import com.artie.gardenbed.domain.GardenBedStatus
+
 /**
  * The garden domain's link relations (SPEC §6.1, §8.5; HAL-SCHEMA-FORMS-HR
  * Rules 6 and 7). In HAL Schema Forms each form is keyed by a relation,
@@ -74,6 +76,29 @@ object GardenProfile {
     )
 
     fun relation(name: String): Relation = relations.getValue(name)
+
+    /** The acts a bed can offer, by logical name. */
+    val BED_ACTS: List<String> = listOf("sowSeed", "waterCell", "harvest")
+
+    /**
+     * Why an act is absent in a status (SPEC §6.12). A function of status
+     * alone: no instance identifiers, so every bed in one state shares it.
+     */
+    fun whyAbsent(status: GardenBedStatus, name: String): String =
+        when (status) {
+            GardenBedStatus.EMPTY -> when (name) {
+                "waterCell" -> "Nothing is planted yet; sow a seed first."
+                else -> "Nothing is growing yet; sow a seed and water it until it is ready."
+            }
+            GardenBedStatus.PLANTED -> when (name) {
+                "sowSeed" -> "The bed is already planted."
+                else -> "The crop is not ready yet; it needs more water to grow."
+            }
+            GardenBedStatus.READY_TO_HARVEST -> when (name) {
+                "sowSeed" -> "The bed is still full; harvest the crop first."
+                else -> "The crop is ready; it needs harvesting, not more water."
+            }
+        }
 
     /** The form's key in `_forms`: the CURIE for [name]'s relation. */
     fun key(name: String): String = "$CURIE:${relation(name).id}"

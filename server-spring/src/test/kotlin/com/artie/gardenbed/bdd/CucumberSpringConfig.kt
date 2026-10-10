@@ -7,6 +7,7 @@ import com.artie.gardenbed.web.ProfileController
 import com.artie.gardenbed.web.SchemaController
 import com.artie.gardenbed.web.ServiceIndexController
 import com.artie.gardenbed.web.ServingLimits
+import com.artie.gardenbed.web.UnavailableController
 import io.cucumber.spring.CucumberContextConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Import
         AffordanceSetController::class,
         SchemaController::class,
         ProfileController::class,
+        UnavailableController::class,
     ],
 )
 @Import(HateoasConfig::class, InMemoryGardenBedsConfig::class, HttpWorld::class, ServingLimits::class)

@@ -180,6 +180,43 @@ object JsonSchemaDialectSupport {
             )
         }
 
+    // ---------------------------------------------------------------
+    // SPEC §6.12: why the acts a state leaves out are absent. One
+    // resource per status, shared and immutable like the sets.
+    // ---------------------------------------------------------------
+
+    private const val UNAVAILABLE_REL = "hr:unavailable"
+    private val HR_CURIE: Map<String, Any> =
+        mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
+
+    private val unavailableJsonByStatus: Map<GardenBedStatus, String> =
+        GardenBedStatus.entries.associateWith { status ->
+            val absent = GardenProfile.BED_ACTS - allowedAffordances(status).toSet()
+            val body = mapOf(
+                "unavailable" to absent.map { name ->
+                    mapOf(
+                        "rel" to GardenProfile.reference(name),
+                        "title" to GardenProfile.relation(name).title,
+                        "reason" to GardenProfile.whyAbsent(status, name),
+                    )
+                },
+            )
+            String(canonicalBytes(body), Charsets.UTF_8)
+        }
+
+    /** hash (no "sha256-" prefix) -> canonical explanation JSON, for UnavailableController. */
+    val unavailableByHash: Map<String, String> =
+        unavailableJsonByStatus.values.associateBy { sha256Hex(it.toByteArray(Charsets.UTF_8)).take(16) }
+
+    private fun unavailableLink(status: GardenBedStatus): Map<String, Any> {
+        val json = unavailableJsonByStatus.getValue(status)
+        return mapOf(
+            "href" to "/unavailable/sha256-${sha256Hex(json.toByteArray(Charsets.UTF_8)).take(16)}",
+            "type" to "application/json",
+            "integrity" to integrityOf(json),
+        )
+    }
+
     /** One Layer 2 resource per (status, rendering). SPEC 0.4 §6.5: the
      *  L1 set (schemas embedded) and the L2 set (schema pointers) are
      *  different bytes, so each gets its own address. Both are always
@@ -191,9 +228,13 @@ object JsonSchemaDialectSupport {
         GardenBedStatus.entries.flatMap { status -> SetRendering.entries.map { SetKey(status, it) } }
             .associateWith { key ->
                 val embed = key.rendering == SetRendering.EMBEDDED_SCHEMAS
-                // The set declares the CURIE its form keys use (HAL-SCHEMA-FORMS-HR Rule 6).
+                // The set declares the CURIEs its keys use (HAL-SCHEMA-FORMS-HR Rule 6), and
+                // links, with integrity, to why the other acts are absent (SPEC §6.12).
                 val body = mapOf(
-                    "_links" to mapOf("curies" to GardenProfile.CURIES),
+                    "_links" to mapOf(
+                        "curies" to GardenProfile.CURIES + HR_CURIE,
+                        UNAVAILABLE_REL to unavailableLink(key.status),
+                    ),
                     "_forms" to buildForms(allowedAffordances(key.status), embed),
                 )
                 String(canonicalBytes(body), Charsets.UTF_8)
@@ -257,7 +298,12 @@ object JsonSchemaDialectSupport {
 
         val rendering = rung.setRendering
         if (rendering == null) {
-            base["_links"] = mapOf("self" to mapOf("href" to "/beds/$bedId"), "curies" to GardenProfile.CURIES)
+            base["_links"] = mapOf(
+                "self" to mapOf("href" to "/beds/$bedId"),
+                "curies" to GardenProfile.CURIES + HR_CURIE,
+                // SPEC §6.12: at L0 the set is embedded, so the link is in Layer 1.
+                UNAVAILABLE_REL to unavailableLink(state.status),
+            )
             base.putAll(resolvedFormsForBed(state.status, bedId, embedSchemas = true))
         } else {
             val hash = affordanceSetHashFor(state.status, rendering)

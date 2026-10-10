@@ -43,6 +43,31 @@ class LadderSteps(private val http: HttpWorld) {
         http.get(schema.path("\$ref").asText())
     }
 
+    /** Follows a link of the last response by its key as written, remembering its integrity. */
+    @When("the client follows the {string} link, keeping its integrity")
+    fun followLink(rel: String) {
+        val link = http.last.json.path("_links").path(rel)
+        expectedIntegrity = link.path("integrity").asText(null)
+        http.get(link.path("href").asText())
+    }
+
+    @Then("the two {string} links are the same")
+    fun sameLinks(rel: String) {
+        val (first, second) = http.exchanges.takeLast(2).map { it.json.path("_links").path(rel).path("href").asText() }
+        assertTrue(first.isNotBlank(), "no $rel link")
+        assertEquals(first, second)
+    }
+
+    @Then("the response explains {string} and {string}")
+    fun explains(first: String, second: String) {
+        val rels = http.last.json.path("unavailable").map { it.path("rel").asText() }.toSet()
+        assertEquals(setOf(first, second), rels)
+        http.last.json.path("unavailable").forEach {
+            assertTrue(it.path("reason").asText().isNotBlank(), "no reason: $it")
+            assertTrue(it.path("title").asText().isNotBlank(), "no title: $it")
+        }
+    }
+
     @When("the client follows the same affordance-set link with Prefer {string}")
     fun followSameLinkWithPrefer(prefer: String) {
         http.get(http.last.path, mapOf("Prefer" to prefer))
