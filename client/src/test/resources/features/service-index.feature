@@ -99,6 +99,48 @@ Feature: Enter at the service index and find a bed
     Then the client's last request was GET "http://garden.test/beds/2"
     And the manifest offers exactly "waterCell"
 
+  Scenario: A long result list is paged; the client follows next by its relation and builds no URI
+    The page links use the IANA relations next, prev, first and last. The
+    page parameter in their hrefs is the server's own naming.
+    Given the service answers GET "http://garden.test/beds?name=border" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      count: 3
+      _links:
+        self: {href: "/beds?name=border"}
+        first: {href: "/beds?name=border"}
+        last: {href: "/beds?name=border&page=2"}
+        next: {href: "/beds?name=border&page=2"}
+        item:
+          - {href: /beds/1, title: North border}
+          - {href: /beds/2, title: South border}
+      """
+    And the service answers GET "http://garden.test/beds?name=border&page=2" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      count: 3
+      _links:
+        self: {href: "/beds?name=border&page=2"}
+        first: {href: "/beds?name=border"}
+        last: {href: "/beds?name=border&page=2"}
+        prev: {href: "/beds?name=border"}
+        item:
+          - {href: /beds/4, title: East border}
+      """
+    When the client acts on "searchBeds" with:
+      """yaml
+      name: border
+      """
+    And the client follows the "next" link
+    Then the client's last request was GET "http://garden.test/beds?name=border&page=2"
+    And the resource links to "item" titled "East border"
+
   Scenario: Following a link the representation does not offer is refused before any request
     When the client acts on "searchBeds" with:
       """yaml

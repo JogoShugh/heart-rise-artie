@@ -52,21 +52,37 @@ class ServiceIndexController(
     suspend fun search(
         @RequestParam(required = false) name: String?,
         @RequestParam(required = false) id: Long?,
+        @RequestParam(required = false, defaultValue = "1") page: Int,
         @RequestHeader headers: HttpHeaders,
     ): ResponseEntity<Map<String, Any>> {
         val dialect = Negotiation.dialect(headers)
         val beds = service.findBeds(name, id)
-        val query = listOfNotNull(
+        val size = limits.pageSize
+        val pageNo = page.coerceAtLeast(1)
+        val lastPage = ((beds.size + size - 1) / size).coerceAtLeast(1)
+        val filters = listOfNotNull(
             name?.let { "name=${URLEncoder.encode(it, Charsets.UTF_8)}" },
             id?.let { "id=$it" },
         )
-        val self = if (query.isEmpty()) "/beds" else "/beds?" + query.joinToString("&")
+        fun href(n: Int): Map<String, String> {
+            val query = filters + listOfNotNull(if (n > 1) "page=$n" else null)
+            return mapOf("href" to if (query.isEmpty()) "/beds" else "/beds?" + query.joinToString("&"))
+        }
+        // IANA link relations (RFC 8288 registry), the paging pattern of RFC 5005.
+        // Page links appear only when the list does not fit on one page.
+        val paging = buildMap {
+            if (lastPage > 1 || pageNo > 1) {
+                put("first", href(1))
+                put("last", href(lastPage))
+            }
+            if (pageNo < lastPage) put("next", href(pageNo + 1))
+            if (pageNo > 1 && pageNo <= lastPage) put("prev", href(pageNo - 1))
+        }
+        val items = beds.drop((pageNo - 1) * size).take(size)
         val body = mapOf(
             "count" to beds.size,
-            "_links" to mapOf(
-                "self" to mapOf("href" to self),
-                "item" to beds.map { mapOf("href" to "/beds/${it.id}", "title" to it.label) },
-            ),
+            "_links" to mapOf("self" to href(pageNo)) + paging +
+                ("item" to items.map { mapOf("href" to "/beds/${it.id}", "title" to it.label) }),
         )
         return layer1(dialect).body(body)
     }

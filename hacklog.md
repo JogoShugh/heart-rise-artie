@@ -244,6 +244,15 @@ encourages readable ones. The W3C opacity advice stays as supporting Web
 guidance only. `/.well-known/ni` (RFC 6920) naming was considered and not
 taken: it adds a fixed name and makes the URLs unreadable.
 
+## 2026-10-09: paging
+
+`GET /beds` pages with the IANA relations `next`, `prev`, `first` and
+`last` (RFC 5005 pattern) in `_links`; `count` is the total. Page length is
+`HEART_PAGE_SIZE` (20). The client follows `next` by relation; it needed no
+code change, since `follow` already accepts an untitled link. Tested in
+server `paging.feature` and client `service-index.feature`; not exercised
+live, because the seed data fits on one page.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

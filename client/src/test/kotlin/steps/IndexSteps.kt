@@ -15,6 +15,12 @@ class IndexSteps(private val ctx: ClientContext) {
         ctx.current = ctx.client.follow(rel, title)
     }
 
+    /** A link with no title, such as a page link: chosen by its relation alone. */
+    @When("the client follows the {string} link")
+    fun followUntitled(rel: String) {
+        ctx.current = ctx.client.follow(rel, null)
+    }
+
     @When("the client tries to follow the {string} link titled {string}")
     fun tryFollow(rel: String, title: String) {
         requestsBeforeFollow = ctx.transport.requests.size

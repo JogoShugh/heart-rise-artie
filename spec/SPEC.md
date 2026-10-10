@@ -720,6 +720,8 @@ The index is served in both dialects, with the same form names:
 
 `GET /beds` filters by `name` (part of the label, case ignored) and `id`, and answers in the dialect negotiated. A server whose resources are reachable only by path, not by query, cannot offer a HAL-FORMS lookup; that is a constraint on server design, not on the client.
 
+**Paging (added 2026-10-09).** A collection too long for one response is split into pages linked under the IANA-registered relations `next`, `prev`, `first` and `last` (RFC 8288's registry; the paging pattern of RFC 5005), in HAL's `_links`. Page links appear only when the list does not fit on one page. Filters carry over into every page link. `count` is the number of matches across all pages. The parameter that selects a page is the server's own naming: a client follows page links by relation and SHALL NOT build them. The reference server's page length is `heart.page-size` (`HEART_PAGE_SIZE`, 20 by default).
+
 #### 6.11.1 Declaring what a server serves (added 2026-10-09)
 
 Many servers will start at L0, and some will stay there. A client should be able to learn what a server serves before it asks, and should always know what it actually received. H.E.A.R.T. invents nothing for either; it uses two existing mechanisms.

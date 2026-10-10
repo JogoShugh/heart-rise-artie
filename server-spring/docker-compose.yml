@@ -31,5 +31,6 @@ services:
       DB_PASSWORD: artie
       # SPEC §6.11.1: the highest rung served. HEART_MAX_RUNG=L0 docker compose up -d
       HEART_MAX_RUNG: ${HEART_MAX_RUNG:-L2}
+      HEART_PAGE_SIZE: ${HEART_PAGE_SIZE:-20}
     ports:
       - "8080:8080"

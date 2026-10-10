@@ -27,6 +27,8 @@ server:
 # to stand up a server that is earlier on the ladder.
 heart:
   max-rung: ${HEART_MAX_RUNG:L2}
+  # SPEC §6.11: the most items in one page of a collection.
+  page-size: ${HEART_PAGE_SIZE:20}
 
 logging:
   level:
