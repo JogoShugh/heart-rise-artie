@@ -68,7 +68,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       status: PLANTED
       _links:
         self: {href: /beds/3}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     And the client enters "http://garden.test/beds/3"
@@ -97,7 +97,9 @@ Feature: Sync at L2: walk three layers through an HTTP cache
     And the manifest offers exactly "waterCell"
 
   Scenario: Two affordances that share one schema fetch it once (an older server's $id pointer is still read)
-    Given the service serves affordance set "two-waterings" at its content address:
+    An older server sends no integrity values, so this client accepts unchecked links.
+    Given the client accepts links without integrity
+    And the service serves affordance set "two-waterings" at its content address:
       """yaml
       _forms:
         waterCell:
@@ -141,7 +143,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     And the client acts on "waterCell" with:

@@ -21,7 +21,7 @@ Feature: Which rung a response is at, and which rung to ask for
         waterCell:
           _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
           method: POST
-          schema: {$ref: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
       """
     And the service answers GET "http://garden.test/beds/2" with:
       """
@@ -34,7 +34,7 @@ Feature: Which rung a response is at, and which rung to ask for
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the current representation is at rung L2
@@ -91,7 +91,7 @@ Feature: Which rung a response is at, and which rung to ask for
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted-l1}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted-l1}", integrity: "{integrity:set:planted-l1}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the current representation is at rung L1

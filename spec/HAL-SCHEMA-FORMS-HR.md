@@ -109,6 +109,12 @@ A server using this profile SHALL send `integrity` on the Layer 1 link to an
 affordance set, and `hr:integrity` on every Layer 2 schema reference. The
 digest is always the full digest, never truncated.
 
+A client SHALL refuse, before any request, a link to an affordance set or a
+schema reference that carries no integrity value. A client MAY offer a
+setting that follows such links unchecked, for servers written before this
+rule; it is off by default, and a link that does carry a value is always
+checked.
+
 **The client reads nothing from a URI.** A server may name content-addressed
 resources by their hash (for example `/schemas/sha256-db7bab9848b1b240`), or
 any other way. That is the server's own naming, and this profile defines no

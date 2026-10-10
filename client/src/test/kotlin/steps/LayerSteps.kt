@@ -60,9 +60,14 @@ class LayerSteps(private val ctx: ClientContext) {
         bedLinks(second, set)
     }
 
-    /** A Layer 1 response at L2 whose only manifest is the link to [set]. */
+    /** A Layer 1 response at L2 whose only manifest is the link to [set], with the set's integrity. */
     @Given("bed {int} links to affordance set {string}")
-    fun bedLinks(bed: Int, set: String) = serveBed(bed, """{"href":"${ctx.expand("{set:$set}")}"}""")
+    fun bedLinks(bed: Int, set: String) = bedLinksWithIntegrity(bed, set, "{integrity:set:$set}")
+
+    @Given("the client accepts links without integrity")
+    fun acceptUnchecked() {
+        ctx.allowUncheckedLinks = true
+    }
 
     private fun serveBed(bed: Int, link: String) {
         val body = """{"id":$bed,"_links":{"self":{"href":"/beds/$bed"},""" +

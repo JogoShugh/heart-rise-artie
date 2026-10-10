@@ -23,11 +23,14 @@ class ClientContext {
     var rung: Rung = Rung.L0
     var dialect: Dialect = Dialect.HAL_SCHEMA_FORMS
 
+    /** True only for scenarios about older servers that send no integrity values. */
+    var allowUncheckedLinks = false
+
     /** Everything that reached the wire (below each client's cache), live or fake. */
     val wireLog: RecordingTransport by lazy { RecordingTransport(if (baseUrl != null) HttpTransport() else transport) }
     private val wire: Transport get() = wireLog
     val cache: CachingTransport by lazy { CachingTransport(IntegrityCheck(wire)) }
-    val client: HeartRiseClient by lazy { ArtieClient(cache, rung, dialect) }
+    val client: HeartRiseClient by lazy { ArtieClient(cache, rung, dialect, allowUncheckedLinks) }
 
     /** When true, the second client sits behind the first client's cache, as two
      *  clients behind one shared cache do in SPEC §6.10.4's diagram. */
@@ -35,7 +38,8 @@ class ClientContext {
 
     /** Another client: a concurrent writer, or a neighbour behind a shared cache. */
     val second: HeartRiseClient by lazy {
-        ArtieClient(if (shareCache) cache else CachingTransport(IntegrityCheck(wire)), rung, dialect)
+        val transport = if (shareCache) cache else CachingTransport(IntegrityCheck(wire))
+        ArtieClient(transport, rung, dialect, allowUncheckedLinks)
     }
 
     lateinit var current: HeartRepresentation
@@ -43,7 +47,7 @@ class ClientContext {
 
     /** A fresh client with its own cache, on the same wire. */
     fun newClient(dialect: Dialect, rung: Rung = Rung.L0): HeartRiseClient =
-        ArtieClient(CachingTransport(IntegrityCheck(wire)), rung, dialect)
+        ArtieClient(CachingTransport(IntegrityCheck(wire)), rung, dialect, allowUncheckedLinks)
 
     /** How many requests the client had sent when it finished entering. */
     var requestsAfterEnter = 0

@@ -18,6 +18,8 @@ class ArtieClient(
     private val transport: Transport,
     private val rung: Rung = Rung.L0,
     private val dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
+    /** Follow forms links and schema references that carry no integrity value (older servers only). */
+    private val allowUncheckedLinks: Boolean = false,
 ) : HeartRiseClient {
     init {
         require(rung <= dialect.maxRung) {
@@ -156,7 +158,15 @@ class ArtieClient(
         }
     }
 
+    /**
+     * Fetches a shared layer. Its link must carry an integrity value
+     * (HAL-SCHEMA-FORMS-HR Rule 2) unless [allowUncheckedLinks] is set for an
+     * older server; a link without one is refused before any request.
+     */
     private fun fetchJson(url: String, integrity: String?): JsonObject {
+        if (integrity == null && !allowUncheckedLinks) {
+            throw IntegrityException("$url was linked without an integrity value; refused (HAL-SCHEMA-FORMS-HR Rule 2)")
+        }
         val accept = mapOf("Accept" to "$HAL_JSON, application/json")
         val response = transport.send(HeartRequest("GET", url, accept, integrity = integrity))
         check(response.status in SUCCESS) { "GET $url answered ${response.status}" }

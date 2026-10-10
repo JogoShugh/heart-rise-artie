@@ -183,9 +183,9 @@ Still open:
 - **Not regenerated:** `exhibits/cache-demo/` (its own fixtures and server)
   and `scripts/test-report/` still show the old link shape. Both are
   historical exhibits; regenerate if they are shown publicly.
-- **Integrity on old links:** a link with no `integrity` is still followed,
-  unchecked except by `Repr-Digest`. The fork says a server SHALL send it;
-  the client could refuse links without it once every server does.
+- **Integrity on old links:** done 2026-10-09. A link with no integrity is
+  refused before any request; `ArtieClient(allowUncheckedLinks = true)`
+  follows such links for older servers.
 - **Later fork rules:** form names as link relations; error format
   (`vnd.error` or `violations`); the entry point.
 - **EVAL-L6**, the L6 real-model run, and RISE are unchanged from above.

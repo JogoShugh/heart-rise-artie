@@ -18,7 +18,7 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
         waterCell:
           _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
           method: POST
-          schema: {$id: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
       """
     And the client works at rung L2
 
@@ -33,7 +33,7 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
       id: 2
       _links:
         curies: [{name: <prefix>, href: "https://github.com/jogoshugh/heart-rise/rels/{rel}", templated: true}]
-        <rel>: {href: "{set:planted}"}
+        <rel>: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the manifest offers exactly "waterCell"
@@ -54,7 +54,7 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
 
       id: 2
       _links:
-        <rel>: {href: "{set:planted}"}
+        <rel>: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the client's current manifest is empty

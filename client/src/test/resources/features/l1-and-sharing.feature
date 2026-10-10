@@ -36,7 +36,7 @@ Feature: L1, and the L3 sharing property seen from the client
 
       id: 2
       _links:
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted-l1}"}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted-l1}", integrity: "{integrity:set:planted-l1}"}
       """
     And the client works at rung L1
     When the client enters "http://garden.test/beds/2"
@@ -54,7 +54,7 @@ Feature: L1, and the L3 sharing property seen from the client
         waterCell:
           _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
           method: POST
-          schema: {$id: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
       """
     And bed 2 and bed 3 both link to affordance set "planted"
     And the client works at rung L2
@@ -74,7 +74,7 @@ Feature: L1, and the L3 sharing property seen from the client
         waterCell:
           _links: {target: {href: /beds/2/actions/water-cell}}
           method: POST
-          schema: {$id: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
       """
     And the service serves affordance set "bed-3-only" at its content address:
       """yaml
@@ -82,7 +82,7 @@ Feature: L1, and the L3 sharing property seen from the client
         waterCell:
           _links: {target: {href: /beds/3/actions/water-cell}}
           method: POST
-          schema: {$id: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
       """
     And bed 2 links to affordance set "bed-2-only"
     And bed 3 links to affordance set "bed-3-only"
