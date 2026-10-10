@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import heart.Rung
 import io.cucumber.java.Before
+import io.cucumber.java.Scenario
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -15,9 +16,11 @@ import kotlin.test.assertNotNull
 /** Switches @live scenarios to real HTTP, and drives the second client. */
 class LiveSteps(private val ctx: ClientContext) {
 
+    /** Also names the scenario in each client's User-Agent, so a filter such as Buster tells runs apart. */
     @Before("@live")
-    fun useLiveServer() {
+    fun useLiveServer(scenario: Scenario) {
         ctx.baseUrl = System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080"
+        ctx.scenario = scenario.name.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
     }
 
     @Then("the client asked for the rung the server serves when it entered {string}")

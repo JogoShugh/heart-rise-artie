@@ -9,6 +9,7 @@ import heart.HeartRiseClient
 import heart.HttpTransport
 import heart.Rung
 import heart.Transport
+import heart.UserAgentTransport
 
 /**
  * Per-scenario state. Scenarios talk to FakeTransport unless tagged @live,
@@ -30,7 +31,7 @@ class ClientContext {
     val wireLog: RecordingTransport by lazy { RecordingTransport(if (baseUrl != null) HttpTransport() else transport) }
     private val wire: Transport get() = wireLog
     val cache: CachingTransport by lazy { CachingTransport(IntegrityCheck(wire)) }
-    val client: HeartRiseClient by lazy { ArtieClient(cache, rung, dialect, allowUncheckedLinks) }
+    val client: HeartRiseClient by lazy { ArtieClient(named("first", cache), rung, dialect, allowUncheckedLinks) }
 
     /** When true, the second client sits behind the first client's cache, as two
      *  clients behind one shared cache do in SPEC §6.10.4's diagram. */
@@ -39,7 +40,7 @@ class ClientContext {
     /** Another client: a concurrent writer, or a neighbour behind a shared cache. */
     val second: HeartRiseClient by lazy {
         val transport = if (shareCache) cache else CachingTransport(IntegrityCheck(wire))
-        ArtieClient(transport, rung, dialect, allowUncheckedLinks)
+        ArtieClient(named("second", transport), rung, dialect, allowUncheckedLinks)
     }
 
     lateinit var current: HeartRepresentation
@@ -47,7 +48,19 @@ class ClientContext {
 
     /** A fresh client with its own cache, on the same wire. */
     fun newClient(dialect: Dialect, rung: Rung = Rung.L0): HeartRiseClient =
-        ArtieClient(CachingTransport(IntegrityCheck(wire)), rung, dialect, allowUncheckedLinks)
+        ArtieClient(
+            named("client-${++clients}", CachingTransport(IntegrityCheck(wire))),
+            rung, dialect, allowUncheckedLinks,
+        )
+
+    /** Names the scenario in each client's User-Agent; LiveSteps sets it from the scenario name. */
+    var scenario = "scenario"
+    private var clients = 0
+
+    /** Each client names itself outermost, above its own cache, so a second
+     *  client behind a shared cache keeps its own name on the wire. */
+    private fun named(who: String, next: Transport): Transport =
+        UserAgentTransport("${UserAgentTransport.DEFAULT} ($scenario; $who)", next)
 
     /** How many requests the client had sent when it finished entering. */
     var requestsAfterEnter = 0
