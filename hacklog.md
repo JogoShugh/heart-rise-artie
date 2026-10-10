@@ -248,6 +248,23 @@ taken: it adds a fixed name and makes the URLs unreadable.
 
 Not planned. Kept so they are not re-derived.
 
+### RISE (set aside 2026-10-09)
+
+All RISE work (SPEC §7) is on hold until H.E.A.R.T. is finished. Nothing
+is built. Open questions, each with the editor's proposal in the spec:
+
+- **Does RISE require L2?** Proposed (§7.2): yes, scoped to the server
+  that issued the template affordance, not to how the originator synced.
+- **Envelope wire binding.** Proposed (§7.2): a top-level `_rise` body
+  member, since every RISE request is a state-changing POST with If-Match.
+- **Poll mode:** a profile over MCP's `io.modelcontextprotocol/tasks`
+  extension, or its own mechanism (§7.7).
+- **Multi-party:** whether `heart:agent` plus the agent directory suffices.
+- **Rel name vocabulary** governance (§7.5).
+
+Pick up by deciding the first two, then a feature for one push-mode round
+trip between two ARTIE instances.
+
 ### HAL-FORMS beyond L0 (parked 2026-10-08)
 
 Decision: HAL-FORMS stays the L0 on-ramp (SPEC "Decided for 0.5"). Two

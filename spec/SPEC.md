@@ -13,7 +13,7 @@
 3. **Evaluation order (§6.2).** Decided 2026-10-09; see below.
 4. **Layer 3 scope (§6.5).** Decided 2026-10-09; see below.
 5. **Template variable resolution (§6.9.1).** Superseded: decided below as declared template pointers.
-6. **RISE answers (§7.2).** Proposes answers to both `[AUTHOR]` questions: RISE requires the originator's source server to reach L2, and the envelope is a body member, since every RISE request is a state-changing `POST`.
+6. **RISE answers (§7.2).** *Set aside 2026-10-09: all RISE work is on hold until H.E.A.R.T. is finished (hack log).*** Proposes answers to both `[AUTHOR]` questions: RISE requires the originator's source server to reach L2, and the envelope is a body member, since every RISE request is a state-changing `POST`.
 7. **Explaining absence (§12).** Proposes a concrete mechanism: an optional, content-addressed `heart:unavailable` resource linked from Layer 2 and fetched only on demand.
 8. **`cid` token name (§6.4).** Decided 2026-10-08; see below.
 
@@ -761,6 +761,8 @@ A client that reads the home document SHOULD ask for the highest dialect and run
 > **Standards footing.** JSON Home and HTTP Link Hints are Internet-Drafts, not RFCs. JSON Home is served in production by OpenStack Keystone; it is still the published design for an API's entry document and its capability hints, and preferable to a `heart`-specific format. `/.well-known/api-catalog` (RFC 9727) could point to the index from the host name; that is parked (hack log), as are per-resource `Link: rel="alternate"` lists (connegp "list profiles"). OPTIONS was considered and rejected: its response has no defined body and is not cacheable.
 
 ## 7. R.I.S.E. Requirements
+
+> **On hold (2026-10-09).** RISE is set aside until H.E.A.R.T. is finished. Nothing in this section is implemented, and its open questions and `[0.5]` proposals stay as written. See the hack log.
 
 R.I.S.E. is a specialisation of H.E.A.R.T. for asynchronous reciprocal interaction. It is not a separate protocol. It extends the H.E.A.R.T. media type with a standard vocabulary of async rel names.
 
