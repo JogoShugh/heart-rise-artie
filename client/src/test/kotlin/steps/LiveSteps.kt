@@ -23,6 +23,16 @@ class LiveSteps(private val ctx: ClientContext) {
         ctx.scenario = scenario.name.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
     }
 
+    /** Runs ARTIE_RESET (server-spring/reset-db.sh by default, set by the liveTest task). */
+    @Given("the beds are at their seed state")
+    fun seedState() {
+        val reset = System.getenv("ARTIE_RESET")
+        check(!reset.isNullOrBlank()) { "ARTIE_RESET names no reset command" }
+        val process = ProcessBuilder(reset).redirectErrorStream(true).start()
+        val output = process.inputStream.bufferedReader().readText()
+        check(process.waitFor() == 0) { "$reset failed: $output" }
+    }
+
     @Then("the client asked for the rung the server serves when it entered {string}")
     fun askedForServedRung(url: String) {
         val entered = ctx.wireLog.exchanges.map { it.first }.last { it.method == "GET" && it.url == ctx.url(url) }

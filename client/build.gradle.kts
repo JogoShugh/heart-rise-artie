@@ -100,6 +100,8 @@ val liveTest by tasks.registering(Test::class) {
     systemProperty("cucumber.filter.tags", if (servedRung == "L2") "@live" else "@live and not @needs-L2")
     environment("ARTIE_BASE_URL", System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080")
     environment("HEART_MAX_RUNG", servedRung)
+    // Each @live scenario starts from the seed data (live-server.feature, Background).
+    environment("ARTIE_RESET", System.getenv("ARTIE_RESET") ?: file("../server-spring/reset-db.sh").absolutePath)
     // ARTIE's event log (hack log, 2026-10-10): a JSON Lines file, a URL to POST to, or both.
     listOf("ARTIE_EVENTS", "ARTIE_EVENTS_URL").forEach { name -> System.getenv(name)?.let { environment(name, it) } }
     outputs.upToDateWhen { false }

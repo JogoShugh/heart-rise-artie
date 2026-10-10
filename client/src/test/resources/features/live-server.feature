@@ -6,8 +6,13 @@ Feature: ARTIE against the real server
   Seed data: bed 1 EMPTY, bed 2 PLANTED, bed 3 READY_TO_HARVEST, bed 4
   PLANTED (read only, so beds 2 and 4 share a state).
   Assertions avoid exact ETag values, and every scenario leaves its bed in
-  the state it found it (1 ml adds no growth), so the suite can run again
-  without a reset.
+  the state it found it (1 ml adds no growth). Each scenario still starts
+  from the seed data: under Buster a mutated scenario can stop halfway, and
+  the next scenario must not inherit a half-grown bed, or its requests stop
+  matching the dry run its mutations were planned from.
+
+  Background:
+    Given the beds are at their seed state
 
   Scenario Outline: Bed 1 through a full cycle at rung <rung>: sow, water, harvest
     Given the client works at rung <rung>
