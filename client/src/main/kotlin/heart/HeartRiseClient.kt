@@ -29,4 +29,13 @@ interface HeartRiseClient {
      * makes an act legal.
      */
     fun describe(rel: String): String?
+
+    /**
+     * Why the act [rel] is not offered (SPEC §6.12), from the explanation the
+     * manifest links to, checked against the link's integrity. [rel] is a
+     * CURIE the manifest declares, or a relation URI. Null when the act is
+     * offered, when the manifest links no explanation, or when the
+     * explanation does not name it: the client never infers a reason.
+     */
+    fun explain(rel: String): String?
 }

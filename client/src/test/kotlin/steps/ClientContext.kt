@@ -84,6 +84,6 @@ class ClientContext {
         else pathOrUrl
 
     private companion object {
-        val ADDRESS = Regex("""\{((?:integrity:)?(?:set|schema):[^}]+)}""")
+        val ADDRESS = Regex("""\{((?:integrity:)?(?:set|schema|unavailable):[^}]+)}""")
     }
 }

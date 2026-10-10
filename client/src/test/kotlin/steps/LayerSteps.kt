@@ -33,6 +33,9 @@ class LayerSteps(private val ctx: ClientContext) {
     @Given("the service serves schema {string} at its content address:")
     fun servesSchema(name: String, yaml: String) = serveAddressed("schema", "/schemas", name, yaml)
 
+    @Given("the service serves explanation {string} at its content address:")
+    fun servesExplanation(name: String, yaml: String) = serveAddressed("unavailable", "/unavailable", name, yaml)
+
     @Given("the service serves affordance set {string} at its content address:")
     fun servesSet(name: String, yaml: String) = serveAddressed("set", "/affordance-sets", name, yaml)
 

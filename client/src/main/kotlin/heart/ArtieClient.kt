@@ -19,13 +19,15 @@ class ArtieClient(
     private val rung: Rung = Rung.L0,
     private val dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
     /** Follow forms links and schema references that carry no integrity value (older servers only). */
-    private val allowUncheckedLinks: Boolean = false,
+    allowUncheckedLinks: Boolean = false,
 ) : HeartRiseClient {
     init {
         require(rung <= dialect.maxRung) {
             "$dialect is served at ${dialect.maxRung} only (SPEC §6.1); rung $rung is not available in it"
         }
     }
+
+    private val layers = SharedLayers(transport, allowUncheckedLinks)
 
     override var current: HeartRepresentation? = null
         private set
@@ -89,6 +91,12 @@ class ArtieClient(
         return Alps.describe(transport, form.relation)
     }
 
+    override fun explain(rel: String): String? {
+        val held = current ?: error("enter a service before asking why an act is absent")
+        if (held.affordance(rel) != null) return null
+        return held.manifest.unavailable?.let { layers.reason(it, held.manifest.relationOf(rel)) }
+    }
+
     /**
      * One act and its refusal handling (SPEC §6.3). 428 is the only refusal
      * that resends, and only once: the client always sends If-Match, so a
@@ -143,40 +151,10 @@ class ArtieClient(
         // link is followed. At L0 (no header) there is no set, whatever the body links.
         val applied = Rung.applied(response.header("Preference-Applied"))
         val synced = layer1.formsLink?.takeIf { applied != Rung.L0 }?.let { link ->
-            layer1.withAffordances(fetchSet(link, layer1.formsIntegrity))
+            layer1.withManifest(layers.manifest(link, layer1.formsIntegrity))
         } ?: layer1
         appliedRung = applied
         return synced.also { current = it }
-    }
-
-    private fun fetchSet(link: String, integrity: String?): Map<String, AffordanceForm> {
-        val forms = HeartResponseParser.forms(fetchJson(link, integrity), link)
-        val schemas = mutableMapOf<String, JsonObject>()
-        return forms.mapValues { (_, form) ->
-            val pointer = schemaPointer(form.schema)
-            if (pointer == null) {
-                form
-            } else {
-                val schemaUrl = URI(link).resolve(pointer).toString()
-                val pin = form.schema[SCHEMA_INTEGRITY]?.jsonPrimitive?.content
-                form.copy(schema = schemas.getOrPut(schemaUrl) { fetchJson(schemaUrl, pin) })
-            }
-        }
-    }
-
-    /**
-     * Fetches a shared layer. Its link must carry an integrity value
-     * (HAL-SCHEMA-FORMS-HR Rule 2) unless [allowUncheckedLinks] is set for an
-     * older server; a link without one is refused before any request.
-     */
-    private fun fetchJson(url: String, integrity: String?): JsonObject {
-        if (integrity == null && !allowUncheckedLinks) {
-            throw IntegrityException("$url was linked without an integrity value; refused (HAL-SCHEMA-FORMS-HR Rule 2)")
-        }
-        val accept = mapOf("Accept" to "$HAL_JSON, application/json")
-        val response = transport.send(HeartRequest("GET", url, accept, integrity = integrity))
-        check(response.status in SUCCESS) { "GET $url answered ${response.status}" }
-        return Json.parseToJsonElement(response.body).jsonObject
     }
 
     private companion object {
@@ -188,15 +166,7 @@ class ArtieClient(
             return URI(held.url).resolve(expanded).toString()
         }
 
-        /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3), or an older server's lone `$id`. */
-        fun schemaPointer(schema: JsonObject): String? =
-            schema[SCHEMA_REF]?.jsonPrimitive?.content
-                ?: schema.takeIf { it.keys == setOf(SCHEMA_ID) }?.get(SCHEMA_ID)?.jsonPrimitive?.content
-
         val SUCCESS = 200..299
-        const val SCHEMA_ID = "\$id"
-        const val SCHEMA_REF = "\$ref"
-        const val SCHEMA_INTEGRITY = "hr:integrity"
         const val CONFLICT = 409
         const val PRECONDITION_FAILED = 412
         const val UNPROCESSABLE = 422

@@ -122,6 +122,7 @@ class ClaudeReasoner(
             "clarify" -> Selection.Clarify(text("question") ?: "Could you say more?")
             "follow" -> Selection.Follow(rel = text("rel").orEmpty(), title = text("title"))
             "describe" -> Selection.Describe(text("affordance").orEmpty())
+            "explain" -> Selection.Explain(text("affordance").orEmpty())
             else -> Selection.Act(
                 affordance = text("affordance").orEmpty(),
                 fields = input["fields"] as? JsonObject ?: JsonObject(emptyMap()),
@@ -136,6 +137,7 @@ class ClaudeReasoner(
         private const val TOOL_NAME = "select"
         private const val MAX_TOKENS = 1024
         private const val ERROR_EXCERPT = 300
+        private val ACTIONS = listOf("act", "describe", "explain", "follow", "clarify")
         private val SUCCESS = 200..299
 
         private val SYSTEM = """
@@ -147,6 +149,9 @@ class ClaudeReasoner(
             Call the select tool exactly once.
             - If you need to know more about what an offered action does before choosing, answer
               action "describe" with that action's exact name. You will be asked again with its detail.
+            - If the user asks why they cannot do something that is not in <offers>, answer action
+              "explain" with the name it would have, in the same form as the offered names
+              (for example "garden:harvest"). The server's own reason is then given to the user.
             - If one offered action clearly matches the intent, and the intent gives every required
               field, answer action "act" with that action's exact name and field values that satisfy
               its schema.
@@ -169,7 +174,7 @@ class ClaudeReasoner(
                 putJsonObject("properties") {
                     putJsonObject("action") {
                         put("type", "string")
-                        put("enum", JsonArray(listOf("act", "describe", "follow", "clarify").map(::jsonString)))
+                        put("enum", JsonArray(ACTIONS.map(::jsonString)))
                     }
                     putJsonObject("affordance") { put("type", "string") }
                     putJsonObject("fields") { put("type", "object") }

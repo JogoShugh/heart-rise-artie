@@ -30,6 +30,9 @@ sealed interface Selection {
 
     /** Ask for an offered form's ALPS descriptor before choosing (SPEC §6.8). Deterministic code fetches it. */
     data class Describe(val affordance: String) : Selection
+
+    /** Ask why an act is not offered (SPEC §6.12). ARTIE answers from the server's explanation; nothing is sent. */
+    data class Explain(val affordance: String) : Selection
     data class Clarify(val question: String) : Selection
 }
 

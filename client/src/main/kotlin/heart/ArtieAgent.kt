@@ -11,6 +11,9 @@ sealed interface Decision {
     /** The selection named an offered link, and ARTIE followed it. */
     data class Followed(val selection: Selection.Follow, val result: HeartRepresentation) : Decision
 
+    /** The reasoner asked why an act is absent; [reason] is the server's, or null if it gave none. No act was sent. */
+    data class Explained(val selection: Selection.Explain, val reason: String?) : Decision
+
     /** The reasoner asked the user a question instead of guessing. Nothing was sent. */
     data class Asked(val question: String) : Decision
 
@@ -51,6 +54,7 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
 
     private fun checked(selection: Selection, synced: HeartRepresentation): Decision = when (selection) {
         is Selection.Clarify -> Decision.Asked(selection.question)
+        is Selection.Explain -> Decision.Explained(selection, client.explain(selection.affordance))
         is Selection.Act -> check(selection, synced)
         is Selection.Follow -> check(selection, synced)
         is Selection.Describe -> describeRejected(selection, synced)

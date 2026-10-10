@@ -11,12 +11,15 @@ import kotlinx.serialization.json.JsonObject
 class HeartRepresentation(
     val url: String,
     val state: JsonObject,
-    val affordances: Map<String, AffordanceForm>,
+    /** The acts legal now, with the manifest document's explanation link and CURIEs. */
+    val manifest: Manifest,
     val etag: String?,
     val forms: HeartLink? = null,
     /** Every link but `curies`, by the relation the server wrote. */
     val linksByRel: Map<String, List<HeartLink>> = emptyMap(),
 ) {
+    val affordances: Map<String, AffordanceForm> get() = manifest.forms
+
     /** The Layer 2 address, if the manifest arrived by link. */
     val formsLink: String? get() = forms?.href
 
@@ -32,8 +35,9 @@ class HeartRepresentation(
     /** The links under [rel], as the server named it (a CURIE is matched as written). */
     fun links(rel: String): List<HeartLink> = linksByRel[rel].orEmpty()
 
-    fun withAffordances(resolved: Map<String, AffordanceForm>): HeartRepresentation =
-        HeartRepresentation(url, state, resolved, etag, forms, linksByRel)
+    /** This representation with the manifest that came by link (L1, L2). */
+    fun withManifest(fetched: Manifest): HeartRepresentation =
+        HeartRepresentation(url, state, fetched, etag, forms, linksByRel)
 }
 
 /**

@@ -20,6 +20,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 /** A reasoner that returns scripted selections in turn (the last repeats) and records what it was shown. */
@@ -56,6 +57,11 @@ class ReasonSteps(private val ctx: ClientContext) {
             Selection.Describe(described),
             Selection.Act(affordance, Json.parseToJsonElement(fields).jsonObject),
         )
+    }
+
+    @Given("the reasoner will ask why {string} is not offered")
+    fun willAskWhy(affordance: String) {
+        reasoner = ScriptedReasoner(Selection.Explain(affordance))
     }
 
     @Given("the reasoner will ask {string}")
@@ -119,6 +125,20 @@ class ReasonSteps(private val ctx: ClientContext) {
     fun rejected(reason: String) {
         val rejected = assertIs<Decision.Rejected>(decision)
         assertTrue(rejected.reasons.any { it.contains(reason) }, "reasons: ${rejected.reasons}")
+    }
+
+    @Then("the agent explained {string} as {string}")
+    fun explained(affordance: String, reason: String) {
+        val explained = assertIs<Decision.Explained>(decision)
+        assertEquals(affordance, explained.selection.affordance)
+        assertEquals(reason, explained.reason)
+    }
+
+    @Then("the agent explained {string} with no reason")
+    fun explainedWithoutReason(affordance: String) {
+        val explained = assertIs<Decision.Explained>(decision)
+        assertEquals(affordance, explained.selection.affordance)
+        assertNull(explained.reason)
     }
 
     @Then("the agent asked {string}")
@@ -189,6 +209,17 @@ class ReasonSteps(private val ctx: ClientContext) {
         val raw = ctx.transport.requests.last { it.url == ClaudeReasoner.ENDPOINT }.body.orEmpty()
         assertTrue(raw.contains(first) && raw.contains(second), raw)
     }
+
+    @Given("the Claude API will answer with a tool call explaining {string}")
+    fun claudeExplains(affordance: String) {
+        val body = """{"id":"msg_1","type":"message","role":"assistant","content":[""" +
+            """{"type":"tool_use","id":"t1","name":"select","input":""" +
+            """{"action":"explain","affordance":"$affordance"}}],"stop_reason":"tool_use"}"""
+        ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
+    }
+
+    @Then("the Claude reasoner chose to explain {string}")
+    fun claudeExplained(affordance: String) = assertEquals(Selection.Explain(affordance), selection)
 
     @Then("the Claude reasoner chose to describe {string}")
     fun claudeDescribed(affordance: String) = assertEquals(Selection.Describe(affordance), selection)

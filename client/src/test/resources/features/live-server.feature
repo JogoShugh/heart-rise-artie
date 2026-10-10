@@ -182,6 +182,18 @@ Feature: ARTIE against the real server
     Then the current representation is at the rung the server serves
     And the manifest offers exactly "garden:water-cell"
 
+  Scenario Outline: The server explains why an act is not offered, at rung <rung>
+    SPEC §6.12. Whatever state bed 2 is in, sowing is not offered (the
+    seed data plants it, and no scenario harvests it), and the server says why.
+    Given the client works at rung <rung>
+    When the client enters "/beds/2"
+    Then the client has an explanation for "garden:sow-seed"
+
+    Examples:
+      | rung |
+      | L0   |
+      | L2   |
+
   Scenario: From the bookmark alone in HAL-FORMS: look a bed up by its id through the query
     Given the client works in dialect hal-forms
     When the client enters "/"

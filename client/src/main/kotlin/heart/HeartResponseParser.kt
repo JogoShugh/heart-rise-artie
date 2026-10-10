@@ -32,12 +32,23 @@ object HeartResponseParser {
         return HeartRepresentation(
             url = self?.let { URI(url).resolve(it).toString() } ?: url,
             state = JsonObject(root.filterKeys { it !in setOf(FORMS, LINKS, HalFormsTemplates.TEMPLATES) }),
-            affordances = if (dialect == Dialect.HAL_FORMS) HalFormsTemplates.forms(root, url) else forms(root, url),
+            manifest = if (dialect == Dialect.HAL_FORMS) {
+                Manifest(HalFormsTemplates.forms(root, url), base = url)
+            } else {
+                manifest(root, url)
+            },
             etag = response.header("ETag"),
-            forms = formsLinkObject(root)?.let { link(it, url) },
+            forms = linkObject(root, FORMS_REL)?.let { link(it, url) },
             linksByRel = links(root, url),
         )
     }
+
+    /**
+     * The manifest a document carries: its `_forms`, its explanation link
+     * (SPEC §6.12) and its CURIEs. Layer 1 at L0; the affordance set at L1, L2.
+     */
+    fun manifest(root: JsonObject, base: String): Manifest =
+        Manifest(forms(root, base), linkObject(root, UNAVAILABLE_REL)?.let { link(it, base) }, Curies.of(root), base)
 
     /** Every link but `curies`, by the rel the server wrote. A rel with one link or an array of them. */
     private fun links(root: JsonObject, base: String): Map<String, List<HeartLink>> =
@@ -66,11 +77,11 @@ object HeartResponseParser {
         }
     }
 
-    /** The link object whose rel, after CURIE expansion, is FORMS_REL. */
-    private fun formsLinkObject(root: JsonObject): JsonObject? {
+    /** The link object whose rel, after CURIE expansion, is [rel]. */
+    private fun linkObject(root: JsonObject, rel: String): JsonObject? {
         val links = root[LINKS]?.jsonObject ?: return null
         val curies = Curies.of(root)
-        return links.keys.firstOrNull { Curies.expand(it, curies) == FORMS_REL }?.let { links[it] as? JsonObject }
+        return links.keys.firstOrNull { Curies.expand(it, curies) == rel }?.let { links[it] as? JsonObject }
     }
 
     private fun linkHref(root: JsonObject, rel: String): String? =
