@@ -142,6 +142,9 @@ class LadderSteps(private val http: HttpWorld) {
     @Then("the response Cache-Control is {string}")
     fun cacheControl(expected: String) = assertEquals(expected, http.last.headers.cacheControl)
 
+    @Then("the response Content-Location is {string}")
+    fun contentLocation(expected: String) = assertEquals(expected, http.last.headers.getFirst("Content-Location"))
+
     @Then("the response has no Vary header")
     fun noVary() = assertTrue(http.last.headers.vary.isEmpty(), "Vary: ${http.last.headers.vary}")
 

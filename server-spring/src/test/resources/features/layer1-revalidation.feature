@@ -55,6 +55,7 @@ Feature: Layer 1 revalidation
     Given a client got bed 2 as <dialect> with Prefer "<prefer>"
     When the client waters bed 2 with 100 ml using the ETag and headers it synced with
     Then the response status is 200
+    And the response Content-Location is "/beds/2"
 
     Examples:
       | dialect          | prefer                  |
@@ -75,3 +76,18 @@ Feature: Layer 1 revalidation
   Scenario: If-Match * matches whatever representation the act's headers select
     When a client posts {"milliliters": 100} to water-cell on bed 2 with If-Match *
     Then the response status is 200
+
+  Scenario Outline: An act's response says it is a representation of the bed: <action>
+    RFC 9110 §8.7: Content-Location on a response to POST says the content is
+    a representation of that resource. The act answers with the bed's new
+    Layer 1, so it names the bed, not the action URL.
+    Given bed <bed> is <state>
+    When a client posts <body> to <action> on bed <bed> with If-Match *
+    Then the response status is 200
+    And the response Content-Location is "/beds/<bed>"
+
+    Examples:
+      | action     | bed | state            | body                                |
+      | sow-seed   | 1   | EMPTY            | {"seedType": "tomato", "depthCm": 2} |
+      | water-cell | 4   | PLANTED          | {"milliliters": 100}                |
+      | harvest    | 3   | READY_TO_HARVEST | {}                                  |

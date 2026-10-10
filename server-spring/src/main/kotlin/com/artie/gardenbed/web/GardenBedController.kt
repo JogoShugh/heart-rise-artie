@@ -119,7 +119,7 @@ class GardenBedController(
             val request = binder.bind(body, SowSeedRequest::class.java)
             service.sowSeed(id, request.seedType, request.depthCm)
         }
-        return renderState(updated, dialect, headers.getFirst(PREFER))
+        return renderAct(id, updated, dialect, headers.getFirst(PREFER))
     }
 
     @PostMapping("/{id}/actions/water-cell")
@@ -134,7 +134,7 @@ class GardenBedController(
             val request = binder.bind(body, WaterCellRequest::class.java)
             service.waterCell(id, request.milliliters)
         }
-        return renderState(updated, dialect, headers.getFirst(PREFER))
+        return renderAct(id, updated, dialect, headers.getFirst(PREFER))
     }
 
     @PostMapping("/{id}/actions/harvest")
@@ -145,11 +145,30 @@ class GardenBedController(
     ): ResponseEntity<Any> {
         val dialect = Negotiation.dialect(headers)
         val (updated, result) = act(id, ifMatch, "harvest", headers) { service.harvest(id) }
-        val rendered = renderState(updated, dialect, headers.getFirst(PREFER))
+        val yieldHeaders = HttpHeaders().apply {
+            add("X-Harvest-Yield-Grams", result.yieldGrams.toString())
+            add("X-Harvest-Crop-Name", result.cropName)
+        }
+        return renderAct(id, updated, dialect, headers.getFirst(PREFER), yieldHeaders)
+    }
+
+    /**
+     * An act answers with the bed's new Layer 1. Content-Location names the bed
+     * (RFC 9110 §8.7), so the response is a representation of /beds/{id}, not of
+     * the action URL the request was sent to.
+     */
+    private fun renderAct(
+        id: Long,
+        state: GardenBedState,
+        dialect: Dialect,
+        prefer: String?,
+        extra: HttpHeaders = HttpHeaders(),
+    ): ResponseEntity<Any> {
+        val rendered = renderState(state, dialect, prefer)
         return ResponseEntity.status(rendered.statusCode)
             .headers(rendered.headers)
-            .header("X-Harvest-Yield-Grams", result.yieldGrams.toString())
-            .header("X-Harvest-Crop-Name", result.cropName)
+            .headers(extra)
+            .header(HttpHeaders.CONTENT_LOCATION, "/beds/$id")
             .body(rendered.body)
     }
 

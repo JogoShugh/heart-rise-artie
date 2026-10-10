@@ -324,7 +324,7 @@ The critical distinction, and the one §6.10.5 exists to demonstrate: **412 mean
 
 HTTP is stateless, so a client SHALL send on each act the same negotiation headers it sent on the sync whose `ETag` it holds. The server SHALL select the owning resource's representation from those headers and compare `If-Match` with that representation's current `ETag` by **strong comparison**, the whole value, character for character; `*` matches any current representation. This is RFC 9110 §13.1.1 as written. Nothing is narrowed: no part of an `ETag` is ignored, and an `ETag` for another representation than the act's headers select does not match, even if the state is unchanged.
 
-A successful act's response is the owning resource's new representation, rendered for the act's own negotiation headers, so its `ETag` is the one the client's next act needs.
+A successful act's response is the owning resource's new representation, rendered for the act's own negotiation headers, so its `ETag` is the one the client's next act needs. The server SHALL send `Content-Location` naming the owning resource (RFC 9110 §8.7), so any intermediary or tool sees that the response is a representation of the resource, not of the action URL.
 
 **Evaluation order (decided 2026-10-09).** A server SHALL check a state-changing request in this order and return the first failure:
 
