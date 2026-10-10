@@ -10,7 +10,7 @@
 
 1. **Status line corrected (front matter).** 0.4 said §6.4–6.7 were verified against a live server. What was verified is the 0.3 mechanism; 0.4 inverted it. The claim now says exactly what was tested.
 2. **Precondition scope and strong validators (§6.1, §6.2, §6.3).** Decided 2026-10-08; see below.
-3. **Evaluation order (§6.2).** With conditional acts mandatory, "the resource moved since sync" is a `412`, not a `409`. 0.5 fixes the order servers check in — `428`, then `412`, then `409`, then `422` — so each code has exactly one meaning.
+3. **Evaluation order (§6.2).** Decided 2026-10-09; see below.
 4. **Layer 3 scope (§6.5).** 0.4 says Layer 3 is hashed over the schema "verbatim", which contradicts the canonicalization step two paragraphs earlier. 0.5 says the canonical bytes are both hashed and served.
 5. **Template variable resolution (§6.9.1).** Superseded: decided below as declared template pointers.
 6. **RISE answers (§7.2).** Proposes answers to both `[AUTHOR]` questions: RISE requires the originator's source server to reach L2, and the envelope is a body member, since every RISE request is a state-changing `POST`.
@@ -31,6 +31,8 @@
 - **Strong comparison for acts, no narrowing (§6.1, §6.3).** Decided 2026-10-08. An act repeats the negotiation headers its client synced with; the server selects the owning resource's representation from them and compares `If-Match`, whole, with its `ETag`. This replaces proposal 2, which read only the state version and ignored the rest of the tag.
 
 - **`Prefer: forms=link, schema=link` (§6.4).** Decided 2026-10-08. The tokens ask for a layer to be delivered by link. `cid` is withdrawn: it read as a multiformats Content Identifier, which the protocol does not use. Like any unrecognised token, `cid` now gets L0.
+
+- **Evaluation order for acts (§6.2).** Decided 2026-10-09. A server checks a state-changing request in a fixed order, `428`, then `412`, then `409`, then `422`, and returns the first failure, so each code has exactly one meaning. A resource that moved since sync always yields `412`; `409` means only an act outside the manifest that went with a fresh `ETag`.
 
 - **Opaque URIs; integrity from the linking representation (§6.5).** Decided 2026-10-08. The client no longer reads a digest from a URL path. Links carry Subresource Integrity values; `Repr-Digest` is optional.
 
@@ -290,14 +292,14 @@ HTTP is stateless, so a client SHALL send on each act the same negotiation heade
 
 A successful act's response is the owning resource's new representation, rendered for the act's own negotiation headers, so its `ETag` is the one the client's next act needs.
 
-`[0.5]` **Evaluation order.** A server SHALL check a state-changing request in this order and return the first failure:
+**Evaluation order (decided 2026-10-09).** A server SHALL check a state-changing request in this order and return the first failure:
 
 1. No `If-Match` header: `428`.
-2. `If-Match` does not match the owning resource's current state version: `412`.
+2. `If-Match` does not match, by strong comparison, the current `ETag` of the representation the request's negotiation headers select: `412`.
 3. The affordance is not in the owning resource's current affordance set: `409`.
 4. The body fails schema validation: `422`.
 
-Under this order, a resource that moved between sync and act always yields `412`, because its state version changed. So `409` reaches a client only when it acted on a fresh precondition but outside the manifest that went with it. That is a client defect or a server-side legality bug, never a race. The `409` row of the table above should be read with that narrower meaning. Its phrase "the resource moved since sync" applies only to servers that do not require `If-Match`, which 0.4 no longer permits.
+Under this order, a resource that moved between sync and act always yields `412`, because its `ETag` changed. So `409` reaches a client only when it acted on a fresh precondition but outside the manifest that went with it. That is a client defect or a server-side legality bug, never a race. The `409` row of the table above should be read with that narrower meaning. Its phrase "the resource moved since sync" applies only to servers that do not require `If-Match`, which 0.4 no longer permits.
 
 ### 6.3 Compliant Client Behaviour
 
