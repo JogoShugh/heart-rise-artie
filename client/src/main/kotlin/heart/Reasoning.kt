@@ -3,11 +3,18 @@ package heart
 import kotlinx.serialization.json.JsonObject
 
 /**
- * What the Reason step is shown of one affordance: its name and its
- * schema. Deliberately no target and no method (SPEC §6.8): a reasoner
- * that is never shown a URI cannot hallucinate one.
+ * What the Reason step is shown of one affordance: its name (a link
+ * relation), its title and description, its schema, and, once asked for,
+ * the [detail] of its ALPS descriptor. Deliberately no target and no method
+ * (SPEC §6.8): a reasoner that is never shown a URI cannot hallucinate one.
  */
-data class Offer(val name: String, val schema: JsonObject)
+data class Offer(
+    val name: String,
+    val schema: JsonObject,
+    val title: String? = null,
+    val description: String? = null,
+    val detail: String? = null,
+)
 
 /**
  * What the Reason step is shown of one link: its relation and title.
@@ -20,6 +27,9 @@ data class LinkOffer(val rel: String, val title: String?)
 sealed interface Selection {
     data class Act(val affordance: String, val fields: JsonObject) : Selection
     data class Follow(val rel: String, val title: String?) : Selection
+
+    /** Ask for an offered form's ALPS descriptor before choosing (SPEC §6.8). Deterministic code fetches it. */
+    data class Describe(val affordance: String) : Selection
     data class Clarify(val question: String) : Selection
 }
 

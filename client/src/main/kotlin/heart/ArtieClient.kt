@@ -83,6 +83,12 @@ class ArtieClient(
         return sync(link.href)
     }
 
+    override fun describe(rel: String): String? {
+        val held = current ?: error("enter a service before describing a form")
+        val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
+        return Alps.describe(transport, form.relation)
+    }
+
     /**
      * One act and its refusal handling (SPEC §6.3). 428 is the only refusal
      * that resends, and only once: the client always sends If-Match, so a
@@ -118,11 +124,6 @@ class ArtieClient(
             else -> UnexpectedResponse(rel, response.status)
         }
 
-    private fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
-        if (!form.templated) return form.target
-        val expanded = UriTemplate.expand(form.target, held.state, form.templatePointers, fields)
-        return URI(held.url).resolve(expanded).toString()
-    }
 
     /**
      * SPEC §6.7. At L0 one GET. At L1/L2 a walk: Layer 1, then the
@@ -180,6 +181,12 @@ class ArtieClient(
 
     private companion object {
         val LAYER1_NO_CACHE = mapOf("Cache-Control" to "no-cache")
+
+        fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
+            if (!form.templated) return form.target
+            val expanded = UriTemplate.expand(form.target, held.state, form.templatePointers, fields)
+            return URI(held.url).resolve(expanded).toString()
+        }
 
         /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3), or an older server's lone `$id`. */
         fun schemaPointer(schema: JsonObject): String? =

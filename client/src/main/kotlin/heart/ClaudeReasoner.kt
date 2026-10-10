@@ -88,7 +88,16 @@ class ClaudeReasoner(
     }
 
     private fun turn(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): String {
-        val offered = JsonObject(offers.associate { it.name to it.schema })
+        val offered = buildJsonObject {
+            offers.forEach { offer ->
+                putJsonObject(offer.name) {
+                    offer.title?.let { put("title", it) }
+                    offer.description?.let { put("description", it) }
+                    offer.detail?.let { put("detail", it) }
+                    put("schema", offer.schema)
+                }
+            }
+        }
         val linked = buildJsonArray {
             links.forEach { link ->
                 add(
@@ -112,6 +121,7 @@ class ClaudeReasoner(
         return when (text("action")) {
             "clarify" -> Selection.Clarify(text("question") ?: "Could you say more?")
             "follow" -> Selection.Follow(rel = text("rel").orEmpty(), title = text("title"))
+            "describe" -> Selection.Describe(text("affordance").orEmpty())
             else -> Selection.Act(
                 affordance = text("affordance").orEmpty(),
                 fields = input["fields"] as? JsonObject ?: JsonObject(emptyMap()),
@@ -131,9 +141,12 @@ class ClaudeReasoner(
         private val SYSTEM = """
             You choose what to do next for a user, from the actions a server offers right now.
             The user message has four parts: <state> is the resource as it is now; <offers> maps each
-            action the server currently allows to the JSON Schema of its fields; <links> lists the
-            links the resource offers, each by relation and title; <intent> is what the user asked for.
+            action the server currently allows, by name, to its title, description and the JSON Schema
+            of its fields (and, if you asked for it, a longer detail); <links> lists the links the
+            resource offers, each by relation and title; <intent> is what the user asked for.
             Call the select tool exactly once.
+            - If you need to know more about what an offered action does before choosing, answer
+              action "describe" with that action's exact name. You will be asked again with its detail.
             - If one offered action clearly matches the intent, and the intent gives every required
               field, answer action "act" with that action's exact name and field values that satisfy
               its schema.
@@ -148,14 +161,15 @@ class ClaudeReasoner(
             put("name", TOOL_NAME)
             put(
                 "description",
-                "Select one offered action with its field values, follow one offered link, or ask a question.",
+                "Select one offered action with its field values, ask for an action's detail, " +
+                    "follow one offered link, or ask a question.",
             )
             putJsonObject("input_schema") {
                 put("type", "object")
                 putJsonObject("properties") {
                     putJsonObject("action") {
                         put("type", "string")
-                        put("enum", JsonArray(listOf("act", "follow", "clarify").map(::jsonString)))
+                        put("enum", JsonArray(listOf("act", "describe", "follow", "clarify").map(::jsonString)))
                     }
                     putJsonObject("affordance") { put("type", "string") }
                     putJsonObject("fields") { put("type", "object") }

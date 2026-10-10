@@ -21,4 +21,12 @@ interface HeartRiseClient {
 
     /** Follows the [rel] link in the current representation whose title is [title]. */
     fun follow(rel: String, title: String?): HeartRepresentation
+
+    /**
+     * The ALPS descriptor's doc for the offered form [rel] (SPEC §6.1, §8.5):
+     * its relation URI, fetched and cached as HTTP allows. Null when the form's
+     * relation is not a URI or names no descriptor. It describes; it never
+     * makes an act legal.
+     */
+    fun describe(rel: String): String?
 }

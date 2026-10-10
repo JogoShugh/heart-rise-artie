@@ -12,8 +12,8 @@ Feature: ARTIE against the real server
   Scenario Outline: Bed 1 through a full cycle at rung <rung>: sow, water, harvest
     Given the client works at rung <rung>
     When the client enters "/beds/1"
-    Then the manifest offers exactly "sowSeed"
-    When the client acts on "sowSeed" with:
+    Then the manifest offers exactly "garden:sow-seed"
+    When the client acts on "garden:sow-seed" with:
       """yaml
       seedType: basil
       depthCm: 2
@@ -21,23 +21,23 @@ Feature: ARTIE against the real server
     Then the resource state contains:
       | key    | value   |
       | status | PLANTED |
-    And the manifest offers exactly "waterCell"
-    When the client acts on "waterCell" with:
+    And the manifest offers exactly "garden:water-cell"
+    When the client acts on "garden:water-cell" with:
       """yaml
       milliliters: 500
       """
     Then the resource state contains:
       | key    | value            |
       | status | READY_TO_HARVEST |
-    And the manifest offers exactly "harvest"
-    When the client acts on "harvest" with:
+    And the manifest offers exactly "garden:harvest"
+    When the client acts on "garden:harvest" with:
       """yaml
       {}
       """
     Then the resource state contains:
       | key    | value |
       | status | EMPTY |
-    And the manifest offers exactly "sowSeed"
+    And the manifest offers exactly "garden:sow-seed"
 
     Examples:
       | rung |
@@ -51,7 +51,7 @@ Feature: ARTIE against the real server
     When the client enters "/beds/3"
     And the client enters "/beds/3"
     Then the wire carried 4 requests, the last answered 304
-    And the manifest offers exactly "harvest"
+    And the manifest offers exactly "garden:harvest"
 
   @needs-L2
   Scenario: L3: two clients behind one shared cache, two beds in one state, one set fetch
@@ -97,11 +97,11 @@ Feature: ARTIE against the real server
   Scenario: Someone else writes first: the act is refused as stale and dropped
     Given the client enters "/beds/2"
     And a second client enters "/beds/2"
-    When the second client acts on "waterCell" with:
+    When the second client acts on "garden:water-cell" with:
       """yaml
       milliliters: 1
       """
-    And the client tries to act on "waterCell" with:
+    And the client tries to act on "garden:water-cell" with:
       """yaml
       milliliters: 1
       """
@@ -110,7 +110,7 @@ Feature: ARTIE against the real server
 
   Scenario: A body that fails the server's schema is refused with its reasons
     Given the client enters "/beds/2"
-    When the client tries to act on "waterCell" with:
+    When the client tries to act on "garden:water-cell" with:
       """yaml
       milliliters: 0
       """
@@ -120,14 +120,14 @@ Feature: ARTIE against the real server
   Scenario Outline: From the bookmark alone at rung <rung>: search by name, follow the result, act
     Given the client works at rung <rung>
     When the client enters "/"
-    Then the manifest offers exactly "searchBeds, getBed"
-    When the client acts on "searchBeds" with:
+    Then the manifest offers exactly "garden:search-beds, garden:get-bed"
+    When the client acts on "garden:search-beds" with:
       """yaml
       name: BED-2
       """
     And the client follows the "item" link titled "bed-2"
-    Then the manifest offers exactly "waterCell"
-    When the client acts on "waterCell" with:
+    Then the manifest offers exactly "garden:water-cell"
+    When the client acts on "garden:water-cell" with:
       """yaml
       milliliters: 1
       """
@@ -142,11 +142,11 @@ Feature: ARTIE against the real server
 
   Scenario: From the bookmark alone: look a bed up by its id
     When the client enters "/"
-    And the client acts on "getBed" with:
+    And the client acts on "garden:get-bed" with:
       """yaml
       id: 3
       """
-    Then the manifest offers exactly "harvest"
+    Then the manifest offers exactly "garden:harvest"
 
   Scenario: From the bookmark alone in HAL-FORMS: search by name, follow the result, act
     Given the client works in dialect hal-forms
@@ -174,13 +174,13 @@ Feature: ARTIE against the real server
     And the client enters "/beds/2"
     Then the client asked for the rung the server serves when it entered "/beds/2"
     And the current representation is at the rung the server serves
-    And the manifest offers exactly "waterCell"
-    When the client acts on "waterCell" with:
+    And the manifest offers exactly "garden:water-cell"
+    When the client acts on "garden:water-cell" with:
       """yaml
       milliliters: 1
       """
     Then the current representation is at the rung the server serves
-    And the manifest offers exactly "waterCell"
+    And the manifest offers exactly "garden:water-cell"
 
   Scenario: From the bookmark alone in HAL-FORMS: look a bed up by its id through the query
     Given the client works in dialect hal-forms

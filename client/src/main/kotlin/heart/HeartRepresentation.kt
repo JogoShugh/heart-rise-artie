@@ -23,8 +23,11 @@ class HeartRepresentation(
     /** That link's Subresource Integrity value, if it had one. */
     val formsIntegrity: String? get() = forms?.integrity
 
-    fun containsAffordance(rel: String): Boolean = affordances.containsKey(rel)
-    fun affordance(rel: String): AffordanceForm? = affordances[rel]
+    fun containsAffordance(rel: String): Boolean = affordance(rel) != null
+
+    /** The form named [rel], as the server wrote its key or by the relation it expands to (SPEC §6.1). */
+    fun affordance(rel: String): AffordanceForm? =
+        affordances[rel] ?: affordances.values.firstOrNull { it.relation == rel }
 
     /** The links under [rel], as the server named it (a CURIE is matched as written). */
     fun links(rel: String): List<HeartLink> = linksByRel[rel].orEmpty()

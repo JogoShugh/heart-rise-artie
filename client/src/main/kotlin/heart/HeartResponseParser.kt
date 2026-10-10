@@ -59,26 +59,18 @@ object HeartResponseParser {
     }
 
     /** The `_forms` of a Layer 1 body (L0) or of a Layer 2 affordance set (L1, L2). */
-    fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> =
-        root[FORMS]?.jsonObject.orEmpty().mapValues { (rel, form) -> form(rel, form.jsonObject, base) }
+    fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> {
+        val curies = Curies.of(root)
+        return root[FORMS]?.jsonObject.orEmpty().mapValues { (rel, form) ->
+            form(rel, form.jsonObject, base).copy(relation = Curies.relation(rel, curies, base))
+        }
+    }
 
     /** The link object whose rel, after CURIE expansion, is FORMS_REL. */
     private fun formsLinkObject(root: JsonObject): JsonObject? {
         val links = root[LINKS]?.jsonObject ?: return null
-        val curies = (links["curies"] as? JsonArray).orEmpty().map { it.jsonObject }
-            .associate { it["name"]?.jsonPrimitive?.content to it["href"]?.jsonPrimitive?.content }
-        return links.keys.firstOrNull { expandRel(it, curies) == FORMS_REL }?.let { links[it] as? JsonObject }
-    }
-
-    /**
-     * HAL CURIEs: "hr:forms" with a curies entry {name: hr, href: ".../rels/{rel}"}
-     * names ".../rels/forms". A key that is already a URI, or whose prefix has
-     * no curies entry, is returned unchanged.
-     */
-    fun expandRel(key: String, curies: Map<String?, String?>): String {
-        val prefix = key.substringBefore(':', "")
-        val template = curies[prefix] ?: return key
-        return template.replace("{rel}", key.substringAfter(':'))
+        val curies = Curies.of(root)
+        return links.keys.firstOrNull { Curies.expand(it, curies) == FORMS_REL }?.let { links[it] as? JsonObject }
     }
 
     private fun linkHref(root: JsonObject, rel: String): String? =
@@ -110,6 +102,8 @@ object HeartResponseParser {
             schema = obj["schema"]?.jsonObject ?: error("affordance '$rel' has no schema"),
             templatePointers = (obj[TEMPLATE_POINTERS] as? JsonObject).orEmpty()
                 .mapValues { (_, pointer) -> pointer.jsonPrimitive.content },
+            title = obj["title"]?.jsonPrimitive?.content,
+            description = obj["description"]?.jsonPrimitive?.content,
         )
     }
 }
