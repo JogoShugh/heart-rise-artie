@@ -7,6 +7,8 @@
 # Set HEART_MAX_RUNG to the rung the server was started at (L2 by default).
 # Writes ARTIE's event log to server-spring/build/artie-events.jsonl (ARTIE_EVENTS).
 # Opens nothing on screen.
+# To prove ARTIE against Buster, run scripts/buster-campaign.sh instead: it starts its own
+# Buster server and calls this script once per round.
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)

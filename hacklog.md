@@ -377,6 +377,57 @@ Parked items below are untouched by this plan.
    is curl, the script's readiness probe, which re-read a bed without
    `no-cache`, which is correct.
 
+## 2026-10-10: Buster campaigns, and no undecided verdicts
+
+The random seed-42 run against the latest Buster gave ARTIE 13 pass, 8 pass
+(attested), 20 inconclusive and 0 FAIL. Inconclusive is not acceptable: a
+mutation the client never exercises proves nothing either way. Buster (main
+at 66675a1) now aims mutations from a dry run, and its verdicts are only pass,
+pass (attested) or FAIL.
+
+`scripts/buster-campaign.sh` runs the whole campaign:
+1. It starts a fresh Buster server.
+2. It records a dry run of the `@live` scenarios and gets the plan.
+3. It arms each round and runs the scenarios again.
+4. It exits non-zero unless the report's `campaign.ok` is true.
+
+The first campaign: 25 rounds, and every plugin was exercised:
+
+| plugin | combinations |
+|---|---|
+| alias-forms-href | 11 |
+| drop-affordance | 11 |
+| drop-curie | 11 |
+| flip-byte | 13 |
+| lie-preference-applied | 11 |
+| relax-layer1-cache | 50 |
+| stale-etag | 19 |
+| strip-forms-integrity | 11 |
+
+Verdicts: 54 pass, 42 pass (attested), 21 FAIL, 0 undecided. The gate failed.
+All 21 FAILs are Buster judging the wrong thing; ARTIE behaved correctly in
+each:
+
+- **relax-layer1-cache on an act's response (14).** The "triggering read" was
+  a POST to `/beds/{id}/actions/...`, and `Cache-Control: no-cache` means
+  nothing on a POST. The resource the response represents is `/beds/{id}`.
+  The rule applies to the next GET of that resource, and the planner should
+  arm only where the dry run makes one.
+- **stale-etag on an act's response (4).** ARTIE re-synced by GET of the
+  bed's self link, `/beds/1`. The plugin waited for a GET of the action URL.
+- **drop-curie and lie-preference-applied at L2 (2).** Buster forces
+  `no-store` on a mutated response, so ARTIE re-read `/beds/3` in full. The
+  new, unmutated representation linked the set, and ARTIE followed it. A later
+  representation of the same resource replaces the mutated one.
+- **stale-etag with two clients (1).** Round 3 armed both clients of "Someone
+  else writes first". The second client's act was refused as stale, which
+  ended the scenario, so the first client never made its act. Clients that
+  share a scenario cannot be armed in the same round.
+
+Server side: act responses do not send `Content-Location`. RFC 9110 §8.7 is
+the standard way to say that a POST response is a representation of
+`/beds/{id}`. Buster can only learn that today from the HAL self link.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

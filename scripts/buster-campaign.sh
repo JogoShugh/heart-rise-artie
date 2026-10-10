@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+# Runs a Buster campaign over ARTIE's @live scenarios and exits non-zero if the gate fails.
+#   1. Starts a fresh server-spring with Buster in front (-Pbuster=on, buster profile).
+#   2. Record: a dry run of the scenarios against the unmutated server.
+#   3. Plan: Buster lists the (client, request, plugin) combinations the clients exercise,
+#      in rounds.
+#   4. For each round: arm it, and run the same scenarios again.
+#   5. Reads Buster's report. The gate is campaign.ok: no FAIL, and every plugin exercised.
+# See Buster's README, "Campaigns: aiming each mutation". Every verdict is pass,
+# pass (attested) or FAIL; nothing is left undecided.
+# Writes campaign-plan.json, campaign-report.json, campaign-round-<k>.log and
+# campaign-server.log under server-spring/build. Stops the server at the end unless
+# BUSTER_KEEP=1. Opens nothing on screen.
+set -euo pipefail
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+base=${ARTIE_BASE_URL:-http://localhost:8080}
+build="$root/server-spring/build"
+# Gradle 8.13 cannot run on JDK 25, which may be the shell default.
+export JAVA_HOME=${ARTIE_JAVA_HOME:-$HOME/.sdkman/candidates/java/21.0.12-graal}
+mkdir -p "$build"
+
+# A fresh server, so verdicts from another run cannot mix into this one.
+if lsof -ti tcp:8080 > /dev/null; then
+  echo "port 8080 is busy; stop that server first (lsof -ti tcp:8080 | xargs kill)" >&2
+  exit 1
+fi
+(cd "$root/server-spring" && docker compose up -d postgres > /dev/null)
+
+stop_server() {
+  if [ "${BUSTER_KEEP:-0}" != 1 ]; then
+    lsof -ti tcp:8080 | xargs kill 2> /dev/null || true
+  fi
+}
+trap stop_server EXIT
+
+(cd "$root/server-spring" && SPRING_PROFILES_ACTIVE=buster BUSTER_PACE=0s \
+  ./gradlew bootRun -Pbuster=on > "$build/campaign-server.log" 2>&1) &
+for _ in $(seq 1 90); do curl -sf -o /dev/null "$base/_buster/report" && break; sleep 2; done
+curl -sf -o /dev/null "$base/_buster/report" || {
+  echo "Buster server did not start; see $build/campaign-server.log" >&2
+  exit 1
+}
+
+post() { curl -sf -X POST "$base/_buster/campaign/$1"; echo; }
+
+# Record. A broken dry run would make a wrong plan, so it must pass.
+post record
+if ! "$root/scripts/live-client-check.sh" > "$build/campaign-round-0.log" 2>&1; then
+  echo "dry run failed; see $build/campaign-round-0.log" >&2
+  exit 1
+fi
+
+# Plan.
+curl -sf "$base/_buster/campaign/plan" > "$build/campaign-plan.json"
+rounds=$(python3 - "$build/campaign-plan.json" <<'EOF'
+import json, sys
+plan = json.load(open(sys.argv[1]))
+combos = sum(len(r["combinations"]) for r in plan["rounds"])
+print(f"plan: {len(plan['rounds'])} rounds, {combos} combinations", file=sys.stderr)
+for plugin, n in sorted(plan["coverage"].items()):
+    print(f"  {plugin}: {n}", file=sys.stderr)
+if plan["holes"]:
+    print(f"  holes: {', '.join(plan['holes'])}", file=sys.stderr)
+print(len(plan["rounds"]))
+EOF
+)
+
+# Rounds. Client tests fail by design under mutation; the verdicts are what count.
+for k in $(seq 1 "$rounds"); do
+  echo "round $k/$rounds: $(post "arm?round=$k")"
+  "$root/scripts/live-client-check.sh" > "$build/campaign-round-$k.log" 2>&1 || true
+done
+
+# Close the last round's windows, then read the gate.
+post off > /dev/null
+curl -sf "$base/_buster/report" > "$build/campaign-report.json"
+python3 - "$build/campaign-report.json" <<'EOF'
+import collections, json, sys
+report = json.load(open(sys.argv[1]))
+campaign = report["campaign"]
+counts = collections.Counter(v["result"] for v in report["verdicts"])
+print("verdicts: " + ", ".join(f"{n} {result}" for result, n in sorted(counts.items())))
+for plugin, n in sorted(campaign["coverage"].items()):
+    print(f"  {plugin}: {n} combinations")
+for v in report["verdicts"]:
+    if v["result"] not in ("pass", "pass (attested)"):
+        print(f"  {v['result']} #{v['seq']} {v['plugin']} {v['client']}: {v['reason']}")
+if campaign["holes"]:
+    print("holes: " + ", ".join(campaign["holes"]))
+print("gate: " + ("ok" if campaign["ok"] else "FAILED"))
+sys.exit(0 if campaign["ok"] else 1)
+EOF
