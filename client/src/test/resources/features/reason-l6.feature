@@ -79,6 +79,16 @@ Feature: L6: the Reason step picks; deterministic code acts
     And the Claude request contains no URI from the manifest
     And the Claude reasoner selected "waterCell" with {"milliliters": 300}
 
+  Scenario: The model may answer in words instead of the tool, and that is a question
+    Current Claude models refuse a forced tool call ("tool_choice: type tool
+    and any are not supported for this model"), so the request lets the model
+    choose. An answer in words alone is the model asking or explaining, never
+    an act: it comes back as a question for the user, and nothing is sent.
+    Given the Claude API will answer with the text "Which bed do you mean?"
+    When the Claude reasoner reasons about "water it" over the manifest of "http://garden.test/beds/2"
+    Then the Claude request lets the model choose whether to call the tool
+    And the Claude reasoner asked "Which bed do you mean?"
+
   Scenario: The reasoner is shown each link by relation and title, never its href, and the agent follows its choice
     Rule 6: a transition is a choice the representation offers, and a link
     is one. The reasoner names a link by relation and title; ARTIE follows it.

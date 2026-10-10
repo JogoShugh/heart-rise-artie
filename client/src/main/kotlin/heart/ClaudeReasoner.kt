@@ -22,10 +22,11 @@ import kotlinx.serialization.json.putJsonObject
  * on purpose: putting this turn's affordance names in it would change the
  * cached prefix every time the manifest changes.
  *
- * The model is forced to call the one "select" tool, whose fields are an
- * affordance name and field values, a link's relation and title, or a
- * question. It is never shown a URI: links arrive as relation and title,
- * without their href.
+ * The model is offered one "select" tool, whose fields are an affordance
+ * name and field values, a link's relation and title, or a question. Current
+ * models refuse a forced tool call, so the model chooses whether to call it;
+ * an answer in words alone is taken as a question for the user, never an act.
+ * It is never shown a URI: links arrive as relation and title, without their href.
  */
 class ClaudeReasoner(
     private val transport: Transport,
@@ -57,10 +58,7 @@ class ClaudeReasoner(
         put("model", model)
         put("max_tokens", MAX_TOKENS)
         putJsonArray("tools") { add(TOOL) }
-        putJsonObject("tool_choice") {
-            put("type", "tool")
-            put("name", TOOL_NAME)
-        }
+        putJsonObject("tool_choice") { put("type", "auto") }
         putJsonArray("system") {
             add(
                 buildJsonObject {
@@ -113,9 +111,9 @@ class ClaudeReasoner(
     }
 
     private fun selection(message: JsonObject): Selection {
-        val call = message.getValue("content").jsonArray.map { it.jsonObject }
-            .firstOrNull { it["type"]?.jsonPrimitive?.content == "tool_use" }
-            ?: error("Claude did not call the $TOOL_NAME tool: $message")
+        val content = message.getValue("content").jsonArray.map { it.jsonObject }
+        val call = content.firstOrNull { it["type"]?.jsonPrimitive?.content == "tool_use" }
+            ?: return Selection.Clarify(words(content))
         val input = call.getValue("input").jsonObject
         fun text(name: String) = input[name]?.jsonPrimitive?.content
         return when (text("action")) {
@@ -135,6 +133,11 @@ class ClaudeReasoner(
         const val DEFAULT_MODEL = "claude-sonnet-5-5"
         private const val API_VERSION = "2023-06-01"
         private const val TOOL_NAME = "select"
+
+        /** The model's words, when it answered without the tool: a question for the user. */
+        fun words(content: List<JsonObject>): String =
+            content.mapNotNull { block -> block["text"]?.jsonPrimitive?.content }.joinToString(" ").trim()
+                .ifEmpty { "Could you say more?" }
         private const val MAX_TOKENS = 1024
         private const val ERROR_EXCERPT = 300
         private val ACTIONS = listOf("act", "describe", "explain", "follow", "clarify")

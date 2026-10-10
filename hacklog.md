@@ -523,6 +523,36 @@ Gaps:
 - No client identity or trace context over CoAP.
 - The option and format numbers are experimental until registered with IANA.
 
+## 2026-10-10: the first real-model run, against the real server
+
+This is one scripted scenario (`live-server.feature`, tagged `@llm`). ARTIE's
+Reason step is a real Claude call (`claude-sonnet-5-5`), and everything around
+it stays deterministic. The request is "please water bed 2 with 250 ml" at
+`/beds/2` on the running server.
+- The model chose `garden:water-cell` with `milliliters` 250.
+- ARTIE's checks passed it, and the server accepted it.
+- The server's own history for bed 2 now ends with `CellWatered` of 250 ml.
+
+It passed in 1.8 s. The older `@llm` scenario in `reason-l6.feature`, against a
+scripted manifest, ran for the first time and passed too.
+
+Found on the way:
+- The model refuses a forced tool call: `tool_choice: type "tool" and "any" are
+  not supported for this model`. `ClaudeReasoner` now sends
+  `tool_choice: auto`. An answer in words alone is taken as a question for the
+  user, never as an act. That rule has its own scripted scenario.
+- My first expectation was wrong. Bed 2 starts with 400 ml, so 250 ml more makes
+  it `READY_TO_HARVEST`, not `PLANTED`.
+
+Running it:
+- `liveTest` now leaves `@llm` out.
+- `llmTest` runs it against the live server, with the key from
+  `ANTHROPIC_API_KEY` or `~/.anthropic/api_key`.
+
+This is one case, so it shows that the AI-driven path works end to end, not
+that a model chooses well. The "AI-driven clients" row stays Partly until
+`spec/EVAL-L6.md` is built.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

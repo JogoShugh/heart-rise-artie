@@ -144,6 +144,22 @@ class ReasonSteps(private val ctx: ClientContext) {
     @Then("the agent asked {string}")
     fun asked(question: String) = assertEquals(question, assertIs<Decision.Asked>(decision).question)
 
+    @Then("the agent acted on {string} with milliliters {int}")
+    fun actedLive(affordance: String, milliliters: Int) {
+        val acted = assertIs<Decision.Acted>(decision, "decision: $decision")
+        assertEquals(affordance, acted.selection.affordance)
+        assertEquals(milliliters, acted.selection.fields["milliliters"]?.jsonPrimitive?.int)
+    }
+
+    /** Reads the server's own event log for the bed, apart from ARTIE, so the act is known to have happened. */
+    @Then("the server's history of bed {int} ends with {string} of {int} ml")
+    fun historyEndsWith(bed: Int, type: String, milliliters: Int) {
+        val response = heart.HttpTransport().send(heart.HeartRequest("GET", ctx.url("/beds/$bed/history")))
+        val last = Json.parseToJsonElement(response.body).jsonArray.last().jsonObject
+        assertEquals(type, last["type"]?.jsonPrimitive?.content, "last event: $last")
+        assertEquals(milliliters, last["event"]?.jsonObject?.get("milliliters")?.jsonPrimitive?.int)
+    }
+
     @Then("the reasoner selected {string} with milliliters {int}")
     fun selectedLive(affordance: String, milliliters: Int) {
         val chosen = assertIs<Selection.Act>(assertIs<Decision.Selected>(decision).selection)
@@ -160,6 +176,20 @@ class ReasonSteps(private val ctx: ClientContext) {
             """{"action":"act","affordance":"$affordance","fields":$fields}}],"stop_reason":"tool_use"}"""
         ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
     }
+
+    @Given("the Claude API will answer with the text {string}")
+    fun claudeAnswersInWords(text: String) {
+        val body = """{"id":"msg_1","type":"message","role":"assistant","content":[""" +
+            """{"type":"text","text":"$text"}],"stop_reason":"end_turn"}"""
+        ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
+    }
+
+    @Then("the Claude request lets the model choose whether to call the tool")
+    fun toolChoiceAuto() =
+        assertEquals("auto", claudeRequestBody().getValue("tool_choice").jsonObject["type"]?.jsonPrimitive?.content)
+
+    @Then("the Claude reasoner asked {string}")
+    fun claudeAsked(question: String) = assertEquals(question, assertIs<Selection.Clarify>(selection).question)
 
     @When("the Claude reasoner reasons about {string} over the manifest of {string}")
     fun claudeReasons(intent: String, url: String) {

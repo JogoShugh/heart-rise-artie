@@ -268,3 +268,19 @@ Feature: ARTIE against the real server
     Then the resource state contains:
       | key    | value            |
       | status | READY_TO_HARVEST |
+
+  @llm
+  Scenario: A real model waters a bed from a plain request, through the real server
+    SPEC §6.8. ARTIE's Reason step is a real Claude call; everything around
+    it stays deterministic. The model is shown the real server's offers,
+    with their relation names, titles and descriptions, and no URI or
+    method. ARTIE checks its pick and sends the act, and the server applies
+    it. The last step reads the bed back, so the act is known to have
+    happened. Runs only under llmTest, with an Anthropic API key.
+    Given the reasoner is Claude, using the ANTHROPIC_API_KEY environment variable
+    When the agent handles "please water bed 2 with 250 ml" at "/beds/2"
+    Then the agent acted on "garden:water-cell" with milliliters 250
+    And the resource state contains:
+      | key    | value            |
+      | status | READY_TO_HARVEST |
+    And the server's history of bed 2 ends with "CellWatered" of 250 ml

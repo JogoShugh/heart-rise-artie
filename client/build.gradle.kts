@@ -98,8 +98,18 @@ val liveTest by tasks.registering(Test::class) {
     useJUnitPlatform()
     // HEART_MAX_RUNG names the rung the server was started at (SPEC §6.11.1).
     // Scenarios that test L2 caching (@needs-L2) are skipped below it.
+    // @llm scenarios call a real model; only llmTest runs them.
     val servedRung = System.getenv("HEART_MAX_RUNG") ?: "L2"
-    systemProperty("cucumber.filter.tags", if (servedRung == "L2") "@live" else "@live and not @needs-L2")
+    systemProperty(
+        "cucumber.filter.tags",
+        if (servedRung == "L2") "@live and not @llm" else "@live and not @llm and not @needs-L2",
+    )
+    liveEnvironment(servedRung)
+    outputs.upToDateWhen { false }
+}
+
+/** What a scenario against the running server needs: where it is, how to reset it, where events go. */
+fun Test.liveEnvironment(servedRung: String) {
     environment("ARTIE_BASE_URL", System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080")
     environment("HEART_MAX_RUNG", servedRung)
     // Each @live scenario starts from the seed data (live-server.feature, Background).
@@ -108,12 +118,12 @@ val liveTest by tasks.registering(Test::class) {
     listOf("ARTIE_EVENTS", "ARTIE_EVENTS_URL", "ARTIE_COAP_PORT").forEach { name ->
         System.getenv(name)?.let { environment(name, it) }
     }
-    outputs.upToDateWhen { false }
 }
 
-
-// Runs only the @llm scenarios: a real model behind the Reason step. Needs
-// ANTHROPIC_API_KEY in the environment and costs a few API calls; not part of check.
+// Runs only the @llm scenarios: a real model behind the Reason step, so it
+// costs a few API calls and is never part of check. The @llm @live ones need
+// a running server, as liveTest does. The key comes from ANTHROPIC_API_KEY, or
+// else from ~/.anthropic/api_key; it is passed to the tests, never printed.
 val llmTest by tasks.registering(Test::class) {
     group = "verification"
     description = "Runs the @llm Cucumber scenarios against the Claude API."
@@ -121,5 +131,9 @@ val llmTest by tasks.registering(Test::class) {
     classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
     systemProperty("cucumber.filter.tags", "@llm")
+    liveEnvironment(System.getenv("HEART_MAX_RUNG") ?: "L2")
+    val keyFile = File(System.getProperty("user.home"), ".anthropic/api_key")
+    (System.getenv("ANTHROPIC_API_KEY") ?: keyFile.takeIf { it.isFile }?.readText()?.trim())
+        ?.let { environment("ANTHROPIC_API_KEY", it) }
     outputs.upToDateWhen { false }
 }
