@@ -3,354 +3,46 @@ package com.artie.gardenbed.web
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.heart.ContentAddress
-import com.artie.heart.Dialect
-import com.artie.heart.HEART_RISE_PROFILE
 import com.artie.heart.Rung
 import com.artie.heart.SetRendering
 
 /**
- * REBUILT A SECOND TIME after a real, caught mistake: the first
- * correction (see README item 12) fixed `_forms` vs `_templates` and
- * restored content addressing for individual SCHEMAS -- but silently
- * collapsed the affordance-SET layer straight into the bed resource
- * itself. `GET /beds/{id}` was embedding the full per-affordance
- * descriptor (`_links.target.href`, `method`, `contentType`,
- * `schema.$id`) directly, every time, regardless of Prefer -- meaning
- * every bed in the same status re-sent identical bytes instead of
- * sharing one cached, content-addressed affordance-set resource. That
- * defeats the actual point: two beds that happen to be READY_TO_HARVEST
- * at the same time should point at the SAME `/affordance-sets/{hash}`
- * URL, fetched once, cached everywhere.
- *
- * The three layers, per SPEC 0.4 §6.4 (see Rung):
- *
- *   GET /beds/{id}                  -- mutable, ETag-revalidated.
- *       No Prefer (L0): collapses ALL THREE layers into one response --
- *           forms AND their full schema bodies, all inline.
- *       Prefer: forms=link (L1) or forms=link, schema=link (L2): state
- *           plus a link to that rung's affordance set.
- *
- *   GET /affordance-sets/sha256-{hash}  -- immutable, never negotiates.
- *       The L1 set embeds schema bodies; the L2 set carries only each
- *       schema's $id. Different bytes, so different addresses (§6.5).
- *
- *   GET /schemas/sha256-{hash}      -- immutable. A real sha256 of the
- *       schema's own canonical bytes.
- *
- * Because this domain's affordances are fully determined by
- * GardenBedStatus (a 3-value enum), there are exactly 6 possible
- * affordance-sets, ever (3 statuses x 2 renderings) -- computed once,
- * at class-init, same as the individual schemas.
+ * The hal-schema-forms dialect for garden beds, as the controllers and the
+ * CoAP binding read it. heart-core's [com.artie.heart.Layers] renders the
+ * three layers (SPEC §6.4) from the [GardenBeds] declaration; this object
+ * keys its content-addressed bodies by the hex part of their address, as the
+ * `/…/sha256-{hash}` routes take it. It goes when the routes come from the
+ * library (spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md, step A5.6).
  */
 object JsonSchemaDialectSupport {
+    private val layers = GardenBeds.layers
 
-    // ---------------------------------------------------------------
-    // Layer 3: individual schemas
-    // ---------------------------------------------------------------
-
-    private val rawSchemas: Map<String, String> = mapOf(
-        "sowSeed" to """
-            {
-              "title": "Sow Seed",
-              "type": "object",
-              "properties": {
-                "seedType": {
-                  "type": "string",
-                  "title": "Seed",
-                  "description": "The kind of seed to sow",
-                  "examples": ["basil"]
-                },
-                "depthCm": {
-                  "type": "number", "minimum": 1, "maximum": 10,
-                  "title": "Depth",
-                  "description": "How deep to sow, in centimetres",
-                  "examples": [2]
-                }
-              },
-              "required": ["seedType"]
-            }
-        """.trimIndent(),
-
-        "waterCell" to """
-            {
-              "title": "Water Cell",
-              "type": "object",
-              "properties": {
-                "milliliters": {
-                  "type": "integer", "minimum": 1, "maximum": 1000,
-                  "title": "Water per cell",
-                  "description": "Millilitres of water poured into each cell",
-                  "examples": [250]
-                }
-              },
-              "required": ["milliliters"]
-            }
-        """.trimIndent(),
-
-        "harvest" to """
-            {
-              "title": "Harvest",
-              "type": "object",
-              "properties": {}
-            }
-        """.trimIndent()
-    )
-
-    /** RFC 8785 (JCS) canonical form of each raw schema above -- per
-     *  SPEC.md §6.5 this, not the hand-indented literal, is what gets
-     *  hashed AND served, so the URL is a true content address of
-     *  exactly the bytes SchemaController returns. */
-    private val canonicalSchemas: Map<String, String> =
-        rawSchemas.mapValues { (_, raw) -> ContentAddress.canonicalText(raw) }
-
-    private val schemaHashes: Map<String, String> =
-        canonicalSchemas.mapValues { (_, body) -> hashOf(body) }
+    private fun byHash(bodies: Map<String, String>): Map<String, String> =
+        bodies.mapKeys { (address, _) -> address.removePrefix(PREFIX) }
 
     /** hash (no "sha256-" prefix) -> canonical schema body, for SchemaController. */
-    val schemasByHash: Map<String, String> =
-        schemaHashes.entries.associate { (name, hash) -> hash to canonicalSchemas.getValue(name) }
-
-    private fun schemaIdFor(name: String): String = "/schemas/sha256-${schemaHashes.getValue(name)}"
-
-    /** Subresource Integrity value of each schema's served bytes: full digest, never truncated
-     *  (HAL-SCHEMA-FORMS-HR Rule 2). The URL is only the server's name for the schema. */
-    private val schemaIntegrity: Map<String, String> =
-        canonicalSchemas.mapValues { (_, body) -> integrityOf(body) }
-
-    // ---------------------------------------------------------------
-    // Shared: which affordances exist for a given status. Single
-    // source of truth -- both dialects (halforms via GardenBedController,
-    // jsonschema via this object) read from the same mapping, so they
-    // can never silently drift about what's currently allowed.
-    // ---------------------------------------------------------------
-
-    fun allowedAffordances(status: GardenBedStatus): List<String> = when (status) {
-        GardenBedStatus.EMPTY -> listOf("sowSeed")
-        GardenBedStatus.PLANTED -> listOf("waterCell")
-        GardenBedStatus.READY_TO_HARVEST -> listOf("harvest")
-    }
-
-    // ---------------------------------------------------------------
-    // Layer 2: affordance-sets. Precomputed for all 3 possible
-    // statuses at class-init, same discipline as the schemas above.
-    // ---------------------------------------------------------------
-
-    /** Builds the `_forms` map for a given list of affordance names.
-     *  Target hrefs are LEFT AS URI TEMPLATES (`/beds/{id}/actions/...`,
-     *  `templated: true`) rather than resolved to a real bed id -- this
-     *  is what makes the affordance-set resource genuinely
-     *  bed-agnostic: the exact same bytes serve every bed currently in
-     *  this status, real HTTP caches included, since nothing about the
-     *  URL or body varies by which bed asked. The client expands
-     *  `{id}` itself before POSTing, from the JSON Pointer the form
-     *  declares in `hr:templatePointers` (HAL-SCHEMA-FORMS-HR Rule 1,
-     *  SPEC §6.9.1): `/id`, the bed body's top-level `id`. */
-    private fun buildForms(names: List<String>, embedSchemas: Boolean): Map<String, Any?> =
-        // HAL-SCHEMA-FORMS-HR Rules 6 and 7: keyed by relation, and self-describing.
-        names.associate { name -> GardenProfile.key(name) to buildForm(name, embedSchemas) }
-
-    private fun buildForm(name: String, embedSchemas: Boolean): Map<String, Any?> =
-        run {
-            val relation = GardenProfile.relation(name)
-            val id = schemaIdFor(name)
-            val schema: Map<String, Any?> = if (embedSchemas) {
-                (parseSchemaBody(canonicalSchemas.getValue(name)) as Map<*, *>)
-                    .mapKeys { it.key as String }
-                    .toMutableMap()
-                    .apply { put("\$id", id) }
-            } else {
-                // HAL-SCHEMA-FORMS-HR Rule 3: a reference, pinned by the schema's integrity.
-                mapOf("\$ref" to id, "hr:integrity" to schemaIntegrity.getValue(name))
-            }
-
-            mapOf(
-                "title" to relation.title,
-                "description" to relation.description,
-                "_links" to mapOf(
-                    "target" to mapOf(
-                        "href" to "/beds/{id}/actions/${actionPath(name)}",
-                        "templated" to true
-                    )
-                ),
-                TEMPLATE_POINTERS to mapOf("id" to "/id"),
-                "method" to "POST",
-                "contentType" to "application/json",
-                "schema" to schema
-            )
-        }
-
-    // ---------------------------------------------------------------
-    // SPEC §6.12: why the acts a state leaves out are absent. One
-    // resource per status, shared and immutable like the sets.
-    // ---------------------------------------------------------------
-
-    private const val UNAVAILABLE_REL = "hr:unavailable"
-    private val HR_CURIE: Map<String, Any> =
-        mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
-
-    private val unavailableJsonByStatus: Map<GardenBedStatus, String> =
-        GardenBedStatus.entries.associateWith { status ->
-            val absent = GardenProfile.BED_ACTS - allowedAffordances(status).toSet()
-            val body = mapOf(
-                "unavailable" to absent.map { name ->
-                    mapOf(
-                        "rel" to GardenProfile.reference(name),
-                        "title" to GardenProfile.relation(name).title,
-                        "reason" to GardenProfile.whyAbsent(status, name),
-                    )
-                },
-            )
-            ContentAddress.canonical(body)
-        }
+    val schemasByHash: Map<String, String> = byHash(layers.schemas)
 
     /** hash (no "sha256-" prefix) -> canonical explanation JSON, for UnavailableController. */
-    val unavailableByHash: Map<String, String> =
-        unavailableJsonByStatus.values.associateBy { hashOf(it) }
-
-    private fun unavailableLink(status: GardenBedStatus): Map<String, Any> {
-        val json = unavailableJsonByStatus.getValue(status)
-        return mapOf(
-            "href" to "/unavailable/${ContentAddress.address(json)}",
-            "type" to "application/json",
-            "integrity" to integrityOf(json),
-        )
-    }
-
-    /** One Layer 2 resource per (status, rendering). SPEC 0.4 §6.5: the
-     *  L1 set (schemas embedded) and the L2 set (schema pointers) are
-     *  different bytes, so each gets its own address. Both are always
-     *  templated, so every bed in one status shares them. */
-    private data class SetKey(val status: GardenBedStatus, val rendering: SetRendering)
-
-    /** JCS canonical JSON for each set: these exact bytes are hashed AND served. */
-    private val setJsonByKey: Map<SetKey, String> =
-        GardenBedStatus.entries.flatMap { status -> SetRendering.entries.map { SetKey(status, it) } }
-            .associateWith { key ->
-                val embed = key.rendering == SetRendering.EMBEDDED_SCHEMAS
-                // The set declares the CURIEs its keys use (HAL-SCHEMA-FORMS-HR Rule 6), and
-                // links, with integrity, to why the other acts are absent (SPEC §6.12).
-                val body = mapOf(
-                    "_links" to mapOf(
-                        "curies" to GardenProfile.CURIES + HR_CURIE,
-                        UNAVAILABLE_REL to unavailableLink(key.status),
-                    ),
-                    "_forms" to buildForms(allowedAffordances(key.status), embed),
-                )
-                ContentAddress.canonical(body)
-            }
-
-    private val setHashByKey: Map<SetKey, String> =
-        setJsonByKey.mapValues { (_, json) -> hashOf(json) }
+    val unavailableByHash: Map<String, String> = byHash(layers.explanations)
 
     /** hash (no "sha256-" prefix) -> canonical set JSON, for AffordanceSetController. */
-    val affordanceSetsByHash: Map<String, String> =
-        setHashByKey.entries.associate { (key, hash) -> hash to setJsonByKey.getValue(key) }
+    val affordanceSetsByHash: Map<String, String> = byHash(layers.affordanceSets)
+
+    /** Which acts a status offers: one source for both dialects, so they cannot drift apart. */
+    fun allowedAffordances(status: GardenBedStatus): List<String> = layers.offered(status)
 
     fun affordanceSetHashFor(status: GardenBedStatus, rendering: SetRendering): String =
-        setHashByKey.getValue(SetKey(status, rendering))
-
-    private val setIntegrityByKey: Map<SetKey, String> = setJsonByKey.mapValues { (_, json) -> integrityOf(json) }
+        ContentAddress.address(affordanceSetJson(status, rendering)).removePrefix(PREFIX)
 
     fun affordanceSetJson(status: GardenBedStatus, rendering: SetRendering): String =
-        setJsonByKey.getValue(SetKey(status, rendering))
+        layers.affordanceSet(status, rendering)
 
-    /** Only used by buildBedBody's L0 (collapse-everything)
-     *  path, where the response is already specific to one bed and
-     *  resolving `{id}` for convenience costs no sharing benefit --
-     *  the standalone affordance-set resource above never calls this. */
-    private fun resolvedFormsForBed(status: GardenBedStatus, bedId: Long, embedSchemas: Boolean): Map<String, Any?> {
-        val forms = buildForms(allowedAffordances(status), embedSchemas)
-        val resolved = forms.mapValues { (_, entry) ->
-            @Suppress("UNCHECKED_CAST")
-            val e = entry as Map<String, Any?>
-            @Suppress("UNCHECKED_CAST")
-            val links = e["_links"] as Map<String, Any?>
-            @Suppress("UNCHECKED_CAST")
-            val target = links["target"] as Map<String, Any?>
-            val href = (target["href"] as String).replace("{id}", bedId.toString())
-            // A concrete target needs no pointers: L0 stays plain HAL Schema Forms.
-            (e - TEMPLATE_POINTERS) + ("_links" to mapOf("target" to mapOf("href" to href)))
-        }
-        return mapOf("_forms" to resolved)
-    }
-
-    // ---------------------------------------------------------------
-    // Layer 1: the bed resource itself.
-    // ---------------------------------------------------------------
-
-    /**
-     * SPEC 0.4 §6.4. L0, the default: all three layers collapsed --
-     * state, forms, and full schemas inline, one hop. L1 and L2: state
-     * plus a link to the affordance set rendered for that rung. `type`
-     * on the link tells a client what it will get before fetching.
-     */
-    fun buildBedBody(state: GardenBedState, rung: Rung = Rung.L0): Map<String, Any?> {
-        val bedId = state.id
-        val base = mutableMapOf<String, Any?>(
-            "id" to bedId,
-            "label" to state.label,
-            "status" to state.status.name,
-            "cropName" to state.cropName,
-            "growthPoints" to state.growthPoints,
-            "moistureLevel" to state.moistureLevel
-        )
-
-        val rendering = rung.setRendering
-        if (rendering == null) {
-            base["_links"] = mapOf(
-                "self" to mapOf("href" to "/beds/$bedId"),
-                "curies" to GardenProfile.CURIES + HR_CURIE,
-                // SPEC §6.12: at L0 the set is embedded, so the link is in Layer 1.
-                UNAVAILABLE_REL to unavailableLink(state.status),
-            )
-            base.putAll(resolvedFormsForBed(state.status, bedId, embedSchemas = true))
-        } else {
-            val hash = affordanceSetHashFor(state.status, rendering)
-            base["_links"] = mapOf(
-                "self" to mapOf("href" to "/beds/$bedId"),
-                // SPEC §6.1 (0.5): the rel is $HEART_RISE_PROFILE/rels/forms. HAL's CURIE
-                // short form "hr:forms" names the same rel; clients expand it.
-                "curies" to listOf(
-                    mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
-                ),
-                "hr:forms" to mapOf(
-                    "href" to "/affordance-sets/sha256-$hash",
-                    "type" to Dialect.JSONSCHEMA.mediaType,
-                    // HAL's own link hint; replaces the withdrawn media-type parameter (§6.1).
-                    "profile" to Dialect.JSONSCHEMA.profile,
-                    // HAL-SCHEMA-FORMS-HR Rule 2: what the set's bytes must hash to.
-                    "integrity" to setIntegrityByKey.getValue(SetKey(state.status, rendering))
-                )
-            )
-        }
-
-        return base
-    }
-
-    // ---------------------------------------------------------------
-    // Helpers
-    // ---------------------------------------------------------------
-
-    /** The hex part of a canonical body's content address (heart-core, SPEC §6.5). */
-    private fun hashOf(body: String): String = ContentAddress.address(body).removePrefix("sha256-")
-
-    /** W3C Subresource Integrity syntax, for links and schema references. */
-    private fun integrityOf(body: String): String = ContentAddress.integrity(body)
+    /** Layer 1 of a bed at [rung] (SPEC §6.4). */
+    fun buildBedBody(state: GardenBedState, rung: Rung = Rung.L0): Map<String, Any?> = layers.layer1(state, rung)
 
     /** RFC 9530 Repr-Digest for a Layer 2 or Layer 3 body, in RFC 8941 byte-sequence syntax. */
     fun reprDigestOf(body: String): String = ContentAddress.reprDigest(body)
 
-    private fun parseSchemaBody(raw: String): Any {
-        val mapper = com.fasterxml.jackson.databind.ObjectMapper()
-        return mapper.readValue(raw, Any::class.java)
-    }
-
-    private const val TEMPLATE_POINTERS = "hr:templatePointers"
-
-    private fun actionPath(affordanceName: String): String = when (affordanceName) {
-        "sowSeed" -> "sow-seed"
-        "waterCell" -> "water-cell"
-        "harvest" -> "harvest"
-        else -> affordanceName
-    }
+    private const val PREFIX = "sha256-"
 }

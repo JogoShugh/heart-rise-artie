@@ -53,9 +53,9 @@ val logBddRun by tasks.registering {
             logFile.appendText("$timestamp BDD_RUN FAIL module=heart-core reason=compile\n")
             return@doLast
         }
-        // A server that includes this build compiles heart-core without testing it.
-        // Then the result file is an older run's, so there is nothing new to log.
-        if (!gradle.taskGraph.hasTask(tasks.test.get())) return@doLast
+        // When the tests did not run (a server compiling heart-core, or a build that
+        // stopped before them), the result file is an older run's: nothing new to log.
+        if (!tasks.test.get().state.executed) return@doLast
         if (!resultFile.exists()) {
             logFile.appendText("$timestamp BDD_RUN FAIL module=heart-core reason=no-results\n")
             return@doLast

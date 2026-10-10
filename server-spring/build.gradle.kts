@@ -147,6 +147,8 @@ val logBddRun by tasks.registering {
             logFile.appendText("$timestamp BDD_RUN FAIL module=server-spring reason=compile\n")
             return@doLast
         }
+        // A build that stopped before the tests ran leaves an older run's result file.
+        if (!tasks.test.get().state.executed) return@doLast
         if (!resultFile.exists()) {
             // No result file means compilation or discovery failed: still red.
             logFile.appendText("$timestamp BDD_RUN FAIL module=server-spring reason=no-results\n")
