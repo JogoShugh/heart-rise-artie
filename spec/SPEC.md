@@ -11,7 +11,7 @@
 1. **Status line corrected (front matter).** 0.4 said §6.4–6.7 were verified against a live server. What was verified is the 0.3 mechanism; 0.4 inverted it. The claim now says exactly what was tested.
 2. **Precondition scope and strong validators (§6.1, §6.2, §6.3).** Decided 2026-10-08; see below.
 3. **Evaluation order (§6.2).** Decided 2026-10-09; see below.
-4. **Layer 3 scope (§6.5).** 0.4 says Layer 3 is hashed over the schema "verbatim", which contradicts the canonicalization step two paragraphs earlier. 0.5 says the canonical bytes are both hashed and served.
+4. **Layer 3 scope (§6.5).** Decided 2026-10-09; see below.
 5. **Template variable resolution (§6.9.1).** Superseded: decided below as declared template pointers.
 6. **RISE answers (§7.2).** Proposes answers to both `[AUTHOR]` questions: RISE requires the originator's source server to reach L2, and the envelope is a body member, since every RISE request is a state-changing `POST`.
 7. **Explaining absence (§12).** Proposes a concrete mechanism: an optional, content-addressed `heart:unavailable` resource linked from Layer 2 and fetched only on demand.
@@ -33,6 +33,8 @@
 - **`Prefer: forms=link, schema=link` (§6.4).** Decided 2026-10-08. The tokens ask for a layer to be delivered by link. `cid` is withdrawn: it read as a multiformats Content Identifier, which the protocol does not use. Like any unrecognised token, `cid` now gets L0.
 
 - **Evaluation order for acts (§6.2).** Decided 2026-10-09. A server checks a state-changing request in a fixed order, `428`, then `412`, then `409`, then `422`, and returns the first failure, so each code has exactly one meaning. A resource that moved since sync always yields `412`; `409` means only an act outside the manifest that went with a fresh `ETag`.
+
+- **Layer 3 is canonical bytes, hashed and served (§6.5).** Decided 2026-10-09. 0.4 said a schema was hashed "verbatim", which contradicted the canonicalization step. A server canonicalizes a schema (RFC 8785), and serves exactly the bytes it hashed, as it already does for affordance sets.
 
 - **Opaque URIs; integrity from the linking representation (§6.5).** Decided 2026-10-08. The client no longer reads a digest from a URL path. Links carry Subresource Integrity values; `Repr-Digest` is optional.
 
@@ -379,7 +381,7 @@ This reverses 0.3's rule that a Layer 2 resource has one canonical address regar
 
 The cost is that L1 and L2 clients do not share affordance-set cache entries. They still share all Layer 3 entries, and each shares fully with its own rung. Given that a deployment will typically standardise on one rung, this is a small loss for a large gain in integrity. `[AUTHOR]` — confirm; this is the one place where 0.4 overturns a stated 0.3 property rather than clarifying it.
 
-**Scope of "the body" for Layer 3:** the schema's own full content, with nothing stripped. `[0.5]` It is canonicalized as above, and the server serves exactly those canonical bytes. 0.4 said "verbatim", which contradicts the canonicalization step: a hand-formatted schema served as written does not hash to its own address. The rule is the same for both layers. **The address is the SHA-256 of the response body, byte for byte.**
+**Scope of "the body" for Layer 3 (decided 2026-10-09):** the schema's own full content, with nothing stripped. It is canonicalized as above, and the server serves exactly those canonical bytes. 0.4 said "verbatim", which contradicts the canonicalization step: a hand-formatted schema served as written would not match its own digest. The rule is the same for both layers. **The digest is the SHA-256 of the response body, byte for byte.** It is the value integrity checks compare against; a server that names resources by digest uses the same value in the URL.
 
 **Naming is the server's (revised 2026-10-09).** The protocol defines no paths. What it requires of a Layer 2 or Layer 3 URL is that it names one body only: each distinct body gets its own URL, served `immutable`, and a URL is never reused for different bytes. How the server builds that URL is its own choice. The reference server uses the digest as the last path segment (`/affordance-sets/sha256-{digest}`, `/schemas/sha256-{digest}`), which meets the requirement by construction; any other scheme that meets it is equally conformant.
 
