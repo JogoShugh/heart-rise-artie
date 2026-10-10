@@ -18,6 +18,8 @@ val cucumberVersion = "7.18.0"
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    // SPEC §6.0.1: the CoAP binding (RFC 7252), for coap: URIs.
+    implementation("org.eclipse.californium:californium-core:3.14.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
@@ -103,7 +105,9 @@ val liveTest by tasks.registering(Test::class) {
     // Each @live scenario starts from the seed data (live-server.feature, Background).
     environment("ARTIE_RESET", System.getenv("ARTIE_RESET") ?: file("../server-spring/reset-db.sh").absolutePath)
     // ARTIE's event log (hack log, 2026-10-10): a JSON Lines file, a URL to POST to, or both.
-    listOf("ARTIE_EVENTS", "ARTIE_EVENTS_URL").forEach { name -> System.getenv(name)?.let { environment(name, it) } }
+    listOf("ARTIE_EVENTS", "ARTIE_EVENTS_URL", "ARTIE_COAP_PORT").forEach { name ->
+        System.getenv(name)?.let { environment(name, it) }
+    }
     outputs.upToDateWhen { false }
 }
 

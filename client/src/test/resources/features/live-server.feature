@@ -50,6 +50,53 @@ Feature: ARTIE against the real server
       | L1   |
       | L2   |
 
+  Scenario Outline: Over CoAP, bed 1 through a full cycle at rung <rung>, with nothing sent over HTTP
+    SPEC §6.0.1. The same server, the same client core, a second protocol:
+    the bed's coap: URI is reached through the CoAP binding, over UDP.
+    Given the client works at rung <rung>
+    When the client enters "/beds/1" over CoAP
+    Then the manifest offers exactly "garden:sow-seed"
+    When the client acts on "garden:sow-seed" with:
+      """yaml
+      seedType: basil
+      depthCm: 2
+      """
+    And the client acts on "garden:water-cell" with:
+      """yaml
+      milliliters: 500
+      """
+    And the client acts on "garden:harvest" with:
+      """yaml
+      {}
+      """
+    Then the resource state contains:
+      | key    | value |
+      | status | EMPTY |
+    And the manifest offers exactly "garden:sow-seed"
+    And the current representation is at rung <rung>
+    And nothing went over HTTP
+
+    Examples:
+      | rung |
+      | L0   |
+      | L2   |
+
+  Scenario: Over CoAP, from the bookmark alone: look a bed up by its id and act
+    When the client enters "/" over CoAP
+    And the client acts on "garden:get-bed" with:
+      """yaml
+      id: 2
+      """
+    Then the manifest offers exactly "garden:water-cell"
+    When the client acts on "garden:water-cell" with:
+      """yaml
+      milliliters: 1
+      """
+    Then the resource state contains:
+      | key    | value   |
+      | status | PLANTED |
+    And nothing went over HTTP
+
   @needs-L2
   Scenario: At L2 a re-sync of an unchanged bed is one request, answered 304
     Given the client works at rung L2

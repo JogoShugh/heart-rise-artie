@@ -29,6 +29,10 @@ class BindingSteps(private val ctx: ClientContext) {
     @Then("the client holds {string}")
     fun holds(url: String) = assertEquals(url, ctx.client.current?.url)
 
+    /** Nothing reached the scripted HTTP service, nor, in a @live scenario, the real one. */
     @Then("nothing went over HTTP")
-    fun nothingOverHttp() = assertTrue(ctx.transport.requests.isEmpty(), "HTTP requests: ${ctx.transport.requests}")
+    fun nothingOverHttp() {
+        assertTrue(ctx.transport.requests.isEmpty(), "HTTP requests: ${ctx.transport.requests}")
+        if (ctx.baseUrl != null) assertTrue(ctx.wireLog.exchanges.isEmpty(), "HTTP requests: ${ctx.wireLog.exchanges}")
+    }
 }

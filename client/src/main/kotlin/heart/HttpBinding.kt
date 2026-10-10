@@ -1,11 +1,5 @@
 package heart
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-
 /**
  * The HTTP binding (SPEC §6.0 table, §6.1–§6.12): the core's read, fetch and act
  * as HTTP requests over a [Transport], and HTTP responses as core outcomes. Every
@@ -30,13 +24,13 @@ class HttpBinding(private val transport: Transport) : Binding {
 
     private fun outcome(response: HeartResponse): Outcome {
         val code = response.status.toString()
-        val problem = problemType(response)
+        val problem = ProblemDetails.type(response.body)
         return when (response.status) {
             in SUCCESS -> Outcome.Done(received(response), code)
             PRECONDITION_REQUIRED -> Outcome.PreconditionRequired(code, problem)
             PRECONDITION_FAILED -> Outcome.Stale(code, problem)
             CONFLICT -> Outcome.NotOffered(code, problem)
-            UNPROCESSABLE -> Outcome.Invalid(violations(response), code, problem)
+            UNPROCESSABLE -> Outcome.Invalid(ProblemDetails.violations(response.body), code, problem)
             else -> Outcome.Failed(code, problem)
         }
     }
@@ -75,23 +69,5 @@ class HttpBinding(private val transport: Transport) : Binding {
                 appliedAs = preferenceApplied,
             )
         }
-
-        fun problemType(response: HeartResponse): String? =
-            runCatching { Json.parseToJsonElement(response.body).jsonObject["type"]?.jsonPrimitive?.content }
-                .getOrNull()
-
-        /** The `violations` of a 422 body (RFC 9457, SPEC §6.2), or its `error` text, or nothing. */
-        fun violations(response: HeartResponse): List<String> {
-            val body = runCatching { Json.parseToJsonElement(response.body).jsonObject }.getOrNull()
-                ?: return emptyList()
-            // Each violation is {pointer, message}. An older server sent strings.
-            val listed = (body["violations"] as? JsonArray)?.map { item ->
-                (item as? JsonObject)?.let { pointerMessage(it) } ?: item.jsonPrimitive.content
-            }
-            return listed ?: listOfNotNull(body["error"]?.jsonPrimitive?.content)
-        }
-
-        private fun pointerMessage(violation: JsonObject): String =
-            "${violation["pointer"]?.jsonPrimitive?.content}: ${violation["message"]?.jsonPrimitive?.content}"
     }
 }

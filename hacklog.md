@@ -477,8 +477,51 @@ codes and headers. Now:
 The campaign still passes after the change: 120 of 120 mutations made, 70 pass,
 50 pass (attested), 0 FAIL.
 
-Parked: a second real binding. CoAP (RFC 7252) fits everything except
-`Prefer`. `ni:` names (RFC 6920) are dropped.
+A second real binding was parked at first; it is done below. `ni:` names
+(RFC 6920) are dropped.
+
+## 2026-10-10: the CoAP binding
+
+The user decided two things:
+- The profile and the rung travel in experimental CoAP options, one for one
+  with the HTTP headers. Content-Format numbers per rung were rejected: they
+  would put the profile into the format ID, which §6.1 rejected for HTTP.
+- The server speaks CoAP natively, not through a CoAP-to-HTTP gateway.
+
+What was built:
+- **SPEC §6.0.1.**
+  - Options: 65000 Accept-Profile, 65003 No-Cache, 65004 Prefer,
+    65008 Profile, 65012 Preference-Applied.
+  - No-Cache is critical and unsafe-to-forward, so a proxy that does not know
+    it must refuse and cannot answer from its cache.
+  - Content-Formats 65000–65004 for hal+json, schema+json, problem+json,
+    json-home and alps+json.
+  - The validator is 8 bytes: the first 8 of SHA-256 over the HTTP ETag.
+  - Codes: 2.05, 2.04, 2.03, 4.12 stale, 4.09 not offered, 4.22 invalid, and
+    4.00 with the problem type for precondition required (CoAP has no 4.28).
+- **Server.**
+  - `CoapFrontDoor`, a Californium server on UDP 5683 beside HTTP, set by
+    `heart.coap.port`. It serves beds, acts, shared layers, the index, search
+    and ALPS from the same services.
+  - The act checks moved into `BedActs`, shared by both front doors, so the
+    order and the refusals are the same everywhere.
+  - `coap.feature` runs 10 scenarios with a real CoAP client over UDP. One of
+    them checks that the CoAP body is the same JSON as the HTTP body.
+- **ARTIE.** `CoapBinding` is registered for `coap:`. `coap-binding.feature`
+  has 6 scenarios against a scripted CoAP server. The architecture test
+  allows network libraries only in Transport and Binding implementations.
+- **Live, over UDP against the real server.**
+  - Bed 1 through sow, water and harvest at L0 and at L2.
+  - From `coap://…/` alone: look a bed up by id, then water it.
+  - In all three, nothing went over HTTP.
+  - The live suite is 24 of 24, and the Buster campaign still passes
+    (120 of 120, 0 FAIL).
+
+Gaps:
+- No `coaps` (DTLS).
+- No HAL-FORMS over CoAP: it answers 4.06.
+- No client identity or trace context over CoAP.
+- The option and format numbers are experimental until registered with IANA.
 
 ## Ideas parked
 

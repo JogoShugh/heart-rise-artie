@@ -214,7 +214,46 @@ This has a cost, and the document should be read as accepting it: a manifest tha
 | Service description | What the service offers, from its bookmark | `application/json-home` (§6.11) |
 | Client identity and trace | Who is asking, and which of its requests an event is about | `User-Agent`, `traceparent` |
 
-**What is parked.** No second binding is defined. CoAP (RFC 7252) is the natural candidate. It has `ETag`, `If-Match`, `Max-Age` and `4.12 Precondition Failed`, but no `Prefer`, so the requested rendering would need another carrier. ARTIE implements the client side of this section: its core works in the concepts above, and a binding is chosen by scheme (`client/…/heart/Binding.kt`).
+ARTIE implements the client side of this section: its core works in the concepts above, and a binding is chosen by scheme (`client/…/heart/Binding.kt`).
+
+#### 6.0.1 The CoAP binding (added 2026-10-10)
+
+> **Decided (2026-10-10).** The second binding is CoAP (RFC 7252), for the scheme `coap`. `coaps` (CoAP over DTLS) would use the same mapping; it is not implemented yet, so ARTIE refuses a `coaps:` URI as having no binding. CoAP has no header for a profile or a preference. The binding therefore carries them in CoAP options from the experimental range (65000–65535, RFC 7252 §12.2), one for one with their HTTP headers. They keep the same values and meaning, and they should be registered with IANA if this binding is adopted. Content-Formats unregistered for these media types use the experimental range too.
+
+| Core concept | CoAP binding |
+|---|---|
+| Read | `GET` (0.01) → `2.05 Content` |
+| Requested rendering | `Accept` option (the Content-Format), option **65000 Accept-Profile** (`<profile URI>`, as in HTTP), option **65004 Prefer** (the HTTP `Prefer` value) |
+| Applied rendering | `Content-Format` option, option **65008 Profile** (the profile URI), option **65012 Preference-Applied** (the HTTP value) |
+| Validator | `ETag` option. CoAP allows at most 8 bytes, so the CoAP validator is the first 8 bytes of SHA-256 over the HTTP binding's ETag value. It is still opaque and still strong. |
+| Never fresh | The response's `Max-Age: 0`, and on every Layer 1 read the request option **65003 No-Cache**. That option is critical and unsafe-to-forward (RFC 7252 §5.4.6): a proxy that does not understand it must refuse the request (§5.7.1), so it can never answer from its cache unchecked. |
+| Unchanged | The request `ETag` option → `2.03 Valid` |
+| Immutable | `Max-Age: 31536000` |
+| Integrity | The link's `integrity` value, as in every binding. There is no `Repr-Digest`. |
+| Act | `POST` (0.02) with `If-Match` (the 8-byte validator) |
+| Act done | `2.04 Changed`, with the resource's new representation. CoAP has no `Content-Location`; the representation's `self` link names the resource. |
+| Precondition required | `4.00 Bad Request` with the problem type `precondition-required`. CoAP has no 4.28. |
+| Stale | `4.12 Precondition Failed` |
+| Not offered | `4.09 Conflict` (RFC 8132) |
+| Invalid input | `4.22 Unprocessable Entity` (RFC 8132) |
+| Refusal detail | An RFC 9457 problem details object, as JSON |
+| Service description | `GET /` with `Accept` = the json-home Content-Format |
+| Client identity and trace | Not carried. CoAP has no `User-Agent`, and Trace Context defines no CoAP carrier. |
+| Large bodies | Block-wise transfer (RFC 7959) |
+
+Experimental Content-Formats:
+
+| Content-Format | Media type |
+|---|---|
+| 65000 | `application/hal+json` |
+| 65001 | `application/schema+json` |
+| 65002 | `application/problem+json` |
+| 65003 | `application/json-home` |
+| 65004 | `application/alps+json` |
+
+`application/json` uses its registered number, 50.
+
+The reference server answers CoAP on UDP port 5683 (`heart.coap.port`) beside HTTP, from the same services, with the same act checks (`BedActs`). It serves the `hal-schema-forms` dialect over CoAP at every rung. It does not serve HAL-FORMS over CoAP: HAL-FORMS is the HTTP on-ramp (§6.1), and a CoAP request for it is answered `4.06 Not Acceptable`.
 
 ### 6.1 Media Type, Dialects, and Profile Negotiation
 

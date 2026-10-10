@@ -23,6 +23,17 @@ class LiveSteps(private val ctx: ClientContext) {
         ctx.scenario = scenario.name.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
     }
 
+    /**
+     * SPEC §6.0.1: the same server's CoAP front door, on the live server's host at
+     * ARTIE_COAP_PORT (CoAP's default, 5683). The client is handed a coap: URI.
+     */
+    @When("the client enters {string} over CoAP")
+    fun enterOverCoap(path: String) {
+        val host = java.net.URI(checkNotNull(ctx.baseUrl)).host
+        val port = System.getenv("ARTIE_COAP_PORT") ?: "5683"
+        ctx.current = ctx.client.enter("coap://$host:$port$path")
+    }
+
     /** Runs ARTIE_RESET (server-spring/reset-db.sh by default, set by the liveTest task). */
     @Given("the beds are at their seed state")
     fun seedState() {

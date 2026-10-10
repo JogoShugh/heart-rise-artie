@@ -9,8 +9,9 @@ import java.net.URI
  * builds a URI of its own; targets come from the manifest, and templates
  * are expanded as each form declares (HAL-SCHEMA-FORMS-HR Rule 1, see UriTemplate).
  * It treats every URI as opaque, and reaches each through the binding its
- * scheme selects: [transport] carries the HTTP binding, for `http` and `https`,
- * and [bindings] adds others. For caching and integrity checks, give it a
+ * scheme selects: [transport] carries the HTTP binding, for `http` and `https`;
+ * CoapBinding serves `coap` (SPEC §6.0.1); and [bindings] adds others or
+ * replaces these. For caching and integrity checks, give it a
  * transport built as CachingTransport(IntegrityCheck(wire)).
  */
 class ArtieClient(
@@ -31,7 +32,7 @@ class ArtieClient(
     }
 
     private val bindings = HttpBinding(transport).let { http ->
-        Bindings(mapOf("http" to http, "https" to http) + bindings)
+        Bindings(mapOf("http" to http, "https" to http, "coap" to CoapBinding()) + bindings)
     }
     private val decisions = DecisionLog(events)
     private val layers = SharedLayers(this.bindings, allowUncheckedLinks, decisions)

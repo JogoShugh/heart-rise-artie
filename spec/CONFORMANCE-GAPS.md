@@ -37,6 +37,7 @@ has since changed.
 | §6.2 (2026-10-10): refusals as RFC 9457 problem details, a `type` per refusal, 422 `violations` as JSON Pointers | **Done** (2026-10-10) | `problem-details.feature`, `Problems` |
 | §6.1, §8.5 (2026-10-10): forms keyed by `garden:` relations, with titles, descriptions and field annotations; ALPS profile at `/profiles/garden` | **Done** (2026-10-10) for HAL Schema Forms; HAL-FORMS keeps template names | `form-relations.feature`, `GardenProfile` |
 | §6.12 (2026-10-10): `hr:unavailable` explanation, immutable, linked with integrity | **Done** (2026-10-10) | `unavailable.feature` |
+| §6.0.1 (2026-10-10): the CoAP binding. A Californium front door on UDP 5683 serves beds, acts, shared layers, the index, search and ALPS, with the experimental options, the 8-byte validator, and the refusals as CoAP codes with problem types | **Done** (2026-10-10) for hal-schema-forms; HAL-FORMS answers 4.06; no `coaps` | `coap.feature`, `CoapFrontDoor` |
 | L6 | n/a (server) | |
 | Snapshot write on real Postgres | **Fixed** (C3). The first snapshot (event 5) threw after the event was committed, so the act returned `500` for a write that happened. Now an upsert, and best-effort | `EventStorePostgresTest` |
 | Tests run the production web stack | **Done**. Production now runs WebFlux on Netty, like the Cucumber suite: `spring-boot-starter-web` is excluded from the HATEOAS starter. `runtime-stack.feature` fails if a servlet stack returns. Journal, content addresses and ARTIE live all pass on Netty |
@@ -67,7 +68,8 @@ has since changed.
 | §6.1, §6.8 (2026-10-10): form names expanded as relations; the reasoner sees titles and descriptions, and may ask for an ALPS descriptor | **Done** (2026-10-10) | `form-relations.feature` |
 | §6.12 (2026-10-10): explains an absent act from `hr:unavailable`, checked against its integrity; never infers a reason | **Done** (2026-10-10) | `explaining-absence.feature` |
 | Breadcrumbs (hack log 2026-10-10): `User-Agent` per client, W3C `traceparent`, an opt-in OpenTelemetry-style event log (file or POST) | **Done** (2026-10-10) | `user-agent.feature`, `breadcrumbs.feature` |
-| §6.0 (2026-10-10): the core works in protocol-neutral terms (`Binding`, `Received`, `Outcome`); a binding is chosen by URI scheme; HTTP is one binding; an unknown scheme is refused before anything is sent | **Done** (2026-10-10). No second real binding (CoAP parked); proven with an in-memory test binding | `any-protocol.feature` |
+| §6.0 (2026-10-10): the core works in protocol-neutral terms (`Binding`, `Received`, `Outcome`); a binding is chosen by URI scheme; HTTP is one binding; an unknown scheme is refused before anything is sent | **Done** (2026-10-10); proven with an in-memory test binding | `any-protocol.feature` |
+| §6.0.1 (2026-10-10): the CoAP binding for `coap:` URIs. Requested and applied rendering in options, No-Cache on Layer 1 reads, the 8-byte validator, refusals from CoAP codes and problem types. Live, over UDP against the real server: full cycles at L0 and L2, and the bookmark flow, with nothing sent over HTTP | **Done** (2026-10-10); no `coaps` | `coap-binding.feature`, live `Over CoAP` scenarios |
 
 ## exhibits/cache-demo
 

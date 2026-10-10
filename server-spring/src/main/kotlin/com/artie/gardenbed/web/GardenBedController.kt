@@ -2,15 +2,12 @@ package com.artie.gardenbed.web
 
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
-import com.artie.gardenbed.eventstore.ConcurrentAppendException
 import com.artie.gardenbed.service.BedNotFoundException
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.gardenbed.service.InvalidTransitionException
 import com.artie.gardenbed.web.dto.GardenBedDto
 import com.artie.gardenbed.web.dto.SowSeedRequest
 import com.artie.gardenbed.web.dto.WaterCellRequest
-import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.Validator
 import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.Link
 import org.springframework.hateoas.MediaTypes
@@ -37,19 +34,16 @@ private const val PREFER = "Prefer"
 private fun allowedAffordances(status: GardenBedStatus): List<String> =
     JsonSchemaDialectSupport.allowedAffordances(status)
 
-class StaleWriteConflict(message: String) : RuntimeException(message)
+class StaleWriteConflict(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 class MalformedAsOfException(message: String) : RuntimeException(message)
 
 @RestController
 @RequestMapping("/beds")
 class GardenBedController(
     private val service: GardenBedService,
-    objectMapper: ObjectMapper,
-    validator: Validator,
+    private val acts: BedActs,
     private val limits: ServingLimits,
 ) {
-    private val binder = ActBodyBinder(objectMapper, validator)
-
     @GetMapping("/{id}")
     suspend fun getBed(
         @PathVariable id: Long,
@@ -115,10 +109,7 @@ class GardenBedController(
     ): ResponseEntity<Any> {
         // Negotiate before acting, so a 406 never follows a write.
         val dialect = Negotiation.dialect(headers)
-        val updated = act(id, ifMatch, "sowSeed", headers) {
-            val request = binder.bind(body, SowSeedRequest::class.java)
-            service.sowSeed(id, request.seedType, request.depthCm)
-        }
+        val updated = act(id, ifMatch, "sowSeed", headers, body).state
         return renderAct(id, updated, dialect, headers.getFirst(PREFER))
     }
 
@@ -130,10 +121,7 @@ class GardenBedController(
         @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
         val dialect = Negotiation.dialect(headers)
-        val updated = act(id, ifMatch, "waterCell", headers) {
-            val request = binder.bind(body, WaterCellRequest::class.java)
-            service.waterCell(id, request.milliliters)
-        }
+        val updated = act(id, ifMatch, "waterCell", headers, body).state
         return renderAct(id, updated, dialect, headers.getFirst(PREFER))
     }
 
@@ -144,12 +132,13 @@ class GardenBedController(
         @RequestHeader headers: HttpHeaders
     ): ResponseEntity<Any> {
         val dialect = Negotiation.dialect(headers)
-        val (updated, result) = act(id, ifMatch, "harvest", headers) { service.harvest(id) }
+        val done = act(id, ifMatch, "harvest", headers, body = null)
+        val result = checkNotNull(done.harvest)
         val yieldHeaders = HttpHeaders().apply {
             add("X-Harvest-Yield-Grams", result.yieldGrams.toString())
             add("X-Harvest-Crop-Name", result.cropName)
         }
-        return renderAct(id, updated, dialect, headers.getFirst(PREFER), yieldHeaders)
+        return renderAct(id, done.state, dialect, headers.getFirst(PREFER), yieldHeaders)
     }
 
     /**
@@ -172,50 +161,23 @@ class GardenBedController(
             .body(rendered.body)
     }
 
-    private suspend fun <T> mapConcurrencyConflict(block: suspend () -> T): T =
-        try {
-            block()
-        } catch (e: ConcurrentAppendException) {
-            throw StaleWriteConflict(e.message ?: "concurrent write conflict")
-        }
-
-    /** SPEC §6.2 evaluation order: 428, then 412, then 409, then
-     *  (inside [block], via the binder) 422. The first failure wins. */
-    private suspend fun <T> act(
+    /** SPEC §6.2 evaluation order: 428, then 412, then 409, then (when
+     *  the body is bound) 422. The first failure wins (see BedActs).
+     *  An action's selected representation is its owning bed's, chosen by
+     *  this request's own Accept, Accept-Profile and Prefer. If-Match is
+     *  compared, whole, with that representation's current ETag: strong
+     *  comparison (RFC 9110 §13.1.1). */
+    private suspend fun act(
         id: Long,
         ifMatch: String?,
         affordance: String,
         headers: HttpHeaders,
-        block: suspend () -> T,
-    ): T {
-        checkPreconditions(id, ifMatch, affordance, headers)
-        return mapConcurrencyConflict(block)
-    }
-
-    /** SPEC §6.2 precondition: an action's selected representation is its
-     *  owning bed's, chosen by this request's own Accept, Accept-Profile and
-     *  Prefer. If-Match is compared, whole, with that representation's
-     *  current ETag: strong comparison (RFC 9110 §13.1.1). Reads state only
-     *  when If-Match is present, so a 428 costs no store read. */
-    private suspend fun checkPreconditions(id: Long, ifMatch: String?, affordance: String, headers: HttpHeaders) {
-        val failure = if (ifMatch == null) {
-            PreconditionRequiredException("$affordance on bed $id needs If-Match with the bed's current ETag")
-        } else {
-            val current = service.currentState(id)
-            val selected = selectedETag(current, headers)
-            when {
-                !StateETag.matches(ifMatch, selected) -> StaleWriteConflict(
-                    "If-Match $ifMatch does not match $selected, the current ETag of the representation " +
-                        "these request headers select for bed $id"
-                )
-                affordance !in allowedAffordances(current.status) -> InvalidTransitionException(
-                    "$affordance is not in bed $id's current affordance set (status ${current.status})",
-                    rel = GardenProfile.reference(affordance),
-                )
-                else -> null
-            }
+        body: String?,
+    ): ActResult {
+        acts.check(id, affordance, ifMatch != null) { current ->
+            StateETag.matches(checkNotNull(ifMatch), selectedETag(current, headers))
         }
-        failure?.let { throw it }
+        return acts.run(id, affordance, body)
     }
 
     /** The ETag of the bed representation [headers] select, at [state]. */

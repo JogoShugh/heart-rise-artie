@@ -44,9 +44,12 @@ class ServiceIndexController(
     fun index(@RequestHeader headers: HttpHeaders): ResponseEntity<String> {
         if (Negotiation.wantsJsonHome(headers)) return homeDocument()
         val dialect = Negotiation.dialect(headers)
-        val body = indexBodies.getValue(dialect)
-        return layer1(dialect).eTag("\"index-${dialect.etagTag}-${sha256Hex(body).take(ETAG_HEX)}\"").body(body)
+        return layer1(dialect).eTag(indexETag(dialect)).body(indexBody(dialect))
     }
+
+    /** The index's validator in [dialect]: it changes only when the body does. */
+    fun indexETag(dialect: Dialect): String =
+        "\"index-${dialect.etagTag}-${sha256Hex(indexBody(dialect)).take(ETAG_HEX)}\""
 
     @GetMapping("/beds")
     suspend fun search(
@@ -56,6 +59,17 @@ class ServiceIndexController(
         @RequestHeader headers: HttpHeaders,
     ): ResponseEntity<Map<String, Any>> {
         val dialect = Negotiation.dialect(headers)
+        return layer1(dialect).body(searchBody(name, id, page))
+    }
+
+    /** The index body in [dialect], the same for every binding. */
+    fun indexBody(dialect: Dialect): String = indexBodies.getValue(dialect)
+
+    /** The home document's body, the same for every binding. */
+    fun homeBody(): String = objectMapper.writeValueAsString(home(limits.maxRung))
+
+    /** One page of the beds matching [name] and [id], the same for every binding. */
+    suspend fun searchBody(name: String?, id: Long?, page: Int): Map<String, Any> {
         val beds = service.findBeds(name, id)
         val size = limits.pageSize
         val pageNo = page.coerceAtLeast(1)
@@ -79,12 +93,11 @@ class ServiceIndexController(
             if (pageNo > 1 && pageNo <= lastPage) put("prev", href(pageNo - 1))
         }
         val items = beds.drop((pageNo - 1) * size).take(size)
-        val body = mapOf(
+        return mapOf(
             "count" to beds.size,
             "_links" to mapOf("self" to href(pageNo)) + paging +
                 ("item" to items.map { mapOf("href" to "/beds/${it.id}", "title" to it.label) }),
         )
-        return layer1(dialect).body(body)
     }
 
     /**
@@ -94,7 +107,7 @@ class ServiceIndexController(
      * up to [ServingLimits.maxRung] (none at L0), and that acts need If-Match.
      */
     private fun homeDocument(): ResponseEntity<String> {
-        val body = objectMapper.writeValueAsString(home(limits.maxRung))
+        val body = homeBody()
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(Negotiation.JSON_HOME))
             .header(HttpHeaders.CACHE_CONTROL, "no-cache")
