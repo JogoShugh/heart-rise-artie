@@ -2,10 +2,10 @@ package com.artie.gardenbed.coap
 
 import com.artie.gardenbed.service.BedNotFoundException
 import com.artie.gardenbed.service.InvalidTransitionException
-import com.artie.gardenbed.web.MalformedActBodyException
-import com.artie.gardenbed.web.PreconditionRequiredException
-import com.artie.gardenbed.web.StaleWriteConflict
-import com.artie.gardenbed.web.UnprocessableContentException
+import com.artie.heart.MalformedActBodyException
+import com.artie.heart.PreconditionRequiredException
+import com.artie.heart.StaleWriteConflict
+import com.artie.heart.UnprocessableContentException
 import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.coap.Response
 

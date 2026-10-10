@@ -2,12 +2,11 @@ package com.artie.gardenbed.web
 
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
-import com.apicatalog.jcs.JsonCanonicalizer
-import jakarta.json.Json
-import jakarta.json.JsonValue
-import java.io.StringReader
-import java.security.MessageDigest
-import java.util.Base64
+import com.artie.heart.ContentAddress
+import com.artie.heart.Dialect
+import com.artie.heart.HEART_RISE_PROFILE
+import com.artie.heart.Rung
+import com.artie.heart.SetRendering
 
 /**
  * REBUILT A SECOND TIME after a real, caught mistake: the first
@@ -102,10 +101,10 @@ object JsonSchemaDialectSupport {
      *  hashed AND served, so the URL is a true content address of
      *  exactly the bytes SchemaController returns. */
     private val canonicalSchemas: Map<String, String> =
-        rawSchemas.mapValues { (_, raw) -> String(canonicalBytesOfJsonText(raw), Charsets.UTF_8) }
+        rawSchemas.mapValues { (_, raw) -> ContentAddress.canonicalText(raw) }
 
     private val schemaHashes: Map<String, String> =
-        canonicalSchemas.mapValues { (_, body) -> sha256Hex(body.toByteArray(Charsets.UTF_8)).take(16) }
+        canonicalSchemas.mapValues { (_, body) -> hashOf(body) }
 
     /** hash (no "sha256-" prefix) -> canonical schema body, for SchemaController. */
     val schemasByHash: Map<String, String> =
@@ -201,17 +200,17 @@ object JsonSchemaDialectSupport {
                     )
                 },
             )
-            String(canonicalBytes(body), Charsets.UTF_8)
+            ContentAddress.canonical(body)
         }
 
     /** hash (no "sha256-" prefix) -> canonical explanation JSON, for UnavailableController. */
     val unavailableByHash: Map<String, String> =
-        unavailableJsonByStatus.values.associateBy { sha256Hex(it.toByteArray(Charsets.UTF_8)).take(16) }
+        unavailableJsonByStatus.values.associateBy { hashOf(it) }
 
     private fun unavailableLink(status: GardenBedStatus): Map<String, Any> {
         val json = unavailableJsonByStatus.getValue(status)
         return mapOf(
-            "href" to "/unavailable/sha256-${sha256Hex(json.toByteArray(Charsets.UTF_8)).take(16)}",
+            "href" to "/unavailable/${ContentAddress.address(json)}",
             "type" to "application/json",
             "integrity" to integrityOf(json),
         )
@@ -237,11 +236,11 @@ object JsonSchemaDialectSupport {
                     ),
                     "_forms" to buildForms(allowedAffordances(key.status), embed),
                 )
-                String(canonicalBytes(body), Charsets.UTF_8)
+                ContentAddress.canonical(body)
             }
 
     private val setHashByKey: Map<SetKey, String> =
-        setJsonByKey.mapValues { (_, json) -> sha256Hex(json.toByteArray(Charsets.UTF_8)).take(16) }
+        setJsonByKey.mapValues { (_, json) -> hashOf(json) }
 
     /** hash (no "sha256-" prefix) -> canonical set JSON, for AffordanceSetController. */
     val affordanceSetsByHash: Map<String, String> =
@@ -332,63 +331,14 @@ object JsonSchemaDialectSupport {
     // Helpers
     // ---------------------------------------------------------------
 
-    private fun sha256Hex(input: ByteArray): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(input)
-        return digest.joinToString("") { "%02x".format(it) }
-    }
-
-    private fun sha256Base64(body: String): String {
-        val digest = MessageDigest.getInstance("SHA-256").digest(body.toByteArray(Charsets.UTF_8))
-        return Base64.getEncoder().encodeToString(digest)
-    }
+    /** The hex part of a canonical body's content address (heart-core, SPEC §6.5). */
+    private fun hashOf(body: String): String = ContentAddress.address(body).removePrefix("sha256-")
 
     /** W3C Subresource Integrity syntax, for links and schema references. */
-    private fun integrityOf(body: String): String = "sha256-${sha256Base64(body)}"
+    private fun integrityOf(body: String): String = ContentAddress.integrity(body)
 
     /** RFC 9530 Repr-Digest for a Layer 2 or Layer 3 body, in RFC 8941 byte-sequence syntax. */
-    fun reprDigestOf(body: String): String = "sha-256=:${sha256Base64(body)}:"
-
-    /** Converts a plain Kotlin object graph (Map/List/String/Int/Long/
-     *  Double/Boolean/null) into a Jakarta JSON-P `JsonValue` tree, since
-     *  that's the type titanium-jcs's `JsonCanonicalizer` actually
-     *  consumes. */
-    private fun toJson(value: Any?): JsonValue = when (value) {
-        null -> JsonValue.NULL
-        is JsonValue -> value
-        is String -> Json.createValue(value)
-        is Int -> Json.createValue(value)
-        is Long -> Json.createValue(value)
-        is Double -> Json.createValue(value)
-        is Boolean -> if (value) JsonValue.TRUE else JsonValue.FALSE
-        is Map<*, *> -> {
-            val b = Json.createObjectBuilder()
-            for ((k, v) in value) b.add(k as String, toJson(v))
-            b.build()
-        }
-        is List<*> -> {
-            val b = Json.createArrayBuilder()
-            for (v in value) b.add(toJson(v))
-            b.build()
-        }
-        else -> throw IllegalArgumentException("Unsupported value type for JCS canonicalization: ${value::class}")
-    }
-
-    /** RFC 8785 (JCS) canonical UTF-8 bytes of a plain Kotlin object
-     *  graph -- recursively sorted keys, no insignificant whitespace, per
-     *  SPEC.md §6.5. This is what actually gets hashed for Layer 2
-     *  (affordance-sets); replaces the old plain-Jackson `canonicalJson`,
-     *  which was deterministic only because Map insertion order happened
-     *  to be stable here, not because it was actually canonical. */
-    private fun canonicalBytes(value: Any?): ByteArray =
-        JsonCanonicalizer.canonize(toJson(value)).toByteArray(Charsets.UTF_8)
-
-    /** RFC 8785 (JCS) canonical UTF-8 bytes of a raw JSON text string --
-     *  used for Layer 3 (schemas), which arrive as hand-written literals
-     *  rather than programmatically-built trees. */
-    private fun canonicalBytesOfJsonText(raw: String): ByteArray =
-        Json.createReader(StringReader(raw)).use { reader ->
-            JsonCanonicalizer.canonize(reader.readValue()).toByteArray(Charsets.UTF_8)
-        }
+    fun reprDigestOf(body: String): String = ContentAddress.reprDigest(body)
 
     private fun parseSchemaBody(raw: String): Any {
         val mapper = com.fasterxml.jackson.databind.ObjectMapper()

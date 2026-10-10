@@ -1,5 +1,6 @@
 package com.artie.gardenbed.web
 
+import com.artie.heart.Rung
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 

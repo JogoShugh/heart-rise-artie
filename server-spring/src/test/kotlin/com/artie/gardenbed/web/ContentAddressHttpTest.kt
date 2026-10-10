@@ -1,6 +1,7 @@
 package com.artie.gardenbed.web
 
 import com.artie.gardenbed.domain.GardenBedStatus
+import com.artie.heart.SetRendering
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test

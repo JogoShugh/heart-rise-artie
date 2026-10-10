@@ -1,8 +1,8 @@
 package com.artie.gardenbed.coap
 
-import com.artie.gardenbed.web.Dialect
-import com.artie.gardenbed.web.HEART_RISE_PROFILE
 import com.artie.gardenbed.web.Problems
+import com.artie.heart.Dialect
+import com.artie.heart.HEART_RISE_PROFILE
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.coap.Option

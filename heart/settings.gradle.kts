@@ -1,0 +1,5 @@
+rootProject.name = "heart"
+
+// The HEART server library (spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md, Part A).
+// A server includes this build and depends on com.artie.heart:<module>.
+include("heart-core")

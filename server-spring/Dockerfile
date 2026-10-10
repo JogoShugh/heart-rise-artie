@@ -20,15 +20,21 @@
 # on any reasonably current Docker Desktop install (the `docker:
 # desktop-linux` driver shown in build output confirms this).
 
+# The build context is the repo root (see docker-compose.yml), because the
+# server includes the HEART library build from ../heart.
 FROM gradle:8.10-jdk21 AS build
 WORKDIR /app
-COPY build.gradle.kts settings.gradle.kts ./
-COPY src ./src
+COPY heart/settings.gradle.kts heart/build.gradle.kts ./heart/
+COPY heart/heart-core/build.gradle.kts ./heart/heart-core/
+COPY heart/heart-core/src/main ./heart/heart-core/src/main
+COPY server-spring/build.gradle.kts server-spring/settings.gradle.kts ./server-spring/
+COPY server-spring/src ./server-spring/src
+WORKDIR /app/server-spring
 RUN --mount=type=cache,target=/root/.gradle \
     gradle bootJar --no-daemon
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/server-spring/build/libs/*.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]

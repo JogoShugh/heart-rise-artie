@@ -1,27 +1,14 @@
 package com.artie.gardenbed.web
 
+import com.artie.heart.MalformedActBodyException
+import com.artie.heart.UnprocessableContentException
+import com.artie.heart.Violation
+import com.artie.heart.pointerOf
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
-
-/** 428: a state-changing request arrived without If-Match (SPEC §6.2). */
-class PreconditionRequiredException(message: String) : RuntimeException(message)
-
-/** One failing field: an RFC 6901 JSON Pointer into the request body, and why (SPEC §6.2). */
-data class Violation(val pointer: String, val message: String)
-
-/** 422: the body is JSON but does not satisfy the affordance's schema. */
-class UnprocessableContentException(val violations: List<Violation>, cause: Throwable? = null) :
-    RuntimeException("request body does not satisfy the affordance schema", cause)
-
-/** A dotted bean-validation or Jackson path as a JSON Pointer, escaping `~` and `/` (RFC 6901 §3). */
-internal fun pointerOf(segments: List<String>): String =
-    segments.joinToString("") { "/" + it.replace("~", "~0").replace("/", "~1") }
-
-/** 400: the body is not JSON at all. */
-class MalformedActBodyException(message: String, cause: Throwable) : RuntimeException(message, cause)
 
 /**
  * Binds and validates an act's body. SPEC [0.5] §6.2 puts schema

@@ -7,6 +7,8 @@ import com.artie.gardenbed.service.InvalidTransitionException
 import com.artie.gardenbed.web.dto.HarvestResult
 import com.artie.gardenbed.web.dto.SowSeedRequest
 import com.artie.gardenbed.web.dto.WaterCellRequest
+import com.artie.heart.PreconditionRequiredException
+import com.artie.heart.StaleWriteConflict
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.validation.Validator
 import org.springframework.stereotype.Component

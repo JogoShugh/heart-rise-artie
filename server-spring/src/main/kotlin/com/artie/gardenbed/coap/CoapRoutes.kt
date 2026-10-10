@@ -3,13 +3,13 @@ package com.artie.gardenbed.coap
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.gardenbed.web.BedActs
-import com.artie.gardenbed.web.Dialect
 import com.artie.gardenbed.web.GardenProfile
 import com.artie.gardenbed.web.JsonSchemaDialectSupport
-import com.artie.gardenbed.web.Rung
 import com.artie.gardenbed.web.ServiceIndexController
 import com.artie.gardenbed.web.ServingLimits
-import com.artie.gardenbed.web.StateETag
+import com.artie.heart.Dialect
+import com.artie.heart.Rung
+import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.californium.core.coap.CoAP.Code
 import org.eclipse.californium.core.coap.CoAP.ResponseCode

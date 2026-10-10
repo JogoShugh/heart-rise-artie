@@ -1,9 +1,9 @@
-package com.artie.gardenbed.web
+package com.artie.heart
 
 /**
  * SPEC §6.1 and §6.2: a Layer 1 ETag names one representation of one state:
- * the bed's last event sequence number (the number the event store's UNIQUE
- * constraint enforces), the dialect, and the rung, as in `"seq-5.hsf.L2"`.
+ * the resource's state version (for an event-sourced resource, its last event
+ * sequence number), the dialect, and the rung, as in `"seq-5.hsf.L2"`.
  * Each representation of a state has its own strong validator, as RFC 9110
  * §8.8.1 requires. Clients treat the value as opaque.
  */

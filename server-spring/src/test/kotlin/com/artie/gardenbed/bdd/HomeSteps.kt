@@ -1,7 +1,7 @@
 package com.artie.gardenbed.bdd
 
-import com.artie.gardenbed.web.Rung
 import com.artie.gardenbed.web.ServingLimits
+import com.artie.heart.Rung
 import com.fasterxml.jackson.databind.JsonNode
 import io.cucumber.java.After
 import io.cucumber.java.en.Given

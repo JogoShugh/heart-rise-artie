@@ -8,6 +8,14 @@ import com.artie.gardenbed.service.InvalidTransitionException
 import com.artie.gardenbed.web.dto.GardenBedDto
 import com.artie.gardenbed.web.dto.SowSeedRequest
 import com.artie.gardenbed.web.dto.WaterCellRequest
+import com.artie.heart.Dialect
+import com.artie.heart.MalformedActBodyException
+import com.artie.heart.NotAcceptableException
+import com.artie.heart.PreconditionRequiredException
+import com.artie.heart.Rung
+import com.artie.heart.StaleWriteConflict
+import com.artie.heart.StateETag
+import com.artie.heart.UnprocessableContentException
 import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.Link
 import org.springframework.hateoas.MediaTypes
@@ -34,7 +42,6 @@ private const val PREFER = "Prefer"
 private fun allowedAffordances(status: GardenBedStatus): List<String> =
     JsonSchemaDialectSupport.allowedAffordances(status)
 
-class StaleWriteConflict(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 class MalformedAsOfException(message: String) : RuntimeException(message)
 
 @RestController

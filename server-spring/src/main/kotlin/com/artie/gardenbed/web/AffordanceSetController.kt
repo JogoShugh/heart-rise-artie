@@ -1,5 +1,6 @@
 package com.artie.gardenbed.web
 
+import com.artie.heart.Dialect
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

@@ -22,6 +22,9 @@ repositories {
 }
 
 dependencies {
+    // HEART itself: content addressing, negotiation, rungs, validators and refusals.
+    implementation("com.artie.heart:heart-core")
+
     // Reactive web stack: WebFlux on Netty, end to end with R2DBC below it.
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     // The hateoas starter brings spring-boot-starter-web (Spring MVC on Tomcat).
@@ -57,19 +60,6 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql") // JDBC driver, only used by Flyway below
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
-
-    // RFC 8785 JSON Canonicalization Scheme, used by JsonSchemaDialectSupport
-    // to compute Layer 2/3 content addresses per SPEC.md §6.5 -- previously
-    // this used plain Jackson serialization relying on Map insertion order,
-    // which is deterministic in practice here but not actually canonical
-    // (no recursive key-sorting, no JCS number normalization). titanium-jcs
-    // operates on Jakarta JSON-P's JsonValue tree, not plain Kotlin objects
-    // or Jackson's, so we bring both the API (titanium-jcs depends on it as
-    // `provided`, which Maven does not propagate) and a runtime
-    // implementation to build/parse JsonValue trees.
-    implementation("com.apicatalog:titanium-jcs:1.0.0")
-    implementation("jakarta.json:jakarta.json-api:2.0.1")
-    runtimeOnly("org.glassfish:jakarta.json:2.0.1")
 
     // SPEC §6.0.1: the CoAP binding (RFC 7252), a second front door beside HTTP.
     implementation("org.eclipse.californium:californium-core:3.14.0")
