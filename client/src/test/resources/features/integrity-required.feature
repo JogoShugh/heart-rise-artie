@@ -29,6 +29,7 @@ Feature: A shared layer is fetched only through a link that carries its integrit
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
@@ -73,6 +74,7 @@ Feature: A shared layer is fetched only through a link that carries its integrit
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2

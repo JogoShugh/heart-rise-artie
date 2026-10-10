@@ -33,6 +33,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       Content-Type: application/hal+json
       Cache-Control: no-cache
       ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Vary: Accept, Prefer, Accept-Profile
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
@@ -62,6 +63,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       Content-Type: application/hal+json
       Cache-Control: no-cache
       ETag: "seq-4.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 3
@@ -84,6 +86,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       """
       304 Not Modified
       ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Cache-Control: no-cache
       """
     When the client enters "http://garden.test/beds/2"
@@ -116,6 +119,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 5
@@ -138,6 +142,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2

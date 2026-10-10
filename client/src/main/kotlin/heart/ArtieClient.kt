@@ -136,10 +136,13 @@ class ArtieClient(
     private fun sync(url: String, received: HeartResponse? = null): HeartRepresentation {
         val response = received ?: transport.send(HeartRequest("GET", url, negotiation))
         val layer1 = HeartResponseParser.parse(response, url, asking.first)
-        val synced = layer1.formsLink?.let { link ->
+        // SPEC §6.11.1: the rung comes from Preference-Applied, read before any
+        // link is followed. At L0 (no header) there is no set, whatever the body links.
+        val applied = Rung.applied(response.header("Preference-Applied"))
+        val synced = layer1.formsLink?.takeIf { applied != Rung.L0 }?.let { link ->
             layer1.withAffordances(fetchSet(link, layer1.formsIntegrity))
         } ?: layer1
-        appliedRung = Rung.applied(response.header("Preference-Applied"))
+        appliedRung = applied
         return synced.also { current = it }
     }
 

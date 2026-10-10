@@ -28,6 +28,7 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
@@ -50,6 +51,7 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2

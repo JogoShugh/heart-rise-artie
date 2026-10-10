@@ -100,6 +100,36 @@ Feature: Which rung a response is at, and which rung to ask for
       | GET http://garden.test{set:planted-l1} |
     And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
 
+  Scenario: A forms link without Preference-Applied is not followed: no header means L0
+    The response is at L0 whatever its body links, so there is no
+    affordance set to fetch. Only embedded _forms count, and there are none,
+    so the client offers nothing and sends nothing more (Buster #37).
+    Given the service serves affordance set "planted" at its content address:
+      """yaml
+      _forms:
+        waterCell:
+          _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
+          method: POST
+          schema: {type: object}
+      """
+    And the service answers GET "http://garden.test/beds/2" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L2"
+      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      _links:
+        self: {href: /beds/2}
+        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
+      """
+    When the client enters "http://garden.test/beds/2"
+    Then the current representation is at rung L0
+    And the client's current manifest is empty
+    And the client sent these requests:
+      | GET http://garden.test/beds/2 |
+
   Scenario Outline: The client asks for the best the home document offers, up to its own rung: <server>
     The service index's JSON Home representation declares the dialects
     (formats) and the Prefer values honoured (accept-prefer). The client

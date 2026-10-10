@@ -75,6 +75,7 @@ class LayerSteps(private val ctx: ClientContext) {
         val headers = mapOf(
             "Content-Type" to listOf("application/hal+json"),
             "ETag" to listOf("\"seq-1.hsf.L2\""),
+            "Preference-Applied" to listOf("forms=link, schema=link"),
             "Link" to listOf("<https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel=\"profile\""),
         )
         ctx.transport.respond("GET", "http://garden.test/beds/$bed", HeartResponse(OK, headers, body))

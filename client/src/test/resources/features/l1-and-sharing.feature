@@ -32,6 +32,7 @@ Feature: L1, and the L3 sharing property seen from the client
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L1"
+      Preference-Applied: forms=link
       Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
