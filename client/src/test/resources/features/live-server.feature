@@ -182,6 +182,17 @@ Feature: ARTIE against the real server
     Then the current representation is at the rung the server serves
     And the manifest offers exactly "garden:water-cell"
 
+  Scenario: A search is paged by next links, and following them reaches every bed it counts
+    SPEC §6.11. The page size is the server's (HEART_PAGE_SIZE); start it
+    with HEART_PAGE_SIZE=2 to see more than one page. ARTIE follows next by
+    relation and builds no URI.
+    When the client enters "/"
+    And the client acts on "garden:search-beds" with:
+      """yaml
+      name: bed
+      """
+    Then following "next" from the search reaches every item it counts
+
   Scenario Outline: The server explains why an act is not offered, at rung <rung>
     SPEC §6.12. Whatever state bed 2 is in, sowing is not offered (the
     seed data plants it, and no scenario harvests it), and the server says why.

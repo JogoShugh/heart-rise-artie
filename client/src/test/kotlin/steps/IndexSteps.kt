@@ -2,6 +2,8 @@ package steps
 
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
@@ -37,6 +39,21 @@ class IndexSteps(private val ctx: ClientContext) {
     fun lastRequest(method: String, url: String) {
         val last = ctx.transport.requests.last()
         assertEquals("$method $url", "${last.method} ${last.url}")
+    }
+
+    /** Collects the items of every page, following [rel] by relation until a page has none. */
+    @Then("following {string} from the search reaches every item it counts")
+    fun followsEveryPage(rel: String) {
+        val counted = ctx.current.state["count"]?.jsonPrimitive?.int ?: error("the search has no count")
+        val seen = mutableListOf<String?>()
+        var page = ctx.current
+        while (true) {
+            seen += page.links("item").map { it.title }
+            if (page.links(rel).isEmpty()) break
+            page = ctx.client.follow(rel, null)
+        }
+        assertEquals(counted, seen.size, "items: $seen")
+        assertEquals(seen.size, seen.toSet().size, "an item was listed twice: $seen")
     }
 
     @Then("the resource links to {string} titled {string}")
