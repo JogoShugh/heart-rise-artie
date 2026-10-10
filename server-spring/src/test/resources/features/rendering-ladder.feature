@@ -10,7 +10,7 @@ Feature: Rendering ladder L0 to L2
   Scenario: L0 is the default: state, forms, and full schemas in one response
     When a client gets bed 2 with no Prefer header
     Then the response status is 200
-    And the response embeds the "waterCell" form with its full schema
+    And the response embeds the "garden:water-cell" form with its full schema
     And the response has no affordance-set link
     And the response has no Preference-Applied header
 
@@ -19,7 +19,7 @@ Feature: Rendering ladder L0 to L2
     delivered by link. The earlier name, cid, is withdrawn: it read as a
     multiformats Content Identifier, which the protocol does not use.
     When a client gets bed 2 with Prefer "<prefer>"
-    Then the response embeds the "waterCell" form with its full schema
+    Then the response embeds the "garden:water-cell" form with its full schema
     And the response has no Preference-Applied header
 
     Examples:
@@ -35,7 +35,7 @@ Feature: Rendering ladder L0 to L2
     And Preference-Applied is "<prefer>"
     When the client follows the affordance-set link
     Then the response status is 200
-    And the "waterCell" form <schema rendering>
+    And the "garden:water-cell" form <schema rendering>
 
     Examples:
       | prefer                | schema rendering                    |
@@ -76,7 +76,7 @@ Feature: Rendering ladder L0 to L2
   Scenario: Each schema reference carries the integrity of the schema it leads to
     When a client gets bed 2 with Prefer "forms=link, schema=link"
     And the client follows the affordance-set link
-    And the client follows the "waterCell" schema reference
+    And the client follows the "garden:water-cell" schema reference
     Then the response status is 200
     And the response body matches the integrity of the link that led to it
     And the response Repr-Digest matches its body

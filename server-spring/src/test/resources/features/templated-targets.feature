@@ -22,7 +22,7 @@ Feature: Templated affordance targets
     Given bed 2 is PLANTED
     And a client got bed 2 as hal-schema-forms with Prefer "forms=link, schema=link"
     When the client follows the affordance-set link
-    And the client expands "waterCell" from bed 2 by its template pointers and posts {"milliliters": 100} with its ETag
+    And the client expands "garden:water-cell" from bed 2 by its template pointers and posts {"milliliters": 100} with its ETag
     Then the response status is 200
 
   Scenario: Two beds in the same state share one affordance set

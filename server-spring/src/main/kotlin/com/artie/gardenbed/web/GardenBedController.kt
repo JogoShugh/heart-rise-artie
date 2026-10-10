@@ -191,7 +191,7 @@ class GardenBedController(
                 )
                 affordance !in allowedAffordances(current.status) -> InvalidTransitionException(
                     "$affordance is not in bed $id's current affordance set (status ${current.status})",
-                    rel = affordance,
+                    rel = GardenProfile.reference(affordance),
                 )
                 else -> null
             }

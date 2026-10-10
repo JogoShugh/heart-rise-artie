@@ -25,12 +25,11 @@ class JsonSchemaDialectSupportTest {
     @Test
     fun `every served schema is genuinely canonical JSON`() {
         for ((hash, body) in JsonSchemaDialectSupport.schemasByHash) {
-            // No insignificant whitespace -- JCS strips it entirely.
-            // (Checking for a plain " " would false-positive on string
-            // *values* like "Sow Seed"; ": " / ", " only ever appear as
-            // structural separators in non-canonical JSON.)
-            assertFalse(body.contains(": "), "schema $hash has structural whitespace: $body")
-            assertFalse(body.contains(", "), "schema $hash has structural whitespace: $body")
+            // No insignificant whitespace -- JCS strips it entirely. String
+            // values may hold spaces ("Sow Seed", "How deep to sow, in
+            // centimetres"), so they are removed before looking.
+            val structure = body.replace(Regex("\"(?:\\\\.|[^\"\\\\])*\""), "\"\"")
+            assertFalse(structure.any { it.isWhitespace() }, "schema $hash has structural whitespace: $body")
             assertFalse(body.contains("\n"), "schema $hash has a newline: $body")
             // Top-level keys must be recursively sorted (RFC 8785), not
             // in whatever order the hand-written literal declared them.

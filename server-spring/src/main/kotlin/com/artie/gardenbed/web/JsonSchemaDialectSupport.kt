@@ -55,8 +55,18 @@ object JsonSchemaDialectSupport {
               "title": "Sow Seed",
               "type": "object",
               "properties": {
-                "seedType": { "type": "string" },
-                "depthCm": { "type": "number", "minimum": 1, "maximum": 10 }
+                "seedType": {
+                  "type": "string",
+                  "title": "Seed",
+                  "description": "The kind of seed to sow",
+                  "examples": ["basil"]
+                },
+                "depthCm": {
+                  "type": "number", "minimum": 1, "maximum": 10,
+                  "title": "Depth",
+                  "description": "How deep to sow, in centimetres",
+                  "examples": [2]
+                }
               },
               "required": ["seedType"]
             }
@@ -67,7 +77,12 @@ object JsonSchemaDialectSupport {
               "title": "Water Cell",
               "type": "object",
               "properties": {
-                "milliliters": { "type": "integer", "minimum": 1, "maximum": 1000 }
+                "milliliters": {
+                  "type": "integer", "minimum": 1, "maximum": 1000,
+                  "title": "Water per cell",
+                  "description": "Millilitres of water poured into each cell",
+                  "examples": [250]
+                }
               },
               "required": ["milliliters"]
             }
@@ -132,7 +147,12 @@ object JsonSchemaDialectSupport {
      *  declares in `hr:templatePointers` (HAL-SCHEMA-FORMS-HR Rule 1,
      *  SPEC §6.9.1): `/id`, the bed body's top-level `id`. */
     private fun buildForms(names: List<String>, embedSchemas: Boolean): Map<String, Any?> =
-        names.associateWith { name ->
+        // HAL-SCHEMA-FORMS-HR Rules 6 and 7: keyed by relation, and self-describing.
+        names.associate { name -> GardenProfile.key(name) to buildForm(name, embedSchemas) }
+
+    private fun buildForm(name: String, embedSchemas: Boolean): Map<String, Any?> =
+        run {
+            val relation = GardenProfile.relation(name)
             val id = schemaIdFor(name)
             val schema: Map<String, Any?> = if (embedSchemas) {
                 (parseSchemaBody(canonicalSchemas.getValue(name)) as Map<*, *>)
@@ -145,6 +165,8 @@ object JsonSchemaDialectSupport {
             }
 
             mapOf(
+                "title" to relation.title,
+                "description" to relation.description,
                 "_links" to mapOf(
                     "target" to mapOf(
                         "href" to "/beds/{id}/actions/${actionPath(name)}",
@@ -169,7 +191,11 @@ object JsonSchemaDialectSupport {
         GardenBedStatus.entries.flatMap { status -> SetRendering.entries.map { SetKey(status, it) } }
             .associateWith { key ->
                 val embed = key.rendering == SetRendering.EMBEDDED_SCHEMAS
-                val body = mapOf("_forms" to buildForms(allowedAffordances(key.status), embed))
+                // The set declares the CURIE its form keys use (HAL-SCHEMA-FORMS-HR Rule 6).
+                val body = mapOf(
+                    "_links" to mapOf("curies" to GardenProfile.CURIES),
+                    "_forms" to buildForms(allowedAffordances(key.status), embed),
+                )
                 String(canonicalBytes(body), Charsets.UTF_8)
             }
 
@@ -231,7 +257,7 @@ object JsonSchemaDialectSupport {
 
         val rendering = rung.setRendering
         if (rendering == null) {
-            base["_links"] = mapOf("self" to mapOf("href" to "/beds/$bedId"))
+            base["_links"] = mapOf("self" to mapOf("href" to "/beds/$bedId"), "curies" to GardenProfile.CURIES)
             base.putAll(resolvedFormsForBed(state.status, bedId, embedSchemas = true))
         } else {
             val hash = affordanceSetHashFor(state.status, rendering)

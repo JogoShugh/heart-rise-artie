@@ -39,13 +39,13 @@ class IndexSteps(private val http: HttpWorld) {
         assertTrue(found != null && found.path("required").asBoolean(), "$name has no required property $property")
     }
 
-    @Then("the two indexes offer the same form names")
-    fun sameFormNames() {
+    @Then("the two indexes offer forms with the same titles")
+    fun sameFormTitles() {
         val (hsf, hf) = http.exchanges.takeLast(2)
-        val hsfNames = hsf.json.path("_forms").fieldNames().asSequence().toSet()
-        val hfNames = hf.json.path("_templates").fieldNames().asSequence().toSet()
-        assertTrue(hsfNames.isNotEmpty(), "no forms in ${hsf.json}")
-        assertEquals(hsfNames, hfNames)
+        val hsfTitles = hsf.json.path("_forms").map { it.path("title").asText() }.toSet()
+        val hfTitles = hf.json.path("_templates").map { it.path("title").asText() }.toSet()
+        assertTrue(hsfTitles.isNotEmpty(), "no forms in ${hsf.json}")
+        assertEquals(hsfTitles, hfTitles)
     }
 
     @Then("the response has an ETag")

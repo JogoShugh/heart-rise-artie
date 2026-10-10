@@ -18,8 +18,8 @@ Feature: Service index: one bookmark reaches every bed
     And the response links to profile "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
     And the response Cache-Control is "no-cache"
     And the response has an ETag
-    And the index offers GET form "searchBeds" with target "/beds{?name}" and field "name"
-    And the index offers GET form "getBed" with target "/beds/{id}" and field "id"
+    And the index offers GET form "garden:search-beds" with target "/beds{?name}" and field "name"
+    And the index offers GET form "garden:get-bed" with target "/beds/{id}" and field "id"
 
   Scenario Outline: Searching by part of a name lists the matching beds as titled items: <name>
     When a client gets "/beds?name=<name>"
@@ -35,7 +35,7 @@ Feature: Service index: one bookmark reaches every bed
 
   Scenario: The lookup form's target, filled from its field, is the bed
     When a client gets the service index
-    And the client fills the "getBed" form with id 2 and follows it
+    And the client fills the "garden:get-bed" form with id 2 and follows it
     Then the response status is 200
     And the response is bed 2
 
@@ -70,6 +70,8 @@ Feature: Service index: one bookmark reaches every bed
       | hal-forms        | application/prs.hal-forms+json |
 
   Scenario: Both dialects' indexes offer the same forms
+    HAL Schema Forms names a form by relation and HAL-FORMS by template
+    name, so the two are matched by title, which both dialects carry.
     When a client gets the service index
     And a client gets the service index as hal-forms
-    Then the two indexes offer the same form names
+    Then the two indexes offer forms with the same titles

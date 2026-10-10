@@ -112,16 +112,15 @@ class ServiceIndexController(
     private companion object {
         const val ETAG_HEX = 16
         const val TITLE = "Garden beds"
-        const val SEARCH_TITLE = "Find beds by name"
-        const val LOOKUP_TITLE = "Get a bed by its id"
 
         val SCHEMA_FORMS_INDEX: Map<String, Any> = mapOf(
             "title" to TITLE,
-            "_links" to mapOf("self" to mapOf("href" to "/")),
+            "_links" to mapOf("self" to mapOf("href" to "/"), "curies" to GardenProfile.CURIES),
+            // HAL-SCHEMA-FORMS-HR Rules 6 and 7: keyed by relation, and self-describing.
             "_forms" to mapOf(
-                "searchBeds" to schemaForm(
+                GardenProfile.key("searchBeds") to schemaForm(
                     target = "/beds{?name}",
-                    title = SEARCH_TITLE,
+                    name = "searchBeds",
                     field = "name",
                     property = mapOf(
                         "type" to "string",
@@ -130,11 +129,16 @@ class ServiceIndexController(
                         "description" to "Part of the bed's name; case is ignored",
                     ),
                 ),
-                "getBed" to schemaForm(
+                GardenProfile.key("getBed") to schemaForm(
                     target = "/beds/{id}",
-                    title = LOOKUP_TITLE,
+                    name = "getBed",
                     field = "id",
-                    property = mapOf("type" to "integer", "minimum" to 1, "title" to "Bed id"),
+                    property = mapOf(
+                        "type" to "integer",
+                        "minimum" to 1,
+                        "title" to "Bed id",
+                        "description" to "The bed's number",
+                    ),
                 ),
             ),
         )
@@ -144,7 +148,7 @@ class ServiceIndexController(
             "_links" to mapOf("self" to mapOf("href" to "/")),
             "_templates" to mapOf(
                 "searchBeds" to halFormsTemplate(
-                    title = SEARCH_TITLE,
+                    title = GardenProfile.relation("searchBeds").title,
                     property = mapOf(
                         "name" to "name",
                         "type" to "search",
@@ -154,7 +158,7 @@ class ServiceIndexController(
                     ),
                 ),
                 "getBed" to halFormsTemplate(
-                    title = LOOKUP_TITLE,
+                    title = GardenProfile.relation("getBed").title,
                     property = mapOf(
                         "name" to "id",
                         "type" to "number",
@@ -166,11 +170,12 @@ class ServiceIndexController(
             ),
         )
 
-        fun schemaForm(target: String, title: String, field: String, property: Map<String, Any>): Map<String, Any> =
+        fun schemaForm(target: String, name: String, field: String, property: Map<String, Any>): Map<String, Any> =
             mapOf(
                 "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
                 "method" to "GET",
-                "title" to title,
+                "title" to GardenProfile.relation(name).title,
+                "description" to GardenProfile.relation(name).description,
                 "schema" to mapOf(
                     "\$schema" to "https://json-schema.org/draft/2020-12/schema",
                     "type" to "object",

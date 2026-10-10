@@ -24,7 +24,7 @@ Feature: Refusals are RFC 9457 problem details
     When the client posts {"seedType": "tomato"} to sow-seed on bed 2 using the ETag it holds
     Then the response status is 409
     And the response is a problem of type "not-offered" with status 409
-    And the problem's "rel" member is "sowSeed"
+    And the problem's "rel" member is "/profiles/garden#sow-seed"
 
   Scenario Outline: 422 lists each failing field by JSON Pointer: <body>
     Given a client got bed 2 as hal-schema-forms with Prefer ""

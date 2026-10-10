@@ -304,7 +304,7 @@ Notes on the changes:
 |---|---|---|
 | `428` | `precondition-required` | none |
 | `412` | `stale` | none |
-| `409` | `not-offered` | `rel`: the relation the client acted on |
+| `409` | `not-offered` | `rel`: the relation the client acted on, as a URI reference resolved against the request URL |
 | `422` | `invalid-input` | `violations`: an array of `{"pointer", "message"}`, each `pointer` an RFC 6901 JSON Pointer into the request body |
 
 ```http
