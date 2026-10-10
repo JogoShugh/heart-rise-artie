@@ -365,6 +365,17 @@ Parked items below are untouched by this plan.
 8. Docs: CONFORMANCE-GAPS rows, journal recaptured (11/11 ok),
    `live-client-check.sh` writes ARTIE's event log where a Buster server
    reads it, and always reruns `liveTest`.
+9. Live proof. Plain server: 23/23 live scenarios, also with
+   `HEART_PAGE_SIZE=2` (the search walks two pages by `next`). Buster, seed
+   42, fresh server, ARTIE's event log read through `buster.client-events`:
+   ARTIE's verdicts are 27 pass, 8 pass (attested), 6 inconclusive, 0 FAIL.
+   The first run's FAILs: #3 and #21 (relax-layer1-cache) now pass, because
+   the read said `no-cache`; #24 (drop-affordance) passes; #37
+   (lie-preference-applied) is an attested pass. The 6 inconclusive are all
+   stale-etag "never acted": the forged ETag landed on a resource the
+   scenario never acted on, so nothing was exercised. The one FAIL in the run
+   is curl, the script's readiness probe, which re-read a bed without
+   `no-cache`, which is correct.
 
 ## Ideas parked
 
