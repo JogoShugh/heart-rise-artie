@@ -164,7 +164,7 @@ INSERT 0 7
   </section>
 
   <section class="entry" id="sow">
-    <div class="entry-head"><span class="entry-num">01</span><h2 class="entry-title">Planting bed-1 — sowSeed</h2></div>
+    <div class="entry-head"><span class="entry-num">01</span><h2 class="entry-title">Planting bed-1 — garden:sow-seed</h2></div>
     <p class="entry-sub">layer 1 → layer 2 → layer 3, captured live</p>
     <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. With no <code>Prefer</code> header (rung L0) everything arrives in one response: state, the form, and its full schema.</p>
     <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json' \
@@ -179,8 +179,23 @@ moistureLevel: 0
 _links:
   self:
     href: /beds/1
+  curies:
+    -
+      name: garden
+      href: &quot;/profiles/garden#{rel}&quot;
+      templated: true
+    -
+      name: hr
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      templated: true
+  &quot;hr:unavailable&quot;:
+    href: /unavailable/sha256-d1995ab17483fab3
+    type: application/json
+    integrity: &quot;sha256-0ZlasXSD+rMFQ7ma65GUvxVZMKwxgWGRFyrwmUUdjy0=&quot;
 _forms:
-  sowSeed:
+  &quot;garden:sow-seed&quot;:
+    title: &quot;Sow a seed&quot;
+    description: &quot;Plants a seed in an empty bed. The bed becomes planted.&quot;
     _links:
       target:
         href: /beds/1/actions/sow-seed
@@ -189,19 +204,27 @@ _forms:
     schema:
       properties:
         depthCm:
+          description: &quot;How deep to sow, in centimetres&quot;
+          examples:
+            - 2
           maximum: 10
           minimum: 1
+          title: Depth
           type: number
         seedType:
+          description: &quot;The kind of seed to sow&quot;
+          examples:
+            - basil
+          title: Seed
           type: string
       required:
         - seedType
       title: &quot;Sow Seed&quot;
       type: object
-      &quot;$id&quot;: /schemas/sha256-4ed779d47421af87</pre></div>
+      &quot;$id&quot;: /schemas/sha256-60ab557222ed326e</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
-      <p>L0 is collapsed: the <code>sowSeed</code> form is inline with its full schema (fields: depthCm, seedType).</p>
+      <p>L0 is collapsed: the <code>garden:sow-seed</code> form is inline with its full schema (fields: depthCm, seedType).</p>
     </div>
 
     <p class="entry-narrative">The same request with <code>Prefer: forms=link, schema=link</code> (rung L2) returns state plus one link:</p>
@@ -220,49 +243,73 @@ _links:
       href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
       templated: true
   &quot;hr:forms&quot;:
-    href: /affordance-sets/sha256-26b50c4c0d57e752
+    href: /affordance-sets/sha256-29c8f0014210ad01
     type: &quot;application/hal+json&quot;
     profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;
-    integrity: &quot;sha256-JrUMTA1X51JjsBf9u6zdrVLl3oPDqV4ONhoRMEmlWa0=&quot;</pre></div>
+    integrity: &quot;sha256-KcjwAUIQrQFuIO6qTC2V1Fs3rxnWDhaM2DUXR8EE86U=&quot;</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
-      <p>No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>/affordance-sets/sha256-26b50c4c0d57e752</code></p>
+      <p>No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>/affordance-sets/sha256-29c8f0014210ad01</code></p>
     </div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
       <p>The response names its profile in a header, not a media-type parameter: <code>Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://github.com/jogoshugh/heart-rise&gt;; rel=&quot;profile&quot;</code></p>
     </div>
 
-    <p class="entry-narrative">At <code>Prefer: forms=link</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-d0961aaaff4916e5</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
+    <p class="entry-narrative">At <code>Prefer: forms=link</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-dcf6be2f1e74ed71</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
     <div class="specimen"><div class="specimen-label output">output (L1 set, schemas embedded)</div><pre>_forms:
-  sowSeed:
+  &quot;garden:sow-seed&quot;:
     _links:
       target:
         href: /beds/{id}/actions/sow-seed
         templated: true
     contentType: application/json
+    description: &quot;Plants a seed in an empty bed. The bed becomes planted.&quot;
     &quot;hr:templatePointers&quot;:
       id: /id
     method: POST
     schema:
-      &quot;$id&quot;: /schemas/sha256-4ed779d47421af87
+      &quot;$id&quot;: /schemas/sha256-60ab557222ed326e
       properties:
         depthCm:
+          description: &quot;How deep to sow, in centimetres&quot;
+          examples:
+            - 2
           maximum: 10
           minimum: 1
+          title: Depth
           type: number
         seedType:
+          description: &quot;The kind of seed to sow&quot;
+          examples:
+            - basil
+          title: Seed
           type: string
       required:
         - seedType
       title: &quot;Sow Seed&quot;
-      type: object</pre></div>
+      type: object
+    title: &quot;Sow a seed&quot;
+_links:
+  curies:
+    -
+      href: &quot;/profiles/garden#{rel}&quot;
+      name: garden
+      templated: true
+    -
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      name: hr
+      templated: true
+  &quot;hr:unavailable&quot;:
+    href: /unavailable/sha256-d1995ab17483fab3
+    integrity: &quot;sha256-0ZlasXSD+rMFQ7ma65GUvxVZMKwxgWGRFyrwmUUdjy0=&quot;
+    type: application/json</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
       <p><code>target.href</code> is a literal, unresolved URI Template (<code>/beds/{id}/actions/sow-seed</code>) — byte-identical for every EMPTY bed, real HTTP caches included.</p>
     </div>
 
-    <div class="specimen"><div class="specimen-label">input</div><pre>curl /schemas/sha256-4ed779d47421af87</pre></div>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl /schemas/sha256-60ab557222ed326e</pre></div>
     <div class="specimen"><div class="specimen-label output">output — headers</div><pre>Cache-Control: public, max-age=31536000, immutable</pre></div>
     <div class="verdict ok">
       <span class="verdict-mark">Correct</span>
@@ -271,7 +318,7 @@ _links:
   </section>
 
   <section class="entry" id="water">
-    <div class="entry-head"><span class="entry-num">02</span><h2 class="entry-title">Watering bed-1 — waterCell</h2></div>
+    <div class="entry-head"><span class="entry-num">02</span><h2 class="entry-title">Watering bed-1 — garden:water-cell</h2></div>
     <p class="entry-sub">the halforms dialect's writable-field check</p>
     <p class="entry-narrative">After sowing, bed-1 is <strong>PLANTED</strong> and watering is the only legal action. This entry checks the HAL-FORMS dialect specifically for a known historical fault: Kotlin <code>val</code> properties (getter-only, no setter) can cause Spring HATEOAS's reflection-based property inspection to mark a field <code>readOnly: true</code> — confirmed against a real, open Spring HATEOAS GitHub issue (#1310) rather than assumed.</p>
     <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/prs.hal-forms+json' \
@@ -306,12 +353,13 @@ _templates:
     <p class="entry-sub">the one that looks broken but isn't</p>
     <p class="entry-narrative">Bed-3's seed data reaches <strong>READY_TO_HARVEST</strong> before the script starts. Its only action, harvest, needs no input at all.</p>
     <div class="specimen"><div class="specimen-label output">output</div><pre>_forms:
-  harvest:
+  &quot;garden:harvest&quot;:
     _links:
       target:
         href: /beds/{id}/actions/harvest
         templated: true
     contentType: application/json
+    description: &quot;Picks the crop from a bed that is ready. The bed becomes empty again.&quot;
     &quot;hr:templatePointers&quot;:
       id: /id
     method: POST
@@ -319,7 +367,22 @@ _templates:
       &quot;$id&quot;: /schemas/sha256-7ab6ce2f03278bdf
       properties: {}
       title: Harvest
-      type: object</pre></div>
+      type: object
+    title: &quot;Harvest the crop&quot;
+_links:
+  curies:
+    -
+      href: &quot;/profiles/garden#{rel}&quot;
+      name: garden
+      templated: true
+    -
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      name: hr
+      templated: true
+  &quot;hr:unavailable&quot;:
+    href: /unavailable/sha256-0b7168a23ddb1595
+    integrity: &quot;sha256-C3Fooj3bFZWkmnJK+qklt435QZ66sBzrL3fqv9NCKQM=&quot;
+    type: application/json</pre></div>
     <div class="verdict ok"><span class="verdict-mark">Correct, not a bug</span><p><code>harvest()</code> in the service layer takes no body. Empty <code>properties</code> reports the truth.</p></div>
   </section>
 
@@ -328,8 +391,8 @@ _templates:
     <p class="entry-sub">what all three layers exist to prove</p>
     <p class="entry-narrative">Bed-1 reached <strong>READY_TO_HARVEST</strong> the long way — sown, watered, grown. Bed-3 arrived at the identical status from seed data. Neither bed knows about the other.</p>
     <div class="hash-pair">
-      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-42b2f7c8d6cd5ae6</div></div>
-      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-42b2f7c8d6cd5ae6</div></div>
+      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-00bb074be861484e</div></div>
+      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-00bb074be861484e</div></div>
     </div>
     <div class="seal-row"><div class="seal">verified<br>match</div><div class="seal-text"><h3>Identical, not merely similar.</h3><p>Two independently-arrived-at beds, one shared, cached resource.</p></div></div>
   </section>

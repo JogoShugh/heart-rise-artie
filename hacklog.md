@@ -346,6 +346,26 @@ inconclusive because the right behaviour sends nothing.
 
 Parked items below are untouched by this plan.
 
+### Done (2026-10-10)
+
+1. Spec sweep (`6d040ed`).
+2. Layer 1 `no-cache` request directive (`401fd34`).
+3. RFC 9457 refusals, server and ARTIE (`d37a97c`).
+4. Forms named by relation, self-describing, ALPS profile (`ff17614`,
+   `4605198`).
+5. `hr:unavailable`, server and ARTIE (`79634e8`, `8c0306f`).
+6. `traceparent` and the event log (`dbf76cb`).
+7. Buster: trace-id clients, `/_buster/events` and `buster.client-events`,
+   attested passes, `client.done`, and the plugin rewrites. Green (98
+   tests), but **not committed**: Buster's pre-commit check reads Buster's
+   own gate log, and these edits were made from a session rooted in artie,
+   whose hooks log only artie paths. The red runs are in Buster's log; the
+   feature and production writes are not. Commit by hand after review, or
+   redo the edits from a session opened in `buster/`.
+8. Docs: CONFORMANCE-GAPS rows, journal recaptured (11/11 ok),
+   `live-client-check.sh` writes ARTIE's event log where a Buster server
+   reads it, and always reruns `liveTest`.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

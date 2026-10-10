@@ -9,3 +9,5 @@ buster:
   log: ${BUSTER_LOG:build/buster.jsonl}
   # Slow motion: hold each mutated response this long, such as 2s. Watch at /_buster.
   pace: ${BUSTER_PACE:0s}
+  # ARTIE's event log, read as it grows; scripts/live-client-check.sh has ARTIE write here.
+  client-events: ${BUSTER_CLIENT_EVENTS:build/artie-events.jsonl}

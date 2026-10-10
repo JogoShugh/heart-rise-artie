@@ -157,9 +157,9 @@ def header_value(filename: str, name: str) -> str:
 
 
 def check_l0_collapsed() -> tuple[bool, str]:
-    """L0 (no Prefer): the sowSeed form arrives inline with its full schema."""
+    """L0 (no Prefer): the garden:sow-seed form arrives inline with its full schema."""
     doc = read_json("01-bed1-l0.json")
-    schema = doc.get("_forms", {}).get("sowSeed", {}).get("schema", {})
+    schema = doc.get("_forms", {}).get("garden:sow-seed", {}).get("schema", {})
     return ("properties" in schema, ", ".join(sorted(schema.get("properties", {}).keys())))
 
 
@@ -224,11 +224,11 @@ def entry_01() -> str:
     l0_ok, l0_fields = check_l0_collapsed()
     l2_ok, _ = check_l2_linked()
     profile_ok, link = check_profile_link()
-    templated_ok, href = check_templated_href("01-set-pointer.json", "_forms", "sowSeed")
+    templated_ok, href = check_templated_href("01-set-pointer.json", "_forms", "garden:sow-seed")
     cache_ok, cache_val = check_cache_control("01-schema-headers.txt")
     return f'''
   <section class="entry" id="sow">
-    <div class="entry-head"><span class="entry-num">01</span><h2 class="entry-title">Planting bed-1 — sowSeed</h2></div>
+    <div class="entry-head"><span class="entry-num">01</span><h2 class="entry-title">Planting bed-1 — garden:sow-seed</h2></div>
     <p class="entry-sub">layer 1 → layer 2 → layer 3, captured live</p>
     <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. With no <code>Prefer</code> header (rung L0) everything arrives in one response: state, the form, and its full schema.</p>
     <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json' \\
@@ -236,8 +236,8 @@ def entry_01() -> str:
      http://localhost:8080/beds/1</pre></div>
     <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("01-bed1-l0.json")}</pre></div>
     {verdict_html(l0_ok,
-        f"L0 is collapsed: the <code>sowSeed</code> form is inline with its full schema (fields: {esc(l0_fields)}).",
-        "Expected the sowSeed form inline with a full schema when no Prefer is sent (SPEC §6.4).")}
+        f"L0 is collapsed: the <code>garden:sow-seed</code> form is inline with its full schema (fields: {esc(l0_fields)}).",
+        "Expected the garden:sow-seed form inline with a full schema when no Prefer is sent (SPEC §6.4).")}
 
     <p class="entry-narrative">The same request with <code>Prefer: forms=link, schema=link</code> (rung L2) returns state plus one link:</p>
     <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("01-bed1-empty.json")}</pre></div>
@@ -266,7 +266,7 @@ def entry_02() -> str:
     bug_present, bad_fields = check_readonly_bug()
     return f'''
   <section class="entry" id="water">
-    <div class="entry-head"><span class="entry-num">02</span><h2 class="entry-title">Watering bed-1 — waterCell</h2></div>
+    <div class="entry-head"><span class="entry-num">02</span><h2 class="entry-title">Watering bed-1 — garden:water-cell</h2></div>
     <p class="entry-sub">the halforms dialect's writable-field check</p>
     <p class="entry-narrative">After sowing, bed-1 is <strong>PLANTED</strong> and watering is the only legal action. This entry checks the HAL-FORMS dialect specifically for a known historical fault: Kotlin <code>val</code> properties (getter-only, no setter) can cause Spring HATEOAS's reflection-based property inspection to mark a field <code>readOnly: true</code> — confirmed against a real, open Spring HATEOAS GitHub issue (#1310) rather than assumed.</p>
     <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/prs.hal-forms+json' \\

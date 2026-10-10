@@ -5,6 +5,7 @@
 #   3. Runs `./gradlew liveTest` in client/.
 # Leaves the stack running; stop it with `docker compose down` in server-spring/.
 # Set HEART_MAX_RUNG to the rung the server was started at (L2 by default).
+# Writes ARTIE's event log to server-spring/build/artie-events.jsonl (ARTIE_EVENTS).
 # Opens nothing on screen.
 set -euo pipefail
 
@@ -20,4 +21,9 @@ fi
 curl -sf -o /dev/null "$base/beds/1" || { echo "server not answering at $base" >&2; exit 1; }
 
 "$root/server-spring/reset-db.sh" > /dev/null
-(cd "$root/client" && ARTIE_BASE_URL="$base" ./gradlew liveTest --console=plain)
+# ARTIE's event log (hack log, 2026-10-10). A Buster server started with the buster
+# profile reads this same file, so its verdicts can use what ARTIE says it decided.
+export ARTIE_EVENTS=${ARTIE_EVENTS:-$root/server-spring/build/artie-events.jsonl}
+mkdir -p "$(dirname "$ARTIE_EVENTS")"
+: > "$ARTIE_EVENTS"
+(cd "$root/client" && ARTIE_BASE_URL="$base" ./gradlew liveTest --rerun --console=plain)
