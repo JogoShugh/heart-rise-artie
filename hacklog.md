@@ -428,6 +428,23 @@ Server side: act responses do not send `Content-Location`. RFC 9110 §8.7 is
 the standard way to say that a POST response is a representation of
 `/beds/{id}`. Buster can only learn that today from the HAL self link.
 
+Closed the same day:
+- **Artie:**
+  - act responses send `Content-Location` (cc70f20);
+  - every live scenario starts from the seed data (78966dd). Before that, a mutated
+    scenario left its bed half-grown and 19 of 120 planned mutations never fired.
+- **Buster:**
+  - act responses are judged by the resource they name (4da016d);
+  - a later unmutated representation closes the window (c9b034d);
+  - interacting clients are not armed together (b5cd244);
+  - the gate counts made combinations and names misaligned ones (ad0f70f, d7ae43b).
+
+Campaign run 4 (Buster d7ae43b):
+- 22 rounds; 120 combinations planned and 120 made.
+- 70 pass, 50 pass (attested), 0 FAIL.
+- No holes, nothing misaligned, nothing unrun.
+- `campaign.ok` is true, and the script exits 0.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.
