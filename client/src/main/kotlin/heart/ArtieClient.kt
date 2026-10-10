@@ -134,7 +134,9 @@ class ArtieClient(
      * Layer 1 too ([received]), and is completed the same way.
      */
     private fun sync(url: String, received: HeartResponse? = null): HeartRepresentation {
-        val response = received ?: transport.send(HeartRequest("GET", url, negotiation))
+        // SPEC §6.3: Layer 1 is never fresh. The request directive binds every cache
+        // on the path (RFC 9111 §5.2.1.4), whatever the stored response said.
+        val response = received ?: transport.send(HeartRequest("GET", url, negotiation + LAYER1_NO_CACHE))
         val layer1 = HeartResponseParser.parse(response, url, asking.first)
         // SPEC §6.11.1: the rung comes from Preference-Applied, read before any
         // link is followed. At L0 (no header) there is no set, whatever the body links.
@@ -177,6 +179,8 @@ class ArtieClient(
     }
 
     private companion object {
+        val LAYER1_NO_CACHE = mapOf("Cache-Control" to "no-cache")
+
         /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3), or an older server's lone `$id`. */
         fun schemaPointer(schema: JsonObject): String? =
             schema[SCHEMA_REF]?.jsonPrimitive?.content

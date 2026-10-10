@@ -29,6 +29,12 @@ class HttpSteps(private val ctx: ClientContext) {
         headers.forEach { (name, value) -> assertEquals(value, request.header(name), "$name on $method $url") }
     }
 
+    @Then("the request for {string} had no {string} header")
+    fun requestLacksHeader(url: String, name: String) {
+        val request = lastRequestTo("GET", ctx.expand(url))
+        assertNull(request.header(name), "$name on GET $url")
+    }
+
     @Then("that request had no {string} header")
     fun noHeader(name: String) = assertNull(ctx.transport.requests.last().header(name))
 

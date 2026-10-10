@@ -14,6 +14,10 @@ import java.util.concurrent.ConcurrentHashMap
  *   returns the stored response.
  * - `Vary` is honoured: an entry is used only when the request headers it
  *   names match. `no-store` and `Vary: *` are never stored.
+ * - A request carrying `Cache-Control: no-cache` (RFC 9111 §5.2.1.4) is
+ *   never answered from storage unchecked, however fresh the entry: it goes
+ *   to the server, conditional on the stored ETag. ARTIE sends it on every
+ *   Layer 1 request (SPEC §6.3).
  */
 class CachingTransport(
     private val inner: Transport,
@@ -35,10 +39,13 @@ class CachingTransport(
         val entry = if (request.method == "GET") lookup(request) else null
         return when {
             request.method != "GET" -> inner.send(request)
-            entry?.freshUntil?.isAfter(now()) == true -> entry.response
+            entry?.freshUntil?.isAfter(now()) == true && !requiresValidation(request) -> entry.response
             else -> fetch(request, entry)
         }
     }
+
+    private fun requiresValidation(request: HeartRequest): Boolean =
+        request.header("Cache-Control").orEmpty().split(',').any { it.trim().lowercase() == "no-cache" }
 
     private fun lookup(request: HeartRequest): Entry? =
         entries[request.url]?.takeIf { e -> e.varied.all { (name, value) -> request.header(name) == value } }
