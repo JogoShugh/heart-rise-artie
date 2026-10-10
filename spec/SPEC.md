@@ -36,6 +36,8 @@
 
 - **Layer 3 is canonical bytes, hashed and served (§6.5).** Decided 2026-10-09. 0.4 said a schema was hashed "verbatim", which contradicted the canonicalization step. A server canonicalizes a schema (RFC 8785), and serves exactly the bytes it hashed, as it already does for affordance sets.
 
+- **Separate L1 and L2 affordance-set addresses (§6.5), and the composite profile URIs (§6.1).** Confirmed 2026-10-09. Each rendering of a set has its own immutable URL, so a cache never serves one rung's bytes to another. Clients negotiate `heart-rise/hal-schema-forms` or `heart-rise/hal-forms`; the bare `heart-rise` URI is listed as their parent and never negotiated alone.
+
 - **Opaque URIs; integrity from the linking representation (§6.5).** Decided 2026-10-08. The client no longer reads a digest from a URL path. Links carry Subresource Integrity values; `Repr-Digest` is optional.
 
 **Changes since 0.3:**
@@ -379,7 +381,7 @@ A H.E.A.R.T. content address is a deterministic identifier for the *actual bytes
 
 This reverses 0.3's rule that a Layer 2 resource has one canonical address regardless of rendering, computed over the never-embedded form. That rule cannot survive the ladder: if two renderings shared one address, then an L1 client's cached copy and an L2 client's cached copy would be different content under the same immutable URL, and whichever arrived first would be served to the other. The address would no longer determine the content, which is the only property content addressing exists to provide. The alternative — making the affordance-set URL `Vary` on `Prefer` — abandons the same property while adding a cache-key dependency that shared caches implement inconsistently.
 
-The cost is that L1 and L2 clients do not share affordance-set cache entries. They still share all Layer 3 entries, and each shares fully with its own rung. Given that a deployment will typically standardise on one rung, this is a small loss for a large gain in integrity. `[AUTHOR]` — confirm; this is the one place where 0.4 overturns a stated 0.3 property rather than clarifying it.
+The cost is that L1 and L2 clients do not share affordance-set cache entries. They still share all Layer 3 entries, and each shares fully with its own rung. Given that a deployment will typically standardise on one rung, this is a small loss for a large gain in integrity. Confirmed by the author 2026-10-09; this is the one place where 0.4 overturns a stated 0.3 property rather than clarifying it.
 
 **Scope of "the body" for Layer 3 (decided 2026-10-09):** the schema's own full content, with nothing stripped. It is canonicalized as above, and the server serves exactly those canonical bytes. 0.4 said "verbatim", which contradicts the canonicalization step: a hand-formatted schema served as written would not match its own digest. The rule is the same for both layers. **The digest is the SHA-256 of the response body, byte for byte.** It is the value integrity checks compare against; a server that names resources by digest uses the same value in the URL.
 
@@ -1064,13 +1066,11 @@ ARTIE interacts correctly with both reference domains from bookmark entry with n
 
 ## 12. Open Questions
 
-**Resolved or superseded in 0.4:** the `Vary: Accept` cache-key question (dissolved — content-addressed layers do not negotiate, §6.1); registry persistence (it is an ordinary HTTP cache, §6.6); whether to adopt a multiformats/CID-style identifier for content addresses (closed 2026-10-09 — naming is the server's own, and the protocol defines no paths, §6.5); how a server declares which rungs it serves (resolved 2026-10-09 — a JSON Home representation of the service index, with `Preference-Applied` as the per-response truth, §6.11.1); the status of `428` (restored with its RFC 6585 meaning now that acts are conditional, §6.2); whether `behaviour`/`domain` should move off `Accept-Profile` (resolved — moved to `Prefer` tokens, since `Accept-Profile` has no parameter extension point under connegp, §6.4); the private `profile` media-type parameter (resolved — replaced by `Accept-Profile`/`Link: rel="profile"` per connegp, §6.1).
+**Resolved or superseded in 0.4:** the `Vary: Accept` cache-key question (dissolved — content-addressed layers do not negotiate, §6.1); registry persistence (it is an ordinary HTTP cache, §6.6); separate affordance-set addresses for L1 and L2 (confirmed 2026-10-09, §6.5); the composite profile URIs `heart-rise/hal-schema-forms` and `heart-rise/hal-forms`, with the bare `heart-rise` URI as a parent never negotiated alone (confirmed 2026-10-09, §6.1); whether to adopt a multiformats/CID-style identifier for content addresses (closed 2026-10-09 — naming is the server's own, and the protocol defines no paths, §6.5); how a server declares which rungs it serves (resolved 2026-10-09 — a JSON Home representation of the service index, with `Preference-Applied` as the per-response truth, §6.11.1); the status of `428` (restored with its RFC 6585 meaning now that acts are conditional, §6.2); whether `behaviour`/`domain` should move off `Accept-Profile` (resolved — moved to `Prefer` tokens, since `Accept-Profile` has no parameter extension point under connegp, §6.4); the private `profile` media-type parameter (resolved — replaced by `Accept-Profile`/`Link: rel="profile"` per connegp, §6.1).
 
 **Recommended for closure:**
 
-- **Dual affordance-set addresses across rungs (§6.5).** Recommend confirming that L1 and L2 renderings are separately addressed, since the alternative sacrifices the one property content addressing exists to provide. This overturns a stated 0.3 property and needs an explicit decision. `[AUTHOR]`
 - **Digest truncation.** Recommend closing as: full digest in production, truncation permitted only for closed-world demonstration servers (§6.5).
-- **Composite profile URIs (§6.1).** `heart-rise/hal-schema-forms` and `heart-rise/hal-forms` as the two negotiable profile identifiers, with the bare `heart-rise` URI retained as a non-negotiable parent for hierarchy discovery only. This is a H.E.A.R.T. modelling decision layered on top of connegp's mechanism, not something connegp specifies — recommend confirming the naming and the never-sent-alone rule for the parent URI before it propagates further. `[AUTHOR]`
 
 **Genuinely open:**
 
