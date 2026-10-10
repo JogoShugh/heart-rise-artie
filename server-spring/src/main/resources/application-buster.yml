@@ -1,0 +1,9 @@
+# The buster profile turns on Buster, the chaos filter (../buster). Run with
+#   SPRING_PROFILES_ACTIVE=buster ./gradlew bootRun -Pbuster=on
+# Without -Pbuster=on, or in a boot jar (Buster is developmentOnly), this profile does nothing.
+buster:
+  # The plugin scripts, *.buster.kts, relative to server-spring.
+  plugins: ${BUSTER_PLUGINS:../buster/plugins}
+  # Unset seed means a random one, logged so the run can be replayed.
+  seed: ${BUSTER_SEED:}
+  log: ${BUSTER_LOG:build/buster.jsonl}

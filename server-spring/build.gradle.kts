@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -90,6 +91,25 @@ dependencies {
 
     // bdd-gates: the domain/web boundary as a failing test.
     testImplementation("com.lemonappdev:konsist:0.17.3")
+
+    // Buster, the chaos filter. developmentOnly keeps it out of the boot jar, so a
+    // production build carries no Buster code; at bootRun it still needs the buster
+    // profile to switch on. Present only with -Pbuster=on (see settings.gradle.kts).
+    if (gradle.includedBuilds.any { it.name == "buster" }) {
+        developmentOnly("com.artie:buster")
+    }
+}
+
+// Buster compiles plugin scripts at runtime. The scripting compiler and the Kotlin
+// compiler must be one version, or script compilation fails deep inside FIR. The BOM
+// pins only some of them, so pin them all to this build's Kotlin. The runtime classpaths
+// need the same pin: the boot jar leaves out exactly the files developmentOnly resolves,
+// so a version that differs there leaks into production.
+val kotlinPinned = setOf("developmentOnly", "runtimeClasspath", "productionRuntimeClasspath")
+configurations.matching { it.name in kotlinPinned }.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") useVersion(getKotlinPluginVersion())
+    }
 }
 
 kotlin {
