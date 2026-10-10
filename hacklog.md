@@ -253,6 +253,99 @@ code change, since `follow` already accepts an untitled link. Tested in
 server `paging.feature` and client `service-index.feature`; not exercised
 live, because the seed data fits on one page.
 
+## 2026-10-10: Buster findings, and the master plan
+
+Done today: each ARTIE client names itself in `User-Agent` (`ed10e70`), and
+ARTIE reads the rung from `Preference-Applied` before following any forms
+link (`1e5c41a`, Buster #37). A seed-42 Buster run showed two more kinds of
+problem: Buster rules that judge the wrong thing, and verdicts left
+inconclusive because the right behaviour sends nothing.
+
+### Principles every item below follows
+
+1. The client trusts only what each response declares (`Preference-Applied`,
+   links, `integrity`). It never infers from a URL or a body's shape.
+2. Layer 1 is never fresh, for any length of time. The client says so itself
+   on every Layer 1 request with the standard request directive
+   `Cache-Control: no-cache` (RFC 9111 §5.2.1.4), plus `If-None-Match` once
+   it holds an ETag, whatever `Cache-Control` the response carried. Every
+   cache on the path, the client's own and any shared one, must then
+   revalidate. Layers 2 and 3 stay cacheable for a year, pinned by
+   `integrity`.
+3. Safety comes from `If-Match`; checking again is for accuracy.
+4. Proof comes from the wire first. ARTIE's own events can only turn silence
+   into "pass (attested)", never clear a FAIL. Test tools read no URLs either.
+5. Standards first: RFC 9110, RFC 9111, RFC 7240, W3C Subresource Integrity,
+   W3C Trace Context, the OpenTelemetry log data model, RFC 9457.
+
+### Decisions (2026-10-10)
+
+- **Layer 1 freshness:** as principle 2. The old "revalidate before every
+  act" reading is withdrawn: the act straight after a read is acting on a
+  fresh representation, and `If-Match` covers the rest.
+- **Breadcrumb events:** ARTIE MAY write one event per decision, off by
+  default, available to any ARTIE (an audit trail, not only a test aid).
+  Delivery to a JSON Lines file, or by POST to a configured URL, or both.
+  Each line uses OpenTelemetry log data model field names (`timestamp`,
+  `trace_id`, `span_id`, `attributes`).
+- **Correlation:** ARTIE sends W3C `traceparent` on every request, one trace
+  id per client. Buster groups requests by trace id and ties events to the
+  exact request; `User-Agent` stays as the readable label, and is the
+  fallback for clients without `traceparent`.
+- **Error bodies:** RFC 9457 `application/problem+json` for 428, 412, 409
+  and 422, each with a `type` URI per refusal; 422 lists field errors in a
+  `violations` extension member with JSON Pointers.
+- **Explaining absence:** `heart:unavailable` accepted, to be built now. The
+  affordance set links, with `integrity`, to a resource listing the acts
+  absent in this state and a short reason each; the client fetches it only
+  when asked why.
+- **Form names as link relations:** forms are keyed by CURIE relations
+  (`garden:water`), expanded like any other relation. Each form carries a
+  `title` and `description`; each field carries JSON Schema `title`,
+  `description` and `examples`. The relation URI serves a fuller document
+  (effect, resulting state, when allowed), fetched on demand and cached. The
+  reasoner sees the inline text and may ask for the document. HAL-FORMS at
+  L0 keeps its template names.
+
+### Corrections the plan makes to existing work
+
+- Buster `relax-layer1-cache` fails the act straight after a read. Rewrite:
+  the client's next read of that resource must reach the server with
+  `Cache-Control: no-cache`.
+- Buster counts an act as "on this resource" when its path starts with the
+  resource's path. That reads URLs; replace it with trace-id attribution
+  from the `act.sent` event.
+- Buster `flip-byte` passes on a refetch, but ARTIE refuses the bytes and
+  stops. New pass: an `integrity.refused` event and no act from that set.
+- SPEC §12: close "Digest truncation" (the full digest travels in
+  `integrity`); remove "full URIs rather than CURIEs" (decided 2026-10-09);
+  `heart:unavailable` is linked with `integrity`, not "content-addressed".
+- `spec/CONFORMANCE-GAPS.md`: three rows are stale (expansion "by the
+  `[0.5]` rule", digest length, "address = SHA-256").
+- `spec/HAL-SCHEMA-FORMS-HR.md` "Not covered here": form names and the
+  error format are now decided.
+
+### Order of work (test-first, one commit per step)
+
+1. Spec sweep: §6.3 Layer 1 rule; §6.2 problem details; §12 corrections and
+   `heart:unavailable` accepted; form relations and descriptions in the
+   profile document; this entry.
+2. ARTIE: Layer 1 `no-cache` request directive; `CachingTransport` honours a
+   request's `no-cache`.
+3. Server and ARTIE: RFC 9457 error bodies.
+4. Server and ARTIE: forms keyed by relation, with titles, descriptions and
+   field annotations; relation documents; reasoner sees the text.
+5. Server and ARTIE: `heart:unavailable`.
+6. ARTIE: `traceparent`, `EventSink` (file, POST), events at each decision,
+   `client.done`.
+7. Buster: `onEvent`, attested passes, trace-id correlation; the three
+   plugin rewrites; README table.
+8. Docs: CONFORMANCE-GAPS, journal, Fielding review and spec artifacts.
+9. Live proof: plain run green, plus paging with `HEART_PAGE_SIZE=2`;
+   Buster seed 42 on a fresh server with no inconclusive verdicts left.
+
+Parked items below are untouched by this plan.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.
