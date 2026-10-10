@@ -2,7 +2,8 @@ package heart
 
 /**
  * The server refused an act. Each kind asks for different handling
- * (SPEC §6.2, §6.3), so each is its own type rather than a status code.
+ * (SPEC §6.0, §6.2, §6.3), so each is its own type rather than a code of any
+ * one protocol. The HTTP binding's codes are given in brackets.
  */
 sealed class ActRefused(message: String) : RuntimeException(message)
 
@@ -16,5 +17,5 @@ class IllegalTransition(rel: String) : ActRefused("$rel is not legal in the curr
 class InvalidPayload(rel: String, val violations: List<String>) :
     ActRefused("$rel body was refused (422): ${violations.joinToString("; ")}")
 
-/** Any other non-success status. */
-class UnexpectedResponse(rel: String, status: Int) : ActRefused("$rel got unexpected status $status")
+/** Any other outcome; [code] is the binding's own word for it (HTTP: the status code). */
+class UnexpectedResponse(rel: String, code: String) : ActRefused("$rel got the unexpected answer $code")

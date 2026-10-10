@@ -445,6 +445,41 @@ Campaign run 4 (Buster d7ae43b):
 - No holes, nothing misaligned, nothing unrun.
 - `campaign.ok` is true, and the script exits 0.
 
+## 2026-10-10: Fielding's Rule 1, any protocol
+
+Fielding asks for identification to be separate from interaction: a URI of
+any scheme may identify, and the mapping to a protocol is a separate matter.
+H.E.A.R.T. was an HTTP spec through and through, and ARTIE's core read status
+codes and headers. Now:
+
+- **SPEC §6.0, "Core and bindings".** It lists the protocol-neutral concepts
+  (read, requested and applied rendering, validator, never fresh, act, done,
+  stale, not offered, invalid, refusal detail…) and maps each to its HTTP
+  form. §6.1–§6.12 are now the HTTP binding.
+  - A client picks a binding by URI scheme.
+  - It refuses a URI whose scheme it has no binding for, before sending
+    anything.
+  - It never rewrites a URI to another scheme.
+- **ARTIE.**
+  - The core works in `Received` and `Outcome`, with no status codes or
+    headers. `HttpBinding` holds every header and code.
+  - `Bindings` dispatches by scheme.
+  - Shared layers are checked against their link's `integrity` in the core,
+    whatever the binding. The HTTP binding still checks below its cache as well.
+- **Proof.** `any-protocol.feature` adds a toy `mem:` binding that knows no
+  HTTP. Through it, ARTIE:
+  - syncs, acts, and is refused as stale, with nothing sent over HTTP;
+  - follows a link from an HTTP representation to a `mem:` resource;
+  - refuses a `gopher:` link without sending anything.
+- **Event log.** `act.sent` and `act.refused` now carry `heart.code` and
+  `heart.method` in place of the `http.*` attributes.
+
+The campaign still passes after the change: 120 of 120 mutations made, 70 pass,
+50 pass (attested), 0 FAIL.
+
+Parked: a second real binding. CoAP (RFC 7252) fits everything except
+`Prefer`. `ni:` names (RFC 6920) are dropped.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

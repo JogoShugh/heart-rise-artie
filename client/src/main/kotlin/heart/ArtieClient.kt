@@ -1,27 +1,28 @@
 package heart
 
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import java.net.URI
 
 /**
  * ARTIE's deterministic core: everything between a selection (an
- * affordance name and field values) and the wire (SPEC §6.8). It never
+ * affordance name and field values) and a binding (SPEC §6.0, §6.8). It never
  * builds a URI of its own; targets come from the manifest, and templates
  * are expanded as each form declares (HAL-SCHEMA-FORMS-HR Rule 1, see UriTemplate).
- * For caching and integrity checks, give it a transport built as
- * CachingTransport(IntegrityCheck(wire)). It treats every URI as opaque.
+ * It treats every URI as opaque, and reaches each through the binding its
+ * scheme selects: [transport] carries the HTTP binding, for `http` and `https`,
+ * and [bindings] adds others. For caching and integrity checks, give it a
+ * transport built as CachingTransport(IntegrityCheck(wire)).
  */
 class ArtieClient(
-    private val transport: Transport,
+    transport: Transport,
     private val rung: Rung = Rung.L0,
     private val dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
     /** Follow forms links and schema references that carry no integrity value (older servers only). */
     allowUncheckedLinks: Boolean = false,
     /** Where ARTIE reports its decisions; off by default. */
     events: EventLog = EventLog.OFF,
+    /** Bindings for other URI schemes, by scheme (SPEC §6.0). */
+    bindings: Map<String, Binding> = emptyMap(),
 ) : HeartRiseClient {
     init {
         require(rung <= dialect.maxRung) {
@@ -29,8 +30,11 @@ class ArtieClient(
         }
     }
 
+    private val bindings = HttpBinding(transport).let { http ->
+        Bindings(mapOf("http" to http, "https" to http) + bindings)
+    }
     private val decisions = DecisionLog(events)
-    private val layers = SharedLayers(transport, allowUncheckedLinks, decisions)
+    private val layers = SharedLayers(this.bindings, allowUncheckedLinks, decisions)
 
     override var current: HeartRepresentation? = null
         private set
@@ -38,33 +42,22 @@ class ArtieClient(
     override var appliedRung: Rung? = null
         private set
 
-    /** The dialect and rung asked for: the client's own ([dialect], [rung]), or less if discovery found less. */
-    private var asking: Pair<Dialect, Rung> = dialect to rung
-
-    /**
-     * The headers that select a representation: sent on every sync and every
-     * act. HTTP is stateless, so an act repeats them; the server then selects
-     * the same representation and compares If-Match with its ETag, whole
-     * (RFC 9110 §13.1.1).
-     */
-    private val negotiation: Map<String, String>
-        get() = buildMap {
-            val (dialect, rung) = asking
-            put("Accept", dialect.mediaType)
-            put("Accept-Profile", "<${dialect.profile}>")
-            rung.prefer?.let { put("Prefer", it) }
-        }
+    /** The rendering asked for: the client's own ([dialect], [rung]), or less if discovery found less. */
+    private var asking = Rendering(dialect, rung)
 
     override fun discover(url: String) {
-        val response = transport.send(HeartRequest("GET", url, mapOf("Accept" to HomeDocument.MEDIA_TYPE)))
-        HomeDocument.offer(response)?.let { asking = HomeDocument.choose(it, dialect, rung) }
+        val outcome = bindings.forUri(url).fetch(url, listOf(HomeDocument.MEDIA_TYPE))
+        HomeDocument.offer(outcome)?.let { offer ->
+            val (dialect, rung) = HomeDocument.choose(offer, dialect, rung)
+            asking = Rendering(dialect, rung)
+        }
     }
 
     override fun enter(url: String): HeartRepresentation = sync(url)
 
     /**
      * A GET form is safe (RFC 9110 §9.2.1): its target, filled from the form's
-     * fields, is synced like any resource, with no body and no If-Match.
+     * fields, is synced like any resource, with no body and no validator.
      * Every other method is a state-changing act.
      */
     override fun act(rel: String, payload: JsonObject): HeartRepresentation {
@@ -77,7 +70,7 @@ class ArtieClient(
         if (form.method != "GET") return act(rel, payload, resendAllowed = true)
         // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
         // template a target; it puts the fields in the query (mutate-action-URL).
-        val target = when (asking.first) {
+        val target = when (asking.dialect) {
             Dialect.HAL_FORMS -> HalFormsTemplates.getTarget(form.target, payload)
             Dialect.HAL_SCHEMA_FORMS -> targetOf(form, held, payload)
         }
@@ -100,7 +93,7 @@ class ArtieClient(
     override fun describe(rel: String): String? {
         val held = current ?: error("enter a service before describing a form")
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
-        return Alps.describe(transport, form.relation)
+        return Alps.describe(bindings, form.relation)
     }
 
     override fun explain(rel: String): String? {
@@ -110,63 +103,54 @@ class ArtieClient(
     }
 
     /**
-     * One act and its refusal handling (SPEC §6.3). 428 is the only refusal
-     * that resends, and only once: the client always sends If-Match, so a
-     * second 428 would mean something else is wrong.
+     * One act and its refusal handling (SPEC §6.3). Precondition required is
+     * the only refusal that resends, and only once: the client always sends a
+     * validator, so a second one would mean something else is wrong.
      */
     private fun act(rel: String, payload: JsonObject, resendAllowed: Boolean): HeartRepresentation {
         val held = current ?: error("enter a service before acting")
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
-        val etag = held.etag ?: error("no ETag held for ${held.url}; an act needs If-Match")
-        val target = targetOf(form, held, payload)
-        val request = HeartRequest(
-            form.method,
-            target,
-            negotiation + mapOf("Content-Type" to form.contentType, "If-Match" to etag),
-            payload.toString(),
-        )
-        val response = transport.send(request)
-        decisions.actSent(rel, request, held.url, response.status)
-        if (response.status in SUCCESS) return sync(target, response)
-        if (response.status == PRECONDITION_REQUIRED && resendAllowed) {
+        val validator = held.etag ?: error("no validator held for ${held.url}; an act needs one")
+        val act = Act(targetOf(form, held, payload), form.method, form.contentType, payload.toString(), validator)
+        val outcome = bindings.forUri(act.url).act(act, asking)
+        decisions.actSent(rel, act, held.url, outcome)
+        if (outcome is Outcome.Done) return sync(act.url, outcome.received)
+        if (outcome is Outcome.PreconditionRequired && resendAllowed) {
             sync(held.url)
-            decisions.actRefused(rel, target, response, "re-synced and resent once")
+            decisions.actRefused(rel, act.url, outcome, "re-synced and resent once")
             return act(rel, payload, resendAllowed = false)
         }
-        throw refusal(rel, target, response, held)
+        throw refusal(rel, act.url, outcome, held)
     }
 
-    /** 412 and 409 re-sync first, so the client never keeps a manifest the server has refused. */
-    private fun refusal(rel: String, target: String, response: HeartResponse, held: HeartRepresentation): ActRefused {
-        val (refused, outcome) = when (response.status) {
-            PRECONDITION_FAILED -> StaleAct(rel).also { sync(held.url) } to "discarded after re-sync"
-            CONFLICT -> IllegalTransition(rel).also { sync(held.url) } to "re-synced and reported"
-            UNPROCESSABLE -> InvalidPayload(rel, HeartResponseParser.violations(response)) to "reported"
-            else -> UnexpectedResponse(rel, response.status) to "reported"
+    /** Stale and not offered re-sync first, so the client never keeps a manifest the server has refused. */
+    private fun refusal(rel: String, target: String, outcome: Outcome, held: HeartRepresentation): ActRefused {
+        val (refused, handled) = when (outcome) {
+            is Outcome.Stale -> StaleAct(rel).also { sync(held.url) } to "discarded after re-sync"
+            is Outcome.NotOffered -> IllegalTransition(rel).also { sync(held.url) } to "re-synced and reported"
+            is Outcome.Invalid -> InvalidPayload(rel, outcome.violations) to "reported"
+            else -> UnexpectedResponse(rel, outcome.code) to "reported"
         }
-        decisions.actRefused(rel, target, response, outcome)
+        decisions.actRefused(rel, target, outcome, handled)
         return refused
     }
 
-
     /**
-     * SPEC §6.7. At L0 one GET. At L1/L2 a walk: Layer 1, then the
+     * SPEC §6.7. At L0 one read. At L1/L2 a walk: Layer 1, then the
      * affordance set it links to, then each schema the set points to by
      * `$ref` (or an older server's `$id`), each URL once. Each fetch carries
-     * the integrity value of the link it follows, checked below the cache.
-     * The transport's HTTP cache makes a URL already held cost nothing;
-     * reasoning waits until the manifest is complete. An act's response is
-     * Layer 1 too ([received]), and is completed the same way.
+     * the integrity value of the link it follows. A binding's cache makes a
+     * URL already held cost nothing; reasoning waits until the manifest is
+     * complete. An act's answer is Layer 1 too ([received]), and is completed
+     * the same way.
      */
-    private fun sync(url: String, received: HeartResponse? = null): HeartRepresentation {
-        // SPEC §6.3: Layer 1 is never fresh. The request directive binds every cache
-        // on the path (RFC 9111 §5.2.1.4), whatever the stored response said.
-        val response = received ?: transport.send(HeartRequest("GET", url, negotiation + LAYER1_NO_CACHE))
-        val layer1 = HeartResponseParser.parse(response, url, asking.first)
-        // SPEC §6.11.1: the rung comes from Preference-Applied, read before any
-        // link is followed. At L0 (no header) there is no set, whatever the body links.
-        val applied = Rung.applied(response.header("Preference-Applied"))
-        decisions.rung(url, response.header("Preference-Applied"), applied)
+    private fun sync(url: String, received: Received? = null): HeartRepresentation {
+        val layer1Received = received ?: bindings.forUri(url).read(url, asking).received(url)
+        val layer1 = HeartResponseParser.parse(layer1Received, url, asking.dialect)
+        // SPEC §6.11.1: the rung is the one the representation says it is at, read
+        // before any link is followed. At L0 there is no set, whatever the body links.
+        val applied = layer1Received.applied
+        decisions.rung(url, layer1Received.appliedAs, applied)
         decisions.forms(url, layer1.formsLink, applied)
         val synced = layer1.formsLink?.takeIf { applied != Rung.L0 }?.let { link ->
             layer1.withManifest(layers.manifest(link, layer1.formsIntegrity))
@@ -176,18 +160,10 @@ class ArtieClient(
     }
 
     private companion object {
-        val LAYER1_NO_CACHE = mapOf("Cache-Control" to "no-cache")
-
         fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
             if (!form.templated) return form.target
             val expanded = UriTemplate.expand(form.target, held.state, form.templatePointers, fields)
             return URI(held.url).resolve(expanded).toString()
         }
-
-        val SUCCESS = 200..299
-        const val CONFLICT = 409
-        const val PRECONDITION_FAILED = 412
-        const val UNPROCESSABLE = 422
-        const val PRECONDITION_REQUIRED = 428
     }
 }

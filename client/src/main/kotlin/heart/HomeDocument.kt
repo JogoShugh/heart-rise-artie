@@ -17,13 +17,10 @@ data class ServerOffer(val dialects: Set<Dialect>, val rung: Rung)
  */
 object HomeDocument {
     const val MEDIA_TYPE = "application/json-home"
-    private const val OK = 200
-
-    /** The offer in [response], or null when it is not a home document. */
-    fun offer(response: HeartResponse): ServerOffer? {
-        val mediaType = response.header("Content-Type")?.substringBefore(';')?.trim()?.lowercase()
-        val hints = if (response.status == OK && mediaType == MEDIA_TYPE) hintsOf(response.body) else null
-        return hints?.let { ServerOffer(dialects(it), rung(it)) }
+    /** The offer in [outcome], or null when it is not a home document. */
+    fun offer(outcome: Outcome): ServerOffer? {
+        val received = (outcome as? Outcome.Done)?.received?.takeIf { it.mediaType == MEDIA_TYPE }
+        return received?.let { hintsOf(it.body) }?.let { ServerOffer(dialects(it), rung(it)) }
     }
 
     /**

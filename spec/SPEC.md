@@ -180,6 +180,42 @@ This has a cost, and the document should be read as accepting it: a manifest tha
 
 ## 6. Protocol Requirements
 
+### 6.0 Core and bindings (added 2026-10-10)
+
+> **Decided (2026-10-10).** Fielding's first rule: "A REST API should not be dependent on any single communication protocol, though its successful mapping to a given protocol may be dependent on the availability of metadata, choice of methods, etc. In general, any protocol element that uses a URI for identification must allow any URI scheme to be used for the sake of that identification." H.E.A.R.T. is therefore stated as a protocol-neutral core with protocol bindings. §6.1–§6.12 are written in HTTP terms; they are the **HTTP binding**, the only binding defined in this version. The core below is what any binding must carry.
+
+**Identification is separate from interaction.**
+
+1. Every link, form target, profile, relation and integrity-carrying reference is a URI. Any URI scheme MAY appear in any of them.
+2. A client SHALL choose how to interact with a URI by its scheme, through the binding registered for that scheme (`http` and `https`: the HTTP binding).
+3. A relative reference is resolved against its base by RFC 3986 and takes the base's scheme.
+4. A client SHALL refuse a URI whose scheme it has no binding for, before sending anything. It SHALL NOT rewrite the URI to another scheme.
+5. A form's `method` names an interaction in the vocabulary of the binding its target selects. HAL Schema Forms and HAL-FORMS write HTTP method names. A binding for another protocol maps them to its own methods, or refuses a method it cannot carry.
+
+**The core, and its HTTP binding.**
+
+| Core concept | What it means | HTTP binding |
+|---|---|---|
+| Read | Get the current representation of a resource | `GET` |
+| Requested rendering | The dialect, the profile and the rung the client asks for | `Accept`, `Accept-Profile`, `Prefer` (§6.1, §6.4) |
+| Applied rendering | The dialect, the profile and the rung the response is in | `Content-Type`, `Link: rel="profile"`, `Preference-Applied` (§6.11.1) |
+| Validator | An opaque value naming one representation of one state | Strong `ETag` (§6.2) |
+| Never fresh | Layer 1 is never reused unchecked, by anyone on the path | Request and response `Cache-Control: no-cache` (§6.3) |
+| Unchanged | The held representation is still current | `If-None-Match`, `304` |
+| Immutable | A shared layer never changes at its URI | `Cache-Control: max-age=…, immutable` (§6.5, §6.6) |
+| Integrity | The bytes of a shared layer are the ones the linking representation vouched for | The link's `integrity` value, carried in the hypertext and so protocol-independent; `Repr-Digest` optional (§6.5) |
+| Act | A state-changing request, conditional on the validator held | The form's `method`, with `If-Match` (§6.2) |
+| Act done | The act succeeded; the answer is the resource's new representation | `2xx`, with `Content-Location` naming the resource (§6.2) |
+| Precondition required | The act carried no validator | `428` |
+| Stale | The validator is not current | `412` |
+| Not offered | The act is not legal in the current state | `409` |
+| Invalid input | The input does not satisfy the form's schema | `422` |
+| Refusal detail | Why, in a machine-readable body | `application/problem+json` (RFC 9457) |
+| Service description | What the service offers, from its bookmark | `application/json-home` (§6.11) |
+| Client identity and trace | Who is asking, and which of its requests an event is about | `User-Agent`, `traceparent` |
+
+**What is parked.** No second binding is defined. CoAP (RFC 7252) is the natural candidate. It has `ETag`, `If-Match`, `Max-Age` and `4.12 Precondition Failed`, but no `Prefer`, so the requested rendering would need another carrier. ARTIE implements the client side of this section: its core works in the concepts above, and a binding is chosen by scheme (`client/…/heart/Binding.kt`).
+
 ### 6.1 Media Type, Dialects, and Profile Negotiation
 
 H.E.A.R.T. is a layer over a base hypermedia-forms dialect, not a single fixed media type. Two base dialects are recognised, selected by ordinary HTTP content negotiation (`Accept`). Conformance to the `heart-rise` profile is negotiated **entirely independently of the media type**, using `Accept-Profile` (request) and `Link: rel="profile"` (response), per the W3C *Content Negotiation by Profile* Working Draft, 03 July 2026 (henceforth "connegp"; §6.1.1 and §7).

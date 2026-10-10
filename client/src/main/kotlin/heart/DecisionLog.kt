@@ -1,12 +1,8 @@
 package heart
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-
 /**
  * The decisions ArtieClient reports to its [EventLog], one function per
- * kind, so the client's own code stays about HTTP. Each names the URL of
+ * kind, so the client's own code stays about its decisions. Each names the URL of
  * the request the decision was about; the log ties it to that request's span.
  */
 internal class DecisionLog(private val events: EventLog) {
@@ -48,28 +44,28 @@ internal class DecisionLog(private val events: EventLog) {
             mapOf("heart.integrity.expected" to expected),
         )
 
-    /** An act sent, with the precondition it carried and the resource it was derived from. */
-    fun actSent(rel: String, request: HeartRequest, owner: String, status: Int) =
+    /** An act sent, with the validator it carried and the resource it was derived from. */
+    fun actSent(rel: String, act: Act, owner: String, outcome: Outcome) =
         events.emit(
-            "act.sent", "sent $rel with If-Match ${request.header("If-Match")}", request.url,
+            "act.sent", "sent $rel with validator ${act.validator}", act.url,
             mapOf(
                 "heart.rel" to rel,
-                "http.request.method" to request.method,
-                "heart.if_match" to request.header("If-Match"),
+                "heart.method" to act.method,
+                "heart.if_match" to act.validator,
                 "heart.resource" to owner,
-                "http.response.status_code" to status.toString(),
+                "heart.code" to outcome.code,
             ),
         )
 
     /** SPEC §6.2, §6.3: a refusal, its problem type, and what ARTIE did about it. */
-    fun actRefused(rel: String, target: String, response: HeartResponse, outcome: String) =
+    fun actRefused(rel: String, target: String, outcome: Outcome, handled: String) =
         events.emit(
-            "act.refused", "$rel was refused (${response.status}); $outcome", target,
+            "act.refused", "$rel was refused (${outcome.code}); $handled", target,
             mapOf(
                 "heart.rel" to rel,
-                "http.response.status_code" to response.status.toString(),
-                "heart.problem.type" to problemType(response),
-                "heart.outcome" to outcome,
+                "heart.code" to outcome.code,
+                "heart.problem.type" to outcome.problemType,
+                "heart.outcome" to handled,
             ),
         )
 
@@ -78,7 +74,4 @@ internal class DecisionLog(private val events: EventLog) {
         events.emit("$kind.absent", "$rel is not offered in $url; nothing was sent", url, mapOf("heart.rel" to rel))
 
     fun done() = events.emit("client.done", "the client has finished", null)
-
-    private fun problemType(response: HeartResponse): String? =
-        runCatching { Json.parseToJsonElement(response.body).jsonObject["type"]?.jsonPrimitive?.content }.getOrNull()
 }

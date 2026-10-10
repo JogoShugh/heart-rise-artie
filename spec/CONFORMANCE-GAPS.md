@@ -67,6 +67,7 @@ has since changed.
 | §6.1, §6.8 (2026-10-10): form names expanded as relations; the reasoner sees titles and descriptions, and may ask for an ALPS descriptor | **Done** (2026-10-10) | `form-relations.feature` |
 | §6.12 (2026-10-10): explains an absent act from `hr:unavailable`, checked against its integrity; never infers a reason | **Done** (2026-10-10) | `explaining-absence.feature` |
 | Breadcrumbs (hack log 2026-10-10): `User-Agent` per client, W3C `traceparent`, an opt-in OpenTelemetry-style event log (file or POST) | **Done** (2026-10-10) | `user-agent.feature`, `breadcrumbs.feature` |
+| §6.0 (2026-10-10): the core works in protocol-neutral terms (`Binding`, `Received`, `Outcome`); a binding is chosen by URI scheme; HTTP is one binding; an unknown scheme is refused before anything is sent | **Done** (2026-10-10). No second real binding (CoAP parked); proven with an in-memory test binding | `any-protocol.feature` |
 
 ## exhibits/cache-demo
 

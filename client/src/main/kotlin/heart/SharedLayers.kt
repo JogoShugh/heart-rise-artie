@@ -11,11 +11,12 @@ import java.net.URI
  * The resources a manifest links to rather than carries: the affordance set
  * (Layer 2), each schema (Layer 3), and the explanation of absent acts
  * (SPEC §6.12). Every one is fetched through a link that carries an
- * integrity value (HAL-SCHEMA-FORMS-HR Rule 2), checked below the cache, so
- * an HTTP cache may keep them for as long as they are served immutable.
+ * integrity value (HAL-SCHEMA-FORMS-HR Rule 2). The core checks the bytes
+ * against it whatever the binding; the HTTP binding also checks below its
+ * cache, so refused bytes are never stored.
  */
 internal class SharedLayers(
-    private val transport: Transport,
+    private val bindings: Bindings,
     /** Follow links that carry no integrity value (older servers only). */
     private val allowUncheckedLinks: Boolean,
     private val decisions: DecisionLog,
@@ -56,21 +57,20 @@ internal class SharedLayers(
      * without one is refused before any request.
      */
     fun json(url: String, integrity: String?): JsonObject {
-        val accept = mapOf("Accept" to "$HAL_JSON, application/json")
-        val response = try {
+        val received = try {
             if (integrity == null && !allowUncheckedLinks) {
                 throw IntegrityException(
                     "$url was linked without an integrity value; refused (HAL-SCHEMA-FORMS-HR Rule 2)",
                 )
             }
-            transport.send(HeartRequest("GET", url, accept, integrity = integrity))
+            bindings.forUri(url).fetch(url, ACCEPT, integrity).received(url)
+                .also { received -> integrity?.let { Integrity.checkLink(url, received.bytes, it) } }
         } catch (refused: IntegrityException) {
             decisions.integrityRefused(url, integrity, refused.message)
             throw refused
         }
         integrity?.let { decisions.integrityChecked(url, it) }
-        check(response.status in SUCCESS) { "GET $url answered ${response.status}" }
-        return Json.parseToJsonElement(response.body).jsonObject
+        return Json.parseToJsonElement(received.body).jsonObject
     }
 
     private companion object {
@@ -79,9 +79,7 @@ internal class SharedLayers(
             schema[SCHEMA_REF]?.jsonPrimitive?.content
                 ?: schema.takeIf { it.keys == setOf(SCHEMA_ID) }?.get(SCHEMA_ID)?.jsonPrimitive?.content
 
-        const val OK = 200
-        const val LAST_SUCCESS = 299
-        val SUCCESS = OK..LAST_SUCCESS
+        val ACCEPT = listOf(HAL_JSON, "application/json")
         const val SCHEMA_ID = "\$id"
         const val SCHEMA_REF = "\$ref"
         const val SCHEMA_INTEGRITY = "hr:integrity"

@@ -1,6 +1,7 @@
 package steps
 
 import heart.ArtieClient
+import heart.Binding
 import heart.CachingTransport
 import heart.EventLog
 import heart.EventSink
@@ -77,8 +78,11 @@ class ClientContext {
         val trace = Trace()
         val transport = UserAgentTransport(agent, TraceContextTransport(trace, next))
         val events = EventLog(eventSink, trace, agent)
-        return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events).also { created += it }
+        return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events, bindings).also { created += it }
     }
+
+    /** Bindings for schemes other than HTTP's, by scheme (SPEC §6.0); a scenario adds them before entering. */
+    val bindings = mutableMapOf<String, Binding>()
 
     /** How many requests the client had sent when it finished entering. */
     var requestsAfterEnter = 0

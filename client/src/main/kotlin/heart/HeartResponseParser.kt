@@ -9,24 +9,23 @@ import kotlinx.serialization.json.Json
 import java.net.URI
 
 /**
- * Reads a Layer 1 response in either dialect (SPEC §6.1). The profile must be
- * named in `Link: rel="profile"`; the old media-type parameter is not
- * accepted. Plain target hrefs are resolved against the URL the response
- * came from; templated ones are kept as templates for the act to expand.
+ * Reads a Layer 1 representation in either dialect (SPEC §6.1). It must say it
+ * conforms to the dialect's profile (HTTP: `Link: rel="profile"`; the old
+ * media-type parameter is not accepted). Plain target hrefs are resolved
+ * against the URL it came from; templated ones are kept as templates for the
+ * act to expand.
  */
 object HeartResponseParser {
-
-    private val profileLink = Regex("""<([^>]*)>\s*;\s*rel="?profile"?""")
 
     /** HAL-SCHEMA-FORMS-HR Rule 1. */
     private const val TEMPLATE_POINTERS = "hr:templatePointers"
 
-    fun parse(response: HeartResponse, url: String, dialect: Dialect = Dialect.HAL_SCHEMA_FORMS): HeartRepresentation {
-        val profiles = profileLink.findAll(response.header("Link").orEmpty()).map { it.groupValues[1] }.toList()
+    fun parse(received: Received, url: String, dialect: Dialect = Dialect.HAL_SCHEMA_FORMS): HeartRepresentation {
+        val profiles = received.profiles
         require(dialect.profile in profiles) {
             "response from $url does not name the profile ${dialect.profile} (Link profiles: $profiles)"
         }
-        val root = Json.parseToJsonElement(response.body).jsonObject
+        val root = Json.parseToJsonElement(received.body).jsonObject
         // An act's response comes from the action URL; its self link says which resource it is.
         val self = linkHref(root, "self")
         return HeartRepresentation(
@@ -37,7 +36,7 @@ object HeartResponseParser {
             } else {
                 manifest(root, url)
             },
-            etag = response.header("ETag"),
+            etag = received.validator,
             forms = linkObject(root, FORMS_REL)?.let { link(it, url) },
             linksByRel = links(root, url),
         )
@@ -86,19 +85,6 @@ object HeartResponseParser {
 
     private fun linkHref(root: JsonObject, rel: String): String? =
         root[LINKS]?.jsonObject?.get(rel)?.jsonObject?.get("href")?.jsonPrimitive?.content
-
-    /** The `violations` list of a 422 body, or its `error` text, or nothing. */
-    fun violations(response: HeartResponse): List<String> {
-        val body = runCatching { Json.parseToJsonElement(response.body).jsonObject }.getOrNull() ?: return emptyList()
-        // RFC 9457 (SPEC §6.2): each violation is {pointer, message}. An older server sent strings.
-        val listed = (body["violations"] as? JsonArray)?.map { item ->
-            (item as? JsonObject)?.let { pointerMessage(it) } ?: item.jsonPrimitive.content
-        }
-        return listed ?: listOfNotNull(body["error"]?.jsonPrimitive?.content)
-    }
-
-    private fun pointerMessage(violation: JsonObject): String =
-        "${violation["pointer"]?.jsonPrimitive?.content}: ${violation["message"]?.jsonPrimitive?.content}"
 
     private fun form(rel: String, obj: JsonObject, base: String): AffordanceForm {
         val target = obj[LINKS]?.jsonObject?.get("target")?.jsonObject ?: error("affordance '$rel' has no target link")
