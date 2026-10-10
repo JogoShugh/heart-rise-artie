@@ -1,14 +1,14 @@
 # H.E.A.R.T. + R.I.S.E. Protocol Suite
 ## With ARTIE Reference Client Implementation
 
-**Version:** 0.5 — Working Draft (proposed revisions to 0.4; each marked `[0.5]` inline)
-**Status:** The 0.3 caching mechanism (content-addressed Layer 2/3, `Prefer: embed=schemas`) is verified end-to-end against a live server (see ADR and `scripts/test-report/`). The 0.4 changes to that mechanism — inverted `Prefer` default, `forms=link`/`schema=link`, per-rung Layer 2 addresses, `Accept-Profile`/`Link: rel="profile"`, mandatory `If-Match`/`428` — are **not yet implemented**. See `spec/CONFORMANCE-GAPS.md`.
+**Version:** 0.5 — Working Draft (remaining proposals are marked `[0.5]` inline)
+**Status (updated 2026-10-09):** The H.E.A.R.T. mechanism, from L0 to L2, is implemented and tested against a live server, in both dialects: the reference server (`server-spring`), the ARTIE client, and live scenarios against servers capped at L0, L1 and L2 (`scripts/live-client-check.sh`). L3 caching is shown live with two clients sharing one cache. L6 reasoning is built and tested with a scripted reasoner, but has not been run with a real model. RISE (§7) is not built. See `spec/CONFORMANCE-GAPS.md`.
 **Author:** Joshua Gough
 **Date:** October 2026 (0.4: August 2026)
 
 **Proposed in 0.5** (editor's proposals; none is accepted until the author removes its `[0.5]` marker):
 
-1. **Status line corrected (front matter).** 0.4 said §6.4–6.7 were verified against a live server. What was verified is the 0.3 mechanism; 0.4 inverted it. The claim now says exactly what was tested.
+1. **Status line corrected (front matter).** Decided 2026-10-09: the status line now says what is implemented and tested live.
 2. **Precondition scope and strong validators (§6.1, §6.2, §6.3).** Decided 2026-10-08; see below.
 3. **Evaluation order (§6.2).** Decided 2026-10-09; see below.
 4. **Layer 3 scope (§6.5).** Decided 2026-10-09; see below.
