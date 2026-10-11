@@ -3,14 +3,16 @@
   "prodPatterns": [
     "server-spring/src/main/kotlin/*.kt",
     "client/src/main/kotlin/*.kt",
-    "heart/*/src/main/kotlin/*.kt"
+    "heart/*/src/main/kotlin/*.kt",
+    "domains/*/src/main/kotlin/*.kt"
   ],
   "prodExcludePatterns": [],
   "featurePatterns": [
     "server-spring/src/test/resources/features/*.feature",
     "client/src/test/resources/features/*.feature",
     "heart/*/src/test/resources/features/*.feature",
-    "heart/heart-tck/src/main/resources/heart/tck/*.feature"
+    "heart/heart-tck/src/main/resources/heart/tck/*.feature",
+    "domains/*/src/test/resources/features/*.feature"
   ],
   "lintPatterns": [
     "server-spring/*.kt",
@@ -18,11 +20,13 @@
     "client/*.kt",
     "client/*.kts",
     "heart/*.kt",
-    "heart/*.kts"
+    "heart/*.kts",
+    "domains/*.kt",
+    "domains/*.kts"
   ],
-  "lintCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew detekt --console=plain -q) && (cd server-spring && ./gradlew detekt --console=plain -q) && (cd client && ./gradlew detekt --console=plain -q)",
-  "checkCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew check --console=plain) && (cd server-spring && ./gradlew check --console=plain) && (cd client && ./gradlew check --console=plain)",
-  "bddCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew test --console=plain) && (cd server-spring && ./gradlew test --console=plain) && (cd client && ./gradlew test --console=plain)",
+  "lintCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew detekt --console=plain -q) && (cd server-spring && ./gradlew detekt --console=plain -q) && (cd client && ./gradlew detekt --console=plain -q) && (cd domains/basketball && ./gradlew detekt --console=plain -q)",
+  "checkCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew check --console=plain) && (cd server-spring && ./gradlew check --console=plain) && (cd client && ./gradlew check --console=plain) && (cd domains/basketball && ./gradlew check --console=plain)",
+  "bddCommand": "export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew test --console=plain) && (cd server-spring && ./gradlew test --console=plain) && (cd client && ./gradlew test --console=plain) && (cd domains/basketball && ./gradlew test --console=plain)",
   "bddLogging": "native",
   "bddRawCommandRegex": ""
 }
