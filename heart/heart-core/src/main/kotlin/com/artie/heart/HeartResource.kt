@@ -28,8 +28,9 @@ class Past<S>(
  * does ([perform], given the act's name and its checked body), and, when the
  * declaration has a [Finding], how resources are found ([find], by part of a
  * name or by id; either may be absent), when the type keeps one, its
- * [past], and, when the declaration names a creation, how a resource is
- * made from its checked body ([create], which returns the new state). Every
+ * [past], and, when the bookmark offers acts for the type, what each does
+ * ([performAtBookmark], given the act's name and its checked body; it
+ * returns the state of the resource the act brought into being). Every
  * binding serves the rest.
  */
 class HeartResource<S, K>(
@@ -38,12 +39,12 @@ class HeartResource<S, K>(
     val perform: suspend (id: Long, act: String, input: ActInput) -> Acted<S>,
     val find: (suspend (name: String?, id: Long?) -> List<Found>)? = null,
     val past: Past<S>? = null,
-    val create: (suspend (input: ActInput) -> Acted<S>)? = null,
+    val performAtBookmark: (suspend (act: String, input: ActInput) -> Acted<S>)? = null,
 ) {
     init {
-        val declared = layers.type.creation != null
-        require(declared == (create != null)) {
-            "${layers.type.collection}: a declared creation needs a create function, and only one does"
+        val declared = layers.type.bookmarkActs.isNotEmpty()
+        require(declared == (performAtBookmark != null)) {
+            "${layers.type.collection}: bookmark acts need performAtBookmark, and only they do"
         }
     }
 }

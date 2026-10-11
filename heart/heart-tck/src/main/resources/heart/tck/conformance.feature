@@ -82,21 +82,21 @@ Feature: HEART conformance over HTTP, for any declared resource type
     When a client gets the resource as hal-schema-forms
     Then every relation its forms use is described in the server's ALPS profile
 
-  # A type with a creation: its fixture names it, with a valid and an invalid
-  # body. A domain whose types create nothing leaves these out with the tag
-  # filter "not @creation".
-  @creation
-  Scenario: The bookmark's creation answers 201 with the new resource, named in Location
+  # A type whose bookmark offers an act: its fixture names one, with a valid
+  # and an invalid body. A domain whose bookmark offers no act leaves these
+  # out with the tag filter "not @bookmark-act".
+  @bookmark-act
+  Scenario: The bookmark's act brings a resource into being, answered 201 and named in Location
     When a client gets "/" as hal-schema-forms
-    Then the index offers the fixture's creation as a POST form on the collection
-    When the client sends the creation with its valid body and the index's ETag
+    Then the index offers the fixture's bookmark act as a form on its own actions
+    When the client sends the bookmark act with its valid body and the index's ETag
     Then the response status is 201
     And the response names the new resource in Location and in Content-Location
     And the new resource can be read where Location says
 
-  @creation
-  Scenario Outline: A refused creation is a problem of type <type>, and creates nothing
-    When the client sends the creation with <body> and <validator>
+  @bookmark-act
+  Scenario Outline: A refused act on the bookmark is a problem of type <type>, and adds no resource
+    When the client sends the bookmark act with <body> and <validator>
     Then the response status is <status>
     And the response is a problem of type "<type>"
     And the collection holds as many resources as before

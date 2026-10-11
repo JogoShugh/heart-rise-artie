@@ -97,15 +97,8 @@ class IndexSteps(private val world: LampWorld) {
         assertEquals(min to max, declared.path("min").asInt() to declared.path("max").asInt())
     }
 
-    @Then("the {string} hints allow {string} and need an ETag to act")
-    fun allows(resource: String, methods: String) {
-        val hints = json.path("resources").path(resource).path("hints")
-        assertEquals(methods.split(", "), hints.path("allow").map { it.asText() })
-        assertEquals(listOf("etag"), hints.path("precondition-req").map { it.asText() })
-    }
-
     @Then("the schema of {string} is served at its content address")
-    fun creationSchema(name: String) {
+    fun actSchema(name: String) {
         val schema = ContentAddress.canonicalText(world.type.act(name).schema)
         assertEquals(schema, world.layers.schemas[ContentAddress.address(schema)])
     }

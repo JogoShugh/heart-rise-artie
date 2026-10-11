@@ -17,8 +17,8 @@ compliant over HTTP.
        override val absent = TckAct("garden:sow-seed", "sow-seed",
            body = """{"seedType": "kale"}""", reason = "The bed is already planted.")
        override val searchTerm = "Bed 2"
-       // Only for a type with a creation:
-       // override val creation = TckAct("garden:plant-bed", "", body = ..., invalidBody = ...)
+       // Only if the bookmark offers an act for the type:
+       // override val bookmarkAct = TckAct("home:install-lamp", "install-lamp", body = ..., invalidBody = ...)
        override suspend fun ready(): Long { /* reset data, prepare bed 2 */ return 2 }
    }
    ```
@@ -27,8 +27,8 @@ compliant over HTTP.
    `com.artie.heart.tck` (plus your fixture's package), in a context with a
    `WebTestClient`, `TckWorld`, and your `HeartResource` beans. See
    `server-spring/.../tck/RunHeartTckTest.kt`.
-4. If nothing on your server is created from the bookmark, add the tag
-   filter `not @creation` (Cucumber's `cucumber.filter.tags`).
+4. If your server's bookmark offers no act, add the tag
+   filter `not @bookmark-act` (Cucumber's `cucumber.filter.tags`).
 
 ## What the 17 scenarios check
 
@@ -37,14 +37,14 @@ integrity-checked `hr:forms` links with templated targets; 304; the absence
 explanation and its reason; a successful act (`Content-Location`, new ETag);
 428, 412, 409 and 422 as problems that change nothing; the same targets in
 HAL-FORMS and HAL Schema Forms; the index, search and JSON Home; every form
-relation described in the ALPS profile. The four `@creation` scenarios: the
-index offers the creation as a POST form on the collection; it answers 201
+relation described in the ALPS profile. The four `@bookmark-act` scenarios: the
+index offers the act as a form on its own `/actions/{path}`; it answers 201
 with the new resource in `Location`, `Content-Location` and `self`, readable
-at that location; and 428, 412 and 422 refuse it as problems that create
-nothing.
+at that location; and 428, 412 and 422 refuse it as problems that add no
+resource.
 
 ## Who runs it
 
 The lamp (`src/test`, a server that declares one type and writes no HTTP
 code) passes all 17. The garden (`server-spring`) and basketball
-(`domains/basketball`) create nothing, and pass the other 13.
+(`domains/basketball`) have no act on the bookmark, and pass the other 13.

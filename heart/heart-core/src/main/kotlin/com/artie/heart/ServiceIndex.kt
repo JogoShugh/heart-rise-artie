@@ -53,29 +53,13 @@ class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
                 type.profile.key(finding.lookup.relation) to schemaForm(
                     type, "/${type.collection}/{id}", finding.lookup.relation, "id", idProperty(finding),
                 ),
-            ) + listOfNotNull(type.creation?.let { type.profile.key(it.relation) to creationForm(type, it) })
+            ) + type.bookmarkActs.map { type.profile.key(it.relation) to actForm(type, it) }
         }.toMap(),
     )
 
-    /**
-     * A type's creation: a POST form whose target is the collection, with its
-     * schema inline (the index is the same at every rung), named by content.
-     */
-    private fun creationForm(type: ResourceType<*, *>, creation: Act): Map<String, Any> {
-        val schema = ContentAddress.canonicalText(creation.schema)
-        @Suppress("UNCHECKED_CAST")
-        val inline = LinkedHashMap(JsonTrees.plain(schema) as Map<String, Any?>)
-        inline["\$id"] = Layers.SCHEMAS + ContentAddress.address(schema)
-        val relation = type.profile.relation(creation.relation)
-        return mapOf(
-            "_links" to mapOf("target" to mapOf("href" to "/${type.collection}")),
-            "method" to "POST",
-            "contentType" to JSON,
-            "title" to relation.title,
-            "description" to relation.description,
-            "schema" to inline,
-        )
-    }
+    /** The type that declares the index's act at [path], if any, and the act. */
+    fun actAt(path: String): Pair<ResourceType<*, *>, Act>? =
+        found.firstNotNullOfOrNull { type -> type.bookmarkActs.firstOrNull { it.path == path }?.let { type to it } }
 
     private fun halFormsIndex(): Map<String, Any> = mapOf(
         "title" to title,
@@ -97,17 +81,15 @@ class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
                         "prompt" to finding.idTitle,
                     ),
                 ),
-            ) + listOfNotNull(
-                type.creation?.let { creation ->
-                    creation.name to mapOf(
-                        "title" to type.profile.relation(creation.relation).title,
-                        "method" to "POST",
-                        "contentType" to JSON,
-                        "target" to "/${type.collection}",
-                        "properties" to HalFormsProperties.of(creation.schema),
-                    )
-                },
-            )
+            ) + type.bookmarkActs.map { act ->
+                act.name to mapOf(
+                    "title" to type.profile.relation(act.relation).title,
+                    "method" to "POST",
+                    "contentType" to JSON,
+                    "target" to ACTIONS + act.path,
+                    "properties" to HalFormsProperties.of(act.schema),
+                )
+            }
         }.toMap(),
     )
 
@@ -143,8 +125,32 @@ class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
 
 }
 
-/** The body a creation takes. */
+/** The body an act takes. */
 private const val JSON = "application/json"
+
+/** Where the index's own acts are: `/actions/{path}`, as a resource's are under it. */
+const val ACTIONS = "/actions/"
+
+/**
+ * An act the index offers: a form like any act's, targeting the index's own
+ * `/actions/{path}`, with its schema inline (the index is the same at every
+ * rung), named by content.
+ */
+private fun actForm(type: ResourceType<*, *>, act: Act): Map<String, Any> {
+    val schema = ContentAddress.canonicalText(act.schema)
+    @Suppress("UNCHECKED_CAST")
+    val inline = LinkedHashMap(JsonTrees.plain(schema) as Map<String, Any?>)
+    inline["\$id"] = Layers.SCHEMAS + ContentAddress.address(schema)
+    val relation = type.profile.relation(act.relation)
+    return mapOf(
+        "_links" to mapOf("target" to mapOf("href" to ACTIONS + act.path)),
+        "method" to "POST",
+        "contentType" to JSON,
+        "title" to relation.title,
+        "description" to relation.description,
+        "schema" to inline,
+    )
+}
 
 /** The search form's one field: part of a resource's name. */
 private fun nameProperty(finding: Finding): Map<String, Any> = mapOf(
@@ -182,26 +188,13 @@ internal class HomeDocument(private val found: List<ResourceType<*, *>>, private
                 (if (single) "collection" else type.collection) to mapOf(
                     "hrefTemplate" to "/${type.collection}{?name,id}",
                     "hrefVars" to mapOf("name" to "$VARS/$noun-name", "id" to "$VARS/$noun-id"),
-                    "hints" to collectionHints(type),
+                    "hints" to mapOf("allow" to listOf("GET"), "formats" to FORMATS),
                 ),
             )
         }.toMap()
         val api = mapOf("title" to title, "links" to mapOf("describedBy" to SPEC_URL))
         return mapOf("api" to api, "resources" to resources)
     }
-
-    /** A collection is searched; one with a creation also takes a POST, conditional on the index's ETag. */
-    private fun collectionHints(type: ResourceType<*, *>): Map<String, Any> =
-        if (type.creation == null) {
-            mapOf("allow" to listOf("GET"), "formats" to FORMATS)
-        } else {
-            mapOf(
-                "allow" to listOf("GET", "POST"),
-                "formats" to FORMATS,
-                "accept-post" to listOf(JSON),
-                "precondition-req" to listOf("etag"),
-            )
-        }
 
     private companion object {
         const val SPEC_URL = "https://github.com/jogoshugh/heart-rise/spec"

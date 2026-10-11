@@ -9,24 +9,25 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 
 /**
- * The `@creation` scenarios: the type's creation, offered by the service
- * index as a POST form on the collection and conditional on the index's ETag.
+ * The `@bookmark-act` scenarios: an act the service index offers, a form on
+ * the index's own `/actions/{path}`, conditional on the index's ETag, whose
+ * result is a resource that did not exist before.
  */
-class TckCreationSteps(private val fixture: TckFixture, private val world: TckWorld) {
+class TckBookmarkActSteps(private val fixture: TckFixture, private val world: TckWorld) {
     private val headers = mapOf(HttpHeaders.ACCEPT to Dialect.JSONSCHEMA.mediaType)
     private var countBefore = 0
 
-    private val creation: TckAct
-        get() = checkNotNull(fixture.creation) { "the fixture names no creation; filter out @creation" }
+    private val act: TckAct
+        get() = checkNotNull(fixture.bookmarkAct) { "the fixture names no bookmark act; filter out @bookmark-act" }
 
-    @Then("the index offers the fixture's creation as a POST form on the collection")
+    @Then("the index offers the fixture's bookmark act as a form on its own actions")
     fun offered() {
-        val form = checkNotNull(world.forms()[creation.key]) { "the index has no form ${creation.key}" }
+        val form = checkNotNull(world.forms()[act.key]) { "the index has no form ${act.key}" }
         assertEquals("POST", form.path("method").asText())
-        assertEquals("/${fixture.collection}", form.path("_links").path("target").path("href").asText())
+        assertEquals("/actions/${act.path}", form.path("_links").path("target").path("href").asText())
     }
 
-    @When("^the client sends the creation with (its valid body|its invalid body) and ($VALIDATORS)$")
+    @When("^the client sends the bookmark act with (its valid body|its invalid body) and ($VALIDATORS)$")
     fun send(body: String, validator: String) {
         countBefore = count()
         val index = world.get("/", headers).responseHeaders.eTag
@@ -35,8 +36,8 @@ class TckCreationSteps(private val fixture: TckFixture, private val world: TckWo
             "an If-Match that is stale" -> mapOf(HttpHeaders.IF_MATCH to "\"stale\"")
             else -> mapOf(HttpHeaders.IF_MATCH to checkNotNull(index) { "the index has no ETag" })
         }
-        val text = if (body == "its valid body") creation.body else checkNotNull(creation.invalidBody)
-        world.post("/${fixture.collection}", text, headers + ifMatch)
+        val text = if (body == "its valid body") act.body else checkNotNull(act.invalidBody)
+        world.post("/actions/${act.path}", text, headers + ifMatch)
     }
 
     @Then("the response names the new resource in Location and in Content-Location")
@@ -50,14 +51,14 @@ class TckCreationSteps(private val fixture: TckFixture, private val world: TckWo
     @Then("the new resource can be read where Location says")
     fun readable() {
         val location = checkNotNull(world.last.responseHeaders.location).toString()
-        val created = world.last.responseHeaders.eTag
+        val made = world.last.responseHeaders.eTag
         val read = world.get(location, headers)
         assertEquals(HttpStatus.OK, read.status)
-        assertEquals(created, read.responseHeaders.eTag)
+        assertEquals(made, read.responseHeaders.eTag)
     }
 
     @Then("the collection holds as many resources as before")
-    fun nothingCreated() = assertEquals(countBefore, count())
+    fun nothingAdded() = assertEquals(countBefore, count())
 
     /** How many resources a search with no term finds. */
     private fun count(): Int =

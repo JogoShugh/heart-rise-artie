@@ -49,17 +49,17 @@ Feature: A declared resource over CoAP, served by heart-coap
     And the CoAP body links self to "/lamps/7"
     And lamp 7 is at version 4
 
-  Scenario: A creation from the service index answers 2.01 Created, with the new lamp and its location
+  Scenario: An act on the bookmark that brings a lamp into being answers 2.01 Created, with the lamp and its location
     Given a CoAP client got "/" with Prefer ""
-    When the CoAP client posts {"brightness": 20} to "/lamps" with the ETag it holds
+    When the CoAP client posts {"brightness": 20} to "/actions/install-lamp" with the ETag it holds
     Then the CoAP response is 2.01
     And the CoAP Location-Path is "lamps/8"
     And the CoAP body links self to "/lamps/8"
     And the CoAP ETag is the first 8 bytes of SHA-256 over "\"seq-1.hsf.L0\""
 
-  Scenario Outline: A refused creation over CoAP: <case>
+  Scenario Outline: A refused act on the bookmark over CoAP: <case>
     Given a CoAP client got "/" with Prefer ""
-    When the CoAP client posts <body> to "/lamps" with <if-match>
+    When the CoAP client posts <body> to "/actions/install-lamp" with <if-match>
     Then the CoAP response is <code>
     And the CoAP problem type is "<problem>"
 

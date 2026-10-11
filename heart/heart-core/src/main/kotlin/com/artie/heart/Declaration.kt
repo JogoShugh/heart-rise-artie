@@ -126,9 +126,11 @@ class Finding(
 
 /**
  * A resource type, declared once: everything heart-core needs to render and
- * act on it. A type with a [creation] act is created from the service index:
- * the index offers that act as a POST form on the collection, beside the
- * type's search, so a creatable type is also found ([finding]).
+ * act on it. [acts] are offered by the type's resources, as their state
+ * allows. [bookmarkActs] are offered by the service index, always: acts
+ * whose result is a resource of this type that did not exist before, such
+ * as a customer reporting a problem. The index offers them beside the
+ * type's search, so such a type is also found ([finding]).
  */
 // A declaration names each of its parts once, by name; grouping them would only rename them.
 @Suppress("LongParameterList")
@@ -139,23 +141,28 @@ class ResourceType<S, K>(
     val offers: Offers<K>,
     val state: StateView<S, K>,
     val finding: Finding? = null,
-    val creation: Act? = null,
+    val bookmarkActs: List<Act> = emptyList(),
 ) {
+    /** Every act declared, the resources' and the bookmark's. */
+    val allActs: List<Act> = acts + bookmarkActs
+
     init {
-        acts.forEach { profile.relation(it.relation) }
+        allActs.forEach { profile.relation(it.relation) }
         finding?.let { profile.relation(it.search.relation) }
         finding?.let { profile.relation(it.lookup.relation) }
-        creation?.let { profile.relation(it.relation) }
-        require(creation == null || finding != null) { "$collection is created from the index, so it is found too" }
-        require(acts.none { it.name == creation?.name }) { "${creation?.name} is declared twice" }
+        require(bookmarkActs.isEmpty() || finding != null) { "$collection has bookmark acts, so it is found too" }
+        val twice = allActs.groupBy { it.name }.filterValues { it.size > 1 }.keys
+        require(twice.isEmpty()) { "acts declared twice: $twice" }
         offers.keys.forEach { key ->
             val unknown = offers.offered(key) - acts.map { it.name }.toSet()
             require(unknown.isEmpty()) { "key $key offers undeclared acts $unknown" }
         }
     }
 
-    /** Act [name]: one a resource offers, or the creation. */
+    /** Act [name], whoever offers it. */
     fun act(name: String): Act =
-        (acts + listOfNotNull(creation)).firstOrNull { it.name == name }
-            ?: throw IllegalArgumentException("no act $name")
+        allActs.firstOrNull { it.name == name } ?: throw IllegalArgumentException("no act $name")
+
+    /** Whether the service index offers act [name]. */
+    fun atBookmark(name: String): Boolean = bookmarkActs.any { it.name == name }
 }

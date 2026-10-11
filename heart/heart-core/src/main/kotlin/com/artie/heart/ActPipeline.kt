@@ -24,51 +24,52 @@ class ActInput(val json: JsonNode, private val mapper: ObjectMapper) {
  * [ConcurrentWriteException] while the act runs is stale too.
  */
 class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper: ObjectMapper = ObjectMapper()) {
-    private val checks: Map<String, BodyCheck> =
-        (type.acts + listOfNotNull(type.creation)).associate { it.name to BodyCheck(it.schema) }
+    private val checks: Map<String, BodyCheck> = type.allActs.associate { it.name to BodyCheck(it.schema) }
 
     /**
-     * Steps 1 to 3. [current] reads the resource's state, only when a
-     * validator was sent; [matches] compares the sent [validator] with the
-     * one the binding selects for that state. A validator is whatever the
-     * binding carries: an HTTP If-Match value, CoAP If-Match options.
-     * Returns the state checked.
+     * Steps 1 to 3 for an act a resource offers. [current] reads the
+     * resource's state, only when a validator was sent; [matches] compares
+     * the sent [validator] with the one the binding selects for that state.
+     * A validator is whatever the binding carries: an HTTP If-Match value,
+     * CoAP If-Match options. Returns the state checked.
      */
     suspend fun <V : Any> check(act: String, validator: V?, current: suspend () -> S, matches: (S, V) -> Boolean): S {
-        val declared = type.act(act)
-        if (validator == null) {
-            throw PreconditionRequiredException("$act needs a validator: the current one of the resource it acts on")
+        require(!type.atBookmark(act)) { "$act is offered by the bookmark; use checkAtBookmark" }
+        var state: S? = null
+        steps(act, validator, { held -> current().also { state = it }.let { matches(it, held) } }) {
+            val key = type.state.keyOf(checkNotNull(state))
+            if (act in type.offers.offered(key)) null else "the resource's current affordance set (key $key)"
         }
-        val state = current()
-        val key = type.state.keyOf(state)
-        val refusal = when {
-            !matches(state, validator) ->
-                StaleWriteConflict("the validator does not match the current one of the selected representation")
-            act !in type.offers.offered(key) -> NotOfferedException(
-                "$act is not in the resource's current affordance set (key $key)",
-                rel = type.profile.reference(declared.relation),
-            )
-            else -> null
-        }
-        refusal?.let { throw it }
-        return state
+        return checkNotNull(state)
     }
 
     /**
-     * Steps 1 and 2 for the type's creation. Its owning resource is the
-     * service index, which always offers it, so step 3 cannot refuse it;
-     * [matches] compares the sent [validator] with the index's current one.
+     * Steps 1 to 3 for an act the service index offers. Its owning resource
+     * is the index, so [matches] compares the sent [validator] with the
+     * index's current one; the index always offers its acts.
      */
-    fun <V : Any> checkCreation(validator: V?, matches: (V) -> Boolean) {
-        val creation = checkNotNull(type.creation) { "${type.collection} declares no creation" }
-        if (validator == null) {
-            throw PreconditionRequiredException(
-                "${creation.name} needs a validator: the current one of the service index",
-            )
+    suspend fun <V : Any> checkAtBookmark(act: String, validator: V?, matches: (V) -> Boolean) {
+        require(type.atBookmark(act)) { "$act is not offered by the bookmark" }
+        steps(act, validator, { matches(it) }) { null }
+    }
+
+    /** The order of SPEC §6.2: [notOffered] names the set that lacks the act, or is null when it is offered. */
+    private suspend fun <V : Any> steps(
+        act: String,
+        validator: V?,
+        matches: suspend (V) -> Boolean,
+        notOffered: () -> String?,
+    ) {
+        val refusal = when {
+            validator == null ->
+                PreconditionRequiredException("$act needs a validator: the current one of the resource offering it")
+            !matches(validator) ->
+                StaleWriteConflict("the validator does not match the current one of the selected representation")
+            else -> notOffered()?.let { set ->
+                NotOfferedException("$act is not in $set", rel = type.profile.reference(type.act(act).relation))
+            }
         }
-        if (!matches(validator)) {
-            throw StaleWriteConflict("the validator does not match the service index's current one")
-        }
+        refusal?.let { throw it }
     }
 
     /** Step 4, then the act: [perform] runs with the checked body. */

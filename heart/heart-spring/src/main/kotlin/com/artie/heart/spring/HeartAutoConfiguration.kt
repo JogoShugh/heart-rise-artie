@@ -28,20 +28,20 @@ class HeartAutoConfiguration {
 
     /**
      * For each declared collection: Layer 1 at `/{collection}/{id}` and its
-     * acts at `/{collection}/{id}/actions/{path}`; for a type with a creation,
-     * a POST to `/{collection}`; for a type that keeps its past, its state as
-     * of `?asOf=` and its `/history`. Every refusal is
+     * acts at `/{collection}/{id}/actions/{path}`; the bookmark's own acts at
+     * `/actions/{path}`; for a type that keeps its past, its state as of
+     * `?asOf=` and its `/history`. Every refusal is
      * answered as SPEC §6.2 says.
      */
     @Bean
     fun heartRoutes(handlers: HeartHandlers, index: HeartIndexHandler): RouterFunction<ServerResponse> =
         coRouter {
             GET("/") { index.index(it) }
+            POST("/actions/{path}") { handlers.actAtBookmark(it) }
             handlers.all.forEach { handler ->
                 val resource = handler.resource
                 val collection = resource.layers.type.collection
                 if (resource.find != null) GET("/$collection") { index.search(resource, it) }
-                if (resource.create != null) POST("/$collection") { handler.create(it) }
                 GET("/$collection/{id}", NO_QUERY) { handler.read(it) }
                 POST("/$collection/{id}/actions/{path}") { handler.act(it) }
                 if (resource.past != null) {

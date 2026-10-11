@@ -54,9 +54,9 @@ class ActSteps(private val world: LampWorld) {
         }
     }
 
-    /** A creation's owning resource is the service index, so its validator is the index's. */
-    @When("^a client creates a lamp with validator (none|stale|current) and body (.*)$")
-    fun create(validator: String, body: String) {
+    /** An act the bookmark offers: its owning resource is the service index, so its validator is the index's. */
+    @When("^a client acts on the bookmark with \"(\\w+)\", validator (none|stale|current), and body (.*)$")
+    fun actOnBookmark(act: String, validator: String, body: String) {
         val pipeline = ActPipeline(world.type)
         val index = ServiceIndex(listOf(world.type)).validator(Dialect.JSONSCHEMA)
         val sent = when (validator) {
@@ -64,11 +64,10 @@ class ActSteps(private val world: LampWorld) {
             "stale" -> "\"index-old\""
             else -> index
         }
-        val creation = checkNotNull(world.type.creation)
         outcome = runCatching {
             runBlocking {
-                pipeline.checkCreation(sent) { it == index }
-                pipeline.run(creation.name, body) { input ->
+                pipeline.checkAtBookmark(act, sent) { it == index }
+                pipeline.run(act, body) { input ->
                     val id = world.lamps.size + 1L
                     val brightness = checkNotNull(input.bind(InstallLamp::class.java).brightness)
                     world.lamps[id] = Lamp(id, "OFF", brightness, version = 1)
@@ -77,8 +76,8 @@ class ActSteps(private val world: LampWorld) {
         }
     }
 
-    @Then("no lamp was created")
-    fun noneCreated() = assertTrue(world.lamps.isEmpty(), "lamps: ${world.lamps}")
+    @Then("no lamp was installed")
+    fun noneInstalled() = assertTrue(world.lamps.isEmpty(), "lamps: ${world.lamps}")
 
     @Then("the act was performed")
     fun performed() {

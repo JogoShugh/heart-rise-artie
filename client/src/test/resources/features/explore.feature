@@ -3,7 +3,9 @@ Feature: ARTIE explores any HEART server from its bookmark
   choose only among what the server offers. The explorer does exactly that,
   for any domain: it reads the bookmark, runs the search the samples name,
   follows the item it finds, and then, again and again, takes the first act
-  the resource offers that the samples still have a body for. It stops when
+  the resource offers that the samples still have a body for. When the
+  bookmark itself offers such an act, as a creation, it starts there instead
+  of searching, and goes on from the resource it made. It stops when
   no offered act has a sample left, or at its step limit. The samples are the
   only domain knowledge it has: example bodies, never URIs or orders.
 
@@ -19,6 +21,16 @@ Feature: ARTIE explores any HEART server from its bookmark
     When ARTIE explores the lamp service
     Then it took the acts "home:switch-on, home:dim, home:dim, home:switch-off"
     And it stopped because "no offered act has a sample left"
+
+  Scenario: When the bookmark offers an act the samples have a body for, the explorer starts there
+    Given the lamp service's bookmark also offers installing a lamp
+    And explore samples searching "lamp 7" with acts:
+      | rel               | bodies             |
+      | home:install-lamp | {"brightness": 40} |
+      | home:switch-on    | {}                 |
+    When ARTIE explores the lamp service
+    Then it took the acts "home:install-lamp, home:switch-on"
+    And it ran no search
 
   Scenario: An act the resource does not offer is never sent, even with a sample
     Given explore samples searching "lamp 7" with acts:

@@ -13,7 +13,7 @@ beans, and every route below is served. The server writes no controllers.
 | `GET /{collection}/{id}` | `HeartResourceHandler.read`: Layer 1 at the asked rung (capped by `heart.max-rung`); ETag, `Cache-Control: no-cache`, `Vary`, profile `Link`, `Preference-Applied`; 304 |
 | `GET /{collection}/{id}?asOf=`, `/history` | The past, when the resource has `past` |
 | `POST /{collection}/{id}/actions/{path}` | `HeartResourceHandler.act`: negotiates first (406 before any write), runs `ActPipeline`, answers new Layer 1 with `Content-Location` |
-| `POST /{collection}` | `HeartResourceHandler.create`, for a type with a creation: If-Match against the index's ETag, then 201 with the new Layer 1, `Location` and `Content-Location` |
+| `POST /actions/{path}` | `HeartResourceHandler.actAtBookmark`, for an act the bookmark offers: If-Match against the index's ETag, then 201 with the new resource's Layer 1, `Location` and `Content-Location` |
 | `GET /affordance-sets/{address}`, `/schemas/{address}`, `/unavailable/{address}` | `HeartContentController`: exact bytes, `immutable`, `Repr-Digest` |
 | `GET /profiles/{name}` | `HeartProfileController`: ALPS, ETag, one-day cache |
 

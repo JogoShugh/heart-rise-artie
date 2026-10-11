@@ -35,8 +35,8 @@ import org.springframework.test.context.TestPropertySource
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.gardenbed.tck")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
-// Nothing here is created from the bookmark, so the @creation scenarios do not apply.
-@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @creation")
+// The bookmark offers no act here, so the @bookmark-act scenarios do not apply.
+@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @bookmark-act")
 class RunHeartTckTest
 
 /** Bed 2, planted: watering is offered, sowing is not. */

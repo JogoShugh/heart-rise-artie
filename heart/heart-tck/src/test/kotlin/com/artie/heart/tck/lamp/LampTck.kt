@@ -44,7 +44,7 @@ class LampServer {
             lamps[id] = next
             Acted(next)
         },
-        create = { input ->
+        performAtBookmark = { _, input ->
             val id = (lamps.keys.maxOrNull() ?: 0) + 1
             val lamp = Lamp(id, "OFF", checkNotNull(input.bind(InstallLamp::class.java).brightness), version = 1)
             lamps[id] = lamp
@@ -74,9 +74,9 @@ class LampServer {
             reason = "The lamp is already on.",
         )
         override val searchTerm = "lamp 7"
-        override val creation = TckAct(
+        override val bookmarkAct = TckAct(
             key = "home:install-lamp",
-            path = "",
+            path = "install-lamp",
             body = """{"brightness": 40}""",
             invalidBody = """{"brightness": 101}""",
             invalidPointer = "/brightness",

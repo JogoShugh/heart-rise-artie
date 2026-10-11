@@ -64,12 +64,12 @@ Feature: A declared resource and its acts, served over HTTP
       | not offered          | switch-on | "seq-3.hsf.L0"    | {}                | 409    | not-offered           |
       | body breaks schema   | dim       | "seq-3.hsf.L0"    | {"brightness": 0} | 422    | invalid-input         |
 
-  Scenario: The service index offers the lamp's creation beside its search and lookup
+  Scenario: The service index offers its own act, installing a lamp, beside its search and lookup
     When a client gets "/" as hal-schema-forms
     Then the response offers "home:search-lamps, home:get-lamp, home:install-lamp"
 
-  Scenario Outline: A creation, conditional on the index's ETag, answers 201 with the new lamp in <dialect>
-    When a client posts {"brightness": 20} to "/lamps" as <dialect> with the index's ETag
+  Scenario Outline: An act on the bookmark that brings a lamp into being answers 201 with the new lamp in <dialect>
+    When a client posts {"brightness": 20} to "/actions/install-lamp" as <dialect> with the index's ETag
     Then the response status is 201
     And the response has Location "/lamps/8"
     And the response has Content-Location "/lamps/8"
@@ -81,8 +81,8 @@ Feature: A declared resource and its acts, served over HTTP
       | hal-schema-forms | \"seq-1.hsf.L0\" |
       | hal-forms        | \"seq-1.hf.L0\"  |
 
-  Scenario Outline: A refused creation is a problem, and creates nothing: <case>
-    When a client posts <body> to "/lamps" as hal-schema-forms with If-Match "<ifMatch>"
+  Scenario Outline: A refused act on the bookmark is a problem, and installs nothing: <case>
+    When a client posts <body> to "/actions/install-lamp" as hal-schema-forms with If-Match "<ifMatch>"
     Then the response status is <status>
     And the response is a problem of type "<type>"
     And the lamp server holds only lamp 7
@@ -92,8 +92,12 @@ Feature: A declared resource and its acts, served over HTTP
       | no If-Match        |                              | {"brightness": 5} | 428    | precondition-required |
       | stale If-Match     | "index-hsf-0000000000000000" | {"brightness": 5} | 412    | stale                 |
 
-  Scenario: A creation whose body breaks the schema is refused, and creates nothing
-    When a client posts {"brightness": 0} to "/lamps" as hal-schema-forms with the index's ETag
+  Scenario: An act on the bookmark whose body breaks the schema is refused, and installs nothing
+    When a client posts {"brightness": 0} to "/actions/install-lamp" as hal-schema-forms with the index's ETag
     Then the response status is 422
     And the response is a problem of type "invalid-input"
     And the lamp server holds only lamp 7
+
+  Scenario: The bookmark offers no act at an unknown path
+    When a client posts {} to "/actions/nothing" as hal-schema-forms with If-Match "*"
+    Then the response status is 404

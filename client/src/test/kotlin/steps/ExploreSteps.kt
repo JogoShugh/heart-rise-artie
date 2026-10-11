@@ -31,6 +31,12 @@ class LampService : HeartRiseClient {
     private var brightness = 50
     private var at = "/"
 
+    /** Whether the bookmark also offers installing a new lamp. */
+    var installs = false
+
+    /** Whether any search was run. */
+    var searched = false
+
     override var current: HeartRepresentation? = null
     override val appliedRung: Rung? = Rung.L0
 
@@ -44,7 +50,15 @@ class LampService : HeartRiseClient {
     override fun act(rel: String, payload: JsonObject): HeartRepresentation {
         check(current?.affordance(rel) != null) { "$rel is not offered at $at" }
         when (rel) {
-            "home:search-lamps" -> at = "/lamps?name=${payload["name"]?.jsonPrimitive?.content}"
+            "home:search-lamps" -> {
+                at = "/lamps?name=${payload["name"]?.jsonPrimitive?.content}"
+                searched = true
+            }
+            "home:install-lamp" -> {
+                at = "/lamps/8"
+                on = false
+                brightness = payload.getValue("brightness").jsonPrimitive.int
+            }
             "home:switch-on" -> on = true
             "home:switch-off" -> on = false
             "home:dim" -> brightness = payload.getValue("brightness").jsonPrimitive.int
@@ -66,7 +80,7 @@ class LampService : HeartRiseClient {
 
     private fun show(): HeartRepresentation {
         val offered = when {
-            at == "/" -> listOf("home:search-lamps")
+            at == "/" -> listOf("home:search-lamps") + if (installs) listOf("home:install-lamp") else emptyList()
             at.startsWith("/lamps?") -> emptyList()
             on -> listOf("home:switch-off", "home:dim")
             else -> listOf("home:switch-on")
@@ -91,6 +105,14 @@ class ExploreSteps {
     fun lampService() {
         service = LampService()
     }
+
+    @Given("the lamp service's bookmark also offers installing a lamp")
+    fun installs() {
+        service.installs = true
+    }
+
+    @Then("it ran no search")
+    fun noSearch() = assertEquals(false, service.searched)
 
     @Given("explore samples searching {string} with acts:")
     fun samples(name: String, table: DataTable) = samples(name, ExploreSamples.DEFAULT_STEPS, table)

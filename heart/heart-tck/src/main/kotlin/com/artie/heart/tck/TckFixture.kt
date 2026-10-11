@@ -20,11 +20,11 @@ interface TckFixture {
     val searchTerm: String
 
     /**
-     * The type's creation, for a type that declares one: its form key, a
-     * valid body and a body its schema refuses ([TckAct.path] is unused; a
-     * creation is sent to the collection). The `@creation` scenarios use it.
+     * An act the bookmark offers for the type, if it offers one: its form key,
+     * its path under `/actions/`, a valid body, and a body its schema refuses.
+     * The `@bookmark-act` scenarios use it.
      */
-    val creation: TckAct? get() = null
+    val bookmarkAct: TckAct? get() = null
 
     /** Puts the server's data back to a known state, with the resource ready; returns its id. */
     suspend fun ready(): Long

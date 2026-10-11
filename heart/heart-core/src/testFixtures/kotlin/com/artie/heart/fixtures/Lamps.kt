@@ -30,7 +30,7 @@ data class Dim(
     val label: String? = null,
 )
 
-/** The install act's input: a new lamp's brightness. It is installed switched off. */
+/** The input of installing a lamp, an act the bookmark offers: the new lamp's brightness. It is installed off. */
 @Schema(title = "Install a lamp")
 data class InstallLamp(
     @field:NotNull @field:Min(1) @field:Max(100)
@@ -80,7 +80,7 @@ object Lamps {
             versionOf = { it.version },
             bodyOf = { linkedMapOf("id" to it.id, "status" to it.status, "brightness" to it.brightness) },
         ),
-        creation = Act.of("installLamp", "install-lamp", InstallLamp::class.java),
+        bookmarkActs = listOf(Act.of("installLamp", "install-lamp", InstallLamp::class.java)),
         finding = Finding(
             noun = "lamp",
             search = Named("searchLamps", "search-lamps"),

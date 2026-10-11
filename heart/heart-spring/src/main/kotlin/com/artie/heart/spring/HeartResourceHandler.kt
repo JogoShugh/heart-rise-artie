@@ -107,20 +107,20 @@ class HeartResourceHandler<S, K>(
     }
 
     /**
-     * The type's creation, a POST to the collection. Its owning resource is
-     * the service index, so If-Match is compared, whole, with the index's
-     * ETag in the dialect this request selects. The answer is 201 with the
-     * new resource's Layer 1, named in Location and Content-Location.
+     * Act [name], which the bookmark offers, at `/actions/{path}`. Its owning
+     * resource is the service index, so If-Match is compared, whole, with the
+     * index's ETag in the dialect this request selects. The act brings a
+     * resource into being, so the answer is 201 with that resource's Layer 1,
+     * named in Location and Content-Location (RFC 9110 §15.3.2, §8.7).
      */
-    suspend fun create(request: ServerRequest): ServerResponse {
-        val creation = checkNotNull(type.creation) { "${type.collection} declares no creation" }
+    suspend fun actAtBookmark(name: String, request: ServerRequest): ServerResponse {
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rung = rung(dialect, request)
-        pipeline.checkCreation(request.headers().firstHeader(HttpHeaders.IF_MATCH)) { held ->
+        pipeline.checkAtBookmark(name, request.headers().firstHeader(HttpHeaders.IF_MATCH)) { held ->
             StateETag.matches(held, index.validator(dialect))
         }
         val body = request.awaitBodyOrNull<String>()
-        val done = pipeline.run(creation.name, body) { input -> checkNotNull(resource.create)(input) }
+        val done = pipeline.run(name, body) { input -> checkNotNull(resource.performAtBookmark)(name, input) }
         val location = "/${type.collection}/${type.state.idOf(done.state)}"
         return Rendered(done.state, dialect, rung).respond(
             ServerResponse.created(URI.create(location))

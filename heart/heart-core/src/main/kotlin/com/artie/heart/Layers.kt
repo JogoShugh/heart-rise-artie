@@ -18,7 +18,7 @@ package com.artie.heart
 class Layers<S, K>(val type: ResourceType<S, K>) {
 
     private val schemaBodies: Map<String, String> =
-        (type.acts + listOfNotNull(type.creation)).associate { it.name to ContentAddress.canonicalText(it.schema) }
+        type.allActs.associate { it.name to ContentAddress.canonicalText(it.schema) }
 
     /** Address -> canonical schema, for `/schemas/{address}`. */
     val schemas: Map<String, String> = schemaBodies.values.associateBy { ContentAddress.address(it) }

@@ -20,8 +20,8 @@ import org.eclipse.californium.core.coap.Response
 /**
  * Every declared resource type over CoAP (SPEC §6.0.1): the same resources as
  * over HTTP, from the same declarations, in the hal-schema-forms dialect.
- * `/` is the service index; `/{collection}` a search, and a POST there a
- * creation; `/{collection}/{id}` Layer 1, with its acts at
+ * `/` is the service index, with its own acts at `/actions/{path}`;
+ * `/{collection}` a search; `/{collection}/{id}` Layer 1, with its acts at
  * `/{collection}/{id}/actions/{path}`; and the
  * content-addressed layers and profiles at the same paths as over HTTP.
  */
@@ -54,12 +54,17 @@ internal class CoapRoutes(
         }
     }
 
-    /** An act at `/{collection}/{id}/actions/{path}`, or a creation at `/{collection}`. */
-    private suspend fun post(request: Request, typed: Typed?, segments: List<String>): Response = when {
-        typed != null && segments.size == ACT_SEGMENTS && segments[2] == "actions" ->
-            typed.act(request, id(segments[1]), segments[ACT_SEGMENTS - 1])
-        typed?.resource?.create != null && segments.size == 1 -> typed.create(request)
-        else -> replies.error(ResponseCode.METHOD_NOT_ALLOWED, "POST ${request.options.uriPathString}")
+    /** An act at `/{collection}/{id}/actions/{path}`, or one the bookmark offers at `/actions/{path}`. */
+    private suspend fun post(request: Request, typed: Typed?, segments: List<String>): Response {
+        val atBookmark = segments.size == 2 && segments[0] == ACTIONS
+        val owner = if (atBookmark) types.values.firstOrNull { it.offersAtBookmark(segments[1]) } else null
+        return when {
+            typed != null && segments.size == ACT_SEGMENTS && segments[2] == ACTIONS ->
+                typed.act(request, id(segments[1]), segments[ACT_SEGMENTS - 1])
+            owner != null -> owner.actAtBookmark(request, segments[1])
+            atBookmark -> replies.error(ResponseCode.NOT_FOUND, request.options.uriPathString)
+            else -> replies.error(ResponseCode.METHOD_NOT_ALLOWED, "POST ${request.options.uriPathString}")
+        }
     }
 
     private fun read(request: Request, segments: List<String>): Response? {
@@ -124,20 +129,24 @@ internal class CoapRoutes(
             return replies.layer1(ResponseCode.CHANGED, body, validatorOf(done.state, rung), rung.preferenceApplied)
         }
 
+        fun offersAtBookmark(path: String): Boolean = resource.layers.type.bookmarkActs.any { it.path == path }
+
         /**
-         * The type's creation, a POST to the collection. Its owning resource is
-         * the service index, so If-Match carries the index's 8-byte validator.
-         * The answer is 2.01 Created, with the new resource's Location-Path and
-         * its representation, whose self link names it too.
+         * The bookmark's act at `/actions/{path}`. Its owning resource is the
+         * service index, so If-Match carries the index's 8-byte validator. The
+         * act brings a resource into being, so the answer is 2.01 Created, with
+         * its Location-Path and its representation, whose self link names it too.
          */
-        suspend fun create(request: Request): Response {
-            val creation = checkNotNull(resource.layers.type.creation)
+        suspend fun actAtBookmark(request: Request, path: String): Response {
+            val act = resource.layers.type.bookmarkActs.first { it.path == path }
             val rung = rung(request)
             val index = CoapOptions.validator(index.validator(Dialect.JSONSCHEMA))
-            pipeline.checkCreation(request.options.ifMatch.takeIf { it.isNotEmpty() }) { validators ->
+            pipeline.checkAtBookmark(act.name, request.options.ifMatch.takeIf { it.isNotEmpty() }) { validators ->
                 validators.any { it.contentEquals(index) }
             }
-            val done = pipeline.run(creation.name, request.payloadString) { checkNotNull(resource.create)(it) }
+            val done = pipeline.run(act.name, request.payloadString) {
+                checkNotNull(resource.performAtBookmark)(act.name, it)
+            }
             val id = resource.layers.type.state.idOf(done.state)
             val body = resource.layers.layer1(done.state, rung)
             return replies.layer1(ResponseCode.CREATED, body, validatorOf(done.state, rung), rung.preferenceApplied)
@@ -155,6 +164,7 @@ internal class CoapRoutes(
 
     private companion object {
         const val ACT_SEGMENTS = 4
+        const val ACTIONS = "actions"
         const val DAY = 86_400L
         const val HAL = CoapOptions.HAL_JSON
         val FORMATS = with(CoapOptions) { setOf(HAL_JSON, JSON_HOME, ALPS_JSON, SCHEMA_JSON, JSON) }
