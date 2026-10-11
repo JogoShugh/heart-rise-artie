@@ -128,6 +128,9 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
     fun listsItem(href: String) =
         assertTrue(href in body().path("_links").path("item").map { it.path("href").asText() }, body().toString())
 
+    @Then("the CoAP Location-Path is {string}")
+    fun locationPath(path: String) = assertEquals(path, last.options.locationPathString)
+
     @Then("lamp {long} is at version {int}")
     fun version(id: Long, version: Int) = assertEquals(version, store.lamps.getValue(id).version)
 

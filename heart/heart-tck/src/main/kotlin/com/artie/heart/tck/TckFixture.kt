@@ -19,6 +19,13 @@ interface TckFixture {
     /** Text that finds the resource with the type's search form. */
     val searchTerm: String
 
+    /**
+     * The type's creation, for a type that declares one: its form key, a
+     * valid body and a body its schema refuses ([TckAct.path] is unused; a
+     * creation is sent to the collection). The `@creation` scenarios use it.
+     */
+    val creation: TckAct? get() = null
+
     /** Puts the server's data back to a known state, with the resource ready; returns its id. */
     suspend fun ready(): Long
 }

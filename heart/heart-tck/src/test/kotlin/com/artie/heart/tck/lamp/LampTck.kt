@@ -6,6 +6,7 @@ import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.fixtures.Dim
+import com.artie.heart.fixtures.InstallLamp
 import com.artie.heart.fixtures.Lamp
 import com.artie.heart.fixtures.Lamps
 import com.artie.heart.spring.HeartAutoConfiguration
@@ -43,6 +44,12 @@ class LampServer {
             lamps[id] = next
             Acted(next)
         },
+        create = { input ->
+            val id = (lamps.keys.maxOrNull() ?: 0) + 1
+            val lamp = Lamp(id, "OFF", checkNotNull(input.bind(InstallLamp::class.java).brightness), version = 1)
+            lamps[id] = lamp
+            Acted(lamp)
+        },
         find = { name, _ ->
             lamps.values.map { Found(it.id, "Lamp ${it.id}") }
                 .filter { name == null || it.title.contains(name, ignoreCase = true) }
@@ -67,6 +74,13 @@ class LampServer {
             reason = "The lamp is already on.",
         )
         override val searchTerm = "lamp 7"
+        override val creation = TckAct(
+            key = "home:install-lamp",
+            path = "",
+            body = """{"brightness": 40}""",
+            invalidBody = """{"brightness": 101}""",
+            invalidPointer = "/brightness",
+        )
 
         override suspend fun ready(): Long {
             lamps.clear()

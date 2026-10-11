@@ -1,5 +1,6 @@
 package com.artie.heart.bdd
 
+import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.Found
 import com.artie.heart.Rung
@@ -70,6 +71,43 @@ class IndexSteps(private val world: LampWorld) {
         val hex = MessageDigest.getInstance("SHA-256").digest(index.body(dialect).toByteArray())
             .joinToString("") { "%02x".format(it) }.take(HEX)
         assertEquals("\"$prefix${dialect.etagTag}-$hex\"", index.validator(dialect))
+    }
+
+    @Then("it offers the POST form {string} with target {string} and required field {string}")
+    fun postForm(key: String, target: String, field: String) {
+        val form = json.path("_forms").path(key)
+        assertEquals("POST", form.path("method").asText())
+        assertEquals("application/json", form.path("contentType").asText())
+        assertEquals(target, form.path("_links").path("target").path("href").asText())
+        assertFalse(form.path("_links").path("target").path("templated").asBoolean())
+        assertEquals(listOf(field), form.path("schema").path("required").map { it.asText() })
+        assertTrue(form.path("schema").path("\$id").asText().startsWith("/schemas/sha256-"))
+    }
+
+    @Then(
+        "it offers the POST template {string} with target {string} and required property {string} from {int} to {int}",
+    )
+    fun postTemplate(name: String, target: String, property: String, min: Int, max: Int) {
+        val template = json.path("_templates").path(name)
+        assertEquals("POST", template.path("method").asText())
+        assertEquals("application/json", template.path("contentType").asText())
+        assertEquals(target, template.path("target").asText())
+        val declared = template.path("properties").single { it.path("name").asText() == property }
+        assertEquals(true, declared.path("required").asBoolean())
+        assertEquals(min to max, declared.path("min").asInt() to declared.path("max").asInt())
+    }
+
+    @Then("the {string} hints allow {string} and need an ETag to act")
+    fun allows(resource: String, methods: String) {
+        val hints = json.path("resources").path(resource).path("hints")
+        assertEquals(methods.split(", "), hints.path("allow").map { it.asText() })
+        assertEquals(listOf("etag"), hints.path("precondition-req").map { it.asText() })
+    }
+
+    @Then("the schema of {string} is served at its content address")
+    fun creationSchema(name: String) {
+        val schema = ContentAddress.canonicalText(world.type.act(name).schema)
+        assertEquals(schema, world.layers.schemas[ContentAddress.address(schema)])
     }
 
     @When("the home document is rendered for a server capped at {word}")

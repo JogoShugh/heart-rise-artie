@@ -6,6 +6,7 @@ import com.artie.heart.Past
 import com.artie.heart.PastEvent
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.fixtures.Dim
+import com.artie.heart.fixtures.InstallLamp
 import com.artie.heart.fixtures.Lamp
 import com.artie.heart.fixtures.Lamps
 import com.artie.heart.Acted
@@ -65,6 +66,12 @@ class LampServer {
             at = { id, instant -> store.lamps[id]?.let { store.at(id, instant) } ?: throw notFound(id) },
             history = { id -> store.lamps[id]?.let { store.events[id].orEmpty() } ?: throw notFound(id) },
         ),
+        create = { input ->
+            val id = (store.lamps.keys.maxOrNull() ?: 0) + 1
+            val lamp = Lamp(id, "OFF", checkNotNull(input.bind(InstallLamp::class.java).brightness), version = 1)
+            store.lamps[id] = lamp
+            Acted(lamp)
+        },
         find = { name, id ->
             store.lamps.values.sortedBy { it.id }
                 .map { Found(it.id, "Lamp ${it.id}") }

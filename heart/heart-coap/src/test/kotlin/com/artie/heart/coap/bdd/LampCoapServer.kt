@@ -6,6 +6,7 @@ import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.fixtures.Dim
+import com.artie.heart.fixtures.InstallLamp
 import com.artie.heart.fixtures.Lamp
 import com.artie.heart.fixtures.Lamps
 import io.cucumber.spring.CucumberContextConfiguration
@@ -43,6 +44,12 @@ class LampCoapServer {
             }.let { it.copy(version = it.version + 1) }
             store.lamps[id] = next
             Acted(next)
+        },
+        create = { input ->
+            val id = (store.lamps.keys.maxOrNull() ?: 0) + 1
+            val lamp = Lamp(id, "OFF", checkNotNull(input.bind(InstallLamp::class.java).brightness), version = 1)
+            store.lamps[id] = lamp
+            Acted(lamp)
         },
         find = { name, id ->
             store.lamps.values.sortedBy { it.id }

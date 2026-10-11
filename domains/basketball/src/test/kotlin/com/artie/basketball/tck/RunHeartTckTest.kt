@@ -13,6 +13,7 @@ import com.artie.heart.spring.HeartAutoConfiguration
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
+import io.cucumber.junit.platform.engine.Constants.FILTER_TAGS_PROPERTY_NAME
 import io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME
 import io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME
 import io.cucumber.spring.CucumberContextConfiguration
@@ -32,6 +33,8 @@ import org.springframework.test.context.TestPropertySource
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.basketball.tck")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
+// Nothing here is created from the bookmark, so the @creation scenarios do not apply.
+@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @creation")
 class RunHeartTckTest
 
 /** Game 1, live: scoring a basket is offered, tipping off is not. */

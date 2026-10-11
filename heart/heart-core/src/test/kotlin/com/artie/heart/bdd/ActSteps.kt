@@ -2,18 +2,22 @@ package com.artie.heart.bdd
 
 import com.artie.heart.ActPipeline
 import com.artie.heart.ConcurrentWriteException
+import com.artie.heart.Dialect
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.NotOfferedException
 import com.artie.heart.PreconditionRequiredException
+import com.artie.heart.ServiceIndex
 import com.artie.heart.StaleWriteConflict
 import com.artie.heart.UnprocessableContentException
 import com.artie.heart.fixtures.Dim
+import com.artie.heart.fixtures.InstallLamp
 import com.artie.heart.fixtures.Lamp
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 
 /** Acts on lamps through heart-core's act pipeline. A lamp's validator is `v<version>`. */
 class ActSteps(private val world: LampWorld) {
@@ -49,6 +53,32 @@ class ActSteps(private val world: LampWorld) {
             }
         }
     }
+
+    /** A creation's owning resource is the service index, so its validator is the index's. */
+    @When("^a client creates a lamp with validator (none|stale|current) and body (.*)$")
+    fun create(validator: String, body: String) {
+        val pipeline = ActPipeline(world.type)
+        val index = ServiceIndex(listOf(world.type)).validator(Dialect.JSONSCHEMA)
+        val sent = when (validator) {
+            "none" -> null
+            "stale" -> "\"index-old\""
+            else -> index
+        }
+        val creation = checkNotNull(world.type.creation)
+        outcome = runCatching {
+            runBlocking {
+                pipeline.checkCreation(sent) { it == index }
+                pipeline.run(creation.name, body) { input ->
+                    val id = world.lamps.size + 1L
+                    val brightness = checkNotNull(input.bind(InstallLamp::class.java).brightness)
+                    world.lamps[id] = Lamp(id, "OFF", brightness, version = 1)
+                }
+            }
+        }
+    }
+
+    @Then("no lamp was created")
+    fun noneCreated() = assertTrue(world.lamps.isEmpty(), "lamps: ${world.lamps}")
 
     @Then("the act was performed")
     fun performed() {

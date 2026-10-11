@@ -102,6 +102,7 @@ the body, already valid against the act's schema. Throw `ConcurrentWriteExceptio
 | `GET /` | Service index (either dialect), or JSON Home when `Accept` ranks it first |
 | `GET /lamps/{id}` | Layer 1: L0 by default, L1/L2 with `Prefer: forms=link[, schema=link]`; ETag, 304 |
 | `POST /lamps/{id}/actions/{path}` | The act, with `If-Match`; answers the new Layer 1 and `Content-Location` |
+| `POST /lamps` | The creation, if declared, with the index's ETag in `If-Match`; answers `201`, the new Layer 1, `Location` |
 | `GET /affordance-sets/{address}`, `/schemas/{address}`, `/unavailable/{address}` | Shared layers, immutable, named by SHA-256 |
 | `GET /profiles/home` | ALPS profile |
 
@@ -113,6 +114,11 @@ Refusals are RFC 9457 problems (`precondition-required`, `stale`,
 - **Search and lookup**: add `finding = Finding(...)` to the type and
   `find = { name, id -> ... }` to the resource. The index then offers both
   forms, and `GET /lamps?name=` returns pages of `item` links.
+- **Creation**: add `creation = Act.of("installLamp", "install-lamp", InstallLamp::class.java)`
+  to the type (it needs `finding` too) and `create = { input -> Acted(newLamp) }`
+  to the resource. The index offers it as a `POST` form on `/lamps`. A
+  client sends the index's ETag, as for any act; the answer is `201` with
+  `Location`.
 - **Past**: add `past = Past(at = ..., history = ...)`. Then
   `GET /lamps/{id}?asOf=<instant>` and `GET /lamps/{id}/history` are served.
   `heart-eventsourcing`'s `EventStore` can answer both (`state(asOf=…)`, `history`).
@@ -124,7 +130,8 @@ Add `testImplementation("com.artie.heart:heart-tck")`, register a
 and an invalid body, a search term), and run the features at
 `classpath:heart/tck` with glue `com.artie.heart.tck`. Thirteen scenarios
 cover the layers, revalidation, every refusal, both dialects, the index and
-the profile.
+the profile; four more, tagged `@creation`, cover a creation. A server that
+creates nothing filters them out with `not @creation`.
 
 ## Configuration
 

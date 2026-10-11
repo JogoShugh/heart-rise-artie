@@ -49,6 +49,26 @@ Feature: A declared resource over CoAP, served by heart-coap
     And the CoAP body links self to "/lamps/7"
     And lamp 7 is at version 4
 
+  Scenario: A creation from the service index answers 2.01 Created, with the new lamp and its location
+    Given a CoAP client got "/" with Prefer ""
+    When the CoAP client posts {"brightness": 20} to "/lamps" with the ETag it holds
+    Then the CoAP response is 2.01
+    And the CoAP Location-Path is "lamps/8"
+    And the CoAP body links self to "/lamps/8"
+    And the CoAP ETag is the first 8 bytes of SHA-256 over "\"seq-1.hsf.L0\""
+
+  Scenario Outline: A refused creation over CoAP: <case>
+    Given a CoAP client got "/" with Prefer ""
+    When the CoAP client posts <body> to "/lamps" with <if-match>
+    Then the CoAP response is <code>
+    And the CoAP problem type is "<problem>"
+
+    Examples:
+      | case                  | if-match          | body              | code | problem               |
+      | no validator          | no If-Match       | {"brightness": 5} | 4.00 | precondition-required |
+      | a stale validator     | If-Match "0000"   | {"brightness": 5} | 4.12 | stale                 |
+      | a body the form fails | the ETag it holds | {"brightness": 0} | 4.22 | invalid-input         |
+
   Scenario: The service index, a search, and the profile work over CoAP
     When a CoAP client gets "/" with Prefer ""
     Then the CoAP response is 2.05

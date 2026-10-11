@@ -206,6 +206,7 @@ This has a cost, and the document should be read as accepting it: a manifest tha
 | Integrity | The bytes of a shared layer are the ones the linking representation vouched for | The link's `integrity` value, carried in the hypertext and so protocol-independent; `Repr-Digest` optional (§6.5) |
 | Act | A state-changing request, conditional on the validator held | The form's `method`, with `If-Match` (§6.2) |
 | Act done | The act succeeded; the answer is the resource's new representation | `2xx`, with `Content-Location` naming the resource (§6.2) |
+| Created | A creation succeeded; the answer is the new resource's representation | `201`, with `Location` and `Content-Location` naming the new resource (§6.2) |
 | Precondition required | The act carried no validator | `428` |
 | Stale | The validator is not current | `412` |
 | Not offered | The act is not legal in the current state | `409` |
@@ -232,6 +233,7 @@ ARTIE implements the client side of this section: its core works in the concepts
 | Integrity | The link's `integrity` value, as in every binding. There is no `Repr-Digest`. |
 | Act | `POST` (0.02) with `If-Match` (the 8-byte validator) |
 | Act done | `2.04 Changed`, with the resource's new representation. CoAP has no `Content-Location`; the representation's `self` link names the resource. |
+| Created | `2.01 Created`, with `Location-Path` and the new resource's representation, whose `self` link names it too |
 | Precondition required | `4.00 Bad Request` with the problem type `precondition-required`. CoAP has no 4.28. |
 | Stale | `4.12 Precondition Failed` |
 | Not offered | `4.09 Conflict` (RFC 8132) |
@@ -398,6 +400,8 @@ The critical distinction, and the one §6.10.5 exists to demonstrate: **412 mean
 **Precondition scope (decided 2026-10-08).** An act is sent to an affordance target (for example `/beds/2/actions/water-cell`), not to the Layer 1 URI that issued the `ETag`. RFC 9110 evaluates `If-Match` against the *selected representation* of the target resource, and the origin server decides what that is (RFC 9110 §3.2). H.E.A.R.T. decides it this way: every affordance target belongs to exactly one *owning resource*, the Layer 1 resource whose affordance set listed it, and an act's selected representation is the owning resource's representation chosen by **the act's own** `Accept`, `Accept-Profile` and `Prefer`.
 
 HTTP is stateless, so a client SHALL send on each act the same negotiation headers it sent on the sync whose `ETag` it holds. The server SHALL select the owning resource's representation from those headers and compare `If-Match` with that representation's current `ETag` by **strong comparison**, the whole value, character for character; `*` matches any current representation. This is RFC 9110 §13.1.1 as written. Nothing is narrowed: no part of an `ETag` is ignored, and an `ETag` for another representation than the act's headers select does not match, even if the state is unchanged.
+
+**Creation (decided 2026-10-11).** A resource type may be created from the service index. The index offers the creation as a `POST` form whose target is the type's collection (for example `/tickets`). Its owning resource is the index, the representation whose forms listed it, so a client sends the index's `ETag` in `If-Match`, exactly as for any other act, and the server compares it with the index's current `ETag` for the act's negotiation headers. The index always offers the creation, so step 3 below never refuses it. A successful creation answers `201 Created` with the new resource's representation, rendered for the act's negotiation headers, and names the new resource in both `Location` and `Content-Location`. The JSON Home document then lists `POST` among the collection's `allow` hints, with `accept-post` and `precondition-req`.
 
 A successful act's response is the owning resource's new representation, rendered for the act's own negotiation headers, so its `ETag` is the one the client's next act needs. The server SHALL send `Content-Location` naming the owning resource (RFC 9110 §8.7), so any intermediary or tool sees that the response is a representation of the resource, not of the action URL.
 

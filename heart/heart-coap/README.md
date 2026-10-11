@@ -14,6 +14,7 @@ paths, in HAL Schema Forms only.
 | ETag | First 8 bytes of SHA-256 over the HTTP ETag value |
 | 200 / 304 | 2.05 Content / 2.03 Valid |
 | Act success | 2.04 Changed, with the new Layer 1 |
+| Creation (201, `Location`) | 2.01 Created, with `Location-Path` and the new Layer 1 |
 | 428 / 412 / 409 / 422 | 4.00 (problem type tells it apart) / 4.12 / 4.09 / 4.22 |
 | `hal+json`, `schema+json`, `problem+json`, `json-home`, `alps+json` | Content-Formats 65000–65004; JSON is 50 |
 

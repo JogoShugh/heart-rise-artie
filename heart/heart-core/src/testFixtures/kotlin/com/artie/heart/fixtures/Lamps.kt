@@ -30,6 +30,14 @@ data class Dim(
     val label: String? = null,
 )
 
+/** The install act's input: a new lamp's brightness. It is installed switched off. */
+@Schema(title = "Install a lamp")
+data class InstallLamp(
+    @field:NotNull @field:Min(1) @field:Max(100)
+    @field:Schema(title = "Brightness", description = "Percent of full brightness", examples = ["50"])
+    val brightness: Int? = null,
+)
+
 /** Switching on or off takes no input. */
 @Schema(title = "Switch off")
 class SwitchOff
@@ -44,6 +52,7 @@ object Lamps {
             Relation("switch-on", AlpsType.UNSAFE, "Switch on", "Turns the lamp on.", "Offered while off."),
             Relation("switch-off", AlpsType.UNSAFE, "Switch off", "Turns the lamp off.", "Offered while on."),
             Relation("dim", AlpsType.IDEMPOTENT, "Dim the lamp", "Sets the brightness.", "Offered while on."),
+            Relation("install-lamp", AlpsType.UNSAFE, "Install a lamp", "Adds a new lamp, switched off.", "Offered by the service index."),
             Relation("search-lamps", AlpsType.SAFE, "Find lamps by name", "Lists the lamps whose name has the text.", "A search."),
             Relation("get-lamp", AlpsType.SAFE, "Get a lamp by its id", "Goes to one lamp, given its id.", "A lookup."),
         ),
@@ -71,6 +80,7 @@ object Lamps {
             versionOf = { it.version },
             bodyOf = { linkedMapOf("id" to it.id, "status" to it.status, "brightness" to it.brightness) },
         ),
+        creation = Act.of("installLamp", "install-lamp", InstallLamp::class.java),
         finding = Finding(
             noun = "lamp",
             search = Named("searchLamps", "search-lamps"),

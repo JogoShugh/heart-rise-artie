@@ -124,7 +124,14 @@ class Finding(
     val idDescription: String,
 )
 
-/** A resource type, declared once: everything heart-core needs to render and act on it. */
+/**
+ * A resource type, declared once: everything heart-core needs to render and
+ * act on it. A type with a [creation] act is created from the service index:
+ * the index offers that act as a POST form on the collection, beside the
+ * type's search, so a creatable type is also found ([finding]).
+ */
+// A declaration names each of its parts once, by name; grouping them would only rename them.
+@Suppress("LongParameterList")
 class ResourceType<S, K>(
     val collection: String,
     val profile: Profile,
@@ -132,16 +139,23 @@ class ResourceType<S, K>(
     val offers: Offers<K>,
     val state: StateView<S, K>,
     val finding: Finding? = null,
+    val creation: Act? = null,
 ) {
     init {
         acts.forEach { profile.relation(it.relation) }
         finding?.let { profile.relation(it.search.relation) }
         finding?.let { profile.relation(it.lookup.relation) }
+        creation?.let { profile.relation(it.relation) }
+        require(creation == null || finding != null) { "$collection is created from the index, so it is found too" }
+        require(acts.none { it.name == creation?.name }) { "${creation?.name} is declared twice" }
         offers.keys.forEach { key ->
             val unknown = offers.offered(key) - acts.map { it.name }.toSet()
             require(unknown.isEmpty()) { "key $key offers undeclared acts $unknown" }
         }
     }
 
-    fun act(name: String): Act = acts.firstOrNull { it.name == name } ?: throw IllegalArgumentException("no act $name")
+    /** Act [name]: one a resource offers, or the creation. */
+    fun act(name: String): Act =
+        (acts + listOfNotNull(creation)).firstOrNull { it.name == name }
+            ?: throw IllegalArgumentException("no act $name")
 }

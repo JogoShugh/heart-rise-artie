@@ -130,10 +130,10 @@ class LayerSteps(private val world: LampWorld) {
 
     @Then("every affordance set, schema and explanation of the lamp type is listed by its address")
     fun everyListed() {
-        // Two keys at two renderings; three acts, but switching on and off share one
-        // schema, so one address; one explanation per key.
+        // Two keys at two renderings; three acts and the creation, but switching on and
+        // off share one schema, so one address; one explanation per key.
         assertEquals(4, layers.affordanceSets.size)
-        assertEquals(2, layers.schemas.size)
+        assertEquals(3, layers.schemas.size)
         assertEquals(2, layers.explanations.size)
     }
 

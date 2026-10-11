@@ -88,6 +88,19 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
         http.results = http.results + spec.bodyValue(body).exchange().expectBody().returnResult()
     }
 
+    /** A creation's owning resource is the service index: the client syncs it, then sends its ETag. */
+    @When("a client posts {} to {string} as {word} with the index's ETag")
+    fun postWithIndexETag(body: String, path: String, dialect: String) {
+        val index = client.get().uri("/").header(HttpHeaders.ACCEPT, accept(dialect)).exchange()
+            .expectBody().returnResult()
+        val etag = checkNotNull(index.responseHeaders.eTag) { "the index has no ETag" }
+        http.results = http.results + client.post().uri(path)
+            .header(HttpHeaders.ACCEPT, accept(dialect))
+            .header(HttpHeaders.CONTENT_TYPE, "application/json")
+            .header(HttpHeaders.IF_MATCH, etag)
+            .bodyValue(body).exchange().expectBody().returnResult()
+    }
+
     @Then("the response has {word} {string}")
     fun header(name: String, value: String) = assertEquals(value, http.last.responseHeaders.getFirst(name), name)
 
@@ -119,6 +132,9 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
         assertEquals("application/problem+json", http.last.responseHeaders.contentType.toString())
         assertEquals("https://github.com/jogoshugh/heart-rise/problems/$type", json.path("type").asText())
     }
+
+    @Then("the lamp server holds only lamp {long}")
+    fun holdsOnly(id: Long) = assertEquals(setOf(id), store.lamps.keys)
 
     @Then("lamp {long} is still at version {int}")
     fun stillAt(id: Long, version: Int) = assertEquals(version, store.lamps.getValue(id).version)

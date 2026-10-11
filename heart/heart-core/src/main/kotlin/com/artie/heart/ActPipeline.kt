@@ -24,7 +24,8 @@ class ActInput(val json: JsonNode, private val mapper: ObjectMapper) {
  * [ConcurrentWriteException] while the act runs is stale too.
  */
 class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper: ObjectMapper = ObjectMapper()) {
-    private val checks: Map<String, BodyCheck> = type.acts.associate { it.name to BodyCheck(it.schema) }
+    private val checks: Map<String, BodyCheck> =
+        (type.acts + listOfNotNull(type.creation)).associate { it.name to BodyCheck(it.schema) }
 
     /**
      * Steps 1 to 3. [current] reads the resource's state, only when a
@@ -51,6 +52,23 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
         }
         refusal?.let { throw it }
         return state
+    }
+
+    /**
+     * Steps 1 and 2 for the type's creation. Its owning resource is the
+     * service index, which always offers it, so step 3 cannot refuse it;
+     * [matches] compares the sent [validator] with the index's current one.
+     */
+    fun <V : Any> checkCreation(validator: V?, matches: (V) -> Boolean) {
+        val creation = checkNotNull(type.creation) { "${type.collection} declares no creation" }
+        if (validator == null) {
+            throw PreconditionRequiredException(
+                "${creation.name} needs a validator: the current one of the service index",
+            )
+        }
+        if (!matches(validator)) {
+            throw StaleWriteConflict("the validator does not match the service index's current one")
+        }
     }
 
     /** Step 4, then the act: [perform] runs with the checked body. */

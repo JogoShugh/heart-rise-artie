@@ -5,6 +5,7 @@ import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.Rung
+import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
 import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -20,6 +21,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBodyOrNull
 import org.springframework.web.reactive.function.server.bodyValueAndAwait
 import org.springframework.web.reactive.function.server.buildAndAwait
+import java.net.URI
 import java.time.Instant
 import java.time.format.DateTimeParseException
 
@@ -37,6 +39,7 @@ class HeartResourceHandler<S, K>(
     val resource: HeartResource<S, K>,
     private val limits: ServingLimits,
     mapper: ObjectMapper,
+    private val index: ServiceIndex,
 ) {
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper)
@@ -99,6 +102,29 @@ class HeartResourceHandler<S, K>(
         return Rendered(done.state, dialect, rung).respond(
             ServerResponse.ok()
                 .header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id")
+                .headers { headers -> done.headers.forEach { (name, value) -> headers.add(name, value) } },
+        )
+    }
+
+    /**
+     * The type's creation, a POST to the collection. Its owning resource is
+     * the service index, so If-Match is compared, whole, with the index's
+     * ETag in the dialect this request selects. The answer is 201 with the
+     * new resource's Layer 1, named in Location and Content-Location.
+     */
+    suspend fun create(request: ServerRequest): ServerResponse {
+        val creation = checkNotNull(type.creation) { "${type.collection} declares no creation" }
+        val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
+        val rung = rung(dialect, request)
+        pipeline.checkCreation(request.headers().firstHeader(HttpHeaders.IF_MATCH)) { held ->
+            StateETag.matches(held, index.validator(dialect))
+        }
+        val body = request.awaitBodyOrNull<String>()
+        val done = pipeline.run(creation.name, body) { input -> checkNotNull(resource.create)(input) }
+        val location = "/${type.collection}/${type.state.idOf(done.state)}"
+        return Rendered(done.state, dialect, rung).respond(
+            ServerResponse.created(URI.create(location))
+                .header(HttpHeaders.CONTENT_LOCATION, location)
                 .headers { headers -> done.headers.forEach { (name, value) -> headers.add(name, value) } },
         )
     }
