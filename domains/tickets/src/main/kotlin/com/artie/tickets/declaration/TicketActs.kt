@@ -19,8 +19,9 @@ class TicketActs(private val tickets: TicketService) {
             tickets.open(TicketEvent.Opened(it.subject!!, it.customer!!, it.description!!, it.priority!!))
         }
 
-    suspend fun perform(id: Long, act: String, input: ActInput): TicketState =
-        tickets.record(id) { ticket -> event(act, input, ticket) }
+    /** Act [act] on [ticket], the state the client's validator was checked against. */
+    suspend fun perform(ticket: TicketState, act: String, input: ActInput): TicketState =
+        tickets.record(ticket) { event(act, input, it) }
 
     private fun event(act: String, input: ActInput, ticket: TicketState): TicketEvent =
         when (act) {

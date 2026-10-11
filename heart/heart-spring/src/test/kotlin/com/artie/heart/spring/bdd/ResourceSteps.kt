@@ -19,11 +19,25 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
     private val json: JsonNode get() = ObjectMapper().readTree(http.last.responseBody)
 
     @Before
-    fun emptyStore() = store.lamps.clear()
+    fun emptyStore() {
+        store.lamps.clear()
+        store.writeAfterNextRead.clear()
+    }
 
     @Given("lamp {long} is {string} at version {int} in the lamp server")
     fun lampIs(id: Long, status: String, version: Int) {
         store.lamps[id] = Lamp(id, status, brightness = 50, version = version)
+    }
+
+    @Given("another client's dim to {int} lands on lamp {long} just after the server checks the next act's If-Match")
+    fun dimLandsAfterCheck(brightness: Int, id: Long) {
+        store.writeAfterNextRead[id] = { lamp -> lamp.copy(brightness = brightness, version = lamp.version + 1) }
+    }
+
+    @Then("lamp {long} has brightness {int} at version {int}")
+    fun hasBrightness(id: Long, brightness: Int, version: Int) {
+        val lamp = store.lamps.getValue(id)
+        assertEquals(brightness to version, lamp.brightness to lamp.version, "$lamp")
     }
 
     @Given("lamp {long} was switched on {int} days ago and dimmed to {int} {int} day ago, in the lamp server")

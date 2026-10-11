@@ -66,6 +66,18 @@ Feature: HEART conformance over HTTP, for any declared resource type
       | the absent act  | the absent body  | the ETag it holds         | 409    | not-offered           |
       | the offered act | its invalid body | the ETag it holds         | 422    | invalid-input         |
 
+  Scenario: An act is performed on the state whose ETag matched, so a write that lands after the check makes it stale
+    SPEC §6.2: 412 means another write landed first. The server checks
+    If-Match against the state it reads, then hands that same state to the
+    domain's act. A domain that read the resource again would apply the act
+    to a state its client never saw. This checks the domain's side: its act
+    on a state the resource has moved past is refused, and changes nothing.
+    When the server reads the resource to check the offered act
+    And another client's offered act lands before it is performed
+    And the server performs the offered act on the state it read
+    Then the act is refused as stale
+    And the resource holds only the other client's act
+
   Scenario: HAL-FORMS offers the same acts, by the same targets
     Then a hal-schema-forms client and a hal-forms client see the same act targets on the resource
 

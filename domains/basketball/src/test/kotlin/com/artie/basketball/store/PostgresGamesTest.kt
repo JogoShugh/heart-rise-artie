@@ -42,8 +42,8 @@ class PostgresGamesTest {
             .await()
         db.sql("INSERT INTO player (game_id, side, number, name) VALUES (1, 'home', 23, 'Riley')").await()
 
-        games.record(1) { GameEvent.TippedOff("home") }
-        val after = games.record(1) { GameEvent.BasketScored("home", 23, 3) }
+        val live = games.record(games.state(1)) { GameEvent.TippedOff("home") }
+        val after = games.record(live) { GameEvent.BasketScored("home", 23, 3) }
 
         assertEquals(Phase.LIVE, after.phase)
         assertEquals(3, after.score("home"))

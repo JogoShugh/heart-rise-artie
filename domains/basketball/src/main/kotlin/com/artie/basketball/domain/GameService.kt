@@ -33,11 +33,15 @@ class GameService(private val games: GameDirectory, private val events: EventSto
     private suspend fun requireGame(id: Long): GameSetup =
         games.find(id) ?: throw GameNotFoundException(id)
 
-    /** Records the event [build] makes from the game as it is now, at the next number; returns the new state. */
-    suspend fun record(id: Long, build: (GameState) -> GameEvent): GameState {
-        val current = state(id)
-        events.append(GAMES, id, current.version + 1, build(current))
-        return state(id)
+    /**
+     * Records the event [build] makes from [current], at the number after it;
+     * returns the new state. If another event took that number first, the
+     * game has moved past [current], and the store refuses it
+     * ([com.artie.heart.ConcurrentWriteException]).
+     */
+    suspend fun record(current: GameState, build: (GameState) -> GameEvent): GameState {
+        events.append(GAMES, current.id, current.version + 1, build(current))
+        return state(current.id)
     }
 
     companion object {

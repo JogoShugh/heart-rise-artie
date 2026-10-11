@@ -121,10 +121,13 @@ internal class CoapRoutes(
                 ?: return replies.error(ResponseCode.NOT_FOUND, path)
             val rung = rung(request)
             val held = request.options.ifMatch.takeIf { it.isNotEmpty() }
-            pipeline.check(act.name, held, { resource.load(id) }) { current, validators ->
+            val checked = pipeline.check(act.name, held, { resource.load(id) }) { current, validators ->
                 validators.any { it.contentEquals(validatorOf(current, rung)) }
             }
-            val done = pipeline.run(act.name, request.payloadString) { input -> resource.perform(id, act.name, input) }
+            // The act is performed on the state whose validator matched, so a write since is stale.
+            val done = pipeline.run(act.name, request.payloadString) { input ->
+                resource.perform(checked, act.name, input)
+            }
             val body = resource.layers.layer1(done.state, rung)
             return replies.layer1(ResponseCode.CHANGED, body, validatorOf(done.state, rung), rung.preferenceApplied)
         }

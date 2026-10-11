@@ -1,6 +1,7 @@
 package com.artie.heart.tck.lamp
 
 import com.artie.heart.Acted
+import com.artie.heart.ConcurrentWriteException
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
@@ -34,14 +35,14 @@ class LampServer {
     fun lamps(): HeartResource<*, *> = HeartResource(
         layers = Layers(Lamps.type(Lamps.profile("home"))),
         load = { id -> lamps[id] ?: throw ResourceNotFoundException("no lamp $id") },
-        perform = { id, act, input ->
-            val lamp = lamps.getValue(id)
+        perform = { lamp, act, input ->
             val next = when (act) {
                 "dim" -> lamp.copy(brightness = checkNotNull(input.bind(Dim::class.java).brightness))
                 "switchOff" -> lamp.copy(status = "OFF")
                 else -> lamp.copy(status = "ON")
             }.let { it.copy(version = it.version + 1) }
-            lamps[id] = next
+            // Recorded only if the lamp is still the one the client's ETag matched.
+            if (!lamps.replace(lamp.id, lamp, next)) throw ConcurrentWriteException("lamp ${lamp.id} was written first")
             Acted(next)
         },
         performAtBookmark = { _, input ->

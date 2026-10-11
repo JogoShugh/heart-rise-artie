@@ -35,8 +35,8 @@ class PostgresTicketsTest {
     @Test
     fun `a ticket opened in Postgres is worked through the event store`() = runBlocking {
         val opened = tickets.open(TicketEvent.Opened("Cannot log in", "Dana Reyes", "Nothing happens.", "high"))
-        tickets.record(opened.id) { TicketEvent.Assigned("priya") }
-        val after = tickets.record(opened.id) { TicketEvent.CustomerAsked("Which browser?") }
+        val assigned = tickets.record(opened) { TicketEvent.Assigned("priya") }
+        val after = tickets.record(assigned) { TicketEvent.CustomerAsked("Which browser?") }
 
         assertEquals(Status.WAITING_ON_CUSTOMER, after.status)
         assertEquals("priya", after.agent)

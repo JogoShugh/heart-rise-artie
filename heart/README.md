@@ -87,13 +87,17 @@ val lamps = ResourceType<Lamp, String>(
 fun lampResource(store: LampStore): HeartResource<*, *> = HeartResource(
     layers = Layers(lamps),
     load = { id -> store.find(id) ?: throw ResourceNotFoundException("no lamp $id") },
-    perform = { id, act, input -> Acted(store.apply(id, act, input)) },
+    perform = { lamp, act, input -> Acted(store.apply(lamp, act, input)) },
 )
 ```
 
-`perform` runs only after the checks pass. `input.bind(Dim::class.java)` gives
-the body, already valid against the act's schema. Throw `ConcurrentWriteException` if another write landed first
-(it becomes 412).
+`perform` runs only after the checks pass. It is given the state the
+client's If-Match was checked against, and acts on that state, never on one
+read again: record the act only if the resource is still at that state
+(an event store's append at the next sequence number does this), and throw
+`ConcurrentWriteException` if another write landed first. It becomes 412.
+`input.bind(Dim::class.java)` gives the body, already valid against the
+act's schema. Every domain proves this with the conformance features.
 
 ## What is then served
 
@@ -130,9 +134,10 @@ Refusals are RFC 9457 problems (`precondition-required`, `stale`,
 Add `testImplementation("com.artie.heart:heart-tck")`, register a
 `TckFixture` bean (a resource, an act it offers, an act it does not, a valid
 and an invalid body, a search term), and run the features at
-`classpath:heart/tck` with glue `com.artie.heart.tck`. Thirteen scenarios
-cover the layers, revalidation, every refusal, both dialects, the index and
-the profile; four more, tagged `@bookmark-act`, cover an act the bookmark
+`classpath:heart/tck` with glue `com.artie.heart.tck`. Fourteen scenarios
+cover the layers, revalidation, every refusal, a write that lands after the
+If-Match check, both dialects, the index and the profile; four more, tagged
+`@bookmark-act`, cover an act the bookmark
 offers. A server whose bookmark offers none filters them out with
 `not @bookmark-act`.
 

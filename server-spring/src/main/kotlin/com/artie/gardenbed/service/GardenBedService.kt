@@ -5,9 +5,7 @@ import com.artie.gardenbed.domain.GARDEN_BEDS
 import com.artie.gardenbed.domain.GardenBedAggregate
 import com.artie.gardenbed.domain.GardenBedEvent
 import com.artie.gardenbed.domain.GardenBedState
-import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
-import com.artie.heart.NotOfferedException
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.eventsourcing.EventStore
 import com.artie.heart.eventsourcing.Recorded
@@ -17,9 +15,6 @@ import java.time.Instant
 
 /** 404, as heart-core names it, so every binding answers it the same way. */
 class BedNotFoundException(id: Long) : ResourceNotFoundException("No garden bed with id $id")
-
-/** 409: the domain's own guard, refused as heart-core's not-offered. [rel] is the act tried, when known. */
-class InvalidTransitionException(message: String, rel: String? = null) : NotOfferedException(message, rel)
 
 @Service
 class GardenBedService(
@@ -51,45 +46,26 @@ class GardenBedService(
     }
 
     /**
-     * Every mutating action follows the same shape: load current
-     * (projected) state, validate the transition is legal FROM THAT
-     * STATE, and append the event at the next number -- which is where
-     * the REAL concurrency check happens, in the event store, not here.
-     * Checking status here catches "this action doesn't make sense for
-     * this bed right now" (a 409); the event store catches "someone else
-     * wrote first" (a 412) -- two different failure modes, deliberately
-     * handled in two different places.
+     * Every act has the same shape. It is given [bed], the state the client's
+     * ETag was checked against, which the HEART library has already found
+     * offers this act. The act builds its event from that state and appends
+     * it at the number after it. If another write took that number first,
+     * the bed has moved on, and the event store refuses it: a stale act, 412.
      */
-    suspend fun sowSeed(id: Long, seedType: String, depthCm: Int?): GardenBedState =
-        act(id, GardenBedStatus.EMPTY, "sow seed on") { GardenBedEvent.SeedSown(seedType, depthCm) }
+    suspend fun sowSeed(bed: GardenBedState, seedType: String, depthCm: Int?): GardenBedState =
+        act(bed) { GardenBedEvent.SeedSown(seedType, depthCm) }
 
-    suspend fun waterCell(id: Long, milliliters: Int): GardenBedState =
-        act(id, GardenBedStatus.PLANTED, "water") { GardenBedEvent.CellWatered(milliliters) }
+    suspend fun waterCell(bed: GardenBedState, milliliters: Int): GardenBedState =
+        act(bed) { GardenBedEvent.CellWatered(milliliters) }
 
-    suspend fun harvest(id: Long): Pair<GardenBedState, HarvestResult> {
-        var result: HarvestResult? = null
-        val updated = act(id, GardenBedStatus.READY_TO_HARVEST, "harvest") { current ->
-            val yieldGrams = current.growthPoints * YIELD_PER_POINT
-            val cropName = current.cropName ?: "unknown crop"
-            result = HarvestResult(yieldGrams, cropName)
-            GardenBedEvent.BedHarvested(yieldGrams, cropName)
-        }
-        return updated to checkNotNull(result)
+    suspend fun harvest(bed: GardenBedState): Pair<GardenBedState, HarvestResult> {
+        val result = HarvestResult(bed.growthPoints * YIELD_PER_POINT, bed.cropName ?: "unknown crop")
+        return act(bed) { GardenBedEvent.BedHarvested(result.yieldGrams, result.cropName) } to result
     }
 
-    private suspend fun act(
-        id: Long,
-        requires: GardenBedStatus,
-        verb: String,
-        event: (GardenBedState) -> GardenBedEvent,
-    ): GardenBedState {
-        val bed = requireAggregate(id)
-        val current = state(bed)
-        if (current.status != requires) {
-            throw InvalidTransitionException("Cannot $verb bed $id: status is ${current.status}, must be $requires")
-        }
-        events.append(GARDEN_BEDS, id, current.lastSequenceNo + 1, event(current))
-        return state(bed)
+    private suspend fun act(bed: GardenBedState, event: (GardenBedState) -> GardenBedEvent): GardenBedState {
+        events.append(GARDEN_BEDS, bed.id, bed.lastSequenceNo + 1, event(bed))
+        return currentState(bed.id)
     }
 
     private companion object {

@@ -12,7 +12,7 @@ behave the same.
 | `HeartResource.kt` | What a binding serves: `Layers` plus `load`, `perform`, and optional `find`, `past` and `performAtBookmark` |
 | `Layers.kt` | Renders HAL Schema Forms: Layer 1 at L0, L1 or L2 (`layer1`), plus every affordance set, schema and absence explanation, each as canonical bytes keyed by address |
 | `InputSchemas.kt` | `InputSchemas.of(class)` generates draft 2020-12 JSON Schema (Jakarta Validation + OpenAPI `@Schema`); `BodyCheck` validates a body against it (422 with JSON Pointers, 400 if not JSON) |
-| `ActPipeline.kt` | `check` (428 no validator → 412 stale → 409 not offered), then `run` (422 body check, then `perform`). A `ConcurrentWriteException` in `perform` becomes 412. `checkAtBookmark` runs the same checks for an act the bookmark offers, against the index's validator |
+| `ActPipeline.kt` | `check` (428 no validator → 412 stale → 409 not offered), then `run` (422 body check, then `perform`, on the state `check` returned). A `ConcurrentWriteException` in `perform` becomes 412. `checkAtBookmark` runs the same checks for an act the bookmark offers, against the index's validator |
 | `ContentAddress.kt` | RFC 8785 canonical JSON, the `sha256-…` address, SRI integrity, `Repr-Digest` |
 | `Negotiation.kt` | `Dialect` (HAL Schema Forms, HAL-FORMS), choosing it from Accept / Accept-Profile, JSON Home detection |
 | `Rung.kt`, `StateETag.kt` | L0–L2 from `Prefer`; Layer 1 ETags `"seq-<version>.<dialect>.<rung>"` and If-Match comparison |

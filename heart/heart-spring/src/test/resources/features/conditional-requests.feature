@@ -42,6 +42,15 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
     Then the response status is 412
     And lamp 7 is still at version 3
 
+  Scenario: A write that lands after the If-Match check makes the act stale, and it changes nothing
+    SPEC §6.2: 412 means another write landed first. The act is performed
+    on the state whose ETag matched, never on one read again afterwards, so
+    a write that lands between the check and the act is caught too.
+    Given another client's dim to 80 lands on lamp 7 just after the server checks the next act's If-Match
+    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    Then the response status is 412
+    And lamp 7 has brightness 80 at version 4
+
   Scenario: If-Match * matches whatever representation the act's headers select
     When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "*"
     Then the response status is 200

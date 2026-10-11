@@ -45,11 +45,15 @@ class TicketService(
         return state(id)
     }
 
-    /** Records the event [build] makes from the ticket as it is now, at the next number; returns the new state. */
-    suspend fun record(id: Long, build: (TicketState) -> TicketEvent): TicketState {
-        val current = state(id)
-        events.append(TICKETS, id, current.version + 1, build(current))
-        return state(id)
+    /**
+     * Records the event [build] makes from [current], at the number after it;
+     * returns the new state. If another event took that number first, the
+     * ticket has moved past [current], and the store refuses it
+     * ([com.artie.heart.ConcurrentWriteException]).
+     */
+    suspend fun record(current: TicketState, build: (TicketState) -> TicketEvent): TicketState {
+        events.append(TICKETS, current.id, current.version + 1, build(current))
+        return state(current.id)
     }
 
     companion object {

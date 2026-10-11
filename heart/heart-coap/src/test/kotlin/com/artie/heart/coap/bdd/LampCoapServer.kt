@@ -1,6 +1,7 @@
 package com.artie.heart.coap.bdd
 
 import com.artie.heart.Acted
+import com.artie.heart.ConcurrentWriteException
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
@@ -35,14 +36,16 @@ class LampCoapServer {
     fun lamps(store: LampStore): HeartResource<*, *> = HeartResource(
         layers = Layers(Lamps.type(Lamps.profile("home"))),
         load = { id -> store.lamps[id] ?: throw ResourceNotFoundException("no lamp $id") },
-        perform = { id, act, input ->
-            val lamp = store.lamps.getValue(id)
+        perform = { lamp, act, input ->
             val next = when (act) {
                 "dim" -> lamp.copy(brightness = checkNotNull(input.bind(Dim::class.java).brightness))
                 "switchOff" -> lamp.copy(status = "OFF")
                 else -> lamp.copy(status = "ON")
             }.let { it.copy(version = it.version + 1) }
-            store.lamps[id] = next
+            // Recorded only if the lamp is still the one the client's validator matched.
+            if (!store.lamps.replace(lamp.id, lamp, next)) {
+                throw ConcurrentWriteException("lamp ${lamp.id} was written first")
+            }
             Acted(next)
         },
         performAtBookmark = { _, input ->

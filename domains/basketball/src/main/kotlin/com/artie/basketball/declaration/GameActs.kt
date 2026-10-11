@@ -13,8 +13,9 @@ import com.artie.heart.ActInput
  */
 class GameActs(private val games: GameService) {
 
-    suspend fun perform(id: Long, act: String, input: ActInput): GameState =
-        games.record(id) { game -> event(act, input, game) }
+    /** Act [act] on [game], the state the client's validator was checked against. */
+    suspend fun perform(game: GameState, act: String, input: ActInput): GameState =
+        games.record(game) { event(act, input, it) }
 
     private fun event(act: String, input: ActInput, game: GameState): GameEvent =
         when (act) {

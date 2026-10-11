@@ -44,7 +44,7 @@ class MigrationPostgresTest {
             assertEquals(GardenBedStatus.READY_TO_HARVEST to 3, statusAndVersion(3))
             assertEquals("bed-2", service.currentState(2).label)
 
-            service.waterCell(2, 1)
+            service.waterCell(service.currentState(2), 1)
 
             assertEquals(GardenBedStatus.PLANTED to 4, statusAndVersion(2))
             assertEquals(listOf(1, 2, 3, 4), service.history(2).map { it.sequenceNo })

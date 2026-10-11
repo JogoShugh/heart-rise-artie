@@ -25,7 +25,7 @@ class HeartConfig {
         return HeartResource(
             layers = Games.layers,
             load = { id -> service.state(id) },
-            perform = { id, act, input -> Acted(acts.perform(id, act, input)) },
+            perform = { game, act, input -> Acted(acts.perform(game, act, input)) },
             find = { name, id -> service.find(name, id).map { Found(it.id, it.label) } },
             past = GAMES.past(at = { id, instant -> service.state(id, instant) }, history = service::history),
         )

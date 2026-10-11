@@ -19,13 +19,14 @@ data class ActResult(val state: GardenBedState, val harvest: HarvestResult? = nu
 @Component
 class BedActs(private val service: GardenBedService) {
 
-    suspend fun perform(id: Long, affordance: String, input: ActInput): ActResult =
+    /** Act [affordance] on [bed], the state the client's ETag was checked against. */
+    suspend fun perform(bed: GardenBedState, affordance: String, input: ActInput): ActResult =
         when (affordance) {
             "sowSeed" -> input.bind(SowSeedRequest::class.java)
-                .let { ActResult(service.sowSeed(id, it.seedType, it.depthCm)) }
+                .let { ActResult(service.sowSeed(bed, it.seedType, it.depthCm)) }
             "waterCell" -> input.bind(WaterCellRequest::class.java)
-                .let { ActResult(service.waterCell(id, it.milliliters)) }
-            "harvest" -> service.harvest(id).let { (state, result) -> ActResult(state, result) }
+                .let { ActResult(service.waterCell(bed, it.milliliters)) }
+            "harvest" -> service.harvest(bed).let { (state, result) -> ActResult(state, result) }
             else -> error("no act $affordance")
         }
 }

@@ -25,7 +25,7 @@ class HeartConfig {
         return HeartResource(
             layers = Tickets.layers,
             load = { id -> service.state(id) },
-            perform = { id, act, input -> Acted(acts.perform(id, act, input)) },
+            perform = { ticket, act, input -> Acted(acts.perform(ticket, act, input)) },
             find = { subject, id -> service.find(subject, id).map { Found(it.id, it.subject) } },
             past = TICKETS.past(at = { id, instant -> service.state(id, instant) }, history = service::history),
             performAtBookmark = { _, input -> Acted(acts.open(input)) },

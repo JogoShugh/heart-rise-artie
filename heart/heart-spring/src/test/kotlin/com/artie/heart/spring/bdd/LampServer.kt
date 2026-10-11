@@ -1,5 +1,6 @@
 package com.artie.heart.spring.bdd
 
+import com.artie.heart.ConcurrentWriteException
 import com.artie.heart.Found
 import com.artie.heart.Layers
 import com.artie.heart.Past
@@ -28,6 +29,19 @@ class LampStore {
     /** What happened to each lamp, for the lamps whose past a scenario sets up. */
     val events = ConcurrentHashMap<Long, List<PastEvent>>()
 
+    /**
+     * Another client's write, staged by a scenario to land on a lamp just
+     * after the server next reads it: between an act's If-Match check and the act.
+     */
+    val writeAfterNextRead = ConcurrentHashMap<Long, (Lamp) -> Lamp>()
+
+    /** Lamp [id] as the server reads it; a staged write lands right after. */
+    fun read(id: Long): Lamp {
+        val lamp = lamps[id] ?: throw notFound(id)
+        writeAfterNextRead.remove(id)?.let { write -> lamps[id] = write(lamp) }
+        return lamp
+    }
+
     /** A lamp as of [instant]: switched off at brightness 50 until its events say otherwise. */
     fun at(id: Long, instant: Instant): Lamp =
         events[id].orEmpty().filter { !it.occurredAt.isAfter(instant) }.fold(Lamp(id, "OFF", 50, 0)) { lamp, past ->
@@ -51,15 +65,17 @@ class LampServer {
     @Bean
     fun lamps(store: LampStore): HeartResource<*, *> = HeartResource(
         layers = Layers(Lamps.type(Lamps.profile("home"))),
-        load = { id -> store.lamps[id] ?: throw ResourceNotFoundException("no lamp $id") },
-        perform = { id, act, input ->
-            val lamp = store.lamps.getValue(id)
+        load = { id -> store.read(id) },
+        perform = { lamp, act, input ->
             val next = when (act) {
                 "dim" -> lamp.copy(brightness = checkNotNull(input.bind(Dim::class.java).brightness))
                 "switchOff" -> lamp.copy(status = "OFF")
                 else -> lamp.copy(status = "ON")
             }.let { it.copy(version = it.version + 1) }
-            store.lamps[id] = next
+            // Recorded only if the lamp is still the one the client's ETag matched.
+            if (!store.lamps.replace(lamp.id, lamp, next)) {
+                throw ConcurrentWriteException("lamp ${lamp.id} was written first")
+            }
             Acted(next)
         },
         past = Past(

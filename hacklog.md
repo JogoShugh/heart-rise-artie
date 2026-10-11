@@ -656,6 +656,25 @@ as the author's user, so a determined bypass is possible; the hook makes it
 deliberate and visible rather than accidental, and the unchanged tests limit
 what a misuse could hide.
 
+## 2026-10-11: a write between the If-Match check and the act
+
+Found while walking garden bed one by hand for the author's review
+(`spec/MANUAL-REVIEW-PLAN.md`). The binding read the resource and checked
+If-Match against it, but each domain's act then read the resource again and
+appended its event after whatever it found. A write that landed between the
+check and the act was therefore not refused: the second act was applied to a
+state its client never saw, and answered 200 where SPEC §6.2 says 412. The
+garden's own status check hid part of this, for acts that change the status.
+
+`HeartResource.perform` is now given the state the validator was checked
+against, and the domain appends at the number after that state's version, so
+the event store refuses the act if anything landed in between. A scenario in
+heart-spring stages the write after the check and expects 412. A new
+conformance scenario makes every domain prove it: another client's act lands,
+then the domain's `perform` is called on the state read before it, and must
+refuse. Putting the old re-read back into tickets makes it fail. The garden's
+leftover status check, and its comment about catching 409, are gone.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

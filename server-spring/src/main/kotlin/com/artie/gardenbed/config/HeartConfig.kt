@@ -25,8 +25,8 @@ class HeartConfig {
         HeartResource(
             layers = GardenBeds.layers,
             load = { id -> service.currentState(id) },
-            perform = { id, act, input ->
-                val done = acts.perform(id, act, input)
+            perform = { bed, act, input ->
+                val done = acts.perform(bed, act, input)
                 // A harvest also says what it yielded.
                 val harvest = done.harvest?.let {
                     mapOf("X-Harvest-Yield-Grams" to it.yieldGrams.toString(), "X-Harvest-Crop-Name" to it.cropName)
