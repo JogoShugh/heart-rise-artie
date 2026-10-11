@@ -75,7 +75,8 @@ has since changed.
 
 This exhibit demonstrates the L2/L3 caching *property*: shared sets fetched once,
 `304` revalidation, and server-log verification. Its fixtures do not follow the
-0.4 wire format: sets use `schemaRef.href`, not `schema.$id`, there are no
+0.4 wire format: sets use `schemaRef.href`, not `schema.$ref` with
+`hr:integrity`, there are no
 `_forms`, and there is no `Prefer` negotiation. It is evidence for §6.6/§10.5 as
 a mechanism, not a conformance test. Its fixtures still use `{bedId}`.
 

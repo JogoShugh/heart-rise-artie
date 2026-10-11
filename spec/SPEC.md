@@ -681,7 +681,7 @@ sequenceDiagram
     Server-->>Client: 200 OK<br/>state + _links.forms href
 
     Client->>Server: GET /affordance-sets/sha256-...
-    Server-->>Client: 200 OK<br/>_forms with schema.$id pointer only
+    Server-->>Client: 200 OK<br/>_forms with schema.$ref and hr:integrity only
 
     Client->>Server: GET /schemas/sha256-...
     Server-->>Client: 200 OK<br/>full schema body

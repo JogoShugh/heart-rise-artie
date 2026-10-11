@@ -128,9 +128,13 @@ so a client never mistakes it for a body it built wrong.
   `performAtBookmark = { act, input -> Acted(newLamp) }` to the resource. The
   index offers each as a form on `/actions/install-lamp`. A client sends the
   index's ETag, as for any act; the answer is `201` with `Location`.
-- **Past**: add `past = Past(at = ..., history = ...)`. Then
+- **Past**: add `past = ...` to the resource. Then
   `GET /lamps/{id}?asOf=<instant>` and `GET /lamps/{id}/history` are served.
-  `heart-eventsourcing`'s `EventStore` can answer both (`state(asOf=…)`, `history`).
+  With `heart-eventsourcing`, build it from the type's `EventSourcing`, which
+  names each event by the type stored with it:
+  `past = LAMPS.past(at = { id, t -> store.state(LAMPS, id, asOf = t) }, history = { id -> store.history(LAMPS, id) })`.
+  Without it, give `Past(at = ..., history = ...)` directly, where `history`
+  returns `PastEvent`s.
 
 ## Prove it
 
