@@ -48,3 +48,12 @@ Feature: Garden beds
     When a client posts {} to harvest on bed 3 with If-Match *
     Then bed 3 is "EMPTY" with no crop and growth 0
     And the bed offers exactly "garden:sow-seed"
+
+  Scenario: Harvesting takes the crop but leaves the soil as moist as it was
+    The water in the soil is still there after the crop is picked, so the
+    next crop starts with it. Decided by the author on 2026-10-11.
+    Given bed 2 is PLANTED
+    When a client posts {"milliliters": 500} to water-cell on bed 2 with If-Match *
+    And a client posts {} to harvest on bed 2 with If-Match *
+    Then bed 2 is "EMPTY" with no crop and growth 0
+    And bed 2 still has moisture 50

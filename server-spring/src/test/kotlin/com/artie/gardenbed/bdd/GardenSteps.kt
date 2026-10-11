@@ -31,6 +31,12 @@ class GardenSteps(private val http: HttpWorld) {
         assertEquals(growth, current().path("growthPoints").asInt())
     }
 
+    @Then("bed {long} still has moisture {int}")
+    fun moisture(id: Long, moisture: Int) {
+        read(id)
+        assertEquals(moisture, current().path("moistureLevel").asInt())
+    }
+
     @Then("the bed offers exactly {string}")
     fun offers(keys: String) {
         val forms = current().path("_forms").fieldNames().asSequence().toSet()
