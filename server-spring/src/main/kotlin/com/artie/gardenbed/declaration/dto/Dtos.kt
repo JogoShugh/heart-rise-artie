@@ -40,14 +40,3 @@ data class HarvestResult(
     val yieldGrams: Int,
     val cropName: String
 )
-
-/** The plain-data view of a bed's current state, independent of which
- *  hypermedia dialect wraps it. */
-data class GardenBedDto(
-    val id: Long,
-    val label: String,
-    val status: String,
-    val cropName: String?,
-    val growthPoints: Int,
-    val moistureLevel: Int
-)
