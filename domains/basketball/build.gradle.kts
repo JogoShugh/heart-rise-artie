@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
@@ -43,6 +44,19 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:r2dbc")
+}
+
+// Buster, the chaos filter: only under -Pbuster=on (settings.gradle.kts), and only
+// at bootRun. developmentOnly keeps it out of the boot jar; it switches on with
+// the buster profile. Buster compiles plugin scripts at runtime, so the Kotlin
+// it runs on must be this build's Kotlin.
+if (gradle.includedBuilds.any { it.name == "buster" }) {
+    dependencies { developmentOnly("com.artie:buster") }
+}
+configurations.matching { it.name in setOf("developmentOnly", "runtimeClasspath", "productionRuntimeClasspath") }.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.jetbrains.kotlin") useVersion(getKotlinPluginVersion())
+    }
 }
 
 kotlin {

@@ -1,40 +1,55 @@
 #!/usr/bin/env bash
-# Runs a Buster campaign over ARTIE's @live scenarios and exits non-zero if the gate fails.
-#   1. Starts a fresh server-spring with Buster in front (-Pbuster=on, buster profile).
-#   2. Record: a dry run of the scenarios against the unmutated server.
+# Runs a Buster campaign on one HEART server and exits non-zero if the gate fails.
+#   scripts/buster-campaign.sh [domain]     garden (default), basketball, ...
+# The domain's campaign.env (server-spring/ for the garden, domains/<name>/ for
+# the others) says where its server is, its ports, its reset command, its
+# explore samples, and which client drives it.
+#   1. Starts a fresh server with Buster in front (-Pbuster=on, buster profile).
+#   2. Record: a dry run of the client against the unmutated server.
 #   3. Plan: Buster lists the (client, request, plugin) combinations the clients exercise,
 #      in rounds.
-#   4. For each round: arm it, and run the same scenarios again.
+#   4. For each round: arm it, and run the same client again.
 #   5. Reads Buster's report. The gate is campaign.ok: no FAIL, and every plugin exercised.
+# The client is "live" (the garden's own @live scenarios) or "explore" (ARTIE's
+# explorer, the same for every domain); CAMPAIGN_CLIENT overrides campaign.env.
 # See Buster's README, "Campaigns: aiming each mutation". Every verdict is pass,
 # pass (attested) or FAIL; nothing is left undecided.
 # Writes campaign-plan.json, campaign-report.json, campaign-round-<k>.log and
-# campaign-server.log under server-spring/build. Stops the server at the end unless
+# campaign-server.log under the server's build/. Stops the server at the end unless
 # BUSTER_KEEP=1. Opens nothing on screen.
 set -euo pipefail
 
 root=$(cd "$(dirname "$0")/.." && pwd)
-base=${ARTIE_BASE_URL:-http://localhost:8080}
-build="$root/server-spring/build"
+domain=${1:-garden}
+if [ "$domain" = garden ]; then config="$root/server-spring/campaign.env"; else config="$root/domains/$domain/campaign.env"; fi
+[ -f "$config" ] || { echo "no campaign.env for $domain ($config)" >&2; exit 1; }
+# shellcheck source=/dev/null
+. "$config"
+client=${CAMPAIGN_CLIENT:-$CLIENT}
+server="$root/$SERVER_DIR"
+base="http://localhost:$PORT"
+build="$server/build"
+events="$build/artie-events.jsonl"
 # Gradle 8.13 cannot run on JDK 25, which may be the shell default.
 export JAVA_HOME=${ARTIE_JAVA_HOME:-$HOME/.sdkman/candidates/java/21.0.12-graal}
 mkdir -p "$build"
 
 # A fresh server, so verdicts from another run cannot mix into this one.
-if lsof -ti tcp:8080 > /dev/null; then
-  echo "port 8080 is busy; stop that server first (lsof -ti tcp:8080 | xargs kill)" >&2
+if lsof -ti "tcp:$PORT" > /dev/null; then
+  echo "port $PORT is busy; stop that server first (lsof -ti tcp:$PORT | xargs kill)" >&2
   exit 1
 fi
 (cd "$root/server-spring" && docker compose up -d postgres > /dev/null)
 
 stop_server() {
   if [ "${BUSTER_KEEP:-0}" != 1 ]; then
-    lsof -ti tcp:8080 | xargs kill 2> /dev/null || true
+    lsof -ti "tcp:$PORT" | xargs kill 2> /dev/null || true
   fi
 }
 trap stop_server EXIT
 
-(cd "$root/server-spring" && SPRING_PROFILES_ACTIVE=buster BUSTER_PACE=0s \
+(cd "$server" && SPRING_PROFILES_ACTIVE=buster BUSTER_PACE=0s \
+  BUSTER_PLUGINS="$root/buster/plugins" BUSTER_LOG="$build/buster.jsonl" BUSTER_CLIENT_EVENTS="$events" \
   ./gradlew bootRun -Pbuster=on > "$build/campaign-server.log" 2>&1) &
 for _ in $(seq 1 90); do curl -sf -o /dev/null "$base/_buster/report" && break; sleep 2; done
 curl -sf -o /dev/null "$base/_buster/report" || {
@@ -44,9 +59,28 @@ curl -sf -o /dev/null "$base/_buster/report" || {
 
 post() { curl -sf -X POST "$base/_buster/campaign/$1"; echo; }
 
+# One run of the client: from the seed data, with ARTIE's event log fresh.
+run_client() {
+  case "$client" in
+    live)
+      ARTIE_BASE_URL="$base" ARTIE_EVENTS="$events" "$root/scripts/live-client-check.sh"
+      ;;
+    explore)
+      "$root/$RESET" > /dev/null
+      : > "$events"
+      (cd "$root/client" && ARTIE_BASE_URL="$base" ARTIE_COAP_PORT="$COAP_PORT" ARTIE_RESET="$root/$RESET" \
+        ARTIE_SAMPLES="$root/$SAMPLES" ARTIE_EVENTS="$events" ./gradlew exploreTest --console=plain)
+      ;;
+    *)
+      echo "unknown client $client" >&2
+      return 1
+      ;;
+  esac
+}
+
 # Record. A broken dry run would make a wrong plan, so it must pass.
 post record
-if ! "$root/scripts/live-client-check.sh" > "$build/campaign-round-0.log" 2>&1; then
+if ! run_client > "$build/campaign-round-0.log" 2>&1; then
   echo "dry run failed; see $build/campaign-round-0.log" >&2
   exit 1
 fi
@@ -69,7 +103,7 @@ EOF
 # Rounds. Client tests fail by design under mutation; the verdicts are what count.
 for k in $(seq 1 "$rounds"); do
   echo "round $k/$rounds: $(post "arm?round=$k")"
-  "$root/scripts/live-client-check.sh" > "$build/campaign-round-$k.log" 2>&1 || true
+  run_client > "$build/campaign-round-$k.log" 2>&1 || true
 done
 
 # Close the last round's windows, then read the gate.
