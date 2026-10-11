@@ -106,6 +106,24 @@ class StateView<S, K>(
     val bodyOf: (S) -> Map<String, Any?>,
 )
 
+/** A form's two names: its logical [name] (a HAL-FORMS template name) and its [relation] id in the profile. */
+data class Named(val name: String, val relation: String)
+
+/**
+ * How a resource type is found from the service index (SPEC §6.11): a
+ * search by part of a resource's name, and a lookup by id. [noun] names one
+ * resource (`bed`), for the home document's variables; the words describe
+ * the two fields to a person or a model.
+ */
+class Finding(
+    val noun: String,
+    val search: Named,
+    val lookup: Named,
+    val nameDescription: String,
+    val idTitle: String,
+    val idDescription: String,
+)
+
 /** A resource type, declared once: everything heart-core needs to render and act on it. */
 class ResourceType<S, K>(
     val collection: String,
@@ -113,9 +131,12 @@ class ResourceType<S, K>(
     val acts: List<Act>,
     val offers: Offers<K>,
     val state: StateView<S, K>,
+    val finding: Finding? = null,
 ) {
     init {
         acts.forEach { profile.relation(it.relation) }
+        finding?.let { profile.relation(it.search.relation) }
+        finding?.let { profile.relation(it.lookup.relation) }
         offers.keys.forEach { key ->
             val unknown = offers.offered(key) - acts.map { it.name }.toSet()
             require(unknown.isEmpty()) { "key $key offers undeclared acts $unknown" }

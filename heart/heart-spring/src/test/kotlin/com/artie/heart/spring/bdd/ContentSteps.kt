@@ -2,7 +2,7 @@ package com.artie.heart.spring.bdd
 
 import com.artie.heart.ContentAddress
 import com.artie.heart.Layers
-import com.artie.heart.spring.HeartResource
+import com.artie.heart.HeartResource
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then

@@ -35,4 +35,4 @@ Feature: Content-addressed resources and profiles, served over HTTP from a decla
     And the response has Content-Type "application/alps+json"
     And the response has Cache-Control "public, max-age=86400"
     And the response has an ETag
-    And the profile describes "switch-on, switch-off, dim"
+    And the profile describes "switch-on, switch-off, dim, search-lamps, get-lamp"

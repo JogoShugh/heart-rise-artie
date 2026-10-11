@@ -2,6 +2,8 @@ package com.artie.heart.fixtures
 
 import com.artie.heart.Act
 import com.artie.heart.AlpsType
+import com.artie.heart.Finding
+import com.artie.heart.Named
 import com.artie.heart.Offers
 import com.artie.heart.Profile
 import com.artie.heart.Relation
@@ -42,6 +44,8 @@ object Lamps {
             Relation("switch-on", AlpsType.UNSAFE, "Switch on", "Turns the lamp on.", "Offered while off."),
             Relation("switch-off", AlpsType.UNSAFE, "Switch off", "Turns the lamp off.", "Offered while on."),
             Relation("dim", AlpsType.IDEMPOTENT, "Dim the lamp", "Sets the brightness.", "Offered while on."),
+            Relation("search-lamps", AlpsType.SAFE, "Find lamps by name", "Lists the lamps whose name has the text.", "A search."),
+            Relation("get-lamp", AlpsType.SAFE, "Get a lamp by its id", "Goes to one lamp, given its id.", "A lookup."),
         ),
     )
 
@@ -66,6 +70,14 @@ object Lamps {
             idOf = { it.id },
             versionOf = { it.version },
             bodyOf = { linkedMapOf("id" to it.id, "status" to it.status, "brightness" to it.brightness) },
+        ),
+        finding = Finding(
+            noun = "lamp",
+            search = Named("searchLamps", "search-lamps"),
+            lookup = Named("getLamp", "get-lamp"),
+            nameDescription = "Part of the lamp's name; case is ignored",
+            idTitle = "Lamp id",
+            idDescription = "The lamp's number",
         ),
     )
 }

@@ -1,13 +1,14 @@
 package com.artie.heart.spring.bdd
 
+import com.artie.heart.Found
 import com.artie.heart.Layers
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.fixtures.Dim
 import com.artie.heart.fixtures.Lamp
 import com.artie.heart.fixtures.Lamps
-import com.artie.heart.spring.Acted
+import com.artie.heart.Acted
 import com.artie.heart.spring.HeartAutoConfiguration
-import com.artie.heart.spring.HeartResource
+import com.artie.heart.HeartResource
 import io.cucumber.spring.CucumberContextConfiguration
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -44,6 +45,12 @@ class LampServer {
             }.let { it.copy(version = it.version + 1) }
             store.lamps[id] = next
             Acted(next)
+        },
+        find = { name, id ->
+            store.lamps.values.sortedBy { it.id }
+                .map { Found(it.id, "Lamp ${it.id}") }
+                .filter { name == null || it.title.contains(name, ignoreCase = true) }
+                .filter { id == null || it.id == id }
         },
     )
 }

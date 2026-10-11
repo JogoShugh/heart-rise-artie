@@ -3,6 +3,7 @@ package com.artie.heart.spring.bdd
 import com.artie.heart.fixtures.Lamp
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -14,10 +15,27 @@ import org.springframework.test.web.reactive.server.WebTestClient
 class ResourceSteps(private val client: WebTestClient, private val store: LampStore, private val http: HttpWorld) {
     private val json: JsonNode get() = ObjectMapper().readTree(http.last.responseBody)
 
+    @Before
+    fun emptyStore() = store.lamps.clear()
+
     @Given("lamp {long} is {string} at version {int} in the lamp server")
     fun lampIs(id: Long, status: String, version: Int) {
-        store.lamps.clear()
         store.lamps[id] = Lamp(id, status, brightness = 50, version = version)
+    }
+
+    @When("a client gets {string} again with the ETag it was given")
+    fun again(path: String) {
+        val etag = checkNotNull(http.last.responseHeaders.eTag)
+        val accept = checkNotNull(http.last.requestHeaders.getFirst(HttpHeaders.ACCEPT))
+        get(path, mapOf(HttpHeaders.ACCEPT to accept, HttpHeaders.IF_NONE_MATCH to etag))
+    }
+
+    @Then("the response lists the items {}")
+    fun items(items: String) {
+        val listed = json.path("_links").path("item").joinToString(", ") {
+            "\"${it.path("href").asText()}\" titled \"${it.path("title").asText()}\""
+        }
+        assertEquals(items, listed)
     }
 
     @When("a client gets {string} as {word}")

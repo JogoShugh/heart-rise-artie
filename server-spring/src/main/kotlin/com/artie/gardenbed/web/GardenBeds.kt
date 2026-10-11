@@ -6,7 +6,9 @@ import com.artie.gardenbed.web.dto.HarvestRequest
 import com.artie.gardenbed.web.dto.SowSeedRequest
 import com.artie.gardenbed.web.dto.WaterCellRequest
 import com.artie.heart.Act
+import com.artie.heart.Finding
 import com.artie.heart.Layers
+import com.artie.heart.Named
 import com.artie.heart.Offers
 import com.artie.heart.ResourceType
 import com.artie.heart.StateView
@@ -36,6 +38,14 @@ object GardenBeds {
                 }
             },
             whyAbsent = GardenProfile::whyAbsent,
+        ),
+        finding = Finding(
+            noun = "bed",
+            search = Named("searchBeds", "search-beds"),
+            lookup = Named("getBed", "get-bed"),
+            nameDescription = "Part of the bed's name; case is ignored",
+            idTitle = "Bed id",
+            idDescription = "The bed's number",
         ),
         state = StateView<GardenBedState, GardenBedStatus>(
             keyOf = { it.status },

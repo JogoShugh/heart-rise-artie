@@ -3,9 +3,9 @@ package com.artie.gardenbed.web
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.service.GardenBedService
+import com.artie.heart.HeartResource
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.spring.HeartHandlers
-import com.artie.heart.spring.HeartResource
 import com.artie.heart.spring.HttpRefusals
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

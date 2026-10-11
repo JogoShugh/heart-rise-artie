@@ -4,22 +4,18 @@ import com.artie.gardenbed.coap.CoapFrontDoor
 import com.artie.gardenbed.config.HeartConfig
 import com.artie.gardenbed.web.BedActs
 import com.artie.gardenbed.web.GardenRoutes
-import com.artie.gardenbed.web.ServiceIndexController
 import com.artie.heart.spring.HeartAutoConfiguration
 import io.cucumber.spring.CucumberContextConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 
-/** One Spring WebFlux slice for every scenario: the service index, the
- *  garden's own history routes, and heart-spring, which serves the beds,
- *  their acts, Layers 2 and 3 and the ALPS profile, wired to the in-memory store. */
+/** One Spring WebFlux slice for every scenario: heart-spring, which serves
+ *  the service index, the searches, the beds and their acts, Layers 2 and 3
+ *  and the ALPS profile, beside the garden's own history routes, wired to
+ *  the in-memory store. The garden has no controllers. */
 @CucumberContextConfiguration
-@WebFluxTest(
-    controllers = [
-        ServiceIndexController::class,
-    ],
-)
+@WebFluxTest
 @Import(
     InMemoryGardenBedsConfig::class, HttpWorld::class, BedActs::class, GardenRoutes::class,
     CoapFrontDoor::class,

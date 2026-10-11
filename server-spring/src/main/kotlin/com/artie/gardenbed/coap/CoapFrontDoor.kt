@@ -1,8 +1,10 @@
 package com.artie.gardenbed.coap
 
-import com.artie.gardenbed.service.GardenBedService
+import com.artie.gardenbed.domain.GardenBedState
+import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.web.BedActs
-import com.artie.gardenbed.web.ServiceIndexController
+import com.artie.heart.HeartResource
+import com.artie.heart.ServiceIndex
 import com.artie.heart.spring.ServingLimits
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.runBlocking
@@ -26,14 +28,14 @@ import java.net.InetSocketAddress
  */
 @Component
 class CoapFrontDoor(
-    service: GardenBedService,
+    beds: HeartResource<GardenBedState, GardenBedStatus>,
     acts: BedActs,
-    index: ServiceIndexController,
+    index: ServiceIndex,
     limits: ServingLimits,
     objectMapper: ObjectMapper,
     @Value("\${heart.coap.port:5683}") private val configuredPort: Int,
 ) : SmartLifecycle {
-    private val routes = CoapRoutes(service, acts, index, limits, objectMapper)
+    private val routes = CoapRoutes(beds, acts, index, limits, objectMapper)
     private var server: CoapServer? = null
 
     /** The UDP port the server listens on, once started. */

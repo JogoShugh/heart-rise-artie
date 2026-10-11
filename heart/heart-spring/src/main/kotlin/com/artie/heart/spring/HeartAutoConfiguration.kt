@@ -1,5 +1,7 @@
 package com.artie.heart.spring
 
+import com.artie.heart.ServiceIndex
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -31,15 +33,32 @@ class HeartAutoConfiguration {
      * for example). Every refusal is answered as SPEC §6.2 says.
      */
     @Bean
-    fun heartRoutes(handlers: HeartHandlers): RouterFunction<ServerResponse> =
+    fun heartRoutes(handlers: HeartHandlers, index: HeartIndexHandler): RouterFunction<ServerResponse> =
         coRouter {
+            GET("/") { index.index(it) }
             handlers.all.forEach { handler ->
-                val collection = handler.resource.layers.type.collection
+                val resource = handler.resource
+                val collection = resource.layers.type.collection
+                if (resource.find != null) GET("/$collection") { index.search(resource, it) }
                 GET("/$collection/{id}", NO_QUERY) { handler.read(it) }
                 POST("/$collection/{id}/actions/{path}") { handler.act(it) }
             }
             onError<Throwable> { failure, _ -> HttpRefusals.of(failure) ?: throw failure }
         }
+
+    /**
+     * The bookmark's representations, from every declared type. `heart.title`
+     * names the API; by default, its first profile's title does.
+     */
+    @Bean
+    fun serviceIndex(
+        registry: HeartRegistry,
+        @Value("\${heart.title:}") title: String,
+    ): ServiceIndex =
+        ServiceIndex(registry.layers.map { it.type }, title.ifBlank { null })
+
+    @Bean
+    fun heartIndexHandler(index: ServiceIndex, limits: ServingLimits) = HeartIndexHandler(index, limits)
 
     private companion object {
         val NO_QUERY = RequestPredicate { it.queryParams().isEmpty() }

@@ -1,13 +1,16 @@
 package com.artie.gardenbed.coap
 
 import com.artie.gardenbed.domain.GardenBedState
-import com.artie.gardenbed.service.GardenBedService
+import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.web.BedActs
 import com.artie.gardenbed.web.GardenProfile
 import com.artie.gardenbed.web.JsonSchemaDialectSupport
-import com.artie.gardenbed.web.ServiceIndexController
 import com.artie.heart.Dialect
+import com.artie.heart.HeartResource
 import com.artie.heart.Rung
+import com.artie.heart.Search
+import com.artie.heart.SearchPages
+import com.artie.heart.ServiceIndex
 import com.artie.heart.StateETag
 import com.artie.heart.spring.ServingLimits
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -21,9 +24,9 @@ import org.eclipse.californium.core.coap.Response
  * HTTP, from the same services and renderers, in the hal-schema-forms dialect.
  */
 internal class CoapRoutes(
-    private val service: GardenBedService,
+    private val beds: HeartResource<GardenBedState, GardenBedStatus>,
     private val acts: BedActs,
-    private val index: ServiceIndexController,
+    private val index: ServiceIndex,
     private val limits: ServingLimits,
     objectMapper: ObjectMapper,
 ) {
@@ -59,7 +62,7 @@ internal class CoapRoutes(
     }
 
     private suspend fun bed(request: Request, id: Long): Response {
-        val state = service.currentState(id)
+        val state = beds.load(id)
         val rung = rung(request)
         val validator = validatorOf(state, rung)
         if (request.options.eTags.any { it.contentEquals(validator) }) return replies.valid(validator)
@@ -82,15 +85,17 @@ internal class CoapRoutes(
 
     private fun serviceIndex(request: Request): Response =
         if (request.options.hasAccept() && request.options.accept == CoapOptions.JSON_HOME) {
-            replies.document(index.homeBody(), CoapOptions.JSON_HOME, maxAge = 0)
+            replies.document(index.home(limits.maxRung), CoapOptions.JSON_HOME, maxAge = 0)
         } else {
-            val validator = CoapOptions.validator(index.indexETag(Dialect.JSONSCHEMA))
-            replies.layer1(ResponseCode.CONTENT, index.indexBody(Dialect.JSONSCHEMA), validator, null)
+            val validator = CoapOptions.validator(index.validator(Dialect.JSONSCHEMA))
+            replies.layer1(ResponseCode.CONTENT, index.body(Dialect.JSONSCHEMA), validator, null)
         }
 
     private suspend fun search(request: Request): Response {
         val query = request.options.uriQuery.associate { it.substringBefore('=') to it.substringAfter('=', "") }
-        val body = index.searchBody(query["name"], query["id"]?.toLongOrNull(), query["page"]?.toIntOrNull() ?: 1)
+        val search = Search("beds", query["name"], query["id"]?.toLongOrNull())
+        val found = checkNotNull(beds.find)(search.name, search.id)
+        val body = SearchPages.page(search, found, query["page"]?.toIntOrNull() ?: 1, limits.pageSize)
         return replies.layer1(ResponseCode.CONTENT, body, null, null)
     }
 

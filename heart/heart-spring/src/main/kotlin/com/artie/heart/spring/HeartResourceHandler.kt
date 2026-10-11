@@ -2,6 +2,7 @@ package com.artie.heart.spring
 
 import com.artie.heart.ActPipeline
 import com.artie.heart.Dialect
+import com.artie.heart.HeartResource
 import com.artie.heart.Rung
 import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -47,7 +48,7 @@ class HeartResourceHandler<S, K>(
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rendered = Rendered(state, dialect, rung(dialect, request))
         val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
-        return if (ifNoneMatch != null && notModified(ifNoneMatch, rendered.etag)) {
+        return if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, rendered.etag)) {
             ServerResponse.status(HttpStatus.NOT_MODIFIED).headers { rendered.headers(it) }.buildAndAwait()
         } else {
             rendered.respond(ServerResponse.ok())
@@ -141,9 +142,5 @@ class HeartResourceHandler<S, K>(
             Dialect.JSONSCHEMA -> "${HttpHeaders.ACCEPT}, ${HttpNegotiation.PREFER}, ${HttpNegotiation.ACCEPT_PROFILE}"
             Dialect.HALFORMS -> "${HttpHeaders.ACCEPT}, ${HttpNegotiation.ACCEPT_PROFILE}"
         }
-
-        /** RFC 9110 §13.1.2: If-None-Match uses weak comparison; `*` matches any current representation. */
-        fun notModified(ifNoneMatch: String, etag: String): Boolean =
-            ifNoneMatch.trim() == "*" || ifNoneMatch.split(',').any { it.trim().removePrefix("W/") == etag }
     }
 }

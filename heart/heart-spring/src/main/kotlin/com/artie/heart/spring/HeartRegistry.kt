@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.Profile
 import org.springframework.stereotype.Component
