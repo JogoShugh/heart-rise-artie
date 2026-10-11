@@ -1,7 +1,6 @@
 package com.artie.basketball.domain
 
 import com.artie.heart.UnprocessableContentException
-import com.artie.heart.Violation
 import com.artie.heart.eventsourcing.EventStore
 import com.artie.heart.eventsourcing.Recorded
 import java.time.Instant
@@ -46,8 +45,10 @@ class GameService(private val games: GameDirectory, private val events: EventSto
         fun requirePlayer(state: GameState, side: String, number: Int) {
             val roster = checkNotNull(state.setup).team(side).roster
             when {
-                number !in roster -> refuse("/playerNumber", "No player $number on the $side team")
-                state.fouledOut(side, number) -> refuse("/playerNumber", "Player $number has fouled out")
+                number !in roster ->
+                    throw UnprocessableContentException.at("/playerNumber", "No player $number on the $side team")
+                state.fouledOut(side, number) ->
+                    throw UnprocessableContentException.at("/playerNumber", "Player $number has fouled out")
             }
         }
 
@@ -55,12 +56,13 @@ class GameService(private val games: GameDirectory, private val events: EventSto
         fun requireScoringPlay(state: GameState, sequenceNo: Int) {
             val play = state.plays.firstOrNull { it.sequenceNo == sequenceNo }
             when {
-                play == null -> refuse("/sequenceNo", "Play $sequenceNo did not score")
-                play.takenBack -> refuse("/sequenceNo", "Play $sequenceNo has already been taken back")
+                play == null ->
+                    throw UnprocessableContentException.at("/sequenceNo", "Play $sequenceNo did not score")
+                play.takenBack -> throw UnprocessableContentException.at(
+                    "/sequenceNo",
+                    "Play $sequenceNo has already been taken back",
+                )
             }
         }
-
-        private fun refuse(pointer: String, message: String): Nothing =
-            throw UnprocessableContentException(listOf(Violation(pointer, message)))
     }
 }

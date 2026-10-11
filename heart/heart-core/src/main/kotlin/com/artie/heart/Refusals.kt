@@ -43,7 +43,12 @@ data class Violation(val pointer: String, val message: String)
 
 /** 422: the body is JSON but does not satisfy the affordance's schema. */
 class UnprocessableContentException(val violations: List<Violation>, cause: Throwable? = null) :
-    RuntimeException("request body does not satisfy the affordance schema", cause)
+    RuntimeException("request body does not satisfy the affordance schema", cause) {
+    companion object {
+        /** A domain rule the schema cannot say, refused at one field: one violation at [pointer]. */
+        fun at(pointer: String, message: String) = UnprocessableContentException(listOf(Violation(pointer, message)))
+    }
+}
 
 /** 400: the body is not JSON at all. */
 class MalformedActBodyException(message: String, cause: Throwable) : RuntimeException(message, cause)

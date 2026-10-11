@@ -1,7 +1,6 @@
 package com.artie.tickets.domain
 
 import com.artie.heart.UnprocessableContentException
-import com.artie.heart.Violation
 import com.artie.heart.eventsourcing.EventStore
 import com.artie.heart.eventsourcing.Recorded
 import java.time.Instant
@@ -56,15 +55,16 @@ class TicketService(
     companion object {
         /** An agent to hand the ticket to: not the one who already has it. */
         fun requireOtherAgent(state: TicketState, agent: String) {
-            if (state.agent == agent) refuse("/agent", "The ticket is already assigned to $agent")
+            if (state.agent == agent) {
+                throw UnprocessableContentException.at("/agent", "The ticket is already assigned to $agent")
+            }
         }
 
         /** A priority to change to: not the one the ticket already has. */
         fun requireOtherPriority(state: TicketState, priority: String) {
-            if (state.priority == priority) refuse("/priority", "The ticket's priority is already $priority")
+            if (state.priority == priority) {
+                throw UnprocessableContentException.at("/priority", "The ticket's priority is already $priority")
+            }
         }
-
-        private fun refuse(pointer: String, message: String): Nothing =
-            throw UnprocessableContentException(listOf(Violation(pointer, message)))
     }
 }
