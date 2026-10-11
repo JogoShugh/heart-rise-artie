@@ -373,7 +373,6 @@ Notes on the changes:
 
 - 0.3 used `409` for "resource moved between sync and act" and `403` for "business rules prohibit it in the current state." Both are now `409`, because from the client's position they are indistinguishable and demand the same response: re-sync. `403` is freed for authorisation, where it belongs.
 - 0.3 deprecated `428` as having no remaining trigger. Making acts conditional gives it back its RFC 6585 meaning exactly — *this server requires the request to be conditional* — which is a better outcome than deletion. §12's recommendation to remove it is withdrawn.
-- `422` is named "Unprocessable Content" in RFC 9110; 0.3's "Unprocessable Entity" is the older RFC 4918 name for the same code.
 
 **Error bodies (decided 2026-10-10).** A server SHALL send each refusal in the table above as an RFC 9457 problem details object, `application/problem+json`, with `type`, `title` and `status`. The `type` is a URI that names the refusal, so a client tells refusals apart by `type` and status, never by reading `title` or `detail`. H.E.A.R.T. defines five, under `https://github.com/jogoshugh/heart-rise/problems/`:
 
