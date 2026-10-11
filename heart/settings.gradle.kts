@@ -5,3 +5,4 @@ rootProject.name = "heart"
 include("heart-core")
 include("heart-spring")
 include("heart-coap")
+include("heart-eventsourcing")
