@@ -1,11 +1,11 @@
-package com.artie.gardenbed.web
+package com.artie.heart.spring
 
 import com.artie.heart.Rung
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 /**
- * How much this server serves, set once at startup. The BDD suite changes
+ * How much this server serves, set once at startup. A test suite may change
  * these per scenario to stand up servers of each kind.
  *
  * - [maxRung] (SPEC §6.11.1): the highest rung served, from `heart.max-rung`

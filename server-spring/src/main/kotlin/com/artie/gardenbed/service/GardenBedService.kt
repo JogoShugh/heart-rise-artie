@@ -7,13 +7,17 @@ import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.eventstore.EventStore
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
 import com.artie.gardenbed.web.dto.HarvestResult
+import com.artie.heart.NotOfferedException
+import com.artie.heart.ResourceNotFoundException
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import java.time.Instant
 
-class BedNotFoundException(id: Long) : RuntimeException("No garden bed with id $id")
-/** 409. [rel] is the act the client tried, when the refusing check knows it. */
-class InvalidTransitionException(message: String, val rel: String? = null) : RuntimeException(message)
+/** 404, as heart-core names it, so every binding answers it the same way. */
+class BedNotFoundException(id: Long) : ResourceNotFoundException("No garden bed with id $id")
+
+/** 409: the domain's own guard, refused as heart-core's not-offered. [rel] is the act tried, when known. */
+class InvalidTransitionException(message: String, rel: String? = null) : NotOfferedException(message, rel)
 
 @Service
 class GardenBedService(

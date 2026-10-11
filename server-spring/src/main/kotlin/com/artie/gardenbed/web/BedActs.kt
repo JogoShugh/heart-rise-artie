@@ -5,6 +5,7 @@ import com.artie.gardenbed.service.GardenBedService
 import com.artie.gardenbed.web.dto.HarvestResult
 import com.artie.gardenbed.web.dto.SowSeedRequest
 import com.artie.gardenbed.web.dto.WaterCellRequest
+import com.artie.heart.ActInput
 import com.artie.heart.ActPipeline
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Component
@@ -33,15 +34,17 @@ class BedActs(private val service: GardenBedService, objectMapper: ObjectMapper)
 
     /** Checks [body] against the act's schema and performs the act. A concurrent write is stale. */
     suspend fun run(id: Long, affordance: String, body: String?): ActResult =
-        pipeline.run(affordance, body) { input ->
-            when (affordance) {
-                "sowSeed" -> input.bind(SowSeedRequest::class.java)
-                    .let { ActResult(service.sowSeed(id, it.seedType, it.depthCm)) }
-                "waterCell" -> input.bind(WaterCellRequest::class.java)
-                    .let { ActResult(service.waterCell(id, it.milliliters)) }
-                "harvest" -> service.harvest(id).let { (state, result) -> ActResult(state, result) }
-                else -> error("no act $affordance")
-            }
+        pipeline.run(affordance, body) { input -> perform(id, affordance, input) }
+
+    /** What each act does to a bed, given its checked body. */
+    suspend fun perform(id: Long, affordance: String, input: ActInput): ActResult =
+        when (affordance) {
+            "sowSeed" -> input.bind(SowSeedRequest::class.java)
+                .let { ActResult(service.sowSeed(id, it.seedType, it.depthCm)) }
+            "waterCell" -> input.bind(WaterCellRequest::class.java)
+                .let { ActResult(service.waterCell(id, it.milliliters)) }
+            "harvest" -> service.harvest(id).let { (state, result) -> ActResult(state, result) }
+            else -> error("no act $affordance")
         }
 
     companion object {

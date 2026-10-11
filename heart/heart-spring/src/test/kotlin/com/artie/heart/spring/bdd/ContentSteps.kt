@@ -2,6 +2,7 @@ package com.artie.heart.spring.bdd
 
 import com.artie.heart.ContentAddress
 import com.artie.heart.Layers
+import com.artie.heart.spring.HeartResource
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -11,9 +12,18 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.springframework.test.web.reactive.server.EntityExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
 
-class ContentSteps(private val client: WebTestClient, private val lamps: Layers<*, *>) {
-    private var results: List<EntityExchangeResult<ByteArray>> = emptyList()
-    private val last get() = results.single()
+class ContentSteps(
+    private val client: WebTestClient,
+    private val resource: HeartResource<*, *>,
+    private val http: HttpWorld,
+) {
+    private val lamps get() = resource.layers
+    private var results
+        get() = http.results
+        set(value) {
+            http.results = value
+        }
+    private val last get() = http.last
 
     @Given("a server that declares only the lamp, with the profile {string}")
     fun aLampServer(name: String) = assertEquals(name, lamps.type.profile.name)
@@ -54,12 +64,6 @@ class ContentSteps(private val client: WebTestClient, private val lamps: Layers<
 
     @Then("the response status is {int}")
     fun status(code: Int) = assertEquals(code, last.status.value())
-
-    @Then("the response has Content-Type {string}")
-    fun contentType(type: String) = assertEquals(type, last.responseHeaders.contentType.toString())
-
-    @Then("the response has Cache-Control {string}")
-    fun cacheControl(value: String) = assertEquals(value, last.responseHeaders.cacheControl)
 
     @Then("the response has an ETag")
     fun hasETag() {

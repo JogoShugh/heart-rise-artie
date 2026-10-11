@@ -18,8 +18,15 @@ class StaleWriteConflict(message: String, cause: Throwable? = null) : RuntimeExc
  */
 open class ConcurrentWriteException(message: String) : RuntimeException(message)
 
-/** 409: the act is not in the resource's current affordance set. [rel] names its relation. */
-class NotOfferedException(message: String, val rel: String) : RuntimeException(message)
+/**
+ * 409: the act is not in the resource's current affordance set. [rel] names
+ * its relation, when known. A domain's own guard may extend this, so the
+ * refusal is the same whichever layer finds it.
+ */
+open class NotOfferedException(message: String, val rel: String? = null) : RuntimeException(message)
+
+/** 404: no resource with that id. A domain's own "not found" extends this. */
+open class ResourceNotFoundException(message: String) : RuntimeException(message)
 
 /** One failing field: an RFC 6901 JSON Pointer into the request body, and why. */
 data class Violation(val pointer: String, val message: String)

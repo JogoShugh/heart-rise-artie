@@ -12,6 +12,8 @@ dependencies {
     api(platform("org.springframework.boot:spring-boot-dependencies:3.3.4"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-webflux")
+    // HAL-FORMS, the L0 on-ramp dialect, is rendered by Spring HATEOAS.
+    implementation("org.springframework.hateoas:spring-hateoas")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
     testImplementation(testFixtures(project(":heart-core")))

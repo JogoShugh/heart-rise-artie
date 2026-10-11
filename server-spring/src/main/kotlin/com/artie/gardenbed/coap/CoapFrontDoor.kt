@@ -3,7 +3,7 @@ package com.artie.gardenbed.coap
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.gardenbed.web.BedActs
 import com.artie.gardenbed.web.ServiceIndexController
-import com.artie.gardenbed.web.ServingLimits
+import com.artie.heart.spring.ServingLimits
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.runBlocking
 import org.eclipse.californium.core.CoapServer

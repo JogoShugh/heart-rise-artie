@@ -2,6 +2,7 @@ package com.artie.gardenbed.web
 
 import com.artie.gardenbed.config.HeartConfig
 import com.artie.gardenbed.domain.GardenBedStatus
+import com.artie.gardenbed.service.GardenBedService
 import com.artie.heart.SetRendering
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -10,6 +11,7 @@ import com.artie.heart.spring.HeartAutoConfiguration
 import com.artie.heart.spring.HeartContentController
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.security.MessageDigest
@@ -25,6 +27,13 @@ import java.security.MessageDigest
 @WebFluxTest(controllers = [HeartContentController::class])
 @Import(HeartConfig::class, HeartAutoConfiguration::class)
 class ContentAddressHttpTest {
+
+    // The bed itself is not read here: only its content-addressed layers are.
+    @MockBean
+    lateinit var service: GardenBedService
+
+    @MockBean
+    lateinit var acts: BedActs
 
     @Autowired
     lateinit var client: WebTestClient
