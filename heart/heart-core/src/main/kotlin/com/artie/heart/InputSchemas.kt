@@ -39,7 +39,7 @@ object InputSchemas {
 
     private val generator: SchemaGenerator =
         SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
-        .without(Option.SCHEMA_VERSION_INDICATOR)
+        .with(Option.SCHEMA_VERSION_INDICATOR)
         .with(
             JakartaValidationModule(
                 JakartaValidationOption.NOT_NULLABLE_FIELD_IS_REQUIRED,

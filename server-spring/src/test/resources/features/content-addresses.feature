@@ -16,19 +16,24 @@ Feature: Content addresses stay the same while HEART moves into a library
   with a crop of three spaces. The same three changed: the sow-seed schema
   and the two sets of an empty bed.
 
+  Changed again on 2026-10-11, when every generated schema began to name its
+  JSON Schema version with "$schema" (HAL-SCHEMA-FORMS-HR Rule 5). All three
+  schemas changed, and so did every affordance set, since each one carries a
+  schema or its integrity value. The hr:unavailable documents did not change.
+
   Scenario: Every content-addressed resource reachable from a bed is pinned
     When a client walks bed 2 through every state at L0, L1 and L2, following every content-addressed link
     Then the addresses it reached are exactly:
       | address                                  |
-      | /affordance-sets/sha256-00bb074be861484e |
-      | /affordance-sets/sha256-261ef481ebd0590a |
-      | /affordance-sets/sha256-4113cd1b7383f843 |
-      | /affordance-sets/sha256-783c24a647c96663 |
-      | /affordance-sets/sha256-b40f579feb74902b |
-      | /affordance-sets/sha256-c6875cb10cbcdbf1 |
-      | /schemas/sha256-7ab6ce2f03278bdf         |
-      | /schemas/sha256-d78168a708f5ba63         |
-      | /schemas/sha256-f2550e5d5e819058         |
+      | /affordance-sets/sha256-00cf08ff2405ee78 |
+      | /affordance-sets/sha256-7e3ca9cea617f22a |
+      | /affordance-sets/sha256-b8147ba339e26934 |
+      | /affordance-sets/sha256-cb7c51c766c9c5b9 |
+      | /affordance-sets/sha256-d12335cf83c54f13 |
+      | /affordance-sets/sha256-fb5cf62de6dbc0e2 |
+      | /schemas/sha256-6efcb63a723f14bc         |
+      | /schemas/sha256-7f232c04c52671dd         |
+      | /schemas/sha256-8547ad80c90a3125         |
       | /unavailable/sha256-0b7168a23ddb1595     |
       | /unavailable/sha256-1648f3dc5307f159     |
       | /unavailable/sha256-d1995ab17483fab3     |
