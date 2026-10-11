@@ -23,15 +23,15 @@ class HeartContentController(private val registry: HeartRegistry) {
 
     @GetMapping("/affordance-sets/{address}")
     fun affordanceSet(@PathVariable address: String): ResponseEntity<String> =
-        immutable(registry.affordanceSets[address], Dialect.JSONSCHEMA.mediaType)
+        immutable(registry.content.affordanceSets[address], Dialect.JSONSCHEMA.mediaType)
 
     @GetMapping("/schemas/{address}")
     fun schema(@PathVariable address: String): ResponseEntity<String> =
-        immutable(registry.schemas[address], SCHEMA_JSON)
+        immutable(registry.content.schemas[address], SCHEMA_JSON)
 
     @GetMapping("/unavailable/{address}")
     fun explanation(@PathVariable address: String): ResponseEntity<String> =
-        immutable(registry.explanations[address], MediaType.APPLICATION_JSON_VALUE)
+        immutable(registry.content.explanations[address], MediaType.APPLICATION_JSON_VALUE)
 
     private fun immutable(body: String?, type: String): ResponseEntity<String> =
         if (body == null) {
@@ -68,7 +68,7 @@ class HeartProfileController(registry: HeartRegistry) {
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(Profile.ALPS_MEDIA_TYPE))
             .header(HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
-            .eTag("\"alps-${ContentAddress.address(body).removePrefix("sha256-")}\"")
+            .eTag("\"alps-${ContentAddress.address(body)}\"")
             .body(body)
     }
 }

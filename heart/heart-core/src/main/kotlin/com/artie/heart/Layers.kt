@@ -21,7 +21,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         type.allActs.associate { it.name to ContentAddress.canonicalText(it.schema) }
 
     /** Address -> canonical schema, for `/schemas/{address}`. */
-    val schemas: Map<String, String> = schemaBodies.values.associateBy { ContentAddress.address(it) }
+    val schemas: Map<String, String> = SharedContent.named(schemaBodies.values)
 
     private val explanationByKey: Map<K, String> = type.offers.keys.associateWith { key ->
         val absent = type.acts.map { it.name } - type.offers.offered(key).toSet()
@@ -40,7 +40,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     }
 
     /** Address -> canonical explanation of the acts a key leaves out, for `/unavailable/{address}`. */
-    val explanations: Map<String, String> = explanationByKey.values.associateBy { ContentAddress.address(it) }
+    val explanations: Map<String, String> = SharedContent.named(explanationByKey.values)
 
     private val setByKey: Map<Pair<K, SetRendering>, String> =
         type.offers.keys.flatMap { key -> SetRendering.entries.map { key to it } }.associateWith { (key, rendering) ->
@@ -58,7 +58,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         }
 
     /** Address -> canonical affordance set, for `/affordance-sets/{address}`. */
-    val affordanceSets: Map<String, String> = setByKey.values.associateBy { ContentAddress.address(it) }
+    val affordanceSets: Map<String, String> = SharedContent.named(setByKey.values)
 
     /** The acts [key] offers, by name, in order. */
     fun offered(key: K): List<String> = type.offers.offered(key)

@@ -81,7 +81,7 @@ class IndexSteps(private val world: LampWorld) {
         assertEquals(target, form.path("_links").path("target").path("href").asText())
         assertFalse(form.path("_links").path("target").path("templated").asBoolean())
         assertEquals(listOf(field), form.path("schema").path("required").map { it.asText() })
-        assertTrue(form.path("schema").path("\$id").asText().startsWith("/schemas/sha256-"))
+        assertTrue(form.path("schema").path("\$id").asText().matches(Regex("/schemas/[0-9a-f]{16}")))
     }
 
     @Then(

@@ -54,7 +54,7 @@ resource whose response linked to, or embedded, the form.
   "hr:templatePointers": { "id": "/id" },
   "method": "POST",
   "contentType": "application/json",
-  "schema": { "$ref": "/schemas/sha256-db7bab9848b1b240", "hr:integrity": "sha256-…" }
+  "schema": { "$ref": "/schemas/db7bab9848b1b240", "hr:integrity": "sha256-…" }
 }
 ```
 
@@ -95,7 +95,7 @@ Both use the Subresource Integrity syntax: a hash algorithm (`sha256`,
 
 ```json
 "hr:forms": {
-  "href": "/affordance-sets/sha256-e16765e81df9b76f",
+  "href": "/affordance-sets/e16765e81df9b76f",
   "integrity": "sha256-4Wdl6B35t29fbzeifgr3sQnIDRyXH5BGwWGvIb7x5yQ="
 }
 ```
@@ -122,7 +122,7 @@ rule; it is off by default, and a link that does carry a value is always
 checked.
 
 **The client reads nothing from a URI.** A server may name content-addressed
-resources by their hash (for example `/schemas/sha256-db7bab9848b1b240`), or
+resources by their hash (for example `/schemas/db7bab9848b1b240`), or
 any other way. That is the server's own naming, and this profile defines no
 paths (Fielding's Rule 4: no fixed resource names). A client SHALL NOT read a
 hash, or any other meaning, from a URI. The expected digest comes only from
@@ -139,7 +139,7 @@ A form's `schema` MAY be a JSON Schema `$ref` to a separately fetched schema
 (SPEC §6.10.3, the L2 rung), with `hr:integrity` beside it:
 
 ```json
-"schema": { "$ref": "/schemas/sha256-db7bab9848b1b240", "hr:integrity": "sha256-…" }
+"schema": { "$ref": "/schemas/db7bab9848b1b240", "hr:integrity": "sha256-…" }
 ```
 
 The client fetches the referenced schema, checks it under Rule 2, and uses it
@@ -183,7 +183,7 @@ URI it expands to are the same form.
     "hr:templatePointers": { "id": "/id" },
     "method": "POST",
     "contentType": "application/json",
-    "schema": { "$ref": "/schemas/sha256-…", "hr:integrity": "sha256-…" }
+    "schema": { "$ref": "/schemas/…", "hr:integrity": "sha256-…" }
   }
 }
 ```

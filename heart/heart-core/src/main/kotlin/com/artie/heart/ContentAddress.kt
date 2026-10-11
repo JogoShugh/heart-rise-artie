@@ -23,8 +23,12 @@ object ContentAddress {
     fun canonicalText(json: String): String =
         Json.createReader(StringReader(json)).use { JsonCanonicalizer.canonize(it.readValue()) }
 
-    /** The resource name of a canonical [body]: `sha256-` and the first 16 hex digits of its digest. */
-    fun address(body: String): String = "sha256-" + hex(digest(body)).take(ADDRESS_HEX)
+    /**
+     * The resource name of a canonical [body]: the first 16 hex digits of its
+     * SHA-256 digest. It is a short name, not a digest, so it carries no
+     * `sha256-`; only [integrity], the full digest, is ever checked.
+     */
+    fun address(body: String): String = hex(digest(body)).take(ADDRESS_HEX)
 
     /** W3C Subresource Integrity of [body]: the full digest, never truncated (HAL-SCHEMA-FORMS-HR Rule 2). */
     fun integrity(body: String): String = "sha256-" + base64(digest(body))

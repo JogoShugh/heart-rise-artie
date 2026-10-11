@@ -43,7 +43,8 @@ class ContentAddressSteps(
             val exchange = fetched.getValue(path)
             assertEquals(200, exchange.status, path)
             val hex = MessageDigest.getInstance("SHA-256").digest(exchange.bytes).joinToString("") { "%02x".format(it) }
-            assertEquals(path.substringAfterLast("sha256-"), hex.take(path.substringAfterLast("sha256-").length), path)
+            val address = path.substringAfterLast('/')
+            assertEquals(address, hex.take(address.length), path)
         }
     }
 
@@ -70,6 +71,6 @@ class ContentAddressSteps(
 
     private companion object {
         val LINK_KEYS = setOf("href", "\$ref", "\$id")
-        val ADDRESS = Regex("^/(affordance-sets|schemas|unavailable)/sha256-[0-9a-f]+$")
+        val ADDRESS = Regex("^/(affordance-sets|schemas|unavailable)/[0-9a-f]+$")
     }
 }

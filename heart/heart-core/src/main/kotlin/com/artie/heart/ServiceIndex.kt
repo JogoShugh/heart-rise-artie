@@ -33,12 +33,12 @@ class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
     fun body(dialect: Dialect): String = bodies.getValue(dialect)
 
     /** The index's validator in [dialect]: it changes only when the body does. */
-    fun validator(dialect: Dialect): String = "\"index-${dialect.etagTag}-${hex(body(dialect))}\""
+    fun validator(dialect: Dialect): String = "\"index-${dialect.etagTag}-${ContentAddress.address(body(dialect))}\""
 
     /** The home document of a server that serves rungs up to [maxRung]. */
     fun home(maxRung: Rung): String = mapper.writeValueAsString(HomeDocument(found, this.title).at(maxRung))
 
-    fun homeValidator(maxRung: Rung): String = "\"index-home-${hex(home(maxRung))}\""
+    fun homeValidator(maxRung: Rung): String = "\"index-home-${ContentAddress.address(home(maxRung))}\""
 
     private fun schemaFormsIndex(): Map<String, Any> = mapOf(
         "title" to title,
@@ -120,8 +120,6 @@ class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
             "target" to "/${type.collection}",
             "properties" to listOf(property),
         )
-
-    private fun hex(text: String): String = ContentAddress.address(text).removePrefix("sha256-")
 
 }
 

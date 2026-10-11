@@ -10,6 +10,7 @@ import com.artie.heart.Search
 import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
+import com.artie.heart.SharedContent
 import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.californium.core.coap.CoAP.Code
@@ -34,6 +35,7 @@ internal class CoapRoutes(
     private val replies = CoapReplies(mapper)
     private val types: Map<String, Typed> = resources.associate { it.layers.type.collection to typed(it, mapper) }
     private val layers: List<Layers<*, *>> = resources.map { it.layers }
+    private val content = SharedContent(layers)
     private val profiles: Map<String, String> = layers.map { it.type.profile }.distinctBy { it.name }
         .associate { it.name to mapper.writeValueAsString(it.alps) }
 
@@ -71,9 +73,9 @@ internal class CoapRoutes(
         val address = segments.getOrNull(1)
         return when (segments.firstOrNull()) {
             null -> serviceIndex(request)
-            "affordance-sets" -> immutable(layers.firstNotNullOfOrNull { it.affordanceSets[address] }, HAL)
-            "schemas" -> immutable(layers.firstNotNullOfOrNull { it.schemas[address] }, CoapOptions.SCHEMA_JSON)
-            "unavailable" -> immutable(layers.firstNotNullOfOrNull { it.explanations[address] }, CoapOptions.JSON)
+            "affordance-sets" -> immutable(content.affordanceSets[address], HAL)
+            "schemas" -> immutable(content.schemas[address], CoapOptions.SCHEMA_JSON)
+            "unavailable" -> immutable(content.explanations[address], CoapOptions.JSON)
             "profiles" -> profiles[address]?.let { replies.document(it, CoapOptions.ALPS_JSON, DAY) }
             else -> null
         }

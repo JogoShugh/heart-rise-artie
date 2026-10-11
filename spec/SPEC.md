@@ -323,7 +323,7 @@ A H.E.A.R.T. response is organised into three layers. Whether those layers arriv
 ```json
 "_links": {
   "curies":   [{ "name": "hr", "href": "https://github.com/jogoshugh/heart-rise/rels/{rel}", "templated": true }],
-  "hr:forms": { "href": "/affordance-sets/sha256-…", "type": "application/hal+json" }
+  "hr:forms": { "href": "/affordance-sets/…", "type": "application/hal+json" }
 }
 ```
 
@@ -498,7 +498,7 @@ The cost is that L1 and L2 clients do not share affordance-set cache entries. Th
 
 **Scope of "the body" for Layer 3 (decided 2026-10-09):** the schema's own full content, with nothing stripped. It is canonicalized as above, and the server serves exactly those canonical bytes. 0.4 said "verbatim", which contradicts the canonicalization step: a hand-formatted schema served as written would not match its own digest. The rule is the same for both layers. **The digest is the SHA-256 of the response body, byte for byte.** It is the value integrity checks compare against; a server that names resources by digest uses the same value in the URL.
 
-**Naming is the server's (revised 2026-10-09).** The protocol defines no paths. What it requires of a Layer 2 or Layer 3 URL is that it names one body only: each distinct body gets its own URL, served `immutable`, and a URL is never reused for different bytes. How the server builds that URL is its own choice. The reference server uses the digest as the last path segment (`/affordance-sets/sha256-{digest}`, `/schemas/sha256-{digest}`), which meets the requirement by construction; any other scheme that meets it is equally conformant.
+**Naming is the server's (revised 2026-10-09).** The protocol defines no paths. What it requires of a Layer 2 or Layer 3 URL is that it names one body only: each distinct body gets its own URL, served `immutable`, and a URL is never reused for different bytes. How the server builds that URL is its own choice. The reference server uses the first 16 hex digits of the digest as the last path segment (`/affordance-sets/e16765e81df9b76f`), with no `sha256-` in front, because a short name is not a digest and should not look like one; any other scheme that meets the requirement is equally conformant.
 
 **Why the client reads nothing from a URL.** Fielding's Rule 4: "A REST API must not define fixed resource names or hierarchies", and a client that verified bytes against a digest in the path would make the path format part of the API. So a client SHALL NOT read a hash, or any other meaning, from a URI; the server tells it everything it needs in the representation. This is not a claim that REST requires opaque URIs. Fielding says it does not ("REST does not require that a URI be opaque… RESTful applications are… encouraged to use human-meaningful, hierarchical identifiers"), and the reference server's paths are readable on purpose. The W3C *Architecture of the World Wide Web* (§2.5: "Agents making use of URIs SHOULD NOT attempt to infer properties of the referenced resource") gives the same advice as general Web guidance. Earlier drafts had the client verify bytes against the digest in the path; that is withdrawn.
 
@@ -506,7 +506,7 @@ The cost is that L1 and L2 clients do not share affordance-set cache entries. Th
 
 **`Repr-Digest` is optional.** A server SHOULD send `Repr-Digest` (RFC 9530) on Layer 2 and Layer 3 responses. A client SHOULD check it when present and SHALL NOT require it: the header shows the bytes arrived intact, but a response cannot vouch for itself against substitution.
 
-**Digest truncation.** A server MAY truncate the digest for readability (e.g. 16 hex characters). The 0.3 text framed this as a straight readability/collision trade, which understates it. Under content addressing a collision does not merely waste a cache slot — it causes the wrong schema to be served under a URL another party's content minted, silently. At 64 bits, birthday collisions become practically reachable at scale, and second-preimage resistance is entirely absent against any party who can influence schema content. Truncated digests are acceptable **only** for closed-world development and demonstration servers where all content is authored by one trusted party. A production server that names resources by digest SHALL use the full digest. Integrity values (below) always carry the full digest, whatever the naming.
+**Digest truncation (revised 2026-10-11).** A server MAY name a body by part of its digest (the reference server uses 16 hex characters, 64 bits). Such a name is a short name, not a digest, and SHOULD NOT be written as one (no `sha256-` prefix). It is safe because nothing trusts it. The client checks bytes only against the full digest in the linking representation's integrity value (below), so a body served under the wrong name is refused, never used. The server SHALL NOT serve two different bodies under one name. Since every Layer 2 and Layer 3 body is computed from the declaration when the server starts, it checks this then and refuses to start on a clash, rather than keeping one body and silently dropping the other. Among a server's few dozen bodies, a 64-bit clash is about one chance in ten quadrillion. Layer 2 and Layer 3 bodies carry no instance data (§6.9.4), so no client or user can shape them to force one. A server whose shared content others can influence SHOULD name it by the full digest, because a clash of 64-bit names can be found with about 2³² tries. Integrity values always carry the full digest, whatever the naming.
 
 **Content addresses are not capability URLs.** A content address is a pure function of content. Anyone who can reconstruct the bytes can compute the URL without ever having been shown it, and a `200` on a speculatively-computed address confirms that content exists on that server. Content-addressed URLs SHALL NOT be treated as unguessable, and SHALL NOT be used as bearer capabilities. §6.9.4 and §6.9.5 set out what follows.
 
@@ -658,7 +658,7 @@ sequenceDiagram
     Client->>Server: GET /beds/2<br/>Prefer: forms=link
     Server-->>Client: 200 OK<br/>state + _links.forms href
 
-    Client->>Server: GET /affordance-sets/sha256-...
+    Client->>Server: GET /affordance-sets/...
     Server-->>Client: 200 OK<br/>_forms with embedded schema
 ```
 
@@ -680,10 +680,10 @@ sequenceDiagram
     Client->>Server: GET /beds/2<br/>Prefer: forms=link, schema=link
     Server-->>Client: 200 OK<br/>state + _links.forms href
 
-    Client->>Server: GET /affordance-sets/sha256-...
+    Client->>Server: GET /affordance-sets/...
     Server-->>Client: 200 OK<br/>_forms with schema.$ref and hr:integrity only
 
-    Client->>Server: GET /schemas/sha256-...
+    Client->>Server: GET /schemas/...
     Server-->>Client: 200 OK<br/>full schema body
 ```
 
@@ -705,18 +705,18 @@ sequenceDiagram
     participant Server
 
     ClientA->>Server: GET /beds/1
-    Server-->>ClientA: 200 OK<br/>_links.forms href = sha256-X
+    Server-->>ClientA: 200 OK<br/>_links.forms href = /affordance-sets/X
 
-    ClientA->>Cache: GET /affordance-sets/sha256-X
+    ClientA->>Cache: GET /affordance-sets/X
     Cache->>Server: cache miss — forward
     Server-->>Cache: 200 OK, Cache-Control: immutable
     Cache-->>ClientA: 200 OK
 
     ClientB->>Server: GET /beds/3
     Note right of ClientB: unrelated resource,<br/>same current status
-    Server-->>ClientB: 200 OK<br/>_links.forms href = sha256-X
+    Server-->>ClientB: 200 OK<br/>_links.forms href = /affordance-sets/X
 
-    ClientB->>Cache: GET /affordance-sets/sha256-X
+    ClientB->>Cache: GET /affordance-sets/X
     Note right of Cache: cache hit — Server never contacted
     Cache-->>ClientB: 200 OK
 ```

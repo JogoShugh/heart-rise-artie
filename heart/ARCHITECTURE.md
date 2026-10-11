@@ -69,7 +69,7 @@ The uniform interface has four parts:
 
 | Part | In HEART |
 |---|---|
-| Identification of resources | URIs; shared layers have content addresses (`/affordance-sets/sha256-…`) |
+| Identification of resources | URIs; shared layers have content addresses (`/affordance-sets/…`) |
 | Manipulation through representations | An act sends a body that satisfies the form's schema, with the representation's ETag in `If-Match` |
 | Self-descriptive messages | Media type, profile `Link`, `Preference-Applied`, `Vary`, ETag, and RFC 9457 problem types say what each message is |
 | Hypermedia as the engine of application state | The forms in each response are the only source of what the client may do next |
@@ -96,8 +96,8 @@ fetched fresh and the parts that do not can be cached forever (§6.4, §6.5).
 ```mermaid
 flowchart TB
   L1["Layer 1: the resource<br/>/beds/2<br/>state, changes often<br/>Cache-Control: no-cache"]
-  L2["Layer 2: the affordance set<br/>/affordance-sets/sha256-…<br/>the forms legal in one state<br/>immutable"]
-  L3["Layer 3: the schemas<br/>/schemas/sha256-…<br/>one per act input<br/>immutable"]
+  L2["Layer 2: the affordance set<br/>/affordance-sets/…<br/>the forms legal in one state<br/>immutable"]
+  L3["Layer 3: the schemas<br/>/schemas/…<br/>one per act input<br/>immutable"]
   L1 -->|"hr:forms link, with integrity"| L2
   L2 -->|"$ref, with hr:integrity"| L3
 ```
@@ -115,9 +115,9 @@ set:
 
 ```mermaid
 flowchart LR
-  B1["/beds/2<br/>PLANTED"] --> S["/affordance-sets/sha256-X<br/>garden:water-cell"]
+  B1["/beds/2<br/>PLANTED"] --> S["/affordance-sets/X<br/>garden:water-cell"]
   B4["/beds/4<br/>PLANTED"] --> S
-  B3["/beds/3<br/>READY_TO_HARVEST"] --> T["/affordance-sets/sha256-Y<br/>garden:harvest"]
+  B3["/beds/3<br/>READY_TO_HARVEST"] --> T["/affordance-sets/Y<br/>garden:harvest"]
 ```
 
 This works because the acts offered depend on the state's key alone, never
@@ -162,7 +162,7 @@ sequenceDiagram
   participant S as Server
   C->>S: GET /beds/2, Prefer: forms=link
   S-->>C: 200, Preference-Applied: forms=link<br/>state + hr:forms link
-  C->>S: GET /affordance-sets/sha256-…
+  C->>S: GET /affordance-sets/…
   S-->>C: 200 immutable: _forms with schemas inline
 ```
 
@@ -174,9 +174,9 @@ sequenceDiagram
   participant S as Server
   C->>S: GET /beds/2, Prefer: forms=link, schema=link
   S-->>C: 200: state + hr:forms link
-  C->>S: GET /affordance-sets/sha256-…
+  C->>S: GET /affordance-sets/…
   S-->>C: 200 immutable: each schema is $ref + hr:integrity
-  C->>S: GET /schemas/sha256-…
+  C->>S: GET /schemas/…
   S-->>C: 200 immutable: the schema
 ```
 
@@ -192,14 +192,14 @@ sequenceDiagram
   participant K as Shared cache
   participant S as Server
   A->>S: GET /beds/2
-  S-->>A: hr:forms = sha256-X
-  A->>K: GET /affordance-sets/sha256-X
+  S-->>A: hr:forms = /affordance-sets/X
+  A->>K: GET /affordance-sets/X
   K->>S: miss
   S-->>K: 200 immutable
   K-->>A: 200
   B->>S: GET /beds/4 (same state)
-  S-->>B: hr:forms = sha256-X
-  B->>K: GET /affordance-sets/sha256-X
+  S-->>B: hr:forms = /affordance-sets/X
+  B->>K: GET /affordance-sets/X
   K-->>B: 200 from cache, server not asked
 ```
 

@@ -685,6 +685,17 @@ did match. It now has its own problem type, `rule-refused`, still 422 with
 `violations`, so a client can tell "I built the body wrong" from "the
 resource's state says no". SPEC §6.2 lists five types.
 
+Later the same day: generated schemas now declare `$schema` (HAL-SCHEMA-FORMS
+Rule 5), and content addresses lost their `sha256-` prefix. Sixteen hex
+digits are a short name, not a digest; only the full integrity value is
+checked, so the name should not look like one. A clash of two different
+bodies under one name, about one chance in ten quadrillion, used to keep one
+body and drop the other without a word, because the maps were built with
+`associateBy`. Every binding now serves Layers 2 and 3 from one
+`SharedContent`, which refuses to start on a clash. SPEC §6.5's truncation
+paragraph is rewritten to match. Addresses are not kept stable for their own
+sake: nothing is in production.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

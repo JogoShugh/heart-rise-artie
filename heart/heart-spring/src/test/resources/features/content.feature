@@ -25,9 +25,9 @@ Feature: Content-addressed resources and profiles, served over HTTP from a decla
 
     Examples:
       | path                                     |
-      | /affordance-sets/sha256-0000000000000000 |
-      | /schemas/sha256-0000000000000000         |
-      | /unavailable/sha256-0000000000000000     |
+      | /affordance-sets/0000000000000000 |
+      | /schemas/0000000000000000         |
+      | /unavailable/0000000000000000     |
 
   Scenario: The ALPS profile describes every relation, and can be revalidated
     When a client gets "/profiles/home"
