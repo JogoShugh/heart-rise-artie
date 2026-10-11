@@ -1,8 +1,11 @@
 package com.artie.heart.spring
 
+import com.artie.heart.Rung
 import com.artie.heart.ServiceIndex
+import com.artie.heart.ServingLimits
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.hateoas.config.EnableHypermediaSupport
@@ -20,10 +23,7 @@ import org.springframework.web.reactive.function.server.coRouter
  */
 @AutoConfiguration
 @EnableHypermediaSupport(type = [HypermediaType.HAL_FORMS])
-@Import(
-    HeartRegistry::class, HeartHandlers::class, ServingLimits::class,
-    HeartContentController::class, HeartProfileController::class,
-)
+@Import(HeartRegistry::class, HeartHandlers::class, HeartContentController::class, HeartProfileController::class)
 class HeartAutoConfiguration {
 
     /**
@@ -51,11 +51,20 @@ class HeartAutoConfiguration {
      * names the API; by default, its first profile's title does.
      */
     @Bean
+    @ConditionalOnMissingBean
     fun serviceIndex(
         registry: HeartRegistry,
         @Value("\${heart.title:}") title: String,
     ): ServiceIndex =
         ServiceIndex(registry.layers.map { it.type }, title.ifBlank { null })
+
+    /** Shared by every binding a server uses; the first auto-configuration to run defines it. */
+    @Bean
+    @ConditionalOnMissingBean
+    fun servingLimits(
+        @Value("\${heart.max-rung:L2}") maxRung: Rung,
+        @Value("\${heart.page-size:${ServingLimits.DEFAULT_PAGE_SIZE}}") pageSize: Int,
+    ): ServingLimits = ServingLimits(maxRung, pageSize)
 
     @Bean
     fun heartIndexHandler(index: ServiceIndex, limits: ServingLimits) = HeartIndexHandler(index, limits)

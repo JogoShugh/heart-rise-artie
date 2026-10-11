@@ -1,6 +1,6 @@
 package com.artie.gardenbed.bdd
 
-import com.artie.heart.spring.ServingLimits
+import com.artie.heart.ServingLimits
 import io.cucumber.java.After
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then

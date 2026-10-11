@@ -1,6 +1,7 @@
 package com.artie.heart.spring
 
 import com.artie.heart.HeartResource
+import com.artie.heart.ServingLimits
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Component
 

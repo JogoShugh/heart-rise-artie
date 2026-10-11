@@ -1,8 +1,14 @@
-package com.artie.gardenbed.coap
+package com.artie.heart.coap
 
-import com.artie.gardenbed.web.Problems
 import com.artie.heart.Dialect
 import com.artie.heart.HEART_RISE_PROFILE
+import com.artie.heart.MalformedActBodyException
+import com.artie.heart.NotOfferedException
+import com.artie.heart.PROBLEM_TYPES
+import com.artie.heart.PreconditionRequiredException
+import com.artie.heart.ResourceNotFoundException
+import com.artie.heart.StaleWriteConflict
+import com.artie.heart.UnprocessableContentException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.coap.Option
@@ -34,12 +40,7 @@ internal class CoapReplies(private val objectMapper: ObjectMapper) {
         }
 
     /** A resource that never changes at its URI (SPEC §6.5). */
-    fun immutable(body: String, contentFormat: Int): Response =
-        Response(ResponseCode.CONTENT).apply {
-            payload = body.toByteArray(Charsets.UTF_8)
-            options.contentFormat = contentFormat
-            options.maxAge = YEAR
-        }
+    fun immutable(body: String, contentFormat: Int): Response = document(body, contentFormat, YEAR)
 
     /** Any other document, cached as long as [maxAge] says. */
     fun document(body: String, contentFormat: Int, maxAge: Long): Response =
@@ -49,8 +50,39 @@ internal class CoapReplies(private val objectMapper: ObjectMapper) {
             options.maxAge = maxAge
         }
 
+    /**
+     * The answer for [failure], or null when it is not a refusal this binding
+     * knows. CoAP has no 4.28, so precondition required is 4.00 and the problem
+     * type tells it apart (SPEC §6.0.1).
+     */
+    fun refusal(failure: Throwable): Response? = when (failure) {
+        is PreconditionRequiredException ->
+            problem(ResponseCode.BAD_REQUEST, "precondition-required", "If-Match is required", failure.message)
+        is StaleWriteConflict -> problem(
+            ResponseCode.PRECONDITION_FAILED, "stale", "The act is stale: the state has changed", failure.message,
+        )
+        is NotOfferedException -> problem(
+            ResponseCode.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
+            failure.message, listOfNotNull(failure.rel?.let { "rel" to it }).toMap(),
+        )
+        is UnprocessableContentException -> problem(
+            ResponseCode.UNPROCESSABLE_ENTITY, "invalid-input", "The body does not match the form's schema",
+            failure.message, mapOf("violations" to failure.violations),
+        )
+        is MalformedActBodyException -> error(ResponseCode.BAD_REQUEST, failure.message)
+        is ResourceNotFoundException -> error(ResponseCode.NOT_FOUND, failure.message)
+        else -> null
+    }
+
+    /** An error that is not a refusal of an act. */
+    fun error(code: ResponseCode, message: String?): Response =
+        Response(code).apply {
+            payload = bytes(mapOf("error" to (message ?: code.name)))
+            options.contentFormat = CoapOptions.JSON
+        }
+
     /** An RFC 9457 problem details object (SPEC §6.2). CoAP has no HTTP status, so none is given. */
-    fun problem(
+    private fun problem(
         code: ResponseCode,
         type: String,
         title: String,
@@ -58,17 +90,10 @@ internal class CoapReplies(private val objectMapper: ObjectMapper) {
         members: Map<String, Any> = emptyMap(),
     ): Response =
         Response(code).apply {
-            val problem = mapOf("type" to Problems.BASE + type, "title" to title) +
+            val problem = mapOf("type" to PROBLEM_TYPES + type, "title" to title) +
                 listOfNotNull(detail?.let { "detail" to it }) + members
             payload = bytes(problem)
             options.contentFormat = CoapOptions.PROBLEM_JSON
-        }
-
-    /** An error that is not a refusal of an act. */
-    fun error(code: ResponseCode, message: String?): Response =
-        Response(code).apply {
-            payload = bytes(mapOf("error" to (message ?: code.name)))
-            options.contentFormat = CoapOptions.JSON
         }
 
     private fun bytes(body: Any): ByteArray = when (body) {

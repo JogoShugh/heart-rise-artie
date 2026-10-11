@@ -4,6 +4,7 @@ import com.artie.heart.ActPipeline
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.Rung
+import com.artie.heart.ServingLimits
 import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.hateoas.EntityModel

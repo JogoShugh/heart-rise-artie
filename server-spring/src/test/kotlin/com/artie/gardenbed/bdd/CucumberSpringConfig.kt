@@ -1,9 +1,9 @@
 package com.artie.gardenbed.bdd
 
-import com.artie.gardenbed.coap.CoapFrontDoor
 import com.artie.gardenbed.config.HeartConfig
 import com.artie.gardenbed.web.BedActs
 import com.artie.gardenbed.web.GardenRoutes
+import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.spring.HeartAutoConfiguration
 import io.cucumber.spring.CucumberContextConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
@@ -18,9 +18,8 @@ import org.springframework.test.context.TestPropertySource
 @WebFluxTest
 @Import(
     InMemoryGardenBedsConfig::class, HttpWorld::class, BedActs::class, GardenRoutes::class,
-    CoapFrontDoor::class,
-    // The garden's declaration, served by the HEART library's own controllers.
-    HeartConfig::class, HeartAutoConfiguration::class,
+    // The garden's declaration, served over HTTP and CoAP by the HEART library.
+    HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class,
 )
 // SPEC §6.0.1: the CoAP front door on a free UDP port, beside the HTTP slice.
 @TestPropertySource(properties = ["heart.coap.port=0"])

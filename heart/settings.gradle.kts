@@ -4,3 +4,4 @@ rootProject.name = "heart"
 // A server includes this build and depends on com.artie.heart:<module>.
 include("heart-core")
 include("heart-spring")
+include("heart-coap")

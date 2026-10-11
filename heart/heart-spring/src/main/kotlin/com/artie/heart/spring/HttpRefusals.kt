@@ -3,6 +3,7 @@ package com.artie.heart.spring
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
+import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.PreconditionRequiredException
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.StaleWriteConflict
@@ -21,12 +22,10 @@ import java.net.URI
  * plain errors, as before.
  */
 object HttpRefusals {
-    const val PROBLEM_BASE = "https://github.com/jogoshugh/heart-rise/problems/"
-
     /** The problem for [type] at [status], as a body any binding can send. */
     fun problem(status: HttpStatus, type: String, title: String, detail: String?, members: Map<String, Any>) =
         ProblemDetail.forStatusAndDetail(status, detail).apply {
-            this.type = URI.create(PROBLEM_BASE + type)
+            this.type = URI.create(PROBLEM_TYPES + type)
             this.title = title
             members.forEach { (name, value) -> setProperty(name, value) }
         }

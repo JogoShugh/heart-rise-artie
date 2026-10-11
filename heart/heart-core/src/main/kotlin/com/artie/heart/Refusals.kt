@@ -6,6 +6,13 @@ package com.artie.heart
  * does not satisfy the schema (422). Each binding maps them to its own codes.
  */
 
+/**
+ * SPEC §6.2: every refusal of an act is an RFC 9457 problem details object,
+ * whose `type` is this base followed by the refusal's name, so a client tells
+ * refusals apart without reading `title` or `detail`.
+ */
+const val PROBLEM_TYPES = "https://github.com/jogoshugh/heart-rise/problems/"
+
 /** 428: a state-changing request arrived without a validator. */
 class PreconditionRequiredException(message: String) : RuntimeException(message)
 

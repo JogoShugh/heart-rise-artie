@@ -63,8 +63,8 @@ dependencies {
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
 
-    // SPEC §6.0.1: the CoAP binding (RFC 7252), a second front door beside HTTP.
-    implementation("org.eclipse.californium:californium-core:3.14.0")
+    // SPEC §6.0.1: HEART over CoAP (RFC 7252), a second front door beside HTTP.
+    implementation("com.artie.heart:heart-coap")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")

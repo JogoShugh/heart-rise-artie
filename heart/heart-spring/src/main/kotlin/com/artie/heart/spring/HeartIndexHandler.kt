@@ -6,6 +6,7 @@ import com.artie.heart.Negotiation
 import com.artie.heart.Search
 import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
+import com.artie.heart.ServingLimits
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType

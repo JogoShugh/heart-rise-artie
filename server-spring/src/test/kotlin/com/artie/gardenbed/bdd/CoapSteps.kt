@@ -1,8 +1,8 @@
 package com.artie.gardenbed.bdd
 
-import com.artie.gardenbed.coap.CoapFrontDoor
-import com.artie.gardenbed.coap.CoapOptions
 import com.artie.gardenbed.domain.GardenBedState
+import com.artie.heart.coap.CoapFrontDoor
+import com.artie.heart.coap.CoapOptions
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.java.After

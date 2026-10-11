@@ -1,4 +1,4 @@
-package com.artie.gardenbed.coap
+package com.artie.heart.coap
 
 import org.eclipse.californium.core.coap.option.EmptyOptionDefinition
 import org.eclipse.californium.core.coap.option.MapBasedOptionRegistry

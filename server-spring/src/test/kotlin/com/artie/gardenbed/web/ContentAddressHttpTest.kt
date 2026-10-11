@@ -3,6 +3,7 @@ package com.artie.gardenbed.web
 import com.artie.gardenbed.config.HeartConfig
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.service.GardenBedService
+import com.artie.heart.ContentAddress
 import com.artie.heart.SetRendering
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -52,9 +53,12 @@ class ContentAddressHttpTest {
         return body!!
     }
 
+    private fun setHash(status: GardenBedStatus, rendering: SetRendering): String =
+        ContentAddress.address(GardenBeds.layers.affordanceSet(status, rendering)).removePrefix("sha256-")
+
     @Test
     fun `each schema URL is the sha256 of the bytes served at it`() {
-        for (hash in JsonSchemaDialectSupport.schemasByHash.keys) {
+        for (hash in GardenBeds.layers.schemas.keys.map { it.removePrefix("sha256-") }) {
             val served = fetchBytes("/schemas/sha256-$hash")
             assertEquals(hash, sha256Hex16(served), "served schema bytes don't hash to their own URL")
         }
@@ -63,7 +67,7 @@ class ContentAddressHttpTest {
     @Test
     fun `each affordance-set URL is the sha256 of the bytes served at it`() {
         for (status in GardenBedStatus.entries) for (rendering in SetRendering.entries) {
-            val hash = JsonSchemaDialectSupport.affordanceSetHashFor(status, rendering)
+            val hash = setHash(status, rendering)
             val served = fetchBytes("/affordance-sets/sha256-$hash")
             assertEquals(
                 hash, sha256Hex16(served),
@@ -74,8 +78,8 @@ class ContentAddressHttpTest {
 
     @Test
     fun `L1 and L2 renderings are different bytes at different URLs`() {
-        val l1 = JsonSchemaDialectSupport.affordanceSetHashFor(GardenBedStatus.EMPTY, SetRendering.EMBEDDED_SCHEMAS)
-        val l2 = JsonSchemaDialectSupport.affordanceSetHashFor(GardenBedStatus.EMPTY, SetRendering.SCHEMA_POINTERS)
+        val l1 = setHash(GardenBedStatus.EMPTY, SetRendering.EMBEDDED_SCHEMAS)
+        val l2 = setHash(GardenBedStatus.EMPTY, SetRendering.SCHEMA_POINTERS)
         val embedded = String(fetchBytes("/affordance-sets/sha256-$l1"))
         val pointers = String(fetchBytes("/affordance-sets/sha256-$l2"))
 
