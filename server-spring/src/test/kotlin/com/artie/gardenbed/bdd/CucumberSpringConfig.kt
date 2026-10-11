@@ -1,7 +1,7 @@
 package com.artie.gardenbed.bdd
 
 import com.artie.gardenbed.config.HeartConfig
-import com.artie.gardenbed.web.BedActs
+import com.artie.gardenbed.declaration.BedActs
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.spring.HeartAutoConfiguration
 import io.cucumber.spring.CucumberContextConfiguration

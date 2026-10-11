@@ -1,9 +1,9 @@
 package com.artie.gardenbed.bdd
 
+import com.artie.gardenbed.domain.GARDEN_BEDS
 import com.artie.gardenbed.domain.GardenBedAggregate
 import com.artie.gardenbed.domain.GardenBedEvent
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
-import com.artie.gardenbed.service.GARDEN_BEDS
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import kotlinx.coroutines.flow.asFlow

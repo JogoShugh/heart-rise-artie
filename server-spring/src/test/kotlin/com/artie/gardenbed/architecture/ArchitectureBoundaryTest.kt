@@ -15,7 +15,7 @@ class ArchitectureBoundaryTest {
         "org.springframework.web",
         "org.springframework.http",
         "org.springframework.hateoas",
-        "com.artie.gardenbed.web",
+        "com.artie.gardenbed.declaration",
         "com.artie.gardenbed.service",
         "com.artie.gardenbed.eventstore",
     )

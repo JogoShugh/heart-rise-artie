@@ -1,10 +1,10 @@
-package com.artie.gardenbed.web
+package com.artie.gardenbed.declaration
 
+import com.artie.gardenbed.declaration.dto.HarvestRequest
+import com.artie.gardenbed.declaration.dto.SowSeedRequest
+import com.artie.gardenbed.declaration.dto.WaterCellRequest
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
-import com.artie.gardenbed.web.dto.HarvestRequest
-import com.artie.gardenbed.web.dto.SowSeedRequest
-import com.artie.gardenbed.web.dto.WaterCellRequest
 import com.artie.heart.Act
 import com.artie.heart.Finding
 import com.artie.heart.Layers

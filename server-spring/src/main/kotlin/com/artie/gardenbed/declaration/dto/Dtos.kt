@@ -1,4 +1,4 @@
-package com.artie.gardenbed.web.dto
+package com.artie.gardenbed.declaration.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Max

@@ -1,4 +1,4 @@
-package com.artie.gardenbed.web
+package com.artie.gardenbed.declaration
 
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.heart.AlpsType
@@ -6,20 +6,14 @@ import com.artie.heart.Profile
 import com.artie.heart.Relation
 
 /**
- * The garden domain's link relations (SPEC §6.1, §8.5; HAL-SCHEMA-FORMS-HR
- * Rules 6 and 7), as a heart-core [Profile]. In HAL Schema Forms each form is
- * keyed by a relation, written as the CURIE `garden:<id>`, which expands to
- * `/profiles/garden#<id>`: a descriptor in this server's ALPS profile
- * document. HAL-FORMS keeps the logical names (`sowSeed`) as template names,
- * so this object also maps each logical name to its relation.
+ * The garden's vocabulary (SPEC §6.1, §8.5): five relations, served as ALPS at
+ * `/profiles/garden` and named in forms by the CURIE `garden:<id>`; and why
+ * each act is absent in each status (SPEC §6.12).
  */
 object GardenProfile {
-    const val PATH = "/profiles/garden"
-    const val CURIE = "garden"
-    const val ALPS_MEDIA_TYPE = Profile.ALPS_MEDIA_TYPE
 
     val profile = Profile(
-        name = CURIE,
+        name = "garden",
         title = "Garden beds",
         doc = "The acts and searches a garden-bed service offers. A descriptor says what a " +
             "relation means; only a resource's current manifest says whether it is offered now.",
@@ -67,26 +61,9 @@ object GardenProfile {
         ),
     )
 
-    /** Each logical name's relation id. */
-    private val ids: Map<String, String> = mapOf(
-        "sowSeed" to "sow-seed",
-        "waterCell" to "water-cell",
-        "harvest" to "harvest",
-        "searchBeds" to "search-beds",
-        "getBed" to "get-bed",
-    )
-
-    /** The `_links.curies` entry every representation with relation-named forms declares. */
-    val CURIES: List<Map<String, Any>> = profile.curies
-
-    fun relation(name: String): Relation = profile.relation(ids.getValue(name))
-
-    /** The acts a bed can offer, by logical name. */
-    val BED_ACTS: List<String> = listOf("sowSeed", "waterCell", "harvest")
-
     /**
-     * Why an act is absent in a status (SPEC §6.12). A function of status
-     * alone: no instance identifiers, so every bed in one state shares it.
+     * Why act [name] is absent in [status]. A function of status alone: no
+     * instance identifiers, so every bed in one state shares it.
      */
     fun whyAbsent(status: GardenBedStatus, name: String): String =
         when (status) {
@@ -103,13 +80,4 @@ object GardenProfile {
                 else -> "The crop is ready; it needs harvesting, not more water."
             }
         }
-
-    /** The form's key in `_forms`: the CURIE for [name]'s relation. */
-    fun key(name: String): String = profile.key(ids.getValue(name))
-
-    /** The relation as a URI reference, resolved against the request URL (used in 409 problem bodies). */
-    fun reference(name: String): String = profile.reference(ids.getValue(name))
-
-    /** The ALPS profile document (draft-amundsen-richardson-foster-alps). */
-    val alps: Map<String, Any> = profile.alps
 }

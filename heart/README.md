@@ -134,6 +134,6 @@ the profile.
 - The lamp: `heart-core/src/testFixtures/.../fixtures/Lamps.kt`, served and
   checked in `heart-tck/src/test/.../lamp/LampTck.kt`.
 - The garden: `server-spring/src/main/kotlin/com/artie/gardenbed/`
-  (`web/GardenBeds.kt`, `config/HeartConfig.kt`).
+  (`declaration/GardenBeds.kt`, `config/HeartConfig.kt`).
 
 Build: `./gradlew check` (Java 21; the event-store features need Docker).

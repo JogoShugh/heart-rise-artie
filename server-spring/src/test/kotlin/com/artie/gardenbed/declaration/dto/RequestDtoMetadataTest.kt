@@ -1,4 +1,4 @@
-package com.artie.gardenbed.web.dto
+package com.artie.gardenbed.declaration.dto
 
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

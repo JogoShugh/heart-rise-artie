@@ -2,10 +2,10 @@ package com.artie.gardenbed.config
 
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
-import com.artie.gardenbed.service.GARDEN_BEDS
+import com.artie.gardenbed.declaration.BedActs
+import com.artie.gardenbed.declaration.GardenBeds
+import com.artie.gardenbed.domain.GARDEN_BEDS
 import com.artie.gardenbed.service.GardenBedService
-import com.artie.gardenbed.web.BedActs
-import com.artie.gardenbed.web.GardenBeds
 import com.artie.heart.Acted
 import com.artie.heart.Found
 import com.artie.heart.HeartResource

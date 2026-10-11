@@ -1,15 +1,15 @@
-package com.artie.gardenbed.web
+package com.artie.gardenbed.declaration
 
 import com.artie.gardenbed.config.HeartConfig
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.heart.ContentAddress
 import com.artie.heart.SetRendering
+import com.artie.heart.spring.HeartAutoConfiguration
+import com.artie.heart.spring.HeartContentController
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import com.artie.heart.spring.HeartAutoConfiguration
-import com.artie.heart.spring.HeartContentController
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.mock.mockito.MockBean

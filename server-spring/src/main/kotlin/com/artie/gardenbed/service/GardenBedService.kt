@@ -1,15 +1,14 @@
 package com.artie.gardenbed.service
 
+import com.artie.gardenbed.declaration.dto.HarvestResult
+import com.artie.gardenbed.domain.GARDEN_BEDS
 import com.artie.gardenbed.domain.GardenBedAggregate
 import com.artie.gardenbed.domain.GardenBedEvent
-import com.artie.gardenbed.domain.GardenBedProjector
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
-import com.artie.gardenbed.web.dto.HarvestResult
 import com.artie.heart.NotOfferedException
 import com.artie.heart.ResourceNotFoundException
-import com.artie.heart.eventsourcing.EventSourcing
 import com.artie.heart.eventsourcing.EventStore
 import com.artie.heart.eventsourcing.Recorded
 import kotlinx.coroutines.flow.toList
@@ -21,24 +20,6 @@ class BedNotFoundException(id: Long) : ResourceNotFoundException("No garden bed 
 
 /** 409: the domain's own guard, refused as heart-core's not-offered. [rel] is the act tried, when known. */
 class InvalidTransitionException(message: String, rel: String? = null) : NotOfferedException(message, rel)
-
-/**
- * How a garden bed is event-sourced (heart-eventsourcing): its stream, its
- * event types by the names stored with them, and the fold. A bed's label
- * is not an event: it lives with the bed's identity, and is set on the
- * folded state when a bed is read.
- */
-val GARDEN_BEDS: EventSourcing<GardenBedEvent, GardenBedState> = EventSourcing(
-    stream = "garden-bed",
-    types = mapOf(
-        "SeedSown" to GardenBedEvent.SeedSown::class.java,
-        "CellWatered" to GardenBedEvent.CellWatered::class.java,
-        "BedHarvested" to GardenBedEvent.BedHarvested::class.java,
-    ),
-    stateClass = GardenBedState::class.java,
-    empty = { id -> GardenBedState.empty(id, label = "") },
-    apply = GardenBedProjector::apply,
-)
 
 @Service
 class GardenBedService(

@@ -1,10 +1,10 @@
-package com.artie.gardenbed.web
+package com.artie.gardenbed.declaration
 
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.service.GardenBedService
-import com.artie.gardenbed.web.dto.HarvestResult
-import com.artie.gardenbed.web.dto.SowSeedRequest
-import com.artie.gardenbed.web.dto.WaterCellRequest
+import com.artie.gardenbed.declaration.dto.HarvestResult
+import com.artie.gardenbed.declaration.dto.SowSeedRequest
+import com.artie.gardenbed.declaration.dto.WaterCellRequest
 import com.artie.heart.ActInput
 import org.springframework.stereotype.Component
 

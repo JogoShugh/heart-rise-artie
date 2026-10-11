@@ -5,8 +5,8 @@ import com.artie.gardenbed.bdd.InMemoryBeds
 import com.artie.gardenbed.bdd.InMemoryGardenBedsConfig
 import com.artie.gardenbed.bdd.putBed
 import com.artie.gardenbed.config.HeartConfig
+import com.artie.gardenbed.declaration.BedActs
 import com.artie.gardenbed.domain.GardenBedStatus
-import com.artie.gardenbed.web.BedActs
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.spring.HeartAutoConfiguration
 import com.artie.heart.tck.TckAct
