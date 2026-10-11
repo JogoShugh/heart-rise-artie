@@ -59,7 +59,16 @@ worlds, with the same cases:
   generated (springdoc) from controllers? Hand-written may be fairer to
   OpenAPI's best case; generated is what most teams ship.
 - Same model, same prompts, same cases for every agent; how is "same prompt"
-  defined when the tool lists differ?
+  defined when the tool lists differ? The API description is the one thing
+  that must differ: OpenAPI gives every operation as a tool in every state,
+  HEART gives only the forms offered now. Everything else must match: the
+  model and its settings, the user's request, the starting state, the
+  system instructions outside the API part, and the turn limit. Suggested
+  approach: one shared system prompt with no domain tips, only the tool or
+  form section swapped. Then a second round where the OpenAPI agent also
+  gets the tips a good team would write ("check the bed's status before
+  acting"), to see whether HEART still does better against OpenAPI at its
+  best.
 - Do the other domains (tickets, basketball) get twins too, to check the
   result holds beyond the garden?
 
