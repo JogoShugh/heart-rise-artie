@@ -108,6 +108,22 @@ val liveTest by tasks.registering(Test::class) {
     outputs.upToDateWhen { false }
 }
 
+// Runs only the @explore scenarios: ARTIE explores the running HEART server at
+// ARTIE_BASE_URL from its bookmark, with the domain's samples (ARTIE_SAMPLES) and
+// reset command (ARTIE_RESET). The same task explores any domain; Buster
+// campaigns use it as their client (scripts/buster-campaign.sh).
+val exploreTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "Explores a running HEART server from its bookmark, with a domain's samples."
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    systemProperty("cucumber.filter.tags", "@explore")
+    liveEnvironment(System.getenv("HEART_MAX_RUNG") ?: "L2")
+    System.getenv("ARTIE_SAMPLES")?.let { environment("ARTIE_SAMPLES", it) }
+    outputs.upToDateWhen { false }
+}
+
 /** What a scenario against the running server needs: where it is, how to reset it, where events go. */
 fun Test.liveEnvironment(servedRung: String) {
     environment("ARTIE_BASE_URL", System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080")

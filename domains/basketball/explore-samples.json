@@ -1,0 +1,20 @@
+{
+  "search": {"rel": "basketball:search-games", "fields": {"name": "Eagles"}, "item": "Eagles v Marauders"},
+  "maxSteps": 30,
+  "acts": {
+    "basketball:tip-off": [{"possession": "home"}],
+    "basketball:score-basket": [
+      {"team": "home", "playerNumber": 23, "points": 2},
+      {"team": "away", "playerNumber": 7, "points": 3},
+      {"team": "home", "playerNumber": 11, "points": 3}
+    ],
+    "basketball:free-throw": [{"team": "away", "playerNumber": 15, "made": true}],
+    "basketball:record-foul": [{"team": "home", "playerNumber": 4, "kind": "personal"}],
+    "basketball:turnover": [{"team": "away", "reason": "steal"}],
+    "basketball:call-timeout": [{"team": "home"}],
+    "basketball:resume-play": [{}],
+    "basketball:end-period": [{}, {}, {}, {}],
+    "basketball:start-period": [{}, {}, {}],
+    "basketball:final-whistle": [{}]
+  }
+}
