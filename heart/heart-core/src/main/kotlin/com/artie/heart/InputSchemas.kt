@@ -18,6 +18,7 @@ import com.networknt.schema.SchemaValidatorsConfig
 import com.networknt.schema.SpecVersion
 import com.networknt.schema.ValidationMessage
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.NotBlank
 
 /**
  * An act's JSON Schema (draft 2020-12), generated from its input class:
@@ -27,6 +28,14 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 object InputSchemas {
     private val mapper = ObjectMapper()
+
+    /**
+     * Some character that is not white space. JSON Schema searches for a
+     * pattern anywhere in the value, while HAL-FORMS clients that behave like
+     * HTML match `regex` against the whole value, so the pattern means the
+     * same under both.
+     */
+    private const val NOT_BLANK = "[\\s\\S]*\\S[\\s\\S]*"
 
     private val generator: SchemaGenerator =
         SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
@@ -43,6 +52,18 @@ object InputSchemas {
             forFields().withInstanceAttributeOverride { node, field, _ ->
                 val examples = field.getAnnotationConsideringFieldAndGetter(Schema::class.java)?.examples.orEmpty()
                 if (examples.isNotEmpty()) node.putArray("examples").addAll(examples.map(::exampleValue))
+            }
+            // @NotBlank is at least one character that is not white space. The Jakarta module
+            // says only minLength 1, which lets "   " through, so a pattern says the rest.
+            // A field with its own @Pattern keeps it, and the not-blank rule goes beside it.
+            forFields().withInstanceAttributeOverride { node, field, _ ->
+                if (field.getAnnotationConsideringFieldAndGetter(NotBlank::class.java) != null) {
+                    if (node.has("pattern")) {
+                        node.putArray("allOf").addObject().put("pattern", NOT_BLANK)
+                    } else {
+                        node.put("pattern", NOT_BLANK)
+                    }
+                }
             }
             // An input with no fields still says it takes an object with no properties.
             forTypesInGeneral().withTypeAttributeOverride { node, _, _ ->

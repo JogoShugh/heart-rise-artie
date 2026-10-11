@@ -5,14 +5,21 @@ import com.artie.heart.ContentAddress
 import com.artie.heart.InputSchemas
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.UnprocessableContentException
+import com.artie.heart.fixtures.Code
 import com.artie.heart.fixtures.Dim
+import com.artie.heart.fixtures.Rename
 import com.artie.heart.fixtures.SwitchOff
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
 
 class SchemaSteps {
-    private val inputs = mapOf("Dim" to Dim::class.java, "SwitchOff" to SwitchOff::class.java)
+    private val inputs = mapOf(
+        "Dim" to Dim::class.java,
+        "SwitchOff" to SwitchOff::class.java,
+        "Rename" to Rename::class.java,
+        "Code" to Code::class.java,
+    )
     private var schema: String = ""
     private var outcome: Result<Any?>? = null
 

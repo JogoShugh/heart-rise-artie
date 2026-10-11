@@ -31,6 +31,77 @@ Feature: One schema per act: generated from its input class, and enforced as ser
       }
       """
 
+  Scenario: A field that must not be blank needs a character that is not white space
+    Jakarta's @NotBlank means at least one character that is not white
+    space. minLength 1 alone lets "   " through, so the schema says it with a
+    pattern too, and the form and the server agree with the annotation. JSON
+    Schema searches for a pattern anywhere in the value; a HAL-FORMS client
+    may match its regex against the whole value, like HTML. This pattern
+    means the same either way.
+    When the schema of the input class "Rename" is generated
+    Then the schema is:
+      """json
+      {
+        "title": "Rename",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "[\\s\\S]*\\S[\\s\\S]*",
+            "title": "Name"
+          }
+        },
+        "required": ["name"]
+      }
+      """
+
+  Scenario: A field that must not be blank and must match its own pattern keeps both
+    The field's own @Pattern gives it a pattern. JSON Schema has one
+    "pattern" per schema, so the not-blank rule is added beside it, under
+    "allOf", rather than replacing it.
+    When the schema of the input class "Code" is generated
+    Then the schema is:
+      """json
+      {
+        "title": "Code",
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[A-Z ]+$",
+            "allOf": [{"pattern": "[\\s\\S]*\\S[\\s\\S]*"}],
+            "title": "Code"
+          }
+        },
+        "required": ["code"]
+      }
+      """
+
+  Scenario Outline: A body's not-blank field is checked as the annotation says: <body>
+    When the body <body> is checked against the schema of "Rename"
+    Then the body is <verdict>
+
+    Examples:
+      | body                | verdict            |
+      | {"name": "desk"}    | accepted           |
+      | {"name": " desk "}  | accepted           |
+      | {"name": ""}        | refused at "/name" |
+      | {"name": "   "}     | refused at "/name" |
+      | {"name": "\\t\\n"}  | refused at "/name" |
+      | {}                  | refused at "/name" |
+
+  Scenario Outline: A body's field is checked against both its own pattern and the not-blank rule: <body>
+    When the body <body> is checked against the schema of "Code"
+    Then the body is <verdict>
+
+    Examples:
+      | body              | verdict            |
+      | {"code": "AB C"}  | accepted           |
+      | {"code": "ab"}    | refused at "/code" |
+      | {"code": "   "}   | refused at "/code" |
+
   Scenario: A class with no fields is an object with no properties
     When the schema of the input class "SwitchOff" is generated
     Then the schema is:

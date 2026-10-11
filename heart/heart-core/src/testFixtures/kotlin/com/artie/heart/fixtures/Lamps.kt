@@ -12,7 +12,9 @@ import com.artie.heart.StateView
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
 /** A lamp: the smallest resource type with an act that needs a body and acts that do not. */
@@ -41,6 +43,23 @@ data class InstallLamp(
 /** Switching on or off takes no input. */
 @Schema(title = "Switch off")
 class SwitchOff
+
+/** An input with a field that must not be blank: a name. */
+@Schema(title = "Rename")
+data class Rename(
+    @field:NotBlank
+    @field:Schema(title = "Name")
+    val name: String = "",
+)
+
+/** An input whose field must not be blank and must also match a pattern of its own: capitals and spaces. */
+@Schema(title = "Code")
+data class Code(
+    @field:NotBlank
+    @field:Pattern(regexp = "^[A-Z ]+$")
+    @field:Schema(title = "Code")
+    val code: String = "",
+)
 
 /** The lamp resource type, declared the way a domain server declares its own. */
 object Lamps {
