@@ -15,7 +15,7 @@ package com.artie.heart
  * computed once, here, from the declaration, as the JCS canonical bytes that
  * are hashed and served.
  */
-class Layers<S, K>(private val type: ResourceType<S, K>) {
+class Layers<S, K>(val type: ResourceType<S, K>) {
 
     private val schemaBodies: Map<String, String> =
         type.acts.associate { it.name to ContentAddress.canonicalText(it.schema) }

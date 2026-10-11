@@ -1,5 +1,9 @@
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 plugins {
     kotlin("jvm") version "2.0.20" apply false
+    kotlin("plugin.spring") version "2.0.20" apply false
     id("io.gitlab.arturbosch.detekt") version "1.23.8" apply false
 }
 
@@ -9,5 +13,45 @@ subprojects {
 
     repositories {
         mavenCentral()
+    }
+
+    // bdd-gates: every module records "BDD_RUN PASS|FAIL" after its tests, as
+    // server-spring does. The log lives at the repo root, two levels up from a module.
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        val module = name
+        val logBddRun = tasks.register("logBddRun") {
+            group = "verification"
+            description = "Appends a BDD_RUN fact to ../../.claude/tdd-events.log for the pre-commit TDD-ordering check."
+            doLast {
+                val logFile = file("../../.claude/tdd-events.log")
+                val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+                logFile.parentFile.mkdirs()
+                val compileFailed = listOf("compileKotlin", "compileTestKotlin")
+                    .any { tasks.named(it).get().state.failure != null }
+                if (compileFailed) {
+                    logFile.appendText("$timestamp BDD_RUN FAIL module=$module reason=compile\n")
+                    return@doLast
+                }
+                // When the tests did not run (a server compiling this module, or a build
+                // that stopped before them), the result file is an older run's: nothing to log.
+                if (!tasks.named("test").get().state.executed) return@doLast
+                val resultFile = fileTree("build/test-results/test") { include("TEST-*RunCucumberTest.xml") }
+                    .files.singleOrNull()
+                if (resultFile == null) {
+                    logFile.appendText("$timestamp BDD_RUN FAIL module=$module reason=no-results\n")
+                    return@doLast
+                }
+                val xml = resultFile.readText()
+                fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
+                val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
+                logFile.appendText(
+                    "$timestamp BDD_RUN $status module=$module total=${attr("tests")} " +
+                        "failures=${attr("failures")} errors=${attr("errors")}\n",
+                )
+            }
+        }
+        tasks.named("test") { finalizedBy(logBddRun) }
+        tasks.named("compileKotlin") { finalizedBy(logBddRun) }
+        tasks.named("compileTestKotlin") { finalizedBy(logBddRun) }
     }
 }

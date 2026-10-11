@@ -1,14 +1,13 @@
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-
 plugins {
     `java-library`
+    `java-test-fixtures`
     kotlin("jvm")
     id("io.gitlab.arturbosch.detekt")
 }
 
 // heart-core: the protocol-neutral part of HEART (SPEC §6.0). No Spring,
 // no HTTP and no CoAP types; the bindings live in their own modules.
+// The test fixtures hold the lamp, a resource type every module tests against.
 dependencies {
     // RFC 8785 JSON Canonicalization Scheme over Jakarta JSON-P trees (SPEC §6.5).
     // Jakarta JSON Processing 2.1 with its reference implementation, Eclipse Parsson:
@@ -22,7 +21,7 @@ dependencies {
     // Jackson 2 lines, as Spring Boot 3.3 manages.
     api("jakarta.validation:jakarta.validation-api:3.0.2")
     api("io.swagger.core.v3:swagger-annotations:2.2.22")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+    api("com.fasterxml.jackson.core:jackson-databind:2.17.2")
     implementation("com.github.victools:jsonschema-generator:4.38.0")
     implementation("com.github.victools:jsonschema-module-jakarta-validation:4.38.0")
     implementation("com.github.victools:jsonschema-module-swagger-2:4.38.0")
@@ -31,8 +30,8 @@ dependencies {
     testImplementation(platform("io.cucumber:cucumber-bom:7.18.0"))
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-picocontainer")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     testImplementation(platform("org.junit:junit-bom:5.10.3"))
     testImplementation("org.junit.platform:junit-platform-suite")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
@@ -50,41 +49,3 @@ tasks.withType<Test> {
 detekt {
     buildUponDefaultConfig = true
 }
-
-// bdd-gates: records "BDD_RUN PASS|FAIL" after every test run, as server-spring does.
-// The log lives at the repo root, two levels up from this module.
-val logBddRun by tasks.registering {
-    group = "verification"
-    description = "Appends a BDD_RUN fact to ../../.claude/tdd-events.log for the pre-commit TDD-ordering check."
-    doLast {
-        val resultFile = file("build/test-results/test/TEST-com.artie.heart.bdd.RunCucumberTest.xml")
-        val logFile = file("../../.claude/tdd-events.log")
-        val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
-        logFile.parentFile.mkdirs()
-        val compileFailed = listOf("compileKotlin", "compileTestKotlin")
-            .any { tasks.named(it).get().state.failure != null }
-        if (compileFailed) {
-            logFile.appendText("$timestamp BDD_RUN FAIL module=heart-core reason=compile\n")
-            return@doLast
-        }
-        // When the tests did not run (a server compiling heart-core, or a build that
-        // stopped before them), the result file is an older run's: nothing new to log.
-        if (!tasks.test.get().state.executed) return@doLast
-        if (!resultFile.exists()) {
-            logFile.appendText("$timestamp BDD_RUN FAIL module=heart-core reason=no-results\n")
-            return@doLast
-        }
-        val xml = resultFile.readText()
-        fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
-        val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
-        logFile.appendText(
-            "$timestamp BDD_RUN $status module=heart-core total=${attr("tests")} failures=${attr("failures")} errors=${attr("errors")}\n",
-        )
-    }
-}
-
-tasks.test {
-    finalizedBy(logBddRun)
-}
-tasks.named("compileKotlin") { finalizedBy(logBddRun) }
-tasks.named("compileTestKotlin") { finalizedBy(logBddRun) }

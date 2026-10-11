@@ -24,6 +24,8 @@ repositories {
 dependencies {
     // HEART itself: content addressing, negotiation, rungs, validators and refusals.
     implementation("com.artie.heart:heart-core")
+    // HEART over HTTP: routes built from the declared resource types.
+    implementation("com.artie.heart:heart-spring")
 
     // Reactive web stack: WebFlux on Netty, end to end with R2DBC below it.
     implementation("org.springframework.boot:spring-boot-starter-webflux")

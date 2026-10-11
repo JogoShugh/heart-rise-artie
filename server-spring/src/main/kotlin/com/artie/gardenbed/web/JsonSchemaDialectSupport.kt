@@ -20,13 +20,15 @@ object JsonSchemaDialectSupport {
     private fun byHash(bodies: Map<String, String>): Map<String, String> =
         bodies.mapKeys { (address, _) -> address.removePrefix(PREFIX) }
 
-    /** hash (no "sha256-" prefix) -> canonical schema body, for SchemaController. */
+    // The CoAP binding reads these three by hash; over HTTP, heart-spring serves them.
+
+    /** hash (no "sha256-" prefix) -> canonical schema body. */
     val schemasByHash: Map<String, String> = byHash(layers.schemas)
 
-    /** hash (no "sha256-" prefix) -> canonical explanation JSON, for UnavailableController. */
+    /** hash (no "sha256-" prefix) -> canonical explanation JSON. */
     val unavailableByHash: Map<String, String> = byHash(layers.explanations)
 
-    /** hash (no "sha256-" prefix) -> canonical set JSON, for AffordanceSetController. */
+    /** hash (no "sha256-" prefix) -> canonical set JSON. */
     val affordanceSetsByHash: Map<String, String> = byHash(layers.affordanceSets)
 
     /** Which acts a status offers: one source for both dialects, so they cannot drift apart. */

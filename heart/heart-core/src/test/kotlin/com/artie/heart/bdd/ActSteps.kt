@@ -7,6 +7,8 @@ import com.artie.heart.NotOfferedException
 import com.artie.heart.PreconditionRequiredException
 import com.artie.heart.StaleWriteConflict
 import com.artie.heart.UnprocessableContentException
+import com.artie.heart.fixtures.Dim
+import com.artie.heart.fixtures.Lamp
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
