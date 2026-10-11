@@ -9,8 +9,6 @@ import com.artie.gardenbed.service.GardenBedService
 import com.artie.heart.Acted
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
-import com.artie.heart.Past
-import com.artie.heart.PastEvent
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -37,13 +35,6 @@ class HeartConfig {
             },
             // A stored bed always has its id; only a bed not yet saved has none.
             find = { name, id -> service.findBeds(name, id).map { Found(checkNotNull(it.id), it.label) } },
-            past = Past(
-                at = { id, instant -> service.stateAt(id, instant) },
-                history = { id ->
-                    service.history(id).map {
-                        PastEvent(it.sequenceNo, GARDEN_BEDS.typeOf(it.event), it.occurredAt, it.event)
-                    }
-                },
-            ),
+            past = GARDEN_BEDS.past(at = service::stateAt, history = service::history),
         )
 }

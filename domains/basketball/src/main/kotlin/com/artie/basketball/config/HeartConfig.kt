@@ -9,8 +9,6 @@ import com.artie.basketball.domain.Phase
 import com.artie.heart.Acted
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
-import com.artie.heart.Past
-import com.artie.heart.PastEvent
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -29,14 +27,7 @@ class HeartConfig {
             load = { id -> service.state(id) },
             perform = { id, act, input -> Acted(acts.perform(id, act, input)) },
             find = { name, id -> service.find(name, id).map { Found(it.id, it.label) } },
-            past = Past(
-                at = { id, instant -> service.state(id, instant) },
-                history = { id ->
-                    service.history(id).map {
-                        PastEvent(it.sequenceNo, GAMES.typeOf(it.event), it.occurredAt, it.event)
-                    }
-                },
-            ),
+            past = GAMES.past(at = { id, instant -> service.state(id, instant) }, history = service::history),
         )
     }
 }

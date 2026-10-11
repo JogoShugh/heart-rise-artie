@@ -1,5 +1,7 @@
 package com.artie.heart.eventsourcing
 
+import com.artie.heart.Past
+import com.artie.heart.PastEvent
 import java.time.Instant
 
 /** One stored event: which resource it belongs to, its number in that resource's stream, when, and what. */
@@ -28,6 +30,13 @@ class EventSourcing<E : Any, S : Any>(
 
     /** The state after [events], in order, starting from [seed]. */
     fun fold(seed: S, events: List<Recorded<E>>): S = events.fold(seed, apply)
+
+    /**
+     * A resource's past for the HEART library: its state [at] an instant, and
+     * its [history], each event named by the type stored with it.
+     */
+    fun past(at: suspend (id: Long, instant: Instant) -> S, history: suspend (id: Long) -> List<Recorded<E>>): Past<S> =
+        Past(at) { id -> history(id).map { PastEvent(it.sequenceNo, typeOf(it.event), it.occurredAt, it.event) } }
 
     companion object {
         const val DEFAULT_SNAPSHOT_EVERY = 5

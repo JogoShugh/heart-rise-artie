@@ -3,8 +3,6 @@ package com.artie.tickets.config
 import com.artie.heart.Acted
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
-import com.artie.heart.Past
-import com.artie.heart.PastEvent
 import com.artie.tickets.declaration.TicketActs
 import com.artie.tickets.declaration.Tickets
 import com.artie.tickets.domain.Status
@@ -29,14 +27,7 @@ class HeartConfig {
             load = { id -> service.state(id) },
             perform = { id, act, input -> Acted(acts.perform(id, act, input)) },
             find = { subject, id -> service.find(subject, id).map { Found(it.id, it.subject) } },
-            past = Past(
-                at = { id, instant -> service.state(id, instant) },
-                history = { id ->
-                    service.history(id).map {
-                        PastEvent(it.sequenceNo, TICKETS.typeOf(it.event), it.occurredAt, it.event)
-                    }
-                },
-            ),
+            past = TICKETS.past(at = { id, instant -> service.state(id, instant) }, history = service::history),
             performAtBookmark = { _, input -> Acted(acts.open(input)) },
         )
     }
