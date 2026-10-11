@@ -25,14 +25,18 @@ class TicketService(
             .sortedBy { it.id }
 
     suspend fun state(id: Long, asOf: Instant? = null): TicketState {
-        tickets.find(id) ?: throw TicketNotFoundException(id)
+        requireTicket(id)
         return events.state(TICKETS, id, asOf)
     }
 
     suspend fun history(id: Long): List<Recorded<TicketEvent>> {
-        tickets.find(id) ?: throw TicketNotFoundException(id)
+        requireTicket(id)
         return events.history(TICKETS, id)
     }
+
+    /** The ticket's directory entry; a ticket that was never opened is not found. */
+    private suspend fun requireTicket(id: Long): TicketEntry =
+        tickets.find(id) ?: throw TicketNotFoundException(id)
 
     /** Brings a ticket into being: its number and its opening, together; returns its state. */
     suspend fun open(opened: TicketEvent.Opened): TicketState {

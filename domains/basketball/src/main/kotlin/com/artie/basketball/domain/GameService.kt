@@ -21,14 +21,18 @@ class GameService(private val games: GameDirectory, private val events: EventSto
             .sortedBy { it.id }
 
     suspend fun state(id: Long, asOf: Instant? = null): GameState {
-        val setup = games.find(id) ?: throw GameNotFoundException(id)
+        val setup = requireGame(id)
         return events.state(GAMES, id, asOf).copy(setup = setup)
     }
 
     suspend fun history(id: Long): List<Recorded<GameEvent>> {
-        games.find(id) ?: throw GameNotFoundException(id)
+        requireGame(id)
         return events.history(GAMES, id)
     }
+
+    /** The game's setup; a game that was never set up is not found. */
+    private suspend fun requireGame(id: Long): GameSetup =
+        games.find(id) ?: throw GameNotFoundException(id)
 
     /** Records the event [build] makes from the game as it is now, at the next number; returns the new state. */
     suspend fun record(id: Long, build: (GameState) -> GameEvent): GameState {
