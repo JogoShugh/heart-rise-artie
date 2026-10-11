@@ -15,6 +15,16 @@ subprojects {
         mavenCentral()
     }
 
+    // Every module publishes as com.artie.heart:<module>, so a server outside
+    // this repo can depend on it from mavenLocal (./gradlew publishToMavenLocal).
+    apply(plugin = "maven-publish")
+    plugins.withId("java") {
+        configure<JavaPluginExtension> { withSourcesJar() }
+        configure<PublishingExtension> {
+            publications { create<MavenPublication>("heart") { from(components["java"]) } }
+        }
+    }
+
     // bdd-gates: every module records "BDD_RUN PASS|FAIL" after its tests, as
     // server-spring does. The log lives at the repo root, two levels up from a module.
     plugins.withId("org.jetbrains.kotlin.jvm") {

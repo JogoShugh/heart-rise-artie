@@ -29,4 +29,23 @@ class ArchitectureBoundaryTest {
                 file.hasImport { import -> forbiddenPrefixes.any { import.name.startsWith(it) } }
             }
     }
+
+    /**
+     * spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md, A4 rule 3: a domain server
+     * declares its resources and the HEART library serves them, so no garden
+     * code touches HTTP, hypermedia rendering or CoAP.
+     */
+    @Test
+    fun `no garden code touches HTTP, hypermedia rendering or CoAP`() {
+        val wire = listOf(
+            "org.springframework.web",
+            "org.springframework.http",
+            "org.springframework.hateoas",
+            "org.eclipse.californium",
+        )
+        Konsist.scopeFromProduction()
+            .files
+            .filter { it.hasPackage("com.artie.gardenbed..") }
+            .assertFalse { file -> file.hasImport { import -> wire.any { import.name.startsWith(it) } } }
+    }
 }
