@@ -71,9 +71,9 @@ internal class CoapRoutes(
     private suspend fun act(request: Request, id: Long, actionPath: String): Response {
         val affordance = BedActs.BY_PATH[actionPath] ?: return replies.error(ResponseCode.NOT_FOUND, actionPath)
         val rung = rung(request)
-        val held = request.options.ifMatch
-        acts.check(id, affordance, held.isNotEmpty()) { current ->
-            held.any { it.contentEquals(validatorOf(current, rung)) }
+        val held = request.options.ifMatch.takeIf { it.isNotEmpty() }
+        acts.check(id, affordance, held) { current, validators ->
+            validators.any { it.contentEquals(validatorOf(current, rung)) }
         }
         val done = acts.run(id, affordance, request.payloadString)
         val body = JsonSchemaDialectSupport.buildBedBody(done.state, rung)

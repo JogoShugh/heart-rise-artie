@@ -3,6 +3,7 @@ package com.artie.gardenbed.coap
 import com.artie.gardenbed.service.BedNotFoundException
 import com.artie.gardenbed.service.InvalidTransitionException
 import com.artie.heart.MalformedActBodyException
+import com.artie.heart.NotOfferedException
 import com.artie.heart.PreconditionRequiredException
 import com.artie.heart.StaleWriteConflict
 import com.artie.heart.UnprocessableContentException
@@ -26,6 +27,10 @@ internal class CoapRefusals(private val replies: CoapReplies) {
         is InvalidTransitionException -> replies.problem(
             ResponseCode.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
             failure.message, listOfNotNull(failure.rel?.let { "rel" to it }).toMap(),
+        )
+        is NotOfferedException -> replies.problem(
+            ResponseCode.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
+            failure.message, mapOf("rel" to failure.rel),
         )
         is UnprocessableContentException -> replies.problem(
             ResponseCode.UNPROCESSABLE_ENTITY, "invalid-input", "The body does not match the form's schema",

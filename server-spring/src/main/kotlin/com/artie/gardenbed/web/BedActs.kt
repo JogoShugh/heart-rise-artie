@@ -1,14 +1,11 @@
 package com.artie.gardenbed.web
 
 import com.artie.gardenbed.domain.GardenBedState
-import com.artie.gardenbed.eventstore.ConcurrentAppendException
 import com.artie.gardenbed.service.GardenBedService
-import com.artie.gardenbed.service.InvalidTransitionException
 import com.artie.gardenbed.web.dto.HarvestResult
 import com.artie.gardenbed.web.dto.SowSeedRequest
 import com.artie.gardenbed.web.dto.WaterCellRequest
-import com.artie.heart.PreconditionRequiredException
-import com.artie.heart.StaleWriteConflict
+import com.artie.heart.ActPipeline
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Component
 
@@ -16,61 +13,39 @@ import org.springframework.stereotype.Component
 data class ActResult(val state: GardenBedState, val harvest: HarvestResult? = null)
 
 /**
- * The acts on a bed and the checks before them (SPEC §6.2), shared by every
- * binding: HTTP (GardenBedController) and CoAP (CoapFrontDoor). Each binding
- * says what its validator is and how it is compared; the order of the checks
- * and what they refuse are the same everywhere.
+ * The acts on a bed, shared by every binding: HTTP (GardenBedController) and
+ * CoAP (CoapFrontDoor). heart-core's [ActPipeline] runs the checks of SPEC
+ * §6.2 in order; this class says only how a bed is read and what each act does.
  */
 @Component
 class BedActs(private val service: GardenBedService, objectMapper: ObjectMapper) {
-    private val binder = ActBodyBinder(objectMapper)
+    private val pipeline = ActPipeline(GardenBeds.type, objectMapper)
 
     /**
-     * SPEC §6.2 evaluation order: no validator, then a stale one, then an act
-     * not offered; the body is checked inside [run]. [matches] compares the
-     * act's validator with the one the binding selects for the current state.
-     * The state is read only when a validator is present.
+     * No validator, then a stale one, then an act not offered; the body is
+     * checked inside [run]. [matches] compares the act's [validator] with the
+     * one the binding selects for the current state, which is read only when
+     * a validator is present.
      */
-    suspend fun check(id: Long, affordance: String, hasValidator: Boolean, matches: (GardenBedState) -> Boolean) {
-        val failure = if (!hasValidator) {
-            PreconditionRequiredException("$affordance on bed $id needs If-Match with the bed's current ETag")
-        } else {
-            val current = service.currentState(id)
-            when {
-                !matches(current) -> StaleWriteConflict(
-                    "the validator does not match the current one of the representation selected for bed $id",
-                )
-                !offered(affordance, current) -> InvalidTransitionException(
-                    "$affordance is not in bed $id's current affordance set (status ${current.status})",
-                    rel = GardenProfile.reference(affordance),
-                )
-                else -> null
-            }
-        }
-        failure?.let { throw it }
+    suspend fun <V : Any> check(id: Long, affordance: String, validator: V?, matches: (GardenBedState, V) -> Boolean) {
+        pipeline.check(affordance, validator, { service.currentState(id) }, matches)
     }
 
-    /** Binds [body] to the act's input and performs the act. A concurrent write is stale. */
+    /** Checks [body] against the act's schema and performs the act. A concurrent write is stale. */
     suspend fun run(id: Long, affordance: String, body: String?): ActResult =
-        try {
+        pipeline.run(affordance, body) { input ->
             when (affordance) {
-                "sowSeed" -> binder.bind(body, SowSeedRequest::class.java)
+                "sowSeed" -> input.bind(SowSeedRequest::class.java)
                     .let { ActResult(service.sowSeed(id, it.seedType, it.depthCm)) }
-                "waterCell" -> binder.bind(body, WaterCellRequest::class.java)
+                "waterCell" -> input.bind(WaterCellRequest::class.java)
                     .let { ActResult(service.waterCell(id, it.milliliters)) }
                 "harvest" -> service.harvest(id).let { (state, result) -> ActResult(state, result) }
                 else -> error("no act $affordance")
             }
-        } catch (e: ConcurrentAppendException) {
-            throw StaleWriteConflict(e.message ?: "concurrent write conflict", e)
         }
-
-    private fun offered(affordance: String, state: GardenBedState): Boolean =
-        affordance in JsonSchemaDialectSupport.allowedAffordances(state.status)
 
     companion object {
         /** The act each action path names: `/beds/{id}/actions/{path}`. */
-        val BY_PATH: Map<String, String> =
-            mapOf("sow-seed" to "sowSeed", "water-cell" to "waterCell", "harvest" to "harvest")
+        val BY_PATH: Map<String, String> = GardenBeds.type.acts.associate { it.path to it.name }
     }
 }

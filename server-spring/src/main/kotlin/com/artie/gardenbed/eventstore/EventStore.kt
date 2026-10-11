@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataAccessException
+import com.artie.heart.ConcurrentWriteException
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -19,7 +20,7 @@ import java.time.Instant
  *  reality -- someone else appended first. Maps to 412 Precondition
  *  Failed at the controller, the direct server-side analogue of
  *  ARTIE's own client-side 428-on-stale-hash discipline. */
-class ConcurrentAppendException(message: String) : RuntimeException(message)
+class ConcurrentAppendException(message: String) : ConcurrentWriteException(message)
 
 @Component
 class EventStore(

@@ -11,6 +11,7 @@ import com.artie.gardenbed.web.dto.WaterCellRequest
 import com.artie.heart.Dialect
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.NotAcceptableException
+import com.artie.heart.NotOfferedException
 import com.artie.heart.PreconditionRequiredException
 import com.artie.heart.Rung
 import com.artie.heart.StaleWriteConflict
@@ -181,8 +182,8 @@ class GardenBedController(
         headers: HttpHeaders,
         body: String?,
     ): ActResult {
-        acts.check(id, affordance, ifMatch != null) { current ->
-            StateETag.matches(checkNotNull(ifMatch), selectedETag(current, headers))
+        acts.check(id, affordance, ifMatch) { current, held ->
+            StateETag.matches(held, selectedETag(current, headers))
         }
         return acts.run(id, affordance, body)
     }
@@ -343,6 +344,13 @@ class GardenBedController(
         Problems.respond(
             HttpStatus.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
             e.message, listOfNotNull(e.rel?.let { "rel" to it }).toMap(),
+        )
+
+    @ExceptionHandler(NotOfferedException::class)
+    fun handleNotOffered(e: NotOfferedException): ResponseEntity<ProblemDetail> =
+        Problems.respond(
+            HttpStatus.CONFLICT, "not-offered", "The act is not offered in the resource's current state",
+            e.message, mapOf("rel" to e.rel),
         )
 
     @ExceptionHandler(NotAcceptableException::class)

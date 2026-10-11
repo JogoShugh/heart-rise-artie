@@ -1,18 +1,10 @@
 package com.artie.heart.bdd
 
-import com.artie.heart.Act
-import com.artie.heart.AlpsType
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.JsonTrees
 import com.artie.heart.Layers
-import com.artie.heart.Offers
-import com.artie.heart.Profile
-import com.artie.heart.Relation
-import com.artie.heart.ResourceType
 import com.artie.heart.Rung
-import com.artie.heart.StateView
-import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -20,65 +12,15 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 
-/** A lamp: the smallest resource type with an act that needs a body and one that does not. */
-data class Lamp(val id: Long, val status: String, val brightness: Int, val version: Int)
-
 @Suppress("UNCHECKED_CAST")
-class LayerSteps {
-    private lateinit var profile: Profile
-    private lateinit var layers: Layers<Lamp, String>
-    private val lamps = mutableMapOf<Long, Lamp>()
+class LayerSteps(private val world: LampWorld) {
+    private val profile get() = world.profile
+    private val layers get() = world.layers
+    private val lamps get() = world.lamps
     private var body: Map<String, Any?> = emptyMap()
     private var set: Map<String, Any?> = emptyMap()
     private var setLink: Map<String, Any?> = emptyMap()
     private var explanation: Map<String, Any?> = emptyMap()
-
-    @Given("a lamp resource type declared with the profile {string}")
-    fun aLampType(name: String) {
-        profile = Profile(
-            name = name,
-            title = "Lamps",
-            doc = "The acts a lamp offers.",
-            relations = listOf(
-                Relation("switch-on", AlpsType.UNSAFE, "Switch on", "Turns the lamp on.", "Offered while off."),
-                Relation("switch-off", AlpsType.UNSAFE, "Switch off", "Turns the lamp off.", "Offered while on."),
-                Relation("dim", AlpsType.IDEMPOTENT, "Dim the lamp", "Sets the brightness.", "Offered while on."),
-            ),
-        )
-        val type = ResourceType<Lamp, String>(
-            collection = "lamps",
-            profile = profile,
-            acts = listOf(
-                Act("switchOn", "switch-on", """{"type": "object", "properties": {}}"""),
-                Act("switchOff", "switch-off", """{"type": "object", "properties": {}}"""),
-                Act(
-                    "dim",
-                    "dim",
-                    """{"type": "object", "required": ["brightness"],
-                        "properties": {"brightness": {"type": "integer", "minimum": 1, "maximum": 100}}}""",
-                ),
-            ),
-            offers = Offers(
-                keys = listOf("ON", "OFF"),
-                offered = { key -> if (key == "ON") listOf("switchOff", "dim") else listOf("switchOn") },
-                whyAbsent = { key, _ ->
-                    if (key == "ON") "The lamp is already on." else "The lamp is off; switch it on."
-                },
-            ),
-            state = StateView(
-                keyOf = { it.status },
-                idOf = { it.id },
-                versionOf = { it.version },
-                bodyOf = { linkedMapOf("id" to it.id, "status" to it.status, "brightness" to it.brightness) },
-            ),
-        )
-        layers = Layers(type)
-    }
-
-    @Given("lamp {long} is {string} at version {int}")
-    fun lampIs(id: Long, status: String, version: Int) {
-        lamps[id] = Lamp(id, status, brightness = 50, version = version)
-    }
 
     @When("lamp {long} is rendered at L{int}")
     fun rendered(id: Long, n: Int) {

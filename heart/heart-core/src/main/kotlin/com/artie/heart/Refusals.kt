@@ -12,6 +12,15 @@ class PreconditionRequiredException(message: String) : RuntimeException(message)
 /** 412: the validator does not match the current one, or another write landed first. */
 class StaleWriteConflict(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
+/**
+ * Thrown by a store or a domain when another write landed first, while an
+ * act was running. heart-core turns it into a stale refusal.
+ */
+open class ConcurrentWriteException(message: String) : RuntimeException(message)
+
+/** 409: the act is not in the resource's current affordance set. [rel] names its relation. */
+class NotOfferedException(message: String, val rel: String) : RuntimeException(message)
+
 /** One failing field: an RFC 6901 JSON Pointer into the request body, and why. */
 data class Violation(val pointer: String, val message: String)
 
