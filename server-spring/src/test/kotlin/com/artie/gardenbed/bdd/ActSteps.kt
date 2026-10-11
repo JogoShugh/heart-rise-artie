@@ -6,7 +6,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 
 /** Steps for SPEC §6.2/§6.10.5: conditional acts and their error codes. */
-class ActSteps(private val http: HttpWorld, private val beds: InMemoryBeds, private val store: InMemoryEventStore) {
+class ActSteps(private val http: HttpWorld, private val store: BedEventLog) {
 
     @When("a client waters bed {long} with {int} ml and no If-Match")
     fun waterWithoutIfMatch(id: Long, milliliters: Int) {
@@ -29,6 +29,6 @@ class ActSteps(private val http: HttpWorld, private val beds: InMemoryBeds, priv
 
     @Then("bed {long} is still at state version {int}")
     fun stateVersion(id: Long, version: Int) = runBlocking {
-        assertEquals(version, store.currentState(id, beds.label(id)).lastSequenceNo)
+        assertEquals(version, store.version(id))
     }
 }

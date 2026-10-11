@@ -1,5 +1,6 @@
 package com.artie.heart.spring.bdd
 
+import com.artie.heart.PastEvent
 import com.artie.heart.fixtures.Lamp
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.http.HttpHeaders
 import org.springframework.test.web.reactive.server.WebTestClient
+import java.time.Duration
+import java.time.Instant
 
 class ResourceSteps(private val client: WebTestClient, private val store: LampStore, private val http: HttpWorld) {
     private val json: JsonNode get() = ObjectMapper().readTree(http.last.responseBody)
@@ -22,6 +25,29 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
     fun lampIs(id: Long, status: String, version: Int) {
         store.lamps[id] = Lamp(id, status, brightness = 50, version = version)
     }
+
+    @Given("lamp {long} was switched on {int} days ago and dimmed to {int} {int} day ago, in the lamp server")
+    fun lampWithPast(id: Long, onAgo: Long, brightness: Int, dimAgo: Long) {
+        val events = listOf(
+            PastEvent(1, "SwitchedOn", Instant.now().minus(Duration.ofDays(onAgo)), emptyMap<String, Any>()),
+            PastEvent(2, "Dimmed", Instant.now().minus(Duration.ofDays(dimAgo)), mapOf("brightness" to brightness)),
+        )
+        store.events[id] = events
+        store.lamps[id] = store.at(id, Instant.now())
+    }
+
+    @When("a client gets lamp {long} as {word} as of {int} days ago")
+    fun getAsOf(id: Long, dialect: String, days: Long) =
+        getAs("/lamps/$id?asOf=${Instant.now().minus(Duration.ofDays(days))}", dialect)
+
+    @Then("the history is {string}, numbered {int} to {int}")
+    fun history(types: String, from: Int, to: Int) {
+        assertEquals(types, json.joinToString(", ") { it.path("type").asText() })
+        assertEquals((from..to).toList(), json.map { it.path("sequenceNo").asInt() })
+    }
+
+    @Then("the last event's {string} is {int}")
+    fun lastEvent(name: String, value: Int) = assertEquals(value, json.last().path("event").path(name).asInt())
 
     @When("a client gets {string} again with the ETag it was given")
     fun again(path: String) {

@@ -32,6 +32,9 @@ open class ConcurrentWriteException(message: String) : RuntimeException(message)
  */
 open class NotOfferedException(message: String, val rel: String? = null) : RuntimeException(message)
 
+/** 400: a request a binding cannot read, such as an instant that is not ISO 8601. */
+class BadRequestException(message: String) : RuntimeException(message)
+
 /** 404: no resource with that id. A domain's own "not found" extends this. */
 open class ResourceNotFoundException(message: String) : RuntimeException(message)
 

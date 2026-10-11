@@ -13,7 +13,7 @@ import java.security.MessageDigest
 class ContentAddressSteps(
     private val http: HttpWorld,
     private val beds: InMemoryBeds,
-    private val store: InMemoryEventStore,
+    private val store: BedEventLog,
 ) {
     private val reached = sortedSetOf<String>()
     private val fetched = mutableMapOf<String, Exchange>()

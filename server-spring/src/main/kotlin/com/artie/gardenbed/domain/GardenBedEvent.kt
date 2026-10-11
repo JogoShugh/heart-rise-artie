@@ -1,7 +1,5 @@
 package com.artie.gardenbed.domain
 
-import java.time.Instant
-
 /** Derived, never stored -- exists only as a field on GardenBedState,
  *  the fold RESULT, not on anything persisted. */
 enum class GardenBedStatus {
@@ -16,35 +14,15 @@ enum class GardenBedStatus {
  * deleted once written -- correcting a mistake means appending a new
  * event that says so, never editing history.
  *
- * `sequenceNo` is 1-based and scoped per bed (bed #7's events are
- * 1, 2, 3... independent of bed #8's own 1, 2, 3...). It's both the
- * ordering key and the optimistic concurrency token -- see EventStore.
+ * An event is only what happened. Which bed, its number in the bed's
+ * stream (1-based, per bed; also the optimistic concurrency token) and
+ * when it occurred are the event store's record of it (Recorded, in
+ * heart-eventsourcing).
  */
 sealed interface GardenBedEvent {
-    val gardenBedId: Long
-    val sequenceNo: Int
-    val occurredAt: Instant
+    data class SeedSown(val seedType: String, val depthCm: Int?) : GardenBedEvent
 
-    data class SeedSown(
-        override val gardenBedId: Long,
-        override val sequenceNo: Int,
-        val seedType: String,
-        val depthCm: Int?,
-        override val occurredAt: Instant = Instant.now()
-    ) : GardenBedEvent
+    data class CellWatered(val milliliters: Int) : GardenBedEvent
 
-    data class CellWatered(
-        override val gardenBedId: Long,
-        override val sequenceNo: Int,
-        val milliliters: Int,
-        override val occurredAt: Instant = Instant.now()
-    ) : GardenBedEvent
-
-    data class BedHarvested(
-        override val gardenBedId: Long,
-        override val sequenceNo: Int,
-        val yieldGrams: Int,
-        val cropName: String,
-        override val occurredAt: Instant = Instant.now()
-    ) : GardenBedEvent
+    data class BedHarvested(val yieldGrams: Int, val cropName: String) : GardenBedEvent
 }

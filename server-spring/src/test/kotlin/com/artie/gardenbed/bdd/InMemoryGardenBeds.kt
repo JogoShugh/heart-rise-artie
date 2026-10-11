@@ -2,52 +2,35 @@ package com.artie.gardenbed.bdd
 
 import com.artie.gardenbed.domain.GardenBedAggregate
 import com.artie.gardenbed.domain.GardenBedEvent
-import com.artie.gardenbed.domain.GardenBedProjector
-import com.artie.gardenbed.domain.GardenBedState
-import com.artie.gardenbed.eventstore.ConcurrentAppendException
-import com.artie.gardenbed.eventstore.EventStore
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
+import com.artie.gardenbed.service.GARDEN_BEDS
 import com.artie.gardenbed.service.GardenBedService
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.artie.heart.eventsourcing.InMemoryEventStore
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.runBlocking
 import org.mockito.Mockito.mock
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
-import java.time.Instant
 
 /**
- * The scenarios run the real controllers and the real GardenBedService
- * against an in-memory event log, so no Postgres is needed. Only storage
- * is replaced: legality checks, projection, and the sequence-number
- * concurrency rule are the production code paths.
+ * The scenarios run the real routes and the real GardenBedService against
+ * the HEART library's in-memory event store, so no Postgres is needed. Only
+ * storage is replaced: legality checks, projection, and the sequence-number
+ * concurrency rule are the production code paths. This gives steps a bed's
+ * events directly, for setting up a state or writing as someone else.
  */
-class InMemoryEventStore : EventStore(mock(), mock(), mock(), ObjectMapper()) {
-    private val log = mutableMapOf<Long, MutableList<GardenBedEvent>>()
+class BedEventLog {
+    val store = InMemoryEventStore()
 
-    fun reset() = log.clear()
+    fun reset() = runBlocking { store.forget(GARDEN_BEDS.stream) }
 
-    override suspend fun nextSequenceNo(bedId: Long): Int =
-        (log[bedId]?.maxOfOrNull { it.sequenceNo } ?: 0) + 1
-
-    /** Same rule as the database's UNIQUE(garden_bed_id, sequence_no). */
-    override suspend fun append(event: GardenBedEvent) {
-        val events = log.getOrPut(event.gardenBedId) { mutableListOf() }
-        if (events.any { it.sequenceNo == event.sequenceNo }) {
-            throw ConcurrentAppendException("Bed ${event.gardenBedId}: sequence ${event.sequenceNo} was already taken")
-        }
-        events += event
+    /** Appends [event] at bed [id]'s next number, as any writer would. */
+    suspend fun append(id: Long, event: GardenBedEvent) {
+        store.append(GARDEN_BEDS, id, store.nextSequenceNo(GARDEN_BEDS, id), event)
     }
 
-    override suspend fun currentState(bedId: Long, label: String): GardenBedState =
-        GardenBedProjector.project(GardenBedState.empty(bedId, label), log[bedId].orEmpty())
-
-    override suspend fun stateAt(bedId: Long, label: String, asOf: Instant): GardenBedState =
-        GardenBedProjector.project(
-            GardenBedState.empty(bedId, label),
-            log[bedId].orEmpty().filter { !it.occurredAt.isAfter(asOf) },
-        )
-
-    override suspend fun fullHistory(bedId: Long): List<GardenBedEvent> = log[bedId].orEmpty().toList()
+    /** The number of bed [id]'s last event: its state version. */
+    suspend fun version(id: Long): Int = store.nextSequenceNo(GARDEN_BEDS, id) - 1
 }
 
 /** Bed identities. A suspend function on a Mockito mock may return its
@@ -82,8 +65,8 @@ class InMemoryGardenBedsConfig {
     fun inMemoryBeds() = InMemoryBeds()
 
     @Bean
-    fun inMemoryEventStore() = InMemoryEventStore()
+    fun bedEventLog() = BedEventLog()
 
     @Bean
-    fun gardenBedService(beds: InMemoryBeds, store: InMemoryEventStore) = GardenBedService(beds.repository, store)
+    fun gardenBedService(beds: InMemoryBeds, events: BedEventLog) = GardenBedService(beds.repository, events.store)
 }

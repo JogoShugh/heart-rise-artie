@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.BadRequestException
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
@@ -46,7 +47,7 @@ object HttpRefusals {
         )
         is ResourceNotFoundException -> error(HttpStatus.NOT_FOUND, failure)
         is NotAcceptableException -> error(HttpStatus.NOT_ACCEPTABLE, failure)
-        is MalformedActBodyException -> error(HttpStatus.BAD_REQUEST, failure)
+        is MalformedActBodyException, is BadRequestException -> error(HttpStatus.BAD_REQUEST, failure)
         else -> null
     }
 

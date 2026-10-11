@@ -1,10 +1,11 @@
 package com.artie.gardenbed.domain
 
+import com.artie.heart.eventsourcing.Recorded
 import java.time.Instant
 
 /**
  * The RESULT of folding events -- never persisted as-is (except as a
- * disposable cache in garden_bed_snapshot). This is what current state
+ * disposable cache in heart_snapshot). This is what current state
  * "is": the answer you get from replaying a bed's event log, nothing
  * more.
  */
@@ -29,47 +30,42 @@ data class GardenBedState(
 }
 
 /**
- * The whole idea in one object: fold a list of events, in order, into
- * a state. Current state is `project(empty, allEvents)`. State as of
- * last Tuesday is `project(empty, allEvents.filter { it.occurredAt <=
- * lastTuesday })`. Same function either way -- point-in-time
- * reconstruction isn't a separate feature, it's just folding a
- * different prefix of the same log.
+ * The whole idea in one object: fold a bed's events, in order, into a state.
+ * Current state is the fold of every event. State as of last Tuesday is the
+ * fold of the events up to last Tuesday. Same function either way -- point
+ * in time reconstruction isn't a separate feature, it's just folding a
+ * different prefix of the same log. Each event comes as the store recorded
+ * it: its number in the bed's stream and when it occurred.
  */
 object GardenBedProjector {
 
-    fun project(seed: GardenBedState, events: List<GardenBedEvent>): GardenBedState =
-        events.sortedBy { it.sequenceNo }.fold(seed, ::applyEvent)
-
-    private fun applyEvent(state: GardenBedState, event: GardenBedEvent): GardenBedState = when (event) {
-        is GardenBedEvent.SeedSown -> state.copy(
-            status = GardenBedStatus.PLANTED,
-            cropName = event.seedType,
-            growthPoints = 0,
-            plantedAt = event.occurredAt,
-            lastSequenceNo = event.sequenceNo
-        )
-
-        is GardenBedEvent.CellWatered -> {
-            val newGrowth = (state.growthPoints + event.milliliters / 5)
-                .coerceAtMost(GardenBedState.HARVEST_THRESHOLD)
-            val newStatus = if (newGrowth >= GardenBedState.HARVEST_THRESHOLD)
-                GardenBedStatus.READY_TO_HARVEST else state.status
-
-            state.copy(
-                growthPoints = newGrowth,
-                moistureLevel = (state.moistureLevel + event.milliliters / 10).coerceAtMost(100),
-                status = newStatus,
-                lastSequenceNo = event.sequenceNo
+    fun apply(state: GardenBedState, recorded: Recorded<GardenBedEvent>): GardenBedState =
+        when (val event = recorded.event) {
+            is GardenBedEvent.SeedSown -> state.copy(
+                status = GardenBedStatus.PLANTED,
+                cropName = event.seedType,
+                growthPoints = 0,
+                plantedAt = recorded.occurredAt,
             )
-        }
 
-        is GardenBedEvent.BedHarvested -> state.copy(
-            status = GardenBedStatus.EMPTY,
-            cropName = null,
-            growthPoints = 0,
-            plantedAt = null,
-            lastSequenceNo = event.sequenceNo
-        )
-    }
+            is GardenBedEvent.CellWatered -> {
+                val newGrowth = (state.growthPoints + event.milliliters / 5)
+                    .coerceAtMost(GardenBedState.HARVEST_THRESHOLD)
+                val newStatus = if (newGrowth >= GardenBedState.HARVEST_THRESHOLD)
+                    GardenBedStatus.READY_TO_HARVEST else state.status
+
+                state.copy(
+                    growthPoints = newGrowth,
+                    moistureLevel = (state.moistureLevel + event.milliliters / 10).coerceAtMost(100),
+                    status = newStatus,
+                )
+            }
+
+            is GardenBedEvent.BedHarvested -> state.copy(
+                status = GardenBedStatus.EMPTY,
+                cropName = null,
+                growthPoints = 0,
+                plantedAt = null,
+            )
+        }.copy(lastSequenceNo = recorded.sequenceNo)
 }

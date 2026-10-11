@@ -2,6 +2,8 @@ package com.artie.heart.spring.bdd
 
 import com.artie.heart.Found
 import com.artie.heart.Layers
+import com.artie.heart.Past
+import com.artie.heart.PastEvent
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.fixtures.Dim
 import com.artie.heart.fixtures.Lamp
@@ -15,11 +17,24 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
 
 /** The lamps this test server holds. */
 class LampStore {
     val lamps = ConcurrentHashMap<Long, Lamp>()
+
+    /** What happened to each lamp, for the lamps whose past a scenario sets up. */
+    val events = ConcurrentHashMap<Long, List<PastEvent>>()
+
+    /** A lamp as of [instant]: switched off at brightness 50 until its events say otherwise. */
+    fun at(id: Long, instant: Instant): Lamp =
+        events[id].orEmpty().filter { !it.occurredAt.isAfter(instant) }.fold(Lamp(id, "OFF", 50, 0)) { lamp, past ->
+            when (past.type) {
+                "SwitchedOn" -> lamp.copy(status = "ON")
+                else -> lamp.copy(brightness = (past.event as Map<*, *>)["brightness"] as Int)
+            }.copy(version = past.sequenceNo)
+        }
 }
 
 /**
@@ -46,6 +61,10 @@ class LampServer {
             store.lamps[id] = next
             Acted(next)
         },
+        past = Past(
+            at = { id, instant -> store.lamps[id]?.let { store.at(id, instant) } ?: throw notFound(id) },
+            history = { id -> store.lamps[id]?.let { store.events[id].orEmpty() } ?: throw notFound(id) },
+        ),
         find = { name, id ->
             store.lamps.values.sortedBy { it.id }
                 .map { Found(it.id, "Lamp ${it.id}") }
@@ -54,6 +73,8 @@ class LampServer {
         },
     )
 }
+
+private fun notFound(id: Long) = ResourceNotFoundException("no lamp $id")
 
 @CucumberContextConfiguration
 @WebFluxTest

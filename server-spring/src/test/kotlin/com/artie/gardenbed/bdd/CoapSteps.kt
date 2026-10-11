@@ -1,6 +1,5 @@
 package com.artie.gardenbed.bdd
 
-import com.artie.gardenbed.domain.GardenBedState
 import com.artie.heart.coap.CoapFrontDoor
 import com.artie.heart.coap.CoapOptions
 import com.fasterxml.jackson.databind.JsonNode
@@ -28,8 +27,7 @@ import java.util.Base64
 class CoapSteps(
     private val door: CoapFrontDoor,
     private val http: HttpWorld,
-    private val beds: InMemoryBeds,
-    private val store: InMemoryEventStore,
+    private val store: BedEventLog,
 ) {
     private val client: CoapClient by lazy {
         CoapConfig.register()
@@ -134,8 +132,7 @@ class CoapSteps(
 
     @Then("bed {long} is at state version {int}")
     fun stateVersion(id: Long, version: Int) = runBlocking {
-        val state: GardenBedState = store.currentState(id, beds.label(id))
-        assertEquals(version, state.lastSequenceNo)
+        assertEquals(version, store.version(id))
     }
 
     /** A Layer 1 read: it says No-Cache, and asks for the rung in Prefer. */

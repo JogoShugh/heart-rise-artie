@@ -28,9 +28,9 @@ class HeartAutoConfiguration {
 
     /**
      * For each declared collection: Layer 1 at `/{collection}/{id}` and its
-     * acts at `/{collection}/{id}/actions/{path}`. A Layer 1 request with a
-     * query string is left to the server's own routes (the garden's `asOf`,
-     * for example). Every refusal is answered as SPEC §6.2 says.
+     * acts at `/{collection}/{id}/actions/{path}`; for a type that keeps its
+     * past, its state as of `?asOf=` and its `/history`. Every refusal is
+     * answered as SPEC §6.2 says.
      */
     @Bean
     fun heartRoutes(handlers: HeartHandlers, index: HeartIndexHandler): RouterFunction<ServerResponse> =
@@ -42,6 +42,10 @@ class HeartAutoConfiguration {
                 if (resource.find != null) GET("/$collection") { index.search(resource, it) }
                 GET("/$collection/{id}", NO_QUERY) { handler.read(it) }
                 POST("/$collection/{id}/actions/{path}") { handler.act(it) }
+                if (resource.past != null) {
+                    GET("/$collection/{id}", queryParam("asOf") { true }) { handler.readAsOf(it) }
+                    GET("/$collection/{id}/history") { handler.history(it) }
+                }
             }
             onError<Throwable> { failure, _ -> HttpRefusals.of(failure) ?: throw failure }
         }

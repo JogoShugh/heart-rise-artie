@@ -7,7 +7,7 @@ import io.cucumber.java.en.Given
 import kotlinx.coroutines.runBlocking
 
 /** Puts beds into a known state by appending the events that lead there. */
-class BedSteps(private val beds: InMemoryBeds, private val store: InMemoryEventStore) {
+class BedSteps(private val beds: InMemoryBeds, private val store: BedEventLog) {
 
     @Before
     fun resetStorage() {
@@ -27,19 +27,19 @@ class BedSteps(private val beds: InMemoryBeds, private val store: InMemoryEventS
     /** A concurrent writer: appends straight to the store, bypassing HTTP. */
     @Given("someone else waters bed {long} with {int} ml")
     fun someoneElseWaters(id: Long, milliliters: Int) = runBlocking {
-        store.append(GardenBedEvent.CellWatered(id, store.nextSequenceNo(id), milliliters))
+        store.append(id, GardenBedEvent.CellWatered(milliliters))
     }
 }
 
 /** Adds bed [id] and appends the events that lead to [status]. */
-fun putBed(beds: InMemoryBeds, store: InMemoryEventStore, id: Long, status: GardenBedStatus) = runBlocking {
+fun putBed(beds: InMemoryBeds, store: BedEventLog, id: Long, status: GardenBedStatus) = runBlocking {
     beds.add(id)
-    val sown = GardenBedEvent.SeedSown(id, 1, "basil", 2)
+    val sown = GardenBedEvent.SeedSown("basil", 2)
     val events = when (status) {
         GardenBedStatus.EMPTY -> emptyList()
         GardenBedStatus.PLANTED -> listOf(sown)
         // 500 ml adds 100 growth points, the harvest threshold.
-        GardenBedStatus.READY_TO_HARVEST -> listOf(sown, GardenBedEvent.CellWatered(id, 2, 500))
+        GardenBedStatus.READY_TO_HARVEST -> listOf(sown, GardenBedEvent.CellWatered(500))
     }
-    events.forEach { store.append(it) }
+    events.forEach { store.append(id, it) }
 }

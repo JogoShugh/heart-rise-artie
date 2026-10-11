@@ -1,6 +1,7 @@
 package com.artie.heart.spring
 
 import com.artie.heart.ActPipeline
+import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.Rung
@@ -19,6 +20,8 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.awaitBodyOrNull
 import org.springframework.web.reactive.function.server.bodyValueAndAwait
 import org.springframework.web.reactive.function.server.buildAndAwait
+import java.time.Instant
+import java.time.format.DateTimeParseException
 
 /**
  * Layer 1 and the acts of one declared resource type, over HTTP.
@@ -39,6 +42,30 @@ class HeartResourceHandler<S, K>(
     private val pipeline = ActPipeline(type, mapper)
 
     suspend fun read(request: ServerRequest): ServerResponse = represent(resource.load(id(request)), request)
+
+    /** The state as of `?asOf=` (an ISO 8601 instant), rendered exactly like the current one. */
+    suspend fun readAsOf(request: ServerRequest): ServerResponse {
+        val asOf = request.queryParam("asOf").orElseThrow()
+        val instant = try {
+            Instant.parse(asOf)
+        } catch (_: DateTimeParseException) {
+            throw BadRequestException("'$asOf' is not an ISO 8601 instant, such as 2026-07-05T00:00:00Z")
+        }
+        return represent(checkNotNull(resource.past).at(id(request), instant), request)
+    }
+
+    /** What happened to the resource, in order, whatever the dialect. */
+    suspend fun history(request: ServerRequest): ServerResponse {
+        val events = checkNotNull(resource.past).history(id(request)).map {
+            mapOf(
+                "sequenceNo" to it.sequenceNo,
+                "type" to it.type,
+                "occurredAt" to it.occurredAt.toString(),
+                "event" to it.event,
+            )
+        }
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON).bodyValueAndAwait(events)
+    }
 
     /**
      * [state] as the representation [request] selects, answering 304 when its
