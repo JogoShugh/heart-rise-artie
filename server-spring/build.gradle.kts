@@ -78,6 +78,8 @@ dependencies {
     testImplementation("io.cucumber:cucumber-java")
     testImplementation("io.cucumber:cucumber-spring")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    // HEART's conformance features: the garden runs them against itself (RunHeartTckTest).
+    testImplementation("com.artie.heart:heart-tck")
     testImplementation("org.junit.platform:junit-platform-suite")
     // EventStore against real Postgres: R2DBC insert/update rules and the
     // UNIQUE constraint only show up on a real database. Skipped without Docker.
