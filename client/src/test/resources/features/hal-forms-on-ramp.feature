@@ -3,9 +3,10 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
   can speak it: it asks by media type and profile, reads _templates, and
   turns each template's inline properties into the same JSON Schema model
   it uses for HAL Schema Forms, so the rest of the client, and the Reason
-  step, see one shape whichever dialect it came from. A lone template is
-  keyed "default", as the HAL-FORMS spec says it should be; ARTIE keeps
-  the server's key as the affordance name rather than guess another.
+  step, see one shape whichever dialect it came from. ARTIE keeps the
+  server's key as the affordance name rather than guess another. A HEART
+  server keys every template by its act's name; another server may key a
+  lone template "default", as HAL-FORMS suggests, and ARTIE keeps that too.
 
   Background:
     Given the service answers GET "http://garden.test/beds/1" with:
@@ -20,7 +21,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       _links:
         self: {href: /beds/1}
       _templates:
-        default:
+        sowSeed:
           method: POST
           target: /beds/1/actions/sow-seed
           properties:
@@ -38,15 +39,15 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
 
   Scenario: The template is an affordance named by its key, with a resolved target
     When the client enters "http://garden.test/beds/1"
-    Then the manifest offers exactly "default"
-    And the "default" affordance is POST to "http://garden.test/beds/1/actions/sow-seed"
+    Then the manifest offers exactly "sowSeed"
+    And the "sowSeed" affordance is POST to "http://garden.test/beds/1/actions/sow-seed"
     And the resource state contains:
       | key    | value |
       | status | EMPTY |
 
   Scenario Outline: HAL-FORMS properties become JSON Schema: <property> has <keyword>
     When the client enters "http://garden.test/beds/1"
-    Then the "<property>" field in the "default" schema has the "<keyword>" keyword
+    Then the "<property>" field in the "sowSeed" schema has the "<keyword>" keyword
     Examples:
       | property | keyword     |
       | depthCm  | minimum     |
@@ -57,7 +58,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
 
   Scenario: Required properties are carried into the schema
     When the client enters "http://garden.test/beds/1"
-    Then the "default" schema marks "seedType" as required
+    Then the "sowSeed" schema marks "seedType" as required
 
   Scenario: An act from a HAL-FORMS manifest is conditional like any other
     Given the service answers POST "http://garden.test/beds/1/actions/sow-seed" with:
@@ -72,7 +73,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       _templates: {}
       """
     When the client enters "http://garden.test/beds/1"
-    And the client acts on "default" with:
+    And the client acts on "sowSeed" with:
       """yaml
       seedType: basil
       """
@@ -138,7 +139,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
     And that request had no body
     When the client follows the "item" link titled "South border"
     Then the client's last request was GET "http://garden.test/beds/1"
-    And the manifest offers exactly "default"
+    And the manifest offers exactly "sowSeed"
 
   Scenario: A HAL-FORMS client looks a bed up by id through the query
     Given the service answers GET "http://garden.test/" with:

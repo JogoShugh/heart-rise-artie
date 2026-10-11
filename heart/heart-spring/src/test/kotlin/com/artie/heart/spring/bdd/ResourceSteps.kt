@@ -134,6 +134,10 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
         assertEquals(200, served.status.value(), href)
     }
 
+    @Then("the response has templates named {string}")
+    fun templateNames(expected: String) =
+        assertEquals(names(expected), json.path("_templates").fieldNames().asSequence().toSet())
+
     @Then("the response has templates targeting {string}")
     fun templates(targets: String) =
         assertEquals(names(targets), json.path("_templates").map { it.path("target").asText() }.toSet())

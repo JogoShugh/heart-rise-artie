@@ -127,18 +127,18 @@ Feature: ARTIE against the real server
   Scenario: Bed 1 through a full cycle at the HAL-FORMS on-ramp
     Given the client works in dialect hal-forms
     When the client enters "/beds/1"
-    And the client acts on "default" with:
+    And the client acts on "sowSeed" with:
       """yaml
       seedType: basil
       """
     Then the resource state contains:
       | key    | value   |
       | status | PLANTED |
-    When the client acts on "default" with:
+    When the client acts on "waterCell" with:
       """yaml
       milliliters: 500
       """
-    And the client acts on "default" with:
+    And the client acts on "harvest" with:
       """yaml
       {}
       """
@@ -209,8 +209,8 @@ Feature: ARTIE against the real server
       name: BED-2
       """
     And the client follows the "item" link titled "bed-2"
-    Then the manifest offers exactly "default"
-    When the client acts on "default" with:
+    Then the manifest offers exactly "waterCell"
+    When the client acts on "waterCell" with:
       """yaml
       milliliters: 1
       """

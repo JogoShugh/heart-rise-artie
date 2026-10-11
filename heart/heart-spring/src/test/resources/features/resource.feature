@@ -30,10 +30,15 @@ Feature: A declared resource and its acts, served over HTTP
     And the response has Cache-Control "no-cache"
 
   Scenario: HAL-FORMS shows the same acts, as templates named by the acts' logical names
+    Every template keeps its act's name, the first one too. HAL-FORMS says a
+    lone template SHOULD be keyed "default", but that name says nothing about
+    the act, and which act it fell on would depend only on its place in the
+    list.
     When a client gets "/lamps/7" as hal-forms
     Then the response status is 200
     And the response has Content-Type "application/prs.hal-forms+json"
     And the response has ETag "\"seq-3.hf.L0\""
+    And the response has templates named "switchOff, dim"
     And the response has templates targeting "/lamps/7/actions/switch-off, /lamps/7/actions/dim"
 
   Scenario: Accept that names no dialect is refused

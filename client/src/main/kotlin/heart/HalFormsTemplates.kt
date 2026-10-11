@@ -14,7 +14,8 @@ import java.net.URI
  * AffordanceForm model HAL Schema Forms produces. Each template's inline
  * `properties` array becomes a JSON Schema object, so the rest of ARTIE,
  * including the Reason step, sees one shape. The template key is kept as
- * the affordance name; a lone template is keyed "default" by HAL-FORMS.
+ * the affordance name, whatever the server chose: a HEART server uses the
+ * act's name, another may key a lone template "default" as HAL-FORMS suggests.
  */
 object HalFormsTemplates {
     const val TEMPLATES = "_templates"
