@@ -553,6 +553,54 @@ This is one case, so it shows that the AI-driven path works end to end, not
 that a model chooses well. The "AI-driven clients" row stays Partly until
 `spec/EVAL-L6.md` is built.
 
+## 2026-10-11: Part A done, a HEART server library
+
+This is Part A of `spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md`. HEART moved out
+of the garden server into a library at `heart/`:
+- `heart-core`: HEART itself, with no protocol. The declaration model, HAL
+  Schema Forms rendering, content addressing, schemas generated from input
+  classes, the act checks, the index, JSON Home and search pages.
+- `heart-spring`: the HTTP binding.
+- `heart-coap`: the CoAP binding.
+- `heart-eventsourcing`: an optional event store, in memory or on Postgres.
+- `heart-tck`: the conformance features every domain runs against itself.
+- `heart-spring-boot-starter`.
+
+`heart/README.md` shows a HEART server in five minutes.
+
+The garden's main code went from 2786 lines to its domain, its event-sourcing
+declaration and its HEART declaration. It has no controllers and no CoAP code;
+an architecture test now keeps it that way.
+
+The lamp is declared only in the library's tests and writes no HTTP or CoAP
+code. It passes all 13 TCK scenarios (over HTTP), heart-coap's features over
+real UDP, and, as event-sourced lamps, heart-eventsourcing's features on both
+stores. The garden passes the same 13 TCK scenarios.
+
+Every step stayed green:
+- server, client and live suites;
+- the Buster campaign after each step that changed the server: 22 rounds, 120
+  combinations made, 70 pass, 50 attested, 0 FAIL, no holes, gate ok. That is
+  the same as the baseline before the move.
+
+Found on the way:
+- The garden's sow-seed schema had drifted from the server:
+  - it said `depthCm` was any number, while the server silently cut 2.5 to 2;
+  - it left out `seedType`'s `minLength`, which the server enforced.
+
+  Schemas are now generated from the input class and enforced as served. The
+  author approved the three content addresses this changed. Every other
+  address is byte-identical to before the move, pinned by
+  `content-addresses.feature`.
+- A library needs `-java-parameters` set itself (the Spring Boot plugin sets
+  it for applications), and Jakarta JSON-P 2.1 with Parsson, the pair Spring
+  Boot manages.
+- Committing the plan document between a red run and the code reset the TDD
+  window. Code is committed first now, documents after.
+
+Migration V2 moved the beds' events to the library's tables and dropped the
+old event and snapshot tables. `reset-db.sh` seeds the new table.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

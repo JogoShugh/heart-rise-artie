@@ -1,6 +1,6 @@
 # Plan: the HEART server library, four domains, and the L6 eval
 
-Status: **plan, not started.** Written 2026-10-10. It replaces sections 3, 4
+Status: **Part A done (2026-10-11); Parts B and C not started.** Written 2026-10-10. It replaces sections 3, 4
 and 10 of `EVAL-L6.md`, which planned a simulated server. The eval now runs
 against real servers, and those servers are built on a library first.
 
