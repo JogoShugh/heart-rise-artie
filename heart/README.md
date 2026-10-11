@@ -1,9 +1,15 @@
 # HEART server library
 
 Build a HEART server (`spec/SPEC.md`) by declaring your resources. You write
-the domain code and one declaration; the library serves HAL Schema Forms and
-HAL-FORMS at every rung, checks every act, and answers over HTTP and CoAP.
+the domain code and one declaration; the library serves HAL Schema Forms at
+every rung (and HAL-FORMS, the L0 on-ramp), checks every act, and answers over
+HTTP and CoAP.
 You write no controllers.
+
+**How it works:** [ARCHITECTURE.md](ARCHITECTURE.md) explains HEART with diagrams:
+REST and Fielding's rules in summary, the three layers, every rung from L0 to
+L6, negotiation, acts and refusals, and the bindings. How HEART measures
+against Fielding's rules, in detail: [spec/FIELDING-REVIEW.md](../spec/FIELDING-REVIEW.md).
 
 ## Modules
 
