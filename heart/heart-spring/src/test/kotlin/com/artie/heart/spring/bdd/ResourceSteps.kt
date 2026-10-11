@@ -88,7 +88,7 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
         http.results = http.results + spec.bodyValue(body).exchange().expectBody().returnResult()
     }
 
-    /** A creation's owning resource is the service index: the client syncs it, then sends its ETag. */
+    /** A bookmark act's owning resource is the service index: the client syncs it, then sends its ETag. */
     @When("a client posts {} to {string} as {word} with the index's ETag")
     fun postWithIndexETag(body: String, path: String, dialect: String) {
         val index = client.get().uri("/").header(HttpHeaders.ACCEPT, accept(dialect)).exchange()

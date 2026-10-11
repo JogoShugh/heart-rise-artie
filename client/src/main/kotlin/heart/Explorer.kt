@@ -51,7 +51,7 @@ data class Exploration(val acts: List<String>, val stopped: String)
  * Explores any HEART server from its bookmark (Fielding's rule 6): reads the
  * bookmark, runs the samples' search, follows the item, then repeatedly takes
  * the first offered act, in the samples' order, that still has a body left.
- * When the bookmark itself offers a sampled act (a creation), it starts
+ * When the bookmark itself offers a sampled act, it starts
  * there instead, and goes on from the resource the act made.
  * It chooses only among what the server offers now, so the same samples
  * explore any state the server leads it through.
@@ -62,7 +62,7 @@ class Explorer(private val client: HeartRiseClient) {
         client.discover("$base/")
         val bookmark = client.enter("$base/")
         val left = samples.acts.mapValuesTo(LinkedHashMap()) { (_, bodies) -> ArrayDeque(bodies) }
-        // A bookmark that offers a sampled act (a creation) is where the exploration starts.
+        // A bookmark that offers a sampled act is where the exploration starts.
         var here = if (left.keys.any { bookmark.containsAffordance(it) }) {
             bookmark
         } else {

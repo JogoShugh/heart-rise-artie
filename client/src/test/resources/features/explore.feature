@@ -4,7 +4,7 @@ Feature: ARTIE explores any HEART server from its bookmark
   for any domain: it reads the bookmark, runs the search the samples name,
   follows the item it finds, and then, again and again, takes the first act
   the resource offers that the samples still have a body for. When the
-  bookmark itself offers such an act, as a creation, it starts there instead
+  bookmark itself offers such an act, it starts there instead
   of searching, and goes on from the resource it made. It stops when
   no offered act has a sample left, or at its step limit. The samples are the
   only domain knowledge it has: example bodies, never URIs or orders.

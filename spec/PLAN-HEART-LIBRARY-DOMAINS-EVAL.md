@@ -359,12 +359,57 @@ text, people as values and a back-and-forth workflow. Their resources, offer
 keys and acts are drafted at the start of B4 and B5, in the same form as B2
 and B3, for your review.
 
+### B5. Support tickets (drafted and approved 2026-10-11)
+
+Built before library loans, at your call. Its own app at `domains/tickets`,
+its own database `tickets`, HTTP on 8282 and CoAP on 5685.
+
+**Resources**
+
+- **ticket:** a subject, the customer, a description, a priority, the
+  assigned agent, and the conversation in order: comments (each internal or
+  not), questions to the customer, the customer's replies, resolutions and
+  reopenings.
+- **the service index** offers `open-ticket`. A ticket is brought into being
+  by that act, never by a create operation (SPEC §6.2, "Acts the bookmark
+  offers").
+
+Agents are fixed values: `priya`, `marco`, `lena` and `tom`. A schema names
+them as an enum, so "people as values" is a closed set the form lists.
+
+**Offer keys of a ticket:** `NEW`, `ASSIGNED`, `WAITING_ON_CUSTOMER`,
+`RESOLVED`, `CLOSED`.
+
+| Act | Offered by | Fields and limits | Leads to |
+|---|---|---|---|
+| `open-ticket` | the service index | `subject`, `customer`, `description`, `priority` | NEW |
+| `assign` | NEW, ASSIGNED | `agent`: one of the agents, not the one already assigned | ASSIGNED |
+| `comment` | NEW, ASSIGNED, WAITING_ON_CUSTOMER | `text`, `internal` true or false | unchanged |
+| `ask-customer` | ASSIGNED | `question` | WAITING_ON_CUSTOMER |
+| `customer-replies` | WAITING_ON_CUSTOMER | `text` | ASSIGNED |
+| `resolve` | ASSIGNED, WAITING_ON_CUSTOMER | `resolution` | RESOLVED |
+| `reopen` | RESOLVED | `reason` | ASSIGNED |
+| `close` | RESOLVED | none | CLOSED, final |
+| `change-priority` | every key except CLOSED | `priority`, not the one it has | unchanged |
+
+`priority` is low, normal, high or urgent. Every text field is 1 to 2000
+characters.
+
+**Why this domain is good for the eval:**
+
+- Free text the model must write, not pick: a question, a resolution.
+- Near neighbours: an internal comment or a question to the customer; resolve
+  or close; reopen or comment on a resolved ticket.
+- A back-and-forth: "the customer says it works now" is `customer-replies`,
+  then `resolve`, in that order.
+- The act that starts it all is on the bookmark, so the model must find it
+  there, not on a ticket.
+
 ### B6. Build order for Part B
 
 1. Basketball, end to end through items 1 to 8 of B1.
-2. The ledger.
-3. Library loans.
-4. Support tickets.
+2. Support tickets, then the A7 vocabulary overlay (reordered 2026-10-11).
+3. The ledger and library loans, in an order to be discussed again.
 
 Each domain is committed as its own series and has a hack-log entry.
 

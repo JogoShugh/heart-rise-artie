@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 
 /**
  * An act's JSON Schema as HAL-FORMS template properties, for a template
- * heart-core renders itself (the service index's creation). Each top-level
+ * heart-core renders itself (an act the service index offers). Each top-level
  * property becomes one HAL-FORMS property: its title is the prompt, and the
  * schema keywords that HAL-FORMS also has carry over (`minimum` as `min`,
  * `pattern` as `regex`, an `enum` as inline `options`). The schema stays the
