@@ -1,118 +1,139 @@
 # HEART server library
 
-A library for building HEART servers (see `spec/SPEC.md`), the way Spring
-HATEOAS is a library for building hypermedia APIs. A server writes its
-domain code and one declaration of its resources and acts. The library
-renders the three layers, checks every act, and serves the result over HTTP
-and CoAP. A server writes no controllers.
+Build a HEART server (`spec/SPEC.md`) by declaring your resources. You write
+the domain code and one declaration; the library serves HAL Schema Forms and
+HAL-FORMS at every rung, checks every act, and answers over HTTP and CoAP.
+You write no controllers.
 
 ## Modules
 
-| Module | What it is | Depends on |
-|---|---|---|
-| `heart-core` | HEART itself, with no protocol: the declaration model, HAL Schema Forms rendering at L0, L1 and L2, content addressing, schemas generated from input classes, the act checks (428, 412, 409, 422), negotiation, the service index, JSON Home and search pages | Jackson, Jakarta JSON-P |
-| `heart-spring` | The HTTP binding on Spring WebFlux, with HAL-FORMS rendered by Spring HATEOAS. Applied by Spring Boot auto-configuration | `heart-core` |
-| `heart-coap` | The CoAP binding on Eclipse Californium (SPEC §6.0.1). Applied by auto-configuration | `heart-core` |
-| `heart-eventsourcing` | Optional. An event store, in memory or on Postgres through R2DBC: numbered events per resource, as-of reads, history, snapshots | `heart-core` |
-| `heart-tck` | The conformance features. A server runs them against itself to show it is HEART compliant | `heart-core` |
-| `heart-spring-boot-starter` | One dependency: `heart-core`, `heart-spring` and WebFlux | the above |
+| Module | Purpose |
+|---|---|
+| `heart-core` | HEART without a protocol: the declaration model, HAL Schema Forms rendering (L0–L2), content addressing, schemas generated from input classes, act checks (428 → 412 → 409 → 422), negotiation, service index, JSON Home, search pages |
+| `heart-spring` | HTTP binding on Spring WebFlux. HAL-FORMS via Spring HATEOAS |
+| `heart-coap` | CoAP binding on Eclipse Californium (SPEC §6.0.1), HAL Schema Forms only |
+| `heart-eventsourcing` | Optional event store, in memory or Postgres (R2DBC) |
+| `heart-tck` | Conformance features a server runs against itself |
+| `heart-spring-boot-starter` | `heart-core` + `heart-spring` + WebFlux |
 
-## A HEART server in five minutes
+The bindings are Spring Boot auto-configurations: adding the dependency is enough.
 
-The example is the lamp from `heart-core`'s test fixtures: on or off, and dimmable while on.
+## A server in four steps
 
-**1. Depend on the starter.** Inside this repo, include the build
-(`includeBuild("../heart")` in `settings.gradle.kts`); outside it, run
-`./gradlew publishToMavenLocal` here and add `mavenLocal()`.
+**1. Depend on the starter** (and `heart-coap` for CoAP).
 
 ```kotlin
-dependencies {
-    implementation("com.artie.heart:heart-spring-boot-starter")
-    testImplementation("com.artie.heart:heart-tck")
-}
+implementation("com.artie.heart:heart-spring-boot-starter")
 ```
 
+Inside this repo, `includeBuild("../heart")`. Elsewhere, run
+`./gradlew publishToMavenLocal` here and add `mavenLocal()`.
+
 **2. Write each act's input as a class.** Its JSON Schema is generated from
-these annotations, and bodies are checked against that same schema.
+Jakarta Validation and OpenAPI `@Schema` annotations, and request bodies are
+checked against that same schema.
 
 ```kotlin
 @Schema(title = "Dim")
 data class Dim(
     @field:NotNull @field:Min(1) @field:Max(100)
-    @field:Schema(title = "Brightness", description = "Percent of full brightness", examples = ["50"])
+    @field:Schema(title = "Brightness", examples = ["50"])
     val brightness: Int? = null,
 )
 ```
 
-**3. Declare the resource type.** The relations are the vocabulary (served
-as ALPS at `/profiles/home`); the offers say which acts each state allows
-and why the others are absent; the state view says how to read a lamp.
+**3. Declare the resource type.**
 
 ```kotlin
-val lamps = ResourceType(
+val lamps = ResourceType<Lamp, String>(
     collection = "lamps",
-    profile = Profile("home", "Lamps", "The acts a lamp offers.", relations = listOf(
+    profile = Profile("home", title = "Lamps", doc = "The acts a lamp offers.", relations = listOf(
         Relation("switch-on", AlpsType.UNSAFE, "Switch on", "Turns the lamp on.", "Offered while off."),
         Relation("dim", AlpsType.IDEMPOTENT, "Dim the lamp", "Sets the brightness.", "Offered while on."),
-        // ...
     )),
-    acts = listOf(Act.of("switchOn", "switch-on", SwitchOn::class.java), Act.of("dim", "dim", Dim::class.java)),
+    acts = listOf(
+        Act.of("switchOn", "switch-on", SwitchOn::class.java),
+        Act.of("dim", "dim", Dim::class.java),
+    ),
     offers = Offers(
         keys = listOf("ON", "OFF"),
         offered = { key -> if (key == "ON") listOf("dim") else listOf("switchOn") },
-        whyAbsent = { key, _ -> if (key == "ON") "The lamp is already on." else "The lamp is off; switch it on." },
+        whyAbsent = { key, _ -> if (key == "ON") "The lamp is already on." else "Switch it on first." },
     ),
-    state = StateView(keyOf = { it.status }, idOf = { it.id }, versionOf = { it.version }, bodyOf = { /* JSON */ }),
+    state = StateView(
+        keyOf = { it.status },
+        idOf = { it.id },
+        versionOf = { it.version },
+        bodyOf = { mapOf("id" to it.id, "status" to it.status, "brightness" to it.brightness) },
+    ),
 )
 ```
 
-The acts offered must depend on the state's key alone, so every lamp in one
-state shares one affordance set (SPEC §6.9).
+- `profile`: the vocabulary, served as ALPS at `/profiles/home`; forms are keyed `home:dim`.
+- `offers`: which acts each state key allows. It must depend on the key alone,
+  so every lamp in one state shares one affordance set (SPEC §6.9).
+- `versionOf`: changes with every change of state; it is part of the ETag.
 
-**4. Register it.** Say how a lamp is read and what each act does.
+**4. Register it as a bean.**
 
 ```kotlin
 @Bean
-fun lampResource(store: LampStore) = HeartResource(
+fun lampResource(store: LampStore): HeartResource<*, *> = HeartResource(
     layers = Layers(lamps),
     load = { id -> store.find(id) ?: throw ResourceNotFoundException("no lamp $id") },
     perform = { id, act, input -> Acted(store.apply(id, act, input)) },
 )
 ```
 
-That is the whole server. `GET /`, `GET /lamps/7` in either dialect and at
-any rung, `POST /lamps/7/actions/dim` with If-Match, the shared affordance
-sets, schemas and explanations, and `/profiles/home` are all served. Add
-`heart-coap` and the same lamp answers on `coap://`.
+`perform` runs only after the checks pass. `input.bind(Dim::class.java)` gives
+the body, already valid against the act's schema. Throw `ConcurrentWriteException` if another write landed first
+(it becomes 412).
 
-**5. Prove it.** Register a `TckFixture` bean (one lamp, an act it offers,
-an act it does not, a valid and an invalid body, a search term) and run the
-features under `classpath:heart/tck` with the glue `com.artie.heart.tck`.
-`heart-tck`'s own tests do exactly this for the lamp; `server-spring`'s
-`RunHeartTckTest` does it for the garden.
+## What is then served
 
-## Optional parts of a declaration
+| Path | Content |
+|---|---|
+| `GET /` | Service index (either dialect), or JSON Home when `Accept` ranks it first |
+| `GET /lamps/{id}` | Layer 1: L0 by default, L1/L2 with `Prefer: forms=link[, schema=link]`; ETag, 304 |
+| `POST /lamps/{id}/actions/{path}` | The act, with `If-Match`; answers the new Layer 1 and `Content-Location` |
+| `GET /affordance-sets/{address}`, `/schemas/{address}`, `/unavailable/{address}` | Shared layers, immutable, named by SHA-256 |
+| `GET /profiles/home` | ALPS profile |
 
-- **Finding** (`ResourceType.finding`, `HeartResource.find`): a search form
-  and a lookup form on the service index, and `/{collection}?name=` pages.
-- **Past** (`HeartResource.past`): for state folded from events, the state
-  as of an instant at `/{collection}/{id}?asOf=` and the events at
-  `/{collection}/{id}/history`. `heart-eventsourcing` keeps such state.
+Refusals are RFC 9457 problems (`precondition-required`, `stale`,
+`not-offered`, `invalid-input`). Over CoAP the same paths answer on UDP.
+
+## Optional
+
+- **Search and lookup**: add `finding = Finding(...)` to the type and
+  `find = { name, id -> ... }` to the resource. The index then offers both
+  forms, and `GET /lamps?name=` returns pages of `item` links.
+- **Past**: add `past = Past(at = ..., history = ...)`. Then
+  `GET /lamps/{id}?asOf=<instant>` and `GET /lamps/{id}/history` are served.
+  `heart-eventsourcing`'s `EventStore` can answer both (`state(asOf=…)`, `history`).
+
+## Prove it
+
+Add `testImplementation("com.artie.heart:heart-tck")`, register a
+`TckFixture` bean (a resource, an act it offers, an act it does not, a valid
+and an invalid body, a search term), and run the features at
+`classpath:heart/tck` with glue `com.artie.heart.tck`. Thirteen scenarios
+cover the layers, revalidation, every refusal, both dialects, the index and
+the profile.
 
 ## Configuration
 
-| Property | Default | Meaning |
+| Property | Default | |
 |---|---|---|
-| `heart.max-rung` | `L2` | The highest rung served (SPEC §6.11.1) |
-| `heart.page-size` | `20` | Items in one page of a search |
-| `heart.title` | the first profile's title | The API's title in the index and home document |
-| `heart.coap.port` | `5683` | CoAP's UDP port; `0` for a free one, `-1` for none |
+| `heart.max-rung` | `L2` | Highest rung served |
+| `heart.page-size` | `20` | Items per search page |
+| `heart.title` | first profile's title | API title |
+| `heart.coap.port` | `5683` | `0`: any free port, `-1`: off |
 
-## Building
+## Working examples
 
-```
-JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal ./gradlew check
-```
+- The lamp: `heart-core/src/testFixtures/.../fixtures/Lamps.kt`, served and
+  checked in `heart-tck/src/test/.../lamp/LampTck.kt`.
+- The garden: `server-spring/src/main/kotlin/com/artie/gardenbed/`
+  (`web/GardenBeds.kt`, `config/HeartConfig.kt`).
 
-`heart-eventsourcing`'s features run against Postgres in Testcontainers, so
-they need Docker.
+Build: `./gradlew check` (Java 21; the event-store features need Docker).
