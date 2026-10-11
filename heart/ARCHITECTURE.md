@@ -236,7 +236,7 @@ store is also 412.
 | Dialect | Media type | Rungs | Rendered by |
 |---|---|---|---|
 | HAL Schema Forms (reference) | `application/hal+json` | L0, L1, L2 | `heart-core` |
-| HAL-FORMS (on-ramp) | `application/prs.hal-forms+json` | L0 only | Spring HATEOAS, in `heart-spring` |
+| HAL-FORMS (on-ramp) | `application/prs.hal-forms+json` | L0 only | `Layers.halForms`, in `heart-core`; properties from the act's schema |
 
 The bytes differ; the legal acts and their targets must not.
 

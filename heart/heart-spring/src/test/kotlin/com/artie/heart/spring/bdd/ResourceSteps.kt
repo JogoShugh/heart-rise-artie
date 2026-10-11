@@ -61,7 +61,7 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
         val listed = json.path("_links").path("item").joinToString(", ") {
             "\"${it.path("href").asText()}\" titled \"${it.path("title").asText()}\""
         }
-        assertEquals(items, listed)
+        assertEquals(if (items == "nothing") "" else items, listed)
     }
 
     @When("a client gets {string} as {word}")

@@ -31,13 +31,6 @@ dependencies {
 
     // Reactive web stack: WebFlux on Netty, end to end with R2DBC below it.
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    // The hateoas starter brings spring-boot-starter-web (Spring MVC on Tomcat).
-    // With both stacks present Spring Boot starts the servlet one, so the app
-    // ran MVC while every in-process test ran WebFlux. runtime-stack.feature
-    // guards this.
-    implementation("org.springframework.boot:spring-boot-starter-hateoas") {
-        exclude(group = "org.springframework.boot", module = "spring-boot-starter-web")
-    }
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 

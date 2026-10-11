@@ -15,20 +15,8 @@ class BedSteps(private val beds: InMemoryBeds, private val store: BedEventLog) {
         store.reset()
     }
 
-    @Given("bed {long} is {word} and named {string}")
-    fun bedIsNamed(id: Long, status: String, label: String) {
-        bedIs(id, status)
-        beds.add(id, label)
-    }
-
     @Given("bed {long} is {word}")
     fun bedIs(id: Long, status: String) = putBed(beds, store, id, GardenBedStatus.valueOf(status))
-
-    /** A concurrent writer: appends straight to the store, bypassing HTTP. */
-    @Given("someone else waters bed {long} with {int} ml")
-    fun someoneElseWaters(id: Long, milliliters: Int) = runBlocking {
-        store.append(id, GardenBedEvent.CellWatered(milliliters))
-    }
 }
 
 /** Adds bed [id] and appends the events that lead to [status]. */

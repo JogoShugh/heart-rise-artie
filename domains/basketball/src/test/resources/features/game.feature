@@ -7,6 +7,11 @@ Feature: Scoring a youth basketball game
   Youth rules: four periods; a player fouls out at 5 personal fouls; a team
   is in the bonus once the other team has 7 fouls in the half.
 
+  Only the game's own rules are here. What every HEART server does (428,
+  412, 409, 422 for a body its schema refuses, the layers, search) is tested
+  once in the HEART library, and RunHeartTckTest runs the conformance
+  features against this server.
+
   Background:
     Given game 1, the Eagles at home to the Marauders
 
@@ -42,18 +47,12 @@ Feature: Scoring a youth basketball game
       | true  | 1     |
       | false | 0     |
 
-  Scenario Outline: A basket's form refuses what it does not allow: <case>
+  Scenario: A basket by a player not on the team is refused, and counts for nothing
+    The form's schema allows any shirt number; only the game knows its roster.
     Given game 1 is live in period 1 with the "home" team in possession
-    When the scorer records "score-basket" on game 1 with <body>
-    Then the game refuses it as invalid at "<pointer>"
+    When the scorer records "score-basket" on game 1 with {"team": "home", "playerNumber": 99, "points": 2}
+    Then the game refuses it as invalid at "/playerNumber"
     And the score is home 0, away 0
-
-    Examples:
-      | case                     | body                                                 | pointer       |
-      | a 1-point basket         | {"team": "home", "playerNumber": 23, "points": 1}    | /points       |
-      | a 4-point basket         | {"team": "home", "playerNumber": 23, "points": 4}    | /points       |
-      | no team                  | {"playerNumber": 23, "points": 2}                    | /team         |
-      | a player not on the team | {"team": "home", "playerNumber": 99, "points": 2}    | /playerNumber |
 
   Scenario: A player's fifth personal foul fouls them out, and they can no longer score
     Given game 1 is live in period 1 with the "home" team in possession

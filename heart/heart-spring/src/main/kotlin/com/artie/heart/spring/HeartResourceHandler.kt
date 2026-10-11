@@ -9,11 +9,7 @@ import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
 import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.hateoas.EntityModel
-import org.springframework.hateoas.Link
-import org.springframework.hateoas.mediatype.Affordances
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -148,32 +144,11 @@ class HeartResourceHandler<S, K>(
             builder.contentType(MediaType.parseMediaType(dialect.mediaType)).headers { headers(it) }
                 .bodyValueAndAwait(body())
 
+        /** Layer 1 in the negotiated dialect, both rendered by heart-core from the declaration. */
         private fun body(): Any = when (dialect) {
             Dialect.JSONSCHEMA -> resource.layers.layer1(state, rung)
-            Dialect.HALFORMS -> halForms(state)
+            Dialect.HALFORMS -> resource.layers.halForms(state)
         }
-    }
-
-    /**
-     * HAL-FORMS, rendered by Spring HATEOAS: one affordance per offered act,
-     * each with its own target (`/{collection}/{id}/actions/{path}`) and its
-     * properties read from the act's input class. HAL-FORMS keys a single
-     * template `default`; a client tells acts apart by target.
-     */
-    private fun halForms(state: S): EntityModel<Map<String, Any?>> {
-        val id = type.state.idOf(state)
-        var self = Link.of("/${type.collection}/$id").withSelfRel()
-        for (name in resource.layers.offered(type.state.keyOf(state))) {
-            val act = type.act(name)
-            val affordance = Affordances.of(Link.of("/${type.collection}/$id/actions/${act.path}"))
-                .afford(HttpMethod.POST)
-                .withInputAndOutput(act.input ?: Void::class.java)
-                .withName(name)
-                .build()
-                .stream().findFirst().orElseThrow()
-            self = self.andAffordance(affordance)
-        }
-        return EntityModel.of(type.state.bodyOf(state), self)
     }
 
     /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. No rung above the cap is served. */

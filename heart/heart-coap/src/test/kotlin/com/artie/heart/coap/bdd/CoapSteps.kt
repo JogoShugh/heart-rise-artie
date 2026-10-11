@@ -68,6 +68,10 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
         send(Request.newGet().apply { setURI(uri(link.path("href").asText())) })
     }
 
+    @When("a CoAP client asks for HAL-FORMS at {string}")
+    fun askHalForms(path: String) =
+        send(read(path).apply { options.addOption(Option(CoapOptions.ACCEPT_PROFILE, "<$HAL_FORMS_PROFILE>")) })
+
     /** [ifMatch] is "no If-Match", "If-Match \"<text>\"" or "the ETag it holds". */
     @When("the CoAP client posts {} to {string} with {}")
     fun post(body: String, path: String, ifMatch: String) {
@@ -150,6 +154,7 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
     private fun uri(path: String) = "coap://localhost:${door.port}$path"
 
     private companion object {
+        const val HAL_FORMS_PROFILE = "https://github.com/jogoshugh/heart-rise/hal-forms"
         const val TIMEOUT_MS = 5_000L
         const val ETAG_BYTES = 8
         const val PROBLEMS = "https://github.com/jogoshugh/heart-rise/problems/"

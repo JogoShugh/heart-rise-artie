@@ -28,9 +28,6 @@ class BedEventLog {
     suspend fun append(id: Long, event: GardenBedEvent) {
         store.append(GARDEN_BEDS, id, store.nextSequenceNo(GARDEN_BEDS, id), event)
     }
-
-    /** The number of bed [id]'s last event: its state version. */
-    suspend fun version(id: Long): Int = store.nextSequenceNo(GARDEN_BEDS, id) - 1
 }
 
 /** Bed identities. A suspend function on a Mockito mock may return its

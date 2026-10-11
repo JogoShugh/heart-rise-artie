@@ -114,6 +114,10 @@ does not extend Spring HATEOAS's.** The reasons:
   cannot produce the shared, immutable Layer 2 and Layer 3 resources.
 
 Spring HATEOAS stays where it fits: rendering the HAL-FORMS dialect, as today.
+(Changed 2026-10-11: it marked every Kotlin `val` field read-only and turned
+an optional string into a numeric range, because it reflects on the input
+class. heart-core now renders HAL-FORMS too, from each act's schema, and
+Spring HATEOAS is no longer used.)
 
 ### A4. The declaration a domain writes
 

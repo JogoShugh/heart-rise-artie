@@ -601,6 +601,47 @@ Found on the way:
 Migration V2 moved the beds' events to the library's tables and dropped the
 old event and snapshot tables. `reset-db.sh` seeds the new table.
 
+## 2026-10-11: acts on the bookmark, support tickets, and features that test only their own
+
+**Acts the bookmark offers.** A first version added a "create" operation:
+`POST /{collection}`. The author pointed out that create is merely an act,
+and that HEART is not CRUD. Now the service index is a resource that offers
+acts like any other, at `/actions/{path}`: the same form, the same checks in
+the same order (428, 412, 422; never 409, since the index always offers its
+acts), with the index's ETag in `If-Match`. Only the answer differs, because
+HTTP says so: an act that brings a resource into being answers 201 with
+`Location` and `Content-Location`. SPEC §6.2 says so. ARTIE's explorer starts
+from the bookmark when it offers an act it has a sample for.
+
+**Support tickets (plan B5)** at `domains/tickets`, the second domain on the
+library. A ticket is opened by `open-ticket`, the bookmark's act; its number
+and its first event commit in one transaction. Statuses NEW, ASSIGNED,
+WAITING_ON_CUSTOMER, RESOLVED and CLOSED; agents are fixed values. It passes
+all 17 TCK scenarios, the bookmark act's included. Buster campaign: 41
+rounds, 64 combinations, 40 pass, 24 attested, 0 FAIL, no holes, gate ok.
+
+**Features test only their own.** Each domain feature now holds only its
+domain's rules: what each state offers, the transitions, the reasons, and
+the rules a schema cannot say. What every HEART server does is tested once in
+the library, and the TCK runs it against every domain.
+- The garden had 75 scenarios, all about the wire, from before the library
+  existed. About 30 of them checked library behaviour that heart tested
+  nowhere else. Those moved to heart-spring and heart-coap, against the lamp;
+  the rest were already covered and were removed. The garden kept its code
+  layout, its runtime stack, its pinned content addresses, and one check that
+  CoAP and HTTP serve the same JSON. It gained `garden.feature`, its rules.
+- Basketball lost the rows that tested its schema rather than its game.
+- Tickets was written this way from the start.
+
+Found on the way: Spring HATEOAS rendered HAL-FORMS properties by reflecting
+on each act's input class. Every Kotlin `val` came out `readOnly: true`, and
+an optional string came out as a numeric range up to 2147483647. So the
+HAL-FORMS forms of basketball and tickets said their fields could not be
+filled. Only the garden's input classes avoided it, with `var` and a test of
+their own. heart-core now renders HAL-FORMS from each act's schema, as it
+already did for the index, and Spring HATEOAS is gone from the library and
+the garden.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

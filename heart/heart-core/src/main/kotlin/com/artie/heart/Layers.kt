@@ -105,6 +105,32 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         return body
     }
 
+    /**
+     * Layer 1 of [state] in HAL-FORMS, the L0 on-ramp: the state, its self
+     * link, and one template per offered act. A template's properties come
+     * from the act's schema ([HalFormsProperties]), as the index's do, so
+     * the two dialects say the same about every field. HAL-FORMS says a lone
+     * template SHOULD be keyed "default" and a client takes the first as the
+     * default, so the first is "default" and the rest keep their act's name.
+     */
+    fun halForms(state: S): Map<String, Any?> {
+        val id = type.state.idOf(state)
+        val body = LinkedHashMap(type.state.bodyOf(state))
+        body["_links"] = mapOf("self" to mapOf("href" to "/${type.collection}/$id"))
+        val templates = offered(type.state.keyOf(state)).mapIndexed { index, name ->
+            val act = type.act(name)
+            (if (index == 0) DEFAULT_TEMPLATE else name) to mapOf(
+                "title" to type.profile.relation(act.relation).title,
+                "method" to "POST",
+                "contentType" to JSON_CONTENT,
+                "target" to "/${type.collection}/$id/actions/${act.path}",
+                "properties" to HalFormsProperties.of(act.schema),
+            )
+        }.toMap()
+        if (templates.isNotEmpty()) body["_templates"] = templates
+        return body
+    }
+
     /** HAL-SCHEMA-FORMS-HR Rules 6 and 7: forms keyed by relation, and self-describing. */
     private fun forms(names: List<String>, embedSchemas: Boolean): Map<String, Any?> =
         names.associate { name ->
@@ -169,6 +195,8 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         const val FORMS_REL = "hr:forms"
         const val UNAVAILABLE_REL = "hr:unavailable"
         private const val TEMPLATE_POINTERS = "hr:templatePointers"
+        private const val DEFAULT_TEMPLATE = "default"
+        private const val JSON_CONTENT = "application/json"
         private val HR_CURIE: Map<String, Any> =
             mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
     }

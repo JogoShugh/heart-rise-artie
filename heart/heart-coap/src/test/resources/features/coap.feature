@@ -80,6 +80,10 @@ Feature: A declared resource over CoAP, served by heart-coap
     Then the CoAP response is 2.05
     And the CoAP Content-Format is 65004
 
+  Scenario: HAL-FORMS is the HTTP on-ramp, not served over CoAP
+    When a CoAP client asks for HAL-FORMS at "/lamps/7"
+    Then the CoAP response is 4.06
+
   Scenario: A lamp the server does not hold is not found
     When a CoAP client gets "/lamps/99" with Prefer ""
     Then the CoAP response is 4.04

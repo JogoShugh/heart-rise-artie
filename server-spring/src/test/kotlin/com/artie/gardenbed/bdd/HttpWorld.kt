@@ -18,11 +18,7 @@ data class Exchange(
     val json: JsonNode by lazy { ObjectMapper().readTree(bytes) }
 }
 
-/**
- * Per-scenario HTTP state shared by every step class. Requests always ask
- * for the hal-schema-forms dialect; the HAL-FORMS dialect gets its own
- * steps when L5 is covered.
- */
+/** Per-scenario HTTP state shared by every step class. */
 // @Component lets the kotlin-spring plugin open the class, so the scenario-scope proxy can subclass it.
 @Component
 @ScenarioScope
@@ -44,14 +40,6 @@ class HttpWorld(private val client: WebTestClient) {
                 .bodyValue(json),
         )
 
-    /** The latest response from a bed resource (Layer 1), whatever came after it. */
-    /** The negotiation headers a request was sent with. HTTP is stateless: an act
-     *  repeats them so the server can select the representation its If-Match names. */
-    fun negotiationHeaders(exchange: Exchange): Map<String, String> =
-        exchange.requestHeaders.filterKeys { it in setOf("Accept", "Accept-Profile", "Prefer") }
-
-    fun lastLayer1(): Exchange = exchanges.last { it.path.startsWith("/beds/") && !it.path.contains("/actions/") }
-
     private fun record(
         path: String,
         headers: Map<String, String>,
@@ -68,9 +56,6 @@ class HttpWorld(private val client: WebTestClient) {
         // SPEC §6.1: the dialect is picked by media type alone.
         const val HAL_SCHEMA_FORMS_ACCEPT = "application/hal+json"
         const val HAL_FORMS_ACCEPT = "application/prs.hal-forms+json"
-        // SPEC §6.1 (0.5): the rel is https://github.com/jogoshugh/heart-rise/rels/forms;
-        // server-spring sends it in its HAL CURIE short form.
-        const val FORMS_REL = "hr:forms"
 
         fun acceptFor(dialect: String): String = when (dialect) {
             "hal-schema-forms" -> HAL_SCHEMA_FORMS_ACCEPT

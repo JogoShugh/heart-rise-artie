@@ -16,7 +16,7 @@ against Fielding's rules, in detail: [spec/FIELDING-REVIEW.md](../spec/FIELDING-
 | Module | Purpose |
 |---|---|
 | `heart-core` | HEART without a protocol: the declaration model, HAL Schema Forms rendering (L0–L2), content addressing, schemas generated from input classes, act checks (428 → 412 → 409 → 422), negotiation, service index, JSON Home, search pages |
-| `heart-spring` | HTTP binding on Spring WebFlux. HAL-FORMS via Spring HATEOAS |
+| `heart-spring` | HTTP binding on Spring WebFlux. Both dialects rendered by `heart-core` |
 | `heart-coap` | CoAP binding on Eclipse Californium (SPEC §6.0.1), HAL Schema Forms only |
 | `heart-eventsourcing` | Optional event store, in memory or Postgres (R2DBC) |
 | `heart-tck` | Conformance features a server runs against itself |

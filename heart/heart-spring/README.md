@@ -20,8 +20,8 @@ beans, and every route below is served. The server writes no controllers.
 ## Dialects
 
 - HAL Schema Forms (`application/hal+json`): bodies from `heart-core`'s `Layers`.
-- HAL-FORMS (`application/prs.hal-forms+json`): rendered by Spring HATEOAS from
-  each act's input class; always L0.
+- HAL-FORMS (`application/prs.hal-forms+json`): bodies from `Layers.halForms`,
+  each template's properties from the act's JSON Schema; always L0.
 
 ## Errors
 
