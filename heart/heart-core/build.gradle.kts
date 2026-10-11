@@ -2,6 +2,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 plugins {
+    `java-library`
     kotlin("jvm")
     id("io.gitlab.arturbosch.detekt")
 }
@@ -15,6 +16,17 @@ dependencies {
     implementation("com.apicatalog:titanium-jcs:1.0.0")
     implementation("jakarta.json:jakarta.json-api:2.1.3")
     runtimeOnly("org.eclipse.parsson:parsson:1.1.7")
+
+    // An act's schema is generated from its input class (Jakarta Validation for the
+    // constraints, OpenAPI @Schema for the words), and bodies are checked against it.
+    // Jackson 2 lines, as Spring Boot 3.3 manages.
+    api("jakarta.validation:jakarta.validation-api:3.0.2")
+    api("io.swagger.core.v3:swagger-annotations:2.2.22")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.2")
+    implementation("com.github.victools:jsonschema-generator:4.38.0")
+    implementation("com.github.victools:jsonschema-module-jakarta-validation:4.38.0")
+    implementation("com.github.victools:jsonschema-module-swagger-2:4.38.0")
+    implementation("com.networknt:json-schema-validator:1.5.9")
 
     testImplementation(platform("io.cucumber:cucumber-bom:7.18.0"))
     testImplementation("io.cucumber:cucumber-java")

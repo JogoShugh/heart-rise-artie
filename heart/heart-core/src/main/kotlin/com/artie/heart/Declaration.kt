@@ -65,9 +65,22 @@ class Profile(val name: String, val title: String, val doc: String, val relation
  * An act a resource can offer. [name] is its logical name (the HAL-FORMS
  * template name); [relation] is the id of its relation in the profile;
  * [schema] is the JSON Schema of its body, as JSON text; [path] is its
- * segment in `/{collection}/{id}/actions/{path}`.
+ * segment in `/{collection}/{id}/actions/{path}`. An act declared with
+ * [of] has an [input] class, and its schema is generated from it.
  */
-data class Act(val name: String, val relation: String, val schema: String, val path: String = relation)
+data class Act(
+    val name: String,
+    val relation: String,
+    val schema: String,
+    val path: String = relation,
+    val input: Class<*>? = null,
+) {
+    companion object {
+        /** An act whose body is [input]: its schema is generated from the class (see InputSchemas). */
+        fun of(name: String, relation: String, input: Class<*>, path: String = relation): Act =
+            Act(name, relation, InputSchemas.of(input), path, input)
+    }
+}
 
 /**
  * Which acts each offer key allows. [offered] names them, in order; the acts

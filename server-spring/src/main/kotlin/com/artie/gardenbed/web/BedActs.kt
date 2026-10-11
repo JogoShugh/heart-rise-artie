@@ -10,7 +10,6 @@ import com.artie.gardenbed.web.dto.WaterCellRequest
 import com.artie.heart.PreconditionRequiredException
 import com.artie.heart.StaleWriteConflict
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.Validator
 import org.springframework.stereotype.Component
 
 /** What an act left behind: the bed's new state and, for a harvest, what was harvested. */
@@ -23,8 +22,8 @@ data class ActResult(val state: GardenBedState, val harvest: HarvestResult? = nu
  * and what they refuse are the same everywhere.
  */
 @Component
-class BedActs(private val service: GardenBedService, objectMapper: ObjectMapper, validator: Validator) {
-    private val binder = ActBodyBinder(objectMapper, validator)
+class BedActs(private val service: GardenBedService, objectMapper: ObjectMapper) {
+    private val binder = ActBodyBinder(objectMapper)
 
     /**
      * SPEC §6.2 evaluation order: no validator, then a stale one, then an act
