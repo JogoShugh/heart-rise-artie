@@ -114,7 +114,7 @@ class LayerSteps(private val ctx: ClientContext) {
         val body = json(yaml)
         val hash = MessageDigest.getInstance("SHA-256").digest(body.toByteArray(Charsets.UTF_8))
             .joinToString("") { "%02x".format(it) }.take(ADDRESS_HEX)
-        serve(kind, name, "$prefix/sha256-$hash", body)
+        serve(kind, name, "$prefix/$hash", body)
     }
 
     /** Serves [body] at [path] as an immutable layer and records its address and integrity value. */

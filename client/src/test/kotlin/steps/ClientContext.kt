@@ -88,7 +88,7 @@ class ClientContext {
     var requestsAfterEnter = 0
 
     /** Addresses and integrity values minted by the scenario, by name:
-     *  "set:planted" -> "/affordance-sets/sha256-...",
+     *  "set:planted" -> "/affordance-sets/<16 hex>",
      *  "integrity:set:planted" -> "sha256-<Base64>". */
     val addresses = mutableMapOf<String, String>()
 

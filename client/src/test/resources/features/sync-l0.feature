@@ -25,7 +25,7 @@ Feature: Sync at L0: enter a service and read one collapsed response
           method: POST
           contentType: application/json
           schema:
-            $id: /schemas/sha256-7ab6ce2f03278bdf
+            $id: /schemas/6efcb63a723f14bc
             title: Water Cell
             type: object
             properties:

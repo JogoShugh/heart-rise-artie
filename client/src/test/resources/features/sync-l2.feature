@@ -165,7 +165,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
     And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
 
   Scenario: The client reads nothing from a URL, even one shaped like a hash
-    Given the service serves affordance set "odd-name" at "/affordance-sets/sha256-0000000000000000":
+    Given the service serves affordance set "odd-name" at "/affordance-sets/0000000000000000":
       """yaml
       _forms:
         waterCell:
@@ -176,7 +176,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
     And bed 8 links to affordance set "odd-name" with integrity "{integrity:set:odd-name}"
     When the client enters "http://garden.test/beds/8"
     Then the manifest offers exactly "waterCell"
-    And the cache holds "http://garden.test/affordance-sets/sha256-0000000000000000"
+    And the cache holds "http://garden.test/affordance-sets/0000000000000000"
 
   Scenario: A set whose bytes do not match the link's integrity is refused, and not cached
     Given the service serves affordance set "planted-v2" at "/forms/planted":

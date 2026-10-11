@@ -80,13 +80,13 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
   Scenario: Tampered bytes are refused, and the log says so
     Given the client keeps an event log
     And the client works at rung L2
-    And the service serves affordance set "planted" at "/affordance-sets/sha256-planted":
+    And the service serves affordance set "planted" at "/affordance-sets/planted":
       """yaml
       _forms: {}
       """
     And bed 5 links to affordance set "planted" with integrity "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
     When the client tries to enter "http://garden.test/beds/5"
-    Then the event log has "integrity.refused" with "url.full" "http://garden.test/affordance-sets/sha256-planted" for the request to "http://garden.test/affordance-sets/sha256-planted"
+    Then the event log has "integrity.refused" with "url.full" "http://garden.test/affordance-sets/planted" for the request to "http://garden.test/affordance-sets/planted"
 
   Scenario: An act is logged with its precondition; a stale act is logged as dropped after the re-sync
     Given the client keeps an event log
