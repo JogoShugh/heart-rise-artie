@@ -213,7 +213,7 @@ NOT include instance identifiers (SPEC §6.9.4).
 
 ## Not covered here
 
-- Refusal bodies are RFC 9457 problem details; the four `type` URIs and the
+- Refusal bodies are RFC 9457 problem details; the five `type` URIs and the
   `violations` member are in SPEC §6.2.
 - Explaining absent acts (`hr:unavailable`) is in SPEC §6.12.
 - `If-Match` scope for acts. See SPEC §6.3.

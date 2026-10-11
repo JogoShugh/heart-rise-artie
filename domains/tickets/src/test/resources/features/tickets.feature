@@ -31,7 +31,7 @@ Feature: Support tickets
     Given ticket 1 was opened about "Cannot log in"
     And ticket 1 is assigned to "priya"
     When the agent records "assign" on ticket 1 with {"agent": "priya"}
-    Then the desk refuses it as invalid at "/agent"
+    Then the desk refuses it by a ticket rule at "/agent"
 
   Scenario: Asking the customer waits for their reply, and the reply hands the ticket back
     Given ticket 1 was opened about "Cannot log in"
@@ -79,6 +79,6 @@ Feature: Support tickets
   Scenario: The priority changes, but not to the one it already has
     Given ticket 1 was opened about "Cannot log in"
     When the agent records "change-priority" on ticket 1 with {"priority": "high"}
-    Then the desk refuses it as invalid at "/priority"
+    Then the desk refuses it by a ticket rule at "/priority"
     When the agent records "change-priority" on ticket 1 with {"priority": "urgent"}
     Then ticket 1 has priority "urgent"

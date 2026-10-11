@@ -1,7 +1,9 @@
 package com.artie.heart.coap.bdd
 
 import com.artie.heart.Acted
+import com.artie.heart.ActInput
 import com.artie.heart.ConcurrentWriteException
+import com.artie.heart.RuleRefusedException
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
@@ -38,7 +40,7 @@ class LampCoapServer {
         load = { id -> store.lamps[id] ?: throw ResourceNotFoundException("no lamp $id") },
         perform = { lamp, act, input ->
             val next = when (act) {
-                "dim" -> lamp.copy(brightness = checkNotNull(input.bind(Dim::class.java).brightness))
+                "dim" -> lamp.copy(brightness = brightness(lamp, input))
                 "switchOff" -> lamp.copy(status = "OFF")
                 else -> lamp.copy(status = "ON")
             }.let { it.copy(version = it.version + 1) }
@@ -61,6 +63,15 @@ class LampCoapServer {
                 .filter { id == null || it.id == id }
         },
     )
+}
+
+/** The brightness to dim [lamp] to. A rule only the lamp knows: not the brightness it already has. */
+private fun brightness(lamp: Lamp, input: ActInput): Int {
+    val brightness = checkNotNull(input.bind(Dim::class.java).brightness)
+    if (brightness == lamp.brightness) {
+        throw RuleRefusedException.at("/brightness", "The lamp is already at $brightness")
+    }
+    return brightness
 }
 
 @CucumberContextConfiguration

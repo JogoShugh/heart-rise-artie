@@ -366,7 +366,7 @@ Business rules SHALL be enforced through affordance presence and absence. An act
 | 405 Method Not Allowed | Client used the wrong HTTP method for the given affordance. | Client defect. |
 | **409 Conflict** | The transition is **not legal from the current state**. Either the resource moved since sync, or the client submitted an affordance absent from the current manifest. | Re-sync. The affordance may legitimately no longer exist. |
 | **412 Precondition Failed** | `If-Match` mismatch — someone else's write landed first. The act is stale. | Re-sync from scratch. **SHALL NOT** resubmit the stale act; the intent must be re-derived against the new state. |
-| 422 Unprocessable Content | Schema validation failure — required field missing or type mismatch. | Client or schema defect; do not retry unmodified. |
+| 422 Unprocessable Content | The body cannot be processed. Either it fails schema validation (required field missing, type mismatch): `invalid-input`. Or it satisfies the schema but a rule of the resource that a schema cannot say refuses it, such as assigning a ticket to the agent who already has it: `rule-refused` (added 2026-10-11). | `invalid-input`: client or schema defect; do not retry unmodified. `rule-refused`: the form was used correctly; report the reason, and choose different values or another act. |
 | **428 Precondition Required** | The state-changing request arrived without `If-Match`. | Re-issue conditionally. |
 
 Notes on the changes:
@@ -375,7 +375,7 @@ Notes on the changes:
 - 0.3 deprecated `428` as having no remaining trigger. Making acts conditional gives it back its RFC 6585 meaning exactly — *this server requires the request to be conditional* — which is a better outcome than deletion. §12's recommendation to remove it is withdrawn.
 - `422` is named "Unprocessable Content" in RFC 9110; 0.3's "Unprocessable Entity" is the older RFC 4918 name for the same code.
 
-**Error bodies (decided 2026-10-10).** A server SHALL send each refusal in the table above as an RFC 9457 problem details object, `application/problem+json`, with `type`, `title` and `status`. The `type` is a URI that names the refusal, so a client tells refusals apart by `type` and status, never by reading `title` or `detail`. H.E.A.R.T. defines four, under `https://github.com/jogoshugh/heart-rise/problems/`:
+**Error bodies (decided 2026-10-10).** A server SHALL send each refusal in the table above as an RFC 9457 problem details object, `application/problem+json`, with `type`, `title` and `status`. The `type` is a URI that names the refusal, so a client tells refusals apart by `type` and status, never by reading `title` or `detail`. H.E.A.R.T. defines five, under `https://github.com/jogoshugh/heart-rise/problems/`:
 
 | Status | `type` (suffix) | Extension members |
 |---|---|---|
@@ -383,6 +383,9 @@ Notes on the changes:
 | `412` | `stale` | none |
 | `409` | `not-offered` | `rel`: the relation the client acted on, as a URI reference resolved against the request URL |
 | `422` | `invalid-input` | `violations`: an array of `{"pointer", "message"}`, each `pointer` an RFC 6901 JSON Pointer into the request body |
+| `422` | `rule-refused` | `violations`, as for `invalid-input`: the field the rule refused, and why |
+
+`invalid-input` and `rule-refused` share a status because both say the body cannot be processed, and they differ in type because a client must act differently. `invalid-input` means the client built the body wrong, or the schema is wrong. `rule-refused` means the body was right for the form, and the resource's current state refuses it for a reason only the server knows (decided 2026-10-11). A server SHALL NOT send `invalid-input` for a body its schema accepts.
 
 ```http
 HTTP/1.1 422 Unprocessable Content

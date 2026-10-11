@@ -675,6 +675,16 @@ then the domain's `perform` is called on the state read before it, and must
 refuse. Putting the old re-read back into tickets makes it fail. The garden's
 leftover status check, and its comment about catching 409, are gone.
 
+Two more from the same walk. `@NotBlank` gave the schema only `minLength 1`,
+so a seed of three spaces was sown; heart-core now adds a pattern that means
+"some character that is not white space" both to JSON Schema, which searches,
+and to HAL-FORMS clients, which match the whole value. And a domain rule's
+refusal, such as assigning a ticket to the agent who has it, was sent as
+`invalid-input`, "The body does not match the form's schema", though the body
+did match. It now has its own problem type, `rule-refused`, still 422 with
+`violations`, so a client can tell "I built the body wrong" from "the
+resource's state says no". SPEC §6.2 lists five types.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

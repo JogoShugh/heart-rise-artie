@@ -1,6 +1,6 @@
 package com.artie.tickets.domain
 
-import com.artie.heart.UnprocessableContentException
+import com.artie.heart.RuleRefusedException
 import com.artie.heart.eventsourcing.EventStore
 import com.artie.heart.eventsourcing.Recorded
 import java.time.Instant
@@ -9,7 +9,8 @@ import java.time.Instant
  * Opens tickets, reads them, and records what happens to them. Which acts
  * are legal in a status is the declaration's business, checked before any of
  * this runs; the rules here are the ones a schema cannot say, such as not
- * assigning a ticket to the agent who already has it.
+ * assigning a ticket to the agent who already has it. Each refuses with
+ * [RuleRefusedException], a 422 of type rule-refused, naming the field.
  */
 class TicketService(
     private val tickets: TicketDirectory,
@@ -60,14 +61,14 @@ class TicketService(
         /** An agent to hand the ticket to: not the one who already has it. */
         fun requireOtherAgent(state: TicketState, agent: String) {
             if (state.agent == agent) {
-                throw UnprocessableContentException.at("/agent", "The ticket is already assigned to $agent")
+                throw RuleRefusedException.at("/agent", "The ticket is already assigned to $agent")
             }
         }
 
         /** A priority to change to: not the one the ticket already has. */
         fun requireOtherPriority(state: TicketState, priority: String) {
             if (state.priority == priority) {
-                throw UnprocessableContentException.at("/priority", "The ticket's priority is already $priority")
+                throw RuleRefusedException.at("/priority", "The ticket's priority is already $priority")
             }
         }
     }

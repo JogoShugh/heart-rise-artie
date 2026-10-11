@@ -64,6 +64,16 @@ Feature: A declared resource and its acts, served over HTTP
       | not offered          | switch-on | "seq-3.hsf.L0"    | {}                | 409    | not-offered           |
       | body breaks schema   | dim       | "seq-3.hsf.L0"    | {"brightness": 0} | 422    | invalid-input         |
 
+  Scenario: A body the schema accepts but a rule of the lamp refuses is its own problem, naming the field
+    SPEC §6.2. The lamp is at 50, and dimming it to 50 is a rule only the
+    lamp knows; the body is valid. invalid-input would tell the client its
+    form handling is wrong, so the refusal says what it is: rule-refused.
+    When a client posts {"brightness": 50} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    Then the response status is 422
+    And the response is a problem of type "rule-refused"
+    And the problem lists a violation at "/brightness"
+    And lamp 7 is still at version 3
+
   Scenario: The service index offers its own act, installing a lamp, beside its search and lookup
     When a client gets "/" as hal-schema-forms
     Then the response offers "home:search-lamps, home:get-lamp, home:install-lamp"

@@ -111,7 +111,10 @@ act's schema. Every domain proves this with the conformance features.
 | `GET /profiles/home` | ALPS profile |
 
 Refusals are RFC 9457 problems (`precondition-required`, `stale`,
-`not-offered`, `invalid-input`). Over CoAP the same paths answer on UDP.
+`not-offered`, `invalid-input`, `rule-refused`). Over CoAP the same paths
+answer on UDP. A rule of your own that a schema cannot say refuses with
+`RuleRefusedException.at("/field", "why")`: a 422 of type `rule-refused`,
+so a client never mistakes it for a body it built wrong.
 
 ## Optional
 

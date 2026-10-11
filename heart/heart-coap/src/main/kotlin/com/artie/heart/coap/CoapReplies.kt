@@ -7,6 +7,7 @@ import com.artie.heart.NotOfferedException
 import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.PreconditionRequiredException
 import com.artie.heart.ResourceNotFoundException
+import com.artie.heart.RuleRefusedException
 import com.artie.heart.StaleWriteConflict
 import com.artie.heart.UnprocessableContentException
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -67,6 +68,10 @@ internal class CoapReplies(private val objectMapper: ObjectMapper) {
         )
         is UnprocessableContentException -> problem(
             ResponseCode.UNPROCESSABLE_ENTITY, "invalid-input", "The body does not match the form's schema",
+            failure.message, mapOf("violations" to failure.violations),
+        )
+        is RuleRefusedException -> problem(
+            ResponseCode.UNPROCESSABLE_ENTITY, "rule-refused", "A rule of the resource refuses the act",
             failure.message, mapOf("violations" to failure.violations),
         )
         is MalformedActBodyException -> error(ResponseCode.BAD_REQUEST, failure.message)

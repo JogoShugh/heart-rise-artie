@@ -7,8 +7,9 @@ Feature: Scoring a youth basketball game
   Youth rules: four periods; a player fouls out at 5 personal fouls; a team
   is in the bonus once the other team has 7 fouls in the half.
 
-  Only the game's own rules are here. What every HEART server does (428,
-  412, 409, 422 for a body its schema refuses, the layers, search) is tested
+  Only the game's own rules are here. A play they refuse is a 422 of type
+  rule-refused, naming the field. What every HEART server does (428, 412,
+  409, 422 for a body its schema refuses, the layers, search) is tested
   once in the HEART library, and RunHeartTckTest runs the conformance
   features against this server.
 
@@ -51,7 +52,7 @@ Feature: Scoring a youth basketball game
     The form's schema allows any shirt number; only the game knows its roster.
     Given game 1 is live in period 1 with the "home" team in possession
     When the scorer records "score-basket" on game 1 with {"team": "home", "playerNumber": 99, "points": 2}
-    Then the game refuses it as invalid at "/playerNumber"
+    Then the game refuses it by a game rule at "/playerNumber"
     And the score is home 0, away 0
 
   Scenario: A player's fifth personal foul fouls them out, and they can no longer score
@@ -60,7 +61,7 @@ Feature: Scoring a youth basketball game
     When the scorer records "record-foul" on game 1 with {"team": "home", "playerNumber": 23, "kind": "personal"}
     Then home player 23 has fouled out
     When the scorer records "score-basket" on game 1 with {"team": "home", "playerNumber": 23, "points": 2}
-    Then the game refuses it as invalid at "/playerNumber"
+    Then the game refuses it by a game rule at "/playerNumber"
 
   Scenario: The other team is in the bonus once a team has 7 fouls in the half
     Given game 1 is live in period 1 with the "home" team in possession
@@ -103,9 +104,9 @@ Feature: Scoring a youth basketball game
     Then the score is home 0, away 0
     And home player 11 has 0 points
     When the scorer takes back game 1's play number 2
-    Then the game refuses it as invalid at "/sequenceNo"
+    Then the game refuses it by a game rule at "/sequenceNo"
 
   Scenario: Only a scoring play can be taken back
     Given game 1 is live in period 1 with the "home" team in possession
     When the scorer takes back game 1's play number 1
-    Then the game refuses it as invalid at "/sequenceNo"
+    Then the game refuses it by a game rule at "/sequenceNo"

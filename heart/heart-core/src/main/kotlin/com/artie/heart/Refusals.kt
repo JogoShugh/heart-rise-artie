@@ -41,12 +41,21 @@ open class ResourceNotFoundException(message: String) : RuntimeException(message
 /** One failing field: an RFC 6901 JSON Pointer into the request body, and why. */
 data class Violation(val pointer: String, val message: String)
 
-/** 422: the body is JSON but does not satisfy the affordance's schema. */
+/** 422, invalid-input: the body is JSON but does not satisfy the affordance's schema. */
 class UnprocessableContentException(val violations: List<Violation>, cause: Throwable? = null) :
-    RuntimeException("request body does not satisfy the affordance schema", cause) {
+    RuntimeException("request body does not satisfy the affordance schema", cause)
+
+/**
+ * 422, rule-refused: the body satisfies the schema, but a rule of the
+ * resource that a schema cannot say refuses it, such as assigning a ticket
+ * to the agent who already has it. A domain's act throws it. The client's
+ * form handling was right; the resource's state says no.
+ */
+class RuleRefusedException(val violations: List<Violation>) :
+    RuntimeException("a rule of the resource refuses the act: " + violations.joinToString { it.message }) {
     companion object {
-        /** A domain rule the schema cannot say, refused at one field: one violation at [pointer]. */
-        fun at(pointer: String, message: String) = UnprocessableContentException(listOf(Violation(pointer, message)))
+        /** Refused at one field: one violation at [pointer]. */
+        fun at(pointer: String, message: String) = RuleRefusedException(listOf(Violation(pointer, message)))
     }
 }
 

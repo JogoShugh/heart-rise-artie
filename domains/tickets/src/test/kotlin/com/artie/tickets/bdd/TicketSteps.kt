@@ -1,5 +1,6 @@
 package com.artie.tickets.bdd
 
+import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import com.artie.tickets.domain.TICKETS
 import com.artie.tickets.store.InMemoryTicketDirectory
@@ -112,9 +113,10 @@ class TicketSteps(
         assertEquals(priority, state.path("priority").asText())
     }
 
-    @Then("the desk refuses it as invalid at {string}")
-    fun invalid(pointer: String) {
+    @Then("the desk refuses it by a ticket rule at {string}")
+    fun refusedByRule(pointer: String) {
         assertEquals(422, last.status.value(), String(last.responseBody ?: ByteArray(0)))
+        assertEquals(PROBLEM_TYPES + "rule-refused", json(last).path("type").asText())
         assertEquals(listOf(pointer), json(last).path("violations").map { it.path("pointer").asText() }.distinct())
     }
 

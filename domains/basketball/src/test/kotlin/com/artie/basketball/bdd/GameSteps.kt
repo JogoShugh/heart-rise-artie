@@ -5,6 +5,7 @@ import com.artie.basketball.domain.GameEvent
 import com.artie.basketball.domain.GameSetup
 import com.artie.basketball.domain.Team
 import com.artie.basketball.store.InMemoryGameDirectory
+import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -134,9 +135,10 @@ class GameSteps(
         assertEquals(count, state.path(side).path("teamFouls").asInt())
     }
 
-    @Then("the game refuses it as invalid at {string}")
-    fun invalid(pointer: String) {
+    @Then("the game refuses it by a game rule at {string}")
+    fun refusedByRule(pointer: String) {
         assertEquals(422, last.status.value(), String(last.responseBody ?: ByteArray(0)))
+        assertEquals(PROBLEM_TYPES + "rule-refused", json(last).path("type").asText())
         assertEquals(listOf(pointer), json(last).path("violations").map { it.path("pointer").asText() }.distinct())
     }
 

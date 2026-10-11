@@ -1,6 +1,6 @@
 package com.artie.basketball.domain
 
-import com.artie.heart.UnprocessableContentException
+import com.artie.heart.RuleRefusedException
 import com.artie.heart.eventsourcing.EventStore
 import com.artie.heart.eventsourcing.Recorded
 import java.time.Instant
@@ -9,7 +9,8 @@ import java.time.Instant
  * Reads games and records what happens in them. Which acts are legal in a
  * phase is the declaration's business, checked before any of this runs; the
  * rules here are the ones a schema cannot say, such as whether a player is on
- * the team or has fouled out.
+ * the team or has fouled out. Each refuses with [RuleRefusedException], a 422
+ * of type rule-refused, naming the field.
  */
 class GameService(private val games: GameDirectory, private val events: EventStore) {
 
@@ -50,9 +51,9 @@ class GameService(private val games: GameDirectory, private val events: EventSto
             val roster = checkNotNull(state.setup).team(side).roster
             when {
                 number !in roster ->
-                    throw UnprocessableContentException.at("/playerNumber", "No player $number on the $side team")
+                    throw RuleRefusedException.at("/playerNumber", "No player $number on the $side team")
                 state.fouledOut(side, number) ->
-                    throw UnprocessableContentException.at("/playerNumber", "Player $number has fouled out")
+                    throw RuleRefusedException.at("/playerNumber", "Player $number has fouled out")
             }
         }
 
@@ -61,8 +62,8 @@ class GameService(private val games: GameDirectory, private val events: EventSto
             val play = state.plays.firstOrNull { it.sequenceNo == sequenceNo }
             when {
                 play == null ->
-                    throw UnprocessableContentException.at("/sequenceNo", "Play $sequenceNo did not score")
-                play.takenBack -> throw UnprocessableContentException.at(
+                    throw RuleRefusedException.at("/sequenceNo", "Play $sequenceNo did not score")
+                play.takenBack -> throw RuleRefusedException.at(
                     "/sequenceNo",
                     "Play $sequenceNo has already been taken back",
                 )

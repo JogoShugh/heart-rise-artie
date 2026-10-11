@@ -41,6 +41,7 @@ Feature: A declared resource over CoAP, served by heart-coap
       | a stale validator     | dim       | If-Match "0000"   | {"brightness": 5} | 4.12 | stale                 |
       | an act not offered    | switch-on | the ETag it holds | {}                | 4.09 | not-offered           |
       | a body the form fails | dim       | the ETag it holds | {"brightness": 0} | 4.22 | invalid-input         |
+      | a rule of the lamp    | dim       | the ETag it holds | {"brightness": 50} | 4.22 | rule-refused          |
 
   Scenario: A successful act answers with the lamp's new representation
     Given a CoAP client got "/lamps/7" with Prefer ""
