@@ -81,3 +81,23 @@ bdd_append() {
 
 # Reads the file path from a hook's JSON payload on stdin.
 bdd_hook_file_path() { jq -r '.tool_input.file_path // empty'; }
+
+# Refactor mode (scripts/refactor-mode): the author lets one commit change
+# production code with no feature change, on the terms .githooks/pre-commit
+# checks. Its file is inside the git directory, never in the working tree.
+bdd_refactor_file() { echo "$(cd "$(bdd_root)" && git rev-parse --absolute-git-dir)/bdd-refactor"; }
+bdd_refactor_present() { [ -f "$(bdd_refactor_file)" ]; }
+bdd_refactor_field() { sed -n "s/^$1=//p" "$(bdd_refactor_file)"; }
+
+# True when refactor mode is on for the current HEAD, the commit it was switched on for.
+bdd_refactor_on() {
+  bdd_refactor_present && [ "$(bdd_refactor_field head)" = "$(cd "$(bdd_root)" && git rev-parse HEAD)" ]
+}
+
+# True for a test file or a test fixture, which a refactor must leave as it is.
+bdd_is_test() {
+  case "$1" in
+    src/test/* | */src/test/* | src/testFixtures/* | */src/testFixtures/*) return 0 ;;
+  esac
+  bdd_is_feature "$1"
+}

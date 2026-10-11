@@ -642,6 +642,20 @@ their own. heart-core now renders HAL-FORMS from each act's schema, as it
 already did for the index, and Spring HATEOAS is gone from the library and
 the garden.
 
+**Refactor mode for the TDD gate.** A refactor changes structure, not
+behaviour, so it has no new scenario and cannot be seen red first; the gate
+used to refuse it. Now the author can switch on refactor mode for one commit,
+by typing `! scripts/refactor-mode on "why"` at the prompt. The commit passes
+only if no feature or test file differs from HEAD, a run passed before the
+first code change, and the last run passed after the last one. It carries a
+`Refactor-Mode: <why>` trailer, and the mode ends with the commit. A
+PreToolUse hook blocks Claude from switching the mode on, from changing the
+gate's scripts, hooks, settings or event log, and from `--no-verify`. Before
+this, nothing stopped Claude from editing the gate itself. Claude still runs
+as the author's user, so a determined bypass is possible; the hook makes it
+deliberate and visible rather than accidental, and the unchanged tests limit
+what a misuse could hide.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.
