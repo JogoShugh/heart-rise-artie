@@ -27,7 +27,12 @@ class GardenBedService(
         aggregates.findById(id) ?: throw BedNotFoundException(id)
 
     private suspend fun state(bed: GardenBedAggregate, asOf: Instant? = null): GardenBedState =
-        events.state(GARDEN_BEDS, checkNotNull(bed.id), asOf).copy(label = bed.label)
+        events.state(GARDEN_BEDS, checkNotNull(bed.id), asOf)
+            .copy(label = bed.label, widthFt = bed.widthFt, lengthFt = bed.lengthFt)
+
+    /** The bookmark's act: a new bed, empty, with its name and size; returns its state. */
+    suspend fun buildBed(label: String, widthFt: Int, lengthFt: Int): GardenBedState =
+        state(aggregates.save(GardenBedAggregate(label = label, widthFt = widthFt, lengthFt = lengthFt)))
 
     /** Beds whose label contains [name], ignoring case, and whose id is [id], in id order. Null matches all. */
     suspend fun findBeds(name: String?, id: Long? = null): List<GardenBedAggregate> =
@@ -36,9 +41,8 @@ class GardenBedService(
             .filter { id == null || it.id == id }
             .sortedBy { it.id }
 
-    suspend fun currentState(id: Long): GardenBedState = state(requireAggregate(id))
-
-    suspend fun stateAt(id: Long, asOf: Instant): GardenBedState = state(requireAggregate(id), asOf)
+    /** Bed [id]'s state now, or as of [asOf]. */
+    suspend fun currentState(id: Long, asOf: Instant? = null): GardenBedState = state(requireAggregate(id), asOf)
 
     /** 404s if the bed doesn't exist, even with zero events. */
     suspend fun history(id: Long): List<Recorded<GardenBedEvent>> {

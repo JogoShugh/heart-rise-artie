@@ -12,6 +12,8 @@ import java.time.Instant
 data class GardenBedState(
     val id: Long,
     val label: String,
+    val widthFt: Int = 0,
+    val lengthFt: Int = 0,
     val status: GardenBedStatus = GardenBedStatus.EMPTY,
     val cropName: String? = null,
     val growthPoints: Int = 0,

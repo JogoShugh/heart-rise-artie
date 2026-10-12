@@ -32,6 +32,23 @@ data class WaterCellRequest(
     val milliliters: Int = 0
 )
 
+@Schema(title = "Build Bed")
+data class BuildBedRequest(
+    @field:NotBlank
+    @field:Schema(title = "Name", description = "What the bed is called", examples = ["Herbs"])
+    val label: String = "",
+
+    @field:NotNull @field:Min(1) @field:Max(MAX_FEET)
+    @field:Schema(title = "Width", description = "How wide the bed is, in feet", examples = ["4"])
+    val widthFt: Int = 0,
+
+    @field:NotNull @field:Min(1) @field:Max(MAX_FEET)
+    @field:Schema(title = "Length", description = "How long the bed is, in feet", examples = ["8"])
+    val lengthFt: Int = 0,
+)
+
+private const val MAX_FEET = 100L
+
 /** Harvesting takes no input. */
 @Schema(title = "Harvest")
 class HarvestRequest

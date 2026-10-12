@@ -723,6 +723,18 @@ leaves the bed dry: the crop drank the water. That replaces the 2026-10-11
 decision that the soil stayed moist. Crop rotation, a rule that leaves no bed
 stuck, is parked in `spec/ideas/crop-rotation-rule.md`.
 
+## 2026-10-12: a bed is built from the bookmark
+
+Roy Bott's review found four TCK scenarios skipped for the garden: they test
+an act on the bookmark that brings a resource into being, and the garden's
+bookmark offered only its search and lookup. It now offers `garden:build-bed`:
+a name and a width and length in whole feet (1 to 100). The answer is 201,
+with the new bed's Location and its representation: empty, offering only
+`garden:sow-seed`. Name and size never change, so they live on the bed's
+identity row (`garden_bed`, migration V3; older beds are taken as 4 by 8),
+not in its events. The garden TCK now runs all its scenarios, none skipped,
+and a live scenario has ARTIE build a bed from `/` and sow it.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

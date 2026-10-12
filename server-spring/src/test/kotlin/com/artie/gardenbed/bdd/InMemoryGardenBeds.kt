@@ -30,29 +30,33 @@ class BedEventLog {
     }
 }
 
-/** Bed identities. A suspend function on a Mockito mock may return its
- *  value directly, so the answer below needs no coroutine machinery. */
+/** Bed identities, names and sizes. A suspend function on a Mockito mock may
+ *  return its value directly, so the answers below need no coroutine machinery. */
 class InMemoryBeds {
-    private val labels = mutableMapOf<Long, String>()
+    private val beds = mutableMapOf<Long, GardenBedAggregate>()
 
-    fun reset() = labels.clear()
+    fun reset() = beds.clear()
 
     fun add(id: Long, label: String = "Bed $id") {
-        labels[id] = label
+        beds[id] = GardenBedAggregate(id = id, label = label, widthFt = WIDTH_FT, lengthFt = LENGTH_FT)
     }
 
-    fun label(id: Long): String = labels.getValue(id)
+    fun label(id: Long): String = beds.getValue(id).label
 
     val repository: GardenBedAggregateRepository = mock(GardenBedAggregateRepository::class.java) { invocation ->
         when (invocation.method.name) {
-            "findById" -> {
-                val id = invocation.arguments[0] as Long
-                labels[id]?.let { GardenBedAggregate(id = id, label = it) }
-            }
-            "findAll" -> labels.entries.sortedBy { it.key }
-                .map { (id, label) -> GardenBedAggregate(id = id, label = label) }.asFlow()
+            "findById" -> beds[invocation.arguments[0] as Long]
+            "findAll" -> beds.values.sortedBy { it.id }.asFlow()
+            "save" -> (invocation.arguments[0] as GardenBedAggregate)
+                .copy(id = (beds.keys.maxOrNull() ?: 0) + 1)
+                .also { beds[checkNotNull(it.id)] = it }
             else -> null
         }
+    }
+
+    private companion object {
+        const val WIDTH_FT = 4
+        const val LENGTH_FT = 8
     }
 }
 

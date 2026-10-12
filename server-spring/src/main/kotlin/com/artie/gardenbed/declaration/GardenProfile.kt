@@ -6,7 +6,7 @@ import com.artie.heart.Profile
 import com.artie.heart.Relation
 
 /**
- * The garden's vocabulary (SPEC §6.1, §8.5): five relations, served as ALPS at
+ * The garden's vocabulary (SPEC §6.1, §8.5): six relations, served as ALPS at
  * `/profiles/garden` and named in forms by the CURIE `garden:<id>`; and why
  * each act is absent in each status (SPEC §6.12).
  */
@@ -18,6 +18,14 @@ object GardenProfile {
         doc = "The acts and searches a garden-bed service offers. A descriptor says what a " +
             "relation means; only a resource's current manifest says whether it is offered now.",
         relations = listOf(
+            Relation(
+                id = "build-bed",
+                type = AlpsType.UNSAFE,
+                title = "Build a bed",
+                description = "Builds a new, empty bed with a name and a size in feet.",
+                doc = "Offered by the service's bookmark, always. The new bed is empty and can be sown; its " +
+                    "name and size never change.",
+            ),
             Relation(
                 id = "sow-seed",
                 type = AlpsType.UNSAFE,

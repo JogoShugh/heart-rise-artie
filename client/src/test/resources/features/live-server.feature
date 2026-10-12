@@ -184,7 +184,7 @@ Feature: ARTIE against the real server
   Scenario Outline: From the bookmark alone at rung <rung>: search by name, follow the result, act
     Given the client works at rung <rung>
     When the client enters "/"
-    Then the manifest offers exactly "garden:search-beds, garden:get-bed"
+    Then the manifest offers exactly "garden:search-beds, garden:get-bed, garden:build-bed"
     When the client acts on "garden:search-beds" with:
       """yaml
       name: BED-2
@@ -204,6 +204,31 @@ Feature: ARTIE against the real server
       | L0   |
       | L2   |
 
+  Scenario: From the bookmark alone, build a new bed and sow it
+    The bookmark's act brings a bed into being; ARTIE lands on the new bed
+    and acts on it, with no URI of its own.
+    When the client enters "/"
+    And the client acts on "garden:build-bed" with:
+      """yaml
+      label: Herbs
+      widthFt: 4
+      lengthFt: 8
+      """
+    Then the resource state contains:
+      | key      | value |
+      | status   | EMPTY |
+      | label    | Herbs |
+      | widthFt  | 4     |
+      | lengthFt | 8     |
+    And the manifest offers exactly "garden:sow-seed"
+    When the client acts on "garden:sow-seed" with:
+      """yaml
+      seedType: thyme
+      """
+    Then the resource state contains:
+      | key    | value   |
+      | status | PLANTED |
+
   Scenario: From the bookmark alone: look a bed up by its id
     When the client enters "/"
     And the client acts on "garden:get-bed" with:
@@ -215,7 +240,7 @@ Feature: ARTIE against the real server
   Scenario: From the bookmark alone in HAL-FORMS: search by name, follow the result, act
     Given the client works in dialect hal-forms
     When the client enters "/"
-    Then the manifest offers exactly "searchBeds, getBed"
+    Then the manifest offers exactly "searchBeds, getBed, buildBed"
     When the client acts on "searchBeds" with:
       """yaml
       name: BED-2

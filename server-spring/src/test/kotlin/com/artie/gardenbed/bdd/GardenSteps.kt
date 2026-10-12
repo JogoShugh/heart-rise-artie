@@ -16,6 +16,27 @@ class GardenSteps(private val http: HttpWorld) {
         bed = http.get("/beds/$id", mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT)).json
     }
 
+    /** The bookmark's act, with the bookmark's current ETag as its validator. */
+    @When("a client builds a bed from the bookmark with {}")
+    fun build(body: String) {
+        val index = http.get("/", mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT))
+        val etag = checkNotNull(index.headers.eTag) { "the bookmark has no ETag" }
+        http.post("/actions/build-bed", body, mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT, "If-Match" to etag))
+    }
+
+    @Then("the answer is 201, naming the new bed in Location")
+    fun created() {
+        assertEquals(201, http.last.status, String(http.last.bytes))
+        assertTrue(http.last.headers.location.toString().contains("/beds/"), "${http.last.headers.location}")
+    }
+
+    @Then("the new bed is {string}, named {string}, {int} by {int} feet")
+    fun newBed(status: String, label: String, widthFt: Int, lengthFt: Int) {
+        bed = http.get(http.last.headers.location.toString(), mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT)).json
+        val actual = listOf("status", "label", "widthFt", "lengthFt").map { current().path(it).asText() }
+        assertEquals(listOf(status, label, widthFt.toString(), lengthFt.toString()), actual)
+    }
+
     @Then("bed {long} is {string} with crop {string}, growth {int} and moisture {int}")
     fun state(id: Long, status: String, crop: String, growth: Int, moisture: Int) {
         read(id)

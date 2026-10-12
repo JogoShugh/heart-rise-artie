@@ -9,6 +9,14 @@ Feature: Garden beds
   negotiation, search and paging) is tested once in the HEART library, and
   RunHeartTckTest runs the conformance features against this server.
 
+  Scenario: A new bed is built from the bookmark: empty, with its name and size in feet
+    The bookmark offers building a bed, the garden's one act that brings a
+    resource into being. Decided 2026-10-12.
+    When a client builds a bed from the bookmark with {"label": "Herbs", "widthFt": 4, "lengthFt": 8}
+    Then the answer is 201, naming the new bed in Location
+    And the new bed is "EMPTY", named "Herbs", 4 by 8 feet
+    And the bed offers exactly "garden:sow-seed"
+
   Scenario: An empty bed can only be sown, and says why it cannot be watered or harvested
     Given bed 1 is EMPTY
     When a client reads bed 1

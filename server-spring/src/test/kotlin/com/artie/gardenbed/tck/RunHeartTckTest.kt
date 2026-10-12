@@ -12,7 +12,6 @@ import com.artie.heart.spring.HeartAutoConfiguration
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
-import io.cucumber.junit.platform.engine.Constants.FILTER_TAGS_PROPERTY_NAME
 import io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME
 import io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME
 import io.cucumber.spring.CucumberContextConfiguration
@@ -28,18 +27,17 @@ import org.springframework.test.context.TestPropertySource
 
 /**
  * The garden runs HEART's conformance features (heart-tck) against itself:
- * the same scenarios every domain server runs, with nothing in them about beds.
+ * the same scenarios every domain server runs, with nothing in them about beds,
+ * the bookmark's act included.
  */
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("heart/tck")
 @ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.tck,com.artie.gardenbed.tck")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
-// The bookmark offers no act here, so the @bookmark-act scenarios do not apply.
-@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @bookmark-act")
 class RunHeartTckTest
 
-/** Bed 2, planted: watering is offered, sowing is not. */
+/** Bed 2, planted: watering is offered, sowing is not; the bookmark offers building a bed. */
 @TestConfiguration
 class GardenFixture {
     @Bean
@@ -59,6 +57,13 @@ class GardenFixture {
             reason = "The bed is already planted.",
         )
         override val searchTerm = "Bed 2"
+        override val bookmarkAct = TckAct(
+            key = "garden:build-bed",
+            path = "build-bed",
+            body = """{"label": "Herbs", "widthFt": 4, "lengthFt": 8}""",
+            invalidBody = """{"label": "Herbs", "widthFt": 0, "lengthFt": 8}""",
+            invalidPointer = "/widthFt",
+        )
 
         override suspend fun ready(): Long {
             beds.reset()

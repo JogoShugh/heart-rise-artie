@@ -35,6 +35,7 @@ class HeartConfig {
             },
             // A stored bed always has its id; only a bed not yet saved has none.
             find = { name, id -> service.findBeds(name, id).map { Found(checkNotNull(it.id), it.label) } },
-            past = GARDEN_BEDS.past(at = service::stateAt, history = service::history),
+            past = GARDEN_BEDS.past(at = { id, asOf -> service.currentState(id, asOf) }, history = service::history),
+            performAtBookmark = { _, input -> Acted(acts.build(input)) },
         )
 }

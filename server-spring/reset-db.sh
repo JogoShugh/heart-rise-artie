@@ -7,11 +7,11 @@ cd "$(dirname "$0")"
 docker compose exec -T postgres psql -U artie -d gardenbed <<'SQL'
 TRUNCATE heart_event, heart_snapshot, garden_bed RESTART IDENTITY CASCADE;
 
-INSERT INTO garden_bed (id, label) VALUES
-    (1, 'bed-1'),
-    (2, 'bed-2'),
-    (3, 'bed-3'),
-    (4, 'bed-4');
+INSERT INTO garden_bed (id, label, width_ft, length_ft) VALUES
+    (1, 'bed-1', 4, 8),
+    (2, 'bed-2', 4, 8),
+    (3, 'bed-3', 3, 6),
+    (4, 'bed-4', 4, 12);
 
 INSERT INTO heart_event (stream, stream_id, sequence_no, event_type, payload, occurred_at) VALUES
     ('garden-bed', 2, 1, 'SeedSown', '{"seedType": "tomato", "depthCm": 3}'::jsonb, now() - INTERVAL '5 days'),

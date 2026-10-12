@@ -2,6 +2,7 @@ package com.artie.gardenbed.declaration
 
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.service.GardenBedService
+import com.artie.gardenbed.declaration.dto.BuildBedRequest
 import com.artie.gardenbed.declaration.dto.HarvestResult
 import com.artie.gardenbed.declaration.dto.SowSeedRequest
 import com.artie.gardenbed.declaration.dto.WaterCellRequest
@@ -18,6 +19,10 @@ data class ActResult(val state: GardenBedState, val harvest: HarvestResult? = nu
  */
 @Component
 class BedActs(private val service: GardenBedService) {
+
+    /** The bookmark's act: a new, empty bed. */
+    suspend fun build(input: ActInput): GardenBedState =
+        input.bind(BuildBedRequest::class.java).let { service.buildBed(it.label, it.widthFt, it.lengthFt) }
 
     /** Act [affordance] on [bed], the state the client's ETag was checked against. */
     suspend fun perform(bed: GardenBedState, affordance: String, input: ActInput): ActResult =

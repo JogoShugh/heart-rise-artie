@@ -1,5 +1,6 @@
 package com.artie.gardenbed.declaration
 
+import com.artie.gardenbed.declaration.dto.BuildBedRequest
 import com.artie.gardenbed.declaration.dto.HarvestRequest
 import com.artie.gardenbed.declaration.dto.SowSeedRequest
 import com.artie.gardenbed.declaration.dto.WaterCellRequest
@@ -28,6 +29,7 @@ object GardenBeds {
             Act.of("waterCell", "water-cell", WaterCellRequest::class.java),
             Act.of("harvest", "harvest", HarvestRequest::class.java),
         ),
+        bookmarkActs = listOf(Act.of("buildBed", "build-bed", BuildBedRequest::class.java)),
         offers = Offers(
             keys = GardenBedStatus.entries,
             offered = { status ->
@@ -55,6 +57,8 @@ object GardenBeds {
                 linkedMapOf(
                     "id" to it.id,
                     "label" to it.label,
+                    "widthFt" to it.widthFt,
+                    "lengthFt" to it.lengthFt,
                     "status" to it.status.name,
                     "cropName" to it.cropName,
                     "growthPoints" to it.growthPoints,
