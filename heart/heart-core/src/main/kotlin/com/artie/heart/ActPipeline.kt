@@ -38,7 +38,7 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
         var state: S? = null
         steps(act, validator, { held -> current().also { state = it }.let { matches(it, held) } }) {
             val key = type.state.keyOf(checkNotNull(state))
-            if (act in type.offers.offered(key)) null else "the resource's current affordance set (key $key)"
+            if (act in type.offers.offered(key)) null else type.offers.whyAbsent(key, act)
         }
         return checkNotNull(state)
     }
@@ -53,20 +53,26 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
         steps(act, validator, { matches(it) }) { null }
     }
 
-    /** The order of SPEC §6.2: [notOffered] names the set that lacks the act, or is null when it is offered. */
+    /**
+     * The order of SPEC §6.2: [notOffered] says why the act is absent now, or is
+     * null when it is offered. A detail names the act by its relation's CURIE, as
+     * the forms do, never by its name in the code.
+     */
     private suspend fun <V : Any> steps(
         act: String,
         validator: V?,
         matches: suspend (V) -> Boolean,
         notOffered: () -> String?,
     ) {
+        val relation = type.act(act).relation
+        val curie = type.profile.key(relation)
         val refusal = when {
             validator == null ->
-                PreconditionRequiredException("$act needs a validator: the current one of the resource offering it")
+                PreconditionRequiredException("$curie needs a validator: the current one of the resource offering it")
             !matches(validator) ->
                 StaleWriteConflict("the validator does not match the current one of the selected representation")
-            else -> notOffered()?.let { set ->
-                NotOfferedException("$act is not in $set", rel = type.profile.reference(type.act(act).relation))
+            else -> notOffered()?.let { why ->
+                NotOfferedException("$curie is not offered now: $why", rel = type.profile.reference(relation))
             }
         }
         refusal?.let { throw it }

@@ -99,6 +99,12 @@ class ActSteps(private val world: LampWorld) {
         assertEquals(world.profile.reference(curie.substringAfter(':')), failure.rel)
     }
 
+    @Then("the refusal's detail is {string}")
+    fun detail(detail: String) {
+        val failure = checkNotNull(checkNotNull(outcome).exceptionOrNull()) { "the act was not refused" }
+        assertEquals(detail, failure.message)
+    }
+
     @Then("the act is refused as invalid at {string}")
     fun invalid(pointer: String) {
         val failure = refusedAs<UnprocessableContentException>()

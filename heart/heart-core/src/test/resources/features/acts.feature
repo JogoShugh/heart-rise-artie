@@ -22,6 +22,18 @@ Feature: An act is checked in SPEC order, then performed
       | offered, but the body breaks the schema     | dim      | current   | {"brightness": 0}  | invalid at "/brightness" |
       | offered, but the body is not JSON           | dim      | current   | {"brightness":     | malformed              |
 
+  Scenario Outline: A refusal's detail names the act by its relation, and says why it is not offered: <case>
+    The detail is for a person reading the problem. It names the act as
+    the forms do, never by a name in the code, and gives the same reason
+    the explanation of absent acts gives, never an internal key.
+    When a client acts on lamp 7 with "<act>", validator <validator>, and body {}
+    Then the refusal's detail is "<detail>"
+
+    Examples:
+      | case         | act      | validator | detail                                                                        |
+      | no validator | switchOn | none      | home:switch-on needs a validator: the current one of the resource offering it |
+      | not offered  | switchOn | current   | home:switch-on is not offered now: The lamp is already on.                    |
+
   Scenario: A checked act is performed with its body bound to the act's input class
     When a client acts on lamp 7 with "dim", validator current, and body {"brightness": 20}
     Then the act was performed
