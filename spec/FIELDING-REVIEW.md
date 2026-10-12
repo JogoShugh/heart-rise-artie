@@ -1,10 +1,10 @@
-<!-- Converted from the published review (claude.ai artifact NiZdhyhpwHrhdpDgkMJgWr, v14). Keep the two in step. -->
+<!-- Converted from the published review (claude.ai artifact NiZdhyhpwHrhdpDgkMJgWr, v15). Keep the two in step. -->
 
 *H.E.A.R.T. + R.I.S.E. · ARTIE · read against Roy T. Fielding, 20 Oct 2008*
 
 # Fielding's Rules, Checked
 
-> **Note.** The evidence below cites paths as of commit `b7f4d00`. Since then the server's HEART code moved into the library at `heart/` (`heart/ARCHITECTURE.md`); the garden server keeps only its domain and its declaration. The verdicts are unchanged: the conformance suite and the Buster campaign pass the same.
+> **Note.** Re-checked 11 October 2026 at commit `a70ecc2`, against the live garden server over HTTP and CoAP: the garden suite (15 scenarios), the HEART conformance suite run against the garden (14 pass; 4 test an act on the bookmark that creates a resource, which the garden does not offer), ARTIE's live suite (24 scenarios) and the last Buster campaign. No verdict changed. The server's HEART code now lives in the library at `heart/` (`heart/ARCHITECTURE.md`); the garden server keeps only its domain and its declaration. Paths below are current.
 
 Each heading below is Fielding's own wording, from ["REST APIs must be hypertext-driven"](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven) and his replies in its comments. Under each is a short account of what the spec and today's code do about it, with the evidence. Where the work falls short, this review says so. Revised 8–9 October 2026: Rule 4 resolved, the entry point added, Rule 6 re-read in full, the `If-Match` narrowing removed, and rung discovery added (a JSON Home index and `Preference-Applied`). Revised 10 October 2026: forms named by typed relations described in an ALPS profile, refusals as RFC 9457 problem details, absent acts explained by the server, Layer 1 always read with `Cache-Control: no-cache`, act responses naming their resource in `Content-Location`, and ARTIE checked by an adversarial proxy, Buster. The spec now has a protocol-neutral core with two bindings, HTTP and CoAP, and ARTIE works live over both (Rule 1).
 
@@ -18,28 +18,28 @@ Key: ✅ Supports the work does this · 🟡 Partly mostly, with a stated gap ·
 
 Each row jumps to its full account below. Columns are the commits this review has been checked against, all re-assessed with Fielding’s full wording.
 
-| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run |
-|---|---|---|---|---|---|---|---|---|---|
-| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ |
-| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ |
-| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 |
+| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run | `a70ecc2` 11 Oct · re-checked live |
+|---|---|---|---|---|---|---|---|---|---|---|
+| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ | ✅ |
+| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ |
+| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 | 🟡 |
 
 ## The six rules in the post
 
@@ -57,7 +57,7 @@ There are two real bindings. §6.1–§6.12 are the HTTP binding. §6.0.1 is a C
 
 What remains is narrower than the rule. The CoAP option and format numbers are experimental until registered with IANA. There is no `coaps` (DTLS) yet. HAL-FORMS, the HTTP on-ramp, is not served over CoAP. A CoAP request carries no client identity or trace context.
 
-- **Code:** client `heart/Binding.kt`, `HttpBinding.kt`, `CoapBinding.kt`; server `coap/CoapFrontDoor.kt`, `web/BedActs.kt`
+- **Code:** client `heart/Binding.kt`, `HttpBinding.kt`, `CoapBinding.kt`; library `heart-coap/…/CoapFrontDoor.kt`; garden `declaration/BedActs.kt`
 - **Tests:** `any-protocol.feature`, `coap-binding.feature` (client), `coap.feature` (server), live "Over CoAP" scenarios
 - **Spec:** §6.0 "Core and bindings", §6.0.1 "The CoAP binding"
 
@@ -72,7 +72,7 @@ What remains is narrower than the rule. The CoAP option and format numbers are e
 Every mechanism is an existing standard: `Prefer` tokens (RFC 7240, which allows unregistered tokens), conditional requests (RFC 9110, RFC 6585), `immutable` (RFC 8246), `Link: rel="profile"` and `Accept-Profile` (W3C content negotiation by profile). Spec 0.4 dropped its private use of the media-type `profile` parameter for exactly this reason. Conditional acts follow RFC 9110 §13.1.1 as written. HTTP is stateless, so an act repeats the `Accept`, `Accept-Profile` and `Prefer` its client synced with; the server selects the owning bed’s representation from them and compares `If-Match` with that representation’s `ETag` by strong comparison, the whole value. An earlier rule read only the state number inside the `ETag` and ignored the rest, a narrowing of RFC 9110; it was removed in `e2a773f`. Declaring what a server serves adds nothing new either: `Preference-Applied` (RFC 7240) says which rung each response is at, and the service index is also served as `application/json-home`, whose link hints `formats`, `accept-prefer` and `precondition-req` were written for exactly this. OPTIONS was considered and rejected, since its response has no defined body and is not cached. The 10 October work kept to the same line: a client reads Layer 1 with the request directive `Cache-Control: no-cache` (RFC 9111 §5.2.1.4), refusals are `application/problem+json` (RFC 9457) with JSON Pointers (RFC 6901), an act’s response names the bed it represents in `Content-Location` (RFC 9110 §8.7), and every request carries a W3C `traceparent`. Things that need watching: `Accept-Profile` is a W3C draft, and JSON Home and HTTP link hints are Internet-Drafts. Using a draft mechanism is not a change to the protocol, but it may move.
 
 - **Spec:** §6.1 "Why not a media-type parameter", §6.3 "Precondition scope"
-- **Tests:** `profile-negotiation.feature`, `layer1-revalidation.feature`, `home-document.feature`
+- **Tests:** `negotiation.feature` (heart-core), `conditional-requests.feature` (heart-spring), `index.feature` (heart-core: the home document), client `layer1-freshness.feature`
 
 <a id="r3">
 
@@ -85,7 +85,7 @@ Every mechanism is an existing standard: `Prefer` tokens (RFC 7240, which allows
 H.E.A.R.T. adds a profile on top of existing media types (`application/hal+json` with HAL Schema Forms, and `application/prs.hal-forms+json`). It names its own extended relations, `hr:forms` and `hr:unavailable` under `https://github.com/jogoshugh/heart-rise/rels/`. The example server names each of its acts by a relation too (`garden:water-cell`, a CURIE for `/profiles/garden#water-cell`), and describes them in an ALPS document at that address. This is the “extended relation names” half of the rule. And it defines how to process the three layers. The garden beds and their action URLs are an example server, not part of the protocol: nothing in the spec requires `/beds` or `/actions`.
 
 - **Spec:** §6.1 profiles and the forms relation; §6.4 layering
-- **Tests:** `forms-link.feature`, `form-relations.feature` (client and server), `rendering-ladder.feature` (server)
+- **Tests:** `forms-link.feature`, `form-relations.feature` (client and server), `layers.feature` (heart-core)
 
 <a id="r4">
 
@@ -95,9 +95,9 @@ H.E.A.R.T. adds a profile on top of existing media types (`application/hal+json`
 
 **✅ Supports:** The server instructs; the client reads nothing from a URL; the spec names no paths. (Resolved 8–9 Oct 2026.)
 
-Every act goes to a target the server sent. ARTIE's `act()` takes an action name, never a URL. Where a target is a template, the form itself says how to fill it: `"hr:templatePointers": {"id": "/id"}`, a JSON Pointer (RFC 6901) into the bed's representation, taken from JSON Hyper-Schema's `templatePointers`. That is an instruction "within media types", defined in the published H.E.A.R.T. profile of HAL Schema Forms, not a rule the client knows from elsewhere. The earlier gap is closed: ARTIE used to verify shared layers by reading the hash out of the `/sha256-` path. It now checks bytes against an `integrity` value carried in the linking representation, as Subresource Integrity does, and reads nothing from any URL. The spec no longer names paths either (9 Oct 2026): §6.5 requires only one URL per distinct body, served `immutable`, and gives the reference server’s `/sha256-` paths as an example. The reason is this rule, not URI opacity: Fielding wrote that “REST does not require that a URI be opaque” and that RESTful applications are “encouraged to use human-meaningful, hierarchical identifiers”, which the reference server’s paths are.
+Every act goes to a target the server sent. ARTIE's `act()` takes an action name, never a URL. Where a target is a template, the form itself says how to fill it: `"hr:templatePointers": {"id": "/id"}`, a JSON Pointer (RFC 6901) into the bed's representation, taken from JSON Hyper-Schema's `templatePointers`. That is an instruction "within media types", defined in the published H.E.A.R.T. profile of HAL Schema Forms, not a rule the client knows from elsewhere. The earlier gap is closed: ARTIE used to verify shared layers by reading the hash out of the URL path. It now checks bytes against an `integrity` value carried in the linking representation, as Subresource Integrity does, and reads nothing from any URL. The spec no longer names paths either (9 Oct 2026): §6.5 requires only one URL per distinct body, served `immutable`. Since 11 October the reference server names each body by the first 16 hex digits of its digest (`/affordance-sets/588773b4c4ba671e`), with no `sha256-` in front, so the name no longer looks like a digest; integrity is the only check, and a server refuses to start if two bodies would share a name. The reason is this rule, not URI opacity: Fielding wrote that “REST does not require that a URI be opaque” and that RESTful applications are “encouraged to use human-meaningful, hierarchical identifiers”, which the reference server’s paths are.
 
-- **Tests:** `templated-targets.feature`, client `conditional-acts.feature` (pointers, fields, refusals), `sync-l2.feature` (a hash-shaped URL is ignored; mismatched integrity is refused)
+- **Tests:** `layers.feature` (heart-core: the pointer `id` at `/id`), client `conditional-acts.feature` (pointers, fields, refusals), `sync-l2.feature` (a hash-shaped URL is ignored; mismatched integrity is refused)
 - **Spec:** `spec/HAL-SCHEMA-FORMS-HR.md` Rules 1 and 2; §6.5 "Naming is the server's", §6.9.1
 
 <a id="r5">
@@ -147,7 +147,7 @@ Fielding answered readers in the comments for three weeks. Several replies read 
 A Layer 1 response is state and manifest together, and the absence of an action is information: you cannot water an empty bed. Since 10 October the server can also say why. An `hr:unavailable` link leads to a list of acts not offered now, each with a reason, and a client fetches it only when it needs to explain. At L0 everything arrives in one response. At L1 and L2 the controls are linked rather than inline, but they are still part of the same representation, through a named relation, and a `304` proves the link is unchanged.
 
 - **Spec:** §3.4, §6.1 three layers, §6.7
-- **Tests:** `sync-l0.feature`, `sync-l2.feature`, `explaining-absence.feature`, `unavailable.feature`
+- **Tests:** `sync-l0.feature`, `sync-l2.feature`, `explaining-absence.feature`, `layers.feature` (heart-core)
 
 <a id="typed-relations">
 
@@ -197,7 +197,7 @@ The reasoner decides the transition: an action name and field values, or a quest
 
 An affordance-set or schema URL is named by the server from the hash of its bytes, so it is valid forever and served as `immutable`. The client checks the bytes against the `integrity` value in the link that led to them, never against the URL. Action URLs can change freely, because clients read them again on every sync. Today's evidence: the server moved from Spring MVC on Tomcat to WebFlux on Netty, and ARTIE's live scenarios passed unchanged.
 
-- **Tests:** `ContentAddressHttpTest`, live hash check 7/7, `runtime-stack.feature`
+- **Tests:** `content.feature` (heart-spring), `content-addressing.feature` (heart-core), live hash check, `runtime-stack.feature`
 
 <a id="post-meaning">
 
@@ -269,7 +269,7 @@ A response must name the hal-schema-forms (or hal-forms) profile in `Link: rel="
 
 The ETag's state version is the resource state. The representation ARTIE holds, with its manifest, is the application state. A `412` is precisely the moment the two have drifted apart: someone else changed the resource. ARTIE resolves it by fetching fresh application state, not by forcing its old intent through.
 
-- **Code:** `StateETag.kt` (server), `ArtieClient` refusal handling
+- **Code:** `StateETag.kt` (heart-core), `ArtieClient` refusal handling
 
 <a id="public-ids">
 
@@ -315,4 +315,4 @@ Two cases pass with a real Claude model. One is against the real server: “wate
 
 **Gaps to carry forward:** CoAP's experimental option numbers, unregistered, and no `coaps` (Rule 1); the draft `Accept-Profile` (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); and how well a model chooses, shown on real cases but not yet measured (its own row). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the `If-Match` narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.
 
-Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to `~/repos/artie` as of commit `b7f4d00`, 10 October 2026. The Buster campaign: 22 rounds, 120 planned mutations, all made, 70 pass, 50 pass (attested), 0 FAIL.
+Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to `~/repos/artie` as of commit `a70ecc2`, 11 October 2026. The Buster campaign: 22 rounds, 120 planned mutations, all made, 70 pass, 50 pass (attested), 0 FAIL.
