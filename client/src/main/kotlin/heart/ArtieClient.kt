@@ -129,6 +129,8 @@ class ArtieClient(
         val (refused, handled) = when (outcome) {
             is Outcome.Stale -> StaleAct(rel).also { sync(held.url) } to "discarded after re-sync"
             is Outcome.NotOffered -> IllegalTransition(rel).also { sync(held.url) } to "re-synced and reported"
+            is Outcome.Invalid if outcome.problemType == RULE_REFUSED ->
+                RuleRefused(rel, outcome.violations) to "reported"
             is Outcome.Invalid -> InvalidPayload(rel, outcome.violations) to "reported"
             else -> UnexpectedResponse(rel, outcome.code) to "reported"
         }
@@ -161,6 +163,9 @@ class ArtieClient(
     }
 
     private companion object {
+        /** SPEC §6.2: the problem type of a 422 whose body was valid but a rule refused. */
+        const val RULE_REFUSED = ProblemDetails.BASE + "rule-refused"
+
         fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
             if (!form.templated) return form.target
             val expanded = UriTemplate.expand(form.target, held.state, form.templatePointers, fields)

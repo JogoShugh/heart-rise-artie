@@ -17,5 +17,13 @@ class IllegalTransition(rel: String) : ActRefused("$rel is not legal in the curr
 class InvalidPayload(rel: String, val violations: List<String>) :
     ActRefused("$rel body was refused (422): ${violations.joinToString("; ")}")
 
+/**
+ * 422 rule-refused: the body satisfied the schema, but a rule of the resource
+ * refused it. The client's form handling was right; [violations] give the
+ * rule's own words. Not retried.
+ */
+class RuleRefused(rel: String, val violations: List<String>) :
+    ActRefused("$rel was refused by a rule of the resource (422): ${violations.joinToString("; ")}")
+
 /** Any other outcome; [code] is the binding's own word for it (HTTP: the status code). */
 class UnexpectedResponse(rel: String, code: String) : ActRefused("$rel got the unexpected answer $code")

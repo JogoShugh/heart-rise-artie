@@ -9,6 +9,8 @@ Feature: Conditional acts and the four refusals
     409  not legal here: re-sync and report; no retry
     428  the server wants a precondition: re-sync, then resend once with it
     422  the body is wrong: report the server's reasons; no retry
+    422  rule-refused: the body was right, a rule of the resource said no;
+         its own refusal, with the rule's words; no retry
 
   Background:
     Given the service answers GET "http://garden.test/beds/2" with:
@@ -349,6 +351,31 @@ Feature: Conditional acts and the four refusals
       """
     Then the client raised a "InvalidPayload" refusal
     And the client raised an error mentioning "/milliliters: must be at least 1"
+    And the client sent these requests after entering:
+      | POST http://garden.test/beds/2/actions/water-cell |
+
+  Scenario: 422 rule-refused is its own refusal, reported in the rule's words
+    SPEC §6.2: the body satisfied the schema, so the client's form handling
+    was right; the resource's state said no. A caller handles that apart
+    from a body that broke the schema.
+    Given the service answers POST "http://garden.test/beds/2/actions/water-cell" with:
+      """
+      422 Unprocessable Content
+      Content-Type: application/problem+json
+
+      type: https://github.com/jogoshugh/heart-rise/problems/rule-refused
+      title: A rule of the resource refuses the act
+      status: 422
+      detail: "The bed would be waterlogged: at most 600 ml now."
+      violations:
+        - {pointer: /milliliters, message: "The bed would be waterlogged: at most 600 ml now."}
+      """
+    When the client tries to act on "waterCell" with:
+      """yaml
+      milliliters: 700
+      """
+    Then the client raised a "RuleRefused" refusal
+    And the client raised an error mentioning "/milliliters: The bed would be waterlogged: at most 600 ml now."
     And the client sent these requests after entering:
       | POST http://garden.test/beds/2/actions/water-cell |
 
