@@ -1,10 +1,12 @@
-<!-- Converted from the published review (claude.ai artifact NiZdhyhpwHrhdpDgkMJgWr, v15). Keep the two in step. -->
+<!-- Converted from the published review (claude.ai artifact NiZdhyhpwHrhdpDgkMJgWr, v16). Keep the two in step. -->
 
 *H.E.A.R.T. + R.I.S.E. · ARTIE · read against Roy T. Fielding, 20 Oct 2008*
 
 # Fielding's Rules, Checked
 
 > **Note.** Re-checked 11 October 2026 at commit `a70ecc2`, against the live garden server over HTTP and CoAP: the garden suite (15 scenarios), the HEART conformance suite run against the garden (14 pass; 4 test an act on the bookmark that creates a resource, which the garden does not offer), ARTIE's live suite (24 scenarios) and the last Buster campaign. No verdict changed. The server's HEART code now lives in the library at `heart/` (`heart/ARCHITECTURE.md`); the garden server keeps only its domain and its declaration. Paths below are current.
+>
+> Re-checked again 12 October 2026 at commit `a7831ce`, after fixing what the Roy Bott review noticed: a CoAP request now carries its W3C trace context; a refusal's `detail` names the act by its relation and gives the domain's reason; the garden's bookmark offers an act that builds a new bed (201, `Location`); and the garden refuses water a bed cannot hold (422 `rule-refused`). Evidence: the garden suite (17 scenarios), the HEART conformance suite against the garden (18 of 18, none skipped), ARTIE's live suite (26 scenarios) and a fresh Buster campaign (125 mutations, 0 FAIL). No verdict changed.
 
 Each heading below is Fielding's own wording, from ["REST APIs must be hypertext-driven"](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven) and his replies in its comments. Under each is a short account of what the spec and today's code do about it, with the evidence. Where the work falls short, this review says so. Revised 8–9 October 2026: Rule 4 resolved, the entry point added, Rule 6 re-read in full, the `If-Match` narrowing removed, and rung discovery added (a JSON Home index and `Preference-Applied`). Revised 10 October 2026: forms named by typed relations described in an ALPS profile, refusals as RFC 9457 problem details, absent acts explained by the server, Layer 1 always read with `Cache-Control: no-cache`, act responses naming their resource in `Content-Location`, and ARTIE checked by an adversarial proxy, Buster. The spec now has a protocol-neutral core with two bindings, HTTP and CoAP, and ARTIE works live over both (Rule 1).
 
@@ -18,28 +20,28 @@ Key: ✅ Supports the work does this · 🟡 Partly mostly, with a stated gap ·
 
 Each row jumps to its full account below. Columns are the commits this review has been checked against, all re-assessed with Fielding’s full wording.
 
-| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run | `a70ecc2` 11 Oct · re-checked live |
-|---|---|---|---|---|---|---|---|---|---|---|
-| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ | ✅ |
-| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ |
-| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 | 🟡 |
+| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run | `a70ecc2` 11 Oct · re-checked live | `a7831ce` 12 Oct · trace over CoAP, bed from the bookmark |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ | ✅ | ✅ |
+| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ |
+| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 | 🟡 | 🟡 |
 
 ## The six rules in the post
 
@@ -55,10 +57,10 @@ The full rule allows that a "successful mapping to a given protocol may be depen
 
 There are two real bindings. §6.1–§6.12 are the HTTP binding. §6.0.1 is a CoAP binding (RFC 7252). CoAP has no header for a profile or a preference, so the binding carries them in experimental CoAP options, one for one with their HTTP headers. A Layer 1 read carries a critical, unsafe `No-Cache` option, which no proxy can answer from its cache. The validator is 8 bytes, CoAP’s limit, and the refusals are CoAP codes with the same problem types. The reference server answers CoAP natively on UDP beside HTTP, from the same services and the same act checks. ARTIE’s core is unchanged; `CoapBinding` serves `coap:` URIs. Live, over UDP against the real server, ARTIE takes a bed through sow, water and harvest at L0 and at L2, and goes from the `coap://…/` bookmark to an act. Nothing is sent over HTTP in any of them.
 
-What remains is narrower than the rule. The CoAP option and format numbers are experimental until registered with IANA. There is no `coaps` (DTLS) yet. HAL-FORMS, the HTTP on-ramp, is not served over CoAP. A CoAP request carries no client identity or trace context.
+What remains is narrower than the rule. The CoAP option and format numbers are experimental until registered with IANA. There is no `coaps` (DTLS) yet. HAL-FORMS, the HTTP on-ramp, is not served over CoAP. A CoAP request carries no client identity. Since 12 October it does carry trace context: option 65020 holds the same value as HTTP's `traceparent` header, elective, safe to forward and no part of the cache key (RFC 7252 §5.4.6). ARTIE mints a new span for each CoAP request, so each event in its log names the request it is about, as over HTTP; in the live run every CoAP event has a span.
 
 - **Code:** client `heart/Binding.kt`, `HttpBinding.kt`, `CoapBinding.kt`; library `heart-coap/…/CoapFrontDoor.kt`; garden `declaration/BedActs.kt`
-- **Tests:** `any-protocol.feature`, `coap-binding.feature` (client), `coap.feature` (server), live "Over CoAP" scenarios
+- **Tests:** `any-protocol.feature`, `coap-binding.feature` (client, with traceparent), `coap.feature` (server), live "Over CoAP" scenarios, including "every event names the span of the request it is about"
 - **Spec:** §6.0 "Core and bindings", §6.0.1 "The CoAP binding"
 
 <a id="r2">
@@ -69,7 +71,7 @@ What remains is narrower than the rule. The CoAP option and format numbers are e
 
 **✅ Supports:** Standard mechanisms only, used as written. (Narrowing removed 9 Oct 2026.)
 
-Every mechanism is an existing standard: `Prefer` tokens (RFC 7240, which allows unregistered tokens), conditional requests (RFC 9110, RFC 6585), `immutable` (RFC 8246), `Link: rel="profile"` and `Accept-Profile` (W3C content negotiation by profile). Spec 0.4 dropped its private use of the media-type `profile` parameter for exactly this reason. Conditional acts follow RFC 9110 §13.1.1 as written. HTTP is stateless, so an act repeats the `Accept`, `Accept-Profile` and `Prefer` its client synced with; the server selects the owning bed’s representation from them and compares `If-Match` with that representation’s `ETag` by strong comparison, the whole value. An earlier rule read only the state number inside the `ETag` and ignored the rest, a narrowing of RFC 9110; it was removed in `e2a773f`. Declaring what a server serves adds nothing new either: `Preference-Applied` (RFC 7240) says which rung each response is at, and the service index is also served as `application/json-home`, whose link hints `formats`, `accept-prefer` and `precondition-req` were written for exactly this. OPTIONS was considered and rejected, since its response has no defined body and is not cached. The 10 October work kept to the same line: a client reads Layer 1 with the request directive `Cache-Control: no-cache` (RFC 9111 §5.2.1.4), refusals are `application/problem+json` (RFC 9457) with JSON Pointers (RFC 6901), an act’s response names the bed it represents in `Content-Location` (RFC 9110 §8.7), and every request carries a W3C `traceparent`. Things that need watching: `Accept-Profile` is a W3C draft, and JSON Home and HTTP link hints are Internet-Drafts. Using a draft mechanism is not a change to the protocol, but it may move.
+Every mechanism is an existing standard: `Prefer` tokens (RFC 7240, which allows unregistered tokens), conditional requests (RFC 9110, RFC 6585), `immutable` (RFC 8246), `Link: rel="profile"` and `Accept-Profile` (W3C content negotiation by profile). Spec 0.4 dropped its private use of the media-type `profile` parameter for exactly this reason. Conditional acts follow RFC 9110 §13.1.1 as written. HTTP is stateless, so an act repeats the `Accept`, `Accept-Profile` and `Prefer` its client synced with; the server selects the owning bed’s representation from them and compares `If-Match` with that representation’s `ETag` by strong comparison, the whole value. An earlier rule read only the state number inside the `ETag` and ignored the rest, a narrowing of RFC 9110; it was removed in `e2a773f`. Declaring what a server serves adds nothing new either: `Preference-Applied` (RFC 7240) says which rung each response is at, and the service index is also served as `application/json-home`, whose link hints `formats`, `accept-prefer` and `precondition-req` were written for exactly this. OPTIONS was considered and rejected, since its response has no defined body and is not cached. The 10 October work kept to the same line: a client reads Layer 1 with the request directive `Cache-Control: no-cache` (RFC 9111 §5.2.1.4), refusals are `application/problem+json` (RFC 9457) with JSON Pointers (RFC 6901), an act’s response names the bed it represents in `Content-Location` (RFC 9110 §8.7), and every request carries a W3C `traceparent`, over CoAP in an experimental option one for one with the header. Things that need watching: `Accept-Profile` is a W3C draft, and JSON Home and HTTP link hints are Internet-Drafts. Using a draft mechanism is not a change to the protocol, but it may move.
 
 - **Spec:** §6.1 "Why not a media-type parameter", §6.3 "Precondition scope"
 - **Tests:** `negotiation.feature` (heart-core), `conditional-requests.feature` (heart-spring), `index.feature` (heart-core: the home document), client `layer1-freshness.feature`
@@ -123,13 +125,13 @@ The client branches only on the media type and profile (its `Dialect`) and on th
 
 `enter("/")` takes the only URL ARTIE is ever given: the service index. From there it searches beds by name or looks one up by id, using GET forms whose targets fill from their own fields, and follows a result chosen by its `item` relation and title. After that, every act must name a choice in the current manifest. A name that is not offered is refused before any request is sent. Each response becomes the new state and manifest. A `412` or `409` makes the client re-sync instead of trusting what it held. At L6 the reasoner can only pick among the offers it is shown, and the agent rejects anything else.
 
-Filling a template is "the user’s manipulation of those representations": the form and its template pointers come from the server, as an HTML form does, so L1 and L2 meet this rule as fully as L0. An earlier version of this review rated the rule "Partly", arguing from a "strictest reading" that required a complete link per action. That reading depended on quoting the rule without its last clause, and is withdrawn. The entry point, a real gap until `91fb71a`, is closed: `GET /` is a service index, and live scenarios go from it alone to a watered bed at L0 and L2.
+Filling a template is "the user’s manipulation of those representations": the form and its template pointers come from the server, as an HTML form does, so L1 and L2 meet this rule as fully as L0. An earlier version of this review rated the rule "Partly", arguing from a "strictest reading" that required a complete link per action. That reading depended on quoting the rule without its last clause, and is withdrawn. The entry point, a real gap until `91fb71a`, is closed: `GET /` is a service index, and live scenarios go from it alone to a watered bed at L0 and L2. Since 12 October the garden's bookmark also offers `garden:build-bed`, an act that brings a new bed into being: ARTIE enters `/`, builds a bed from the form, lands on it from the response and sows it, with no URI of its own.
 
 What remains is the rule’s first sentence: "standardized media types … expected to be understood by any client". ARTIE’s prior knowledge is HAL, HAL Schema Forms and the H.E.A.R.T. profile of it. HAL is an IETF draft, HAL Schema Forms is a published but unstandardized specification, and the profile is this project’s own. A generic HAL Schema Forms client can use L0, which uses none of the profile’s additions, but not L1 or L2. That is a question of adoption, not of how ARTIE behaves, and it is the same theme as the typed-relations reply below. Both dialects have the entry point: HAL-FORMS cannot put a field into a target’s path, so its index uses GET templates whose fields go in the query (`/beds?name=`, `/beds?id=`), and a live scenario goes from `/` alone to a watered bed in HAL-FORMS too.
 
 The bookmark also tells ARTIE what the server can do, without a second bookmark. Asked for `application/json-home`, the same `/` answers with a home document whose hints list the dialects and the `Prefer` values honoured. ARTIE asks for the best it offers, never more than its own setting, and then believes each response’s `Preference-Applied` over the declaration. A server just starting at L0 declares nothing and is used at L0. Live, the real server was started at L0, L1 and L2 in turn, and ARTIE found and worked at each level from `/` alone. `/.well-known/api-catalog` (RFC 9727) would go one step further, from a host name alone; it is parked, because it adds a fixed name and ARTIE is always given the index.
 
-- **Tests:** `service-index.feature` (client and server), `act-unknown.feature`, `conditional-acts.feature`, `reason-l6.feature`; live "From the bookmark alone" at L0 and L2, full cycles at L0, L1, L2 and over HAL-FORMS, discovery against servers capped at L0, L1 and L2; client `rung-discovery.feature`. Buster campaign (10 Oct): with an offered act removed from the manifest 11 times, ARTIE never sent it
+- **Tests:** `service-index.feature` (client and server), live "build a new bed and sow it", the HEART conformance suite's bookmark-act scenarios (201, 428, 412, 422), `act-unknown.feature`, `conditional-acts.feature`, `reason-l6.feature`; live "From the bookmark alone" at L0 and L2, full cycles at L0, L1, L2 and over HAL-FORMS, discovery against servers capped at L0, L1 and L2; client `rung-discovery.feature`. Buster campaign (12 Oct): an offered act was removed from the manifest 13 times, twice in the scenario that builds a bed, and ARTIE never sent it
 - **Open:** the media type and profile are published but not standardized
 
 ## From his replies in the comments
@@ -207,9 +209,9 @@ An affordance-set or schema URL is named by the server from the hash of its byte
 
 **✅ Supports:** The purpose sits next to the target, and the answer is the next hypertext.
 
-A form carries its title and schema beside its target. The response to an act is a full representation: what changed, and what can be done next. That matches his description of a POST answered with "another hypertext representation (telling you what happened and what can be done next)". Since 10 October the response also says, in `Content-Location`, which resource it is a representation of: the bed, not the action URL.
+A form carries its title and schema beside its target. The response to an act is a full representation: what changed, and what can be done next. That matches his description of a POST answered with "another hypertext representation (telling you what happened and what can be done next)". Since 10 October the response also says, in `Content-Location`, which resource it is a representation of: the bed, not the action URL. An act on the bookmark that builds a bed is answered `201`, with the new bed in `Location` and its representation in the body. When the resource refuses, the problem's `detail` uses the same words the form does: it names the act by its relation and gives the domain's reason (`garden:sow-seed is not offered now: The bed is already planted.`), never a name from the code. A rule the schema cannot say is refused as `rule-refused`, pointing at the field (`/milliliters`: "The bed would be waterlogged: at most 600 ml now.").
 
-- **Tests:** client `act.feature` (the manifest reflects the transition)
+- **Tests:** client `act.feature` (the manifest reflects the transition); heart-core `acts.feature` (a refusal's detail); garden `garden.feature` (building a bed, over-watering refused)
 
 <a id="prior-knowledge">
 
@@ -243,7 +245,7 @@ Instead of one big response or a bulk endpoint, the manifest and each schema are
 
 **✅ Supports:** ARTIE looks zero steps ahead.
 
-It keeps no script of request sequences. Each act is decided from the current manifest. A stale act is dropped, never resent. It does not even assume the rung it asked for: each response says, in `Preference-Applied`, what it is. The live full cycle (sow, water, harvest) is discovered one response at a time, at every rung and in both dialects. Under Buster, a forged `ETag` was planted 19 times where ARTIE would act next; every time, the act was refused with `412`, ARTIE re-synced, and it never resent the stale act.
+It keeps no script of request sequences. Each act is decided from the current manifest. A stale act is dropped, never resent. It does not even assume the rung it asked for: each response says, in `Preference-Applied`, what it is. The live full cycle (sow, water, harvest) is discovered one response at a time, at every rung and in both dialects. Under Buster, a forged `ETag` was planted 21 times where ARTIE would act next; every time, the act was refused with `412`, ARTIE re-synced, and it never resent the stale act.
 
 - **Tests:** `live-server.feature`; client `conditional-acts.feature` (412 drops the act); `scripts/buster-campaign.sh`
 
@@ -313,6 +315,6 @@ Two cases pass with a real Claude model. One is against the real server: “wate
 - **Tests:** two `@llm` scenarios (`llmTest`)
 - **Open:** the eval harness, the domains and cases, the pass bar, local and hosted models
 
-**Gaps to carry forward:** CoAP's experimental option numbers, unregistered, and no `coaps` (Rule 1); the draft `Accept-Profile` (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); and how well a model chooses, shown on real cases but not yet measured (its own row). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the `If-Match` narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.
+**Gaps to carry forward:** CoAP's experimental option numbers, unregistered (now including 65020 for trace context), and no `coaps` (Rule 1); the draft `Accept-Profile` (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); and how well a model chooses, shown on real cases but not yet measured (its own row). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the `If-Match` narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Resolved 12 October 2026: no trace context over CoAP (Rule 1). Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.
 
-Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to `~/repos/artie` as of commit `a70ecc2`, 11 October 2026. The Buster campaign: 22 rounds, 120 planned mutations, all made, 70 pass, 50 pass (attested), 0 FAIL.
+Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to `~/repos/artie` as of commit `a7831ce`, 12 October 2026. The Buster campaign, run at that commit: 22 rounds, 125 planned mutations, all made, 74 pass, 51 pass (attested), 0 FAIL, no holes.
