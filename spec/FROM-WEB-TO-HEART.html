@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Published at https://claude.ai/artifact/JmRxGm7vJPyPuLdPeMy146 -->
+<title>From the Web to HEART</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column. Part 1 is a timeline down a vertical rule; Part 2 is a numbered sequence of steps, each with the wire bytes it adds in a dark pane, added lines marked in green. */
+:root {
+  --paper: #f3f5f1;
+  --card: #ffffff;
+  --ink: #1b2420;
+  --muted: #5a6762;
+  --rule: #d3dbd5;
+  --leaf: #2f6d3a;
+  --leaf-soft: #e1eee2;
+  --soil: #7a4a26;
+  --soil-soft: #f3e9df;
+  --pane: #172019;
+  --pane-fg: #dbe6dd;
+  --pane-dim: #8ea397;
+  --pane-add: rgba(124, 204, 136, .18);
+  --pane-add-fg: #a9e7b2;
+  --pane-key: #9fd2c4;
+  --pane-str: #f1c890;
+  --bad: #b3361e;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #111613; --card: #18201b; --ink: #e2ebe4; --muted: #9fb1a6; --rule: #2b3730;
+    --leaf: #7fcf8c; --leaf-soft: #1b3221; --soil: #e0a273; --soil-soft: #34261b;
+    --pane: #0b100d; --pane-fg: #dbe6dd; --pane-dim: #7f948a; --pane-add: rgba(124, 204, 136, .16);
+    --pane-add-fg: #a9e7b2; --pane-key: #9fd2c4; --pane-str: #f1c890; --bad: #f08a76; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #111613; --card: #18201b; --ink: #e2ebe4; --muted: #9fb1a6; --rule: #2b3730;
+  --leaf: #7fcf8c; --leaf-soft: #1b3221; --soil: #e0a273; --soil-soft: #34261b;
+  --pane: #0b100d; --pane-fg: #dbe6dd; --pane-dim: #7f948a; --pane-add: rgba(124, 204, 136, .16);
+  --pane-add-fg: #a9e7b2; --pane-key: #9fd2c4; --pane-str: #f1c890; --bad: #f08a76; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 17px/1.62 var(--body); padding-inline: 16px; padding-block: 0 72px; margin: 0; }
+.wrap { max-width: 760px; margin: 0 auto; }
+p, ul, ol { margin: 0; }
+.prose { display: grid; gap: 14px; }
+.prose ul, .prose ol { padding-left: 1.3em; display: grid; gap: 6px; }
+a { color: var(--leaf); }
+a:focus-visible { outline: 2px solid var(--soil); outline-offset: 2px; }
+code { font: .84em var(--mono); background: var(--leaf-soft); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+b, strong { font-weight: 700; }
+
+header.top { padding-block: 56px 8px; display: grid; gap: 14px; }
+.eyebrow { font: 700 12.5px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--soil); }
+h1 { font: 800 clamp(36px, 7vw, 58px)/1.02 var(--display); margin: 0; letter-spacing: -.01em; text-wrap: balance; }
+.lede { font-size: 19.5px; color: var(--muted); max-width: 62ch; }
+h2 { font: 800 clamp(26px, 4.4vw, 34px)/1.15 var(--display); margin: 64px 0 14px; text-wrap: balance; }
+h3 { font: 600 22px/1.25 var(--display); margin: 0; text-wrap: balance; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; padding-top: 6px; }
+
+/* Part 1 timeline */
+.timeline { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 0; border-left: 2px solid var(--rule); }
+.timeline li { position: relative; padding: 0 0 26px 22px; display: grid; gap: 6px; }
+.timeline li::before { content: ""; position: absolute; left: -7px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--paper); border: 2px solid var(--leaf); }
+.timeline li.loss::before { border-color: var(--soil); background: var(--soil); }
+.timeline li.now::before { background: var(--leaf); }
+.when { font: 600 13px var(--mono); color: var(--muted); }
+.timeline h3 { font-size: 20px; }
+
+.analogy { width: 100%; border-collapse: collapse; font-size: 15.5px; }
+.table-box { overflow-x: auto; margin-top: 16px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; }
+.analogy th, .analogy td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.analogy th { font: 700 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.analogy tr:last-child td { border-bottom: 0; }
+
+/* Part 2 steps */
+.step { margin-top: 48px; display: grid; gap: 14px; }
+.step-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+.num { font: 800 34px/1 var(--display); color: var(--leaf); grid-row: span 2; min-width: 1.3em; }
+.adds { font: 700 12.5px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--soil); }
+.step-head > * { min-width: 0; }
+
+pre.wire { margin: 0; background: var(--pane); color: var(--pane-fg); font: 12.8px/1.6 var(--mono); padding: 12px 14px; border-radius: 6px; overflow-x: auto; white-space: pre; }
+pre.wire .d { color: var(--pane-dim); }
+pre.wire .k { color: var(--pane-key); }
+pre.wire .s { color: var(--pane-str); }
+pre.wire .a { background: var(--pane-add); color: var(--pane-add-fg); display: inline-block; min-width: 100%; }
+.cap { font-size: 14px; color: var(--muted); }
+
+.why { display: grid; gap: 6px; padding: 12px 14px; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; font-size: 15.5px; }
+.why b { color: var(--leaf); }
+.why.pain b { color: var(--bad); }
+
+.codes { width: 100%; border-collapse: collapse; font-size: 15px; }
+.codes td, .codes th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.codes th { font: 700 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.codes td:first-child { font: 600 14px var(--mono); white-space: nowrap; }
+.codes tr:last-child td { border-bottom: 0; }
+
+.ladder { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.ladder li { display: grid; grid-template-columns: 3.2em 1fr; gap: 12px; align-items: baseline; background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 9px 12px; font-size: 15.5px; }
+.ladder li > * { min-width: 0; }
+.ladder .lv { font: 600 15px var(--mono); color: var(--leaf); }
+.ladder li.ref { border-color: var(--leaf); background: var(--leaf-soft); }
+
+.diagram { background: var(--card); border: 1px solid var(--rule); border-radius: 6px; padding: 10px; overflow-x: auto; }
+.diagram pre.mermaid { margin: 0; background: transparent; }
+
+.checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
+.checklist li { padding-left: 28px; position: relative; }
+.checklist li::before { content: "✓"; position: absolute; left: 4px; top: 0; color: var(--leaf); font-weight: 700; }
+
+footer { margin-top: 64px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 14px; display: grid; gap: 8px; }
+@media (max-width: 520px) { body { font-size: 16px; } .num { font-size: 28px; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="eyebrow">A beginner's walk-through · H.E.A.R.T. 0.5 draft · garden example</div>
+  <h1>From the Web to HEART</h1>
+  <p class="lede">How the browser learned to work any website without knowing it in advance, how JSON APIs lost that ability, and how HEART gives it back so an AI agent can use a service the way a person uses a website. Then one plain data API, changed step by step until it speaks HEART's profile of HAL Schema Forms.</p>
+  <nav class="toc" aria-label="Contents">
+    <a href="#landscape">1. The landscape</a>
+    <a href="#evolve">2. Evolving one API</a>
+    <a href="#agent">3. The agent's loop</a>
+    <a href="#checklist">4. Checklist</a>
+  </nav>
+</header>
+
+<!-- ============ PART 1 ============ -->
+<h2 id="landscape">1. The landscape</h2>
+<div class="prose">
+  <p>Every example below talks to the same thing: a <b>garden bed</b>. You can sow a seed in an empty bed, water a planted one, and harvest it when it is ready. What you are allowed to do depends on the bed's state right now. That last sentence is the whole story.</p>
+</div>
+
+<ol class="timeline">
+  <li>
+    <span class="when">1989–1995</span>
+    <h3>The Web: a client that knows nothing about the site</h3>
+    <p>Tim Berners-Lee combined three things: <b>URIs</b> to name resources, <b>HTTP</b> to transfer them, and <b>HTML</b> to represent them. HTML carries the data and also the controls: links to follow and forms to fill in. A browser knows HTML and nothing about any particular shop or bank. The site tells it, in every response, what can be done next. When the site changes, nobody reinstalls the browser.</p>
+  </li>
+  <li>
+    <span class="when">2000</span>
+    <h3>REST names why it works</h3>
+    <p>Roy Fielding's dissertation describes the Web's architecture as <b>REST</b>. One of its constraints is "hypermedia as the engine of application state": the client moves from state to state only by choosing among the links and forms the server sent. This is what lets clients and servers change independently.</p>
+  </li>
+  <li class="loss">
+    <span class="when">2000s–2010s</span>
+    <h3>JSON APIs drop the controls</h3>
+    <p>Programs started talking to servers in JSON over HTTP, and called it REST. But JSON has no links or forms, so the controls moved out of the response and into documentation: which URL to build, which method, which body, and which rules apply. Swagger (2011), later OpenAPI (2016), made that documentation machine-readable. Clients hard-code the URLs and the rules. In 2008 Fielding objected: "REST APIs must be hypertext-driven." Leonard Richardson's maturity model (2008) put hypermedia at the top level, and most APIs stopped below it.</p>
+  </li>
+  <li>
+    <span class="when">2011 onward</span>
+    <h3>Hypermedia JSON formats appear</h3>
+    <p>Several formats put links and forms back into JSON: <b>HAL</b> (Mike Kelly, 2011) for links, Siren, JSON Hyper-Schema, <b>HAL-FORMS</b> (Mike Amundsen) and <b>HAL Schema Forms</b> (forms whose fields are JSON Schema). They worked, but they stayed niche, because a developer was writing each client by hand from the docs anyway.</p>
+  </li>
+  <li class="loss">
+    <span class="when">2023 onward</span>
+    <h3>AI agents get a catalogue, not a map</h3>
+    <p>Agents call APIs through tool definitions: function calling, OpenAPI documents in the prompt, tool search, and the Model Context Protocol (MCP, 2024). Each gives the agent a list of what the system can do <i>in principle</i>. None says what is allowed for <i>this</i> bed <i>now</i>. So an agent tries "water bed 1", and only learns from the refusal that nothing is planted.</p>
+  </li>
+  <li class="now">
+    <span class="when">2026</span>
+    <h3>HEART: the browser's idea, for agents</h3>
+    <p><b>H.E.A.R.T.</b> (Hypermedia Enforced Agentic Reliable Transactions) puts the controls back in the response, scoped to one resource in its current state. An agent gets the bed and exactly the acts the bed allows now. An act that is not offered is not allowed: the absence is the enforcement. <b>ARTIE</b> is the reference client. An agent built on it can work a garden, a basketball game or a ticket desk with no code about any of them.</p>
+  </li>
+</ol>
+
+<div class="table-box">
+<table class="analogy">
+  <thead><tr><th>On the Web</th><th>In HEART</th></tr></thead>
+  <tbody>
+    <tr><td>Browser</td><td>ARTIE, a generic client</td></tr>
+    <tr><td>HTML</td><td>HAL Schema Forms (<code>application/hal+json</code>) with the HEART profile</td></tr>
+    <tr><td>A link</td><td>A HAL link, such as <code>self</code> or <code>item</code></td></tr>
+    <tr><td>A form and its fields</td><td>A form in <code>_forms</code>, its fields described by JSON Schema</td></tr>
+    <tr><td>The person choosing what to click</td><td>The user's goal, or a language model choosing among the offered acts</td></tr>
+    <tr><td>The home page you bookmarked</td><td>The service's bookmark, <code>/</code></td></tr>
+    <tr><td>"This page has expired" on resubmit</td><td><code>412</code>: the act was based on a state that has changed</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ============ PART 2 ============ -->
+<h2 id="evolve">2. Evolving one API</h2>
+<div class="prose">
+  <p>We start with an ordinary data API and add one idea at a time. Each step shows what goes on the wire. Lines in green are new in that step. The responses come from the reference garden server, trimmed with <code>…</code>.</p>
+</div>
+
+<!-- Step 0 -->
+<section class="step" id="s0">
+  <div class="step-head"><span class="num">0</span><span class="adds">The starting point</span><h3>A data API: state only</h3></div>
+  <pre class="wire"><span class="d">GET /beds/1   Accept: application/json</span>
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{"id":1, "label":"bed-1", "status":"EMPTY", "moistureLevel":0}</pre>
+  <p>Everything else lives in a document the client's developer read once:</p>
+  <pre class="wire"><span class="d">API docs (out of band)</span>
+POST /beds/{id}/sow-seed    body {"seedType":string, "depthCm":1..10}   only if status is EMPTY
+POST /beds/{id}/water-cell  body {"milliliters":1..1000}            only if a seed is planted
+POST /beds/{id}/harvest     body {}                                 only if READY_TO_HARVEST</pre>
+  <div class="why pain"><b>What goes wrong</b>
+    <p>The client builds URLs itself, and copies the rules about status into its own code. When the server changes a rule or a path, the client breaks or quietly does the wrong thing. An agent given these docs will try acts the bed does not allow, and learn the rules by being refused. Two clients acting at once can overwrite each other.</p></div>
+</section>
+
+<!-- Step 1 -->
+<section class="step" id="s1">
+  <div class="step-head"><span class="num">1</span><span class="adds">Adds a hypermedia type and links</span><h3>Say it is HAL, and link instead of documenting</h3></div>
+  <pre class="wire"><span class="d">GET /beds/1   Accept: application/hal+json</span>
+<span class="a">Content-Type: application/hal+json</span>
+
+{"id":1, "label":"bed-1", "status":"EMPTY", "moistureLevel":0,
+<span class="a"> "_links":{"self":{"href":"/beds/1"}}}</span></pre>
+  <div class="why"><b>Why</b><p>The media type tells the client how to read the response, the way <code>text/html</code> does for a browser. Addresses now come from the server inside <code>_links</code>, so the client stops building them. HAL alone can only say "go there". It cannot say "send this".</p></div>
+</section>
+
+<!-- Step 2 -->
+<section class="step" id="s2">
+  <div class="step-head"><span class="num">2</span><span class="adds">Adds forms, only the legal ones</span><h3>Put the acts in the response, with HAL Schema Forms</h3></div>
+  <pre class="wire">{"id":1, "status":"EMPTY", …,
+ "_links":{"self":{"href":"/beds/1"}},
+<span class="a"> "_forms":{</span>
+<span class="a">   "sow-seed":{</span>
+<span class="a">     "_links":{"target":{"href":"/beds/1/actions/sow-seed"}},</span>
+<span class="a">     "method":"POST", "contentType":"application/json",</span>
+<span class="a">     "schema":{"type":"object", "required":["seedType"],</span>
+<span class="a">       "properties":{"seedType":{"type":"string","minLength":1},</span>
+<span class="a">                     "depthCm":{"type":"integer","minimum":1,"maximum":10}}}}}}</span></pre>
+  <div class="why"><b>Why</b><p>Each form carries everything needed to act: where, how, and what the body must look like. The important part is what is <i>missing</i>. Bed 1 is empty, so it offers only sow-seed. Watering and harvesting are not in the response, so the client cannot even try them. Bed 2, which is planted, would offer water-cell instead. The rule about status has moved from the client's code into the server's response. At this point the API is like a website again.</p></div>
+</section>
+
+<!-- Step 3 -->
+<section class="step" id="s3">
+  <div class="step-head"><span class="num">3</span><span class="adds">Adds meaning: relations, a profile, descriptions</span><h3>Name each act so a stranger can understand it</h3></div>
+  <pre class="wire"><span class="a">Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel="profile"</span>
+
+{… "_links":{"self":{"href":"/beds/1"},
+<span class="a">   "curies":[{"name":"garden","href":"/profiles/garden#{rel}","templated":true}]},</span>
+ "_forms":{
+<span class="a">   "garden:sow-seed":{</span>
+<span class="a">     "title":"Sow a seed",</span>
+<span class="a">     "description":"Plants a seed in an empty bed. The bed becomes planted.",</span>
+     …
+     "schema":{… "seedType":{"type":"string", <span class="a">"title":"Seed", "description":"The kind of seed to sow", "examples":["basil"]</span>} …}}}}</pre>
+  <div class="why"><b>Why</b><p>The <code>profile</code> link tells the client this response follows HEART's profile of HAL Schema Forms, so it may rely on the profile's rules. The form's name is now a <b>link relation</b>. <code>garden:sow-seed</code> is a short form (a CURIE) of <code>/profiles/garden#sow-seed</code>, and that address is a description of the act in an ALPS profile. A client learns the CURIE and the profile from the response itself, during the interaction. Titles, descriptions and examples are written for whoever chooses: a person, or a language model.</p></div>
+</section>
+
+<!-- Step 4 -->
+<section class="step" id="s4">
+  <div class="step-head"><span class="num">4</span><span class="adds">Adds safe acts: validators and clear refusals</span><h3>Act only on the state you saw</h3></div>
+  <pre class="wire"><span class="d">GET /beds/1</span>
+<span class="a">ETag: "seq-0.hsf.L0"</span>
+<span class="a">Cache-Control: no-cache</span>
+
+<span class="d">POST /beds/1/actions/sow-seed</span>
+<span class="a">If-Match: "seq-0.hsf.L0"</span>
+Content-Type: application/json
+
+{"seedType":"basil"}</pre>
+  <p>The <code>ETag</code> names the version of the bed the client saw. Every act sends it back in <code>If-Match</code>. If the bed has changed since, the server refuses. Each refusal is an RFC 9457 problem details body with its own <code>type</code>, and the server checks them in this order:</p>
+  <div class="table-box">
+  <table class="codes">
+    <thead><tr><th>Code</th><th>Meaning</th><th>Real detail from the garden</th></tr></thead>
+    <tbody>
+      <tr><td>428</td><td>No <code>If-Match</code> was sent</td><td>garden:water-cell needs a validator: the current one of the resource offering it</td></tr>
+      <tr><td>412</td><td>Stale: the bed changed since you looked</td><td>the validator does not match the current one of the selected representation</td></tr>
+      <tr><td>409</td><td>Not offered in the bed's current state</td><td>garden:harvest is not offered now: Nothing is growing yet; sow a seed and water it until it is ready.</td></tr>
+      <tr><td>422</td><td><code>invalid-input</code>: the body breaks the form's schema</td><td><code>/depthCm</code>: must have a maximum value of 10</td></tr>
+      <tr><td>422</td><td><code>rule-refused</code>: the body is valid, but a rule of the resource says no</td><td>The bed would be waterlogged: at most 600 ml now.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="why"><b>Why</b><p>Two clients can no longer overwrite each other. On a 412 the client fetches the bed again and decides afresh. It never resends the old act. Each code has exactly one meaning, so a client handles refusals without reading the text.</p></div>
+</section>
+
+<!-- Step 5 -->
+<section class="step" id="s5">
+  <div class="step-head"><span class="num">5</span><span class="adds">Adds one entry point</span><h3>Start from a bookmark, nothing else</h3></div>
+  <pre class="wire"><span class="d">GET /   Accept: application/hal+json</span>
+{"title":"Garden beds",
+ "_forms":{
+<span class="a">   "garden:search-beds":{"_links":{"target":{"href":"/beds{?name}","templated":true}}, "method":"GET", …},</span>
+<span class="a">   "garden:get-bed":{"_links":{"target":{"href":"/beds/{id}","templated":true}}, "method":"GET", …},</span>
+<span class="a">   "garden:build-bed":{"_links":{"target":{"href":"/actions/build-bed"}}, "method":"POST", …}}}</span></pre>
+  <div class="why"><b>Why</b><p>A client needs to know only one URI. From the bookmark it can search for a bed by name, go to a bed by id, or build a new one. A new bed comes from an act the bookmark offers, with its own form and rules. It is not a generic "create" on a collection. Asked for <code>application/json-home</code>, the same <code>/</code> also lists the formats and the <code>Prefer</code> options the server supports.</p></div>
+</section>
+
+<!-- Step 6 -->
+<section class="step" id="s6">
+  <div class="step-head"><span class="num">6</span><span class="adds">Adds layers, so the forms can be cached</span><h3>Send the state, and link to the forms</h3></div>
+  <p>Until now every response repeats every form and schema. That is correct but wasteful. Many beds are in the same state and offer the same forms. A client may ask for the forms and schemas as separate, cacheable resources:</p>
+  <pre class="wire"><span class="d">GET /beds/2   Prefer: forms=link, schema=link</span>
+ETag: "seq-3.hsf.L2"
+<span class="a">Preference-Applied: forms=link, schema=link</span>
+
+{"id":2, "status":"PLANTED", "cropName":"tomato", …,
+ "_links":{"self":{"href":"/beds/2"},
+<span class="a">   "hr:forms":{"href":"/affordance-sets/aab67c2bd106ace1",</span>
+<span class="a">               "integrity":"sha256-qrZ8K9EGrOGeWjyrqHskN7gZvS6ib1NGBk3/Vnx2JaM="}}}</span>
+
+<span class="d">GET /affordance-sets/aab67c2bd106ace1      (shared by every bed in this state; cached for a year)</span>
+{"_forms":{"garden:water-cell":{
+   "_links":{"target":{"href":"/beds/{id}/actions/water-cell","templated":true}},
+<span class="a">   "hr:templatePointers":{"id":"/id"},</span>
+   "method":"POST", "title":"Water the bed", …,
+<span class="a">   "schema":{"$ref":"/schemas/7f232c04c52671dd",</span>
+<span class="a">             "hr:integrity":"sha256-fyMsBMUmcd0HdvI4xkfZO3dvViJqO0HdGynlKasuMdQ="}}}}</span>
+
+<span class="d">GET /schemas/7f232c04c52671dd             (shared by every form that uses it)</span>
+{"type":"object", "required":["milliliters"],
+ "properties":{"milliliters":{"type":"integer","minimum":1,"maximum":1000, …}}}</pre>
+  <div class="why"><b>Why</b><p>The bed itself is never cached as fresh: it can change at any moment. The forms and schemas are named by their content, so they never change and are served <code>immutable</code>. A shared set cannot name one bed, so its target is a URI Template, and <code>hr:templatePointers</code> says to fill <code>{id}</code> from <code>/id</code> in the bed that linked to it. The client checks every fetched set and schema against the <code>integrity</code> hash in the link that led to it, so a year-old cached copy can be trusted. The bed's own response is now small, and checking an unchanged bed again costs one request answered <code>304</code>.</p></div>
+  <p>These choices form a ladder. A server can climb it one rung at a time:</p>
+  <ul class="ladder">
+    <li><span class="lv">L0</span><span>Everything in one response, no special headers (steps 1–5). An on-ramp: it gives correct behaviour, but is not yet HEART conformance.</span></li>
+    <li><span class="lv">L1</span><span><code>Prefer: forms=link</code>: the forms move to a linked, cached set; schemas are still inside it.</span></li>
+    <li class="ref"><span class="lv">L2</span><span><code>Prefer: forms=link, schema=link</code>: schemas move out too. The reference rung, and the minimum to claim conformance.</span></li>
+    <li><span class="lv">L3</span><span>Proof of sharing: two beds in one state, two clients, one cache, one fetch of the set.</span></li>
+    <li><span class="lv">L4</span><span>Concurrency and refusals: 428, 412, 409, 422, as in step 4.</span></li>
+    <li><span class="lv">L5</span><span>Cross-dialect: the same acts also served as HAL-FORMS, an L0 on-ramp format.</span></li>
+    <li><span class="lv">L6</span><span>Optional: a language model chooses the act. A HEART client never needs a model.</span></li>
+  </ul>
+</section>
+
+<!-- Step 7 -->
+<section class="step" id="s7">
+  <div class="step-head"><span class="num">7</span><span class="adds">Optional: explains what is missing</span><h3>Say why an act is absent</h3></div>
+  <pre class="wire"><span class="a">"hr:unavailable":{"href":"/unavailable/d1995ab17483fab3", "integrity":"sha256-0Zla…"}</span>
+
+<span class="d">GET /unavailable/d1995ab17483fab3</span>
+{"unavailable":[
+  {"rel":"/profiles/garden#water-cell","reason":"Nothing is planted yet; sow a seed first."},
+  {"rel":"/profiles/garden#harvest","reason":"Nothing is growing yet; sow a seed and water it until it is ready."}]}</pre>
+  <div class="why"><b>Why</b><p>When a person asks "why can't I water bed 1?", the client can answer from the server's own words. It fetches this only when asked, and never acts on it.</p></div>
+</section>
+
+<!-- ============ PART 3 ============ -->
+<h2 id="agent">3. The agent's loop</h2>
+<div class="prose">
+  <p>A HEART client runs the same three steps over and over: <b>Sync</b>, <b>Reason</b>, <b>Act</b>.</p>
+  <ol>
+    <li><b>Sync.</b> Fetch the resource, check the profile, follow and verify the layers, and hold the bed with its current forms and <code>ETag</code>.</li>
+    <li><b>Reason.</b> Pick one of the offered acts and fill in its fields. Code or a language model can do this. A model sees only the forms, their titles, descriptions and schemas. Its whole output is a choice such as "act <code>garden:water-cell</code> with <code>{"milliliters":250}</code>", or "follow <code>item</code> titled bed-2", or "ask the user". It has no way to write a URL, a method or a header.</li>
+    <li><b>Act.</b> Ordinary code fills the template, sets the method and <code>If-Match</code>, checks the body against the schema, and sends it. The answer is the bed's new state with its new forms, so the loop starts again. On a refusal, the client syncs and reasons again.</li>
+  </ol>
+</div>
+<div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  participant U as User goal
+  participant A as ARTIE
+  participant S as Garden server
+  A->>S: GET / (the bookmark)
+  S-->>A: forms: search-beds, get-bed, build-bed
+  A->>S: GET /beds?name=bed-2 (from the search form)
+  S-->>A: item /beds/2
+  A->>S: GET /beds/2
+  S-->>A: state + only the legal forms + ETag
+  U->>A: "water bed 2 with 250 ml"
+  Note over A: Reason picks garden:water-cell {milliliters: 250}
+  A->>S: POST target, If-Match: ETag
+  S-->>A: new state + new forms (or a refusal)
+</pre></div>
+
+<!-- ============ PART 4 ============ -->
+<h2 id="checklist">4. Checklist: from data API to HEART</h2>
+<ul class="checklist">
+  <li>Serve <code>application/hal+json</code>, and send <code>Link: &lt;…/heart-rise/hal-schema-forms&gt;; rel="profile"</code>.</li>
+  <li>Give every resource <code>_links.self</code>, and link instead of documenting URLs.</li>
+  <li>Put the acts in <code>_forms</code>, with target, method, content type and a JSON Schema, and only the acts legal in the current state.</li>
+  <li>Name each form by a link relation (a CURIE), described in an ALPS profile, with a title and a description; annotate each field.</li>
+  <li>Send a strong <code>ETag</code> and <code>Cache-Control: no-cache</code> on every resource. Require <code>If-Match</code> on every act.</li>
+  <li>Refuse with problem details, checked in order: 428, 412, 409, 422.</li>
+  <li>Offer one bookmark that reaches everything, new resources included.</li>
+  <li>Honour <code>Prefer: forms=link, schema=link</code>: content-addressed, immutable affordance sets and schemas, linked with integrity, and <code>hr:templatePointers</code> for shared targets. Report what you did in <code>Preference-Applied</code>.</li>
+  <li>Optionally, explain absent acts with <code>hr:unavailable</code>.</li>
+</ul>
+
+<footer>
+  <p>H.E.A.R.T. is a working draft (version 0.5). L0 to L2 run live against the reference garden server and the ARTIE client; L6 has been tested with a scripted reasoner and once with a real model. R.I.S.E., the companion protocol for system-to-system exchange, is not built. The wire samples on this page come from the garden server on 12 October 2026.</p>
+  <p>Sources: Roy T. Fielding, <a href="https://ics.uci.edu/~fielding/pubs/dissertation/top.htm">Architectural Styles and the Design of Network-based Software Architectures</a> (2000) and <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">REST APIs must be hypertext-driven</a> (2008); <a href="https://github.com/jbadeau/hal-schema-forms">HAL Schema Forms</a>; RFC 9110 (HTTP semantics), RFC 9111 (caching), RFC 7240 (Prefer), RFC 9457 (problem details), RFC 6570 (URI Templates), RFC 6901 (JSON Pointer), W3C Subresource Integrity, ALPS. The full specification is <code>spec/SPEC.md</code>; the profile is <code>spec/HAL-SCHEMA-FORMS-HR.md</code>.</p>
+</footer>
+</div>
+
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+mermaid.initialize({ startOnLoad: true, theme: matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default" });
+</script>
