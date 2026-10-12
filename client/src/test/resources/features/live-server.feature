@@ -81,6 +81,18 @@ Feature: ARTIE against the real server
       | L0   |
       | L2   |
 
+  Scenario: Over CoAP, every event names the span of the request it is about
+    SPEC §6.0.1: the CoAP binding carries traceparent as an option, so an
+    event about a CoAP request ties to that request as it does over HTTP.
+    Given the client keeps an event log
+    When the client enters "/beds/1" over CoAP
+    And the client acts on "garden:sow-seed" with:
+      """yaml
+      seedType: basil
+      depthCm: 2
+      """
+    Then every event names a span
+
   Scenario: Over CoAP, from the bookmark alone: look a bed up by its id and act
     When the client enters "/" over CoAP
     And the client acts on "garden:get-bed" with:

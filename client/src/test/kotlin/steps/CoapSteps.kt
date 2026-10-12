@@ -4,6 +4,9 @@ import io.cucumber.java.After
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -60,6 +63,33 @@ class CoapSteps(private val ctx: ClientContext) {
     fun hasOption(number: Int) =
         assertTrue(coap.requests.last().options.others.any { it.number == number }, "no option $number")
 
+    @Then("every CoAP request had option {int} with a W3C traceparent")
+    fun everyTraced(number: Int) {
+        val parents = coap.requests.map { request -> request.options.others.singleOrNull { it.number == number } }
+        val wellFormed = parents.isNotEmpty() && parents.all { it != null && TRACEPARENT.matches(it.stringValue) }
+        assertTrue(wellFormed, "traceparents: $parents")
+    }
+
+    @Then("the CoAP requests share a trace id but not a span id")
+    fun shareTrace() {
+        val parts = coap.requests.map { request ->
+            val value = request.options.others.single { it.number == FakeCoapServer.TRACEPARENT.number }.stringValue
+            value.split('-').let { it[1] to it[2] }
+        }
+        assertEquals(1, parts.map { it.first }.distinct().size, "$parts")
+        assertEquals(parts.size, parts.map { it.second }.distinct().size, "$parts")
+    }
+
+    @Then("the {string} event names the span of the CoAP act")
+    fun eventNamesSpan(event: String) {
+        val act = coap.requests.first { it.code.name == "POST" }
+        val span = act.options.others.single { it.number == FakeCoapServer.TRACEPARENT.number }.stringValue.split('-')[2]
+        val lines = (ctx.eventSink as MemoryEventSink).lines.map { Json.parseToJsonElement(it).jsonObject }
+        val spans = lines.filter { it["event_name"]?.jsonPrimitive?.content == event }
+            .map { it["span_id"]?.jsonPrimitive?.content }
+        assertEquals(listOf(span), spans)
+    }
+
     @Then("the client holds the CoAP bed's validator")
     fun holdsValidator() = assertEquals(hex(coap.validator), ctx.client.current?.etag)
 
@@ -71,6 +101,7 @@ class CoapSteps(private val ctx: ClientContext) {
 
     private companion object {
         const val CLASS_SHIFT = 5
+        val TRACEPARENT = Regex("00-[0-9a-f]{32}-[0-9a-f]{16}-01")
         fun hex(bytes: ByteArray) = bytes.joinToString("") { "%02x".format(it) }
     }
 }

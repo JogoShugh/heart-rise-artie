@@ -3,6 +3,7 @@ package steps
 import heart.ArtieClient
 import heart.Binding
 import heart.CachingTransport
+import heart.CoapBinding
 import heart.EventLog
 import heart.EventSink
 import heart.EventSinks
@@ -72,12 +73,14 @@ class ClientContext {
      * trace context outermost, above its own cache, so a second client behind
      * a shared cache keeps its own name and trace on the wire. Its event log
      * shares the trace, so each event points at the request it is about.
+     * Its CoAP binding carries the same trace (SPEC §6.0.1).
      */
     private fun build(who: String, next: Transport, rung: Rung, dialect: Dialect): HeartRiseClient {
         val agent = "${UserAgentTransport.DEFAULT} ($scenario; $who)"
         val trace = Trace()
         val transport = UserAgentTransport(agent, TraceContextTransport(trace, next))
         val events = EventLog(eventSink, trace, agent)
+        val bindings = mapOf("coap" to CoapBinding(trace = trace)) + bindings
         return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events, bindings).also { created += it }
     }
 

@@ -240,7 +240,7 @@ ARTIE implements the client side of this section: its core works in the concepts
 | Invalid input | `4.22 Unprocessable Entity` (RFC 8132) |
 | Refusal detail | An RFC 9457 problem details object, as JSON |
 | Service description | `GET /` with `Accept` = the json-home Content-Format |
-| Client identity and trace | Not carried. CoAP has no `User-Agent`, and Trace Context defines no CoAP carrier. |
+| Client identity and trace | Option **65020 traceparent** (the HTTP `traceparent` value, W3C Trace Context §3.2): elective, safe-to-forward and NoCacheKey (RFC 7252 §5.4.6), so a trace never splits a cache. Trace Context defines no CoAP carrier, so this one is experimental like the others (decided 2026-10-12). Client identity is not carried: CoAP has no `User-Agent`. |
 | Large bodies | Block-wise transfer (RFC 7959) |
 
 Experimental Content-Formats:

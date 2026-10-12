@@ -10,6 +10,7 @@ paths, in HAL Schema Forms only.
 | HTTP | CoAP |
 |---|---|
 | `Accept-Profile`, `Prefer`, `Profile`, `Preference-Applied` | Options 65000, 65004, 65008, 65012 |
+| `traceparent` | Option 65020 (elective, NoCacheKey); the server reads it no more than it reads the HTTP header |
 | `Cache-Control: no-cache` on a read | Option 65003 No-Cache (critical); responses Max-Age 0 |
 | ETag | First 8 bytes of SHA-256 over the HTTP ETag value |
 | 200 / 304 | 2.05 Content / 2.03 Valid |

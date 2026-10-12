@@ -3,8 +3,10 @@ Feature: ARTIE over CoAP (SPEC §6.0.1)
   core rules as HTTP. The binding carries the requested rendering in the
   Accept option and in the experimental options 65000 Accept-Profile and
   65004 Prefer, says 65003 No-Cache on every Layer 1 read, and reads the
-  applied rendering from 65008 Profile and 65012 Preference-Applied. These
-  scenarios run against a scripted CoAP server on this machine.
+  applied rendering from 65008 Profile and 65012 Preference-Applied. Each
+  request carries the client's W3C Trace Context in 65020 traceparent, the
+  same value HTTP's traceparent header carries. These scenarios run against
+  a scripted CoAP server on this machine.
 
   Background:
     Given a CoAP service holds bed 1 EMPTY
@@ -33,6 +35,24 @@ Feature: ARTIE over CoAP (SPEC §6.0.1)
     Then the CoAP act carried If-Match with the bed's validator
     And the manifest offers exactly "water"
     And nothing went over HTTP
+
+  Scenario: Every CoAP request carries traceparent: one trace per client, a new span per request
+    When the client enters the CoAP bed
+    And the client acts on "sow" with:
+      """yaml
+      seedType: tomato
+      """
+    Then every CoAP request had option 65020 with a W3C traceparent
+    And the CoAP requests share a trace id but not a span id
+
+  Scenario: An event about a CoAP request names that request's span
+    Given the client keeps an event log
+    When the client enters the CoAP bed
+    And the client acts on "sow" with:
+      """yaml
+      seedType: tomato
+      """
+    Then the "act.sent" event names the span of the CoAP act
 
   Scenario Outline: A CoAP refusal <code> is the core's <refusal>
     Given the CoAP service will refuse the next act with <code> and problem type "<problem>"

@@ -696,6 +696,21 @@ body and drop the other without a word, because the maps were built with
 paragraph is rewritten to match. Addresses are not kept stable for their own
 sake: nothing is in production.
 
+## 2026-10-12: trace context over CoAP
+
+Roy Bott's review found that ARTIE's CoAP requests carried no trace context,
+so its events about them had an empty `span_id` and could not be tied to a
+request. Trace Context defines no CoAP carrier, and no IETF draft adds one.
+
+The CoAP binding now carries `traceparent` in experimental option 65020, one
+for one with the HTTP header, as Accept-Profile and Prefer already are. 65020
+is elective, safe-to-forward and NoCacheKey (RFC 7252 §5.4.6), so a proxy
+that does not know it passes it on and a trace never splits a cache. ARTIE
+mints a new span per CoAP request under the URL it was given; keying it by
+Californium's rewritten URI missed, since Californium drops the default port.
+In the live run, all 30 events about CoAP requests now name a span (0 before).
+Client identity is still not carried over CoAP.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

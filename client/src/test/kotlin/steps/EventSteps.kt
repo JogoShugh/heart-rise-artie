@@ -88,6 +88,12 @@ class EventSteps(private val ctx: ClientContext) {
         assertTrue(match, "no $event with $attribute=$value for span $span in ${memory().lines}")
     }
 
+    @Then("every event names a span")
+    fun everyEventHasSpan() {
+        val spans = events().map { it.text("event_name") to it.text("span_id") }
+        assertTrue(spans.isNotEmpty() && spans.all { (_, span) -> !span.isNullOrEmpty() }, "spans: $spans")
+    }
+
     @Then("every event line has the fields {string}")
     fun fields(names: String) {
         val expected = names.split(',').map { it.trim() }.toSet()

@@ -21,8 +21,10 @@ import org.eclipse.californium.elements.config.UdpConfig
  * Profile and Preference-Applied. The 8-byte CoAP ETag is the validator,
  * written in hex for the core. It keeps no cache, so a Layer 1 read always
  * reaches the server, and it says No-Cache so no proxy answers it either.
+ * With a [trace], every request carries the experimental option traceparent,
+ * holding the value HTTP's traceparent header would, with a new span each.
  */
-class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS) : Binding {
+class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS, private val trace: Trace? = null) : Binding {
 
     private val client: CoapClient by lazy {
         CoapConfig.register()
@@ -35,22 +37,19 @@ class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS) : Binding {
     }
 
     override fun read(url: String, rendering: Rendering): Outcome =
-        send(Request.newGet().apply {
-            setURI(url)
+        send(url, Request.newGet().apply {
             ask(rendering)
             options.addOption(Option(NO_CACHE))
         })
 
     override fun fetch(url: String, accept: List<String>, integrity: String?): Outcome =
-        send(Request.newGet().apply {
-            setURI(url)
+        send(url, Request.newGet().apply {
             // CoAP's Accept takes one Content-Format; with several, the server picks.
             accept.mapNotNull { FORMATS[it] }.singleOrNull()?.let { options.accept = it }
         })
 
     override fun act(act: Act, rendering: Rendering): Outcome =
-        send(Request.newPost().apply {
-            setURI(act.url)
+        send(act.url, Request.newPost().apply {
             ask(rendering)
             options.contentFormat = FORMATS[act.contentType] ?: JSON
             options.addIfMatch(hexBytes(act.validator))
@@ -63,7 +62,16 @@ class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS) : Binding {
         rendering.rung.prefer?.let { options.addOption(Option(PREFER, it)) }
     }
 
-    private fun send(request: Request): Outcome {
+    /**
+     * The span is kept under [url] as ARTIE was given it, so an event about the
+     * request finds it: Californium rewrites the URI, dropping a default port.
+     */
+    private fun send(url: String, request: Request): Outcome {
+        request.setURI(url)
+        trace?.let { trace ->
+            val span = trace.newSpan(url)
+            request.options.addOption(Option(TRACEPARENT, "00-${trace.traceId}-$span-01"))
+        }
         val response = client.advanced(request)?.advanced()
             ?: return Outcome.Failed("no answer from ${request.uri}", null)
         return outcome(response)
@@ -81,9 +89,12 @@ class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS) : Binding {
         val PREFER = StringOptionDefinition(65_004, "Prefer", false, 1, TEXT_MAX)
         val PROFILE = StringOptionDefinition(65_008, "Profile", false, 1, TEXT_MAX)
         val PREFERENCE_APPLIED = StringOptionDefinition(65_012, "Preference-Applied", false, 1, TEXT_MAX)
+
+        /** Elective, safe to forward, and no part of the cache key (RFC 7252 §5.4.6): a trace never splits a cache. */
+        val TRACEPARENT = StringOptionDefinition(65_020, "traceparent", true, 1, TEXT_MAX)
         val REGISTRY = MapBasedOptionRegistry(
             StandardOptionRegistry.getDefaultOptionRegistry(),
-            ACCEPT_PROFILE, NO_CACHE, PREFER, PROFILE, PREFERENCE_APPLIED,
+            ACCEPT_PROFILE, NO_CACHE, PREFER, PROFILE, PREFERENCE_APPLIED, TRACEPARENT,
         )
 
         /** SPEC §6.0.1: experimental Content-Formats, and application/json's registered 50. */

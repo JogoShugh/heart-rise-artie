@@ -114,9 +114,10 @@ class FakeCoapServer(var status: String) {
         val PREFER = StringOptionDefinition(65_004, "Prefer", false, 1, TEXT_MAX)
         val PROFILE = StringOptionDefinition(65_008, "Profile", false, 1, TEXT_MAX)
         val PREFERENCE_APPLIED = StringOptionDefinition(65_012, "Preference-Applied", false, 1, TEXT_MAX)
+        val TRACEPARENT = StringOptionDefinition(65_020, "traceparent", true, 1, TEXT_MAX)
         val REGISTRY = MapBasedOptionRegistry(
             StandardOptionRegistry.getDefaultOptionRegistry(),
-            ACCEPT_PROFILE, NO_CACHE, PREFER, PROFILE, PREFERENCE_APPLIED,
+            ACCEPT_PROFILE, NO_CACHE, PREFER, PROFILE, PREFERENCE_APPLIED, TRACEPARENT,
         )
     }
 }
