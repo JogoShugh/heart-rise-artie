@@ -37,6 +37,16 @@ class GardenSteps(private val http: HttpWorld) {
         assertEquals(moisture, current().path("moistureLevel").asInt())
     }
 
+    @Then("the act is refused by the rule {string} at {string}")
+    fun ruleRefused(reason: String, pointer: String) {
+        val problem = http.last.json
+        val violations = problem.path("violations").map { it.path("pointer").asText() to it.path("message").asText() }
+        assertEquals(
+            listOf(422, PROBLEM_TYPES + "rule-refused", listOf(pointer to reason)),
+            listOf(http.last.status, problem.path("type").asText(), violations),
+        )
+    }
+
     @Then("the bed offers exactly {string}")
     fun offers(keys: String) {
         val forms = current().path("_forms").fieldNames().asSequence().toSet()
@@ -53,4 +63,8 @@ class GardenSteps(private val http: HttpWorld) {
 
     /** The bed as last read, in HAL Schema Forms. */
     private fun current(): JsonNode = checkNotNull(bed) { "no bed read yet" }
+
+    private companion object {
+        const val PROBLEM_TYPES = "https://github.com/jogoshugh/heart-rise/problems/"
+    }
 }

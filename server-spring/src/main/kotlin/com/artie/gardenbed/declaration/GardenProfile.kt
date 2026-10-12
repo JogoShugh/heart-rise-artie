@@ -33,7 +33,7 @@ object GardenProfile {
                 description = "Pours water into every cell of a planted bed. Enough water makes it ready to harvest.",
                 doc = "Adds the given millilitres of water to each cell. Offered only while the bed is planted. " +
                     "Each watering raises moisture and growth; once growth is high enough the bed is ready to " +
-                    "harvest.",
+                    "harvest. Water that would raise moisture past 100 is refused; harvesting leaves the bed dry.",
             ),
             Relation(
                 id = "harvest",

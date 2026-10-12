@@ -711,6 +711,18 @@ Californium's rewritten URI missed, since Californium drops the default port.
 In the live run, all 30 events about CoAP requests now name a span (0 before).
 Client identity is still not carried over CoAP.
 
+## 2026-10-12: the garden refuses over-watering
+
+Roy Bott's review found the garden never answered `rule-refused`: it had no
+rule a schema-valid body could break, so over-watering was silently trimmed
+at moisture 100. Now `garden:water-cell` refuses water that would push
+moisture past 100, as 422 `rule-refused` at `/milliliters` ("The bed would be
+waterlogged: at most 600 ml now."). Because moisture only ever rose, the rule
+alone would leave a bed unable to grow after two crops, so harvesting now
+leaves the bed dry: the crop drank the water. That replaces the 2026-10-11
+decision that the soil stayed moist. Crop rotation, a rule that leaves no bed
+stuck, is parked in `spec/ideas/crop-rotation-rule.md`.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

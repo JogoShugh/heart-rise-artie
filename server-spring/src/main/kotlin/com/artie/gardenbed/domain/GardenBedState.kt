@@ -22,8 +22,13 @@ data class GardenBedState(
      *  the bed's last known sequence is still this number." */
     val lastSequenceNo: Int = 0
 ) {
+    /** The most water the bed takes now: each millilitre adds a tenth to moisture, which tops out at [MAX_MOISTURE]. */
+    fun waterRoom(): Int = (MAX_MOISTURE - moistureLevel) * ML_PER_MOISTURE
+
     companion object {
         const val HARVEST_THRESHOLD = 100
+        const val MAX_MOISTURE = 100
+        const val ML_PER_MOISTURE = 10
 
         fun empty(id: Long, label: String): GardenBedState = GardenBedState(id = id, label = label)
     }
@@ -56,7 +61,7 @@ object GardenBedProjector {
 
                 state.copy(
                     growthPoints = newGrowth,
-                    moistureLevel = (state.moistureLevel + event.milliliters / 10).coerceAtMost(100),
+                    moistureLevel = state.moistureLevel + event.milliliters / GardenBedState.ML_PER_MOISTURE,
                     status = newStatus,
                 )
             }
@@ -65,6 +70,8 @@ object GardenBedProjector {
                 status = GardenBedStatus.EMPTY,
                 cropName = null,
                 growthPoints = 0,
+                // The crop has drunk the soil's water (decided 2026-10-12).
+                moistureLevel = 0,
                 plantedAt = null,
             )
         }.copy(lastSequenceNo = recorded.sequenceNo)

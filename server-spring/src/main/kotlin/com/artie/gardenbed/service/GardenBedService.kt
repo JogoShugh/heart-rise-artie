@@ -7,6 +7,7 @@ import com.artie.gardenbed.domain.GardenBedEvent
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.repository.GardenBedAggregateRepository
 import com.artie.heart.ResourceNotFoundException
+import com.artie.heart.RuleRefusedException
 import com.artie.heart.eventsourcing.EventStore
 import com.artie.heart.eventsourcing.Recorded
 import kotlinx.coroutines.flow.toList
@@ -55,8 +56,17 @@ class GardenBedService(
     suspend fun sowSeed(bed: GardenBedState, seedType: String, depthCm: Int?): GardenBedState =
         act(bed) { GardenBedEvent.SeedSown(seedType, depthCm) }
 
-    suspend fun waterCell(bed: GardenBedState, milliliters: Int): GardenBedState =
-        act(bed) { GardenBedEvent.CellWatered(milliliters) }
+    /**
+     * The bed's rule, which no schema can say: water that would push its
+     * moisture past the most it holds is refused.
+     */
+    suspend fun waterCell(bed: GardenBedState, milliliters: Int): GardenBedState {
+        val room = bed.waterRoom()
+        if (milliliters > room) {
+            throw RuleRefusedException.at("/milliliters", "The bed would be waterlogged: at most $room ml now.")
+        }
+        return act(bed) { GardenBedEvent.CellWatered(milliliters) }
+    }
 
     suspend fun harvest(bed: GardenBedState): Pair<GardenBedState, HarvestResult> {
         val result = HarvestResult(bed.growthPoints * YIELD_PER_POINT, bed.cropName ?: "unknown crop")

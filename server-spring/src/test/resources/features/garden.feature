@@ -36,6 +36,16 @@ Feature: Garden beds
       | 500  | READY_TO_HARVEST | 100    | 50       |
       | 1000 | READY_TO_HARVEST | 100    | 100      |
 
+  Scenario: Water that would push the bed's moisture past 100 is refused by the bed's rule
+    The body satisfies the schema; the bed's own state says no. A planted
+    bed at moisture 49 holds at most 510 ml more, a tenth of each millilitre
+    becoming moisture. Decided 2026-10-12.
+    Given bed 2 is PLANTED
+    When a client posts {"milliliters": 495} to water-cell on bed 2 with If-Match *
+    And a client posts {"milliliters": 600} to water-cell on bed 2 with If-Match *
+    Then the act is refused by the rule "The bed would be waterlogged: at most 510 ml now." at "/milliliters"
+    And bed 2 is "PLANTED" with crop "basil", growth 99 and moisture 49
+
   Scenario: A ready bed can only be harvested, and says why it is not sown or watered
     Given bed 3 is READY_TO_HARVEST
     When a client reads bed 3
@@ -49,11 +59,12 @@ Feature: Garden beds
     Then bed 3 is "EMPTY" with no crop and growth 0
     And the bed offers exactly "garden:sow-seed"
 
-  Scenario: Harvesting takes the crop but leaves the soil as moist as it was
-    The water in the soil is still there after the crop is picked, so the
-    next crop starts with it. Decided by the author on 2026-10-11.
+  Scenario: Harvesting takes the crop, which has drunk the water in the soil
+    The crop uses up the bed's water, so the next crop starts dry and the
+    bed's moisture rule never leaves it unable to grow. Decided 2026-10-12,
+    replacing the 2026-10-11 decision that the soil stayed moist.
     Given bed 2 is PLANTED
     When a client posts {"milliliters": 500} to water-cell on bed 2 with If-Match *
     And a client posts {} to harvest on bed 2 with If-Match *
     Then bed 2 is "EMPTY" with no crop and growth 0
-    And bed 2 still has moisture 50
+    And bed 2 still has moisture 0
