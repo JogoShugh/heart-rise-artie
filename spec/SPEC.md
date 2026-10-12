@@ -1022,6 +1022,8 @@ The distinction is scope, not timing. MCP discovery describes what a *server* of
 
 The two compose. An MCP server can act as a H.E.A.R.T. transport bridge, where a tool invocation maps to executing an affordance transition — see §12, now more tractable than in 0.3 because the per-request self-describing model removes the session state a bridge previously had to manage.
 
+**HEART through MCP (added 2026-10-12, branch `mcp-spike`).** `mcp/` is such a bridge. Its six tools never change (`heart_look`, `heart_act`, `heart_follow`, `heart_describe`, `heart_explain`, `heart_back`), so the host's tool list is stable. The state-scoped part travels in each result: the current resource's state, the acts it offers now with their titles, descriptions and schemas, and its links by relation and title. No tool input or result carries a URI, method, header or validator. The host's model is the Reason step (§6.8). ARTIE checks each selection against the representation it holds before sending, and performs Sync and Act. The bridge is tested over the MCP SDK's stdio transport against the reference garden server (`scripts/mcp-check.sh`). It speaks MCP 2025-06-18, the version its SDK implements, not the 2026-07-28 revision described above.
+
 ### 8.2 HAL+JSON and HAL Schema Forms
 
 H.E.A.R.T. is built directly on `application/hal+json` and HAL Schema Forms as one of its two base dialects (§6.1). HAL Schema Forms provides the `_forms` structure and full JSON Schema field definitions. H.E.A.R.T. does not replace or extend this layer. Note that HAL itself is an expired Internet-Draft (draft-kelly-json-hal) rather than an RFC, and `application/hal+json` is registered but thinly specified — which is part of why §6.1's `profile` parameter has no registered home.

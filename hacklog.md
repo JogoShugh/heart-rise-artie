@@ -748,6 +748,39 @@ and a live scenario has ARTIE build a bed from `/` and sow it.
   `embed=schemas` preference. Removed; the live suite and `capture.sh` cover
   what it showed.
 
+## 2026-10-12: HEART through MCP (branch mcp-spike)
+
+`mcp/` lets any MCP host (Claude Code, Claude Desktop, any agent) work any
+HEART service. The positioning: MCP gives an agent a catalogue scoped to the
+server; HEART gives it this resource's legal next moves; heart-mcp puts the
+second inside the first.
+
+- **Decision: six fixed verbs**, not one tool per offered act. The tool list
+  (heart_look, heart_act, heart_follow, heart_describe, heart_explain,
+  heart_back) never changes; what is legal now comes back in every result.
+  That is the browser model (fixed buttons, changing resources). It works in
+  every host, whatever its `list_changed` support. It keeps the host's prompt
+  cache warm, and keeps CURIEs intact (API tool names allow only
+  `[a-zA-Z0-9_-]`). Per-act tools are parked in
+  `spec/ideas/mcp-per-act-tools.md`.
+- The host's model is the Reason step. No tool input and no result carries an
+  address, a method, a header or a validator. Schemas lose their `$id`.
+  ARTIE checks a choice against the resource it holds before sending
+  anything, and acts on the state the model saw, never a re-read.
+- Built as a library (`mcp/heart-mcp`), a thin stdio app
+  (`mcp/heart-mcp-server`), and an image (`mcp/Dockerfile`). The MCP
+  Kotlin SDK 0.8.1 speaks protocol 2025-06-18; Claude Code connected to the
+  spike.
+- ARTIE now raises `RuleRefused` for a 422 `rule-refused`, apart from
+  `InvalidPayload`.
+- Proof: `scripts/mcp-check.sh` gives 12/12 scenarios through the official
+  MCP client SDK over stdio, 10 of them against the live garden.
+  `--docker` drives the image over JSON-RPC and waters bed 2.
+- Found while building: ArtieAgent's link offers include `hr:unavailable`
+  (only `self` and the forms link are excluded), so an L6 reasoner could
+  "follow" the explanation link. heart-mcp excludes it. ArtieAgent is
+  unchanged for now.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.
