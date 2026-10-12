@@ -17,6 +17,9 @@ import java.time.Instant
 /** 404, as heart-core names it, so every binding answers it the same way. */
 class BedNotFoundException(id: Long) : ResourceNotFoundException("No garden bed with id $id")
 
+/** 404 for a time before the bed was built: it had no state then. */
+class NotBuiltYetException(id: Long, asOf: Instant) : ResourceNotFoundException("Bed $id was not built yet at $asOf")
+
 @Service
 class GardenBedService(
     private val aggregates: GardenBedAggregateRepository,
@@ -41,8 +44,12 @@ class GardenBedService(
             .filter { id == null || it.id == id }
             .sortedBy { it.id }
 
-    /** Bed [id]'s state now, or as of [asOf]. */
-    suspend fun currentState(id: Long, asOf: Instant? = null): GardenBedState = state(requireAggregate(id), asOf)
+    /** Bed [id]'s state now, or as of [asOf]. Before it was built there was no bed: 404. */
+    suspend fun currentState(id: Long, asOf: Instant? = null): GardenBedState {
+        val bed = requireAggregate(id)
+        if (asOf != null && asOf < bed.createdAt) throw NotBuiltYetException(id, asOf)
+        return state(bed, asOf)
+    }
 
     /** 404s if the bed doesn't exist, even with zero events. */
     suspend fun history(id: Long): List<Recorded<GardenBedEvent>> {

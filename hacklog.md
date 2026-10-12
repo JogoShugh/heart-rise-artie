@@ -735,6 +735,19 @@ identity row (`garden_bed`, migration V3; older beds are taken as 4 by 8),
 not in its events. The garden TCK now runs all its scenarios, none skipped,
 and a live scenario has ARTIE build a bed from `/` and sow it.
 
+## 2026-10-12: Roy Bott's second findings
+
+- A built bed had a past from before it was built: `GET /beds/5?asOf=` a
+  date before building answered 200 with an empty bed. Now it is 404, "Bed 5
+  was not built yet at …", judged by the bed's `created_at`. Migration V4
+  moves any bed's `created_at` back to its first event, and `reset-db.sh`
+  seeds beds as built 30 days ago, before their seed events.
+- A `rule-refused` detail repeated its title ("a rule of the resource
+  refuses the act: …"). The detail is now the rule's own words.
+- `server-spring/script.sh` wrote to tables V2 removed and used the old
+  `embed=schemas` preference. Removed; the live suite and `capture.sh` cover
+  what it showed.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

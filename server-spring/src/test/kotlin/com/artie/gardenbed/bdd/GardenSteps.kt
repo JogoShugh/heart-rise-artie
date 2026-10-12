@@ -37,6 +37,15 @@ class GardenSteps(private val http: HttpWorld) {
         assertEquals(listOf(status, label, widthFt.toString(), lengthFt.toString()), actual)
     }
 
+    @When("a client reads the new bed as of {string}")
+    fun readNewBedAsOf(instant: String) {
+        val bed = checkNotNull(http.last.headers.location) { "no bed was built" }
+        http.get("$bed?asOf=$instant", mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT))
+    }
+
+    @Then("the answer is {int}")
+    fun answer(status: Int) = assertEquals(status, http.last.status, String(http.last.bytes))
+
     @Then("bed {long} is {string} with crop {string}, growth {int} and moisture {int}")
     fun state(id: Long, status: String, crop: String, growth: Int, moisture: Int) {
         read(id)

@@ -17,6 +17,13 @@ Feature: Garden beds
     And the new bed is "EMPTY", named "Herbs", 4 by 8 feet
     And the bed offers exactly "garden:sow-seed"
 
+  Scenario: A bed has no past from before it was built
+    A past state is the bed as it was then. Before it was built there was
+    no bed, so there is nothing to show. Decided 2026-10-12.
+    When a client builds a bed from the bookmark with {"label": "Herbs", "widthFt": 4, "lengthFt": 8}
+    And a client reads the new bed as of "2026-01-01T00:00:00Z"
+    Then the answer is 404
+
   Scenario: An empty bed can only be sown, and says why it cannot be watered or harvested
     Given bed 1 is EMPTY
     When a client reads bed 1

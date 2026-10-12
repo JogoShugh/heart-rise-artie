@@ -137,6 +137,9 @@ class WireSteps(
     fun violation(pointer: String) =
         assertTrue(json.path("violations").any { it.path("pointer").asText() == pointer }, "$json")
 
+    @Then("the problem's detail is {string}")
+    fun detail(detail: String) = assertEquals(detail, json.path("detail").asText(), "$json")
+
     @Then("the response declares the CURIE {string} as {string}")
     fun curie(name: String, href: String) {
         val curies = json.path("_links").path("curies")

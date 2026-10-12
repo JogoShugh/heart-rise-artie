@@ -77,6 +77,7 @@ Feature: A declared resource and its acts, served over HTTP
     Then the response status is 422
     And the response is a problem of type "rule-refused"
     And the problem lists a violation at "/brightness"
+    And the problem's detail is "The lamp is already at 50"
     And lamp 7 is still at version 3
 
   Scenario: The service index offers its own act, installing a lamp, beside its search and lookup

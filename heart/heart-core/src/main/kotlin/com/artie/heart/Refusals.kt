@@ -52,7 +52,8 @@ class UnprocessableContentException(val violations: List<Violation>, cause: Thro
  * form handling was right; the resource's state says no.
  */
 class RuleRefusedException(val violations: List<Violation>) :
-    RuntimeException("a rule of the resource refuses the act: " + violations.joinToString { it.message }) {
+    // The detail is the rule's own words; the problem's title already says a rule refused.
+    RuntimeException(violations.joinToString("; ") { it.message }) {
     companion object {
         /** Refused at one field: one violation at [pointer]. */
         fun at(pointer: String, message: String) = RuleRefusedException(listOf(Violation(pointer, message)))
