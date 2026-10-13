@@ -1,6 +1,6 @@
 # One Page, Then Many: A Conversation About the Ladder
 
-Josh and Dev talk about HEART's rendering ladder, L0 to L3, as if it were a website: from one page with everything inlined, to linked files, to shared files on a cache, and then about the integrity that makes sharing safe. About fifteen minutes read aloud.
+Josh and Dev talk about HEART's two dialects and its rendering ladder, L0 to L3, as if it were a website: HAL-FORMS as the on-ramp that stops at one page, and HAL Schema Forms, which climbs from one page to linked files to shared files on a cache. Then the integrity that makes sharing safe. About fifteen minutes read aloud.
 
 The HEART samples are real responses from the garden server, captured on 13 October 2026 and trimmed with "…". The speakers say what each one shows.
 
@@ -14,15 +14,37 @@ The HEART samples are real responses from the garden server, captured on 13 Octo
 
 **Dev:** And nothing shared. Save ten pages from the same site and you've got ten copies of the same stylesheet.
 
-**Josh:** That's L0 in HEART. Ask the garden for bed 2 with no special headers, and you get one response with everything in it.
+**Josh:** That's L0 in HEART. One response, everything inside. And the garden can give it to you in two dialects. Here's bed 2 in the first one, HAL-FORMS.
 
 ```json
 {
   "id": 2, "status": "PLANTED", "cropName": "tomato", "moistureLevel": 40,
-  "_links": { "self": { "href": "/beds/2" }, … },
+  "_links": { "self": { "href": "/beds/2" } },
+  "_templates": {
+    "waterCell": {
+      "title": "Water the bed",
+      "method": "POST",
+      "target": "/beds/2/actions/water-cell",
+      "properties": [
+        { "name": "milliliters", "prompt": "Water per cell", "required": true, "type": "number", "min": 1, "max": 1000 }
+      ]
+    }
+  }
+}
+```
+
+**Dev:** In words: bed 2 is planted with tomatoes, moisture 40. Under "templates" there's one form, "waterCell", titled "Water the bed". Post it to the bed's water-cell address. It has one property, millilitres, required, between 1 and 1000.
+
+**Josh:** 417 bytes. Now the same bed, same moment, in the second dialect, HAL Schema Forms.
+
+```json
+{
+  "id": 2, "status": "PLANTED", "cropName": "tomato", "moistureLevel": 40,
+  "_links": { "self": { "href": "/beds/2" }, "hr:unavailable": { …, "integrity": "sha256-…" }, … },
   "_forms": {
     "garden:water-cell": {
       "title": "Water the bed",
+      "description": "Pours water into every cell of a planted bed. Enough water makes it ready to harvest.",
       "_links": { "target": { "href": "/beds/2/actions/water-cell" } },
       "method": "POST",
       "schema": { "properties": { "milliliters": { "type": "integer", "minimum": 1, "maximum": 1000, … } }, … }
@@ -31,27 +53,67 @@ The HEART samples are real responses from the garden server, captured on 13 Octo
 }
 ```
 
-**Dev:** In words: bed 2 is planted with tomatoes, moisture 40. And inside the same response, the one act it offers right now, "Water the bed", with where to send it and the full schema: millilitres, a whole number from 1 to 1000.
+**Dev:** In words: the same state, the same one act. But the act is named by a link relation, "garden colon water-cell", it has a description of what watering does, and the fields are a full JSON Schema. Plus a link explaining what's not offered, with a hash next to it.
 
-**Josh:** 1,089 bytes. The state, the form and the schema, all inlined, like the single-file page.
+**Josh:** 1,089 bytes. Same legal act, same state, different vocabulary.
 
-**Dev:** And it works. A client with no cache and no clever headers still gets the truth.
+**Dev:** And the important part holds in both: the water act is there because watering is legal now.
 
-**Josh:** It does. The important part holds even at L0: the water act is there because watering is legal now. When the bed is ready, the water act disappears and harvest shows up. Absence still means something.
+**Josh:** Right. When the bed is ready, water disappears and harvest shows up, in either dialect. Absence means something even at L0.
 
-**Dev:** So what's wrong with it?
+## Why HAL-FORMS is the on-ramp
 
-**Josh:** Nothing is wrong. It's just expensive. Every visit re-sends the form and the schema, even though they haven't changed. The spec puts it in one line: "L0 buys correctness, L2 buys economy."
+**Dev:** So why two? I know HAL-FORMS. Spring HATEOAS does it out of the box.
 
-**Dev:** And it's honest about the label, I remember. A server that only does L0 doesn't get to claim it conforms.
+**Josh:** That's exactly why it's here. A Spring team can turn on HAL-FORMS and get a usable L0 nearly for free. The spec calls HAL-FORMS the on-ramp dialect.
 
-**Josh:** Right. The spec calls it "H.E.A.R.T.-shaped." It's the on-ramp, not the destination.
+**Dev:** On-ramp sounds like "toy."
+
+**Josh:** It isn't. At L0, HAL-FORMS covers the service's front door, search and lookup, every act, conditional requests, and the same legal acts as the other dialect. A client could live there.
+
+**Dev:** You said "nearly" for free.
+
+**Josh:** We found the catch. Spring HATEOAS builds the HAL-FORMS fields by reflecting on each act's input class. In Kotlin, every `val` came out as read-only. And an optional text field came out as a number range up to 2,147,483,647.
+
+**Dev:** So the forms said "you can't fill in these fields."
+
+**Josh:** For basketball and tickets, yes. Only the garden dodged it, because its input classes happened to use `var`. So now our library renders HAL-FORMS itself, from each act's schema, and Spring HATEOAS is gone from the library and the garden. There's even a test that forbids it in garden code.
+
+**Dev:** So the dialect stayed, and the free generator went.
+
+**Josh:** Right. The point of HAL-FORMS is that other people's tools speak it. Ours just has to speak it correctly.
+
+## Where HAL-FORMS stops
+
+**Dev:** And it stays at L0?
+
+**Josh:** Always. I tried it this morning. I asked the HAL-FORMS bed for L1, then L2, with the `Prefer` header. Both times I got the same 417 bytes back, and no `Preference-Applied` header.
+
+**Dev:** So it didn't error. It just said "here's L0."
+
+**Josh:** Which is what the spec requires. A preference it can't honour degrades to L0, it doesn't fail.
+
+**Dev:** Why can't it climb, though?
+
+**Josh:** Two things in HAL-FORMS itself. First, a template's target can't be a URI template. It's a fixed address, and if you leave it out, it means "the address of this form document." So every bed would need its own form document, and nothing could be shared between beds.
+
+**Dev:** And sharing is the whole point of the upper rungs.
+
+**Josh:** Second, the properties are always inline. There's no way to say "the schema is over there." So there's no separate schema to cache.
+
+**Dev:** You could extend HAL-FORMS.
+
+**Josh:** We thought about it. But then we'd be hand-building HAL-FORMS bytes nobody else's tools produce, and we'd lose the one reason HAL-FORMS is here. So the rule is simple. If you need caching, switch dialects. Same acts, same state.
+
+**Dev:** How hard is the switch?
+
+**Josh:** Two request headers. `Accept: application/hal+json` and an `Accept-Profile` naming HAL Schema Forms. ARTIE reads the profile on each response, so it knows which dialect it got, and it never asks a HAL-FORMS response to go above L0.
 
 ## The external stylesheet
 
-**Dev:** So the first thing any web developer does is pull the CSS out into its own file. The page says "my styles are over there," and the browser fetches that once and keeps it.
+**Dev:** Okay, now the climb. First thing any web developer does is pull the CSS out into its own file. The browser fetches it once and keeps it.
 
-**Josh:** That's L1. The client sends one extra header, `Prefer: forms=link`. Same bed, now the response is much smaller.
+**Josh:** That's L1, and from here on it's HAL Schema Forms only. The client adds `Prefer: forms=link`.
 
 ```json
 {
@@ -66,19 +128,15 @@ The HEART samples are real responses from the garden server, captured on 13 Octo
 }
 ```
 
-**Dev:** In words: the same state, but instead of the forms themselves there's a link called "forms", pointing at an affordance set. And next to the link, a long hash starting "sha256".
+**Dev:** In words: the same state, but instead of the forms there's a link called "forms", pointing at an affordance set. And next to it, a hash starting "sha256".
 
-**Josh:** Hold that hash. We'll come back to it. The point for now: 485 bytes instead of 1,089. And the server says "I did what you asked" with a header, `Preference-Applied: forms=link`.
-
-**Dev:** What if the server ignores the header?
-
-**Josh:** Then you get L0, which still works. That's why it's a `Prefer` and not a demand. It degrades, it doesn't break.
+**Josh:** Hold that hash. 485 bytes now instead of 1,089, and the server confirms with `Preference-Applied: forms=link`.
 
 ## Splitting the assets
 
-**Dev:** Next step on the web: you don't just split out one stylesheet. You split the fonts, the scripts, the icons. Each is its own file, and the same font file serves every page on the site.
+**Dev:** Next step on the web: split the fonts, the scripts, the icons. Each its own file, shared across every page.
 
-**Josh:** That's L2. The client asks `Prefer: forms=link, schema=link`. Now the affordance set doesn't carry the schema either. It points to it.
+**Josh:** That's L2: `Prefer: forms=link, schema=link`. Now the affordance set doesn't carry the schema either.
 
 ```json
 {
@@ -97,27 +155,19 @@ The HEART samples are real responses from the garden server, captured on 13 Octo
 }
 ```
 
-**Dev:** In words: the affordance set has the water act, its title and method. The schema is now just a reference to another address, with its own hash. And the target has changed. It's not "beds slash 2" anymore. It's "beds slash, id in braces," a template.
+**Dev:** In words: the water act, its title and method, and the schema is now just a reference with its own hash. And the target is "beds slash, id in braces," a template.
 
-**Josh:** That's the subtle bit, and it's what makes the next rung possible. The template says "fill in the id from the bed's own state," and the pointer says where: the `id` field. So this affordance set says nothing about bed 2 in particular.
+**Josh:** The exact thing HAL-FORMS can't do. The pointer says "take the id from the bed's own state." So this affordance set says nothing about bed 2 in particular.
 
-**Dev:** So it's like a stylesheet that doesn't mention any one page.
+**Dev:** A stylesheet that doesn't mention any one page.
 
-**Josh:** Exactly. And now there are three hops on a cold start: the bed, the affordance set, the schema. But only once.
-
-**Dev:** And after that?
-
-**Josh:** After that, checking bed 2 is one conditional request. The client sends the ETag it has, the server says `304 Not Modified`, and that's the whole conversation. I ran that this morning: 304, nothing else.
+**Josh:** Right. A cold start is three hops: the bed, the set, the schema. Once. After that, checking bed 2 is one conditional request. I ran it this morning: `304 Not Modified`, and nothing else.
 
 ## Fingerprinted filenames
 
-**Dev:** Here's a web trick that I think matters. Build tools rename your files with a hash in the name. `app.3f9a1c.css`. And the server says that file is good for a year.
+**Dev:** Build tools rename files with a hash in the name, `app.3f9a1c.css`, and serve them as good for a year.
 
-**Josh:** Because if the contents change, the name changes. So the old name can be cached forever.
-
-**Dev:** Cache busting by naming.
-
-**Josh:** HEART does exactly that for the affordance sets and schemas. Here's the header the server sends on the affordance set:
+**Josh:** Same here. The affordance set comes with:
 
 ```http
 Cache-Control: public, max-age=31536000, immutable
@@ -125,106 +175,91 @@ Cache-Control: public, max-age=31536000, immutable
 
 **Dev:** In words: anyone may cache it, for a year, and it will never change.
 
-**Josh:** And the name ends in sixteen hex characters taken from the SHA-256 of the body. The body is canonical JSON, keys sorted, no extra spaces, per RFC 8785. So the same content always gives the same name.
+**Josh:** Its name ends in sixteen hex characters from the SHA-256 of its body, canonical JSON per RFC 8785. Same content, same name. So the L1 set and the L2 set for the same bed have different names, because their bytes differ. An earlier version of the spec gave them one name, and the ladder showed why that can't work: a cache could hand an L1 client the L2 bytes.
 
-**Dev:** Which means the L1 set and the L2 set for the same bed have different names.
+**Dev:** And the bed itself isn't fingerprinted.
 
-**Josh:** Yes, because their bytes differ: one has the schema inside, the other has a pointer. An earlier version of the spec gave them one name, and the ladder showed why that can't work: a cache could hand an L1 client the L2 bytes. Different bytes, different address. No exceptions.
-
-**Dev:** And the bed itself? That's not fingerprinted.
-
-**Josh:** No, and it can't be. The bed's state changes whenever someone waters it. So the bed is `Cache-Control: no-cache` with an ETag. Always check. The things that never change get a year. The thing that changes gets checked every time.
-
-**Dev:** Same as the web. The HTML page is checked, the hashed assets are cached forever.
+**Josh:** It can't be. It changes when someone waters it. So the bed is `no-cache` with an ETag: always check. Things that never change get a year. The thing that changes gets checked every time. Same as the web: the HTML is checked, the hashed assets are cached forever.
 
 ## The shared cache
 
-**Dev:** Now picture a CDN. A thousand pages on a site, all using the same stylesheet. The CDN fetches it from the origin once and serves everyone.
+**Dev:** Now a CDN. A thousand pages, one stylesheet, fetched from the origin once.
 
-**Josh:** That's L3. And here's the moment I like best. When I captured these, bed 2 and bed 4 were both planted tomato beds. Different beds, different moisture: 40 and 0. Ask each for its forms at L2…
+**Josh:** That's L3. When I captured these, bed 2 and bed 4 were both planted tomato beds, moisture 40 and 0. Ask each for its forms at L2, and both point to the same affordance set, `aab67c2bd106ace1`.
 
-**Dev:** And they point to the same affordance set.
+**Dev:** Because of the template.
 
-**Josh:** Same address, `/affordance-sets/aab67c2bd106ace1`. Because the template made the set independent of which bed it's on. Two resources in the same state share one set, and a shared cache fetches it from the origin once.
+**Josh:** Yes. Bed 1, empty, has a different set, since an empty bed offers different acts. Bed 3, ready to harvest, has a third. The number of affordance sets is the number of states, not the number of beds. The spec's live test runs two clients through one shared cache, and the origin is contacted exactly once.
 
-**Dev:** And bed 1, which was empty?
+**Dev:** And in HAL-FORMS, a million beds is a million copies.
 
-**Josh:** A different set, because an empty bed offers different acts. Sowing, not watering. Bed 3, ready to harvest, had a third one.
-
-**Dev:** So the number of affordance sets is the number of states, not the number of beds.
-
-**Josh:** That's it. A million beds in five states is five sets. The spec has a live test for this: two clients, one shared cache, and the origin contacted exactly once.
+**Josh:** Each one inline, each one re-sent. Correct, but never shared.
 
 ## Integrity
 
-**Dev:** Okay, the hash we held on to. Why does the link carry one?
+**Dev:** Okay, the hash. Why does the link carry one?
 
-**Josh:** Let's do the web version first. Do you know Subresource Integrity?
+**Josh:** Web version first. Subresource Integrity.
 
-**Dev:** The `integrity` attribute on a script tag. You write the script's hash into your page, and the browser refuses to run the script if the file it downloads doesn't match.
+**Dev:** The `integrity` attribute on a script tag. The page carries the script's hash, and the browser refuses the script if it doesn't match.
 
-**Josh:** Right. The page vouches for the files it links to. And here's why it matters. In 2024, the domain behind polyfill.io, a script loaded by a huge number of sites, changed hands. Security firm Sansec reported in June that it had started injecting malware. Reports put it at over 100,000 sites.
+**Josh:** The page vouches for what it links to. In 2024 the domain behind polyfill.io, a script loaded by a huge number of sites, changed hands, and Sansec reported in June that it was injecting malware. Reports put it at over 100,000 sites.
 
-**Dev:** And those sites never changed a line. The file under the same URL changed.
+**Dev:** And those sites never changed a line.
 
-**Josh:** That's the danger of trusting a URL. And there's a twist. polyfill.io tailored its response to each browser, so sites couldn't pin one hash even if they'd wanted to.
+**Josh:** The file under the same URL changed. And polyfill.io tailored its response to each browser, so sites couldn't have pinned one hash anyway.
 
-**Dev:** Which HEART avoids how?
+**Dev:** And HAL Schema Forms avoids that how?
 
-**Josh:** Two ways. First, layer 2 and layer 3 bodies carry no instance data. The same bytes for everyone, so they can be pinned. Second, every link to them carries the hash. That `integrity` value on the forms link, and the `hr:integrity` on the schema reference. Same syntax as the web's: "sha256-" and the base64 digest.
+**Josh:** Layer 2 and 3 bodies carry no instance data, so they're the same bytes for everyone and can be pinned. And every link to them carries the hash: `integrity` on the forms link, `hr:integrity` on the schema reference, same syntax as the web's.
 
 **Dev:** And ARTIE checks it.
 
-**Josh:** Before parsing. It hashes the bytes exactly as they arrive. If they don't match, it refuses them and doesn't cache them. I checked by hand this morning: I hashed the L2 affordance set with openssl, and it came out "sha256-qrZ8K9…", exactly the value in bed 2's link. Same for the schema.
+**Josh:** Before parsing, on the bytes exactly as they arrive. A mismatch is refused and never cached. I checked by hand with openssl this morning: the L2 set hashed to exactly the value in bed 2's link, and the schema to the value in the set.
 
-**Dev:** So it's a chain. The bed vouches for the affordance set, and the affordance set vouches for the schema.
+**Dev:** A chain. The bed vouches for the set, the set for the schema.
 
-**Josh:** And the bed itself is checked every visit, with its ETag. So each layer vouches for the next, starting from the one you always revalidate.
+**Josh:** And the bed is revalidated every visit. So each layer vouches for the next.
 
-**Dev:** What about the header that carries a digest? I saw `Repr-Digest` on the response.
+**Dev:** What about HAL-FORMS?
 
-**Josh:** The server sends it, and ARTIE checks it when it's there. But it's optional, on purpose. A header in the response can show the bytes arrived intact, but a response can't vouch for itself. If someone swapped the body, they could swap the header too. The vouching has to come from the link you already trust.
+**Josh:** At L0 there's nothing separate to vouch for. Everything is in the one response, and that response is revalidated with its ETag every time. Integrity becomes a question only once you start sharing.
 
-**Dev:** And those sixteen-character names? A hash cut to 64 bits, can't someone find a clash?
+**Dev:** And the `Repr-Digest` header I saw?
 
-**Josh:** The spec's answer is that nothing trusts the name. It's only a name. The check is always against the full digest in the link. Serve the wrong body under a name, and it's refused, not used. And the server checks at start-up that no two of its own bodies share a name, and refuses to start if they do.
-
-**Dev:** And a link with no integrity value at all?
-
-**Josh:** Refused before any request is sent. Unless you've deliberately set ARTIE to talk to an older server that doesn't send them.
+**Josh:** Sent, and checked when present, but optional on purpose. A response can't vouch for itself: whoever swaps the body can swap the header. The vouching comes from the link you already trust. Same reason the short sixteen-character names are safe: nothing trusts a name, only the full digest in the link. And a link with no integrity value is refused before any request, unless you've set ARTIE to talk to an older server.
 
 ## What it costs, and what's open
 
 **Dev:** What does all this cost?
 
-**Josh:** A few things. L1 and L2 clients don't share affordance-set cache entries, because the bytes differ. They do share schemas. A deployment usually settles on one rung, so it's a small loss.
+**Josh:** Two dialects to keep in step, for one. Our library renders both from the same declaration, so the acts can't drift apart. L1 and L2 clients don't share affordance-set cache entries, though they share schemas. And on CoAP, the ETag is at most eight bytes, so it's derived from a hash of the HTTP one. Integrity still rides in the links, so it works on any protocol.
 
-**Dev:** And HAL-FORMS?
+**Dev:** And HAL-FORMS over CoAP?
 
-**Josh:** Stops at L0. Its forms can't point to a shared schema, and its target can't be a template. So it's the on-ramp dialect. If you want caching, you move to HAL Schema Forms, with the same acts.
-
-**Dev:** And over CoAP?
-
-**Josh:** The ETag can be at most eight bytes there, so the CoAP validator is the first eight bytes of a hash of the HTTP one. Still opaque, still strong. The integrity values ride in the links, so they work the same on any protocol.
+**Josh:** Not offered. A CoAP client asking for HAL-FORMS gets "not acceptable."
 
 **Dev:** And above L3?
 
-**Josh:** L4 to L6 aren't more caching. They're other axes: the error model, a second dialect, and the optional reasoning step. Another conversation.
+**Josh:** L4 to L6 are other axes: the error model, the second dialect itself, and the optional reasoning step. Another conversation.
 
-**Dev:** One sentence, then. What's the ladder?
+**Dev:** One sentence, then.
 
-**Josh:** It's how the web learned to stop sending the same stylesheet a million times, applied to forms and schemas, with the page vouching for everything it links to.
+**Josh:** HAL-FORMS gets you onto the ramp with the tools you already have, and HAL Schema Forms is how you stop sending the same form a million times, with every page vouching for what it links to.
 
 ---
 
 ## Where it is
 
-- `spec/SPEC.md` §6.4 (`Prefer`), §6.5 (content addressing and integrity), §6.6 (caching) and §6.10 (the ladder).
+- `spec/SPEC.md` §6.1 (the two dialects), §6.4 (`Prefer`), §6.5 (content addressing and integrity), §6.6 (caching) and §6.10 (the ladder).
 - `spec/HAL-SCHEMA-FORMS-HR.md`, Rules 2 and 3 (integrity).
-- `client/src/main/kotlin/heart/Rung.kt`, `Integrity.kt` and `CachingTransport.kt`.
+- `client/src/main/kotlin/heart/Dialect.kt`, `Rung.kt`, `Integrity.kt` and `CachingTransport.kt`.
+- `hacklog.md`: why Spring HATEOAS was removed (commit `f4f342f`).
 
 ## Sources
 
+- HAL-FORMS: <https://rwcbook.github.io/hal-forms/>
+- Spring HATEOAS, HAL-FORMS support: <https://docs.spring.io/spring-hateoas/docs/current/reference/html/#mediatypes.hal-forms>
 - Subresource Integrity, W3C: <https://www.w3.org/TR/SRI/>
 - RFC 8785, JSON Canonicalization Scheme: <https://www.rfc-editor.org/rfc/rfc8785>
 - RFC 9530, Digest Fields (`Repr-Digest`): <https://www.rfc-editor.org/rfc/rfc9530>
