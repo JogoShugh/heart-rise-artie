@@ -4,6 +4,10 @@ Published write-ups, decks and evidence for H.E.A.R.T., R.I.S.E. and ARTIE, newe
 
 They're hosted on claude.ai. Most are private, so a link opens only for people it has been shared with.
 
+## Series
+
+- [HEART, Session by Session](https://claude.ai/artifact/5Kab4UnSpjhRvtwuZsE7wP) — a slow introduction in fifteen sessions, anchored on Fielding's 2008 rules (2026-10-13). In the repo: [spec/HEART-SESSIONS.html](spec/HEART-SESSIONS.html)
+
 ## Decks
 
 - [Why Don't Users Reinstall Their Browser?](https://claude.ai/artifact/SsQfAsSaaRA7R5MsbNnFku) — the short provocation talk, with speaker notes (2026-10-13)

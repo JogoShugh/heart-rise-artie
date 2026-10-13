@@ -1,0 +1,762 @@
+<title>HEART, Session by Session</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column of fifteen sessions, each a short always-visible core with layers of detail folded beneath it; a slim progress bar sits at the top. */
+:root {
+  --paper: #f3f5f1; --card: #fbfcfa; --ink: #1b2420; --muted: #56635d; --rule: #d3dbd5;
+  --leaf: #2f6d3a; --leaf-soft: #e1eee2; --soil: #8a4a22; --soil-soft: #f3e9df;
+  --quote: #eef2ec; --pane: #172019; --pane-fg: #dbe6dd; --pane-dim: #8ea397;
+  --pane-key: #9fd2c4; --pane-str: #f1c890; --pane-num: #c9b3f0; --pane-kw: #f29e9e;
+  --pane-add: rgba(124, 204, 136, .16); --pane-add-fg: #a9e7b2;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #111613; --card: #18201b; --ink: #e2ebe4; --muted: #9fb1a6; --rule: #2b3730;
+  --leaf: #7fcf8c; --leaf-soft: #1b3221; --soil: #e0a273; --soil-soft: #34261b; --quote: #1a231d;
+  --pane: #0b100d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #111613; --card: #18201b; --ink: #e2ebe4; --muted: #9fb1a6; --rule: #2b3730;
+  --leaf: #7fcf8c; --leaf-soft: #1b3221; --soil: #e0a273; --soil-soft: #34261b; --quote: #1a231d;
+  --pane: #0b100d; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 17px/1.62 var(--body); margin: 0; padding-inline: 16px; padding-block: 0 80px; }
+.wrap { max-width: 780px; margin: 0 auto; }
+p, ul, ol, table, figure, blockquote { margin: 0; }
+a { color: var(--leaf); }
+a:focus-visible, summary:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--soil); outline-offset: 2px; }
+code { font: .84em var(--mono); background: var(--leaf-soft); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+b, strong { font-weight: 700; }
+.prose { display: grid; gap: 14px; }
+.prose ul, .prose ol { padding-left: 1.3em; display: grid; gap: 6px; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper); border-bottom: 1px solid var(--rule); margin-inline: -16px; padding: 10px 16px; }
+.bar-in { max-width: 780px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 14.5px; }
+.meter { flex: 1 1 160px; height: 6px; background: var(--rule); border-radius: 3px; overflow: hidden; min-width: 120px; }
+.meter i { display: block; height: 100%; width: 0; background: var(--leaf); transition: width .3s; }
+.bar button { font: 600 14px var(--body); color: var(--ink); background: var(--card); border: 1px solid var(--rule); border-radius: 5px; padding: 4px 10px; cursor: pointer; }
+.count { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+header.top { padding-block: 48px 8px; display: grid; gap: 14px; }
+.eyebrow { font: 700 12.5px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--soil); }
+h1 { font: 800 clamp(36px, 7vw, 56px)/1.03 var(--display); margin: 0; text-wrap: balance; }
+.lede { font-size: 19.5px; color: var(--muted); max-width: 62ch; }
+h2 { font: 800 clamp(25px, 4.2vw, 32px)/1.15 var(--display); margin: 0; text-wrap: balance; }
+h3 { font: 600 19px/1.3 var(--display); margin: 0; }
+
+.howto { margin-top: 28px; display: grid; gap: 12px; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; padding: 18px 20px; }
+.arc { margin-top: 28px; display: grid; gap: 4px; list-style: none; padding: 0; }
+.arc li { display: grid; grid-template-columns: 2.4em 1fr auto; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: 15.5px; }
+.arc li > * { min-width: 0; }
+.arc .n { font: 600 14px var(--mono); color: var(--muted); }
+.arc .part { font: 700 11.5px var(--body); letter-spacing: .1em; text-transform: uppercase; color: var(--soil); grid-column: 1 / -1; padding-top: 14px; border: 0; }
+.arc .tick { color: var(--leaf); font-weight: 700; font-size: 14px; }
+
+section.session { margin-top: 64px; display: grid; gap: 16px; scroll-margin-top: 64px; }
+.s-head { display: grid; gap: 6px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+.s-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; }
+.s-num { font: 600 13px var(--mono); color: var(--muted); }
+.s-tag { font: 700 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--soil); }
+.minute { font-size: 18.5px; }
+.minute b { color: var(--leaf); }
+
+blockquote.roy { background: var(--quote); border-left: 4px solid var(--leaf); padding: 14px 18px; display: grid; gap: 8px; border-radius: 0 6px 6px 0; }
+blockquote.roy p { font: italic 18px/1.55 var(--body); }
+blockquote.roy cite { font: 13.5px var(--body); font-style: normal; color: var(--muted); }
+
+details { border: 1px solid var(--rule); border-radius: 6px; background: var(--card); }
+details > summary { cursor: pointer; list-style: none; padding: 11px 14px; display: flex; gap: 10px; align-items: baseline; font-weight: 700; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "+"; font: 600 15px var(--mono); color: var(--leaf); width: 1em; flex: none; }
+details[open] > summary::before { content: "−"; }
+details > summary .hint { font-weight: 400; color: var(--muted); font-size: 14.5px; }
+details > .body { padding: 2px 16px 16px; display: grid; gap: 14px; min-width: 0; }
+details.talk > summary::before { color: var(--soil); }
+
+pre.code { margin: 0; background: var(--pane); color: var(--pane-fg); font: 13px/1.6 var(--mono); padding: 12px 14px; border-radius: 6px; overflow-x: auto; white-space: pre; }
+pre.code .d { color: var(--pane-dim); }
+pre.code .k { color: var(--pane-key); }
+pre.code .s { color: var(--pane-str); }
+pre.code .n { color: var(--pane-num); }
+pre.code .w { color: var(--pane-kw); }
+pre.code .h { color: var(--pane-key); font-weight: 600; }
+pre.code .add { background: var(--pane-add); color: var(--pane-add-fg); display: inline-block; min-width: 100%; }
+pre.code .add .k, pre.code .add .s, pre.code .add .n { color: var(--pane-add-fg); }
+.cap { font-size: 14px; color: var(--muted); }
+
+.tbl { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--card); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 700 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+
+.verdict { display: inline-block; font: 700 12.5px var(--body); padding: 2px 9px; border-radius: 999px; background: var(--leaf-soft); color: var(--leaf); }
+.verdict.part { background: var(--soil-soft); color: var(--soil); }
+.files { font: 13.5px/1.7 var(--mono); color: var(--muted); }
+.done { display: flex; gap: 8px; align-items: center; font-size: 15px; color: var(--muted); }
+.done input { width: 18px; height: 18px; accent-color: var(--leaf); }
+
+footer { margin-top: 72px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 14px; display: grid; gap: 8px; }
+@media (max-width: 520px) { body { font-size: 16px; } .arc li { grid-template-columns: 2em 1fr; } .arc .tick { display: none; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<div class="bar"><div class="bar-in">
+  <span class="count" id="count">0 of 15 sessions done</span>
+  <span class="meter" aria-hidden="true"><i id="meter"></i></span>
+  <button type="button" id="openAll">Open every detail</button>
+  <button type="button" id="closeAll">Fold every detail</button>
+</div></div>
+
+<header class="top">
+  <div class="eyebrow">H.E.A.R.T. and ARTIE · a slow introduction in fifteen sessions</div>
+  <h1>HEART, Session by Session</h1>
+  <p class="lede">The story of how the Web lets one generic client use any site, how the APIs inside our companies drifted away from that, what Roy Fielding said about it in 2008, and how HEART and ARTIE take his rules literally for programs and AI agents.</p>
+</header>
+
+<div class="howto prose">
+  <h3>How to use this with a team</h3>
+  <ul>
+    <li><b>One session per meeting.</b> Each takes about 15 to 20 minutes. Nothing later depends on remembering details from earlier, only the ideas.</li>
+    <li><b>Start folded.</b> Read the quote and the "in one minute" paragraph out loud. Open the folds only as far as the room wants to go: <i>the story</i>, then <i>on the wire</i>, then <i>in the code</i>.</li>
+    <li><b>End on the questions.</b> Every session closes with two or three questions to talk through. They matter more than the detail.</li>
+    <li><b>Tick it off.</b> The box at the end of each session remembers, in this browser only, which sessions you have covered.</li>
+  </ul>
+</div>
+
+<ol class="arc" id="arc">
+  <li class="part">Part one · the history</li>
+  <li><span class="n">1</span><a href="#s1">Why nobody reinstalls the browser</a><span class="tick" data-for="s1"></span></li>
+  <li><span class="n">2</span><a href="#s2">2000: the architecture of the Web, named</a><span class="tick" data-for="s2"></span></li>
+  <li><span class="n">3</span><a href="#s3">How the industry drifted, for good reasons</a><span class="tick" data-for="s3"></span></li>
+  <li><span class="n">4</span><a href="#s4">2008: "REST APIs must be hypertext-driven"</a><span class="tick" data-for="s4"></span></li>
+  <li class="part">Part two · Fielding's six rules, one at a time</li>
+  <li><span class="n">5</span><a href="#s5">Rule 1: any protocol</a><span class="tick" data-for="s5"></span></li>
+  <li><span class="n">6</span><a href="#s6">Rule 2: change no protocol</a><span class="tick" data-for="s6"></span></li>
+  <li><span class="n">7</span><a href="#s7">Rule 3: describe the media type, not the endpoints</a><span class="tick" data-for="s7"></span></li>
+  <li><span class="n">8</span><a href="#s8">Rule 4: the server owns its names</a><span class="tick" data-for="s8"></span></li>
+  <li><span class="n">9</span><a href="#s9">Rule 5: no typed resources</a><span class="tick" data-for="s9"></span></li>
+  <li><span class="n">10</span><a href="#s10">Rule 6: a bookmark and nothing else</a><span class="tick" data-for="s10"></span></li>
+  <li class="part">Part three · from his replies to HEART's own ideas</li>
+  <li><span class="n">11</span><a href="#s11">The information becomes the affordance</a><span class="tick" data-for="s11"></span></li>
+  <li><span class="n">12</span><a href="#s12">Application state and resource state</a><span class="tick" data-for="s12"></span></li>
+  <li><span class="n">13</span><a href="#s13">More resources, not batch calls</a><span class="tick" data-for="s13"></span></li>
+  <li><span class="n">14</span><a href="#s14">The client decides the transition, not the interface</a><span class="tick" data-for="s14"></span></li>
+  <li><span class="n">15</span><a href="#s15">What is still open</a><span class="tick" data-for="s15"></span></li>
+</ol>
+
+<!-- ===================== SESSION 1 ===================== -->
+<section class="session" id="s1">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 1</span><span class="s-tag">The question</span></div><h2>Why nobody reinstalls the browser</h2></div>
+  <p class="minute">When your team ships a new feature in a web application, users reload and use it. Nobody downloads a new browser. When a team ships a new operation in an internal API, every caller regenerates a client, rebuilds and redeploys. <b>This series asks why those two worlds behave so differently, and what it would take to give programs and AI agents what the browser already has.</b></p>
+  <details><summary>The story <span class="hint">· the two worlds, side by side</span></summary><div class="body prose">
+    <p>Picture one feature, shipped twice. On the web: a new button appears in the next response, the person sees it, the person clicks it. On the services side: someone edits an OpenAPI or protobuf file, runs a generator, publishes a new client library, and every consuming team bumps a version, rebuilds, retests and redeploys, sometimes in a careful order.</p>
+    <p>The browser never changed because it was never built for your application. It was built for a <i>format</i>, HTML, and a <i>protocol</i>, HTTP. Everything specific to your application, including what the user can do next, arrives inside each response.</p>
+    <p>That is the thread the whole series pulls on. We'll use one tiny example throughout: a <b>garden bed</b>. You can sow a seed in an empty bed, water a planted one, and harvest a ready one. What you are allowed to do depends on the bed's state right now.</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>When did we last regenerate a client because a service changed? What actually changed on the server?</li>
+    <li>Where in our code do we copy a server's business rules, for example "only when the order is paid"?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s1" data-done="s1"> We have covered session 1</label>
+</section>
+
+<!-- ===================== SESSION 2 ===================== -->
+<section class="session" id="s2">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 2</span><span class="s-tag">2000 · the dissertation</span></div><h2>The architecture of the Web, named</h2></div>
+  <blockquote class="roy"><p>"REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state."</p><cite>Roy T. Fielding, <i>Architectural Styles and the Design of Network-based Software Architectures</i>, 2000, §5.1.5</cite></blockquote>
+  <p class="minute">Roy Fielding co-wrote the HTTP and URI specifications. In his 2000 dissertation he described the rules the Web follows and called the style <b>REST</b>. The last of its four interface rules, <b>hypermedia as the engine of application state</b>, says the client moves forward only by choosing among the links and forms the server just sent. It is the rule the industry later dropped, and the one HEART is built on.</p>
+  <details><summary>The story <span class="hint">· six constraints, and the one that matters most here</span></summary><div class="body prose">
+    <p>REST is a set of constraints. Each one buys a property the Web needed to grow without central coordination:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Constraint</th><th>What it buys</th><th>Where it shows up in HEART</th></tr></thead>
+      <tbody>
+        <tr><td>Client–server</td><td>Each side evolves separately</td><td>ARTIE has no code about any service</td></tr>
+        <tr><td>Stateless</td><td>Any server can answer any request</td><td>Every act repeats what it needs: <code>If-Match</code>, <code>Accept</code>, <code>Prefer</code></td></tr>
+        <tr><td>Cache</td><td>Fewer round trips</td><td>Forms and schemas are immutable and cached for a year</td></tr>
+        <tr><td>Uniform interface</td><td>One generic client for everything</td><td>One media type, one profile, a handful of codes</td></tr>
+        <tr><td>Layered system</td><td>Proxies and caches in between</td><td>Two clients behind one cache share one fetch</td></tr>
+        <tr><td>Code on demand <i>(optional)</i></td><td>Extend the client at runtime</td><td>Not used</td></tr>
+      </tbody>
+    </table></div>
+    <p>The uniform interface has four parts. <b>Identification of resources</b>: every bed has an address. <b>Manipulation through representations</b>: you change a bed by sending a representation, not by calling a method on an object. <b>Self-descriptive messages</b>: each message says how to read it, through its media type. <b>Hypermedia as the engine of application state</b>: the links and forms in the response are the only way forward.</p>
+    <p>The fourth part is often shortened to HATEOAS. It is why a browser works on a site it has never seen: the site sends the controls with the data.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· a web form and a HEART form say the same thing</span></summary><div class="body">
+    <p>A web form for watering a bed tells the browser where, how and what:</p>
+    <pre class="code" data-lang="html">&lt;form action="/beds/2/actions/water-cell" method="post"&gt;
+  &lt;input name="milliliters" type="number" min="1" max="1000" required&gt;
+&lt;/form&gt;</pre>
+    <p>The same control in HEART's format, as the garden server sends it:</p>
+    <pre class="code" data-lang="json">"garden:water-cell": {
+  "_links": { "target": { "href": "/beds/2/actions/water-cell" } },
+  "method": "POST",
+  "contentType": "application/json",
+  "title": "Water the bed",
+  "schema": {
+    "type": "object",
+    "required": ["milliliters"],
+    "properties": { "milliliters": { "type": "integer", "minimum": 1, "maximum": 1000 } }
+  }
+}</pre>
+    <p class="cap">Trimmed. The second form is HAL Schema Forms: the fields are described by JSON Schema.</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>Which of the six constraints do our APIs keep today? Which one do they drop?</li>
+    <li>If our JSON carried its own forms, what could a client stop hard-coding?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s2" data-done="s2"> We have covered session 2</label>
+</section>
+
+<!-- ===================== SESSION 3 ===================== -->
+<section class="session" id="s3">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 3</span><span class="s-tag">2000s–2010s · the drift</span></div><h2>How the industry drifted, for good reasons</h2></div>
+  <p class="minute">JSON over HTTP took over, and was called REST. But plain JSON has no links or forms, so the controls moved out of the response and into documentation, then into OpenAPI files, then into generated code. <b>It happened for sensible reasons: a developer chose every call at compile time, so nobody was there at runtime to choose.</b> The cost is three things baked into every client: the addresses, the operations and the rules.</p>
+  <details><summary>The story <span class="hint">· four reasons, told fairly</span></summary><div class="body prose">
+    <ol>
+      <li><b>An older lineage.</b> Remote procedure calls predate the Web: CORBA, Java RMI, DCOM, SOAP with WSDL, later gRPC. Each says: describe the operations, generate a stub, call it as if it were local. If a service is a library of functions, generated bindings are natural.</li>
+      <li><b>JSON kept HTTP but dropped the controls.</b> Where to go, how to send, and what is allowed moved into docs. Swagger (2011), later OpenAPI (2016), made the docs machine-readable, so the next step was generating code from them.</li>
+      <li><b>Nobody was there at runtime.</b> A browser works because a person decides what to click. A program had no one to decide, so developers decided in advance. They wanted autocomplete and types, and generators gave them that.</li>
+      <li><b>Microservices multiplied it.</b> Hundreds of services, each with its own contract, clients and versions.</li>
+    </ol>
+    <p>Leonard Richardson's maturity model (2008) gave the industry a ladder: level 0 is one endpoint for everything, level 1 adds resources, level 2 adds HTTP methods, level 3 adds hypermedia controls. Most APIs stopped at level 2.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Baked into a generated client</th><th>Where the browser gets it instead</th></tr></thead>
+      <tbody>
+        <tr><td>The addresses</td><td>The links in each response</td></tr>
+        <tr><td>The operations</td><td>The forms in each response</td></tr>
+        <tr><td>The rules: when each operation is allowed</td><td>The server doesn't show a button you may not press</td></tr>
+      </tbody>
+    </table></div>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· where the rule lives in a typical API description</span></summary><div class="body">
+    <pre class="code" data-lang="yaml">paths:
+  /beds/{id}/water-cell:
+    post:
+      description: Waters the bed. Only allowed when a seed is planted.
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Water' }</pre>
+    <p class="cap">Illustrative, written for this session. The address is a fixed pattern the client builds, and the rule "only when planted" is prose a developer must copy into code.</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>Which of the four reasons applies most to us?</li>
+    <li>How many of our clients contain a copy of the same server rule? How would we find out?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s3" data-done="s3"> We have covered session 3</label>
+</section>
+
+<!-- ===================== SESSION 4 ===================== -->
+<section class="session" id="s4">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 4</span><span class="s-tag">20 October 2008 · the anchor</span></div><h2>"REST APIs must be hypertext-driven"</h2></div>
+  <blockquote class="roy"><p>"I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC."</p><p>"if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period."</p><cite>Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a>, Untangled, 20 October 2008</cite></blockquote>
+  <p class="minute">Eight years after the dissertation, Fielding wrote a short, blunt blog post listing six rules an API must follow before calling itself REST. Every rule is about the same thing: <b>the client must be driven by what the server sends, not by what it was told in advance.</b> HEART uses this post as its checklist. Sessions 5 to 10 take one rule each.</p>
+  <details><summary>The six rules <span class="hint">· in his words, with his own "failure here implies"</span></summary><div class="body prose">
+    <ol>
+      <li><b>Any protocol.</b> "A REST API should not be dependent on any single communication protocol." <i>Failure implies "that identification is not separated from interaction."</i></li>
+      <li><b>No protocol changes.</b> "A REST API should not contain any changes to the communication protocols aside from filling-out or fixing the details of underspecified bits of standard protocols." <i>Failure implies "that the resource interfaces are object-specific, not generic."</i></li>
+      <li><b>Media types first.</b> "A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state." <i>Failure implies "that out-of-band information is driving interaction instead of hypertext."</i></li>
+      <li><b>No fixed names.</b> "A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server)." <i>Failure implies clients assume a structure from out-of-band information, "the data-oriented equivalent to RPC’s functional coupling".</i></li>
+      <li><b>No typed resources.</b> "A REST API should never have “typed” resources that are significant to the client."</li>
+      <li><b>Bookmark only.</b> "A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types". <i>Failure implies "that out-of-band information is driving interaction instead of hypertext."</i></li>
+    </ol>
+    <p>He closed: "Please try to adhere to them or choose some other buzzword for your API." Then he answered readers in the comments for three weeks. Several of those replies read as if written for machine clients. Part three of this series uses them.</p>
+  </div></details>
+  <details><summary>The scorecard <span class="hint">· how HEART stands against each rule today</span></summary><div class="body prose">
+    <p>The project keeps a running review, <a href="https://claude.ai/artifact/NiZdhyhpwHrhdpDgkMJgWr">Fielding's Rules, Checked</a>, re-checked against the code after each change. As of 12 October 2026:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Rule</th><th>Verdict</th><th>What is still open</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Any protocol</td><td><span class="verdict">Supports</span></td><td>CoAP option numbers are experimental; no secure CoAP yet</td></tr>
+        <tr><td>2 · No protocol changes</td><td><span class="verdict">Supports</span></td><td><code>Accept-Profile</code> and JSON Home are still drafts</td></tr>
+        <tr><td>3 · Media types first</td><td><span class="verdict">Supports</span></td><td>—</td></tr>
+        <tr><td>4 · No fixed names</td><td><span class="verdict">Supports</span></td><td>—</td></tr>
+        <tr><td>5 · No typed resources</td><td><span class="verdict">Supports</span></td><td>—</td></tr>
+        <tr><td>6 · Bookmark only</td><td><span class="verdict">Supports</span></td><td>The media type and profile are published, not standardized</td></tr>
+      </tbody>
+    </table></div>
+    <p>Those verdicts weren't always green. Rules 1, 2, 4 and 6 each started as a gap and were closed in the code over 8–12 October 2026. Each later session says what changed.</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>By his test, which of our "REST APIs" are RPC? Is that a problem for us, or just a label?</li>
+    <li>Which rule would be hardest for our services to meet?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s4" data-done="s4"> We have covered session 4</label>
+</section>
+
+<!-- ===================== SESSION 5 ===================== -->
+<section class="session" id="s5">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 5</span><span class="s-tag">Rule 1</span></div><h2>Any protocol</h2></div>
+  <blockquote class="roy"><p>"A REST API should not be dependent on any single communication protocol, though its successful mapping to a given protocol may be dependent on the availability of metadata, choice of methods, etc. In general, any protocol element that uses a URI for identification must allow any URI scheme to be used for the sake of that identification."</p><cite>Rule 1</cite></blockquote>
+  <p class="minute">The rule isn't "avoid HTTP". It is: <b>don't mix up naming a thing with how you talk to it.</b> HEART's core is written without HTTP words (read, act, validator, stale, not offered), and then mapped onto two real protocols, HTTP and CoAP. ARTIE picks the protocol from the link's URI scheme. <span class="verdict">Supports</span></p>
+  <details><summary>The story <span class="hint">· a protocol-neutral core, two bindings</span></summary><div class="body prose">
+    <p>Early versions of the spec were written entirely in HTTP terms, and this rule was red. On 10 October 2026 the spec gained a protocol-neutral core (§6.0) and two bindings: HTTP (§6.1–§6.12) and CoAP (§6.0.1), the small UDP protocol used by constrained devices.</p>
+    <p>ARTIE chooses a binding by the scheme of the URI it is following: <code>http:</code> or <code>coap:</code>. A scheme it has no binding for is refused before anything is sent, and it never rewrites a URI to another scheme. Live, over UDP against the real garden server, ARTIE sows, waters and harvests a bed starting from a <code>coap://</code> bookmark, with nothing sent over HTTP.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Core idea</th><th>HTTP</th><th>CoAP</th></tr></thead>
+      <tbody>
+        <tr><td>Validator</td><td><code>ETag</code> / <code>If-Match</code></td><td>The same options; 8 bytes, CoAP's limit</td></tr>
+        <tr><td>Read fresh, never from cache</td><td><code>Cache-Control: no-cache</code></td><td>A critical, unsafe No-Cache option (experimental)</td></tr>
+        <tr><td>Profile and preference</td><td><code>Link: rel="profile"</code>, <code>Prefer</code></td><td>Experimental options, one for one</td></tr>
+        <tr><td>Trace context</td><td><code>traceparent</code></td><td>Option 65020, same value</td></tr>
+        <tr><td>Refusals</td><td>428, 412, 409, 422</td><td>CoAP codes with the same problem types</td></tr>
+      </tbody>
+    </table></div>
+  </div></details>
+  <details><summary>In the code <span class="hint">· where to look</span></summary><div class="body prose">
+    <p class="files">client/src/main/kotlin/heart/Binding.kt<br>client/src/main/kotlin/heart/HttpBinding.kt<br>client/src/main/kotlin/heart/CoapBinding.kt<br>client/src/test/resources/features/any-protocol.feature<br>client/src/test/resources/features/coap-binding.feature</p>
+  </div></details>
+  <details><summary>Where it falls short</summary><div class="body prose"><ul>
+    <li>The CoAP option and format numbers are experimental until registered with IANA.</li>
+    <li>There is no secure CoAP (<code>coaps</code>, over DTLS) yet.</li>
+    <li>HAL-FORMS, the beginner's format, isn't served over CoAP.</li>
+    <li>Buster, the adversarial test proxy, attacks only the HTTP binding.</li>
+  </ul></div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>Where do our clients assume HTTP even when they only need to name something?</li>
+    <li>Do we have devices or queues where a second binding would matter?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s5" data-done="s5"> We have covered session 5</label>
+</section>
+
+<!-- ===================== SESSION 6 ===================== -->
+<section class="session" id="s6">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 6</span><span class="s-tag">Rule 2</span></div><h2>Change no protocol</h2></div>
+  <blockquote class="roy"><p>"A REST API should not contain any changes to the communication protocols aside from filling-out or fixing the details of underspecified bits of standard protocols, such as HTTP’s PATCH method or Link header field."</p><cite>Rule 2</cite></blockquote>
+  <p class="minute">HEART invents no headers and no status codes. <b>Every mechanism it uses is an existing standard, used as written.</b> That matters because any cache, proxy or HTTP library already understands it. <span class="verdict">Supports</span></p>
+  <details><summary>The story <span class="hint">· the standards, and one correction</span></summary><div class="body prose">
+    <div class="tbl"><table>
+      <thead><tr><th>Need</th><th>Standard</th><th>Used for</th></tr></thead>
+      <tbody>
+        <tr><td>Act on the state you saw</td><td>RFC 9110 conditional requests, RFC 6585</td><td><code>ETag</code>, <code>If-Match</code>, 412, 428</td></tr>
+        <tr><td>Ask for a lighter response</td><td>RFC 7240 <code>Prefer</code></td><td><code>forms=link</code>, <code>schema=link</code>, and <code>Preference-Applied</code></td></tr>
+        <tr><td>Cache forever</td><td>RFC 8246 <code>immutable</code></td><td>Shared forms and schemas</td></tr>
+        <tr><td>Always read the resource fresh</td><td>RFC 9111 <code>no-cache</code></td><td>Reading the bed itself</td></tr>
+        <tr><td>Refuse clearly</td><td>RFC 9457 problem details, RFC 6901 JSON Pointer</td><td>Every refusal, pointing at the field</td></tr>
+        <tr><td>Say which rules a response follows</td><td><code>Link: rel="profile"</code>, W3C <code>Accept-Profile</code></td><td>The HEART profile</td></tr>
+        <tr><td>Say what the server offers</td><td>JSON Home, link hints</td><td>The bookmark, asked for <code>application/json-home</code></td></tr>
+        <tr><td>Follow one request across systems</td><td>W3C <code>traceparent</code></td><td>Every request ARTIE sends</td></tr>
+      </tbody>
+    </table></div>
+    <p>One correction is part of the story. An early rule compared only the state number inside an <code>ETag</code> and ignored the rest. That narrowed RFC 9110, which says to compare the whole value. It was removed on 9 October 2026. Now an act repeats the <code>Accept</code>, <code>Accept-Profile</code> and <code>Prefer</code> it read with, and the server compares <code>If-Match</code> with that representation's <code>ETag</code>, all of it.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· an act, and a refusal</span></summary><div class="body">
+    <pre class="code" data-lang="http">POST /beds/2/actions/water-cell
+If-Match: "seq-3.hsf.L2"
+Prefer: forms=link, schema=link
+Content-Type: application/json
+
+{"milliliters": 700}
+
+HTTP/1.1 422 Unprocessable Content
+Content-Type: application/problem+json
+
+{
+  "type": "https://github.com/jogoshugh/heart-rise/problems/rule-refused",
+  "title": "A rule of the resource refuses the act",
+  "status": 422,
+  …
+}</pre>
+    <p class="cap">Trimmed. The <code>type</code> and <code>title</code> are the server's own. The rest of the body carries the detail and the violations, which name <code>/milliliters</code>: "The bed would be waterlogged: at most 600 ml now." The <code>ETag</code> value comes from walk-through step 6.</p>
+  </div></details>
+  <details><summary>Where it falls short</summary><div class="body prose"><ul>
+    <li><code>Accept-Profile</code> is a W3C draft, and JSON Home and HTTP link hints are Internet-Drafts. Using a draft isn't a change to the protocol, but the drafts may move.</li>
+  </ul></div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>Which custom headers or status conventions do our services use? Is there a standard for each one?</li>
+    <li>How do our clients avoid overwriting each other today?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s6" data-done="s6"> We have covered session 6</label>
+</section>
+
+<!-- ===================== SESSION 7 ===================== -->
+<section class="session" id="s7">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 7</span><span class="s-tag">Rule 3</span></div><h2>Describe the media type, not the endpoints</h2></div>
+  <blockquote class="roy"><p>"A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types."</p><cite>Rule 3</cite></blockquote>
+  <p class="minute">An OpenAPI file describes endpoints: this URL, this method, this body. Fielding says to describe the <b>format</b> instead, and how to process it. HEART's specification defines a profile of an existing format, two link relations and processing rules. <b>It defines no endpoints at all.</b> <span class="verdict">Supports</span></p>
+  <details><summary>The story <span class="hint">· a profile on an existing format, and acts named by relations</span></summary><div class="body prose">
+    <p>HEART builds on <code>application/hal+json</code> with HAL Schema Forms: HAL for links, plus forms whose fields are JSON Schema. On top it adds a <b>profile</b>, a published set of extra rules a response can declare it follows. It also names two extended relations of its own: <code>hr:forms</code> (where this resource's forms are) and <code>hr:unavailable</code> (why some acts are missing).</p>
+    <p>Each act is named by a link relation, too. <code>garden:water-cell</code> is a CURIE, a short form of <code>/profiles/garden#water-cell</code>, and that address is an ALPS document describing the act in words. ARTIE reads ALPS only to describe an act to a person or a model, never to decide what to do.</p>
+    <p>The garden's <code>/beds</code> and <code>/actions</code> paths belong to one example server. Nothing in the spec requires them.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· the profile and the relation, in the response</span></summary><div class="body">
+    <pre class="code" data-lang="http">+Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel="profile"
+
+{ "id": 1, "status": "EMPTY", …,
+  "_links": { "self": { "href": "/beds/1" },
++   "curies": [{ "name": "garden", "href": "/profiles/garden#{rel}", "templated": true }] },
+  "_forms": {
++   "garden:sow-seed": {
++     "title": "Sow a seed",
++     "description": "Plants a seed in an empty bed. The bed becomes planted.",
+      …
+      "schema": { … "seedType": { "type": "string",
++       "title": "Seed", "description": "The kind of seed to sow", "examples": ["basil"] } … } } } }</pre>
+    <p class="cap">From the walk-through, step 3. Lines in green are what the profile and relations add.</p>
+  </div></details>
+  <details><summary>In the code</summary><div class="body prose">
+    <p class="files">spec/HAL-SCHEMA-FORMS-HR.md · the profile<br>client/src/test/resources/features/form-relations.feature<br>heart/heart-core/src/test/resources/features/layers.feature</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>Where does our descriptive effort go today: endpoint lists, or formats?</li>
+    <li>If two of our services named the same act with the same relation, what could a single client do?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s7" data-done="s7"> We have covered session 7</label>
+</section>
+
+<!-- ===================== SESSION 8 ===================== -->
+<section class="session" id="s8">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 8</span><span class="s-tag">Rule 4</span></div><h2>The server owns its names</h2></div>
+  <blockquote class="roy"><p>"A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace. Instead, allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates, by defining those instructions within media types and link relations."</p><cite>Rule 4</cite></blockquote>
+  <p class="minute">ARTIE never builds a URL from its own knowledge. <b>Every act goes to a target the server sent.</b> When a target is a template, the form itself says how to fill it. ARTIE reads nothing out of a URL, not even a hash. <span class="verdict">Supports</span> since 8–9 October 2026.</p>
+  <details><summary>The story <span class="hint">· templates, pointers, and a gap that was closed</span></summary><div class="body prose">
+    <p>Many beds in the same state share one set of forms, so a shared form can't name one bed. Its target is a URI Template, <code>/beds/{id}/actions/water-cell</code>. The form carries an instruction for the blank: <code>"hr:templatePointers": {"id": "/id"}</code>, a JSON Pointer into the bed that linked to the form. The idea comes from JSON Hyper-Schema. It lives in the published profile, so it is an instruction "within media types", as the rule asks.</p>
+    <p>The closed gap: ARTIE used to verify a shared form set by reading a hash out of its URL. That is a client assuming a URL's structure. Now the linking representation carries an <code>integrity</code> value, as browsers' Subresource Integrity does, and ARTIE checks the bytes against it. Since 11 October the server names each set by 16 hex digits with no <code>sha256-</code> in front, so the name no longer even looks like a digest.</p>
+    <p>Fielding himself said URIs needn't be opaque, and encouraged human-meaningful, hierarchical identifiers. The garden's paths are readable. The point of the rule is that the client mustn't depend on them.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· a shared form that knows how to fill its own blank</span></summary><div class="body">
+    <pre class="code" data-lang="json">GET /affordance-sets/aab67c2bd106ace1
+
+{ "_forms": { "garden:water-cell": {
+    "_links": { "target": { "href": "/beds/{id}/actions/water-cell", "templated": true } },
++   "hr:templatePointers": { "id": "/id" },
+    "method": "POST",
+    "title": "Water the bed",
+    "schema": { "$ref": "/schemas/7f232c04c52671dd",
++               "hr:integrity": "sha256-fyMsBMUmcd0HdvI4xkfZO3dvViJqO0HdGynlKasuMdQ=" } } } }</pre>
+    <p class="cap">From the walk-through, step 6.</p>
+  </div></details>
+  <details><summary>In the code</summary><div class="body prose">
+    <p class="files">client/src/test/resources/features/conditional-acts.feature · pointers and fields<br>client/src/test/resources/features/sync-l2.feature · a hash-shaped URL is ignored; mismatched integrity is refused<br>spec/HAL-SCHEMA-FORMS-HR.md · rules 1 and 2</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>What would break in our clients if a service renamed one path tomorrow?</li>
+    <li>Where do we parse IDs or versions out of URLs?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s8" data-done="s8"> We have covered session 8</label>
+</section>
+
+<!-- ===================== SESSION 9 ===================== -->
+<section class="session" id="s9">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 9</span><span class="s-tag">Rule 5</span></div><h2>No typed resources</h2></div>
+  <blockquote class="roy"><p>"A REST API should never have “typed” resources that are significant to the client. Specification authors may use resource types for describing server implementation behind the interface, but those types must be irrelevant and invisible to the client. The only types that are significant to a client are the current representation’s media type and standardized relation names."</p><cite>Rule 5</cite></blockquote>
+  <p class="minute"><b>ARTIE knows nothing about garden beds.</b> It branches only on the media type, the profile and a few relations. A resource's state is JSON it carries but never interprets. The proof: the same client works a garden, a basketball game and a support desk with no code about any of them. <span class="verdict">Supports</span></p>
+  <details><summary>The story <span class="hint">· three services, one client</span></summary><div class="body prose">
+    <p>A generated client has a <code>Bed</code> class with a <code>water()</code> method. ARTIE has neither. It holds "the current representation" and "the acts it offers", whatever they are.</p>
+    <p>On 12 October 2026 Claude Code worked three unrelated services through heart-mcp, the MCP server built on ARTIE. It watered a bed in the garden. It found the live basketball game and scored a basket. It assigned a support ticket, and the ticket refused a second assignment in its own words. No line of client code mentions beds, games or tickets.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· what a model is shown: state it doesn't need to understand, and acts it can choose</span></summary><div class="body">
+    <pre class="code" data-lang="json">{
+  "resource": { "state": {
+    "id": 2, "label": "bed-2", "widthFt": 4, "lengthFt": 8,
+    "status": "PLANTED", "cropName": "tomato",
+    "growthPoints": 80, "moistureLevel": 40 } },
+  "acts": [ {
+    "name": "garden:water-cell",
+    "title": "Water the bed",
+    "description": "Pours water into every cell of a planted bed. Enough water makes it ready to harvest.",
+    "schema": {
+      "type": "object",
+      "required": ["milliliters"],
+      "properties": { "milliliters": {
+        "title": "Water per cell", "type": "integer",
+        "minimum": 1, "maximum": 1000, "examples": [250] } } } } ],
+  "links": []
+}</pre>
+    <p class="cap">A real heart-mcp result from 12 October 2026, slightly reflowed. There is no URL, method or validator anywhere in it.</p>
+  </div></details>
+  <details><summary>In the code</summary><div class="body prose">
+    <p class="files">client/src/main/kotlin/heart/Dialect.kt<br>client/src/main/kotlin/heart/HeartResponseParser.kt<br>mcp/PROOF.md · the three-service runs</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>How many domain classes exist in our clients only to mirror a server's resources?</li>
+    <li>What would a client look like that held "the current resource" instead?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s9" data-done="s9"> We have covered session 9</label>
+</section>
+
+<!-- ===================== SESSION 10 ===================== -->
+<section class="session" id="s10">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 10</span><span class="s-tag">Rule 6</span></div><h2>A bookmark and nothing else</h2></div>
+  <blockquote class="roy"><p>"A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations."</p><cite>Rule 6</cite></blockquote>
+  <p class="minute">ARTIE is given exactly one URL: the service's bookmark, <code>/</code>. From there it searches, follows and acts using only what the responses offer. <b>Even a brand-new bed comes from an act the bookmark offers.</b> <span class="verdict">Supports</span> since 8 October 2026.</p>
+  <details><summary>The story <span class="hint">· entering, discovering, and building</span></summary><div class="body prose">
+    <p>The bookmark offers three forms: search beds by name, get a bed by id, and build a new bed. Search and get are GET forms, filled like a search box on a web page; Fielding's rule counts that as "the user’s manipulation of those representations". Build is a real act with its own schema and rules, answered <code>201</code> with the new bed in <code>Location</code>.</p>
+    <p>The same bookmark also says what the server can do. Asked for <code>application/json-home</code>, it lists the formats and the <code>Prefer</code> values it honours. ARTIE asks for the best of those it supports, then trusts each response's <code>Preference-Applied</code> over the declaration. A server started at a lower level is simply used at that level.</p>
+    <p>An earlier version of the review rated this rule "partly", reading it without its last clause. That reading was withdrawn. The entry point itself was a real gap until 8 October.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· the bookmark</span></summary><div class="body">
+    <pre class="code" data-lang="json">GET /   Accept: application/hal+json
+
+{ "title": "Garden beds",
+  "_forms": {
+    "garden:search-beds": { "_links": { "target": { "href": "/beds{?name}", "templated": true } }, "method": "GET", … },
+    "garden:get-bed":     { "_links": { "target": { "href": "/beds/{id}", "templated": true } }, "method": "GET", … },
+    "garden:build-bed":   { "_links": { "target": { "href": "/actions/build-bed" } }, "method": "POST", … } } }</pre>
+    <p class="cap">From the walk-through, step 5.</p>
+  </div></details>
+  <details><summary>In the code</summary><div class="body prose">
+    <p class="files">client/src/test/resources/features/service-index.feature<br>client/src/test/resources/features/rung-discovery.feature</p>
+  </div></details>
+  <details><summary>Where it falls short</summary><div class="body prose"><ul>
+    <li>"Standardized media types": HAL is an IETF draft, HAL Schema Forms is published but not standardized, and the HEART profile is the project's own. A plain HAL Schema Forms client can use the simplest level, but not the cached layers. That is a question of adoption, not of behaviour.</li>
+  </ul></div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>How many URLs does a new consumer of our services need to know today?</li>
+    <li>Where do we have a generic "create" endpoint that hides a real business act?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s10" data-done="s10"> We have covered session 10</label>
+</section>
+
+<!-- ===================== SESSION 11 ===================== -->
+<section class="session" id="s11">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 11</span><span class="s-tag">His definition of hypertext</span></div><h2>The information becomes the affordance</h2></div>
+  <blockquote class="roy"><p>"the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions"</p><cite>Fielding, replying to readers in the comments, 20 October 2008</cite></blockquote>
+  <p class="minute">This is where HEART gets its central idea. Each response carries the bed <b>and exactly the acts the bed allows now</b>. An empty bed offers sowing and nothing else. <b>The absence of an act is the enforcement:</b> a client can't water an empty bed, because there is nothing to send.</p>
+  <details><summary>The story <span class="hint">· HEART's addition: controls scoped to the state</span></summary><div class="body prose">
+    <p>Note the words "or automaton". Fielding meant machine clients too. Today's agent tools hand a model a catalogue of everything a service can do in principle. HEART hands it the affordances of one resource in its current state. That is the difference between a map of the city and the doors you can open in this room.</p>
+    <p>The server can also say why something is missing. An <code>hr:unavailable</code> link leads to a list of absent acts, each with a reason in the domain's words. A client fetches it only when someone asks "why can't I?", and never acts on it.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· two beds, two different sets of controls</span></summary><div class="body">
+    <pre class="code" data-lang="json">GET /beds/1   (EMPTY)
+"_forms": { "garden:sow-seed": { … } }
+
+GET /beds/2   (PLANTED)
+"_forms": { "garden:water-cell": { … } }
+
+GET /unavailable/d1995ab17483fab3
+{ "unavailable": [
+  { "rel": "/profiles/garden#water-cell", "reason": "Nothing is planted yet; sow a seed first." },
+  { "rel": "/profiles/garden#harvest",
+    "reason": "Nothing is growing yet; sow a seed and water it until it is ready." } ] }</pre>
+    <p class="cap">From the walk-through, steps 2 and 7.</p>
+  </div></details>
+  <details><summary>In the code</summary><div class="body prose">
+    <p class="files">client/src/test/resources/features/explaining-absence.feature<br>spec/SPEC.md §3.4, §6.7</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>Which of our screens hide buttons the user may not press? Do our APIs do the same for programs?</li>
+    <li>Where would "why can't I?" in the domain's own words save support time?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s11" data-done="s11"> We have covered session 11</label>
+</section>
+
+<!-- ===================== SESSION 12 ===================== -->
+<section class="session" id="s12">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 12</span><span class="s-tag">Two kinds of state</span></div><h2>Application state and resource state</h2></div>
+  <blockquote class="roy"><p>"Don’t confuse application state (the state of the user’s application of computing to a given task) with resource state (the state of the world as exposed by a given service)."</p><cite>Fielding, in the comments, 22 October 2008</cite></blockquote>
+  <blockquote class="roy"><p>"You don’t get to decide what POST means — that is decided by the resource. Its purpose is supposed to be described in the same context in which you found the URI that you are posting to."</p><cite>Fielding, in the comments, 21 October 2008</cite></blockquote>
+  <p class="minute">The bed's real state lives on the server. What the client holds is its <i>view</i> of the bed, which can go stale. <b>The <code>ETag</code> ties the two together:</b> every act sends back the version it saw, and if the bed has changed, the server refuses with <code>412</code>. The client reads again and decides afresh. It never resends the old act.</p>
+  <details><summary>The story <span class="hint">· one meaning per refusal, checked in order</span></summary><div class="body prose">
+    <p>Each refusal has exactly one meaning, so a client handles it without reading the text. The server checks them in this order:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Code</th><th>Problem type</th><th>Meaning</th><th>What ARTIE does</th></tr></thead>
+      <tbody>
+        <tr><td>428</td><td>precondition-required</td><td>No <code>If-Match</code> was sent</td><td>Never happens: ARTIE always sends one</td></tr>
+        <tr><td>412</td><td>stale</td><td>The bed changed since you looked</td><td>Reads again; drops the act</td></tr>
+        <tr><td>409</td><td>not-offered</td><td>Not allowed in the bed's current state</td><td>Reads again</td></tr>
+        <tr><td>422</td><td>invalid-input</td><td>The body breaks the form's schema</td><td>Reports the violations</td></tr>
+        <tr><td>422</td><td>rule-refused</td><td>Valid, but a rule of the resource says no</td><td>Reports the rule's own words</td></tr>
+      </tbody>
+    </table></div>
+    <p>On the second quote: the form carries the act's title and schema beside its target, so the purpose sits next to the URI. The answer to an act is the next representation, saying what changed and what can be done next, with <code>Content-Location</code> naming the bed it represents. Building a bed is answered <code>201</code> with the new bed's <code>Location</code>.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· acting on the version you saw</span></summary><div class="body">
+    <pre class="code" data-lang="http">GET /beds/1
++ETag: "seq-0.hsf.L0"
++Cache-Control: no-cache
+
+POST /beds/1/actions/sow-seed
++If-Match: "seq-0.hsf.L0"
+Content-Type: application/json
+
+{"seedType": "basil"}</pre>
+    <p class="cap">From the walk-through, step 4. If another client had changed bed 1 in between, this act would be answered 412.</p>
+  </div></details>
+  <details><summary>In the code</summary><div class="body prose">
+    <p class="files">heart/heart-core/src/main/kotlin/com/artie/heart/StateETag.kt<br>client/src/main/kotlin/heart/Refusals.kt<br>client/src/test/resources/features/conditional-acts.feature</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>How do our services detect that two clients are acting on the same thing at once?</li>
+    <li>Can our clients tell "you're too late" from "you're not allowed" from "your input is wrong" without parsing text?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s12" data-done="s12"> We have covered session 12</label>
+</section>
+
+<!-- ===================== SESSION 13 ===================== -->
+<section class="session" id="s13">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 13</span><span class="s-tag">Caching and layers</span></div><h2>More resources, not batch calls</h2></div>
+  <blockquote class="roy"><p>"If you find yourself in need of a batch operation, then most likely you just haven’t defined enough resources."</p><cite>Fielding, in the comments, 22 October 2008</cite></blockquote>
+  <blockquote class="roy"><p>"Because implementations change, but cool URIs don’t."</p><cite>Fielding, in the comments, 21 October 2008</cite></blockquote>
+  <p class="minute">Sending every form and schema in every response is correct but wasteful, because many beds in the same state offer the same forms. HEART's answer is more resources: <b>the bed links to its set of forms, the set links to its schemas, and both are named by their content, so they never change and can be cached for a year.</b> The bed itself is always read fresh.</p>
+  <details><summary>The story <span class="hint">· three layers, and a ladder to climb</span></summary><div class="body prose">
+    <p>A client asks with <code>Prefer: forms=link, schema=link</code>. The bed's response shrinks to its data plus one link to its forms, with an <code>integrity</code> hash. The forms set is shared by every bed in the same state. A schema is shared by every form that uses it. Checking an unchanged bed again costs one request answered <code>304</code>.</p>
+    <p>Because those addresses come from the content, they are "cool URIs": valid forever. The action addresses can change freely, because clients read them again on every sync. When the server moved from Spring MVC on Tomcat to WebFlux on Netty, ARTIE's live tests passed unchanged.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Rung</th><th>What it adds</th></tr></thead>
+      <tbody>
+        <tr><td>L0</td><td>Everything in one response. An on-ramp, not yet conformance.</td></tr>
+        <tr><td>L1</td><td>Forms move to a linked, cached set</td></tr>
+        <tr><td><b>L2</b></td><td><b>Schemas move out too. The reference rung, and the minimum to claim conformance.</b></td></tr>
+        <tr><td>L3</td><td>Proof of sharing: two beds, two clients, one cache, one fetch</td></tr>
+        <tr><td>L4</td><td>Concurrency and refusals, as in session 12</td></tr>
+        <tr><td>L5</td><td>The same acts also served as HAL-FORMS</td></tr>
+        <tr><td>L6</td><td>Optional: a language model chooses. A HEART client never needs one.</td></tr>
+      </tbody>
+    </table></div>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· a bed at L2</span></summary><div class="body">
+    <pre class="code" data-lang="http">GET /beds/2   Prefer: forms=link, schema=link
+
+ETag: "seq-3.hsf.L2"
++Preference-Applied: forms=link, schema=link
+
+{ "id": 2, "status": "PLANTED", "cropName": "tomato", …,
+  "_links": { "self": { "href": "/beds/2" },
++   "hr:forms": { "href": "/affordance-sets/aab67c2bd106ace1",
++                 "integrity": "sha256-qrZ8K9EGrOGeWjyrqHskN7gZvS6ib1NGBk3/Vnx2JaM=" } } }</pre>
+    <p class="cap">From the walk-through, step 6.</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>Where have we built a batch endpoint that could have been a few cacheable resources?</li>
+    <li>Which parts of our responses never change, and could be named by their content?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s13" data-done="s13"> We have covered session 13</label>
+</section>
+
+<!-- ===================== SESSION 14 ===================== -->
+<section class="session" id="s14">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 14</span><span class="s-tag">Agents</span></div><h2>The client decides the transition, not the interface</h2></div>
+  <blockquote class="roy"><p>"The client (user or agent) has to decide what transition to take, not what interface to use."</p><cite>Fielding, in the comments, 21 October 2008</cite></blockquote>
+  <blockquote class="roy"><p>"All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven."</p><cite>Fielding, in the comments, 8 November 2008</cite></blockquote>
+  <p class="minute">In 2008 Fielding named the AI-driven client. HEART builds it with a strict split. <b>The model decides the transition: which offered act, with which values. Ordinary code builds the interface: the address, the method, the validator, the body check.</b> The model's output has no field for a URL, so it can't invent one.</p>
+  <details><summary>The story <span class="hint">· Sync, Reason, Act, and heart-mcp</span></summary><div class="body prose">
+    <p>ARTIE runs three steps in a loop. <b>Sync</b>: read the resource, check its profile, verify the layers, hold the forms and the <code>ETag</code>. <b>Reason</b>: pick one offered act and fill its fields; code or a model can do this. <b>Act</b>: code fills the target, sets <code>If-Match</code>, checks the body against the schema and sends it. A configuration-driven client with no model is fully conformant. The model is optional, level L6.</p>
+    <p><b>heart-mcp</b> puts this behind the Model Context Protocol, so any MCP host can use any HEART service. It offers six fixed tools: look, act, follow, describe, explain and back. Every result carries the current resource and its offered acts, with no addresses. Before anything is sent, heart-mcp checks that the act is offered and the fields fit the schema.</p>
+    <p>Fielding also wrote: "Of course the client has prior knowledge. … What REST does is concentrate that need for prior knowledge into readily standardizable forms." ARTIE's prior knowledge fits on one card: HTTP, two media types, two profile URIs, two link relations, two <code>Prefer</code> tokens, four refusal codes and problem details. None of it is about gardens.</p>
+  </div></details>
+  <details><summary>On the wire <span class="hint">· a model's choice, refused by the bed's own rule</span></summary><div class="body">
+    <pre class="code" data-lang="json">heart_act { "act": "garden:water-cell", "fields": { "milliliters": 700 } }
+
+{ "outcome": {
+    "kind": "rule-refused",
+    "message": "garden:water-cell was refused by a rule of the resource (422): /milliliters: The bed would be waterlogged: at most 600 ml now.",
+    "violations": ["/milliliters: The bed would be waterlogged: at most 600 ml now."] },
+  … }</pre>
+    <pre class="code" data-lang="json">heart_act { "act": "garden:water-cell", "fields": { "milliliters": 2000 } }
+
+{ "outcome": {
+    "kind": "rejected-before-sending",
+    "message": "The fields do not satisfy garden:water-cell's schema. Nothing was sent.",
+    "violations": ["milliliters is above 1000"] },
+  … }</pre>
+    <p class="cap">Real heart-mcp outcomes from 12 October 2026. The first reached the server and was refused by its rule; the second never left the client.</p>
+  </div></details>
+  <details><summary>In the code</summary><div class="body prose">
+    <p class="files">client/src/main/kotlin/heart/Reasoning.kt<br>client/src/main/kotlin/heart/ArtieAgent.kt<br>client/src/test/resources/features/reason-l6.feature<br>mcp/docs/HOW-IT-WORKS.md · mcp/PROOF.md</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>If an agent called our services today, what stops it from calling an operation the resource doesn't allow right now?</li>
+    <li>Which of our services would be a safe first one to put behind heart-mcp?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s14" data-done="s14"> We have covered session 14</label>
+</section>
+
+<!-- ===================== SESSION 15 ===================== -->
+<section class="session" id="s15">
+  <div class="s-head"><div class="s-meta"><span class="s-num">Session 15</span><span class="s-tag">Status</span></div><h2>What is still open</h2></div>
+  <p class="minute">HEART is a <b>working draft, version 0.5</b>. The rules in this series run live against the reference garden server and ARTIE, over HTTP and CoAP, and through heart-mcp against three services. <b>Some things are not done, and the team should hear them as plainly as the rest.</b></p>
+  <details><summary>The open list <span class="hint">· carried forward from the review</span></summary><div class="body prose"><ul>
+    <li><b>How well a model chooses</b> has been shown on real cases, not measured. The evaluation plan in <code>spec/EVAL-L6.md</code> calls for five domains, 60–75 reviewed requests, renamed copies and several runs per case. <span class="verdict part">Partly</span></li>
+    <li><b>Shared vocabulary.</b> Acts are typed relations, but each belongs to one service. Two shops' "submit order" aren't yet the same relation. That is the R.I.S.E. work, which isn't built.</li>
+    <li><b>Standards status.</b> The media type and profile are published, not standardized. <code>Accept-Profile</code> and JSON Home are drafts. CoAP options are experimental.</li>
+    <li><b>heart-mcp</b> is a spike: stdio only, no HTTP transport, no auth.</li>
+    <li><b>One author.</b> The code, the tests and the reviews were written by one author. Mistakes can line up. The best check is a narrow, deep trace of one act by someone else, including breaking it on purpose to see the tests go red.</li>
+  </ul></div></details>
+  <details><summary>Try it yourself</summary><div class="body prose">
+    <p>From the repository, with nothing on port 8080:</p>
+    <pre class="code" data-lang="sh">scripts/mcp-check.sh            # 12 scenarios through MCP, 10 against the live garden
+scripts/mcp-check.sh --docker   # the heart-mcp image, end to end</pre>
+    <p>Further reading: <a href="https://claude.ai/artifact/JmRxGm7vJPyPuLdPeMy146">From the Web to HEART</a> (the short walk-through), <a href="https://claude.ai/artifact/NiZdhyhpwHrhdpDgkMJgWr">Fielding's Rules, Checked</a> (the full review with evidence), and <code>spec/SPEC.md</code>.</p>
+  </div></details>
+  <details class="talk"><summary>Talk about it</summary><div class="body prose"><ul>
+    <li>What would we need to see before trusting this in one of our own services?</li>
+    <li>Which single act in our domain would make the best first trial?</li>
+  </ul></div></details>
+  <label class="done"><input type="checkbox" id="done-s15" data-done="s15"> We have covered session 15</label>
+</section>
+
+<footer>
+  <p>Quotes from Roy T. Fielding are verbatim: from his 2000 dissertation, and from <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a> (20 October 2008) and his replies in its comments. Wire samples come from the reference garden server and heart-mcp runs on 12 October 2026, trimmed with "…"; the OpenAPI fragment in session 3 is illustrative. Verdicts are from the project's review as re-checked on 12 October 2026.</p>
+</footer>
+</div>
+
+<script>
+(function () {
+  // Highlight code blocks: JSON tokens, HTTP request and header lines, and "+" lines marked as added.
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function json(line) {
+    var out = "", last = 0, re = /("(?:\\.|[^"\\])*")(\s*:)?|(-?\b\d+(?:\.\d+)?\b)|\b(true|false|null)\b/g, m;
+    while ((m = re.exec(line))) {
+      out += esc(line.slice(last, m.index));
+      if (m[1]) out += '<span class="' + (m[2] ? "k" : "s") + '">' + esc(m[1]) + "</span>" + (m[2] ? esc(m[2]) : "");
+      else if (m[3]) out += '<span class="n">' + m[3] + "</span>";
+      else out += '<span class="w">' + m[4] + "</span>";
+      last = re.lastIndex;
+    }
+    return out + esc(line.slice(last));
+  }
+  function line(text, lang) {
+    if (/^(GET|POST|PUT|PATCH|DELETE|HTTP\/)/.test(text)) return '<span class="h">' + esc(text) + "</span>";
+    if (lang === "http" && /^[A-Za-z-]+: /.test(text)) {
+      var i = text.indexOf(":");
+      return '<span class="k">' + esc(text.slice(0, i)) + "</span>" + esc(text.slice(i));
+    }
+    if (/^heart_[a-z]+ /.test(text)) { var j = text.indexOf(" "); return '<span class="h">' + esc(text.slice(0, j)) + "</span>" + json(text.slice(j)); }
+    if (lang === "html") return esc(text).replace(/(&lt;\/?)([a-z]+)/g, '$1<span class="k">$2</span>').replace(/(\w+)=("[^"]*")/g, '$1=<span class="s">$2</span>');
+    if (lang === "sh") return esc(text).replace(/(#.*)$/, '<span class="d">$1</span>');
+    if (lang === "yaml") return esc(text).replace(/^(\s*)([\w\/{}$-]+):/, '$1<span class="k">$2</span>:');
+    if (/^\s*\((.*)\)\s*$/.test(text)) return '<span class="d">' + esc(text) + "</span>";
+    return json(text);
+  }
+  document.querySelectorAll("pre.code").forEach(function (pre) {
+    var lang = pre.getAttribute("data-lang") || "json";
+    pre.innerHTML = pre.textContent.split("\n").map(function (t) {
+      if (t.charAt(0) === "+") return '<span class="add">' + line(t.slice(1), lang) + "</span>";
+      return line(t, lang);
+    }).join("\n");
+  });
+
+  // Progress: which sessions are done, kept only in this browser.
+  var KEY = "heart-sessions-done";
+  var done = {};
+  try { done = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { done = {}; }
+  var boxes = document.querySelectorAll("input[data-done]");
+  function render() {
+    var n = 0;
+    boxes.forEach(function (b) {
+      var id = b.getAttribute("data-done");
+      b.checked = !!done[id];
+      if (done[id]) n++;
+      var t = document.querySelector('.tick[data-for="' + id + '"]');
+      if (t) t.textContent = done[id] ? "done" : "";
+    });
+    document.getElementById("count").textContent = n + " of " + boxes.length + " sessions done";
+    document.getElementById("meter").style.width = (100 * n / boxes.length) + "%";
+  }
+  boxes.forEach(function (b) {
+    b.addEventListener("change", function () {
+      done[b.getAttribute("data-done")] = b.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {}
+      render();
+    });
+  });
+  render();
+
+  document.getElementById("openAll").addEventListener("click", function () { document.querySelectorAll("details").forEach(function (d) { d.open = true; }); });
+  document.getElementById("closeAll").addEventListener("click", function () { document.querySelectorAll("details").forEach(function (d) { d.open = false; }); });
+})();
+</script>
