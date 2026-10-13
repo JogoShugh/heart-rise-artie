@@ -1,12 +1,12 @@
-# One Page, Then Many: A Conversation About the Ladder
+# Inline, Then Linked: A Conversation About the Ladder
 
-Josh and Dev talk about HEART's two dialects and its rendering ladder, L0 to L3, as if it were a website: HAL-FORMS as the on-ramp that stops at one page, and HAL Schema Forms, which climbs from one page to linked files to shared files on a cache. Then the integrity that makes sharing safe. About fifteen minutes read aloud.
+Josh and Dev talk about HEART's two dialects and its rendering ladder, L0 to L3, as if it were a website: HAL-FORMS as the on-ramp that keeps everything inline, and HAL Schema Forms, which moves the forms and then the schemas out into their own linked, cacheable resources, the way a site moves its CSS and scripts out of the HTML. Then the integrity that makes sharing safe. About fifteen minutes read aloud.
 
 The HEART samples are real responses from the garden server, captured on 13 October 2026 and trimmed with "…". The speakers say what each one shows.
 
 ---
 
-## One big page
+## Everything inline
 
 **Dev:** You know "Save page as, single file"? You get one HTML file with everything inside. The styles are inlined, the scripts are inlined, and even the images are pasted in as long strings of base64.
 
@@ -245,7 +245,7 @@ Cache-Control: public, max-age=31536000, immutable
 
 **Dev:** One sentence, then.
 
-**Josh:** HAL-FORMS gets you onto the ramp with the tools you already have, and HAL Schema Forms is how you stop sending the same form a million times, with every page vouching for what it links to.
+**Josh:** HAL-FORMS gets you onto the ramp with the tools you already have, and HAL Schema Forms is how you stop sending the same form a million times, with every representation vouching for what it links to.
 
 ---
 
