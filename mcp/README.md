@@ -8,6 +8,10 @@ principle. heart-mcp hands it what is legal right now, for one resource in its
 current state. The model chooses. ARTIE, the HEART client, checks the choice
 and builds and sends every request.
 
+- [docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md): how it works, with diagrams.
+- [PROOF.md](PROOF.md): the evidence from real runs against the garden,
+  basketball and tickets services.
+
 ## The six tools
 
 The tool list never changes. What is legal now comes back in every result.

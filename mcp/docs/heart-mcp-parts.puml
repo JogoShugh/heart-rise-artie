@@ -1,0 +1,44 @@
+@startuml heart-mcp-parts
+title heart-mcp: the parts
+skinparam defaultFontSize 15
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #444444
+
+actor "You" as you
+node "Claude Code (MCP host)" as host {
+  component "Model\nchooses the next move" as model
+}
+
+node "heart-mcp process\n(child process, or docker run -i)" as mcp {
+  component "Six fixed tools\nlook · act · follow\ndescribe · explain · back\nchecks: act offered? fields fit schema?" as tools
+  component "Result builder\nstate, acts, links, outcome\nno URLs, methods, headers, ETags" as views
+  component "ARTIE (HEART client)\nholds current representation + ETag\nbuilds URL, method, If-Match\nre-reads on 409 / 412" as artie
+}
+
+file "HEART_BOOKMARKS\ngarden=http://...:8080/" as bookmarks
+
+cloud "HEART services" {
+  node "garden :8080" as garden
+  node "basketball :8181" as bball
+  node "tickets :8282" as tickets
+}
+database "Postgres\nevent rows" as db
+
+you --> model : asks in plain words
+model -up-> tools : tool call
+tools --> artie
+artie --> views
+views --> model : tool result
+note right of host
+  Host and heart-mcp talk JSON-RPC
+  over stdin / stdout. No network port.
+end note
+bookmarks ..> artie : only source\nof addresses
+artie --> garden : HTTP: HAL, forms,\nschemas, profile
+artie --> bball
+artie --> tickets
+garden --> db
+bball --> db
+tickets --> db
+@enduml
