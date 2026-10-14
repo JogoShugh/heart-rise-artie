@@ -38,15 +38,16 @@ mkdir -p "$build"
 "$root/scripts/dev-credentials.sh" > /dev/null
 
 # A fresh server, so verdicts from another run cannot mix into this one.
-if lsof -ti "tcp:$PORT" > /dev/null; then
-  echo "port $PORT is busy; stop that server first (lsof -ti tcp:$PORT | xargs kill)" >&2
+# Listeners only: a browser's closed connection to the port is not a server, and must never be killed.
+if lsof -ti "tcp:$PORT" -sTCP:LISTEN > /dev/null; then
+  echo "port $PORT is busy; stop that server first (lsof -nP -iTCP:$PORT -sTCP:LISTEN)" >&2
   exit 1
 fi
 (cd "$root/server-spring" && docker compose up -d postgres > /dev/null)
 
 stop_server() {
   if [ "${BUSTER_KEEP:-0}" != 1 ]; then
-    lsof -ti "tcp:$PORT" | xargs kill 2> /dev/null || true
+    lsof -ti "tcp:$PORT" -sTCP:LISTEN | xargs kill 2> /dev/null || true
   fi
 }
 trap stop_server EXIT

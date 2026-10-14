@@ -97,6 +97,49 @@ claude mcp add heart -e HEART_BOOKMARKS=garden=http://localhost:8080/ \
   line per decision).
 - `ARTIE_EVENTS_URL`: where to POST those lines instead.
 
+### Credentials
+
+Every HEART service requires a credential (SPEC §6.13). heart-mcp reads it as
+ARTIE does, and the host's model never sees it: no tool takes one, and no result,
+error or event shows one. ARTIE adds it just above the wire, for the service's
+own origin only. In order, it reads:
+
+1. **Environment variables, named by origin.** `http://localhost:8080` reads
+   `ARTIE_TOKEN_LOCALHOST_8080` (Bearer), or `ARTIE_USER_LOCALHOST_8080` and
+   `ARTIE_PASSWORD_LOCALHOST_8080` (Basic).
+2. **`~/.artie/credentials`** (or `$ARTIE_HOME/credentials`), readable by you
+   only (`chmod 600`), one section per origin:
+
+   ```ini
+   [http://localhost:8080]
+   bearer = ...
+
+   [https://tickets.example]
+   user = coach
+   password = ...
+   ```
+
+3. **Vault**, when `ARTIE_VAULT_ADDR` is set: the secret at
+   `secret/artie/<host>_<port>` holds `bearer`, or `user` and `password`. ARTIE
+   logs in with `VAULT_TOKEN`, `~/.vault-token`, or an AppRole
+   (`ARTIE_VAULT_ROLE_ID` and `ARTIE_VAULT_SECRET_ID_FILE`).
+
+For the services in this repo, `scripts/dev-credentials.sh` makes one token per
+service and writes it to `~/.artie/credentials`. It never prints a token.
+
+In Docker, the service is `http://host.docker.internal:8080`, so the credential is
+for that origin. Mount a credentials file made for it, read-only:
+
+```sh
+claude mcp add heart -- docker run -i --rm -v "$HOME/.artie-docker:/root/.artie:ro" \
+  -e HEART_BOOKMARKS=garden=http://host.docker.internal:8080/ heart-mcp
+```
+
+ARTIE's promise covers what passes through ARTIE. A host that also gives its
+model a shell on the same machine, as Claude Code does, lets that model read your
+environment and your files directly. Deny it reads of `~/.artie` and of the
+environment in the host's own settings, or keep credentials in Vault.
+
 ## Use it from your own JVM code
 
 `heart-mcp` is a library. Give it a client and bookmarks, then register its tools
@@ -104,14 +147,15 @@ on any MCP SDK server:
 
 ```kotlin
 val server = Server(Implementation("my-agent", "1.0"), HeartMcp.options())
-HeartMcp(HeartMcp.client("my-agent", EventSinks.NONE), mapOf("garden" to "http://localhost:8080/"))
+val credentials = CredentialSources.standard(System.getenv(), Path.of(System.getProperty("user.home")))
+HeartMcp(HeartMcp.client("my-agent", EventSinks.NONE, credentials), mapOf("garden" to "http://localhost:8080/"))
     .register(server)
 ```
 
 ## Prove it
 
 ```sh
-scripts/mcp-check.sh            # 12 scenarios through the MCP client SDK, 10 against the live garden
+scripts/mcp-check.sh            # 15 scenarios through the MCP client SDK, 13 against the live garden
 scripts/mcp-check.sh --docker   # the image over JSON-RPC: tools, find bed 2, water it
 ```
 

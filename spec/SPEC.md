@@ -897,6 +897,29 @@ The rules:
 - It is a reference for answering the user, not a manifest. A client SHALL NOT act on any relation it finds there.
 - A server that sends no such link has said nothing about why; the client SHALL NOT infer a reason from absence alone.
 
+### 6.13 Credentials (added 2026-10-14)
+
+A service admits only callers with a credential. Today that means Basic (RFC 7617) or Bearer (RFC 6750) over HTTP. Signed tokens from an identity provider (OIDC) come later, in the same `Authorization` header. The rule this section exists for: **no model is ever shown a credential.**
+
+Server:
+
+- Every state, every act and the bookmark SHALL require a credential. A service with no credentials configured SHALL NOT start.
+- The shared, content-addressed resources (affordance sets, schemas, explanations of absence, §6.5, §6.12) and the ALPS profiles MAY be served to any caller. They are the same for every caller and say what a service offers, not what any resource holds. They keep their `public, immutable` caching.
+- A refusal is `401` with an RFC 9457 problem of type `not-authenticated` and a `WWW-Authenticate` challenge for each scheme the service accepts. A wrong credential SHALL be answered exactly as a missing one.
+- The service stores no password or token as itself: bcrypt hashes for Basic users, and SHA-256 digests for Bearer tokens.
+
+Client:
+
+- The credential is added below the client's cache, just above the wire. Nothing above that layer holds it: the core, the event log, the Reason step (§6.8). The reasoner's input has no field for a header, so a credential is not withheld from a model, it is inexpressible to one.
+- A credential is scoped to one origin (scheme, host and port) and SHALL NOT be sent to any other. A representation chooses where its links lead, so a link to another origin is followed without it.
+- A client SHALL NOT send a credential over plain HTTP to a host beyond the machine, and SHALL refuse an address that carries a user name or password.
+- After a `401`, the client MAY ask its source once for a renewed credential and send once more with it, and only if the credential changed. `401` and `403` are refusals of their own (ARTIE: `NotAuthenticated`, `Forbidden`). Their messages name the origin and the scheme sent, never the credential.
+- Credentials come from places a person or a deployment controls, never from a representation. ARTIE reads, in order: environment variables named by origin (`ARTIE_TOKEN_LOCALHOST_8080`), a credentials file readable by its owner only (`~/.artie/credentials`), and Vault (`ARTIE_VAULT_ADDR`). A source set up wrongly stops the client at the start.
+
+CoAP has no `Authorization` option, so neither scheme can be checked over it. Until CoAP's own security is in place (OSCORE or DTLS, `spec/ideas/coap-security.md`), a service's CoAP endpoint listens on the loopback address only.
+
+The limit: a host that gives its model a shell on the same machine, such as a coding agent, lets that model read environment variables and files directly. ARTIE's promise covers what passes through ARTIE. Keeping the credential out of the host's own reach is the host's job: run the client in a container, or use Vault, and deny the model reads of those places.
+
 ## 7. R.I.S.E. Requirements
 
 > **On hold (2026-10-09).** RISE is set aside until H.E.A.R.T. is finished. Nothing in this section is implemented, and its open questions and `[0.5]` proposals stay as written. See the hack log.
@@ -1022,7 +1045,7 @@ The distinction is scope, not timing. MCP discovery describes what a *server* of
 
 The two compose. An MCP server can act as a H.E.A.R.T. transport bridge, where a tool invocation maps to executing an affordance transition — see §12, now more tractable than in 0.3 because the per-request self-describing model removes the session state a bridge previously had to manage.
 
-**HEART through MCP (added 2026-10-12, branch `mcp-spike`).** `mcp/` is such a bridge. Its six tools never change (`heart_look`, `heart_act`, `heart_follow`, `heart_describe`, `heart_explain`, `heart_back`), so the host's tool list is stable. The state-scoped part travels in each result: the current resource's state, the acts it offers now with their titles, descriptions and schemas, and its links by relation and title. No tool input or result carries a URI, method, header or validator. The host's model is the Reason step (§6.8). ARTIE checks each selection against the representation it holds before sending, and performs Sync and Act. The bridge is tested over the MCP SDK's stdio transport against the reference garden server (`scripts/mcp-check.sh`). It speaks MCP 2025-06-18, the version its SDK implements, not the 2026-07-28 revision described above.
+**HEART through MCP (added 2026-10-12, branch `mcp-spike`).** `mcp/` is such a bridge. Its six tools never change (`heart_look`, `heart_act`, `heart_follow`, `heart_describe`, `heart_explain`, `heart_back`), so the host's tool list is stable. The state-scoped part travels in each result: the current resource's state, the acts it offers now with their titles, descriptions and schemas, and its links by relation and title. No tool input or result carries a URI, method, header or validator. The host's model is the Reason step (§6.8). ARTIE checks each selection against the representation it holds before sending, and performs Sync and Act. The bridge is tested over the MCP SDK's stdio transport against the reference garden server (`scripts/mcp-check.sh`). It speaks MCP 2025-06-18, the version its SDK implements, not the 2026-07-28 revision described above. It reads credentials as ARTIE does (§6.13), and no tool takes one or shows one.
 
 ### 8.2 HAL+JSON and HAL Schema Forms
 

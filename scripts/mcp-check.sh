@@ -37,6 +37,7 @@ stop() {
   pkill -f 'com.artie.gardenbed' || true
   sleep 2
   "$root/server-spring/reset-db.sh" > /dev/null || true
+  rm -rf "${docker_artie:-}"
 }
 trap stop EXIT
 
@@ -50,16 +51,20 @@ fi
 
 docker build --quiet -f "$root/mcp/Dockerfile" -t heart-mcp "$root" > /dev/null
 # Inside the container the garden is http://host.docker.internal:8080, so its token goes
-# in that origin's variable. docker run -e NAME passes the value from this environment,
-# never on a command line.
-ARTIE_TOKEN_HOST_DOCKER_INTERNAL_8080=$(auth_header "$base" | sed 's/^Authorization: Bearer //')
-export ARTIE_TOKEN_HOST_DOCKER_INTERNAL_8080
+# in a credentials file made for that origin, mounted read-only as the container's
+# ~/.artie (mcp/README.md, "Credentials"). The token never goes on a command line.
+docker_artie=$(mktemp -d)
+chmod 700 "$docker_artie"
+{ echo "[http://host.docker.internal:8080]"; auth_header "$base" | sed 's/^Authorization: Bearer /bearer = /'; } \
+  > "$docker_artie/credentials"
+chmod 600 "$docker_artie/credentials"
+export DOCKER_ARTIE=$docker_artie
 python3 - <<'EOF'
-import json, subprocess, sys
+import json, os, subprocess, sys
 
 host = subprocess.Popen(
-    ["docker", "run", "-i", "--rm", "-e", "HEART_BOOKMARKS=garden=http://host.docker.internal:8080/",
-     "-e", "ARTIE_TOKEN_HOST_DOCKER_INTERNAL_8080", "heart-mcp"],
+    ["docker", "run", "-i", "--rm", "-v", f"{os.environ['DOCKER_ARTIE']}:/root/.artie:ro",
+     "-e", "HEART_BOOKMARKS=garden=http://host.docker.internal:8080/", "heart-mcp"],
     stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
 ids = iter(range(1, 100))
 

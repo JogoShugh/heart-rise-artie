@@ -34,11 +34,16 @@ half time). A player not on the roster, or fouled out, is refused with 422 at
 ## Run
 
 ```
+../../scripts/dev-credentials.sh   # once: a Bearer token, its SHA-256 in .env, the token in ~/.artie
 docker compose -f ../../server-spring/docker-compose.yml up -d postgres
 ./reset-db.sh                      # first time: creates the basketball database
-./gradlew bootRun                  # HTTP on 8181, CoAP on 5684; migrates
+set -a; . ./.env; set +a           # the service admits only that token, and will not start without one
+./gradlew bootRun                  # HTTP on 8181, CoAP on 5684 (loopback only); migrates
 ./reset-db.sh                      # seeds game 1 (scheduled) and game 2 (live)
 ```
+
+Every state, act and the bookmark need the credential (SPEC §6.13). ARTIE and
+heart-mcp find it in `~/.artie/credentials`.
 
 Tests: `./gradlew test` runs the game rules (`game.feature`), the HEART
 conformance features (`RunHeartTckTest`), the architecture rules, and the

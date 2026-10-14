@@ -781,6 +781,56 @@ second inside the first.
   "follow" the explanation link. heart-mcp excludes it. ArtieAgent is
   unchanged for now.
 
+## 2026-10-14: credentials no model can see (branch auth)
+
+Every HEART service now admits only callers with a credential, and ARTIE
+sends one without any model ever having it (SPEC §6.13). Dynamic credentials
+from Okta or Google come next, on the same seams.
+
+- **Decisions (the author's):** services accept both Basic and Bearer (I had
+  recommended Bearer alone, since OIDC issues Bearer tokens). CoAP endpoints
+  listen on loopback only, since CoAP can carry neither; OSCORE or DTLS is in
+  `spec/ideas/coap-security.md`. The shared, content-addressed layers and the
+  ALPS profiles stay open; state, acts and the bookmark need a credential.
+- **Client:** `AuthTransport` adds `Authorization` below the cache, just above
+  the wire, for the request's own origin only. Plain HTTP beyond the machine
+  is refused (`localhost`, `127.0.0.1`, `[::1]` and `host.docker.internal`
+  count as the machine), and so is an address with a user name or password.
+  After a 401 the source is asked once for a renewed credential. 401 and 403
+  became `NotAuthenticated` and `Forbidden`. A credential prints as
+  `Bearer(****)`, and `HeartRequest` hides `Authorization` when printed.
+- **Sources, in the order asked for (easiest Gherkin first):** environment
+  variables named by origin (`ARTIE_TOKEN_LOCALHOST_8080`), then
+  `~/.artie/credentials` (mode 0600, one section per origin), then Vault
+  KV v2 (`VAULT_TOKEN`, `~/.vault-token` or AppRole; held for a TTL; read
+  again after a 401). A source set up wrongly stops ARTIE at the start, and
+  no message carries a value.
+- **Server:** a WebFilter in heart-spring, not Spring Security's chain:
+  Spring Security adds `Cache-Control: no-store` and CSRF by default, both
+  wrong for HEART, and only its BCrypt is needed today. bcrypt hashes and
+  SHA-256 token digests from `HEART_AUTH_BASIC_USERS` and
+  `HEART_AUTH_BEARER_TOKENS`. With neither, a service refuses to start. A
+  wrong credential is answered byte for byte like a missing one. Spring
+  Security's resource server can take over when JWTs arrive.
+- **heart-mcp:** reads the same sources. A refused look is a tool error naming
+  the origin; a refused act is the outcome `not-authenticated` or `forbidden`.
+- **Proof:** client 230 scenarios; heart 233 (the TCK gained 5); garden 44,
+  basketball 40, tickets 35; heart-mcp 15/15 live; client liveTest 26/26 live
+  against a bootRun garden (CoAP on loopback included); `scripts/auth-check.sh`
+  9/9 (each source alone, both schemes, real 401s, a live Vault dev server).
+  Canary scans: the garden token appears in no event, no MCP result and no
+  Claude request. A garden Buster campaign through the protected server: 125
+  mutations, 74 pass and 51 pass (attested), no FAIL. `mcp-check.sh --docker`
+  now mounts a credentials file read-only, as `mcp/README.md` says to.
+- **Found:** `buster-campaign.sh` checked and killed every process with any
+  socket on its port, including a browser's closed connection. It now matches
+  listeners only. The four CoAP live scenarios never passed against the
+  Docker Compose garden, which publishes no UDP port; they pass against
+  bootRun.
+- **The limit, written into SPEC §6.13:** a host that gives its model a shell
+  (Claude Code) lets that model read the environment and `~/.artie` itself.
+  ARTIE's promise covers what passes through ARTIE.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

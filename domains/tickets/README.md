@@ -38,11 +38,16 @@ already has (`/priority`).
 ## Run
 
 ```
+../../scripts/dev-credentials.sh   # once: a Bearer token, its SHA-256 in .env, the token in ~/.artie
 docker compose -f ../../server-spring/docker-compose.yml up -d postgres
 ./reset-db.sh                      # first time: creates the tickets database
-./gradlew bootRun                  # HTTP on 8282, CoAP on 5685; migrates
+set -a; . ./.env; set +a           # the service admits only that token, and will not start without one
+./gradlew bootRun                  # HTTP on 8282, CoAP on 5685 (loopback only); migrates
 ./reset-db.sh                      # seeds ticket 1 (new) and ticket 2 (waiting on the customer)
 ```
+
+Every state, act and the bookmark need the credential (SPEC §6.13). ARTIE and
+heart-mcp find it in `~/.artie/credentials`.
 
 Tests: `./gradlew test` runs the ticket rules (`tickets.feature`), the HEART
 conformance features (`RunHeartTckTest`, the bookmark act included), the
