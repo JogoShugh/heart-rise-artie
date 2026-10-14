@@ -1,9 +1,15 @@
 package heart.mcp
 
+import heart.AccessRefused
 import heart.ActRefused
 import heart.ArtieClient
+import heart.AuthTransport
 import heart.CachingTransport
 import heart.CoapBinding
+import heart.CredentialSource
+import heart.CredentialsUnavailable
+import heart.Forbidden
+import heart.NotAuthenticated
 import heart.Dialect
 import heart.EventLog
 import heart.EventSink
@@ -74,6 +80,11 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
         )
     } catch (e: IllegalStateException) {
         CallToolResult(listOf(TextContent(e.message ?: "$tool failed")), true, null, null)
+    } catch (e: AccessRefused) {
+        // Its message names the origin and the scheme sent, never the credential.
+        CallToolResult(listOf(TextContent(e.message ?: "$tool was refused")), true, null, null)
+    } catch (e: CredentialsUnavailable) {
+        CallToolResult(listOf(TextContent(e.message ?: "$tool has no credential")), true, null, null)
     }
 
     private fun look(service: String?): JsonObject {
@@ -106,6 +117,12 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
         Views.of(client.act(name, fields), outcome("acted", "$name was done."))
     } catch (refusal: ActRefused) {
         Views.of(client.current ?: held, refused(refusal))
+    } catch (refusal: AccessRefused) {
+        val kind = when (refusal) {
+            is NotAuthenticated -> "not-authenticated"
+            is Forbidden -> "forbidden"
+        }
+        Views.of(held, outcome(kind, refusal.message.orEmpty()))
     }
 
     private fun follow(rel: String, title: String?): JsonObject {
@@ -140,12 +157,14 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
         /**
          * ARTIE composed as production composes it: named, carrying its trace
          * context above its own cache, which checks integrity on the wire;
-         * asking for L2, or less if the service's bookmark says so.
+         * asking for L2, or less if the service's bookmark says so. Its
+         * [credentials] go only on the wire, to each one's own origin.
          */
-        fun client(agent: String, events: EventSink): HeartRiseClient {
+        fun client(agent: String, events: EventSink, credentials: CredentialSource): HeartRiseClient {
             val name = "${UserAgentTransport.DEFAULT} ($agent)"
             val trace = Trace()
-            val wire = CachingTransport(IntegrityCheck(HttpTransport()))
+            // The credential is added just above the wire, below the cache: nothing the host's model sees holds it.
+            val wire = CachingTransport(IntegrityCheck(AuthTransport(credentials, HttpTransport())))
             val transport = UserAgentTransport(name, TraceContextTransport(trace, wire))
             return ArtieClient(
                 transport,

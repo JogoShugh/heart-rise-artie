@@ -1,7 +1,15 @@
 package steps
 
+import heart.Credential
+import heart.CredentialSource
+import heart.CredentialSources
+import heart.EnvironmentCredentials
 import heart.EventSinks
+import heart.Origin
 import heart.mcp.HeartMcp
+import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
+import java.nio.file.Files
+import java.nio.file.Path
 import io.cucumber.java.Before
 import io.cucumber.java.Scenario
 import io.cucumber.java.en.Given
@@ -37,7 +45,47 @@ class McpSteps(private val host: McpHost) {
     }
 
     @Given("an MCP host connected to heart-mcp with the bookmark {string}")
-    fun connected(service: String) = host.connect(service)
+    fun connected(service: String) {
+        this.service = service
+        host.connect(service)
+    }
+
+    private var service = "garden"
+
+    @Given("heart-mcp holds no credentials")
+    fun noCredentials() {
+        host.credentials = CredentialSources.NONE
+        host.connect(service)
+    }
+
+    @Given("heart-mcp's credential for the garden is replaced by one the garden does not admit")
+    fun wrongCredential() {
+        val swappable = host.credentials as McpHost.Swappable
+        swappable.inner = CredentialSources.of(mapOf(host.baseUrl to Credential.Bearer("not-the-garden-token")))
+    }
+
+    @Then("the credential ARTIE sends to the garden appears in no tool result and no event")
+    fun credentialNowhere() {
+        val token = gardenToken()
+        assertTrue(host.results.isNotEmpty(), "no tool result was received")
+        assertTrue(host.results.none { Json.encodeToString(CallToolResult.serializer(), it).contains(token) })
+        assertTrue(host.events.isNotEmpty() && host.events.none { it.contains(token) })
+    }
+
+    /** The garden's Bearer token, as the run configured it: its variable, or ARTIE's credentials file. */
+    private fun gardenToken(): String {
+        val origin = Origin.of(host.baseUrl)
+        System.getenv(EnvironmentCredentials.namesFor(origin).token)?.let { return it }
+        val file = Path.of(System.getenv("ARTIE_HOME") ?: "${System.getProperty("user.home")}/.artie", "credentials")
+        var section: String? = null
+        Files.readAllLines(file).map { it.trim() }.forEach { line ->
+            if (line.startsWith("[")) section = line.removeSurrounding("[", "]")
+            else if (section?.let { Origin.ofOrNull(it) } == origin && line.startsWith("bearer")) {
+                return line.substringAfter('=').trim()
+            }
+        }
+        fail("no Bearer token for $origin in the environment or $file")
+    }
 
     @Then("the host sees exactly the tools {string}")
     fun seesTools(names: String) = assertEquals(list(names), host.tools().map { it.name })
@@ -95,7 +143,7 @@ class McpSteps(private val host: McpHost) {
 
     @Given("another client waters bed {int} with {int} ml")
     fun anotherClientWaters(bed: Int, milliliters: Int) {
-        val other = HeartMcp.client("another client", EventSinks.NONE)
+        val other = HeartMcp.client("another client", EventSinks.NONE, standardCredentials())
         other.enter("${host.baseUrl}/beds/$bed")
         other.act("garden:water-cell", buildJsonObject { put("milliliters", milliliters) })
     }
@@ -173,7 +221,11 @@ class McpSteps(private val host: McpHost) {
 
     private fun list(names: String) = names.split(",").map { it.trim() }
 
-    private companion object {
-        val ADDRESS_KEYS = setOf("href", "target", "\$id", "\$ref", "url", "method")
+    companion object {
+        private val ADDRESS_KEYS = setOf("href", "target", "\$id", "\$ref", "url", "method")
+
+        /** ARTIE's standard sources, as heart-mcp's main reads them. */
+        fun standardCredentials(): CredentialSource =
+            CredentialSources.standard(System.getenv(), Path.of(System.getProperty("user.home")))
     }
 }

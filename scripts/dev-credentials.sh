@@ -35,14 +35,20 @@ make() {
   token=$(openssl rand -hex 32)
   sha=$(printf %s "$token" | shasum -a 256 | cut -d' ' -f1)
   printf '# Made by scripts/dev-credentials.sh; not committed.\nHEART_AUTH_BEARER_TOKENS=%s\n' "$sha" > "$env_file"
-  # The token goes through stdin, never on a command line.
-  printf %s "$token" | python3 -I - "$file" "$origin" <<'EOF'
+  # The token goes through stdin, never on a command line; the program goes in -c.
+  printf %s "$token" | python3 -I -c "$replace_section" "$file" "$origin"
+  echo "$name: made a Bearer token for $origin (its SHA-256 in $dir/.env, the token in $file)"
+}
+
+# Replaces (or adds) the origin's section in the credentials file with the token read from stdin.
+replace_section='
 import sys
 path, origin = sys.argv[1], sys.argv[2]
 token = sys.stdin.read()
-lines = open(path).read().splitlines()
+if not token:
+    sys.exit("no token on stdin")
 kept, skipping = [], False
-for line in lines:
+for line in open(path).read().splitlines():
     stripped = line.strip()
     if stripped.startswith("[") and stripped.endswith("]"):
         skipping = stripped == f"[{origin}]"
@@ -52,9 +58,7 @@ while kept and not kept[-1].strip():
     kept.pop()
 kept += ["", f"[{origin}]", f"bearer = {token}"]
 open(path, "w").write("\n".join(kept).lstrip("\n") + "\n")
-EOF
-  echo "$name: made a Bearer token for $origin (its SHA-256 in $dir/.env, the token in $file)"
-}
+'
 
 make garden server-spring 8080
 make basketball domains/basketball 8181

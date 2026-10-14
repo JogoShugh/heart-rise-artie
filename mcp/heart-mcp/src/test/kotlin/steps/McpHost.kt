@@ -1,6 +1,9 @@
 package steps
 
+import heart.Credential
+import heart.CredentialSource
 import heart.EventSink
+import heart.Origin
 import heart.mcp.HeartMcp
 import io.modelcontextprotocol.kotlin.sdk.client.Client
 import io.modelcontextprotocol.kotlin.sdk.client.StdioClientTransport
@@ -39,13 +42,25 @@ class McpHost {
     var last: CallToolResult? = null
         private set
 
+    /** Every tool result the host received, in order. */
+    val results = CopyOnWriteArrayList<CallToolResult>()
+
+    /** heart-mcp's credentials: ARTIE's standard sources, unless a scenario replaces them. */
+    var credentials: CredentialSource = Swappable(McpSteps.standardCredentials())
+
+    /** The source a scenario can swap mid-session, as a credential revoked on the server would be. */
+    class Swappable(@Volatile var inner: CredentialSource) : CredentialSource {
+        override fun credentialFor(origin: Origin): Credential? = inner.credentialFor(origin)
+        override fun renewed(origin: Origin): Credential? = inner.renewed(origin)
+    }
+
     fun connect(service: String) = runBlocking {
         val toServer = PipedOutputStream()
         val serverIn = PipedInputStream(toServer, PIPE_BYTES)
         val toClient = PipedOutputStream()
         val clientIn = PipedInputStream(toClient, PIPE_BYTES)
 
-        val artie = HeartMcp.client("heart-mcp test", EventSink { events += it })
+        val artie = HeartMcp.client("heart-mcp test", EventSink { events += it }, credentials)
         val server = Server(Implementation("heart-mcp", "test"), HeartMcp.options())
         HeartMcp(artie, mapOf(service to "$baseUrl/")).register(server)
         server.createSession(StdioServerTransport(serverIn.asSource().buffered(), toClient.asSink().buffered()))
@@ -58,7 +73,10 @@ class McpHost {
 
     fun call(tool: String, arguments: JsonObject): CallToolResult = runBlocking {
         client.callTool(CallToolRequest(CallToolRequestParams(name = tool, arguments = arguments)))
-    }.also { last = it }
+    }.also {
+        last = it
+        results += it
+    }
 
     private companion object {
         const val PIPE_BYTES = 1 shl 20

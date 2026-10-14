@@ -93,3 +93,30 @@ Feature: HEART through MCP, with six fixed verbs
     When the host calls heart_back
     And the host calls heart_back
     Then the result offers exactly the acts "garden:search-beds, garden:get-bed, garden:build-bed"
+
+  # The garden admits only callers with a credential. heart-mcp reads it as
+  # ARTIE does: the environment, ~/.artie/credentials, then Vault. No tool
+  # takes one, and no result shows one.
+
+  @live
+  Scenario: With the garden's credential, the host waters bed 2, and the credential is in no result
+    Given the host has found the bed "bed-2"
+    When the host calls heart_act "garden:water-cell" with {"milliliters": 250}
+    Then the outcome is "acted"
+    And the credential ARTIE sends to the garden appears in no tool result and no event
+
+  @live
+  Scenario: With no credential, looking at the garden is refused, and the error names no value
+    Given heart-mcp holds no credentials
+    When the host calls heart_look with the service "garden"
+    Then the tool answers with an error mentioning "asks for a credential (Basic, Bearer); ARTIE sent none"
+
+  @live
+  Scenario: A credential the garden no longer admits makes the act not-authenticated, and nothing changes
+    Given the host has found the bed "bed-2"
+    And heart-mcp's credential for the garden is replaced by one the garden does not admit
+    When the host calls heart_act "garden:water-cell" with {"milliliters": 250}
+    Then the outcome is "not-authenticated"
+    And the outcome mentions "refused the Bearer credential ARTIE sent"
+    And the result's state has "moistureLevel" 40
+    And the event log shows 1 act sent
