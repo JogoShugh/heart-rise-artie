@@ -36,11 +36,14 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
     }
 
     suspend fun search(resource: HeartResource<*, *>, request: ServerRequest): ServerResponse {
-        val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val name = request.queryParam("name").orElse(null)
         val id = request.queryParam("id").map { it.toLongOrNull() }.orElse(null)
         val page = request.queryParam("page").map { it.toIntOrNull() }.orElse(null) ?: 1
         val found = checkNotNull(resource.find)(name, id)
+        if (HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())) {
+            return PlainJson.respond(ServerResponse.ok(), SearchPages.plainPage(found, page, limits.pageSize))
+        }
+        val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val search = Search(resource.layers.type.collection, name, id)
         return ServerResponse.ok().contentType(MediaType.parseMediaType(dialect.mediaType))
             .headers { layer1(it, dialect) }

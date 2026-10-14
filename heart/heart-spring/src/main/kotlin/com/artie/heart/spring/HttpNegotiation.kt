@@ -14,5 +14,7 @@ object HttpNegotiation {
 
     fun wantsJsonHome(headers: HttpHeaders): Boolean = Negotiation.wantsJsonHome(headers.getFirst(HttpHeaders.ACCEPT))
 
+    fun wantsPlainJson(headers: HttpHeaders): Boolean = Negotiation.wantsPlainJson(headers.getFirst(HttpHeaders.ACCEPT))
+
     fun profileLinks(dialect: Dialect): String = Negotiation.profileLinks(dialect)
 }

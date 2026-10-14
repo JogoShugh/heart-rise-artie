@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
@@ -72,6 +73,9 @@ class HeartResourceHandler<S, K>(
      * state of their own finding, such as a past one.
      */
     suspend fun represent(state: S, request: ServerRequest): ServerResponse {
+        if (HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())) {
+            return PlainJson.respond(ServerResponse.ok(), type.state.bodyOf(state))
+        }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rendered = Rendered(state, dialect, rung(dialect, request))
         val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
@@ -84,7 +88,15 @@ class HeartResourceHandler<S, K>(
 
     suspend fun act(request: ServerRequest): ServerResponse {
         val act = type.acts.firstOrNull { it.path == request.pathVariable("path") }
-            ?: return ServerResponse.notFound().buildAndAwait()
+        return when {
+            act == null -> ServerResponse.notFound().buildAndAwait()
+            HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders()) -> actPlain(act.name, request)
+            else -> actHeart(act, request)
+        }
+    }
+
+    /** An act in HEART: its validator checked first, as SPEC §6.2 says. */
+    private suspend fun actHeart(act: Act, request: ServerRequest): ServerResponse {
         // Negotiate before acting, so a 406 never follows a write.
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rung = rung(dialect, request)
@@ -111,6 +123,12 @@ class HeartResourceHandler<S, K>(
      * named in Location and Content-Location (RFC 9110 §15.3.2, §8.7).
      */
     suspend fun actAtBookmark(name: String, request: ServerRequest): ServerResponse {
+        if (HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())) {
+            val body = request.awaitBodyOrNull<String>()
+            val done = pipeline.run(name, body) { input -> checkNotNull(resource.performAtBookmark)(name, input) }
+            val location = "/${type.collection}/${type.state.idOf(done.state)}"
+            return PlainJson.respond(ServerResponse.created(URI.create(location)), type.state.bodyOf(done.state))
+        }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rung = rung(dialect, request)
         pipeline.checkAtBookmark(name, request.headers().firstHeader(HttpHeaders.IF_MATCH)) { held ->
@@ -123,6 +141,22 @@ class HeartResourceHandler<S, K>(
             ServerResponse.created(URI.create(location))
                 .header(HttpHeaders.CONTENT_LOCATION, location)
                 .headers { headers -> done.headers.forEach { (name, value) -> headers.add(name, value) } },
+        )
+    }
+
+    /**
+     * An act in plain JSON, the OpenAPI twin: no If-Match is asked for, so
+     * the act is checked only against the state now, and refused after it
+     * is sent when that state does not offer it.
+     */
+    private suspend fun actPlain(name: String, request: ServerRequest): ServerResponse {
+        val id = id(request)
+        val checked = pipeline.checkOffered(name) { resource.load(id) }
+        val body = request.awaitBodyOrNull<String>()
+        val done = pipeline.run(name, body) { input -> resource.perform(checked, name, input) }
+        return PlainJson.respond(
+            ServerResponse.ok().header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id"),
+            type.state.bodyOf(done.state),
         )
     }
 

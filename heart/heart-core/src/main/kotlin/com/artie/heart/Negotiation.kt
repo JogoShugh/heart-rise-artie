@@ -35,6 +35,7 @@ object Negotiation {
     val DEFAULT_DIALECT = Dialect.HALFORMS
     const val ACCEPT_PROFILE = "Accept-Profile"
     const val JSON_HOME = "application/json-home"
+    const val PLAIN_JSON = "application/json"
 
     private data class Ranked(val value: String, val q: Double, val index: Int)
 
@@ -54,11 +55,21 @@ object Negotiation {
      * SPEC §6.11.1: true when `Accept` ranks the JSON Home media type above
      * both dialects, so the service index answers as a home document.
      */
-    fun wantsJsonHome(accept: String?): Boolean {
+    fun wantsJsonHome(accept: String?): Boolean = ranksAboveDialects(accept, JSON_HOME)
+
+    /**
+     * True when `Accept` names plain JSON above both dialects: the OpenAPI
+     * twin's rendering, the state with every control stripped. A wildcard
+     * never selects it, so a client that names nothing still gets HEART.
+     */
+    fun wantsPlainJson(accept: String?): Boolean = ranksAboveDialects(accept, PLAIN_JSON)
+
+    private fun ranksAboveDialects(accept: String?, mediaType: String): Boolean {
         val accepted = ranked(accept.orEmpty().lowercase()).filter { it.q > 0 }
-        val home = accepted.firstOrNull { it.value == JSON_HOME } ?: return false
+        val wanted = accepted.firstOrNull { it.value == mediaType } ?: return false
         return accepted.none { r ->
-            Dialect.entries.any { it.mediaType == r.value } && (r.q > home.q || r.q == home.q && r.index < home.index)
+            Dialect.entries.any { it.mediaType == r.value } &&
+                (r.q > wanted.q || r.q == wanted.q && r.index < wanted.index)
         }
     }
 

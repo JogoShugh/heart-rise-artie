@@ -121,6 +121,13 @@ class WireSteps(
     @Then("the response has no body")
     fun noBody() = assertTrue((http.last.responseBody ?: ByteArray(0)).isEmpty(), "a body came back")
 
+    @Then("the response body is exactly {}")
+    fun bodyIsExactly(expected: String) = assertEquals(ObjectMapper().readTree(expected), json)
+
+    @Then("the response carries no {word} header")
+    fun carriesNo(name: String) =
+        assertNull(http.last.responseHeaders.getFirst(name), "$name: ${http.last.responseHeaders.getFirst(name)}")
+
     @Then("the response has no Vary header")
     fun noVary() = assertTrue(http.last.responseHeaders.vary.isEmpty(), "${http.last.responseHeaders.vary}")
 

@@ -40,4 +40,11 @@ object SearchPages {
         )
     }
 
+    /** Page [page] in plain JSON, the OpenAPI twin: each match by id and title, and no links. */
+    fun plainPage(found: List<Found>, page: Int, size: Int): Map<String, Any> = mapOf(
+        "count" to found.size,
+        "items" to found.drop((page.coerceAtLeast(1) - 1) * size).take(size)
+            .map { mapOf("id" to it.id, "title" to it.title) },
+    )
+
 }

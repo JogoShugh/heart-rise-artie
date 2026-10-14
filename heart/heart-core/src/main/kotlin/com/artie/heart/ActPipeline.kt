@@ -44,6 +44,25 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
     }
 
     /**
+     * Step 3 alone, for plain JSON, the OpenAPI twin: no validator is asked
+     * for, so the act is checked only against the state [current] reads now.
+     * An act the state does not offer is still refused, after it was sent.
+     */
+    suspend fun checkOffered(act: String, current: suspend () -> S): S {
+        require(!type.atBookmark(act)) { "$act is offered by the bookmark" }
+        val state = current()
+        val key = type.state.keyOf(state)
+        if (act !in type.offers.offered(key)) {
+            val relation = type.act(act).relation
+            throw NotOfferedException(
+                "${type.profile.key(relation)} is not offered now: ${type.offers.whyAbsent(key, act)}",
+                rel = type.profile.reference(relation),
+            )
+        }
+        return state
+    }
+
+    /**
      * Steps 1 to 3 for an act the service index offers. Its owning resource
      * is the index, so [matches] compares the sent [validator] with the
      * index's current one; the index always offers its acts.

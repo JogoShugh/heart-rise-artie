@@ -166,6 +166,7 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
     private fun accept(dialect: String) = when (dialect) {
         "hal-schema-forms" -> "application/hal+json"
         "hal-forms" -> "application/prs.hal-forms+json"
+        "plain-json" -> "application/json"
         else -> error("unknown dialect $dialect")
     }
 

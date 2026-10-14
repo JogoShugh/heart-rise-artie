@@ -76,6 +76,10 @@ class CoreSteps {
     @Then("JSON Home is {}")
     fun jsonHomeIs(wanted: String) = assertEquals(wanted == "wanted", Negotiation.wantsJsonHome(accept))
 
+    @Then("plain JSON is {}")
+    fun plainJsonIs(wanted: String) =
+        assertEquals(wanted == "wanted", Negotiation.wantsPlainJson(accept.ifEmpty { null }))
+
     @When("^a client sends Prefer \"(.*)\"$")
     fun aClientSendsPrefer(prefer: String) {
         rung = Rung.fromPrefer(prefer.ifEmpty { null })

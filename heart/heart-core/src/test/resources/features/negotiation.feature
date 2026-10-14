@@ -33,6 +33,22 @@ Feature: Choosing the dialect, the rung and the validator
       | application/json-home;q=0.5, application/hal+json   | not wanted |
       | application/hal+json                                | not wanted |
 
+  Scenario Outline: Plain JSON is wanted when Accept names application/json above both dialects: <accept>
+    The OpenAPI twin's rendering: the state alone, with every control stripped.
+    A wildcard never selects it, so a client that names nothing still gets HEART.
+
+    When a client sends Accept "<accept>"
+    Then plain JSON is <wanted>
+
+    Examples:
+      | accept                                       | wanted     |
+      | application/json                             | wanted     |
+      | application/json, application/hal+json;q=0.5 | wanted     |
+      | application/hal+json, application/json       | not wanted |
+      | application/json;q=0.5, application/hal+json | not wanted |
+      | */*                                          | not wanted |
+      |                                              | not wanted |
+
   Scenario Outline: The rung for Prefer "<prefer>"
     When a client sends Prefer "<prefer>"
     Then the rung is <rung>
