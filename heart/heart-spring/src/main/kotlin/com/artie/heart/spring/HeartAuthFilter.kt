@@ -59,6 +59,8 @@ class HeartAuthFilter(private val credentials: HeartCredentials, realm: String) 
             Regex("^${Layers.EXPLANATIONS}$ADDRESS$"),
             Regex("^/profiles/[A-Za-z0-9_-]+$"),
             Regex("^${Regex.escape(OpenApiDocument.PATH)}$"),
+            Regex("^${Regex.escape(SwaggerUiPage.PATH)}$"),
+            Regex("^${Regex.escape(SwaggerUiPage.FILES)}/[A-Za-z0-9_-]+(\\.[A-Za-z0-9]+)+$"),
         )
         val PROBLEM = (
             """{"type":"${PROBLEM_TYPES}not-authenticated","title":"A credential is needed",""" +

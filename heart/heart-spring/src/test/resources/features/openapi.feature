@@ -29,6 +29,23 @@ Feature: The OpenAPI 3.1 description, served and linked from the bookmark
     And the response has Cache-Control "no-cache"
     And the response has an ETag
 
+  Scenario: A person can read the description in Swagger UI at /docs, with no credential
+    Swagger UI is served from the server itself, pinned, with nothing
+    fetched from elsewhere. It reads /openapi.json. Its Authorize button
+    takes a credential from the person reading, for trying acts out.
+    When a client with no credential sends GET "/docs"
+    Then the response status is 200
+    And the response has Content-Type "text/html;charset=UTF-8"
+    And the page loads Swagger UI from this server and points it at "/openapi.json"
+
+  Scenario: Swagger UI's script and styles are served with no credential
+    When a client with no credential gets each Swagger UI file the page loads
+    Then each answers 200
+
+  Scenario: Only Swagger UI's own files are open, not every path under /webjars
+    When a client with no credential sends GET "/webjars/swagger-ui/../../lamps/7"
+    Then the response status is 401
+
   Scenario: An unchanged description is revalidated with 304
     When a client gets "/openapi.json" with Accept "application/json"
     And a client gets "/openapi.json" again with the ETag it was given

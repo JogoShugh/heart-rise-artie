@@ -37,10 +37,12 @@ class HeartAutoConfiguration {
         handlers: HeartHandlers,
         index: HeartIndexHandler,
         openApi: OpenApiHandler,
+        swaggerUi: SwaggerUiPage,
     ): RouterFunction<ServerResponse> =
         coRouter {
             GET("/") { index.index(it) }
             GET(OpenApiDocument.PATH) { openApi.serve(it) }
+            GET(SwaggerUiPage.PATH) { swaggerUi.serve(it) }
             POST("/actions/{path}") { handlers.actAtBookmark(it) }
             handlers.all.forEach { handler ->
                 val resource = handler.resource
@@ -83,6 +85,10 @@ class HeartAutoConfiguration {
 
     @Bean
     fun openApiHandler(document: OpenApiDocument) = OpenApiHandler(document)
+
+    /** Swagger UI at `/docs`, reading the description above. */
+    @Bean
+    fun swaggerUiPage() = SwaggerUiPage()
 
     /** Shared by every binding a server uses; the first auto-configuration to run defines it. */
     @Bean

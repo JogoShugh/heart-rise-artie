@@ -15,6 +15,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     // BCrypt only, for Basic credentials; not Spring Security's filter chain.
     implementation("org.springframework.security:spring-security-crypto")
+    // Swagger UI for /docs, served from this jar (Spring Boot maps /webjars/**). Keep the
+    // version in step with SwaggerUiPage.VERSION.
+    implementation("org.webjars:swagger-ui:5.17.14")
 
     testImplementation(testFixtures(project(":heart-core")))
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
