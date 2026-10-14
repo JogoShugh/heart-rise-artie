@@ -12,11 +12,15 @@ import java.util.Base64
 data class Origin(val scheme: String, val host: String, val port: Int) {
     override fun toString() = "$scheme://$host:$port"
 
-    /** True for a host that never leaves the machine. */
-    val loopback: Boolean get() = host == "localhost" || host == "127.0.0.1" || host == "[::1]"
+    /**
+     * True for a host that never leaves the machine. `host.docker.internal`
+     * is Docker's name, inside a container, for the machine it runs on.
+     */
+    val loopback: Boolean get() = host in LOOPBACK
 
     companion object {
         private val DEFAULT_PORTS = mapOf("http" to 80, "https" to 443, "coap" to 5683, "coaps" to 5684)
+        private val LOOPBACK = setOf("localhost", "127.0.0.1", "[::1]", "host.docker.internal")
 
         /** The origin of [url]. Only the origin is read; a path is ignored. */
         fun of(url: String): Origin = requireNotNull(ofOrNull(url)) { "$url has no origin" }

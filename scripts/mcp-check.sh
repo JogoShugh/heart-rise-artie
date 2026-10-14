@@ -15,6 +15,10 @@ base=http://localhost:8080
 # Gradle 8.14 runs on JDK 21; the code itself builds for 22 through Gradle's toolchains.
 export JAVA_HOME=${ARTIE_JAVA_HOME:-$HOME/.sdkman/candidates/java/21.0.12-graal}
 mode=${1:-sdk}
+# shellcheck source=lib/credentials.sh
+. "$root/scripts/lib/credentials.sh"
+# Every service requires a credential: the garden's .env, and ARTIE's in ~/.artie.
+"$root/scripts/dev-credentials.sh" > /dev/null
 
 if lsof -nP -iTCP:8080 -sTCP:LISTEN > /dev/null; then
   echo "Port 8080 is in use. This script starts and stops its own garden server;" >&2
@@ -27,7 +31,7 @@ fi
 
 log=$root/server-spring/build/mcp-server.log
 mkdir -p "$(dirname "$log")"
-(cd "$root/server-spring" && ./gradlew bootRun --quiet > "$log" 2>&1) &
+(cd "$root/server-spring" && service_env . && ./gradlew bootRun --quiet > "$log" 2>&1) &
 stop() {
   pkill -f 'server-spring.*bootRun' || true
   pkill -f 'com.artie.gardenbed' || true
@@ -36,8 +40,8 @@ stop() {
 }
 trap stop EXIT
 
-for _ in $(seq 1 90); do curl -sf -o /dev/null "$base/" && break; sleep 2; done
-curl -sf -o /dev/null "$base/" || { echo "the garden server did not answer at $base; see $log" >&2; exit 1; }
+for _ in $(seq 1 90); do answering "$base/" && break; sleep 2; done
+answering "$base/" || { echo "the garden server did not answer at $base; see $log" >&2; exit 1; }
 
 if [ "$mode" != "--docker" ]; then
   (cd "$root/mcp" && ARTIE_BASE_URL="$base" ./gradlew :heart-mcp:liveTest --console=plain)
@@ -45,11 +49,17 @@ if [ "$mode" != "--docker" ]; then
 fi
 
 docker build --quiet -f "$root/mcp/Dockerfile" -t heart-mcp "$root" > /dev/null
+# Inside the container the garden is http://host.docker.internal:8080, so its token goes
+# in that origin's variable. docker run -e NAME passes the value from this environment,
+# never on a command line.
+ARTIE_TOKEN_HOST_DOCKER_INTERNAL_8080=$(auth_header "$base" | sed 's/^Authorization: Bearer //')
+export ARTIE_TOKEN_HOST_DOCKER_INTERNAL_8080
 python3 - <<'EOF'
 import json, subprocess, sys
 
 host = subprocess.Popen(
-    ["docker", "run", "-i", "--rm", "-e", "HEART_BOOKMARKS=garden=http://host.docker.internal:8080/", "heart-mcp"],
+    ["docker", "run", "-i", "--rm", "-e", "HEART_BOOKMARKS=garden=http://host.docker.internal:8080/",
+     "-e", "ARTIE_TOKEN_HOST_DOCKER_INTERNAL_8080", "heart-mcp"],
     stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
 ids = iter(range(1, 100))
 

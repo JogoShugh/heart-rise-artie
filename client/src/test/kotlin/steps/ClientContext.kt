@@ -117,7 +117,11 @@ class ClientContext {
         if (pathOrUrl.startsWith("/")) checkNotNull(baseUrl) { "relative URL outside a @live scenario" } + pathOrUrl
         else pathOrUrl
 
-    private companion object {
-        val ADDRESS = Regex("""\{((?:integrity:)?(?:set|schema|unavailable):[^}]+)}""")
+    companion object {
+        /** A live run's credentials: the environment, ~/.artie, then Vault, as production reads them. */
+        fun standardCredentials(): CredentialSource =
+            CredentialSources.standard(System.getenv(), java.nio.file.Path.of(System.getProperty("user.home")))
+
+        private val ADDRESS = Regex("""\{((?:integrity:)?(?:set|schema|unavailable):[^}]+)}""")
     }
 }

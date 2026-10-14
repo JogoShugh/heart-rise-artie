@@ -30,6 +30,8 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       | Basic                     | Basic  | coach:s3cret | https://garden.test     | https://garden.test/beds/2   | Basic Y29hY2g6czNjcmV0   |
       | default port written out  | Bearer | t0k3n        | https://GARDEN.test:443 | https://garden.test/beds/2   | Bearer t0k3n             |
       | plain HTTP on loopback    | Bearer | t0k3n        | http://localhost:8080   | http://localhost:8080/beds/2 | Bearer t0k3n             |
+      | plain HTTP to 127.0.0.1   | Bearer | t0k3n        | http://127.0.0.1:8080   | http://127.0.0.1:8080/beds/2 | Bearer t0k3n             |
+      | plain HTTP to Docker's host | Bearer | t0k3n      | http://host.docker.internal:8080 | http://host.docker.internal:8080/beds/2 | Bearer t0k3n |
 
   Scenario Outline: A credential does not go to another origin: <case>
     Given ARTIE holds the Bearer credential "t0k3n" for "https://garden.test"

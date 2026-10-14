@@ -159,7 +159,8 @@ class ReasonSteps(private val ctx: ClientContext) {
     /** Reads the server's own event log for the bed, apart from ARTIE, so the act is known to have happened. */
     @Then("the server's history of bed {int} ends with {string} of {int} ml")
     fun historyEndsWith(bed: Int, type: String, milliliters: Int) {
-        val response = heart.HttpTransport().send(heart.HeartRequest("GET", ctx.url("/beds/$bed/history")))
+        val wire = heart.AuthTransport(ctx.credentials, heart.HttpTransport())
+        val response = wire.send(heart.HeartRequest("GET", ctx.url("/beds/$bed/history")))
         val last = Json.parseToJsonElement(response.body).jsonArray.last().jsonObject
         assertEquals(type, last["type"]?.jsonPrimitive?.content, "last event: $last")
         assertEquals(milliliters, last["event"]?.jsonObject?.get("milliliters")?.jsonPrimitive?.int)

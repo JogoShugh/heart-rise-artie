@@ -19,6 +19,7 @@ class LiveExploreSteps(private val ctx: ClientContext) {
     @Before("@explore")
     fun useLiveServer(scenario: Scenario) {
         ctx.baseUrl = System.getenv("ARTIE_BASE_URL") ?: "http://localhost:8080"
+        ctx.credentials = ClientContext.standardCredentials()
         ctx.scenario = "explore-" + scenario.name.lowercase().replace(Regex("[^a-z0-9]+"), "-").trim('-')
     }
 

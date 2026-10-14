@@ -15,12 +15,16 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 base=${ARTIE_BASE_URL:-http://localhost:8080}
 # Gradle 8.13 cannot run on JDK 25, which may be the shell default.
 export JAVA_HOME=${ARTIE_JAVA_HOME:-$HOME/.sdkman/candidates/java/21.0.12-graal}
+# shellcheck source=lib/credentials.sh
+. "$root/scripts/lib/credentials.sh"
+# Every service requires a credential: the garden's .env, and ARTIE's in ~/.artie.
+"$root/scripts/dev-credentials.sh" > /dev/null
 
-if ! curl -sf -o /dev/null "$base/beds/1"; then
+if ! answering "$base/"; then
   (cd "$root/server-spring" && docker compose up --build -d)
-  for _ in $(seq 1 60); do curl -sf -o /dev/null "$base/beds/1" && break; sleep 2; done
+  for _ in $(seq 1 60); do answering "$base/" && break; sleep 2; done
 fi
-curl -sf -o /dev/null "$base/beds/1" || { echo "server not answering at $base" >&2; exit 1; }
+answering "$base/" || { echo "server not answering at $base" >&2; exit 1; }
 
 "$root/server-spring/reset-db.sh" > /dev/null
 # ARTIE's event log (hack log, 2026-10-10). A Buster server started with the buster

@@ -35,5 +35,10 @@ services:
       # SPEC §6.11.1: the highest rung served. HEART_MAX_RUNG=L0 docker compose up -d
       HEART_MAX_RUNG: ${HEART_MAX_RUNG:-L2}
       HEART_PAGE_SIZE: ${HEART_PAGE_SIZE:-20}
+      # Who the service admits. The SHA-256 of a Bearer token, from .env, which
+      # scripts/dev-credentials.sh makes (the token itself goes in ~/.artie/credentials).
+      # The service does not start without one.
+      HEART_AUTH_BEARER_TOKENS: ${HEART_AUTH_BEARER_TOKENS:?run scripts/dev-credentials.sh first}
+      HEART_AUTH_BASIC_USERS: ${HEART_AUTH_BASIC_USERS:-}
     ports:
       - "8080:8080"

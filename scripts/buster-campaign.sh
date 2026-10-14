@@ -33,6 +33,9 @@ events="$build/artie-events.jsonl"
 # Gradle 8.13 cannot run on JDK 25, which may be the shell default.
 export JAVA_HOME=${ARTIE_JAVA_HOME:-$HOME/.sdkman/candidates/java/21.0.12-graal}
 mkdir -p "$build"
+# shellcheck source=lib/credentials.sh
+. "$root/scripts/lib/credentials.sh"
+"$root/scripts/dev-credentials.sh" > /dev/null
 
 # A fresh server, so verdicts from another run cannot mix into this one.
 if lsof -ti "tcp:$PORT" > /dev/null; then
@@ -48,16 +51,17 @@ stop_server() {
 }
 trap stop_server EXIT
 
-(cd "$server" && SPRING_PROFILES_ACTIVE=buster BUSTER_PACE=0s \
+(cd "$server" && service_env "$server" && SPRING_PROFILES_ACTIVE=buster BUSTER_PACE=0s \
   BUSTER_PLUGINS="$root/buster/plugins" BUSTER_LOG="$build/buster.jsonl" BUSTER_CLIENT_EVENTS="$events" \
   ./gradlew bootRun -Pbuster=on > "$build/campaign-server.log" 2>&1) &
-for _ in $(seq 1 90); do curl -sf -o /dev/null "$base/_buster/report" && break; sleep 2; done
-curl -sf -o /dev/null "$base/_buster/report" || {
+buster() { curl -sf -H @<(auth_header "$base") "$@"; }
+for _ in $(seq 1 90); do buster -o /dev/null "$base/_buster/report" && break; sleep 2; done
+buster -o /dev/null "$base/_buster/report" || {
   echo "Buster server did not start; see $build/campaign-server.log" >&2
   exit 1
 }
 
-post() { curl -sf -X POST "$base/_buster/campaign/$1"; echo; }
+post() { buster -X POST "$base/_buster/campaign/$1"; echo; }
 
 # One run of the client: from the seed data, with ARTIE's event log fresh.
 run_client() {
@@ -86,7 +90,7 @@ if ! run_client > "$build/campaign-round-0.log" 2>&1; then
 fi
 
 # Plan.
-curl -sf "$base/_buster/campaign/plan" > "$build/campaign-plan.json"
+buster "$base/_buster/campaign/plan" > "$build/campaign-plan.json"
 rounds=$(python3 - "$build/campaign-plan.json" <<'EOF'
 import json, sys
 plan = json.load(open(sys.argv[1]))
@@ -108,7 +112,7 @@ done
 
 # Close the last round's windows, then read the gate.
 post off > /dev/null
-curl -sf "$base/_buster/report" > "$build/campaign-report.json"
+buster "$base/_buster/report" > "$build/campaign-report.json"
 python3 - "$build/campaign-report.json" <<'EOF'
 import collections, json, sys
 report = json.load(open(sys.argv[1]))
