@@ -11,6 +11,9 @@ import heart.Origin
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.attribute.PosixFilePermissions
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -138,6 +141,42 @@ class CredentialSteps(private val ctx: ClientContext) {
     @When("ARTIE tries to read credentials from the environment")
     fun tryReadEnvironment() {
         failure = runCatching { CredentialSources.fromEnvironment(environment) }.exceptionOrNull()
+    }
+
+    /** A home folder for this scenario, so ~/.artie is never the real one. */
+    private val home: Path by lazy { Files.createTempDirectory("artie-home") }
+
+    @Given("ARTIE's folder holds a credentials file with mode {string}:")
+    fun credentialsFile(mode: String, content: String) = writeCredentials(home.resolve(".artie"), mode, content)
+
+    @Given("ARTIE_HOME names a folder holding a credentials file with mode {string}:")
+    fun artieHome(mode: String, content: String) {
+        val folder = Files.createTempDirectory("artie-elsewhere")
+        environment["ARTIE_HOME"] = folder.toString()
+        writeCredentials(folder, mode, content)
+    }
+
+    @Given("ARTIE's folder holds no credentials file")
+    fun noCredentialsFile() = check(!Files.exists(home.resolve(".artie/credentials")))
+
+    @When("ARTIE reads its credentials")
+    fun readStandard() {
+        source = CredentialSources.standard(environment, home)
+    }
+
+    @When("ARTIE tries to read its credentials")
+    fun tryReadStandard() {
+        failure = runCatching { CredentialSources.standard(environment, home) }.exceptionOrNull()
+    }
+
+    private fun writeCredentials(folder: Path, mode: String, content: String) {
+        Files.createDirectories(folder)
+        val file = Files.writeString(folder.resolve("credentials"), content)
+        val bits = mode.toInt(radix = 8)
+        val text = (8 downTo 0).joinToString("") { bit ->
+            if (bits and (1 shl bit) == 0) "-" else "rwx"[(8 - bit) % 3].toString()
+        }
+        Files.setPosixFilePermissions(file, PosixFilePermissions.fromString(text))
     }
 
     @Then("the credential for {string} is the {word} credential {string}")

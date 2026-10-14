@@ -1,6 +1,7 @@
 package heart
 
 import java.net.URI
+import java.nio.file.Path
 import java.util.Base64
 
 /**
@@ -76,6 +77,22 @@ object CredentialSources {
 
     /** The credentials the environment holds, by the convention of [EnvironmentCredentials]. */
     fun fromEnvironment(env: Map<String, String>): CredentialSource = EnvironmentCredentials(env)
+
+    /**
+     * The standard sources, in order: the environment ([EnvironmentCredentials]),
+     * then the credentials file in `ARTIE_HOME`, or else `.artie` in [userHome]
+     * ([FileCredentials]). The first that has a credential for an origin wins.
+     */
+    fun standard(env: Map<String, String>, userHome: Path): CredentialSource {
+        val folder = env["ARTIE_HOME"]?.let { Path.of(it) } ?: userHome.resolve(".artie")
+        return chain(EnvironmentCredentials(env), FileCredentials(folder.resolve("credentials")))
+    }
+
+    /** Asks each source in turn; the first with a credential for the origin wins, renewals included. */
+    fun chain(vararg sources: CredentialSource): CredentialSource = object : CredentialSource {
+        override fun credentialFor(origin: Origin) = sources.firstNotNullOfOrNull { it.credentialFor(origin) }
+        override fun renewed(origin: Origin) = sources.firstNotNullOfOrNull { it.renewed(origin) }
+    }
 
     /** A fixed credential per origin, keyed by any URL of that origin. */
     fun of(byOrigin: Map<String, Credential>): CredentialSource {
