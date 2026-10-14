@@ -5,6 +5,7 @@ import heart.ClaudeReasoner
 import heart.Credential
 import heart.CredentialSource
 import heart.CredentialSources
+import heart.EnvironmentCredentials
 import heart.HeartRequest
 import heart.Origin
 import io.cucumber.java.en.Given
@@ -110,6 +111,53 @@ class CredentialSteps(private val ctx: ClientContext) {
         val lines = (ctx.eventSink as MemoryEventSink).lines
         assertTrue(lines.isNotEmpty(), "no events were written")
         assertFalse(lines.any { it.contains(secret) }, "an event line carried the secret")
+    }
+
+    // ---- where credentials come from ----
+
+    private val environment = mutableMapOf<String, String>()
+    private var source: CredentialSource? = null
+    private var failure: Throwable? = null
+
+    @Then("the credential variables for {string} are {string}, {string} and {string}")
+    fun variables(origin: String, token: String, user: String, password: String) {
+        val names = EnvironmentCredentials.namesFor(Origin.of(origin))
+        assertEquals(listOf(token, user, password), listOf(names.token, names.user, names.password))
+    }
+
+    @Given("the environment holds:")
+    fun environmentHolds(rows: List<List<String?>>) {
+        rows.forEach { (name, value) -> environment[checkNotNull(name)] = value.orEmpty() }
+    }
+
+    @When("ARTIE reads credentials from the environment")
+    fun readEnvironment() {
+        source = CredentialSources.fromEnvironment(environment)
+    }
+
+    @When("ARTIE tries to read credentials from the environment")
+    fun tryReadEnvironment() {
+        failure = runCatching { CredentialSources.fromEnvironment(environment) }.exceptionOrNull()
+    }
+
+    @Then("the credential for {string} is the {word} credential {string}")
+    fun credentialIs(origin: String, scheme: String, value: String) =
+        assertEquals(credential(scheme, value), checkNotNull(source).credentialFor(Origin.of(origin)))
+
+    @Then("the credential for {string} is none")
+    fun credentialIsNone(origin: String) = assertNull(checkNotNull(source).credentialFor(Origin.of(origin)))
+
+    @Then("reading credentials failed with {string}")
+    fun failedWith(text: String) {
+        val error = assertNotNull(failure, "expected a failure, none was raised")
+        assertTrue(error.message.orEmpty().contains(text), "failure was: ${error.message}")
+    }
+
+    /** An empty value cannot leak, so there is nothing to look for. */
+    @Then("the failure does not contain {string}")
+    fun failureLacks(text: String) {
+        val error = assertNotNull(failure, "expected a failure, none was raised")
+        if (text.isNotEmpty()) assertFalse(error.toString().contains(text), "failure was: $error")
     }
 
     private lateinit var lastCredential: Credential

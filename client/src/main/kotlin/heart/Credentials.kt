@@ -74,6 +74,9 @@ object CredentialSources {
     /** No credential for any origin. */
     val NONE: CredentialSource = of(emptyMap())
 
+    /** The credentials the environment holds, by the convention of [EnvironmentCredentials]. */
+    fun fromEnvironment(env: Map<String, String>): CredentialSource = EnvironmentCredentials(env)
+
     /** A fixed credential per origin, keyed by any URL of that origin. */
     fun of(byOrigin: Map<String, Credential>): CredentialSource {
         val held = byOrigin.mapKeys { Origin.of(it.key) }
