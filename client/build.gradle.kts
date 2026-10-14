@@ -108,6 +108,21 @@ val liveTest by tasks.registering(Test::class) {
     outputs.upToDateWhen { false }
 }
 
+// Runs only the @auth-live scenarios: each credential source alone, against the
+// garden, the basketball service and a Vault dev server that scripts/auth-check.sh
+// starts with credentials made for the run (passed in ARTIE_CHECK_* variables).
+val authLiveTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "Runs the @auth-live Cucumber scenarios against the services scripts/auth-check.sh starts."
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    systemProperty("cucumber.filter.tags", "@auth-live")
+    liveEnvironment(System.getenv("HEART_MAX_RUNG") ?: "L2")
+    System.getenv().filterKeys { it.startsWith("ARTIE_CHECK_") }.forEach { (name, value) -> environment(name, value) }
+    outputs.upToDateWhen { false }
+}
+
 // Runs only the @explore scenarios: ARTIE explores the running HEART server at
 // ARTIE_BASE_URL from its bookmark, with the domain's samples (ARTIE_SAMPLES) and
 // reset command (ARTIE_RESET). The same task explores any domain; Buster
