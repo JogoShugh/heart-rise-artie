@@ -28,8 +28,7 @@ class FileCredentials(private val file: Path) : CredentialSource {
     override fun credentialFor(origin: Origin): Credential? = held[origin]
 
     private fun read(): Map<Origin, Credential> {
-        val open = Files.getPosixFilePermissions(file) - OWNER_ONLY
-        require(open.isEmpty()) { "$file can be read by others; run chmod 600 on it" }
+        requireOwnerOnly(file)
         val sections = linkedMapOf<Origin, MutableMap<String, String>>()
         var current: MutableMap<String, String>? = null
         Files.readAllLines(file).forEachIndexed { index, raw ->
@@ -81,8 +80,14 @@ class FileCredentials(private val file: Path) : CredentialSource {
         return token?.let { Credential.Bearer(it) } ?: Credential.Basic(checkNotNull(user), checkNotNull(password))
     }
 
-    private companion object {
-        val KEYS = setOf("bearer", "user", "password")
-        val OWNER_ONLY = setOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)
+    internal companion object {
+        private val KEYS = setOf("bearer", "user", "password")
+        private val OWNER_ONLY = setOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)
+
+        /** A file holding a secret must be readable by its owner only, as ssh requires of a private key. */
+        fun requireOwnerOnly(file: Path) =
+            require((Files.getPosixFilePermissions(file) - OWNER_ONLY).isEmpty()) {
+                "$file can be read by others; run chmod 600 on it"
+            }
     }
 }

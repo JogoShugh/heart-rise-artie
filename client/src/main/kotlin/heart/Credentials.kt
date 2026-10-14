@@ -79,17 +79,25 @@ object CredentialSources {
     fun fromEnvironment(env: Map<String, String>): CredentialSource = EnvironmentCredentials(env)
 
     /**
-     * The standard sources, in order: the environment ([EnvironmentCredentials]),
-     * then the credentials file in `ARTIE_HOME`, or else `.artie` in [userHome]
-     * ([FileCredentials]). The first that has a credential for an origin wins.
+     * The standard sources, in order: the environment ([EnvironmentCredentials]);
+     * the credentials file in `ARTIE_HOME`, or else `.artie` in [userHome]
+     * ([FileCredentials]); then Vault, when `ARTIE_VAULT_ADDR` is set
+     * ([VaultCredentials], reached through [vault], never the service's
+     * transport). The first that has a credential for an origin wins.
      */
-    fun standard(env: Map<String, String>, userHome: Path): CredentialSource {
+    fun standard(env: Map<String, String>, userHome: Path, vault: Transport = HttpTransport()): CredentialSource {
         val folder = env["ARTIE_HOME"]?.let { Path.of(it) } ?: userHome.resolve(".artie")
-        return chain(EnvironmentCredentials(env), FileCredentials(folder.resolve("credentials")))
+        return chain(
+            listOfNotNull(
+                EnvironmentCredentials(env),
+                FileCredentials(folder.resolve("credentials")),
+                VaultCredentials.fromEnvironment(env, userHome, vault),
+            ),
+        )
     }
 
     /** Asks each source in turn; the first with a credential for the origin wins, renewals included. */
-    fun chain(vararg sources: CredentialSource): CredentialSource = object : CredentialSource {
+    fun chain(sources: List<CredentialSource>): CredentialSource = object : CredentialSource {
         override fun credentialFor(origin: Origin) = sources.firstNotNullOfOrNull { it.credentialFor(origin) }
         override fun renewed(origin: Origin) = sources.firstNotNullOfOrNull { it.renewed(origin) }
     }
