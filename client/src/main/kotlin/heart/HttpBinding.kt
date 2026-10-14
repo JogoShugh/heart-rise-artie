@@ -31,6 +31,8 @@ class HttpBinding(private val transport: Transport) : Binding {
             PRECONDITION_FAILED -> Outcome.Stale(code, problem)
             CONFLICT -> Outcome.NotOffered(code, problem)
             UNPROCESSABLE -> Outcome.Invalid(ProblemDetails.violations(response.body), code, problem)
+            UNAUTHORIZED -> Outcome.Unauthenticated(challengeSchemes(response), response.credentialSent, code, problem)
+            FORBIDDEN -> Outcome.Denied(response.credentialSent, code, problem)
             else -> Outcome.Failed(code, problem)
         }
     }
@@ -40,6 +42,20 @@ class HttpBinding(private val transport: Transport) : Binding {
         private val profileLink = Regex("""<([^>]*)>\s*;\s*rel="?profile"?""")
 
         val SUCCESS = 200..299
+        const val UNAUTHORIZED = 401
+        const val FORBIDDEN = 403
+        private val quoted = Regex(""""(?:[^"\\]|\\.)*"""")
+
+        /**
+         * The auth schemes named in WWW-Authenticate (RFC 9110 §11.6.1). A
+         * challenge starts with its scheme; parameters are name=value, so a
+         * comma-separated part whose first word has no '=' starts a challenge.
+         */
+        fun challengeSchemes(response: HeartResponse): List<String> =
+            quoted.replace(response.header("WWW-Authenticate").orEmpty(), "\"\"")
+                .split(',')
+                .map { it.trim().substringBefore(' ') }
+                .filter { it.isNotEmpty() && '=' !in it }
         const val CONFLICT = 409
         const val PRECONDITION_FAILED = 412
         const val UNPROCESSABLE = 422

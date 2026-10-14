@@ -25,5 +25,23 @@ class InvalidPayload(rel: String, val violations: List<String>) :
 class RuleRefused(rel: String, val violations: List<String>) :
     ActRefused("$rel was refused by a rule of the resource (422): ${violations.joinToString("; ")}")
 
+/**
+ * The service refused access to a resource, for a read or an act. Each
+ * message names the origin and the scheme ARTIE sent, never the credential.
+ */
+sealed class AccessRefused(message: String) : RuntimeException(message)
+
+/** 401: the service wants a credential ([schemes]), or refused the one ARTIE sent ([sent]). */
+class NotAuthenticated(val origin: String, val schemes: List<String>, val sent: String?) : AccessRefused(
+    if (sent == null) "$origin asks for a credential (${schemes.joinToString()}); ARTIE sent none"
+    else "$origin refused the $sent credential ARTIE sent",
+)
+
+/** 403: the service knows who is asking, and does not allow this. */
+class Forbidden(val origin: String, val sent: String?) : AccessRefused(
+    if (sent == null) "$origin does not allow this, and ARTIE sent no credential"
+    else "$origin does not allow this with the $sent credential ARTIE sent",
+)
+
 /** Any other outcome; [code] is the binding's own word for it (HTTP: the status code). */
 class UnexpectedResponse(rel: String, code: String) : ActRefused("$rel got the unexpected answer $code")

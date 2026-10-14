@@ -75,6 +75,11 @@ class ReasonSteps(private val ctx: ClientContext) {
         reasoner = ClaudeReasoner(heart.HttpTransport(), key)
     }
 
+    @Given("the reasoner is Claude, through the scripted Claude API")
+    fun claudeScripted() {
+        reasoner = ClaudeReasoner(ctx.transport, "test-key")
+    }
+
     @When("the agent handles {string} at {string}")
     fun handle(intent: String, url: String) {
         decision = agent().handle(intent, ctx.url(url))

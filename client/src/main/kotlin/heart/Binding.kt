@@ -39,9 +39,34 @@ sealed class Outcome(val code: String, val problemType: String?) {
     class Invalid(val violations: List<String>, code: String, problemType: String?) : Outcome(code, problemType)
     class Failed(code: String, problemType: String?) : Outcome(code, problemType)
 
+    /**
+     * The service wants a credential, or refused the one sent (HTTP 401).
+     * [schemes] are the schemes it asked for; [sent] is the scheme ARTIE
+     * sent, or null if none. Never the credential itself.
+     */
+    class Unauthenticated(val schemes: List<String>, val sent: String?, code: String, problemType: String?) :
+        Outcome(code, problemType) {
+        fun refusal(url: String) = NotAuthenticated(originOf(url), schemes, sent)
+    }
+
+    /** The service knows who is asking and does not allow it (HTTP 403). */
+    class Denied(val sent: String?, code: String, problemType: String?) : Outcome(code, problemType) {
+        fun refusal(url: String) = Forbidden(originOf(url), sent)
+    }
+
     /** The representation, or an error naming what the binding answered instead. */
-    fun received(url: String): Received =
-        (this as? Done)?.received ?: error("$url could not be read: the binding answered $code")
+    fun received(url: String): Received {
+        if (this is Done) return received
+        throw when (this) {
+            is Unauthenticated -> refusal(url)
+            is Denied -> refusal(url)
+            else -> IllegalStateException("$url could not be read: the binding answered $code")
+        }
+    }
+
+    private companion object {
+        fun originOf(url: String) = Origin.ofOrNull(url)?.toString() ?: url
+    }
 }
 
 /**

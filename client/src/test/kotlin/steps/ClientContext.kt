@@ -3,7 +3,10 @@ package steps
 import heart.ArtieClient
 import heart.Binding
 import heart.CachingTransport
+import heart.AuthTransport
 import heart.CoapBinding
+import heart.CredentialSource
+import heart.CredentialSources
 import heart.EventLog
 import heart.EventSink
 import heart.EventSinks
@@ -37,7 +40,13 @@ class ClientContext {
     /** Everything that reached the wire (below each client's cache), live or fake. */
     val wireLog: RecordingTransport by lazy { RecordingTransport(if (baseUrl != null) HttpTransport() else transport) }
     private val wire: Transport get() = wireLog
-    val cache: CachingTransport by lazy { CachingTransport(IntegrityCheck(wire)) }
+
+    /** The credentials every client in the scenario holds; a scenario sets them before the first request. */
+    var credentials: CredentialSource = CredentialSources.NONE
+
+    /** A client's own stack below its name and trace: its cache, the integrity check, then its credentials. */
+    private fun stack() = CachingTransport(IntegrityCheck(AuthTransport(credentials, wire)))
+    val cache: CachingTransport by lazy { stack() }
     val client: HeartRiseClient by lazy { build("first", cache, rung, dialect) }
 
     /** When true, the second client sits behind the first client's cache, as two
@@ -46,7 +55,7 @@ class ClientContext {
 
     /** Another client: a concurrent writer, or a neighbour behind a shared cache. */
     val second: HeartRiseClient by lazy {
-        val transport = if (shareCache) cache else CachingTransport(IntegrityCheck(wire))
+        val transport = if (shareCache) cache else stack()
         build("second", transport, rung, dialect)
     }
 
@@ -55,7 +64,7 @@ class ClientContext {
 
     /** A fresh client with its own cache, on the same wire. */
     fun newClient(dialect: Dialect, rung: Rung = Rung.L0): HeartRiseClient =
-        build("client-${++clients}", CachingTransport(IntegrityCheck(wire)), rung, dialect)
+        build("client-${++clients}", stack(), rung, dialect)
 
     /** Where each client's event log goes: off unless ARTIE_EVENTS or ARTIE_EVENTS_URL
      *  is set, or a scenario sets it. */

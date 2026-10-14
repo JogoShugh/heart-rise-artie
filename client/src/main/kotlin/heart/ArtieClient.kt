@@ -125,8 +125,10 @@ class ArtieClient(
     }
 
     /** Stale and not offered re-sync first, so the client never keeps a manifest the server has refused. */
-    private fun refusal(rel: String, target: String, outcome: Outcome, held: HeartRepresentation): ActRefused {
+    private fun refusal(rel: String, target: String, outcome: Outcome, held: HeartRepresentation): RuntimeException {
         val (refused, handled) = when (outcome) {
+            is Outcome.Unauthenticated -> outcome.refusal(target) to "reported"
+            is Outcome.Denied -> outcome.refusal(target) to "reported"
             is Outcome.Stale -> StaleAct(rel).also { sync(held.url) } to "discarded after re-sync"
             is Outcome.NotOffered -> IllegalTransition(rel).also { sync(held.url) } to "re-synced and reported"
             is Outcome.Invalid if outcome.problemType == RULE_REFUSED ->
