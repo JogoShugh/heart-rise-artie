@@ -3,6 +3,8 @@ package com.artie.heart.spring
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.Negotiation
+import com.artie.heart.OpenApiDocument
+import com.artie.heart.SERVICE_DESC
 import com.artie.heart.Search
 import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
@@ -29,10 +31,15 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
             val body = index.home(limits.maxRung)
             return answer(request, index.homeValidator(limits.maxRung), Negotiation.JSON_HOME, body) {
                 it.set(HttpHeaders.VARY, HttpHeaders.ACCEPT)
+                it.set(HttpHeaders.LINK, SERVICE_DESC_LINK)
             }
         }
         val dialect = HttpNegotiation.dialect(headers)
-        return answer(request, index.validator(dialect), dialect.mediaType, index.body(dialect)) { layer1(it, dialect) }
+        return answer(request, index.validator(dialect), dialect.mediaType, index.body(dialect)) {
+            layer1(it, dialect)
+            // RFC 8631: the OpenAPI description, for a client that knows only this address.
+            it.set(HttpHeaders.LINK, "${HttpNegotiation.profileLinks(dialect)}, $SERVICE_DESC_LINK")
+        }
     }
 
     suspend fun search(resource: HeartResource<*, *>, request: ServerRequest): ServerResponse {
@@ -74,6 +81,9 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
         headers.set(HttpHeaders.VARY, "${HttpHeaders.ACCEPT}, ${HttpNegotiation.ACCEPT_PROFILE}")
     }
 }
+
+private const val SERVICE_DESC_LINK =
+    "<${OpenApiDocument.PATH}>; rel=\"$SERVICE_DESC\"; type=\"${OpenApiDocument.MEDIA_TYPE}\""
 
 /** HTTP validators (RFC 9110 §13.1.2). */
 object Validators {

@@ -18,7 +18,9 @@ import org.springframework.context.annotation.Bean
  * binding the server uses, so whichever auto-configuration runs first
  * defines them.
  */
-@AutoConfiguration
+// After the HTTP binding, when both serve one server: its service index, which links the
+// OpenAPI description only HTTP serves, is the one both bindings share.
+@AutoConfiguration(afterName = ["com.artie.heart.spring.HeartAutoConfiguration"])
 class HeartCoapAutoConfiguration {
 
     @Bean

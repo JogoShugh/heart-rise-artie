@@ -20,6 +20,17 @@ import jakarta.validation.constraints.Size
 /** A lamp: the smallest resource type with an act that needs a body and acts that do not. */
 data class Lamp(val id: Long, val status: String, val brightness: Int, val version: Int)
 
+/** A lamp as its body reads, for the schema of its state: every field always there. */
+@Schema(title = "Lamp")
+data class LampBody(
+    @field:NotNull @field:Schema(title = "Lamp id")
+    val id: Long? = null,
+    @field:NotNull @field:Schema(title = "Status", description = "Whether the lamp is on")
+    val status: String? = null,
+    @field:NotNull @field:Min(1) @field:Max(100) @field:Schema(title = "Brightness")
+    val brightness: Int? = null,
+)
+
 /** The dim act's input. */
 @Schema(title = "Dim")
 data class Dim(
@@ -98,6 +109,8 @@ object Lamps {
             idOf = { it.id },
             versionOf = { it.version },
             bodyOf = { linkedMapOf("id" to it.id, "status" to it.status, "brightness" to it.brightness) },
+            bodyClass = LampBody::class.java,
+            keyField = "status",
         ),
         bookmarkActs = listOf(Act.of("installLamp", "install-lamp", InstallLamp::class.java)),
         finding = Finding(

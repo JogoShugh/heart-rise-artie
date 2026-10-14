@@ -1,6 +1,7 @@
 package com.artie.heart.spring
 
 import com.artie.heart.Layers
+import com.artie.heart.OpenApiDocument
 import com.artie.heart.PROBLEM_TYPES
 import org.springframework.core.Ordered
 import org.springframework.http.HttpHeaders
@@ -17,8 +18,8 @@ import reactor.core.scheduler.Schedulers
 /**
  * Admits only callers with a credential [credentials] admits, Basic or
  * Bearer. Every state, every act and the bookmark need one. The shared,
- * content-addressed layers and the ALPS profiles stay open: they are the same
- * for every caller. Each open path is matched whole, so no other path can
+ * content-addressed layers, the ALPS profiles and the OpenAPI description
+ * stay open: they are the same for every caller. Each open path is matched whole, so no other path can
  * borrow its prefix.
  *
  * A refusal is a 401 problem offering both schemes in [realm]. A wrong
@@ -57,6 +58,7 @@ class HeartAuthFilter(private val credentials: HeartCredentials, realm: String) 
             Regex("^${Layers.SCHEMAS}$ADDRESS$"),
             Regex("^${Layers.EXPLANATIONS}$ADDRESS$"),
             Regex("^/profiles/[A-Za-z0-9_-]+$"),
+            Regex("^${Regex.escape(OpenApiDocument.PATH)}$"),
         )
         val PROBLEM = (
             """{"type":"${PROBLEM_TYPES}not-authenticated","title":"A credential is needed",""" +

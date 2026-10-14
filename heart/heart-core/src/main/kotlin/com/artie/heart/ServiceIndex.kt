@@ -19,7 +19,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
  *
  * The index ignores `Prefer`: its forms are inline at every rung.
  */
-class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
+class ServiceIndex(
+    types: List<ResourceType<*, *>>,
+    title: String? = null,
+    /**
+     * Where the binding serves the OpenAPI description, if it does: linked
+     * from the index and the home document as `service-desc` (RFC 8631).
+     */
+    private val serviceDesc: String? = null,
+) {
     private val found: List<ResourceType<*, *>> = types.filter { it.finding != null }
     private val mapper = ObjectMapper()
     val title: String = title ?: types.first().profile.title
@@ -36,13 +44,18 @@ class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
     fun validator(dialect: Dialect): String = "\"index-${dialect.etagTag}-${ContentAddress.address(body(dialect))}\""
 
     /** The home document of a server that serves rungs up to [maxRung]. */
-    fun home(maxRung: Rung): String = mapper.writeValueAsString(HomeDocument(found, this.title).at(maxRung))
+    fun home(maxRung: Rung): String =
+        mapper.writeValueAsString(HomeDocument(found, this.title, serviceDesc).at(maxRung))
+
+    /** The index's own links: itself and, when served, the OpenAPI description. */
+    private fun links(): Map<String, Any> = mapOf("self" to mapOf("href" to "/")) +
+        listOfNotNull(serviceDesc?.let { SERVICE_DESC to mapOf("href" to it, "type" to OpenApiDocument.MEDIA_TYPE) })
 
     fun homeValidator(maxRung: Rung): String = "\"index-home-${ContentAddress.address(home(maxRung))}\""
 
     private fun schemaFormsIndex(): Map<String, Any> = mapOf(
         "title" to title,
-        "_links" to mapOf("self" to mapOf("href" to "/"), "curies" to found.flatMap { it.profile.curies }.distinct()),
+        "_links" to links() + ("curies" to found.flatMap { it.profile.curies }.distinct()),
         // HAL-SCHEMA-FORMS-HR Rules 6 and 7: keyed by relation, and self-describing.
         "_forms" to found.flatMap { type ->
             val finding = checkNotNull(type.finding)
@@ -63,7 +76,7 @@ class ServiceIndex(types: List<ResourceType<*, *>>, title: String? = null) {
 
     private fun halFormsIndex(): Map<String, Any> = mapOf(
         "title" to title,
-        "_links" to mapOf("self" to mapOf("href" to "/")),
+        "_links" to links(),
         "_templates" to found.flatMap { type ->
             val finding = checkNotNull(type.finding)
             listOf(
@@ -129,6 +142,9 @@ private const val JSON = "application/json"
 /** Where the index's own acts are: `/actions/{path}`, as a resource's are under it. */
 const val ACTIONS = "/actions/"
 
+/** RFC 8631: the relation of a link to a machine-readable description of the service. */
+const val SERVICE_DESC = "service-desc"
+
 /**
  * An act the index offers: a form like any act's, targeting the index's own
  * `/actions/{path}`, with its schema inline (the index is the same at every
@@ -161,7 +177,11 @@ private fun idProperty(finding: Finding): Map<String, Any> = mapOf(
 )
 
 /** SPEC §6.11.1: the index as a JSON Home document, for the types that can be found. */
-internal class HomeDocument(private val found: List<ResourceType<*, *>>, private val title: String) {
+internal class HomeDocument(
+    private val found: List<ResourceType<*, *>>,
+    private val title: String,
+    private val serviceDesc: String?,
+) {
     /**
      * Each type's resources (`item`) and searches (`collection`). With more
      * than one type, each is keyed by its own noun and collection instead.
@@ -190,7 +210,8 @@ internal class HomeDocument(private val found: List<ResourceType<*, *>>, private
                 ),
             )
         }.toMap()
-        val api = mapOf("title" to title, "links" to mapOf("describedBy" to SPEC_URL))
+        val links = mapOf("describedBy" to SPEC_URL) + listOfNotNull(serviceDesc?.let { SERVICE_DESC to it })
+        val api = mapOf("title" to title, "links" to links)
         return mapOf("api" to api, "resources" to resources)
     }
 

@@ -96,7 +96,13 @@ class Offers<K>(
     val whyAbsent: (K, String) -> String,
 )
 
-/** How heart-core reads a resource's state [S]: its offer key, id, version and JSON body. */
+/**
+ * How heart-core reads a resource's state [S]: its offer key, id, version and
+ * JSON body. [bodyClass], when given, is the body's shape, as an act's input
+ * class is the shape of its body: the OpenAPI description's schema of the state
+ * is generated from it. [keyField] names the body's member that holds the
+ * offer key; that member's schema is then the closed enum of every declared key.
+ */
 class StateView<S, K>(
     val keyOf: (S) -> K,
     val idOf: (S) -> Long,
@@ -104,6 +110,8 @@ class StateView<S, K>(
     val versionOf: (S) -> Int,
     /** The state as plain JSON values, with its `id` at the top level. */
     val bodyOf: (S) -> Map<String, Any?>,
+    val bodyClass: Class<*>? = null,
+    val keyField: String? = null,
 )
 
 /** A form's two names: its logical [name] (a HAL-FORMS template name) and its [relation] id in the profile. */

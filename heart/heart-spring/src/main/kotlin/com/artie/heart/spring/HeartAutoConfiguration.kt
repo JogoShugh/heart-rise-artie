@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.OpenApiDocument
 import com.artie.heart.Rung
 import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
@@ -32,9 +33,14 @@ class HeartAutoConfiguration {
      * answered as SPEC §6.2 says.
      */
     @Bean
-    fun heartRoutes(handlers: HeartHandlers, index: HeartIndexHandler): RouterFunction<ServerResponse> =
+    fun heartRoutes(
+        handlers: HeartHandlers,
+        index: HeartIndexHandler,
+        openApi: OpenApiHandler,
+    ): RouterFunction<ServerResponse> =
         coRouter {
             GET("/") { index.index(it) }
+            GET(OpenApiDocument.PATH) { openApi.serve(it) }
             POST("/actions/{path}") { handlers.actAtBookmark(it) }
             handlers.all.forEach { handler ->
                 val resource = handler.resource
@@ -60,7 +66,23 @@ class HeartAutoConfiguration {
         registry: HeartRegistry,
         @Value("\${heart.title:}") title: String,
     ): ServiceIndex =
-        ServiceIndex(registry.layers.map { it.type }, title.ifBlank { null })
+        ServiceIndex(registry.layers.map { it.type }, title.ifBlank { null }, serviceDesc = OpenApiDocument.PATH)
+
+    /**
+     * Everything the server could ever be asked, as OpenAPI 3.1, from every
+     * declared type. `heart.openapi.version` is its `info.version`: the
+     * server's owner bumps it when the declarations change.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    fun openApiDocument(
+        registry: HeartRegistry,
+        @Value("\${heart.title:}") title: String,
+        @Value("\${heart.openapi.version:${OpenApiDocument.DEFAULT_VERSION}}") version: String,
+    ): OpenApiDocument = OpenApiDocument(registry.resources, title.ifBlank { null }, version)
+
+    @Bean
+    fun openApiHandler(document: OpenApiDocument) = OpenApiHandler(document)
 
     /** Shared by every binding a server uses; the first auto-configuration to run defines it. */
     @Bean
