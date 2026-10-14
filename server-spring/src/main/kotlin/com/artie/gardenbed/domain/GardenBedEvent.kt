@@ -5,7 +5,10 @@ package com.artie.gardenbed.domain
 enum class GardenBedStatus {
     EMPTY,
     PLANTED,
-    READY_TO_HARVEST
+    READY_TO_HARVEST,
+
+    /** Only with frost (garden.frost.enabled): a planted bed a hard frost froze. */
+    FROZEN,
 }
 
 /**
@@ -25,4 +28,10 @@ sealed interface GardenBedEvent {
     data class CellWatered(val milliliters: Int) : GardenBedEvent
 
     data class BedHarvested(val yieldGrams: Int, val cropName: String) : GardenBedEvent
+
+    /** A hard frost froze the planted bed and the crop in it. */
+    data class BedFrozen(val cropName: String) : GardenBedEvent
+
+    /** The frozen bed was covered with fleece, and its crop is growing again. */
+    data class BedThawed(val cropName: String) : GardenBedEvent
 }

@@ -28,6 +28,8 @@ fun putBed(beds: InMemoryBeds, store: BedEventLog, id: Long, status: GardenBedSt
         GardenBedStatus.PLANTED -> listOf(sown)
         // 500 ml adds 100 growth points, the harvest threshold.
         GardenBedStatus.READY_TO_HARVEST -> listOf(sown, GardenBedEvent.CellWatered(500))
+        // Only a garden with frost (Tuesday) has frozen beds.
+        GardenBedStatus.FROZEN -> listOf(sown, GardenBedEvent.BedFrozen("basil"))
     }
     events.forEach { store.append(id, it) }
 }

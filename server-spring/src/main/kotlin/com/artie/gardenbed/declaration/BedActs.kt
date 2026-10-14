@@ -1,5 +1,6 @@
 package com.artie.gardenbed.declaration
 
+import com.artie.gardenbed.domain.GardenBedEvent
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.gardenbed.declaration.dto.BuildBedRequest
@@ -32,6 +33,8 @@ class BedActs(private val service: GardenBedService) {
             "waterCell" -> input.bind(WaterCellRequest::class.java)
                 .let { ActResult(service.waterCell(bed, it.milliliters)) }
             "harvest" -> service.harvest(bed).let { (state, result) -> ActResult(state, result) }
+            // Only a garden with frost declares it, so only then is it offered.
+            "thaw" -> ActResult(service.act(bed) { GardenBedEvent.BedThawed(bed.cropName ?: "unknown crop") })
             else -> error("no act $affordance")
         }
 }

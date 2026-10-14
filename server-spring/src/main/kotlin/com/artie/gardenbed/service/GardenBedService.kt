@@ -84,7 +84,12 @@ class GardenBedService(
         return act(bed) { GardenBedEvent.BedHarvested(result.yieldGrams, result.cropName) } to result
     }
 
-    private suspend fun act(bed: GardenBedState, event: (GardenBedState) -> GardenBedEvent): GardenBedState {
+    /**
+     * Records [event] on [bed], at the number after the state it was given,
+     * and returns the new state. An act with no rule of its own beyond its
+     * offer, such as a thaw, and the weather (GardenWeather) record directly.
+     */
+    suspend fun act(bed: GardenBedState, event: (GardenBedState) -> GardenBedEvent): GardenBedState {
         events.append(GARDEN_BEDS, bed.id, bed.lastSequenceNo + 1, event(bed))
         return currentState(bed.id)
     }

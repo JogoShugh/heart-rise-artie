@@ -1,8 +1,10 @@
 package com.artie.gardenbed.declaration
 
+import com.artie.gardenbed.declaration.dto.Bed
 import com.artie.gardenbed.declaration.dto.BuildBedRequest
 import com.artie.gardenbed.declaration.dto.HarvestRequest
 import com.artie.gardenbed.declaration.dto.SowSeedRequest
+import com.artie.gardenbed.declaration.dto.ThawRequest
 import com.artie.gardenbed.declaration.dto.WaterCellRequest
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
@@ -18,25 +20,31 @@ import com.artie.heart.StateView
  * The garden bed, declared once for heart-core: its acts and their schemas,
  * which acts each status offers, and how a bed's state reads. heart-core
  * renders every layer from this ([layers]).
+ *
+ * [frost] is Tuesday (From OpenAPI to HEART, part three): a hard frost can
+ * freeze a planted bed, which then offers only thaw. Without it the
+ * declaration is Monday's, and every byte it renders is as it was.
  */
 object GardenBeds {
 
-    val type = ResourceType(
+    fun type(frost: Boolean = false) = ResourceType(
         collection = "beds",
-        profile = GardenProfile.profile,
-        acts = listOf(
+        profile = GardenProfile.profile(frost),
+        acts = listOfNotNull(
             Act.of("sowSeed", "sow-seed", SowSeedRequest::class.java),
             Act.of("waterCell", "water-cell", WaterCellRequest::class.java),
             Act.of("harvest", "harvest", HarvestRequest::class.java),
+            Act.of("thaw", "thaw", ThawRequest::class.java).takeIf { frost },
         ),
         bookmarkActs = listOf(Act.of("buildBed", "build-bed", BuildBedRequest::class.java)),
         offers = Offers(
-            keys = GardenBedStatus.entries,
+            keys = GardenBedStatus.entries.filter { frost || it != GardenBedStatus.FROZEN },
             offered = { status ->
                 when (status) {
                     GardenBedStatus.EMPTY -> listOf("sowSeed")
                     GardenBedStatus.PLANTED -> listOf("waterCell")
                     GardenBedStatus.READY_TO_HARVEST -> listOf("harvest")
+                    GardenBedStatus.FROZEN -> listOf("thaw")
                 }
             },
             whyAbsent = GardenProfile::whyAbsent,
@@ -65,8 +73,10 @@ object GardenBeds {
                     "moistureLevel" to it.moistureLevel,
                 )
             },
+            bodyClass = Bed::class.java,
+            keyField = "status",
         ),
     )
 
-    val layers = Layers(type)
+    fun layers(frost: Boolean = false) = Layers(type(frost))
 }

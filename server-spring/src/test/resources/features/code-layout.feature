@@ -11,4 +11,6 @@ Feature: The garden's code says what it is
     Then "GARDEN_BEDS" is declared in the package "com.artie.gardenbed.domain"
 
   Scenario: The garden profile keeps only the vocabulary and the reasons
-    Then "GardenProfile" declares exactly "profile, whyAbsent"
+    Its relations and its reasons are tables, read by profile and whyAbsent,
+    since a garden with frost declares one more of each. Decided 2026-10-14.
+    Then "GardenProfile" declares exactly "profile, whyAbsent, relations, reasons"

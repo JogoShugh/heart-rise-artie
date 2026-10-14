@@ -14,6 +14,8 @@ val GARDEN_BEDS: EventSourcing<GardenBedEvent, GardenBedState> = EventSourcing(
         "SeedSown" to GardenBedEvent.SeedSown::class.java,
         "CellWatered" to GardenBedEvent.CellWatered::class.java,
         "BedHarvested" to GardenBedEvent.BedHarvested::class.java,
+        "BedFrozen" to GardenBedEvent.BedFrozen::class.java,
+        "BedThawed" to GardenBedEvent.BedThawed::class.java,
     ),
     stateClass = GardenBedState::class.java,
     empty = { id -> GardenBedState.empty(id, label = "") },

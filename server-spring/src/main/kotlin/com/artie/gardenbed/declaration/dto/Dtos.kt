@@ -53,6 +53,35 @@ private const val MAX_FEET = 100L
 @Schema(title = "Harvest")
 class HarvestRequest
 
+/** Thawing takes no input: the fleece is all it needs. */
+@Schema(title = "Thaw")
+class ThawRequest
+
+/**
+ * A bed as its plain body reads: the shape of its state, from which the
+ * OpenAPI description's Bed schema is generated. Its status is a closed
+ * enum of the statuses this garden declares.
+ */
+@Schema(title = "Bed")
+data class Bed(
+    @field:NotNull @field:Schema(title = "Bed id", description = "The bed's number")
+    val id: Long? = null,
+    @field:NotNull @field:Schema(title = "Name", description = "What the bed is called")
+    val label: String? = null,
+    @field:NotNull @field:Schema(title = "Width", description = "How wide the bed is, in feet")
+    val widthFt: Int? = null,
+    @field:NotNull @field:Schema(title = "Length", description = "How long the bed is, in feet")
+    val lengthFt: Int? = null,
+    @field:NotNull @field:Schema(title = "Status", description = "What the bed holds now")
+    val status: String? = null,
+    @field:Schema(title = "Crop", description = "What is planted, if anything", nullable = true)
+    val cropName: String? = null,
+    @field:NotNull @field:Schema(title = "Growth", description = "How far the crop has grown, to 100")
+    val growthPoints: Int? = null,
+    @field:NotNull @field:Schema(title = "Moisture", description = "How moist the soil is, to 100")
+    val moistureLevel: Int? = null,
+)
+
 data class HarvestResult(
     val yieldGrams: Int,
     val cropName: String

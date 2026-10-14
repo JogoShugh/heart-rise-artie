@@ -76,5 +76,9 @@ object GardenBedProjector {
                 moistureLevel = 0,
                 plantedAt = null,
             )
+
+            is GardenBedEvent.BedFrozen -> state.copy(status = GardenBedStatus.FROZEN)
+
+            is GardenBedEvent.BedThawed -> state.copy(status = GardenBedStatus.PLANTED)
         }.copy(lastSequenceNo = recorded.sequenceNo)
 }

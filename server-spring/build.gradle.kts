@@ -33,6 +33,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    // The operator's frost (POST /actuator/frost), served by Actuator: the garden touches no HTTP.
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // CORRECTED: the artifact was relocated from io.r2dbc:r2dbc-postgresql
     // to org.postgresql:r2dbc-postgresql -- confirmed via live search of
@@ -110,6 +112,9 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // -Popenapi.write=true writes the served OpenAPI descriptions over the published copies
+    // in exhibits/openapi-vs-heart/openapi, instead of checking them (OpenApiSteps).
+    systemProperty("openapi.write", providers.gradleProperty("openapi.write").getOrElse("false"))
 }
 
 detekt {
@@ -134,7 +139,9 @@ val logBddRun by tasks.registering {
     group = "verification"
     description = "Appends a BDD_RUN fact to ../.claude/tdd-events.log for the pre-commit TDD-ordering check."
     doLast {
-        val resultFile = file("build/test-results/test/TEST-com.artie.gardenbed.bdd.RunCucumberTest.xml")
+        // Monday's runner and Tuesday's (the garden with frost): both are the garden's features.
+        val resultFiles = listOf("bdd.RunCucumberTest", "tuesday.RunTuesdayTest")
+            .map { file("build/test-results/test/TEST-com.artie.gardenbed.$it.xml") }
         val logFile = file("../.claude/tdd-events.log")
         val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
         logFile.parentFile.mkdirs()
@@ -148,14 +155,16 @@ val logBddRun by tasks.registering {
         }
         // A build that stopped before the tests ran leaves an older run's result file.
         if (!tasks.test.get().state.executed) return@doLast
-        if (!resultFile.exists()) {
+        if (resultFiles.any { !it.exists() }) {
             // No result file means compilation or discovery failed: still red.
             logFile.appendText("$timestamp BDD_RUN FAIL module=server-spring reason=no-results\n")
             return@doLast
         }
-        val xml = resultFile.readText()
-        fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
-        val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
+        val xmls = resultFiles.map { it.readText() }
+        fun attr(name: String) = xmls.sumOf { xml ->
+            Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1)?.toInt() ?: 0
+        }
+        val status = if (attr("failures") == 0 && attr("errors") == 0) "PASS" else "FAIL"
         logFile.appendText(
             "$timestamp BDD_RUN $status module=server-spring total=${attr("tests")} failures=${attr("failures")} errors=${attr("errors")}\n",
         )
