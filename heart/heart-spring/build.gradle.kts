@@ -13,6 +13,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-webflux")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    // BCrypt only, for Basic credentials; not Spring Security's filter chain.
+    implementation("org.springframework.security:spring-security-crypto")
 
     testImplementation(testFixtures(project(":heart-core")))
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")

@@ -94,6 +94,31 @@ Feature: HEART conformance over HTTP, for any declared resource type
     When a client gets the resource as hal-schema-forms
     Then every relation its forms use is described in the server's ALPS profile
 
+  # Every request above carries the fixture's credential. These scenarios
+  # send none.
+  Scenario Outline: <what> needs a credential, and a refusal offers Basic and Bearer
+    When a client with no credential <does>
+    Then the response status is 401
+    And the response offers the challenges "Basic" and "Bearer"
+    And the response is a problem of type "not-authenticated"
+
+    Examples:
+      | what            | does                                    |
+      | The resource    | gets the resource as hal-schema-forms   |
+      | The bookmark    | gets "/" as hal-schema-forms            |
+      | The offered act | sends the offered act with its valid body |
+
+  Scenario Outline: The <rel> layer is open to a caller with no credential
+    When a client gets the resource as hal-schema-forms with Prefer "<prefer>"
+    And a client with no credential follows the "<rel>" link
+    Then the response status is 200
+    And the body matches the integrity of the link that led to it
+
+    Examples:
+      | rel            | prefer                  |
+      | hr:forms       | forms=link, schema=link |
+      | hr:unavailable |                         |
+
   # A type whose bookmark offers an act: its fixture names one, with a valid
   # and an invalid body. A domain whose bookmark offers no act leaves these
   # out with the tag filter "not @bookmark-act".

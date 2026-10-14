@@ -14,6 +14,7 @@ import org.eclipse.californium.core.server.MessageDeliverer
 import org.eclipse.californium.elements.config.Configuration
 import org.eclipse.californium.elements.config.UdpConfig
 import org.springframework.context.SmartLifecycle
+import java.net.InetAddress
 import java.net.InetSocketAddress
 
 /**
@@ -31,8 +32,11 @@ class CoapFrontDoor(
     private val routes = CoapRoutes(resources, index, limits, mapper)
     private var server: CoapServer? = null
 
+    /** The UDP address the server listens on, once started. */
+    val address: InetSocketAddress get() = checkNotNull(server).endpoints.first().address
+
     /** The UDP port the server listens on, once started. */
-    val port: Int get() = checkNotNull(server).endpoints.first().address.port
+    val port: Int get() = address.port
 
     override fun start() {
         if (configuredPort < 0) return
@@ -42,7 +46,9 @@ class CoapFrontDoor(
             .set(CoapConfig.MAX_RESOURCE_BODY_SIZE, MAX_BODY)
         val endpoint = CoapEndpoint.Builder()
             .setConfiguration(config)
-            .setInetSocketAddress(InetSocketAddress(configuredPort))
+            // CoAP has no Authorization header, so no Basic or Bearer credential can be
+            // checked here: only the same machine may reach it (spec/ideas/coap-security.md).
+            .setInetSocketAddress(InetSocketAddress(InetAddress.getLoopbackAddress(), configuredPort))
             .setOptionRegistry(CoapOptions.registry)
             .build()
         server = CoapServer(config).apply {

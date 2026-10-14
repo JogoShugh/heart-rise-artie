@@ -111,6 +111,11 @@ private fun brightness(lamp: Lamp, input: ActInput): Int {
 }
 
 @CucumberContextConfiguration
-@WebFluxTest
-@Import(LampServer::class, HeartAutoConfiguration::class, HttpWorld::class)
+@WebFluxTest(
+    properties = [
+        "heart.auth.basic.users=${TestCredentials.USERS}",
+        "heart.auth.bearer.tokens=${TestCredentials.TOKENS}",
+    ],
+)
+@Import(LampServer::class, HeartAutoConfiguration::class, HttpWorld::class, TestCredentials::class)
 class CucumberSpringConfig

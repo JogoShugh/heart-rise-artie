@@ -88,3 +88,9 @@ Feature: A declared resource over CoAP, served by heart-coap
   Scenario: A lamp the server does not hold is not found
     When a CoAP client gets "/lamps/99" with Prefer ""
     Then the CoAP response is 4.04
+
+  Scenario: The CoAP endpoint listens on the loopback address only
+    CoAP has no Authorization header, so heart-coap cannot check a Basic or
+    Bearer credential. Until it has CoAP's own security (OSCORE or DTLS),
+    only the same machine can reach it.
+    Then the CoAP lamp server listens on a loopback address only

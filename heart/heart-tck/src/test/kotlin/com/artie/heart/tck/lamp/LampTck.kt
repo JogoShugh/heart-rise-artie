@@ -74,6 +74,7 @@ class LampServer {
             body = "{}",
             reason = "The lamp is already on.",
         )
+        override val credential = "Bearer $LAMP_TOKEN"
         override val searchTerm = "lamp 7"
         override val bookmarkAct = TckAct(
             key = "home:install-lamp",
@@ -91,7 +92,11 @@ class LampServer {
     }
 }
 
+/** The lamp server admits one Bearer token; it is held as its SHA-256 in hex. */
+private const val LAMP_TOKEN = "lamp-token"
+private const val LAMP_TOKEN_SHA256 = "a1011f8452b5270bb1b7dd59ea154bca26711ace2c21d4607c0fd4d5b26d14cb"
+
 @CucumberContextConfiguration
-@WebFluxTest
+@WebFluxTest(properties = ["heart.auth.bearer.tokens=$LAMP_TOKEN_SHA256"])
 @Import(LampServer::class, HeartAutoConfiguration::class, TckWorld::class)
 class CucumberSpringConfig

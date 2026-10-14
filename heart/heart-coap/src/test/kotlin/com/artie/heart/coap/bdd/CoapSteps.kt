@@ -44,6 +44,9 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
         if (this::last.isInitialized) client.shutdown()
     }
 
+    @Then("the CoAP lamp server listens on a loopback address only")
+    fun loopbackOnly() = assertTrue(door.address.address.isLoopbackAddress, "listens on ${door.address}")
+
     @Given("lamp {long} is {string} at version {int} in the CoAP lamp server")
     fun lampIs(id: Long, status: String, version: Int) {
         store.lamps.clear()

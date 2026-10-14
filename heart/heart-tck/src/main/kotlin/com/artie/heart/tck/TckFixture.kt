@@ -16,6 +16,13 @@ interface TckFixture {
     /** An act the resource does not offer, with a body for it and the reason the server gives. */
     val absent: TckAct
 
+    /**
+     * An Authorization header value the server admits (`Basic ...` or
+     * `Bearer ...`). Every request carries it, except in the scenarios that
+     * check what a caller with no credential is told.
+     */
+    val credential: String
+
     /** Text that finds the resource with the type's search form. */
     val searchTerm: String
 

@@ -25,17 +25,23 @@ class TckWorld(private val client: WebTestClient, private val fixture: TckFixtur
     /** The fixture's resource. */
     val resource: String get() = "/${fixture.collection}/$id"
 
+    /** When false, requests carry no credential: the scenarios about callers with none. */
+    var credentialed = true
+
     fun get(path: String, headers: Map<String, String> = emptyMap()): EntityExchangeResult<ByteArray> {
         val spec = client.get().uri(path)
-        headers.forEach { (name, value) -> spec.header(name, value) }
+        (credential() + headers).forEach { (name, value) -> spec.header(name, value) }
         return spec.exchange().expectBody().returnResult().also { results += it }
     }
 
     fun post(path: String, body: String, headers: Map<String, String>): EntityExchangeResult<ByteArray> {
         val spec = client.post().uri(path).header(HttpHeaders.CONTENT_TYPE, "application/json")
-        headers.forEach { (name, value) -> spec.header(name, value) }
+        (credential() + headers).forEach { (name, value) -> spec.header(name, value) }
         return spec.bodyValue(body).exchange().expectBody().returnResult().also { results += it }
     }
+
+    private fun credential(): Map<String, String> =
+        if (credentialed) mapOf(HttpHeaders.AUTHORIZATION to fixture.credential) else emptyMap()
 
     /** Reads the resource and holds its ETag and the negotiation headers it was read with. */
     fun hold(headers: Map<String, String>) {

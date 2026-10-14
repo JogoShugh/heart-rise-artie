@@ -70,6 +70,25 @@ class HeartAutoConfiguration {
         @Value("\${heart.page-size:${ServingLimits.DEFAULT_PAGE_SIZE}}") pageSize: Int,
     ): ServingLimits = ServingLimits(maxRung, pageSize)
 
+    /**
+     * Who the service admits: `HEART_AUTH_BASIC_USERS` and `HEART_AUTH_BEARER_TOKENS`.
+     * With neither set, the service does not start.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    fun heartCredentials(
+        @Value("\${heart.auth.basic.users:}") users: String,
+        @Value("\${heart.auth.bearer.tokens:}") tokens: String,
+    ): HeartCredentials = HeartCredentials.parse(users, tokens)
+
+    /** The realm of each challenge is `heart.auth.realm`, or else the first declared profile's name. */
+    @Bean
+    fun heartAuthFilter(
+        credentials: HeartCredentials,
+        registry: HeartRegistry,
+        @Value("\${heart.auth.realm:}") realm: String,
+    ) = HeartAuthFilter(credentials, realm.ifBlank { registry.profiles.keys.first() })
+
     @Bean
     fun heartIndexHandler(index: ServiceIndex, limits: ServingLimits) = HeartIndexHandler(index, limits)
 
