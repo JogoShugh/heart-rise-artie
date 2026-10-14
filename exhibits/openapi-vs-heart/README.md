@@ -69,11 +69,93 @@ planted with tomato at moisture 40, and walks through these steps:
 
 Every response is saved under `run/`, which git ignores.
 
-## Not built yet
+## Early binding against late binding, run for real
 
-The clients the walk-through describes, built against Monday's description
-only: a generated client with default enum handling, a dashboard with the
-rules copied by hand, and an agent whose tools come one per operation from
-the spec. On the HEART side there will be ARTIE and an LLM agent that reads
-the forms. All of them will be scored with the same cases, per
-`spec/ideas/openapi-twin-comparison.md`.
+Two dashboards look after the same garden. Both are small htmx web pages, so
+the only difference between them is when they bind to what the garden can do.
+
+- **The bespoke dashboard** (`bespoke-1.0/`, TypeScript). Its client is generated
+  from `garden-1.0.0.json` by OpenAPI Generator 7.8.0 (`typescript-fetch`). Its
+  page binds at build time: the statuses come from the generated `BedStatusEnum`,
+  the badge from a `Record<BedStatusEnum, string>`, and the buttons from a
+  `switch` copied from the description's prose (sow an empty bed, harvest a
+  ready one, water the rest). It reads plain JSON.
+- **The ARTIE dashboard** (`artie-dashboard/`, Kotlin, over the ARTIE client).
+  It knows the garden's bookmark and nothing else: no status, no rule, no act
+  name. Each card is rendered from the HEART response ARTIE just received. The
+  state is a table of its members, each offered form becomes an HTML form built
+  from its JSON Schema with the form's title on the button, and each card
+  re-syncs every 2 seconds. It was written once, on Monday, and not changed.
+  Its "Ask" box hands the same offers to Claude through `ArtieAgent`.
+
+One regression suite (`suite/garden-care.feature`, Cucumber-JS) drives either
+dashboard over HTTP, as a person would: open a bed, read its buttons and
+status, press a button. Only the page objects (`suite/features/support/pages.mjs`)
+know where each page puts its buttons. `run-matrix.sh` runs it at three releases.
+The dashboards keep running from Monday into Tuesday; only the garden restarts.
+
+### What happened (`results/matrix.json`)
+
+| Release | Server | Bespoke dashboard | ARTIE dashboard |
+|---|---|---|---|
+| Monday | 1.0.0 | 1.0: 3/3 pass | 3/3 pass |
+| Tuesday morning | 1.1.0, the frost | 1.0, unchanged: **3/7 pass** | unchanged: **7/7 pass** |
+| Tuesday, after the rework | 1.1.0 | 1.1: 7/7 pass | not needed |
+
+Tuesday morning, the unchanged bespoke dashboard:
+
+- showed the frozen bed's status as `undefined`: `FROZEN` is not in Monday's enum;
+- still showed "Water the bed", from the `switch`'s `default`;
+- had no "Thaw the bed" button at all;
+- pressed Water and got a real `409` from `POST /beds/2/actions/water-cell`.
+
+The unchanged ARTIE dashboard showed `FROZEN`, offered only "Thaw the bed",
+thawed the bed, and then offered "Water the bed" again. It sent nothing the
+garden refused.
+
+### The rework the bespoke dashboard needed
+
+1. Regenerate the client from `garden-1.1.0.json`: 12 generated files changed,
+   +75 −13 lines (`results/bespoke-1.0-to-1.1.generated.diff`). Most of it is
+   the version stamp; the real changes are `thaw` in `BedsApi.ts` and `FROZEN`
+   in `Bed.ts`.
+2. Build, and read what the compiler says (`results/tsc-after-regenerate.txt`),
+   one error:
+
+   ```
+   src/dashboard.ts(26,7): error TS2741: Property 'FROZEN' is missing in type
+   '{ EMPTY: string; PLANTED: string; READY_TO_HARVEST: string; }' but required
+   in type 'Record<BedStatusEnum, string>'.
+   ```
+
+   The compiler said nothing about the `switch`, whose `default` still gave a
+   frozen bed a Water button. Only the regression suite caught that.
+3. Edit by hand: 11 lines in and 4 out in `src/dashboard.ts` (the
+   badge, a Thaw button, its case, its call and its route), plus the version
+   in `package.json` and `generate.sh`
+   (`results/bespoke-1.0-to-1.1.hand-written.diff`).
+4. Build again, run the suite, release 1.1.0, and deploy it.
+
+Until step 4, the people using the bespoke dashboard had no way to thaw a bed,
+and a button that the garden refuses. The ARTIE dashboard needed none of the
+four steps.
+
+### What this does and does not show
+
+- **The regression suite ran on both dashboards at every release.** Testing
+  is not what late binding saves: a server change is tested either way. What
+  it saves is the rework between the server's release and the client's:
+  regenerating, fixing what the compiler finds, finding what it misses,
+  editing, rebuilding and releasing, and the time users wait for the new
+  capability.
+- A generic client shows and performs Thaw with no code change, but something
+  still decides to press it: a person on the page, or a model. With Claude,
+  asked "Bed 2 looks frozen. Please look after it.", `ArtieAgent` chose
+  `garden:thaw` from the offered forms, and the bed was planted again
+  (`results/claude-ask.html`, `results/claude-ask-calls.json`; one run).
+- Both dashboards are deliberately small. The bespoke one is written the
+  common way; a team could have made it read more from the description at
+  runtime, which is a step toward what HEART makes standard.
+
+Run it again with `exhibits/openapi-vs-heart/run-matrix.sh`. It needs Docker,
+Node 20 and a JDK 22 or later for the ARTIE dashboard.
