@@ -28,14 +28,18 @@ class HttpWorld(private val client: WebTestClient) {
     val last: Exchange get() = exchanges.last()
 
     fun get(path: String, headers: Map<String, String> = emptyMap()): Exchange =
-        record(path, headers, client.get().uri(path).headers { h -> headers.forEach { (k, v) -> h.set(k, v) } })
+        record(
+            path,
+            headers,
+            client.get().uri(path).headers { h -> (CREDENTIAL + headers).forEach { (k, v) -> h.set(k, v) } },
+        )
 
     fun post(path: String, json: String, headers: Map<String, String> = emptyMap()): Exchange =
         record(
             path,
             headers,
             client.post().uri(path)
-                .headers { h -> headers.forEach { (k, v) -> h.set(k, v) } }
+                .headers { h -> (CREDENTIAL + headers).forEach { (k, v) -> h.set(k, v) } }
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .bodyValue(json),
         )
@@ -53,6 +57,10 @@ class HttpWorld(private val client: WebTestClient) {
     }
 
     companion object {
+        /** The test garden admits this Bearer token (its SHA-256 is in the test application.properties). */
+        const val TEST_TOKEN = "garden-test-token"
+        val CREDENTIAL = mapOf(HttpHeaders.AUTHORIZATION to "Bearer $TEST_TOKEN")
+
         // SPEC §6.1: the dialect is picked by media type alone.
         const val HAL_SCHEMA_FORMS_ACCEPT = "application/hal+json"
         const val HAL_FORMS_ACCEPT = "application/prs.hal-forms+json"

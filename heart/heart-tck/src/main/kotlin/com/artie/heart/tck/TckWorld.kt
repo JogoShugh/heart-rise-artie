@@ -29,19 +29,26 @@ class TckWorld(private val client: WebTestClient, private val fixture: TckFixtur
     var credentialed = true
 
     fun get(path: String, headers: Map<String, String> = emptyMap()): EntityExchangeResult<ByteArray> {
-        val spec = client.get().uri(path)
+        val spec = sender().get().uri(path)
         (credential() + headers).forEach { (name, value) -> spec.header(name, value) }
         return spec.exchange().expectBody().returnResult().also { results += it }
     }
 
     fun post(path: String, body: String, headers: Map<String, String>): EntityExchangeResult<ByteArray> {
-        val spec = client.post().uri(path).header(HttpHeaders.CONTENT_TYPE, "application/json")
+        val spec = sender().post().uri(path).header(HttpHeaders.CONTENT_TYPE, "application/json")
         (credential() + headers).forEach { (name, value) -> spec.header(name, value) }
         return spec.bodyValue(body).exchange().expectBody().returnResult().also { results += it }
     }
 
     private fun credential(): Map<String, String> =
         if (credentialed) mapOf(HttpHeaders.AUTHORIZATION to fixture.credential) else emptyMap()
+
+    /** A client with no credential of its own drops any the server's test context sets on every request. */
+    private val bare: WebTestClient by lazy {
+        client.mutate().defaultHeaders { it.remove(HttpHeaders.AUTHORIZATION) }.build()
+    }
+
+    private fun sender(): WebTestClient = if (credentialed) client else bare
 
     /** Reads the resource and holds its ETag and the negotiation headers it was read with. */
     fun hold(headers: Map<String, String>) {

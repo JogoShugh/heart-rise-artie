@@ -3,6 +3,7 @@ package com.artie.tickets.tck
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import com.artie.heart.spring.HeartAutoConfiguration
+import com.artie.tickets.bdd.TestCredentials
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
@@ -56,6 +57,7 @@ class TicketFixture {
             body = """{"resolution": "Fixed."}""",
             reason = "No one is assigned; assign the ticket first.",
         )
+        override val credential = TestCredentials.CREDENTIAL
         override val searchTerm = "log in"
         override val bookmarkAct = TckAct(
             key = "support:open-ticket",
@@ -82,6 +84,7 @@ class TicketFixture {
 @Import(
     InMemoryTickets::class, TicketFixture::class, TckWorld::class,
     HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class,
+    TestCredentials::class,
 )
 @TestPropertySource(properties = ["heart.coap.port=-1"])
 class TicketTckContext

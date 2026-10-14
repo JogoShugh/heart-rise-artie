@@ -42,6 +42,9 @@ class InMemoryGames {
 
 @CucumberContextConfiguration
 @WebFluxTest
-@Import(InMemoryGames::class, HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class)
+@Import(
+    InMemoryGames::class, HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class,
+    TestCredentials::class,
+)
 @TestPropertySource(properties = ["heart.coap.port=-1"])
 class CucumberSpringConfig

@@ -10,6 +10,7 @@ import com.artie.basketball.store.InMemoryGameDirectory
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import com.artie.heart.spring.HeartAutoConfiguration
+import com.artie.basketball.bdd.TestCredentials
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
@@ -56,6 +57,7 @@ class GameFixture {
             body = """{"possession": "home"}""",
             reason = "The game has already started.",
         )
+        override val credential = TestCredentials.CREDENTIAL
         override val searchTerm = "Eagles"
 
         override suspend fun ready(): Long {
@@ -79,6 +81,7 @@ class GameFixture {
 @Import(
     InMemoryGames::class, GameFixture::class, TckWorld::class,
     HeartConfig::class, HeartAutoConfiguration::class, HeartCoapAutoConfiguration::class,
+    TestCredentials::class,
 )
 @TestPropertySource(properties = ["heart.coap.port=-1"])
 class GameTckContext

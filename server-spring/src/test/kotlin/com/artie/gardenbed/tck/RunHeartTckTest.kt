@@ -9,6 +9,7 @@ import com.artie.gardenbed.declaration.BedActs
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.heart.coap.HeartCoapAutoConfiguration
 import com.artie.heart.spring.HeartAutoConfiguration
+import com.artie.gardenbed.bdd.HttpWorld
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
@@ -56,6 +57,7 @@ class GardenFixture {
             body = """{"seedType": "kale"}""",
             reason = "The bed is already planted.",
         )
+        override val credential = "Bearer ${HttpWorld.TEST_TOKEN}"
         override val searchTerm = "Bed 2"
         override val bookmarkAct = TckAct(
             key = "garden:build-bed",

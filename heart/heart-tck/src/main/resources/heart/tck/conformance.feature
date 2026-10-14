@@ -95,7 +95,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
     Then every relation its forms use is described in the server's ALPS profile
 
   # Every request above carries the fixture's credential. These scenarios
-  # send none.
+  # send none, even when the server's test context gives every client one.
   Scenario Outline: <what> needs a credential, and a refusal offers Basic and Bearer
     When a client with no credential <does>
     Then the response status is 401

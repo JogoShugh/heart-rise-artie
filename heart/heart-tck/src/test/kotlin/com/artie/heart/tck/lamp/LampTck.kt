@@ -18,8 +18,11 @@ import io.cucumber.spring.CucumberContextConfiguration
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.web.reactive.server.WebTestClientBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpHeaders
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -96,7 +99,20 @@ class LampServer {
 private const val LAMP_TOKEN = "lamp-token"
 private const val LAMP_TOKEN_SHA256 = "a1011f8452b5270bb1b7dd59ea154bca26711ace2c21d4607c0fd4d5b26d14cb"
 
+/**
+ * Every client in this context carries the lamp token by default, as a domain's
+ * test context may. The TCK's scenarios about callers with no credential must
+ * still send none.
+ */
+@TestConfiguration
+class CredentialByDefault {
+    @Bean
+    fun bearerByDefault() = WebTestClientBuilderCustomizer {
+        it.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer $LAMP_TOKEN")
+    }
+}
+
 @CucumberContextConfiguration
 @WebFluxTest(properties = ["heart.auth.bearer.tokens=$LAMP_TOKEN_SHA256"])
-@Import(LampServer::class, HeartAutoConfiguration::class, TckWorld::class)
+@Import(LampServer::class, HeartAutoConfiguration::class, TckWorld::class, CredentialByDefault::class)
 class CucumberSpringConfig
