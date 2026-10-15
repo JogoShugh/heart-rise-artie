@@ -5,19 +5,37 @@ import com.artie.heart.Finding
 import com.artie.heart.Layers
 import com.artie.heart.Named
 import com.artie.heart.Offers
+import com.artie.heart.Options
+import com.artie.heart.Pick
 import com.artie.heart.ResourceType
 import com.artie.heart.StateView
+import com.artie.tickets.domain.Agents
 import com.artie.tickets.domain.Status
 import com.artie.tickets.domain.TicketState
 
 /** A ticket, declared once for the HEART library. The service index offers opening one. */
 object Tickets {
 
+    /**
+     * HAL-SCHEMA-FORMS-HR Rule 8: the agent is one of the desk's agents, another
+     * resource, who handle the ticket's priority and are on duty. The server checks
+     * an assignment against its own copy of them.
+     */
+    private val agentOnDuty = mapOf(
+        "agent" to Options.fromLink(
+            href = "/agents{?priority}",
+            templatePointers = mapOf("priority" to "/priority"),
+            items = "/agents",
+            pick = Pick(value = "name", prompt = "name", where = mapOf("onDuty" to true), maxItems = 1),
+            resolve = { ticket, _ -> Agents.handling((ticket as TicketState).priority).map(Agents::json) },
+        ),
+    )
+
     val type = ResourceType(
         collection = "tickets",
         profile = SupportProfile.profile,
         acts = listOf(
-            Act.of("assign", "assign", Assign::class.java),
+            Act.of("assign", "assign", Assign::class.java).withOptions(agentOnDuty),
             Act.of("comment", "comment", Comment::class.java),
             Act.of("askCustomer", "ask-customer", AskCustomer::class.java),
             Act.of("customerReplies", "customer-replies", CustomerReplies::class.java),

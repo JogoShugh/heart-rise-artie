@@ -3,6 +3,8 @@ package com.artie.tickets.config
 import com.artie.heart.Acted
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
+import com.artie.heart.Listing
+import com.artie.tickets.domain.Agents
 import com.artie.tickets.declaration.TicketActs
 import com.artie.tickets.declaration.Tickets
 import com.artie.tickets.domain.Status
@@ -19,6 +21,10 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration
 class HeartConfig {
+    /** The desk's agents at /agents{?priority}, where the assign act's choices come from (Tickets). */
+    @Bean
+    fun agents() = Listing("/agents", "agents") { query -> Agents.handling(query["priority"]).map(Agents::json) }
+
     @Bean
     fun tickets(service: TicketService): HeartResource<TicketState, Status> {
         val acts = TicketActs(service)

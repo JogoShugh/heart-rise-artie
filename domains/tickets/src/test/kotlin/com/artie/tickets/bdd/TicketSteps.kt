@@ -24,6 +24,7 @@ class TicketSteps(
 ) {
     private lateinit var last: EntityExchangeResult<ByteArray>
     private var state: JsonNode = ObjectMapper().createObjectNode()
+    private var options: JsonNode = ObjectMapper().createObjectNode()
 
     @Given("the support desk has no tickets")
     fun empty() = runBlocking {
@@ -111,6 +112,58 @@ class TicketSteps(
     fun priority(id: Long, priority: String) {
         read(id)
         assertEquals(priority, state.path("priority").asText())
+    }
+
+    @When("the agent opens ticket {long}")
+    fun openTicket(id: Long) {
+        read(id)
+    }
+
+    @Then("the form {string} takes {string} from the link {string}, filled from {string}")
+    fun takesFromLink(form: String, property: String, href: String, pointer: String) {
+        options = state.path("_forms").path(form).path("schema").path("properties").path(property).path("hr:options")
+        assertEquals(href, options.path("link").path("href").asText(), "$form: $options")
+        val pointers = options.path("templatePointers")
+        assertEquals(pointer, pointers.elements().asSequence().singleOrNull()?.asText(), "$form: $options")
+    }
+
+    @Then("it keeps only the agents whose {string} is true, by their {string}")
+    fun keepsOnly(member: String, valueField: String) {
+        assertTrue(options.path("where").path(member).asBoolean(false), "$options")
+        assertEquals(valueField, options.path("valueField").asText(), "$options")
+    }
+
+    @When("a client reads the agents for priority {string}")
+    fun readAgents(priority: String) {
+        last = client.get().uri("/agents?priority=$priority").header(HttpHeaders.ACCEPT, JSON)
+            .exchange().expectBody().returnResult()
+    }
+
+    @Then("the agents listed are {string}, each with whether they are on duty")
+    fun agentsListed(names: String) {
+        assertEquals(200, last.status.value(), String(last.responseBody ?: ByteArray(0)))
+        val agents = json(last).path("agents")
+        assertEquals(names, agents.joinToString(", ") { it.path("name").asText() })
+        assertTrue(agents.all { it.path("onDuty").isBoolean }, "$agents")
+    }
+
+    @Then("that answer is revalidated on every use, by its ETag")
+    fun revalidated() {
+        assertEquals("no-cache", last.responseHeaders.cacheControl)
+        val etag = checkNotNull(last.responseHeaders.eTag) { "no ETag" }
+        val again = client.get().uri(checkNotNull(last.url.rawPath) + "?" + last.url.rawQuery)
+            .header(HttpHeaders.ACCEPT, JSON).header(HttpHeaders.IF_NONE_MATCH, etag)
+            .exchange().expectBody().returnResult()
+        assertEquals(304, again.status.value())
+    }
+
+    @Then("the desk refuses it as not one of the choices at {string}")
+    fun notAChoice(pointer: String) {
+        assertEquals(422, last.status.value(), String(last.responseBody ?: ByteArray(0)))
+        assertEquals(PROBLEM_TYPES + "invalid-input", json(last).path("type").asText())
+        val violations = json(last).path("violations")
+        assertEquals(listOf(pointer), violations.map { it.path("pointer").asText() }.distinct())
+        assertTrue(violations.all { "not one of the choices" in it.path("message").asText() }, "$violations")
     }
 
     @Then("the desk refuses it by a ticket rule at {string}")

@@ -27,6 +27,29 @@ Feature: Support tickets
     Then ticket 1 is "ASSIGNED" to "priya"
     And the ticket offers exactly "support:assign, support:comment, support:ask-customer, support:resolve, support:change-priority"
 
+  Scenario: The agent is chosen from another resource: the agents on duty who handle the ticket's priority
+    HAL-SCHEMA-FORMS-HR Rule 8. The form does not list agents. It links to
+    the desk's agents, filtered by the ticket's own priority, and keeps
+    only those on duty.
+    Given ticket 1 was opened about "Cannot log in"
+    When the agent opens ticket 1
+    Then the form "support:assign" takes "agent" from the link "/agents{?priority}", filled from "/priority"
+    And it keeps only the agents whose "onDuty" is true, by their "name"
+    When a client reads the agents for priority "high"
+    Then the agents listed are "priya, marco, lena", each with whether they are on duty
+    And that answer is revalidated on every use, by its ETag
+
+  Scenario Outline: An agent outside the choices is refused: <case>
+    Given ticket 1 was opened about "Cannot log in"
+    When the agent records "assign" on ticket 1 with {"agent": "<agent>"}
+    Then the desk refuses it as not one of the choices at "/agent"
+
+    Examples:
+      | case                                | agent |
+      | an agent who is off duty            | lena  |
+      | an agent who does not handle high   | tom   |
+      | no such agent                       | sam   |
+
   Scenario: A ticket is not assigned again to the agent who has it
     Given ticket 1 was opened about "Cannot log in"
     And ticket 1 is assigned to "priya"

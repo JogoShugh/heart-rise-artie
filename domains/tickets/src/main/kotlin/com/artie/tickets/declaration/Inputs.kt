@@ -33,11 +33,8 @@ data class OpenTicket(
 @Schema(title = "Assign")
 data class Assign(
     @field:NotNull
-    @field:Schema(
-        title = "Agent",
-        description = "The agent who works on the ticket",
-        allowableValues = ["priya", "marco", "lena", "tom"],
-    )
+    // Its choices are the desk's agents on duty for the ticket's priority (Tickets.agentOnDuty).
+    @field:Schema(title = "Agent", description = "The agent who works on the ticket", examples = ["priya"])
     val agent: String? = null,
 )
 
