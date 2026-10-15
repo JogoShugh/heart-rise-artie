@@ -1,0 +1,47 @@
+plugins {
+    `java-library`
+    application
+    kotlin("jvm")
+    id("io.gitlab.arturbosch.detekt")
+}
+
+// heart-gateway: presents a service that only publishes OpenAPI to HEART
+// clients as a HEART server (spec/PLAN-OPENAPI-GATEWAY.md). It reads the
+// upstream's spec, builds resource types from it at run time, and serves them
+// with heart-http4k; it calls the upstream with http4k's own client.
+dependencies {
+    api(project(":heart-http4k"))
+    implementation("org.http4k:http4k-server-jetty")
+    // Reads the upstream's OpenAPI 3.x description, with every $ref resolved.
+    implementation("io.swagger.parser.v3:swagger-parser-v3:2.1.22")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
+    // The conformance features run against the gateway in front of a plain JSON
+    // twin, served by heart-http4k in memory.
+    testImplementation(project(":heart-tck"))
+    testImplementation(testFixtures(project(":heart-core")))
+    testImplementation(platform("org.springframework.boot:spring-boot-dependencies:3.3.4"))
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework:spring-webflux")
+    testImplementation("io.projectreactor.netty:reactor-netty-http")
+    testImplementation(platform("io.cucumber:cucumber-bom:7.18.0"))
+    testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    testImplementation("org.junit.platform:junit-platform-suite")
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+// `installDist` builds build/install/heart-gateway/bin/heart-gateway; it is configured by its environment.
+application {
+    mainClass.set("com.artie.heart.gateway.MainKt")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
+detekt {
+    buildUponDefaultConfig = true
+}

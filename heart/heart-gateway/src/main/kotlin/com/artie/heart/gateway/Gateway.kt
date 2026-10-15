@@ -1,0 +1,170 @@
+package com.artie.heart.gateway
+
+import com.artie.heart.Act
+import com.artie.heart.Acted
+import com.artie.heart.AlpsType
+import com.artie.heart.ConcurrentWriteException
+import com.artie.heart.Finding
+import com.artie.heart.Found
+import com.artie.heart.HeartResource
+import com.artie.heart.Layers
+import com.artie.heart.Named
+import com.artie.heart.Offers
+import com.artie.heart.Profile
+import com.artie.heart.Relation
+import com.artie.heart.ResourceType
+import com.artie.heart.StateView
+import com.artie.heart.http4k.Credentials
+import com.artie.heart.http4k.HeartHttp
+import com.artie.heart.http4k.HeartSettings
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.core.type.TypeReference
+import org.http4k.core.HttpHandler
+import java.net.URLEncoder
+import java.util.concurrent.ConcurrentHashMap
+
+/**
+ * A service that only publishes OpenAPI, presented to HEART clients as a
+ * HEART server (spec/PLAN-OPENAPI-GATEWAY.md). Each collection in [spec]
+ * becomes a resource type whose relations are named in one profile,
+ * [profile], after the operations' ids; heart-http4k serves them. What each
+ * state allows comes from the upstream itself, by its affordance link.
+ */
+class Gateway(
+    spec: GatewaySpec,
+    upstream: HttpHandler,
+    profile: String,
+    auth: UpstreamAuth = UpstreamAuth.None,
+    private val mapper: ObjectMapper = HeartSettings.defaultMapper(),
+) {
+    private val calls = Upstream(upstream, auth, mapper)
+    private val links = AffordanceLinks(calls)
+    private val vocabulary = Profile(profile, spec.title, spec.doc, relations(spec))
+
+    /** One resource type per upstream collection. */
+    val resources: List<HeartResource<*, *>> =
+        spec.types.map { GatewayResource(it, vocabulary, calls, links, mapper).resource }
+
+    /** The gateway as one HTTP handler, admitting the callers [credentials] admits. */
+    fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler =
+        HeartHttp(resources, credentials, settings)
+
+    private companion object {
+        /** Every operation's relation, named after its id: `switchOff` is `switch-off`. */
+        fun relations(spec: GatewaySpec): List<Relation> = spec.types.flatMap { type ->
+            (type.acts + type.bookmarkActs).map { relation(it.operation, AlpsType.UNSAFE) } +
+                listOfNotNull(type.search?.operation, type.read).map { relation(it, AlpsType.SAFE) }
+        }.distinctBy { it.id }
+
+        fun relation(operation: SpecOperation, type: AlpsType) =
+            Relation(relationOf(operation.name), type, operation.title, operation.doc, operation.doc)
+    }
+}
+
+/** A relation's id from an operation's: `switchOff` is `switch-off`. */
+internal fun relationOf(operationId: String): String =
+    operationId.replace(Regex("([a-z0-9])([A-Z])"), "$1-$2").lowercase()
+
+/** A member of an upstream collection as last read: its id, its plain JSON, and the acts it allows now, as its key. */
+data class UpstreamState(val id: Long, val json: JsonNode, val key: String)
+
+/**
+ * One upstream collection as a HEART resource type. Its offers are open: a
+ * key is the set of acts the upstream allows a member now, met at run time.
+ * An act is checked, then acted: the member is read again just before the
+ * act, and if it is no longer the state the client's validator matched, the
+ * act is stale. Without the upstream's own If-Match, a write that lands in
+ * between can't be caught; that is the weaker guarantee the plan names.
+ */
+internal class GatewayResource(
+    private val spec: SpecType,
+    profile: Profile,
+    private val calls: Upstream,
+    private val links: AffordanceLinks,
+    private val mapper: ObjectMapper,
+) {
+    private val acts = spec.acts.map { Act(it.operation.name, relationOf(it.operation.name), it.schema, it.path) }
+    private val bookmarkActs =
+        spec.bookmarkActs.map { Act(it.operation.name, relationOf(it.operation.name), it.schema, it.path) }
+
+    /** Why the acts a key leaves out are absent, as the upstream said the first time it sent that key. */
+    private val reasons = ConcurrentHashMap<String, Map<String, String>>()
+
+    private val type = ResourceType<UpstreamState, String>(
+        collection = spec.collection,
+        profile = profile,
+        acts = acts,
+        offers = Offers<String>(
+            keys = emptyList(),
+            offered = { key -> key.split(',').filter { it.isNotEmpty() } },
+            whyAbsent = { key, act -> reasons[key]?.get(relationOf(act)) ?: NOT_NOW },
+            open = true,
+        ),
+        state = StateView(
+            keyOf = { it.key },
+            idOf = { it.id },
+            // The ETag also names the representation's digest, so the body itself tells states apart.
+            versionOf = { 0 },
+            bodyOf = { mapper.convertValue(it.json, BODY) },
+        ),
+        finding = spec.search?.let { search ->
+            Finding(
+                noun = spec.noun,
+                search = Named(search.operation.name, relationOf(search.operation.name)),
+                lookup = Named(spec.read.name, relationOf(spec.read.name)),
+                nameDescription = search.nameDescription,
+                idTitle = "${spec.noun.replaceFirstChar { it.uppercase() }} id",
+                idDescription = search.idDescription,
+            )
+        },
+        bookmarkActs = bookmarkActs,
+    )
+
+    val resource: HeartResource<UpstreamState, String> = HeartResource(
+        layers = Layers(type),
+        load = { id -> state(calls.get("/${spec.collection}/$id")) },
+        perform = { checked, name, input ->
+            if (calls.get("/${spec.collection}/${checked.id}").body != checked.json) {
+                throw ConcurrentWriteException("${spec.noun} ${checked.id} changed upstream since it was checked")
+            }
+            val path = acts.first { it.name == name }.path
+            Acted(state(calls.post("/${spec.collection}/${checked.id}/actions/$path", input.json.toString())))
+        },
+        find = if (spec.search == null) null else { name, id -> find(name, id) },
+        performAtBookmark = if (bookmarkActs.isEmpty()) null else { name, input ->
+            val path = bookmarkActs.first { it.name == name }.path
+            Acted(state(calls.post("/actions/$path", input.json.toString())))
+        },
+    )
+
+    /** [answer] as a state, keyed by the acts its affordance link allows, in the order they are declared. */
+    private fun state(answer: Answer): UpstreamState {
+        val allowed = links.of(answer)
+        val key = acts.filter { it.path in allowed.paths }.joinToString(",") { it.name }
+        reasons.putIfAbsent(key, allowed.reasons)
+        return UpstreamState(answer.body.path("id").asLong(), answer.body, key)
+    }
+
+    /** Every match, a page at a time, as the upstream's plain search pages list them. */
+    private fun find(name: String?, id: Long?): List<Found> {
+        val query = listOfNotNull(
+            name?.let { "name=" + URLEncoder.encode(it, Charsets.UTF_8) },
+            id?.let { "id=$it" },
+        )
+        val found = mutableListOf<Found>()
+        var page = 1
+        do {
+            val answer = calls.get("/${spec.collection}?" + (query + "page=$page").joinToString("&")).body
+            val items = answer.path("items").map { Found(it.path("id").asLong(), it.path("title").asText()) }
+            found += items
+            page++
+        } while (items.isNotEmpty() && found.size < answer.path("count").asInt())
+        return found
+    }
+
+    private companion object {
+        const val NOT_NOW = "The upstream doesn't allow it in the resource's current state."
+        val BODY = object : TypeReference<Map<String, Any?>>() {}
+    }
+}

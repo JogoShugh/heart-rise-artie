@@ -1,0 +1,102 @@
+package com.artie.heart.gateway
+
+import io.swagger.v3.core.util.Json
+import io.swagger.v3.core.util.Json31
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.Operation
+import io.swagger.v3.oas.models.SpecVersion
+import io.swagger.v3.parser.OpenAPIV3Parser
+import io.swagger.v3.parser.core.models.ParseOptions
+
+/** An operation as the gateway uses it: its name (the operationId), title and doc. */
+class SpecOperation(val name: String, val title: String, val doc: String)
+
+/** An act: its operation, its segment under `/actions/`, and its body's JSON Schema, every `$ref` resolved. */
+class SpecAct(val operation: SpecOperation, val path: String, val schema: String)
+
+/** A search: its operation, and what its `name` and `id` parameters are. */
+class SpecSearch(val operation: SpecOperation, val nameDescription: String, val idDescription: String)
+
+/** One collection the upstream serves, with what can be done to its members and at the bookmark. */
+class SpecType(
+    val collection: String,
+    val noun: String,
+    val read: SpecOperation,
+    val search: SpecSearch?,
+    val acts: List<SpecAct>,
+    val bookmarkActs: List<SpecAct>,
+)
+
+/**
+ * The upstream's OpenAPI 3.x description, read by the conventions every
+ * HEART binding's twin follows: `/{collection}/{id}` reads a member,
+ * `/{collection}` searches, `/{collection}/{id}/actions/{path}` acts on a
+ * member and `/actions/{path}` acts at the bookmark, tagged with its
+ * collection. Deprecated operations are left out: they are former paths.
+ */
+class GatewaySpec(text: String) {
+    private val api: OpenAPI = OpenAPIV3Parser()
+        .readContents(text, null, ParseOptions().apply { isResolve = true; isResolveFully = true })
+        .let { read -> checkNotNull(read.openAPI) { "the upstream's description is unreadable: ${read.messages}" } }
+
+    val title: String = api.info?.title ?: "Upstream"
+    val doc: String = api.info?.description ?: title
+
+    /** Each (path, method, operation) the gateway can use. */
+    private val operations = api.paths.orEmpty().flatMap { (path, item) ->
+        listOfNotNull(item.get?.let { Triple(path, "GET", it) }, item.post?.let { Triple(path, "POST", it) })
+    }.filter { (_, _, operation) -> operation.deprecated != true }
+
+    val types: List<SpecType> = operations.mapNotNull { (path, method, _) ->
+        READ.matchEntire(path)?.groupValues?.get(1)?.takeIf { method == "GET" }
+    }.distinct().map { type(it) }
+
+    private fun type(collection: String): SpecType {
+        val read = operation(single("GET", "/$collection/{id}") ?: error("no read of /$collection/{id}"))
+        val search = single("GET", "/$collection")?.let { found ->
+            val parameters = found.parameters.orEmpty().associateBy { it.name }
+            SpecSearch(
+                operation(found),
+                parameters["name"]?.description ?: "Part of the name",
+                parameters["id"]?.description ?: "The id",
+            )
+        }
+        val acts = operations.mapNotNull { (path, method, operation) ->
+            ACT.matchEntire(path)?.takeIf { method == "POST" && it.groupValues[1] == collection }
+                ?.let { act(operation, it.groupValues[2]) }
+        }
+        val bookmarkActs = operations.mapNotNull { (path, method, operation) ->
+            val tag = operation.tags.orEmpty().firstOrNull()
+            BOOKMARK_ACT.matchEntire(path)?.takeIf { method == "POST" && tag == collection }
+                ?.let { act(operation, it.groupValues[1]) }
+        }
+        val noun = read.name.removePrefix("get").replaceFirstChar { it.lowercase() }.ifEmpty { collection }
+        return SpecType(collection, noun, read, search, acts, bookmarkActs)
+    }
+
+    /** The one operation of [method] at [path], whatever its id parameter is named. */
+    private fun single(method: String, path: String): Operation? = operations.firstOrNull { (at, m, _) ->
+        m == method && at.replace(PARAMETER, "{id}") == path
+    }?.third
+
+    private fun act(operation: Operation, path: String): SpecAct {
+        val schema = operation.requestBody?.content?.get(JSON)?.schema
+        val mapper = if (api.specVersion == SpecVersion.V31) Json31.mapper() else Json.mapper()
+        return SpecAct(operation(operation), path, schema?.let { mapper.writeValueAsString(it) } ?: "{}")
+    }
+
+    private fun operation(operation: Operation): SpecOperation {
+        val name = checkNotNull(operation.operationId) { "an operation has no operationId: ${operation.summary}" }
+        // The first paragraph is what the act does; the rest, such as when it is allowed, the gateway learns per state.
+        val doc = operation.description?.substringBefore("\n\n")?.trim()?.ifEmpty { null }
+        return SpecOperation(name, operation.summary ?: name, doc ?: operation.summary ?: name)
+    }
+
+    private companion object {
+        const val JSON = "application/json"
+        val PARAMETER = Regex("\\{[^}/]+}")
+        val READ = Regex("^/([^/{}]+)/\\{[^}/]+}$")
+        val ACT = Regex("^/([^/{}]+)/\\{[^}/]+}/actions/([^/{}]+)$")
+        val BOOKMARK_ACT = Regex("^/actions/([^/{}]+)$")
+    }
+}
