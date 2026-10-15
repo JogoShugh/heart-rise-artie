@@ -4,7 +4,9 @@ import com.artie.gardenbed.declaration.GardenBeds
 import com.artie.gardenbed.declaration.GardenChange
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
+import com.artie.heart.HeartResource
 import com.artie.heart.Layers
+import com.artie.heart.OpenApiDocument
 import com.artie.heart.Rung
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -19,6 +21,7 @@ class WednesdaySteps {
     private var layers: Layers<GardenBedState, GardenBedStatus>? = null
     private var failure: Throwable? = null
     private lateinit var bed: JsonNode
+    private lateinit var description: JsonNode
 
     // Cucumber matches the step's text, not its keyword: this one serves Given and When.
     @Given("the garden is declared with the change {string}")
@@ -64,6 +67,51 @@ class WednesdaySteps {
         assertEquals(values.split(",").map { it.trim() }, property.path("enum").map { it.asText() })
         assertEquals(example, property.path("examples").first().asText())
     }
+
+    @Then("its state has the members {string}")
+    fun members(names: String) {
+        val members = bed.fieldNames().asSequence().toList()
+        names.split(",").map { it.trim() }.forEach { assertTrue(it in members, "state members: $members") }
+    }
+
+    @Then("the water form's {string} is one of {string}, defaulting to {string}")
+    fun defaulting(field: String, values: String, default: String) {
+        val property = form().path("schema").path("properties").path(field)
+        assertEquals(values.split(",").map { it.trim() }, property.path("enum").map { it.asText() })
+        assertEquals(default, property.path("default").asText())
+    }
+
+    @When("the garden's OpenAPI description is rendered")
+    fun describe() {
+        // Only the description is read here, so the resource never loads or performs anything.
+        val resource = HeartResource(
+            checkNotNull(layers),
+            load = { error("not loaded") },
+            perform = { _, _, _ -> error("not performed") },
+            performAtBookmark = { _, _ -> error("not performed") },
+        )
+        description = ObjectMapper().readTree(OpenApiDocument(listOf(resource)).body)
+    }
+
+    @Then("its operation {string} is at {string}")
+    fun operationAt(operationId: String, path: String) = assertEquals(path, operationPath(operationId))
+
+    @Then("its operation {string} is at {string}, deprecated")
+    fun deprecatedAt(operationId: String, path: String) {
+        assertEquals(path, operationPath(operationId))
+        assertTrue(description.path("paths").path(path).path("post").path("deprecated").asBoolean())
+    }
+
+    @Then("the bed's member {string} is deprecated, and {string} is not")
+    fun deprecatedMember(old: String, new: String) {
+        val properties = description.path("components").path("schemas").path("Bed").path("properties")
+        assertTrue(properties.path(old).path("deprecated").asBoolean(), "$old: ${properties.path(old)}")
+        assertTrue(properties.has(new) && !properties.path(new).has("deprecated"), "$new: ${properties.path(new)}")
+    }
+
+    private fun operationPath(operationId: String): String? =
+        description.path("paths").fields().asSequence()
+            .firstOrNull { (_, item) -> item.path("post").path("operationId").asText() == operationId }?.key
 
     @Then("the declaration fails with {string}")
     fun fails(text: String) {

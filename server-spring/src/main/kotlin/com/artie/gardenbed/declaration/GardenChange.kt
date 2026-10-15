@@ -26,6 +26,17 @@ enum class GardenChange(val property: String) {
 
     /** Watering also requires a method, drip or spray. */
     NEW_REQUIRED_INPUT("new-required-input"),
+
+    // The careful changes: three of the above, made the way a careful OpenAPI team would make them.
+
+    /** The water act moves to `/actions/water`, and `/actions/water-cell` keeps working, deprecated. */
+    MOVE_URL_KEPT("move-url-kept"),
+
+    /** The state gains `soilMoisture`, and keeps `moistureLevel` beside it, deprecated. */
+    RENAME_FIELD_KEPT("rename-field-kept"),
+
+    /** Watering takes a method, drip or spray, which is optional and defaults to drip. */
+    NEW_OPTIONAL_INPUT("new-optional-input"),
     ;
 
     /** The garden's vocabulary as this change leaves it: the water relation renamed, or retitled. */

@@ -1,10 +1,12 @@
 package com.artie.gardenbed.declaration
 
 import com.artie.gardenbed.declaration.dto.Bed
+import com.artie.gardenbed.declaration.dto.BedWithBothMoistures
 import com.artie.gardenbed.declaration.dto.BedWithSoilMoisture
 import com.artie.gardenbed.declaration.dto.BuildBedRequest
 import com.artie.gardenbed.declaration.dto.WaterCellLimitedRequest
 import com.artie.gardenbed.declaration.dto.WaterCellMethodRequest
+import com.artie.gardenbed.declaration.dto.WaterCellOptionalMethodRequest
 import com.artie.gardenbed.declaration.dto.HarvestRequest
 import com.artie.gardenbed.declaration.dto.SowSeedRequest
 import com.artie.gardenbed.declaration.dto.ThawRequest
@@ -73,10 +75,13 @@ object GardenBeds {
                     "status" to it.status.name,
                     "cropName" to it.cropName,
                     "growthPoints" to it.growthPoints,
-                    (if (change == GardenChange.RENAME_FIELD) "soilMoisture" else "moistureLevel") to it.moistureLevel,
-                )
+                ) + moisture(change, it.moistureLevel)
             },
-            bodyClass = if (change == GardenChange.RENAME_FIELD) BedWithSoilMoisture::class.java else Bed::class.java,
+            bodyClass = when (change) {
+                GardenChange.RENAME_FIELD -> BedWithSoilMoisture::class.java
+                GardenChange.RENAME_FIELD_KEPT -> BedWithBothMoistures::class.java
+                else -> Bed::class.java
+            },
             keyField = "status",
         ),
     )
@@ -90,8 +95,17 @@ object GardenBeds {
         input = when (change) {
             GardenChange.TIGHTER_LIMIT -> WaterCellLimitedRequest::class.java
             GardenChange.NEW_REQUIRED_INPUT -> WaterCellMethodRequest::class.java
+            GardenChange.NEW_OPTIONAL_INPUT -> WaterCellOptionalMethodRequest::class.java
             else -> WaterCellRequest::class.java
         },
-        path = if (change == GardenChange.MOVE_URL) "water" else "water-cell",
+        path = if (change == GardenChange.MOVE_URL || change == GardenChange.MOVE_URL_KEPT) "water" else "water-cell",
+        formerPaths = if (change == GardenChange.MOVE_URL_KEPT) listOf("water-cell") else emptyList(),
     )
+
+    /** The moisture member as Monday names it, renamed, or under both names while the old one is deprecated. */
+    private fun moisture(change: GardenChange?, level: Int): Map<String, Any?> = when (change) {
+        GardenChange.RENAME_FIELD -> linkedMapOf("soilMoisture" to level)
+        GardenChange.RENAME_FIELD_KEPT -> linkedMapOf("soilMoisture" to level, "moistureLevel" to level)
+        else -> linkedMapOf("moistureLevel" to level)
+    }
 }

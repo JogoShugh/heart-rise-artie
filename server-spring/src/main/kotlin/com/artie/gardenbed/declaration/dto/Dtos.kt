@@ -66,6 +66,20 @@ data class WaterCellMethodRequest(
     val method: WaterMethod? = null,
 )
 
+/** Wednesday, new-optional-input: watering takes a method, which is optional and defaults to drip. */
+@Schema(title = "Water Cell")
+data class WaterCellOptionalMethodRequest(
+    @field:NotNull @field:Min(1) @field:Max(MONDAY_ML)
+    @field:Schema(
+        title = "Water per cell",
+        description = "Millilitres of water poured into each cell",
+        examples = ["250"],
+    )
+    val milliliters: Int = 0,
+    @field:Schema(title = "Method", description = "How the water reaches the soil", defaultValue = "drip")
+    val method: WaterMethod? = null,
+)
+
 @Schema(title = "Build Bed")
 data class BuildBedRequest(
     @field:NotBlank
@@ -135,6 +149,29 @@ data class BedWithSoilMoisture(
     val growthPoints: Int? = null,
     @field:NotNull @field:Schema(title = "Soil moisture", description = "How moist the soil is, to 100")
     val soilMoisture: Int? = null,
+)
+
+/** Wednesday, rename-field-kept: the state names its moisture both ways, and the old name is deprecated. */
+data class BedWithBothMoistures(
+    @field:NotNull @field:Schema(title = "Bed id", description = "The bed's number")
+    val id: Long? = null,
+    @field:NotNull @field:Schema(title = "Name", description = "What the bed is called")
+    val label: String? = null,
+    @field:NotNull @field:Schema(title = "Width", description = "How wide the bed is, in feet")
+    val widthFt: Int? = null,
+    @field:NotNull @field:Schema(title = "Length", description = "How long the bed is, in feet")
+    val lengthFt: Int? = null,
+    @field:NotNull @field:Schema(title = "Status", description = "What the bed holds now")
+    val status: String? = null,
+    @field:Schema(title = "Crop", description = "What is planted, if anything", nullable = true)
+    val cropName: String? = null,
+    @field:NotNull @field:Schema(title = "Growth", description = "How far the crop has grown, to 100")
+    val growthPoints: Int? = null,
+    @field:NotNull @field:Schema(title = "Soil moisture", description = "How moist the soil is, to 100")
+    val soilMoisture: Int? = null,
+    @field:NotNull
+    @field:Schema(title = "Moisture", description = "The same as soilMoisture, kept for old clients", deprecated = true)
+    val moistureLevel: Int? = null,
 )
 
 /** What the water act binds, under any change: the millilitres, and a method where one is required. */
