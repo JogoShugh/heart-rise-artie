@@ -20,6 +20,8 @@ dependencies {
     implementation("org.webjars:swagger-ui:5.17.14")
 
     testImplementation(testFixtures(project(":heart-core")))
+    // The HTTP binding features, written once in heart-tck and run here against the lamp.
+    testImplementation(project(":heart-tck"))
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation(platform("io.cucumber:cucumber-bom:7.18.0"))
@@ -27,8 +29,6 @@ dependencies {
     testImplementation("io.cucumber:cucumber-spring")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
     testImplementation("org.junit.platform:junit-platform-suite")
-    // A plain response is checked against the schema the OpenAPI description gives it.
-    testImplementation("com.networknt:json-schema-validator:1.5.9")
 }
 
 kotlin {

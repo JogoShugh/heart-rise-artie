@@ -1,10 +1,11 @@
-package com.artie.heart.spring.bdd
+package com.artie.heart.binding
 
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.WebTestClient
 
 /** The Swagger UI page at /docs, and the files it loads. */
@@ -33,13 +34,14 @@ class SwaggerUiSteps(client: WebTestClient, private val http: HttpWorld) {
     @Then("each answers 200")
     fun eachOk() {
         assertTrue(http.results.isNotEmpty())
-        http.results.forEach { assertEquals(200, it.status.value(), it.url.toString()) }
+        http.results.forEach { assertEquals(HttpStatus.OK, it.status, it.url.toString()) }
     }
 
     private fun files(page: String) = SRC.findAll(page).map { it.groupValues[1] }.toList()
 
     private companion object {
         val SRC = Regex("""(?:src|href)="([^"]+)"""")
-        const val BUNDLE_BYTES = 8 * 1024 * 1024
+        /** 8 MiB. */
+        const val BUNDLE_BYTES = 8_388_608
     }
 }

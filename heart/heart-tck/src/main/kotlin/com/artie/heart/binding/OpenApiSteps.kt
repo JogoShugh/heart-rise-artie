@@ -1,4 +1,4 @@
-package com.artie.heart.spring.bdd
+package com.artie.heart.binding
 
 import com.artie.heart.ContentAddress
 import com.fasterxml.jackson.databind.JsonNode

@@ -1,8 +1,8 @@
 Feature: A declared resource and its acts, served over HTTP
-  SPEC §6.1, §6.2, §6.4 and RFC 9110 §8.7. heart-spring serves Layer 1 of
-  every declared resource type at /{collection}/{id}, in either dialect, and
-  takes its acts at /{collection}/{id}/actions/{path}. The server supplies
-  only how a resource is read and what each act does.
+  SPEC §6.1, §6.2, §6.4 and RFC 9110 §8.7. The HTTP binding serves Layer 1
+  of every declared resource type at /{collection}/{id}, in either dialect,
+  and takes its acts at /{collection}/{id}/actions/{path}. The server
+  supplies only how a resource is read and what each act does.
 
   Background:
     Given lamp 7 is "ON" at version 3 in the lamp server

@@ -1,8 +1,8 @@
 Feature: Content-addressed resources and profiles, served over HTTP from a declaration
   SPEC §6.5, §6.12 and §8.5. A server that declares a resource type gets its
   affordance sets, schemas, absence explanations and ALPS profile served by
-  heart-spring, with no controller of its own. Each content-addressed body is
-  served as the exact bytes its address names, and never changes.
+  its HTTP binding, with no handler of its own. Each content-addressed body
+  is served as the exact bytes its address names, and never changes.
 
   Background:
     Given a server that declares only the lamp, with the profile "home"

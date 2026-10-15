@@ -1,9 +1,9 @@
 Feature: The OpenAPI 3.1 description, served and linked from the bookmark
-  heart-core renders the description (its openapi.feature); heart-spring
-  serves it at /openapi.json and links it from the bookmark under the
-  service-desc relation (RFC 8631), so a client that knows only / can find
-  it. It is the same bytes for every caller, so like the profiles and the
-  content-addressed layers it needs no credential.
+  heart-core renders the description (its openapi.feature); the HTTP
+  binding serves it at /openapi.json and links it from the bookmark under
+  the service-desc relation (RFC 8631), so a client that knows only / can
+  find it. It is the same bytes for every caller, so like the profiles and
+  the content-addressed layers it needs no credential.
 
   Background:
     Given lamp 7 is "ON" at version 3 in the lamp server

@@ -1,5 +1,5 @@
 Feature: The bookmark and the searches, served over HTTP from the declarations
-  SPEC §6.11 and §6.11.1. heart-spring serves the service index at / in
+  SPEC §6.11 and §6.11.1. The HTTP binding serves the service index at / in
   either dialect, or as JSON Home when Accept ranks it first, and each
   findable type's search at /{collection}. All are Layer 1: revalidated on
   every use.

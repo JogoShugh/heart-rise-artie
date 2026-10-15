@@ -2,7 +2,7 @@ Feature: A long search comes in pages, linked by next, prev, first and last
   SPEC §6.11. heart-core renders each page's links (its index.feature);
   these scenarios follow them over HTTP. The client follows the links by
   relation and never builds the query that selects a page. A filter carries
-  over into every page link. heart.page-size sets the page length.
+  over into every page link. The server's page size sets the page length.
 
   Background:
     Given lamps 1 to 5 are "ON" in the lamp server

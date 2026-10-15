@@ -7,10 +7,13 @@ import org.junit.platform.suite.api.IncludeEngines
 import org.junit.platform.suite.api.SelectClasspathResource
 import org.junit.platform.suite.api.Suite
 
-/** Runs every scenario under src/test/resources/features. The bdd-gates log task reads its JUnit XML. */
+/**
+ * Runs heart-tck's HTTP binding features (classpath heart/binding) against the
+ * lamp served by heart-spring. The bdd-gates log task reads its JUnit XML.
+ */
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("features")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.spring.bdd")
+@SelectClasspathResource("heart/binding")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.artie.heart.binding,com.artie.heart.spring.bdd")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "summary")
 class RunCucumberTest

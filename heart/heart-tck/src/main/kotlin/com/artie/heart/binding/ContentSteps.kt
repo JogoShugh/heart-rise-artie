@@ -1,14 +1,15 @@
-package com.artie.heart.spring.bdd
+package com.artie.heart.binding
 
 import com.artie.heart.ContentAddress
-import com.artie.heart.Layers
 import com.artie.heart.HeartResource
+import com.artie.heart.Layers
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.EntityExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
 
@@ -47,7 +48,7 @@ class ContentSteps(
     fun eachAnswers(type: String) {
         check(results.isNotEmpty())
         results.forEach {
-            assertEquals(200, it.status.value(), it.url.toString())
+            assertEquals(HttpStatus.OK, it.status, it.url.toString())
             assertEquals(type, it.responseHeaders.contentType.toString())
         }
     }

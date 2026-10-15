@@ -1,8 +1,8 @@
 Feature: A resource's past, when it has one
   spec/PLAN-HEART-LIBRARY-DOMAINS-EVAL.md, step A5.8. A resource whose state
   is folded from events can also say what it was at any past instant, and
-  what happened to it, in order. heart-spring serves both for any declared
-  type that supplies them: the state as of an instant at
+  what happened to it, in order. The HTTP binding serves both for any
+  declared type that supplies them: the state as of an instant at
   /{collection}/{id}?asOf=, rendered exactly like the current state, and the
   events at /{collection}/{id}/history.
 

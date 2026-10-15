@@ -1,9 +1,9 @@
 Feature: Choosing the representation over HTTP: dialect, profile and rung
   SPEC §6.1, §6.4 and §6.11.1. heart-core decides from the header values
-  (its negotiation.feature); these scenarios check that heart-spring reads
-  them from the right HTTP headers and says what it chose: Content-Type,
-  Link rel="profile", Vary and Preference-Applied. heart.max-rung caps the
-  rungs a server serves.
+  (its negotiation.feature); these scenarios check that the HTTP binding
+  reads them from the right HTTP headers and says what it chose:
+  Content-Type, Link rel="profile", Vary and Preference-Applied. The
+  server's maximum rung caps the rungs it serves.
 
   Background:
     Given lamp 7 is "ON" at version 3 in the lamp server

@@ -4,7 +4,7 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
   client read with (Accept, Accept-Profile, Prefer), and its If-Match is
   compared, whole and strongly, with the ETag those headers select now.
   heart-core decides whether a validator matches (its negotiation.feature);
-  these scenarios check that heart-spring hands it the right one.
+  these scenarios check that the HTTP binding hands it the right one.
 
   Background:
     Given lamp 7 is "ON" at version 3 in the lamp server

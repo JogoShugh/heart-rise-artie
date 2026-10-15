@@ -1,132 +1,59 @@
 package com.artie.heart.spring.bdd
 
-import com.artie.heart.ActInput
-import com.artie.heart.ConcurrentWriteException
-import com.artie.heart.RuleRefusedException
-import com.artie.heart.Found
-import com.artie.heart.Layers
-import com.artie.heart.Listing
-import com.artie.heart.Past
-import com.artie.heart.PastEvent
-import com.artie.heart.ResourceNotFoundException
-import com.artie.heart.fixtures.Dim
-import com.artie.heart.fixtures.InstallLamp
-import com.artie.heart.fixtures.Lamp
-import com.artie.heart.fixtures.Lamps
-import com.artie.heart.Acted
-import com.artie.heart.spring.HeartAutoConfiguration
 import com.artie.heart.HeartResource
+import com.artie.heart.binding.CredentialReader
+import com.artie.heart.binding.HttpWorld
+import com.artie.heart.binding.LampServer
+import com.artie.heart.binding.LampStore
+import com.artie.heart.spring.HeartAutoConfiguration
+import com.artie.heart.spring.HeartCredentials
 import io.cucumber.spring.CucumberContextConfiguration
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.web.reactive.server.WebTestClientBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import java.time.Instant
-import java.util.concurrent.ConcurrentHashMap
-
-/** The lamps this test server holds. */
-class LampStore {
-    val lamps = ConcurrentHashMap<Long, Lamp>()
-
-    /** What happened to each lamp, for the lamps whose past a scenario sets up. */
-    val events = ConcurrentHashMap<Long, List<PastEvent>>()
-
-    /**
-     * Another client's write, staged by a scenario to land on a lamp just
-     * after the server next reads it: between an act's If-Match check and the act.
-     */
-    val writeAfterNextRead = ConcurrentHashMap<Long, (Lamp) -> Lamp>()
-
-    /** Lamp [id] as the server reads it; a staged write lands right after. */
-    fun read(id: Long): Lamp {
-        val lamp = lamps[id] ?: throw notFound(id)
-        writeAfterNextRead.remove(id)?.let { write -> lamps[id] = write(lamp) }
-        return lamp
-    }
-
-    /** A lamp as of [instant]: switched off at brightness 50 until its events say otherwise. */
-    fun at(id: Long, instant: Instant): Lamp =
-        events[id].orEmpty().filter { !it.occurredAt.isAfter(instant) }.fold(Lamp(id, "OFF", 50, 0)) { lamp, past ->
-            when (past.type) {
-                "SwitchedOn" -> lamp.copy(status = "ON")
-                else -> lamp.copy(brightness = (past.event as Map<*, *>)["brightness"] as Int)
-            }.copy(version = past.sequenceNo)
-        }
-}
+import org.springframework.http.HttpHeaders
 
 /**
- * A server that declares one resource type, the lamp, and nothing else: no
- * controllers of its own. It says only how a lamp is read and what each act does.
+ * The lamp server under heart-tck's binding features: a server that declares
+ * one resource type, the lamp, and a listing, and writes no controllers.
  */
 @SpringBootConfiguration
 @EnableAutoConfiguration
-class LampServer {
+class LampSpringServer {
     @Bean
     fun lampStore() = LampStore()
 
-    /** A listing for forms' choices (listings.feature): the colours of a tone. */
     @Bean
-    fun colours() = Listing("/colours", "colours") { query ->
-        listOf("amber" to "warm", "red" to "warm", "blue" to "cool")
-            .filter { (_, tone) -> query["tone"] == null || query["tone"] == tone }
-            .map { (name, tone) -> linkedMapOf("name" to name, "tone" to tone) }
-    }
+    fun lamps(store: LampStore): HeartResource<*, *> = LampServer.resource(store)
 
     @Bean
-    fun lamps(store: LampStore): HeartResource<*, *> = HeartResource(
-        layers = Layers(Lamps.type(Lamps.profile("home"))),
-        load = { id -> store.read(id) },
-        perform = { lamp, act, input ->
-            val next = when (act) {
-                "dim" -> lamp.copy(brightness = brightness(lamp, input))
-                "switchOff" -> lamp.copy(status = "OFF")
-                else -> lamp.copy(status = "ON")
-            }.let { it.copy(version = it.version + 1) }
-            // Recorded only if the lamp is still the one the client's ETag matched.
-            if (!store.lamps.replace(lamp.id, lamp, next)) {
-                throw ConcurrentWriteException("lamp ${lamp.id} was written first")
-            }
-            Acted(next)
-        },
-        past = Past(
-            at = { id, instant -> store.lamps[id]?.let { store.at(id, instant) } ?: throw notFound(id) },
-            history = { id -> store.lamps[id]?.let { store.events[id].orEmpty() } ?: throw notFound(id) },
-        ),
-        performAtBookmark = { _, input ->
-            val id = (store.lamps.keys.maxOrNull() ?: 0) + 1
-            val lamp = Lamp(id, "OFF", checkNotNull(input.bind(InstallLamp::class.java).brightness), version = 1)
-            store.lamps[id] = lamp
-            Acted(lamp)
-        },
-        find = { name, id ->
-            store.lamps.values.sortedBy { it.id }
-                .map { Found(it.id, "Lamp ${it.id}") }
-                .filter { name == null || it.title.contains(name, ignoreCase = true) }
-                .filter { id == null || it.id == id }
-        },
-    )
+    fun colours() = LampServer.colours()
+
+    @Bean
+    fun credentialReader() = CredentialReader { users, tokens -> HeartCredentials.parse(users, tokens)::admits }
 }
 
-private fun notFound(id: Long) = ResourceNotFoundException("no lamp $id")
-
-/** The brightness to dim [lamp] to. A rule only the lamp knows: not the brightness it already has. */
-private fun brightness(lamp: Lamp, input: ActInput): Int {
-    val brightness = checkNotNull(input.bind(Dim::class.java).brightness)
-    if (brightness == lamp.brightness) {
-        throw RuleRefusedException.at("/brightness", "The lamp is already at $brightness")
+/** Every scenario's client carries the lamp server's Bearer token, unless a step says otherwise. */
+@TestConfiguration
+class BearerByDefault {
+    @Bean
+    fun lampToken() = WebTestClientBuilderCustomizer {
+        it.defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer ${LampServer.LAMP_TOKEN}")
     }
-    return brightness
 }
 
 @CucumberContextConfiguration
 @WebFluxTest(
     properties = [
-        "heart.auth.basic.users=${TestCredentials.USERS}",
-        "heart.auth.bearer.tokens=${TestCredentials.TOKENS}",
+        "heart.auth.basic.users=${LampServer.USERS}",
+        "heart.auth.bearer.tokens=${LampServer.TOKENS}",
         // The lamp server links each plain answer to its state's affordance set (plain-json.feature).
         "heart.affordance-links=true",
     ],
 )
-@Import(LampServer::class, HeartAutoConfiguration::class, HttpWorld::class, TestCredentials::class)
+@Import(LampSpringServer::class, HeartAutoConfiguration::class, HttpWorld::class, BearerByDefault::class)
 class CucumberSpringConfig
