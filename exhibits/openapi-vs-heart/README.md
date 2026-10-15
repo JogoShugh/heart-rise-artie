@@ -159,3 +159,65 @@ four steps.
 
 Run it again with `exhibits/openapi-vs-heart/run-matrix.sh`. It needs Docker,
 Node 20 and a JDK 22 or later for the ARTIE dashboard.
+
+## Six more kinds of change
+
+The frost adds a state and an act, which suits HEART best. A real API also
+moves URLs, renames things, tightens limits and asks for new input. So the
+garden has a Wednesday release in six variants, each one change from Monday,
+chosen with `GARDEN_CHANGE` (`garden.change`): `move-url`, `rename-field`,
+`rename-act`, `retitle`, `tighter-limit` and `new-required-input`.
+
+Four clients, none changed since Monday, try to water bed 2 with about 250 ml:
+
+- the bespoke dashboard 1.0;
+- the ARTIE dashboard, driven as a person would drive it
+  (`changes/drive.mjs`): find the button whose title is about watering
+  (`/water|irrigat/i`, the same rule for both dashboards), keep what the form
+  shows, and press it;
+- an ARTIE script that names the act `garden:water-cell` and its field
+  `milliliters` (`artie-dashboard/src/main/kotlin/ArtieScript.kt`);
+- Claude, through the ARTIE dashboard's Ask, one run per variant.
+
+The score is the garden's own history: did bed 2 get a new `CellWatered`
+event? Run it with `run-changes.sh`; raw attempts are in
+`results/changes/attempts.jsonl`, screenshots in `results/screenshots/changes/`.
+
+| Change | Bespoke 1.0 | ARTIE dashboard | ARTIE script | Claude |
+|---|---|---|---|---|
+| `move-url` | 404 | watered | watered | watered |
+| `rename-field` | watered, moisture shows `undefined` | watered | watered | watered |
+| `rename-act` | watered | watered | "No affordance 'garden:water-cell'" | watered, chose `garden:irrigate` |
+| `retitle` | watered | watered | watered | watered |
+| `tighter-limit` | watered at 250 ml, 422 at 800 ml | watered | watered | watered |
+| `new-required-input` | 422 | watered, with the form's `drip` | 422, `method` missing | asked "drip or spray?", sent nothing |
+| **Watered, of 6** | 4 | 6 | 4 | 5 |
+
+Late binding protects a client exactly as far as the client binds late. The
+ARTIE dashboard binds nothing about the garden, and watered under all six. The
+ARTIE script uses the same library, but its author wrote the relation and the
+field into code, and it broke on exactly the two changes to those names. The
+bespoke dashboard ignores relations and titles, so it shrugged off
+`rename-act` and `retitle`, but it hard-codes the URL, the member names and
+the request body.
+
+Rework after each failure:
+
+- **Bespoke, `move-url`:** regenerate; `tsc` reports 0 errors; rebuild and
+  release.
+- **Bespoke, `rename-field`:** regenerate; 1 error, `Property 'moistureLevel'
+  does not exist on type 'Bed'`; rename it in the card.
+- **Bespoke, `tighter-limit` and `new-required-input`:** regenerate; 1 error
+  each, about the request type's name, not about the limit or the new field.
+  The name changed only because each variant is a separate class; a server
+  that kept it would give no compiler error. Then edit the field's `max`, or
+  add a method field.
+- **ARTIE script:** one line each: `"garden:irrigate"`, or
+  `put("method", "drip")`, a choice its author now has to make.
+
+The first run of these variants found a HEART bug: the Layer 1 `ETag`
+(`"seq-3.hsf.L2"`) named only the state, so after `move-url` the ARTIE
+dashboard revalidated with `304`, reused its stored form, and posted to the
+old target. Each `ETag` now ends with a digest of the representation
+(`"seq-3.hsf.L2.e8e98768123683fa"`); the table above is from the run after
+the fix.
