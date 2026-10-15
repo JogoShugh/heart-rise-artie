@@ -236,3 +236,41 @@ dashboard revalidated with `304`, reused its stored form, and posted to the
 old target. Each `ETag` now ends with a digest of the representation
 (`"seq-3.hsf.L2.e8e98768123683fa"`); the table above is from the run after
 the fix.
+
+## OpenAPI at its best
+
+The bespoke dashboard is OpenAPI as most teams use it: generated once, then
+frozen. Two additions show OpenAPI at its strongest, and the typical client
+stays as it is.
+
+- **A client that reads the spec while it runs** (`openapi-live/`, port 3004).
+  No generated code: on every render it fetches `/openapi.json` (revalidated
+  by ETag) and builds the bed's members, a button per non-deprecated operation
+  under the bed, and each button's fields (defaults, examples, limits) from
+  it. It binds the garden's URL, the spec's URL and the operation `getBed`.
+- **Careful changes** (`garden.change`): `move-url-kept`, `rename-field-kept`
+  and `new-optional-input`, the three breaking Wednesday changes made the way a
+  careful OpenAPI team would make them. One declaration serves both HEART and
+  OpenAPI, so HEART gained an act's former paths to keep the same rules.
+
+| Test | Bespoke 1.0 | Spec-reading | ARTIE dashboard |
+|---|---|---|---|
+| Six Wednesday changes, bed 2 watered | 4 of 6 | 6 of 6 | 6 of 6 |
+| Frost suite, Monday | 3 of 3 | 0 of 3 | 3 of 3 |
+| Frost suite, Tuesday morning | 3 of 7 | 1 of 7 | 7 of 7 |
+
+The spec-reading client copes with every change to the API's shape. It fails
+on state: the spec says which acts are allowed only in prose, so it shows
+every act in every state, fails each "shows exactly these buttons" check, and
+offers Water on a frozen bed (409).
+
+Under the careful changes, all five clients (bespoke, spec-reading, ARTIE
+dashboard, Claude, control script) watered bed 2 under all three. The cost
+moves to the server team, which keeps an old path, an old field and a
+default until every old client has moved.
+
+Run them with `LIVE_ONLY=1 ./run-matrix.sh`, `RUN=changes-best CLIENTS=live
+./run-changes.sh`, and `RUN=changes-careful CHANGES="move-url-kept
+rename-field-kept new-optional-input" ./run-changes.sh`. Results are in
+`results/changes-best/`, `results/changes-careful/` and
+`results/*--live-1.0.*`; screenshots in `results/screenshots/best/`.

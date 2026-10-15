@@ -350,6 +350,66 @@ but required in type 'Record&lt;BedStatusEnum, string&gt;'.</pre>
     <p>A strong validator must change whenever the bytes do (RFC 9110 §8.8.1). Each <code>ETag</code> now ends with a digest of the representation: <code>"seq-3.hsf.L2.e8e98768123683fa"</code>. The results above come from the run after that fix. The first run's dashboard and Claude results were void and are not used.</p>
   </section>
 
+  <section class="wide">
+    <h2>OpenAPI at its best</h2>
+    <p>The bespoke dashboard is OpenAPI as most teams use it: a client generated once, then frozen. A fair critic would say that's OpenAPI at its weakest. So the exhibit adds OpenAPI at its strongest, in two ways, and keeps the typical client as it is.</p>
+    <ul>
+      <li><b>A client that reads the spec while it runs</b> (<code>openapi-live/</code>). It has no generated code. On every render it fetches <code>/openapi.json</code>, revalidated by its <code>ETag</code>, and builds the page from it: the bed's members and their titles, a button for every operation under the bed that isn't deprecated, and each button's fields from the request schema, with defaults, examples and limits. Its "bookmark" is the garden's URL, the spec's URL, and the operation <code>getBed</code>.</li>
+      <li><b>Changes made the way a careful OpenAPI team would make them.</b> Keep the old path working and mark it deprecated, keep the old field beside the new one, and make new input optional with a default. HEART is held to the same rules, because one declaration serves both, so HEART gained an act's former paths for this.</li>
+    </ul>
+
+    <h3>The spec-reading client, against the same changes</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Test</th><th scope="col">Bespoke 1.0</th><th scope="col">Spec-reading client</th><th scope="col">ARTIE dashboard</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">The six Wednesday changes: bed 2 watered</th><td>4 of 6</td><td class="pass">6 of 6</td><td class="pass">6 of 6</td></tr>
+          <tr><th scope="row">Frost suite, Monday</th><td class="pass">3 of 3</td><td class="fail">0 of 3</td><td class="pass">3 of 3</td></tr>
+          <tr><th scope="row">Frost suite, Tuesday morning</th><td class="fail">3 of 7</td><td class="fail">1 of 7</td><td class="pass">7 of 7</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Against changes to the API's <em>shape</em>, the spec-reading client did as well as the ARTIE dashboard:</p>
+    <ul>
+      <li>it read the moved path;</li>
+      <li>it showed the renamed field under its title;</li>
+      <li>the renamed HEART relation never reached it, since the OpenAPI operation keeps its name;</li>
+      <li>it showed the new title and the new limit;</li>
+      <li>it offered drip or spray, preset to the spec's example <code>drip</code>.</li>
+    </ul>
+    <p>Against the bed's <em>state</em>, it failed. The spec says which acts are allowed only in prose ("Only allowed when status is PLANTED."), so the client shows every act in every state. That's why it fails every "shows exactly these buttons" check, Monday's included. On Tuesday it showed a frozen bed's status correctly, and still offered Water, Sow and Harvest beside Thaw. Pressing Water got a 409.</p>
+    <div class="shots">
+      <figure><img src="shots/best/tuesday-live.png" alt="The spec-reading dashboard on Tuesday: bed 2 FROZEN, with Harvest, Sow, Thaw and Water buttons" width="820" height="620"><figcaption><b>Spec-reading client, Tuesday.</b> FROZEN, and every act the spec lists.</figcaption></figure>
+      <figure><img src="shots/best/tuesday-live-water.png" alt="The spec-reading dashboard after pressing Water on the frozen bed: the garden refused it with 409" width="820" height="620"><figcaption><b>After pressing Water.</b> 409, in the garden's words.</figcaption></figure>
+    </div>
+    <p class="note">My plan predicted 5 of 6 for this client, but its own list of expected passes left out <code>rename-act</code>, which can't affect an OpenAPI client at all. That was a miscount, not a surprise: a client that reads the spec as it runs should absorb all six.</p>
+
+    <h3>The careful changes, on every client</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Careful change</th><th scope="col">Bespoke 1.0</th><th scope="col">Spec-reading</th><th scope="col">ARTIE dashboard</th><th scope="col">Claude</th><th scope="col">Control script</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>move-url-kept</code><br><span class="quiet">new path, old one kept, deprecated</span></th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+          <tr><th scope="row"><code>rename-field-kept</code><br><span class="quiet">new field, old one kept, deprecated</span></th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+          <tr><th scope="row"><code>new-optional-input</code><br><span class="quiet"><code>method</code> optional, default drip</span></th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>With careful changes, every client keeps working, the generated one and the control script included. The differences are in what each shows and what the care costs:</p>
+    <ul>
+      <li>The bespoke dashboard still reads the old field, so it shows Moisture correctly. The spec-reading client hides the deprecated field and shows "Soil moisture". The ARTIE dashboard shows both, because a HEART representation doesn't yet mark a state member deprecated.</li>
+      <li>The server team pays for it: an old path, an old field and a default, kept until every old client has moved. A team doesn't know when that is.</li>
+      <li>Regenerating the bespoke client gave one <code>tsc</code> error under <code>new-optional-input</code>. As before, that came from the request type's name changing, which is how these variants are built, not from the change itself.</li>
+    </ul>
+    <div class="shots">
+      <figure><img src="shots/best/rename-field-kept-live.png" alt="The spec-reading dashboard under rename-field-kept: Soil moisture 40, the deprecated field hidden" width="820" height="620"><figcaption><b>Spec-reading client.</b> The new field; the deprecated one hidden.</figcaption></figure>
+      <figure><img src="shots/best/rename-field-kept-artie.png" alt="The ARTIE dashboard under rename-field-kept: both Soil moisture and Moisture level shown" width="820" height="620"><figcaption><b>ARTIE.</b> Both members, since HEART's state carries no deprecation yet.</figcaption></figure>
+    </div>
+
+    <h3>What it shows</h3>
+    <p>At its best, an OpenAPI client copes with changes to an API's shape as well as a HEART client does, and careful evolution protects even a generated client. What no OpenAPI client can know is which acts this resource allows <em>now</em>, because the spec describes the API, not the resource's current state. That one gap is Fielding's rule 6, and it's exactly what HEART's per-state affordances fill.</p>
+  </section>
+
   <section>
     <h2>Fair to say</h2>
     <ul>
@@ -359,6 +419,7 @@ but required in type 'Record&lt;BedStatusEnum, string&gt;'.</pre>
       <li>The Claude results are one run per change, not a measured rate.</li>
       <li>Under <code>tighter-limit</code> and <code>new-required-input</code>, the garden's request schema got a new name, because each variant is a separate class. That name change is the one <code>tsc</code> error in each. A server that kept the schema's name would give the bespoke team no compiler error at all for those two changes, and they'd have only the regression suite.</li>
       <li>The control script is short on purpose. A script could look acts up by title, as the dashboard does, and then fail where the dashboard fails, which here is nowhere.</li>
+      <li>The spec-reading client binds three things: the garden's URL, the spec's URL and the operation <code>getBed</code>. It is about as long as the ARTIE dashboard, and it was written for this exhibit, not taken from a product.</li>
       <li>Matching the watering button by <code>/water|irrigat/i</code> is a choice, the same for both dashboards. A person who reads "Irrigate" as watering is assumed.</li>
     </ul>
   </section>
