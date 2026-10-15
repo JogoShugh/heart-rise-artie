@@ -2,10 +2,12 @@ package com.artie.heart.bdd
 
 import com.artie.heart.ActPipeline
 import com.artie.heart.ContentAddress
+import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.Rung
+import com.artie.heart.StateETag
 import com.artie.heart.UnprocessableContentException
 import com.artie.heart.fixtures.Match
 import com.artie.heart.fixtures.MatchPlayer
@@ -93,6 +95,12 @@ class OptionSteps {
     @Then("the template {string} property {string} has an options link {string}")
     fun optionsLink(template: String, property: String, href: String) =
         assertEquals(href, halFormsProperty(template, property).path("options").path("link").path("href").asText())
+
+    @Then("that HAL-FORMS representation has a validator, as every Layer 1 representation does")
+    fun validator() {
+        val etag = StateETag.of(1, Dialect.HALFORMS.etagTag, Rung.L0, layers.halForms(matches.first()))
+        assertTrue(etag.startsWith("\"seq-1.hf.L0."), etag)
+    }
 
     @When("the OpenAPI description of the matches is rendered")
     fun openApi() {

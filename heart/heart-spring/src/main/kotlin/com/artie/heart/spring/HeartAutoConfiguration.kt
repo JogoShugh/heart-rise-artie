@@ -1,9 +1,11 @@
 package com.artie.heart.spring
 
+import com.artie.heart.Listing
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.Rung
 import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -38,9 +40,15 @@ class HeartAutoConfiguration {
         index: HeartIndexHandler,
         openApi: OpenApiHandler,
         swaggerUi: SwaggerUiPage,
+        listings: ObjectProvider<Listing>,
     ): RouterFunction<ServerResponse> =
         coRouter {
             GET("/") { index.index(it) }
+            // Lists the domain declares for its forms' choices (HAL-SCHEMA-FORMS-HR Rule 8).
+            listings.orderedStream().forEach { listing ->
+                val handler = ListingHandler(listing)
+                GET(listing.path) { handler.serve(it) }
+            }
             GET(OpenApiDocument.PATH) { openApi.serve(it) }
             GET(SwaggerUiPage.PATH) { swaggerUi.serve(it) }
             POST("/actions/{path}") { handlers.actAtBookmark(it) }

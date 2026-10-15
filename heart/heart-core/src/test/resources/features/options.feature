@@ -73,6 +73,7 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
     When the match is rendered in HAL-FORMS
     Then the template "foul" property "playerNumber" has inline options "4 Ana, 5 Cy, 9 Dee"
     And the template "assignOfficial" property "official" has an options link "/officials?level=senior"
+    And that HAL-FORMS representation has a validator, as every Layer 1 representation does
 
   Scenario: The OpenAPI description carries the choices as an extension, and says them in prose
     When the OpenAPI description of the matches is rendered

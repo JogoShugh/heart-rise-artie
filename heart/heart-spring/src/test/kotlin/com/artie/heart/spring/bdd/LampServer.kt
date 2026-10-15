@@ -5,6 +5,7 @@ import com.artie.heart.ConcurrentWriteException
 import com.artie.heart.RuleRefusedException
 import com.artie.heart.Found
 import com.artie.heart.Layers
+import com.artie.heart.Listing
 import com.artie.heart.Past
 import com.artie.heart.PastEvent
 import com.artie.heart.ResourceNotFoundException
@@ -63,6 +64,14 @@ class LampStore {
 class LampServer {
     @Bean
     fun lampStore() = LampStore()
+
+    /** A listing for forms' choices (listings.feature): the colours of a tone. */
+    @Bean
+    fun colours() = Listing("/colours", "colours") { query ->
+        listOf("amber" to "warm", "red" to "warm", "blue" to "cool")
+            .filter { (_, tone) -> query["tone"] == null || query["tone"] == tone }
+            .map { (name, tone) -> linkedMapOf("name" to name, "tone" to tone) }
+    }
 
     @Bean
     fun lamps(store: LampStore): HeartResource<*, *> = HeartResource(

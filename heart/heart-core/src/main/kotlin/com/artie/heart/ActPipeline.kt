@@ -105,7 +105,8 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
     suspend fun <R> run(act: String, body: String?, state: S? = null, perform: suspend (ActInput) -> R): R {
         val declared = type.act(act)
         val input = ActInput(checks.getValue(declared.name).check(body), mapper)
-        if (declared.options.isNotEmpty()) checkChoices(declared, input.json, state)
+        // Choices come from the resource the earlier steps checked; with none, there is nothing to compute them from.
+        if (declared.options.isNotEmpty() && state != null) checkChoices(declared, input.json, state)
         return try {
             perform(input)
         } catch (e: ConcurrentWriteException) {
@@ -114,11 +115,10 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
     }
 
     /** Each sent value of a property with options is one of its choices now, or the act is refused at it. */
-    private fun checkChoices(act: Act, body: JsonNode, state: S?) {
-        val stateBody: JsonNode = state?.let { mapper.valueToTree(type.state.bodyOf(it)) } ?: mapper.createObjectNode()
+    private fun checkChoices(act: Act, body: JsonNode, state: S) {
+        val stateBody: JsonNode = mapper.valueToTree(type.state.bodyOf(state))
         val violations = act.options.mapNotNull { (property, options) ->
             val sent = body.get(property) ?: return@mapNotNull null
-            if (options is Options.FromState && state == null) return@mapNotNull null
             val allowed = options.choices(state, stateBody, body).map { it.value }.toSet()
             val values = if (sent.isArray) sent.toList() else listOf(sent)
             values.firstOrNull { it !in allowed }?.let { Violation("/$property", "$it is not one of the choices now") }

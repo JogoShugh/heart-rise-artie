@@ -199,7 +199,7 @@ sealed class Options(val pick: Pick) {
             choices.pick.maxItems?.let { put("maxItems", it) }
         }
 
-        private fun inline(choices: FromState, state: Any?, body: JsonNode, schema: JsonNode): List<Map<String, Any>> {
+        private fun inline(choices: FromState, state: Any?, body: JsonNode, schema: JsonNode): List<Map<String, Any?>> {
             val combinations = choices.variables.fold(listOf(emptyMap<String, JsonNode>())) { done, name ->
                 val values = schema.path("properties").path(name).path("enum").toList()
                 done.flatMap { fields -> values.map { fields + (name to it) } }
@@ -208,7 +208,10 @@ sealed class Options(val pick: Pick) {
                 val node = JsonNodeFactory.instance.objectNode()
                 fields.forEach { (name, value) -> node.set<JsonNode>(name, value) }
                 choices.choices(state, body, node)
-            }.distinctBy { it.value }.map { mapOf("prompt" to it.prompt, "value" to it.value) }
+            }.distinctBy { it.value }.map {
+                // Plain values, not JSON trees: the representation is canonicalized for its validator.
+                mapOf("prompt" to it.prompt, "value" to JsonTrees.plain(it.value.toString()))
+            }
         }
     }
 }
