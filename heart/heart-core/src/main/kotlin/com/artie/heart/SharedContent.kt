@@ -7,9 +7,28 @@ package com.artie.heart
  * address are refused when the server starts.
  */
 class SharedContent(layers: List<Layers<*, *>>) {
-    val affordanceSets: Map<String, String> = named(layers.flatMap { it.affordanceSets.values })
+    /** With open offers, a set first rendered after start is found in the type that rendered it. */
+    val affordanceSets: Map<String, String> =
+        Growing(named(layers.flatMap { it.affordanceSets.values })) { layers.map { it.affordanceSets } }
     val schemas: Map<String, String> = named(layers.flatMap { it.schemas.values })
-    val explanations: Map<String, String> = named(layers.flatMap { it.explanations.values })
+    val explanations: Map<String, String> =
+        Growing(named(layers.flatMap { it.explanations.values })) { layers.map { it.explanations } }
+
+    /**
+     * The bodies held at start, checked for clashes then, and any each type
+     * has held since. A type checks its own later bodies as it holds them.
+     */
+    private class Growing(
+        private val atStart: Map<String, String>,
+        private val now: () -> List<Map<String, String>>,
+    ) : AbstractMap<String, String>() {
+        override val entries: Set<Map.Entry<String, String>>
+            get() = (now().fold(emptyMap<String, String>()) { all, more -> all + more } + atStart).entries
+
+        override fun get(key: String): String? = atStart[key] ?: now().firstNotNullOfOrNull { it[key] }
+
+        override fun containsKey(key: String): Boolean = get(key) != null
+    }
 
     companion object {
         /**

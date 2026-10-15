@@ -108,11 +108,16 @@ data class Act(
  * [keys] lists every key, so every set is known in advance. [whyAbsent] says
  * why an act is absent under a key (SPEC §6.12): a function of the key and
  * the act alone, never of one resource.
+ *
+ * Offers that are [open] may meet keys beyond [keys] at run time, as a server
+ * that learns its acts from another API does: each new key's sets are
+ * rendered the first time a state with it is, and shared from then on.
  */
 class Offers<K>(
     val keys: List<K>,
     val offered: (K) -> List<String>,
     val whyAbsent: (K, String) -> String,
+    val open: Boolean = false,
 )
 
 /**
@@ -180,10 +185,13 @@ class ResourceType<S, K>(
         require(bookmarkActs.isEmpty() || finding != null) { "$collection has bookmark acts, so it is found too" }
         val twice = allActs.groupBy { it.name }.filterValues { it.size > 1 }.keys
         require(twice.isEmpty()) { "acts declared twice: $twice" }
-        offers.keys.forEach { key ->
-            val unknown = offers.offered(key) - acts.map { it.name }.toSet()
-            require(unknown.isEmpty()) { "key $key offers undeclared acts $unknown" }
-        }
+        offers.keys.forEach { checkKey(it) }
+    }
+
+    /** Refuses a [key] that offers an act this type doesn't declare: at start, or when an open key is first met. */
+    fun checkKey(key: K) {
+        val unknown = offers.offered(key) - acts.map { it.name }.toSet()
+        require(unknown.isEmpty()) { "key $key offers undeclared acts $unknown" }
     }
 
     /** Act [name], whoever offers it. */

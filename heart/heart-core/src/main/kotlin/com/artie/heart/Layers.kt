@@ -23,48 +23,23 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     /** Address -> canonical schema, for `/schemas/{address}`. */
     val schemas: Map<String, String> = SharedContent.named(schemaBodies.values)
 
-    private val explanationByKey: Map<K, String> = type.offers.keys.associateWith { key ->
-        val absent = type.acts.map { it.name } - type.offers.offered(key).toSet()
-        ContentAddress.canonical(
-            mapOf(
-                "unavailable" to absent.map { name ->
-                    val relation = type.act(name).relation
-                    mapOf(
-                        "rel" to type.profile.reference(relation),
-                        "title" to type.profile.relation(relation).title,
-                        "reason" to type.offers.whyAbsent(key, name),
-                    )
-                },
-            ),
-        )
-    }
+    /** Each offer key's sets and explanation: a declared key's from start, an open key's once met. */
+    private val content = OfferContent(type) { names, embedSchemas -> forms(names, embedSchemas) }
 
-    /** Address -> canonical explanation of the acts a key leaves out, for `/unavailable/{address}`. */
-    val explanations: Map<String, String> = SharedContent.named(explanationByKey.values)
+    /**
+     * Address -> canonical explanation of the acts a key leaves out, for
+     * `/unavailable/{address}`. With open offers it grows as keys are met.
+     */
+    val explanations: Map<String, String> get() = content.explanations
 
-    private val setByKey: Map<Pair<K, SetRendering>, String> =
-        type.offers.keys.flatMap { key -> SetRendering.entries.map { key to it } }.associateWith { (key, rendering) ->
-            // The set declares the CURIEs its keys use (HAL-SCHEMA-FORMS-HR Rule 6), and
-            // links, with integrity, to why the other acts are absent (SPEC §6.12).
-            ContentAddress.canonical(
-                mapOf(
-                    "_links" to mapOf(
-                        "curies" to type.profile.curies + HR_CURIE,
-                        UNAVAILABLE_REL to explanationLink(key),
-                    ),
-                    "_forms" to forms(type.offers.offered(key), rendering == SetRendering.EMBEDDED_SCHEMAS),
-                ),
-            )
-        }
-
-    /** Address -> canonical affordance set, for `/affordance-sets/{address}`. */
-    val affordanceSets: Map<String, String> = SharedContent.named(setByKey.values)
+    /** Address -> canonical affordance set, for `/affordance-sets/{address}`. It grows as open keys are met. */
+    val affordanceSets: Map<String, String> get() = content.affordanceSets
 
     /** The acts [key] offers, by name, in order. */
-    fun offered(key: K): List<String> = type.offers.offered(key)
+    fun offered(key: K): List<String> = type.offers.offered(content.known(key))
 
     /** The canonical affordance set of [key] at [rendering]. */
-    fun affordanceSet(key: K, rendering: SetRendering): String = setByKey.getValue(key to rendering)
+    fun affordanceSet(key: K, rendering: SetRendering): String = content.affordanceSet(key, rendering)
 
     /**
      * Layer 1 of [state] at [rung]. L0, the default, collapses all three
@@ -192,14 +167,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         return (entry - TEMPLATE_POINTERS) + ("_links" to mapOf("target" to mapOf("href" to href)))
     }
 
-    private fun explanationLink(key: K): Map<String, Any> {
-        val json = explanationByKey.getValue(key)
-        return mapOf(
-            "href" to EXPLANATIONS + ContentAddress.address(json),
-            "type" to "application/json",
-            "integrity" to ContentAddress.integrity(json),
-        )
-    }
+    private fun explanationLink(key: K): Map<String, Any> = content.explanationLink(key)
 
     companion object {
         /** Where each kind of content-addressed resource is served; the address follows. */
@@ -211,7 +179,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         const val UNAVAILABLE_REL = "hr:unavailable"
         private const val TEMPLATE_POINTERS = "hr:templatePointers"
         private const val JSON_CONTENT = "application/json"
-        private val HR_CURIE: Map<String, Any> =
+        internal val HR_CURIE: Map<String, Any> =
             mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
     }
 }
