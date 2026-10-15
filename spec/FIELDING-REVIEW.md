@@ -8,6 +8,8 @@
 >
 > Re-checked again 12 October 2026 at commit `a7831ce`, after fixing what the Roy Bott review noticed: a CoAP request now carries its W3C trace context; a refusal's `detail` names the act by its relation and gives the domain's reason; the garden's bookmark offers an act that builds a new bed (201, `Location`); and the garden refuses water a bed cannot hold (422 `rule-refused`). Evidence: the garden suite (17 scenarios), the HEART conformance suite against the garden (18 of 18, none skipped), ARTIE's live suite (26 scenarios) and a fresh Buster campaign (125 mutations, 0 FAIL). No verdict changed.
 
+> Re-checked 15 October 2026, on the work since `a7831ce` (some of it not yet committed): `coaps` with pre-shared keys (Rule 1); HEART's identifiers moved to `https://w3id.org/heart-rise/`, each with a page; a Layer 1 `ETag` that changes whenever its representation's bytes do; an act's former paths; the OpenAPI twin's opt-in link to each state's affordance set; and **choices from state** (HAL-SCHEMA-FORMS-HR Rule 8): a property's choices taken from the resource itself or from another resource, enforced by the server and shown to a model as a closed set. Two verdicts moved. Rule 2 goes from ✅ to 🟡: on a closer reading, the way an act's `If-Match` is scoped stretches RFC 9110, and the section [Precondition scope, examined](#precondition-scope) says how far, what the alternatives cost, and the fix this review recommends. And the "interface in the form" reply is stronger: a form now says not only how to build the request but which values it may carry now.
+
 Each heading below is Fielding's own wording, from ["REST APIs must be hypertext-driven"](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven) and his replies in its comments. Under each is a short account of what the spec and today's code do about it, with the evidence. Where the work falls short, this review says so. Revised 8–9 October 2026: Rule 4 resolved, the entry point added, Rule 6 re-read in full, the `If-Match` narrowing removed, and rung discovery added (a JSON Home index and `Preference-Applied`). Revised 10 October 2026: forms named by typed relations described in an ALPS profile, refusals as RFC 9457 problem details, absent acts explained by the server, Layer 1 always read with `Cache-Control: no-cache`, act responses naming their resource in `Content-Location`, and ARTIE checked by an adversarial proxy, Buster. The spec now has a protocol-neutral core with two bindings, HTTP and CoAP, and ARTIE works live over both (Rule 1).
 
 > "if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period."
@@ -20,28 +22,28 @@ Key: ✅ Supports the work does this · 🟡 Partly mostly, with a stated gap ·
 
 Each row jumps to its full account below. Columns are the commits this review has been checked against, all re-assessed with Fielding’s full wording.
 
-| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run | `a70ecc2` 11 Oct · re-checked live | `a7831ce` 12 Oct · trace over CoAP, bed from the bookmark |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ |
-| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 | 🟡 | 🟡 |
+| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run | `a70ecc2` 11 Oct · re-checked live | `a7831ce` 12 Oct · trace over CoAP, bed from the bookmark | 15 Oct · coaps, ETag digest, choices from state |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 |
+| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
+| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 | 🟡 | 🟡 | 🟡 |
 
 ## The six rules in the post
 
@@ -69,12 +71,49 @@ What remains is narrower than the rule. The CoAP option and format numbers are e
 
 *Rule 2*
 
-**✅ Supports:** Standard mechanisms only, used as written. (Narrowing removed 9 Oct 2026.)
+**🟡 Partly:** Standard mechanisms only; one of them, `If-Match` on an act, is scoped in a way RFC 9110 does not quite say. (Narrowing removed 9 Oct 2026; scope re-examined 15 Oct 2026, see [Precondition scope, examined](#precondition-scope).)
 
 Every mechanism is an existing standard: `Prefer` tokens (RFC 7240, which allows unregistered tokens), conditional requests (RFC 9110, RFC 6585), `immutable` (RFC 8246), `Link: rel="profile"` and `Accept-Profile` (W3C content negotiation by profile). Spec 0.4 dropped its private use of the media-type `profile` parameter for exactly this reason. Conditional acts follow RFC 9110 §13.1.1 as written. HTTP is stateless, so an act repeats the `Accept`, `Accept-Profile` and `Prefer` its client synced with; the server selects the owning bed’s representation from them and compares `If-Match` with that representation’s `ETag` by strong comparison, the whole value. An earlier rule read only the state number inside the `ETag` and ignored the rest, a narrowing of RFC 9110; it was removed in `e2a773f`. Declaring what a server serves adds nothing new either: `Preference-Applied` (RFC 7240) says which rung each response is at, and the service index is also served as `application/json-home`, whose link hints `formats`, `accept-prefer` and `precondition-req` were written for exactly this. OPTIONS was considered and rejected, since its response has no defined body and is not cached. The 10 October work kept to the same line: a client reads Layer 1 with the request directive `Cache-Control: no-cache` (RFC 9111 §5.2.1.4), refusals are `application/problem+json` (RFC 9457) with JSON Pointers (RFC 6901), an act’s response names the bed it represents in `Content-Location` (RFC 9110 §8.7), and every request carries a W3C `traceparent`, over CoAP in an experimental option one for one with the header. Things that need watching: `Accept-Profile` is a W3C draft, and JSON Home and HTTP link hints are Internet-Drafts. Using a draft mechanism is not a change to the protocol, but it may move.
 
 - **Spec:** §6.1 "Why not a media-type parameter", §6.3 "Precondition scope"
 - **Tests:** `negotiation.feature` (heart-core), `conditional-requests.feature` (heart-spring), `index.feature` (heart-core: the home document), client `layer1-freshness.feature`
+- **Open:** the act's precondition scope ([below](#precondition-scope))
+
+<a id="precondition-scope">
+
+### Precondition scope, examined
+
+*Added 15 October 2026. Rule 2, read strictly.*
+
+**What HEART does.** An act goes to its own target, `POST /beds/2/actions/water-cell`, but its `If-Match` carries the `ETag` of a different resource: the bed, `/beds/2`, whose representation offered the form. The server compares the two, refuses a mismatch with 412, and answers with the bed's new representation, naming it in `Content-Location`. SPEC §6.3 calls the bed the act's *owning resource*.
+
+**Why that stretches RFC 9110.** §13.1.1 evaluates `If-Match` against "the selected representation of the target resource", and the target resource of this request is `/beds/2/actions/water-cell`, not `/beds/2`. HEART's defence, written on 8 October, is that the origin server decides what a target's selected representation is (§3.2), and that it decides it to be the owning bed's representation. That defence holds up only halfway: today `/beds/2/actions/water-cell` has no representation of its own at all. `GET` on it is not served. So the "selected representation" is a fiction the server asserts, not something a client, a cache or a proxy could observe. A strict reader of Rule 2, which forbids changing the protocol beyond filling its underspecified parts, could fairly call this a change to what `If-Match` means. It works, it is consistent, and every client and test relies on it; but it is the one place where HEART leans on its own reading of HTTP rather than HTTP's.
+
+**The obvious fix, and why it is worse.** Post the act to the bed itself: `POST /beds/2`, with the bed's own `ETag` in `If-Match`. That is RFC 9110 exactly. But then the request has to say *which* act it is, and there are only two places left to say it:
+
+- **In the body**, as `{"act": "water-cell", "milliliters": 250}`. This is tunnelling: the operation is hidden inside the payload, the way SOAP hides it in the envelope.
+- **In a header**, as SOAP 1.1 did with `SOAPAction: "urn:garden#waterCell"`. That is a protocol extension of HEART's own, the thing Rule 2 forbids, and it is still invisible to most tools.
+
+Either way, the operation disappears from the request line. That costs a great deal in practice:
+- **Logs:** access logs, which record the method and URI, can no longer tell a watering from a harvest. Filtering by operation means parsing bodies or custom headers.
+- **Gateways:** they route, rate-limit and authorize on the URI. A rule like "only the irrigation service may `POST …/water-cell`" can no longer be written there.
+- **Metrics and traces:** these group requests by route. Every act would collapse into one `POST /beds/{id}` series.
+- **Caches:** they invalidate by URI. They already invalidate `/beds/2` after any unsafe request to it, so nothing is gained there.
+
+Fielding's own reply covers the method: "You don't get to decide what POST means — that is decided by the resource". It doesn't ask for one URI per resource with a multiplexed body. Distinct, readable URIs for distinct things are what he encourages, as long as the server provides them, which HEART's forms do.
+
+**What this review recommends: make the action resource real.** Keep the per-act URIs. Give each one an actual representation, so that its `ETag` is genuinely the target's own:
+
+- **What `GET` returns:** `GET /beds/2/actions/water-cell` returns that act's form for bed 2: its title, schema and choices, the same form the bed embeds or links. When the act isn't offered, it returns an explanation (the act's entry in `hr:unavailable`) with a 409-style problem, or a representation saying so.
+- **Its validator:** the action resource's `ETag` names that representation, and changes whenever the bed's state does, since the form exists only by virtue of the bed's state. The simplest form: the bed's state version plus the form's digest.
+- **The act:** `POST` with `If-Match` is then compared against **the target resource's own** selected representation, exactly as §13.1.1 says. A stale view of the bed yields a stale view of the action resource, so the 412 behaviour is unchanged.
+- **What clients may send:** a client that already holds the bed's `ETag` keeps working if the server accepts either validator. This review suggests one release where both are accepted, then the action resource's own.
+
+That keeps everything the URI buys for observability, removes the fiction, and adds something useful. An action resource becomes a thing you can fetch, link to, cache-revalidate and log. That is the "define more resources" advice from the batch-calls reply below.
+
+**An alternative worth naming: nouns for acts.** An event-sourced domain could expose each act as creating a subordinate resource: `POST /beds/2/waterings` answers `201` with `/beds/2/waterings/17`, one of the bed's history events. The operation stays in the URI, and the collection has its own representation and validator. It suits domains whose acts are records, such as waterings, fouls and comments, better than ones whose acts are commands, such as thaw or resolve. It is a modelling choice per domain. HEART's declaration could allow it, since an act's path is already the domain's to name.
+
+**Status:** open. SPEC §6.3 still reads as decided on 8 October. Changing it is the author's decision, and the next step would be a heart-spring and heart-coap feature for `GET` on an action resource and its validator.
 
 <a id="r3">
 
@@ -172,9 +211,9 @@ Each action comes with its own JSON Schema (Layer 3), and every act is named by 
 
 **✅ Supports:** A form entry is everything needed to build the request.
 
-Each `_forms` entry carries the target, the method, the content type and the schema. ARTIE builds the request from that entry and nothing else. Content addressing keeps "right there" cheap. The set and its schemas are fetched once and served from cache afterwards. Two beds in the same state cost one set fetch, proved live with two clients behind one cache.
+Each `_forms` entry carries the target, the method, the content type and the schema. ARTIE builds the request from that entry and nothing else. Since 15 October a property can also say where its choices are (HAL-SCHEMA-FORMS-HR Rule 8): from the resource's own state, such as "this team's players who have not fouled out", or from another resource, such as "the agents on duty for this priority". So the form tells the client not only how to compose the transition but which values it may carry right now. ARTIE resolves them deterministically, shows a model only that closed set, and never sends a value outside it. The server refuses one if it arrives. Content addressing keeps "right there" cheap. The set and its schemas are fetched once and served from cache afterwards. Two beds in the same state cost one set fetch, proved live with two clients behind one cache.
 
-- **Tests:** client `act.feature`, `l1-and-sharing.feature`; live L3 scenario
+- **Tests:** client `act.feature`, `l1-and-sharing.feature`, `choices.feature`; heart-core `options.feature`; basketball and tickets features; live L3 scenario
 
 <a id="client-decides">
 
@@ -315,6 +354,6 @@ Two cases pass with a real Claude model. One is against the real server: “wate
 - **Tests:** two `@llm` scenarios (`llmTest`)
 - **Open:** the eval harness, the domains and cases, the pass bar, local and hosted models
 
-**Gaps to carry forward:** CoAP's experimental option numbers, unregistered (now including 65020 for trace context), and no `coaps`, and Buster attacks only the HTTP binding (`spec/ideas/buster-over-coap.md`) (Rule 1); the draft `Accept-Profile` (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); and how well a model chooses, shown on real cases but not yet measured (its own row). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the `If-Match` narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Resolved 12 October 2026: no trace context over CoAP (Rule 1). Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.
+**Gaps to carry forward:** the act's precondition scope, which stretches RFC 9110 until an action resource has a representation of its own ([Precondition scope, examined](#precondition-scope), Rule 2); CoAP's experimental option numbers, unregistered (now including 65020 for trace context), and Buster attacks only the HTTP binding (`spec/ideas/buster-over-coap.md`) (Rule 1); the draft `Accept-Profile` (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); and how well a model chooses, shown on real cases but not yet measured (its own row). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the `If-Match` narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Resolved 12 October 2026: no trace context over CoAP (Rule 1). Resolved 14 October 2026: no `coaps` (Rule 1), now DTLS 1.2 with a pre-shared key per client. Added 15 October 2026: choices from state (the "interface in the form" reply). Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.
 
 Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to `~/repos/artie` as of commit `a7831ce`, 12 October 2026. The Buster campaign, run at that commit: 22 rounds, 125 planned mutations, all made, 74 pass, 51 pass (attested), 0 FAIL, no holes.
