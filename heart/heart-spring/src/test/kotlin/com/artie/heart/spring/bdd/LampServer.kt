@@ -115,6 +115,8 @@ private fun brightness(lamp: Lamp, input: ActInput): Int {
     properties = [
         "heart.auth.basic.users=${TestCredentials.USERS}",
         "heart.auth.bearer.tokens=${TestCredentials.TOKENS}",
+        // The lamp server links each plain answer to its state's affordance set (plain-json.feature).
+        "heart.affordance-links=true",
     ],
 )
 @Import(LampServer::class, HeartAutoConfiguration::class, HttpWorld::class, TestCredentials::class)

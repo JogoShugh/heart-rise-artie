@@ -106,6 +106,17 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     }
 
     /**
+     * An RFC 8288 Link to [state]'s affordance set, with each schema inline,
+     * for an answer that carries no forms of its own: the plain JSON twin.
+     * A client that follows it learns which acts the state allows now.
+     */
+    fun formsLink(state: S): String {
+        val set = affordanceSet(type.state.keyOf(state), SetRendering.EMBEDDED_SCHEMAS)
+        return "<$AFFORDANCE_SETS${ContentAddress.address(set)}>; rel=\"$HEART_RISE_PROFILE/rels/forms\"; " +
+            "type=\"${Dialect.JSONSCHEMA.mediaType}\"; integrity=\"${ContentAddress.integrity(set)}\""
+    }
+
+    /**
      * Layer 1 of [state] in HAL-FORMS, the L0 on-ramp: the state, its self
      * link, and one template per offered act. A template's properties come
      * from the act's schema ([HalFormsProperties]), as the index's do, so

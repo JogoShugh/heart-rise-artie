@@ -1,5 +1,6 @@
 package com.artie.heart.spring.bdd
 
+import com.artie.heart.ContentAddress
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.networknt.schema.JsonSchemaFactory
@@ -9,10 +10,34 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.springframework.http.HttpHeaders
 import org.springframework.test.web.reactive.server.EntityExchangeResult
+import org.springframework.test.web.reactive.server.WebTestClient
 
 /** The served OpenAPI description, and what links to it. */
-class OpenApiSteps(private val http: HttpWorld) {
+class OpenApiSteps(private val http: HttpWorld, private val client: WebTestClient) {
     private val mapper = ObjectMapper()
+    private var set: String = ""
+    private var integrity: String = ""
+
+    @Then("the response's only Link is the forms link to an affordance set")
+    fun onlyFormsLink() {
+        val links = http.last.responseHeaders[HttpHeaders.LINK].orEmpty()
+        assertEquals(1, links.size, "$links")
+        assertTrue(links.single().startsWith("<$AFFORDANCE_SETS") && "rel=\"$FORMS_REL\"" in links.single(), "$links")
+    }
+
+    @Then("the plain response's forms link names an affordance set that offers {string}")
+    fun plainFormsLink(relations: String) {
+        val link = http.last.responseHeaders[HttpHeaders.LINK].orEmpty().single { "rel=\"$FORMS_REL\"" in it }
+        val href = link.substringAfter('<').substringBefore('>')
+        integrity = Regex("""integrity="([^"]+)"""").find(link)?.groupValues?.get(1).orEmpty()
+        val served = client.get().uri(href).exchange().expectStatus().isOk.expectBody().returnResult()
+        set = String(checkNotNull(served.responseBody))
+        val offered = mapper.readTree(set).path("_forms").fieldNames().asSequence().toSet()
+        assertEquals(relations.split(",").map { it.trim() }.toSet(), offered)
+    }
+
+    @Then("that affordance set's bytes match the link's integrity")
+    fun setIntegrity() = assertEquals(ContentAddress.integrity(set), integrity)
 
     @Then("the response has a Link to {string} with rel {string}")
     fun linkHeader(href: String, rel: String) {
@@ -45,6 +70,8 @@ class OpenApiSteps(private val http: HttpWorld) {
     private fun json(result: EntityExchangeResult<ByteArray>): JsonNode = mapper.readTree(result.responseBody)
 
     private companion object {
+        const val AFFORDANCE_SETS = "/affordance-sets/"
+        const val FORMS_REL = "https://w3id.org/heart-rise/rels/forms"
         val METHODS = setOf("get", "put", "post", "delete", "patch")
     }
 }

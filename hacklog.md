@@ -867,6 +867,20 @@ dashboard, which stays as it is:
   HTTP and CoAP, deprecated operations in OpenAPI), and input schemas carry
   `default` and `deprecated` from `@Schema`. SPEC §6.2 records former paths.
 
+## 2026-10-15: closing OpenAPI's last gap with a link
+
+The spec-reading client (OpenAPI at its best) copes with every change to the
+garden's shape, but shows every act in every state: OpenAPI says which acts
+are allowed now only in prose. The fix is the Web's own: a link in the
+answer. With `heart.affordance-links` on, each plain JSON answer carries a
+`Link` to its state's affordance set, and the description documents it in
+`x-heart-affordances`. A third OpenAPI client,
+`exhibits/openapi-vs-heart/openapi-affordances/`, follows it and keeps only
+the operations whose method and path template a form names. It's opt-in
+because it changes a description's bytes: the published 1.0.0 and 1.1.0 stay
+as they were, and the garden marks the option in its version
+(`1.0.0+affordance-links`).
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

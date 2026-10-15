@@ -11,6 +11,7 @@ import com.artie.heart.Acted
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.OpenApiDocument
+import com.artie.heart.ServingLimits
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -52,17 +53,26 @@ class HeartConfig(
             performAtBookmark = { _, input -> Acted(acts.build(input)) },
         )
 
-    /** The garden's OpenAPI description: the frost is a change to the API, so it is a new version. */
+    /**
+     * The garden's OpenAPI description: the frost is a change to the API, so it is a new version.
+     * Affordance links change its bytes too, so they are marked in the version, after a `+`.
+     */
     @Bean
-    fun openApiDocument(gardenBeds: HeartResource<GardenBedState, GardenBedStatus>): OpenApiDocument =
-        OpenApiDocument(
+    fun openApiDocument(
+        gardenBeds: HeartResource<GardenBedState, GardenBedStatus>,
+        limits: ServingLimits,
+    ): OpenApiDocument {
+        val release = when {
+            change != null -> "$WEDNESDAY-${change.property}"
+            frost -> TUESDAY
+            else -> MONDAY
+        }
+        return OpenApiDocument(
             listOf(gardenBeds),
-            version = when {
-                change != null -> "$WEDNESDAY-${change.property}"
-                frost -> TUESDAY
-                else -> MONDAY
-            },
+            version = if (limits.affordanceLinks) "$release+affordance-links" else release,
+            affordanceLinks = limits.affordanceLinks,
         )
+    }
 
     private companion object {
         const val MONDAY = "1.0.0"

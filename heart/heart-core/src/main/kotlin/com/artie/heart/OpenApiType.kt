@@ -5,7 +5,11 @@ package com.artie.heart
  * serves, the same routes every HTTP binding builds from the declaration,
  * and the schemas they name.
  */
-internal class OpenApiType(private val type: ResourceType<*, *>, private val keepsPast: Boolean) {
+internal class OpenApiType(
+    private val type: ResourceType<*, *>,
+    private val keepsPast: Boolean,
+    private val affordanceLinks: Boolean = false,
+) {
     private val noun = type.finding?.noun ?: type.collection
     private val stateName = noun.replaceFirstChar { it.uppercase() }
 
@@ -66,7 +70,10 @@ internal class OpenApiType(private val type: ResourceType<*, *>, private val kee
             "description" to (relation?.doc ?: "One $noun, by its id."),
             "parameters" to listOfNotNull(OpenApiShapes.idParameter(noun), asOf.takeIf { keepsPast }),
             "responses" to listOfNotNull(
-                "200" to OpenApiShapes.json("The $noun", OpenApiShapes.ref(stateName)),
+                "200" to OpenApiShapes.withFormsLink(
+                    OpenApiShapes.json("The $noun", OpenApiShapes.ref(stateName)),
+                    affordanceLinks,
+                ),
                 ("400" to OpenApiShapes.response("BadRequest")).takeIf { keepsPast },
                 "401" to OpenApiShapes.response("Unauthorized"),
                 "404" to OpenApiShapes.response("NotFound"),
@@ -100,7 +107,10 @@ internal class OpenApiType(private val type: ResourceType<*, *>, private val kee
             "parameters" to listOf(OpenApiShapes.idParameter(noun)),
             "requestBody" to OpenApiShapes.requestBody(inputName(act)),
             "responses" to mapOf(
-                "200" to OpenApiShapes.json("The $noun after the act", OpenApiShapes.ref(stateName)),
+                "200" to OpenApiShapes.withFormsLink(
+                    OpenApiShapes.json("The $noun after the act", OpenApiShapes.ref(stateName)),
+                    affordanceLinks,
+                ),
                 "401" to OpenApiShapes.response("Unauthorized"),
                 "404" to OpenApiShapes.response("NotFound"),
                 "409" to OpenApiShapes.response("NotOffered"),
@@ -111,8 +121,11 @@ internal class OpenApiType(private val type: ResourceType<*, *>, private val kee
 
     private fun bookmarkAct(act: Act): Map<String, Any> {
         val relation = type.profile.relation(act.relation)
-        val created = OpenApiShapes.json("The new $noun", OpenApiShapes.ref(stateName)) +
-            ("headers" to mapOf("Location" to OpenApiShapes.LOCATION))
+        val created = OpenApiShapes.withFormsLink(
+            OpenApiShapes.json("The new $noun", OpenApiShapes.ref(stateName)) +
+                ("headers" to mapOf("Location" to OpenApiShapes.LOCATION)),
+            affordanceLinks,
+        )
         return mapOf(
             "operationId" to act.name,
             "tags" to listOf(type.collection),

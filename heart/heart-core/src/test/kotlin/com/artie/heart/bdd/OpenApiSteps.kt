@@ -38,6 +38,17 @@ class OpenApiSteps(private val world: LampWorld) {
         renderings += OpenApiDocument(listOf(lampResource()), version = version)
     }
 
+    @When("the OpenAPI description of the lamp is rendered at version {string} with affordance links")
+    fun renderedWithLinks(version: String) {
+        renderings += OpenApiDocument(listOf(lampResource()), version = version, affordanceLinks = true)
+    }
+
+    @Then("the operation {string} answers {int} with no header {string}")
+    fun answersWithoutHeader(operationId: String, status: Int, header: String) {
+        val response = resolve(operation(operationId).path("responses").path(status.toString()))
+        assertTrue(!response.path("headers").has(header), "headers: ${response.path("headers")}")
+    }
+
     @Then("it validates against the OpenAPI 3.1 schema")
     fun validOpenApi() {
         val factory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
@@ -120,6 +131,12 @@ class OpenApiSteps(private val world: LampWorld) {
     fun answers(operationId: String, status: Int, ref: String) {
         val response = resolve(operation(operationId).path("responses").path(status.toString()))
         assertEquals(ref, response.path("content").path("application/json").path("schema").path("\$ref").asText())
+    }
+
+    @Then("the operation {string} answers {int} with the header {string}")
+    fun answersWithHeader(operationId: String, status: Int, header: String) {
+        val response = resolve(operation(operationId).path("responses").path(status.toString()))
+        assertTrue(response.path("headers").has(header), "headers: ${response.path("headers")}")
     }
 
     @Then("the component {string} has the property {string} with the enum {string}")

@@ -81,7 +81,8 @@ class HeartAutoConfiguration {
         registry: HeartRegistry,
         @Value("\${heart.title:}") title: String,
         @Value("\${heart.openapi.version:${OpenApiDocument.DEFAULT_VERSION}}") version: String,
-    ): OpenApiDocument = OpenApiDocument(registry.resources, title.ifBlank { null }, version)
+        limits: ServingLimits,
+    ): OpenApiDocument = OpenApiDocument(registry.resources, title.ifBlank { null }, version, limits.affordanceLinks)
 
     @Bean
     fun openApiHandler(document: OpenApiDocument) = OpenApiHandler(document)
@@ -96,7 +97,8 @@ class HeartAutoConfiguration {
     fun servingLimits(
         @Value("\${heart.max-rung:L2}") maxRung: Rung,
         @Value("\${heart.page-size:${ServingLimits.DEFAULT_PAGE_SIZE}}") pageSize: Int,
-    ): ServingLimits = ServingLimits(maxRung, pageSize)
+        @Value("\${heart.affordance-links:false}") affordanceLinks: Boolean,
+    ): ServingLimits = ServingLimits(maxRung, pageSize, affordanceLinks)
 
     /**
      * Who the service admits: `HEART_AUTH_BASIC_USERS` and `HEART_AUTH_BEARER_TOKENS`.

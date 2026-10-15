@@ -8,11 +8,19 @@ package com.artie.heart
  *   server just starting on the ladder runs at L0: it ignores `Prefer`, sends
  *   no `Preference-Applied`, and its home document declares no `accept-prefer`.
  * - [pageSize] (SPEC §6.11): the most items in one page of a collection.
+ * - [affordanceLinks]: whether each plain JSON answer about a resource links
+ *   its state's affordance set, and the OpenAPI description says so. Off by
+ *   default, since it changes a published description's bytes.
  *
- * The Spring bindings read them from `heart.max-rung` and `heart.page-size`
- * (environment `HEART_MAX_RUNG`, `HEART_PAGE_SIZE`).
+ * The Spring bindings read them from `heart.max-rung`, `heart.page-size` and
+ * `heart.affordance-links` (environment `HEART_MAX_RUNG`, `HEART_PAGE_SIZE`,
+ * `HEART_AFFORDANCE_LINKS`).
  */
-class ServingLimits(maxRung: Rung = Rung.L2, pageSize: Int = DEFAULT_PAGE_SIZE) {
+class ServingLimits(
+    maxRung: Rung = Rung.L2,
+    pageSize: Int = DEFAULT_PAGE_SIZE,
+    val affordanceLinks: Boolean = false,
+) {
     @Volatile
     var maxRung: Rung = maxRung
 

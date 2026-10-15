@@ -38,6 +38,24 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
       | POST   | /lamps/{id}/actions/brighten   | dimFormer     |
       | POST   | /actions/install-lamp          | installLamp   |
 
+  Scenario: The description says where to learn which acts a resource allows now
+    OpenAPI can say which acts there are, but which are allowed now only in
+    prose. Each plain answer about a resource carries a Link to its state's
+    affordance set; the description documents that header, and says once,
+    in an extension, how a client matches the set's forms to operations: by
+    method and path template. A server opts in, since it changes the
+    description's bytes: a description already published keeps its bytes.
+    When the OpenAPI description of the lamp is rendered at version "1.0.0" with affordance links
+    Then the operation "getLamp" answers 200 with the header "Link"
+    And the operation "dim" answers 200 with the header "Link"
+    And its "x-heart-affordances.rel" is "https://w3id.org/heart-rise/rels/forms"
+    And its "x-heart-affordances.header" is "Link"
+    And its "x-heart-affordances.match" is "method and path template"
+
+  Scenario: Without affordance links, the description says nothing about them
+    Then the operation "getLamp" answers 200 with no header "Link"
+    And its "x-heart-affordances" is ""
+
   Scenario: An act that moved still answers at its former path, which is marked deprecated
     The lamp's dim act used to be at "brighten". A server that moves an act
     can keep its former path working, as a careful OpenAPI team keeps an old

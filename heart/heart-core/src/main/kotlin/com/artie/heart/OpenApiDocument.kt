@@ -12,12 +12,15 @@ package com.artie.heart
  * schema, with its offer key as a closed enum of every declared key; and the
  * rule about state where OpenAPI can carry it, in prose, in each act's
  * description. It is JCS canonical JSON, so the same declarations at the
- * same [version] always give the same bytes.
+ * same [version] always give the same bytes. With [affordanceLinks], each
+ * answer about a resource documents the Link to its state's affordance set,
+ * and the `x-heart-affordances` extension says how to use it.
  */
 class OpenApiDocument(
     resources: List<HeartResource<*, *>>,
     title: String? = null,
     val version: String = DEFAULT_VERSION,
+    affordanceLinks: Boolean = false,
 ) {
     /** The document, as the exact canonical text served. */
     val body: String
@@ -27,7 +30,7 @@ class OpenApiDocument(
 
     init {
         require(resources.isNotEmpty()) { "an OpenAPI description needs at least one resource type" }
-        val described = resources.map { OpenApiType(it.layers.type, keepsPast = it.past != null) }
+        val described = resources.map { OpenApiType(it.layers.type, keepsPast = it.past != null, affordanceLinks) }
         val types = resources.map { it.layers.type }
         body = ContentAddress.canonical(
             mapOf(
@@ -47,10 +50,14 @@ class OpenApiDocument(
                     "responses" to OpenApiShapes.RESPONSES,
                     "securitySchemes" to OpenApiShapes.SECURITY_SCHEMES,
                 ),
-            ),
+            ) + affordances(affordanceLinks),
         )
         validator = "\"openapi-${ContentAddress.address(body)}\""
     }
+
+    /** The extension that says how to use each answer's affordance link, when there is one. */
+    private fun affordances(linked: Boolean): Map<String, Any> =
+        if (linked) mapOf("x-heart-affordances" to OpenApiShapes.AFFORDANCES_EXTENSION) else emptyMap()
 
     /** Every type's schemas by name. Two acts may share an input class, and so one schema; never one name for two. */
     private fun schemas(described: List<OpenApiType>): Map<String, Any?> =

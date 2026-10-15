@@ -74,7 +74,12 @@ class HeartResourceHandler<S, K>(
      */
     suspend fun represent(state: S, request: ServerRequest): ServerResponse {
         if (HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())) {
-            return PlainJson.respond(ServerResponse.ok(), type.state.bodyOf(state))
+            return PlainJson.respond(
+                ServerResponse.ok().apply {
+                    if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(state))
+                },
+                type.state.bodyOf(state),
+            )
         }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rendered = Rendered(state, dialect, rung(dialect, request))
@@ -127,7 +132,12 @@ class HeartResourceHandler<S, K>(
             val body = request.awaitBodyOrNull<String>()
             val done = pipeline.run(name, body) { input -> checkNotNull(resource.performAtBookmark)(name, input) }
             val location = "/${type.collection}/${type.state.idOf(done.state)}"
-            return PlainJson.respond(ServerResponse.created(URI.create(location)), type.state.bodyOf(done.state))
+            return PlainJson.respond(
+                ServerResponse.created(URI.create(location)).apply {
+                    if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state))
+                },
+                type.state.bodyOf(done.state),
+            )
         }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rung = rung(dialect, request)
@@ -155,7 +165,8 @@ class HeartResourceHandler<S, K>(
         val body = request.awaitBodyOrNull<String>()
         val done = pipeline.run(name, body) { input -> resource.perform(checked, name, input) }
         return PlainJson.respond(
-            ServerResponse.ok().header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id"),
+            ServerResponse.ok().header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id")
+                .apply { if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state)) },
             type.state.bodyOf(done.state),
         )
     }

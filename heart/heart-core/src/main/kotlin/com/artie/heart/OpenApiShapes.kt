@@ -15,6 +15,28 @@ internal object OpenApiShapes {
     val LOCATION: Map<String, Any> =
         mapOf("description" to "Where the new resource is", "schema" to mapOf("type" to "string"))
 
+    /** The Link header every plain answer about a resource carries: its state's affordance set. */
+    val FORMS_LINK: Map<String, Any> = mapOf(
+        "description" to "The affordance set of the state this answer shows, by the relation " +
+            "$HEART_RISE_PROFILE/rels/forms: the acts it allows now (see x-heart-affordances)",
+        "schema" to mapOf("type" to "string"),
+    )
+
+    /** A response about one resource: with [linked], it carries the Link to its state's affordance set. */
+    fun withFormsLink(response: Map<String, Any>, linked: Boolean): Map<String, Any> {
+        if (!linked) return response
+        @Suppress("UNCHECKED_CAST")
+        val headers = response["headers"] as? Map<String, Any> ?: emptyMap()
+        return response + ("headers" to headers + ("Link" to FORMS_LINK))
+    }
+
+    /** How a client uses [FORMS_LINK]: follow it, and keep the operations whose method and path a form names. */
+    val AFFORDANCES_EXTENSION: Map<String, Any> = mapOf(
+        "header" to "Link",
+        "rel" to "$HEART_RISE_PROFILE/rels/forms",
+        "match" to "method and path template",
+    )
+
     val SECURITY_SCHEMES: Map<String, Any> = mapOf(
         "basic" to mapOf("type" to "http", "scheme" to "basic"),
         "bearer" to mapOf("type" to "http", "scheme" to "bearer"),
