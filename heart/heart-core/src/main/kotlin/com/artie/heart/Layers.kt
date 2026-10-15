@@ -135,7 +135,11 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
                 "method" to "POST",
                 "contentType" to JSON_CONTENT,
                 "target" to "/${type.collection}/$id/actions/${act.path}",
-                "properties" to HalFormsProperties.of(act.schema),
+                // HAL-SCHEMA-FORMS-HR Rule 8: each property's choices for this state, as HAL-FORMS options.
+                "properties" to HalFormsProperties.of(
+                    act.schema,
+                    Options.halForms(act, state, type.state.bodyOf(state)),
+                ),
             )
         }
         if (templates.isNotEmpty()) body["_templates"] = templates

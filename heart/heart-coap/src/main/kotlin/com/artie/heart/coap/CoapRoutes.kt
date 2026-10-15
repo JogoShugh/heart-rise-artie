@@ -127,7 +127,7 @@ internal class CoapRoutes(
                 validators.any { it.contentEquals(validatorOf(current, rung)) }
             }
             // The act is performed on the state whose validator matched, so a write since is stale.
-            val done = pipeline.run(act.name, request.payloadString) { input ->
+            val done = pipeline.run(act.name, request.payloadString, checked) { input ->
                 resource.perform(checked, act.name, input)
             }
             val body = resource.layers.layer1(done.state, rung)

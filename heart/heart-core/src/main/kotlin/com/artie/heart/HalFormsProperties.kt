@@ -23,11 +23,16 @@ object HalFormsProperties {
         "pattern" to "regex",
     )
 
-    fun of(schema: String): List<Map<String, Any>> {
+    /**
+     * The properties of [schema]. A property in [choices] takes those HAL-FORMS
+     * `options` (HAL-SCHEMA-FORMS-HR Rule 8), resolved for one resource.
+     */
+    fun of(schema: String, choices: Map<String, Map<String, Any?>> = emptyMap()): List<Map<String, Any>> {
         val root = mapper.readTree(schema)
         val required = root.path("required").map { it.asText() }.toSet()
         return root.path("properties").properties().map { (name, property) ->
-            property(name, property, name in required)
+            val base = property(name, property, name in required)
+            choices[name]?.let { base + ("options" to it) } ?: base
         }
     }
 

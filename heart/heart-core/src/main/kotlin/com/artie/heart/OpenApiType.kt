@@ -18,7 +18,8 @@ internal class OpenApiType(
 
     /** Each act's input schema, under its input class's name, and the state's schema, under the type's noun. */
     fun schemas(): Map<String, Any?> =
-        type.allActs.associate { inputName(it) to JsonTrees.plain(it.schema) } + (stateName to stateSchema())
+        type.allActs.associate { inputName(it) to JsonTrees.plain(Options.openApi(it.schema)) } +
+            (stateName to stateSchema())
 
     fun paths(): Map<String, Any> = buildMap {
         val collection = "/${type.collection}"
@@ -103,7 +104,7 @@ internal class OpenApiType(
             "operationId" to act.name,
             "tags" to listOf(type.collection),
             "summary" to relation.title,
-            "description" to "${relation.doc}\n\n${onlyWhen(act)}",
+            "description" to "${relation.doc}\n\n${onlyWhen(act)}${Options.prose(act)}",
             "parameters" to listOf(OpenApiShapes.idParameter(noun)),
             "requestBody" to OpenApiShapes.requestBody(inputName(act)),
             "responses" to mapOf(

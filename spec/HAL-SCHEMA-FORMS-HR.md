@@ -1,6 +1,6 @@
 # HAL Schema Forms, H.E.A.R.T. profile
 
-**Status:** draft, 2026-10-08; Rules 6 and 7 added 2026-10-10. Differences only.
+**Status:** draft, 2026-10-08; Rules 6 and 7 added 2026-10-10; Rule 8 added 2026-10-15. Differences only.
 
 **Profile:** `https://w3id.org/heart-rise/hal-schema-forms`
 
@@ -33,6 +33,7 @@ mechanism.
 | Form names as relations | RFC 8288 link relation types; HAL CURIEs |
 | Relation descriptions | ALPS profile documents |
 | Refusal bodies | RFC 9457 problem details |
+| `hr:options` | HAL-FORMS `options` (`link`, `promptField`, `valueField`, `minItems`, `maxItems`); JSON Pointer (RFC 6901); URI Template (RFC 6570) |
 
 The `hr:` prefix is the HAL CURIE the server declares in `_links.curies`,
 expanding to `https://w3id.org/heart-rise/rels/{rel}`.
@@ -210,6 +211,87 @@ Annotations change no validation result.
 Text is part of the bytes, so it is covered by the set's or the schema's
 `integrity` value like everything else, and it is cached with them. It SHALL
 NOT include instance identifiers (SPEC §6.9.4).
+
+## Rule 8: choices from state
+
+A property of a form's schema MAY carry `hr:options`: the choices for that
+property, taken from the owning resource or from another resource. JSON Schema
+2020-12 lets a schema carry keywords it does not define, so a validator that
+does not know this profile ignores it. Fixed choices stay JSON Schema `enum`;
+`hr:options` is for choices that depend on state.
+
+`hr:options` is an instruction, not the values. It says where the choices are,
+so the form stays the same bytes for every resource in the same state and the
+set that holds it stays shared (SPEC §6.9). The values come from the owning
+resource, or from a resource the client reads when it fills the form.
+
+```json
+"playerNumber": {
+  "type": "integer",
+  "hr:options": {
+    "pointer": "/{team}/players",
+    "valueField": "number",
+    "promptField": "name",
+    "where": { "fouledOut": false },
+    "minItems": 1,
+    "maxItems": 1
+  }
+}
+```
+
+```json
+"agent": {
+  "type": "string",
+  "hr:options": {
+    "link": { "href": "/agents{?skill}", "templated": true },
+    "templatePointers": { "skill": "/category" },
+    "items": "/agents",
+    "valueField": "name",
+    "promptField": "name",
+    "where": { "onDuty": true }
+  }
+}
+```
+
+Its members:
+
+- **`pointer`** or **`link`**, exactly one. A `pointer` is a JSON Pointer
+  (RFC 6901) into the owning resource's JSON body, resolved as Rule 1
+  resolves template pointers. A `link` is an object like a HAL link, with
+  `href` and `templated`; the client reads it with GET, and it follows the
+  rules of any Layer 1 resource (SPEC §6.1): no-cache, revalidated by ETag.
+- **Templates.** A `pointer` MAY be an RFC 6570 Level 1 template whose
+  variables are other properties of the same form. That is how one choice
+  depends on another: the team first, then that team's players. A `link`'s
+  template variables are filled from `templatePointers` first, which point
+  into the owning resource as in Rule 1, then from properties of the same
+  form.
+- **`items`**: for a `link`, a JSON Pointer to the list in the answer; by
+  default the answer is the list.
+- **`valueField`** and **`promptField`**: for items that are objects, the
+  member that is sent and the member that is shown. They default to `value`
+  and `prompt`, as in HAL-FORMS. Items that are strings or numbers are both
+  value and prompt.
+- **`where`**: an object of member names and values; only items whose members
+  equal every one of them are choices. It is equality only, so every client
+  applies it the same way.
+- **`minItems`** and **`maxItems`**: as in HAL-FORMS. With `maxItems` 1 the
+  property is one value; otherwise it is an array of values.
+
+What resolves to nothing, or to something other than a list, gives no
+choices. A client SHALL offer only the choices it resolved, and SHALL NOT send
+a form whose required property has none: the act cannot be filled now.
+
+A server SHALL refuse a value that is not among the choices it computes when
+the act arrives, with 422 and the `invalid-input` problem type, at that
+property (SPEC §6.2). For a `pointer`, it computes them from the state the
+act's `If-Match` matched, so a client that read an older state gets 412
+first. For a `link`, the other resource may have changed since the client
+read it; the refusal says so.
+
+A HAL-FORMS rendering of the same form (SPEC §6.10.6) carries the choices as
+HAL-FORMS `options`: those from a `pointer` inline, resolved from the owning
+resource, and those from a `link` as `options.link`.
 
 ## Not covered here
 

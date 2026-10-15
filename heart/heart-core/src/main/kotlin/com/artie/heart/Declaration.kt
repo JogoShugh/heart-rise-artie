@@ -70,6 +70,8 @@ class Profile(val name: String, val title: String, val doc: String, val relation
  * [formerPaths] are segments the act was served at before it moved: a
  * request there runs the same act with the same checks, while forms name
  * only [path], and the OpenAPI description marks each one deprecated.
+ * [options] says where a property's choices are (HAL-SCHEMA-FORMS-HR Rule 8);
+ * its schema carries them as `hr:options`, and a value outside them is refused.
  */
 data class Act(
     val name: String,
@@ -78,7 +80,12 @@ data class Act(
     val path: String = relation,
     val input: Class<*>? = null,
     val formerPaths: List<String> = emptyList(),
+    val options: Map<String, Options> = emptyMap(),
 ) {
+    /** This act with choices for some of its properties: its schema carries them as `hr:options`. */
+    fun withOptions(choices: Map<String, Options>): Act =
+        copy(schema = Options.merged(schema, choices), options = options + choices)
+
     /** Whether a request to [segment] reaches this act: its path, or one it was served at before. */
     fun answersAt(segment: String): Boolean = segment == path || segment in formerPaths
 

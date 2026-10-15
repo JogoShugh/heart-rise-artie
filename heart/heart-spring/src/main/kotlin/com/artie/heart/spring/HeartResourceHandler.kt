@@ -112,7 +112,7 @@ class HeartResourceHandler<S, K>(
         }
         val body = request.awaitBodyOrNull<String>()
         // The act is performed on the state whose ETag matched, so a write since is stale (SPEC §6.2).
-        val done = pipeline.run(act.name, body) { input -> resource.perform(checked, act.name, input) }
+        val done = pipeline.run(act.name, body, checked) { input -> resource.perform(checked, act.name, input) }
         return Rendered(done.state, dialect, rung).respond(
             ServerResponse.ok()
                 .header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id")
@@ -163,7 +163,7 @@ class HeartResourceHandler<S, K>(
         val id = id(request)
         val checked = pipeline.checkOffered(name) { resource.load(id) }
         val body = request.awaitBodyOrNull<String>()
-        val done = pipeline.run(name, body) { input -> resource.perform(checked, name, input) }
+        val done = pipeline.run(name, body, checked) { input -> resource.perform(checked, name, input) }
         return PlainJson.respond(
             ServerResponse.ok().header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id")
                 .apply { if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state)) },
