@@ -78,6 +78,10 @@ tbody th { font-weight: 600; }
 .verdicts b { font-size: 0.85rem; }
 .gap { border-left: 3px solid var(--partial); padding-left: 1rem; display: grid; gap: 0.7rem; }
 .gap h3 { font-size: 1.2rem; }
+.gap.withdrawn { border-left-color: var(--rule); }
+.gap.withdrawn > :not(.why):not(h3):not(.label) { color: var(--muted); }
+.gap.withdrawn h3 { text-decoration: line-through; text-decoration-color: var(--refuse); text-decoration-thickness: 1px; }
+.why { border-left: 3px solid var(--leaf); padding-left: 0.8rem; }
 .plain { font-size: 0.95rem; }
 .label { font: 600 0.75rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rule); padding-top: 1.25rem; display: grid; gap: 0.4rem; }
@@ -86,12 +90,17 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
 <body>
 <main class="wrap">
   <header style="display:grid;gap:0.9rem">
-    <span class="eyebrow">Assessment · 14 October 2026</span>
+    <span class="eyebrow">Assessment · 14 October 2026 · revised the same day</span>
     <h1>OpenAPI and HEART, by Fielding's rules</h1>
-    <p class="lede">Roy Fielding defined REST in 2000. In 2008 he listed six rules an API must follow to call itself REST. This page scores OpenAPI and HEART against them, using what the garden exhibit actually showed, and explains where HEART still falls short.</p>
+    <p class="lede">Roy Fielding defined REST in 2000. In 2008 he listed six rules an API must follow to call itself REST. This page scores OpenAPI and HEART against them, using what the garden exhibit actually showed, and says what is still open to question about HEART.</p>
   </header>
 
-  <p class="thesis">OpenAPI describes HTTP APIs well and was never trying to be REST. HEART aims straight at REST's core rule, and gets most of the way. Its real gaps are shared meaning, protocol creep, and clients that couple themselves anyway.</p>
+  <p class="thesis">OpenAPI describes HTTP APIs well and was never trying to be REST. HEART follows all six rules for the clients it's meant for: generic ones that know its media type. What's left to question is evidence, cost, and meaning the representation doesn't carry.</p>
+
+  <section>
+    <h2>This page changed its mind</h2>
+    <p>The first version of this page, published earlier on 14 October, listed five gaps in HEART. The project's author pushed back on three of them. I checked them against the exact text of Fielding's post, and the author was right. Those three are withdrawn. They're kept below, under <a href="#withdrawn">"What I got wrong first"</a>, with the reason for each, so the change is visible rather than quietly erased. The scorecard moved with them: rules 2, 3 and 5 went from "Mostly" or "Partly" to "Yes".</p>
+  </section>
 
   <section>
     <h2>Read this first</h2>
@@ -109,10 +118,10 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
         <thead><tr><th scope="col">Rule, paraphrased</th><th scope="col">OpenAPI</th><th scope="col">HEART</th><th scope="col">Evidence from the exhibit</th></tr></thead>
         <tbody>
           <tr><th scope="row">1. Not tied to one protocol</th><td class="fail">No</td><td class="part">Partly</td><td>HEART serves the same declaration over HTTP and CoAP (with coaps). OpenAPI is built from HTTP paths and methods.</td></tr>
-          <tr><th scope="row">2. Don't change the protocol; only fill in its gaps</th><td class="pass">Yes</td><td class="part">Mostly</td><td>HEART adds requirements on top of HTTP, all from existing standards, plus one draft. See gap 2.</td></tr>
-          <tr><th scope="row">3. Put the descriptive effort into media types and link relations</th><td class="fail">No</td><td class="part">Mostly</td><td>HEART defines a media type profile and names its relations. The domain's own relations aren't shared beyond one API. See gap 1.</td></tr>
+          <tr><th scope="row">2. Don't change the protocol; only fill in its gaps</th><td class="pass">Yes</td><td class="pass">Yes <span class="quiet">(was "Mostly")</span></td><td>HEART's requirements, such as <code>If-Match</code> on every act, are processing rules of its media type, built from standard HTTP pieces. HTTP itself is unchanged.</td></tr>
+          <tr><th scope="row">3. Put the descriptive effort into media types and link relations</th><td class="fail">No</td><td class="pass">Yes <span class="quiet">(was "Mostly")</span></td><td>HEART defines a media type profile and its processing rules. Domains add extended relation names, such as <code>garden:water-cell</code>, which this rule explicitly allows.</td></tr>
           <tr><th scope="row">4. No fixed URIs; the server tells the client how to make them</th><td class="fail">No</td><td class="pass">Yes</td><td><code>move-url</code>: the bespoke dashboard got 404, while every HEART client followed the form's new target.</td></tr>
-          <tr><th scope="row">5. No resource types the client depends on</th><td class="fail">No</td><td class="part">Partly</td><td><code>rename-field</code>: the bespoke dashboard showed <code>undefined</code>, the ARTIE dashboard showed the new name. A script that names fields brings types back. See gap 3.</td></tr>
+          <tr><th scope="row">5. No resource types the client depends on</th><td class="fail">No</td><td class="pass">Yes <span class="quiet">(was "Partly")</span></td><td><code>rename-field</code>: the bespoke dashboard showed <code>undefined</code>, while the ARTIE dashboard and Claude carried on with the new name.</td></tr>
           <tr><th scope="row">6. Enter with one URI; every next step is a choice the server offered</th><td class="fail">No</td><td class="pass">Yes</td><td>The frost: the bespoke dashboard offered Water on a frozen bed and got 409. ARTIE showed only Thaw, with no code change.</td></tr>
         </tbody>
       </table>
@@ -136,7 +145,7 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p class="plain">An API should use HTTP as HTTP is defined. It may fill in things HTTP leaves open, but it shouldn't invent new rules that every client and intermediary has to learn. Caches, proxies and generic tools only understand standard HTTP.</p>
       <div class="verdicts">
         <div class="o"><b>OpenAPI</b><span>Describes HTTP as it is. No new protocol rules.</span></div>
-        <div class="h"><b>HEART</b><span>Uses standard pieces, but adds several requirements on top. Whether that's filling gaps or building a protocol is gap 2 below.</span></div>
+        <div class="h"><b>HEART</b><span>Leaves HTTP as it is. Its requirements, such as <code>If-Match</code> on every act and <code>Prefer</code> tokens for the layout, are rules of its media type, which is where rule 3 says they belong. A generic client learns them once, for every resource.</span></div>
       </div>
     </div>
 
@@ -145,7 +154,7 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p class="plain">The documentation effort should go into what a representation looks like (its media type) and what its links mean (link relations, such as <code>next</code> or <code>edit</code>). It should not go into a list of URLs and what each one does. Media types and relations are reusable across APIs; endpoint lists aren't.</p>
       <div class="verdicts">
         <div class="o"><b>OpenAPI</b><span>An OpenAPI document is, by design, a list of endpoints and their payloads.</span></div>
-        <div class="h"><b>HEART</b><span>Defines a profile of HAL Schema Forms, named relations, and ALPS profiles. But <code>garden:water-cell</code> means something only to clients of this garden. See gap 1.</span></div>
+        <div class="h"><b>HEART</b><span>Defines a profile of HAL Schema Forms and its processing rules, its own relations, and ALPS profiles. Each domain adds extended relation names, such as <code>garden:water-cell</code>, which the rule names as the other place effort should go.</span></div>
       </div>
     </div>
 
@@ -163,7 +172,7 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p class="plain">A client shouldn't decide in advance that "/beds/2 is a Bed object with these fields". It should look at what it received: this is HAL with these forms. If the client hard-codes a type, every change to that type breaks it.</p>
       <div class="verdicts">
         <div class="o"><b>OpenAPI</b><span>Generated clients are typed classes. When <code>moistureLevel</code> was renamed, the bespoke card showed <code>undefined</code>.</span></div>
-        <div class="h"><b>HEART</b><span>The ARTIE dashboard shows whatever members arrive. But a client is free to type itself, and the ARTIE script did. See gap 3.</span></div>
+        <div class="h"><b>HEART</b><span>The ARTIE dashboard shows whatever members arrive, and Claude reads them by meaning. Neither assumes a type for the bed.</span></div>
       </div>
     </div>
 
@@ -178,11 +187,53 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
   </section>
 
   <section>
-    <h2>Where HEART falls short</h2>
-    <p>Five critiques a careful REST reviewer would likely raise. Each comes with what it means, why it matters, what the exhibit showed, and what could close it.</p>
+    <h2>What can still be questioned</h2>
+    <p>Four questions a careful REST reviewer could still fairly ask. None is a rule HEART breaks. They're about evidence, cost, and limits.</p>
 
     <div class="gap">
-      <h3>Gap 1. The garden's relations mean nothing outside the garden</h3>
+      <h3>Question 1. Someone still has to understand the choices</h3>
+      <span class="label">What it means</span>
+      <p>Rule 6 assumes a client that can read the offers and pick one. On the web, that's a person in a browser. For machine clients, this was always the weak point of HATEOAS: a program can see that a form exists, but not what it is for, unless someone coded that meaning in. That's a big reason most machine-to-machine APIs gave up on hypermedia.</p>
+      <span class="label">What changed</span>
+      <p>A language model can read a form's title, relation and schema and decide whether it serves the goal. In the exhibit, Claude chose <code>garden:thaw</code> for a frozen bed it was never told about, and <code>garden:irrigate</code> after the rename. That's late binding of meaning, which REST always needed and rarely had.</p>
+      <span class="label">The limit</span>
+      <p>This moves the problem; it doesn't remove it. Under <code>new-required-input</code>, Claude asked "Should the water reach bed 2 by drip or by spray?" instead of acting. That was right: the choice was real, and only the person could make it. Meaning that isn't in the representation can't be read from it, by a model or anyone else.</p>
+    </div>
+
+    <div class="gap">
+      <h3>Question 2. The model's results are one run each</h3>
+      <span class="label">What it means</span>
+      <p>Claude tried each change once. It chose <code>garden:thaw</code> for the frozen bed, <code>garden:irrigate</code> after the rename, and asked about the new input. One run shows what can happen, not how often it happens.</p>
+      <span class="label">What could close it</span>
+      <p>Run each change many times, with more than one model, and report rates: how often the model chose the right act, chose a wrong one, or asked.</p>
+    </div>
+
+    <div class="gap">
+      <h3>Question 3. Reading by meaning has a cost</h3>
+      <span class="label">What it means</span>
+      <p>A script calls one act directly. A Reasoner reads the offers, sends them to a model, and waits for its choice. That costs tokens and time on every decision, and the same question can get different answers on different runs.</p>
+      <span class="label">Why it matters</span>
+      <p>Resilience to drift is bought with that cost. Whether it's worth it depends on how often the server changes and what a broken client costs. That trade has to be measured, not assumed.</p>
+      <span class="label">What could close it</span>
+      <p>Measure it: tokens and latency per decision, against the rework a change forces on early-bound clients. The exhibit already counts the rework; it doesn't yet count the model's cost.</p>
+    </div>
+
+    <div class="gap">
+      <h3>Question 4. The payoff shows at scale, and the exhibit is small</h3>
+      <span class="label">What it means</span>
+      <p>REST was designed for systems that live for decades, with many clients the server's owner never meets. That's how the web works. Its benefits, such as independent evolution, caching, and generic clients, grow with the number of clients and the length of time.</p>
+      <span class="label">What the exhibit shows</span>
+      <p>One garden, four clients, one developer, a few days. It shows the mechanism working: a server changes, and the clients that didn't bind early carry on. It doesn't show the economics at scale: what happens across dozens of services, hundreds of independent clients, and years of change.</p>
+      <span class="label">What could close it</span>
+      <p>More domains (there are already garden, basketball and tickets), more independent client implementations (there are already two HEART clients, in Kotlin and TypeScript, and a conformance suite), and clients written by people other than the server's authors.</p>
+    </div>
+  </section>
+
+  <section id="withdrawn">
+    <h2>What I got wrong first</h2>
+    <p>The first version listed these three as gaps 1 to 3. Each is kept as it was published, followed by why it was withdrawn. The project's author raised all three; the reasons come from the text of Fielding's post.</p>
+    <div class="gap withdrawn">
+      <h3>Withdrawn gap 1. The garden's relations mean nothing outside the garden</h3>
       <span class="label">What it means</span>
       <p>A link relation is a name for what a link or form does. On the web, some names are shared by everyone: IANA keeps a registry with names such as <code>next</code>, <code>prev</code> and <code>edit</code>, and any client knows what they mean. HEART's own relations, such as <code>https://w3id.org/heart-rise/rels/forms</code>, are global names with a page that defines them. But the domain's acts are named <code>garden:water-cell</code> or <code>garden:thaw</code>. Only a client that learned this garden knows what they mean.</p>
       <span class="label">Why it matters</span>
@@ -196,10 +247,12 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
         <li>Reuse shared vocabularies where they exist, such as ALPS descriptors shared between gardens, or schema.org's action types.</li>
         <li>Accept the limit: some meaning is domain-specific. A watering act will always need a client that understands watering.</li>
       </ul>
+      <span class="label">Why I withdrew it</span>
+      <p class="why">Rule 3 itself says the effort should go into media types "or in defining extended relation names". A domain relation like <code>garden:water-cell</code> is exactly that, and it doesn't need a global registry. What a client needs is a standard way to survive a server renaming things, and HEART has one: every form carries a relation, a title and a schema, and a Reasoner reads them while it runs. Under <code>rename-act</code>, Claude chose <code>garden:irrigate</code> with no change. The only client that failed was a script that hard-coded the old name, which is withdrawn gap 3's mistake.</p>
     </div>
 
-    <div class="gap">
-      <h3>Gap 2. Is HEART a media type, or a new protocol on top of HTTP?</h3>
+    <div class="gap withdrawn">
+      <h3>Withdrawn gap 2. Is HEART a media type, or a new protocol on top of HTTP?</h3>
       <span class="label">What it means</span>
       <p>Rule 2 says you may fill gaps HTTP leaves open, but not change how HTTP works. HEART asks for more than plain HTTP does:</p>
       <ul>
@@ -216,10 +269,12 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p><code>Accept-Profile</code> comes from a W3C draft, Content Negotiation by Profile, that never became a Recommendation. And taken together, the rungs, layers and tokens can feel like a protocol even if each part is legal.</p>
       <span class="label">What could close it</span>
       <p>Keep L0 working with nothing but HTTP and the media type. Make every rule above L0 optional for clients. And say in the spec, rule by rule, which standard each requirement rests on, as the Internet-Draft starts to do.</p>
+      <span class="label">Why I withdrew it</span>
+      <p class="why">Rule 3 says "Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type". HEART's requirements are exactly those processing rules. Rule 6 says transitions "may be determined (or limited by) the client's knowledge of media types", so a generic client that knows HEART's rules well is doing what Fielding asked, not coupling to a protocol. Rule 2 is about changing HTTP itself; its failure note is "resource interfaces are object-specific, not generic", and HEART's rules apply the same way to every resource. What remains true is small: <code>Accept-Profile</code> comes from a draft standard. That's a note about standards maturity, not a REST problem.</p>
     </div>
 
-    <div class="gap">
-      <h3>Gap 3. Clients can couple themselves anyway</h3>
+    <div class="gap withdrawn">
+      <h3>Withdrawn gap 3. Clients can couple themselves anyway</h3>
       <span class="label">What it means</span>
       <p>Rule 5 is about the client's assumptions as much as the server's design. A server can send fully self-describing responses, and a client can still ignore that and hard-code "the act is called this, and the field is called that". That client is as brittle as a generated one, just in different places.</p>
       <span class="label">What the exhibit showed</span>
@@ -228,32 +283,16 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p>HEART removes coupling only for clients that don't add it back. "Our API is hypermedia" doesn't make every client evolvable. Early binding is a choice every client author makes.</p>
       <span class="label">What could close it</span>
       <p>It can't be fully closed, and shouldn't be: sometimes a script <em>should</em> fail loudly when the meaning changes. What helps is a client library that makes the late-bound way easy. That means looking acts up by meaning or title, filling fields from the form's defaults and examples, and reporting clearly what changed when it can't.</p>
+      <span class="label">Why I withdrew it</span>
+      <p class="why">The script isn't a generic client. It's early-bound code that happens to use the ARTIE library, and nobody expects early-bound code to survive server-directed change. It fails rule 6 by its own design, not HEART's. Using it as evidence that changes "hurt ARTIE" was a red herring. No generic ARTIE client broke under any change. The dashboard acted correctly under all seven. Claude acted under six, and under the new required input it asked the person a real question instead of guessing. Neither sent anything the garden refused. In the exhibit the script stays only as a control, to show what early binding costs.</p>
     </div>
 
-    <div class="gap">
-      <h3>Gap 4. Someone still has to understand the choices</h3>
-      <span class="label">What it means</span>
-      <p>Rule 6 assumes a client that can read the offers and pick one. On the web, that's a person in a browser. For machine clients, this was always the weak point of HATEOAS: a program can see that a form exists, but not what it is for, unless someone coded that meaning in. That's a big reason most machine-to-machine APIs gave up on hypermedia.</p>
-      <span class="label">What changed</span>
-      <p>A language model can read a form's title, relation and schema and decide whether it serves the goal. In the exhibit, Claude chose <code>garden:thaw</code> for a frozen bed it was never told about, and <code>garden:irrigate</code> after the rename. That's late binding of meaning, which REST always needed and rarely had.</p>
-      <span class="label">The limit</span>
-      <p>This moves the problem; it doesn't remove it. Under <code>new-required-input</code>, Claude asked "Should the water reach bed 2 by drip or by spray?" instead of acting. That was right: the choice was real, and only the person could make it. Meaning that isn't in the representation can't be read from it, by a model or anyone else.</p>
-    </div>
-
-    <div class="gap">
-      <h3>Gap 5. The payoff shows at scale, and the exhibit is small</h3>
-      <span class="label">What it means</span>
-      <p>REST was designed for systems that live for decades, with many clients the server's owner never meets. That's how the web works. Its benefits, such as independent evolution, caching, and generic clients, grow with the number of clients and the length of time.</p>
-      <span class="label">What the exhibit shows</span>
-      <p>One garden, four clients, one developer, a few days. It shows the mechanism working: a server changes, and the clients that didn't bind early carry on. It doesn't show the economics at scale: what happens across dozens of services, hundreds of independent clients, and years of change.</p>
-      <span class="label">What could close it</span>
-      <p>More domains (there are already garden, basketball and tickets), more independent client implementations (there are already two HEART clients, in Kotlin and TypeScript, and a conformance suite), and clients written by people other than the server's authors.</p>
-    </div>
   </section>
 
   <section>
     <h2>The verdict, in one paragraph</h2>
-    <p>By Fielding's rules, OpenAPI isn't REST, and it doesn't claim to be. It's a precise contract for HTTP-based remote calls, and it's good at that. HEART follows the rules that matter most: the server owns its URLs, and every step is a choice the server offered in the current state. It also uses HTTP caching the way REST intends. Its weak spots are that the domain's relations aren't shared beyond one API, that its extra requirements risk reading as a protocol, and that a client can still couple itself. The exhibit showed all three of those in the data, not just in theory.</p>
+    <p>By Fielding's rules, OpenAPI isn't REST, and it doesn't claim to be. It's a precise contract for HTTP-based remote calls, and it's good at that. HEART follows all six rules for the clients it's built for: generic clients that know its media type. The server owns its URLs, every step is a choice the server offered in the current state, and HTTP caching is used the way REST intends. In the exhibit, no generic client broke under any change. What's still open is how often a model chooses well, what reading by meaning costs, what to do when the meaning isn't in the representation, and how this holds up at scale.</p>
+    <p class="note">The first version of this verdict named three weak spots: relations not shared beyond one API, requirements that risk reading as a protocol, and clients that couple themselves. All three are withdrawn; see <a href="#withdrawn">"What I got wrong first"</a>.</p>
   </section>
 
   <footer>

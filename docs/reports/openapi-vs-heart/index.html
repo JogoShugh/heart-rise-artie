@@ -98,6 +98,7 @@ figure { margin: 0; display: grid; gap: 0.45rem; align-content: start; min-width
 figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
 figcaption { font-size: 0.9rem; color: var(--muted); }
 figcaption b { color: var(--fg); }
+.revision { border: 1px dashed var(--rule); border-radius: 8px; padding: 1rem 1.1rem; display: grid; gap: 0.6rem; background: var(--surface); }
 .day-label { font: 600 0.8rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rule); padding-top: 1.25rem; display: grid; gap: 0.4rem; }
 </style>
@@ -273,39 +274,43 @@ but required in type 'Record&lt;BedStatusEnum, string&gt;'.</pre>
   <section class="wide">
     <h2>Six more kinds of change</h2>
     <p>The frost adds a state and an act, which is the change that suits HEART best. A real API also moves URLs, renames things, tightens limits and asks for new input. So the garden got a Wednesday release in six variants. Each one is a single change from Monday, chosen at startup with <code>GARDEN_CHANGE</code>.</p>
-    <p>Four clients, none changed since Monday, then tried to water bed 2 with about 250 ml:</p>
+    <p>Four clients, none changed since Monday, then tried to water bed 2 with about 250 ml. Three are the real contenders; the fourth is a control:</p>
     <ul>
       <li>the bespoke dashboard 1.0;</li>
       <li>the ARTIE dashboard, driven the way a person would drive it. The person finds the button whose title is about watering (<code>/water|irrigat/i</code>), keeps what the form shows, and presses it. The same rule drives the bespoke dashboard;</li>
-      <li>an ARTIE script, the README's example of ARTIE driven by code. It names the act <code>garden:water-cell</code> and its field <code>milliliters</code>;</li>
-      <li>Claude, through the ARTIE dashboard's Ask box, given "Water bed 2 with about 250 ml". That's one run per variant.</li>
+      <li>Claude, through the ARTIE dashboard's Ask box, given "Water bed 2 with about 250 ml". That's one run per variant;</li>
+      <li><b>a control:</b> a script that uses the ARTIE library but hard-codes the act <code>garden:water-cell</code> and its field <code>milliliters</code>. It isn't a generic client. It's there to show what early binding costs, whatever the protocol.</li>
     </ul>
     <p>The score is the garden's own history: did bed 2 get a new <code>CellWatered</code> event? Under <code>tighter-limit</code> the person also typed 800 ml on the bespoke dashboard, whose field still allowed 1000.</p>
     <div class="table-scroll">
       <table>
-        <thead><tr><th scope="col">Change</th><th scope="col">Bespoke 1.0</th><th scope="col">ARTIE dashboard</th><th scope="col">ARTIE script</th><th scope="col">Claude</th></tr></thead>
+        <thead><tr><th scope="col">Change</th><th scope="col">Bespoke 1.0</th><th scope="col">ARTIE dashboard</th><th scope="col">Claude</th><th scope="col">Control: early-bound script</th></tr></thead>
         <tbody>
           <tr><th scope="row"><code>move-url</code><br><span class="quiet">target moves to <code>/actions/water</code></span></th><td class="fail">404</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
           <tr><th scope="row"><code>rename-field</code><br><span class="quiet"><code>moistureLevel</code> becomes <code>soilMoisture</code></span></th><td><span class="pass">watered</span><br><span class="fail">shows moisture <code>undefined</code></span></td><td><span class="pass">watered</span><br><span class="quiet">shows "Soil moisture 40"</span></td><td class="pass">watered</td><td class="pass">watered</td></tr>
-          <tr><th scope="row"><code>rename-act</code><br><span class="quiet">relation becomes <code>garden:irrigate</code></span></th><td class="pass">watered</td><td class="pass">watered</td><td class="fail">"No affordance 'garden:water-cell'"</td><td class="pass">watered, chose <code>garden:irrigate</code></td></tr>
+          <tr><th scope="row"><code>rename-act</code><br><span class="quiet">relation becomes <code>garden:irrigate</code></span></th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered, chose <code>garden:irrigate</code></td><td class="fail">"No affordance 'garden:water-cell'"</td></tr>
           <tr><th scope="row"><code>retitle</code><br><span class="quiet">"Water the bed" becomes "Irrigate the bed"</span></th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
           <tr><th scope="row"><code>tighter-limit</code><br><span class="quiet">maximum 1000 ml becomes 500</span></th><td><span class="pass">watered at 250</span><br><span class="fail">422 at 800</span></td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
-          <tr><th scope="row"><code>new-required-input</code><br><span class="quiet"><code>method</code>, drip or spray</span></th><td class="fail">422</td><td class="pass">watered, with the form's <code>drip</code></td><td class="fail">422, <code>method</code> missing</td><td class="quiet">asked "Should the water reach bed 2 by drip or by spray?" and sent nothing</td></tr>
-          <tr><th scope="row">Watered, of 6</th><td>4</td><td>6</td><td>4</td><td>5</td></tr>
+          <tr><th scope="row"><code>new-required-input</code><br><span class="quiet"><code>method</code>, drip or spray</span></th><td class="fail">422</td><td class="pass">watered, with the form's <code>drip</code></td><td class="quiet">asked "Should the water reach bed 2 by drip or by spray?" and sent nothing</td><td class="fail">422, <code>method</code> missing</td></tr>
+          <tr><th scope="row">Watered, of 6</th><td>4</td><td>6</td><td>5</td><td>4</td></tr>
         </tbody>
       </table>
     </div>
     <p class="note">Raw attempts, with every request each client sent and its status: <code>results/changes/attempts.jsonl</code>. Run it again with <code>run-changes.sh</code>.</p>
 
     <h3>What it shows</h3>
-    <p>Late binding protects a client exactly as far as the client binds late.</p>
+    <p>No generic client broke under any of the six changes. The only failures came from clients that bound early: the bespoke dashboard and the control script.</p>
     <ul>
       <li><b>The ARTIE dashboard</b> binds nothing about the garden. It shows whatever members the bed has and whatever forms it offers, and it posts each form to its own target. Under all six changes it watered the bed with no change of its own.</li>
-      <li><b>The ARTIE script</b> uses the same client library, but its author wrote two names into code: the relation and the field. It survived the moved URL, the renamed member, the retitle and the tighter limit, because the forms carried those. It broke on exactly the two changes to names it had written down: the relation, and a field it had never heard of.</li>
-      <li><b>Claude</b> reads relations and titles at run time, so the renamed act didn't matter. Under <code>new-required-input</code> it asked which method to use instead of picking one. The bed wasn't watered, but nothing was refused, and the choice it asked about is a real one.</li>
+      <li><b>Claude</b> reads relations, titles and schemas at run time, so the renamed act and the changed schema didn't stop it. Under <code>new-required-input</code> it asked which method to use instead of picking one. The bed wasn't watered, but nothing was refused, and the choice it asked about is a real one.</li>
       <li><b>The bespoke dashboard</b> never reads relations or titles, so renaming and retitling the act didn't touch it. It hard-codes the URL, the member names and the request body, so those changes did.</li>
+      <li><b>The control script</b> survived the changes the forms absorbed for it (the URL, the member, the title, the limit) and broke on exactly the two names written into its code. Nobody expects early-bound code to survive server-directed change. It shows the cost of binding early, not a weakness of HEART.</li>
     </ul>
-    <p>So both claims were partly right. Late binding didn't make every ARTIE client immune. The script failed where it had bound early, as any client does. And no change in this set hurt a client that bound nothing early.</p>
+    <div class="revision">
+      <span class="eyebrow">Revised 14 October 2026</span>
+      <p>The first version of this section listed the script as a fourth ARTIE client and concluded: "So both claims were partly right. Late binding didn't make every ARTIE client immune. The script failed where it had bound early, as any client does. And no change in this set hurt a client that bound nothing early."</p>
+      <p>The project's author pushed back, and was right. The script isn't a generic client; it's early-bound code that happens to use the ARTIE library. Counting it as evidence that a change "hurts ARTIE" was a red herring. Fielding's rule 6 lets a client's transitions be "determined (or limited by) the client's knowledge of media types", which is what the generic ARTIE clients do. The script now appears as a control, and the claim that some changes hurt ARTIE is withdrawn. <a href="../fielding-openapi-vs-heart/">The Fielding assessment</a> records the same change of mind.</p>
+    </div>
 
     <h3>The rework each failure needed</h3>
     <div class="table-scroll">
@@ -316,8 +321,8 @@ but required in type 'Record&lt;BedStatusEnum, string&gt;'.</pre>
           <tr><th scope="row"><code>rename-field</code> (display)</th><td>1: <code>Property 'moistureLevel' does not exist on type 'Bed'</code></td><td>rename the member in the card</td></tr>
           <tr><th scope="row"><code>tighter-limit</code> (800 ml)</th><td>1, about the request type's name, not the limit</td><td>change the field's <code>max</code>; the compiler never mentions 500</td></tr>
           <tr><th scope="row"><code>new-required-input</code></th><td>1, about the request type's name</td><td>add a method field to the form and the call</td></tr>
-          <tr><th scope="row">ARTIE script, <code>rename-act</code></th><td colspan="2">one line: <code>"garden:water-cell"</code> becomes <code>"garden:irrigate"</code></td></tr>
-          <tr><th scope="row">ARTIE script, <code>new-required-input</code></th><td colspan="2">one line: add <code>put("method", "drip")</code>, which is a choice the script's author now has to make</td></tr>
+          <tr><th scope="row">Control script, <code>rename-act</code></th><td colspan="2">one line: <code>"garden:water-cell"</code> becomes <code>"garden:irrigate"</code></td></tr>
+          <tr><th scope="row">Control script, <code>new-required-input</code></th><td colspan="2">one line: add <code>put("method", "drip")</code>, which is a choice the script's author now has to make</td></tr>
         </tbody>
       </table>
     </div>
@@ -353,7 +358,7 @@ but required in type 'Record&lt;BedStatusEnum, string&gt;'.</pre>
       <li>The suite's page objects know where each page puts its buttons. That's the only client-specific test code; the feature file and steps are shared.</li>
       <li>The Claude results are one run per change, not a measured rate.</li>
       <li>Under <code>tighter-limit</code> and <code>new-required-input</code>, the garden's request schema got a new name, because each variant is a separate class. That name change is the one <code>tsc</code> error in each. A server that kept the schema's name would give the bespoke team no compiler error at all for those two changes, and they'd have only the regression suite.</li>
-      <li>The ARTIE script is short on purpose. A script could look acts up by title, as the dashboard does, and then fail where the dashboard fails, which here is nowhere.</li>
+      <li>The control script is short on purpose. A script could look acts up by title, as the dashboard does, and then fail where the dashboard fails, which here is nowhere.</li>
       <li>Matching the watering button by <code>/water|irrigat/i</code> is a choice, the same for both dashboards. A person who reads "Irrigate" as watering is assumed.</li>
     </ul>
   </section>

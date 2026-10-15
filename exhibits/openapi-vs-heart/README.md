@@ -168,38 +168,53 @@ garden has a Wednesday release in six variants, each one change from Monday,
 chosen with `GARDEN_CHANGE` (`garden.change`): `move-url`, `rename-field`,
 `rename-act`, `retitle`, `tighter-limit` and `new-required-input`.
 
-Four clients, none changed since Monday, try to water bed 2 with about 250 ml:
+Four clients, none changed since Monday, try to water bed 2 with about 250 ml.
+Three are the real contenders; the fourth is a control:
 
 - the bespoke dashboard 1.0;
 - the ARTIE dashboard, driven as a person would drive it
   (`changes/drive.mjs`): find the button whose title is about watering
   (`/water|irrigat/i`, the same rule for both dashboards), keep what the form
   shows, and press it;
-- an ARTIE script that names the act `garden:water-cell` and its field
-  `milliliters` (`artie-dashboard/src/main/kotlin/ArtieScript.kt`);
-- Claude, through the ARTIE dashboard's Ask, one run per variant.
+- Claude, through the ARTIE dashboard's Ask, one run per variant;
+- **a control:** a script that uses the ARTIE library but hard-codes the act
+  `garden:water-cell` and its field `milliliters`
+  (`artie-dashboard/src/main/kotlin/ArtieScript.kt`). It isn't a generic
+  client; it shows what early binding costs, whatever the protocol.
 
 The score is the garden's own history: did bed 2 get a new `CellWatered`
 event? Run it with `run-changes.sh`; raw attempts are in
 `results/changes/attempts.jsonl`, screenshots in `results/screenshots/changes/`.
 
-| Change | Bespoke 1.0 | ARTIE dashboard | ARTIE script | Claude |
+| Change | Bespoke 1.0 | ARTIE dashboard | Claude | Control: early-bound script |
 |---|---|---|---|---|
 | `move-url` | 404 | watered | watered | watered |
 | `rename-field` | watered, moisture shows `undefined` | watered | watered | watered |
-| `rename-act` | watered | watered | "No affordance 'garden:water-cell'" | watered, chose `garden:irrigate` |
+| `rename-act` | watered | watered | watered, chose `garden:irrigate` | "No affordance 'garden:water-cell'" |
 | `retitle` | watered | watered | watered | watered |
 | `tighter-limit` | watered at 250 ml, 422 at 800 ml | watered | watered | watered |
-| `new-required-input` | 422 | watered, with the form's `drip` | 422, `method` missing | asked "drip or spray?", sent nothing |
-| **Watered, of 6** | 4 | 6 | 4 | 5 |
+| `new-required-input` | 422 | watered, with the form's `drip` | asked "drip or spray?", sent nothing | 422, `method` missing |
+| **Watered, of 6** | 4 | 6 | 5 | 4 |
 
-Late binding protects a client exactly as far as the client binds late. The
-ARTIE dashboard binds nothing about the garden, and watered under all six. The
-ARTIE script uses the same library, but its author wrote the relation and the
-field into code, and it broke on exactly the two changes to those names. The
-bespoke dashboard ignores relations and titles, so it shrugged off
-`rename-act` and `retitle`, but it hard-codes the URL, the member names and
-the request body.
+No generic client broke under any of the six changes. The ARTIE dashboard binds
+nothing about the garden, and watered under all six. Claude reads relations,
+titles and schemas at run time; it watered under five and, under
+`new-required-input`, asked a real question instead of guessing. The bespoke
+dashboard ignores relations and titles, so it shrugged off `rename-act` and
+`retitle`, but it hard-codes the URL, the member names and the request body.
+The control script broke on exactly the two names written into its code, which
+is what early-bound code does; it's not a weakness of HEART.
+
+> **Revised 14 October 2026.** The first version of this section counted the
+> script as a fourth ARTIE client and concluded that "late binding protects a
+> client exactly as far as the client binds late", using the script's two
+> failures as evidence that some changes hurt ARTIE. The project's author
+> pushed back, and was right: the script is early-bound code that happens to
+> use the ARTIE library, not a generic client, and Fielding's rule 6 lets a
+> client's transitions be "determined (or limited by) the client's knowledge
+> of media types", which is what the generic ARTIE clients do. That claim is
+> withdrawn, and the script is now a control. The Fielding assessment on the
+> project's Pages site records the same change of mind.
 
 Rework after each failure:
 
@@ -212,7 +227,7 @@ Rework after each failure:
   The name changed only because each variant is a separate class; a server
   that kept it would give no compiler error. Then edit the field's `max`, or
   add a method field.
-- **ARTIE script:** one line each: `"garden:irrigate"`, or
+- **Control script:** one line each: `"garden:irrigate"`, or
   `put("method", "drip")`, a choice its author now has to make.
 
 The first run of these variants found a HEART bug: the Layer 1 `ETag`
