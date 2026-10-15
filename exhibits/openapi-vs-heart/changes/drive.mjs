@@ -6,12 +6,14 @@
 //
 //   node drive.mjs bespoke [millilitres]   the bespoke dashboard on :3001
 //   node drive.mjs live [millilitres]      the dashboard that reads OpenAPI live, on :3004
+//   node drive.mjs afford                  that dashboard plus the affordance link, on :3005
 //   node drive.mjs artie                   the ARTIE dashboard on :3002
 //   node drive.mjs claude                  the ARTIE dashboard's Ask, with Claude
 const [client, typed] = process.argv.slice(2);
 const WATERING = /water|irrigat/i;
 const garden = process.env.GARDEN_URL ?? "http://localhost:8080";
-const dashboard = { bespoke: "http://localhost:3001", live: "http://localhost:3004" }[client] ?? "http://localhost:3002";
+const dashboard = { bespoke: "http://localhost:3001", live: "http://localhost:3004", afford: "http://localhost:3005" }[client]
+    ?? "http://localhost:3002";
 
 function forms(html) {
     return [...html.matchAll(/<form class="act" hx-post="([^"]+)"[^>]*>([\s\S]*?)<\/form>/g)].map(([, action, body]) => ({
@@ -42,7 +44,7 @@ const message = (html) => html.match(/<p class="message[^"]*">([^<]*)<\/p>/)?.[1
 
 const before = (await (await fetch(`${dashboard}/_calls`)).json()).length;
 let card;
-if (client === "bespoke" || client === "live") {
+if (client === "bespoke" || client === "live" || client === "afford") {
     card = await (await fetch(`${dashboard}/beds/2/card`)).text();
 } else {
     const home = await (await fetch(`${dashboard}/card`)).text();

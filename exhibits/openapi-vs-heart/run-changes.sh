@@ -9,6 +9,8 @@
 #   claude    the ARTIE dashboard's Ask, with Claude choosing (one run per change)
 #   live      a dashboard with no generated code that reads the OpenAPI description
 #             while it runs (openapi-live/), OpenAPI at its best
+#   afford    the same, plus the affordance link each plain answer carries when the
+#             garden runs with HEART_AFFORDANCE_LINKS=true (openapi-affordances/)
 # Under tighter-limit the person also types 800 ml on the bespoke dashboard,
 # whose field still allows 1000.
 #
@@ -30,7 +32,7 @@ dashboard_java=${ARTIE_DASHBOARD_JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4
 read -r -a changes <<< "${CHANGES:-move-url rename-field rename-act retitle tighter-limit new-required-input}"
 read -r -a clients <<< "${CLIENTS:-bespoke artie script claude live}"
 
-for port in 8080 3001 3002 3004; do
+for port in 8080 3001 3002 3004 3005; do
   if lsof -nP -iTCP:$port -sTCP:LISTEN > /dev/null; then echo "Port $port is in use." >&2; exit 1; fi
 done
 # shellcheck source=../../scripts/lib/credentials.sh
@@ -42,7 +44,7 @@ export GARDEN_TOKEN GARDEN_URL=$garden
 pids=()
 stop_all() {
   for pid in "${pids[@]}"; do kill "$pid" 2> /dev/null || true; done
-  for port in 8080 3001 3002 3004; do lsof -ti "tcp:$port" -sTCP:LISTEN | xargs kill 2> /dev/null || true; done
+  for port in 8080 3001 3002 3004 3005; do lsof -ti "tcp:$port" -sTCP:LISTEN | xargs kill 2> /dev/null || true; done
   sleep 2
   "$root/server-spring/reset-db.sh" > /dev/null 2>&1 || true
 }
@@ -54,7 +56,7 @@ watered() { history | python3 -c 'import json,sys; h=json.load(sys.stdin); print
 rm -rf "$out"; mkdir -p "$out"
 (cd "$here/bespoke-1.0" && npm ci --no-audit --no-fund --silent && npx tsc)
 (cd "$here/artie-dashboard" && ./gradlew installDist -q)
-(cd "$here/openapi-live" && npm ci --no-audit --no-fund --silent && npx tsc)
+for client in openapi-live openapi-affordances; do (cd "$here/$client" && npm ci --no-audit --no-fund --silent && npx tsc); done
 (cd "$root/server-spring" && docker compose up -d postgres > /dev/null 2>&1)
 for _ in $(seq 1 30); do (cd "$root/server-spring" && docker compose exec -T postgres pg_isready -q) && break; sleep 1; done
 
@@ -102,7 +104,10 @@ pids+=($!)
 pids+=($!)
 wait_for http://localhost:3001/_calls
 wait_for http://localhost:3002/_calls
+(cd "$here/openapi-affordances" && PORT=3005 node dist/dashboard.js > "$out/afford.log" 2>&1) &
+pids+=($!)
 wait_for http://localhost:3004/_calls
+wait_for http://localhost:3005/_calls
 
 for change in "${changes[@]}"; do
   echo "== $change =="

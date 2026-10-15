@@ -7,9 +7,11 @@
 #   Tuesday, later   server 1.1.0   bespoke 1.1 (the rework)     the whole suite
 #
 # A fourth dashboard, live (openapi-live/), reads the OpenAPI description while
-# it runs and has no generated code: OpenAPI at its best. It runs on Monday and
-# Tuesday morning beside the others, unchanged. LIVE_ONLY=1 runs only it, and
-# writes nothing over the other dashboards' results.
+# it runs and has no generated code: OpenAPI at its best. A fifth, afford
+# (openapi-affordances/), also follows the affordance link each plain answer
+# carries when the garden runs with HEART_AFFORDANCE_LINKS=true. Both run on
+# Monday and Tuesday morning, unchanged. ONLY=live or ONLY=afford runs only that
+# one, and writes nothing over the other dashboards' results.
 #
 # The dashboards keep running from Monday into Tuesday: only the garden restarts,
 # with GARDEN_FROST=true, as a server-side release would. The suite drives each
@@ -17,7 +19,7 @@
 #
 # Needs Docker (Postgres), Node 20 and npm, and a JDK 22 or later for the ARTIE
 # dashboard (ARTIE_DASHBOARD_JAVA_HOME). Refuses to start if 8080, 3001, 3002 or 3003
-# is taken (and 3004 for live). Never prints a credential. Opens nothing on screen.
+# is taken (and 3004, 3005 for live and afford). Never prints a credential. Opens nothing on screen.
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")" && pwd)
@@ -27,7 +29,7 @@ garden=http://localhost:8080
 export JAVA_HOME=${ARTIE_JAVA_HOME:-$HOME/.sdkman/candidates/java/21.0.12-graal}
 dashboard_java=${ARTIE_DASHBOARD_JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal}
 
-for port in 8080 3001 3002 3003 3004; do
+for port in 8080 3001 3002 3003 3004 3005; do
   if lsof -nP -iTCP:$port -sTCP:LISTEN > /dev/null; then
     echo "Port $port is in use; this script starts and stops its own servers." >&2
     exit 1
@@ -44,7 +46,7 @@ export GARDEN_TOKEN GARDEN_URL=$garden GARDEN_RESET=$root/server-spring/reset-db
 pids=()
 stop_all() {
   for pid in "${pids[@]}"; do kill "$pid" 2> /dev/null || true; done
-  for port in 8080 3001 3002 3003 3004; do lsof -ti "tcp:$port" -sTCP:LISTEN | xargs kill 2> /dev/null || true; done
+  for port in 8080 3001 3002 3003 3004 3005; do lsof -ti "tcp:$port" -sTCP:LISTEN | xargs kill 2> /dev/null || true; done
   sleep 2
   "$root/server-spring/reset-db.sh" > /dev/null 2>&1 || true
 }
@@ -87,7 +89,7 @@ echo "Building the dashboards"
 for version in 1.0 1.1; do (cd "$here/bespoke-$version" && npm ci --no-audit --no-fund --silent && npx tsc); done
 (cd "$here/suite" && npm ci --no-audit --no-fund --silent)
 (cd "$here/artie-dashboard" && ./gradlew installDist -q)
-(cd "$here/openapi-live" && npm ci --no-audit --no-fund --silent && npx tsc)
+for client in openapi-live openapi-affordances; do (cd "$here/$client" && npm ci --no-audit --no-fund --silent && npx tsc); done
 
 (cd "$root/server-spring" && docker compose up -d postgres > /dev/null 2>&1)
 for _ in $(seq 1 30); do (cd "$root/server-spring" && docker compose exec -T postgres pg_isready -q) && break; sleep 1; done
@@ -102,22 +104,24 @@ pids+=($!)
 wait_for http://localhost:3002/_calls
 (cd "$here/openapi-live" && PORT=3004 node dist/dashboard.js > "$results/live.log" 2>&1) &
 pids+=($!)
+(cd "$here/openapi-affordances" && PORT=3005 node dist/dashboard.js > "$results/afford.log" 2>&1) &
+pids+=($!)
 wait_for http://localhost:3004/_calls
-if [ -z "${LIVE_ONLY:-}" ]; then
-  suite monday bespoke 1.0 3001 "not @tuesday"
-  suite monday artie 1.0 3002 "not @tuesday"
-fi
-suite monday live 1.0 3004 "not @tuesday"
+wait_for http://localhost:3005/_calls
+runs() { [ -z "${ONLY:-}" ] || [ "$ONLY" = "$1" ]; }
+runs bespoke && suite monday bespoke 1.0 3001 "not @tuesday"
+runs artie && suite monday artie 1.0 3002 "not @tuesday"
+runs live && suite monday live 1.0 3004 "not @tuesday"
+runs afford && suite monday afford 1.0 3005 "not @tuesday"
 
 echo "Tuesday: the garden team ships the frost; only the server restarts"
 start_garden true
-if [ -z "${LIVE_ONLY:-}" ]; then
-  suite tuesday-morning bespoke 1.0 3001 "@tuesday or not @tuesday"
-  suite tuesday-morning artie 1.0 3002 "@tuesday or not @tuesday"
-fi
-suite tuesday-morning live 1.0 3004 "@tuesday or not @tuesday"
+runs bespoke && suite tuesday-morning bespoke 1.0 3001 "@tuesday or not @tuesday"
+runs artie && suite tuesday-morning artie 1.0 3002 "@tuesday or not @tuesday"
+runs live && suite tuesday-morning live 1.0 3004 "@tuesday or not @tuesday"
+runs afford && suite tuesday-morning afford 1.0 3005 "@tuesday or not @tuesday"
 
-if [ -z "${LIVE_ONLY:-}" ]; then
+if runs bespoke; then
   echo "Tuesday, after the bespoke team's rework: dashboard 1.1 released"
   start_bespoke 1.1 3003
   suite tuesday-after-rework bespoke 1.1 3003 "@tuesday or not @tuesday"

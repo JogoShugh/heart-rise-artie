@@ -71,3 +71,5 @@ export const pages = {
         moisture: (html) => html.match(/data-member="moistureLevel">([^<]*)</)[1],
     },
 };
+// The same page, from the dashboard that also follows each answer's affordance link.
+pages.afford = pages.live;

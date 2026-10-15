@@ -1,0 +1,17 @@
+{
+  "name": "garden-dashboard-affordances",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenAPI with one hypermedia step: it reads the OpenAPI description live and follows each answer's Link to the state's affordance set.",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/dashboard.js"
+  },
+  "dependencies": {
+    "htmx.org": "2.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.5",
+    "typescript": "5.5.4"
+  }
+}
