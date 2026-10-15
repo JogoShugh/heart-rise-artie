@@ -80,29 +80,35 @@ async function logged<T>(method: string, path: string, call: () => Promise<T>): 
     }
 }
 
-function card(bed: Bed, message = ""): string {
+function card(bed: Bed, message = "", refused = false): string {
     const buttons = buttonsFor(bed.status).map((b) => `
       <form class="act" hx-post="/beds/${bed.id}/${b.action}" hx-target="closest .card" hx-swap="outerHTML">
         ${b.fields}<button type="submit">${b.title}</button>
       </form>`).join("");
+    const label = STATUS_LABEL[bed.status];
     return `
     <section class="card" id="bed-${bed.id}" hx-get="/beds/${bed.id}/card" hx-trigger="every 2s" hx-swap="outerHTML">
-      <h2>${bed.label}</h2>
-      <p>Status: <span class="badge">${STATUS_LABEL[bed.status]}</span></p>
-      <dl>
-        <dt>Crop</dt><dd>${bed.cropName ?? "none"}</dd>
-        <dt>Moisture</dt><dd class="moisture">${bed.moistureLevel}</dd>
-        <dt>Growth</dt><dd>${bed.growthPoints}</dd>
+      <div class="card-head">
+        <div><div class="kind">Garden bed</div><h2>${bed.label}</h2></div>
+        <span class="badge ${String(label).split(" ")[0].toLowerCase()}">${label}</span>
+      </div>
+      <dl class="facts">
+        <div><dt>Crop</dt><dd>${bed.cropName ?? "none"}</dd></div>
+        <div><dt>Moisture</dt><dd class="moisture">${bed.moistureLevel}</dd></div>
+        <div><dt>Growth</dt><dd>${bed.growthPoints}</dd></div>
+        <div><dt>Size</dt><dd>${bed.widthFt} × ${bed.lengthFt} ft</dd></div>
       </dl>
       <div class="buttons">${buttons}</div>
-      ${message ? `<p class="message">${message}</p>` : ""}
+      ${message ? `<p class="message${refused ? " refused" : ""}">${message}</p>` : ""}
     </section>`;
 }
 
 function page(body: string): string {
     return `<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>Garden dashboard ${VERSION}</title><script src="/htmx.min.js"></script></head>
-<body><h1>Garden dashboard <small>${VERSION}</small></h1>${body}</body></html>`;
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garden dashboard ${VERSION}</title><link rel="stylesheet" href="/dashboard.css"><script src="/htmx.min.js"></script></head>
+<body><header class="topbar">${mark}<h1>Garden dashboard</h1><span class="version">v${VERSION}</span>
+<span class="live">Polling every 2s</span></header><main>${body}</main></body></html>`;
 }
 
 async function problem(e: unknown): Promise<string> {
@@ -112,6 +118,9 @@ async function problem(e: unknown): Promise<string> {
 }
 
 const htmx = readFileSync(require.resolve("htmx.org/dist/htmx.min.js"));
+// The look both dashboards share (../shared), so they differ only in how they bind.
+const css = readFileSync(`${__dirname}/../../shared/dashboard.css`);
+const mark = readFileSync(`${__dirname}/../../shared/mark.svg`, "utf8");
 
 http.createServer(async (req, res) => {
     const url = new URL(req.url ?? "/", `http://localhost:${port}`);
@@ -122,6 +131,7 @@ http.createServer(async (req, res) => {
     };
     try {
         if (url.pathname === "/htmx.min.js") return send(200, "text/javascript", htmx);
+        if (url.pathname === "/dashboard.css") return send(200, "text/css", css);
         if (url.pathname === "/_calls") return send(200, "application/json", JSON.stringify(calls));
         if (!match) return send(404, "text/plain", "not found");
         const id = Number(match[1]);
@@ -135,7 +145,7 @@ http.createServer(async (req, res) => {
                 return send(200, "text/html", card(await act(id, match[2], form)));
             } catch (e) {
                 const message = await problem(e);
-                return send(200, "text/html", card(await api.getBed({ id }), message));
+                return send(200, "text/html", card(await api.getBed({ id }), message, true));
             }
         }
         const bed = await logged("GET", `/beds/${id}`, () => api.getBed({ id }));

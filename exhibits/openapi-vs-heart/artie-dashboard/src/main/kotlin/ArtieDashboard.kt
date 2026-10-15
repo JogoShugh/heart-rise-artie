@@ -64,6 +64,8 @@ fun main() {
     val htmx = Thread.currentThread().contextClassLoader
         .getResourceAsStream("META-INF/resources/webjars/htmx.org/2.0.3/dist/htmx.min.js")!!.readAllBytes()
 
+    val css = Thread.currentThread().contextClassLoader.getResourceAsStream("dashboard.css")!!.readAllBytes()
+
     val server = HttpServer.create(InetSocketAddress(port), 0)
     server.executor = Executors.newFixedThreadPool(THREADS)
     server.createContext("/") { exchange ->
@@ -72,6 +74,7 @@ fun main() {
             val at = query["at"] ?: bookmark
             when (exchange.requestURI.path) {
                 "/htmx.min.js" -> send(exchange, "text/javascript", htmx)
+                "/dashboard.css" -> send(exchange, "text/css", css)
                 "/_calls" -> send(exchange, "application/json", json(log.calls))
                 "/card" -> send(exchange, HTML, Render.card(client().enter(at)))
                 "/act" -> send(exchange, HTML, act(client(), at, form(exchange)))
@@ -94,9 +97,9 @@ private fun act(client: ArtieClient, at: String, fields: Map<String, String>): S
     return try {
         Render.card(client.act(key, typed(fields - "_form", schema)))
     } catch (refusal: ActRefused) {
-        Render.card(client.current ?: held, refusal.message.orEmpty())
+        Render.card(client.current ?: held, refusal.message.orEmpty(), refused = true)
     } catch (refusal: AccessRefused) {
-        Render.card(held, refusal.message.orEmpty())
+        Render.card(held, refusal.message.orEmpty(), refused = true)
     }
 }
 

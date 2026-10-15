@@ -18,22 +18,27 @@ import java.net.URLEncoder
  */
 object Render {
 
-    fun page(body: String): String = """<!doctype html><html lang="en"><head><meta charset="utf-8">
-<title>ARTIE dashboard</title><script src="/htmx.min.js"></script></head>
-<body><h1>ARTIE dashboard</h1>$body</body></html>"""
+    /** The look both dashboards share (../shared, on the classpath), so they differ only in how they bind. */
+    private val mark = Render::class.java.getResource("/mark.svg")!!.readText()
 
-    fun card(rep: HeartRepresentation, message: String = ""): String {
+    fun page(body: String): String = """<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARTIE dashboard</title><link rel="stylesheet" href="/dashboard.css"><script src="/htmx.min.js"></script></head>
+<body><header class="topbar">$mark<h1>ARTIE dashboard</h1><span class="version">generic HEART client</span>
+<span class="live">Re-syncs every 2s</span></header><main>$body</main></body></html>"""
+
+    fun card(rep: HeartRepresentation, message: String = "", refused: Boolean = false): String {
         val at = enc(rep.url)
         return """
     <section class="card" hx-get="/card?at=$at" hx-trigger="every 2s" hx-swap="outerHTML">
-      <h2>${esc(title(rep))}</h2>
-      <table class="state">${state(rep.state)}</table>
+      <div class="card-head"><div><div class="kind">${esc(java.net.URI(rep.url).path)}</div><h2>${esc(title(rep))}</h2></div></div>
+      <div class="facts">${state(rep.state)}</div>
       <div class="buttons">${rep.affordances.values.joinToString("") { form(rep, it) }}</div>
       <nav class="links">${links(rep)}</nav>
       <form class="ask" hx-post="/ask?at=$at" hx-target="closest .card" hx-swap="outerHTML">
-        <input name="intent" placeholder="Ask ARTIE" aria-label="Ask ARTIE"><button type="submit">Ask</button>
+        <input name="intent" placeholder="Ask ARTIE to do something here" aria-label="Ask ARTIE"><button type="submit">Ask</button>
       </form>
-      ${if (message.isNotEmpty()) "<p class=\"message\">${esc(message)}</p>" else ""}
+      ${if (message.isNotEmpty()) "<p class=\"message${if (refused) " refused" else ""}\">${esc(message)}</p>" else ""}
     </section>"""
     }
 
@@ -42,8 +47,13 @@ object Render {
 
     private fun state(state: JsonObject): String =
         state.entries.joinToString("") { (name, value) ->
-            "<tr><th>${esc(name)}</th><td data-member=\"${esc(name)}\">${esc(shown(value))}</td></tr>"
+            "<div><span class=\"name\">${esc(spoken(name))}</span>" +
+                "<span class=\"value\" data-member=\"${esc(name)}\">${esc(shown(value))}</span></div>"
         }
+
+    /** A member's name as words: `moistureLevel` reads "Moisture level". */
+    private fun spoken(name: String): String =
+        name.replace(Regex("([a-z0-9])([A-Z])"), "$1 $2").replace('_', ' ').lowercase().replaceFirstChar { it.uppercase() }
 
     private fun shown(value: JsonElement): String = when (value) {
         is JsonNull -> "none"

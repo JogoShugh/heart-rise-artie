@@ -45,7 +45,7 @@ export const pages = {
     bespoke: {
         ...common,
         open: (dashboard, bed) => text(`${dashboard}/beds/${bed}/card`),
-        status: (html) => html.match(/<span class="badge">([^<]*)<\/span>/)[1],
+        status: (html) => html.match(/<span class="badge[^"]*">([^<]*)<\/span>/)[1],
         moisture: (html) => html.match(/<dd class="moisture">([^<]*)<\/dd>/)[1],
     },
     // The ARTIE dashboard: from the bookmark, the bed is found by the form that gets a bed by its id.

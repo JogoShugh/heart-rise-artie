@@ -12,6 +12,9 @@ dependencies {
     runtimeOnly("org.webjars.npm:htmx.org:2.0.3")
 }
 
+// The look both dashboards share.
+sourceSets { main { resources.srcDir("../shared") } }
+
 kotlin {
     jvmToolchain(22)
 }
