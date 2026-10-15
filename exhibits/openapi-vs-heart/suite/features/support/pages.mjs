@@ -63,4 +63,11 @@ export const pages = {
         status: (html) => html.match(/data-member="status">([^<]*)</)[1],
         moisture: (html) => html.match(/data-member="moistureLevel">([^<]*)</)[1],
     },
+    // The dashboard that reads the OpenAPI description live: a page per bed, its members as the ARTIE card shows them.
+    live: {
+        ...common,
+        open: (dashboard, bed) => text(`${dashboard}/beds/${bed}/card`),
+        status: (html) => html.match(/data-member="status">([^<]*)</)[1],
+        moisture: (html) => html.match(/data-member="moistureLevel">([^<]*)</)[1],
+    },
 };

@@ -7,6 +7,8 @@
 #   artie     the ARTIE dashboard, driven as a person would (changes/drive.mjs)
 #   script    ARTIE driven by code that names the act and its field (ArtieScript)
 #   claude    the ARTIE dashboard's Ask, with Claude choosing (one run per change)
+#   live      a dashboard with no generated code that reads the OpenAPI description
+#             while it runs (openapi-live/), OpenAPI at its best
 # Under tighter-limit the person also types 800 ml on the bespoke dashboard,
 # whose field still allows 1000.
 #
@@ -14,17 +16,21 @@
 # Where the bespoke dashboard fails, it is regenerated from the change's spec and
 # tsc's errors are kept. Results go to results/changes/. Refuses busy ports,
 # stops only what it started, resets the data, and never prints a credential.
+#
+# RUN names the results folder (results/$RUN, default "changes"); CHANGES and
+# CLIENTS, space-separated, choose which changes and clients to run.
 set -euo pipefail
 
 here=$(cd "$(dirname "$0")" && pwd)
 root=$(cd "$here/../.." && pwd)
-out=$here/results/changes
+out=$here/results/${RUN:-changes}
 garden=http://localhost:8080
 export JAVA_HOME=${ARTIE_JAVA_HOME:-$HOME/.sdkman/candidates/java/21.0.12-graal}
 dashboard_java=${ARTIE_DASHBOARD_JAVA_HOME:-$HOME/.sdkman/candidates/java/25.3.4+1.r25-graal}
-changes=(move-url rename-field rename-act retitle tighter-limit new-required-input)
+read -r -a changes <<< "${CHANGES:-move-url rename-field rename-act retitle tighter-limit new-required-input}"
+read -r -a clients <<< "${CLIENTS:-bespoke artie script claude live}"
 
-for port in 8080 3001 3002; do
+for port in 8080 3001 3002 3004; do
   if lsof -nP -iTCP:$port -sTCP:LISTEN > /dev/null; then echo "Port $port is in use." >&2; exit 1; fi
 done
 # shellcheck source=../../scripts/lib/credentials.sh
@@ -36,7 +42,7 @@ export GARDEN_TOKEN GARDEN_URL=$garden
 pids=()
 stop_all() {
   for pid in "${pids[@]}"; do kill "$pid" 2> /dev/null || true; done
-  for port in 8080 3001 3002; do lsof -ti "tcp:$port" -sTCP:LISTEN | xargs kill 2> /dev/null || true; done
+  for port in 8080 3001 3002 3004; do lsof -ti "tcp:$port" -sTCP:LISTEN | xargs kill 2> /dev/null || true; done
   sleep 2
   "$root/server-spring/reset-db.sh" > /dev/null 2>&1 || true
 }
@@ -48,6 +54,7 @@ watered() { history | python3 -c 'import json,sys; h=json.load(sys.stdin); print
 rm -rf "$out"; mkdir -p "$out"
 (cd "$here/bespoke-1.0" && npm ci --no-audit --no-fund --silent && npx tsc)
 (cd "$here/artie-dashboard" && ./gradlew installDist -q)
+(cd "$here/openapi-live" && npm ci --no-audit --no-fund --silent && npx tsc)
 (cd "$root/server-spring" && docker compose up -d postgres > /dev/null 2>&1)
 for _ in $(seq 1 30); do (cd "$root/server-spring" && docker compose exec -T postgres pg_isready -q) && break; sleep 1; done
 
@@ -91,15 +98,22 @@ start_garden ""
 pids+=($!)
 (cd "$here/artie-dashboard" && JAVA_HOME=$dashboard_java build/install/artie-dashboard/bin/artie-dashboard > "$out/artie.log" 2>&1) &
 pids+=($!)
+(cd "$here/openapi-live" && PORT=3004 node dist/dashboard.js > "$out/live.log" 2>&1) &
+pids+=($!)
 wait_for http://localhost:3001/_calls
 wait_for http://localhost:3002/_calls
+wait_for http://localhost:3004/_calls
 
 for change in "${changes[@]}"; do
   echo "== $change =="
   start_garden "$change"
   curl -s "$garden/openapi.json" > "$out/openapi-$change.json"
-  for client in bespoke artie script claude; do attempt "$change" "$client"; done
-  [ "$change" = tighter-limit ] && attempt "$change" bespoke 800
+  for client in "${clients[@]}"; do attempt "$change" "$client"; done
+  if [ "$change" = tighter-limit ]; then
+    # Only the bespoke field still allows 800; the others show the new maximum, which the browser enforces.
+    [[ " ${clients[*]} " == *" bespoke "* ]] && attempt "$change" bespoke 800
+  fi
+  [[ " ${clients[*]} " == *" bespoke "* ]] || continue
   # What the bespoke team's compiler says after regenerating from this change's spec.
   work=$(mktemp -d)
   rsync -a --exclude node_modules --exclude dist "$here/bespoke-1.0/" "$work/bespoke/"
