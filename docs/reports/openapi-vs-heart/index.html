@@ -410,6 +410,40 @@ but required in type 'Record&lt;BedStatusEnum, string&gt;'.</pre>
     <p>At its best, an OpenAPI client copes with changes to an API's shape as well as a HEART client does, and careful evolution protects even a generated client. What no OpenAPI client can know is which acts this resource allows <em>now</em>, because the spec describes the API, not the resource's current state. That one gap is Fielding's rule 6, and it's exactly what HEART's per-state affordances fill.</p>
   </section>
 
+  <section class="wide">
+    <h2>Closing OpenAPI's last gap, with a link</h2>
+    <p>At its best, an OpenAPI client copes with every change to an API's shape. What it can't know is which acts a resource allows now: the description says that only in prose. No better tooling around a static description can fix that, because it's a fact about this resource at this moment. It has to travel with the answer.</p>
+    <p>So the garden can now add one thing to its plain JSON answers, switched on with <code>HEART_AFFORDANCE_LINKS=true</code>. The body stays the plain state. Each answer about a bed also carries a standing link:</p>
+<pre>Link: &lt;/affordance-sets/…&gt;; rel="https://w3id.org/heart-rise/rels/forms";
+      type="application/hal+json"; integrity="sha256-…"</pre>
+    <ul>
+      <li>The link names the content-addressed affordance set of the state the answer shows. That's the same set HEART's L1 representation links to, so nothing new is invented. It's immutable, so a client fetches each set once.</li>
+      <li>The OpenAPI description documents the header on every answer about a bed, and says once, in <code>x-heart-affordances</code>, how to use it: keep the operations whose method and path template a form names.</li>
+      <li>It's opt-in, because it changes the description's bytes. The published 1.0.0 and 1.1.0 stay exactly as they were. With it on, the garden calls its description <code>1.0.0+affordance-links</code>.</li>
+    </ul>
+    <p>A sixth client, <code>openapi-affordances/</code>, is the spec-reading client plus that one step. It follows the link, checks the set against its integrity, and shows only the operations a form names. If there's no link, it shows everything, as before.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Test</th><th scope="col">Bespoke 1.0</th><th scope="col">Spec-reading</th><th scope="col">Spec-reading + link</th><th scope="col">ARTIE dashboard</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Frost suite, Monday</th><td class="pass">3 of 3</td><td class="fail">0 of 3</td><td class="pass">3 of 3</td><td class="pass">3 of 3</td></tr>
+          <tr><th scope="row">Frost suite, Tuesday morning</th><td class="fail">3 of 7</td><td class="fail">1 of 7</td><td class="pass">7 of 7</td><td class="pass">7 of 7</td></tr>
+          <tr><th scope="row">Six Wednesday changes, bed 2 watered</th><td>4 of 6</td><td class="pass">6 of 6</td><td class="pass">6 of 6</td><td class="pass">6 of 6</td></tr>
+          <tr><th scope="row">Three careful changes, bed 2 watered</th><td class="pass">3 of 3</td><td class="pass">3 of 3</td><td class="pass">3 of 3</td><td class="pass">3 of 3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="shots">
+      <figure><img src="shots/best/tuesday-live.png" alt="The spec-reading dashboard on Tuesday: a frozen bed with Harvest, Sow, Thaw and Water buttons" width="820" height="620"><figcaption><b>Spec-reading client.</b> Every act the description lists.</figcaption></figure>
+      <figure><img src="shots/afford/tuesday-afford.png" alt="The spec-reading dashboard with the affordance link on Tuesday: a frozen bed with only a Thaw the bed button" width="820" height="620"><figcaption><b>Spec-reading client + link.</b> Only Thaw, as the frozen bed allows.</figcaption></figure>
+    </div>
+
+    <h3>What it means</h3>
+    <p>The last thing OpenAPI couldn't do took one link in the answer, pointing to a set of forms. That is hypermedia: the client now chooses among controls the server sent with the state, which is Fielding's rule 6. OpenAPI still does what it's good at, the names, schemas and documentation. The link does what it can't.</p>
+    <p>So the road from OpenAPI to a client that survives every change here ends at the Web's own mechanism. The OpenAPI maintainers deliberately scope their spec to "HTTP APIs", and that leaves this gap open by design. Closing it doesn't mean throwing OpenAPI away. It means adding the one piece of hypermedia that carries per-state truth, which is HEART's L1 rung, reached from the other side.</p>
+    <p class="note">Caveats: this client still binds three things (the garden's URL, the spec's URL and <code>getBed</code>), and it matches forms to operations by path template. A form whose target the description doesn't list would be dropped. Following the form's target directly would fix that, and would be one more step toward a plain HEART client.</p>
+  </section>
+
   <section>
     <h2>Fair to say</h2>
     <ul>

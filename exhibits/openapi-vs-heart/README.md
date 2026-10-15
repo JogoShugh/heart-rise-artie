@@ -274,3 +274,34 @@ Run them with `LIVE_ONLY=1 ./run-matrix.sh`, `RUN=changes-best CLIENTS=live
 rename-field-kept new-optional-input" ./run-changes.sh`. Results are in
 `results/changes-best/`, `results/changes-careful/` and
 `results/*--live-1.0.*`; screenshots in `results/screenshots/best/`.
+
+## Closing OpenAPI's last gap, with a link
+
+The spec-reading client fails only on state: the description says which acts
+are allowed now only in prose. With `HEART_AFFORDANCE_LINKS=true`, each plain
+JSON answer about a bed also carries
+`Link: </affordance-sets/…>; rel="https://w3id.org/heart-rise/rels/forms"; integrity="sha256-…"`,
+naming its state's content-addressed affordance set (the one HEART's L1 links
+to). The description documents the header and, in `x-heart-affordances`, how
+to use it. It's opt-in: the published 1.0.0 and 1.1.0 keep their bytes, and
+the garden marks the option in its version (`1.0.0+affordance-links`).
+
+`openapi-affordances/` (port 3005) is the spec-reading client plus that one
+step: it follows the link, checks the set's integrity, and keeps only the
+operations whose method and path template a form names.
+
+| Test | Bespoke 1.0 | Spec-reading | Spec-reading + link | ARTIE dashboard |
+|---|---|---|---|---|
+| Frost suite, Monday | 3 of 3 | 0 of 3 | 3 of 3 | 3 of 3 |
+| Frost suite, Tuesday morning | 3 of 7 | 1 of 7 | 7 of 7 | 7 of 7 |
+| Six Wednesday changes | 4 of 6 | 6 of 6 | 6 of 6 | 6 of 6 |
+| Three careful changes | 3 of 3 | 3 of 3 | 3 of 3 | 3 of 3 |
+
+The last thing OpenAPI couldn't do took one link in the answer to a set of
+forms: hypermedia, Fielding's rule 6. OpenAPI keeps the names, schemas and
+docs; the link carries what's allowed now.
+
+Run it with `HEART_AFFORDANCE_LINKS=true ONLY=afford ./run-matrix.sh`, and
+`HEART_AFFORDANCE_LINKS=true RUN=changes-afford CLIENTS=afford ./run-changes.sh`
+(add `RUN=changes-afford-careful CHANGES="move-url-kept rename-field-kept
+new-optional-input"` for the careful ones).
