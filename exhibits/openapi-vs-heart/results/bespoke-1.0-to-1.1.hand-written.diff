@@ -1,5 +1,5 @@
 diff --git a/bespoke-1.0/src/dashboard.ts b/bespoke-1.1/src/dashboard.ts
-index 219af4a..9d28308 100644
+index fa2b532..e7585d8 100644
 --- a/bespoke-1.0/src/dashboard.ts
 +++ b/bespoke-1.1/src/dashboard.ts
 @@ -1,4 +1,5 @@
@@ -54,7 +54,7 @@ index 219af4a..9d28308 100644
          default:
              throw new Error(`no action ${action}`);
      }
-@@ -115,7 +122,7 @@ const htmx = readFileSync(require.resolve("htmx.org/dist/htmx.min.js"));
+@@ -124,7 +131,7 @@ const mark = readFileSync(`${__dirname}/../../shared/mark.svg`, "utf8");
  
  http.createServer(async (req, res) => {
      const url = new URL(req.url ?? "/", `http://localhost:${port}`);
