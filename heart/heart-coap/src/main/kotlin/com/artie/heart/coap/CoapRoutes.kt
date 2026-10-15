@@ -159,7 +159,10 @@ internal class CoapRoutes(
         }
 
         private fun validatorOf(state: Any?, rung: Rung): ByteArray = CoapOptions.validator(
-            StateETag.of(resource.layers.type.state.versionOf(state), Dialect.JSONSCHEMA.etagTag, rung),
+            StateETag.of(
+                resource.layers.type.state.versionOf(state), Dialect.JSONSCHEMA.etagTag, rung,
+                resource.layers.layer1(state, rung),
+            ),
         )
     }
 

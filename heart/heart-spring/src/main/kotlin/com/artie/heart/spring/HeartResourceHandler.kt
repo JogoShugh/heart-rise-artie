@@ -162,7 +162,14 @@ class HeartResourceHandler<S, K>(
 
     /** One representation of one state: its validator, its headers and its body. */
     private inner class Rendered(val state: S, val dialect: Dialect, val rung: Rung) {
-        val etag: String = StateETag.of(type.state.versionOf(state), dialect.etagTag, rung)
+        /** Layer 1 in the negotiated dialect, both rendered by heart-core from the declaration. */
+        private val body: Any = when (dialect) {
+            Dialect.JSONSCHEMA -> resource.layers.layer1(state, rung)
+            Dialect.HALFORMS -> resource.layers.halForms(state)
+        }
+
+        /** Names this representation, so a release that renders the state differently changes it. */
+        val etag: String = StateETag.of(type.state.versionOf(state), dialect.etagTag, rung, body)
 
         /** Every header that can change the body is listed in Vary, so a cache never mixes them up. */
         fun headers(headers: HttpHeaders) {
@@ -177,13 +184,7 @@ class HeartResourceHandler<S, K>(
 
         suspend fun respond(builder: ServerResponse.BodyBuilder): ServerResponse =
             builder.contentType(MediaType.parseMediaType(dialect.mediaType)).headers { headers(it) }
-                .bodyValueAndAwait(body())
-
-        /** Layer 1 in the negotiated dialect, both rendered by heart-core from the declaration. */
-        private fun body(): Any = when (dialect) {
-            Dialect.JSONSCHEMA -> resource.layers.layer1(state, rung)
-            Dialect.HALFORMS -> resource.layers.halForms(state)
-        }
+                .bodyValueAndAwait(body)
     }
 
     /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. No rung above the cap is served. */

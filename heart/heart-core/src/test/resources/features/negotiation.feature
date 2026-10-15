@@ -63,12 +63,20 @@ Feature: Choosing the dialect, the rung and the validator
       | cid                        | L0   |
 
   Scenario Outline: A Layer 1 validator names one representation of one state
-    Then the validator of state 5 in dialect <dialect> at rung <rung> is "<etag>"
+    RFC 9110 §8.8.1: a strong validator changes whenever the representation
+    does. The state's version, the dialect and the rung keep it readable; the
+    digest of the representation (the first 16 hex digits of the SHA-256 of
+    its canonical JSON, RFC 8785) makes it change when a server release
+    changes the representation of an unchanged state.
+    Then the validator of state 5 in dialect <dialect> at rung <rung>, for the representation {"id": 5}, is "<etag>"
 
     Examples:
-      | dialect    | rung | etag              |
-      | JSONSCHEMA | L2   | seq-5.hsf.L2 |
-      | HALFORMS   | L0   | seq-5.hf.L0  |
+      | dialect    | rung | etag                          |
+      | JSONSCHEMA | L2   | seq-5.hsf.L2.e8e98768123683fa |
+      | HALFORMS   | L0   | seq-5.hf.L0.e8e98768123683fa  |
+
+  Scenario: The same state, rendered differently by another release, has another validator
+    Then the validator of state 5 in dialect JSONSCHEMA at rung L2 differs between the representations {"moistureLevel": 40} and {"soilMoisture": 40}
 
   Scenario Outline: If-Match "<ifMatch>" against the current "seq-5.hsf.L2"
     Then If-Match <ifMatch> <verdict> the current validator "seq-5.hsf.L2"

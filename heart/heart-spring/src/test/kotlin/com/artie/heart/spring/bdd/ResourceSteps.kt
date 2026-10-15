@@ -1,6 +1,10 @@
 package com.artie.heart.spring.bdd
 
+import com.artie.heart.ContentAddress
+import com.artie.heart.HeartResource
+import com.artie.heart.JsonTrees
 import com.artie.heart.PastEvent
+import com.artie.heart.Rung
 import com.artie.heart.fixtures.Lamp
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -15,7 +19,14 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import java.time.Duration
 import java.time.Instant
 
-class ResourceSteps(private val client: WebTestClient, private val store: LampStore, private val http: HttpWorld) {
+class ResourceSteps(
+    private val client: WebTestClient,
+    private val store: LampStore,
+    private val http: HttpWorld,
+    resource: HeartResource<*, *>,
+) {
+    @Suppress("UNCHECKED_CAST")
+    private val layers = (resource as HeartResource<Lamp, Any?>).layers
     private val json: JsonNode get() = ObjectMapper().readTree(http.last.responseBody)
 
     @Before
@@ -87,7 +98,7 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
 
     @When("a client gets {string} as {word} with If-None-Match {string}")
     fun getIfNoneMatch(path: String, dialect: String, etag: String) =
-        get(path, mapOf(HttpHeaders.ACCEPT to accept(dialect), HttpHeaders.IF_NONE_MATCH to etag))
+        get(path, mapOf(HttpHeaders.ACCEPT to accept(dialect), HttpHeaders.IF_NONE_MATCH to expand(etag)))
 
     @When("a client gets {string} with Accept {string}")
     fun getWithAccept(path: String, value: String) = get(path, mapOf(HttpHeaders.ACCEPT to value))
@@ -98,7 +109,7 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
             .header(HttpHeaders.ACCEPT, accept(dialect))
             .header(HttpHeaders.CONTENT_TYPE, "application/json")
         // A regex step keeps Gherkin's \" escapes; a validator's quotes are part of it.
-        if (ifMatch.isNotEmpty()) spec.header(HttpHeaders.IF_MATCH, ifMatch.replace("\\\"", "\""))
+        if (ifMatch.isNotEmpty()) spec.header(HttpHeaders.IF_MATCH, expand(ifMatch.replace("\\\"", "\"")))
         http.results = http.results + spec.bodyValue(body).exchange().expectBody().returnResult()
     }
 
@@ -116,7 +127,31 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
     }
 
     @Then("the response has {word} {string}")
-    fun header(name: String, value: String) = assertEquals(value, http.last.responseHeaders.getFirst(name), name)
+    fun header(name: String, value: String) {
+        val isETag = name.equals(HttpHeaders.ETAG, ignoreCase = true)
+        val expected = if (isETag) expand(value, http.last.responseBody) else value
+        assertEquals(expected, http.last.responseHeaders.getFirst(name), name)
+    }
+
+    /**
+     * Fills `{digest}` in a validator such as "seq-3.hsf.L0.{digest}": the digest of a
+     * response's own body when it has one, or else of lamp 7's current representation in
+     * that dialect and rung, as the server renders it.
+     */
+    private fun expand(text: String, body: ByteArray? = null): String =
+        DIGEST.replace(text) { match ->
+            val (version, tag, rung) = match.destructured
+            val digest = body?.takeIf { it.isNotEmpty() }
+                ?.let { ContentAddress.address(ContentAddress.canonical(JsonTrees.plain(String(it)))) }
+                ?: current(tag, Rung.valueOf(rung))
+            "seq-$version.$tag.$rung.$digest"
+        }
+
+    private fun current(tag: String, rung: Rung): String {
+        val lamp = store.lamps.getValue(LAMP)
+        val representation = if (tag == "hf") layers.halForms(lamp) else layers.layer1(lamp, rung)
+        return ContentAddress.address(ContentAddress.canonical(representation))
+    }
 
     @Then("the response links its profile {string}")
     fun linksProfile(profile: String) {
@@ -171,4 +206,12 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
     }
 
     private fun names(list: String): Set<String> = list.split(",").map { it.trim() }.toSet()
+
+    private companion object {
+        /** A validator whose digest the scenario leaves to be filled: "seq-3.hsf.L0.{digest}". */
+        val DIGEST = Regex("""seq-(\d+)\.(hsf|hf)\.(L\d)\.\{digest}""")
+
+        /** Every lamp scenario works on lamp 7. */
+        const val LAMP = 7L
+    }
 }

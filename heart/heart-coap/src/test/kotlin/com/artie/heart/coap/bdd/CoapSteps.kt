@@ -1,5 +1,7 @@
 package com.artie.heart.coap.bdd
 
+import com.artie.heart.ContentAddress
+import com.artie.heart.JsonTrees
 import com.artie.heart.coap.CoapFrontDoor
 import com.artie.heart.coap.CoapOptions
 import com.artie.heart.fixtures.Lamp
@@ -177,7 +179,10 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
 
     @Then("the CoAP ETag is the first 8 bytes of SHA-256 over {string}")
     fun etag(httpETag: String) {
-        val expected = MessageDigest.getInstance("SHA-256").digest(httpETag.toByteArray()).copyOf(ETAG_BYTES)
+        // "{digest}" is the digest of the representation this response carries, as HTTP's ETag has it.
+        val digest = ContentAddress.address(ContentAddress.canonical(JsonTrees.plain(String(last.payload))))
+        val value = httpETag.replace("{digest}", digest)
+        val expected = MessageDigest.getInstance("SHA-256").digest(value.toByteArray()).copyOf(ETAG_BYTES)
         assertArrayEquals(expected, last.options.eTags.single())
     }
 

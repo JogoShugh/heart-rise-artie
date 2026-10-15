@@ -28,14 +28,14 @@ Feature: Choosing the representation over HTTP: dialect, profile and rung
 
   Scenario: HAL-FORMS is the L0 on-ramp: it ignores layering preferences, so it does not vary on Prefer
     When a client gets "/lamps/7" as hal-forms with Prefer "forms=link, schema=link"
-    Then the response has ETag "\"seq-3.hf.L0\""
+    Then the response has ETag "\"seq-3.hf.L0.{digest}\""
     And the response has Vary "Accept, Accept-Profile"
     And the response carries its forms under "_templates"
     And the response has no Preference-Applied header
 
   Scenario Outline: A Prefer token the server does not know degrades to L0: <prefer>
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "<prefer>"
-    Then the response has ETag "\"seq-3.hsf.L0\""
+    Then the response has ETag "\"seq-3.hsf.L0.{digest}\""
     And the response carries its forms under "_forms"
     And the response has no Preference-Applied header
 
@@ -47,7 +47,7 @@ Feature: Choosing the representation over HTTP: dialect, profile and rung
   Scenario Outline: A server capped at <max> answers a request for L2 at <max>, and its home document says so
     Given the server serves rungs up to <max>
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "forms=link, schema=link"
-    Then the response has ETag "\"seq-3.hsf.<max>\""
+    Then the response has ETag "\"seq-3.hsf.<max>.{digest}\""
     And Preference-Applied is <applied>
     When a client gets "/" with Accept "application/json-home"
     Then the home document's "item" hint "accept-prefer" is <applied>

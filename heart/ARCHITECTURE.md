@@ -271,8 +271,10 @@ L6 is never required: a deterministic client is fully conformant.
 | `If-None-Match` | Revalidation | `304` with the same ETag |
 | `If-Match` | Which state an act was decided on | `412` if stale |
 
-A Layer 1 ETag names one representation of one state: `"seq-<version>.<dialect>.<rung>"`,
-for example `"seq-3.hsf.L2"`. An act repeats the `Accept` and `Prefer` it was
+A Layer 1 ETag names one representation of one state:
+`"seq-<version>.<dialect>.<rung>.<digest>"`, for example `"seq-3.hsf.L2.e8e98768123683fa"`.
+The digest is the first 16 hex digits of the SHA-256 of the representation's canonical JSON,
+so a release that renders an unchanged state differently changes the ETag too. An act repeats the `Accept` and `Prefer` it was
 read with, so the server compares against the same representation. `Accept`
 that names no dialect is 406, before anything is written.
 

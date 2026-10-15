@@ -15,7 +15,7 @@ Feature: A declared resource over CoAP, served by heart-coap
     And the CoAP option 65008 is "https://w3id.org/heart-rise/hal-schema-forms"
     And the CoAP option 65012 is "forms=link, schema=link"
     And the CoAP Max-Age is 0
-    And the CoAP ETag is the first 8 bytes of SHA-256 over "\"seq-3.hsf.L2\""
+    And the CoAP ETag is the first 8 bytes of SHA-256 over "\"seq-3.hsf.L2.{digest}\""
 
   Scenario: An unchanged lamp revalidates to 2.03 Valid
     Given a CoAP client got "/lamps/7" with Prefer ""
@@ -56,7 +56,7 @@ Feature: A declared resource over CoAP, served by heart-coap
     Then the CoAP response is 2.01
     And the CoAP Location-Path is "lamps/8"
     And the CoAP body links self to "/lamps/8"
-    And the CoAP ETag is the first 8 bytes of SHA-256 over "\"seq-1.hsf.L0\""
+    And the CoAP ETag is the first 8 bytes of SHA-256 over "\"seq-1.hsf.L0.{digest}\""
 
   Scenario Outline: A refused act on the bookmark over CoAP: <case>
     Given a CoAP client got "/" with Prefer ""

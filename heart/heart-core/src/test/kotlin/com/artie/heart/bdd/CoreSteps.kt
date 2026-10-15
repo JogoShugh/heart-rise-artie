@@ -5,6 +5,7 @@ import com.artie.heart.Dialect
 import com.artie.heart.Negotiation
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.Rung
+import com.artie.heart.JsonTrees
 import com.artie.heart.StateETag
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -88,9 +89,18 @@ class CoreSteps {
     @Then("the rung is {word}")
     fun theRungIs(expected: String) = assertEquals(Rung.valueOf(expected), rung)
 
-    @Then("the validator of state {int} in dialect {word} at rung {word} is {string}")
-    fun theValidatorIs(version: Int, dialect: String, rung: String, expected: String) {
-        assertEquals("\"$expected\"", StateETag.of(version, Dialect.valueOf(dialect).etagTag, Rung.valueOf(rung)))
+    @Then("the validator of state {int} in dialect {word} at rung {word}, for the representation {}, is {string}")
+    fun theValidatorIs(version: Int, dialect: String, rung: String, representation: String, expected: String) {
+        val tree = JsonTrees.plain(representation)
+        assertEquals("\"$expected\"", StateETag.of(version, Dialect.valueOf(dialect).etagTag, Rung.valueOf(rung), tree))
+    }
+
+    @Then("the validator of state {int} in dialect {word} at rung {word} differs between the representations {} and {}")
+    fun theValidatorDiffers(version: Int, dialect: String, rung: String, first: String, second: String) {
+        val tag = Dialect.valueOf(dialect).etagTag
+        val one = StateETag.of(version, tag, Rung.valueOf(rung), JsonTrees.plain(first))
+        val other = StateETag.of(version, tag, Rung.valueOf(rung), JsonTrees.plain(second))
+        assertTrue(one != other, "both are $one")
     }
 
     @Then("^If-Match (.+) (matches|does not match) the current validator \"(.+)\"$")

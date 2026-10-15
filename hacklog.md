@@ -831,6 +831,24 @@ from Okta or Google come next, on the same seams.
   (Claude Code) lets that model read the environment and `~/.artie` itself.
   ARTIE's promise covers what passes through ARTIE.
 
+## 2026-10-14: an ETag that outlived a release
+
+Found while running the Wednesday server variants (fairness item 1). After the
+garden restarted with `move-url`, the ARTIE dashboard revalidated bed 2 with
+its held ETag `"seq-3.hsf.L2"`, got `304`, and reused its stored form, whose
+target was `/beds/2/actions/water-cell`. The garden now served that act at
+`/beds/2/actions/water`, so the act got `404`. The state had not changed, but
+the representation had, and the validator named only the state.
+
+That broke RFC 9110 §8.8.1 (a strong validator changes whenever the bytes
+do) and SPEC §6.7's own rule that the ETag is computed over a representation
+that includes the affordance-set link. The author chose to fix it in HEART:
+each Layer 1 ETag now ends with the first 16 hex digits of the SHA-256 of the
+representation's canonical JSON, `"seq-3.hsf.L2.e8e98768123683fa"`, over HTTP
+and (through the 8-byte hash) over CoAP. Clients are unchanged; they treat
+the value as opaque. The dashboard and Claude results from the first run of
+`run-changes.sh` are void and were rerun.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

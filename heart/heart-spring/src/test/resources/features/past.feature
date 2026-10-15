@@ -19,7 +19,7 @@ Feature: A resource's past, when it has one
     When a client gets lamp 7 as hal-schema-forms as of 2 days ago
     Then the response status is 200
     And the response body has "brightness" 50
-    And the response has ETag "\"seq-1.hsf.L0\""
+    And the response has ETag "\"seq-1.hsf.L0.{digest}\""
     And the response offers "home:switch-off, home:dim"
 
   Scenario: An instant that is not ISO 8601 is a bad request

@@ -10,16 +10,23 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
     Given lamp 7 is "ON" at version 3 in the lamp server
 
   Scenario: A 304 has no body, and keeps the ETag the client holds
-    When a client gets "/lamps/7" as hal-schema-forms with If-None-Match "\"seq-3.hsf.L0\""
+    When a client gets "/lamps/7" as hal-schema-forms with If-None-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 304
     And the response has no body
-    And the response has ETag "\"seq-3.hsf.L0\""
+    And the response has ETag "\"seq-3.hsf.L0.{digest}\""
+
+  Scenario: A validator without the representation's digest is not the current one
+    The state is unchanged, but "seq-3.hsf.L0" alone could name a
+    representation an earlier release rendered differently, so it does not
+    revalidate.
+    When a client gets "/lamps/7" as hal-schema-forms with If-None-Match "\"seq-3.hsf.L0\""
+    Then the response status is 200
 
   Scenario: An ETag from another rung does not revalidate
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "forms=link"
     And the client gets it again at Prefer "forms=link, schema=link" with the ETag it holds
     Then the response status is 200
-    And the response has ETag "\"seq-3.hsf.L2\""
+    And the response has ETag "\"seq-3.hsf.L2.{digest}\""
 
   Scenario Outline: An act sent with the headers it read with matches the ETag it holds: <dialect>, Prefer "<prefer>"
     When a client gets "/lamps/7" as <dialect> with Prefer "<prefer>"
@@ -28,11 +35,11 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
     And the response has ETag "<etag>"
 
     Examples:
-      | dialect          | prefer                  | etag              |
-      | hal-schema-forms |                         | \"seq-4.hsf.L0\" |
-      | hal-schema-forms | forms=link              | \"seq-4.hsf.L1\" |
-      | hal-schema-forms | forms=link, schema=link | \"seq-4.hsf.L2\" |
-      | hal-forms        |                         | \"seq-4.hf.L0\"  |
+      | dialect          | prefer                  | etag                       |
+      | hal-schema-forms |                         | \"seq-4.hsf.L0.{digest}\" |
+      | hal-schema-forms | forms=link              | \"seq-4.hsf.L1.{digest}\" |
+      | hal-schema-forms | forms=link, schema=link | \"seq-4.hsf.L2.{digest}\" |
+      | hal-forms        |                         | \"seq-4.hf.L0.{digest}\"  |
 
   Scenario: An ETag for another representation than the act's headers select is stale, and changes nothing
     The lamp has not changed, but the client read L2 and now asks for L0.
@@ -47,7 +54,7 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
     on the state whose ETag matched, never on one read again afterwards, so
     a write that lands between the check and the act is caught too.
     Given another client's dim to 80 lands on lamp 7 just after the server checks the next act's If-Match
-    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 412
     And lamp 7 has brightness 80 at version 4
 
@@ -56,12 +63,12 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
     Then the response status is 200
 
   Scenario: A body that is not JSON at all is a bad request, not a schema failure, and changes nothing
-    When a client posts {"brightness": to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    When a client posts {"brightness": to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 400
     And lamp 7 is still at version 3
 
   Scenario: A refusal names what it refused: the act not offered, or each field that failed
-    When a client posts {} to "/lamps/7/actions/switch-on" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    When a client posts {} to "/lamps/7/actions/switch-on" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the problem's "rel" member is "/profiles/home#switch-on"
-    When a client posts {"brightness": 0} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    When a client posts {"brightness": 0} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the problem lists a violation at "/brightness"

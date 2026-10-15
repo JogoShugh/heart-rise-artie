@@ -11,7 +11,7 @@ Feature: A declared resource and its acts, served over HTTP
     When a client gets "/lamps/7" as hal-schema-forms
     Then the response status is 200
     And the response has Content-Type "application/hal+json"
-    And the response has ETag "\"seq-3.hsf.L0\""
+    And the response has ETag "\"seq-3.hsf.L0.{digest}\""
     And the response has Cache-Control "no-cache"
     And the response has Vary "Accept, Prefer, Accept-Profile"
     And the response links its profile "https://w3id.org/heart-rise/hal-schema-forms"
@@ -20,12 +20,12 @@ Feature: A declared resource and its acts, served over HTTP
   Scenario: L2 links to the shared affordance set, and says which preference it applied
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "forms=link, schema=link"
     Then the response status is 200
-    And the response has ETag "\"seq-3.hsf.L2\""
+    And the response has ETag "\"seq-3.hsf.L2.{digest}\""
     And the response has Preference-Applied "forms=link, schema=link"
     And the response links "hr:forms" to an affordance set the server serves
 
   Scenario: An unchanged resource is revalidated with 304
-    When a client gets "/lamps/7" as hal-schema-forms with If-None-Match "\"seq-3.hsf.L0\""
+    When a client gets "/lamps/7" as hal-schema-forms with If-None-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 304
     And the response has Cache-Control "no-cache"
 
@@ -37,7 +37,7 @@ Feature: A declared resource and its acts, served over HTTP
     When a client gets "/lamps/7" as hal-forms
     Then the response status is 200
     And the response has Content-Type "application/prs.hal-forms+json"
-    And the response has ETag "\"seq-3.hf.L0\""
+    And the response has ETag "\"seq-3.hf.L0.{digest}\""
     And the response has templates named "switchOff, dim"
     And the response has templates targeting "/lamps/7/actions/switch-off, /lamps/7/actions/dim"
 
@@ -50,10 +50,10 @@ Feature: A declared resource and its acts, served over HTTP
     Then the response status is 404
 
   Scenario: An act answers with the resource's new Layer 1, which it names
-    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 200
     And the response has Content-Location "/lamps/7"
-    And the response has ETag "\"seq-4.hsf.L0\""
+    And the response has ETag "\"seq-4.hsf.L0.{digest}\""
     And the response body has "brightness" 20
 
   Scenario Outline: A refused act is a problem: <case>
@@ -66,14 +66,14 @@ Feature: A declared resource and its acts, served over HTTP
       | case                 | path      | ifMatch           | body              | status | type                  |
       | no If-Match          | dim       |                   | {"brightness": 5} | 428    | precondition-required |
       | stale If-Match       | dim       | "seq-2.hsf.L0"    | {"brightness": 5} | 412    | stale                 |
-      | not offered          | switch-on | "seq-3.hsf.L0"    | {}                | 409    | not-offered           |
-      | body breaks schema   | dim       | "seq-3.hsf.L0"    | {"brightness": 0} | 422    | invalid-input         |
+      | not offered          | switch-on | "seq-3.hsf.L0.{digest}" | {}          | 409    | not-offered           |
+      | body breaks schema   | dim       | "seq-3.hsf.L0.{digest}" | {"brightness": 0} | 422 | invalid-input       |
 
   Scenario: A body the schema accepts but a rule of the lamp refuses is its own problem, naming the field
     SPEC §6.2. The lamp is at 50, and dimming it to 50 is a rule only the
     lamp knows; the body is valid. invalid-input would tell the client its
     form handling is wrong, so the refusal says what it is: rule-refused.
-    When a client posts {"brightness": 50} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0\""
+    When a client posts {"brightness": 50} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 422
     And the response is a problem of type "rule-refused"
     And the problem lists a violation at "/brightness"
@@ -93,9 +93,9 @@ Feature: A declared resource and its acts, served over HTTP
     And the response body has "brightness" 20
 
     Examples:
-      | dialect          | etag               |
-      | hal-schema-forms | \"seq-1.hsf.L0\" |
-      | hal-forms        | \"seq-1.hf.L0\"  |
+      | dialect          | etag                        |
+      | hal-schema-forms | \"seq-1.hsf.L0.{digest}\" |
+      | hal-forms        | \"seq-1.hf.L0.{digest}\"  |
 
   Scenario Outline: A refused act on the bookmark is a problem, and installs nothing: <case>
     When a client posts <body> to "/actions/install-lamp" as hal-schema-forms with If-Match "<ifMatch>"
