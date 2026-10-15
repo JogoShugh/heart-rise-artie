@@ -4,6 +4,7 @@ import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.declaration.BedActs
 import com.artie.gardenbed.declaration.GardenBeds
+import com.artie.gardenbed.declaration.GardenChange
 import com.artie.gardenbed.domain.GARDEN_BEDS
 import com.artie.gardenbed.service.GardenBedService
 import com.artie.heart.Acted
@@ -25,11 +26,17 @@ import org.springframework.context.annotation.Configuration
  * description's version: 1.0.0 without frost, 1.1.0 with it.
  */
 @Configuration
-class HeartConfig(@Value("\${garden.frost.enabled:false}") private val frost: Boolean) {
+class HeartConfig(
+    @Value("\${garden.frost.enabled:false}") private val frost: Boolean,
+    // Wednesday: one more kind of change, released on its own from Monday (GARDEN_CHANGE).
+    @Value("\${garden.change:}") changeName: String,
+) {
+    private val change = GardenChange.of(changeName)
+
     @Bean
     fun gardenBeds(service: GardenBedService, acts: BedActs): HeartResource<GardenBedState, GardenBedStatus> =
         HeartResource(
-            layers = GardenBeds.layers(frost),
+            layers = GardenBeds.layers(frost, change),
             load = { id -> service.currentState(id) },
             perform = { bed, act, input ->
                 val done = acts.perform(bed, act, input)
@@ -48,10 +55,18 @@ class HeartConfig(@Value("\${garden.frost.enabled:false}") private val frost: Bo
     /** The garden's OpenAPI description: the frost is a change to the API, so it is a new version. */
     @Bean
     fun openApiDocument(gardenBeds: HeartResource<GardenBedState, GardenBedStatus>): OpenApiDocument =
-        OpenApiDocument(listOf(gardenBeds), version = if (frost) TUESDAY else MONDAY)
+        OpenApiDocument(
+            listOf(gardenBeds),
+            version = when {
+                change != null -> "$WEDNESDAY-${change.property}"
+                frost -> TUESDAY
+                else -> MONDAY
+            },
+        )
 
     private companion object {
         const val MONDAY = "1.0.0"
         const val TUESDAY = "1.1.0"
+        const val WEDNESDAY = "1.2.0"
     }
 }

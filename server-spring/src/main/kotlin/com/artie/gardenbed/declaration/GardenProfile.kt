@@ -14,12 +14,12 @@ import com.artie.heart.Relation
 object GardenProfile {
 
     /** The vocabulary; without frost it is Monday's, exactly. */
-    fun profile(frost: Boolean = false) = Profile(
+    fun profile(frost: Boolean = false, change: GardenChange? = null) = Profile(
         name = "garden",
         title = "Garden beds",
         doc = "The acts and searches a garden-bed service offers. A descriptor says what a " +
             "relation means; only a resource's current manifest says whether it is offered now.",
-        relations = relations.filter { frost || it.id != "thaw" },
+        relations = relations.filter { frost || it.id != "thaw" }.map { change?.alter(it) ?: it },
     )
 
     /**

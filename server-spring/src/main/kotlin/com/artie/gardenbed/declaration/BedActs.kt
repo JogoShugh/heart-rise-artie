@@ -6,7 +6,7 @@ import com.artie.gardenbed.service.GardenBedService
 import com.artie.gardenbed.declaration.dto.BuildBedRequest
 import com.artie.gardenbed.declaration.dto.HarvestResult
 import com.artie.gardenbed.declaration.dto.SowSeedRequest
-import com.artie.gardenbed.declaration.dto.WaterCellRequest
+import com.artie.gardenbed.declaration.dto.WaterCellInput
 import com.artie.heart.ActInput
 import org.springframework.stereotype.Component
 
@@ -30,7 +30,8 @@ class BedActs(private val service: GardenBedService) {
         when (affordance) {
             "sowSeed" -> input.bind(SowSeedRequest::class.java)
                 .let { ActResult(service.sowSeed(bed, it.seedType, it.depthCm)) }
-            "waterCell" -> input.bind(WaterCellRequest::class.java)
+            // Its schema, under any Wednesday change, has already been checked; only the amount waters the bed.
+            "waterCell" -> input.bind(WaterCellInput::class.java)
                 .let { ActResult(service.waterCell(bed, it.milliliters)) }
             "harvest" -> service.harvest(bed).let { (state, result) -> ActResult(state, result) }
             // Only a garden with frost declares it, so only then is it offered.

@@ -1,7 +1,10 @@
 package com.artie.gardenbed.declaration
 
 import com.artie.gardenbed.declaration.dto.Bed
+import com.artie.gardenbed.declaration.dto.BedWithSoilMoisture
 import com.artie.gardenbed.declaration.dto.BuildBedRequest
+import com.artie.gardenbed.declaration.dto.WaterCellLimitedRequest
+import com.artie.gardenbed.declaration.dto.WaterCellMethodRequest
 import com.artie.gardenbed.declaration.dto.HarvestRequest
 import com.artie.gardenbed.declaration.dto.SowSeedRequest
 import com.artie.gardenbed.declaration.dto.ThawRequest
@@ -27,12 +30,12 @@ import com.artie.heart.StateView
  */
 object GardenBeds {
 
-    fun type(frost: Boolean = false) = ResourceType(
+    fun type(frost: Boolean = false, change: GardenChange? = null) = ResourceType(
         collection = "beds",
-        profile = GardenProfile.profile(frost),
+        profile = GardenProfile.profile(frost, change),
         acts = listOfNotNull(
             Act.of("sowSeed", "sow-seed", SowSeedRequest::class.java),
-            Act.of("waterCell", "water-cell", WaterCellRequest::class.java),
+            water(change),
             Act.of("harvest", "harvest", HarvestRequest::class.java),
             Act.of("thaw", "thaw", ThawRequest::class.java).takeIf { frost },
         ),
@@ -70,13 +73,25 @@ object GardenBeds {
                     "status" to it.status.name,
                     "cropName" to it.cropName,
                     "growthPoints" to it.growthPoints,
-                    "moistureLevel" to it.moistureLevel,
+                    (if (change == GardenChange.RENAME_FIELD) "soilMoisture" else "moistureLevel") to it.moistureLevel,
                 )
             },
-            bodyClass = Bed::class.java,
+            bodyClass = if (change == GardenChange.RENAME_FIELD) BedWithSoilMoisture::class.java else Bed::class.java,
             keyField = "status",
         ),
     )
 
-    fun layers(frost: Boolean = false) = Layers(type(frost))
+    fun layers(frost: Boolean = false, change: GardenChange? = null) = Layers(type(frost, change))
+
+    /** The water act as Monday declares it, or as one Wednesday change alters it. */
+    private fun water(change: GardenChange?): Act = Act.of(
+        name = "waterCell",
+        relation = if (change == GardenChange.RENAME_ACT) "irrigate" else "water-cell",
+        input = when (change) {
+            GardenChange.TIGHTER_LIMIT -> WaterCellLimitedRequest::class.java
+            GardenChange.NEW_REQUIRED_INPUT -> WaterCellMethodRequest::class.java
+            else -> WaterCellRequest::class.java
+        },
+        path = if (change == GardenChange.MOVE_URL) "water" else "water-cell",
+    )
 }
