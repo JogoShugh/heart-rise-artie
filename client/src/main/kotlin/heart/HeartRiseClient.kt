@@ -1,5 +1,6 @@
 package heart
 
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
 interface HeartRiseClient {
@@ -38,6 +39,17 @@ interface HeartRiseClient {
      * explanation does not name it: the client never infers a reason.
      */
     fun explain(rel: String): String?
+
+    /**
+     * The choices of the offered form [rel] (HAL-SCHEMA-FORMS-HR Rule 8) on the
+     * current resource: from its state, or from the resource a link names,
+     * which the client reads. Null when [rel] is not offered.
+     */
+    fun choices(rel: String): FormChoices? =
+        current?.let { held -> held.affordance(rel)?.let { FormChoices(it, held, listReader) } }
+
+    /** How this client reads a list a form's choices come from, as JSON; null when it cannot be read. */
+    val listReader: (String) -> JsonElement? get() = { null }
 
     /** Says the client has finished, in its event log, so a watcher can close what it was waiting for. */
     fun done()

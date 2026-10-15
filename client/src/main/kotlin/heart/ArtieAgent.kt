@@ -41,7 +41,10 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
      */
     fun decide(intent: String, url: String): Decision {
         val synced = client.enter(url)
-        var offers = synced.affordances.values.map { Offer(it.rel, it.schema, it.title, it.description) }
+        // HAL-SCHEMA-FORMS-HR Rule 8: the reasoner is shown each form's choices as a closed set.
+        var offers = synced.affordances.values.map {
+            Offer(it.rel, client.choices(it.rel)?.shownSchema() ?: it.schema, it.title, it.description)
+        }
         while (true) {
             val selection = reasoner.reason(intent, synced.state, offers, linkOffers(synced))
             if (selection !is Selection.Describe) return checked(selection, synced)
@@ -86,7 +89,8 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
     private fun check(selection: Selection.Act, synced: HeartRepresentation): Decision {
         val form = synced.affordance(selection.affordance)
             ?: return Decision.Rejected(selection, listOf("${selection.affordance} is not in the current manifest"))
-        val violations = SchemaCheck.violations(selection.fields, form.schema)
+        val violations = SchemaCheck.violations(selection.fields, form.schema) +
+            client.choices(selection.affordance)?.violations(selection.fields).orEmpty()
         return if (violations.isEmpty()) Decision.Selected(selection) else Decision.Rejected(selection, violations)
     }
 

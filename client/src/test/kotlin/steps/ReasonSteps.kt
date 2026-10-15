@@ -107,6 +107,15 @@ class ReasonSteps(private val ctx: ClientContext) {
         assertEquals(description, offer.description)
     }
 
+    @Then("the reasoner was shown {string}'s {string} with the choices {string}")
+    fun shownChoices(name: String, property: String, choices: String) {
+        val offer = (reasoner as ScriptedReasoner).shown.last().single { it.name == name }
+        val shown = offer.schema["properties"]?.jsonObject?.get(property)?.jsonObject ?: error("no $property shown")
+        val description = shown["description"]?.jsonPrimitive?.content.orEmpty()
+        assertTrue(description.endsWith("Choices: $choices"), description)
+        assertFalse(shown.containsKey("hr:options"), "the reasoner was shown hr:options: $shown")
+    }
+
     @Then("the reasoner was last shown {string} with the detail {string}")
     fun shownDetail(name: String, detail: String) {
         val offer = (reasoner as ScriptedReasoner).shown.last().single { it.name == name }

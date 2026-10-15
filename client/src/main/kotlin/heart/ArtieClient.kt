@@ -1,5 +1,7 @@
 package heart
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import java.net.URI
 
@@ -68,6 +70,8 @@ class ArtieClient(
                 decisions.absent("affordance", rel, held.url)
                 error("No affordance '$rel' in current manifest")
             }
+        // HAL-SCHEMA-FORMS-HR Rule 8: a value outside the form's choices is never sent.
+        choices(rel)?.violations(payload)?.takeIf { it.isNotEmpty() }?.let { throw NotAChoice(rel, it) }
         if (form.method != "GET") return act(rel, payload, resendAllowed = true)
         // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
         // template a target; it puts the fields in the query (mutate-action-URL).
@@ -95,6 +99,12 @@ class ArtieClient(
         val held = current ?: error("enter a service before describing a form")
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
         return Alps.describe(bindings, form.relation)
+    }
+
+    /** A plain JSON resource a form's choices come from, read as HTTP allows; null if it is not there. */
+    override val listReader: (String) -> JsonElement? = { url ->
+        (this.bindings.forUri(url).fetch(url, listOf(JSON_MEDIA_TYPE)) as? Outcome.Done)
+            ?.let { runCatching { Json.parseToJsonElement(it.received.body) }.getOrNull() }
     }
 
     override fun explain(rel: String): String? {
@@ -167,6 +177,9 @@ class ArtieClient(
     private companion object {
         /** SPEC §6.2: the problem type of a 422 whose body was valid but a rule refused. */
         const val RULE_REFUSED = ProblemDetails.BASE + "rule-refused"
+
+        /** What a list of choices is read as (HAL-SCHEMA-FORMS-HR Rule 8). */
+        const val JSON_MEDIA_TYPE = "application/json"
 
         fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
             if (!form.templated) return form.target

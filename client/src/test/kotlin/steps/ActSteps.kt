@@ -41,6 +41,13 @@ class ActSteps(private val ctx: ClientContext) {
         ctx.lastError = runCatching { ctx.client.act(rel, payload(yaml)) }.exceptionOrNull()
     }
 
+    @Then("the choices of {string} for {string}, with {}, are {string}")
+    fun choices(rel: String, property: String, fields: String, expected: String) {
+        val choices = ctx.client.choices(rel)?.of(Json.parseToJsonElement(fields).jsonObject) ?: error("no form $rel")
+        val shown = choices[property].orEmpty().joinToString(", ") { "${it.value.jsonPrimitive.content} ${it.prompt}" }
+        assertEquals(expected, shown)
+    }
+
     @Then("the client raised an error mentioning {string}")
     fun raisedError(text: String) {
         val error = assertNotNull(ctx.lastError, "expected an error, none was raised")

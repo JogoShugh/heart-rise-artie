@@ -18,6 +18,13 @@ class InvalidPayload(rel: String, val violations: List<String>) :
     ActRefused("$rel body was refused (422): ${violations.joinToString("; ")}")
 
 /**
+ * Not sent: a value is not among its property's choices (HAL-SCHEMA-FORMS-HR
+ * Rule 8). The client checks before sending, as the server would refuse it.
+ */
+class NotAChoice(rel: String, val violations: List<String>) :
+    ActRefused("$rel was not sent: ${violations.joinToString("; ")}")
+
+/**
  * 422 rule-refused: the body satisfied the schema, but a rule of the resource
  * refused it. The client's form handling was right; [violations] give the
  * rule's own words. Not retried.
