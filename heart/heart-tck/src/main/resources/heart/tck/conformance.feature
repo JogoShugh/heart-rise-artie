@@ -80,6 +80,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
 
   Scenario: HAL-FORMS offers the same acts, by the same targets
     Then a hal-schema-forms client and a hal-forms client see the same act targets on the resource
+    And the response status is 200
 
   Scenario: The bookmark finds the resource, in either dialect, and as JSON Home
     When a client gets "/" as hal-schema-forms
@@ -92,7 +93,8 @@ Feature: HEART conformance over HTTP, for any declared resource type
 
   Scenario: The profile describes every relation the resource's forms use
     When a client gets the resource as hal-schema-forms
-    Then every relation its forms use is described in the server's ALPS profile
+    Then the response offers the offered act, with its full schema and a concrete target
+    And every relation its forms use is described in the server's ALPS profile
 
   # Every request above carries the fixture's credential. These scenarios
   # send none, even when the server's test context gives every client one.
