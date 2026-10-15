@@ -35,6 +35,14 @@ class LiveSteps(private val ctx: ClientContext) {
         ctx.current = ctx.client.enter("coap://$host:$port$path")
     }
 
+    /** The same server's coaps endpoint, on ARTIE_COAPS_PORT (5784 by default), over DTLS. */
+    @When("the client enters {string} over coaps")
+    fun enterOverCoaps(path: String) {
+        val host = java.net.URI(checkNotNull(ctx.baseUrl)).host
+        val port = System.getenv("ARTIE_COAPS_PORT") ?: "5784"
+        ctx.current = ctx.client.enter("coaps://$host:$port$path")
+    }
+
     /** Runs ARTIE_RESET (server-spring/reset-db.sh by default, set by the liveTest task). */
     @Given("the beds are at their seed state")
     fun seedState() {

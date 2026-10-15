@@ -40,5 +40,9 @@ services:
       # The service does not start without one.
       HEART_AUTH_BEARER_TOKENS: ${HEART_AUTH_BEARER_TOKENS:?run scripts/dev-credentials.sh first}
       HEART_AUTH_BASIC_USERS: ${HEART_AUTH_BASIC_USERS:-}
+      # coaps (DTLS with a pre-shared key), from .env too. Plain CoAP stays inside the container.
+      HEART_COAPS_PORT: ${HEART_COAPS_PORT:-5784}
+      HEART_COAPS_PSK: ${HEART_COAPS_PSK:?run scripts/dev-credentials.sh first}
     ports:
       - "8080:8080"
+      - "5784:5784/udp"

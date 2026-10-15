@@ -93,6 +93,24 @@ Feature: ARTIE against the real server
       """
     Then every event names a span
 
+  Scenario: Over coaps, from the bookmark alone: look a bed up by its id and act
+    The same service, reached beyond loopback over DTLS with ARTIE's
+    pre-shared key for the coaps origin (ARTIE_COAPS_PORT, 5784 by default).
+    When the client enters "/" over coaps
+    And the client acts on "garden:get-bed" with:
+      """yaml
+      id: 2
+      """
+    Then the manifest offers exactly "garden:water-cell"
+    When the client acts on "garden:water-cell" with:
+      """yaml
+      milliliters: 1
+      """
+    Then the resource state contains:
+      | key    | value   |
+      | status | PLANTED |
+    And nothing went over HTTP
+
   Scenario: Over CoAP, from the bookmark alone: look a bed up by its id and act
     When the client enters "/" over CoAP
     And the client acts on "garden:get-bed" with:
