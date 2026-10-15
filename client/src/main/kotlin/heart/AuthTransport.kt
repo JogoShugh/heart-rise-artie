@@ -25,7 +25,8 @@ class AuthTransport(private val credentials: CredentialSource, private val next:
             "a request carries a user name or password in its address; it was refused, and nothing was sent"
         }
         val origin = Origin.ofOrNull(request.url)?.takeIf { request.header(AUTHORIZATION) == null }
-        val credential = origin?.let(credentials::credentialFor)
+        // Only a credential that is sent as a header; a coaps key never reaches HTTP.
+        val credential = origin?.let(credentials::credentialFor)?.takeIf { it.header() != null }
         return if (origin == null || credential == null) next.send(request) else send(request, origin, credential)
     }
 
@@ -39,7 +40,7 @@ class AuthTransport(private val credentials: CredentialSource, private val next:
     }
 
     private fun sendWith(request: HeartRequest, credential: Credential): HeartResponse =
-        next.send(request.copy(headers = request.headers + (AUTHORIZATION to credential.header())))
+        next.send(request.copy(headers = request.headers + (AUTHORIZATION to checkNotNull(credential.header()))))
             .sentWith(credential.scheme)
 
     private companion object {

@@ -89,7 +89,11 @@ class ClientContext {
         val trace = Trace()
         val transport = UserAgentTransport(agent, TraceContextTransport(trace, next))
         val events = EventLog(eventSink, trace, agent)
-        val bindings = mapOf("coap" to CoapBinding(trace = trace)) + bindings
+        val coap = mapOf(
+            "coap" to CoapBinding(trace = trace),
+            "coaps" to CoapBinding(trace = trace, credentials = credentials),
+        )
+        val bindings = coap + bindings
         return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events, bindings).also { created += it }
     }
 

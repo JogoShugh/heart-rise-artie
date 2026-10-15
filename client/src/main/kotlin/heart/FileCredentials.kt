@@ -3,6 +3,7 @@ package heart
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.PosixFilePermission
+import java.util.Base64
 
 /**
  * Credentials from a file, one origin per section:
@@ -60,9 +61,7 @@ class FileCredentials(private val file: Path) : CredentialSource {
         val origin = requireNotNull(Origin.ofOrNull(text)) {
             "$at: a section names an origin, such as [https://garden.example]"
         }
-        require(origin.scheme != "coap" && origin.scheme != "coaps") {
-            "$at: CoAP credentials are not supported (they need OSCORE or DTLS)"
-        }
+        require(origin.scheme != "coap") { "$at: plain coap carries no credential; use a coaps:// section" }
         require(text.substringAfter("://").substringAfter('/', missingDelimiterValue = "").isEmpty()) {
             "$at: a section names an origin, not a path"
         }
@@ -70,6 +69,26 @@ class FileCredentials(private val file: Path) : CredentialSource {
     }
 
     private fun credential(origin: Origin, keys: Map<String, String>): Credential {
+        require(keys.values.none { it.isEmpty() }) { "$origin has an empty value" }
+        return if (origin.scheme == "coaps") preShared(origin, keys) else httpCredential(origin, keys)
+    }
+
+    /** A coaps section: a DTLS pre-shared key, `psk_identity` and `psk_key` (base64). */
+    private fun preShared(origin: Origin, keys: Map<String, String>): Credential {
+        require(keys.keys.none { it in HTTP_KEYS }) { "$origin takes psk_identity and psk_key, not a bearer or a user" }
+        val identity = keys["psk_identity"]
+        val key = keys["psk_key"]
+        require(key == null || identity != null) { "$origin has psk_key but no psk_identity" }
+        require(identity != null && key != null) { "$origin has psk_identity but no psk_key" }
+        val bytes = runCatching { Base64.getDecoder().decode(key) }
+            .getOrElse { throw IllegalArgumentException("$origin's psk_key is not base64") }
+        return Credential.PreShared(identity, bytes)
+    }
+
+    private fun httpCredential(origin: Origin, keys: Map<String, String>): Credential {
+        require(keys.keys.none { it in PSK_KEYS }) {
+            "$origin is not coaps; psk_identity and psk_key are for coaps sections"
+        }
         val token = keys["bearer"]
         val user = keys["user"]
         val password = keys["password"]
@@ -81,7 +100,9 @@ class FileCredentials(private val file: Path) : CredentialSource {
     }
 
     internal companion object {
-        private val KEYS = setOf("bearer", "user", "password")
+        private val HTTP_KEYS = setOf("bearer", "user", "password")
+        private val PSK_KEYS = setOf("psk_identity", "psk_key")
+        private val KEYS = HTTP_KEYS + PSK_KEYS
         private val OWNER_ONLY = setOf(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE)
 
         /** A file holding a secret must be readable by its owner only, as ssh requires of a private key. */

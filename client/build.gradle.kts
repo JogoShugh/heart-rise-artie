@@ -20,6 +20,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     // SPEC §6.0.1: the CoAP binding (RFC 7252), for coap: URIs.
     implementation("org.eclipse.californium:californium-core:3.14.0")
+    // coaps: DTLS with a pre-shared key.
+    implementation("org.eclipse.californium:scandium:3.14.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")

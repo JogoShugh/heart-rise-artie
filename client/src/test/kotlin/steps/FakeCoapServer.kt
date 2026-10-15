@@ -16,6 +16,11 @@ import org.eclipse.californium.core.network.Exchange
 import org.eclipse.californium.core.server.MessageDeliverer
 import org.eclipse.californium.elements.config.Configuration
 import org.eclipse.californium.elements.config.UdpConfig
+import org.eclipse.californium.scandium.DTLSConnector
+import org.eclipse.californium.scandium.config.DtlsConfig
+import org.eclipse.californium.scandium.config.DtlsConnectorConfig
+import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
+import org.eclipse.californium.scandium.dtls.pskstore.AdvancedMultiPskStore
 import java.net.InetSocketAddress
 
 /**
@@ -23,7 +28,7 @@ import java.net.InetSocketAddress
  * hal-schema-forms dialect, answering with the binding's options. It records
  * every request, so steps can check what ARTIE sent.
  */
-class FakeCoapServer(var status: String) {
+class FakeCoapServer(var status: String, private val secure: Pair<String, ByteArray>? = null) {
     val requests = mutableListOf<Request>()
     private var version = 1
     var rung: String? = null
@@ -36,11 +41,20 @@ class FakeCoapServer(var status: String) {
         CoapConfig.register()
         UdpConfig.register()
         val config = Configuration.createStandardWithoutFile()
-        val endpoint = CoapEndpoint.Builder()
-            .setConfiguration(config)
-            .setInetSocketAddress(InetSocketAddress("localhost", 0))
-            .setOptionRegistry(REGISTRY)
-            .build()
+        val builder = CoapEndpoint.Builder().setConfiguration(config).setOptionRegistry(REGISTRY)
+        val endpoint = if (secure == null) {
+            builder.setInetSocketAddress(InetSocketAddress("localhost", 0)).build()
+        } else {
+            // coaps: DTLS 1.2 with one pre-shared key, as heart-coap serves it.
+            DtlsConfig.register()
+            val dtls = DtlsConnectorConfig.builder(config)
+                .set(DtlsConfig.DTLS_ROLE, DtlsConfig.DtlsRole.SERVER_ONLY)
+                .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(CipherSuite.TLS_PSK_WITH_AES_128_GCM_SHA256))
+                .setAddress(InetSocketAddress("localhost", 0))
+                .setAdvancedPskStore(AdvancedMultiPskStore().apply { setKey(secure.first, secure.second) })
+                .build()
+            builder.setConnector(DTLSConnector(dtls)).build()
+        }
         CoapServer(config).apply {
             addEndpoint(endpoint)
             setMessageDeliverer(Deliverer())
@@ -48,7 +62,8 @@ class FakeCoapServer(var status: String) {
         }
     }
 
-    val url: String get() = "coap://localhost:${server.endpoints.first().address.port}/beds/1"
+    val url: String get() =
+        "${if (secure == null) "coap" else "coaps"}://localhost:${server.endpoints.first().address.port}/beds/1"
 
     fun refuseNext(code: ResponseCode, problemType: String) {
         refusal = code to problemType

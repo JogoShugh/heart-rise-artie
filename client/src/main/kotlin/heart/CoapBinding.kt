@@ -13,6 +13,12 @@ import org.eclipse.californium.core.config.CoapConfig
 import org.eclipse.californium.core.network.CoapEndpoint
 import org.eclipse.californium.elements.config.Configuration
 import org.eclipse.californium.elements.config.UdpConfig
+import org.eclipse.californium.scandium.DTLSConnector
+import org.eclipse.californium.scandium.config.DtlsConfig
+import org.eclipse.californium.scandium.config.DtlsConnectorConfig
+import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
+import org.eclipse.californium.scandium.dtls.pskstore.AdvancedSinglePskStore
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * The CoAP binding (SPEC §6.0.1), for `coap:` URIs, over UDP with Californium.
@@ -24,7 +30,12 @@ import org.eclipse.californium.elements.config.UdpConfig
  * With a [trace], every request carries the experimental option traceparent,
  * holding the value HTTP's traceparent header would, with a new span each.
  */
-class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS, private val trace: Trace? = null) : Binding {
+class CoapBinding(
+    private val timeoutMs: Long = DEFAULT_TIMEOUT_MS,
+    private val trace: Trace? = null,
+    /** For coaps: the pre-shared key of each origin, held only inside its DTLS connector. */
+    private val credentials: CredentialSource = CredentialSources.NONE,
+) : Binding {
 
     private val client: CoapClient by lazy {
         CoapConfig.register()
@@ -35,6 +46,28 @@ class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS, private val 
             .build()
         CoapClient().setEndpoint(endpoint).setTimeout(timeoutMs)
     }
+
+    /** One DTLS client per coaps origin, holding that origin's key (RFC 7252 §9.1.3.1). */
+    private val secureClients = ConcurrentHashMap<Origin, CoapClient>()
+
+    private fun secureClient(origin: Origin, key: Credential.PreShared): CoapClient =
+        secureClients.getOrPut(origin) {
+            CoapConfig.register()
+            UdpConfig.register()
+            DtlsConfig.register()
+            val config = Configuration.createStandardWithoutFile()
+            val dtls = DtlsConnectorConfig.builder(config)
+                .set(DtlsConfig.DTLS_ROLE, DtlsConfig.DtlsRole.CLIENT_ONLY)
+                .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(CipherSuite.TLS_PSK_WITH_AES_128_GCM_SHA256))
+                .setAdvancedPskStore(AdvancedSinglePskStore(key.identity, key.key()))
+                .build()
+            val endpoint = CoapEndpoint.Builder()
+                .setConfiguration(config)
+                .setConnector(DTLSConnector(dtls))
+                .setOptionRegistry(REGISTRY)
+                .build()
+            CoapClient().setEndpoint(endpoint).setTimeout(timeoutMs)
+        }
 
     override fun read(url: String, rendering: Rendering): Outcome =
         send(url, Request.newGet().apply {
@@ -67,18 +100,30 @@ class CoapBinding(private val timeoutMs: Long = DEFAULT_TIMEOUT_MS, private val 
      * request finds it: Californium rewrites the URI, dropping a default port.
      */
     private fun send(url: String, request: Request): Outcome {
+        val origin = Origin.ofOrNull(url)
+        val secure = origin?.scheme == "coaps"
+        val key = if (secure) credentials.credentialFor(checkNotNull(origin)) as? Credential.PreShared else null
+        if (secure && key == null) return Outcome.Unauthenticated(listOf(PSK), null, NO_KEY, null)
         request.setURI(url)
         trace?.let { trace ->
             val span = trace.newSpan(url)
             request.options.addOption(Option(TRACEPARENT, "00-${trace.traceId}-$span-01"))
         }
-        val response = client.advanced(request)?.advanced()
-            ?: return Outcome.Failed("no answer from ${request.uri}", null)
-        return outcome(response)
+        val sender = if (key != null) secureClient(checkNotNull(origin), key) else client
+        val response = sender.advanced(request)?.advanced()
+        return when {
+            response != null -> outcome(response)
+            secure -> Outcome.Failed("no answer from ${request.uri}: the DTLS handshake did not complete", null)
+            else -> Outcome.Failed("no answer from ${request.uri}", null)
+        }
     }
 
     private companion object {
         const val DEFAULT_TIMEOUT_MS = 5_000L
+        const val PSK = "PSK"
+
+        /** Nothing was sent: there is no key for the origin, so no code came back. */
+        const val NO_KEY = "no key"
         const val JSON = 50
         const val HEX = 16
 

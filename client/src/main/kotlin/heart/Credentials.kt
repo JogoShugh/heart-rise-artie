@@ -42,8 +42,8 @@ data class Origin(val scheme: String, val host: String, val port: Int) {
  * [AuthTransport] reads its value, as the Authorization header.
  */
 sealed class Credential(val scheme: String) {
-    /** The Authorization header's value. */
-    internal abstract fun header(): String
+    /** The Authorization header's value, for an HTTP credential; null for one that is not sent in a header. */
+    internal abstract fun header(): String?
 
     final override fun toString() = "$scheme(****)"
 
@@ -63,6 +63,18 @@ sealed class Credential(val scheme: String) {
         override fun header() = "Bearer $token"
         override fun equals(other: Any?) = other is Bearer && other.token == token
         override fun hashCode() = token.hashCode()
+    }
+
+    /**
+     * A DTLS pre-shared key, for a coaps origin (RFC 7252 §9.1.3.1). It is never
+     * a header: only CoapBinding's DTLS connector reads [key].
+     */
+    class PreShared(val identity: String, private val key: ByteArray) : Credential("PreShared") {
+        override fun header(): String? = null
+        internal fun key(): ByteArray = key.copyOf()
+        override fun equals(other: Any?) =
+            other is PreShared && other.identity == identity && other.key.contentEquals(key)
+        override fun hashCode() = identity.hashCode() * 31 + key.contentHashCode()
     }
 }
 

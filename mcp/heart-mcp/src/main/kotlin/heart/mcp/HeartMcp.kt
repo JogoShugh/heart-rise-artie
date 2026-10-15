@@ -171,7 +171,11 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
                 Rung.L2,
                 Dialect.HAL_SCHEMA_FORMS,
                 events = EventLog(events, trace, name),
-                bindings = mapOf("coap" to CoapBinding(trace = trace)),
+                bindings = mapOf(
+                    "coap" to CoapBinding(trace = trace),
+                    // coaps keys come from the same sources, and stay inside the DTLS connector.
+                    "coaps" to CoapBinding(trace = trace, credentials = credentials),
+                ),
             )
         }
 

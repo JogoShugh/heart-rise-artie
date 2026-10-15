@@ -85,10 +85,11 @@ class CredentialSteps(private val ctx: ClientContext) {
 
     @Then("a request carrying it prints with {string} and without {string}")
     fun requestPrints(shown: String, hidden: String) {
-        val request = HeartRequest("GET", "https://garden.test/beds/2", mapOf(AUTHORIZATION to lastCredential.header()))
+        val header = checkNotNull(lastCredential.header())
+        val request = HeartRequest("GET", "https://garden.test/beds/2", mapOf(AUTHORIZATION to header))
         val text = request.toString()
         assertTrue(text.contains(shown), text)
-        assertFalse(text.contains(hidden) || text.contains(lastCredential.header()), text)
+        assertFalse(text.contains(hidden) || text.contains(header), text)
     }
 
     @Then("{string} appears on the wire only in the Authorization header of requests to {string}")
@@ -265,6 +266,12 @@ class CredentialSteps(private val ctx: ClientContext) {
     @Then("the credential for {string} is the {word} credential {string}")
     fun credentialIs(origin: String, scheme: String, value: String) =
         assertEquals(credential(scheme, value), checkNotNull(source).credentialFor(Origin.of(origin)))
+
+    @Then("the credential for {string} is the pre-shared key of {string}")
+    fun credentialIsPsk(origin: String, identity: String) {
+        val credential = checkNotNull(source).credentialFor(Origin.of(origin))
+        assertEquals(Credential.PreShared(identity, "s3cret-key-for-tray".toByteArray()), credential)
+    }
 
     @Then("the credential for {string} is none")
     fun credentialIsNone(origin: String) = assertNull(checkNotNull(source).credentialFor(Origin.of(origin)))

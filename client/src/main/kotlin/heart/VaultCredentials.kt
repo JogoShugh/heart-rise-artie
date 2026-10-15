@@ -70,6 +70,12 @@ class VaultCredentials internal constructor(
         val data = body["data"]?.jsonObject?.get("data")?.jsonObject
             ?: throw CredentialsUnavailable(origin.toString(), "Vault's answer has no data")
         val keys = data.mapValues { (_, value) -> value.jsonPrimitive.content }
+        if (origin.scheme == "coaps") {
+            val identity = keys["psk_identity"]
+            val key = keys["psk_key"]
+            require(identity != null && key != null) { "Vault's secret for $origin needs psk_identity and psk_key" }
+            return Credential.PreShared(identity, java.util.Base64.getDecoder().decode(key))
+        }
         val token = keys["bearer"]
         val user = keys["user"]
         val password = keys["password"]

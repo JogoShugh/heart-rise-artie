@@ -80,11 +80,30 @@ Feature: Where ARTIE finds credentials
         | case                     | mode | section               | first line     | second line       | says                                                    |
         | readable by others       | 0644 | http://localhost:8080 | bearer = t0k3n |                   | can be read by others; run chmod 600 on it              |
         | a path, not an origin    | 0600 | http://localhost:8080/beds | bearer = t0k3n |              | line 1: a section names an origin, not a path           |
-        | CoAP                     | 0600 | coap://tray.local     | bearer = t0k3n |                   | line 1: CoAP credentials are not supported (they need OSCORE or DTLS) |
+        | plain CoAP               | 0600 | coap://tray.local     | bearer = t0k3n |                   | line 1: plain coap carries no credential; use a coaps:// section |
+        | a token for coaps        | 0600 | coaps://tray.local    | bearer = t0k3n |                   | coaps://tray.local:5684 takes psk_identity and psk_key, not a bearer or a user |
+        | a key, no identity       | 0600 | coaps://tray.local    | psk_key = czNjcmV0LWtleS1mb3ItdHJheQ== |   | coaps://tray.local:5684 has psk_key but no psk_identity |
         | a token and a user       | 0600 | http://localhost:8080 | bearer = t0k3n | user = coach      | http://localhost:8080 has both a token and a user; set one |
         | a user with no password  | 0600 | http://localhost:8080 | user = coach   |                   | http://localhost:8080 has a user but no password        |
         | an unknown key           | 0600 | http://localhost:8080 | token = t0k3n  |                   | line 2: unknown key 'token'; use bearer, or user and password |
         | a line with no equals    | 0600 | http://localhost:8080 | bearer t0k3n   |                   | line 2: expected 'key = value'                          |
+
+    Scenario: A coaps section holds a pre-shared key
+      Given ARTIE's folder holds a credentials file with mode "0600":
+        """
+        [coaps://tray.local]
+        psk_identity = artie
+        psk_key = czNjcmV0LWtleS1mb3ItdHJheQ==
+        """
+      When ARTIE reads its credentials
+      Then the credential for "coaps://tray.local" is the pre-shared key of "artie"
+
+    Scenario: The environment holds a pre-shared key for a coaps origin
+      Given the environment holds:
+        | ARTIE_PSK_IDENTITY_TRAY_LOCAL_5684 | artie                        |
+        | ARTIE_PSK_KEY_TRAY_LOCAL_5684      | czNjcmV0LWtleS1mb3ItdHJheQ== |
+      When ARTIE reads its credentials
+      Then the credential for "coaps://tray.local" is the pre-shared key of "artie"
 
     Scenario: With no credentials file, there are no credentials from it, and no error
       Given ARTIE's folder holds no credentials file
