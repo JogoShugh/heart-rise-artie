@@ -1,0 +1,14 @@
+
+:root { --bg: #f6f8f7; --card: #fff; --ink: #18221d; --soft: #4d5b54; --line: #dfe6e2; --leaf: #2d7a4c; }
+@media (prefers-color-scheme: dark) { :root { --bg: #121816; --card: #19211e; --ink: #e3ebe7; --soft: #9aaba3; --line: #2c3833; --leaf: #6cc290; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { max-width: 46rem; margin: 0 auto; padding: 3rem 1rem 4rem; display: grid; gap: 1.25rem; }
+.kind { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--soft); }
+h1 { margin: 0; font-size: 2rem; line-height: 1.2; }
+code { font: .9em ui-monospace, Menlo, monospace; background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: .1em .35em; overflow-wrap: anywhere; }
+a { color: var(--leaf); }
+ul { padding-left: 1.2rem; }
+table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); }
+td, th { text-align: left; padding: .5rem .75rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+footer { color: var(--soft); font-size: .9rem; border-top: 1px solid var(--line); padding-top: 1rem; }
