@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="One garden server changes; a bespoke OpenAPI dashboard and generic HEART clients meet it, scored by the server itself.">
+<title>OpenAPI and HEART, Side by Side</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Public+Sans:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; wide blocks (matrix, code pairs) break out to a wider measure; the three releases read as a sequence. */
+:root {
+  --bg: #f6f8f7;
+  --surface: #ffffff;
+  --fg: #1d2622;
+  --muted: #56645e;
+  --rule: #d6dfdb;
+  --leaf: #2f7a4f;
+  --frost: #3c6e9e;
+  --refuse: #a3442e;
+  --code-bg: #eef3f1;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121816; --surface: #19211e; --fg: #e3ebe7; --muted: #9aaba3; --rule: #2c3833;
+    --leaf: #6cc290; --frost: #86b4e0; --refuse: #e58a72; --code-bg: #1f2925; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121816; --surface: #19211e; --fg: #e3ebe7; --muted: #9aaba3; --rule: #2c3833;
+  --leaf: #6cc290; --frost: #86b4e0; --refuse: #e58a72; --code-bg: #1f2925; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 46rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; gap: 2.75rem; }
+.wide { margin-inline: calc((46rem - min(64rem, 100%)) / 2); }
+@media (max-width: 64rem) { .wide { margin-inline: 0; } }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; line-height: 1.15; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); }
+h2 { font-size: 1.55rem; }
+h3 { font-size: 1.15rem; }
+p, li { max-width: 65ch; }
+p { margin: 0; }
+section { display: grid; gap: 1rem; min-width: 0; }
+.eyebrow { font: 600 0.75rem/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.15rem; color: var(--muted); }
+.thesis { font-family: var(--display); font-size: 1.35rem; line-height: 1.4; border-left: 3px solid var(--leaf); padding-left: 1rem; }
+code { font: 0.88em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+a { color: var(--leaf); }
+a:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
+.note { color: var(--muted); font-size: 0.92rem; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 38rem; font-size: 0.95rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: left; vertical-align: top; padding: 0.7rem 1rem; border-bottom: 1px solid var(--rule); }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 600; }
+.pass { color: var(--leaf); font-weight: 600; }
+.fail { color: var(--refuse); font-weight: 600; }
+.quiet { color: var(--muted); }
+
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 1rem; }
+.pane { display: grid; gap: 0.5rem; align-content: start; min-width: 0; }
+.pane h3 { font: 600 0.95rem/1.3 var(--body); }
+.pane.bespoke h3 { color: var(--frost); }
+.pane.artie h3 { color: var(--leaf); }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.8rem/1.55 var(--mono); }
+.hl { background: color-mix(in srgb, var(--refuse) 18%, transparent); }
+.ok { background: color-mix(in srgb, var(--leaf) 16%, transparent); }
+
+.bind { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem; }
+.bind div { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 1rem 1.1rem; display: grid; gap: 0.35rem; align-content: start; }
+.bind b { font-family: var(--display); font-size: 1.1rem; }
+
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; counter-reset: s; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 2.25rem 1fr; gap: 0.75rem; max-width: none; }
+ol.steps li::before { content: counter(s); font: 600 1rem/2rem var(--display); width: 2rem; height: 2rem; text-align: center; border-radius: 50%; border: 1px solid var(--frost); color: var(--frost); }
+ol.steps li > div { display: grid; gap: 0.5rem; min-width: 0; }
+
+.cost { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; }
+.cost div { border-top: 3px solid var(--rule); padding-top: 0.6rem; display: grid; gap: 0.2rem; }
+.cost .n { font: 600 1.9rem/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.cost .zero .n { color: var(--leaf); }
+.cost div.zero { border-color: var(--leaf); }
+.cost div.some { border-color: var(--frost); }
+
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); gap: 1rem; }
+figure { margin: 0; display: grid; gap: 0.45rem; align-content: start; min-width: 0; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+figcaption { font-size: 0.9rem; color: var(--muted); }
+figcaption b { color: var(--fg); }
+.day-label { font: 600 0.8rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rule); padding-top: 1.25rem; display: grid; gap: 0.4rem; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header style="display:grid;gap:0.9rem">
+    <span class="eyebrow">Exhibit · run for real on 14 October 2026, rerun on 15 October with the same results</span>
+    <h1>OpenAPI and HEART, side by side</h1>
+    <p class="lede">One garden server ships a change overnight. Two dashboards, one bespoke and one generic, meet it the next morning. The same regression suite tests both.</p>
+  </header>
+
+  <section>
+    <p class="thesis">Both clients get regression-tested on every release; that never goes away. What late binding saves is the rework between the server's release and the client's.</p>
+  </section>
+
+  <section>
+    <h2>The change</h2>
+    <p>On Monday the garden serves version 1.0.0. Overnight the garden team ships the frost, version 1.1.0: a hard frost can freeze a planted bed, watering a frozen bed is no longer allowed (it would split the roots), and a new act, <b>Thaw the bed</b>, covers it with fleece. Only the server changes.</p>
+    <p class="note">In the OpenAPI description, <code>FROZEN</code> joins the status enum, <code>POST /beds/{id}/actions/thaw</code> appears, and the version becomes 1.1.0. The rule for watering is still a sentence of prose: "Only allowed when status is PLANTED."</p>
+  </section>
+
+  <section>
+    <h2>Two dashboards, bound at different times</h2>
+    <p>Both are small htmx web pages that poll their bed every 2 seconds. The only difference is when they learn what the garden can do.</p>
+    <div class="bind">
+      <div><span class="eyebrow">Early binding</span><b>Bespoke dashboard</b><p>TypeScript. Its client is generated by OpenAPI Generator 7.8.0 from Monday's <code>garden-1.0.0.json</code>. Statuses, buttons and calls are fixed when it is built.</p></div>
+      <div><span class="eyebrow">Late binding</span><b>ARTIE dashboard</b><p>Kotlin, over the ARTIE client. It knows the bookmark and nothing else. Statuses, buttons and calls come from each HEART response, every time it renders.</p></div>
+    </div>
+  </section>
+
+  <section class="wide">
+    <h3>Where the buttons come from</h3>
+    <div class="pair">
+      <div class="pane bespoke">
+        <h3>Bespoke, <code>src/dashboard.ts</code> (1.0)</h3>
+<pre>const STATUS_LABEL: Record&lt;BedStatusEnum, string&gt; = {
+    EMPTY: "Empty",
+    PLANTED: "Planted",
+    READY_TO_HARVEST: "Ready to harvest",
+};
+
+// From the description: sow an empty bed,
+// harvest a ready one, water a planted one.
+function buttonsFor(status: BedStatusEnum) {
+    switch (status) {
+        case BedStatusEnum.Empty:
+            return [SOW];
+        case BedStatusEnum.ReadyToHarvest:
+            return [HARVEST];
+<span class="hl">        default:
+            return [WATER];</span>
+    }
+}</pre>
+        <p class="note">Reasonable code, written the common way. The <code>default</code> is a bet that Monday's three statuses are all there will ever be.</p>
+      </div>
+      <div class="pane artie">
+        <h3>ARTIE, <code>Render.kt</code></h3>
+<pre>fun card(rep: HeartRepresentation) = """
+  &lt;table class="state"&gt;${state(rep.state)}&lt;/table&gt;
+  &lt;div class="buttons"&gt;${
+<span class="ok">    rep.affordances.values.joinToString("") {
+      form(rep, it)
+    }</span>
+  }&lt;/div&gt; ..."""
+
+/** An offered form: one input per schema
+ *  property, and its title on the button. */
+private fun form(rep, form: AffordanceForm) = ...
+  &lt;button&gt;${form.title}&lt;/button&gt;</pre>
+        <p class="note">No status, no rule, no act name. The buttons are whatever forms the bed's representation offers right now.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wide">
+    <h2>What the regression suite found</h2>
+    <p>One Cucumber-JS suite drives each dashboard over HTTP the way a person would: open a bed, read its buttons and status, press a button. Seven scenarios, three of them written on Monday and four added with the frost. The dashboards kept running from Monday into Tuesday; only the garden restarted.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Release</th><th>Server</th><th>Bespoke dashboard</th><th>ARTIE dashboard</th></tr></thead>
+        <tbody>
+          <tr><th>Monday</th><td>1.0.0</td><td>1.0 · <span class="pass">3 of 3</span></td><td><span class="pass">3 of 3</span></td></tr>
+          <tr><th>Tuesday morning</th><td>1.1.0, the frost</td><td>1.0, unchanged · <span class="fail">3 of 7</span></td><td>unchanged · <span class="pass">7 of 7</span></td></tr>
+          <tr><th>Tuesday, after the rework</th><td>1.1.0</td><td>1.1 · <span class="pass">7 of 7</span></td><td class="quiet">no rework needed</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Tuesday morning scenario</th><th>Bespoke 1.0</th><th>ARTIE</th></tr></thead>
+        <tbody>
+          <tr><td>A frozen bed shows it is frozen</td><td><span class="fail">fail</span> · the status reads <code>undefined</code></td><td><span class="pass">pass</span> · <code>FROZEN</code></td></tr>
+          <tr><td>A frozen bed offers thaw, and not water</td><td><span class="fail">fail</span> · shows "Water the bed"</td><td><span class="pass">pass</span> · shows "Thaw the bed"</td></tr>
+          <tr><td>Thawing a frozen bed lets it be watered again</td><td><span class="fail">fail</span> · no "Thaw the bed" button</td><td><span class="pass">pass</span></td></tr>
+          <tr><td>Every button a frozen bed shows is one the garden accepts</td><td><span class="fail">fail</span> · <code>POST /beds/2/actions/water-cell</code> → <span class="fail">409</span></td><td><span class="pass">pass</span> · nothing refused</td></tr>
+          <tr><td>Monday's three scenarios</td><td><span class="pass">pass</span></td><td><span class="pass">pass</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="wide">
+    <h2>What the operator saw</h2>
+    <p>Bed 2 on each dashboard, captured from the running pages with headless Chrome. Both dashboards load the same stylesheet, so the only difference you see is what each one knew.</p>
+    <span class="day-label">Monday, server 1.0.0</span>
+    <div class="shots">
+      <figure><img src="shots/monday-bespoke-1.0.png" alt="Bespoke dashboard 1.0 on Monday: bed 2, status Planted, a Water the bed button" width="820" height="560"><figcaption><b>Bespoke 1.0.</b> Planted, with Water.</figcaption></figure>
+      <figure><img src="shots/monday-artie.png" alt="ARTIE dashboard on Monday: bed 2's state table with status PLANTED, a Water the bed button and an Ask box" width="820" height="560"><figcaption><b>ARTIE.</b> PLANTED, with Water.</figcaption></figure>
+    </div>
+    <span class="day-label">Tuesday morning, server 1.1.0, after the frost. Neither dashboard changed.</span>
+    <div class="shots">
+      <figure><img src="shots/tuesday-bespoke-1.0.png" alt="Bespoke dashboard 1.0 on Tuesday: bed 2, status undefined, still a Water the bed button" width="820" height="560"><figcaption><b>Bespoke 1.0.</b> Status <code>undefined</code>, and still Water, which the garden refuses with a 409.</figcaption></figure>
+      <figure><img src="shots/tuesday-artie.png" alt="ARTIE dashboard on Tuesday: bed 2's state table with status FROZEN, and only a Thaw the bed button" width="820" height="560"><figcaption><b>ARTIE.</b> FROZEN, and only Thaw. Same code as Monday.</figcaption></figure>
+    </div>
+    <span class="day-label">Tuesday morning: the operator presses Water on the bespoke dashboard</span>
+    <div class="shots">
+      <figure><img src="shots/tuesday-bespoke-1.0-water.png" alt="Bespoke dashboard 1.0 after pressing Water: a red message, the garden refused it with 409 because the bed is frozen" width="820" height="560"><figcaption><b>Bespoke 1.0.</b> The garden refuses with 409, in its own words. The button shouldn't have been there.</figcaption></figure>
+    </div>
+    <span class="day-label">Tuesday, after the bespoke rework</span>
+    <div class="shots">
+      <figure><img src="shots/tuesday-bespoke-1.1.png" alt="Bespoke dashboard 1.1 on Tuesday: bed 2, status Frozen, a Thaw the bed button" width="820" height="560"><figcaption><b>Bespoke 1.1.</b> Frozen, with Thaw, once the team regenerated, edited and released.</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>The rework the bespoke dashboard needed</h2>
+    <p>This is what the team did to get from 1.0 to 1.1, recorded as it happened.</p>
+    <ol class="steps">
+      <li><div><b>Regenerate the client</b> from <code>garden-1.1.0.json</code>. 12 generated files changed, 75 lines in and 13 out. Most of that is the version stamp in each file; the real changes are <code>thaw</code> in <code>BedsApi.ts</code> and <code>FROZEN</code> in <code>Bed.ts</code>.</div></li>
+      <li><div><b>Build, and read what the compiler says.</b> One error:
+<pre>src/dashboard.ts(26,7): error TS2741: Property 'FROZEN' is missing
+in type '{ EMPTY: string; PLANTED: string; READY_TO_HARVEST: string; }'
+but required in type 'Record&lt;BedStatusEnum, string&gt;'.</pre>
+        <p>The compiler said nothing about the <code>switch</code>. Its <code>default</code> still gave a frozen bed a Water button. Only the regression suite caught that.</p></div></li>
+      <li><div><b>Edit by hand.</b> 11 lines in and 4 out of <code>src/dashboard.ts</code>: the badge, a Thaw button, its case, its call and its route. Plus the version in <code>package.json</code> and <code>generate.sh</code>.</div></li>
+      <li><div><b>Build, test, release, deploy</b> dashboard 1.1.0. Until this step, the people using it had no way to thaw a bed, and a Water button the garden refuses.</div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>The cost, side by side</h2>
+    <div class="cost">
+      <div class="some"><span class="eyebrow">Bespoke</span><span class="n">4 steps</span><p class="note">regenerate, fix, edit, release; 12 generated files and 14 hand-written lines</p></div>
+      <div class="zero"><span class="eyebrow">ARTIE</span><span class="n">0 lines</span><p class="note">no regeneration, no edit, no release; still running since Monday</p></div>
+      <div><span class="eyebrow">Both</span><span class="n">Same suite</span><p class="note">run on every dashboard at every release: 3 runs for bespoke, 2 for ARTIE, because ARTIE had no new release to test</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Testing is not the saving</h2>
+    <p>A server change gets regression-tested whatever the client. The garden team ran the same suite against both dashboards on Monday and again on Tuesday morning, and that is what told them the bespoke dashboard was broken. Generic clients don't make that testing unnecessary, and this demo doesn't claim they do.</p>
+    <p>What late binding changes is everything after the test run. The bespoke team had to:</p>
+    <ul>
+      <li>regenerate,</li>
+      <li>fix what the compiler found,</li>
+      <li>find what it missed,</li>
+      <li>edit, rebuild, release and redeploy,</li>
+      <li>and leave users without Thaw until all of that was done.</li>
+    </ul>
+    <p>The ARTIE dashboard passed the same suite on Tuesday morning as it stood. The benefit is evolvability: the server can change what it offers, and generic clients follow without rework.</p>
+  </section>
+
+  <section>
+    <h2>Who presses Thaw</h2>
+    <p>A generic client can show and perform an act it was never coded for. Something still has to decide to press it.</p>
+    <ul>
+      <li><b>A person</b> sees "Thaw the bed" appear on the ARTIE dashboard while the page is open, because the card re-syncs and renders whatever the bed offers.</li>
+      <li><b>A model</b> can choose from the same offers. Given "Bed 2 looks frozen. Please look after it.", Claude, through <code>ArtieAgent</code>, chose <code>garden:thaw</code>. ARTIE checked the choice against the offered forms and sent it, and the bed was planted again. That was one run; every call it made got a 2xx.</li>
+    </ul>
+  </section>
+
+  <section class="wide">
+    <h2>Six more kinds of change</h2>
+    <p>The frost adds a state and an act, which is the change that suits HEART best. A real API also moves URLs, renames things, tightens limits and asks for new input. So the garden got a Wednesday release in six variants. Each one is a single change from Monday, chosen at startup with <code>GARDEN_CHANGE</code>.</p>
+    <p>Four clients, none changed since Monday, then tried to water bed 2 with about 250 ml:</p>
+    <ul>
+      <li>the bespoke dashboard 1.0;</li>
+      <li>the ARTIE dashboard, driven the way a person would drive it. The person finds the button whose title is about watering (<code>/water|irrigat/i</code>), keeps what the form shows, and presses it. The same rule drives the bespoke dashboard;</li>
+      <li>an ARTIE script, the README's example of ARTIE driven by code. It names the act <code>garden:water-cell</code> and its field <code>milliliters</code>;</li>
+      <li>Claude, through the ARTIE dashboard's Ask box, given "Water bed 2 with about 250 ml". That's one run per variant.</li>
+    </ul>
+    <p>The score is the garden's own history: did bed 2 get a new <code>CellWatered</code> event? Under <code>tighter-limit</code> the person also typed 800 ml on the bespoke dashboard, whose field still allowed 1000.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Change</th><th scope="col">Bespoke 1.0</th><th scope="col">ARTIE dashboard</th><th scope="col">ARTIE script</th><th scope="col">Claude</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>move-url</code><br><span class="quiet">target moves to <code>/actions/water</code></span></th><td class="fail">404</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+          <tr><th scope="row"><code>rename-field</code><br><span class="quiet"><code>moistureLevel</code> becomes <code>soilMoisture</code></span></th><td><span class="pass">watered</span><br><span class="fail">shows moisture <code>undefined</code></span></td><td><span class="pass">watered</span><br><span class="quiet">shows "Soil moisture 40"</span></td><td class="pass">watered</td><td class="pass">watered</td></tr>
+          <tr><th scope="row"><code>rename-act</code><br><span class="quiet">relation becomes <code>garden:irrigate</code></span></th><td class="pass">watered</td><td class="pass">watered</td><td class="fail">"No affordance 'garden:water-cell'"</td><td class="pass">watered, chose <code>garden:irrigate</code></td></tr>
+          <tr><th scope="row"><code>retitle</code><br><span class="quiet">"Water the bed" becomes "Irrigate the bed"</span></th><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+          <tr><th scope="row"><code>tighter-limit</code><br><span class="quiet">maximum 1000 ml becomes 500</span></th><td><span class="pass">watered at 250</span><br><span class="fail">422 at 800</span></td><td class="pass">watered</td><td class="pass">watered</td><td class="pass">watered</td></tr>
+          <tr><th scope="row"><code>new-required-input</code><br><span class="quiet"><code>method</code>, drip or spray</span></th><td class="fail">422</td><td class="pass">watered, with the form's <code>drip</code></td><td class="fail">422, <code>method</code> missing</td><td class="quiet">asked "Should the water reach bed 2 by drip or by spray?" and sent nothing</td></tr>
+          <tr><th scope="row">Watered, of 6</th><td>4</td><td>6</td><td>4</td><td>5</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Raw attempts, with every request each client sent and its status: <code>results/changes/attempts.jsonl</code>. Run it again with <code>run-changes.sh</code>.</p>
+
+    <h3>What it shows</h3>
+    <p>Late binding protects a client exactly as far as the client binds late.</p>
+    <ul>
+      <li><b>The ARTIE dashboard</b> binds nothing about the garden. It shows whatever members the bed has and whatever forms it offers, and it posts each form to its own target. Under all six changes it watered the bed with no change of its own.</li>
+      <li><b>The ARTIE script</b> uses the same client library, but its author wrote two names into code: the relation and the field. It survived the moved URL, the renamed member, the retitle and the tighter limit, because the forms carried those. It broke on exactly the two changes to names it had written down: the relation, and a field it had never heard of.</li>
+      <li><b>Claude</b> reads relations and titles at run time, so the renamed act didn't matter. Under <code>new-required-input</code> it asked which method to use instead of picking one. The bed wasn't watered, but nothing was refused, and the choice it asked about is a real one.</li>
+      <li><b>The bespoke dashboard</b> never reads relations or titles, so renaming and retitling the act didn't touch it. It hard-codes the URL, the member names and the request body, so those changes did.</li>
+    </ul>
+    <p>So both claims were partly right. Late binding didn't make every ARTIE client immune. The script failed where it had bound early, as any client does. And no change in this set hurt a client that bound nothing early.</p>
+
+    <h3>The rework each failure needed</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Failure</th><th scope="col">Bespoke: regenerate, then <code>tsc</code> says</th><th scope="col">Then by hand</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>move-url</code></th><td>0 errors</td><td>nothing; rebuild, release, redeploy</td></tr>
+          <tr><th scope="row"><code>rename-field</code> (display)</th><td>1: <code>Property 'moistureLevel' does not exist on type 'Bed'</code></td><td>rename the member in the card</td></tr>
+          <tr><th scope="row"><code>tighter-limit</code> (800 ml)</th><td>1, about the request type's name, not the limit</td><td>change the field's <code>max</code>; the compiler never mentions 500</td></tr>
+          <tr><th scope="row"><code>new-required-input</code></th><td>1, about the request type's name</td><td>add a method field to the form and the call</td></tr>
+          <tr><th scope="row">ARTIE script, <code>rename-act</code></th><td colspan="2">one line: <code>"garden:water-cell"</code> becomes <code>"garden:irrigate"</code></td></tr>
+          <tr><th scope="row">ARTIE script, <code>new-required-input</code></th><td colspan="2">one line: add <code>put("method", "drip")</code>, which is a choice the script's author now has to make</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>What each dashboard showed</h3>
+    <span class="day-label"><code>rename-field</code></span>
+    <div class="shots">
+      <figure><img src="shots/changes/rename-field-bespoke.png" alt="Bespoke dashboard under rename-field: moisture shows undefined" width="820" height="620"><figcaption><b>Bespoke 1.0.</b> Moisture <code>undefined</code>.</figcaption></figure>
+      <figure><img src="shots/changes/rename-field-artie.png" alt="ARTIE dashboard under rename-field: a Soil moisture cell showing 40" width="820" height="620"><figcaption><b>ARTIE.</b> The member under its new name.</figcaption></figure>
+    </div>
+    <span class="day-label"><code>retitle</code></span>
+    <div class="shots">
+      <figure><img src="shots/changes/retitle-bespoke.png" alt="Bespoke dashboard under retitle: the button still says Water the bed" width="820" height="620"><figcaption><b>Bespoke 1.0.</b> Its own title, "Water the bed".</figcaption></figure>
+      <figure><img src="shots/changes/retitle-artie.png" alt="ARTIE dashboard under retitle: the button says Irrigate the bed" width="820" height="620"><figcaption><b>ARTIE.</b> The garden's new title.</figcaption></figure>
+    </div>
+    <span class="day-label"><code>new-required-input</code></span>
+    <div class="shots">
+      <figure><img src="shots/changes/new-required-input-bespoke.png" alt="Bespoke dashboard under new-required-input: only a millilitres field and Water the bed" width="820" height="620"><figcaption><b>Bespoke 1.0.</b> No method field, so the garden refuses with 422.</figcaption></figure>
+      <figure><img src="shots/changes/new-required-input-artie.png" alt="ARTIE dashboard under new-required-input: a drip or spray choice beside the millilitres field" width="820" height="620"><figcaption><b>ARTIE.</b> The new choice, from the form, with the garden's example <code>drip</code> first.</figcaption></figure>
+    </div>
+    <p class="note">All twelve captures, two per change, are in <code>results/screenshots/changes/</code>.</p>
+
+    <h3>A HEART bug this found</h3>
+    <p>The first run of these variants found a bug in HEART itself. A Layer 1 <code>ETag</code> named only the state version, dialect and rung, as in <code>"seq-3.hsf.L2"</code>. After the garden restarted with <code>move-url</code>, bed 2's state hadn't changed, so its <code>ETag</code> hadn't either. The ARTIE dashboard revalidated, got <code>304</code>, reused its stored form, and posted to the old target, which returned 404.</p>
+    <p>A strong validator must change whenever the bytes do (RFC 9110 §8.8.1). Each <code>ETag</code> now ends with a digest of the representation: <code>"seq-3.hsf.L2.e8e98768123683fa"</code>. The results above come from the run after that fix. The first run's dashboard and Claude results were void and are not used.</p>
+  </section>
+
+  <section>
+    <h2>Fair to say</h2>
+    <ul>
+      <li>Both dashboards are deliberately small. The bespoke one is written the common way. A team could make it read more from the description at runtime, which is a step toward what HEART makes standard.</li>
+      <li>Both dashboards share one stylesheet (<code>shared/dashboard.css</code>), added to both before the final run, so neither looks better than the other.</li>
+      <li>The suite's page objects know where each page puts its buttons. That's the only client-specific test code; the feature file and steps are shared.</li>
+      <li>The Claude results are one run per change, not a measured rate.</li>
+      <li>Under <code>tighter-limit</code> and <code>new-required-input</code>, the garden's request schema got a new name, because each variant is a separate class. That name change is the one <code>tsc</code> error in each. A server that kept the schema's name would give the bespoke team no compiler error at all for those two changes, and they'd have only the regression suite.</li>
+      <li>The ARTIE script is short on purpose. A script could look acts up by title, as the dashboard does, and then fail where the dashboard fails, which here is nowhere.</li>
+      <li>Matching the watering button by <code>/water|irrigat/i</code> is a choice, the same for both dashboards. A person who reads "Irrigate" as watering is assumed.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Code, suite and raw results: <code>exhibits/openapi-vs-heart/</code> on branch <code>claude/auth-branch-4bnmhc</code>. Run it again with <code>run-matrix.sh</code>.</span>
+    <span><a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/openapi-vs-heart/README.md">The exhibit on GitHub</a> (once pushed)</span>
+  </footer>
+</main>
+</body>
+</html>
