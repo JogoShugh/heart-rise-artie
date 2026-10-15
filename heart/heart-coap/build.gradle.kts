@@ -11,6 +11,8 @@ dependencies {
     api(project(":heart-core"))
     api(platform("org.springframework.boot:spring-boot-dependencies:3.3.4"))
     api("org.eclipse.californium:californium-core:3.14.0")
+    // DTLS for coaps, with pre-shared keys.
+    api("org.eclipse.californium:scandium:3.14.0")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 

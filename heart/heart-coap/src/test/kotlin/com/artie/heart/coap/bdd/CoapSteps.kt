@@ -9,7 +9,13 @@ import io.cucumber.java.After
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import com.artie.heart.coap.CoapsSettings
 import org.eclipse.californium.core.CoapClient
+import org.eclipse.californium.scandium.DTLSConnector
+import org.eclipse.californium.scandium.config.DtlsConfig
+import org.eclipse.californium.scandium.config.DtlsConnectorConfig
+import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
+import org.eclipse.californium.scandium.dtls.pskstore.AdvancedSinglePskStore
 import org.eclipse.californium.core.coap.Option
 import org.eclipse.californium.core.coap.Request
 import org.eclipse.californium.core.coap.Response
@@ -42,6 +48,65 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
     @After
     fun shutdown() {
         if (this::last.isInitialized) client.shutdown()
+    }
+
+    // ---- coaps: DTLS with a pre-shared key ----
+
+    private var coapsAnswered: Boolean = false
+    private var settings: Result<CoapsSettings?>? = null
+
+    @When("a coaps client with identity {string} and its key gets {string}")
+    fun coapsGet(identity: String, path: String) = coapsGet(identity, LAMP_KEY, path)
+
+    @When("a coaps client with identity {string} and a wrong key gets {string}")
+    fun coapsGetWrongKey(identity: String, path: String) = coapsGet(identity, "the-wrong-key-16b".toByteArray(), path)
+
+    private fun coapsGet(identity: String, key: ByteArray, path: String) {
+        DtlsConfig.register()
+        CoapConfig.register()
+        UdpConfig.register()
+        val config = Configuration.createStandardWithoutFile()
+        val dtls = DtlsConnectorConfig.builder(config)
+            .set(DtlsConfig.DTLS_ROLE, DtlsConfig.DtlsRole.CLIENT_ONLY)
+            .set(DtlsConfig.DTLS_CIPHER_SUITES, listOf(CipherSuite.TLS_PSK_WITH_AES_128_GCM_SHA256))
+            .setAdvancedPskStore(AdvancedSinglePskStore(identity, key))
+            .build()
+        val endpoint = CoapEndpoint.Builder().setConfiguration(config).setConnector(DTLSConnector(dtls))
+            .setOptionRegistry(CoapOptions.registry).build()
+        val secure = CoapClient().setEndpoint(endpoint).setTimeout(COAPS_TIMEOUT_MS)
+        try {
+            val request = read("coaps://localhost:${door.securePort}$path", whole = true)
+            val answer = secure.advanced(request)
+            coapsAnswered = answer != null
+            answer?.let { last = it.advanced() }
+        } finally {
+            secure.shutdown()
+        }
+    }
+
+    @Then("the coaps request got no answer")
+    fun noCoapsAnswer() = assertTrue(!coapsAnswered, "the server answered a client it should not admit")
+
+    @Then("the CoAP lamp server's coaps endpoint listens on every address")
+    fun coapsEverywhere() = assertTrue(door.secureAddress.address.isAnyLocalAddress, "listens on ${door.secureAddress}")
+
+    @When("the coaps settings are port {int} and keys {string}")
+    fun coapsSettings(port: Int, keys: String) {
+        settings = runCatching { CoapsSettings.parse(port, keys) }
+    }
+
+    @Then("the coaps settings turn coaps off")
+    fun coapsOff() = assertEquals(null, checkNotNull(settings).getOrThrow())
+
+    @Then("the coaps settings admit {string}")
+    fun coapsAdmit(identity: String) =
+        assertTrue(identity in checkNotNull(checkNotNull(settings).getOrThrow()).keys.keys)
+
+    @Then("the coaps settings fail with {string}")
+    fun coapsFail(text: String) {
+        val failure = checkNotNull(checkNotNull(settings).exceptionOrNull()) { "expected the settings to fail" }
+        assertTrue(failure.message.orEmpty().contains(text), "failed with: ${failure.message}")
+        assertTrue(!failure.message.orEmpty().contains("bGFtcC"), "the failure shows a key")
     }
 
     @Then("the CoAP lamp server listens on a loopback address only")
@@ -142,8 +207,8 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
     fun version(id: Long, version: Int) = assertEquals(version, store.lamps.getValue(id).version)
 
     /** A Layer 1 read: it says No-Cache, and asks for the rung in Prefer. */
-    private fun read(path: String) = Request.newGet().apply {
-        setURI(uri(path))
+    private fun read(path: String, whole: Boolean = false) = Request.newGet().apply {
+        setURI(if (whole) path else uri(path))
         options.addOption(Option(CoapOptions.NO_CACHE))
         if (prefer.isNotEmpty()) options.addOption(Option(CoapOptions.PREFER, prefer))
     }
@@ -159,6 +224,10 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
     private companion object {
         const val HAL_FORMS_PROFILE = "https://github.com/jogoshugh/heart-rise/hal-forms"
         const val TIMEOUT_MS = 5_000L
+        const val COAPS_TIMEOUT_MS = 3_000L
+
+        /** The lamp server's key for "lamp-client" (LampCoapServer's test settings): "lamp-client-key!". */
+        val LAMP_KEY = "lamp-client-key!".toByteArray()
         const val ETAG_BYTES = 8
         const val PROBLEMS = "https://github.com/jogoshugh/heart-rise/problems/"
     }

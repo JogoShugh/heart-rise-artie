@@ -75,5 +75,9 @@ private fun brightness(lamp: Lamp, input: ActInput): Int {
 }
 
 @CucumberContextConfiguration
-@SpringBootTest(classes = [LampCoapServer::class], properties = ["heart.coap.port=0"])
+@SpringBootTest(
+    classes = [LampCoapServer::class],
+    // coaps admits one identity, "lamp-client", whose key is "lamp-client-key!" in base64.
+    properties = ["heart.coap.port=0", "heart.coaps.port=0", "heart.coaps.psk=lamp-client:bGFtcC1jbGllbnQta2V5IQ=="],
+)
 class CucumberSpringConfig

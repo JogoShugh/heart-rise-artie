@@ -89,8 +89,43 @@ Feature: A declared resource over CoAP, served by heart-coap
     When a CoAP client gets "/lamps/99" with Prefer ""
     Then the CoAP response is 4.04
 
-  Scenario: The CoAP endpoint listens on the loopback address only
-    CoAP has no Authorization header, so heart-coap cannot check a Basic or
-    Bearer credential. Until it has CoAP's own security (OSCORE or DTLS),
-    only the same machine can reach it.
+  Scenario: The plain CoAP endpoint listens on the loopback address only
+    Plain CoAP carries no credential at all, so only the same machine can
+    reach it. Beyond the machine, a service is reached over coaps (below).
     Then the CoAP lamp server listens on a loopback address only
+
+  Rule: coaps, over DTLS with a pre-shared key
+    CoAP cannot carry a Basic or Bearer credential, so a service that is
+    reached beyond its own machine is reached over coaps: DTLS 1.2 with a
+    pre-shared key per client (RFC 7252 §9.1.3.1). The lamp server admits the
+    identity "lamp-client" with its key.
+
+    Scenario: A client with its key reads a lamp over coaps
+      When a coaps client with identity "lamp-client" and its key gets "/lamps/7"
+      Then the CoAP response is 2.05
+      And the CoAP option 65008 is "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
+
+    Scenario Outline: A client the server does not admit gets no answer: <case>
+      When a coaps client with identity "<identity>" and <key> gets "/lamps/7"
+      Then the coaps request got no answer
+
+      Examples:
+        | case             | identity      | key           |
+        | a wrong key      | lamp-client   | a wrong key   |
+        | unknown identity | someone-else  | its key       |
+
+    Scenario: The coaps endpoint is reachable beyond the machine
+      Then the CoAP lamp server's coaps endpoint listens on every address
+
+    Scenario Outline: coaps settings are checked when the server starts: <case>
+      When the coaps settings are port <port> and keys "<keys>"
+      Then the coaps settings <outcome>
+
+      Examples:
+        | case                  | port | keys                                  | outcome                                                       |
+        | off                   | -1   |                                       | turn coaps off                                                |
+        | on                    | 0    | lamp-client:bGFtcC1jbGllbnQta2V5IQ==  | admit "lamp-client"                                           |
+        | a port, no keys       | 0    |                                       | fail with "coaps needs HEART_COAPS_PSK"                       |
+        | keys, no port         | -1   | lamp-client:bGFtcC1jbGllbnQta2V5IQ==  | fail with "HEART_COAPS_PSK is set, but heart.coaps.port is not" |
+        | a key too short       | 0    | lamp-client:c2hvcnQ=                  | fail with "the key for lamp-client is shorter than 16 bytes"  |
+        | not identity:key      | 0    | lamp-client                           | fail with "expected identity:base64-key"                      |
