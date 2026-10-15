@@ -9,11 +9,24 @@ import com.artie.heart.Finding
 import com.artie.heart.Layers
 import com.artie.heart.Named
 import com.artie.heart.Offers
+import com.artie.heart.Options
+import com.artie.heart.Pick
 import com.artie.heart.ResourceType
 import com.artie.heart.StateView
 
 /** A game, declared once for the HEART library. */
 object Games {
+
+    /**
+     * HAL-SCHEMA-FORMS-HR Rule 8: the player is one of the chosen team's players in
+     * the game itself, at /{team}/players, leaving out those who have fouled out.
+     */
+    private val playerOfTheTeam = mapOf(
+        "playerNumber" to Options.fromState(
+            "/{team}/players",
+            Pick(value = "number", prompt = "name", where = mapOf("fouledOut" to false), maxItems = 1),
+        ),
+    )
 
     private val inPlay = listOf(
         "scoreBasket", "freeThrow", "recordFoul", "turnover", "callTimeout", "endPeriod", "correctScore",
@@ -24,9 +37,9 @@ object Games {
         profile = BasketballProfile.profile,
         acts = listOf(
             Act.of("tipOff", "tip-off", TipOff::class.java),
-            Act.of("scoreBasket", "score-basket", ScoreBasket::class.java),
-            Act.of("freeThrow", "free-throw", FreeThrow::class.java),
-            Act.of("recordFoul", "record-foul", RecordFoul::class.java),
+            Act.of("scoreBasket", "score-basket", ScoreBasket::class.java).withOptions(playerOfTheTeam),
+            Act.of("freeThrow", "free-throw", FreeThrow::class.java).withOptions(playerOfTheTeam),
+            Act.of("recordFoul", "record-foul", RecordFoul::class.java).withOptions(playerOfTheTeam),
             Act.of("turnover", "turnover", Turnover::class.java),
             Act.of("callTimeout", "call-timeout", CallTimeout::class.java),
             Act.of("resumePlay", "resume-play", NoInput::class.java),

@@ -135,6 +135,24 @@ class GameSteps(
         assertEquals(count, state.path(side).path("teamFouls").asInt())
     }
 
+    @Then("the form {string} takes {string} from {string}, the {string} of each player not fouled out")
+    fun takesFrom(form: String, property: String, pointer: String, valueField: String) {
+        val schema = state.path("_forms").path(form).path("schema")
+        val options = schema.path("properties").path(property).path("hr:options")
+        assertEquals(pointer, options.path("pointer").asText(), "$form: $options")
+        assertEquals(valueField, options.path("valueField").asText(), "$form: $options")
+        assertEquals(false, options.path("where").path("fouledOut").asBoolean(true), "$form: $options")
+    }
+
+    @Then("the game refuses it as not one of the choices at {string}")
+    fun notAChoice(pointer: String) {
+        assertEquals(422, last.status.value(), String(last.responseBody ?: ByteArray(0)))
+        assertEquals(PROBLEM_TYPES + "invalid-input", json(last).path("type").asText())
+        val violations = json(last).path("violations")
+        assertEquals(listOf(pointer), violations.map { it.path("pointer").asText() }.distinct())
+        assertTrue(violations.all { "not one of the choices" in it.path("message").asText() }, "$violations")
+    }
+
     @Then("the game refuses it by a game rule at {string}")
     fun refusedByRule(pointer: String) {
         assertEquals(422, last.status.value(), String(last.responseBody ?: ByteArray(0)))

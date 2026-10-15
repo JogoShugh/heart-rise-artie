@@ -48,20 +48,33 @@ Feature: Scoring a youth basketball game
       | true  | 1     |
       | false | 0     |
 
-  Scenario: A basket by a player not on the team is refused, and counts for nothing
-    The form's schema allows any shirt number; only the game knows its roster.
+  Scenario Outline: The player is chosen from the team's own players who are still in the game: <act>
+    HAL-SCHEMA-FORMS-HR Rule 8. The form does not take any shirt number: it
+    says the choices are the chosen team's players in the game itself, at
+    /{team}/players, leaving out those who have fouled out.
+    Given game 1 is live in period 1 with the "home" team in possession
+    When the scorer opens game 1
+    Then the form "<act>" takes "playerNumber" from "/{team}/players", the "number" of each player not fouled out
+
+    Examples:
+      | act                     |
+      | basketball:score-basket |
+      | basketball:free-throw   |
+      | basketball:record-foul  |
+
+  Scenario: A basket by a player not on the team is not one of the choices, and counts for nothing
     Given game 1 is live in period 1 with the "home" team in possession
     When the scorer records "score-basket" on game 1 with {"team": "home", "playerNumber": 99, "points": 2}
-    Then the game refuses it by a game rule at "/playerNumber"
+    Then the game refuses it as not one of the choices at "/playerNumber"
     And the score is home 0, away 0
 
-  Scenario: A player's fifth personal foul fouls them out, and they can no longer score
+  Scenario: A player's fifth personal foul fouls them out, and they are no longer a choice
     Given game 1 is live in period 1 with the "home" team in possession
     And home player 23 has 4 personal fouls
     When the scorer records "record-foul" on game 1 with {"team": "home", "playerNumber": 23, "kind": "personal"}
     Then home player 23 has fouled out
     When the scorer records "score-basket" on game 1 with {"team": "home", "playerNumber": 23, "points": 2}
-    Then the game refuses it by a game rule at "/playerNumber"
+    Then the game refuses it as not one of the choices at "/playerNumber"
 
   Scenario: The other team is in the bonus once a team has 7 fouls in the half
     Given game 1 is live in period 1 with the "home" team in possession
