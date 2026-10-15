@@ -222,13 +222,13 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
     private fun uri(path: String) = "coap://localhost:${door.port}$path"
 
     private companion object {
-        const val HAL_FORMS_PROFILE = "https://github.com/jogoshugh/heart-rise/hal-forms"
+        const val HAL_FORMS_PROFILE = "https://w3id.org/heart-rise/hal-forms"
         const val TIMEOUT_MS = 5_000L
         const val COAPS_TIMEOUT_MS = 3_000L
 
         /** The lamp server's key for "lamp-client" (LampCoapServer's test settings): "lamp-client-key!". */
         val LAMP_KEY = "lamp-client-key!".toByteArray()
         const val ETAG_BYTES = 8
-        const val PROBLEMS = "https://github.com/jogoshugh/heart-rise/problems/"
+        const val PROBLEMS = "https://w3id.org/heart-rise/problems/"
     }
 }

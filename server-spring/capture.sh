@@ -5,7 +5,7 @@ BASE="${ARTIE_BASE_URL:-http://localhost:8080}"
 # SPEC 0.4 §6.1: Accept picks the dialect; the profile travels in
 # Accept-Profile / Link rel="profile", never as a media-type parameter.
 HSF='application/hal+json'
-HSF_PROFILE='<https://github.com/jogoshugh/heart-rise/hal-schema-forms>'
+HSF_PROFILE='<https://w3id.org/heart-rise/hal-schema-forms>'
 HALFORMS='application/prs.hal-forms+json'
 L1='forms=link'
 L2='forms=link, schema=link'

@@ -12,7 +12,7 @@ Feature: A declared resource over CoAP, served by heart-coap
     When a CoAP client gets "/lamps/7" with Prefer "forms=link, schema=link"
     Then the CoAP response is 2.05
     And the CoAP Content-Format is 65000
-    And the CoAP option 65008 is "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
+    And the CoAP option 65008 is "https://w3id.org/heart-rise/hal-schema-forms"
     And the CoAP option 65012 is "forms=link, schema=link"
     And the CoAP Max-Age is 0
     And the CoAP ETag is the first 8 bytes of SHA-256 over "\"seq-3.hsf.L2\""
@@ -103,7 +103,7 @@ Feature: A declared resource over CoAP, served by heart-coap
     Scenario: A client with its key reads a lamp over coaps
       When a coaps client with identity "lamp-client" and its key gets "/lamps/7"
       Then the CoAP response is 2.05
-      And the CoAP option 65008 is "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
+      And the CoAP option 65008 is "https://w3id.org/heart-rise/hal-schema-forms"
 
     Scenario Outline: A client the server does not admit gets no answer: <case>
       When a coaps client with identity "<identity>" and <key> gets "/lamps/7"

@@ -25,18 +25,20 @@ Feature: Content addresses stay the same while HEART moves into a library
   sixteen hex digits are a short name, not a digest, and only the integrity
   value is checked. Schemas and hr:unavailable documents keep their digits.
   Every affordance set changed, since each one links to its schemas and its
-  hr:unavailable document by address.
+  hr:unavailable document by address. On 15 October 2026 every affordance set
+  changed again, when the HEART identifiers moved to https://w3id.org/heart-rise/:
+  each set names its relations by those URIs.
 
   Scenario: Every content-addressed resource reachable from a bed is pinned
     When a client walks bed 2 through every state at L0, L1 and L2, following every content-addressed link
     Then the addresses it reached are exactly:
       | address                                  |
-      | /affordance-sets/1cc9754cbe3d826c |
-      | /affordance-sets/1f74f68248fe20ba |
-      | /affordance-sets/588773b4c4ba671e |
-      | /affordance-sets/9ed8db109c9f6eb6 |
-      | /affordance-sets/a092fe364864d570 |
-      | /affordance-sets/aab67c2bd106ace1 |
+      | /affordance-sets/05be51a12c70166c |
+      | /affordance-sets/19768aa9dd26adc0 |
+      | /affordance-sets/1b2e0dba2236ac99 |
+      | /affordance-sets/6838506d57dd246f |
+      | /affordance-sets/a978757f7c5f6f10 |
+      | /affordance-sets/fc011cbafe712f8d |
       | /schemas/6efcb63a723f14bc         |
       | /schemas/7f232c04c52671dd         |
       | /schemas/8547ad80c90a3125         |

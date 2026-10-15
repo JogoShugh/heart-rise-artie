@@ -2,7 +2,7 @@
 
 **Status:** draft, 2026-10-08; Rules 6 and 7 added 2026-10-10. Differences only.
 
-**Profile:** `https://github.com/jogoshugh/heart-rise/hal-schema-forms`
+**Profile:** `https://w3id.org/heart-rise/hal-schema-forms`
 
 **Base:** HAL Schema Forms, https://github.com/jbadeau/hal-schema-forms
 (referred to below as "upstream").
@@ -35,7 +35,7 @@ mechanism.
 | Refusal bodies | RFC 9457 problem details |
 
 The `hr:` prefix is the HAL CURIE the server declares in `_links.curies`,
-expanding to `https://github.com/jogoshugh/heart-rise/rels/{rel}`.
+expanding to `https://w3id.org/heart-rise/rels/{rel}`.
 
 ## Rule 1: template pointers
 

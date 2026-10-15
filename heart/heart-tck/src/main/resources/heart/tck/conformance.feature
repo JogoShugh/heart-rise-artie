@@ -14,7 +14,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
     Then the response status is 200
     And the response has Cache-Control "no-cache"
     And the response varies on "Accept, Prefer, Accept-Profile"
-    And the response links its profile "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
+    And the response links its profile "https://w3id.org/heart-rise/hal-schema-forms"
     And the response offers the offered act, with its full schema and a concrete target
     And the response does not offer the absent act
 

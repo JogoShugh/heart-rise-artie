@@ -29,12 +29,12 @@ Feature: Which rung a response is at, and which rung to ask for
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the current representation is at rung L2
@@ -46,7 +46,7 @@ Feature: Which rung a response is at, and which rung to ask for
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
@@ -86,12 +86,12 @@ Feature: Which rung a response is at, and which rung to ask for
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L1"
       Preference-Applied: forms=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted-l1}", integrity: "{integrity:set:planted-l1}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted-l1}", integrity: "{integrity:set:planted-l1}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the current representation is at rung L1
@@ -117,12 +117,12 @@ Feature: Which rung a response is at, and which rung to ask for
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the current representation is at rung L0
@@ -204,7 +204,7 @@ Feature: Which rung a response is at, and which rung to ask for
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _forms:

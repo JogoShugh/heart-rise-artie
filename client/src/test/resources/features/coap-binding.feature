@@ -15,7 +15,7 @@ Feature: ARTIE over CoAP (SPEC §6.0.1)
     Given the client works at rung L2
     When the client enters the CoAP bed
     Then the CoAP request had Accept 65000
-    And the CoAP request had option 65000 "<https://github.com/jogoshugh/heart-rise/hal-schema-forms>"
+    And the CoAP request had option 65000 "<https://w3id.org/heart-rise/hal-schema-forms>"
     And the CoAP request had option 65004 "forms=link, schema=link"
     And the CoAP request had option 65003
     And nothing went over HTTP

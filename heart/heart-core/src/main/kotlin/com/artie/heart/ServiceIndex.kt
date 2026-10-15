@@ -216,8 +216,8 @@ internal class HomeDocument(
     }
 
     private companion object {
-        const val SPEC_URL = "https://github.com/jogoshugh/heart-rise/spec"
-        const val VARS = "https://github.com/jogoshugh/heart-rise/vars"
+        const val SPEC_URL = "https://w3id.org/heart-rise/spec"
+        const val VARS = "https://w3id.org/heart-rise/vars"
 
         /** Each dialect, with its heart-rise profile in the format object's `links` (link-hint `formats`). */
         val FORMATS: Map<String, Any> =

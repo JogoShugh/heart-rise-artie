@@ -95,6 +95,6 @@ class GardenSteps(private val http: HttpWorld) {
     private fun current(): JsonNode = checkNotNull(bed) { "no bed read yet" }
 
     private companion object {
-        const val PROBLEM_TYPES = "https://github.com/jogoshugh/heart-rise/problems/"
+        const val PROBLEM_TYPES = "https://w3id.org/heart-rise/problems/"
     }
 }

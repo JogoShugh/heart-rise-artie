@@ -14,7 +14,7 @@ Feature: A declared resource and its acts, served over HTTP
     And the response has ETag "\"seq-3.hsf.L0\""
     And the response has Cache-Control "no-cache"
     And the response has Vary "Accept, Prefer, Accept-Profile"
-    And the response links its profile "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
+    And the response links its profile "https://w3id.org/heart-rise/hal-schema-forms"
     And the response offers "home:switch-off, home:dim"
 
   Scenario: L2 links to the shared affordance set, and says which preference it applied

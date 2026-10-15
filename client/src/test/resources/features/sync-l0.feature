@@ -11,7 +11,7 @@ Feature: Sync at L0: enter a service and read one collapsed response
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile", <https://github.com/jogoshugh/heart-rise>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile"
 
       id: 2
       label: Bed 2
@@ -37,7 +37,7 @@ Feature: Sync at L0: enter a service and read one collapsed response
     When the client enters "http://garden.test/beds/2"
     Then the client sent GET "http://garden.test/beds/2" with headers:
       | Accept         | application/hal+json                                        |
-      | Accept-Profile | <https://github.com/jogoshugh/heart-rise/hal-schema-forms> |
+      | Accept-Profile | <https://w3id.org/heart-rise/hal-schema-forms> |
     And that request had no "Prefer" header
 
   Scenario: State is held apart from the manifest
@@ -85,6 +85,6 @@ Feature: Sync at L0: enter a service and read one collapsed response
 
     Examples:
       | case                 | profile header                                                          |
-      | another profile      | Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile" |
+      | another profile      | Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile" |
       | no profile link      | Link: </beds/9>; rel="self"                                             |
       | withdrawn media-type | X-Note: profile only in Content-Type parameter                          |

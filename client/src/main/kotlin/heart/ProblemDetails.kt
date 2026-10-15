@@ -8,7 +8,7 @@ import kotlinx.serialization.json.jsonPrimitive
 
 /** RFC 9457 problem details (SPEC §6.2), as every binding carries them: a JSON body. */
 internal object ProblemDetails {
-    const val BASE = "https://github.com/jogoshugh/heart-rise/problems/"
+    const val BASE = "https://w3id.org/heart-rise/problems/"
 
     fun type(body: String): String? =
         runCatching { Json.parseToJsonElement(body).jsonObject["type"]?.jsonPrimitive?.content }.getOrNull()

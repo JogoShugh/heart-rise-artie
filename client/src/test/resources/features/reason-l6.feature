@@ -12,7 +12,7 @@ Feature: L6: the Reason step picks; deterministic code acts
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
@@ -38,7 +38,7 @@ Feature: L6: the Reason step picks; deterministic code acts
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
@@ -96,7 +96,7 @@ Feature: L6: the Reason step picks; deterministic code acts
       """
       200 OK
       Content-Type: application/hal+json
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       count: 2
       _links:
@@ -116,7 +116,7 @@ Feature: L6: the Reason step picks; deterministic code acts
       """
       200 OK
       Content-Type: application/hal+json
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       count: 1
       _links:
@@ -132,7 +132,7 @@ Feature: L6: the Reason step picks; deterministic code acts
       """
       200 OK
       Content-Type: application/hal+json
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       count: 2
       _links:

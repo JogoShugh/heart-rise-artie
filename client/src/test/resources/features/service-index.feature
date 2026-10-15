@@ -13,7 +13,7 @@ Feature: Enter at the service index and find a bed
       Content-Type: application/hal+json
       Cache-Control: no-cache
       ETag: "index-1"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       _links:
         self: {href: /}
@@ -38,7 +38,7 @@ Feature: Enter at the service index and find a bed
       200 OK
       Content-Type: application/hal+json
       Cache-Control: no-cache
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       count: 2
       _links:
@@ -52,7 +52,7 @@ Feature: Enter at the service index and find a bed
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       label: South border
@@ -106,7 +106,7 @@ Feature: Enter at the service index and find a bed
       """
       200 OK
       Content-Type: application/hal+json
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       count: 3
       _links:
@@ -122,7 +122,7 @@ Feature: Enter at the service index and find a bed
       """
       200 OK
       Content-Type: application/hal+json
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       count: 3
       _links:

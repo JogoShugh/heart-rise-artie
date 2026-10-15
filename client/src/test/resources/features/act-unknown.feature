@@ -8,7 +8,7 @@ Feature: Act: refuse an affordance the manifest does not offer
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-0.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 1
       status: EMPTY

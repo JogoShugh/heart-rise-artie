@@ -46,7 +46,7 @@ Feature: A HEART service admits only callers with a credential
     Then the response status is 401
     And the response has Content-Type "application/problem+json"
     And the response offers the challenges "Basic realm=\"home\"" and "Bearer realm=\"home\""
-    And the problem's "type" member is "https://github.com/jogoshugh/heart-rise/problems/not-authenticated"
+    And the problem's "type" member is "https://w3id.org/heart-rise/problems/not-authenticated"
 
   Scenario: A wrong credential is answered exactly as a missing one
     When a client with no credential sends GET "/lamps/7"

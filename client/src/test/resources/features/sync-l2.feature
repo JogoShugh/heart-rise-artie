@@ -35,13 +35,13 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
       Vary: Accept, Prefer, Accept-Profile
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", type: application/hal+json, integrity: "{integrity:set:planted}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted}", type: application/hal+json, integrity: "{integrity:set:planted}"}
       """
     And the client works at rung L2
 
@@ -64,13 +64,13 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       Cache-Control: no-cache
       ETag: "seq-4.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 3
       status: PLANTED
       _links:
         self: {href: /beds/3}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     And the client enters "http://garden.test/beds/3"
@@ -120,11 +120,11 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 5
       _links:
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:two-waterings}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:two-waterings}"}
       """
     When the client enters "http://garden.test/beds/5"
     Then the client sent these requests:
@@ -143,12 +143,12 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
     And the client acts on "waterCell" with:
@@ -158,7 +158,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
     Then the client sent POST "http://garden.test/beds/2/actions/water-cell" with headers:
       | If-Match       | "seq-1.hsf.L2"                                              |
       | Accept         | application/hal+json                                        |
-      | Accept-Profile | <https://github.com/jogoshugh/heart-rise/hal-schema-forms> |
+      | Accept-Profile | <https://w3id.org/heart-rise/hal-schema-forms> |
       | Prefer         | forms=link, schema=link                                     |
     And the client holds the ETag "seq-2.hsf.L2"
     And the manifest offers exactly "waterCell"

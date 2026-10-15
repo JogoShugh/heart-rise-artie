@@ -61,7 +61,7 @@ has since changed.
 | L3 sharing property | **Done**: two clients behind one shared cache, two beds in one state, one set fetch, fake and live (seed bed 4). The concrete-profile counter-case (one set per bed, two fetches, one schema fetch) is checked against the scripted server |
 | L5: speak both dialects | **Done**. ARTIE reads HAL-FORMS at L0 (`_templates`, properties mapped to JSON Schema) and refuses to be set above L0 in it. Live: both dialects show the same act targets on all four seeded beds, and a full cycle runs over HAL-FORMS |
 | RISE | **Missing** |
-| Rel name of the Layer 1 link to the set | **Done** (decided for 0.5). `https://github.com/jogoshugh/heart-rise/rels/forms`; server-spring sends the `hr:forms` CURIE, ARTIE expands CURIEs (`forms-link.feature`) |
+| Rel name of the Layer 1 link to the set | **Done** (decided for 0.5). `https://w3id.org/heart-rise/rels/forms`; server-spring sends the `hr:forms` CURIE, ARTIE expands CURIEs (`forms-link.feature`) |
 | §6.3 (2026-10-10): `Cache-Control: no-cache` on every Layer 1 request, honoured by its own cache | **Done** (2026-10-10) | `layer1-freshness.feature` |
 | §6.11.1: the rung read from `Preference-Applied` before any forms link is followed | **Done** (2026-10-10, Buster #37) | `rung-discovery.feature` |
 | §6.2 (2026-10-10): reads RFC 9457 problem details, and an older server's plain body | **Done** (2026-10-10) | `conditional-acts.feature` |

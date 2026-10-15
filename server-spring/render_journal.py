@@ -171,7 +171,7 @@ def check_l2_linked() -> tuple[bool, str]:
 
 def check_profile_link() -> tuple[bool, str]:
     link = header_value("01-bed1-headers.txt", "Link")
-    return ('<https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"' in link, link)
+    return ('<https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"' in link, link)
 
 
 def check_point_in_time() -> tuple[bool, str]:
@@ -232,7 +232,7 @@ def entry_01() -> str:
     <p class="entry-sub">layer 1 → layer 2 → layer 3, captured live</p>
     <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. With no <code>Prefer</code> header (rung L0) everything arrives in one response: state, the form, and its full schema.</p>
     <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json' \\
-     -H 'Accept-Profile: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;' \\
+     -H 'Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;' \\
      http://localhost:8080/beds/1</pre></div>
     <div class="specimen"><div class="specimen-label output">output</div><pre>{yaml_block("01-bed1-l0.json")}</pre></div>
     {verdict_html(l0_ok,

@@ -14,7 +14,7 @@ Feature: Choosing the dialect, the rung and the validator
       | APPLICATION/HAL+JSON                                 |                                                             | JSONSCHEMA |
       | application/prs.hal-forms+json;q=0.5, application/hal+json |                                                   | JSONSCHEMA |
       | application/hal+json, application/prs.hal-forms+json |                                                             | JSONSCHEMA |
-      | */*                                                  | <https://github.com/jogoshugh/heart-rise/hal-schema-forms>  | JSONSCHEMA |
+      | */*                                                  | <https://w3id.org/heart-rise/hal-schema-forms>  | JSONSCHEMA |
       | */*                                                  | <https://example.org/unknown>                               | HALFORMS   |
 
   Scenario: Accept that names no dialect and no wildcard is refused

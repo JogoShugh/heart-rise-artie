@@ -12,19 +12,19 @@ Feature: Choosing the representation over HTTP: dialect, profile and rung
     When a client gets "/lamps/7" with Accept "<accept>" and Accept-Profile "<profile>"
     Then the response status is 200
     And the response has Content-Type "<type>"
-    And the response links its profile "https://github.com/jogoshugh/heart-rise/<dialect>"
+    And the response links its profile "https://w3id.org/heart-rise/<dialect>"
     And the response carries its forms under "<forms>"
 
     Examples:
       | accept | profile                                                     | type                           | dialect          | forms      |
-      | */*    | <https://github.com/jogoshugh/heart-rise/hal-schema-forms> | application/hal+json           | hal-schema-forms | _forms     |
-      |        | <https://github.com/jogoshugh/heart-rise/hal-forms>        | application/prs.hal-forms+json | hal-forms        | _templates |
+      | */*    | <https://w3id.org/heart-rise/hal-schema-forms> | application/hal+json           | hal-schema-forms | _forms     |
+      |        | <https://w3id.org/heart-rise/hal-forms>        | application/prs.hal-forms+json | hal-forms        | _templates |
       |        |                                                             | application/prs.hal-forms+json | hal-forms        | _templates |
       |        | <https://example.org/unknown-profile>                       | application/prs.hal-forms+json | hal-forms        | _templates |
 
   Scenario: Layer 1 also names the parent heart-rise profile
     When a client gets "/lamps/7" as hal-schema-forms
-    Then the response links its profile "https://github.com/jogoshugh/heart-rise"
+    Then the response links its profile "https://w3id.org/heart-rise"
 
   Scenario: HAL-FORMS is the L0 on-ramp: it ignores layering preferences, so it does not vary on Prefer
     When a client gets "/lamps/7" as hal-forms with Prefer "forms=link, schema=link"

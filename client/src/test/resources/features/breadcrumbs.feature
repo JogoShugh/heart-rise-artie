@@ -15,7 +15,7 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
@@ -35,7 +35,7 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _forms: {}
@@ -45,7 +45,7 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _forms: {}
@@ -65,12 +65,12 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 3
       _links:
         self: {href: /beds/3}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: /affordance-sets/x, integrity: sha256-AAAA}
+        https://w3id.org/heart-rise/rels/forms: {href: /affordance-sets/x, integrity: sha256-AAAA}
       """
     When the client enters "http://garden.test/beds/3"
     Then the event log has "rung.applied" with "heart.rung" "L0" for the request to "http://garden.test/beds/3"
@@ -95,7 +95,7 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
       412 Precondition Failed
       Content-Type: application/problem+json
 
-      type: https://github.com/jogoshugh/heart-rise/problems/stale
+      type: https://w3id.org/heart-rise/problems/stale
       title: The act is stale
       status: 412
       """
@@ -104,7 +104,7 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _forms: {}
@@ -115,7 +115,7 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
       {}
       """
     Then the event log has "act.sent" with "heart.if_match" "\"seq-1.hsf.L0\"" for the request to "http://garden.test/beds/2/actions/water-cell"
-    And the event log has "act.refused" with "heart.problem.type" "https://github.com/jogoshugh/heart-rise/problems/stale" for the request to "http://garden.test/beds/2/actions/water-cell"
+    And the event log has "act.refused" with "heart.problem.type" "https://w3id.org/heart-rise/problems/stale" for the request to "http://garden.test/beds/2/actions/water-cell"
     And the event log has "act.refused" with "heart.outcome" "discarded after re-sync" for the request to "http://garden.test/beds/2/actions/water-cell"
 
   Scenario: An act the manifest does not offer is logged as absent, and nothing is sent

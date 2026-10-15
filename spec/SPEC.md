@@ -22,7 +22,7 @@
 - **HAL-FORMS is the L0 on-ramp; HAL Schema Forms is the reference dialect (§6.1, §6.2, §6.10.6).** Decided 2026-10-04. HAL-FORMS has no field that points to a separately addressed properties fragment, and its common toolchains generate the bytes, so the layering and content addressing of L1–L3 do not fit it. Rather than extend HAL-FORMS, 0.5 serves it at L0 only. Every rung, L0 to L6, is defined for HAL Schema Forms.
   Reaffirmed 2026-10-08, after checking the HAL-FORMS text. At L0 HAL-FORMS is complete: the service index (§6.11), search and lookup, every act, conditional requests, and the same legal acts as HAL Schema Forms. L1 is blocked because a template `target` cannot be a URI Template, and an absent target means the form document's own address, so every resource would need its own form document and nothing could be shared. L3 is blocked because properties are always inline. Extending HAL-FORMS would mean building its bytes by hand and losing the off-the-shelf tooling that is its reason to be here; a client that needs caching moves to HAL Schema Forms, with the same acts. Parked alternatives are in `hacklog.md`.
 
-- **The affordance-set link has a name (§6.1).** Decided 2026-10-04. At L1 and L2, Layer 1 links to its affordance set under the link relation `https://github.com/jogoshugh/heart-rise/rels/forms`. A server MAY write it in HAL's CURIE short form; a client MUST expand CURIEs before matching. 0.4 drew the link as `_links.forms` without naming it, so two conformant implementations could disagree.
+- **The affordance-set link has a name (§6.1).** Decided 2026-10-04. At L1 and L2, Layer 1 links to its affordance set under the link relation `https://w3id.org/heart-rise/rels/forms`. A server MAY write it in HAL's CURIE short form; a client MUST expand CURIEs before matching. 0.4 drew the link as `_links.forms` without naming it, so two conformant implementations could disagree.
 
 - **A H.E.A.R.T. profile of HAL Schema Forms (`spec/HAL-SCHEMA-FORMS-HR.md`).** Decided 2026-10-08. Affordance sets stay. The additions they need are written as a differences-only profile of HAL Schema Forms, each taken from an existing standard. L0 responses use none of them and stay valid upstream HAL Schema Forms.
 
@@ -263,34 +263,34 @@ H.E.A.R.T. is a layer over a base hypermedia-forms dialect, not a single fixed m
 
 **Profile identifiers are composite, not conjunctive.** `heart-rise` never stands alone on the wire. It is always layered over exactly one base dialect, and connegp's negotiation model (§7.3.2) is built for a client to request *one profile from a set of alternatives*, ranked by preference — not for two independent profiles to apply to a response simultaneously. Sending `Accept-Profile: <hal-schema-forms>, <heart-rise>` would ask for either one, which is not what's meant. Accordingly, 0.4 mints one atomic profile URI per (dialect, `heart-rise`) pair:
 
-- `https://github.com/jogoshugh/heart-rise/hal-schema-forms`
-- `https://github.com/jogoshugh/heart-rise/hal-forms`
+- `https://w3id.org/heart-rise/hal-schema-forms`
+- `https://w3id.org/heart-rise/hal-forms`
 
-The bare `https://github.com/jogoshugh/heart-rise` URI remains as the family/parent identifier — analogous to connegp's own worked example where GeoDCAT-AP and StatDCAT-AP are each a narrower `prof:Profile` of DCAT-AP without profiling each other (connegp §7.3.2, Example 7; §A.2). It is never sent in `Accept-Profile`, since alone it does not fully constrain a wire format; a server MAY include it alongside the concrete profile in a `Link: rel="profile"` response for hierarchy discoverability.
+The bare `https://w3id.org/heart-rise` URI remains as the family/parent identifier — analogous to connegp's own worked example where GeoDCAT-AP and StatDCAT-AP are each a narrower `prof:Profile` of DCAT-AP without profiling each other (connegp §7.3.2, Example 7; §A.2). It is never sent in `Accept-Profile`, since alone it does not fully constrain a wire format; a server MAY include it alongside the concrete profile in a `Link: rel="profile"` response for hierarchy discoverability.
 
 **HAL Schema Forms dialect** (`https://github.com/jbadeau/hal-schema-forms`):
 ```
 Accept: application/hal+json
-Accept-Profile: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>
+Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>
 
 ---
 
 HTTP/1.1 200 OK
 Content-Type: application/hal+json
-Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 ```
 Uses the `_forms` key. Full JSON Schema per field.
 
 **HAL-FORMS dialect** (Amundsen's `application/prs.hal-forms+json`, the format Spring HATEOAS and other toolchains already ship natively):
 ```
 Accept: application/prs.hal-forms+json, application/hal+json;q=0.5
-Accept-Profile: <https://github.com/jogoshugh/heart-rise/hal-forms>
+Accept-Profile: <https://w3id.org/heart-rise/hal-forms>
 
 ---
 
 HTTP/1.1 200 OK
 Content-Type: application/prs.hal-forms+json
-Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
 ```
 Uses the `_templates` key. Amundsen's inline `properties` array (`name`, `type`, `required`, `readOnly`, etc.), not JSON Schema.
 
@@ -318,11 +318,11 @@ A H.E.A.R.T. response is organised into three layers. Whether those layers arriv
 
 `immutable` is RFC 8246. Support outside browser caches is uneven; the year-long `max-age` carries most of the benefit regardless, and the content address makes staleness meaningless by construction.
 
-**The affordance-set link relation (decided for 0.5).** At L1 and L2, Layer 1 SHALL link to its affordance set under the link relation type `https://github.com/jogoshugh/heart-rise/rels/forms`. An extension relation is a URI under RFC 8288 §2.1.2, and this one sits in the same namespace as the profile URIs above. A server MAY write it in HAL's CURIE short form, declaring the prefix in `_links.curies`:
+**The affordance-set link relation (decided for 0.5).** At L1 and L2, Layer 1 SHALL link to its affordance set under the link relation type `https://w3id.org/heart-rise/rels/forms`. An extension relation is a URI under RFC 8288 §2.1.2, and this one sits in the same namespace as the profile URIs above. A server MAY write it in HAL's CURIE short form, declaring the prefix in `_links.curies`:
 
 ```json
 "_links": {
-  "curies":   [{ "name": "hr", "href": "https://github.com/jogoshugh/heart-rise/rels/{rel}", "templated": true }],
+  "curies":   [{ "name": "hr", "href": "https://w3id.org/heart-rise/rels/{rel}", "templated": true }],
   "hr:forms": { "href": "/affordance-sets/…", "type": "application/hal+json" }
 }
 ```
@@ -374,7 +374,7 @@ Notes on the changes:
 - 0.3 used `409` for "resource moved between sync and act" and `403` for "business rules prohibit it in the current state." Both are now `409`, because from the client's position they are indistinguishable and demand the same response: re-sync. `403` is freed for authorisation, where it belongs.
 - 0.3 deprecated `428` as having no remaining trigger. Making acts conditional gives it back its RFC 6585 meaning exactly — *this server requires the request to be conditional* — which is a better outcome than deletion. §12's recommendation to remove it is withdrawn.
 
-**Error bodies (decided 2026-10-10).** A server SHALL send each refusal in the table above as an RFC 9457 problem details object, `application/problem+json`, with `type`, `title` and `status`. The `type` is a URI that names the refusal, so a client tells refusals apart by `type` and status, never by reading `title` or `detail`. H.E.A.R.T. defines five, under `https://github.com/jogoshugh/heart-rise/problems/`:
+**Error bodies (decided 2026-10-10).** A server SHALL send each refusal in the table above as an RFC 9457 problem details object, `application/problem+json`, with `type`, `title` and `status`. The `type` is a URI that names the refusal, so a client tells refusals apart by `type` and status, never by reading `title` or `detail`. H.E.A.R.T. defines five, under `https://w3id.org/heart-rise/problems/`:
 
 | Status | `type` (suffix) | Extension members |
 |---|---|---|
@@ -390,7 +390,7 @@ Notes on the changes:
 HTTP/1.1 422 Unprocessable Content
 Content-Type: application/problem+json
 
-{"type": "https://github.com/jogoshugh/heart-rise/problems/invalid-input",
+{"type": "https://w3id.org/heart-rise/problems/invalid-input",
  "title": "The body does not match the form's schema", "status": 422,
  "violations": [{"pointer": "/milliliters", "message": "must be at least 1"}]}
 ```
@@ -846,17 +846,17 @@ Many servers will start at L0, and some will stay there. A client should be able
 {
   "api": {
     "title": "Garden beds",
-    "links": { "describedBy": "https://github.com/jogoshugh/heart-rise/spec" }
+    "links": { "describedBy": "https://w3id.org/heart-rise/spec" }
   },
   "resources": {
     "item": {
       "hrefTemplate": "/beds/{id}",
-      "hrefVars": { "id": "https://github.com/jogoshugh/heart-rise/vars/bed-id" },
+      "hrefVars": { "id": "https://w3id.org/heart-rise/vars/bed-id" },
       "hints": {
         "allow": ["GET"],
         "formats": {
-          "application/hal+json": { "links": { "profile": "https://github.com/jogoshugh/heart-rise/hal-schema-forms" } },
-          "application/prs.hal-forms+json": { "links": { "profile": "https://github.com/jogoshugh/heart-rise/hal-forms" } }
+          "application/hal+json": { "links": { "profile": "https://w3id.org/heart-rise/hal-schema-forms" } },
+          "application/prs.hal-forms+json": { "links": { "profile": "https://w3id.org/heart-rise/hal-forms" } }
         },
         "accept-prefer": ["forms=link", "schema=link"],
         "precondition-req": ["etag"]
@@ -878,7 +878,7 @@ A client that reads the home document SHOULD ask for the highest dialect and run
 
 Business rules are enforced by leaving acts out of the manifest (§6.2). That prevents an illegal call, but leaves an agent nothing to say when a user asks why an act is not offered, and a model will invent a reason rather than decline. This section gives the server a place to say why.
 
-An affordance set MAY carry one link under the relation `https://github.com/jogoshugh/heart-rise/rels/unavailable` (`hr:unavailable`), with `integrity` (`spec/HAL-SCHEMA-FORMS-HR.md`, Rule 2). At L1 and L2 the link is in the affordance set's `_links`; at L0, where the set is embedded, it is in Layer 1's `_links`. Its target lists the acts absent in this state, each by its relation (a URI reference, resolved against the target's own URL), with a title and a short reason:
+An affordance set MAY carry one link under the relation `https://w3id.org/heart-rise/rels/unavailable` (`hr:unavailable`), with `integrity` (`spec/HAL-SCHEMA-FORMS-HR.md`, Rule 2). At L1 and L2 the link is in the affordance set's `_links`; at L0, where the set is embedded, it is in Layer 1's `_links`. Its target lists the acts absent in this state, each by its relation (a URI reference, resolved against the target's own URL), with a title and a short reason:
 
 ```json
 {
@@ -992,7 +992,7 @@ In the HAL Schema Forms dialect these are CURIEs and the representation SHALL in
 "_links": {
   "curies": [{
     "name": "heart",
-    "href": "https://github.com/jogoshugh/heart-rise/rels/{rel}",
+    "href": "https://w3id.org/heart-rise/rels/{rel}",
     "templated": true
   }]
 }

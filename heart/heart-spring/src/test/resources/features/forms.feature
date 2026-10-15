@@ -11,7 +11,7 @@ Feature: Forms over HTTP: named by relations, shared, and accepted where their t
   Scenario: At L0 a form is keyed by a declared CURIE, with a title and a description
     When a client gets "/lamps/7" as hal-schema-forms
     Then the response declares the CURIE "home" as "/profiles/home#{rel}"
-    And the response declares the CURIE "hr" as "https://github.com/jogoshugh/heart-rise/rels/{rel}"
+    And the response declares the CURIE "hr" as "https://w3id.org/heart-rise/rels/{rel}"
     And the "home:dim" form has a title and a description
 
   Scenario: An affordance set declares its CURIEs too, does not vary, and ignores Prefer

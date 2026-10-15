@@ -183,7 +183,7 @@ POST /beds/{id}/harvest     body {}                                 only if READ
 ### Step 3 · Adds meaning (relations, a profile, descriptions): name each act so a stranger can understand it
 
 ```diff
-+ Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
++ Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
   {… "_links":{"self":{"href":"/beds/1"},
 +    "curies":[{"name":"garden","href":"/profiles/garden#{rel}","templated":true}]},

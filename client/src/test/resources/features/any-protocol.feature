@@ -37,7 +37,7 @@ Feature: Identification is separate from interaction (SPEC §6.0)
       200 OK
       Content-Type: application/hal+json
       Cache-Control: no-cache
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       _links:
         self: {href: /}
@@ -55,7 +55,7 @@ Feature: Identification is separate from interaction (SPEC §6.0)
       200 OK
       Content-Type: application/hal+json
       Cache-Control: no-cache
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       _links:
         self: {href: /}

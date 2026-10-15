@@ -33,11 +33,11 @@ Feature: L1, and the L3 sharing property seen from the client
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L1"
       Preference-Applied: forms=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted-l1}", integrity: "{integrity:set:planted-l1}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted-l1}", integrity: "{integrity:set:planted-l1}"}
       """
     And the client works at rung L1
     When the client enters "http://garden.test/beds/2"

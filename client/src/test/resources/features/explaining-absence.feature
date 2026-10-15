@@ -17,7 +17,7 @@ Feature: Explaining why an act is not offered
       _links:
         curies:
           - {name: garden, href: "/profiles/garden#{rel}", templated: true}
-          - {name: hr, href: "https://github.com/jogoshugh/heart-rise/rels/{rel}", templated: true}
+          - {name: hr, href: "https://w3id.org/heart-rise/rels/{rel}", templated: true}
         hr:unavailable: {href: "{unavailable:planted}", integrity: "{integrity:unavailable:planted}"}
       _forms:
         garden:water-cell:
@@ -52,7 +52,7 @@ Feature: Explaining why an act is not offered
     And the service serves affordance set "lying" at its content address:
       """yaml
       _links:
-        curies: [{name: hr, href: "https://github.com/jogoshugh/heart-rise/rels/{rel}", templated: true}]
+        curies: [{name: hr, href: "https://w3id.org/heart-rise/rels/{rel}", templated: true}]
         hr:unavailable: {href: "{unavailable:planted}", integrity: "{integrity:unavailable:other}"}
       _forms: {}
       """
@@ -73,7 +73,7 @@ Feature: Explaining why an act is not offered
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       _links: {self: {href: /beds/7}}

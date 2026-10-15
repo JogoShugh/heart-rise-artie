@@ -74,12 +74,12 @@ class LayerSteps(private val ctx: ClientContext) {
 
     private fun serveBed(bed: Int, link: String) {
         val body = """{"id":$bed,"_links":{"self":{"href":"/beds/$bed"},""" +
-            """"https://github.com/jogoshugh/heart-rise/rels/forms":$link}}"""
+            """"https://w3id.org/heart-rise/rels/forms":$link}}"""
         val headers = mapOf(
             "Content-Type" to listOf("application/hal+json"),
             "ETag" to listOf("\"seq-1.hsf.L2\""),
             "Preference-Applied" to listOf("forms=link, schema=link"),
-            "Link" to listOf("<https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel=\"profile\""),
+            "Link" to listOf("<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\""),
         )
         ctx.transport.respond("GET", "http://garden.test/beds/$bed", HeartResponse(OK, headers, body))
     }

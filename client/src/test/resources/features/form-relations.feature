@@ -13,7 +13,7 @@ Feature: Forms named by link relations, described for the reasoner
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
@@ -38,7 +38,7 @@ Feature: Forms named by link relations, described for the reasoner
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED

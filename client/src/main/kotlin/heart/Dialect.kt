@@ -6,7 +6,7 @@ package heart
  */
 enum class Dialect(val mediaType: String, val profile: String, val maxRung: Rung) {
     HAL_SCHEMA_FORMS(HAL_JSON, HAL_SCHEMA_FORMS_PROFILE, Rung.L2),
-    HAL_FORMS("application/prs.hal-forms+json", "https://github.com/jogoshugh/heart-rise/hal-forms", Rung.L0),
+    HAL_FORMS("application/prs.hal-forms+json", "https://w3id.org/heart-rise/hal-forms", Rung.L0),
     ;
 
     companion object {

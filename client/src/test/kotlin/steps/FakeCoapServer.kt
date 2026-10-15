@@ -87,7 +87,7 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
     }
 
     private fun problem(code: ResponseCode, type: String) = Response(code).apply {
-        setPayload("""{"type": "https://github.com/jogoshugh/heart-rise/problems/$type", "title": "refused"}""")
+        setPayload("""{"type": "https://w3id.org/heart-rise/problems/$type", "title": "refused"}""")
         options.contentFormat = PROBLEM_JSON
     }
 
@@ -96,7 +96,7 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
         options.contentFormat = HAL_JSON
         options.maxAge = 0
         options.addETag(validator)
-        options.addOption(Option(PROFILE, "https://github.com/jogoshugh/heart-rise/hal-schema-forms"))
+        options.addOption(Option(PROFILE, "https://w3id.org/heart-rise/hal-schema-forms"))
         rung?.let { options.addOption(Option(PREFERENCE_APPLIED, it)) }
     }
 

@@ -29,12 +29,12 @@ Feature: Layer 1 is never fresh; the client says so on every request
       Cache-Control: private, max-age=3600
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
         self: {href: /beds/2}
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     And the service answers GET "http://garden.test/beds/2" with:
       """
@@ -82,7 +82,7 @@ Feature: Layer 1 is never fresh; the client says so on every request
       Content-Type: application/hal+json
       Cache-Control: no-cache
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       _links:

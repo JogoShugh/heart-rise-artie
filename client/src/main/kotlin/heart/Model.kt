@@ -8,15 +8,15 @@ const val PROPERTIES = "properties"
 const val REQUIRED = "required"
 
 /** SPEC §6.1: the composite profile ARTIE speaks, and the dialect's media type. */
-const val HAL_SCHEMA_FORMS_PROFILE = "https://github.com/jogoshugh/heart-rise/hal-schema-forms"
+const val HAL_SCHEMA_FORMS_PROFILE = "https://w3id.org/heart-rise/hal-schema-forms"
 const val HAL_JSON = "application/hal+json"
 
 /** SPEC §6.1 (0.5): the rel of the Layer 1 link to the affordance set. A server
  *  may write it as a HAL CURIE ("hr:forms"); see Curies.expand. */
-const val FORMS_REL = "https://github.com/jogoshugh/heart-rise/rels/forms"
+const val FORMS_REL = "https://w3id.org/heart-rise/rels/forms"
 
 /** SPEC §6.12: the rel of the link to why absent acts are absent. */
-const val UNAVAILABLE_REL = "https://github.com/jogoshugh/heart-rise/rels/unavailable"
+const val UNAVAILABLE_REL = "https://w3id.org/heart-rise/rels/unavailable"
 
 /**
  * The manifest: the acts legal right now ([forms], by key as written), the

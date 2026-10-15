@@ -11,7 +11,7 @@ package com.artie.heart
  * whose `type` is this base followed by the refusal's name, so a client tells
  * refusals apart without reading `title` or `detail`.
  */
-const val PROBLEM_TYPES = "https://github.com/jogoshugh/heart-rise/problems/"
+const val PROBLEM_TYPES = "https://w3id.org/heart-rise/problems/"
 
 /** 428: a state-changing request arrived without a validator. */
 class PreconditionRequiredException(message: String) : RuntimeException(message)

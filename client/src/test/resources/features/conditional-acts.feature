@@ -18,7 +18,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
@@ -40,7 +40,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
@@ -64,7 +64,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       _forms:
@@ -80,7 +80,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       _links:
@@ -100,7 +100,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       garden: {name: north, bed: 12}
@@ -117,7 +117,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       """
@@ -135,7 +135,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       _forms:
@@ -151,7 +151,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       """
@@ -170,7 +170,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       garden: {name: north}
@@ -206,7 +206,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 7
       _forms:
@@ -237,7 +237,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-5.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: READY_TO_HARVEST
@@ -269,7 +269,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
@@ -298,7 +298,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
@@ -315,7 +315,7 @@ Feature: Conditional acts and the four refusals
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _forms: {}
@@ -338,7 +338,7 @@ Feature: Conditional acts and the four refusals
       422 Unprocessable Content
       Content-Type: application/problem+json
 
-      type: https://github.com/jogoshugh/heart-rise/problems/invalid-input
+      type: https://w3id.org/heart-rise/problems/invalid-input
       title: The body does not match the form's schema
       status: 422
       instance: /incidents/7
@@ -363,7 +363,7 @@ Feature: Conditional acts and the four refusals
       422 Unprocessable Content
       Content-Type: application/problem+json
 
-      type: https://github.com/jogoshugh/heart-rise/problems/rule-refused
+      type: https://w3id.org/heart-rise/problems/rule-refused
       title: A rule of the resource refuses the act
       status: 422
       detail: "The bed would be waterlogged: at most 600 ml now."

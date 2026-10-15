@@ -148,7 +148,7 @@ class ResourceSteps(private val client: WebTestClient, private val store: LampSt
     @Then("the response is a problem of type {string}")
     fun problem(type: String) {
         assertEquals("application/problem+json", http.last.responseHeaders.contentType.toString())
-        assertEquals("https://github.com/jogoshugh/heart-rise/problems/$type", json.path("type").asText())
+        assertEquals("https://w3id.org/heart-rise/problems/$type", json.path("type").asText())
     }
 
     @Then("the lamp server holds only lamp {long}")

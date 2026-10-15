@@ -14,7 +14,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       200 OK
       Content-Type: application/prs.hal-forms+json
       ETag: "seq-0.hf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
 
       id: 1
       status: EMPTY
@@ -34,7 +34,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
     When the client enters "http://garden.test/beds/1"
     Then the client sent GET "http://garden.test/beds/1" with headers:
       | Accept         | application/prs.hal-forms+json                       |
-      | Accept-Profile | <https://github.com/jogoshugh/heart-rise/hal-forms> |
+      | Accept-Profile | <https://w3id.org/heart-rise/hal-forms> |
     And that request had no "Prefer" header
 
   Scenario: The template is an affordance named by its key, with a resolved target
@@ -66,7 +66,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       200 OK
       Content-Type: application/prs.hal-forms+json
       ETag: "seq-1.hf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
 
       id: 1
       status: PLANTED
@@ -81,7 +81,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       | If-Match       | "seq-0.hf.L0"                                        |
       | Content-Type   | application/json                                     |
       | Accept         | application/prs.hal-forms+json                       |
-      | Accept-Profile | <https://github.com/jogoshugh/heart-rise/hal-forms> |
+      | Accept-Profile | <https://w3id.org/heart-rise/hal-forms> |
     And that request had no "Prefer" header
     And the client holds the ETag "seq-1.hf.L0"
 
@@ -99,7 +99,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       Content-Type: application/prs.hal-forms+json
       Cache-Control: no-cache
       ETag: "index-hf"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
 
       _links:
         self: {href: /}
@@ -120,7 +120,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       200 OK
       Content-Type: application/prs.hal-forms+json
       Cache-Control: no-cache
-      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
 
       count: 1
       _links:
@@ -147,7 +147,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       200 OK
       Content-Type: application/prs.hal-forms+json
       ETag: "index-hf"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
 
       _templates:
         getBed:
@@ -160,7 +160,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       """
       200 OK
       Content-Type: application/prs.hal-forms+json
-      Link: <https://github.com/jogoshugh/heart-rise/hal-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
 
       count: 1
       _links:

@@ -15,7 +15,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-0.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
@@ -40,7 +40,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-0.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
@@ -62,7 +62,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-0.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
@@ -74,7 +74,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-0.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 9
       """
@@ -151,7 +151,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-0.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       """
@@ -166,7 +166,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
@@ -207,7 +207,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED
@@ -231,7 +231,7 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       200 OK
       Content-Type: application/hal+json
       ETag: "seq-2.hsf.L0"
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       status: PLANTED

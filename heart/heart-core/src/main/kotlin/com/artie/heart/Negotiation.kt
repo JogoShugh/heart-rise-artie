@@ -1,7 +1,7 @@
 package com.artie.heart
 
 /** SPEC §6.1: the parent profile. Never negotiated alone; listed beside the concrete one. */
-const val HEART_RISE_PROFILE = "https://github.com/jogoshugh/heart-rise"
+const val HEART_RISE_PROFILE = "https://w3id.org/heart-rise"
 
 /**
  * The two base dialects (SPEC §6.1). Each pairs a media type, which

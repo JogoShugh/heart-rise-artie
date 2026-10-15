@@ -1,6 +1,6 @@
 Feature: Finding the affordance set: the heart-rise forms rel, full or short
   SPEC §6.1 (0.5). At L1 and L2, Layer 1 links to its affordance set under
-  the rel https://github.com/jogoshugh/heart-rise/rels/forms. A server may
+  the rel https://w3id.org/heart-rise/rels/forms. A server may
   write it in HAL's CURIE short form ("hr:forms" with a curies entry); the
   client expands the prefix and treats both the same. A link under any
   other name is not the affordance set.
@@ -29,11 +29,11 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
-        curies: [{name: <prefix>, href: "https://github.com/jogoshugh/heart-rise/rels/{rel}", templated: true}]
+        curies: [{name: <prefix>, href: "https://w3id.org/heart-rise/rels/{rel}", templated: true}]
         <rel>: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
     When the client enters "http://garden.test/beds/2"
@@ -41,7 +41,7 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
 
     Examples:
       | form                    | prefix | rel                                                 |
-      | full URI                | hr     | https://github.com/jogoshugh/heart-rise/rels/forms |
+      | full URI                | hr     | https://w3id.org/heart-rise/rels/forms |
       | hr: short form          | hr     | hr:forms                                            |
       | short form, own prefix  | garden | garden:forms                                        |
 
@@ -52,7 +52,7 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:

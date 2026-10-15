@@ -30,11 +30,11 @@ Feature: A shared layer is fetched only through a link that carries its integrit
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:planted}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted}"}
       """
     When the client tries to enter "http://garden.test/beds/2"
     Then the client raised an error mentioning "integrity"
@@ -75,11 +75,11 @@ Feature: A shared layer is fetched only through a link that carries its integrit
       Content-Type: application/hal+json
       ETag: "seq-1.hsf.L2"
       Preference-Applied: forms=link, schema=link
-      Link: <https://github.com/jogoshugh/heart-rise/hal-schema-forms>; rel="profile"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
       _links:
-        https://github.com/jogoshugh/heart-rise/rels/forms: {href: "{set:unpinned}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:unpinned}"}
       """
     When the client enters "http://garden.test/beds/2"
     Then the manifest offers exactly "waterCell"
