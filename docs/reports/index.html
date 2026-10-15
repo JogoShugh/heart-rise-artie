@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HEART reports</title>
+<meta name="description" content="Write-ups from the HEART project: OpenAPI against HEART, run for real, and what the results mean.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<style>
+/* Layout: one short column, a list of reports in reading order. */
+:root { --bg: #f3f6f5; --surface: #ffffff; --fg: #17211d; --muted: #55645d; --rule: #d3ddd8; --link: #2f5f8f;
+  --display: "Literata", Georgia, serif; --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6; color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 42rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; gap: 1.5rem; }
+h1 { font: 650 2.1rem/1.15 var(--display); margin: 0; }
+p { margin: 0; color: var(--muted); }
+ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+li a { display: grid; gap: 0.25rem; padding: 0.9rem 1.1rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; color: var(--fg); text-decoration: none; }
+li a:hover b, li a:focus-visible b { color: var(--link); text-decoration: underline; }
+li a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+li b { font: 650 1.1rem/1.3 var(--display); }
+li span { color: var(--muted); font-size: 0.94rem; }
+footer { color: var(--muted); font-size: 0.9rem; }
+footer a { color: var(--link); }
+</style>
+</head>
+<body>
+<main>
+  <h1>HEART reports</h1>
+  <p>OpenAPI against HEART, run for real on one garden server, and what the results mean. In the order they were written.</p>
+  <ol>
+    <li><a href="openapi-vs-heart/"><b>OpenAPI and HEART, side by side</b><span>The exhibit: a generated dashboard and generic clients meet the same server changes, scored by the server itself.</span></a></li>
+    <li><a href="fielding-openapi-vs-heart/"><b>OpenAPI and HEART, by Fielding's rules</b><span>Both scored against the six rules of "REST APIs must be hypertext-driven", including the critiques withdrawn.</span></a></li>
+    <li><a href="hateoas-anyway/"><b>In the end we wind up with HATEOAS anyway</b><span>The final OpenAPI client: it reads its spec live and follows one link per answer to what's allowed now.</span></a></li>
+    <li><a href="dynamic-openapi-client/"><b>The dynamic OpenAPI client, checked</b><span>Design for people, then for agents: the page with every form on it, and what a HEART form tells a machine.</span></a></li>
+  </ol>
+  <footer>HEART's identifiers are listed at <a href="../">the identifier site</a>.</footer>
+</main>
+</body>
+</html>
