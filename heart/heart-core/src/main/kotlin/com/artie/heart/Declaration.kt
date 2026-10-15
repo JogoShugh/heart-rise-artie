@@ -67,6 +67,9 @@ class Profile(val name: String, val title: String, val doc: String, val relation
  * [schema] is the JSON Schema of its body, as JSON text; [path] is its
  * segment in `/{collection}/{id}/actions/{path}`. An act declared with
  * [of] has an [input] class, and its schema is generated from it.
+ * [formerPaths] are segments the act was served at before it moved: a
+ * request there runs the same act with the same checks, while forms name
+ * only [path], and the OpenAPI description marks each one deprecated.
  */
 data class Act(
     val name: String,
@@ -74,11 +77,20 @@ data class Act(
     val schema: String,
     val path: String = relation,
     val input: Class<*>? = null,
+    val formerPaths: List<String> = emptyList(),
 ) {
+    /** Whether a request to [segment] reaches this act: its path, or one it was served at before. */
+    fun answersAt(segment: String): Boolean = segment == path || segment in formerPaths
+
     companion object {
         /** An act whose body is [input]: its schema is generated from the class (see InputSchemas). */
-        fun of(name: String, relation: String, input: Class<*>, path: String = relation): Act =
-            Act(name, relation, InputSchemas.of(input), path, input)
+        fun of(
+            name: String,
+            relation: String,
+            input: Class<*>,
+            path: String = relation,
+            formerPaths: List<String> = emptyList(),
+        ): Act = Act(name, relation, InputSchemas.of(input), path, input, formerPaths)
     }
 }
 

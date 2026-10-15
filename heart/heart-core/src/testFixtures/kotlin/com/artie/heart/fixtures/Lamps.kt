@@ -72,6 +72,15 @@ data class Code(
     val code: String = "",
 )
 
+/** An input that grew carefully: a new field with a default, and an old one kept but deprecated. */
+@Schema(title = "Glow")
+data class Glow(
+    @field:Schema(title = "Colour", allowableValues = ["warm", "cool"], defaultValue = "warm")
+    val colour: String? = null,
+    @field:Schema(title = "Shade", deprecated = true)
+    val shade: String? = null,
+)
+
 /** The lamp resource type, declared the way a domain server declares its own. */
 object Lamps {
     fun profile(name: String = "home") = Profile(
@@ -95,7 +104,8 @@ object Lamps {
             // Switching on and off take no input, so they share one schema.
             Act.of("switchOn", "switch-on", SwitchOff::class.java),
             Act.of("switchOff", "switch-off", SwitchOff::class.java),
-            Act.of("dim", "dim", Dim::class.java),
+            // Dimming used to be at "brighten"; that path still works (SPEC §6.2, former paths).
+            Act.of("dim", "dim", Dim::class.java, formerPaths = listOf("brighten")),
         ),
         offers = Offers(
             keys = listOf("ON", "OFF"),

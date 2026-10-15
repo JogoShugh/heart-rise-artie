@@ -65,6 +65,12 @@ object InputSchemas {
                     }
                 }
             }
+            // @Schema(deprecated = true): a field kept for old clients, which new ones should leave alone.
+            forFields().withInstanceAttributeOverride { node, field, _ ->
+                if (field.getAnnotationConsideringFieldAndGetter(Schema::class.java)?.deprecated == true) {
+                    node.put("deprecated", true)
+                }
+            }
             // An input with no fields still says it takes an object with no properties.
             forTypesInGeneral().withTypeAttributeOverride { node, _, _ ->
                 if (node.path("type").asText() == "object" && !node.has("properties")) node.putObject("properties")

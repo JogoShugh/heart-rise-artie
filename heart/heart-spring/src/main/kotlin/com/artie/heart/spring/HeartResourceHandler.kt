@@ -87,7 +87,7 @@ class HeartResourceHandler<S, K>(
     }
 
     suspend fun act(request: ServerRequest): ServerResponse {
-        val act = type.acts.firstOrNull { it.path == request.pathVariable("path") }
+        val act = type.acts.firstOrNull { it.answersAt(request.pathVariable("path")) }
         return when {
             act == null -> ServerResponse.notFound().buildAndAwait()
             HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders()) -> actPlain(act.name, request)

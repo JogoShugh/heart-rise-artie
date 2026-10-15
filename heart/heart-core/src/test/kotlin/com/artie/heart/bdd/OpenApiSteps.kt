@@ -106,6 +106,12 @@ class OpenApiSteps(private val world: LampWorld) {
         assertTrue(description.endsWith(end), description)
     }
 
+    @Then("the operation {string} is deprecated")
+    fun deprecated(operationId: String) = assertTrue(operation(operationId).path("deprecated").asBoolean())
+
+    @Then("the operation {string} is not deprecated")
+    fun notDeprecated(operationId: String) = assertTrue(!operation(operationId).has("deprecated"))
+
     @Then("the summary of {string} is {string}")
     fun summary(operationId: String, summary: String) =
         assertEquals(summary, operation(operationId).path("summary").asText())

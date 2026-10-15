@@ -849,6 +849,24 @@ and (through the 8-byte hash) over CoAP. Clients are unchanged; they treat
 the value as opaque. The dashboard and Claude results from the first run of
 `run-changes.sh` are void and were rerun.
 
+## 2026-10-15: OpenAPI at its best (fairness item 2)
+
+Two additions to the OpenAPI-vs-HEART exhibit, beside the typical generated
+dashboard, which stays as it is:
+
+- **A spec-reading client** (`exhibits/openapi-vs-heart/openapi-live/`). No
+  generated code: it fetches `/openapi.json` on every render (revalidated by
+  ETag) and builds buttons and fields from it. It binds the garden's URL, the
+  description's URL and the operation `getBed`. It shows every non-deprecated
+  operation under the bed in every state, because the description says which
+  are allowed only in prose.
+- **Careful-evolution variants** of the garden: `move-url-kept`,
+  `rename-field-kept` and `new-optional-input`, the three breaking Wednesday
+  changes made the way a careful OpenAPI team would make them. To hold HEART
+  to the same rules, heart-core gained an act's former paths (served over
+  HTTP and CoAP, deprecated operations in OpenAPI), and input schemas carry
+  `default` and `deprecated` from `@Schema`. SPEC §6.2 records former paths.
+
 ## Ideas parked
 
 Not planned. Kept so they are not re-derived.

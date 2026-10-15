@@ -7,6 +7,7 @@ import com.artie.heart.MalformedActBodyException
 import com.artie.heart.UnprocessableContentException
 import com.artie.heart.fixtures.Code
 import com.artie.heart.fixtures.Dim
+import com.artie.heart.fixtures.Glow
 import com.artie.heart.fixtures.Rename
 import com.artie.heart.fixtures.SwitchOff
 import io.cucumber.java.en.Then
@@ -19,6 +20,7 @@ class SchemaSteps {
         "SwitchOff" to SwitchOff::class.java,
         "Rename" to Rename::class.java,
         "Code" to Code::class.java,
+        "Glow" to Glow::class.java,
     )
     private var schema: String = ""
     private var outcome: Result<Any?>? = null

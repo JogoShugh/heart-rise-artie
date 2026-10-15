@@ -56,6 +56,16 @@ Feature: A declared resource and its acts, served over HTTP
     And the response has ETag "\"seq-4.hsf.L0.{digest}\""
     And the response body has "brightness" 20
 
+  Scenario: An act still answers at the path it moved from, while its forms name only the new one
+    The lamp's dim act used to be at "brighten". A client that kept the
+    former target still reaches the act, with the same checks.
+    When a client posts {"brightness": 20} to "/lamps/7/actions/brighten" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    Then the response status is 200
+    And the response has Content-Location "/lamps/7"
+    And the response body has "brightness" 20
+    When a client gets "/lamps/7" as hal-forms
+    Then the response has templates targeting "/lamps/7/actions/switch-off, /lamps/7/actions/dim"
+
   Scenario Outline: A refused act is a problem: <case>
     When a client posts <body> to "/lamps/7/actions/<path>" as hal-schema-forms with If-Match "<ifMatch>"
     Then the response status is <status>

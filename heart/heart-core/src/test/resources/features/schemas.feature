@@ -34,6 +34,35 @@ Feature: One schema per act: generated from its input class, and enforced as ser
       }
       """
 
+  Scenario: A field's default, and a field kept but deprecated, are in the schema
+    A server that evolves carefully adds new input as optional, with a
+    default, and keeps an old field while marking it deprecated. OpenAPI's
+    Schema annotation says both; the schema carries them as JSON Schema's "default" and
+    "deprecated" keywords, so a form can prefill the default and a client can
+    leave the deprecated field alone.
+    When the schema of the input class "Glow" is generated
+    Then the schema is:
+      """json
+      {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "title": "Glow",
+        "type": "object",
+        "properties": {
+          "colour": {
+            "type": "string",
+            "enum": ["warm", "cool"],
+            "default": "warm",
+            "title": "Colour"
+          },
+          "shade": {
+            "type": "string",
+            "deprecated": true,
+            "title": "Shade"
+          }
+        }
+      }
+      """
+
   Scenario: A field that must not be blank needs a character that is not white space
     Jakarta's @NotBlank means at least one character that is not white
     space. minLength 1 alone lets "   " through, so the schema says it with a

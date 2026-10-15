@@ -35,7 +35,17 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
       | POST   | /lamps/{id}/actions/switch-on  | switchOn      |
       | POST   | /lamps/{id}/actions/switch-off | switchOff     |
       | POST   | /lamps/{id}/actions/dim        | dim           |
+      | POST   | /lamps/{id}/actions/brighten   | dimFormer     |
       | POST   | /actions/install-lamp          | installLamp   |
+
+  Scenario: An act that moved still answers at its former path, which is marked deprecated
+    The lamp's dim act used to be at "brighten". A server that moves an act
+    can keep its former path working, as a careful OpenAPI team keeps an old
+    path: OpenAPI then lists the former path as its own operation, deprecated,
+    and a client reading the description can leave it alone.
+    Then the operation "dimFormer" is deprecated
+    And the operation "dimFormer" takes a required application/json body "#/components/schemas/Dim"
+    And the operation "dim" is not deprecated
 
   Scenario: An act's request body is the act's own schema, the very one its form carries
     Then the operation "dim" takes a required application/json body "#/components/schemas/Dim"

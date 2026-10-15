@@ -119,7 +119,7 @@ internal class CoapRoutes(
 
         /** SPEC §6.2 over CoAP: the same checks, in the same order, with the 8-byte validator. */
         suspend fun act(request: Request, id: Long, path: String): Response {
-            val act = resource.layers.type.acts.firstOrNull { it.path == path }
+            val act = resource.layers.type.acts.firstOrNull { it.answersAt(path) }
                 ?: return replies.error(ResponseCode.NOT_FOUND, path)
             val rung = rung(request)
             val held = request.options.ifMatch.takeIf { it.isNotEmpty() }

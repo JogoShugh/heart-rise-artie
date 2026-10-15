@@ -21,7 +21,14 @@ internal class OpenApiType(private val type: ResourceType<*, *>, private val kee
         type.finding?.let { put(collection, mapOf("get" to search(it))) }
         put("$collection/{id}", mapOf("get" to read()))
         if (keepsPast) put("$collection/{id}/history", mapOf("get" to history()))
-        type.acts.forEach { put("$collection/{id}/actions/${it.path}", mapOf("post" to act(it))) }
+        type.acts.forEach { act ->
+            put("$collection/{id}/actions/${act.path}", mapOf("post" to act(act)))
+            // A path the act moved from still answers; it is its own operation, deprecated.
+            act.formerPaths.forEach { former ->
+                val operation = act(act) + mapOf("operationId" to "${act.name}Former", "deprecated" to true)
+                put("$collection/{id}/actions/$former", mapOf("post" to operation))
+            }
+        }
         type.bookmarkActs.forEach { put("$ACTIONS${it.path}", mapOf("post" to bookmarkAct(it))) }
     }
 

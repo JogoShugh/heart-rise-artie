@@ -53,7 +53,7 @@ Feature: The OpenAPI 3.1 description, served and linked from the bookmark
 
   Scenario: Every route the server serves is in the description
     When a client gets "/openapi.json" with Accept "application/json"
-    Then the description's operations are "GET /lamps, GET /lamps/{id}, GET /lamps/{id}/history, POST /lamps/{id}/actions/switch-on, POST /lamps/{id}/actions/switch-off, POST /lamps/{id}/actions/dim, POST /actions/install-lamp"
+    Then the description's operations are "GET /lamps, GET /lamps/{id}, GET /lamps/{id}/history, POST /lamps/{id}/actions/switch-on, POST /lamps/{id}/actions/switch-off, POST /lamps/{id}/actions/dim, POST /lamps/{id}/actions/brighten, POST /actions/install-lamp"
 
   Scenario: The description says what a plain client gets, and the server answers just that
     When a client gets "/openapi.json" with Accept "application/json"

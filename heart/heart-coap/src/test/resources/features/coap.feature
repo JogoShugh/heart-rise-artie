@@ -50,6 +50,12 @@ Feature: A declared resource over CoAP, served by heart-coap
     And the CoAP body links self to "/lamps/7"
     And lamp 7 is at version 4
 
+  Scenario: An act still answers at the path it moved from
+    Given a CoAP client got "/lamps/7" with Prefer ""
+    When the CoAP client posts {"brightness": 20} to "/lamps/7/actions/brighten" with the ETag it holds
+    Then the CoAP response is 2.04
+    And lamp 7 is at version 4
+
   Scenario: An act on the bookmark that brings a lamp into being answers 2.01 Created, with the lamp and its location
     Given a CoAP client got "/" with Prefer ""
     When the CoAP client posts {"brightness": 20} to "/actions/install-lamp" with the ETag it holds
