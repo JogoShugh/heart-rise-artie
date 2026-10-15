@@ -8,48 +8,48 @@
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-10-14T21:22:24.586-04:00  INFO 48686 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : Starting GardenBedApplicationKt using Java 21.0.12 with PID 48686 (/Users/josh/repos/artie/server-spring/build/classes/kotlin/main started by josh in /Users/josh/repos/artie/server-spring)
-2026-10-14T21:22:24.586-04:00 DEBUG 48686 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : Running with Spring Boot v3.3.4, Spring v6.1.13
-2026-10-14T21:22:24.587-04:00  INFO 48686 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : No active profile set, falling back to 1 default profile: "default"
-2026-10-14T21:22:24.940-04:00  INFO 48686 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data R2DBC repositories in DEFAULT mode.
-2026-10-14T21:22:25.005-04:00  INFO 48686 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 62 ms. Found 1 R2DBC repository interface.
-2026-10-14T21:22:25.637-04:00  INFO 48686 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
-2026-10-14T21:22:25.936-04:00  INFO 48686 --- [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/gardenbed (PostgreSQL 16.15)
-2026-10-14T21:22:25.964-04:00  INFO 48686 --- [           main] o.f.core.internal.command.DbValidate     : Successfully validated 4 migrations (execution time 00:00.014s)
-2026-10-14T21:22:25.987-04:00  INFO 48686 --- [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 4
-2026-10-14T21:22:25.988-04:00  INFO 48686 --- [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
-2026-10-14T21:22:26.101-04:00  INFO 48686 --- [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080 (http)
-2026-10-14T21:22:26.105-04:00  INFO 48686 --- [           main] o.e.c.elements.config.Configuration      : defaults added COAP.
-2026-10-14T21:22:26.106-04:00  INFO 48686 --- [           main] o.e.c.elements.config.Configuration      : defaults added SYS.
-2026-10-14T21:22:26.106-04:00  INFO 48686 --- [           main] o.e.c.elements.config.Configuration      : defaults added UDP.
-2026-10-14T21:22:26.115-04:00  INFO 48686 --- [           main] o.e.c.elements.util.JceProviderUtil      : JCE default setup
-2026-10-14T21:22:26.137-04:00  INFO 48686 --- [           main] o.e.c.elements.util.JceProviderUtil      : RSA: true, EC: true, AES: not restricted
-2026-10-14T21:22:26.138-04:00  INFO 48686 --- [           main] o.e.c.elements.util.JceProviderUtil      : EdDSA supported by SunEC, Ed25519: true, Ed448: true
-2026-10-14T21:22:26.138-04:00  INFO 48686 --- [           main] o.e.c.elements.util.JceProviderUtil      : JCE setup: SunEC version 21, ready.
-2026-10-14T21:22:26.155-04:00  INFO 48686 --- [           main] o.e.c.elements.config.Configuration      : defaults added DTLS.
-2026-10-14T21:22:26.155-04:00  INFO 48686 --- [           main] o.e.c.elements.config.Configuration      : Creating standard configuration properties without a file
-2026-10-14T21:22:26.159-04:00  INFO 48686 --- [           main] o.e.c.core.network.RandomTokenGenerator  : using tokens of 8 bytes in length
-2026-10-14T21:22:26.164-04:00  INFO 48686 --- [           main] org.eclipse.californium.ban              : Started.
-2026-10-14T21:22:26.164-04:00  INFO 48686 --- [           main] o.e.c.core.network.CoapEndpoint          : coap CoapEndpoint uses udp context
-2026-10-14T21:22:26.168-04:00  INFO 48686 --- [           main] o.e.c.core.network.stack.BlockwiseLayer  : coap BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000, MAX_RESOURCE_BODY_SIZE=65536, BLOCKWISE_STRICT_BLOCK2_OPTION=false
-2026-10-14T21:22:26.183-04:00  INFO 48686 --- [           main] s.d.InMemoryReadWriteLockConnectionStore : Created new InMemoryConnectionStore [capacity: 150000, connection expiration threshold: 1800s]
-2026-10-14T21:22:26.184-04:00  INFO 48686 --- [           main] o.e.c.core.network.RandomTokenGenerator  : using tokens of 8 bytes in length
-2026-10-14T21:22:26.185-04:00  INFO 48686 --- [           main] o.e.c.core.network.CoapEndpoint          : coaps CoapEndpoint uses strict context
-2026-10-14T21:22:26.185-04:00  INFO 48686 --- [           main] o.e.c.core.network.stack.BlockwiseLayer  : coaps BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000, MAX_RESOURCE_BODY_SIZE=65536, BLOCKWISE_STRICT_BLOCK2_OPTION=false
-2026-10-14T21:22:26.187-04:00  INFO 48686 --- [           main] o.eclipse.californium.core.CoapServer    : Starting server
-2026-10-14T21:22:26.192-04:00  INFO 48686 --- [           main] o.e.californium.elements.UDPConnector    : UDPConnector starts up 2 sender threads and 2 receiver threads
-2026-10-14T21:22:26.193-04:00  INFO 48686 --- [           main] o.e.californium.elements.UDPConnector    : UDPConnector listening on /127.0.0.1:5683, recv buf = 786896, send buf = 65527, recv packet size = 2048
-2026-10-14T21:22:26.193-04:00  INFO 48686 --- [           main] o.e.c.core.network.CoapEndpoint          : coap Started endpoint at coap://127.0.0.1:5683
-2026-10-14T21:22:26.195-04:00  INFO 48686 --- [           main] o.e.californium.scandium.DTLSConnector   : multiple network interfaces, using smallest MTU [IPv4 1500, IPv6 1000]
-2026-10-14T21:22:26.196-04:00  INFO 48686 --- [0:0:0:0:0]:5784] o.e.californium.scandium.DTLSConnector   : Starting worker thread [DTLS-Receiver-0-/[0:0:0:0:0:0:0:0]:5784]
-2026-10-14T21:22:26.196-04:00  INFO 48686 --- [           main] o.e.californium.scandium.DTLSConnector   : DTLSConnector listening on /[0:0:0:0:0:0:0:0]:5784, recv buf = 786896, send buf = 65527, recv packet size = 16490, MTU = IPv4 1500 / IPv6 1000
-2026-10-14T21:22:26.196-04:00  INFO 48686 --- [0:0:0:0:0]:5784] o.e.californium.scandium.DTLSConnector   : Starting worker thread [DTLS-Receiver-1-/[0:0:0:0:0:0:0:0]:5784]
-2026-10-14T21:22:26.196-04:00  INFO 48686 --- [           main] o.e.c.core.network.CoapEndpoint          : coaps Started endpoint at coaps://[0:0:0:0:0:0:0:0]:5784
-2026-10-14T21:22:26.202-04:00  INFO 48686 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : Started GardenBedApplicationKt in 1.769 seconds (process running for 1.902)
-2026-10-14T21:22:32.429-04:00  INFO 48686 --- [ionShutdownHook] o.eclipse.californium.core.CoapServer    : Destroying server
-2026-10-14T21:22:32.429-04:00  INFO 48686 --- [ionShutdownHook] o.e.c.core.network.CoapEndpoint          : coap Destroying endpoint at coap://127.0.0.1:5683
-2026-10-14T21:22:32.430-04:00  INFO 48686 --- [ionShutdownHook] o.e.c.core.network.CoapEndpoint          : coaps Destroying endpoint at coaps://[0:0:0:0:0:0:0:0]:5784
-2026-10-14T21:22:32.430-04:00  INFO 48686 --- [ionShutdownHook] o.eclipse.californium.core.CoapServer    : CoAP server has been destroyed
+2026-10-14T21:53:27.221-04:00  INFO 63065 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : Starting GardenBedApplicationKt using Java 21.0.12 with PID 63065 (/Users/josh/repos/artie/server-spring/build/classes/kotlin/main started by josh in /Users/josh/repos/artie/server-spring)
+2026-10-14T21:53:27.222-04:00 DEBUG 63065 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : Running with Spring Boot v3.3.4, Spring v6.1.13
+2026-10-14T21:53:27.222-04:00  INFO 63065 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : No active profile set, falling back to 1 default profile: "default"
+2026-10-14T21:53:27.596-04:00  INFO 63065 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data R2DBC repositories in DEFAULT mode.
+2026-10-14T21:53:27.658-04:00  INFO 63065 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 60 ms. Found 1 R2DBC repository interface.
+2026-10-14T21:53:28.276-04:00  INFO 63065 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-14T21:53:28.583-04:00  INFO 63065 --- [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/gardenbed (PostgreSQL 16.15)
+2026-10-14T21:53:28.618-04:00  INFO 63065 --- [           main] o.f.core.internal.command.DbValidate     : Successfully validated 4 migrations (execution time 00:00.021s)
+2026-10-14T21:53:28.645-04:00  INFO 63065 --- [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 4
+2026-10-14T21:53:28.646-04:00  INFO 63065 --- [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-10-14T21:53:28.751-04:00  INFO 63065 --- [           main] o.s.b.web.embedded.netty.NettyWebServer  : Netty started on port 8080 (http)
+2026-10-14T21:53:28.755-04:00  INFO 63065 --- [           main] o.e.c.elements.config.Configuration      : defaults added COAP.
+2026-10-14T21:53:28.756-04:00  INFO 63065 --- [           main] o.e.c.elements.config.Configuration      : defaults added SYS.
+2026-10-14T21:53:28.756-04:00  INFO 63065 --- [           main] o.e.c.elements.config.Configuration      : defaults added UDP.
+2026-10-14T21:53:28.765-04:00  INFO 63065 --- [           main] o.e.c.elements.util.JceProviderUtil      : JCE default setup
+2026-10-14T21:53:28.787-04:00  INFO 63065 --- [           main] o.e.c.elements.util.JceProviderUtil      : RSA: true, EC: true, AES: not restricted
+2026-10-14T21:53:28.789-04:00  INFO 63065 --- [           main] o.e.c.elements.util.JceProviderUtil      : EdDSA supported by SunEC, Ed25519: true, Ed448: true
+2026-10-14T21:53:28.789-04:00  INFO 63065 --- [           main] o.e.c.elements.util.JceProviderUtil      : JCE setup: SunEC version 21, ready.
+2026-10-14T21:53:28.807-04:00  INFO 63065 --- [           main] o.e.c.elements.config.Configuration      : defaults added DTLS.
+2026-10-14T21:53:28.807-04:00  INFO 63065 --- [           main] o.e.c.elements.config.Configuration      : Creating standard configuration properties without a file
+2026-10-14T21:53:28.812-04:00  INFO 63065 --- [           main] o.e.c.core.network.RandomTokenGenerator  : using tokens of 8 bytes in length
+2026-10-14T21:53:28.817-04:00  INFO 63065 --- [           main] org.eclipse.californium.ban              : Started.
+2026-10-14T21:53:28.818-04:00  INFO 63065 --- [           main] o.e.c.core.network.CoapEndpoint          : coap CoapEndpoint uses udp context
+2026-10-14T21:53:28.822-04:00  INFO 63065 --- [           main] o.e.c.core.network.stack.BlockwiseLayer  : coap BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000, MAX_RESOURCE_BODY_SIZE=65536, BLOCKWISE_STRICT_BLOCK2_OPTION=false
+2026-10-14T21:53:28.837-04:00  INFO 63065 --- [           main] s.d.InMemoryReadWriteLockConnectionStore : Created new InMemoryConnectionStore [capacity: 150000, connection expiration threshold: 1800s]
+2026-10-14T21:53:28.838-04:00  INFO 63065 --- [           main] o.e.c.core.network.RandomTokenGenerator  : using tokens of 8 bytes in length
+2026-10-14T21:53:28.839-04:00  INFO 63065 --- [           main] o.e.c.core.network.CoapEndpoint          : coaps CoapEndpoint uses strict context
+2026-10-14T21:53:28.839-04:00  INFO 63065 --- [           main] o.e.c.core.network.stack.BlockwiseLayer  : coaps BlockwiseLayer uses MAX_MESSAGE_SIZE=1024, PREFERRED_BLOCK_SIZE=512, BLOCKWISE_STATUS_LIFETIME=300000, MAX_RESOURCE_BODY_SIZE=65536, BLOCKWISE_STRICT_BLOCK2_OPTION=false
+2026-10-14T21:53:28.841-04:00  INFO 63065 --- [           main] o.eclipse.californium.core.CoapServer    : Starting server
+2026-10-14T21:53:28.849-04:00  INFO 63065 --- [           main] o.e.californium.elements.UDPConnector    : UDPConnector starts up 2 sender threads and 2 receiver threads
+2026-10-14T21:53:28.850-04:00  INFO 63065 --- [           main] o.e.californium.elements.UDPConnector    : UDPConnector listening on /127.0.0.1:5683, recv buf = 786896, send buf = 65527, recv packet size = 2048
+2026-10-14T21:53:28.851-04:00  INFO 63065 --- [           main] o.e.c.core.network.CoapEndpoint          : coap Started endpoint at coap://127.0.0.1:5683
+2026-10-14T21:53:28.853-04:00  INFO 63065 --- [           main] o.e.californium.scandium.DTLSConnector   : multiple network interfaces, using smallest MTU [IPv4 1500, IPv6 1000]
+2026-10-14T21:53:28.853-04:00  INFO 63065 --- [0:0:0:0:0]:5784] o.e.californium.scandium.DTLSConnector   : Starting worker thread [DTLS-Receiver-0-/[0:0:0:0:0:0:0:0]:5784]
+2026-10-14T21:53:28.854-04:00  INFO 63065 --- [           main] o.e.californium.scandium.DTLSConnector   : DTLSConnector listening on /[0:0:0:0:0:0:0:0]:5784, recv buf = 786896, send buf = 65527, recv packet size = 16490, MTU = IPv4 1500 / IPv6 1000
+2026-10-14T21:53:28.854-04:00  INFO 63065 --- [0:0:0:0:0]:5784] o.e.californium.scandium.DTLSConnector   : Starting worker thread [DTLS-Receiver-1-/[0:0:0:0:0:0:0:0]:5784]
+2026-10-14T21:53:28.854-04:00  INFO 63065 --- [           main] o.e.c.core.network.CoapEndpoint          : coaps Started endpoint at coaps://[0:0:0:0:0:0:0:0]:5784
+2026-10-14T21:53:28.860-04:00  INFO 63065 --- [           main] c.a.gardenbed.GardenBedApplicationKt     : Started GardenBedApplicationKt in 1.804 seconds (process running for 1.939)
+2026-10-14T21:53:35.184-04:00  INFO 63065 --- [ionShutdownHook] o.eclipse.californium.core.CoapServer    : Destroying server
+2026-10-14T21:53:35.185-04:00  INFO 63065 --- [ionShutdownHook] o.e.c.core.network.CoapEndpoint          : coap Destroying endpoint at coap://127.0.0.1:5683
+2026-10-14T21:53:35.186-04:00  INFO 63065 --- [ionShutdownHook] o.e.c.core.network.CoapEndpoint          : coaps Destroying endpoint at coaps://[0:0:0:0:0:0:0:0]:5784
+2026-10-14T21:53:35.186-04:00  INFO 63065 --- [ionShutdownHook] o.eclipse.californium.core.CoapServer    : CoAP server has been destroyed
 
 FAILURE: Build failed with an exception.
 
