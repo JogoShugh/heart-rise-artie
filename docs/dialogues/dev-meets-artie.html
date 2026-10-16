@@ -1,0 +1,316 @@
+<title>Dev Meets ARTIE</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a stage script. Speaker names sit in a left margin column, like a play; code exhibits break out as "props". */
+:root {
+  --bg: #f3f6f4;
+  --paper: #ffffff;
+  --ink: #1b2420;
+  --muted: #5d6b65;
+  --rule: #d5ddd9;
+  --link: #1f47c4;      /* Me: unvisited-link blue */
+  --visited: #6f3fa3;   /* Dev: visited-link purple */
+  --ok: #2c7a4b;
+  --fail: #b3362b;
+  --code-bg: #e9eeeb;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111614; --paper: #182019; --ink: #e3ebe6; --muted: #98a7a0; --rule: #2c3732;
+  --link: #8fa9ff; --visited: #c6a2f0; --ok: #6fcf94; --fail: #ff8a7d; --code-bg: #1d2622; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #111614; --paper: #182019; --ink: #e3ebe6; --muted: #98a7a0; --rule: #2c3732;
+  --link: #8fa9ff; --visited: #c6a2f0; --ok: #6fcf94; --fail: #ff8a7d; --code-bg: #1d2622; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.page { max-width: 46rem; margin: 0 auto; padding-block: 3.5rem 5rem; }
+header { display: grid; gap: 1rem; margin-bottom: 3rem; }
+.kicker { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.6rem, 8vw, 4.4rem); line-height: 1; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+h1 .artie { color: var(--link); text-decoration: underline; text-decoration-thickness: 0.08em; text-underline-offset: 0.12em; }
+.dek { font-style: italic; color: var(--muted); margin: 0; max-width: 36rem; }
+.cast { list-style: none; padding: 1rem 0 0; margin: 0; border-top: 1px solid var(--rule); display: grid; gap: 0.5rem; }
+.cast li { display: grid; grid-template-columns: 4.5rem 1fr; gap: 1rem; font-size: 0.95rem; }
+.cast li > span:last-child { min-width: 0; }
+
+.scene { margin-top: 3.5rem; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 1.7rem; line-height: 1.15; margin: 0 0 1.5rem; display: flex; gap: 0.9rem; align-items: baseline; text-wrap: balance; }
+h2 .numeral { font-family: var(--mono); font-weight: 500; font-size: 0.85rem; color: var(--muted); border: 1px solid var(--rule); border-radius: 4px; padding: 0.1rem 0.45rem; flex: none; transform: translateY(-0.2rem); }
+
+.who { font-family: var(--mono); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding-top: 0.28rem; }
+.who.me, .me .who { color: var(--link); }
+.who.dev, .dev .who { color: var(--visited); }
+.line { display: grid; grid-template-columns: 4.5rem 1fr; gap: 1rem; margin-bottom: 1rem; }
+.line p { margin: 0; min-width: 0; }
+.dev p { padding-left: 0.9rem; border-left: 2px solid color-mix(in srgb, var(--visited) 35%, transparent); }
+.me p { padding-left: 0.9rem; border-left: 2px solid transparent; }
+.stage { font-style: italic; color: var(--muted); margin: 1.75rem 0 1.75rem 5.5rem; }
+.narr { margin: 0 0 1rem 5.5rem; }
+.beat-list { margin: -0.25rem 0 1.25rem 5.5rem; padding-left: 1.4rem; display: grid; gap: 0.4rem; }
+.beat-list li::marker { font-family: var(--mono); color: var(--muted); font-size: 0.85em; }
+
+code { font-family: var(--mono); font-size: 0.86em; background: var(--code-bg); padding: 0.08em 0.3em; border-radius: 3px; }
+.exhibit { margin: 0.5rem 0 1.5rem 5.5rem; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; min-width: 0; }
+.exhibit figcaption { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0.45rem 0.9rem; border-bottom: 1px solid var(--rule); }
+.exhibit pre { margin: 0; padding: 0.9rem; overflow-x: auto; font-size: 0.82rem; line-height: 1.55; }
+.exhibit pre code { background: none; padding: 0; font-size: inherit; }
+
+.table-wrap { margin: 0.5rem 0 1.5rem 5.5rem; overflow-x: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.55rem 0.9rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+thead th { font-family: var(--mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+tbody th { font-weight: 400; }
+tbody tr:last-child > * { border-bottom: none; }
+td { font-family: var(--mono); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+td.ok { color: var(--ok); }
+td.fail { color: var(--fail); }
+td.fail strong { font-weight: 500; }
+
+.sources { margin: 4rem 0 0; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: 0.85rem; color: var(--muted); font-style: italic; }
+.sources code { font-style: normal; }
+
+@media (max-width: 620px) {
+  body { font-size: 16px; }
+  .line, .cast li { grid-template-columns: 1fr; gap: 0.15rem; }
+  .stage, .narr, .exhibit, .table-wrap, .beat-list { margin-left: 0; }
+  .beat-list { padding-left: 1.4rem; }
+}
+</style>
+
+<main class="page">
+  <header>
+    <p class="kicker">A conversation · after “Take HEART,” Part 1</p>
+    <h1>Dev Meets <span class="artie">ARTIE</span></h1>
+    <p class="dek">A longtime HTML developer, lost in lockstep deploys and statically compiled clients, finds out the browser solved this in 1995.</p>
+    <ul class="cast"><li><span class="who me">Me</span><span>has been building HEART, the server side, and ARTIE, the generic client.</span></li><li><span class="who dev">Dev</span><span>has written HTML for twenty years. Six weeks into a move to backend work, and not enjoying it.</span></li></ul>
+  </header>
+<section class="scene" id="scene-i"><h2><span class="numeral">I</span>The page that never broke</h2>
+<p class="stage">A Thursday afternoon. Dev drops into the chair across from me with a laptop and the look of someone who has just read their fourth release-coordination thread of the day.</p>
+<div class="line dev"><span class="who">Dev</span><p>Can I ask you something stupid?</p></div>
+<div class="line me"><span class="who">Me</span><p>Those are usually the good ones.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>How long have I been doing web work? Since tables for layout, since spacer GIFs. I've built thousands of pages, and in all that time I never once had to tell anyone's browser that I'd changed something.</p></div>
+<div class="line me"><span class="who">Me</span><p>Go on.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Say I move the contact page from <code>/contact.html</code> to <code>/about/contact</code>. I change the link in the nav. Done. Nobody calls Mozilla or Google. Nobody's browser needs an update. Next time anyone loads the home page, the link points at the new place and they click it. They never knew the old address and they don't need to know the new one. The page <em>told</em> them.</p></div>
+<div class="line me"><span class="who">Me</span><p>It did.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Forms are the same. Marketing wants a phone number on the sign-up form, so I add an <code>&lt;input name=&quot;phone&quot; required&gt;</code>. That's the whole release. Every browser on earth renders the new field, refuses to submit without it, and posts it wherever the <code>action</code> attribute says. If the rule is "only digits, max fifteen," I write <code>pattern</code> and <code>maxlength</code> and the browser enforces it. I never shipped a single line of code to the client.</p></div>
+<div class="line me"><span class="who">Me</span><p>Because the browser is a generic client. It knows nothing about your site, about contact pages or sign-ups. It knows how to render whatever arrives and follow the controls the page offers.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Right! And the best bit: if a user isn't allowed to do something, I simply <em>don't put the button there</em>. Logged out? No "Edit profile" link. Order shipped? No "Cancel order" button, just a line saying "This order has shipped and can no longer be cancelled." The page shows what you can do <strong>now</strong>.</p></div>
+<div class="line me"><span class="who">Me</span><p>Information and controls, presented together.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>That's just... how the Web works. I never thought about it. Then I moved to the backend team.</p></div>
+</section>
+<section class="scene" id="scene-ii"><h2><span class="numeral">II</span>The bewilderment</h2>
+<div class="line me"><span class="who">Me</span><p>What happened?</p></div>
+<div class="line dev"><span class="who">Dev</span><p>My first ticket. The orders service has an endpoint, <code>POST /orders/{id}/cancel</code>. Product wants a <code>reason</code> field on cancellations, required. In my world that's one <code>&lt;input&gt;</code> on the form. Twenty minutes, tops.</p></div>
+<div class="line me"><span class="who">Me</span><p>And?</p></div>
+<div class="line dev"><span class="who">Dev</span><p>It's been three weeks. <em>Three weeks.</em> First I learned that the mobile app has the URL <code>/orders/{id}/cancel</code> <strong>compiled into it</strong>. And the iOS app has a different copy. And there's a "typed SDK" generated from our OpenAPI file, with a <code>CancelOrderRequest</code> class that has exactly the fields it had on the day someone ran the generator. If I add a required field, every client that doesn't send it gets a 422, and the iOS app was submitted to the App Store two weeks ago and there's no telling when people will update it.</p></div>
+<div class="line me"><span class="who">Me</span><p>So you can't just add the field.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Apparently not! So someone says "version it." Make <code>/v2/orders/{id}/cancel</code>. Keep v1 alive. But v1 cancellations won't have a reason, so analytics needs to handle nulls, so their schema changes, so their client library needs regenerating, and <em>they</em> have a release train that leaves every other Tuesday...</p></div>
+<div class="line me"><span class="who">Me</span><p>Oh no.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Then there's a spreadsheet. A literal spreadsheet called "Release Matrix Q4," with columns for orders-service, the SDK, web, iOS, Android, the analytics consumer and the partner integration, and rows that say which versions are compatible with which. There's a meeting about the spreadsheet. The meeting has its own Slack channel.</p></div>
+<div class="line me"><span class="who">Me</span><p><em>(laughing, but not unkindly)</em> The lockstep deploy.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Is that what it's called? Because it's how it feels. Everything chained together, marching in step. Nobody can move unless everybody moves. A <em>field</em>. I wanted to add <em>one field</em>.</p></div>
+<div class="line me"><span class="who">Me</span><p>It gets worse, doesn't it?</p></div>
+<div class="line dev"><span class="who">Dev</span><p>It gets so much worse. The rules! On the Web, if you can't cancel a shipped order, the page leaves the button out. Here the mobile client has an <code>if (order.status == &quot;PENDING&quot; || order.status == &quot;CONFIRMED&quot;)</code> to decide whether to show Cancel. The server has <em>its own</em> copy of that rule, because it has to refuse. Last month the server added a <code>PAYMENT_HOLD</code> status where cancellation is allowed too. The app doesn't know about it, so it hides the button from people who are allowed to press it. Yesterday someone proposed a "feature-flag service" so the server could tell clients which buttons to show.</p></div>
+<div class="line me"><span class="who">Me</span><p>A feature-flag service. To tell the client which buttons to show.</p></div>
+<div class="line dev"><span class="who">Dev</span><p><strong>Yes!</strong> And I sat in that meeting thinking: <em>we invented that in 1995.</em> It's called <em>sending the form</em>. Why are we compiling the URL, the fields, the validation and the business rules into a binary, shipping it to a hundred thousand phones, and then building a whole separate system to tell those binaries what we already knew when we sent the response?</p></div>
+<p class="stage">Dev slumps.</p>
+<div class="line dev"><span class="who">Dev</span><p>I honestly thought I was missing something. Everyone treats it as normal. "Oh, that's a breaking change, we'll need to coordinate." <em>Coordinate.</em> Like moving a link is a diplomatic incident.</p></div>
+</section>
+<section class="scene" id="scene-iii"><h2><span class="numeral">III</span>You're not missing anything</h2>
+<div class="line me"><span class="who">Me</span><p>Dev, I need you to hear this: you're not missing anything. You're the one in that meeting who <em>isn't</em> confused. You're seeing it with fresh eyes.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>That's very kind, but...</p></div>
+<div class="line me"><span class="who">Me</span><p>No, I mean it literally. In 2000 Roy Fielding wrote the dissertation that named REST. One of its constraints is <em>hypermedia as the engine of application state</em>, HATEOAS. It means exactly what you've described: the client moves from state to state by choosing among the controls each response carries. Links and forms.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>So REST APIs <em>are</em> supposed to send the forms?</p></div>
+<div class="line me"><span class="who">Me</span><p>They were. Most "REST APIs" quietly dropped that part. By 2008 it annoyed Fielding enough that he wrote a post called <em>REST APIs must be hypertext-driven.</em> He defined hypertext as, and I'm quoting, "the simultaneous presentation of information and controls such that the information becomes the affordance through which the user <strong>(or automaton)</strong> obtains choices and selects actions."</p></div>
+<div class="line dev"><span class="who">Dev</span><p>"Or automaton."</p></div>
+<div class="line me"><span class="who">Me</span><p>He wasn't only talking about people. In the comments he even says a client needs only "the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of <strong>AI-driven</strong>." That's 2008. Eighteen years before everyone started pointing AI agents at APIs.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>So how did we end up with the Release Matrix spreadsheet?</p></div>
+<div class="line me"><span class="who">Me</span><p>Your browser story has four frames. Picture a page about one garden bed.</p></div>
+<ol class="beat-list"><li><strong>Information.</strong> Some values, read-only. You can look, that's all.</li><li><strong>A link.</strong> Now you can go somewhere, and the page gave you the address. You didn't build it.</li><li><strong>A form.</strong> Now you can do something. It says where it goes, what it needs, and the limits.</li><li><strong>Forms that follow the state.</strong> The bed froze overnight. Water is gone, Thaw is offered, and the page says why.</li></ol>
+<div class="line dev"><span class="who">Dev</span><p>That's every good page I ever built. Frame four is the shipped-order thing.</p></div>
+<div class="line me"><span class="who">Me</span><p>A typical JSON API sends frame one and stops. Here's bed 2:</p></div>
+<figure class="exhibit"><figcaption>json</figcaption><pre><code>{
+  &quot;id&quot;: 2,
+  &quot;label&quot;: &quot;bed-2&quot;,
+  &quot;status&quot;: &quot;PLANTED&quot;,
+  &quot;cropName&quot;: &quot;tomato&quot;,
+  &quot;growthPoints&quot;: 80,
+  &quot;moistureLevel&quot;: 40
+}</code></pre></figure>
+<div class="line dev"><span class="who">Dev</span><p>...that's it? No links? No forms?</p></div>
+<div class="line me"><span class="who">Me</span><p>None. So the client has to <em>already know</em> that watering means <code>POST /beds/2/actions/water-cell</code>, that the body needs <code>milliliters</code>, that it has to be between 1 and 1000, and that a frozen bed can't be watered. Where does it learn all that?</p></div>
+<div class="line dev"><span class="who">Dev</span><p><em>(slowly)</em> From the docs. Written for people. And then a developer types it into the client. Compiles it.</p></div>
+<div class="line me"><span class="who">Me</span><p>And when the client gets a rule wrong?</p></div>
+<div class="line dev"><span class="who">Dev</span><p>It finds out by failing. 409 Conflict, "the bed is frozen."</p></div>
+<div class="line me"><span class="who">Me</span><p>That's the whole disease. Every address, field, limit and rule is copied from the server into every client, <em>ahead of time</em>, and frozen into a build. Two copies of the truth. When the server's copy changes, the frozen ones are wrong. Your lockstep deploys, version matrices and synchronized upgrades are all ways of keeping those copies in agreement by force.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>And the feature-flag service is...</p></div>
+<div class="line me"><span class="who">Me</span><p>...a third copy, to patch the second one. Yes.</p></div>
+<p class="stage">Dev stares at the ceiling for a long moment.</p>
+<div class="line dev"><span class="who">Dev</span><p>Okay. So how do we stop? Because "go back to HTML" isn't the answer. A phone app isn't a browser. A batch job isn't a browser.</p></div>
+<div class="line me"><span class="who">Me</span><p>No. But each of them could be <em>a</em> browser. A browser for JSON.</p></div>
+</section>
+<section class="scene" id="scene-iv"><h2><span class="numeral">IV</span>Putting the forms back: HEART</h2>
+<div class="line me"><span class="who">Me</span><p>That's what HEART is. <em>Hypermedia Enforced Agentic Reliable Transactions.</em> It's not a new idea. It's your idea, the Web's idea, written down carefully enough for programs. Let's rebuild bed 2 the way you'd rebuild a page, one rung at a time.</p></div>
+<div class="line me"><span class="who">Me</span><p>Rung one: <strong>it names itself and its vocabulary.</strong></p></div>
+<figure class="exhibit"><figcaption>json</figcaption><pre><code>&quot;_links&quot;: {
+  &quot;self&quot;: { &quot;href&quot;: &quot;/beds/2&quot; },
+  &quot;curies&quot;: [
+    { &quot;name&quot;: &quot;garden&quot;, &quot;href&quot;: &quot;/profiles/garden#{rel}&quot;, &quot;templated&quot;: true },
+    { &quot;name&quot;: &quot;hr&quot;, &quot;href&quot;: &quot;https://w3id.org/heart-rise/rels/{rel}&quot;, &quot;templated&quot;: true }
+  ]
+}</code></pre></figure>
+<div class="line dev"><span class="who">Dev</span><p>A self link is the page's own URL. And the curies?</p></div>
+<div class="line me"><span class="who">Me</span><p>Shorthand for vocabularies. <code>garden:</code> words are defined in the garden's profile, <code>hr:</code> words in HEART's. It's like a page that says what it's <em>about</em>.</p></div>
+<div class="line me"><span class="who">Me</span><p>Rung two: <strong>forms. What you can do now, and where.</strong></p></div>
+<figure class="exhibit"><figcaption>json</figcaption><pre><code>&quot;_forms&quot;: {
+  &quot;garden:water-cell&quot;: {
+    &quot;title&quot;: &quot;Water the bed&quot;,
+    &quot;description&quot;: &quot;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&quot;,
+    &quot;_links&quot;: { &quot;target&quot;: { &quot;href&quot;: &quot;/beds/2/actions/water-cell&quot; } },
+    &quot;method&quot;: &quot;POST&quot;,
+    &quot;contentType&quot;: &quot;application/json&quot;
+  }
+}</code></pre></figure>
+<div class="line dev"><span class="who">Dev</span><p><em>(sitting up)</em> That's a <code>&lt;form&gt;</code>! <code>action</code> is the target, plus <code>method</code>, and the title is the button label.</p></div>
+<div class="line me"><span class="who">Me</span><p>Exactly. Keyed by its <em>meaning</em>, <code>garden:water-cell</code>, not by its URL. The title and description are there for people <em>and</em> for language models.</p></div>
+<div class="line me"><span class="who">Me</span><p>Rung three: <strong>what the act needs, embedded.</strong> A JSON Schema, inline:</p></div>
+<figure class="exhibit"><figcaption>json</figcaption><pre><code>&quot;schema&quot;: {
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;title&quot;: &quot;Water Cell&quot;,
+  &quot;required&quot;: [&quot;milliliters&quot;],
+  &quot;properties&quot;: {
+    &quot;milliliters&quot;: {
+      &quot;type&quot;: &quot;integer&quot;,
+      &quot;title&quot;: &quot;Water per cell&quot;,
+      &quot;description&quot;: &quot;Millilitres of water poured into each cell&quot;,
+      &quot;minimum&quot;: 1,
+      &quot;maximum&quot;: 1000,
+      &quot;examples&quot;: [250]
+    }
+  }
+}</code></pre></figure>
+<div class="line dev"><span class="who">Dev</span><p><code>required</code>, <code>min</code>, <code>max</code>, a placeholder. Those are my <code>&lt;input&gt;</code> attributes!</p></div>
+<div class="line me"><span class="who">Me</span><p>They're your <code>&lt;input&gt;</code> attributes. Now, your <code>reason</code> field on cancellation: where would it go?</p></div>
+<div class="line dev"><span class="who">Dev</span><p>In the schema. Add it to <code>properties</code> and to <code>required</code>. And any client that <em>renders the schema</em> would just... show a new box.</p></div>
+<div class="line me"><span class="who">Me</span><p>Same day. No regeneration, no v2.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Oh my god.</p></div>
+<div class="line me"><span class="who">Me</span><p>Rung four: <strong>why the other acts are absent.</strong></p></div>
+<figure class="exhibit"><figcaption>json</figcaption><pre><code>&quot;hr:unavailable&quot;: {
+  &quot;href&quot;: &quot;/unavailable/3257a9132e2fdd0b&quot;,
+  &quot;type&quot;: &quot;application/json&quot;,
+  &quot;integrity&quot;: &quot;sha256-MlepEy4v3Qt2z8jIohUJxoffZ2SOwNKCgJP7hMT/XV8=&quot;
+}</code></pre></figure>
+<p class="narr">which resolves to:</p>
+<figure class="exhibit"><figcaption>json</figcaption><pre><code>{
+  &quot;unavailable&quot;: [
+    { &quot;title&quot;: &quot;Sow a seed&quot;, &quot;reason&quot;: &quot;The bed is already planted.&quot; },
+    { &quot;title&quot;: &quot;Harvest the crop&quot;, &quot;reason&quot;: &quot;The crop is not ready yet; it needs more water to grow.&quot; },
+    { &quot;title&quot;: &quot;Thaw the bed&quot;, &quot;reason&quot;: &quot;The bed is not frozen.&quot; }
+  ]
+}</code></pre></figure>
+<div class="line dev"><span class="who">Dev</span><p>"This order has shipped and can no longer be cancelled." The red line under the missing button.</p></div>
+<div class="line me"><span class="who">Me</span><p>In the server's own words. Now the frost hits overnight. Same bed, same URL, nothing changed on the client:</p></div>
+<figure class="exhibit"><figcaption>json</figcaption><pre><code>&quot;status&quot;: &quot;FROZEN&quot;,
+&quot;_forms&quot;: {
+  &quot;garden:thaw&quot;: {
+    &quot;title&quot;: &quot;Thaw the bed&quot;,
+    &quot;description&quot;: &quot;Covers a frozen bed with fleece. The bed becomes planted again.&quot;,
+    &quot;_links&quot;: { &quot;target&quot;: { &quot;href&quot;: &quot;/beds/2/actions/thaw&quot; } },
+    &quot;method&quot;: &quot;POST&quot;
+  }
+}</code></pre></figure>
+<p class="narr">and the unavailable list now says <em>"The bed is frozen; watering now would split the roots. Thaw it first."</em></p>
+<div class="line dev"><span class="who">Dev</span><p>So the client doesn't have an <code>if (status == FROZEN)</code> anywhere.</p></div>
+<div class="line me"><span class="who">Me</span><p>Nowhere. The rule exists <strong>once</strong>, on the server, which is the only place that can actually enforce it. The client's job is to show whatever forms arrived. Your <code>PAYMENT_HOLD</code> bug can't happen: the server adds the status, includes Cancel in the forms for it, and every client shows the button.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>What about two people pressing at once? On the Web I'd sometimes get double submits.</p></div>
+<div class="line me"><span class="who">Me</span><p>Rung five, the headers:</p></div>
+<figure class="exhibit"><figcaption>http</figcaption><pre><code>HTTP/1.1 200 OK
+Content-Type: application/hal+json
+ETag: &quot;seq-3.hsf.L0.da0109b4d9380b72&quot;
+Cache-Control: no-cache
+Link: &lt;https://w3id.org/heart-rise&gt;; rel=&quot;profile&quot;</code></pre></figure>
+<p class="narr">An act has to send that ETag back as <code>If-Match</code>. If somebody else's write landed first, you get a <strong>412</strong>, not a silent overwrite. Leave <code>If-Match</code> off and you get a <strong>428</strong>: precondition required. Fill in the form wrong, <strong>422</strong>. Press a form that isn't offered any more, <strong>409</strong>. Each one tells you what happened instead of quietly doing something you didn't mean.</p>
+</section>
+<section class="scene" id="scene-v"><h2><span class="numeral">V</span>ARTIE: one client for everything</h2>
+<div class="line dev"><span class="who">Dev</span><p>Okay, the server side makes sense. But somebody still has to <em>write</em> the client that reads all this.</p></div>
+<div class="line me"><span class="who">Me</span><p>Once. That's ARTIE: <em>Autonomous Restful Traversal and Interactive Engine.</em> A generic API client, the same way the browser is a generic web client. It doesn't know about beds, frost, orders or cancellations. It knows four things:</p></div>
+<ol class="beat-list"><li>Start from a bookmark. <code>GET /</code>, the only address it's ever told.</li><li>Show the state it receives.</li><li>Show the forms it receives, and build each form's inputs from its schema.</li><li>When one is chosen, fill the schema, send it to the form's target with the form's method, and include <code>If-Match</code> with the ETag it saw.</li></ol>
+<p class="narr">Then repeat with whatever comes back.</p>
+<div class="line dev"><span class="who">Dev</span><p>That's... a browser's main loop.</p></div>
+<div class="line me"><span class="who">Me</span><p>It is a browser's main loop. <em>Choose among what's offered. Fill the schema. Never guess.</em> The spec sets ARTIE a test: run against two unrelated domains, a garden and a sports scoreboard, from a bookmark, with <strong>no</strong> domain-specific configuration. Their only shared trait is that both speak HEART.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Same binary, two completely different apps.</p></div>
+<div class="line me"><span class="who">Me</span><p>Same binary. Now the bit you'll enjoy. We ran an experiment. Monday, every client works. Then on "Wednesday" we change the API, one release at a time, and see which clients survive <em>without being touched since Monday</em>. Each one tries to water bed 2.</p></div>
+<div class="table-wrap"><table><thead><tr><th>Change</th><th>Generated from the OpenAPI description</th><th>ARTIE (native HEART)</th></tr></thead><tbody><tr><th scope="row">Move the URL</th><td class="fail"><strong>404</strong></td><td class="ok">watered</td></tr><tr><th scope="row">Rename a field</th><td class="ok">watered</td><td class="ok">watered</td></tr><tr><th scope="row">Rename the act</th><td class="ok">watered</td><td class="ok">watered</td></tr><tr><th scope="row">Retitle it</th><td class="ok">watered</td><td class="ok">watered</td></tr><tr><th scope="row">Tighter limit (max now below 800 ml)</th><td class="fail"><strong>422 at 800 ml</strong></td><td class="ok">watered</td></tr><tr><th scope="row">New required input</th><td class="fail"><strong>422</strong></td><td class="ok">watered</td></tr></tbody></table></div>
+<div class="line dev"><span class="who">Dev</span><p><em>(pointing)</em> "Move the URL." That's my contact page! The generated client had the URL baked in, so it got a 404. ARTIE followed the form's target, the way a browser follows a link.</p></div>
+<div class="line me"><span class="who">Me</span><p>"New required input" is your <code>reason</code> field. The generated client sends the old body and gets a 422. ARTIE reads the new schema, sees the new required field, and fills it in. "Tighter limit" is the same story: ARTIE reads the new <code>maximum</code> rather than remembering the old one.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>So none of the release matrix is needed. You don't coordinate the client's upgrade, because <em>there is no client upgrade.</em></p></div>
+<div class="line me"><span class="who">Me</span><p>That's the point. The server is free to evolve. The client's only promise is to read what it's sent. No lockstep, no synchronized upgrades, nothing statically compiled that can go stale.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>I need to be suspicious for a second. Nothing is free.</p></div>
+<div class="line me"><span class="who">Me</span><p>Good, stay suspicious. We ran one more column: a <strong>scripted</strong> client, ARTIE driven by code that names the act <code>garden:water-cell</code> and its field by hand. That's hard-coding at a higher level.</p></div>
+<div class="table-wrap"><table><thead><tr><th>Change</th><th>Scripted, on top of ARTIE</th></tr></thead><tbody><tr><th scope="row">Move the URL</th><td class="ok">watered</td></tr><tr><th scope="row">Rename a field</th><td class="ok">watered</td></tr><tr><th scope="row"><strong>Rename the act</strong></th><td class="fail"><strong>not found</strong></td></tr><tr><th scope="row">Retitle it</th><td class="ok">watered</td></tr><tr><th scope="row">Tighter limit</th><td class="ok">watered</td></tr><tr><th scope="row"><strong>New required input</strong></th><td class="fail"><strong>422</strong></td></tr></tbody></table></div>
+<div class="line dev"><span class="who">Dev</span><p>So if my code <em>says</em> "water-cell," and the server renames it "irrigate," I'm broken again.</p></div>
+<div class="line me"><span class="who">Me</span><p>Yes. Hypermedia doesn't make coupling disappear. It moves it to the one place it belongs: <strong>meaning.</strong> You're no longer coupled to URLs, HTTP methods, field layouts, limits or state rules. You're coupled to the vocabulary, "water-cell means pour water into the bed," and that vocabulary is published in a profile, versioned on its own, and changes far less often than paths do. Browsers live the same way. Your form fields' <code>name</code> attributes are a contract too.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>And if I don't hard-code names at all? If a person or a model is choosing from the titles and descriptions?</p></div>
+<div class="line me"><span class="who">Me</span><p>Then you get the ARTIE column: it survived all six. That's where agents come in. An AI agent is the perfect HEART client. Give it the forms allowed <em>now</em>, with their titles, descriptions and schemas, and it chooses among them. It can't call Water on a frozen bed because Water isn't on the menu, and it can read <em>why</em>. Fielding called them "guidance for automated agents." Today we'd say <strong>guardrails</strong>.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Instead of handing the model a forty-page OpenAPI file and hoping it remembers which rules apply.</p></div>
+<div class="line me"><span class="who">Me</span><p>And hoping it doesn't learn them by failing, in production.</p></div>
+</section>
+<section class="scene" id="scene-vi"><h2><span class="numeral">VI</span>"But my backend is already OpenAPI"</h2>
+<div class="line dev"><span class="who">Dev</span><p>Here's my real problem, though. The orders service isn't HEART. It's a pile of OpenAPI endpoints, and nobody's rewriting it this quarter.</p></div>
+<div class="line me"><span class="who">Me</span><p>Think about what an OpenAPI description actually is. Imagine a shop putting every inventory action on one page: eight blank forms, each asking for a plant ID, each with a red sentence saying when it would work.</p></div>
+<div class="line dev"><span class="who">Dev</span><p><em>(wincing)</em> I've seen that page. That's the admin panel nobody's allowed to touch.</p></div>
+<div class="line me"><span class="who">Me</span><p>It's accurate! Every form works if you fill it in correctly, for a plant in the right state. But it asks for what it already knows, makes you apply the rules yourself, and teaches by failure. That's an OpenAPI description. Every operation is a form card, every <code>{plantId}</code> is a blank ID field, and every "Only allowed when the plant is in quarantine, after 14 days" is a red sentence. It lists everything the service can ever do, in every state, for everyone. What it <em>can't</em> say is what <em>this</em> plant allows <em>now</em>.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>So it's the documentation, not the page.</p></div>
+<div class="line me"><span class="who">Me</span><p>Right. So we put a <strong>gateway</strong> in front. OpenAPI in, HEART out. It reads the description at start and builds resource types. For each answer it needs one more thing: a signal of what's allowed now. There are three ways to get one:</p></div>
+<ol class="beat-list"><li>**Add one <code>Link</code> header** pointing at a HEART affordance set. Best option: shared, cached forms, and reasons for what's missing.</li><li><strong>Change nothing; say what you already say.</strong> Lots of real APIs already send this, each in their own way: Google Drive's <code>capabilities</code> (<code>canTrash</code>, <code>canDelete</code>), Box's permissions, PayPal's links, OData's advertised actions. The gateway reads them.</li><li><strong>Nothing at all; write the rules down.</strong> A table in the gateway: "when status is LOCKED, only unlock, because…" It's still early binding, but it lives in <em>one</em> place instead of in every client. Last resort.</li></ol>
+<div class="line dev"><span class="who">Dev</span><p>Number three is the <code>if</code> statement again.</p></div>
+<div class="line me"><span class="who">Me</span><p>It is, but it's <em>one</em> <code>if</code> statement, next to the service, instead of seven copies in seven clients on seven release trains. And when the service learns to send a real signal, you delete the table and no client notices.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>How's it configured?</p></div>
+<div class="line me"><span class="who">Me</span><p>A connector, a folder per API. Most need one small file:</p></div>
+<figure class="exhibit"><figcaption>yaml</figcaption><pre><code># connectors/drive/file.reader.yaml
+allowed:
+  booleans: /capabilities
+  map: { canTrash: trashFile, canDelete: deleteFile }
+hide: [/capabilities]</code></pre></figure>
+<p class="narr">It fails loudly. A connector that names an operation the description doesn't have stops the gateway at startup and names the file. An answer nothing recognizes gets refused. <strong>The gateway never guesses.</strong></p>
+<div class="line dev"><span class="who">Dev</span><p>And when ARTIE presses a button through the gateway?</p></div>
+<div class="line me"><span class="who">Me</span><p>The gateway checks what a HEART server would check: is the form offered now, is the body valid, is the ETag current? If not, it refuses with 409, 422, 412 or 428 before anything is sent upstream. If so, it re-reads the resource to confirm nothing's changed, calls the real OpenAPI operation, and turns the plain JSON answer back into HEART with the new forms.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>How do you know it actually works?</p></div>
+<div class="line me"><span class="who">Me</span><p>We gave it the hardest test we could think of. We took a real HEART server, the garden, and flattened it into a plain OpenAPI twin with no controls at all. Then we asked the gateway to rebuild HEART from that alone.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>You translated a novel into French and back to check the translator.</p></div>
+<div class="line me"><span class="who">Me</span><p><em>(grinning)</em> That's exactly how the write-up puts it. And it's exactly the reason: the native garden is the answer key. Anything the gateway dropped would show up as a different result. Through the gateway, every result matched native HEART, change by change. The frost test was 7 out of 7 buttons right. HEART's conformance kit passed 23 of 23 through the gateway, and the gateway's own tests passed 26 scenarios against a little door service that's never heard of HEART.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>And the honest limits?</p></div>
+<div class="line me"><span class="who">Me</span><p>They're real. If the upstream service doesn't support <code>If-Match</code>, the gateway re-reads before acting, but a write landing in that gap can't be caught. Reasons for missing acts only come from the <code>Link</code> signal or from tables. Right now the gateway calls the service as itself, so per-caller credentials are planned, not built. And it's our own services and one run of a small suite: evidence of behaviour, not a benchmark.</p></div>
+</section>
+<section class="scene" id="scene-vii"><h2><span class="numeral">VII</span>The ticket, again</h2>
+<p class="stage">Dev pulls the laptop closer and opens the cancellation ticket.</p>
+<div class="line dev"><span class="who">Dev</span><p>Let me replay my three weeks with this.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>One: the orders service adds <code>reason</code> to the cancel schema. Required, max 500 characters.</p></div>
+<div class="line me"><span class="who">Me</span><p>Through the gateway, it shows up in the form's schema on the next response.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Two: ARTIE, or any HEART client, renders the new box, because it renders whatever schema it's given. No regeneration, no <code>CancelOrderRequest</code> class, no v2.</p></div>
+<div class="line me"><span class="who">Me</span><p>Correct.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Three: the old iOS app, the one stuck in review...</p></div>
+<div class="line me"><span class="who">Me</span><p>...would be fine if it were a HEART client. That's the migration: you stop shipping clients that <em>know</em> the API and ship clients that <em>read</em> it. After that, an app store review is just a UI change.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Four: <code>PAYMENT_HOLD</code>. The server offers Cancel in that state, so the button appears. When it doesn't offer it, the client shows the reason. No feature-flag service.</p></div>
+<div class="line me"><span class="who">Me</span><p>You can cancel that meeting.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>Five: the Release Matrix spreadsheet...</p></div>
+<div class="line me"><span class="who">Me</span><p>...gets much shorter. The rows that remain are about <em>meaning</em>, like "we renamed <code>cancel</code> to <code>void</code>." That's a vocabulary change, and you handle it the way the Web always has: keep the old relation alongside the new one for a while, publish the profile, and let hard-coded scripts migrate when they're ready. Everything else, the paths, fields, limits and rules, just isn't a coordinated release any more.</p></div>
+<p class="stage">Dev closes the laptop.</p>
+<div class="line dev"><span class="who">Dev</span><p>You know what's funny? I spent six weeks thinking backend people knew something I didn't. That all this ceremony was the price of doing "real" engineering.</p></div>
+<div class="line me"><span class="who">Me</span><p>And?</p></div>
+<div class="line dev"><span class="who">Dev</span><p>And the browser solved it in 1995. We just stopped sending the forms.</p></div>
+<div class="line me"><span class="who">Me</span><p>So let's send them again.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>One last question. What about things that aren't ours, like GitHub?</p></div>
+<div class="line me"><span class="who">Me</span><p>That's Part 2. GitHub publishes its full OpenAPI description, and a pull request is nothing <em>but</em> state: open or closed, draft or ready, mergeable or blocked. Put the gateway in front, and you can ask an agent "why can't I merge #482?" and get GitHub's actual reason: behind main, a required check missing, still a draft. And it's offered Merge only when GitHub would accept it.</p></div>
+<div class="line dev"><span class="who">Dev</span><p>A page about a pull request, with only the buttons that work right now.</p></div>
+<div class="line me"><span class="who">Me</span><p>With a red line under the ones that don't, saying why.</p></div>
+<div class="line dev"><span class="who">Dev</span><p><em>(standing up)</em> I'm going to go be annoying in the release meeting.</p></div>
+<div class="line me"><span class="who">Me</span><p>Take HEART.</p></div>
+</section>
+<p class="sources">Sources: "Take HEART: Dynamically Guardrailing OpenAPI Services with HATEOAS," Part 1 (16 October 2026); <code>SPEC.md</code> in this repository; Roy T. Fielding, "REST APIs must be hypertext-driven" (2008). Dev is fictional. The JSON excerpts are trimmed from the article's real garden responses, and the results tables are from its 16 October run.</p>
+</main>
