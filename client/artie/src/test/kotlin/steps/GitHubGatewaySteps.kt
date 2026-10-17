@@ -39,7 +39,7 @@ class GitHubGatewaySteps(private val ctx: ClientContext) {
     @Given("ARTIE talks to the GitHub gateway at {string} in front of the small GitHub")
     fun gateway(origin: String) {
         // The gateway as shipped: its own connector folder, beside this build.
-        val connector = Path.of("..", "heart", "heart-gateway", "connectors", "github")
+        val connector = Path.of("..", "..", "heart", "heart-gateway", "connectors", "github")
         ctx.inProcess = InProcessTransport(GitHubGateway.handler(github, connector))
         ctx.baseUrl = null
         check(origin.startsWith("http")) { "an http origin, as the gateway serves" }
