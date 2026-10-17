@@ -1,5 +1,6 @@
 package com.artie.heart.binding
 
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.When
 import org.springframework.http.HttpHeaders
 
@@ -55,9 +56,9 @@ class FollowSteps(private val http: HttpWorld) {
         http.get(href.replace("{id}", id.toString()), mapOf(HttpHeaders.ACCEPT to "application/hal+json"))
     }
 
-    @When("the client fills the {string} form with {string} and follows it")
-    fun fillWithAndFollow(key: String, filled: String) {
-        val values = filled.split(", ").associate { it.substringBefore("=") to it.substringAfter("=") }
+    @When("the client fills the {string} form with these values and follows it")
+    fun fillWithAndFollow(key: String, table: DataTable) {
+        val values = table.asMaps().associate { it.getValue("field") to it.getValue("value") }
         val target = http.json.path("_forms").path(key).path("_links").path("target").path("href").asText()
         http.get(expand(target, values), mapOf(HttpHeaders.ACCEPT to "application/hal+json"))
     }

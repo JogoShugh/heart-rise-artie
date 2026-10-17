@@ -16,12 +16,12 @@ acts:
   close:
     operation: pulls/update
     title: Close
-    description: Close the pull request without merging it.
+    description: Close it; a pull request unmerged, an issue as completed.
     body: { state: closed }
   reopen:
     operation: pulls/update
     title: Reopen
-    description: Open the closed pull request again.
+    description: Open it again.
     body: { state: open }
   merge:
     operation: pulls/merge
@@ -33,6 +33,24 @@ acts:
     # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
     stale: 409
     refused: 405
+  edit:
+    operation: pulls/update
+    title: Edit
+    description: Change its title or description.
+    fields: [title, body]
+  request-review:
+    operation: pulls/request-reviewers
+    title: Request a review
+    description: Ask people or teams to review the pull request.
+    fields: [reviewers, team_reviewers]
+  update-branch:
+    operation: pulls/update-branch
+    title: Update the branch
+    description: Bring the latest changes from the base branch into this one.
+    # GitHub updates the branch only if its head is still the one the client's view had.
+    bind: { expected_head_sha: /head/sha }
+    # GitHub's 422 here: the branch is already up to date, or the head moved; either way, not now, in its words.
+    refused: 422
 # Other answers the reader's rules read: the repository says whether the caller may push.
 facts:
   repository:

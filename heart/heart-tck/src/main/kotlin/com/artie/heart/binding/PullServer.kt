@@ -37,7 +37,7 @@ class PullStore {
  */
 object PullServer {
     fun resource(store: PullStore): HeartResource<PullRequest, String> = HeartResource(
-        layers = Layers(PullRequests.type(finding = PullRequests.finding())),
+        layers = Layers(PullRequests.type(finding = PullRequests.finding(), subCollections = mapOf("stack" to STACK))),
         loadAt = { at ->
             store.lastCaller = Caller.authorization()
             refuseIn(at.getValue("repo"))
@@ -47,6 +47,12 @@ object PullServer {
         },
         perform = { pull, act, _ ->
             store.lastCaller = Caller.authorization()
+            // Splitting makes a new pull request elsewhere, and leaves this one as it was (creating-acts.feature).
+            if (act == "split") {
+                val split = pull.copy(number = pull.number + SPLIT_OFFSET, version = 1)
+                store.put(split)
+                return@HeartResource Acted(pull, created = "/repos/${split.owner}/${split.repo}/pulls/${split.number}")
+            }
             val next = pull.copy(state = if (act == "close") "closed" else "open", version = pull.version + 1)
             if (!store.pulls.replace(store.key(pull), pull, next)) {
                 throw ConcurrentWriteException("pull request ${pull.number} was written first")
@@ -61,6 +67,17 @@ object PullServer {
                 .sortedBy { it.number }
                 .map { Found(it.number, "Pull request ${it.number}", it.variables()) }
         },
+        // A pull request's stack: the one split off it (sub-collections.feature).
+        lists = mapOf(
+            "stack" to { at ->
+                val (owner, repo) = at.getValue("owner") to at.getValue("repo")
+                val number = at.getValue("number").toLongOrNull()
+                    ?.takeIf { store.pulls.containsKey(Triple(owner, repo, it)) }
+                    ?: throw ResourceNotFoundException("no pull request at $at")
+                listOfNotNull(store.pulls[Triple(owner, repo, number + SPLIT_OFFSET)])
+                    .map { Found(it.number, "Pull request ${it.number}", it.variables()) }
+            },
+        ),
     )
 
     /** Two repositories refuse every caller: one finds the credential no longer good, one won't show itself. */
@@ -68,6 +85,9 @@ object PullServer {
         if (repo == "expired") throw CallerUnauthorizedException("the credential has expired")
         if (repo == "secret") throw CallerForbiddenException("this repository is not yours to see")
     }
+
+    private const val SPLIT_OFFSET = 1000L
+    private const val STACK = "/repos/{owner}/{repo}/pulls/{number}/stack"
 
     private fun PullRequest.variables() = mapOf("owner" to owner, "repo" to repo, "number" to "$number")
 }

@@ -26,6 +26,8 @@ class ActDeclaration(
     val bound: Map<String, StatePointer>,
     val stale: Int?,
     val refused: Int?,
+    /** The resource, by its noun, that the operation's answer is: a repository's open-issue makes an issue. */
+    val creates: String? = null,
 ) {
     companion object {
         /** The act [name] in [node], from the file [label], or a refusal naming it. */
@@ -47,6 +49,7 @@ class ActDeclaration(
                 },
                 stale = node.path("stale").takeIf { it.isInt }?.asInt(),
                 refused = node.path("refused").takeIf { it.isInt }?.asInt(),
+                creates = node.path("creates").asText(null),
             )
         }
 

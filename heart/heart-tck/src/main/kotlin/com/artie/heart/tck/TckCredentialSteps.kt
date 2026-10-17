@@ -1,6 +1,7 @@
 package com.artie.heart.tck
 
 import com.artie.heart.Dialect
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -28,10 +29,10 @@ class TckCredentialSteps(private val fixture: TckFixture, private val world: Tck
     }
 
     /** RFC 9110 §11.6.1: each challenge starts with its scheme; the realm is the server's to choose. */
-    @Then("the response offers the challenges {string} and {string}")
-    fun challenges(first: String, second: String) {
+    @Then("the response offers these challenges")
+    fun challenges(table: DataTable) {
         val schemes = world.last.responseHeaders[HttpHeaders.WWW_AUTHENTICATE].orEmpty().map { it.substringBefore(' ') }
-        assertEquals(listOf(first, second), schemes)
+        assertEquals(table.asMaps().map { it.getValue("scheme") }, schemes)
     }
 
     private fun bare(request: () -> Unit) {

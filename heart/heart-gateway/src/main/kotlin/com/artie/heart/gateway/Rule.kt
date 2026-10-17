@@ -5,18 +5,30 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.MissingNode
 
 /**
- * One of a reader's rules: when every condition holds, the acts it names
- * are absent, for the reasons it gives. A condition is a JSON value at a
- * JSON Pointer, equal: into the answer (`/draft`), or into one of its facts
- * (`repository:/permissions/push`). A JSON null matches a member that is
- * there and null, as GitHub's `mergeable` is while it is still working it
- * out; a member that isn't there matches nothing.
+ * One condition of a rule, or of a resource file's `skip`: a term, a JSON
+ * Pointer into the answer (`/draft`) or into one of its facts
+ * (`repository:/permissions/push`), and a test:
+ * - a JSON value: the member is there and equal to it; `null` matches a
+ *   member that is there and null, as GitHub's `mergeable` is while it is
+ *   still working it out;
+ * - `{present: true}` or `{present: false}`: the member is there, or not;
+ * - `{not: value}`: the member is missing, or not equal to the value;
+ * - `{same-as: term}` and `{not-same-as: term}`: equal to another term, or
+ *   not, as an issue's author to the caller: `{same-as: "user:/login"}`.
  */
-class Rule(private val conditions: Map<String, JsonNode>, val absent: AbsenceReasons) {
+class Condition(private val term: String, private val test: JsonNode) {
 
-    fun holds(answer: Answer): Boolean = conditions.all { (at, value) ->
-        val member = at(answer, at)
-        !member.isMissingNode && member == value
+    fun holds(answer: Answer): Boolean {
+        val member = at(answer, term)
+        val operator = test.takeIf { it.isObject && it.size() == 1 }?.fieldNames()?.next().orEmpty()
+        val operand = test.path(operator)
+        return when (operator) {
+            "present" -> !member.isMissingNode == operand.asBoolean()
+            "not" -> member.isMissingNode || member != operand
+            "same-as" -> !member.isMissingNode && member == at(answer, operand.asText())
+            "not-same-as" -> member.isMissingNode || member != at(answer, operand.asText())
+            else -> !member.isMissingNode && member == test
+        }
     }
 
     private fun at(answer: Answer, term: String): JsonNode {
@@ -24,6 +36,21 @@ class Rule(private val conditions: Map<String, JsonNode>, val absent: AbsenceRea
         val body = if (fact.isEmpty()) answer.body else answer.facts[fact]
         return body?.at(JsonPointer.compile(term.substringAfter(':'))) ?: MissingNode.getInstance()
     }
+
+    companion object {
+        /** Each member of [node] a condition: the term, and its test. */
+        fun all(node: JsonNode): List<Condition> =
+            node.fields().asSequence().map { Condition(it.key, it.value) }.toList()
+    }
+}
+
+/**
+ * One of a reader's rules: when every condition holds, the acts it names
+ * are absent, for the reasons it gives.
+ */
+class Rule(private val conditions: List<Condition>, val absent: AbsenceReasons) {
+
+    fun holds(answer: Answer): Boolean = conditions.all { it.holds(answer) }
 
     companion object {
         /**

@@ -2,6 +2,7 @@ package com.artie.heart.binding
 
 import com.artie.heart.PastEvent
 import com.artie.heart.fixtures.Lamp
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -33,12 +34,13 @@ class LampSteps(private val store: LampStore) {
         store.writeAfterNextRead[id] = { lamp -> lamp.copy(brightness = brightness, version = lamp.version + 1) }
     }
 
-    @Given("lamp {long} was switched on {int} days ago and dimmed to {int} {int} day ago, in the lamp server")
-    fun lampWithPast(id: Long, onAgo: Long, brightness: Int, dimAgo: Long) {
-        val events = listOf(
-            PastEvent(1, "SwitchedOn", Instant.now().minus(Duration.ofDays(onAgo)), emptyMap<String, Any>()),
-            PastEvent(2, "Dimmed", Instant.now().minus(Duration.ofDays(dimAgo)), mapOf("brightness" to brightness)),
-        )
+    @Given("lamp {long} recorded these events in the lamp server")
+    fun lampWithPast(id: Long, table: DataTable) {
+        val events = table.asMaps().mapIndexed { index, row ->
+            val at = Instant.now().minus(Duration.ofDays(row.getValue("days ago").toLong()))
+            val data = row["brightness"]?.takeIf { it.isNotEmpty() }?.let { mapOf("brightness" to it.toInt()) }
+            PastEvent(index + 1, row.getValue("event"), at, data ?: emptyMap<String, Any>())
+        }
         store.events[id] = events
         store.lamps[id] = store.at(id, Instant.now())
     }

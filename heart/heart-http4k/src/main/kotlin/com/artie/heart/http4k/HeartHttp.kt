@@ -98,6 +98,11 @@ class HeartHttp(
                 searchedAt bind GET to { indexHandler.search(resource, it) }
             },
             item bind GET to handler::read,
+        ) + resource.lists.keys.map { relation ->
+            resource.layers.type.subCollections.getValue(relation) bind GET to {
+                indexHandler.listed(resource, relation, it)
+            }
+        } + listOfNotNull(
             "$item/actions/{path}" bind POST to handler::act,
             resource.past?.let { "$item/history" bind GET to handler::history },
         )

@@ -157,7 +157,10 @@ Feature: ARTIE sends a credential only to its own origin, and never shows it
       """
     When the client enters "https://garden.test/beds/2"
     Then the client sent 2 requests
-    And the requests carried Authorization "Bearer old", then "Bearer new"
+    And the requests carried Authorization in turn
+      | authorization |
+      | Bearer old    |
+      | Bearer new    |
 
   Scenario: An act refused with 401 is a NotAuthenticated refusal, not an unexpected answer
     Given ARTIE holds the Bearer credential "t0k3n" for "https://garden.test"

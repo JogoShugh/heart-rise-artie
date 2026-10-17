@@ -175,12 +175,38 @@ runner), or its reds go unlogged; that's the author's change.
    (github-states.feature). heart-tck's conformance kit runs through the
    gateway (RunGitHubTckTest, 19 scenarios, no bookmark act); the kit's
    fixture now names item paths, search and lookup targets.
+   *Seen live, 2026-10-16, on the seeded scratch repository
+   (heart-gateway/live/github/seed.py):* every open pull request's first
+   read is `mergeable: null, unknown`, settled seconds later; a draft says
+   `clean`, only `draft: true` marks it; closed and merged ones stay
+   `null, unknown`; `behind` needs a required check, not only up-to-date
+   protection. The fake GitHub now answers the same way.
 9. **Live, read-only.** The author's token against a repository the author
    chooses: list pull requests, show each one's state, offers and reasons.
    Compare the gateway's reasons with GitHub's web page for the same PRs.
    Verify `mergeable_state`'s real values.
+   *Done 2026-10-16 (heart-gateway/live/github/README.md):* all seven
+   seeded pull requests read through the gateway, GET only, each offered
+   and explained as GitHub's own page describes it; five reads again cost
+   none of GitHub's rate limit (304s).
 10. **Live writes, on the scratch repository only.** Update branch, close and
     reopen, merge; a stale merge refused by GitHub's `sha` check, as a 412.
+    *Done 2026-10-16 (live/github/act.py, report "GitHub Pulls, Two
+    Ways"):* through the gateway's forms, with each read's ETag: #1 closed
+    and reopened, #7 merged (sha from the head the client saw), a merge of
+    #1 after another push refused 412 by the gateway's re-read before
+    acting (GitHub moved the head a moment after the push, so the ETag
+    still matched), a merge of #6 refused 409 with its reason. Reopened, #1
+    offered close but not merge: GitHub's mergeable was null again.
+    *Edit, review requests and branch updates, live 2026-10-17:* #1's
+    title and body edited; a review request naming nobody refused 422 by
+    the form; one naming a non-collaborator refused 422 in GitHub's words;
+    #1's branch updated after a push to main (expected_head_sha bound), and
+    updated again, refused 409 with "There are no new commits on the base
+    branch." A first try at the update was refused 412 twice: GitHub was
+    still working out mergeability after the push, so the pull request
+    changed between the client's read and its act. A client reads again
+    until it settles, as the connector's reason says.
 11. **The demo and Part 2's report.** ARTIE and heart-mcp, asked in words:
     "what's the status of my PRs?", "why can't I merge #N?", "merge the one
     that's ready". Then the same question captured as a script and replayed

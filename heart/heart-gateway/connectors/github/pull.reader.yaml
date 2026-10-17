@@ -6,13 +6,15 @@ allowed:
   table: /state
   rows:
     open:
-      allow: [close, merge]
+      allow: [close, merge, edit, request-review, update-branch]
       absent: { reopen: The pull request is already open. }
     closed:
-      allow: [reopen]
+      allow: [reopen, edit]
       absent:
         close: The pull request is already closed.
         merge: "A closed pull request can't be merged; reopen it first."
+        request-review: "A closed pull request can't have reviews requested; reopen it first."
+        update-branch: "A closed pull request's branch isn't updated; reopen it first."
   rules:
     # The repository's own answer says whether the caller may push (the fact named in pull.resource.yaml).
     - when: { "repository:/permissions/push": false }
@@ -20,6 +22,9 @@ allowed:
         close: You can't push to this repository.
         reopen: You can't push to this repository.
         merge: You can't push to this repository.
+        edit: You can't push to this repository.
+        request-review: You can't push to this repository.
+        update-branch: You can't push to this repository.
     - when: { /merged: true }
       absent: { reopen: A merged pull request can't be reopened. }
     - when: { /draft: true }
@@ -27,9 +32,13 @@ allowed:
     # GitHub works mergeability out in the background; until it has, mergeable is null.
     - when: { /mergeable: null }
       absent: { merge: "GitHub is still checking whether it can be merged; read it again shortly." }
+    # GitHub says behind only when the base's protection asks for up-to-date branches and names a required
+    # check; with none required, a branch behind its base is clean (seen live, 2026-10-16).
     - when: { /mergeable_state: behind }
       absent: { merge: "The branch is behind its base; update it first." }
     - when: { /mergeable_state: dirty }
-      absent: { merge: "The branch has conflicts with its base; resolve them first." }
+      absent:
+        merge: "The branch has conflicts with its base; resolve them first."
+        update-branch: "The branch has conflicts with its base; resolve them first."
     - when: { /mergeable_state: blocked }
       absent: { merge: "Branch protection blocks the merge: a required check or review is missing." }

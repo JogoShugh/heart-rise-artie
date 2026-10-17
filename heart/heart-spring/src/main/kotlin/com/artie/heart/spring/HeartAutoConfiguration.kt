@@ -70,6 +70,9 @@ class HeartAutoConfiguration {
                 val searchedAt = resource.layers.type.finding?.collectionPath ?: "/$collection"
                 if (resource.find != null || resource.search != null) GET(searchedAt) { index.search(resource, it) }
                 GET(item, NO_QUERY) { handler.read(it) }
+                resource.lists.keys.forEach { relation ->
+                    GET(resource.layers.type.subCollections.getValue(relation)) { index.listed(resource, relation, it) }
+                }
                 POST("$item/actions/{path}") { handler.act(it) }
                 if (resource.past != null) {
                     GET(item, queryParam("asOf") { true }) { handler.readAsOf(it) }

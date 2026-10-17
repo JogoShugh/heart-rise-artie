@@ -1,6 +1,7 @@
 package com.artie.heart.binding
 
 import com.artie.heart.binding.HttpWorld.Companion.accept
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -44,9 +45,11 @@ class ActSteps(private val http: HttpWorld) {
         assertEquals("https://w3id.org/heart-rise/problems/$type", http.json.path("type").asText())
     }
 
-    @Then("the response offers {string}")
-    fun offers(keys: String) =
-        assertEquals(HttpWorld.names(keys), http.json.path("_forms").fieldNames().asSequence().toSet())
+    @Then("the response offers")
+    fun offers(table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("form") }.toSet(),
+        http.json.path("_forms").fieldNames().asSequence().toSet(),
+    )
 
     @Then("the response links {string} to an affordance set the server serves")
     fun linksSet(rel: String) {
@@ -57,13 +60,17 @@ class ActSteps(private val http: HttpWorld) {
         assertEquals(HttpStatus.OK, served.status, href)
     }
 
-    @Then("the response has templates named {string}")
-    fun templateNames(expected: String) =
-        assertEquals(HttpWorld.names(expected), http.json.path("_templates").fieldNames().asSequence().toSet())
+    @Then("the response has templates named")
+    fun templateNames(table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("template") }.toSet(),
+        http.json.path("_templates").fieldNames().asSequence().toSet(),
+    )
 
-    @Then("the response has templates targeting {string}")
-    fun templates(targets: String) =
-        assertEquals(HttpWorld.names(targets), http.json.path("_templates").map { it.path("target").asText() }.toSet())
+    @Then("the response has templates targeting")
+    fun templates(table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("target") }.toSet(),
+        http.json.path("_templates").map { it.path("target").asText() }.toSet(),
+    )
 
     @Then("the response links its profile {string}")
     fun linksProfile(profile: String) {

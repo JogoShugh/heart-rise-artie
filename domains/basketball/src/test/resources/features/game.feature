@@ -18,13 +18,23 @@ Feature: Scoring a youth basketball game
 
   Scenario: Before tip-off, only the tip-off is offered, and the rest say why not
     When the scorer opens game 1
-    Then the game offers exactly "basketball:tip-off"
+    Then the game offers exactly
+      | act                |
+      | basketball:tip-off |
     And "basketball:score-basket" is absent because "The game has not started; tip off first."
 
   Scenario: The tip-off starts period 1 with the team that won it in possession
     When the scorer records "tip-off" on game 1 with {"possession": "away"}
     Then game 1 is "LIVE" in period 1 with the "away" team in possession
-    And the game offers exactly "basketball:score-basket, basketball:free-throw, basketball:record-foul, basketball:turnover, basketball:call-timeout, basketball:end-period, basketball:correct-score"
+    And the game offers exactly
+      | act                      |
+      | basketball:score-basket  |
+      | basketball:free-throw    |
+      | basketball:record-foul   |
+      | basketball:turnover      |
+      | basketball:call-timeout  |
+      | basketball:end-period    |
+      | basketball:correct-score |
 
   Scenario Outline: A <points>-point basket counts for the team and the player, and possession changes
     Given game 1 is live in period 1 with the "home" team in possession
@@ -86,7 +96,10 @@ Feature: Scoring a youth basketball game
     Given game 1 is live in period 1 with the "home" team in possession
     When the scorer records "call-timeout" on game 1 with {"team": "away"}
     Then game 1 is "TIMEOUT"
-    And the game offers exactly "basketball:resume-play, basketball:correct-score"
+    And the game offers exactly
+      | act                      |
+      | basketball:resume-play   |
+      | basketball:correct-score |
     And "basketball:score-basket" is absent because "Play is stopped for a timeout; resume play first."
     When the scorer records "resume-play" on game 1 with {}
     Then game 1 is "LIVE" in period 1 with the "home" team in possession
@@ -96,7 +109,9 @@ Feature: Scoring a youth basketball game
     And the "home" team committed 5 fouls this half
     When the scorer records "end-period" on game 1 with {}
     Then game 1 is "BREAK"
-    And the game offers exactly "basketball:start-period"
+    And the game offers exactly
+      | act                     |
+      | basketball:start-period |
     When the scorer records "start-period" on game 1 with {}
     Then game 1 is "LIVE" in period 3 with the "home" team in possession
     And the "home" team has 0 fouls this half
@@ -105,7 +120,9 @@ Feature: Scoring a youth basketball game
     Given game 1 is live in period 4 with the "home" team in possession
     When the scorer records "end-period" on game 1 with {}
     Then game 1 is "FULL_TIME"
-    And the game offers exactly "basketball:final-whistle"
+    And the game offers exactly
+      | act                      |
+      | basketball:final-whistle |
     When the scorer records "final-whistle" on game 1 with {}
     Then game 1 is "FINAL"
     And the game offers nothing

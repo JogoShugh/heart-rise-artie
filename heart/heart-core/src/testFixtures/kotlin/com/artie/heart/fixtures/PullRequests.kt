@@ -27,8 +27,11 @@ object PullRequests {
         relations = listOf(
             Relation("close", AlpsType.IDEMPOTENT, "Close", "Close the pull request.", "Closes it unmerged."),
             Relation("reopen", AlpsType.IDEMPOTENT, "Reopen", "Reopen the pull request.", "Opens it again."),
+            Relation("split", AlpsType.UNSAFE, "Split", "Split off a new pull request.", "Makes a new pull request."),
             Relation("list", AlpsType.SAFE, "List pull requests", "A repository's pull requests.", "Lists them."),
             Relation("get", AlpsType.SAFE, "Get a pull request", "One pull request, by number.", "Reads it."),
+            Relation("stack", AlpsType.SAFE, "Stack", "The pull requests split off it.", "Lists them."),
+            Relation("comments", AlpsType.SAFE, "Comments", "The pull request's comments.", "Lists them."),
         ),
     )
 
@@ -52,13 +55,14 @@ object PullRequests {
     fun type(
         itemPath: ItemPath = ItemPath(TEMPLATE, POINTERS),
         finding: Finding? = null,
+        subCollections: Map<String, String> = emptyMap(),
     ): ResourceType<PullRequest, String> = ResourceType(
         collection = "pulls",
         profile = profile,
-        acts = listOf(Act("close", "close", "{}"), Act("reopen", "reopen", "{}")),
+        acts = listOf(Act("close", "close", "{}"), Act("reopen", "reopen", "{}"), Act("split", "split", "{}")),
         offers = Offers(
             keys = listOf("open", "closed"),
-            offered = { if (it == "open") listOf("close") else listOf("reopen") },
+            offered = { if (it == "open") listOf("close", "split") else listOf("reopen") },
             whyAbsent = { key, _ -> "The pull request is already $key." },
         ),
         state = StateView(
@@ -72,5 +76,6 @@ object PullRequests {
             itemPath = itemPath,
         ),
         finding = finding,
+        subCollections = subCollections,
     )
 }

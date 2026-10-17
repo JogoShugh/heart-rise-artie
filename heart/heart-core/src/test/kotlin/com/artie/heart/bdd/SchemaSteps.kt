@@ -10,6 +10,7 @@ import com.artie.heart.fixtures.Dim
 import com.artie.heart.fixtures.Glow
 import com.artie.heart.fixtures.Rename
 import com.artie.heart.fixtures.SwitchOff
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -46,10 +47,15 @@ class SchemaSteps {
     }
 
     @Then("the body is refused at {string}")
-    fun refused(pointers: String) {
+    fun refused(pointer: String) = refusedAt(listOf(pointer))
+
+    @Then("the body is refused at these pointers")
+    fun refusedAtThese(table: DataTable) = refusedAt(table.asMaps().map { it.getValue("pointer") })
+
+    private fun refusedAt(pointers: List<String>) {
         val failure = checkNotNull(outcome).exceptionOrNull()
         check(failure is UnprocessableContentException) { "expected 422, got $outcome" }
-        assertEquals(pointers, failure.violations.map { it.pointer }.distinct().joinToString(", "))
+        assertEquals(pointers, failure.violations.map { it.pointer }.distinct())
     }
 
     @Then("the body is malformed")

@@ -114,7 +114,8 @@ class HeartResourceHandler<S, K>(
         // The act is performed on the state whose ETag matched, so a write since is stale (SPEC §6.2).
         val done = pipeline.run(act.name, body, checked) { input -> resource.perform(checked, act.name, input) }
         return Rendered(done.state, dialect, rung).respond(
-            ServerResponse.ok()
+            // An act that brought another resource into being: 201, and Location names it (RFC 9110 §15.3.2).
+            (done.created?.let { ServerResponse.created(URI.create(it)) } ?: ServerResponse.ok())
                 .header(HttpHeaders.CONTENT_LOCATION, resource.location(done.state))
                 .headers { headers -> done.headers.forEach { (name, value) -> headers.add(name, value) } },
         )
@@ -165,7 +166,8 @@ class HeartResourceHandler<S, K>(
         val body = request.awaitBodyOrNull<String>()
         val done = pipeline.run(name, body, checked) { input -> resource.perform(checked, name, input) }
         return PlainJson.respond(
-            ServerResponse.ok().header(HttpHeaders.CONTENT_LOCATION, resource.location(done.state))
+            (done.created?.let { ServerResponse.created(URI.create(it)) } ?: ServerResponse.ok())
+                .header(HttpHeaders.CONTENT_LOCATION, resource.location(done.state))
                 .apply { if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state)) },
             type.state.bodyOf(done.state),
         )

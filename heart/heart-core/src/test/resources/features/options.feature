@@ -10,7 +10,12 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
   carries the same choices as HAL-FORMS options.
 
   Background:
-    Given a playing match at level "senior" with home players "4 Ana, 7 Bea fouled out" and away players "5 Cy, 9 Dee"
+    Given a playing match at level "senior" with these players
+      | team | number | name | fouled out |
+      | home | 4      | Ana  | no         |
+      | home | 7      | Bea  | yes        |
+      | away | 5      | Cy   | no         |
+      | away | 9      | Dee  | no         |
 
   Scenario: The HAL Schema Forms schema carries hr:options for a choice from the resource itself
     When the schema of the act "foul" is read
@@ -41,7 +46,10 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
       """
 
   Scenario: Matches in the same phase share one affordance set, whoever plays
-    Given another playing match at level "junior" with home players "11 Eve" and away players "12 Fay"
+    Given another playing match at level "junior" with these players
+      | team | number | name | fouled out |
+      | home | 11     | Eve  | no         |
+      | away | 12     | Fay  | no         |
     Then both matches link the same affordance set at L1 and at L2
 
   Scenario: At L0 the form embeds the same schema, hr:options and all
@@ -71,7 +79,11 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
 
   Scenario: HAL-FORMS carries the same choices as HAL-FORMS options
     When the match is rendered in HAL-FORMS
-    Then the template "foul" property "playerNumber" has inline options "4 Ana, 5 Cy, 9 Dee"
+    Then the template "foul" property "playerNumber" has these inline options
+      | value | prompt |
+      | 4     | Ana    |
+      | 5     | Cy     |
+      | 9     | Dee    |
     And the template "assignOfficial" property "official" has an options link "/officials?level=senior"
     And that HAL-FORMS representation has a validator, as every Layer 1 representation does
 

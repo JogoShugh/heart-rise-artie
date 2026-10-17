@@ -13,11 +13,15 @@ Feature: The bookmark offers acts, like any resource
 
   Scenario: In HAL Schema Forms, the bookmark offers the act as a form on its own actions
     When the service index is rendered in HAL Schema Forms
-    Then it offers the POST form "home:install-lamp" with target "/actions/install-lamp" and required field "brightness"
+    Then it offers these POST forms
+      | form              | target                | required field |
+      | home:install-lamp | /actions/install-lamp | brightness     |
 
   Scenario: In HAL-FORMS, the act is a template whose properties come from its schema
     When the service index is rendered in HAL-FORMS
-    Then it offers the POST template "installLamp" with target "/actions/install-lamp" and required property "brightness" from 1 to 100
+    Then it offers these POST templates
+      | template    | target                | required property | min | max |
+      | installLamp | /actions/install-lamp | brightness        | 1   | 100 |
 
   Scenario: The act's schema is served by its content, like every act's
     Then the schema of "installLamp" is served at its content address

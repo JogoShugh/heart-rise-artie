@@ -2,6 +2,7 @@ package com.artie.heart.binding
 
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertArrayEquals
@@ -47,9 +48,11 @@ class CredentialSteps(
         http.results = bodies.keys.map { bare.get().uri(prefix + it).exchange().expectBody().returnResult() }
     }
 
-    @Then("the response offers the challenges {string} and {string}")
-    fun challenges(first: String, second: String) =
-        assertEquals(listOf(first, second), http.last.responseHeaders[HttpHeaders.WWW_AUTHENTICATE])
+    @Then("the response offers these challenges")
+    fun challenges(table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("challenge") },
+        http.last.responseHeaders[HttpHeaders.WWW_AUTHENTICATE],
+    )
 
     /** The same bytes and headers, but the Date a server stamps on each response. */
     @Then("the last three responses have identical bytes and headers")

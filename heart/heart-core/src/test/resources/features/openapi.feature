@@ -96,16 +96,32 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
 
   Scenario: The state is a schema whose offer key is a closed enum of every declared key
     Then the operation "getLamp" answers 200 with "#/components/schemas/Lamp"
-    And the component "Lamp" has the property "status" with the enum "ON, OFF"
+    And the component "Lamp" has the property "status" with the enum
+      | value |
+      | ON    |
+      | OFF   |
 
   Scenario: An act answers with the state, and documents its refusals; no validator is asked for
     Then the operation "dim" answers 200 with "#/components/schemas/Lamp"
-    And the operation "dim" documents the responses "200, 401, 404, 409, 422"
+    And the operation "dim" documents the responses
+      | status |
+      | 200    |
+      | 401    |
+      | 404    |
+      | 409    |
+      | 422    |
     And the operation "dim" has no "If-Match" parameter
-    And the operation "installLamp" documents the responses "201, 401, 422"
+    And the operation "installLamp" documents the responses
+      | status |
+      | 201    |
+      | 401    |
+      | 422    |
 
   Scenario: Both credentials the service admits are security schemes
-    Then its security schemes are "basic" as http "basic" and "bearer" as http "bearer"
+    Then its security schemes are
+      | name   | type | scheme |
+      | basic  | http | basic  |
+      | bearer | http | bearer |
 
   Scenario: Another version is other bytes
     When the OpenAPI description of the lamp is rendered at version "1.1.0" again

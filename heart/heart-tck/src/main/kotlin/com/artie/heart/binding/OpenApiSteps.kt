@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.networknt.schema.JsonSchemaFactory
 import com.networknt.schema.SpecVersion
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -25,15 +26,15 @@ class OpenApiSteps(private val http: HttpWorld, private val client: WebTestClien
         assertTrue(links.single().startsWith("<$AFFORDANCE_SETS") && "rel=\"$FORMS_REL\"" in links.single(), "$links")
     }
 
-    @Then("the plain response's forms link names an affordance set that offers {string}")
-    fun plainFormsLink(relations: String) {
+    @Then("the plain response's forms link names an affordance set that offers")
+    fun plainFormsLink(table: DataTable) {
         val link = http.last.responseHeaders[HttpHeaders.LINK].orEmpty().single { "rel=\"$FORMS_REL\"" in it }
         val href = link.substringAfter('<').substringBefore('>')
         integrity = Regex("""integrity="([^"]+)"""").find(link)?.groupValues?.get(1).orEmpty()
         val served = client.get().uri(href).exchange().expectStatus().isOk.expectBody().returnResult()
         set = String(checkNotNull(served.responseBody))
         val offered = mapper.readTree(set).path("_forms").fieldNames().asSequence().toSet()
-        assertEquals(relations.split(",").map { it.trim() }.toSet(), offered)
+        assertEquals(table.asMaps().map { it.getValue("form") }.toSet(), offered)
     }
 
     @Then("that affordance set's bytes match the link's integrity")
@@ -49,12 +50,14 @@ class OpenApiSteps(private val http: HttpWorld, private val client: WebTestClien
     fun homeLinks(rel: String, href: String) =
         assertEquals(href, json(http.last).path("api").path("links").path(rel).asText())
 
-    @Then("the description's operations are {string}")
-    fun operations(expected: String) {
+    @Then("the description's operations are")
+    fun operations(table: DataTable) {
         val operations = json(http.last).path("paths").fields().asSequence().flatMap { (path, item) ->
             item.fieldNames().asSequence().filter { it in METHODS }.map { "${it.uppercase()} $path" }
         }.toList()
-        assertEquals(expected.split(",").map { it.trim() }.toSet(), operations.toSet())
+        val expected = table.asMaps().map { row -> "${row.getValue("method")} ${row.getValue("path")}" }
+            .toSet()
+        assertEquals(expected, operations.toSet())
     }
 
     @Then("the plain response satisfies the description's schema {string}")

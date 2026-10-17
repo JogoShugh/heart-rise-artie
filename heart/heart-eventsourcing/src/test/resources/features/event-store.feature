@@ -8,9 +8,17 @@ Feature: An event store for any declared resource type
 
   Scenario Outline: Events fold into state, in order (<store>)
     Given the <store> event store
-    When lamp 7 records SwitchedOn, then Dimmed to 30, then Dimmed to 60
+    When lamp 7 records these events
+      | event      | brightness |
+      | SwitchedOn |            |
+      | Dimmed     | 30         |
+      | Dimmed     | 60         |
     Then lamp 7's state is "ON" at brightness 60, version 3
-    And lamp 7's history is "SwitchedOn, Dimmed, Dimmed", numbered 1 to 3
+    And lamp 7's history is
+      | number | type       |
+      | 1      | SwitchedOn |
+      | 2      | Dimmed     |
+      | 3      | Dimmed     |
 
     Examples:
       | store     |

@@ -7,6 +7,7 @@ import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartSettings
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -81,9 +82,12 @@ class ConnectorSteps {
     @Then("the response status is {int}")
     fun status(code: Int) = assertEquals(code, responses.last().status.code, responses.last().bodyString())
 
-    @Then("the gateway offers {string}")
-    fun offers(keys: String) =
-        assertEquals(keys.split(", ").toSet(), json.path("_forms").fieldNames().asSequence().toSet(), "$json")
+    @Then("the gateway offers")
+    fun offers(table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("act") }.toSet(),
+        json.path("_forms").fieldNames().asSequence().toSet(),
+        "$json",
+    )
 
     @Then("the door's state has no member {string}")
     fun hidden(name: String) = assertFalse(json.has(name), "$json")

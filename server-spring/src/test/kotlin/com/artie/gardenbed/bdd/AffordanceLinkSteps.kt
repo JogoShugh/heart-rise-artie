@@ -6,6 +6,7 @@ import com.artie.heart.HeartResource
 import com.artie.heart.ServingLimits
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -38,8 +39,8 @@ class AffordanceLinkSteps {
     @Then("the built description's version is {string}")
     fun version(version: String) = assertEquals(version, description.path("info").path("version").asText())
 
-    @Then("the built description documents the Link header on {string} and {string}")
-    fun linkHeader(first: String, second: String) = listOf(first, second).forEach { operationId ->
+    @Then("the built description documents the Link header on these operations")
+    fun linkHeader(table: DataTable) = table.asMaps().map { it.getValue("operation") }.forEach { operationId ->
         val operation = description.path("paths").flatMap { item -> item.toList() }
             .first { it.path("operationId").asText() == operationId }
         assertTrue(operation.path("responses").path("200").path("headers").has("Link"), "$operationId: $operation")

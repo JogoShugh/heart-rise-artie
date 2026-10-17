@@ -202,7 +202,11 @@ Feature: ARTIE against the real server
   Scenario Outline: From the bookmark alone at rung <rung>: search by name, follow the result, act
     Given the client works at rung <rung>
     When the client enters "/"
-    Then the manifest offers exactly "garden:search-beds, garden:get-bed, garden:build-bed"
+    Then the manifest offers exactly
+      | act                |
+      | garden:search-beds |
+      | garden:get-bed     |
+      | garden:build-bed   |
     When the client acts on "garden:search-beds" with:
       """yaml
       name: BED-2
@@ -258,7 +262,11 @@ Feature: ARTIE against the real server
   Scenario: From the bookmark alone in HAL-FORMS: search by name, follow the result, act
     Given the client works in dialect hal-forms
     When the client enters "/"
-    Then the manifest offers exactly "searchBeds, getBed, buildBed"
+    Then the manifest offers exactly
+      | act        |
+      | searchBeds |
+      | getBed     |
+      | buildBed   |
     When the client acts on "searchBeds" with:
       """yaml
       name: BED-2

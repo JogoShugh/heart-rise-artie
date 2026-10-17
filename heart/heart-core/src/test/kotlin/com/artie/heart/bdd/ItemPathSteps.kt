@@ -25,9 +25,44 @@ class ItemPathSteps(private val world: LampWorld) {
     private lateinit var read: JsonNode
     private var refusal: Throwable? = null
 
+    private lateinit var template: String
+
     @Given("a pull request type declared with the item path {string}")
     fun declared(template: String) {
+        this.template = template
         layers = Layers(PullRequests.type(ItemPath(template, PullRequests.POINTERS)))
+    }
+
+    @Given("the pull request type links these sub-collections")
+    fun linksSubCollections(table: DataTable) {
+        val collections = table.asMaps().associate { it.getValue("relation") to it.getValue("path") }
+        layers = Layers(PullRequests.type(ItemPath(template, PullRequests.POINTERS), subCollections = collections))
+    }
+
+    @When("a pull request type is declared linking {string} at {string}")
+    fun declaredLinking(relation: String, path: String) {
+        refusal = runCatching {
+            PullRequests.type(ItemPath(template, PullRequests.POINTERS), subCollections = mapOf(relation to path))
+        }.exceptionOrNull()
+    }
+
+    @Then("it links these sub-collections")
+    fun linksThese(table: DataTable) {
+        val links = rendered.last().path("_links")
+        table.asMaps().forEach { row ->
+            assertEquals(row.getValue("href"), links.path(row.getValue("link")).path("href").asText(), "$links")
+        }
+    }
+
+    @Then("its curies name the profile {string}")
+    fun curiesName(profile: String) {
+        val names = rendered.last().path("_links").path("curies").map { it.path("name").asText() }
+        assertEquals(true, profile in names, "curies: $names")
+    }
+
+    @Then("the lamp type links no sub-collections")
+    fun lampLinksNone() {
+        assertEquals(emptyMap<String, String>(), world.type.subCollections)
     }
 
     @Given("pull request {long} of {string} is open")
@@ -107,10 +142,10 @@ class ItemPathSteps(private val world: LampWorld) {
         assertEquals(href, rendered.last().path("_templates").path(name).path("target").asText())
     }
 
-    @Then("it has the path {string} with the parameters {string}")
-    fun pathWithParameters(path: String, names: String) {
+    @Then("it has the path {string} with these parameters")
+    fun pathWithParameters(path: String, table: DataTable) {
         val parameters = read.path("paths").path(path).path("get").path("parameters").map { it.path("name").asText() }
-        assertEquals(names.split(", "), parameters)
+        assertEquals(table.asMaps().map { it.getValue("parameter") }, parameters)
     }
 
     @Then("it has the path {string}")

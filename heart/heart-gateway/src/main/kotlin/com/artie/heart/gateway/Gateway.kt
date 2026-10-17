@@ -52,6 +52,17 @@ class Gateway(
         connector?.check(spec)
     }
 
+    /** The resource files' resources, by noun: an act of one may make another (a repository's open-issue). */
+    private val declared: Map<String, DeclaredResource> by lazy {
+        val standards = Standards(links.signal(byPath = emptyMap(), byRelation = emptyMap()))
+        connector?.resources.orEmpty().associate { file ->
+            val read = reader(connector, standards)
+            file.noun to DeclaredResource(file, spec, vocabulary, calls, read, mapper) { noun, body ->
+                checkNotNull(declared[noun]) { "${file.file}: no resource $noun" }.location(body)
+            }
+        }
+    }
+
     /**
      * One resource type per upstream collection. Each answer is read by the
      * first of the connector's readers that recognizes it, or else by a
@@ -65,10 +76,7 @@ class Gateway(
             ),
         )
         GatewayResource(type, vocabulary, calls, reader(connector, standards), mapper).resource
-    } + connector?.resources.orEmpty().map { declared ->
-        val standards = Standards(links.signal(byPath = emptyMap(), byRelation = emptyMap()))
-        DeclaredResource(declared, spec, vocabulary, calls, reader(connector, standards), mapper).resource
-    }
+    } + declared.values.map { it.resource }
 
     /** The gateway as one HTTP handler, admitting the callers [credentials] admits. */
     fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler =
@@ -89,7 +97,9 @@ class Gateway(
                 val acts = connector.resources.flatMap { it.acts }
                 spec.routes.values.filter { route -> acts.none { it.operation == route.operation.name } }.map { route ->
                     relation(route.operation, if (route.method == "GET") AlpsType.SAFE else AlpsType.UNSAFE)
-                } + acts.map { Relation(it.name, AlpsType.UNSAFE, it.title, it.description, it.description) }
+                } + acts.distinctBy { it.name }.map { act -> // close, reopen, edit: one relation, any resource
+                    Relation(act.name, AlpsType.UNSAFE, act.title, act.description, act.description)
+                }
             } else {
                 spec.types.flatMap { type ->
                     (type.acts + type.bookmarkActs).map { relation(it.operation, AlpsType.UNSAFE) } +

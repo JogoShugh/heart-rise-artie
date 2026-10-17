@@ -13,7 +13,10 @@ Feature: Open offers: offer keys first seen at run time
   Scenario: A state whose key was never declared is rendered, and its set is served by its address
     When a lamp in the key "ON" is rendered at L1
     Then the server holds the affordance set its "hr:forms" link names, matching the link's integrity
-    And that set offers exactly "home:switch-off, home:dim"
+    And that set offers exactly
+      | act             |
+      | home:switch-off |
+      | home:dim        |
 
   Scenario: Two resources with one new key share one affordance set
     When a lamp in the key "ON" is rendered at L1

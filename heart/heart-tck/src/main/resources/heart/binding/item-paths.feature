@@ -34,4 +34,7 @@ Feature: A binding serves each resource at its item path
 
   Scenario: HAL-FORMS targets the item path too
     When a client gets "/repos/acme/rockets/pulls/482" as hal-forms
-    Then the response has templates targeting "/repos/acme/rockets/pulls/482/actions/close"
+    Then the response has templates targeting
+      | target                                      |
+      | /repos/acme/rockets/pulls/482/actions/close |
+      | /repos/acme/rockets/pulls/482/actions/split |

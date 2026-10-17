@@ -14,6 +14,7 @@ import com.artie.heart.fixtures.PullRequest
 import com.artie.heart.fixtures.PullRequests
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -60,11 +61,13 @@ class FindingSteps {
         assertEquals(true, form.path("_links").path("target").path("templated").asBoolean())
     }
 
-    @Then("its fields are {string}, of which {string} are required")
-    fun fields(names: String, required: String) {
+    @Then("its fields are")
+    fun fields(table: DataTable) {
         val schema = form.path("schema")
-        assertEquals(names.split(", "), schema.path("properties").fieldNames().asSequence().toList())
-        assertEquals(required.split(", "), schema.path("required").map { it.asText() })
+        val rows = table.asMaps()
+        assertEquals(rows.map { it.getValue("field") }, schema.path("properties").fieldNames().asSequence().toList())
+        val required = rows.filter { it["required"] == "yes" }.map { it.getValue("field") }
+        assertEquals(required, schema.path("required").map { it.asText() })
     }
 
     @Then("the index form {string} field {string} is an integer from {int}")
@@ -74,19 +77,19 @@ class FindingSteps {
         assertEquals(minimum, property.path("minimum").asInt())
     }
 
-    @Then("the index form {string} field {string} is one of {string}")
-    fun oneOf(key: String, field: String, values: String) {
-        assertEquals(values.split(", "), property(key, field).path("enum").map { it.asText() })
+    @Then("the index form {string} field {string} is one of")
+    fun oneOf(key: String, field: String, table: DataTable) {
+        assertEquals(table.asMaps().map { it.getValue("value") }, property(key, field).path("enum").map { it.asText() })
     }
 
-    @Given("the search of {string} for {string} finds {string} and {string}")
-    fun finds(repository: String, state: String, first: String, second: String) {
+    @Given("the search of {string} for {string} finds")
+    fun finds(repository: String, state: String, table: DataTable) {
         val (owner, repo) = repository.split("/")
         this.repository = owner to repo
         this.state = state
-        found = listOf(first, second).map { match ->
-            val (number, title) = match.split(" ", limit = 2)
-            Found(number.toLong(), title, mapOf("owner" to owner, "repo" to repo, "number" to number))
+        found = table.asMaps().map { row ->
+            val number = row.getValue("number")
+            Found(number.toLong(), row.getValue("title"), mapOf("owner" to owner, "repo" to repo, "number" to number))
         }
     }
 
@@ -114,17 +117,19 @@ class FindingSteps {
         assertEquals(href, read.path("_links").path(rel).path("href").asText())
     }
 
-    @Then("the page's items are {string}")
-    fun items(expected: String) {
-        val items = read.path("_links").path("item").map { "${it.path("href").asText()} ${it.path("title").asText()}" }
-        assertEquals(expected.split(", "), items)
+    @Then("the page's items are")
+    fun items(table: DataTable) {
+        val items = read.path("_links").path("item")
+            .map { mapOf("href" to it.path("href").asText(), "title" to it.path("title").asText()) }
+        assertEquals(table.asMaps(), items)
     }
 
-    @Then("the resource {string} has the template {string} with variables {string}")
-    fun homeResource(name: String, template: String, variables: String) {
+    @Then("the resource {string} has the template {string} with these variables")
+    fun homeResource(name: String, template: String, table: DataTable) {
         val resource = read.path("resources").path(name)
         assertEquals(template, resource.path("hrefTemplate").asText())
-        assertEquals(variables.split(", "), resource.path("hrefVars").fieldNames().asSequence().toList())
+        val variables = resource.path("hrefVars").fieldNames().asSequence().toList()
+        assertEquals(table.asMaps().map { it.getValue("variable") }, variables)
     }
 
     @When("the OpenAPI description of the found pull request type is rendered")
@@ -138,18 +143,18 @@ class FindingSteps {
         read = mapper.readTree(OpenApiDocument(listOf(resource)).body)
     }
 
-    @Then("its operation {string} is {string} with the parameters {string}")
-    fun operation(operationId: String, route: String, parameters: String) {
+    @Then("its operation {string} is {string} with these parameters")
+    fun operation(operationId: String, route: String, table: DataTable) {
         val (method, path) = route.split(" ")
         val operation = read.path("paths").path(path).path(method.lowercase())
         assertEquals(operationId, operation.path("operationId").asText())
-        assertEquals(parameters.split(", "), operation.path("parameters").map { it.path("name").asText() })
+        val parameters = table.asMaps().map { it.getValue("parameter") }
+        assertEquals(parameters, operation.path("parameters").map { it.path("name").asText() })
     }
 
-    @Then("it has no template {string} or {string}")
-    fun noTemplates(first: String, second: String) {
-        assertFalse(read.path("_templates").has(first), "templates: ${read.path("_templates")}")
-        assertFalse(read.path("_templates").has(second), "templates: ${read.path("_templates")}")
+    @Then("it has none of these templates")
+    fun noTemplates(table: DataTable) = table.asMaps().map { it.getValue("template") }.forEach {
+        assertFalse(read.path("_templates").has(it), "templates: ${read.path("_templates")}")
     }
 
     @When("a pull request type is found at {string} with no field {string}")

@@ -4,6 +4,7 @@ import com.artie.heart.ContentAddress
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -72,10 +73,10 @@ class ContentSteps(
         assertNotNull(last.responseHeaders.eTag)
     }
 
-    @Then("the profile describes {string}")
-    fun describes(ids: String) {
+    @Then("the profile describes these relations")
+    fun describes(table: DataTable) {
         val descriptors = ObjectMapper().readTree(last.responseBody).path("alps").path("descriptor")
-        assertEquals(ids.split(",").map { it.trim() }, descriptors.map { it.path("id").asText() })
+        assertEquals(table.asMaps().map { it.getValue("relation") }, descriptors.map { it.path("id").asText() })
     }
 
     private fun get(path: String): EntityExchangeResult<ByteArray> =

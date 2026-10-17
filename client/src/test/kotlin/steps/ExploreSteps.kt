@@ -132,8 +132,8 @@ class ExploreSteps {
         exploration = Explorer(service).explore("http://lamps.test", samples)
     }
 
-    @Then("it took the acts {string}")
-    fun took(rels: String) = assertEquals(rels.split(",").map { it.trim() }, exploration.acts)
+    @Then("it took these acts")
+    fun took(table: DataTable) = assertEquals(table.asMaps().map { it.getValue("act") }, exploration.acts)
 
     @Then("it took no acts")
     fun tookNone() = assertEquals(emptyList(), exploration.acts)

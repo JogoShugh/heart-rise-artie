@@ -3,6 +3,7 @@ package steps
 import heart.EventSink
 import heart.EventSinks
 import io.cucumber.java.After
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -94,9 +95,9 @@ class EventSteps(private val ctx: ClientContext) {
         assertTrue(spans.isNotEmpty() && spans.all { (_, span) -> !span.isNullOrEmpty() }, "spans: $spans")
     }
 
-    @Then("every event line has the fields {string}")
-    fun fields(names: String) {
-        val expected = names.split(',').map { it.trim() }.toSet()
+    @Then("every event line has exactly these fields")
+    fun fields(table: DataTable) {
+        val expected = table.asMaps().map { it.getValue("field") }.toSet()
         assertTrue(events().isNotEmpty())
         events().forEach { assertEquals(expected, it.keys, "fields of $it") }
     }

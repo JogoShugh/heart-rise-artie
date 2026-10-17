@@ -9,6 +9,7 @@ import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -44,8 +45,12 @@ class IndexSteps(private val world: LampWorld) {
         assertEquals(href, json.path("_links").path(rel).path("href").asText())
     }
 
-    @Then("it offers the GET form {string} with target {string} and required field {string}")
-    fun getForm(key: String, target: String, field: String) {
+    @Then("it offers these GET forms")
+    fun getForms(table: DataTable) = table.asMaps().forEach {
+        getForm(it.getValue("form"), it.getValue("target"), it.getValue("required field"))
+    }
+
+    private fun getForm(key: String, target: String, field: String) {
         val form = json.path("_forms").path(key)
         assertEquals("GET", form.path("method").asText())
         assertEquals(target, form.path("_links").path("target").path("href").asText())
@@ -54,8 +59,12 @@ class IndexSteps(private val world: LampWorld) {
         assertFalse(form.path("schema").path("properties").path(field).isMissingNode)
     }
 
-    @Then("it offers the GET template {string} with target {string} and required property {string}")
-    fun getTemplate(name: String, target: String, property: String) {
+    @Then("it offers these GET templates")
+    fun getTemplates(table: DataTable) = table.asMaps().forEach {
+        getTemplate(it.getValue("template"), it.getValue("target"), it.getValue("required property"))
+    }
+
+    private fun getTemplate(name: String, target: String, property: String) {
         val template = json.path("_templates").path(name)
         assertEquals("GET", template.path("method").asText())
         assertEquals(target, template.path("target").asText())
@@ -73,8 +82,12 @@ class IndexSteps(private val world: LampWorld) {
         assertEquals("\"$prefix${dialect.etagTag}-$hex\"", index.validator(dialect))
     }
 
-    @Then("it offers the POST form {string} with target {string} and required field {string}")
-    fun postForm(key: String, target: String, field: String) {
+    @Then("it offers these POST forms")
+    fun postForms(table: DataTable) = table.asMaps().forEach {
+        postForm(it.getValue("form"), it.getValue("target"), it.getValue("required field"))
+    }
+
+    private fun postForm(key: String, target: String, field: String) {
         val form = json.path("_forms").path(key)
         assertEquals("POST", form.path("method").asText())
         assertEquals("application/json", form.path("contentType").asText())
@@ -84,10 +97,15 @@ class IndexSteps(private val world: LampWorld) {
         assertTrue(form.path("schema").path("\$id").asText().matches(Regex("/schemas/[0-9a-f]{16}")))
     }
 
-    @Then(
-        "it offers the POST template {string} with target {string} and required property {string} from {int} to {int}",
-    )
-    fun postTemplate(name: String, target: String, property: String, min: Int, max: Int) {
+    @Then("it offers these POST templates")
+    fun postTemplates(table: DataTable) = table.asMaps().forEach {
+        postTemplate(
+            it.getValue("template"), it.getValue("target"), it.getValue("required property"),
+            it.getValue("min").toInt(), it.getValue("max").toInt(),
+        )
+    }
+
+    private fun postTemplate(name: String, target: String, property: String, min: Int, max: Int) {
         val template = json.path("_templates").path(name)
         assertEquals("POST", template.path("method").asText())
         assertEquals("application/json", template.path("contentType").asText())
@@ -108,10 +126,10 @@ class IndexSteps(private val world: LampWorld) {
         json = mapper.readTree(index.home(Rung.valueOf(max)))
     }
 
-    @Then("it names {string} at template {string} and {string} at template {string}")
-    fun names(item: String, itemTemplate: String, collection: String, collectionTemplate: String) {
-        assertEquals(itemTemplate, json.path("resources").path(item).path("hrefTemplate").asText())
-        assertEquals(collectionTemplate, json.path("resources").path(collection).path("hrefTemplate").asText())
+    @Then("it names these resources at their templates")
+    fun names(table: DataTable) = table.asMaps().forEach { row ->
+        val resource = json.path("resources").path(row.getValue("resource"))
+        assertEquals(row.getValue("template"), resource.path("hrefTemplate").asText())
     }
 
     @Then("the {string} hints offer both dialects with their profiles, and need an ETag to act")
@@ -139,24 +157,28 @@ class IndexSteps(private val world: LampWorld) {
         json = mapper.valueToTree(SearchPages.page(search, found, page, size))
     }
 
-    @Then("the page counts {int} and lists the items {}")
-    fun items(count: Int, items: String) {
+    @Then("each page of the lamps matching {string}, {int} to a page, counts {int} and lists")
+    fun pagesList(name: String, size: Int, count: Int, table: DataTable) = byPage(table, name, size) { rows ->
         assertEquals(count, json.path("count").asInt())
-        val listed = json.path("_links").path("item").joinToString(", ") {
-            "\"${it.path("href").asText()}\" titled \"${it.path("title").asText()}\""
-        }
-        assertEquals(items, listed)
+        val listed = json.path("_links").path("item")
+            .map { mapOf("href" to it.path("href").asText(), "title" to it.path("title").asText()) }
+        assertEquals(rows.map { mapOf("href" to it["href"], "title" to it["title"]) }, listed)
     }
 
-    @Then("its paging links are {}")
-    fun paging(links: String) {
-        val expected = links.split(", ")
-            .associate { it.substringBefore(' ') to it.substringAfter(' ').removeSurrounding("\"") }
+    @Then("each page of the lamps matching {string}, {int} to a page, links")
+    fun pagesLink(name: String, size: Int, table: DataTable) = byPage(table, name, size) { rows ->
         val actual = listOf("first", "last", "next", "prev")
             .filter { json.path("_links").has(it) }
             .associateWith { json.path("_links").path(it).path("href").asText() }
-        assertEquals(expected, actual)
+        assertEquals(rows.associate { it.getValue("rel") to it.getValue("href") }, actual)
     }
+
+    /** Each page's rows of [table], checked by [check] against that page of the search, [size] to a page. */
+    private fun byPage(table: DataTable, name: String, size: Int, check: (List<Map<String, String>>) -> Unit) =
+        table.asMaps().groupBy { it.getValue("page").toInt() }.forEach { (page, rows) ->
+            page(page, name, size)
+            check(rows)
+        }
 
     private companion object {
         const val HEX = 16

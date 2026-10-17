@@ -15,20 +15,35 @@ Feature: A binding serves a declared search at its collection path
   Scenario: A search fills the collection path and filters by the query
     When a client gets "/repos/acme/rockets/pulls?state=open" as hal-schema-forms
     Then the response status is 200
-    And the response lists the items "/repos/acme/rockets/pulls/7" titled "Pull request 7", "/repos/acme/rockets/pulls/482" titled "Pull request 482"
+    And the response lists these items
+      | href                          | title            |
+      | /repos/acme/rockets/pulls/7   | Pull request 7   |
+      | /repos/acme/rockets/pulls/482 | Pull request 482 |
     And the response links "self" to "/repos/acme/rockets/pulls?state=open"
 
   Scenario: Without a filter, the search lists every pull request of the repository
     When a client gets "/repos/acme/engines/pulls" as hal-schema-forms
-    Then the response lists the items "/repos/acme/engines/pulls/3" titled "Pull request 3"
+    Then the response lists these items
+      | href                        | title          |
+      | /repos/acme/engines/pulls/3 | Pull request 3 |
 
   Scenario: A client fills the index's search form and follows it
     When a client gets "/" as hal-schema-forms
-    And the client fills the "pulls:list" form with "owner=acme, repo=rockets, state=closed" and follows it
-    Then the response lists the items "/repos/acme/rockets/pulls/9" titled "Pull request 9"
+    And the client fills the "pulls:list" form with these values and follows it
+      | field | value   |
+      | owner | acme    |
+      | repo  | rockets |
+      | state | closed  |
+    Then the response lists these items
+      | href                        | title          |
+      | /repos/acme/rockets/pulls/9 | Pull request 9 |
 
   Scenario: A client fills the index's lookup form and follows it to the pull request
     When a client gets "/" as hal-schema-forms
-    And the client fills the "pulls:get" form with "owner=acme, repo=rockets, number=482" and follows it
+    And the client fills the "pulls:get" form with these values and follows it
+      | field  | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 482     |
     Then the response status is 200
     And the response links "self" to "/repos/acme/rockets/pulls/482"

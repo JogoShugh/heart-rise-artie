@@ -1,5 +1,6 @@
 package com.artie.heart.binding
 
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -59,21 +60,21 @@ class FormSteps(private val http: HttpWorld) {
     fun noLink(rel: String) =
         assertFalse(http.json.path("_links").has(rel), "found $rel in ${http.json.path("_links")}")
 
-    @Then("the response lists the items {}")
-    fun items(items: String) {
-        val listed = http.json.path("_links").path("item").joinToString(", ") {
-            "\"${it.path("href").asText()}\" titled \"${it.path("title").asText()}\""
-        }
-        assertEquals(if (items == "nothing") "" else items, listed)
+    @Then("the response lists these items")
+    fun items(table: DataTable) {
+        val listed = http.json.path("_links").path("item")
+            .map { mapOf("href" to it.path("href").asText(), "title" to it.path("title").asText()) }
+        assertEquals(table.asMaps(), listed)
     }
 
     /** A HAL-FORMS target cannot be templated, so a search or lookup that fills a path has no template. */
-    @Then("the two indexes offer forms with the same titles, but for {string}")
-    fun sameTitles(untemplated: String) {
+    @Then("the two indexes offer forms with the same titles, but for these")
+    fun sameTitles(table: DataTable) {
+        val untemplated = table.asMaps().map { it.getValue("title") }.toSet()
         val (hsf, hf) = http.results.takeLast(2).map(http::json)
         val forms = hsf.path("_forms").map { it.path("title").asText() }.toSet()
         assertTrue(forms.isNotEmpty(), "no forms in $hsf")
         val templates = hf.path("_templates").map { it.path("title").asText() }.toSet()
-        assertEquals(forms - untemplated.split(", ").toSet(), templates)
+        assertEquals(forms - untemplated, templates)
     }
 }

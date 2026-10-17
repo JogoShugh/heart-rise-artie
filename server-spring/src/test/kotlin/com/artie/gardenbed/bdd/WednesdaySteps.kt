@@ -10,6 +10,7 @@ import com.artie.heart.OpenApiDocument
 import com.artie.heart.Rung
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -51,33 +52,41 @@ class WednesdaySteps {
     fun max(max: Int) =
         assertEquals(max, form().path("schema").path("properties").path("milliliters").path("maximum").asInt())
 
-    @Then("its body requires {string}")
-    fun requires(fields: String) {
+    @Then("under each change, a planted bed's water form requires exactly")
+    fun requires(table: DataTable) = byChange(table) { change, rows ->
         val required = form().path("schema").path("required").map { it.asText() }.sorted()
-        assertEquals(fields.split(",").map { it.trim() }.sorted(), required)
+        assertEquals(rows.map { it.getValue("field") }.sorted(), required, change)
     }
 
     @Then("its state names its moisture {string}")
     fun moisture(member: String) =
         assertTrue(bed.has(member), "state members: ${bed.fieldNames().asSequence().toList()}")
 
-    @Then("the water form's {string} is one of {string}, for example {string}")
-    fun choices(field: String, values: String, example: String) {
+    @Then("the water form's {string} is one of these, for example {string}")
+    fun choices(field: String, example: String, table: DataTable) {
         val property = form().path("schema").path("properties").path(field)
-        assertEquals(values.split(",").map { it.trim() }, property.path("enum").map { it.asText() })
+        assertEquals(table.asMaps().map { it.getValue("value") }, property.path("enum").map { it.asText() })
         assertEquals(example, property.path("examples").first().asText())
     }
 
-    @Then("its state has the members {string}")
-    fun members(names: String) {
+    @Then("under each change, a planted bed's state has the members")
+    fun members(table: DataTable) = byChange(table) { change, rows ->
         val members = bed.fieldNames().asSequence().toList()
-        names.split(",").map { it.trim() }.forEach { assertTrue(it in members, "state members: $members") }
+        rows.map { it.getValue("member") }.forEach { assertTrue(it in members, "$change: state members: $members") }
     }
 
-    @Then("the water form's {string} is one of {string}, defaulting to {string}")
-    fun defaulting(field: String, values: String, default: String) {
+    /** Each change's rows of [table], checked by [check] against a planted bed rendered under that change. */
+    private fun byChange(table: DataTable, check: (String, List<Map<String, String>>) -> Unit) =
+        table.asMaps().groupBy { it.getValue("change") }.forEach { (change, rows) ->
+            declared(change)
+            rendered(2)
+            check(change, rows)
+        }
+
+    @Then("the water form's {string} is one of these, defaulting to {string}")
+    fun defaulting(field: String, default: String, table: DataTable) {
         val property = form().path("schema").path("properties").path(field)
-        assertEquals(values.split(",").map { it.trim() }, property.path("enum").map { it.asText() })
+        assertEquals(table.asMaps().map { it.getValue("value") }, property.path("enum").map { it.asText() })
         assertEquals(default, property.path("default").asText())
     }
 

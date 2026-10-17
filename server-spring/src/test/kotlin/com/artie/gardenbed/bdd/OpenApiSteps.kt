@@ -3,6 +3,7 @@ package com.artie.gardenbed.bdd
 import com.artie.gardenbed.declaration.GardenBeds
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -39,11 +40,11 @@ class OpenApiSteps(private val http: HttpWorld) {
     @Then("its info version is {string}")
     fun version(version: String) = assertEquals(version, description.path("info").path("version").asText())
 
-    @Then("its {string} status enum is {string}")
-    fun statusEnum(schema: String, values: String) {
+    @Then("its {string} status enum is")
+    fun statusEnum(schema: String, table: DataTable) {
         val enum = description.path("components").path("schemas").path(schema).path("properties").path("status")
             .path("enum").map { it.asText() }
-        assertEquals(values.split(",").map { it.trim() }, enum)
+        assertEquals(table.asMaps().map { it.getValue("status") }, enum)
     }
 
     @Then("its operations include {string}")

@@ -1,11 +1,13 @@
 package com.artie.heart.http4k
 
 import com.artie.heart.Dialect
+import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.SERVICE_DESC
 import com.artie.heart.ItemPath
+import com.artie.heart.Search
 import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
@@ -41,11 +43,22 @@ class IndexHandler(
     }
 
     fun search(resource: HeartResource<*, *>, request: Request): Response {
-        val page = request.query("page")?.toIntOrNull() ?: 1
         val variables = resource.layers.type.finding?.collectionPath
             ?.let { path -> ItemPath.variablesOf(path).mapNotNull { name -> request.path(name)?.let { name to it } } }
             .orEmpty().toMap()
-        val (search, found) = runBlocking { resource.searched(variables) { request.query(it) } }
+        return page(request, runBlocking { resource.searched(variables) { request.query(it) } })
+    }
+
+    /** The sub-collection [relation] under the resource the request's path names, as a search's page. */
+    fun listed(resource: HeartResource<*, *>, relation: String, request: Request): Response {
+        val path = resource.layers.type.subCollections.getValue(relation)
+        val variables = ItemPath.variablesOf(path).mapNotNull { name -> request.path(name)?.let { name to it } }.toMap()
+        return page(request, runBlocking { resource.listed(relation, variables) })
+    }
+
+    private fun page(request: Request, searched: Pair<Search, List<Found>>): Response {
+        val page = request.query("page")?.toIntOrNull() ?: 1
+        val (search, found) = searched
         if (Negotiation.wantsPlainJson(request.header(ACCEPT))) {
             return Response(Status.OK).header(CONTENT_TYPE, JSON).header(VARY, ACCEPT)
                 .body(mapper.writeValueAsString(SearchPages.plainPage(found, page, limits.pageSize)))

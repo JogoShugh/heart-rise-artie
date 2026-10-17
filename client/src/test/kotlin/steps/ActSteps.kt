@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import heart.PROPERTIES
 import heart.REQUIRED
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -41,11 +44,21 @@ class ActSteps(private val ctx: ClientContext) {
         ctx.lastError = runCatching { ctx.client.act(rel, payload(yaml)) }.exceptionOrNull()
     }
 
-    @Then("the choices of {string} for {string}, with {}, are {string}")
-    fun choices(rel: String, property: String, fields: String, expected: String) {
+    @Then("the choices of {string} for {string}, by the field {string}, are")
+    fun choicesBy(rel: String, property: String, field: String, table: DataTable) =
+        table.asMaps().groupBy { it.getValue(field) }.forEach { (value, rows) ->
+            val form = ctx.client.choices(rel) ?: error("no form $rel")
+            val shown = form.of(buildJsonObject { put(field, value) })[property].orEmpty()
+                .map { mapOf("value" to it.value.jsonPrimitive.content, "prompt" to it.prompt) }
+            assertEquals(rows.map { mapOf("value" to it["value"], "prompt" to it["prompt"]) }, shown, "$field $value")
+        }
+
+    @Then("the choices of {string} for {string}, with {}, are")
+    fun choices(rel: String, property: String, fields: String, table: DataTable) {
         val choices = ctx.client.choices(rel)?.of(Json.parseToJsonElement(fields).jsonObject) ?: error("no form $rel")
-        val shown = choices[property].orEmpty().joinToString(", ") { "${it.value.jsonPrimitive.content} ${it.prompt}" }
-        assertEquals(expected, shown)
+        val shown = choices[property].orEmpty()
+            .map { mapOf("value" to it.value.jsonPrimitive.content, "prompt" to it.prompt) }
+        assertEquals(table.asMaps(), shown)
     }
 
     @Then("the client raised an error mentioning {string}")
@@ -63,8 +76,11 @@ class ActSteps(private val ctx: ClientContext) {
     fun stateLacks(key: String) = assertFalse(ctx.current.state.containsKey(key), "state has $key")
 
     @Then("the manifest offers exactly {string}")
-    fun manifestOffers(rels: String) =
-        assertEquals(rels.split(',').map { it.trim() }.toSet(), ctx.current.affordances.keys)
+    fun manifestOffersOne(rel: String) = assertEquals(setOf(rel), ctx.current.affordances.keys)
+
+    @Then("the manifest offers exactly")
+    fun manifestOffers(table: DataTable) =
+        assertEquals(table.asMaps().map { it.getValue("act") }.toSet(), ctx.current.affordances.keys)
 
     @Then("the {string} affordance is {word} to {string}")
     fun affordanceTarget(rel: String, method: String, url: String) {

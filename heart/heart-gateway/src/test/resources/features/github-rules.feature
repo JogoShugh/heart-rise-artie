@@ -20,23 +20,47 @@ Feature: What a GitHub pull request allows now, and why not the rest
   Scenario: A draft can't be merged
     Given pull request 482 is a draft
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the GitHub gateway offers "github:close"
-    And the GitHub gateway says "github:merge" is absent because "A draft can't be merged; mark it ready for review first."
+    Then the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
+    And the GitHub gateway says these acts are absent, and why
+      | act          | reason                                                   |
+      | github:merge | A draft can't be merged; mark it ready for review first. |
 
   Scenario: A merged pull request can't be reopened
     Given pull request 482 was merged
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the GitHub gateway offers nothing
-    And the GitHub gateway says "github:reopen" is absent because "A merged pull request can't be reopened."
+    Then the GitHub gateway offers
+      | act         |
+      | github:edit |
+    And the GitHub gateway says these acts are absent, and why
+      | act           | reason                                   |
+      | github:reopen | A merged pull request can't be reopened. |
 
   Scenario: While GitHub is still checking mergeability, merge is absent, and offered once it knows
     Given GitHub hasn't yet worked out whether pull request 482 can be merged
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the GitHub gateway offers "github:close"
-    And the GitHub gateway says "github:merge" is absent because "GitHub is still checking whether it can be merged; read it again shortly."
+    Then the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
+    And the GitHub gateway says these acts are absent, and why
+      | act          | reason                                                                    |
+      | github:merge | GitHub is still checking whether it can be merged; read it again shortly. |
     Given GitHub has worked out that pull request 482 can be merged cleanly
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the GitHub gateway offers "github:close, github:merge"
+    Then the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:merge          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
 
   Scenario Outline: A pull request GitHub says is <mergeable state> can't be merged now
     Given GitHub says pull request 482 is "<mergeable state>"
@@ -44,14 +68,19 @@ Feature: What a GitHub pull request allows now, and why not the rest
     Then the GitHub gateway says "github:merge" is absent because "<reason>"
 
     Examples:
-      | mergeable state | reason                                                                       |
-      | behind          | The branch is behind its base; update it first.                             |
-      | dirty           | The branch has conflicts with its base; resolve them first.                 |
+      | mergeable state | reason                                                                     |
+      | behind          | The branch is behind its base; update it first.                            |
+      | dirty           | The branch has conflicts with its base; resolve them first.                |
       | blocked         | Branch protection blocks the merge: a required check or review is missing. |
 
   Scenario: A caller who can't push to the repository is offered nothing, from the repository's own answer
     Given the caller can't push to "acme/rockets"
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway offers nothing
-    And the GitHub gateway says "github:merge" is absent because "You can't push to this repository."
-    And the GitHub gateway says "github:close" is absent because "You can't push to this repository."
+    And the GitHub gateway says these acts are absent, and why
+      | act                   | reason                             |
+      | github:close          | You can't push to this repository. |
+      | github:merge          | You can't push to this repository. |
+      | github:edit           | You can't push to this repository. |
+      | github:request-review | You can't push to this repository. |
+      | github:update-branch  | You can't push to this repository. |

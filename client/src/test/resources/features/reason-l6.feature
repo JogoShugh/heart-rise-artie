@@ -107,7 +107,10 @@ Feature: L6: the Reason step picks; deterministic code acts
       """
     And the reasoner will follow the "item" link titled "South border"
     When the agent handles "water the south border" at "http://garden.test/beds?name=border"
-    Then the reasoner was shown the links "item: North border, item: South border" and no URI
+    Then the reasoner was shown these links and no URI
+      | rel  | title        |
+      | item | North border |
+      | item | South border |
     And the agent followed the link to "http://garden.test/beds/2"
     And the manifest offers exactly "waterCell"
 

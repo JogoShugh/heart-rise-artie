@@ -29,7 +29,10 @@ Feature: A resource knows who asks, and may refuse them
     When a client gets "/repos/acme/expired/pulls/1" as hal-schema-forms
     Then the response status is 401
     And the response is a problem of type "not-authenticated"
-    And the response offers the challenges "Basic realm=\"home\"" and "Bearer realm=\"home\""
+    And the response offers these challenges
+      | challenge           |
+      | Basic realm="home"  |
+      | Bearer realm="home" |
 
   Scenario: A resource that won't let this caller see it answers 403
     Given pull request 1 of "acme/secret" is "open" in the pull request server

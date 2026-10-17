@@ -11,9 +11,15 @@ Feature: A declared resource type is rendered in three layers
 
   Scenario: L0 collapses state, forms and full schemas into Layer 1
     When lamp 7 is rendered at L0
-    Then the body has "status" "ON" and "id" 7
+    Then the body has these members
+      | member | value |
+      | status | ON    |
+      | id     | 7     |
     And the body links "self" to "/lamps/7"
-    And the body offers exactly "home:switch-off, home:dim"
+    And the body offers exactly
+      | act             |
+      | home:switch-off |
+      | home:dim        |
     And the "home:dim" form targets "/lamps/7/actions/dim" with POST
     And the "home:dim" form embeds its schema, with its address as "$id"
     And the body links "hr:unavailable" to an explanation, with its integrity
@@ -24,7 +30,10 @@ Feature: A declared resource type is rendered in three layers
     And the body links "hr:forms" to an affordance set, with its integrity, type and profile
     When the affordance set is fetched
     Then its bytes hash to its address and match the link's integrity
-    And the set offers exactly "home:switch-off, home:dim"
+    And the set offers exactly
+      | act             |
+      | home:switch-off |
+      | home:dim        |
     And the "home:dim" form targets "/lamps/{id}/actions/dim", templated, with the pointer "id" at "/id"
     And the "home:dim" form <schema>
 

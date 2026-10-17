@@ -14,6 +14,7 @@ import com.artie.heart.fixtures.MatchPlayer
 import com.artie.heart.fixtures.Matches
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -29,10 +30,11 @@ class OptionSteps {
     private lateinit var read: JsonNode
     private var outcome: Result<Unit>? = null
 
-    @Given("a playing match at level {string} with home players {string} and away players {string}")
-    @Given("another playing match at level {string} with home players {string} and away players {string}")
-    fun match(level: String, home: String, away: String) {
-        matches += Match(matches.size + 1L, "PLAYING", level, players(home), players(away))
+    @Given("a playing match at level {string} with these players")
+    @Given("another playing match at level {string} with these players")
+    fun match(level: String, table: DataTable) {
+        val rows = table.asMaps()
+        matches += Match(matches.size + 1L, "PLAYING", level, players(rows, "home"), players(rows, "away"))
     }
 
     @When("the schema of the act {string} is read")
@@ -85,11 +87,11 @@ class OptionSteps {
         read = mapper.valueToTree(layers.halForms(matches.first()))
     }
 
-    @Then("the template {string} property {string} has inline options {string}")
-    fun inlineOptions(template: String, property: String, expected: String) {
+    @Then("the template {string} property {string} has these inline options")
+    fun inlineOptions(template: String, property: String, table: DataTable) {
         val inline = halFormsProperty(template, property).path("options").path("inline")
-        val shown = inline.joinToString(", ") { "${it.path("value").asText()} ${it.path("prompt").asText()}" }
-        assertEquals(expected, shown)
+        val shown = inline.map { mapOf("value" to it.path("value").asText(), "prompt" to it.path("prompt").asText()) }
+        assertEquals(table.asMaps(), shown)
     }
 
     @Then("the template {string} property {string} has an options link {string}")
@@ -133,10 +135,10 @@ class OptionSteps {
         read.path("_templates").path(template).path("properties").first { it.path("name").asText() == property }
 
     /** "4 Ana, 7 Bea fouled out" -> players. */
-    private fun players(text: String): List<MatchPlayer> = text.split(",").map { it.trim() }.map { entry ->
-        val parts = entry.split(" ")
-        MatchPlayer(parts[0].toInt(), parts[1], fouledOut = entry.endsWith("fouled out"))
-    }
+    private fun players(rows: List<Map<String, String>>, team: String): List<MatchPlayer> =
+        rows.filter { it["team"] == team }.map {
+            MatchPlayer(it.getValue("number").toInt(), it.getValue("name"), fouledOut = it["fouled out"] == "yes")
+        }
 
     private companion object {
         const val OPTIONS = "hr:options"

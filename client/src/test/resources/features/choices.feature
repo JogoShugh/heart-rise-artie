@@ -91,18 +91,19 @@ Feature: Choices from state: ARTIE offers only the choices a form allows now
       _forms: {}
       """
 
-  Scenario Outline: Choices from the resource itself depend on the other fields: <team>
+  Scenario: Choices from the resource itself depend on the other fields
     When the client enters "http://league.test/matches/1"
-    Then the choices of "foul" for "playerNumber", with {"team": "<team>"}, are "<choices>"
-
-    Examples:
-      | team | choices      |
-      | home | 4 Ana        |
-      | away | 5 Cy, 9 Dee  |
+    Then the choices of "foul" for "playerNumber", by the field "team", are
+      | team | value | prompt |
+      | home | 4     | Ana    |
+      | away | 5     | Cy     |
+      | away | 9     | Dee    |
 
   Scenario: Choices from another resource are read by following the link, filled from the state
     When the client enters "http://league.test/matches/1"
-    Then the choices of "assign-official" for "official", with {}, are "Kim Kim"
+    Then the choices of "assign-official" for "official", with {}, are
+      | value | prompt |
+      | Kim   | Kim    |
     And the client sent these requests after entering:
       | GET http://league.test/officials?level=senior |
 

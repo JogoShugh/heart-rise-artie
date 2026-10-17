@@ -6,6 +6,7 @@ import com.artie.tickets.domain.TICKETS
 import com.artie.tickets.store.InMemoryTicketDirectory
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -90,9 +91,9 @@ class TicketSteps(
         assertEquals(expected, entries.joinToString(" | "))
     }
 
-    @Then("the ticket offers exactly {string}")
-    fun offers(keys: String) {
-        assertEquals(keys.split(",").map { it.trim() }.toSet(), forms())
+    @Then("the ticket offers exactly")
+    fun offers(table: DataTable) {
+        assertEquals(table.asMaps().map { it.getValue("act") }.toSet(), forms())
     }
 
     @Then("the ticket offers nothing")
@@ -139,11 +140,11 @@ class TicketSteps(
             .exchange().expectBody().returnResult()
     }
 
-    @Then("the agents listed are {string}, each with whether they are on duty")
-    fun agentsListed(names: String) {
+    @Then("these agents are listed, each with whether they are on duty")
+    fun agentsListed(table: DataTable) {
         assertEquals(200, last.status.value(), String(last.responseBody ?: ByteArray(0)))
         val agents = json(last).path("agents")
-        assertEquals(names, agents.joinToString(", ") { it.path("name").asText() })
+        assertEquals(table.asMaps().map { it.getValue("agent") }, agents.map { it.path("name").asText() })
         assertTrue(agents.all { it.path("onDuty").isBoolean }, "$agents")
     }
 

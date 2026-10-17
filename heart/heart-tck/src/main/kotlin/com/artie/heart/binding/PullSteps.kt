@@ -1,12 +1,19 @@
 package com.artie.heart.binding
 
 import com.artie.heart.fixtures.PullRequest
+import io.cucumber.java.Before
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import org.junit.jupiter.api.Assertions.assertEquals
 
 /** The pull requests in the server under test, set up and checked by owner, repository and number. */
 class PullSteps(private val store: PullStore) {
+
+    /** Each scenario starts with no pull requests: one a scenario splits off doesn't linger in the next. */
+    @Before
+    fun empty() {
+        store.pulls.clear()
+    }
 
     @Given("pull request {long} of {string} is {string} in the pull request server")
     fun pullIs(number: Long, repository: String, state: String) {

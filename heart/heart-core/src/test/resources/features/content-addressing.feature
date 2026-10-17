@@ -23,7 +23,11 @@ Feature: Content addressing
       | {}                      | 44136fa355b3678a | RBNvo1WzZ4oRRq0W9+hknpT7T8If536DEMBg9hyq/4o= |
 
   Scenario: Bodies are served by their address, and one body met twice is one resource
-    When the bodies {"a":1}, {"a":2} and {"a":1} are named by their addresses
+    When these bodies are named by their addresses
+      | body    |
+      | {"a":1} |
+      | {"a":2} |
+      | {"a":1} |
     Then 2 bodies are named
     And each named body hashes to its name
 
@@ -33,7 +37,10 @@ Feature: Content addressing
     start: a map keyed by address would otherwise keep one body and drop the
     other without a word, and a client would meet the drop only as an
     integrity mismatch. To force the clash, every body is given one name.
-    When the bodies {"a":1} and {"a":2} are named by a naming that gives every body the name "0"
+    When these bodies are named by a naming that gives every body the name "0"
+      | body    |
+      | {"a":1} |
+      | {"a":2} |
     Then naming them is refused, saying two different bodies share the name "0"
 
   Scenario: Content shared by two resource types is held once across the server

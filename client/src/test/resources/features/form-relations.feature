@@ -91,7 +91,10 @@ Feature: Forms named by link relations, described for the reasoner
   Scenario: The Claude reasoner is shown titles and descriptions, and can ask for a descriptor
     Given the Claude API will answer with a tool call describing "garden:water-cell"
     When the Claude reasoner reasons about "what does watering do?" over the manifest of "http://garden.test/beds/2"
-    Then the Claude request shows "Water the bed" and "Pours water into every cell of a planted bed."
+    Then the Claude request shows these texts
+      | text                                          |
+      | Water the bed                                 |
+      | Pours water into every cell of a planted bed. |
     And the Claude request contains no URI from the manifest
     And the Claude reasoner chose to describe "garden:water-cell"
 

@@ -147,16 +147,22 @@ private class ReaderFile(val folder: Path, val label: String, val node: JsonNode
             ?: allowed.path("booleans").asText(null)?.let { BooleanMap(pointer(it), names) }
             ?: allowed.path("links").asText(null)?.let { LinkArray(pointer(it), names) }
             ?: allowed.path("jsonata").asText(null)?.let { JsonataSignal(Files.readString(folder.resolve(it)), mapper) }
-            ?: error("$label: allowed must name one of names, booleans, links, odata, table or jsonata")
+            ?: always()
+            ?: error("$label: allowed must name one of names, booleans, links, odata, table, jsonata or always")
         val hidden = node.path("hide").map { pointer(it.asText()) }
         val rules = allowed.path("rules").map { rule ->
             Rule(
-                rule.path("when").fields().asSequence().associate { it.key to it.value },
+                Condition.all(rule.path("when")),
                 rule.path("absent").fields().asSequence().associate { it.key to it.value.asText() },
             )
         }
-        return Reader(label, match(), signal, hidden, names.values.toSet() + rowsNamed() + rulesNamed(rules), rules)
+        val named = names.values.toSet() + rowsNamed() + always()?.allow.orEmpty() + rulesNamed(rules)
+        return Reader(label, match(), signal, hidden, named, rules)
     }
+
+    /** Acts every state allows, but as the rules say: an upstream whose resource has no state to choose by. */
+    private fun always(): Always? =
+        allowed.path("always").takeIf { it.isArray }?.let { list -> Always(list.map { it.asText() }.toSet()) }
 
     private fun rulesNamed(rules: List<Rule>): Set<OperationId> = rules.flatMap { it.absent.keys }.toSet()
 

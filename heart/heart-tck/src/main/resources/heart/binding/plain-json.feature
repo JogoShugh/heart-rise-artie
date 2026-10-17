@@ -25,13 +25,18 @@ Feature: Plain JSON: the same state with every control stripped
     sees nothing new; one that follows it learns which acts are allowed now,
     and can drop the operations of the OpenAPI description that are not.
     When a client gets "/lamps/7" as plain-json
-    Then the plain response's forms link names an affordance set that offers "home:switch-off, home:dim"
+    Then the plain response's forms link names an affordance set that offers
+      | form            |
+      | home:switch-off |
+      | home:dim        |
     And that affordance set's bytes match the link's integrity
 
   Scenario: After an act, the plain answer links the new state's affordance set
     When a client posts {} to "/lamps/7/actions/switch-off" as plain-json with If-Match ""
     Then the response status is 200
-    And the plain response's forms link names an affordance set that offers "home:switch-on"
+    And the plain response's forms link names an affordance set that offers
+      | form           |
+      | home:switch-on |
 
   Scenario: An act needs no If-Match in plain JSON, and answers with the plain state
     When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as plain-json with If-Match ""

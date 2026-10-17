@@ -131,7 +131,10 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       | GET http://garden.test/beds/5               |
       | GET http://garden.test{set:two-waterings}  |
       | GET http://garden.test{schema:water}       |
-    And the manifest offers exactly "waterCell, waterAgain"
+    And the manifest offers exactly
+      | act        |
+      | waterCell  |
+      | waterAgain |
 
   Scenario: An act at L2 expands the set's template from Layer 1 and repeats the headers it synced with
     HTTP is stateless: the act carries the same Accept, Accept-Profile and

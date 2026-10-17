@@ -7,12 +7,18 @@ Feature: A resource's past, when it has one
   events at /{collection}/{id}/history.
 
   Background:
-    Given lamp 7 was switched on 3 days ago and dimmed to 30 1 day ago, in the lamp server
+    Given lamp 7 recorded these events in the lamp server
+      | event      | brightness | days ago |
+      | SwitchedOn |            | 3        |
+      | Dimmed     | 30         | 1        |
 
   Scenario: The history lists what happened, in order
     When a client gets "/lamps/7/history"
     Then the response status is 200
-    And the history is "SwitchedOn, Dimmed", numbered 1 to 2
+    And the history is
+      | number | type       |
+      | 1      | SwitchedOn |
+      | 2      | Dimmed     |
     And the last event's "brightness" is 30
 
   Scenario: The state as of a past instant reads exactly like the current state
@@ -20,7 +26,10 @@ Feature: A resource's past, when it has one
     Then the response status is 200
     And the response body has "brightness" 50
     And the response has ETag "\"seq-1.hsf.L0.{digest}\""
-    And the response offers "home:switch-off, home:dim"
+    And the response offers
+      | form            |
+      | home:switch-off |
+      | home:dim        |
 
   Scenario: An instant that is not ISO 8601 is a bad request
     When a client gets "/lamps/7?asOf=yesterday" as hal-schema-forms

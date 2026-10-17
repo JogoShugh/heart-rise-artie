@@ -151,15 +151,15 @@ class OpenApiSteps(private val world: LampWorld) {
         assertTrue(response.path("headers").has(header), "headers: ${response.path("headers")}")
     }
 
-    @Then("the component {string} has the property {string} with the enum {string}")
-    fun enumOf(name: String, property: String, values: String) {
+    @Then("the component {string} has the property {string} with the enum")
+    fun enumOf(name: String, property: String, table: DataTable) {
         val enum = json.path("components").path("schemas").path(name).path("properties").path(property).path("enum")
-        assertEquals(values.split(",").map { it.trim() }, enum.map { it.asText() })
+        assertEquals(table.asMaps().map { it.getValue("value") }, enum.map { it.asText() })
     }
 
-    @Then("the operation {string} documents the responses {string}")
-    fun responses(operationId: String, statuses: String) = assertEquals(
-        statuses.split(",").map { it.trim() }.toSet(),
+    @Then("the operation {string} documents the responses")
+    fun responses(operationId: String, table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("status") }.toSet(),
         operation(operationId).path("responses").fieldNames().asSequence().toSet(),
     )
 
@@ -167,16 +167,18 @@ class OpenApiSteps(private val world: LampWorld) {
     fun noParameter(operationId: String, name: String) =
         assertFalse(operation(operationId).path("parameters").any { it.path("name").asText() == name })
 
-    @Then("its security schemes are {string} as http {string} and {string} as http {string}")
-    fun securitySchemes(first: String, firstScheme: String, second: String, secondScheme: String) {
+    @Then("its security schemes are")
+    fun securitySchemes(table: DataTable) {
+        val expected = table.asMaps()
+            .associate { it.getValue("name") to (it.getValue("type") to it.getValue("scheme")) }
         val schemes = json.path("components").path("securitySchemes")
-        assertEquals(setOf(first, second), schemes.fieldNames().asSequence().toSet())
-        listOf(first to firstScheme, second to secondScheme).forEach { (name, scheme) ->
+        assertEquals(expected.keys, schemes.fieldNames().asSequence().toSet())
+        expected.forEach { (name, scheme) ->
             val declared = schemes.path(name)
-            assertEquals("http" to scheme, declared.path("type").asText() to declared.path("scheme").asText())
+            assertEquals(scheme, declared.path("type").asText() to declared.path("scheme").asText())
         }
         val required = json.path("security").flatMap { it.fieldNames().asSequence().toList() }.toSet()
-        assertEquals(setOf(first, second), required)
+        assertEquals(expected.keys, required)
     }
 
     private fun operation(operationId: String): JsonNode =

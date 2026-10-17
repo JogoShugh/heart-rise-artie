@@ -12,23 +12,40 @@ Feature: Wednesday: six more kinds of change, each one release from Monday
     Then it offers exactly the form "<relation>"
     And that form is titled "<title>" and targets "<target>"
     And its milliliters may be at most <max>
-    And its body requires "<required>"
     And its state names its moisture "<moisture>"
 
     Examples:
-      | change             | relation         | title            | target                     | max  | required          | moisture      |
-      | none               | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 1000 | milliliters       | moistureLevel |
-      | move-url           | garden:water-cell | Water the bed    | /beds/2/actions/water      | 1000 | milliliters       | moistureLevel |
-      | rename-field       | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 1000 | milliliters       | soilMoisture  |
-      | rename-act         | garden:irrigate   | Water the bed    | /beds/2/actions/water-cell | 1000 | milliliters       | moistureLevel |
-      | retitle            | garden:water-cell | Irrigate the bed | /beds/2/actions/water-cell | 1000 | milliliters       | moistureLevel |
-      | tighter-limit      | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 500  | milliliters       | moistureLevel |
-      | new-required-input | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 1000 | milliliters, method | moistureLevel |
+      | change             | relation          | title            | target                     | max  | moisture      |
+      | none               | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 1000 | moistureLevel |
+      | move-url           | garden:water-cell | Water the bed    | /beds/2/actions/water      | 1000 | moistureLevel |
+      | rename-field       | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 1000 | soilMoisture  |
+      | rename-act         | garden:irrigate   | Water the bed    | /beds/2/actions/water-cell | 1000 | moistureLevel |
+      | retitle            | garden:water-cell | Irrigate the bed | /beds/2/actions/water-cell | 1000 | moistureLevel |
+      | tighter-limit      | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 500  | moistureLevel |
+      | new-required-input | garden:water-cell | Water the bed    | /beds/2/actions/water-cell | 1000 | moistureLevel |
+
+  Scenario: What the water form requires under each change
+    Then under each change, a planted bed's water form requires exactly
+      | change             | field       |
+      | none               | milliliters |
+      | move-url           | milliliters |
+      | rename-field       | milliliters |
+      | rename-act         | milliliters |
+      | retitle            | milliliters |
+      | tighter-limit      | milliliters |
+      | new-required-input | milliliters |
+      | new-required-input | method      |
+      | move-url-kept      | milliliters |
+      | rename-field-kept  | milliliters |
+      | new-optional-input | milliliters |
 
   Scenario: The new required input offers its choices
     Given the garden is declared with the change "new-required-input"
     When a planted bed 2 is rendered at L0
-    Then the water form's "method" is one of "drip, spray", for example "drip"
+    Then the water form's "method" is one of these, for example "drip"
+      | value |
+      | drip  |
+      | spray |
 
   Scenario Outline: A planted bed under the careful change "<change>"
     Three of the changes break a client that bound early. A careful OpenAPI
@@ -41,19 +58,28 @@ Feature: Wednesday: six more kinds of change, each one release from Monday
     When a planted bed 2 is rendered at L0
     Then it offers exactly the form "garden:water-cell"
     And that form is titled "Water the bed" and targets "<target>"
-    And its body requires "milliliters"
-    And its state has the members "<members>"
 
     Examples:
-      | change             | target                     | members                     |
-      | move-url-kept      | /beds/2/actions/water      | moistureLevel               |
-      | rename-field-kept  | /beds/2/actions/water-cell | soilMoisture, moistureLevel |
-      | new-optional-input | /beds/2/actions/water-cell | moistureLevel               |
+      | change             | target                     |
+      | move-url-kept      | /beds/2/actions/water      |
+      | rename-field-kept  | /beds/2/actions/water-cell |
+      | new-optional-input | /beds/2/actions/water-cell |
+
+  Scenario: Under the careful changes, the state keeps the members a client already reads
+    Then under each change, a planted bed's state has the members
+      | change             | member        |
+      | move-url-kept      | moistureLevel |
+      | rename-field-kept  | soilMoisture  |
+      | rename-field-kept  | moistureLevel |
+      | new-optional-input | moistureLevel |
 
   Scenario: The new optional input offers its choices, and defaults to drip
     Given the garden is declared with the change "new-optional-input"
     When a planted bed 2 is rendered at L0
-    Then the water form's "method" is one of "drip, spray", defaulting to "drip"
+    Then the water form's "method" is one of these, defaulting to "drip"
+      | value |
+      | drip  |
+      | spray |
 
   Scenario: The moved act keeps its old path, which the OpenAPI description marks deprecated
     Given the garden is declared with the change "move-url-kept"

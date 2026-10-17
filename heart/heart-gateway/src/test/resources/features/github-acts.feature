@@ -14,23 +14,43 @@ Feature: Acts on GitHub pull requests, derived from GitHub's operations
     And pull request 482 of "acme/rockets" is "open" upstream, titled "Fix the login bug"
     And pull request 7 of "acme/rockets" is "closed" upstream, titled "Bump the engines"
 
-  Scenario: An open pull request offers close and merge; a closed one, reopen
+  Scenario: An open pull request offers what can be done to it; a closed one, reopen and edit
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the GitHub gateway offers "github:close, github:merge"
+    Then the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:merge          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
     When a client gets "/repos/acme/rockets/pulls/7" through the GitHub gateway
-    Then the GitHub gateway offers "github:reopen"
+    Then the GitHub gateway offers
+      | act           |
+      | github:reopen |
+      | github:edit   |
 
   Scenario: Close is pulls/update with the state closed
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     And the client sends "github:close" with {} and the ETag it holds
     Then the GitHub gateway answers 200
     And GitHub was asked to PATCH "/repos/acme/rockets/pulls/482" with {"state":"closed"}
-    And the GitHub gateway offers "github:reopen"
+    And the GitHub gateway offers
+      | act           |
+      | github:reopen |
+      | github:edit   |
 
   Scenario: Merge's form asks for the merge method and the commit's words, never the sha
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the form "github:merge" has the fields "merge_method, commit_title, commit_message"
-    And the form "github:merge" field "merge_method" is one of "merge, squash, rebase"
+    Then the form "github:merge" has the fields
+      | field          |
+      | merge_method   |
+      | commit_title   |
+      | commit_message |
+    And the form "github:merge" field "merge_method" is one of
+      | value  |
+      | merge  |
+      | squash |
+      | rebase |
 
   Scenario: Merge sends GitHub the head sha the client's view had
     Given pull request 482's head is at "a1b2c3"

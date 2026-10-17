@@ -1,10 +1,12 @@
 package com.artie.heart.spring
 
 import com.artie.heart.Dialect
+import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.SERVICE_DESC
+import com.artie.heart.Search
 import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
@@ -41,9 +43,16 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
         }
     }
 
-    suspend fun search(resource: HeartResource<*, *>, request: ServerRequest): ServerResponse {
+    suspend fun search(resource: HeartResource<*, *>, request: ServerRequest): ServerResponse =
+        page(request, resource.searched(request.pathVariables()) { request.queryParam(it).orElse(null) })
+
+    /** The sub-collection [relation] under the resource the request's path names, as a search's page. */
+    suspend fun listed(resource: HeartResource<*, *>, relation: String, request: ServerRequest): ServerResponse =
+        page(request, resource.listed(relation, request.pathVariables()))
+
+    private suspend fun page(request: ServerRequest, searched: Pair<Search, List<Found>>): ServerResponse {
         val page = request.queryParam("page").map { it.toIntOrNull() }.orElse(null) ?: 1
-        val (search, found) = resource.searched(request.pathVariables()) { request.queryParam(it).orElse(null) }
+        val (search, found) = searched
         if (HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())) {
             return PlainJson.respond(ServerResponse.ok(), SearchPages.plainPage(found, page, limits.pageSize))
         }

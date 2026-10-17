@@ -1,6 +1,7 @@
 package com.artie.gardenbed.bdd
 
 import com.lemonappdev.konsist.api.Konsist
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -9,10 +10,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 class LayoutSteps {
     private val scope get() = Konsist.scopeFromProduction()
 
-    @Then("the package {string} holds {string}")
-    fun packageHolds(pkg: String, names: String) {
+    @Then("the package {string} holds")
+    fun packageHolds(pkg: String, table: DataTable) {
         val held = scope.files.filter { it.packagee?.name == pkg }.map { it.name }.toSet()
-        val expected = names.split(",").map { it.trim() }
+        val expected = table.asMaps().map { it.getValue("file") }
         assertTrue(held.containsAll(expected), "$pkg holds $held")
     }
 
@@ -28,10 +29,10 @@ class LayoutSteps {
         assertEquals(listOf(pkg), where)
     }
 
-    @Then("{string} declares exactly {string}")
-    fun declaresExactly(name: String, members: String) {
+    @Then("{string} declares exactly")
+    fun declaresExactly(name: String, table: DataTable) {
         val declaration = scope.objects().single { it.name == name }
         val declared = (declaration.properties().map { it.name } + declaration.functions().map { it.name }).toSet()
-        assertEquals(members.split(",").map { it.trim() }.toSet(), declared)
+        assertEquals(table.asMaps().map { it.getValue("member") }.toSet(), declared)
     }
 }

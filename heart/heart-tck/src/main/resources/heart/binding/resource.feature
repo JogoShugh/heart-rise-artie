@@ -15,7 +15,10 @@ Feature: A declared resource and its acts, served over HTTP
     And the response has Cache-Control "no-cache"
     And the response has Vary "Accept, Prefer, Accept-Profile"
     And the response links its profile "https://w3id.org/heart-rise/hal-schema-forms"
-    And the response offers "home:switch-off, home:dim"
+    And the response offers
+      | form            |
+      | home:switch-off |
+      | home:dim        |
 
   Scenario: L2 links to the shared affordance set, and says which preference it applied
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "forms=link, schema=link"
@@ -38,8 +41,14 @@ Feature: A declared resource and its acts, served over HTTP
     Then the response status is 200
     And the response has Content-Type "application/prs.hal-forms+json"
     And the response has ETag "\"seq-3.hf.L0.{digest}\""
-    And the response has templates named "switchOff, dim"
-    And the response has templates targeting "/lamps/7/actions/switch-off, /lamps/7/actions/dim"
+    And the response has templates named
+      | template  |
+      | switchOff |
+      | dim       |
+    And the response has templates targeting
+      | target                      |
+      | /lamps/7/actions/switch-off |
+      | /lamps/7/actions/dim        |
 
   Scenario: Accept that names no dialect is refused
     When a client gets "/lamps/7" with Accept "text/html"
@@ -64,7 +73,10 @@ Feature: A declared resource and its acts, served over HTTP
     And the response has Content-Location "/lamps/7"
     And the response body has "brightness" 20
     When a client gets "/lamps/7" as hal-forms
-    Then the response has templates targeting "/lamps/7/actions/switch-off, /lamps/7/actions/dim"
+    Then the response has templates targeting
+      | target                      |
+      | /lamps/7/actions/switch-off |
+      | /lamps/7/actions/dim        |
 
   Scenario Outline: A refused act is a problem: <case>
     When a client posts <body> to "/lamps/7/actions/<path>" as hal-schema-forms with If-Match "<ifMatch>"
@@ -92,7 +104,13 @@ Feature: A declared resource and its acts, served over HTTP
 
   Scenario: The service index offers its own act, installing a lamp, beside its search and lookup
     When a client gets "/" as hal-schema-forms
-    Then the response offers "home:search-lamps, home:get-lamp, home:install-lamp, pulls:list, pulls:get"
+    Then the response offers
+      | form              |
+      | home:search-lamps |
+      | home:get-lamp     |
+      | home:install-lamp |
+      | pulls:list        |
+      | pulls:get         |
 
   Scenario Outline: An act on the bookmark that brings a lamp into being answers 201 with the new lamp in <dialect>
     When a client posts {"brightness": 20} to "/actions/install-lamp" as <dialect> with the index's ETag

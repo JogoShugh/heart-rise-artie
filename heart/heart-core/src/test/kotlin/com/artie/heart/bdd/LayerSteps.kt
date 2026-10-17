@@ -5,6 +5,7 @@ import com.artie.heart.Dialect
 import com.artie.heart.JsonTrees
 import com.artie.heart.Layers
 import com.artie.heart.Rung
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -27,17 +28,16 @@ class LayerSteps(private val world: LampWorld) {
         body = layers.layer1(lamps.getValue(id), Rung.valueOf("L$n"))
     }
 
-    @Then("the body has {string} {string} and {string} {long}")
-    fun bodyHas(key: String, value: String, idKey: String, id: Long) {
-        assertEquals(value, body[key])
-        assertEquals(id, body[idKey])
+    @Then("the body has these members")
+    fun bodyHas(table: DataTable) = table.asMaps().forEach { row ->
+        assertEquals(row.getValue("value"), body[row.getValue("member")].toString())
     }
 
     @Then("the body links {string} to {string}")
     fun bodyLinks(rel: String, href: String) = assertEquals(href, link(body, rel)["href"])
 
-    @Then("the body offers exactly {string}")
-    fun bodyOffers(keys: String) = assertEquals(names(keys), forms(body).keys)
+    @Then("the body offers exactly")
+    fun bodyOffers(table: DataTable) = assertEquals(names(table), forms(body).keys)
 
     @Then("the body has no forms")
     fun noForms() = assertFalse("_forms" in body)
@@ -83,8 +83,8 @@ class LayerSteps(private val world: LampWorld) {
         assertEquals(setLink["integrity"], ContentAddress.integrity(served()))
     }
 
-    @Then("the set offers exactly {string}")
-    fun setOffers(keys: String) = assertEquals(names(keys), forms(set).keys)
+    @Then("the set offers exactly")
+    fun setOffers(table: DataTable) = assertEquals(names(table), forms(set).keys)
 
     @Then("the {string} form targets {string}, templated, with the pointer {string} at {string}")
     fun setFormTargets(key: String, href: String, variable: String, pointer: String) {
@@ -154,7 +154,7 @@ class LayerSteps(private val world: LampWorld) {
         assertEquals(JsonTrees.plain(served), schema - member)
     }
 
-    private fun names(keys: String): Set<String> = keys.split(',').map { it.trim() }.toSet()
+    private fun names(table: DataTable): Set<String> = table.asMaps().map { it.getValue("act") }.toSet()
 
     private fun forms(of: Map<String, Any?>): Map<String, Any?> = of["_forms"] as Map<String, Any?>
 

@@ -129,7 +129,10 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
           - {href: /beds/1, title: South border}
       """
     When the client enters "http://garden.test/"
-    Then the manifest offers exactly "searchBeds, getBed"
+    Then the manifest offers exactly
+      | act        |
+      | searchBeds |
+      | getBed     |
     When the client acts on "searchBeds" with:
       """yaml
       name: south border

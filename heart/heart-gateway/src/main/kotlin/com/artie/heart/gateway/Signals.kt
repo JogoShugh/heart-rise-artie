@@ -63,6 +63,11 @@ class ODataActions(private val namespace: String?, private val names: NameMap = 
     }
 }
 
+/** The same acts in every state, as for a GitHub comment, which has none; the reader's rules take some away. */
+class Always(val allow: AllowedOperations) : AllowedNow {
+    override fun of(body: UpstreamBody, links: UpstreamLinks) = Allowed(allow)
+}
+
 /** One row of a state table: what a value of the state field allows, and why the rest are absent. */
 class TableRow(val allow: AllowedOperations, val absent: AbsenceReasons = emptyMap())
 

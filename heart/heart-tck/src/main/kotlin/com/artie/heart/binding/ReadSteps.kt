@@ -1,6 +1,7 @@
 package com.artie.heart.binding
 
 import com.artie.heart.binding.HttpWorld.Companion.accept
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -48,10 +49,11 @@ class ReadSteps(private val http: HttpWorld) {
     fun getAsOf(id: Long, dialect: String, days: Long) =
         getAs("/lamps/$id?asOf=${Instant.now().minus(Duration.ofDays(days))}", dialect)
 
-    @Then("the history is {string}, numbered {int} to {int}")
-    fun history(types: String, from: Int, to: Int) {
-        assertEquals(types, http.json.joinToString(", ") { it.path("type").asText() })
-        assertEquals((from..to).toList(), http.json.map { it.path("sequenceNo").asInt() })
+    @Then("the history is")
+    fun history(table: DataTable) {
+        val history = http.json
+            .map { mapOf("number" to it.path("sequenceNo").asText(), "type" to it.path("type").asText()) }
+        assertEquals(table.asMaps(), history)
     }
 
     @Then("the last event's {string} is {int}")

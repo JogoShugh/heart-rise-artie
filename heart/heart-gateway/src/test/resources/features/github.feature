@@ -20,7 +20,36 @@ Feature: The gateway in front of GitHub, known by its own description, sliced to
 
   Scenario: The profile has a relation for each act, and for each included operation no act is made of
     When a client gets "/profiles/github" through the GitHub gateway
-    Then the profile describes exactly "pulls-list, pulls-get, repos-get, close, reopen, merge"
+    Then the profile describes exactly these relations
+      | relation                |
+      | pulls-list              |
+      | pulls-get               |
+      | issues-list-for-repo    |
+      | issues-get              |
+      | repos-get               |
+      | users-get-authenticated |
+      | close                   |
+      | reopen                  |
+      | merge                   |
+      | edit                    |
+      | request-review          |
+      | update-branch           |
+      | close-not-planned       |
+      | close-duplicate         |
+      | lock                    |
+      | unlock                  |
+      | label                   |
+      | unlabel                 |
+      | assign                  |
+      | unassign                |
+      | set-milestone           |
+      | open-issue              |
+      | issues-list-comments    |
+      | issues-get-comment      |
+      | issues-list-sub-issues  |
+      | comment                 |
+      | add-sub-issue           |
+      | remove-sub-issue        |
 
   Scenario: The bookmark offers the search and lookup the resource file declares
     When a client gets "/" through the GitHub gateway
@@ -30,7 +59,11 @@ Feature: The gateway in front of GitHub, known by its own description, sliced to
   Scenario: The forms' fields keep the description's words and schemas
     When a client gets "/" through the GitHub gateway
     Then the index form "github:pulls-get" field "pull_number" has the type "integer"
-    And the index form "github:pulls-list" field "state" is one of "open, closed, all"
+    And the index form "github:pulls-list" field "state" is one of
+      | value  |
+      | open   |
+      | closed |
+      | all    |
     And the index form "github:pulls-list" field "owner" is described as "The account owner of the repository. The name is not case sensitive."
 
   Scenario: A pull request is read from GitHub at its own path, with the connector's headers

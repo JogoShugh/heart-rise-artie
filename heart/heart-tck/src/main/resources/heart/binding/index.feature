@@ -36,17 +36,25 @@ Feature: The bookmark and the searches, served over HTTP from the declarations
     When a client gets "/lamps?name=lamp" as hal-schema-forms
     Then the response status is 200
     And the response has Content-Type "application/hal+json"
-    And the response lists the items "/lamps/1" titled "Lamp 1", "/lamps/2" titled "Lamp 2"
+    And the response lists these items
+      | href     | title  |
+      | /lamps/1 | Lamp 1 |
+      | /lamps/2 | Lamp 2 |
 
   Scenario: A search answers in HAL-FORMS too
     When a client gets "/lamps?name=lamp" as hal-forms
     Then the response status is 200
     And the response has Content-Type "application/prs.hal-forms+json"
-    And the response lists the items "/lamps/1" titled "Lamp 1", "/lamps/2" titled "Lamp 2"
+    And the response lists these items
+      | href     | title  |
+      | /lamps/1 | Lamp 1 |
+      | /lamps/2 | Lamp 2 |
 
   Scenario: A lamp can also be looked up by id in the query, which lists exactly that lamp
     When a client gets "/lamps?id=2" as hal-schema-forms
-    Then the response lists the items "/lamps/2" titled "Lamp 2"
+    Then the response lists these items
+      | href     | title  |
+      | /lamps/2 | Lamp 2 |
 
   Scenario: The lookup form's target, filled from its field, is the lamp
     When a client gets "/" as hal-schema-forms
@@ -57,4 +65,7 @@ Feature: The bookmark and the searches, served over HTTP from the declarations
   Scenario: Both dialects' indexes offer the same forms, matched by title, but those HAL-FORMS cannot target
     When a client gets "/" as hal-schema-forms
     And a client gets "/" as hal-forms
-    Then the two indexes offer forms with the same titles, but for "List pull requests, Get a pull request"
+    Then the two indexes offer forms with the same titles, but for these
+      | title              |
+      | List pull requests |
+      | Get a pull request |

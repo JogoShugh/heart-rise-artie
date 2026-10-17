@@ -89,8 +89,12 @@ class Upstream(
      * say what its own refusals mean, where it names them: GitHub answers a
      * merge whose `sha` no longer matches with 409, which is a stale view.
      */
-    fun act(method: String, path: String, body: String, statuses: RefusalStatuses): Answer =
-        send(Request(Method.valueOf(method), path).header("Content-Type", JSON).body(body), statuses)
+    fun act(method: String, path: String, body: String, statuses: RefusalStatuses): Answer {
+        // A DELETE with nothing to say sends no body, as GitHub's unlock and remove-label expect.
+        val request = Request(Method.valueOf(method), path)
+        val sent = if (method == "DELETE" && body == "{}") request else request.header("Content-Type", JSON).body(body)
+        return send(sent, statuses)
+    }
 
     private fun send(request: Request, statuses: RefusalStatuses = RefusalStatuses()): Answer {
         val authorization = auth.authorization()
@@ -113,8 +117,10 @@ class Upstream(
         // RFC 9457 says it in detail; GitHub, in message.
         val detail = problem?.path("detail")?.asText(null) ?: problem?.path("message")?.asText(null)
             ?: "the upstream answered ${response.status}"
+        // An upstream that names no violation, as GitHub's 422s don't, still said why: the body as a whole.
         val violations = problem?.path("violations")?.toList().orEmpty()
             .map { Violation(it.path("pointer").asText(), it.path("message").asText()) }
+            .ifEmpty { listOf(Violation("", detail)) }
         return when {
             response.status.code == statuses.stale -> StaleWriteConflict(detail)
             response.status.code == statuses.refused -> NotOfferedException(detail)

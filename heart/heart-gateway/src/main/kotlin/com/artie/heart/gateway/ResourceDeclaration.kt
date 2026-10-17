@@ -25,10 +25,21 @@ class ResourceDeclaration(
     val title: JsonPointer?,
     val acts: List<ActDeclaration> = emptyList(),
     val facts: Map<String, FactDeclaration> = emptyMap(),
+    /** A listed item for which every one of these holds is not one of these resources: GitHub lists pulls as issues. */
+    val skip: List<Condition> = emptyList(),
+    /**
+     * Where the item's own URL is, when its state names its parts only there, as an issue's `/url` does:
+     * the read's path variables are read from it, and kept in the state as `hr:address`.
+     */
+    val address: JsonPointer? = null,
+    /** Other list operations whose members are these resources, each served at its own path: an issue's sub-issues. */
+    val lists: List<OperationId> = emptyList(),
+    /** List operations under one of these resources that another resource file searches by: an issue's comments. */
+    val links: List<OperationId> = emptyList(),
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
-        facts.values.map { it.operation }
+        facts.values.map { it.operation } + lists + links
 
     companion object {
         /** The declaration in [node], from the file [label], or a refusal naming it. */
@@ -55,6 +66,10 @@ class ResourceDeclaration(
                             .associate { (variable, at) -> variable to pointer(label, at.asText()).toString() },
                     )
                 },
+                skip = Condition.all(node.path("skip")),
+                address = node.path("address").asText(null)?.let { pointer(label, it) },
+                lists = node.path("lists").map { it.asText() },
+                links = node.path("links").map { it.asText() },
             )
         }
 

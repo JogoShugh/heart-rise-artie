@@ -10,6 +10,7 @@ import com.artie.heart.SharedContent
 import com.artie.heart.fixtures.Lamp
 import com.artie.heart.fixtures.Lamps
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -70,12 +71,12 @@ class OpenOfferSteps {
         assertEquals(link["integrity"], ContentAddress.integrity(set))
     }
 
-    @Then("that set offers exactly {string}")
-    fun offersExactly(keys: String) {
+    @Then("that set offers exactly")
+    fun offersExactly(table: DataTable) {
         val link = link(rendered.last(), Layers.FORMS_REL)
         val set = shared.affordanceSets.getValue(address(link, Layers.AFFORDANCE_SETS))
         val forms = ObjectMapper().readTree(set).path("_forms").fieldNames().asSequence().toList()
-        assertEquals(keys.split(", ").toSet(), forms.toSet())
+        assertEquals(table.asMaps().map { it.getValue("act") }.toSet(), forms.toSet())
     }
 
     @Then("both link the same affordance set")

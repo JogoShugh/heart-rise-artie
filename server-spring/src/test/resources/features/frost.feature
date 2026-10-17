@@ -49,7 +49,12 @@ Feature: Tuesday: a hard frost can freeze a planted bed
     When a client gets the OpenAPI description
     Then it is the published "garden-1.1.0.json"
     And its info version is "1.1.0"
-    And its "Bed" status enum is "EMPTY, PLANTED, READY_TO_HARVEST, FROZEN"
+    And its "Bed" status enum is
+      | status           |
+      | EMPTY            |
+      | PLANTED          |
+      | READY_TO_HARVEST |
+      | FROZEN           |
     And its operations include "POST /beds/{id}/actions/thaw"
     And the description of "waterCell" ends "Only allowed when status is PLANTED."
     And the description of "thaw" ends "Only allowed when status is FROZEN."

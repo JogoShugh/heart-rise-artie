@@ -101,7 +101,10 @@ Feature: HEART conformance over HTTP, for any declared resource type
   Scenario Outline: <what> needs a credential, and a refusal offers Basic and Bearer
     When a client with no credential <does>
     Then the response status is 401
-    And the response offers the challenges "Basic" and "Bearer"
+    And the response offers these challenges
+      | scheme |
+      | Basic  |
+      | Bearer |
     And the response is a problem of type "not-authenticated"
 
     Examples:

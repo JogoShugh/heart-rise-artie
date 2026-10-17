@@ -194,7 +194,10 @@ data class SearchField(
  * allows. [bookmarkActs] are offered by the service index, always: acts
  * whose result is a resource of this type that did not exist before, such
  * as a customer reporting a problem. The index offers them beside the
- * type's search, so such a type is also found ([finding]).
+ * type's search, so such a type is also found ([finding]). Each of
+ * [subCollections] is a collection under a resource, by a relation of the
+ * profile, at a URI template filled from the item path's variables: an
+ * issue's comments. Each resource links them.
  */
 // A declaration names each of its parts once, by name; grouping them would only rename them.
 @Suppress("LongParameterList")
@@ -206,6 +209,7 @@ class ResourceType<S, K>(
     val state: StateView<S, K>,
     val finding: Finding? = null,
     val bookmarkActs: List<Act> = emptyList(),
+    val subCollections: Map<String, UriTemplate> = emptyMap(),
 ) {
     /** Every act declared, the resources' and the bookmark's. */
     val allActs: List<Act> = acts + bookmarkActs
@@ -226,6 +230,21 @@ class ResourceType<S, K>(
             (ItemPath.variablesOf(path) + itemPath.variables).distinct().forEach {
                 require(it in named) { "$collection: no field for $it" }
             }
+        }
+        subCollections.forEach { (relation, path) ->
+            profile.relation(relation)
+            ItemPath.variablesOf(path).forEach {
+                require(it in itemPath.variables) { "$collection: the sub-collection $relation has no value for $it" }
+            }
+        }
+    }
+
+    /** Each sub-collection of the resource whose state reads as [body], keyed by its relation's CURIE. */
+    fun subCollectionLinks(body: Map<String, Any?>): Map<String, Map<String, String>> {
+        if (subCollections.isEmpty()) return emptyMap()
+        val values = itemPath.valuesOf(body)
+        return subCollections.entries.associate { (relation, path) ->
+            profile.key(relation) to mapOf("href" to ItemPath.fill(path, values))
         }
     }
 

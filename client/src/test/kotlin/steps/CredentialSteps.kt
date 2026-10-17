@@ -12,6 +12,7 @@ import heart.Origin
 import heart.Transport
 import kotlinx.serialization.json.Json
 import java.net.ConnectException
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -60,9 +61,11 @@ class CredentialSteps(private val ctx: ClientContext) {
     @Then("the request to {string} carried no Authorization")
     fun carriedNone(url: String) = assertNull(requestTo(url).header(AUTHORIZATION))
 
-    @Then("the requests carried Authorization {string}, then {string}")
-    fun carriedInTurn(first: String, second: String) =
-        assertEquals(listOf(first, second), ctx.transport.requests.map { it.header(AUTHORIZATION) })
+    @Then("the requests carried Authorization in turn")
+    fun carriedInTurn(table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("authorization") },
+        ctx.transport.requests.map { it.header(AUTHORIZATION) },
+    )
 
     @Then("the client sent no request")
     fun sentNone() = assertEquals(emptyList(), ctx.transport.requests.map { "${it.method} ${it.url}" })
@@ -202,10 +205,11 @@ class CredentialSteps(private val ctx: ClientContext) {
         logins.forEach { assertEquals(expected, Json.parseToJsonElement(it.body.orEmpty())) }
     }
 
-    @Then("the credential variables for {string} are {string}, {string} and {string}")
-    fun variables(origin: String, token: String, user: String, password: String) {
-        val names = EnvironmentCredentials.namesFor(Origin.of(origin))
-        assertEquals(listOf(token, user, password), listOf(names.token, names.user, names.password))
+    @Then("the credential variables for each origin are")
+    fun variables(table: DataTable) = table.asMaps().forEach { row ->
+        val names = EnvironmentCredentials.namesFor(Origin.of(row.getValue("origin")))
+        val expected = listOf(row.getValue("token"), row.getValue("user"), row.getValue("password"))
+        assertEquals(expected, listOf(names.token, names.user, names.password))
     }
 
     @Given("the environment holds:")

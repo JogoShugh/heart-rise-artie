@@ -17,7 +17,11 @@ Feature: Support tickets
   Scenario: A ticket opened from the bookmark is NEW, and waits for an agent
     When a customer opens a ticket from the bookmark with {"subject": "Cannot log in", "customer": "Dana Reyes", "description": "The login button does nothing.", "priority": "high"}
     Then ticket 1 is "NEW" with priority "high" and no agent
-    And the ticket offers exactly "support:assign, support:comment, support:change-priority"
+    And the ticket offers exactly
+      | act                     |
+      | support:assign          |
+      | support:comment         |
+      | support:change-priority |
     And "support:resolve" is absent because "No one is assigned; assign the ticket first."
     And "support:customer-replies" is absent because "The customer has not been asked anything."
 
@@ -25,7 +29,13 @@ Feature: Support tickets
     Given ticket 1 was opened about "Cannot log in"
     When the agent records "assign" on ticket 1 with {"agent": "priya"}
     Then ticket 1 is "ASSIGNED" to "priya"
-    And the ticket offers exactly "support:assign, support:comment, support:ask-customer, support:resolve, support:change-priority"
+    And the ticket offers exactly
+      | act                     |
+      | support:assign          |
+      | support:comment         |
+      | support:ask-customer    |
+      | support:resolve         |
+      | support:change-priority |
 
   Scenario: The agent is chosen from another resource: the agents on duty who handle the ticket's priority
     HAL-SCHEMA-FORMS-HR Rule 8. The form does not list agents. It links to
@@ -36,7 +46,11 @@ Feature: Support tickets
     Then the form "support:assign" takes "agent" from the link "/agents{?priority}", filled from "/priority"
     And it keeps only the agents whose "onDuty" is true, by their "name"
     When a client reads the agents for priority "high"
-    Then the agents listed are "priya, marco, lena", each with whether they are on duty
+    Then these agents are listed, each with whether they are on duty
+      | agent |
+      | priya |
+      | marco |
+      | lena  |
     And that answer is revalidated on every use, by its ETag
 
   Scenario Outline: An agent outside the choices is refused: <case>
@@ -61,7 +75,12 @@ Feature: Support tickets
     And ticket 1 is assigned to "priya"
     When the agent records "ask-customer" on ticket 1 with {"question": "Which browser do you use?"}
     Then ticket 1 is "WAITING_ON_CUSTOMER" to "priya"
-    And the ticket offers exactly "support:comment, support:customer-replies, support:resolve, support:change-priority"
+    And the ticket offers exactly
+      | act                      |
+      | support:comment          |
+      | support:customer-replies |
+      | support:resolve          |
+      | support:change-priority  |
     And "support:ask-customer" is absent because "The customer has already been asked; wait for their reply."
     When the agent records "customer-replies" on ticket 1 with {"text": "Firefox, on a laptop."}
     Then ticket 1 is "ASSIGNED" to "priya"
@@ -79,7 +98,11 @@ Feature: Support tickets
     And ticket 1 is assigned to "priya"
     When the agent records "resolve" on ticket 1 with {"resolution": "Cleared the session cookie."}
     Then ticket 1 is "RESOLVED" to "priya"
-    And the ticket offers exactly "support:reopen, support:close, support:change-priority"
+    And the ticket offers exactly
+      | act                     |
+      | support:reopen          |
+      | support:close           |
+      | support:change-priority |
     And "support:comment" is absent because "The ticket is resolved; reopen it first."
 
   Scenario: Reopening hands a resolved ticket back to its agent

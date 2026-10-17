@@ -75,7 +75,16 @@ Feature: ARTIE leaves breadcrumbs: trace context and an event log
     When the client enters "http://garden.test/beds/3"
     Then the event log has "rung.applied" with "heart.rung" "L0" for the request to "http://garden.test/beds/3"
     And the event log has "forms.skipped" with "heart.forms.href" "http://garden.test/affordance-sets/x" for the request to "http://garden.test/beds/3"
-    And every event line has the fields "timestamp, trace_id, span_id, severity_text, event_name, body, attributes, resource"
+    And every event line has exactly these fields
+      | field         |
+      | timestamp     |
+      | trace_id      |
+      | span_id       |
+      | severity_text |
+      | event_name    |
+      | body          |
+      | attributes    |
+      | resource      |
 
   Scenario: Tampered bytes are refused, and the log says so
     Given the client keeps an event log

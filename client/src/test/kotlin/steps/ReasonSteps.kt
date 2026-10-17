@@ -8,6 +8,7 @@ import heart.LinkOffer
 import heart.Offer
 import heart.Reasoner
 import heart.Selection
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -122,10 +123,10 @@ class ReasonSteps(private val ctx: ClientContext) {
         assertEquals(detail, offer.detail)
     }
 
-    @Then("the reasoner was shown the links {string} and no URI")
-    fun shownLinks(expected: String) {
+    @Then("the reasoner was shown these links and no URI")
+    fun shownLinks(table: DataTable) {
         val links = (reasoner as ScriptedReasoner).shownLinks.single()
-        assertEquals(expected, links.joinToString { "${it.rel}: ${it.title}" })
+        assertEquals(table.asMaps(), links.map { mapOf("rel" to it.rel, "title" to it.title) })
         assertFalse(links.toString().contains("/beds"), "links leaked a URI: $links")
     }
 
@@ -249,10 +250,10 @@ class ReasonSteps(private val ctx: ClientContext) {
         ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
     }
 
-    @Then("the Claude request shows {string} and {string}")
-    fun claudeShowsText(first: String, second: String) {
+    @Then("the Claude request shows these texts")
+    fun claudeShowsText(table: DataTable) {
         val raw = ctx.transport.requests.last { it.url == ClaudeReasoner.ENDPOINT }.body.orEmpty()
-        assertTrue(raw.contains(first) && raw.contains(second), raw)
+        table.asMaps().forEach { assertTrue(raw.contains(it.getValue("text")), raw) }
     }
 
     @Given("the Claude API will answer with a tool call explaining {string}")

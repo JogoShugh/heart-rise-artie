@@ -27,14 +27,16 @@ class ItemPath(val template: UriTemplate, val pointers: Map<String, StatePointer
     }
 
     /** The address of the resource whose state reads as [body], every variable filled and encoded. */
-    fun expand(body: Map<String, Any?>): String {
+    fun expand(body: Map<String, Any?>): String = fill(template, valuesOf(body))
+
+    /** Each variable's value in the resource whose state reads as [body]: `owner` to `acme`. */
+    fun valuesOf(body: Map<String, Any?>): PathVariables {
         val tree: JsonNode = MAPPER.valueToTree(body)
-        val values = pointers.mapValues { (_, pointer) ->
+        return pointers.mapValues { (_, pointer) ->
             val value = tree.at(pointer)
             check(!value.isMissingNode && !value.isNull) { "the state has nothing at $pointer" }
             value.asText()
         }
-        return fill(template, values)
     }
 
     companion object {

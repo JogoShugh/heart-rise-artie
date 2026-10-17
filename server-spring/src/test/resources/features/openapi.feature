@@ -14,13 +14,20 @@ Feature: Monday: the garden as an OpenAPI 3.1 description
     Given the garden serves affordance links
     When the garden's OpenAPI description is built
     Then the built description's version is "1.0.0+affordance-links"
-    And the built description documents the Link header on "getBed" and "waterCell"
+    And the built description documents the Link header on these operations
+      | operation |
+      | getBed    |
+      | waterCell |
     And the built description names the affordance relation "https://w3id.org/heart-rise/rels/forms"
 
   Scenario: Monday's OpenAPI description is the published version 1.0.0, byte for byte
     When a client gets the OpenAPI description
     Then it is the published "garden-1.0.0.json"
     And its info version is "1.0.0"
-    And its "Bed" status enum is "EMPTY, PLANTED, READY_TO_HARVEST"
+    And its "Bed" status enum is
+      | status           |
+      | EMPTY            |
+      | PLANTED          |
+      | READY_TO_HARVEST |
     And the description of "waterCell" ends "Only allowed when status is PLANTED."
     And the operation "waterCell" takes the schema "WaterCellRequest", which is the water-cell form's schema

@@ -12,6 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import io.cucumber.java.Before
 import io.cucumber.java.Scenario
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -87,8 +88,8 @@ class McpSteps(private val host: McpHost) {
         fail("no Bearer token for $origin in the environment or $file")
     }
 
-    @Then("the host sees exactly the tools {string}")
-    fun seesTools(names: String) = assertEquals(list(names), host.tools().map { it.name })
+    @Then("the host sees exactly these tools")
+    fun seesTools(table: DataTable) = assertEquals(list(table, "tool"), host.tools().map { it.name })
 
     @Then("no tool takes an input named like an address, a method or a header")
     fun noAddressInputs() {
@@ -148,9 +149,9 @@ class McpSteps(private val host: McpHost) {
         other.act("garden:water-cell", buildJsonObject { put("milliliters", milliliters) })
     }
 
-    @Then("the result offers exactly the acts {string}")
-    fun offersExactly(names: String) =
-        assertEquals(list(names).sorted(), ok()["acts"]!!.jsonArray.map { it.jsonObject.string("name") }.sorted())
+    @Then("the result offers exactly these acts")
+    fun offersExactly(table: DataTable) =
+        assertEquals(list(table, "act").sorted(), ok()["acts"]!!.jsonArray.map { it.jsonObject.string("name") }.sorted())
 
     @Then("every offered act has a title and a schema")
     fun actsDescribed() = ok()["acts"]!!.jsonArray.forEach { act ->
@@ -219,7 +220,7 @@ class McpSteps(private val host: McpHost) {
 
     private fun JsonObject.string(name: String): String = this[name]?.jsonPrimitive?.content.orEmpty()
 
-    private fun list(names: String) = names.split(",").map { it.trim() }
+    private fun list(table: DataTable, column: String) = table.asMaps().map { it.getValue(column) }
 
     companion object {
         private val ADDRESS_KEYS = setOf("href", "target", "\$id", "\$ref", "url", "method")

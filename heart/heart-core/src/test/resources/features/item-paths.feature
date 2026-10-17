@@ -42,7 +42,11 @@ Feature: Where a resource lives: its item path, filled from its own state
 
   Scenario: The OpenAPI description serves the item path, with a parameter for each variable
     When the OpenAPI description of the pull request type is rendered
-    Then it has the path "/repos/{owner}/{repo}/pulls/{number}" with the parameters "owner, repo, number"
+    Then it has the path "/repos/{owner}/{repo}/pulls/{number}" with these parameters
+      | parameter |
+      | owner     |
+      | repo      |
+      | number    |
     And it has the path "/repos/{owner}/{repo}/pulls/{number}/actions/close"
 
   Scenario: An item path variable with no pointer is refused when the type is declared

@@ -144,7 +144,8 @@ class ResourceHandler<S, K>(
             val checked = pipeline.checkOffered(name) { resource.locate(variables) }
             pipeline.run(name, body(request), checked) { input -> resource.perform(checked, name, input) }
         }
-        return plain(Response(Status.OK).header(CONTENT_LOCATION, resource.location(done.state)), done.state)
+        val answered = added(Response(Status.OK).header(CONTENT_LOCATION, resource.location(done.state)), done)
+        return plain(answered, done.state)
     }
 
     /** Plain JSON: a body with no links, forms, profile or validator; only Accept chooses it. */
@@ -194,8 +195,11 @@ class ResourceHandler<S, K>(
         }
 
         /** The act's own headers, as the domain gave them. */
-        fun added(response: Response, done: Acted<*>): Response =
-            done.headers.entries.fold(response) { r, (name, value) -> r.header(name, value) }
+        fun added(response: Response, done: Acted<*>): Response {
+            val headed = done.headers.entries.fold(response) { r, (name, value) -> r.header(name, value) }
+            // An act that brought another resource into being: 201, and Location names it (RFC 9110 §15.3.2).
+            return done.created?.let { headed.status(Status.CREATED).header(LOCATION, it) } ?: headed
+        }
 
         fun body(request: Request): String? = request.bodyString().ifEmpty { null }
 

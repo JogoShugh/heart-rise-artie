@@ -1,0 +1,39 @@
+#!/bin/sh
+# Builds a run report: one self-contained HTML page from a trace (heart-run-report skill), with the viewer
+# inlined from this folder, so the page works on GitHub Pages and as an artifact alike.
+#
+#   build-run-report.sh TRACE.json OUT.html "Title" "One sentence saying what was run, against what."
+set -eu
+trace=$1 out=$2 title=$3 lede=$4
+here=$(cd "$(dirname "$0")" && pwd)
+
+# Text for HTML: & < > escaped. JSON in a script element: "</" written "<\/", which JSON allows.
+html_escape() { printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
+safe_title=$(html_escape "$title")
+safe_lede=$(html_escape "$lede")
+
+TITLE=$safe_title LEDE=$safe_lede awk \
+    -v rrcss="$here/run-report.css" -v jvcss="$here/json-view.css" \
+    -v jvjs="$here/json-view.js" -v rrjs="$here/run-report.js" -v trace="$trace" '
+  BEGIN { title = ENVIRON["TITLE"]; lede = ENVIRON["LEDE"] }
+  function emit(file,   line) { while ((getline line < file) > 0) print line; close(file) }
+  function emit_trace(file,   line) {
+    while ((getline line < file) > 0) { gsub(/<\//, "<\\/", line); print line }
+    close(file)
+  }
+  /\/\*@RUN_REPORT_CSS@\*\// { emit(rrcss); next }
+  /\/\*@JSON_VIEW_CSS@\*\//  { emit(jvcss); next }
+  /\/\*@JSON_VIEW_JS@\*\//   { emit(jvjs); next }
+  /\/\*@RUN_REPORT_JS@\*\//  { emit(rrjs); next }
+  /@TRACE@/ {
+    split($0, parts, "@TRACE@"); printf "%s", parts[1]; emit_trace(trace); print parts[2]; next
+  }
+  # Literal replacement: gsub would read "&" in the text as the match.
+  function swap(s, from, to,   i, out) {
+    out = ""
+    while ((i = index(s, from)) > 0) { out = out substr(s, 1, i - 1) to; s = substr(s, i + length(from)) }
+    return out s
+  }
+  { print swap(swap($0, "@TITLE@", title), "@LEDE@", lede) }
+' "$here/run-report.html" > "$out"
+echo "wrote $out"

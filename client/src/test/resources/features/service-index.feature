@@ -69,7 +69,10 @@ Feature: Enter at the service index and find a bed
     And the client enters "http://garden.test/"
 
   Scenario: The index is a manifest like any other
-    Then the manifest offers exactly "searchBeds, getBed"
+    Then the manifest offers exactly
+      | act        |
+      | searchBeds |
+      | getBed     |
 
   Scenario: A search form fills its query from its field, percent-encoded, and sends no body or If-Match
     When the client acts on "searchBeds" with:

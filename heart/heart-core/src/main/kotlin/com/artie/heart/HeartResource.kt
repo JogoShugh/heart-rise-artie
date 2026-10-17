@@ -2,8 +2,12 @@ package com.artie.heart
 
 import java.time.Instant
 
-/** What an act left behind: the resource's new state, and any headers the act adds to its answer. */
-data class Acted<S>(val state: S, val headers: Map<String, String> = emptyMap())
+/**
+ * What an act left behind: the resource's new state, any headers the act
+ * adds to its answer, and, for an act that brought another resource into
+ * being, where that one is: the answer is then 201, naming it in Location.
+ */
+data class Acted<S>(val state: S, val headers: Map<String, String> = emptyMap(), val created: String? = null)
 
 /**
  * One search result: a resource's id, the title its `item` link carries, and
@@ -56,6 +60,12 @@ class HeartResource<S, K>(
     val loadAt: (suspend (PathVariables) -> S)? = null,
     /** How a type that declares its collection path is searched: by its search form's fields, as filled. */
     val search: (suspend (SearchValues) -> List<Found>)? = null,
+    /**
+     * The type's sub-collections whose members are this type's resources, by
+     * relation: each lists the members under the resource its path's
+     * variables name, and throws [ResourceNotFoundException] when there is none.
+     */
+    val lists: Map<String, suspend (PathVariables) -> List<Found>> = emptyMap(),
 ) {
     private val type = layers.type
 
@@ -74,6 +84,14 @@ class HeartResource<S, K>(
         require(collectionPath == (search != null)) {
             "${type.collection}: a declared collection path needs search, and only it does"
         }
+        lists.keys.forEach { require(it in type.subCollections) { "${type.collection}: $it is no sub-collection" } }
+    }
+
+    /** The sub-collection [relation] under the resource a request's path filled with [variables]. */
+    suspend fun listed(relation: String, variables: PathVariables): Pair<Search, List<Found>> {
+        val path = ItemPath.fill(type.subCollections.getValue(relation), variables)
+        val found = lists.getValue(relation)(variables)
+        return Search(type.collection, path = path, item = type.itemPath.template) to found
     }
 
     /**

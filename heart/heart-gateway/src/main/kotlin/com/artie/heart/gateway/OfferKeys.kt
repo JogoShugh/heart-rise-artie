@@ -12,21 +12,28 @@ import java.util.concurrent.ConcurrentHashMap
  * Where the upstream's signal says why an act is absent, the reasons are
  * part of the key, and the first answer with that key gives them.
  */
-internal class OfferKeys(private val acts: List<Act>, private val read: (Answer) -> Reading) {
+internal class OfferKeys(
+    private val acts: List<Act>,
+    private val read: (Answer) -> Reading,
+    /** What a reader calls an act: its operationId, or, for a resource file's acts, its relation. */
+    private val named: (Act) -> String = { it.name },
+) {
     /** Why the acts a key leaves out are absent, as the upstream's signal said the first time it sent that key. */
     private val reasons = ConcurrentHashMap<String, AbsenceReasons>()
 
     val offers = Offers<String>(
         keys = emptyList(),
         offered = { key -> key.substringBefore(REASONS).split(',').filter { it.isNotEmpty() } },
-        whyAbsent = { key, act -> reasons[key]?.get(act) ?: NOT_NOW },
+        whyAbsent = { key, act ->
+            reasons[key]?.get(acts.firstOrNull { it.name == act }?.let(named) ?: act) ?: NOT_NOW
+        },
         open = true,
     )
 
     /** [answer] as a state, keyed by the acts its signal allows, in the order they are declared. */
     fun state(answer: Answer): UpstreamState {
         val reading = read(answer)
-        val offered = acts.filter { it.name in reading.allowed.operations }.joinToString(",") { it.name }
+        val offered = acts.filter { named(it) in reading.allowed.operations }.joinToString(",") { it.name }
         // Two answers that allow the same acts for different reasons explain their absences differently,
         // so the reasons are part of the key; equal reasons still share one affordance set.
         val said = reading.allowed.reasons

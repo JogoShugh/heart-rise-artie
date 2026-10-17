@@ -9,6 +9,7 @@ import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.eventsourcing.InMemoryEventStore
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -74,9 +75,9 @@ class GameSteps(
     @When("the scorer takes back game {long}'s play number {int}")
     fun takeBack(id: Long, sequenceNo: Int) = act("correct-score", id, """{"sequenceNo": $sequenceNo}""")
 
-    @Then("the game offers exactly {string}")
-    fun offers(keys: String) {
-        assertEquals(keys.split(",").map { it.trim() }.toSet(), forms())
+    @Then("the game offers exactly")
+    fun offers(table: DataTable) {
+        assertEquals(table.asMaps().map { it.getValue("act") }.toSet(), forms())
     }
 
     @Then("the game offers nothing")

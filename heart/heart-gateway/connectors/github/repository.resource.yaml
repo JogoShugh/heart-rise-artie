@@ -1,0 +1,17 @@
+# A repository: read by repos/get. It is where new issues come from: GitHub's issues/create
+# is an act the repository offers, and GitHub's answer is the new issue (spec/PLAN-GITHUB-ISSUES.md, I5).
+noun: repository
+collection: repos
+read: repos/get
+# Where each variable of the read's path is, in a repository's state.
+pointers:
+  owner: /owner/login
+  repo: /name
+acts:
+  open-issue:
+    operation: issues/create
+    title: Open an issue
+    description: Open a new issue in this repository.
+    fields: [title, body, assignees, labels, milestone]
+    # GitHub answers with the new issue; the gateway answers 201, with the issue's address in Location.
+    creates: issue

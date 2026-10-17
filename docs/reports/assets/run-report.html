@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@TITLE@</title>
+<meta name="description" content="@LEDE@">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/*@RUN_REPORT_CSS@*/
+/*@JSON_VIEW_CSS@*/
+</style>
+</head>
+<body>
+<main class="rr-wrap">
+  <header>
+    <h1>@TITLE@</h1>
+    <p class="rr-lede">@LEDE@</p>
+  </header>
+  <div id="run-report"></div>
+</main>
+<script type="application/json" id="run-trace">@TRACE@</script>
+<script>
+/*@JSON_VIEW_JS@*/
+</script>
+<script>
+/*@RUN_REPORT_JS@*/
+</script>
+</body>
+</html>

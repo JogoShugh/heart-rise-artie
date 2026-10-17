@@ -52,6 +52,8 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         val body = LinkedHashMap(type.state.bodyOf(state))
         val item = type.itemPath.expand(body)
         val self = mapOf("href" to item)
+        // Sub-collections name this resource, so their links are Layer 1, never in a shared set.
+        val collections = type.subCollectionLinks(body)
         val rendering = rung.setRendering
         if (rendering == null) {
             body["_links"] = mapOf(
@@ -59,14 +61,14 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
                 "curies" to type.profile.curies + HR_CURIE,
                 // SPEC §6.12: at L0 the set is embedded, so its explanation link is in Layer 1.
                 UNAVAILABLE_REL to explanationLink(key),
-            )
+            ) + collections
             body["_forms"] = forms(offered(key), embedSchemas = true).mapValues { (_, form) -> resolved(form, item) }
         } else {
             val set = affordanceSet(key, rendering)
             body["_links"] = mapOf(
                 "self" to self,
                 // SPEC §6.1: the rel is $HEART_RISE_PROFILE/rels/forms, written as the CURIE hr:forms.
-                "curies" to listOf(HR_CURIE),
+                "curies" to (if (collections.isEmpty()) emptyList() else type.profile.curies) + HR_CURIE,
                 FORMS_REL to mapOf(
                     "href" to AFFORDANCE_SETS + ContentAddress.address(set),
                     "type" to Dialect.JSONSCHEMA.mediaType,
@@ -75,7 +77,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
                     // HAL-SCHEMA-FORMS-HR Rule 2: what the set's bytes must hash to.
                     "integrity" to ContentAddress.integrity(set),
                 ),
-            )
+            ) + collections
         }
         return body
     }
@@ -102,7 +104,9 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     fun halForms(state: S): Map<String, Any?> {
         val body = LinkedHashMap(type.state.bodyOf(state))
         val item = type.itemPath.expand(body)
-        body["_links"] = mapOf("self" to mapOf("href" to item))
+        val collections = type.subCollectionLinks(body)
+        body["_links"] = mapOf("self" to mapOf("href" to item)) +
+            (if (collections.isEmpty()) emptyMap() else mapOf("curies" to type.profile.curies) + collections)
         val templates = offered(type.state.keyOf(state)).associate { name ->
             val act = type.act(name)
             name to mapOf(

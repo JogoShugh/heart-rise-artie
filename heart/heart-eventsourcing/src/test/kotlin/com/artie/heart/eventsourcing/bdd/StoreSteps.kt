@@ -52,11 +52,15 @@ class StoreSteps {
     @Given("lamp {long} records SwitchedOn")
     fun recordsOn(id: Long) = runBlocking { record(id, LampEvent.SwitchedOn) }
 
-    @When("lamp {long} records SwitchedOn, then Dimmed to {int}, then Dimmed to {int}")
-    fun recordsThree(id: Long, first: Int, second: Int) = runBlocking {
-        record(id, LampEvent.SwitchedOn)
-        record(id, LampEvent.Dimmed(first))
-        record(id, LampEvent.Dimmed(second))
+    @When("lamp {long} records these events")
+    fun recordsThese(id: Long, table: DataTable) = runBlocking {
+        table.asMaps().forEach { row ->
+            val event = when (row.getValue("event")) {
+                "SwitchedOn" -> LampEvent.SwitchedOn
+                else -> LampEvent.Dimmed(row.getValue("brightness").toInt())
+            }
+            record(id, event)
+        }
     }
 
     @When("two writers both record an event as lamp {long}'s number {int}")
@@ -105,11 +109,11 @@ class StoreSteps {
         assertEquals(version, store.state(lamps, id).version)
     }
 
-    @Then("lamp {long}'s history is {string}, numbered {int} to {int}")
-    fun history(id: Long, types: String, from: Int, to: Int) = runBlocking {
+    @Then("lamp {long}'s history is")
+    fun history(id: Long, table: DataTable) = runBlocking {
         val history = store.history(lamps, id)
-        assertEquals(types, history.joinToString(", ") { lamps.typeOf(it.event) })
-        assertEquals((from..to).toList(), history.map { it.sequenceNo })
+            .map { mapOf("number" to "${it.sequenceNo}", "type" to lamps.typeOf(it.event)) }
+        assertEquals(table.asMaps(), history)
     }
 
     @Then("the state read from the latest snapshot equals the state folded from the first event")

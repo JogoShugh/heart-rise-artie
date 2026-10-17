@@ -162,6 +162,12 @@ Feature: One schema per act: generated from its input class, and enforced as ser
       | {"brightness": "lots"}                | refused at "/brightness"          |
       | {}                                    | refused at "/brightness"          |
       | {"brightness": 50, "label": ""}       | refused at "/label"               |
-      | {"label": ""}                         | refused at "/brightness, /label"  |
       |                                       | refused at "/brightness"          |
       | {"brightness":                        | malformed                         |
+
+  Scenario: A body wrong in two places is refused at each
+    When the body {"label": ""} is checked against the schema of "Dim"
+    Then the body is refused at these pointers
+      | pointer     |
+      | /brightness |
+      | /label      |

@@ -91,7 +91,6 @@ class HttpWorld(
             else -> error("unknown dialect $dialect")
         }
 
-        fun names(list: String): Set<String> = list.split(",").map { it.trim() }.toSet()
 
         /** A validator whose digest the scenario leaves to be filled: "seq-3.hsf.L0.{digest}". */
         private val DIGEST = Regex("""seq-(\d+)\.(hsf|hf)\.(L\d)\.\{digest}""")

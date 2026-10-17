@@ -4,6 +4,7 @@ import com.artie.heart.ContentAddress
 import com.artie.heart.Layers
 import com.artie.heart.SharedContent
 import com.artie.heart.fixtures.Lamps
+import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,14 +15,14 @@ class ContentSteps {
     private var shared: SharedContent? = null
     private var single: Layers<*, *>? = null
 
-    @When("^the bodies (.+) are named by their addresses$")
-    fun namedByAddress(bodies: String) {
-        named = runCatching { SharedContent.named(bodies(bodies)) }
+    @When("these bodies are named by their addresses")
+    fun namedByAddress(table: DataTable) {
+        named = runCatching { SharedContent.named(bodies(table)) }
     }
 
-    @When("^the bodies (.+) are named by a naming that gives every body the name \"(.+)\"$")
-    fun namedByOneName(bodies: String, name: String) {
-        named = runCatching { SharedContent.named(bodies(bodies)) { name } }
+    @When("these bodies are named by a naming that gives every body the name {string}")
+    fun namedByOneName(name: String, table: DataTable) {
+        named = runCatching { SharedContent.named(bodies(table)) { name } }
     }
 
     @Then("{int} bodies are named")
@@ -54,5 +55,5 @@ class ContentSteps {
     }
 
     /** `{"a":1}, {"a":2} and {"a":1}` as the three JSON texts. */
-    private fun bodies(text: String): List<String> = text.split(Regex(", | and "))
+    private fun bodies(table: DataTable): List<String> = table.asMaps().map { it.getValue("body") }
 }

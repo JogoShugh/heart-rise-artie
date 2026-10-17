@@ -6,10 +6,8 @@ Feature: Where ARTIE finds credentials
 
   Rule: Environment variables name the origin they are for
 
-    Scenario Outline: The variable names come from the origin: <origin>
-      Then the credential variables for "<origin>" are "<token>", "<user>" and "<password>"
-
-      Examples:
+    Scenario: The variable names come from the origin
+      Then the credential variables for each origin are
         | origin                      | token                           | user                           | password                           |
         | http://localhost:8080       | ARTIE_TOKEN_LOCALHOST_8080      | ARTIE_USER_LOCALHOST_8080      | ARTIE_PASSWORD_LOCALHOST_8080      |
         | https://garden.example      | ARTIE_TOKEN_GARDEN_EXAMPLE_443  | ARTIE_USER_GARDEN_EXAMPLE_443  | ARTIE_PASSWORD_GARDEN_EXAMPLE_443  |

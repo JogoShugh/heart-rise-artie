@@ -1,0 +1,105 @@
+# An issue: read by issues/get, a repository's listed by issues/list-for-repo.
+noun: issue
+collection: issues
+read: issues/get
+search: issues/list-for-repo
+# An issue names its owner and repository only in its own URL: the gateway reads the read's path variables
+# from it, and keeps them in the state as hr:address, for forms to fill their targets from.
+address: /url
+filters: [state, labels, assignee, creator, mentioned, milestone, sort, direction, since]
+title: /title
+# GitHub lists pull requests as issues too; those are the pull request resource's.
+skip:
+  /pull_request: { present: true }
+# Lists under an issue, each linked from it: its sub-issues, which are issues, so served here,
+# and its comments, which the comment resource searches by.
+lists: [issues/list-sub-issues]
+links: [issues/list-comments]
+# Other answers the reader's rules read: the repository's permissions for the caller, and the caller.
+facts:
+  repository:
+    operation: repos/get
+    pointers:
+      owner: /hr:address/owner
+      repo: /hr:address/repo
+  user:
+    operation: users/get-authenticated
+acts:
+  close:
+    operation: issues/update
+    title: Close
+    description: Close it; a pull request unmerged, an issue as completed.
+    body: { state: closed, state_reason: completed }
+  close-not-planned:
+    operation: issues/update
+    title: Close as not planned
+    description: Close the issue as something that won't be done.
+    body: { state: closed, state_reason: not_planned }
+  close-duplicate:
+    operation: issues/update
+    title: Close as a duplicate
+    description: Close the issue as a duplicate of another, named by its id.
+    body: { state: closed, state_reason: duplicate }
+    fields: [duplicate_issue_id]
+  reopen:
+    operation: issues/update
+    title: Reopen
+    description: Open it again.
+    body: { state: open, state_reason: reopened }
+  edit:
+    operation: issues/update
+    title: Edit
+    description: Change its title or description.
+    fields: [title, body]
+  lock:
+    operation: issues/lock
+    title: Lock the conversation
+    description: Limit the conversation to collaborators, for a reason.
+    fields: [lock_reason]
+  unlock:
+    operation: issues/unlock
+    title: Unlock the conversation
+    description: Let everyone comment again.
+  label:
+    operation: issues/add-labels
+    title: Label
+    description: Add labels to the issue.
+    fields: [labels]
+  unlabel:
+    operation: issues/remove-label
+    title: Remove a label
+    description: Take one label off the issue, by its name.
+    # GitHub names the label in its path, /labels/{name}: the form asks for it, the gateway puts it there.
+    fields: [name]
+  assign:
+    operation: issues/add-assignees
+    title: Assign
+    description: Assign people to the issue.
+    fields: [assignees]
+  unassign:
+    operation: issues/remove-assignees
+    title: Unassign
+    description: Take people off the issue.
+    fields: [assignees]
+  set-milestone:
+    operation: issues/update
+    title: Set the milestone
+    description: Put the issue in a milestone, by its number, or take it out with null.
+    fields: [milestone]
+  comment:
+    operation: issues/create-comment
+    title: Comment
+    description: Add a comment to the issue's conversation.
+    fields: [body]
+    # GitHub answers with the new comment; the gateway answers 201, with the comment's address in Location.
+    creates: comment
+  add-sub-issue:
+    operation: issues/add-sub-issue
+    title: Add a sub-issue
+    description: Make another issue a sub-issue of this one, named by its id (not its number).
+    fields: [sub_issue_id, replace_parent]
+  remove-sub-issue:
+    operation: issues/remove-sub-issue
+    title: Remove a sub-issue
+    description: Take a sub-issue off this issue, named by its id (not its number).
+    fields: [sub_issue_id]

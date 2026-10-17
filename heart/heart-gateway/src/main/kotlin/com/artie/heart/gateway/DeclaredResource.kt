@@ -28,6 +28,8 @@ import java.net.URLEncoder
  * Each form's field keeps the description's words and schema. Its acts are
  * projections of the upstream's operations (ActDeclaration).
  */
+// The file, the description and the upstream are each its own part; grouping them would only rename them.
+@Suppress("LongParameterList")
 internal class DeclaredResource(
     private val declared: ResourceDeclaration,
     private val spec: GatewaySpec,
@@ -35,16 +37,35 @@ internal class DeclaredResource(
     private val calls: Upstream,
     read: (Answer) -> Reading,
     private val mapper: ObjectMapper,
+    /** Where a resource of another declared type lives, by its noun and the upstream's answer for it. */
+    private val locate: (noun: String, body: JsonNode) -> String = { noun, _ -> error("no resource $noun") },
 ) {
     private val reading = spec.route(declared.read)
     private val listing = declared.search?.let { spec.route(it) }
-    private val itemPath = ItemPath(reading.path, declared.pointers)
-    private val acts = declared.acts.map { Act(it.name, it.name, schema(it, spec.route(it.operation)), it.name) }
-    private val keys = OfferKeys(acts) { answer -> read(answer.with(facts(answer.body))) }
+    private val address = declared.address?.let { ItemAddress(it, reading.path, declared.file) }
+
+    /** Each variable of the read's path, where in the state it is: by the file's pointers, or in `hr:address`. */
+    private val pointers: Map<String, String> = address?.pointers ?: declared.pointers
+    private val itemPath = ItemPath(reading.path, pointers)
+
+    // An act's relation is the file's name for it, shared by every resource that does it (github:close);
+    // its own name is the resource's (issue-close), so OpenAPI's operations and schemas stay apart.
+    private val actName = { act: ActDeclaration -> "${declared.noun}-${act.name}" }
+    private val acts = declared.acts.map { Act(actName(it), it.name, schema(it, spec.route(it.operation)), it.name) }
+    private val keys = OfferKeys(acts, { answer ->
+        val addressed = address?.of(answer) ?: answer
+        read(addressed.with(facts(addressed.body)))
+    }) { it.relation }
+
+    // Lists under a resource, each linked from it by its operation's relation: this file's lists, served here,
+    // and the lists another file searches by.
+    private val subCollections = (declared.lists + declared.links).map { spec.route(it) }
+        .associate { it.operation.relation to it.path }
 
     private val type = ResourceType<UpstreamState, String>(
         collection = declared.collection,
         profile = profile,
+        subCollections = subCollections,
         acts = acts,
         offers = keys.offers,
         state = StateView(
@@ -69,8 +90,11 @@ internal class DeclaredResource(
     val resource: HeartResource<UpstreamState, String> = HeartResource(
         layers = Layers(type),
         loadAt = { at -> keys.state(calls.get(ItemPath.fill(reading.path, at))) },
-        perform = { checked, name, input -> perform(checked, declared.acts.first { it.name == name }, input.json) },
+        perform = { checked, name, input -> perform(checked, declared.acts.first { actName(it) == name }, input.json) },
         search = listing?.let { search -> { values -> find(search, values) } },
+        lists = declared.lists.map { spec.route(it) }.associate { list ->
+            list.operation.relation to { at -> pages(ItemPath.fill(list.path, at)) }
+        },
     )
 
     /**
@@ -86,13 +110,24 @@ internal class DeclaredResource(
             throw ConcurrentWriteException("$item changed upstream since it was checked")
         }
         val route = spec.route(act.operation)
-        val variables = declared.pointers.mapValues { (_, pointer) -> checked.json.at(pointer).asText() }
-        val body = act.fixed + mapper.convertValue(input, BODY).filterKeys { it in act.fields } +
+        val fields = mapper.convertValue(input, BODY).filterKeys { it in act.fields }
+        // A path variable the state doesn't fill is the client's field of that name: remove-label's {name}.
+        val inPath = ActSchema(act, route, declared.file).pathFields(pointers.keys).toSet()
+        val variables = pointers.mapValues { (_, pointer) -> checked.json.at(pointer).asText() } +
+            fields.filterKeys { it in inPath }.mapValues { (_, value) -> value.toString() }
+        val body = act.fixed + fields.filterKeys { it !in inPath } +
             act.bound.mapValues { (_, pointer) -> mapper.convertValue(checked.json.at(pointer), Any::class.java) }
         val statuses = RefusalStatuses(act.stale, act.refused)
-        calls.act(route.method, ItemPath.fill(route.path, variables), mapper.writeValueAsString(body), statuses)
-        return Acted(keys.state(calls.get(item)))
+        val path = ItemPath.fill(route.path, variables)
+        val answer = calls.act(route.method, path, mapper.writeValueAsString(body), statuses)
+        // An act that makes another resource answers with it; heart-core names it in Location (201).
+        val created = act.creates?.let { locate(it, answer.body) }
+        return Acted(keys.state(calls.get(item)), created = created)
     }
+
+    /** Where the resource the upstream answered [body] for lives, by this type's item path. */
+    fun location(body: JsonNode): String =
+        itemPath.expand(mapper.convertValue(address?.of(body) ?: body, BODY))
 
     /** The answers the file's facts name, each read at its operation's path, filled from [state]. */
     private fun facts(state: JsonNode): Map<String, UpstreamBody> = declared.facts.mapValues { (_, fact) ->
@@ -101,23 +136,9 @@ internal class DeclaredResource(
     }
 
     /** An act's schema: the operation body's properties the client fills, and nothing else. */
-    private fun schema(act: ActDeclaration, route: SpecRoute): String {
-        @Suppress("UNCHECKED_CAST")
-        val properties = route.body?.get("properties") as? Map<String, Any?> ?: emptyMap()
-        val required = (route.body?.get("required") as? List<*>).orEmpty()
-        return mapper.writeValueAsString(
-            mapOf(
-                "\$schema" to "https://json-schema.org/draft/2020-12/schema",
-                "type" to "object",
-                "title" to act.title,
-                "properties" to act.fields.associateWith { field ->
-                    checkNotNull(properties[field]) { "${declared.file}: ${act.operation} has no field $field" }
-                },
-                "required" to act.fields.filter { it in required },
-                "additionalProperties" to false,
-            ),
-        )
-    }
+    /** An act's form: the fields the client fills, as the operation describes them (ActSchema). */
+    private fun schema(act: ActDeclaration, route: SpecRoute): String =
+        mapper.writeValueAsString(ActSchema(act, route, declared.file).of(pointers.keys))
 
     /** The fields of the forms: the read's and the search's path parameters, then the filters, in order. */
     private fun fields(search: SpecRoute): List<SearchField> {
@@ -129,25 +150,34 @@ internal class DeclaredResource(
         }
     }
 
-    /** Every match, following the upstream's `next` links, at each item's own path. */
+    /** Every match, by the search form's values. */
     private fun find(search: SpecRoute, values: SearchValues): List<Found> {
         val path = ItemPath.fill(search.path, values.filterKeys { it in ItemPath.variablesOf(search.path) })
         val query = declared.filters.mapNotNull { name ->
             values[name]?.let { "$name=" + URLEncoder.encode(it, Charsets.UTF_8) }
         }
+        return pages(if (query.isEmpty()) path else "$path?" + query.joinToString("&"))
+    }
+
+    /** Every item listed at [first] and the pages after it, at each item's own path. */
+    private fun pages(first: String): List<Found> {
         val found = mutableListOf<Found>()
-        var next: String? = if (query.isEmpty()) path else "$path?" + query.joinToString("&")
+        var next: String? = first
         while (next != null) {
             val answer = calls.get(next)
-            found += answer.body.map { found(it) }
+            found += answer.body.filterNot { skipped(it) }.map { found(it) }
             // GitHub's next link is absolute; the gateway calls its upstream by path.
             next = answer.links["next"]?.let { if (it.query.isEmpty()) it.path else "${it.path}?${it.query}" }
         }
         return found
     }
 
+    private fun skipped(item: JsonNode): Boolean =
+        declared.skip.isNotEmpty() && declared.skip.all { it.holds(Answer(item, emptyMap(), "", null)) }
+
     private fun found(item: JsonNode): Found {
-        val variables = declared.pointers.mapValues { (_, pointer) -> item.at(pointer).asText() }
+        val addressed = address?.of(item) ?: item
+        val variables = pointers.mapValues { (_, pointer) -> addressed.at(pointer).asText() }
         val title = declared.title?.let { item.at(it).asText() } ?: ItemPath.fill(reading.path, variables)
         return Found(item.path("id").asLong(), title, variables)
     }

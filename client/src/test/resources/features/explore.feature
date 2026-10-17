@@ -19,7 +19,12 @@ Feature: ARTIE explores any HEART server from its bookmark
       | home:dim       | {"brightness": 30}; {"brightness": 60}  |
       | home:switch-off| {}                                      |
     When ARTIE explores the lamp service
-    Then it took the acts "home:switch-on, home:dim, home:dim, home:switch-off"
+    Then it took these acts
+      | act             |
+      | home:switch-on  |
+      | home:dim        |
+      | home:dim        |
+      | home:switch-off |
     And it stopped because "no offered act has a sample left"
 
   Scenario: When the bookmark offers an act the samples have a body for, the explorer starts there
@@ -29,7 +34,10 @@ Feature: ARTIE explores any HEART server from its bookmark
       | home:install-lamp | {"brightness": 40} |
       | home:switch-on    | {}                 |
     When ARTIE explores the lamp service
-    Then it took the acts "home:install-lamp, home:switch-on"
+    Then it took these acts
+      | act               |
+      | home:install-lamp |
+      | home:switch-on    |
     And it ran no search
 
   Scenario: An act the resource does not offer is never sent, even with a sample
@@ -46,7 +54,10 @@ Feature: ARTIE explores any HEART server from its bookmark
       | home:switch-on | {}                                                        |
       | home:dim       | {"brightness": 10}; {"brightness": 20}; {"brightness": 30} |
     When ARTIE explores the lamp service
-    Then it took the acts "home:switch-on, home:dim"
+    Then it took these acts
+      | act            |
+      | home:switch-on |
+      | home:dim       |
     And it stopped because "the step limit"
 
   Scenario: Samples are read from a JSON file a domain keeps

@@ -13,7 +13,14 @@ Feature: HEART through MCP, with six fixed verbs
     Given an MCP host connected to heart-mcp with the bookmark "garden"
 
   Scenario: The tools are six verbs, and none takes an address
-    Then the host sees exactly the tools "heart_look, heart_act, heart_follow, heart_describe, heart_explain, heart_back"
+    Then the host sees exactly these tools
+      | tool           |
+      | heart_look     |
+      | heart_act      |
+      | heart_follow   |
+      | heart_describe |
+      | heart_explain  |
+      | heart_back     |
     And no tool takes an input named like an address, a method or a header
 
   Scenario: A service that is not configured is refused, naming those that are
@@ -23,7 +30,11 @@ Feature: HEART through MCP, with six fixed verbs
   @live
   Scenario: Looking at the garden shows its acts with titles and schemas, and no address
     When the host calls heart_look with the service "garden"
-    Then the result offers exactly the acts "garden:search-beds, garden:get-bed, garden:build-bed"
+    Then the result offers exactly these acts
+      | act                |
+      | garden:search-beds |
+      | garden:get-bed     |
+      | garden:build-bed   |
     And every offered act has a title and a schema
     And no address appears anywhere in the result
 
@@ -31,7 +42,9 @@ Feature: HEART through MCP, with six fixed verbs
   Scenario: From the bookmark, the host finds bed 2, which offers only watering
     When the host finds the bed "bed-2" from the garden's bookmark
     Then the result's state has "status" "PLANTED"
-    And the result offers exactly the acts "garden:water-cell"
+    And the result offers exactly these acts
+      | act               |
+      | garden:water-cell |
     And no address appears anywhere in the result
 
   @live
@@ -40,7 +53,9 @@ Feature: HEART through MCP, with six fixed verbs
     When the host calls heart_act "garden:water-cell" with {"milliliters": 250}
     Then the outcome is "acted"
     And the result's state has "moistureLevel" 65
-    And the result offers exactly the acts "garden:harvest"
+    And the result offers exactly these acts
+      | act            |
+      | garden:harvest |
     And the event log shows 1 act sent
 
   @live
@@ -92,7 +107,11 @@ Feature: HEART through MCP, with six fixed verbs
     Given the host has found the bed "bed-2"
     When the host calls heart_back
     And the host calls heart_back
-    Then the result offers exactly the acts "garden:search-beds, garden:get-bed, garden:build-bed"
+    Then the result offers exactly these acts
+      | act                |
+      | garden:search-beds |
+      | garden:get-bed     |
+      | garden:build-bed   |
 
   # The garden admits only callers with a credential. heart-mcp reads it as
   # ARTIE does: the environment, ~/.artie/credentials, then Vault. No tool

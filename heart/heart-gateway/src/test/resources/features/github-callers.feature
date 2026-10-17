@@ -11,7 +11,10 @@ Feature: The gateway calls GitHub as each caller, and revalidates what it read
   Background:
     Given the GitHub gateway reads GitHub's description with the connector "github"
     And the GitHub gateway calls GitHub as each caller
-    And GitHub knows the callers "ada" and "bob"
+    And GitHub knows these callers
+      | caller |
+      | ada    |
+      | bob    |
     And pull request 482 of "acme/rockets" is "open" upstream, titled "Fix the login bug"
 
   Scenario: GitHub is asked with the caller's own token
@@ -22,7 +25,13 @@ Feature: The gateway calls GitHub as each caller, and revalidates what it read
   Scenario: Each caller is offered what GitHub lets them do
     Given "bob" can't push to "acme/rockets"
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the GitHub gateway offers "github:close, github:merge"
+    Then the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:merge          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
     When "bob" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway offers nothing
 
@@ -40,7 +49,13 @@ Feature: The gateway calls GitHub as each caller, and revalidates what it read
     And "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway answers 200
     And GitHub answered the last request for "/repos/acme/rockets/pulls/482" with 304
-    And the GitHub gateway offers "github:close, github:merge"
+    And the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:merge          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
 
   Scenario: One caller's copy never answers another
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
