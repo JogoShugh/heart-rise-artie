@@ -63,6 +63,9 @@ class LampStore {
  * [TOKENS], and the profile "home" names its realm.
  */
 object LampServer {
+    /** The name a binding's tests register [resource] under, beside the pull requests. */
+    const val BEAN = "lamps"
+
     /** The Bearer token every scenario's client carries by default. */
     const val LAMP_TOKEN = "lamp-token"
 

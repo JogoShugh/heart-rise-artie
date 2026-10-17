@@ -5,6 +5,8 @@ import com.artie.heart.binding.CredentialReader
 import com.artie.heart.binding.HttpWorld
 import com.artie.heart.binding.LampServer
 import com.artie.heart.binding.LampStore
+import com.artie.heart.binding.PullServer
+import com.artie.heart.binding.PullStore
 import com.artie.heart.spring.HeartAutoConfiguration
 import com.artie.heart.spring.HeartCredentials
 import io.cucumber.spring.CucumberContextConfiguration
@@ -29,6 +31,13 @@ class LampSpringServer {
 
     @Bean
     fun lamps(store: LampStore): HeartResource<*, *> = LampServer.resource(store)
+
+    @Bean
+    fun pullStore() = PullStore()
+
+    /** A type whose item path is more than `/{collection}/{id}` (item-paths.feature). */
+    @Bean
+    fun pulls(store: PullStore): HeartResource<*, *> = PullServer.resource(store)
 
     @Bean
     fun colours() = LampServer.colours()

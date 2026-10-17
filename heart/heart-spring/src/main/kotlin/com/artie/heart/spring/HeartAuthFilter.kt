@@ -26,7 +26,8 @@ import reactor.core.scheduler.Schedulers
  * credential is answered exactly as a missing one.
  */
 class HeartAuthFilter(private val credentials: HeartCredentials, realm: String) : WebFilter, Ordered {
-    private val challenges = listOf("Basic realm=\"$realm\"", "Bearer realm=\"$realm\"")
+    /** The challenges a 401 offers, the service's own or a resource's. */
+    val challenges = listOf("Basic realm=\"$realm\"", "Bearer realm=\"$realm\"")
 
     override fun getOrder() = Ordered.HIGHEST_PRECEDENCE
 

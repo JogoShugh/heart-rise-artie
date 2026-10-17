@@ -9,13 +9,14 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpStatus
 import org.springframework.test.web.reactive.server.EntityExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
 
 class ContentSteps(
     private val client: WebTestClient,
-    private val resource: HeartResource<*, *>,
+    @Qualifier(LampServer.BEAN) private val resource: HeartResource<*, *>,
     private val http: HttpWorld,
 ) {
     private val lamps get() = resource.layers

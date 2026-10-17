@@ -2,8 +2,19 @@ package com.artie.heart
 
 import java.net.URLEncoder
 
-/** A search of [collection] by part of a name and by id; either may be absent. */
-data class Search(val collection: String, val name: String? = null, val id: Long? = null)
+/**
+ * A search of [collection] by part of a name and by id; either may be absent.
+ * A type that declares its collection path is searched at [path], that path
+ * filled, by [filters], and lists its matches at their [item] paths.
+ */
+data class Search(
+    val collection: String,
+    val name: String? = null,
+    val id: Long? = null,
+    val path: String = "/$collection",
+    val filters: Map<String, String> = emptyMap(),
+    val item: UriTemplate = "/$collection/{id}",
+)
 
 /**
  * The pages of a search (SPEC §6.11): matches under the IANA `item` relation
@@ -12,16 +23,15 @@ data class Search(val collection: String, val name: String? = null, val id: Long
 object SearchPages {
     /** Page [page] (from 1) of the [found] resources of a [search], [size] to a page. */
     fun page(search: Search, found: List<Found>, page: Int, size: Int): Map<String, Any> {
-        val (collection, name, id) = search
         val pageNo = page.coerceAtLeast(1)
         val lastPage = ((found.size + size - 1) / size).coerceAtLeast(1)
         val filters = listOfNotNull(
-            name?.let { "name=${URLEncoder.encode(it, Charsets.UTF_8)}" },
-            id?.let { "id=$it" },
-        )
+            search.name?.let { "name=${encode(it)}" },
+            search.id?.let { "id=$it" },
+        ) + search.filters.map { (field, value) -> "$field=${encode(value)}" }
         fun href(n: Int): Map<String, String> {
             val query = filters + listOfNotNull(if (n > 1) "page=$n" else null)
-            return mapOf("href" to if (query.isEmpty()) "/$collection" else "/$collection?" + query.joinToString("&"))
+            return mapOf("href" to if (query.isEmpty()) search.path else "${search.path}?" + query.joinToString("&"))
         }
         // Page links appear only when the list does not fit on one page.
         val paging = buildMap {
@@ -36,7 +46,7 @@ object SearchPages {
         return mapOf(
             "count" to found.size,
             "_links" to mapOf("self" to href(pageNo)) + paging +
-                ("item" to items.map { mapOf("href" to "/$collection/${it.id}", "title" to it.title) }),
+                ("item" to items.map { item(search, it) }),
         )
     }
 
@@ -46,5 +56,11 @@ object SearchPages {
         "items" to found.drop((page.coerceAtLeast(1) - 1) * size).take(size)
             .map { mapOf("id" to it.id, "title" to it.title) },
     )
+
+    private fun encode(value: String): String = URLEncoder.encode(value, Charsets.UTF_8)
+
+    /** RFC 6573: a match as an `item` link, at its item path, titled. */
+    private fun item(search: Search, found: Found): Map<String, String> =
+        mapOf("href" to ItemPath.fill(search.item, found.variables), "title" to found.title)
 
 }

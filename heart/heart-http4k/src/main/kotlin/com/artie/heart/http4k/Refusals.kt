@@ -1,6 +1,8 @@
 package com.artie.heart.http4k
 
 import com.artie.heart.BadRequestException
+import com.artie.heart.CallerForbiddenException
+import com.artie.heart.CallerUnauthorizedException
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
@@ -29,18 +31,25 @@ object Refusals {
      * heart-core's refusals share no supertype but [RuntimeException].
      */
     @Suppress("TooGenericExceptionCaught")
-    fun filter(mapper: ObjectMapper) = Filter { next ->
+    fun filter(mapper: ObjectMapper, realm: String) = Filter { next ->
         { request ->
             try {
                 next(request)
             } catch (failure: RuntimeException) {
-                of(failure, mapper) ?: throw failure
+                of(failure, mapper, realm) ?: throw failure
             }
         }
     }
 
     /** The answer for [failure], or null when it is not a refusal heart-core raises. */
-    fun of(failure: Throwable, mapper: ObjectMapper): Response? = when (failure) {
+    fun of(failure: Throwable, mapper: ObjectMapper, realm: String): Response? = when (failure) {
+        // RFC 9110 §15.5.2: a 401 says how to authenticate, as the service's own refusal does.
+        is CallerUnauthorizedException ->
+            problem(Status.UNAUTHORIZED, "not-authenticated", "A credential is needed", failure, mapper)
+                .header("WWW-Authenticate", "Basic realm=\"$realm\"")
+                .header("WWW-Authenticate", "Bearer realm=\"$realm\"")
+        is CallerForbiddenException ->
+            problem(Status.FORBIDDEN, "forbidden", "The credential is not enough for this resource", failure, mapper)
         is PreconditionRequiredException ->
             problem(Status.PRECONDITION_REQUIRED, "precondition-required", "If-Match is required", failure, mapper)
         is StaleWriteConflict ->

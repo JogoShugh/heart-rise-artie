@@ -13,6 +13,12 @@ package com.artie.heart
  */
 const val PROBLEM_TYPES = "https://w3id.org/heart-rise/problems/"
 
+/** 401: a resource finds the caller's credential no longer good, as an upstream that rejects it does. */
+class CallerUnauthorizedException(message: String) : RuntimeException(message)
+
+/** 403: the caller's credential is good, but not enough for this resource. */
+class CallerForbiddenException(message: String) : RuntimeException(message)
+
 /** 428: a state-changing request arrived without a validator. */
 class PreconditionRequiredException(message: String) : RuntimeException(message)
 

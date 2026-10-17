@@ -1,6 +1,8 @@
 package com.artie.heart.spring
 
 import com.artie.heart.BadRequestException
+import com.artie.heart.CallerForbiddenException
+import com.artie.heart.CallerUnauthorizedException
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
@@ -10,6 +12,7 @@ import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.RuleRefusedException
 import com.artie.heart.StaleWriteConflict
 import com.artie.heart.UnprocessableContentException
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ProblemDetail
@@ -32,8 +35,18 @@ object HttpRefusals {
             members.forEach { (name, value) -> setProperty(name, value) }
         }
 
-    /** The answer for [failure], or null when it is not a refusal heart-spring knows. */
-    suspend fun of(failure: Throwable): ServerResponse? = when (failure) {
+    /** The answer for [failure], or null when it is not a refusal heart-spring knows; a 401 offers [challenges]. */
+    suspend fun of(failure: Throwable, challenges: List<String>): ServerResponse? = when (failure) {
+        // RFC 9110 §15.5.2: a 401 says how to authenticate, as the service's own refusal does.
+        is CallerUnauthorizedException -> ServerResponse.status(HttpStatus.UNAUTHORIZED)
+            .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+            .headers { it[HttpHeaders.WWW_AUTHENTICATE] = challenges }
+            .bodyValueAndAwait(
+                problem(HttpStatus.UNAUTHORIZED, "not-authenticated", NEEDED, failure.message, emptyMap()),
+            )
+        is CallerForbiddenException -> problem(
+            HttpStatus.FORBIDDEN, "forbidden", "The credential is not enough for this resource", failure,
+        )
         is PreconditionRequiredException ->
             problem(HttpStatus.PRECONDITION_REQUIRED, "precondition-required", "If-Match is required", failure)
         is StaleWriteConflict ->
@@ -69,4 +82,6 @@ object HttpRefusals {
     private suspend fun error(status: HttpStatus, failure: Throwable): ServerResponse =
         ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON)
             .bodyValueAndAwait(mapOf("error" to (failure.message ?: status.reasonPhrase)))
+
+    private const val NEEDED = "A credential is needed"
 }

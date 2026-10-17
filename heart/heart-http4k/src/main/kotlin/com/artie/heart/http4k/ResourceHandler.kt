@@ -44,17 +44,18 @@ class ResourceHandler<S, K>(
     /** The current state, or as of `?asOf=` for a type that keeps its past; any other query is not a route. */
     fun read(request: Request): Response {
         val asOf = request.query("asOf")
+        val past = resource.past
         return when {
-            request.uri.query.isEmpty() -> represent(runBlocking { resource.load(id(request)) }, request)
-            asOf != null && resource.past != null ->
-                represent(runBlocking { checkNotNull(resource.past).at(id(request), instant(asOf)) }, request)
+            request.uri.query.isEmpty() -> represent(runBlocking { resource.locate(variables(request)) }, request)
+            asOf != null && past != null ->
+                represent(runBlocking { past.at(resource.id(variables(request)), instant(asOf)) }, request)
             else -> Response(Status.NOT_FOUND)
         }
     }
 
     /** What happened to the resource, in order, whatever the dialect. */
     fun history(request: Request): Response {
-        val events = runBlocking { checkNotNull(resource.past).history(id(request)) }.map {
+        val events = runBlocking { checkNotNull(resource.past).history(resource.id(variables(request))) }.map {
             mapOf(
                 "sequenceNo" to it.sequenceNo,
                 "type" to it.type,
@@ -92,16 +93,17 @@ class ResourceHandler<S, K>(
         // Negotiate before acting, so a 406 never follows a write.
         val dialect = dialect(request)
         val rung = limits.rung(dialect, request)
-        val id = id(request)
+        val variables = variables(request)
         val done = runBlocking {
-            val checked = pipeline.check(act.name, request.header(IF_MATCH), { resource.load(id) }) { current, held ->
+            val read = suspend { resource.locate(variables) }
+            val checked = pipeline.check(act.name, request.header(IF_MATCH), read) { current, held ->
                 StateETag.matches(held, Rendered(current, dialect, rung).etag)
             }
             // The act is performed on the state whose ETag matched, so a write since is stale (SPEC §6.2).
             pipeline.run(act.name, body(request), checked) { input -> resource.perform(checked, act.name, input) }
         }
         return Rendered(done.state, dialect, rung)
-            .respond(added(Response(Status.OK).header(CONTENT_LOCATION, location(type.collection, id)), done))
+            .respond(added(Response(Status.OK).header(CONTENT_LOCATION, resource.location(done.state)), done))
     }
 
     /**
@@ -114,7 +116,7 @@ class ResourceHandler<S, K>(
         val perform = checkNotNull(resource.performAtBookmark)
         if (Negotiation.wantsPlainJson(request.header(ACCEPT))) {
             val done = runBlocking { pipeline.run(name, body(request)) { input -> perform(name, input) } }
-            val location = location(type.collection, type.state.idOf(done.state))
+            val location = resource.location(done.state)
             return plain(Response(Status.CREATED).header(LOCATION, location), done.state)
         }
         val dialect = dialect(request)
@@ -125,7 +127,7 @@ class ResourceHandler<S, K>(
             }
             pipeline.run(name, body(request)) { input -> perform(name, input) }
         }
-        val location = location(type.collection, type.state.idOf(done.state))
+        val location = resource.location(done.state)
         return Rendered(done.state, dialect, rung).respond(
             added(Response(Status.CREATED).header(LOCATION, location).header(CONTENT_LOCATION, location), done),
         )
@@ -137,12 +139,12 @@ class ResourceHandler<S, K>(
      * is sent when that state does not offer it.
      */
     private fun actPlain(name: String, request: Request): Response {
-        val id = id(request)
+        val variables = variables(request)
         val done = runBlocking {
-            val checked = pipeline.checkOffered(name) { resource.load(id) }
+            val checked = pipeline.checkOffered(name) { resource.locate(variables) }
             pipeline.run(name, body(request), checked) { input -> resource.perform(checked, name, input) }
         }
-        return plain(Response(Status.OK).header(CONTENT_LOCATION, location(type.collection, id)), done.state)
+        return plain(Response(Status.OK).header(CONTENT_LOCATION, resource.location(done.state)), done.state)
     }
 
     /** Plain JSON: a body with no links, forms, profile or validator; only Accept chooses it. */
@@ -176,10 +178,9 @@ class ResourceHandler<S, K>(
             headers(response.header(CONTENT_TYPE, dialect.mediaType)).body(mapper.writeValueAsString(body))
     }
 
-    private fun id(request: Request): Long {
-        val id = request.path("id")
-        return id?.toLongOrNull() ?: throw ResourceNotFoundException("no ${type.collection} $id")
-    }
+    /** The item path's variables, as the request's path filled them. */
+    private fun variables(request: Request): Map<String, String> =
+        type.itemPath.variables.mapNotNull { name -> request.path(name)?.let { name to it } }.toMap()
 
     private companion object {
         /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. No rung above the cap is served. */
@@ -191,8 +192,6 @@ class ResourceHandler<S, K>(
         } catch (_: DateTimeParseException) {
             throw BadRequestException("'$asOf' is not an ISO 8601 instant, such as 2026-07-05T00:00:00Z")
         }
-
-        fun location(collection: String, id: Any?): String = "/$collection/$id"
 
         /** The act's own headers, as the domain gave them. */
         fun added(response: Response, done: Acted<*>): Response =

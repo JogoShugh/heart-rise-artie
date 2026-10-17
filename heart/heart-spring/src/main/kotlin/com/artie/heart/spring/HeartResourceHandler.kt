@@ -41,7 +41,7 @@ class HeartResourceHandler<S, K>(
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper)
 
-    suspend fun read(request: ServerRequest): ServerResponse = represent(resource.load(id(request)), request)
+    suspend fun read(request: ServerRequest): ServerResponse = represent(resource.locate(variables(request)), request)
 
     /** The state as of `?asOf=` (an ISO 8601 instant), rendered exactly like the current one. */
     suspend fun readAsOf(request: ServerRequest): ServerResponse {
@@ -51,12 +51,12 @@ class HeartResourceHandler<S, K>(
         } catch (_: DateTimeParseException) {
             throw BadRequestException("'$asOf' is not an ISO 8601 instant, such as 2026-07-05T00:00:00Z")
         }
-        return represent(checkNotNull(resource.past).at(id(request), instant), request)
+        return represent(checkNotNull(resource.past).at(resource.id(variables(request)), instant), request)
     }
 
     /** What happened to the resource, in order, whatever the dialect. */
     suspend fun history(request: ServerRequest): ServerResponse {
-        val events = checkNotNull(resource.past).history(id(request)).map {
+        val events = checkNotNull(resource.past).history(resource.id(variables(request))).map {
             mapOf(
                 "sequenceNo" to it.sequenceNo,
                 "type" to it.type,
@@ -105,9 +105,9 @@ class HeartResourceHandler<S, K>(
         // Negotiate before acting, so a 406 never follows a write.
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rung = rung(dialect, request)
-        val id = id(request)
+        val variables = variables(request)
         val ifMatch = request.headers().firstHeader(HttpHeaders.IF_MATCH)
-        val checked = pipeline.check(act.name, ifMatch, { resource.load(id) }) { current, held ->
+        val checked = pipeline.check(act.name, ifMatch, { resource.locate(variables) }) { current, held ->
             StateETag.matches(held, Rendered(current, dialect, rung).etag)
         }
         val body = request.awaitBodyOrNull<String>()
@@ -115,7 +115,7 @@ class HeartResourceHandler<S, K>(
         val done = pipeline.run(act.name, body, checked) { input -> resource.perform(checked, act.name, input) }
         return Rendered(done.state, dialect, rung).respond(
             ServerResponse.ok()
-                .header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id")
+                .header(HttpHeaders.CONTENT_LOCATION, resource.location(done.state))
                 .headers { headers -> done.headers.forEach { (name, value) -> headers.add(name, value) } },
         )
     }
@@ -131,7 +131,7 @@ class HeartResourceHandler<S, K>(
         if (HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())) {
             val body = request.awaitBodyOrNull<String>()
             val done = pipeline.run(name, body) { input -> checkNotNull(resource.performAtBookmark)(name, input) }
-            val location = "/${type.collection}/${type.state.idOf(done.state)}"
+            val location = resource.location(done.state)
             return PlainJson.respond(
                 ServerResponse.created(URI.create(location)).apply {
                     if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state))
@@ -146,7 +146,7 @@ class HeartResourceHandler<S, K>(
         }
         val body = request.awaitBodyOrNull<String>()
         val done = pipeline.run(name, body) { input -> checkNotNull(resource.performAtBookmark)(name, input) }
-        val location = "/${type.collection}/${type.state.idOf(done.state)}"
+        val location = resource.location(done.state)
         return Rendered(done.state, dialect, rung).respond(
             ServerResponse.created(URI.create(location))
                 .header(HttpHeaders.CONTENT_LOCATION, location)
@@ -160,12 +160,12 @@ class HeartResourceHandler<S, K>(
      * is sent when that state does not offer it.
      */
     private suspend fun actPlain(name: String, request: ServerRequest): ServerResponse {
-        val id = id(request)
-        val checked = pipeline.checkOffered(name) { resource.load(id) }
+        val variables = variables(request)
+        val checked = pipeline.checkOffered(name) { resource.locate(variables) }
         val body = request.awaitBodyOrNull<String>()
         val done = pipeline.run(name, body, checked) { input -> resource.perform(checked, name, input) }
         return PlainJson.respond(
-            ServerResponse.ok().header(HttpHeaders.CONTENT_LOCATION, "/${type.collection}/$id")
+            ServerResponse.ok().header(HttpHeaders.CONTENT_LOCATION, resource.location(done.state))
                 .apply { if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state)) },
             type.state.bodyOf(done.state),
         )
@@ -206,9 +206,9 @@ class HeartResourceHandler<S, K>(
             Rung.L0
         }
 
-    private fun id(request: ServerRequest): Long =
-        request.pathVariable("id").toLongOrNull()
-            ?: throw com.artie.heart.ResourceNotFoundException("no ${type.collection} ${request.pathVariable("id")}")
+    /** The item path's variables, as the request's path filled them. */
+    private fun variables(request: ServerRequest): Map<String, String> =
+        request.pathVariables().filterKeys { it in type.itemPath.variables }
 
     private companion object {
         const val PREFERENCE_APPLIED = "Preference-Applied"

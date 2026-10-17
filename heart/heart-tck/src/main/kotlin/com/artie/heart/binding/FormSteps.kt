@@ -67,11 +67,13 @@ class FormSteps(private val http: HttpWorld) {
         assertEquals(if (items == "nothing") "" else items, listed)
     }
 
-    @Then("the two indexes offer forms with the same titles")
-    fun sameTitles() {
+    /** A HAL-FORMS target cannot be templated, so a search or lookup that fills a path has no template. */
+    @Then("the two indexes offer forms with the same titles, but for {string}")
+    fun sameTitles(untemplated: String) {
         val (hsf, hf) = http.results.takeLast(2).map(http::json)
         val forms = hsf.path("_forms").map { it.path("title").asText() }.toSet()
         assertTrue(forms.isNotEmpty(), "no forms in $hsf")
-        assertEquals(forms, hf.path("_templates").map { it.path("title").asText() }.toSet())
+        val templates = hf.path("_templates").map { it.path("title").asText() }.toSet()
+        assertEquals(forms - untemplated.split(", ").toSet(), templates)
     }
 }

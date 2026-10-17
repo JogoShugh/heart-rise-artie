@@ -1,5 +1,6 @@
 package com.artie.heart.http4k
 
+import com.artie.heart.Caller
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.Listing
@@ -9,6 +10,7 @@ import com.artie.heart.ServingLimits
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Method.POST
@@ -67,7 +69,9 @@ class HeartHttp(
     private val realm = settings.realm ?: layers.first().type.profile.name
 
     private val app: HttpHandler = credentials.filter(realm)
-        .then(Refusals.filter(settings.mapper))
+        .then(Refusals.filter(settings.mapper, realm))
+        // Every read, act and search is handed the credential its request carried (Caller).
+        .then(Filter { next -> { request -> Caller.during(request.header("Authorization")) { next(request) } } })
         .then(routes(shared(settings.listings) + handlers.flatMap { routesOf(it) }))
 
     override fun invoke(request: Request): Response = app(request)
@@ -87,11 +91,15 @@ class HeartHttp(
     private fun routesOf(handler: ResourceHandler<*, *>): List<RoutingHttpHandler> {
         val resource = handler.resource
         val collection = resource.layers.type.collection
+        val item = resource.layers.type.itemPath.template
         return listOfNotNull(
-            resource.find?.let { "/$collection" bind GET to { indexHandler.search(resource, it) } },
-            "/$collection/{id}" bind GET to handler::read,
-            "/$collection/{id}/actions/{path}" bind POST to handler::act,
-            resource.past?.let { "/$collection/{id}/history" bind GET to handler::history },
+            (resource.find ?: resource.search)?.let {
+                val searchedAt = resource.layers.type.finding?.collectionPath ?: "/$collection"
+                searchedAt bind GET to { indexHandler.search(resource, it) }
+            },
+            item bind GET to handler::read,
+            "$item/actions/{path}" bind POST to handler::act,
+            resource.past?.let { "$item/history" bind GET to handler::history },
         )
     }
 

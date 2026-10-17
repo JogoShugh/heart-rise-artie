@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
 import org.springframework.test.web.reactive.server.EntityExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -16,7 +17,7 @@ import java.util.Base64
 /** Steps for who a HEART service admits, and what it says to those it does not. */
 class CredentialSteps(
     client: WebTestClient,
-    private val resource: HeartResource<*, *>,
+    @Qualifier(LampServer.BEAN) private val resource: HeartResource<*, *>,
     private val http: HttpWorld,
 ) {
     /** A client with no default credential; each request sets its own, or none. */

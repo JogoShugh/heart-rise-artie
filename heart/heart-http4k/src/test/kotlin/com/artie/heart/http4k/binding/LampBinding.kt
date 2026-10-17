@@ -6,6 +6,8 @@ import com.artie.heart.binding.CredentialReader
 import com.artie.heart.binding.HttpWorld
 import com.artie.heart.binding.LampServer
 import com.artie.heart.binding.LampStore
+import com.artie.heart.binding.PullServer
+import com.artie.heart.binding.PullStore
 import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartHttp
 import com.artie.heart.http4k.HeartSettings
@@ -13,6 +15,7 @@ import io.cucumber.spring.CucumberContextConfiguration
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
@@ -32,6 +35,13 @@ class LampBinding {
     @Bean
     fun lamps(store: LampStore): HeartResource<*, *> = LampServer.resource(store)
 
+    @Bean
+    fun pullStore() = PullStore()
+
+    /** A type whose item path is more than `/{collection}/{id}` (item-paths.feature). */
+    @Bean
+    fun pulls(store: PullStore): HeartResource<*, *> = PullServer.resource(store)
+
     /** One object for the run: the binding reads it on every request, and the features change it. */
     @Bean
     fun limits() = ServingLimits(affordanceLinks = true)
@@ -40,9 +50,13 @@ class LampBinding {
     fun credentialReader() = CredentialReader { users, tokens -> Credentials.parse(users, tokens)::admits }
 
     @Bean(destroyMethod = "stop")
-    fun server(lamps: HeartResource<*, *>, limits: ServingLimits): Http4kServer =
+    fun server(
+        @Qualifier(LampServer.BEAN) lamps: HeartResource<*, *>,
+        @Qualifier("pulls") pulls: HeartResource<*, *>,
+        limits: ServingLimits,
+    ): Http4kServer =
         HeartHttp(
-            listOf(lamps),
+            listOf(lamps, pulls),
             Credentials.parse(LampServer.USERS, LampServer.TOKENS),
             HeartSettings(limits = limits, listings = listOf(LampServer.colours())),
         ).asServer(Jetty(0)).start()

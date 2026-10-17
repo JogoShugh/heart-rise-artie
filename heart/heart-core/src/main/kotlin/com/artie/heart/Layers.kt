@@ -48,10 +48,10 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
      * tell a client what it will get before fetching it.
      */
     fun layer1(state: S, rung: Rung = Rung.L0): Map<String, Any?> {
-        val id = type.state.idOf(state)
         val key = type.state.keyOf(state)
         val body = LinkedHashMap(type.state.bodyOf(state))
-        val self = mapOf("href" to "/${type.collection}/$id")
+        val item = type.itemPath.expand(body)
+        val self = mapOf("href" to item)
         val rendering = rung.setRendering
         if (rendering == null) {
             body["_links"] = mapOf(
@@ -60,7 +60,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
                 // SPEC §6.12: at L0 the set is embedded, so its explanation link is in Layer 1.
                 UNAVAILABLE_REL to explanationLink(key),
             )
-            body["_forms"] = forms(offered(key), embedSchemas = true).mapValues { (_, form) -> resolved(form, id) }
+            body["_forms"] = forms(offered(key), embedSchemas = true).mapValues { (_, form) -> resolved(form, item) }
         } else {
             val set = affordanceSet(key, rendering)
             body["_links"] = mapOf(
@@ -100,16 +100,16 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
      * "default", but that name says nothing about the act.
      */
     fun halForms(state: S): Map<String, Any?> {
-        val id = type.state.idOf(state)
         val body = LinkedHashMap(type.state.bodyOf(state))
-        body["_links"] = mapOf("self" to mapOf("href" to "/${type.collection}/$id"))
+        val item = type.itemPath.expand(body)
+        body["_links"] = mapOf("self" to mapOf("href" to item))
         val templates = offered(type.state.keyOf(state)).associate { name ->
             val act = type.act(name)
             name to mapOf(
                 "title" to type.profile.relation(act.relation).title,
                 "method" to "POST",
                 "contentType" to JSON_CONTENT,
-                "target" to "/${type.collection}/$id/actions/${act.path}",
+                "target" to "$item/actions/${act.path}",
                 // HAL-SCHEMA-FORMS-HR Rule 8: each property's choices for this state, as HAL-FORMS options.
                 "properties" to HalFormsProperties.of(
                     act.schema,
@@ -130,8 +130,9 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
 
     /**
      * One form. Its target stays a URI template, so the set that holds it is
-     * the same bytes for every resource with one key; a client expands `{id}`
-     * from the JSON Pointer in `hr:templatePointers` (HAL-SCHEMA-FORMS-HR Rule 1).
+     * the same bytes for every resource with one key; a client expands each of
+     * the item path's variables from its JSON Pointer in `hr:templatePointers`
+     * (HAL-SCHEMA-FORMS-HR Rule 1).
      */
     private fun form(act: Act, embedSchemas: Boolean): Map<String, Any?> {
         val relation = type.profile.relation(act.relation)
@@ -148,9 +149,9 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
             "title" to relation.title,
             "description" to relation.description,
             "_links" to mapOf(
-                "target" to mapOf("href" to "/${type.collection}/{id}/actions/${act.path}", "templated" to true),
+                "target" to mapOf("href" to "${type.itemPath.template}/actions/${act.path}", "templated" to true),
             ),
-            TEMPLATE_POINTERS to mapOf("id" to "/id"),
+            TEMPLATE_POINTERS to type.itemPath.pointers,
             "method" to "POST",
             "contentType" to "application/json",
             "schema" to schema,
@@ -158,12 +159,12 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     }
 
     /** At L0 a form belongs to one resource: its target is concrete and needs no pointers. */
-    private fun resolved(form: Any?, id: Long): Map<String, Any?> {
+    private fun resolved(form: Any?, item: String): Map<String, Any?> {
         @Suppress("UNCHECKED_CAST")
         val entry = form as Map<String, Any?>
         @Suppress("UNCHECKED_CAST")
         val target = (entry.getValue("_links") as Map<String, Map<String, Any?>>).getValue("target")
-        val href = (target.getValue("href") as String).replace("{id}", id.toString())
+        val href = (target.getValue("href") as String).replace(type.itemPath.template, item)
         return (entry - TEMPLATE_POINTERS) + ("_links" to mapOf("target" to mapOf("href" to href)))
     }
 

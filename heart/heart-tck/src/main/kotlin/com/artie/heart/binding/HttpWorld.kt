@@ -8,6 +8,7 @@ import com.artie.heart.fixtures.Lamp
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.spring.ScenarioScope
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.test.web.reactive.server.EntityExchangeResult
@@ -19,7 +20,11 @@ import org.springframework.test.web.reactive.server.WebTestClient
  */
 @Component
 @ScenarioScope
-class HttpWorld(private val client: WebTestClient, private val store: LampStore, resource: HeartResource<*, *>) {
+class HttpWorld(
+    private val client: WebTestClient,
+    private val store: LampStore,
+    @Qualifier(LampServer.BEAN) resource: HeartResource<*, *>,
+) {
     var results: List<EntityExchangeResult<ByteArray>> = emptyList()
     val last: EntityExchangeResult<ByteArray> get() = results.last()
 
@@ -35,9 +40,9 @@ class HttpWorld(private val client: WebTestClient, private val store: LampStore,
     fun post(path: String, body: String, headers: Map<String, String>): EntityExchangeResult<ByteArray> =
         exchange(client.post().uri(path).header(HttpHeaders.CONTENT_TYPE, "application/json").bodyValue(body), headers)
 
-    /** The latest read of a lamp's Layer 1, whatever came after it. */
+    /** The latest read of a resource's Layer 1, a lamp's or a pull request's, whatever came after it. */
     fun layer1(): EntityExchangeResult<ByteArray> =
-        results.last { it.method.name() == "GET" && it.url.path.matches(Regex("/lamps/\\d+")) }
+        results.last { it.method.name() == "GET" && it.url.path.matches(LAYER_1) }
 
     /** The negotiation headers [read] was sent with, for an act that repeats them. */
     fun negotiation(read: EntityExchangeResult<ByteArray>): Map<String, String> =
@@ -76,6 +81,8 @@ class HttpWorld(private val client: WebTestClient, private val store: LampStore,
     }
 
     companion object {
+        private val LAYER_1 = Regex("/lamps/\\d+|/repos/[^/]+/[^/]+/pulls/\\d+")
+
         /** What Accept asks for each dialect by. */
         fun accept(dialect: String) = when (dialect) {
             "hal-schema-forms" -> "application/hal+json"

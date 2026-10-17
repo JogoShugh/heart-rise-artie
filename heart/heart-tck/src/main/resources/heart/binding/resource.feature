@@ -92,7 +92,7 @@ Feature: A declared resource and its acts, served over HTTP
 
   Scenario: The service index offers its own act, installing a lamp, beside its search and lookup
     When a client gets "/" as hal-schema-forms
-    Then the response offers "home:search-lamps, home:get-lamp, home:install-lamp"
+    Then the response offers "home:search-lamps, home:get-lamp, home:install-lamp, pulls:list, pulls:get"
 
   Scenario Outline: An act on the bookmark that brings a lamp into being answers 201 with the new lamp in <dialect>
     When a client posts {"brightness": 20} to "/actions/install-lamp" as <dialect> with the index's ETag

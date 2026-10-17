@@ -55,11 +55,28 @@ class FollowSteps(private val http: HttpWorld) {
         http.get(href.replace("{id}", id.toString()), mapOf(HttpHeaders.ACCEPT to "application/hal+json"))
     }
 
+    @When("the client fills the {string} form with {string} and follows it")
+    fun fillWithAndFollow(key: String, filled: String) {
+        val values = filled.split(", ").associate { it.substringBefore("=") to it.substringAfter("=") }
+        val target = http.json.path("_forms").path(key).path("_links").path("target").path("href").asText()
+        http.get(expand(target, values), mapOf(HttpHeaders.ACCEPT to "application/hal+json"))
+    }
+
     private fun etag(): String = checkNotNull(http.layer1().responseHeaders.eTag)
 
     private fun ifMatch(): Pair<String, String> = HttpHeaders.IF_MATCH to etag()
 
     private companion object {
         val VARIABLE = Regex("""\{([A-Za-z0-9_]+)}""")
+        val QUERY = Regex("""\{\?([A-Za-z0-9_,]+)}""")
+
+        /** RFC 6570 levels 1 and 3, as far as forms use them: `{name}` and `{?a,b}`, leaving out unfilled ones. */
+        fun expand(template: String, values: Map<String, String>): String {
+            val query = QUERY.replace(template) { match ->
+                val pairs = match.groupValues[1].split(",").mapNotNull { name -> values[name]?.let { "$name=$it" } }
+                if (pairs.isEmpty()) "" else pairs.joinToString("&", "?")
+            }
+            return VARIABLE.replace(query) { checkNotNull(values[it.groupValues[1]]) }
+        }
     }
 }

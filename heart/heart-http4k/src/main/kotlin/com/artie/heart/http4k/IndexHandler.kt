@@ -5,7 +5,7 @@ import com.artie.heart.HeartResource
 import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.SERVICE_DESC
-import com.artie.heart.Search
+import com.artie.heart.ItemPath
 import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
 import com.artie.heart.ServingLimits
@@ -14,6 +14,7 @@ import kotlinx.coroutines.runBlocking
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
+import org.http4k.routing.path
 
 /**
  * The bookmark and the searches over HTTP (SPEC §6.11, §6.11.1): `/` as the
@@ -40,16 +41,16 @@ class IndexHandler(
     }
 
     fun search(resource: HeartResource<*, *>, request: Request): Response {
-        val name = request.query("name")
-        val id = request.query("id")?.toLongOrNull()
         val page = request.query("page")?.toIntOrNull() ?: 1
-        val found = runBlocking { checkNotNull(resource.find)(name, id) }
+        val variables = resource.layers.type.finding?.collectionPath
+            ?.let { path -> ItemPath.variablesOf(path).mapNotNull { name -> request.path(name)?.let { name to it } } }
+            .orEmpty().toMap()
+        val (search, found) = runBlocking { resource.searched(variables) { request.query(it) } }
         if (Negotiation.wantsPlainJson(request.header(ACCEPT))) {
             return Response(Status.OK).header(CONTENT_TYPE, JSON).header(VARY, ACCEPT)
                 .body(mapper.writeValueAsString(SearchPages.plainPage(found, page, limits.pageSize)))
         }
         val dialect = dialect(request)
-        val search = Search(resource.layers.type.collection, name, id)
         return layer1(Response(Status.OK).header(CONTENT_TYPE, dialect.mediaType), dialect)
             .body(mapper.writeValueAsString(SearchPages.page(search, found, page, limits.pageSize)))
     }

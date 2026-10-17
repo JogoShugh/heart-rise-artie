@@ -59,13 +59,12 @@ class ServiceIndex(
         // HAL-SCHEMA-FORMS-HR Rules 6 and 7: keyed by relation, and self-describing.
         "_forms" to found.flatMap { type ->
             val finding = checkNotNull(type.finding)
+            val forms = FindingForms(type)
             listOf(
-                type.profile.key(finding.search.relation) to schemaForm(
-                    type, "/${type.collection}{?name}", finding.search.relation, "name", nameProperty(finding),
-                ),
-                type.profile.key(finding.lookup.relation) to schemaForm(
-                    type, "/${type.collection}/{id}", finding.lookup.relation, "id", idProperty(finding),
-                ),
+                type.profile.key(finding.search.relation) to
+                    schemaForm(type, forms.searchTarget, finding.search.relation, forms.searchSchema),
+                type.profile.key(finding.lookup.relation) to
+                    schemaForm(type, forms.lookupTarget, finding.lookup.relation, forms.lookupSchema),
             ) + type.bookmarkActs.map { type.profile.key(it.relation) to actForm(type, it) }
         }.toMap(),
     )
@@ -79,7 +78,8 @@ class ServiceIndex(
         "_links" to links(),
         "_templates" to found.flatMap { type ->
             val finding = checkNotNull(type.finding)
-            listOf(
+            // A HAL-FORMS target cannot be templated, so a declared collection path has no template here.
+            val searches = if (FindingForms(type).declared) emptyList() else listOf(
                 finding.search.name to halFormsTemplate(
                     type, finding.search.relation,
                     mapOf(
@@ -94,7 +94,8 @@ class ServiceIndex(
                         "prompt" to finding.idTitle,
                     ),
                 ),
-            ) + type.bookmarkActs.map { act ->
+            )
+            searches + type.bookmarkActs.map { act ->
                 act.name to mapOf(
                     "title" to type.profile.relation(act.relation).title,
                     "method" to "POST",
@@ -110,19 +111,13 @@ class ServiceIndex(
         type: ResourceType<*, *>,
         target: String,
         relation: String,
-        field: String,
-        property: Map<String, Any>,
+        schema: Map<String, Any>,
     ): Map<String, Any> = mapOf(
         "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
         "method" to "GET",
         "title" to type.profile.relation(relation).title,
         "description" to type.profile.relation(relation).description,
-        "schema" to mapOf(
-            "\$schema" to "https://json-schema.org/draft/2020-12/schema",
-            "type" to "object",
-            "properties" to mapOf(field to property),
-            "required" to listOf(field),
-        ),
+        "schema" to schema,
     )
 
     /** A HAL-FORMS GET template: its properties become the query string of the collection. */
@@ -166,16 +161,6 @@ private fun actForm(type: ResourceType<*, *>, act: Act): Map<String, Any> {
     )
 }
 
-/** The search form's one field: part of a resource's name. */
-private fun nameProperty(finding: Finding): Map<String, Any> = mapOf(
-    "type" to "string", "minLength" to 1, "title" to "Name", "description" to finding.nameDescription,
-)
-
-/** The lookup form's one field: a resource's id. */
-private fun idProperty(finding: Finding): Map<String, Any> = mapOf(
-    "type" to "integer", "minimum" to 1, "title" to finding.idTitle, "description" to finding.idDescription,
-)
-
 /** SPEC §6.11.1: the index as a JSON Home document, for the types that can be found. */
 internal class HomeDocument(
     private val found: List<ResourceType<*, *>>,
@@ -197,15 +182,18 @@ internal class HomeDocument(
         val single = found.size == 1
         val resources = found.flatMap { type ->
             val noun = checkNotNull(type.finding).noun
+            val forms = FindingForms(type)
+            val (item, itemVars) = forms.item(VARS)
+            val (collection, collectionVars) = forms.collection(VARS)
             listOf(
                 (if (single) "item" else noun) to mapOf(
-                    "hrefTemplate" to "/${type.collection}/{id}",
-                    "hrefVars" to mapOf("id" to "$VARS/$noun-id"),
+                    "hrefTemplate" to item,
+                    "hrefVars" to itemVars,
                     "hints" to itemHints,
                 ),
                 (if (single) "collection" else type.collection) to mapOf(
-                    "hrefTemplate" to "/${type.collection}{?name,id}",
-                    "hrefVars" to mapOf("name" to "$VARS/$noun-name", "id" to "$VARS/$noun-id"),
+                    "hrefTemplate" to collection,
+                    "hrefVars" to collectionVars,
                     "hints" to mapOf("allow" to listOf("GET"), "formats" to FORMATS),
                 ),
             )

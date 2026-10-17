@@ -50,7 +50,7 @@ Feature: Choosing the representation over HTTP: dialect, profile and rung
     Then the response has ETag "\"seq-3.hsf.<max>.{digest}\""
     And Preference-Applied is <applied>
     When a client gets "/" with Accept "application/json-home"
-    Then the home document's "item" hint "accept-prefer" is <applied>
+    Then the home document's "lamp" hint "accept-prefer" is <applied>
 
     Examples:
       | max | applied                   |

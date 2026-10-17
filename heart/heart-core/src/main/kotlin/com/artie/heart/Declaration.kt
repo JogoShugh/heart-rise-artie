@@ -126,7 +126,11 @@ class Offers<K>(
  * class is the shape of its body: the OpenAPI description's schema of the state
  * is generated from it. [keyField] names the body's member that holds the
  * offer key; that member's schema is then the closed enum of every declared key.
+ * [itemPath], when given, is where each resource lives, filled from its state;
+ * by default `/{collection}/{id}`.
  */
+// A declaration names each of its parts once, by name; grouping them would only rename them.
+@Suppress("LongParameterList")
 class StateView<S, K>(
     val keyOf: (S) -> K,
     val idOf: (S) -> Long,
@@ -136,6 +140,7 @@ class StateView<S, K>(
     val bodyOf: (S) -> Map<String, Any?>,
     val bodyClass: Class<*>? = null,
     val keyField: String? = null,
+    val itemPath: ItemPath? = null,
 )
 
 /** A form's two names: its logical [name] (a HAL-FORMS template name) and its [relation] id in the profile. */
@@ -146,14 +151,41 @@ data class Named(val name: String, val relation: String)
  * search by part of a resource's name, and a lookup by id. [noun] names one
  * resource (`bed`), for the home document's variables; the words describe
  * the two fields to a person or a model.
+ *
+ * A type may instead declare its [collectionPath], a URI template such as
+ * `/repos/{owner}/{repo}/pulls`, and its forms' [fields]: one for each
+ * variable of the collection path and of the item path, and any filters,
+ * which go in the search's query. Its search then takes the collection
+ * path's variables and the filters, and its lookup the item path's variables.
  */
+// A declaration names each of its parts once, by name; grouping them would only rename them.
+@Suppress("LongParameterList")
 class Finding(
     val noun: String,
     val search: Named,
     val lookup: Named,
-    val nameDescription: String,
-    val idTitle: String,
-    val idDescription: String,
+    val nameDescription: String = "",
+    val idTitle: String = "",
+    val idDescription: String = "",
+    val collectionPath: UriTemplate? = null,
+    val fields: List<SearchField> = emptyList(),
+) {
+    /** The fields that are no variable of [collectionPath] or of [itemPath]: the search's query. */
+    fun filters(itemPath: ItemPath): List<SearchField> {
+        val variables = ItemPath.variablesOf(collectionPath.orEmpty()) + itemPath.variables
+        return fields.filter { it.name !in variables }
+    }
+
+    /** The field named [name]. */
+    fun field(name: String): SearchField = fields.first { it.name == name }
+}
+
+/** A field of a search or lookup form: its name, its words, and its JSON Schema. */
+data class SearchField(
+    val name: String,
+    val title: String,
+    val description: String,
+    val schema: Map<String, Any> = mapOf("type" to "string", "minLength" to 1),
 )
 
 /**
@@ -178,6 +210,9 @@ class ResourceType<S, K>(
     /** Every act declared, the resources' and the bookmark's. */
     val allActs: List<Act> = acts + bookmarkActs
 
+    /** Where each resource of this type lives. */
+    val itemPath: ItemPath = state.itemPath ?: ItemPath.of(collection)
+
     init {
         allActs.forEach { profile.relation(it.relation) }
         finding?.let { profile.relation(it.search.relation) }
@@ -186,6 +221,12 @@ class ResourceType<S, K>(
         val twice = allActs.groupBy { it.name }.filterValues { it.size > 1 }.keys
         require(twice.isEmpty()) { "acts declared twice: $twice" }
         offers.keys.forEach { checkKey(it) }
+        finding?.collectionPath?.let { path ->
+            val named = finding.fields.map { it.name }.toSet()
+            (ItemPath.variablesOf(path) + itemPath.variables).distinct().forEach {
+                require(it in named) { "$collection: no field for $it" }
+            }
+        }
     }
 
     /** Refuses a [key] that offers an act this type doesn't declare: at start, or when an open key is first met. */

@@ -16,6 +16,14 @@ internal class OpenApiType(
     @Suppress("UNCHECKED_CAST")
     private val offers = type.offers as Offers<Any?>
 
+    /** The item path's parameters: the id, by default; otherwise one per variable, read from the state. */
+    private val itemParameters: List<Map<String, Any>> =
+        if (type.state.itemPath == null) {
+            listOf(OpenApiShapes.idParameter(noun))
+        } else {
+            type.itemPath.pointers.map { (variable, pointer) -> pathParameter(variable, pointer) }
+        }
+
     /** Each act's input schema, under its input class's name, and the state's schema, under the type's noun. */
     fun schemas(): Map<String, Any?> =
         type.allActs.associate { inputName(it) to JsonTrees.plain(Options.openApi(it.schema)) } +
@@ -23,15 +31,16 @@ internal class OpenApiType(
 
     fun paths(): Map<String, Any> = buildMap {
         val collection = "/${type.collection}"
-        type.finding?.let { put(collection, mapOf("get" to search(it))) }
-        put("$collection/{id}", mapOf("get" to read()))
-        if (keepsPast) put("$collection/{id}/history", mapOf("get" to history()))
+        val item = type.itemPath.template
+        type.finding?.let { put(it.collectionPath ?: collection, mapOf("get" to search(it))) }
+        put(item, mapOf("get" to read()))
+        if (keepsPast) put("$item/history", mapOf("get" to history()))
         type.acts.forEach { act ->
-            put("$collection/{id}/actions/${act.path}", mapOf("post" to act(act)))
+            put("$item/actions/${act.path}", mapOf("post" to act(act)))
             // A path the act moved from still answers; it is its own operation, deprecated.
             act.formerPaths.forEach { former ->
                 val operation = act(act) + mapOf("operationId" to "${act.name}Former", "deprecated" to true)
-                put("$collection/{id}/actions/$former", mapOf("post" to operation))
+                put("$item/actions/$former", mapOf("post" to operation))
             }
         }
         type.bookmarkActs.forEach { put("$ACTIONS${it.path}", mapOf("post" to bookmarkAct(it))) }
@@ -44,11 +53,8 @@ internal class OpenApiType(
             "tags" to listOf(type.collection),
             "summary" to relation.title,
             "description" to relation.description,
-            "parameters" to listOf(
-                OpenApiShapes.query("name", finding.nameDescription, mapOf("type" to "string", "minLength" to 1)),
-                OpenApiShapes.query("id", finding.idDescription, OpenApiShapes.ID),
+            "parameters" to searchParameters(finding, type.itemPath) +
                 OpenApiShapes.query("page", "The page of matches, from 1", OpenApiShapes.ID),
-            ),
             "responses" to mapOf(
                 "200" to OpenApiShapes.json("The matches, a page at a time", OpenApiShapes.ref("SearchPage")),
                 "401" to OpenApiShapes.response("Unauthorized"),
@@ -72,7 +78,7 @@ internal class OpenApiType(
             "tags" to listOf(type.collection),
             "summary" to (relation?.title ?: "Get a $noun"),
             "description" to (relation?.doc ?: "One $noun, by its id."),
-            "parameters" to listOfNotNull(OpenApiShapes.idParameter(noun), asOf.takeIf { keepsPast }),
+            "parameters" to itemParameters + listOfNotNull(asOf.takeIf { keepsPast }),
             "responses" to listOfNotNull(
                 "200" to OpenApiShapes.withFormsLink(
                     OpenApiShapes.json("The $noun", OpenApiShapes.ref(stateName)),
@@ -90,7 +96,7 @@ internal class OpenApiType(
         "tags" to listOf(type.collection),
         "summary" to "What happened to the $noun",
         "description" to "Every event in the $noun's history, in order.",
-        "parameters" to listOf(OpenApiShapes.idParameter(noun)),
+        "parameters" to itemParameters,
         "responses" to mapOf(
             "200" to OpenApiShapes.json(
                 "The $noun's events, oldest first",
@@ -108,7 +114,7 @@ internal class OpenApiType(
             "tags" to listOf(type.collection),
             "summary" to relation.title,
             "description" to "${relation.doc}\n\n${onlyWhen(act)}${Options.prose(act)}",
-            "parameters" to listOf(OpenApiShapes.idParameter(noun)),
+            "parameters" to itemParameters,
             "requestBody" to OpenApiShapes.requestBody(inputName(act)),
             "responses" to mapOf(
                 "200" to OpenApiShapes.withFormsLink(
@@ -176,6 +182,33 @@ internal class OpenApiType(
         /** With affordance links, an operation also names the HEART relation it is: an opt-in, as the links are. */
         private fun named(operation: Map<String, Any>, key: String?, linked: Boolean): Map<String, Any> =
             if (linked && key != null) operation + (RELATION to key) else operation
+
+        /** A search's fields: by default part of a name and an id; else the collection path's and the filters. */
+        private fun searchParameters(finding: Finding, itemPath: ItemPath): List<Map<String, Any>> {
+            val path = finding.collectionPath ?: return listOf(
+                OpenApiShapes.query("name", finding.nameDescription, mapOf("type" to "string", "minLength" to 1)),
+                OpenApiShapes.query("id", finding.idDescription, OpenApiShapes.ID),
+            )
+            val inPath = ItemPath.variablesOf(path).map { finding.field(it) }.map { field ->
+                mapOf(
+                    "name" to field.name,
+                    "in" to "path",
+                    "required" to true,
+                    "description" to field.description,
+                    "schema" to field.schema,
+                )
+            }
+            return inPath + finding.filters(itemPath).map { OpenApiShapes.query(it.name, it.description, it.schema) }
+        }
+
+        /** One variable of a declared item path: a string, read from the state at [pointer]. */
+        private fun pathParameter(variable: String, pointer: String): Map<String, Any> = mapOf(
+            "name" to variable,
+            "in" to "path",
+            "required" to true,
+            "description" to "The state's $pointer",
+            "schema" to mapOf("type" to "string"),
+        )
 
         private fun inputName(act: Act): String =
             act.input?.simpleName ?: act.name.replaceFirstChar { it.uppercase() }

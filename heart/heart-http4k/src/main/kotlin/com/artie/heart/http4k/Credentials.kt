@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentHashMap
 class Credentials private constructor(
     private val users: Map<String, String>,
     private val tokens: List<ByteArray>,
+    /** True for a service that forwards each caller's credential to an upstream, which checks it. */
+    private val forwarding: Boolean = false,
 ) {
     /** The SHA-256 of each Basic credential already checked against its bcrypt hash, so bcrypt runs once. */
     private val verified = ConcurrentHashMap.newKeySet<String>()
@@ -33,9 +35,11 @@ class Credentials private constructor(
     fun admits(authorization: String?): Boolean {
         val parts = authorization?.trim()?.split(' ', limit = 2).orEmpty()
         val value = parts.getOrNull(1)?.trim().orEmpty()
-        return when (parts.firstOrNull()?.lowercase()) {
-            "basic" -> basic(value)
-            "bearer" -> bearer(value)
+        val scheme = parts.firstOrNull()?.lowercase()
+        return when {
+            forwarding -> scheme in FORWARDED && value.isNotEmpty()
+            scheme == "basic" -> basic(value)
+            scheme == "bearer" -> bearer(value)
             else -> false
         }
     }
@@ -114,6 +118,17 @@ class Credentials private constructor(
             }
             return Credentials(byName, tokenList.map { HexFormat.of().parseHex(it) })
         }
+
+        /**
+         * For a service that acts as each caller upstream, as a gateway in front
+         * of GitHub does: it admits any Basic or Bearer credential and forwards
+         * it, and the upstream says whether it is good (a 401 if not). A
+         * request with no credential is still refused here, so the service is
+         * never open.
+         */
+        fun forwarded(): Credentials = Credentials(emptyMap(), emptyList(), forwarding = true)
+
+        private val FORWARDED = setOf("basic", "bearer")
 
         private fun sha256(text: String): ByteArray = MessageDigest.getInstance("SHA-256").digest(text.toByteArray())
         private fun sha256Hex(text: String): String = HexFormat.of().formatHex(sha256(text))

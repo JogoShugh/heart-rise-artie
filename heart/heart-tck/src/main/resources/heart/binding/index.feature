@@ -54,7 +54,7 @@ Feature: The bookmark and the searches, served over HTTP from the declarations
     Then the response status is 200
     And the response links "self" to "/lamps/2"
 
-  Scenario: Both dialects' indexes offer the same forms, matched by title
+  Scenario: Both dialects' indexes offer the same forms, matched by title, but those HAL-FORMS cannot target
     When a client gets "/" as hal-schema-forms
     And a client gets "/" as hal-forms
-    Then the two indexes offer forms with the same titles
+    Then the two indexes offer forms with the same titles, but for "List pull requests, Get a pull request"
