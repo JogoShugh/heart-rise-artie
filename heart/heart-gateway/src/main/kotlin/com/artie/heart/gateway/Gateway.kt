@@ -44,9 +44,9 @@ class Gateway(
     private val mapper: ObjectMapper = HeartSettings.defaultMapper(),
     connector: Connector? = null,
 ) {
-    private val calls = Upstream(upstream, auth, mapper)
+    private val calls = Upstream(upstream, auth, mapper, connector?.headers.orEmpty())
     private val links = AffordanceLinks(calls)
-    private val vocabulary = Profile(profile, spec.title, spec.doc, relations(spec))
+    private val vocabulary = Profile(profile, spec.title, spec.doc, relations(spec, connector))
 
     init {
         connector?.check(spec)
@@ -64,8 +64,10 @@ class Gateway(
                 byRelation = type.acts.associate { act -> act.operation.relation to act.operation.name },
             ),
         )
-        val read: (Answer) -> Reading = { connector?.readerFor(it)?.read(it) ?: standards.read(it) }
-        GatewayResource(type, vocabulary, calls, read, mapper).resource
+        GatewayResource(type, vocabulary, calls, reader(connector, standards), mapper).resource
+    } + connector?.resources.orEmpty().map { declared ->
+        val standards = Standards(links.signal(byPath = emptyMap(), byRelation = emptyMap()))
+        DeclaredResource(declared, spec, vocabulary, calls, reader(connector, standards), mapper).resource
     }
 
     /** The gateway as one HTTP handler, admitting the callers [credentials] admits. */
@@ -73,11 +75,27 @@ class Gateway(
         HeartHttp(resources, credentials, settings)
 
     private companion object {
-        /** Every operation's relation, as the description names it, or after its id: `switchOff` is `switch-off`. */
-        fun relations(spec: GatewaySpec): List<Relation> = spec.types.flatMap { type ->
-            (type.acts + type.bookmarkActs).map { relation(it.operation, AlpsType.UNSAFE) } +
-                listOfNotNull(type.search?.operation, type.read).map { relation(it, AlpsType.SAFE) }
-        }.distinctBy { it.id }
+        /** Each answer is read by the first of the connector's readers that recognizes it, or else by a standard. */
+        fun reader(connector: Connector?, standards: Standards): (Answer) -> Reading =
+            { connector?.readerFor(it)?.read(it) ?: standards.read(it) }
+
+        /**
+         * Every operation's relation, as the description names it, or after its id: `switchOff` is `switch-off`.
+         * A connector that includes only some operations has a relation for each act its resource files
+         * declare, and for each included operation no act is made of.
+         */
+        fun relations(spec: GatewaySpec, connector: Connector?): List<Relation> =
+            if (connector?.include != null) {
+                val acts = connector.resources.flatMap { it.acts }
+                spec.routes.values.filter { route -> acts.none { it.operation == route.operation.name } }.map { route ->
+                    relation(route.operation, if (route.method == "GET") AlpsType.SAFE else AlpsType.UNSAFE)
+                } + acts.map { Relation(it.name, AlpsType.UNSAFE, it.title, it.description, it.description) }
+            } else {
+                spec.types.flatMap { type ->
+                    (type.acts + type.bookmarkActs).map { relation(it.operation, AlpsType.UNSAFE) } +
+                        listOfNotNull(type.search?.operation, type.read).map { relation(it, AlpsType.SAFE) }
+                }.distinctBy { it.id }
+            }
 
         fun relation(operation: SpecOperation, type: AlpsType) =
             Relation(id = operation.relation, type, operation.title, operation.doc, operation.doc)
@@ -103,9 +121,12 @@ internal class Standards(private val affordanceLink: AllowedNow) {
     }
 }
 
-/** A relation's id from an operation's, when the description names none: `switchOff` is `switch-off`. */
+/**
+ * A relation's id from an operation's, when the description names none:
+ * `switchOff` is `switch-off`, and GitHub's `pulls/merge` is `pulls-merge`.
+ */
 internal fun relationOf(operationId: String): String =
-    operationId.replace(Regex("([a-z0-9])([A-Z])"), "$1-$2").lowercase()
+    operationId.replace(Regex("([a-z0-9])([A-Z])"), "$1-$2").replace('/', '-').lowercase()
 
 /** A member of an upstream collection as last read: its id, its plain JSON, and the acts it allows now, as its key. */
 data class UpstreamState(val id: Long, val json: JsonNode, val key: String)
@@ -128,20 +149,13 @@ internal class GatewayResource(
 ) {
     private val acts = spec.acts.map { act(it) }
     private val bookmarkActs = spec.bookmarkActs.map { act(it) }
-
-    /** Why the acts a key leaves out are absent, as the upstream's signal said the first time it sent that key. */
-    private val reasons = ConcurrentHashMap<String, AbsenceReasons>()
+    private val keys = OfferKeys(acts, read)
 
     private val type = ResourceType<UpstreamState, String>(
         collection = spec.collection,
         profile = profile,
         acts = acts,
-        offers = Offers<String>(
-            keys = emptyList(),
-            offered = { key -> key.substringBefore(REASONS).split(',').filter { it.isNotEmpty() } },
-            whyAbsent = { key, act -> reasons[key]?.get(act) ?: NOT_NOW },
-            open = true,
-        ),
+        offers = keys.offers,
         state = StateView(
             keyOf = { it.key },
             idOf = { it.id },
@@ -179,17 +193,7 @@ internal class GatewayResource(
         },
     )
 
-    /** [answer] as a state, keyed by the acts its signal allows, in the order they are declared. */
-    private fun state(answer: Answer): UpstreamState {
-        val reading = read(answer)
-        val offered = acts.filter { it.name in reading.allowed.operations }.joinToString(",") { it.name }
-        // Two answers that allow the same acts for different reasons explain their absences differently,
-        // so the reasons are part of the key; equal reasons still share one affordance set.
-        val said = reading.allowed.reasons
-        val key = if (said.isEmpty()) offered else offered + REASONS + ContentAddress.address(canonical(said))
-        reasons.putIfAbsent(key, said)
-        return UpstreamState(reading.state.path("id").asLong(), reading.state, key)
-    }
+    private fun state(answer: Answer): UpstreamState = keys.state(answer)
 
     /** Every match, a page at a time, as the upstream's plain search pages list them. */
     private fun find(name: String?, id: Long?): List<Found> {
@@ -209,10 +213,6 @@ internal class GatewayResource(
     }
 
     private companion object {
-        const val NOT_NOW = "The upstream doesn't allow it in the resource's current state."
-
-        /** Separates the acts a key offers from the digest of the reasons it gives for the rest. */
-        const val REASONS = "|"
         val BODY = object : TypeReference<Map<String, Any?>>() {}
 
         /** An operation as an act, known by the relation the description names. */

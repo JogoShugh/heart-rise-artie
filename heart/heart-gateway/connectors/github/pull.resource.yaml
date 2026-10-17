@@ -1,0 +1,42 @@
+# A pull request: read by pulls/get, a repository's listed by pulls/list.
+noun: pull
+collection: pulls
+read: pulls/get
+search: pulls/list
+# Where each variable of the read's path is, in a pull request's state.
+pointers:
+  owner: /base/repo/owner/login
+  repo: /base/repo/name
+  pull_number: /number
+# The list's query parameters a search form offers; GitHub pages with Link, so page and per_page are not.
+filters: [state, sort, direction]
+title: /title
+# Acts, each a projection of one of GitHub's operations.
+acts:
+  close:
+    operation: pulls/update
+    title: Close
+    description: Close the pull request without merging it.
+    body: { state: closed }
+  reopen:
+    operation: pulls/update
+    title: Reopen
+    description: Open the closed pull request again.
+    body: { state: open }
+  merge:
+    operation: pulls/merge
+    title: Merge
+    description: Merge the pull request into its base branch.
+    fields: [merge_method, commit_title, commit_message]
+    # GitHub merges only if the head is still at this sha: the head the client's view had.
+    bind: { sha: /head/sha }
+    # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
+    stale: 409
+    refused: 405
+# Other answers the reader's rules read: the repository says whether the caller may push.
+facts:
+  repository:
+    operation: repos/get
+    pointers:
+      owner: /base/repo/owner/login
+      repo: /base/repo/name

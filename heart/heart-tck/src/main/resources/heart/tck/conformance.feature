@@ -27,7 +27,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
     Then the response status is 200
     And the response has Cache-Control "public, max-age=31536000, immutable"
     And the body matches the integrity of the link that led to it
-    And the offered act's target is a template, with the pointer "id" at "/id"
+    And the offered act's target is a template, filled by the fixture's pointers
 
     Examples:
       | n | prefer                  |

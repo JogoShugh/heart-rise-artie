@@ -58,11 +58,12 @@ class TckReadSteps(private val fixture: TckFixture, private val world: TckWorld)
         assertEquals(world.linkIntegrity, ContentAddress.integrity(body))
     }
 
-    @Then("the offered act's target is a template, with the pointer {string} at {string}")
-    fun template(variable: String, pointer: String) {
+    @Then("the offered act's target is a template, filled by the fixture's pointers")
+    fun template() {
         val form = world.forms().getValue(fixture.offered.key)
         assertEquals(true, form.path("_links").path("target").path("templated").asBoolean())
-        assertEquals(pointer, form.path("hr:templatePointers").path(variable).asText())
+        val pointers = form.path("hr:templatePointers").properties().associate { it.key to it.value.asText() }
+        assertEquals(fixture.pointers, pointers)
     }
 
 }

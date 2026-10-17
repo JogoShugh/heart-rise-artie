@@ -23,7 +23,7 @@ class TckWorld(private val client: WebTestClient, private val fixture: TckFixtur
     val json: JsonNode get() = ObjectMapper().readTree(last.responseBody ?: ByteArray(0))
 
     /** The fixture's resource. */
-    val resource: String get() = "/${fixture.collection}/$id"
+    val resource: String get() = fixture.address(id)
 
     /** When false, requests carry no credential: the scenarios about callers with none. */
     var credentialed = true

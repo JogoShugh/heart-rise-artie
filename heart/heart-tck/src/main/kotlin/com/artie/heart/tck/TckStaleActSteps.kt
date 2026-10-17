@@ -1,6 +1,7 @@
 package com.artie.heart.tck
 
 import com.artie.heart.ActPipeline
+import com.artie.heart.Caller
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.StaleWriteConflict
@@ -41,7 +42,8 @@ class TckStaleActSteps(
 
     @When("the server reads the resource to check the offered act")
     fun readForAct() {
-        read = runBlocking { resource.load(world.id) }
+        // As a binding does, the domain reads as the request's caller (Caller).
+        read = Caller.during(fixture.credential) { runBlocking { resource.locate(fixture.variables(world.id)) } }
     }
 
     @When("another client's offered act lands before it is performed")
@@ -57,9 +59,12 @@ class TckStaleActSteps(
     @When("the server performs the offered act on the state it read")
     fun performOnRead() {
         val pipeline = ActPipeline(resource.layers.type, mapper)
+        // As a binding does, the domain's act runs as the request's caller (Caller).
         refusal = runCatching {
-            runBlocking {
-                pipeline.run(offeredAct, fixture.offered.body) { input -> resource.perform(read, offeredAct, input) }
+            Caller.during(fixture.credential) {
+                runBlocking {
+                    pipeline.run(offeredAct, fixture.offered.body) { resource.perform(read, offeredAct, it) }
+                }
             }
         }.exceptionOrNull()
     }

@@ -32,20 +32,47 @@ class SpecType(
     val bookmarkActs: List<SpecAct>,
 )
 
+/** A parameter of an operation: its name, where it goes (`path` or `query`), its words and its JSON Schema. */
+class SpecParameter(val name: String, val location: String, val description: String, val schema: Map<String, Any>)
+
+/** An operation where it is served: its method, its path template, its parameters, and its JSON body's schema. */
+class SpecRoute(
+    val operation: SpecOperation,
+    val method: String,
+    val path: PathTemplate,
+    val parameters: List<SpecParameter>,
+    val body: Map<String, Any>?,
+)
+
 /**
  * The upstream's OpenAPI 3.x description, read by the conventions every
  * HEART binding's twin follows: `/{collection}/{id}` reads a member,
  * `/{collection}` searches, `/{collection}/{id}/actions/{path}` acts on a
  * member and `/actions/{path}` acts at the bookmark, tagged with its
  * collection. Deprecated operations are left out: they are former paths.
+ *
+ * With [include], only the operations it names are read, and the rest of the
+ * description is left out before it is parsed: GitHub's is 13.5 MB, and a
+ * connector uses a few of its operations. Every operation read is a [route],
+ * whatever its path, for a connector's resource files to name.
  */
-class GatewaySpec(text: String) {
+class GatewaySpec(text: String, include: Set<OperationId>? = null) {
     private val api: OpenAPI = OpenAPIV3Parser()
-        .readContents(text, null, ParseOptions().apply { isResolve = true; isResolveFully = true })
+        .readContents(Slice.of(text, include), null, ParseOptions().apply { isResolve = true; isResolveFully = true })
         .let { read -> checkNotNull(read.openAPI) { "the upstream's description is unreadable: ${read.messages}" } }
 
     val title: String = api.info?.title ?: "Upstream"
     val doc: String = api.info?.description ?: title
+
+    private val mapper = if (api.specVersion == SpecVersion.V31) Json31.mapper() else Json.mapper()
+
+    /** Every operation read, by its id. */
+    val routes: Map<OperationId, SpecRoute> = api.paths.orEmpty().flatMap { (path, item) ->
+        item.readOperationsMap().map { (method, operation) -> route(path, method.name, operation) }
+    }.associateBy { it.operation.name }
+
+    /** The operation [id], or a refusal naming it. */
+    fun route(id: OperationId): SpecRoute = routes[id] ?: error("the upstream's description has no operation $id")
 
     /** Each (path, method, operation) the gateway can use. */
     private val operations = api.paths.orEmpty().flatMap { (path, item) ->
@@ -86,9 +113,22 @@ class GatewaySpec(text: String) {
 
     private fun act(operation: Operation, path: String): SpecAct {
         val schema = operation.requestBody?.content?.get(JSON)?.schema
-        val mapper = if (api.specVersion == SpecVersion.V31) Json31.mapper() else Json.mapper()
         return SpecAct(operation(operation), path, schema?.let { mapper.writeValueAsString(it) } ?: "{}")
     }
+
+    private fun route(path: String, method: String, operation: Operation): SpecRoute {
+        val parameters = operation.parameters.orEmpty().map { parameter ->
+            val schema = plain(parameter.schema).orEmpty()
+            SpecParameter(parameter.name, parameter.`in`, parameter.description.orEmpty(), schema)
+        }
+        val body = plain(operation.requestBody?.content?.get(JSON)?.schema)
+        return SpecRoute(operation(operation), method, path, parameters, body)
+    }
+
+    /** A schema as plain JSON values. */
+    @Suppress("UNCHECKED_CAST")
+    private fun plain(schema: Any?): Map<String, Any>? =
+        schema?.let { mapper.convertValue(it, Map::class.java) as Map<String, Any> }
 
     private fun operation(operation: Operation): SpecOperation {
         val name = checkNotNull(operation.operationId) { "an operation has no operationId: ${operation.summary}" }

@@ -23,15 +23,15 @@ class TckBookmarkSteps(private val fixture: TckFixture, private val world: TckWo
 
     @When("a client follows the search form with the fixture's search term")
     fun search() {
-        val target = world.targets().single { it == "/${fixture.collection}{?name}" }
-        world.get(target.replace("{?name}", "?name=" + URLEncoder.encode(fixture.searchTerm, Charsets.UTF_8)))
+        val target = world.targets().single { it == fixture.searchTarget }
+        world.get(expand(target, fixture.searchValues))
     }
 
     @Then("the index offers the type's search and lookup forms")
     fun indexForms() {
         val targets = world.targets()
-        assertTrue("/${fixture.collection}{?name}" in targets, "index targets: $targets")
-        assertTrue("/${fixture.collection}/{id}" in targets, "index targets: $targets")
+        assertTrue(fixture.searchTarget in targets, "index targets: $targets")
+        assertTrue(fixture.lookupTarget in targets, "index targets: $targets")
     }
 
     @Then("the results list the resource")
@@ -43,7 +43,7 @@ class TckBookmarkSteps(private val fixture: TckFixture, private val world: TckWo
     @Then("the home document names the resource's collection")
     fun homeNames() {
         val templates = world.json.path("resources").map { it.path("hrefTemplate").asText() }
-        assertTrue("/${fixture.collection}/{id}" in templates, "templates: $templates")
+        assertTrue(fixture.lookupTarget in templates, "templates: $templates")
     }
 
     @Then("a hal-schema-forms client and a hal-forms client see the same act targets on the resource")
@@ -66,6 +66,24 @@ class TckBookmarkSteps(private val fixture: TckFixture, private val world: TckWo
             world.get(path)
             val ids = world.json.path("alps").path("descriptor").map { it.path("id").asText() }
             assertTrue(rel in ids, "$rel is not in $path: $ids")
+        }
+    }
+
+    private companion object {
+        val VARIABLE = Regex("""\{([A-Za-z0-9_]+)}""")
+        val QUERY = Regex("""\{\?([A-Za-z0-9_,]+)}""")
+
+        /** RFC 6570, as far as a search form uses it: `{name}` and `{?a,b}`, leaving out the unfilled. */
+        fun expand(template: String, values: Map<String, String>): String {
+            val query = QUERY.replace(template) { match ->
+                val pairs = match.groupValues[1].split(",").mapNotNull { name ->
+                    values[name]?.let { "$name=" + URLEncoder.encode(it, Charsets.UTF_8) }
+                }
+                if (pairs.isEmpty()) "" else pairs.joinToString("&", "?")
+            }
+            return VARIABLE.replace(query) { match ->
+                URLEncoder.encode(checkNotNull(values[match.groupValues[1]]), Charsets.UTF_8)
+            }
         }
     }
 }

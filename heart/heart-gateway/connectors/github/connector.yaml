@@ -1,0 +1,14 @@
+# GitHub's REST API, its pull requests (spec/PLAN-GITHUB-PULLS.md).
+# Run the gateway with GATEWAY_CONNECTOR pointing here, UPSTREAM_URL=https://api.github.com,
+# UPSTREAM_SPEC at GitHub's description (github/rest-api-description, api.github.com.json),
+# and UPSTREAM_AUTH=caller, so GitHub is called as each caller, with their own token.
+profile: github
+# Only these operations of GitHub's description are read; the rest is left out before parsing.
+include: [pulls/list, pulls/get, pulls/update, pulls/merge, repos/get]
+# Every call to GitHub names the API version it was written against.
+headers:
+  X-GitHub-Api-Version: "2022-11-28"
+resources:
+  - pull.resource.yaml
+readers:
+  - pull.reader.yaml

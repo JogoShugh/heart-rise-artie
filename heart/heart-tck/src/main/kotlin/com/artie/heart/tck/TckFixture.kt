@@ -35,6 +35,28 @@ interface TckFixture {
 
     /** Puts the server's data back to a known state, with the resource ready; returns its id. */
     suspend fun ready(): Long
+
+    /**
+     * Where resource [id] lives: by default `/{collection}/{id}`. A type that
+     * declares its item path, such as `/repos/{owner}/{repo}/pulls/{number}`,
+     * names its resource's address here.
+     */
+    fun address(id: Long): String = "/$collection/$id"
+
+    /** Resource [id]'s item path variables, as a binding fills them from its address: by default, its id. */
+    fun variables(id: Long): Map<String, String> = mapOf("id" to "$id")
+
+    /** The JSON Pointer each variable of a shared form's target is filled from: by default the id, at `/id`. */
+    val pointers: Map<String, String> get() = mapOf("id" to "/id")
+
+    /** The index's search form's target: by default by part of a name, `/{collection}{?name}`. */
+    val searchTarget: String get() = "/$collection{?name}"
+
+    /** The values that fill the search form to find the resource: by default the [searchTerm] as its name. */
+    val searchValues: Map<String, String> get() = mapOf("name" to searchTerm)
+
+    /** The index's lookup form's target, which is also the item's template in the home document. */
+    val lookupTarget: String get() = "/$collection/{id}"
 }
 
 /**

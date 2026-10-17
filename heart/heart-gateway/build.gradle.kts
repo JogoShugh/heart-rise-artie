@@ -42,6 +42,15 @@ application {
     mainClass.set("com.artie.heart.gateway.MainKt")
 }
 
+// The connectors that ship with the gateway (connectors/github, ...), beside bin/ and lib/.
+distributions {
+    main {
+        contents {
+            from("connectors") { into("connectors") }
+        }
+    }
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
 }

@@ -59,6 +59,15 @@ Feature: The gateway is configured by its environment
     When the gateway reads its configuration
     Then the gateway calls the upstream with "Basic Z2F0ZTpub3QtYS1yZWFsLXBhc3N3b3Jk"
 
+  Scenario: Calling the upstream as each caller, the gateway holds no credentials of its own
+    Given the environment
+      | UPSTREAM_URL    | https://api.github.com |
+      | UPSTREAM_AUTH   | caller                 |
+      | GATEWAY_PROFILE | github                 |
+    When the gateway reads its configuration
+    Then the gateway calls the upstream with each caller's own credential
+    And the gateway admits any Basic or Bearer credential, for the upstream to judge, and no request without one
+
   Scenario Outline: A missing or wrong setting stops the gateway, naming the variable and no secret
     Given the environment
       | UPSTREAM_URL             | <url>     |
@@ -73,7 +82,7 @@ Feature: The gateway is configured by its environment
       |                    | none    | garden  | set UPSTREAM_URL: where the upstream is                  |
       | http://garden:8080 | none    |         | set GATEWAY_PROFILE, or GATEWAY_CONNECTOR to a connector naming one |
       | http://garden:8080 | bearer  | garden  | UPSTREAM_AUTH is bearer, so set UPSTREAM_TOKEN           |
-      | http://garden:8080 | forward | garden  | UPSTREAM_AUTH must be none, bearer or basic, not forward |
+      | http://garden:8080 | forward | garden  | UPSTREAM_AUTH must be none, bearer, basic or caller, not forward |
 
   Scenario: Who may call the gateway is required, as on every HEART server
     Given the environment

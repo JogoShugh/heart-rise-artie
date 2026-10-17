@@ -44,12 +44,14 @@ class Reader(
     private val hidden: List<JsonPointer>,
     /** The operationIds the file names, checked against the description at start. */
     val named: Set<OperationId>,
+    /** Rules, in order, that make acts absent, with reasons, after the signal has said what it allows. */
+    private val rules: List<Rule> = emptyList(),
 ) {
     fun read(answer: Answer): Reading {
         val state = answer.body.deepCopy<JsonNode>()
         hidden.forEach { pointer -> (state.at(pointer.head()) as? ObjectNode)?.remove(pointer.last().matchingProperty) }
         if (signal is ODataActions) (state as? ObjectNode)?.properties()?.removeIf { signal.isAdvertisement(it.key) }
-        return Reading(signal.of(answer.body, answer.links), state)
+        return Reading(Rule.applied(signal.of(answer.body, answer.links), rules, answer), state)
     }
 }
 
@@ -61,15 +63,36 @@ class Reader(
  * recognizes an answer reads it, so the API's default reader, which
  * recognizes everything, is listed last.
  */
-class Connector(val name: String, val profile: String, val readers: List<Reader>) {
+// A declaration names each of its parts once, by name; grouping them would only rename them.
+@Suppress("LongParameterList")
+class Connector(
+    val name: String,
+    val profile: String,
+    val readers: List<Reader>,
+    /** The operations the gateway reads; none means every one. */
+    val include: Set<OperationId>? = null,
+    /** Headers every call to the upstream carries, such as GitHub's `X-GitHub-Api-Version`. */
+    val headers: Map<String, String> = emptyMap(),
+    /** The resources of an upstream whose paths aren't HEART's, one file each. */
+    val resources: List<ResourceDeclaration> = emptyList(),
+) {
 
     /** The first reader that recognizes [answer], or none. */
     fun readerFor(answer: Answer): Reader? = readers.firstOrNull { it.match.holds(answer) }
 
-    /** Refuses a reader that names an operation or a path the upstream's description doesn't have. */
+    /** Refuses an included operation, a resource or a reader the upstream's description doesn't serve. */
     fun check(spec: GatewaySpec) {
-        val operations = spec.types.flatMap { it.acts + it.bookmarkActs }.map { it.operation.name }.toSet()
-        val paths = spec.types.map { "/${it.collection}/{id}" }.toSet()
+        (include.orEmpty() - spec.routes.keys).firstOrNull()
+            ?.let { error("$name/connector.yaml: the upstream's description has no operation $it") }
+        resources.forEach { resource ->
+            (resource.named - spec.routes.keys).firstOrNull()
+                ?.let { error("${resource.file}: the upstream's description has no operation $it") }
+        }
+        // A reader names an act by its operation's id; a declared act is named by the resource file.
+        val operations = spec.types.flatMap { it.acts + it.bookmarkActs }.map { it.operation.name }.toSet() +
+            resources.flatMap { resource -> resource.acts.map { it.name } }
+        val paths = spec.types.map { "/${it.collection}/{id}" }.toSet() +
+            resources.map { spec.route(it.read).path.replace(Regex("\\{[^}/]+}"), "{id}") }
         readers.forEach { reader ->
             reader.match.path?.let { path ->
                 check(path.replace(Regex("\\{[^}/]+}"), "{id}") in paths) {
@@ -101,7 +124,12 @@ class Connector(val name: String, val profile: String, val readers: List<Reader>
             val readers = listed.map { file ->
                 ReaderFile(folder, "$name/$file", yaml.readTree(folder.resolve(file).toFile()), mapper).reader()
             }
-            return Connector(name, profile, readers)
+            val resources = api.path("resources").map { it.asText() }.map { file ->
+                ResourceDeclaration.of("$name/$file", yaml.readTree(folder.resolve(file).toFile()))
+            }
+            val include = api.path("include").takeIf { it.isArray }?.map { it.asText() }?.toSet()
+            val headers = api.path("headers").fields().asSequence().associate { it.key to it.value.asText() }
+            return Connector(name, profile, readers, include, headers, resources)
         }
     }
 }
@@ -121,8 +149,16 @@ private class ReaderFile(val folder: Path, val label: String, val node: JsonNode
             ?: allowed.path("jsonata").asText(null)?.let { JsonataSignal(Files.readString(folder.resolve(it)), mapper) }
             ?: error("$label: allowed must name one of names, booleans, links, odata, table or jsonata")
         val hidden = node.path("hide").map { pointer(it.asText()) }
-        return Reader(label, match(), signal, hidden, names.values.toSet() + rowsNamed())
+        val rules = allowed.path("rules").map { rule ->
+            Rule(
+                rule.path("when").fields().asSequence().associate { it.key to it.value },
+                rule.path("absent").fields().asSequence().associate { it.key to it.value.asText() },
+            )
+        }
+        return Reader(label, match(), signal, hidden, names.values.toSet() + rowsNamed() + rulesNamed(rules), rules)
     }
+
+    private fun rulesNamed(rules: List<Rule>): Set<OperationId> = rules.flatMap { it.absent.keys }.toSet()
 
     private fun match(): Match {
         val matches = node.path("matches")

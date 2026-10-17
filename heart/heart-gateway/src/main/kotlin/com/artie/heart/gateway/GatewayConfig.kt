@@ -35,16 +35,22 @@ class GatewayConfig private constructor(
             }
             val upstream = UpstreamSettings(url, value("UPSTREAM_SPEC") ?: "$url/openapi.json", auth(::value))
             val port = value("PORT")?.let { checkNotNull(it.toIntOrNull()) { "PORT must be a number" } } ?: DEFAULT_PORT
-            val credentials = Credentials.parse(
-                value("HEART_AUTH_BASIC_USERS").orEmpty(),
-                value("HEART_AUTH_BEARER_TOKENS").orEmpty(),
-            )
+            // Calling the upstream as each caller, the gateway lets the upstream say whose credential is good.
+            val credentials = if (upstream.auth == UpstreamAuth.Forwarded) {
+                Credentials.forwarded()
+            } else {
+                Credentials.parse(
+                    value("HEART_AUTH_BASIC_USERS").orEmpty(),
+                    value("HEART_AUTH_BEARER_TOKENS").orEmpty(),
+                )
+            }
             return GatewayConfig(upstream, profile, connector, port, credentials)
         }
 
         private fun auth(value: (String) -> String?): UpstreamAuth = when (val scheme = value("UPSTREAM_AUTH")) {
             null -> UpstreamAuth.None
             "none" -> UpstreamAuth.None
+            "caller" -> UpstreamAuth.Forwarded
             "bearer" -> UpstreamAuth.Bearer(
                 checkNotNull(value("UPSTREAM_TOKEN")) { "UPSTREAM_AUTH is bearer, so set UPSTREAM_TOKEN" },
             )
@@ -56,7 +62,7 @@ class GatewayConfig private constructor(
                 }
                 UpstreamAuth.Basic(user, password)
             }
-            else -> error("UPSTREAM_AUTH must be none, bearer or basic, not $scheme")
+            else -> error("UPSTREAM_AUTH must be none, bearer, basic or caller, not $scheme")
         }
     }
 }

@@ -1,12 +1,16 @@
 package com.artie.heart.gateway.bdd
 
+import com.artie.heart.Caller
 import com.artie.heart.gateway.GatewayConfig
+import com.artie.heart.gateway.UpstreamAuth
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertTrue
 
 /** A gateway's configuration, read from an environment a scenario sets up. */
 class ConfigurationSteps {
@@ -51,6 +55,20 @@ class ConfigurationSteps {
 
     @Then("the gateway listens on port {int}")
     fun port(port: Int) = assertEquals(port, config.port)
+
+    @Then("the gateway calls the upstream with each caller's own credential")
+    fun forwarded() {
+        assertEquals(UpstreamAuth.Forwarded, config.upstream.auth)
+        assertEquals("Bearer ada-token", Caller.during("Bearer ada-token") { config.upstream.auth.authorization() })
+    }
+
+    @Then("the gateway admits any Basic or Bearer credential, for the upstream to judge, and no request without one")
+    fun admitsAny() {
+        assertTrue(config.credentials.admits("Bearer anyone's-token"))
+        assertTrue(config.credentials.admits("Basic YW55b25lOnNlY3JldA=="))
+        assertFalse(config.credentials.admits(null))
+        assertFalse(config.credentials.admits("Bearer "))
+    }
 
     @Then("it refuses to start, saying {string}")
     fun refuses(says: String) = assertEquals(says, read.exceptionOrNull()?.message)
