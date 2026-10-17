@@ -2,14 +2,14 @@
   "stack": "gradle-kotlin",
   "prodPatterns": [
     "server-spring/src/main/kotlin/*.kt",
-    "client/src/main/kotlin/*.kt",
+    "client/*/src/main/kotlin/*.kt",
     "heart/*/src/main/kotlin/*.kt",
     "domains/*/src/main/kotlin/*.kt"
   ],
   "prodExcludePatterns": [],
   "featurePatterns": [
     "server-spring/src/test/resources/features/*.feature",
-    "client/src/test/resources/features/*.feature",
+    "client/*/src/test/resources/features/*.feature",
     "heart/*/src/test/resources/features/*.feature",
     "heart/heart-tck/src/main/resources/heart/tck/*.feature",
     "domains/*/src/test/resources/features/*.feature"
