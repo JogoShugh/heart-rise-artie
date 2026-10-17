@@ -1,4 +1,4 @@
-package com.artie.heart.gateway.bdd
+package com.artie.heart.gateway.fixtures
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper

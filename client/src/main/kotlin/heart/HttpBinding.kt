@@ -19,13 +19,18 @@ class HttpBinding(private val transport: Transport) : Binding {
 
     override fun act(act: Act, rendering: Rendering): Outcome {
         val headers = negotiation(rendering) + mapOf("Content-Type" to act.contentType, "If-Match" to act.validator)
-        return outcome(transport.send(HeartRequest(act.method, act.url, headers, act.body)))
+        return outcome(transport.send(HeartRequest(act.method, act.url, headers, act.body)), act.url)
     }
 
-    private fun outcome(response: HeartResponse): Outcome {
+    /** A 201's Location (SPEC §6.0, "New resource") is resolved against [requested], the URL asked. */
+    private fun outcome(response: HeartResponse, requested: String? = null): Outcome {
         val code = response.status.toString()
         val problem = ProblemDetails.type(response.body)
         return when (response.status) {
+            CREATED -> Outcome.Done(
+                received(response), code, resolved(response, "Location", requested),
+                represents = resolved(response, "Content-Location", requested),
+            )
             in SUCCESS -> Outcome.Done(received(response), code)
             PRECONDITION_REQUIRED -> Outcome.PreconditionRequired(code, problem)
             PRECONDITION_FAILED -> Outcome.Stale(code, problem)
@@ -42,7 +47,14 @@ class HttpBinding(private val transport: Transport) : Binding {
         private val profileLink = Regex("""<([^>]*)>\s*;\s*rel="?profile"?""")
 
         val SUCCESS = 200..299
+        const val CREATED = 201
         const val UNAUTHORIZED = 401
+
+        /** The address in the response's [header], resolved against [requested], the URL asked. */
+        fun resolved(response: HeartResponse, header: String, requested: String?): String? =
+            response.header(header)?.let { address ->
+                requested?.let { java.net.URI(it).resolve(address).toString() } ?: address
+            }
         const val FORBIDDEN = 403
         private val quoted = Regex(""""(?:[^"\\]|\\.)*"""")
 

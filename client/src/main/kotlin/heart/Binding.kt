@@ -32,7 +32,18 @@ class Received(
  * the status code), and is only reported, never acted on.
  */
 sealed class Outcome(val code: String, val problemType: String?) {
-    class Done(val received: Received, code: String) : Outcome(code, null)
+    /**
+     * The request succeeded. [newResource] is where a resource the act brought into
+     * being lives (SPEC §6.0, "New resource"), absolute; null when it made none.
+     * [represents] is the resource the answer's body is a representation of, when the
+     * binding says (HTTP: Content-Location), absolute; null when it does not.
+     */
+    class Done(
+        val received: Received,
+        code: String,
+        val newResource: String? = null,
+        val represents: String? = null,
+    ) : Outcome(code, null)
     class PreconditionRequired(code: String, problemType: String?) : Outcome(code, problemType)
     class Stale(code: String, problemType: String?) : Outcome(code, problemType)
     class NotOffered(code: String, problemType: String?) : Outcome(code, problemType)

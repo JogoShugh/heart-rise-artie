@@ -112,7 +112,7 @@ class CoapBinding(
         val sender = if (key != null) secureClient(checkNotNull(origin), key) else client
         val response = sender.advanced(request)?.advanced()
         return when {
-            response != null -> outcome(response)
+            response != null -> outcome(response).withNewResource(response, url)
             secure -> Outcome.Failed("no answer from ${request.uri}: the DTLS handshake did not complete", null)
             else -> Outcome.Failed("no answer from ${request.uri}", null)
         }
@@ -152,6 +152,16 @@ class CoapBinding(
             "application/json" to JSON,
         )
         val MEDIA_TYPES = FORMATS.entries.associate { (type, format) -> format to type }
+
+        /**
+         * SPEC §6.0.1, "New resource": 2.01 Created names the resource the act brought into
+         * being in Location-Path, resolved against [requested], the URI asked.
+         */
+        fun Outcome.withNewResource(response: Response, requested: String): Outcome {
+            val path = response.options.locationPathString
+            if (this !is Outcome.Done || response.code != ResponseCode.CREATED || path.isNullOrEmpty()) return this
+            return Outcome.Done(received, code, java.net.URI(requested).resolve("/$path").toString())
+        }
 
         fun outcome(response: Response): Outcome {
             val code = response.code

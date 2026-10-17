@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `java-test-fixtures`
     application
     kotlin("jvm")
     id("io.gitlab.arturbosch.detekt")
@@ -19,6 +20,11 @@ dependencies {
     // A connector's escape hatch: a JSONata expression, bounded in time and depth. No dependencies of its own.
     implementation("com.dashjoin:jsonata:0.9.10")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
+    // The small GitHub, on GitHub's own example JSON, and the gateway in front of it: for this
+    // module's features and for clients' tests (ARTIE's, through a composite build).
+    testFixturesApi(project(":heart-http4k"))
+    testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind")
 
     // The conformance features run against the gateway in front of a plain JSON
     // twin, served by heart-http4k in memory.

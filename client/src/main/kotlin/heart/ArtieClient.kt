@@ -125,7 +125,11 @@ class ArtieClient(
         val act = Act(targetOf(form, held, payload), form.method, form.contentType, payload.toString(), validator)
         val outcome = bindings.forUri(act.url).act(act, asking)
         decisions.actSent(rel, act, held.url, outcome)
-        if (outcome is Outcome.Done) return sync(act.url, outcome.received)
+        // SPEC §6.0, "New resource": the act brought a resource into being, and the client holds it next:
+        // the answer itself when it represents that resource, else read at its own address.
+        if (outcome is Outcome.Done) return outcome.newResource?.let { made ->
+            if (outcome.represents == made) sync(made, outcome.received) else sync(made)
+        } ?: sync(act.url, outcome.received)
         if (outcome is Outcome.PreconditionRequired && resendAllowed) {
             sync(held.url)
             decisions.actRefused(rel, act.url, outcome, "re-synced and resent once")

@@ -4,6 +4,10 @@ import com.artie.heart.gateway.Connector
 import com.artie.heart.gateway.Gateway
 import com.artie.heart.gateway.GatewaySpec
 import com.artie.heart.gateway.UpstreamAuth
+import com.artie.heart.gateway.fixtures.Comment
+import com.artie.heart.gateway.fixtures.GitHubUpstream
+import com.artie.heart.gateway.fixtures.Issue
+import com.artie.heart.gateway.fixtures.Pull
 import com.artie.heart.http4k.Credentials
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -11,6 +15,8 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import java.nio.file.Path
+import java.security.MessageDigest
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -18,8 +24,6 @@ import org.http4k.core.Response
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
-import java.nio.file.Path
-import java.security.MessageDigest
 
 /** The gateway in front of a small GitHub, known by a slice of GitHub's own description. */
 class GitHubSteps {

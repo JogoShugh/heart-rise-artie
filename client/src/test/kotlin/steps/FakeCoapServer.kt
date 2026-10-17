@@ -34,6 +34,10 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
     var rung: String? = null
     private var refusal: Pair<ResponseCode, String>? = null
 
+    /** The path of a resource the next act brings into being (2.01 Created, Location-Path), if any. */
+    var createsNext: String? = null
+    private val made = mutableSetOf<String>()
+
     /** The 8-byte validator of the bed's current state. */
     val validator: ByteArray get() = byteArrayOf(0, 0, 0, 0, 0, 0, 0, version.toByte())
 
@@ -73,17 +77,33 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
 
     private fun answer(request: Request): Response {
         requests += request
-        if (request.code == Code.GET) return representation(ResponseCode.CONTENT)
+        val path = request.options.uriPathString
+        if (request.code == Code.GET) {
+            return if (path in made) newResource(path) else representation(ResponseCode.CONTENT)
+        }
         val refused = refusal.also { refusal = null }
         return when {
             refused != null -> problem(refused.first, refused.second)
             request.options.ifMatch.none { it.contentEquals(validator) } -> Response(ResponseCode.PRECONDITION_FAILED)
+            createsNext != null -> {
+                val at = checkNotNull(createsNext).also { createsNext = null; made += it }
+                representation(ResponseCode.CREATED).apply { options.setLocationPath(at) }
+            }
             else -> {
                 status = "PLANTED"
                 version++
                 representation(ResponseCode.CHANGED)
             }
         }
+    }
+
+    /** A resource an act brought into being: its own state, and no forms. */
+    private fun newResource(path: String) = Response(ResponseCode.CONTENT).apply {
+        setPayload("""{"status": "NEW", "_links": {"self": {"href": "/$path"}}, "_forms": {}}""")
+        options.contentFormat = HAL_JSON
+        options.maxAge = 0
+        options.addETag(byteArrayOf(0, 0, 0, 0, 0, 0, 0, 1))
+        options.addOption(Option(PROFILE, "https://w3id.org/heart-rise/hal-schema-forms"))
     }
 
     private fun problem(code: ResponseCode, type: String) = Response(code).apply {

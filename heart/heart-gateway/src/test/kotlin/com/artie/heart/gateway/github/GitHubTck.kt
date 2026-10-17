@@ -5,14 +5,15 @@ import com.artie.heart.gateway.Connector
 import com.artie.heart.gateway.Gateway
 import com.artie.heart.gateway.GatewaySpec
 import com.artie.heart.gateway.UpstreamAuth
-import com.artie.heart.gateway.bdd.GitHubUpstream
-import com.artie.heart.gateway.bdd.Pull
+import com.artie.heart.gateway.fixtures.GitHubUpstream
+import com.artie.heart.gateway.fixtures.Pull
 import com.artie.heart.http4k.Credentials
 import com.artie.heart.tck.TckAct
 import com.artie.heart.tck.TckFixture
 import com.artie.heart.tck.TckWorld
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.spring.CucumberContextConfiguration
+import java.nio.file.Path
 import org.http4k.server.Http4kServer
 import org.http4k.server.Jetty
 import org.http4k.server.asServer
@@ -21,7 +22,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.reactive.server.WebTestClient
-import java.nio.file.Path
 
 /**
  * HEART's conformance features through the gateway in front of a small

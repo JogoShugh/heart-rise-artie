@@ -38,7 +38,11 @@ class ClientContext {
     var allowUncheckedLinks = false
 
     /** Everything that reached the wire (below each client's cache), live or fake. */
-    val wireLog: RecordingTransport by lazy { RecordingTransport(if (baseUrl != null) HttpTransport() else transport) }
+    /** A server in this process, reached as over the network (github-gateway.feature); else live or fake. */
+    var inProcess: Transport? = null
+    val wireLog: RecordingTransport by lazy {
+        RecordingTransport(inProcess ?: if (baseUrl != null) HttpTransport() else transport)
+    }
     private val wire: Transport get() = wireLog
 
     /** The credentials every client in the scenario holds; a scenario sets them before the first request. */

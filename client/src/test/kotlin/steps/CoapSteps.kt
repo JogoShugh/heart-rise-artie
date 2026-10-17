@@ -38,6 +38,11 @@ class CoapSteps(private val ctx: ClientContext) {
         }
     }
 
+    @Given("the CoAP service will bring bed {int} into being on the next act")
+    fun createsNext(bed: Int) {
+        coap.createsNext = "beds/$bed"
+    }
+
     @Given("the CoAP service will refuse the next act with {word} and problem type {string}")
     fun refuseNext(code: String, type: String) {
         val (codeClass, detail) = code.split('.').map { it.toInt() }

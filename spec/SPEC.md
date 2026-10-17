@@ -214,7 +214,7 @@ This has a cost, and the document should be read as accepting it: a manifest tha
 | Integrity | The bytes of a shared layer are the ones the linking representation vouched for | The link's `integrity` value, carried in the hypertext and so protocol-independent; `Repr-Digest` optional (§6.5) |
 | Act | A state-changing request, conditional on the validator held | The form's `method`, with `If-Match` (§6.2) |
 | Act done | The act succeeded; the answer is the resource's new representation | `2xx`, with `Content-Location` naming the resource (§6.2) |
-| New resource | The act brought a resource into being; the answer is that resource's representation | `201`, with `Location` and `Content-Location` naming it (§6.2) |
+| New resource | The act brought a resource into being, named by the answer; the answer's body is a representation of the new resource or of the one acted on, and says which. The client holds the new resource next, reading it unless the body is it (decided 2026-10-17) | `201` with `Location` naming the new resource; `Content-Location` names what the body represents: the new resource (the client need not read it) or the one acted on (§6.2) |
 | Precondition required | The act carried no validator | `428` |
 | Stale | The validator is not current | `412` |
 | Not offered | The act is not legal in the current state | `409` |
@@ -241,7 +241,7 @@ ARTIE implements the client side of this section: its core works in the concepts
 | Integrity | The link's `integrity` value, as in every binding. There is no `Repr-Digest`. |
 | Act | `POST` (0.02) with `If-Match` (the 8-byte validator) |
 | Act done | `2.04 Changed`, with the resource's new representation. CoAP has no `Content-Location`; the representation's `self` link names the resource. |
-| New resource | `2.01 Created`, with `Location-Path` and the new resource's representation, whose `self` link names it too |
+| New resource | `2.01 Created`, with `Location-Path` naming the new resource; the body's `self` link names what it represents, the new resource or the one acted on |
 | Precondition required | `4.00 Bad Request` with the problem type `precondition-required`. CoAP has no 4.28. |
 | Stale | `4.12 Precondition Failed` |
 | Not offered | `4.09 Conflict` (RFC 8132) |

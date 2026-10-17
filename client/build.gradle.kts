@@ -31,6 +31,8 @@ dependencies {
     testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.0")
     testImplementation(kotlin("reflect"))
     testImplementation("io.cucumber:cucumber-picocontainer:$cucumberVersion")
+    // The GitHub gateway and a small GitHub, in process (github-gateway.feature).
+    testImplementation(testFixtures("com.artie.heart:heart-gateway"))
     // bdd-gates: the client's architecture boundary as a failing test.
     testImplementation("com.lemonappdev:konsist:0.17.3")
 }
