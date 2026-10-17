@@ -26,19 +26,28 @@ class ConfigurationSteps {
     }
 
     @Then("the upstream is {string}")
-    fun upstream(url: String) = assertEquals(url, config.upstreamUrl)
+    fun upstream(url: String) = assertEquals(url, config.upstream.url)
 
     @Then("the description is read from {string}")
-    fun description(spec: String) = assertEquals(spec, config.spec)
+    fun description(spec: String) = assertEquals(spec, config.upstream.spec)
 
     @Then("the gateway calls the upstream with no credential")
-    fun noCredential() = assertNull(config.auth.authorization())
+    fun noCredential() = assertNull(config.upstream.auth.authorization())
 
     @Then("the gateway calls the upstream with {string}")
-    fun credential(authorization: String) = assertEquals(authorization, config.auth.authorization())
+    fun credential(authorization: String) = assertEquals(authorization, config.upstream.auth.authorization())
 
     @Then("the relations are named in the profile {string}")
     fun profile(name: String) = assertEquals(name, config.profile)
+
+    @Then("the connector is read from {string}")
+    fun connector(path: String) = assertEquals(path, config.connector.toString())
+
+    @Then("the relations are named by the connector's profile")
+    fun connectorProfile() = assertNull(config.profile)
+
+    @Then("the gateway has no connector")
+    fun noConnector() = assertNull(config.connector)
 
     @Then("the gateway listens on port {int}")
     fun port(port: Int) = assertEquals(port, config.port)

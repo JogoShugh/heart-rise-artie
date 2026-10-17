@@ -31,6 +31,23 @@ Feature: The gateway is configured by its environment
     And the gateway calls the upstream with "Bearer not-a-real-token"
     And the gateway listens on port 8383
 
+  Scenario: A connector folder names the profile, so GATEWAY_PROFILE is not needed
+    Given the environment
+      | UPSTREAM_URL             | http://doors:8080 |
+      | GATEWAY_CONNECTOR        | /connectors/doors |
+      | HEART_AUTH_BEARER_TOKENS | 5e884898da28047151d0e56f8dc6292773603d0d6aff2bdcb2c38e8f3b2ba4c1 |
+    When the gateway reads its configuration
+    Then the connector is read from "/connectors/doors"
+    And the relations are named by the connector's profile
+
+  Scenario: Without a connector, the gateway reads only HEART's affordance link
+    Given the environment
+      | UPSTREAM_URL             | http://garden:8080 |
+      | GATEWAY_PROFILE          | garden             |
+      | HEART_AUTH_BEARER_TOKENS | 5e884898da28047151d0e56f8dc6292773603d0d6aff2bdcb2c38e8f3b2ba4c1 |
+    When the gateway reads its configuration
+    Then the gateway has no connector
+
   Scenario: A Basic user for the upstream
     Given the environment
       | UPSTREAM_URL             | http://garden:8080 |
@@ -54,7 +71,7 @@ Feature: The gateway is configured by its environment
     Examples:
       | url                | auth    | profile | says                                                     |
       |                    | none    | garden  | set UPSTREAM_URL: where the upstream is                  |
-      | http://garden:8080 | none    |         | set GATEWAY_PROFILE: the name of the gateway's profile   |
+      | http://garden:8080 | none    |         | set GATEWAY_PROFILE, or GATEWAY_CONNECTOR to a connector naming one |
       | http://garden:8080 | bearer  | garden  | UPSTREAM_AUTH is bearer, so set UPSTREAM_TOKEN           |
       | http://garden:8080 | forward | garden  | UPSTREAM_AUTH must be none, bearer or basic, not forward |
 

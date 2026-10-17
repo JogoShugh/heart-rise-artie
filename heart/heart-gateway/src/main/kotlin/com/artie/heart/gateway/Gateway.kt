@@ -4,8 +4,11 @@ import com.artie.heart.Act
 import com.artie.heart.Acted
 import com.artie.heart.AlpsType
 import com.artie.heart.ConcurrentWriteException
+import com.artie.heart.ContentAddress
+import com.artie.heart.ContentAddress.canonical
 import com.artie.heart.Finding
 import com.artie.heart.Found
+import com.artie.heart.HEART_RISE_PROFILE
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.Named
@@ -28,8 +31,10 @@ import java.util.concurrent.ConcurrentHashMap
  * A service that only publishes OpenAPI, presented to HEART clients as a
  * HEART server (spec/PLAN-OPENAPI-GATEWAY.md). Each collection in [spec]
  * becomes a resource type whose relations are named in one profile,
- * [profile], after the operations' ids; heart-http4k serves them. What each
- * state allows comes from the upstream itself, by its affordance link.
+ * [profile], as the description names them (or after the operations' ids);
+ * heart-http4k serves them. What each
+ * state allows comes from the upstream itself: by the signal [connector]
+ * names for its resource, or else by its HEART affordance link.
  */
 class Gateway(
     spec: GatewaySpec,
@@ -37,32 +42,68 @@ class Gateway(
     profile: String,
     auth: UpstreamAuth = UpstreamAuth.None,
     private val mapper: ObjectMapper = HeartSettings.defaultMapper(),
+    connector: Connector? = null,
 ) {
     private val calls = Upstream(upstream, auth, mapper)
     private val links = AffordanceLinks(calls)
     private val vocabulary = Profile(profile, spec.title, spec.doc, relations(spec))
 
-    /** One resource type per upstream collection. */
-    val resources: List<HeartResource<*, *>> =
-        spec.types.map { GatewayResource(it, vocabulary, calls, links, mapper).resource }
+    init {
+        connector?.check(spec)
+    }
+
+    /**
+     * One resource type per upstream collection. Each answer is read by the
+     * first of the connector's readers that recognizes it, or else by a
+     * standard the gateway detects by itself.
+     */
+    val resources: List<HeartResource<*, *>> = spec.types.map { type ->
+        val standards = Standards(
+            links.signal(
+                byPath = type.acts.associate { it.path to it.operation.name },
+                byRelation = type.acts.associate { act -> act.operation.relation to act.operation.name },
+            ),
+        )
+        val read: (Answer) -> Reading = { connector?.readerFor(it)?.read(it) ?: standards.read(it) }
+        GatewayResource(type, vocabulary, calls, read, mapper).resource
+    }
 
     /** The gateway as one HTTP handler, admitting the callers [credentials] admits. */
     fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler =
         HeartHttp(resources, credentials, settings)
 
     private companion object {
-        /** Every operation's relation, named after its id: `switchOff` is `switch-off`. */
+        /** Every operation's relation, as the description names it, or after its id: `switchOff` is `switch-off`. */
         fun relations(spec: GatewaySpec): List<Relation> = spec.types.flatMap { type ->
             (type.acts + type.bookmarkActs).map { relation(it.operation, AlpsType.UNSAFE) } +
                 listOfNotNull(type.search?.operation, type.read).map { relation(it, AlpsType.SAFE) }
         }.distinctBy { it.id }
 
         fun relation(operation: SpecOperation, type: AlpsType) =
-            Relation(relationOf(operation.name), type, operation.title, operation.doc, operation.doc)
+            Relation(id = operation.relation, type, operation.title, operation.doc, operation.doc)
     }
 }
 
-/** A relation's id from an operation's: `switchOff` is `switch-off`. */
+/**
+ * The signals the gateway reads with no connector, because they are
+ * standards: HEART's affordance link, then OData 4.01's advertised actions.
+ * An answer with neither is refused: the gateway never guesses what is allowed.
+ */
+internal class Standards(private val affordanceLink: AllowedNow) {
+    private val odata = Reader("OData 4.01", Match(), ODataActions(namespace = null), emptyList(), emptySet())
+
+    fun read(answer: Answer): Reading = when {
+        FORMS in answer.links -> Reading(affordanceLink.of(answer.body, answer.links), answer.body)
+        ODataActions(namespace = null).advertises(answer.body) -> odata.read(answer)
+        else -> error("${answer.path}: no reader recognizes the answer, and it carries no standard signal")
+    }
+
+    private companion object {
+        const val FORMS = "$HEART_RISE_PROFILE/rels/forms"
+    }
+}
+
+/** A relation's id from an operation's, when the description names none: `switchOff` is `switch-off`. */
 internal fun relationOf(operationId: String): String =
     operationId.replace(Regex("([a-z0-9])([A-Z])"), "$1-$2").lowercase()
 
@@ -81,15 +122,15 @@ internal class GatewayResource(
     private val spec: SpecType,
     profile: Profile,
     private val calls: Upstream,
-    private val links: AffordanceLinks,
+    /** What an answer allows now, and its state alone. */
+    private val read: (Answer) -> Reading,
     private val mapper: ObjectMapper,
 ) {
-    private val acts = spec.acts.map { Act(it.operation.name, relationOf(it.operation.name), it.schema, it.path) }
-    private val bookmarkActs =
-        spec.bookmarkActs.map { Act(it.operation.name, relationOf(it.operation.name), it.schema, it.path) }
+    private val acts = spec.acts.map { act(it) }
+    private val bookmarkActs = spec.bookmarkActs.map { act(it) }
 
-    /** Why the acts a key leaves out are absent, as the upstream said the first time it sent that key. */
-    private val reasons = ConcurrentHashMap<String, Map<String, String>>()
+    /** Why the acts a key leaves out are absent, as the upstream's signal said the first time it sent that key. */
+    private val reasons = ConcurrentHashMap<String, AbsenceReasons>()
 
     private val type = ResourceType<UpstreamState, String>(
         collection = spec.collection,
@@ -97,8 +138,8 @@ internal class GatewayResource(
         acts = acts,
         offers = Offers<String>(
             keys = emptyList(),
-            offered = { key -> key.split(',').filter { it.isNotEmpty() } },
-            whyAbsent = { key, act -> reasons[key]?.get(relationOf(act)) ?: NOT_NOW },
+            offered = { key -> key.substringBefore(REASONS).split(',').filter { it.isNotEmpty() } },
+            whyAbsent = { key, act -> reasons[key]?.get(act) ?: NOT_NOW },
             open = true,
         ),
         state = StateView(
@@ -111,8 +152,8 @@ internal class GatewayResource(
         finding = spec.search?.let { search ->
             Finding(
                 noun = spec.noun,
-                search = Named(search.operation.name, relationOf(search.operation.name)),
-                lookup = Named(spec.read.name, relationOf(spec.read.name)),
+                search = Named(search.operation.name, search.operation.relation),
+                lookup = Named(spec.read.name, spec.read.relation), // as the description names them
                 nameDescription = search.nameDescription,
                 idTitle = "${spec.noun.replaceFirstChar { it.uppercase() }} id",
                 idDescription = search.idDescription,
@@ -125,7 +166,7 @@ internal class GatewayResource(
         layers = Layers(type),
         load = { id -> state(calls.get("/${spec.collection}/$id")) },
         perform = { checked, name, input ->
-            if (calls.get("/${spec.collection}/${checked.id}").body != checked.json) {
+            if (read(calls.get("/${spec.collection}/${checked.id}")).state != checked.json) {
                 throw ConcurrentWriteException("${spec.noun} ${checked.id} changed upstream since it was checked")
             }
             val path = acts.first { it.name == name }.path
@@ -138,12 +179,16 @@ internal class GatewayResource(
         },
     )
 
-    /** [answer] as a state, keyed by the acts its affordance link allows, in the order they are declared. */
+    /** [answer] as a state, keyed by the acts its signal allows, in the order they are declared. */
     private fun state(answer: Answer): UpstreamState {
-        val allowed = links.of(answer)
-        val key = acts.filter { it.path in allowed.paths }.joinToString(",") { it.name }
-        reasons.putIfAbsent(key, allowed.reasons)
-        return UpstreamState(answer.body.path("id").asLong(), answer.body, key)
+        val reading = read(answer)
+        val offered = acts.filter { it.name in reading.allowed.operations }.joinToString(",") { it.name }
+        // Two answers that allow the same acts for different reasons explain their absences differently,
+        // so the reasons are part of the key; equal reasons still share one affordance set.
+        val said = reading.allowed.reasons
+        val key = if (said.isEmpty()) offered else offered + REASONS + ContentAddress.address(canonical(said))
+        reasons.putIfAbsent(key, said)
+        return UpstreamState(reading.state.path("id").asLong(), reading.state, key)
     }
 
     /** Every match, a page at a time, as the upstream's plain search pages list them. */
@@ -165,6 +210,12 @@ internal class GatewayResource(
 
     private companion object {
         const val NOT_NOW = "The upstream doesn't allow it in the resource's current state."
+
+        /** Separates the acts a key offers from the digest of the reasons it gives for the rest. */
+        const val REASONS = "|"
         val BODY = object : TypeReference<Map<String, Any?>>() {}
+
+        /** An operation as an act, known by the relation the description names. */
+        fun act(spec: SpecAct) = Act(spec.operation.name, spec.operation.relation, spec.schema, spec.path)
     }
 }

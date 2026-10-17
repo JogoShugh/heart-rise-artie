@@ -33,11 +33,11 @@ type Button = { title: string; action: string; fields: string };
 
 const WATER: Button = {
     title: "Water the bed", action: "water",
-    fields: `<input name="milliliters" type="number" min="1" max="1000" value="250" aria-label="Millilitres">`,
+    fields: `<label class="field">Millilitres<input name="milliliters" type="number" min="1" max="1000" value="250"></label>`,
 };
 const SOW: Button = {
     title: "Sow a seed", action: "sow",
-    fields: `<input name="seedType" value="basil" aria-label="Seed"><input name="depthCm" type="number" min="1" max="10" value="2" aria-label="Depth">`,
+    fields: `<label class="field">Seed<input name="seedType" value="basil"></label><label class="field">Depth (cm)<input name="depthCm" type="number" min="1" max="10" value="2"></label>`,
 };
 const HARVEST: Button = { title: "Harvest the crop", action: "harvest", fields: "" };
 

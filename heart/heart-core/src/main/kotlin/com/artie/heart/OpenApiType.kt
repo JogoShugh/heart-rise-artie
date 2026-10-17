@@ -53,8 +53,11 @@ internal class OpenApiType(
                 "200" to OpenApiShapes.json("The matches, a page at a time", OpenApiShapes.ref("SearchPage")),
                 "401" to OpenApiShapes.response("Unauthorized"),
             ),
-        )
+        ).named(finding.search.relation)
     }
+
+    private fun Map<String, Any>.named(relation: String?): Map<String, Any> =
+        named(this, relation?.let { type.profile.key(it) }, affordanceLinks)
 
     private fun read(): Map<String, Any> {
         val lookup = type.finding?.lookup
@@ -79,7 +82,7 @@ internal class OpenApiType(
                 "401" to OpenApiShapes.response("Unauthorized"),
                 "404" to OpenApiShapes.response("NotFound"),
             ).toMap(),
-        )
+        ).named(lookup?.relation)
     }
 
     private fun history(): Map<String, Any> = mapOf(
@@ -117,7 +120,7 @@ internal class OpenApiType(
                 "409" to OpenApiShapes.response("NotOffered"),
                 "422" to OpenApiShapes.response("Unprocessable"),
             ),
-        )
+        ).named(act.relation)
     }
 
     private fun bookmarkAct(act: Act): Map<String, Any> {
@@ -138,7 +141,7 @@ internal class OpenApiType(
                 "401" to OpenApiShapes.response("Unauthorized"),
                 "422" to OpenApiShapes.response("Unprocessable"),
             ),
-        )
+        ).named(act.relation)
     }
 
     /** The rule about state, as the only thing OpenAPI has for it: a sentence. */
@@ -166,5 +169,15 @@ internal class OpenApiType(
         return declared + ("properties" to properties + (field to key))
     }
 
-    private fun inputName(act: Act): String = act.input?.simpleName ?: act.name.replaceFirstChar { it.uppercase() }
+    companion object {
+        /** The extension naming the HEART relation an operation is, as its form key: `garden:water-cell`. */
+        const val RELATION = "x-heart-relation"
+
+        /** With affordance links, an operation also names the HEART relation it is: an opt-in, as the links are. */
+        private fun named(operation: Map<String, Any>, key: String?, linked: Boolean): Map<String, Any> =
+            if (linked && key != null) operation + (RELATION to key) else operation
+
+        private fun inputName(act: Act): String =
+            act.input?.simpleName ?: act.name.replaceFirstChar { it.uppercase() }
+    }
 }

@@ -84,11 +84,13 @@ object Render {
             schema["maximum"]?.let { append(" max=\"${it.text()}\"") }
         }
         val enum = schema["enum"] as? JsonArray
-        return when {
+        val control = when {
             enum != null -> "<select$attrs>${enum.joinToString("") { "<option>${esc(it.jsonPrimitive.content)}</option>" }}</select>"
             schema["type"]?.text() in setOf("integer", "number") -> "<input type=\"number\"$attrs>"
             else -> "<input$attrs>"
         }
+        // The field and its label together, inside its own form, so it's clear which act it belongs to.
+        return "<label class=\"field\">${esc(label)}$control</label>"
     }
 
     private fun links(rep: HeartRepresentation): String =

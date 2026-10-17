@@ -14,6 +14,10 @@ dependencies {
     implementation("org.http4k:http4k-server-jetty")
     // Reads the upstream's OpenAPI 3.x description, with every $ref resolved.
     implementation("io.swagger.parser.v3:swagger-parser-v3:2.1.22")
+    // Connectors are YAML files, one per resource, in a folder per API.
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2")
+    // A connector's escape hatch: a JSONata expression, bounded in time and depth. No dependencies of its own.
+    implementation("com.dashjoin:jsonata:0.9.10")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
     // The conformance features run against the gateway in front of a plain JSON

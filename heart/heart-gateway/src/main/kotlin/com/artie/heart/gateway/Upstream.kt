@@ -36,8 +36,11 @@ sealed interface UpstreamAuth {
     }
 }
 
-/** One answer from the upstream: its JSON body, and the links in its Link header by relation. */
-class Answer(val body: JsonNode, val links: Map<String, Uri>)
+/**
+ * One answer from the upstream: its JSON body, the links in its Link header
+ * by relation, the path it was asked at, and its media type, without parameters.
+ */
+class Answer(val body: UpstreamBody, val links: UpstreamLinks, val path: String, val mediaType: MediaType?)
 
 /**
  * The upstream, as the gateway calls it: plain JSON only, with the gateway's
@@ -56,7 +59,8 @@ class Upstream(private val http: HttpHandler, private val auth: UpstreamAuth, pr
         val signed = auth.authorization()?.let { request.header("Authorization", it) } ?: request
         val response = http(signed.header("Accept", JSON))
         if (!response.status.successful) throw refusal(request, response)
-        return Answer(mapper.readTree(response.bodyString()), Header.LINK(response))
+        val mediaType = response.header("Content-Type")?.substringBefore(';')?.trim()?.lowercase()
+        return Answer(mapper.readTree(response.bodyString()), Header.LINK(response), request.uri.path, mediaType)
     }
 
     private fun refusal(request: Request, response: Response): RuntimeException {

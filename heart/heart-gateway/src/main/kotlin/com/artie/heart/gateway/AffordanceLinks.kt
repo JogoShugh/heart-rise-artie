@@ -4,8 +4,8 @@ import com.artie.heart.HEART_RISE_PROFILE
 import com.artie.heart.Layers
 import java.util.concurrent.ConcurrentHashMap
 
-/** What the upstream allows a resource now: the paths of its acts, and why each absent relation is absent. */
-class Allowed(val paths: List<String>, val reasons: Map<String, String>)
+/** What an upstream affordance set holds: the action paths its forms target, and reasons by relation id. */
+private class ReadSet(val paths: List<String>, val reasons: Map<String, Reason>)
 
 /**
  * The best per-state signal an upstream can send: each plain JSON answer
@@ -14,17 +14,24 @@ class Allowed(val paths: List<String>, val reasons: Map<String, String>)
  * explanation of the acts it leaves out, and kept.
  */
 class AffordanceLinks(private val upstream: Upstream) {
-    private val read = ConcurrentHashMap<String, Allowed>()
+    private val read = ConcurrentHashMap<String, ReadSet>()
 
-    /** What [answer]'s state allows, or a refusal to guess when the upstream sends no link. */
-    fun of(answer: Answer): Allowed {
-        val href = checkNotNull(answer.links[FORMS]) {
+    /**
+     * The signal for one resource type: a form's target names an operation by
+     * its action path ([byPath]), and a reason names it by its relation id ([byRelation]).
+     */
+    fun signal(byPath: Map<String, OperationId>, byRelation: Map<String, OperationId>) = AllowedNow { _, links ->
+        val href = checkNotNull(links[FORMS]) {
             "the upstream's answer links no affordance set, and the gateway has no other signal of what it allows"
         }
-        return read.computeIfAbsent(href.toString()) { allowedBy(it) }
+        val set = read.computeIfAbsent(href.toString()) { setAt(it) }
+        Allowed(
+            set.paths.mapNotNull { byPath[it] }.toSet(),
+            set.reasons.mapNotNull { (relation, reason) -> byRelation[relation]?.let { it to reason } }.toMap(),
+        )
     }
 
-    private fun allowedBy(href: String): Allowed {
+    private fun setAt(href: String): ReadSet {
         val set = upstream.get(href).body
         val paths = set.path("_forms").map { form ->
             form.path("_links").path("target").path("href").asText().substringAfterLast(ACTIONS)
@@ -32,7 +39,7 @@ class AffordanceLinks(private val upstream: Upstream) {
         val explanation = set.path("_links").path(Layers.UNAVAILABLE_REL).path("href").asText(null)
         val reasons = explanation?.let { upstream.get(it).body.path("unavailable").toList() }.orEmpty()
             .associate { it.path("rel").asText().substringAfter('#') to it.path("reason").asText() }
-        return Allowed(paths, reasons)
+        return ReadSet(paths, reasons)
     }
 
     private companion object {

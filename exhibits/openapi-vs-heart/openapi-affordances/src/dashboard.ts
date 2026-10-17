@@ -151,6 +151,11 @@ function form(doc: Json, bed: Json, o: Operation): string {
       </form>`;
 }
 
+/** A field and its label, together, so it's clear which act it belongs to. */
+function field(label: string, control: string): string {
+    return `<label class="field">${esc(label)}${control}</label>`;
+}
+
 function input(name: string, schema: Json, required: boolean): string {
     const label = schema.title ?? name;
     const preset = schema.default ?? schema.examples?.[0];
@@ -162,10 +167,10 @@ function input(name: string, schema: Json, required: boolean): string {
     if (Array.isArray(schema.enum)) {
         // The preset first, as a person would see it chosen.
         const options = [...schema.enum].sort((a, b) => Number(b === preset) - Number(a === preset));
-        return `<select${attrs}>${options.map((v) => `<option>${esc(String(v))}</option>`).join("")}</select>`;
+        return field(label, `<select${attrs}>${options.map((v) => `<option>${esc(String(v))}</option>`).join("")}</select>`);
     }
     const numeric = schema.type === "integer" || schema.type === "number";
-    return `<input${numeric ? ` type="number"` : ""}${attrs}>`;
+    return field(label, `<input${numeric ? ` type="number"` : ""}${attrs}>`);
 }
 
 /** The submitted form as the JSON the operation's schema asks for. */

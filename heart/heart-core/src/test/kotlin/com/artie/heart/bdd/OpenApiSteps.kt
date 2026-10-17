@@ -98,6 +98,18 @@ class OpenApiSteps(private val world: LampWorld) {
         assertEquals(expected.size, actual.size, "$actual")
     }
 
+    @Then("the operations name their relations")
+    fun relations(table: DataTable) = table.asMaps().forEach { row ->
+        val operationId = row.getValue("operationId")
+        assertEquals(row.getValue("relation"), operation(operationId).path("x-heart-relation").asText(), operationId)
+    }
+
+    @Then("no operation names a HEART relation")
+    fun noRelations() {
+        val named = json.path("paths").flatMap { item -> item.toList() }.filter { it.has("x-heart-relation") }
+        assertEquals(emptyList<JsonNode>(), named)
+    }
+
     @Then("the operation {string} takes a required application\\/json body {string}")
     fun body(operationId: String, ref: String) {
         val body = operation(operationId).path("requestBody")

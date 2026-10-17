@@ -52,9 +52,28 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
     And its "x-heart-affordances.header" is "Link"
     And its "x-heart-affordances.match" is "method and path template"
 
+  Scenario: With affordance links, each operation names the HEART relation it is
+    An operation's id is a name for code; a HEART client knows an act by
+    its relation in the profile. The two can differ, and a relation can be
+    renamed while the operation keeps its id. With affordance links on, each
+    operation also says, in an extension, which relation it is, so a reader
+    of the description (such as the OpenAPI-to-HEART gateway) names it as
+    the HEART server does. Like the links, it changes the description's
+    bytes, so a description already published keeps its bytes.
+    When the OpenAPI description of the lamp is rendered at version "1.0.0" with affordance links
+    Then the operations name their relations
+      | operationId | relation          |
+      | searchLamps | home:search-lamps |
+      | getLamp     | home:get-lamp     |
+      | switchOn    | home:switch-on    |
+      | dim         | home:dim          |
+      | dimFormer   | home:dim          |
+      | installLamp | home:install-lamp |
+
   Scenario: Without affordance links, the description says nothing about them
     Then the operation "getLamp" answers 200 with no header "Link"
     And its "x-heart-affordances" is ""
+    And no operation names a HEART relation
 
   Scenario: An act that moved still answers at its former path, which is marked deprecated
     The lamp's dim act used to be at "brighten". A server that moves an act

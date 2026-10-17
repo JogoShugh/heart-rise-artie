@@ -65,8 +65,16 @@ main { padding: 22px 24px 32px; display: grid; justify-items: start; }
 .facts dt, .facts .name { font-size: 11.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
 .facts dd, .facts .value { margin: 0; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
-.buttons { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--line); }
-.act { display: flex; align-items: center; gap: 8px; margin: 0; }
+/* Each act is its own small form: its fields, labelled, and its button, together in one box,
+   so it's always clear which field belongs to which button. */
+.buttons { display: grid; gap: 10px; padding: 16px 20px; border-top: 1px solid var(--line); }
+.buttons:empty { display: none; }
+.act {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 12px; margin: 0;
+  padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #fafcfb;
+}
+.act .field { display: grid; gap: 4px; font-size: 11.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; }
+.act .field input, .act .field select { text-transform: none; letter-spacing: normal; font-size: 15px; }
 .act input, .act select, .ask input {
   font: inherit; padding: 8px 10px; border: 1px solid #c9d4ce; border-radius: 8px; background: #fff; color: var(--ink);
   min-width: 0; width: 7.5em;

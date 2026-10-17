@@ -114,11 +114,11 @@ settles.
   |---|---|
   | `UPSTREAM_URL` | The service's base URL |
   | `UPSTREAM_SPEC` | The spec's URL, or a path to a mounted file |
-  | `GATEWAY_CONNECTOR` | Path to the connector file |
+  | `GATEWAY_CONNECTOR` | Path to one API's connector folder |
   | `GATEWAY_PUBLIC_URL` | How clients reach the gateway |
   | `UPSTREAM_AUTH` | How the gateway calls the upstream (below) |
   | `UPSTREAM_TOKEN`, `UPSTREAM_USER`, `UPSTREAM_PASSWORD` | The gateway's own credential at the upstream |
-  | `GATEWAY_PROFILE` | The profile name its relations are named in, such as `garden` |
+  | `GATEWAY_PROFILE` | The profile name its relations are named in, such as `garden`; a connector names its own |
   | `PORT` | The port the gateway listens on; 8090 by default |
   | `HEART_AUTH_BEARER_TOKENS`, `HEART_AUTH_BASIC_USERS` | Who may call the gateway, as on every HEART server |
 
@@ -199,15 +199,25 @@ In order of preference, chosen per service in the connector file:
      when `HEART_AFFORDANCE_LINKS=true`.
    - The gateway fetches that set, checks its integrity, maps its forms to
      operations by method and path template, and offers exactly those.
-2. **An allowed-transitions field.**
-   - The upstream lists allowed operations in the body: an array of
-     `operationId`s or names at a JSON Pointer the connector names.
-   - The gateway offers those, and hides the field from the state, or keeps it,
-     by configuration.
-3. **A state-to-operations table** in the connector file, for an upstream whose
-   rules are known and stable: "`status` = `available` allows `placeOrder`".
-   - This is early binding, in the gateway rather than the client.
-   - It is marked as such in the profile, and is the least preferred.
+2. **A signal in the upstream's own answer, read by a connector.** Real APIs
+   that publish only OpenAPI often say per resource what is allowed now, each
+   in its own way (researched 15 October 2026):
+   - a **names list**: a field of allowed action names;
+   - a **boolean map**: Google Drive's `capabilities` (`canTrash`, `canDelete`,
+     ...), Box's permissions;
+   - a **link array**: PayPal's `links`, each with `rel`, `method` and `href`;
+   - **OData annotations**: OData 4.01's `"#Namespace.Action": {}` for
+     available and `null` for not, the one formal standard for this;
+   - a separate call (Jira's `/transitions`, Salesforce's record actions) is
+     left for later.
+
+   The gateway reads the first four with no code, from a connector (below),
+   and offers what they allow. A connector can hide the signal from the
+   state, so the controls appear only as forms.
+3. **A state table** in a connector, for an upstream that says nothing: "when
+   `status` is `OPEN`, `close` is allowed". It is early binding, in the
+   gateway rather than the client, and the least preferred signal; it is the
+   only one besides the affordance link that can say why an act is absent.
 4. **Permissive mode.**
    - No signal at all: every operation under the item is offered.
    - The gateway says so in the representation: a profile link
@@ -215,6 +225,83 @@ In order of preference, chosen per service in the connector file:
      added to the site.
    - Clients and reports never mistake it for real HEART. A refusal then comes
      from the upstream, mapped as below.
+
+### Connectors: a folder per API, readers that recognize answers
+
+A connector says how one upstream API signals what is allowed. Connectors are
+small, well-named files, so that someone who knows an API can add or fix its
+connector in a pull request that touches only that API's folder.
+
+Most APIs signal one way everywhere, so most connectors are one default
+reader. Standards need no connector at all: the gateway reads HEART's
+affordance link, and OData 4.01's advertised actions, by itself.
+
+```
+connectors/
+  google-drive/
+    connector.yaml            the API: its profile, and its readers in order
+    file.reader.yaml          the API's default reader: matches every answer
+  acme/
+    connector.yaml
+    vault-door.reader.yaml    matches vault doors only, listed first
+    door.reader.yaml          the default, listed last
+    door.allowed.jsonata      an expression, beside the reader that uses it
+```
+
+- **Choosing the API is explicit**: `GATEWAY_CONNECTOR` names its folder.
+- **Choosing the reader is by sniffing**: each reader says which upstream
+  answers it recognizes, and the first that does, reads it. A reader's
+  `matches` recognizes an answer by:
+  - `body`: members at JSON Pointers equal to values, or present at all
+    (Google Drive's resources carry `kind: drive#file`, Stripe's `object`);
+  - `mediaType`: the answer's media type;
+  - `path`: the description's path template the answer was asked at.
+
+  Every test a reader has must hold. A reader with none matches every
+  answer: the API's default, listed last.
+- **Order is explicit**: `connector.yaml` lists its readers, and the first
+  that recognizes an answer reads it. A reader file that isn't listed, or a
+  listed one that isn't there, stops the gateway at start.
+- **A reader's signal** is one of `names`, `booleans`, `links`, `odata`,
+  `table`, or `jsonata: <file>`, the escape hatch for a shape the others
+  don't cover, with the upstream's names `map`ped to operationIds where they
+  differ, and the JSON Pointers to `hide` from the state.
+- **JSONata** (dashjoin's jsonata-java: no dependencies, a 1:1 port of the
+  reference implementation, with a time and recursion bound per evaluation)
+  is the only expression language. An expression maps the upstream's JSON to
+  the operationIds allowed now; it has no I/O. Kotlin scripts, as in Buster,
+  were considered and left out: they run with full JVM power, which suits a
+  development tool, not a gateway loading connectors others wrote.
+- An answer no reader recognizes, with no standard signal, is refused: the
+  gateway never guesses what is allowed.
+- The gateway refuses to start on a reader that names an operation the spec
+  doesn't have, or a path it doesn't serve, naming the file.
+- When a signal gives reasons for absent acts (a table, or the affordance
+  link), the reasons are part of the offer key, so two answers that allow the
+  same acts for different reasons explain themselves differently, and equal
+  reasons still share one affordance set.
+
+In the gateway, each signal is one small class behind one interface, with
+its terms named by type aliases so that their representations can change
+without changing every signal:
+
+```kotlin
+typealias OperationId = String
+typealias Reason = String
+typealias Rel = String
+typealias UpstreamBody = JsonNode
+typealias UpstreamLinks = Map<Rel, Uri>
+typealias AllowedOperations = Set<OperationId>
+typealias AbsenceReasons = Map<OperationId, Reason>
+
+/** What one upstream answer allows now, and why others are absent where the signal says. */
+class Allowed(val operations: AllowedOperations, val reasons: AbsenceReasons = emptyMap())
+
+/** One way an upstream signals what is allowed: the affordance link, or a connector's signal. */
+fun interface AllowedNow {
+    fun of(body: UpstreamBody, links: UpstreamLinks): Allowed
+}
+```
 
 ### Conditional acts
 
@@ -308,9 +395,12 @@ before any production code, then green across every suite.
      script waters. A gateway's vocabulary is the upstream's OpenAPI
      contract, and that contract didn't change.
    - **Acceptance:** the same results as ARTIE against the native HEART garden.
-3. **The other signals and permissive mode.**
-   - The same suites with the link off: allowed-transitions field, table, and
-     permissive mode.
+3. **Connectors, then permissive mode.**
+   - The connector loader and the five signals (names, booleans, links, OData,
+     table) and the JSONata escape hatch, each with a scenario against a small
+     in-memory upstream that signals that way, and heart-tck run through the
+     gateway in front of it.
+   - Then permissive mode, with its own profile.
    - The cost of each is measured and reported, not argued.
 4. **A third-party spec.**
    - The classic Petstore OpenAPI 3 document against its public demo server,
