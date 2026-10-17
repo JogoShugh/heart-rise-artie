@@ -2,7 +2,7 @@
 // app runs them over stdio; mcp/Dockerfile packages the app.
 rootProject.name = "heart-mcp-build"
 
-// The ARTIE client (heart:heart), built from source.
+// The ARTIE client (heart:artie), built from source.
 includeBuild("../client")
 
 include("heart-mcp", "heart-mcp-server")

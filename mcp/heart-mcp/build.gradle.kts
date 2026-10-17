@@ -12,7 +12,7 @@ val mcpSdkVersion = "0.8.1"
 
 dependencies {
     // ARTIE, the generic HEART client: Sync and Act.
-    api("heart:heart:0.1.0")
+    api("heart:artie:0.1.0")
     // The official MCP Kotlin SDK: the host's model is the Reason step.
     api("io.modelcontextprotocol:kotlin-sdk-server:$mcpSdkVersion")
 

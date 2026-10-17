@@ -17,11 +17,8 @@ repositories {
 val cucumberVersion = "7.18.0"
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
-    // SPEC §6.0.1: the CoAP binding (RFC 7252), for coap: URIs.
-    implementation("org.eclipse.californium:californium-core:3.14.0")
-    // coaps: DTLS with a pre-shared key.
-    implementation("org.eclipse.californium:scandium:3.14.0")
+    // ARTIE itself, in client/artie; the root project holds its tests.
+    testImplementation(project(":artie"))
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
@@ -89,6 +86,16 @@ val logBddRun by tasks.registering {
 
 kotlin {
     jvmToolchain(22)
+}
+
+// The tests use ARTIE's internal declarations, as they did when they shared its module:
+// the root project's test compilation is a friend of :artie (Kotlin's friend modules).
+tasks.named<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>("compileTestKotlin") {
+    val artie = project(":artie")
+    friendPaths.from(
+        artie.layout.buildDirectory.dir("classes/kotlin/main"),
+        artie.tasks.named<Jar>("jar").flatMap { it.archiveFile },
+    )
 }
 
 // Runs only the @live scenarios, against a running server-spring
