@@ -143,3 +143,7 @@ mark.rr-param { background: var(--mark); color: var(--mark-fg); font-family: var
 /* Kotlin colouring (kotlin-view.js), from the tokens above. */
 .kt-kw { color: var(--kt-kw); font-weight: 500; } .kt-str { color: var(--kt-str); } .kt-tpl { color: var(--kt-tpl); }
 .kt-cm { color: var(--kt-cm); font-style: italic; } .kt-fn { color: var(--kt-fn); } .kt-num { color: var(--kt-num); }
+
+/* A failed check(condition), drawn by Power-assert: columns matter, so it never wraps. */
+.rr-drawing { margin: 0; overflow-x: auto; padding: 0.6rem 0.8rem; background: var(--code-bg); border-radius: 6px;
+  font: 0.8rem/1.45 var(--mono); white-space: pre; }

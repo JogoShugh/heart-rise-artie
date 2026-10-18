@@ -33,6 +33,15 @@
         out.append(mark);
       } else if (part) out.append(document.createTextNode(part));
     });
+    // A check's facts (heart-script): each fact a value, its test, and what was held when it failed.
+    const facts = step.params && Array.isArray(step.params.facts) ? step.params.facts : [];
+    facts.forEach((fact, i) => {
+      out.append(document.createTextNode(i === 0 ? " " : ", "));
+      const said = `${fact.member} ${fact.test}` + (fact.holds ? "" : `, was ${fact.held}`);
+      const mark = el("mark", "rr-param", said);
+      mark.title = `held: ${fact.held}`;
+      out.append(mark);
+    });
     return out;
   };
 
@@ -157,8 +166,14 @@
     lines.append(line("asked", [verbOf(step), ...values].join("   ")),
       line("answer", [answerKey(step), step.address].filter(Boolean).join("   ")));
     body.append(lines);
-    const fields = Object.fromEntries(Object.entries(step.params || {}).filter(([k]) => k !== "relation"));
+    const fields = Object.fromEntries(Object.entries(step.params || {}).filter(([k]) => k !== "relation" && k !== "drawing"));
     if (Object.keys(fields).length) body.append(box("request", { a: fields, labelA: "the values given", summary: "Values given" }));
+    // A failed check(condition), drawn by Power-assert: the condition with the value of each part.
+    if (step.params && typeof step.params.drawing === "string") {
+      const drawing = el("pre", "rr-drawing", step.params.drawing);
+      drawing.dataset.kind = "lines";
+      body.append(drawing);
+    }
     if (step.now) {
       const prior = trace.steps.slice(0, index).reverse().find((s) => s.now && s.address === step.address);
       body.append(box("response", prior
