@@ -47,12 +47,38 @@ requests that served it under it, tied by `traceparent`. Bodies are written as Y
 credentials as `<token>`. Mockup: step 3 of the recorded reasoned run, `step-3.capture.yaml` (sent
 2026-10-18).
 
+## One capture, two uses: the report and the script generator
+
+The same capture feeds the line-by-line report and, later, script synthesis by slot filling
+(spec/PLAN-ARTIE-SCRIPTS.md step 5, spec/ideas/captured-scripts.md). The report needs what happened; a
+generator also needs why each value was what it was. So the capture holds now, per step (decided
+2026-10-18; mockup version 2, https://claude.ai/artifact/RZSim7b6qnZWBZmJSq5GtR):
+
+| Field | What | For |
+|---|---|---|
+| `values.*.from` | where each value sent came from: `words`, `{input: name}`, `{step: n, pointer: /…}`, `constant`, `default`; a value built of several, its `parts`; `ambiguous` when more than one source fits, never a guess | slots become inputs; state is read again at run time, never hard-coded |
+| `reason.template`, `reason.slots` | the reason line before Kotlin filled it in (from the source line), and each `$variable` with its value and source | the words a generated script asks with, and its parameters |
+| `guard` | the form or link relation used, its schema's content address, the If-Match sent; at L1 the affordance set's own address | a replay refuses to act when the server changed what it relies on |
+| `block` | whether the step opens a block, and the step whose block it is in | the report's block ends; the generator's nesting |
+| `waited` | an `until`: what it waited for (an offered relation, a state), how many reads | a generated script waits as the run did |
+| `picked` | how a link or item was picked: by relation, by title, by a test on state | the generator's follow or pick |
+| `judgement` | true when a choice was not in the words (the hybrid's "close it the right way") | the generator keeps a reason there, or freezes it only once a person confirms |
+| `model` | what the model was asked and answered, at least on judgement steps | why a judgement step chose what it did |
+| `expect`, `outcome.keeps` | the status the step had, and which members later steps read from its answer, by pointer | the generated script's expect, and its bindings |
+| `run.inputs` | the script's inputs, their values and where each was given (command line, file, default) | the generated script's own inputs |
+
+Values that change from run to run (time stamps, generated names) are inputs or defaults, never constants.
+A replay writes the same capture, so comparing two captures checks that it made the same requests (the
+plan's done condition for trace capture), and the report can show that comparison.
+
 ## Work, test first
 
 1. heart-script: `line` on every trace step, and the block a block end closes (feature: a script's steps
    name their lines, nested blocks included).
-2. heart-script / ARTIE: `affordance` and `offered` on every act, follow and reason step (features in
-   heart-script with the scripted service, and in artie against the HEART test server).
+2. heart-script / ARTIE: `affordance` and `offered` on every act, follow and reason step, with
+   `values.*.from`, `reason.template` and `slots`, `guard`, `block`, `waited`, `picked`, `judgement`,
+   `model`, `expect` and `outcome.keeps` (features in heart-script with the scripted service, and in artie
+   against the HEART test server).
 3. ARTIE: `--exchanges` keeps each step's HTTP exchanges, credentials redacted (artie-cli feature).
 4. ARTIE sends `traceparent` on every request; the gateway records upstream exchanges with it when
    `GATEWAY_RECORD` is set (heart-gateway feature with the fake GitHub).
