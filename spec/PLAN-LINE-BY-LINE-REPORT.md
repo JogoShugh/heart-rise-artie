@@ -58,7 +58,7 @@ generator also needs why each value was what it was. So the capture holds now, p
 |---|---|---|
 | `values.*.from` | where each value sent came from: `words`, `{input: name}`, `{step: n, pointer: /…}`, `constant`, `default`; a value built of several, its `parts`; `ambiguous` when more than one source fits, never a guess | slots become inputs; state is read again at run time, never hard-coded |
 | `reason.template`, `reason.slots` | the reason line before Kotlin filled it in (from the source line), and each `$variable` with its value and source | the words a generated script asks with, and its parameters |
-| `guard` | the form or link relation used, its schema's content address, the If-Match sent; at L1 the affordance set's own address | a replay refuses to act when the server changed what it relies on |
+| `guard` | the rung; the affordance set's href and integrity; the form's relation, its integrity (published by the server) and its schema's href and integrity; the If-Match sent | lenient and strict replay (spec/ideas/replay-guards-lenient-strict.md) |
 | `block` | whether the step opens a block, and the step whose block it is in | the report's block ends; the generator's nesting |
 | `waited` | an `until`: what it waited for (an offered relation, a state), how many reads | a generated script waits as the run did |
 | `picked` | how a link or item was picked: by relation, by title, by a test on state | the generator's follow or pick |
@@ -72,6 +72,10 @@ A replay writes the same capture, so comparing two captures checks that it made 
 plan's done condition for trace capture), and the report can show that comparison.
 
 ## Work, test first
+
+0. heart-core: each form in an affordance set carries its own `integrity`, published by the server
+   (decided 2026-10-18; spec/ideas/replay-guards-lenient-strict.md). The gateway gets it from heart-core.
+   Live captures are recorded at `--rung L2`, so guards hold the server's addresses, not client digests.
 
 1. heart-script: `line` on every trace step, and the block a block end closes (feature: a script's steps
    name their lines, nested blocks included).
