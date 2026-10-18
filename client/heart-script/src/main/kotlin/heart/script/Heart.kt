@@ -125,12 +125,22 @@ internal fun arrived(step: Int, what: String, answer: Answer): Representation = 
 internal fun refused(step: Int, what: String, answer: Answer.Refused) =
     ScriptStopped(step, what, "${answer.kind.words}, refused by ${answer.by.words}: \"${answer.detail}\"", answer)
 
-/** A representation's state, read by JSON Pointer (RFC 6901). */
+/**
+ * A representation's state, read by member: a name is one member, as it is (`state_reason`, even `a/b`);
+ * a leading slash makes it a JSON Pointer (RFC 6901), for nested state (`/head/sha`). A missing member is
+ * null, never an error.
+ */
 class State internal constructor(private val root: JsonObject) {
-    operator fun get(pointer: String): Any? {
-        val tokens = pointer.removePrefix("/").split('/').filter { it.isNotEmpty() }
+    operator fun get(member: String): Any? = plain(node(member))
+
+    /** Whether [member] is there at all, null or not, and its value. */
+    internal fun find(member: String): Pair<Boolean, Any?> = node(member).let { (it != null) to plain(it) }
+
+    private fun node(member: String): JsonElement? {
+        if (!member.startsWith("/")) return root[member]
+        val tokens = member.removePrefix("/").split('/').filter { it.isNotEmpty() }
             .map { it.replace("~1", "/").replace("~0", "~") }
-        return plain(tokens.fold(root as JsonElement?) { node, key -> child(node, key) })
+        return tokens.fold(root as JsonElement?) { node, key -> child(node, key) }
     }
 
     private fun child(node: JsonElement?, key: String): JsonElement? = when (node) {

@@ -99,6 +99,7 @@ internal fun element(value: Any?): JsonElement = when (value) {
     is Number -> JsonPrimitive(value)
     is Boolean -> JsonPrimitive(value)
     is List<*> -> JsonArray(value.map { element(it) })
+    is Map<*, *> -> JsonObject(value.entries.associate { (k, v) -> k.toString() to element(v) })
     else -> JsonPrimitive(value.toString())
 }
 

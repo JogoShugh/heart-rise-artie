@@ -27,6 +27,9 @@ class ScriptedService : Navigator {
     /** Resources one embeds (SPEC §6.1): at an address, by relation, the embedded resource's address. */
     val embeds = mutableListOf<Link>()
 
+    /** A resource's whole state, by address, where a feature gives one: numbers, arrays, nested objects. */
+    val bodies = mutableMapOf<String, JsonObject>()
+
     /** Refusals an act meets, from the server or the client, by "relation at address". */
     val refusals = mutableMapOf<String, Answer.Refused>()
     val asked = mutableListOf<Pair<String, String>>()
@@ -87,7 +90,8 @@ class ScriptedService : Navigator {
 
     private fun representation(address: String): Representation {
         val values = resources.getValue(address)
-        val state = buildJsonObject { values.filterValues { it.isNotEmpty() }.forEach { (k, v) -> put(k, v) } }
+        val state = bodies[address]
+            ?: buildJsonObject { values.filterValues { it.isNotEmpty() }.forEach { (k, v) -> put(k, v) } }
         return Representation(
             address,
             state,
