@@ -26,6 +26,9 @@ Feature: Branches, commits and new pull requests, from acts a branch offers
     When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
     Then the GitHub gateway answers 200
     And the answer links "self" to "/repos/acme/rockets/branches/fix"
+    And the answer links these, by type
+      | relation  | href                                      | type      | templated |
+      | alternate | https://github.com/acme/rockets/tree/fix  | text/html |           |
     And the GitHub gateway offers
       | act                      |
       | github:branch-from-here  |

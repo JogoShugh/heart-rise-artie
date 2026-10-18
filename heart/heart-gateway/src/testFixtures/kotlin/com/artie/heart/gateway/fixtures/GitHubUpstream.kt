@@ -336,9 +336,10 @@ class GitHubUpstream {
         return mapper.createObjectNode().apply {
             put("name", branch.name)
             putObject("commit").put("sha", branch.sha).put("url", "$api/commits/${branch.sha}")
+            // As GitHub writes a branch's: each link a plain string, not a HAL link object as on a pull request.
             putObject("_links").apply {
-                putObject("self").put("href", "$api/branches/${branch.name}")
-                putObject("html").put("href", "https://github.com/${branch.owner}/${branch.repo}/tree/${branch.name}")
+                put("self", "$api/branches/${branch.name}")
+                put("html", "https://github.com/${branch.owner}/${branch.repo}/tree/${branch.name}")
             }
             put("protected", branch.protected)
         }

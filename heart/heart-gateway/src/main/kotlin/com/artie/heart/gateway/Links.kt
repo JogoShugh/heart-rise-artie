@@ -205,10 +205,13 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
         return body
     }
 
-    /** The upstream's own links object: each relation's href, as a link named after it. */
+    /**
+     * The upstream's own links object: each relation's href, as a link named after it. GitHub writes it
+     * HAL's way on a pull request (`{"href": ...}`) and as plain strings on a branch.
+     */
     private fun upstream(node: JsonNode?, links: MutableMap<String, Any?>) {
         node?.properties()?.forEach { (rel, link) ->
-            val href = link.path("href").asText(null)
+            val href = if (link.isTextual) link.asText() else link.path("href").asText(null)
             if (rel != "self" && href != null) writer.add(links, rel.replace('_', '-'), "$rel$URL", href)
         }
     }
@@ -264,7 +267,9 @@ class LinkRelations(private val rules: LinkRules, private val writer: LinkWriter
         rules.embed.forEach { path -> embedded(members, path) }
         val upstream = rules.upstreamLinks?.let { members[it] }?.let { properties(map(it)) }.orEmpty()
         upstream.filterKeys { it != "self" }.forEach { (rel, link) ->
-            link(rel.replace('_', '-'), "${rel}_url", properties(map(link))["href"]?.let(::map))
+            // A link object's href, or the link itself where the upstream writes it as a plain string.
+            val href = properties(map(link))["href"]?.let(::map) ?: map(link)
+            link(rel.replace('_', '-'), "${rel}_url", href)
         }
         walk(members, "", "")
     }
