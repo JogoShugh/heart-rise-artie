@@ -1,6 +1,6 @@
 # Plan: `_embedded`, the HAL way, across HEART
 
-Drafted 2026-10-18. Not started. The precursor to `PLAN-GATEWAY-URL-LINKS.md`, which needs it for
+Drafted 2026-10-18; built the same day (082c3fe, 93804a5, 4ca8f59, 92cf988, and the reports). The precursor to `PLAN-GATEWAY-URL-LINKS.md`, which needs it for
 nested objects (a pull request's user, head repository, base repository). Decisions marked **D**
 were made by the author on 2026-10-18.
 

@@ -29119,14 +29119,19 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     const key = Object.keys(response.headers || {}).find((k) => k.toLowerCase() === name.toLowerCase());
     return key ? response.headers[key] : undefined;
   };
+  // SPEC §6.1: the state is the body without exactly these four members; any other member is data.
+  const CONTROLS = ["_links", "_embedded", "_forms", "_templates"];
+  const perRel = (group, skip) => Object.entries(group || {}).filter(([rel]) => rel !== skip)
+    .reduce((n, [, v]) => n + (Array.isArray(v) ? v.length : 1), 0);
   const counts = (body) => {
     if (!body || typeof body !== "object" || Array.isArray(body)) return "";
-    const data = Object.keys(body).filter((k) => !k.startsWith("_")).length;
+    const data = Object.keys(body).filter((k) => !CONTROLS.includes(k)).length;
     const forms = Object.keys(body._forms || body._templates || {}).length;
-    const links = Object.entries(body._links || {}).filter(([rel]) => rel !== "curies")
-      .reduce((n, [, v]) => n + (Array.isArray(v) ? v.length : 1), 0);
+    const links = perRel(body._links, "curies");
+    const embedded = perRel(body._embedded);
     const plural = (n, one) => `${n} ${one}${n === 1 ? "" : "s"}`;
-    return `${plural(data, "data field")}, ${plural(forms, "form")}, ${plural(links, "link")}.`;
+    const also = embedded ? `, ${embedded} embedded` : "";
+    return `${plural(data, "data field")}, ${plural(forms, "form")}, ${plural(links, "link")}${also}.`;
   };
   // RFC 9457: a problem document says type, title and status.
   const problem = (body) => !!body && typeof body === "object" && "type" in body && "title" in body && "status" in body;
@@ -29146,7 +29151,9 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     const forms = Object.fromEntries((step.now.forms || []).map((f) => [f, {}]));
     const links = Object.fromEntries(Object.entries(step.now.links || {}).map(([rel, titles]) =>
       [rel, titles.map((title) => (title === null ? {} : { title }))]));
-    return { ...step.now.state, _forms: forms, _links: links };
+    const embedded = Object.fromEntries(Object.entries(step.now.embedded || {}).map(([rel, resources]) =>
+      [rel, resources.map((r) => ({ ...r.state, _links: { self: r.title === null ? {} : { title: r.title } } }))]));
+    return { ...step.now.state, _forms: forms, _links: links, _embedded: embedded };
   };
   // The answer as one key: the status for HTTP, the outcome (and refusal kind) for a neutral trace.
   const answerKey = (step) => (neutral(step)
