@@ -1,5 +1,6 @@
 package com.artie.heart.gateway
 
+import com.artie.heart.Dialect
 import com.artie.heart.Hypermedia
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -116,6 +117,9 @@ class LinkWriter(
         return buildMap {
             put("href", address(href))
             type?.let { put("type", it) }
+            // A HEART resource names its profile the HAL way, as heart-core's hr:forms link does; never as a
+            // media-type parameter, which SPEC §6.1 withdrew.
+            if (served != null) put("profile", Dialect.JSONSCHEMA.profile)
             if ('{' in href) put("templated", true)
         }
     }

@@ -14,6 +14,27 @@ class LinkSteps(private val github: GitHubSteps) {
     @Then("the answer links these, by type")
     fun linksByType(table: DataTable) = assertLinks(answer.path("_links"), table)
 
+    @Then("every link to a HEART resource in the gateway, embedded ones too, has the profile {string}")
+    fun profiled(profile: String) {
+        // A link into the gateway at a HEART resource; hr:unavailable's plain JSON explanation is no such link.
+        val into = links(answer).filter {
+            it.path("href").asText().startsWith("/") && it.path("type").asText() == "application/hal+json"
+        }
+        assertTrue(into.isNotEmpty(), "no link into the gateway in $answer")
+        into.forEach { assertEquals(profile, it.path("profile").asText(), "$it") }
+    }
+
+    @Then("no link's type carries a parameter")
+    fun typesBare() = links(answer).forEach { assertFalse(';' in it.path("type").asText(), "$it") }
+
+    /** Every link of [resource] and of the resources it embeds, however deep. */
+    private fun links(resource: JsonNode): List<JsonNode> =
+        resource.path("_links").properties().filter { it.key != "curies" }
+            .flatMap { (_, value) -> if (value.isArray) value.toList() else listOf(value) } +
+            resource.path("_embedded").properties()
+                .flatMap { (_, value) -> if (value.isArray) value.toList() else listOf(value) }
+                .flatMap(::links)
+
     @Then("the answer has none of these links")
     fun noLinks(table: DataTable) = table.asMaps().forEach {
         assertFalse(answer.path("_links").has(it.getValue("relation")), "${it.getValue("relation")} is linked")

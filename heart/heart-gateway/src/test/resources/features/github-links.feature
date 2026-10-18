@@ -95,3 +95,18 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | github:head-user-followers |
       | github:base-user-followers |
       | github:pulls-get          |
+
+  Scenario Outline: Every link into the gateway names HEART's profile by HAL's link profile, never by a media-type parameter
+    SPEC §6.1 withdrew the media-type profile parameter: connegp reserves it
+    for profiles of one media type, and heart-rise spans two. A link says what
+    it leads to the HAL way, as heart-core's hr:forms link does: type
+    application/hal+json and profile https://w3id.org/heart-rise/hal-schema-forms.
+    When "ada" gets "<path>" through the GitHub gateway
+    Then every link to a HEART resource in the gateway, embedded ones too, has the profile "https://w3id.org/heart-rise/hal-schema-forms"
+    And no link's type carries a parameter
+
+    Examples:
+      | path                          |
+      | /repos/acme/rockets/issues/10 |
+      | /repos/acme/rockets/pulls/482 |
+      | /users/ada                    |

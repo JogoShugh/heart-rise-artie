@@ -35,7 +35,11 @@ in the data are addresses.
    image gateway. Web pages (`html_url`), images (`avatar_url`), `.diff` and `.patch` pages keep
    their own addresses, in `_links`, with a `type` hint.
 5. **Media type hints on every link** (`type`, RFC 8288's target attribute). Links the gateway
-   serves carry `application/hal+json;profile=…` (HAL Schema Forms).
+   serves carry `type: application/hal+json` and HAL's link `profile`,
+   `https://w3id.org/heart-rise/hal-schema-forms`, as heart-core's `hr:forms` link does. Not a
+   media-type `profile` parameter: SPEC withdrew that (front matter, §6.1), since connegp reserves it
+   for profiles of one media type and heart-rise spans two. (Corrected 2026-10-18; the draft said
+   `application/hal+json;profile=…`.)
 6. **Templates** (`{/name}`, `{+path}`, `{?since,...}`) become `templated: true`.
 7. **Nested objects become `_embedded`** (`user`, `head.repo`, `base.repo`, `owner`), each with its
    own `self` and its own lifted links, under a relation named after its path (`github:user`,
