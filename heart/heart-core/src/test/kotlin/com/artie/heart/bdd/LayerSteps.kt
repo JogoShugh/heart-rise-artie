@@ -5,11 +5,13 @@ import com.artie.heart.Dialect
 import com.artie.heart.JsonTrees
 import com.artie.heart.Layers
 import com.artie.heart.Rung
+import com.artie.heart.fixtures.Lamp
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 
@@ -137,6 +139,54 @@ class LayerSteps(private val world: LampWorld) {
         assertEquals(2, layers.explanations.size)
     }
 
+    @Then("the {string} form's integrity is the same at L0, L1 and L2")
+    fun formIntegrityEveryRung(key: String) {
+        val lamp = lamps.getValue(LAMP)
+        val each = listOf(Rung.L0, Rung.L1, Rung.L2).map { formIntegrity(lamp, it, key) }
+        assertNotNull(each.first(), "no hr:integrity on $key")
+        assertEquals(1, each.toSet().size, "$each")
+    }
+
+    @Then("the {string} form's integrity is that of these members, canonical")
+    fun formIntegrityOf(key: String, table: DataTable) {
+        val schemaIntegrity = layers.schemas.values.first { schemaOf(it, key) }.let(ContentAddress::integrity)
+        val members = table.asMaps().associate { row ->
+            val value = row.getValue("value")
+            row.getValue("member") to when {
+                value.startsWith("the integrity of") -> schemaIntegrity
+                value.startsWith("{") -> JsonTrees.plain(value)
+                else -> value
+            }
+        }
+        val expected = ContentAddress.integrity(ContentAddress.canonical(members))
+        assertEquals(expected, formIntegrity(lamps.getValue(LAMP), Rung.L2, key))
+    }
+
+    @Then("the forms {string} and {string} have different integrities")
+    fun formsDiffer(a: String, b: String) {
+        val lamp = lamps.getValue(LAMP)
+        assertNotEquals(formIntegrity(lamp, Rung.L2, a), formIntegrity(lamp, Rung.L2, b))
+    }
+
+    /** The hr:integrity of [key]'s form for [lamp] at [rung]: inline at L0, in the linked set otherwise. */
+    private fun formIntegrity(lamp: Lamp, rung: Rung, key: String): Any? {
+        val rendered = layers.layer1(lamp, rung)
+        val forms = if (rung == Rung.L0) {
+            forms(rendered)
+        } else {
+            val address = (link(rendered, "hr:forms")["href"] as String).removePrefix(Layers.AFFORDANCE_SETS)
+            forms(JsonTrees.plain(layers.affordanceSets.getValue(address)) as Map<String, Any?>)
+        }
+        return (forms.getValue(key) as Map<String, Any?>)["hr:integrity"]
+    }
+
+    /** Whether [served] is the schema of [key]'s act, as the L0 form embeds it. */
+    private fun schemaOf(served: String, key: String): Boolean {
+        val form = forms(layers.layer1(lamps.getValue(LAMP), Rung.L0)).getValue(key) as Map<String, Any?>
+        val embedded = form["schema"]
+        return JsonTrees.plain(served) == (embedded as Map<String, Any?>) - "\$id"
+    }
+
     @Then("each listed body hashes to its address")
     fun eachHashes() {
         (layers.affordanceSets + layers.schemas + layers.explanations).forEach { (address, served) ->
@@ -160,4 +210,9 @@ class LayerSteps(private val world: LampWorld) {
 
     private fun link(of: Map<String, Any?>, rel: String): Map<String, Any?> =
         (of["_links"] as Map<String, Any?>).getValue(rel) as Map<String, Any?>
+
+    private companion object {
+        /** The lamp every scenario of the feature renders. */
+        const val LAMP = 7L
+    }
 }

@@ -42,6 +42,24 @@ Feature: A declared resource type is rendered in three layers
       | 1 | embeds its schema, with its address as "$id"       |
       | 2 | refers to its schema by "$ref", with its integrity |
 
+  Scenario: Each form carries its own integrity, over what it does, the same at every rung
+    A replay compares the form it used with the form offered now: lenient, it
+    acts when that form is unchanged in a set that changed
+    (spec/ideas/replay-guards-lenient-strict.md). A form's hr:integrity is the
+    integrity of these members, in canonical form (RFC 8785): its target
+    template, its template pointers, its method, its content type, and its
+    schema's integrity. Not its title or description: a retitled form does the
+    same.
+    Then the "home:dim" form's integrity is the same at L0, L1 and L2
+    And the "home:dim" form's integrity is that of these members, canonical
+      | member              | value                                  |
+      | target              | /lamps/{id}/actions/dim                |
+      | hr:templatePointers | {"id": "/id"}                          |
+      | method              | POST                                   |
+      | contentType         | application/json                       |
+      | schema              | the integrity of the "home:dim" schema |
+    And the forms "home:dim" and "home:switch-off" have different integrities
+
   Scenario: Two lamps with the same offer key share every Layer 2 resource
     Given lamp 8 is "ON" at version 12
     Then lamps 7 and 8 link to the same affordance set at L1 and at L2

@@ -33,12 +33,12 @@ Feature: Content addresses stay the same while HEART moves into a library
     When a client walks bed 2 through every state at L0, L1 and L2, following every content-addressed link
     Then the addresses it reached are exactly:
       | address                                  |
-      | /affordance-sets/05be51a12c70166c |
-      | /affordance-sets/19768aa9dd26adc0 |
-      | /affordance-sets/1b2e0dba2236ac99 |
-      | /affordance-sets/6838506d57dd246f |
-      | /affordance-sets/a978757f7c5f6f10 |
-      | /affordance-sets/fc011cbafe712f8d |
+      | /affordance-sets/217c8ab839ccabff |
+      | /affordance-sets/3931614f5ea55db8 |
+      | /affordance-sets/3d6ba1c77d11f0e4 |
+      | /affordance-sets/55a61198bd5a8680 |
+      | /affordance-sets/5a87cb79ed7349ea |
+      | /affordance-sets/b13691ccea74b6f7 |
       | /schemas/6efcb63a723f14bc         |
       | /schemas/7f232c04c52671dd         |
       | /schemas/8547ad80c90a3125         |

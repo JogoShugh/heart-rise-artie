@@ -312,6 +312,33 @@ choices resolve against the owning resource's state, which is its body without
 (Decided 2026-10-18; SPEC §6.1. A possible remedy, embedded validators, is
 filed as `spec/ideas/embedded-forms-with-validators.md`.)
 
+## Rule 10: each form's own integrity
+
+Every form a server writes carries `hr:integrity`: the integrity (Rule 2's
+`sha256-` form) of a JSON object holding these members of the form, in
+canonical form (RFC 8785):
+
+| Member | Value |
+|---|---|
+| `target` | the target's URI template, as served at L1 and L2 (never the expanded address) |
+| `hr:templatePointers` | the form's template pointers (Rule 1) |
+| `method` | the form's method |
+| `contentType` | the form's content type |
+| `schema` | the integrity of the form's schema body |
+
+Not the form's `title` or `description`: a retitled form does the same. The
+value is the same at every rung, whether the schema is embedded or referred to
+(Rule 3), and for every resource whose set offers the form.
+
+An affordance set's integrity changes when any form in it changes; a form's
+changes only when what that form does changes. A client replaying a recorded
+act uses the two: lenient, it acts when the form it used still has its
+integrity, in whatever set holds it now; strict, it acts only when the set
+itself is unchanged (`spec/ideas/replay-guards-lenient-strict.md`). Both
+still check every fetched body against its link's integrity (Rule 2).
+
+(Decided 2026-10-18; SPEC §6.9.)
+
 ## Not covered here
 
 - Refusal bodies are RFC 9457 problem details; the five `type` URIs and the

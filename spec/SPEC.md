@@ -60,6 +60,8 @@
 
 - **Embedded resources, the HAL way (§6.1, §6.11).** Decided 2026-10-18 (`spec/PLAN-HAL-EMBEDDED.md`). A Layer 1 representation MAY carry HAL's `_embedded`: link relations to resource objects, each with its own `self`, state and links. Only resources are embedded; nested data with no address of its own stays state. Embedded resources carry no forms, though HAL Schema Forms allows them: every act needs `If-Match`, and an embedded copy has no `ETag`, so a client follows an embedded resource to act on it, and following always fetches. Clients take exactly `_links`, `_embedded`, `_forms` and `_templates` out of state. A collection MAY embed its items beside its `item` links.
 
+- **Each form names its own integrity (§6.9).** Decided 2026-10-18 (HAL-SCHEMA-FORMS-HR Rule 10). A form carries `hr:integrity`, over its target template, template pointers, method, content type and schema integrity, never its title or description; the same at every rung. A replaying client tells "the set changed" from "the form I used changed": lenient replay acts on an unchanged form in a changed set, strict replay only on an unchanged set (`spec/ideas/replay-guards-lenient-strict.md`).
+
 **Changes since 0.3:**
 
 - **Introduced the L0–L6 conformance ladder (§6.10)** as the normative structure for incremental adoption, with sequence diagrams per rung. L0 — everything embedded, zero headers — is an on-ramp, explicitly *not* conformance (§6.10.1).

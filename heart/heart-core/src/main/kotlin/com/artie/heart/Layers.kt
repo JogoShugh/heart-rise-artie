@@ -160,18 +160,37 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
             // HAL-SCHEMA-FORMS-HR Rule 3: a reference, pinned by the schema's integrity.
             mapOf("\$ref" to id, "hr:integrity" to ContentAddress.integrity(body))
         }
+        val target = "${type.itemPath.template}/actions/${act.path}"
         return mapOf(
             "title" to relation.title,
             "description" to relation.description,
-            "_links" to mapOf(
-                "target" to mapOf("href" to "${type.itemPath.template}/actions/${act.path}", "templated" to true),
-            ),
+            "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
             TEMPLATE_POINTERS to type.itemPath.pointers,
             "method" to "POST",
             "contentType" to "application/json",
             "schema" to schema,
+            FORM_INTEGRITY to formIntegrity(target, ContentAddress.integrity(body)),
         )
     }
+
+    /**
+     * A form's own integrity (spec/ideas/replay-guards-lenient-strict.md): over what it does, its target
+     * template, template pointers, method, content type and its schema's integrity, in canonical form. Not its
+     * title or description, so a retitled form keeps it; the same at every rung, whether the schema is
+     * embedded or referred to.
+     */
+    private fun formIntegrity(target: String, schemaIntegrity: String): String =
+        ContentAddress.integrity(
+            ContentAddress.canonical(
+                mapOf(
+                    "target" to target,
+                    TEMPLATE_POINTERS to type.itemPath.pointers,
+                    "method" to "POST",
+                    "contentType" to "application/json",
+                    "schema" to schemaIntegrity,
+                ),
+            ),
+        )
 
     /** At L0 a form belongs to one resource: its target is concrete and needs no pointers. */
     private fun resolved(form: Any?, item: String): Map<String, Any?> {
@@ -194,6 +213,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         const val FORMS_REL = "hr:forms"
         const val UNAVAILABLE_REL = "hr:unavailable"
         private const val TEMPLATE_POINTERS = "hr:templatePointers"
+        private const val FORM_INTEGRITY = "hr:integrity"
         private const val JSON_CONTENT = "application/json"
         internal val HR_CURIE: Map<String, Any> =
             mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
