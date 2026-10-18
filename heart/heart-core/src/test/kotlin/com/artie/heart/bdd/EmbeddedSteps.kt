@@ -37,6 +37,31 @@ class EmbeddedSteps(private val world: LampWorld, private val pull: PullWorld) {
         pull.pulls += PullRequest(owner, repo, number, "open", version = 1, author = mapOf("login" to login))
     }
 
+    @Given("the pull request's state says these links")
+    fun stateLinks(table: DataTable) {
+        pull.stateLinks = table.asMaps().associate {
+            it.getValue("relation") to mapOf("href" to it.getValue("href"), "type" to it.getValue("type"))
+        }
+        pull.declare()
+    }
+
+    @Given("the pull request's state embeds its merger {string} at {string}")
+    fun stateEmbeds(login: String, self: String) {
+        val merger = mapOf("login" to login, "_links" to mapOf("self" to mapOf("href" to self)))
+        pull.stateEmbedded = mapOf("pulls:merger" to merger)
+        pull.declare()
+    }
+
+    @Then("it links these resources by their types")
+    fun linksByType(table: DataTable) {
+        val links = last.path("_links")
+        table.asMaps().forEach { row ->
+            val link = links.path(row.getValue("relation"))
+            assertEquals(row.getValue("href"), link.path("href").asText(), "$links")
+            assertEquals(row.getValue("type"), link.path("type").asText(), "$links")
+        }
+    }
+
     @Given("its reviewers are")
     fun reviewers(table: DataTable) {
         update { it.copy(reviewers = table.asMaps().map { row -> row.getValue("login") }) }

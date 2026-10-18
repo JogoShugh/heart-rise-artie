@@ -3,6 +3,7 @@ package com.artie.heart.fixtures
 import com.artie.heart.Act
 import com.artie.heart.AlpsType
 import com.artie.heart.Embedded
+import com.artie.heart.Hypermedia
 import com.artie.heart.Finding
 import com.artie.heart.ItemPath
 import com.artie.heart.Named
@@ -83,6 +84,7 @@ object PullRequests {
         finding: Finding? = null,
         subCollections: Map<String, String> = emptyMap(),
         embedded: List<Embedded> = emptyList(),
+        hypermedia: Hypermedia = Hypermedia.NONE,
     ): ResourceType<PullRequest, String> = ResourceType(
         collection = "pulls",
         profile = profile,
@@ -99,6 +101,7 @@ object PullRequests {
             bodyOf = { it.body() },
             keyField = "state",
             itemPath = itemPath,
+            hypermediaOf = { hypermedia },
         ),
         finding = finding,
         subCollections = subCollections,

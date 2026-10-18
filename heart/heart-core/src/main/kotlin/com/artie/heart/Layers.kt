@@ -53,9 +53,11 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         val item = type.itemPath.expand(body)
         val self = mapOf("href" to item)
         // Sub-collections name this resource, so their links are Layer 1, never in a shared set.
-        val collections = type.subCollectionLinks(body)
+        // The state's own links and embedded resources (a gateway's), beside the declared ones.
+        val said = type.state.hypermediaOf(state)
+        val collections = type.subCollectionLinks(body) + said.links
         // SPEC §6.1: other resources in the state leave it, embedded under their relations.
-        val embedded = type.embeddedOf(body)
+        val embedded = type.embeddedOf(body) + said.embedded
         val rendering = rung.setRendering
         if (rendering == null) {
             body["_links"] = mapOf(
@@ -109,8 +111,9 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     fun halForms(state: S): Map<String, Any?> {
         val body = LinkedHashMap(type.state.bodyOf(state))
         val item = type.itemPath.expand(body)
-        val collections = type.subCollectionLinks(body)
-        val embedded = type.embeddedOf(body)
+        val said = type.state.hypermediaOf(state)
+        val collections = type.subCollectionLinks(body) + said.links
+        val embedded = type.embeddedOf(body) + said.embedded
         val named = collections.isNotEmpty() || embedded.isNotEmpty()
         body["_links"] = mapOf("self" to mapOf("href" to item)) +
             (if (named) mapOf("curies" to type.profile.curies) + collections else emptyMap())

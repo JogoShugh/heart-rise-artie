@@ -79,6 +79,39 @@ Feature: A resource embeds the resources its state holds
       | owner    | /owner  | /users/{login}         | no relation owner in pulls                  |
       | author   | /author | /users/{login}/{team}  | item path variable team has no pointer      |
 
+  Scenario Outline: A state's own links and embedded resources are rendered with the declared ones, in every rendering
+    A server that learns its links from another API (the gateway) can't
+    declare them in advance: its state view says them, state by state.
+    Given the pull request's state says these links
+      | relation   | href                                           | type        |
+      | alternate  | https://github.com/acme/rockets/pull/482       | text/html   |
+      | pulls:diff | https://github.com/acme/rockets/pull/482.diff  | text/x-diff |
+    And the pull request's state embeds its merger "bo" at "/users/bo"
+    When the pull request is rendered <rendering>
+    Then it links these resources by their types
+      | relation   | href                                           | type        |
+      | alternate  | https://github.com/acme/rockets/pull/482       | text/html   |
+      | pulls:diff | https://github.com/acme/rockets/pull/482.diff  | text/x-diff |
+    And it embeds these resources
+      | relation     | index | self       | login |
+      | pulls:author |       | /users/ada | ada   |
+      | pulls:merger |       | /users/bo  | bo    |
+    And its curies name the profile "pulls"
+
+    Examples:
+      | rendering    |
+      | at L0        |
+      | at L2        |
+      | in HAL-FORMS |
+
+  Scenario: A state's own links are not in the shared affordance set
+    Given the pull request's state says these links
+      | relation  | href                                     | type      |
+      | alternate | https://github.com/acme/rockets/pull/482 | text/html |
+    And pull request 7 of "acme/engines" is open, written by "bo"
+    When both pull requests are rendered at L1
+    Then they link the same affordance set
+
   Scenario: A type that embeds nothing renders no _embedded
     Given a lamp resource type declared with the profile "home"
     Then the lamp type embeds nothing

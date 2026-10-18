@@ -141,7 +141,22 @@ class StateView<S, K>(
     val bodyClass: Class<*>? = null,
     val keyField: String? = null,
     val itemPath: ItemPath? = null,
+    /**
+     * Links and embedded resources the state itself says, beside those the type declares: for a server
+     * that learns them from another API, state by state, as the gateway does. Layer 1, never shared.
+     */
+    val hypermediaOf: (S) -> Hypermedia = { Hypermedia.NONE },
 )
+
+/**
+ * A state's own hypermedia: [links] by relation (a link object or an array of them, as HAL writes them)
+ * and [embedded] resources by relation (a resource object, with its self link, or an array of them).
+ */
+class Hypermedia(val links: Map<String, Any?> = emptyMap(), val embedded: Map<String, Any?> = emptyMap()) {
+    companion object {
+        val NONE = Hypermedia()
+    }
+}
 
 /** A form's two names: its logical [name] (a HAL-FORMS template name) and its [relation] id in the profile. */
 data class Named(val name: String, val relation: String)
