@@ -75,7 +75,11 @@ hand-written message becomes optional:
 check(state["merged_at"] != null || state["state"] == "closed")
 ```
 
-To verify first: that Power-assert can be enabled in the scripting host that compiles `.kts`.
+Verified and built, 2026-10-18: heart-script-host builds the script engine (JSR-223, for `artie run`
+and the features alike) with Power-assert given `-Xplugin` and told to draw `heart.script.Here.check`.
+The message's first line stays the script's own words; the drawing goes into the trace, and
+`artie run` prints it above the run's end. One limit: `&&` stops early, so a part after a failed
+first part is not drawn.
 
 ### Alternatives considered
 
@@ -169,6 +173,6 @@ forms whose ALPS descriptor says they create, if the profile says so.
 
 ## To decide
 
-1. Checks: decided in shape, 2026-10-18 (facts with matchers, `check(condition)` with Power-assert,
-   member names in `state[...]`). To settle when built: the matcher words' final spelling.
+1. Checks: built, 2026-10-18 (facts with matchers, `check(condition)` with Power-assert, member
+   names in `state[...]`). Still open: the matcher words' final spelling.
 2. Blocks after reason: A, B or C?

@@ -22,8 +22,8 @@ dependencies {
     // The features' steps and scripted service, shared with add-ons' features (heart-script-test).
     testFixturesApi(kotlin("test"))
     testFixturesApi("io.cucumber:cucumber-java:$cucumberVersion")
-    // The features run real scripts, through Kotlin's script engine.
-    testFixturesImplementation("org.jetbrains.kotlin:kotlin-scripting-jsr223:2.3.0")
+    // The features run real scripts, in the engine artie run uses.
+    testFixturesImplementation(project(":heart-script-host"))
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.cucumber:cucumber-junit-platform-engine:$cucumberVersion")

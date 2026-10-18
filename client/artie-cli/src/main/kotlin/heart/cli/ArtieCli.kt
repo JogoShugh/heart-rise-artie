@@ -13,7 +13,7 @@ import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Instant
-import javax.script.ScriptEngineManager
+import heart.script.host.ScriptHost
 import javax.script.ScriptException
 
 /**
@@ -85,7 +85,7 @@ class ArtieCli(
 
     private fun execute(run: Run, script: String): Ended {
         Run.current = run
-        val engine = checkNotNull(ScriptEngineManager().getEngineByExtension("kts")) { "no Kotlin script engine" }
+        val engine = ScriptHost.engine()
         return try {
             engine.eval(IMPORTS.joinToString("") { "import $it\n" } + script)
             Ended(0, "finished", "finished, ${run.trace.size} steps", run.trace.size)
@@ -107,7 +107,8 @@ class ArtieCli(
             stop.step == 0 -> STOPPED_BEFORE
             else -> NOT_MET
         }
-        return Ended(exit, "stopped", stop.message.orEmpty(), run.trace.size)
+        val drawing = run.trace.lastOrNull()?.asked?.params?.get("drawing") as? String
+        return Ended(exit, "stopped", stop.message.orEmpty(), run.trace.size, drawing)
     }
 
     /**
@@ -143,7 +144,10 @@ class ArtieCli(
                     if (ended.exit != 0) put("line", ended.line)
                 },
             )
-            else -> out.println(ended.line)
+            else -> {
+                ended.drawing?.let(out::println)
+                out.println(ended.line)
+            }
         }
     }
 
@@ -152,7 +156,8 @@ class ArtieCli(
         return typed().orEmpty().ifEmpty { default ?: throw BadArguments("no answer to: $question") }
     }
 
-    private class Ended(val exit: Int, val ended: String, val line: String, val steps: Int)
+    /** How a run ended; [drawing], a failed check's condition drawn with its values, printed above [line]. */
+    private class Ended(val exit: Int, val ended: String, val line: String, val steps: Int, val drawing: String? = null)
 
     private companion object {
         val IMPORTS = listOf("heart.script.*", "heart.script.test.*")

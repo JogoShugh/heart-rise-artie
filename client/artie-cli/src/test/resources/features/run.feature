@@ -59,10 +59,37 @@ Feature: artie run: a script, run from the command line
       | act("close")                                               | 0    | finished, 3 steps                                                                      |
       | expect(Done) { act("comment") }                            | 1    | stopped at step 2, "expect": expected done, but it was new resource                    |
       | check(state["/state"] == "closed") { "should be closed" }  | 1    | stopped at step 2, "check": "should be closed"                                         |
+      | check(state["/state"] == "closed")                         | 1    | stopped at step 2, "check": "check failed"                                             |
       | act("reopen")                                              | 3    | stopped at step 2, "reopen": not offered, refused by the client: "The issue is already open." |
       | follow("item", title = "nope")                             | 3    | stopped at step 2, "item": not offered, refused by the client: "no "item" link titled "nope""             |
       | act("lock")                                                | 4    | stopped at step 2, "lock": unreachable, refused by the client: "connection refused"    |
       | error("a bug in the script")                               | 5    | the script failed: a bug in the script                                                 |
+
+  Scenario: A condition that fails is drawn above the run's end
+    Given the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          val state = state["/state"]
+          check(state == "closed") { "should be closed" }
+      }
+      """
+    When artie is run with
+      | argument  |
+      | run       |
+      | issue.kts |
+    Then artie exits 1
+    And artie prints, exactly
+      """
+      1 enter scripted://service/: done
+      2 act issues-get, number 10: done
+      3 check: failed
+      check(state == "closed") { "should be closed" }
+            |     |
+            |     false
+            open
+      stopped at step 2, "check": "should be closed"
+      """
 
   Scenario Outline: Inputs come from the command line or a file, the command line winning
     Given the script "comment.kts" is

@@ -20,7 +20,7 @@ dependencies {
     implementation(project(":heart-script-test"))
     // The client a script finds, by ServiceLoader.
     runtimeOnly(project(":artie"))
-    implementation("org.jetbrains.kotlin:kotlin-scripting-jsr223:2.3.0")
+    implementation(project(":heart-script-host"))
     implementation("org.yaml:snakeyaml:2.2")
     // Californium logs through SLF4J 1.7; with no binding it warns on every run. A run's output is its steps.
     runtimeOnly("org.slf4j:slf4j-nop:1.7.36")

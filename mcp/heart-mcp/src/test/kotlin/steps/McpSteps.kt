@@ -150,8 +150,10 @@ class McpSteps(private val host: McpHost) {
     }
 
     @Then("the result offers exactly these acts")
-    fun offersExactly(table: DataTable) =
-        assertEquals(list(table, "act").sorted(), ok()["acts"]!!.jsonArray.map { it.jsonObject.string("name") }.sorted())
+    fun offersExactly(table: DataTable) {
+        val acts = ok()["acts"]!!.jsonArray.map { it.jsonObject.string("name") }
+        assertEquals(list(table, "act").sorted(), acts.sorted())
+    }
 
     @Then("every offered act has a title and a schema")
     fun actsDescribed() = ok()["acts"]!!.jsonArray.forEach { act ->

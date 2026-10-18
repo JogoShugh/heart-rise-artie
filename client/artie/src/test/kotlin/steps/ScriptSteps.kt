@@ -5,10 +5,10 @@ import heart.script.Navigator
 import heart.script.NavigatorProvider
 import heart.script.Run
 import heart.script.ScriptStopped
+import heart.script.host.ScriptHost
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 import kotlin.test.assertEquals
 
@@ -32,7 +32,7 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
 
     private fun runs(script: String, navigator: ArtieNavigator) {
         Run.current = Run(navigator = { navigator }).also { it.reasoning = true }
-        val engine = checkNotNull(ScriptEngineManager().getEngineByExtension("kts")) { "no Kotlin script engine" }
+        val engine = ScriptHost.engine()
         try {
             engine.eval("import heart.script.*\n$script")
         } catch (e: ScriptException) {

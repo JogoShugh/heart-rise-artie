@@ -64,6 +64,9 @@ class CliSteps(private val script: ScriptSteps) {
     @Then("artie prints")
     fun prints(table: DataTable) = assertEquals(table.asMaps().map { it.getValue("line") }, printed)
 
+    @Then("artie prints, exactly")
+    fun printsExactly(lines: String) = assertEquals(lines, printed.joinToString("\n"))
+
     @Then("the client was made to ask at rung {string}")
     fun rung(rung: String) = assertEquals(rung, askedRung.orEmpty())
 

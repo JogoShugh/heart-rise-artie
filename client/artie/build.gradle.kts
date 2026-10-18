@@ -38,7 +38,7 @@ dependencies {
     // The GitHub gateway and a small GitHub, in process (github-gateway.feature).
     testImplementation(testFixtures("com.artie.heart:heart-gateway"))
     // script-github.feature runs real scripts, through Kotlin's script engine.
-    testImplementation("org.jetbrains.kotlin:kotlin-scripting-jsr223:2.3.0")
+    testImplementation(project(":heart-script-host"))
     // bdd-gates: the client's architecture boundary as a failing test.
     testImplementation("com.lemonappdev:konsist:0.17.3")
 }

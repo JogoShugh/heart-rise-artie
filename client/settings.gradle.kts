@@ -9,6 +9,9 @@ include("heart-script")
 // expect, for test scripts: an add-on to the DSL.
 include("heart-script-test")
 
+// The script engine a HEART script runs in, with Power-assert.
+include("heart-script-host")
+
 // artie run: a script, run from the command line.
 include("artie-cli")
 

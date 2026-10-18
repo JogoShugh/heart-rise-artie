@@ -60,11 +60,23 @@ class Here internal constructor(
         run.notes += text
     }
 
-    /** An assertion: when it fails, the script stops here, with [message]. */
+    /**
+     * An assertion: when it fails, the script stops here, with [message]. In a script host with Power-assert
+     * (heart-script-host), the message's first line is the script's own words, and the lines after it draw the
+     * condition with the value of each part; the trace keeps that drawing.
+     */
     fun check(condition: Boolean, message: () -> String = { "check failed" }) {
         val step = ++run.step
-        run.record(TraceStep.Asked("check", emptyMap()), if (condition) "held" else "failed", held)
-        if (!condition) throw ScriptStopped(step, "\"check\"", "\"${message()}\"")
+        if (condition) {
+            run.record(TraceStep.Asked("check", emptyMap()), "held", held)
+            return
+        }
+        val said = message().trimEnd().lines()
+        val words = said.first().ifBlank { "check failed" }
+        val drawing = said.drop(1).joinToString("\n")
+        val params = if (drawing.isEmpty()) emptyMap() else mapOf("drawing" to drawing)
+        run.record(TraceStep.Asked("check", params), "failed", held)
+        throw ScriptStopped(step, "\"check\"", "\"$words\"")
     }
 
     /** Read the held resource again. */

@@ -1,10 +1,10 @@
 package heart.script
 
+import heart.script.host.ScriptHost
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
-import javax.script.ScriptEngineManager
 import javax.script.ScriptException
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -203,7 +203,7 @@ class ScriptSteps {
     private fun execute(with: Run) {
         run = with
         Run.current = with
-        val engine = checkNotNull(ScriptEngineManager().getEngineByExtension("kts")) { "no Kotlin script engine" }
+        val engine = ScriptHost.engine()
         try {
             engine.eval(imports.joinToString("") { "import $it\n" } + script)
         } catch (e: ScriptException) {

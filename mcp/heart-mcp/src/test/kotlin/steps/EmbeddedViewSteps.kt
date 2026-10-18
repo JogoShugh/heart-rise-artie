@@ -32,7 +32,8 @@ class EmbeddedViewSteps {
             HeartEmbedded(ADDRESS + login, row.getValue("title"), buildJsonObject { put("login", login) })
         }
         val state = buildJsonObject { put("number", NUMBER) }
-        held = HeartRepresentation(ADDRESS + "pulls/482", state, Manifest(), "\"seq-1\"", related = Related(embedded = embedded))
+        val related = Related(embedded = embedded)
+        held = HeartRepresentation(ADDRESS + "pulls/482", state, Manifest(), "\"seq-1\"", related = related)
     }
 
     @Given("heart-mcp holds a resource with these links")

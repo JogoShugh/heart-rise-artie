@@ -27,4 +27,10 @@ class CheckSteps(private val steps: ScriptSteps) {
         }
         assertEquals(table.asMaps(), read)
     }
+
+    @Then("trace step {int} drew the check")
+    fun drew(step: Int, drawing: String) {
+        val params = steps.run.trace[step - 1].json().getValue("params") as JsonObject
+        assertEquals(drawing, params["drawing"]?.jsonPrimitive?.content)
+    }
 }

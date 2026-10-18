@@ -56,6 +56,25 @@ Feature: Checks as facts: a member and a value, or a member and a matcher
       """
     Then the script noted "Herbs, Herbs, loam, slashed"
 
+  Scenario: A condition that fails is drawn, with the value of each part
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("bed-get", "id" to 1)
+          val moisture = state["moisture"] as Long
+          check(moisture > 50) { "the bed is too dry" }
+      }
+      """
+    Then the script stopped at step 2, "check": "the bed is too dry"
+    And trace step 3 drew the check
+      """
+      check(moisture > 50) { "the bed is too dry" }
+            |        | |
+            |        | 50
+            |        false
+            40
+      """
+
   Scenario: The trace keeps each fact as data
     When this script runs, written to a trace
       """kotlin
