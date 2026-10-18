@@ -47,6 +47,11 @@ class ReasonSteps(private val ctx: ClientContext) {
         reasoner = ScriptedReasoner(Selection.Act(affordance, Json.parseToJsonElement(fields).jsonObject))
     }
 
+    @Given("the reasoner will follow the {string} link")
+    fun willFollowUntitled(rel: String) {
+        reasoner = ScriptedReasoner(Selection.Follow(rel, null))
+    }
+
     @Given("the reasoner will follow the {string} link titled {string}")
     fun willFollow(rel: String, title: String) {
         reasoner = ScriptedReasoner(Selection.Follow(rel, title))

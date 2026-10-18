@@ -1,27 +1,48 @@
-// The GitHub task, hybrid: the script opens the issue, edits and merges the pull request, and comments,
-// exactly; the model makes the one choice that is a matter of judgement, which way to close the issue
-// (completed, not planned, or duplicate). Needs --reasoner claude. The pull request comes from
-// github-task-setup.sh.
-//   artie run tests/github-task-hybrid.kts owner=JogoShugh repo=heart-github-test pull=12 --reasoner claude
+// The GitHub task, hybrid: the script does every step exactly, as github-task-scripted.kts does, but the one
+// choice that is a matter of judgement, which way to close the issue (completed, not planned, or a duplicate),
+// the model makes. Needs --reasoner claude. Real writes, to the repository given.
+//   artie run tests/github-task-hybrid.kts owner=JogoShugh repo=heart-github-test --reasoner claude
 val owner by input()
 val repo by input()
-val pull by input()
-val title by input(default = "Crash when a bed has no name (hybrid)")
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd-HHmmss")))
 
 heart("http://localhost:8392/") {
     var issue = 0L
+    var pull = 0L
     act("github:repos-get", "owner" to owner, "repo" to repo) {
-        act("github:open-issue", "title" to title, "body" to "Opened by a HEART script.") {
+        act("github:open-issue", "title" to "Crash when a bed has no name (hybrid)", "body" to "Opened by a HEART script.") {
             issue = state["/number"] as Long
         }
-    }
-    act("github:pulls-get", "owner" to owner, "repo" to repo, "pull_number" to pull.toInt()) {
-        act("github:edit", "body" to "Refuses a bed with no name. Relates to #$issue.")
-        act("github:merge", "merge_method" to "squash")
-        check(state["/merged"] == true) { "the pull request should be merged" }
+        follow("github:repos-list-branches") {
+            follow("item", title = "main") {
+                act("github:branch-from-here", "name" to "fix-blank-names-hybrid-$stamp") {
+                    act(
+                        "github:commit-file",
+                        "path" to "fix-hybrid-$stamp.md",
+                        "message" to "Refuse a bed with no name",
+                        "content" to "Bed names may not be blank.\n",
+                    )
+                    act(
+                        "github:open-pull-request",
+                        "title" to "Refuse a bed with no name (hybrid)",
+                        "base" to "main",
+                        "body" to "Relates to #$issue.",
+                    ) {
+                        pull = state["/number"] as Long
+                        // GitHub works out whether it can merge a new pull request a moment after it opens.
+                        until(tries = 20) { offers("github:merge") }
+                        act("github:merge", "merge_method" to "squash")
+                        check(state["/merged"] == true) { "the pull request should be merged" }
+                    }
+                }
+            }
+        }
     }
     act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to issue) {
-        act("github:comment", "body" to "Fixed in 1.2 by #$pull.")
+        // The comment is a new resource: visit it, then come back to the issue to close it.
+        act("github:comment", "body" to "Fixed in 1.2 by #$pull.") {
+            check(state["/body"] == "Fixed in 1.2 by #$pull.") { "the comment should say what fixed it" }
+        }
         reason("close it the right way: the fix shipped in 1.2")
         check(state["/state"] == "closed") { "the issue should be closed" }
         check(state["/state_reason"] == "completed") { "the issue should be closed as completed" }

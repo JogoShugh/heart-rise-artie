@@ -1,6 +1,7 @@
 package steps
 
 import heart.HeartEmbedded
+import heart.HeartLink
 import heart.HeartRepresentation
 import heart.Manifest
 import heart.Related
@@ -32,6 +33,24 @@ class EmbeddedViewSteps {
         }
         val state = buildJsonObject { put("number", NUMBER) }
         held = HeartRepresentation(ADDRESS + "pulls/482", state, Manifest(), "\"seq-1\"", related = Related(embedded = embedded))
+    }
+
+    @Given("heart-mcp holds a resource with these links")
+    fun holdsLinks(table: DataTable) {
+        val links = table.asMaps().groupBy({ it.getValue("relation") }) { row ->
+            HeartLink(
+                ADDRESS + row.getValue("relation").substringAfter(':'),
+                type = row["type"]?.ifEmpty { null },
+                templated = row.getValue("templated").toBoolean(),
+            )
+        }
+        held = HeartRepresentation(ADDRESS, buildJsonObject { }, Manifest(), "\"seq-1\"", related = Related(links))
+    }
+
+    @Then("the view shows exactly these links")
+    fun showsLinks(table: DataTable) {
+        val shown = view.getValue("links").jsonArray.map { it.jsonObject.getValue("rel").jsonPrimitive.content }
+        assertEquals(table.asMaps().map { it.getValue("relation") }, shown)
     }
 
     @When("heart-mcp shows what it holds")

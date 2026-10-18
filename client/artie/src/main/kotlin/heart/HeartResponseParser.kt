@@ -91,6 +91,7 @@ object HeartResponseParser {
             title = obj["title"]?.jsonPrimitive?.content,
             integrity = obj["integrity"]?.jsonPrimitive?.content,
             templated = templated,
+            type = obj["type"]?.jsonPrimitive?.content,
         )
     }
 

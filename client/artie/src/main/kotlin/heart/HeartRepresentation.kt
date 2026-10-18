@@ -77,11 +77,19 @@ data class HeartEmbedded(
 /**
  * One HAL link: [href] resolved against the representation's URL, its
  * title, and its Subresource Integrity value (HAL-SCHEMA-FORMS-HR Rule 2).
- * A [templated] link's href is a URI Template (RFC 6570), kept as written.
+ * A [templated] link's href is a URI Template (RFC 6570), kept as written. [type] is the media type the
+ * link says it leads to, when it says.
  */
 data class HeartLink(
     val href: String,
     val title: String? = null,
     val integrity: String? = null,
     val templated: Boolean = false,
-)
+    val type: String? = null,
+) {
+    /**
+     * Whether ARTIE can follow it as it stands: a URI, not a template that needs values, leading to a
+     * HEART resource, so untyped or typed as HAL.
+     */
+    val followable: Boolean get() = !templated && (type == null || type == HAL_JSON)
+}

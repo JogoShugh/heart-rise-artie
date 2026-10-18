@@ -61,12 +61,13 @@ internal object Views {
 
     /**
      * The links a model may follow: every one but `self`, the affordance-set
-     * link and the explanation link, which are ARTIE's plumbing, not choices.
+     * link and the explanation link, which are ARTIE's plumbing, not choices,
+     * and but those ARTIE can't follow: a template, or a link out of HEART.
      */
     fun links(held: HeartRepresentation): List<Pair<String, String?>> {
         val plumbing = setOfNotNull(held.forms?.href, held.manifest.unavailable?.href)
         return held.linksByRel.filterKeys { it != "self" }.flatMap { (rel, links) ->
-            links.filter { it.href !in plumbing }.map { rel to it.title }
+            links.filter { it.href !in plumbing && it.followable }.map { rel to it.title }
         }
     }
 

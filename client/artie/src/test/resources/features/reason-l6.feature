@@ -114,6 +114,35 @@ Feature: L6: the Reason step picks; deterministic code acts
     And the agent followed the link to "http://garden.test/beds/2"
     And the manifest offers exactly "waterCell"
 
+  Scenario: The reasoner is offered only the links ARTIE can follow: no templates, nothing outside HEART
+    Live, a reasoner given GitHub's repository through the gateway chose the
+    branches_url template over the gateway's own branches link (2026-10-18). A
+    URI template needs values the reasoner can't give, and a link whose type is
+    not HAL leads out of HEART: ARTIE can follow neither, so neither is offered.
+    Given the service answers GET "http://garden.test/repos/acme/rockets" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      name: rockets
+      _links:
+        self: {href: /repos/acme/rockets}
+        github:repos-list-branches: {href: /repos/acme/rockets/branches, type: application/hal+json, profile: "https://w3id.org/heart-rise/hal-schema-forms"}
+        github:issues: {href: /repos/acme/rockets/issues}
+        github:branches: {href: "https://api.github.com/repos/acme/rockets/branches{/branch}", type: application/vnd.github+json, templated: true}
+        github:hooks: {href: "https://api.github.com/repos/acme/rockets/hooks", type: application/vnd.github+json}
+        alternate: {href: "https://github.com/acme/rockets", type: text/html}
+      """
+    And the reasoner will follow the "github:branches" link
+    When the agent handles "look at the branches" at "http://garden.test/repos/acme/rockets"
+    Then the reasoner was shown these links and no URI
+      | rel                        | title |
+      | github:repos-list-branches |       |
+      | github:issues              |       |
+    And the agent rejected the selection because "no github:branches link titled null in http://garden.test/repos/acme/rockets"
+    And the client sent no request after entering
+
   Scenario: A link the representation does not offer is rejected before any request
     Given the service answers GET "http://garden.test/beds?name=border" with:
       """
