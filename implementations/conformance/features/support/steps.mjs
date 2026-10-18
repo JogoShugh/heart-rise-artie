@@ -141,6 +141,46 @@ When("it tries to enter that service", async function () {
     try { await this.me.heart.enter(this.fakeUrl); } catch (e) { this.error = e; }
 });
 
+// ---- Embedded resources (SPEC §6.1, §6.11) ----
+
+Then("it holds these embedded resources", function (table) {
+    const held = (this.rep.embedded ?? []).map((e) => ({ relation: e.rel, title: e.title ?? "", status: String(e.state.status) }));
+    assert.deepEqual(held, table.hashes());
+});
+
+Then("it read no bed on its own", function () {
+    const beds = this.me.log.filter((r) => /\/beds\/\d+$/.test(r.url));
+    assert.deepEqual(beds, []);
+});
+
+Given("a service whose resource embeds its author, and keeps a member named {string}", async function (member) {
+    const profile = `<${heart.PROFILE}>; rel="profile"`;
+    const headers = { "Content-Type": "application/hal+json", Link: profile, ETag: '"1"' };
+    this.fake = http.createServer((req, res) => {
+        res.writeHead(200, headers);
+        if (req.url === "/users/ada") {
+            return res.end(JSON.stringify({
+                login: "ada", name: "Ada Lovelace", _links: { self: { href: "/users/ada" } },
+                _forms: { befriend: { _links: { target: { href: "/users/ada/actions/befriend" } }, method: "POST", schema: {} } },
+            }));
+        }
+        res.end(JSON.stringify({
+            number: 482, [member]: "kept as state", _links: { self: { href: "/" } }, _forms: {},
+            _embedded: { author: { login: "ada", _links: { self: { href: "/users/ada", title: "Ada" } } } },
+        }));
+    });
+    await new Promise((ok) => this.fake.listen(0, "127.0.0.1", ok));
+    this.fakeUrl = `http://127.0.0.1:${this.fake.address().port}/`;
+});
+
+When("it enters that service", async function () {
+    this.rep = await this.me.heart.enter(this.fakeUrl);
+});
+
+Then("the state has exactly these members", function (table) {
+    assert.deepEqual(Object.keys(this.rep.state), table.hashes().map((r) => r.member));
+});
+
 Then("it refused the affordance set for its integrity", function () {
     assert.ok(this.error instanceof heart.IntegrityFailure, `expected an integrity failure, got ${this.error}`);
 });

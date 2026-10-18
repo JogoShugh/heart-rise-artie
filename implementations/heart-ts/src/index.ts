@@ -31,6 +31,13 @@ export interface Form {
 
 export interface Link { rel: string; href: string; title?: string; integrity?: string }
 
+/**
+ * A resource another embeds (SPEC §6.1): its relation, its self link's address
+ * and title, its state and its own links. It carries no forms and no validator:
+ * to act on it, a client follows it, which reads it.
+ */
+export interface Embedded { rel: string; href: string; title?: string; state: JsonObject; links: Link[] }
+
 export interface Representation {
     url: string;
     etag: string;
@@ -38,6 +45,14 @@ export interface Representation {
     state: JsonObject;
     forms: Map<string, Form>;
     links: Link[];
+    embedded: Embedded[];
+}
+
+/** SPEC §6.1: the state is the body without exactly these four members; any other member is state. */
+const CONTROLS = new Set(["_links", "_embedded", "_forms", "_templates"]);
+
+function stateOf(body: JsonObject): JsonObject {
+    return Object.fromEntries(Object.entries(body).filter(([key]) => !CONTROLS.has(key)));
 }
 
 /** Every refusal names what happened; none carries a credential. */
@@ -82,9 +97,10 @@ export class HeartClient {
         return this.sync(this.held().url);
     }
 
-    /** Follow a link the representation offers, by relation and title. */
+    /** Follow a link the representation offers, or a resource it embeds, by relation and title. */
     async follow(rel: string, title?: string): Promise<Representation> {
-        const link = this.held().links.find((l) => l.rel === rel && (title === undefined || l.title === title));
+        const matches = (l: { rel: string; title?: string }) => l.rel === rel && (title === undefined || l.title === title);
+        const link = this.held().links.find(matches) ?? this.held().embedded.find(matches);
         if (!link) throw new Error(`no ${rel} link${title ? ` titled ${title}` : ""} is offered; nothing was sent`);
         return this.sync(new URL(link.href, this.held().url).toString());
     }
@@ -142,9 +158,25 @@ export class HeartClient {
         for (const [name, raw] of Object.entries((formsBody._forms ?? {}) as JsonObject)) {
             forms.set(name, await this.form(name, raw as JsonObject, url));
         }
-        const state = Object.fromEntries(Object.entries(body).filter(([key]) => !key.startsWith("_")));
-        this.current = { url, etag: response.headers.get("ETag") ?? "", rung: applied, state, forms, links: linked };
+        const etag = response.headers.get("ETag") ?? "";
+        const embedded = this.embedded(body);
+        this.current = { url, etag, rung: applied, state: stateOf(body), forms, links: linked, embedded };
         return this.current;
+    }
+
+    /** Each resource object under `_embedded`, by relation; one without a self link names no resource. */
+    private embedded(body: JsonObject): Embedded[] {
+        const result: Embedded[] = [];
+        for (const [rel, value] of Object.entries((body._embedded ?? {}) as JsonObject)) {
+            for (const resource of (Array.isArray(value) ? value : [value]) as JsonObject[]) {
+                const self = ((resource?._links ?? {}) as JsonObject).self as JsonObject | undefined;
+                if (self && typeof self.href === "string") {
+                    const title = self.title as string | undefined;
+                    result.push({ rel, href: self.href, title, state: stateOf(resource), links: this.links(resource) });
+                }
+            }
+        }
+        return result;
     }
 
     private async form(name: string, raw: JsonObject, base: string): Promise<Form> {

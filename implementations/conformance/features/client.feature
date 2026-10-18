@@ -80,3 +80,24 @@ Feature: What a HEART client must do, against a real HEART service
     And a client at rung L2 with no credential
     When it tries to enter that service
     Then it refused the affordance set for its integrity
+
+  Scenario: A search's embedded beds are read in place, with no request per bed
+    Given a client at rung L0 with the garden's credential
+    When it enters at the bookmark
+    And it submits "garden:search-beds" with {"name": "bed-2"}
+    Then it holds these embedded resources
+      | relation | title | status  |
+      | item     | bed-2 | PLANTED |
+    And it read no bed on its own
+
+  Scenario: State is the body without exactly four members; an embedded resource is followed to act
+    Given a service whose resource embeds its author, and keeps a member named "_note"
+    And a client at rung L0 with no credential
+    When it enters that service
+    Then the state has exactly these members
+      | member |
+      | number |
+      | _note  |
+    When it follows the "author" link titled "Ada"
+    Then the state's "name" is "Ada Lovelace"
+    And it offers exactly "befriend"
