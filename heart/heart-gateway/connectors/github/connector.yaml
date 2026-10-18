@@ -43,3 +43,25 @@ readers:
   - issue.reader.yaml
   - repository.reader.yaml
   - comment.reader.yaml
+# GitHub puts its links in the state, as members named *_url, and on a pull request also in its own _links.
+# Each becomes a HEART link and leaves the state (spec/PLAN-GATEWAY-URL-LINKS.md). Only these members are
+# read: no other data is scanned for addresses. A link into GitHub's API that the gateway serves is rewritten
+# to the gateway's address; any other keeps GitHub's, typed. Nested users, repositories, labels and
+# milestones are resources of their own, embedded. Nothing is dropped.
+links:
+  members: ["*_url", url]
+  self: url
+  upstream: _links
+  relations:
+    html_url: alternate
+    avatar_url: icon
+  api: application/vnd.github+json
+  types:
+    - { host: github.com, suffix: .diff, type: text/x-diff }
+    - { host: github.com, suffix: .patch, type: text/x-patch }
+    - { host: github.com, suffix: .gif, type: image/gif }
+    - { host: github.com, suffix: .png, type: image/png }
+    - { host: github.com, type: text/html }
+    - { host: avatars.githubusercontent.com, type: "image/*" }
+  embed: [user, owner, assignee, assignees, closed_by, merged_by, creator, milestone, labels,
+          requested_reviewers, head/repo, base/repo]

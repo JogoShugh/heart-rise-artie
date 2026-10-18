@@ -75,6 +75,8 @@ class Connector(
     val headers: Map<String, String> = emptyMap(),
     /** The resources of an upstream whose paths aren't HEART's, one file each. */
     val resources: List<ResourceDeclaration> = emptyList(),
+    /** Which members of the upstream's answers are only links, and how each becomes a HEART link. */
+    val links: LinkRules? = null,
 ) {
 
     /** The first reader that recognizes [answer], or none. */
@@ -129,7 +131,7 @@ class Connector(
             }
             val include = api.path("include").takeIf { it.isArray }?.map { it.asText() }?.toSet()
             val headers = api.path("headers").fields().asSequence().associate { it.key to it.value.asText() }
-            return Connector(name, profile, readers, include, headers, resources)
+            return Connector(name, profile, readers, include, headers, resources, LinkRules.of(api.path("links")))
         }
     }
 }

@@ -81,11 +81,15 @@ class GitHubThroughGateway {
         override val credential = CREDENTIAL
         override val searchTerm = "Amazing"
 
-        // GitHub's paths, as the connector's resource file declares them.
+        // GitHub's paths, as the connector's resource file declares them: read from the pull request's own URL,
+        // since its repository is embedded, and kept in the state as hr:address.
         override fun address(id: Long) = "/repos/octocat/Hello-World/pulls/$id"
         override fun variables(id: Long) = mapOf("owner" to "octocat", "repo" to "Hello-World", "pull_number" to "$id")
-        override val pointers =
-            mapOf("owner" to "/base/repo/owner/login", "repo" to "/base/repo/name", "pull_number" to "/number")
+        override val pointers = mapOf(
+            "owner" to "/hr:address/owner",
+            "repo" to "/hr:address/repo",
+            "pull_number" to "/hr:address/pull_number",
+        )
         override val searchTarget = "/repos/{owner}/{repo}/pulls{?state,sort,direction}"
         override val searchValues = mapOf("owner" to "octocat", "repo" to "Hello-World", "state" to "open")
         override val lookupTarget = "/repos/{owner}/{repo}/pulls/{pull_number}"

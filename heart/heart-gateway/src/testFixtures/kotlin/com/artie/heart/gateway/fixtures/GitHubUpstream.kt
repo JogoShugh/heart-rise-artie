@@ -360,7 +360,24 @@ class GitHubUpstream {
     }
 
     /** GitHub's own example issue, as [issue]: its URL names its owner and repository, nothing else does. */
-    private fun issueBody(issue: Issue): JsonNode = ISSUE.deepCopy().apply {
+    private fun issueBody(issue: Issue): JsonNode =
+        addressed(issueFields(issue), issue.owner, issue.repo, issue.number, issue.author)
+
+    /**
+     * [example] with its addresses made [owner]'s, [repo]'s and [number]'s, and its people [login]'s, as
+     * GitHub's answer would have them: the example names octocat's Hello-World and its number 1347 throughout.
+     */
+    private fun addressed(example: JsonNode, owner: String, repo: String, number: Long, login: String): JsonNode {
+        val text = mapper.writeValueAsString(example)
+            .replace("octocat/Hello-World/issues/1347", "$owner/$repo/issues/$number")
+            .replace("octocat/Hello-World/pulls/1347", "$owner/$repo/pulls/$number")
+            .replace("octocat/Hello-World/pull/1347", "$owner/$repo/pull/$number")
+            .replace("octocat/Hello-World", "$owner/$repo")
+            .replace("octocat", login)
+        return mapper.readTree(text)
+    }
+
+    private fun issueFields(issue: Issue): JsonNode = ISSUE.deepCopy().apply {
         val url = "https://api.github.com/repos/${issue.owner}/${issue.repo}/issues/${issue.number}"
         put("id", ISSUE_BASE + issue.number)
         put("number", issue.number)
@@ -401,7 +418,9 @@ class GitHubUpstream {
         response.header("Content-Type", "application/json; charset=utf-8").body(mapper.writeValueAsString(body))
 
     /** GitHub's own example pull request, from its description, with the fields of [pull] set. */
-    private fun body(pull: Pull): JsonNode = PULL.deepCopy().apply {
+    private fun body(pull: Pull): JsonNode = addressed(pullFields(pull), pull.owner, pull.repo, pull.number, pull.owner)
+
+    private fun pullFields(pull: Pull): JsonNode = PULL.deepCopy().apply {
         put("id", ID_BASE + pull.number)
         put("number", pull.number)
         put("state", pull.state)
@@ -421,7 +440,10 @@ class GitHubUpstream {
     }
 
     /** GitHub's own example repository, as [name] and with whether the caller may [push]. */
-    private fun repository(name: String, push: Boolean, triage: Boolean): JsonNode = REPOSITORY.deepCopy().apply {
+    private fun repository(name: String, push: Boolean, triage: Boolean): JsonNode =
+        addressed(repositoryFields(name, push, triage), name.substringBefore('/'), name.substringAfter('/'), 0, name.substringBefore('/'))
+
+    private fun repositoryFields(name: String, push: Boolean, triage: Boolean): JsonNode = REPOSITORY.deepCopy().apply {
         put("full_name", name)
         put("name", name.substringAfter('/'))
         (path("owner") as ObjectNode).put("login", name.substringBefore('/'))

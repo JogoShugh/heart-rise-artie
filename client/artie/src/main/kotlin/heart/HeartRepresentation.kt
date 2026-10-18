@@ -77,5 +77,11 @@ data class HeartEmbedded(
 /**
  * One HAL link: [href] resolved against the representation's URL, its
  * title, and its Subresource Integrity value (HAL-SCHEMA-FORMS-HR Rule 2).
+ * A [templated] link's href is a URI Template (RFC 6570), kept as written.
  */
-data class HeartLink(val href: String, val title: String? = null, val integrity: String? = null)
+data class HeartLink(
+    val href: String,
+    val title: String? = null,
+    val integrity: String? = null,
+    val templated: Boolean = false,
+)

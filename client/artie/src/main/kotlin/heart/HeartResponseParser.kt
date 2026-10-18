@@ -85,12 +85,30 @@ object HeartResponseParser {
 
     private fun link(obj: JsonObject, base: String): HeartLink? {
         val href = obj["href"]?.jsonPrimitive?.content ?: return null
+        val templated = obj["templated"]?.jsonPrimitive?.booleanOrNull == true
         return HeartLink(
-            href = URI(base).resolve(href).toString(),
+            href = if (templated) resolveTemplate(href, base) else URI(base).resolve(href).toString(),
             title = obj["title"]?.jsonPrimitive?.content,
             integrity = obj["integrity"]?.jsonPrimitive?.content,
+            templated = templated,
         )
     }
+
+    /**
+     * A URI Template (RFC 6570) is not a URI until it is expanded: its expressions are set aside while
+     * it is resolved against [base], then put back, so a relative template resolves and nothing is parsed
+     * that isn't a URI.
+     */
+    private fun resolveTemplate(href: String, base: String): String {
+        val expressions = EXPRESSION.findAll(href).map { it.value }.toList()
+        var at = 0
+        val held = EXPRESSION.replace(href) { "${HOLE}${at++}$HOLE" }
+        return URI(base).resolve(held).toString()
+            .replace(Regex("$HOLE(\\d+)$HOLE")) { expressions[it.groupValues[1].toInt()] }
+    }
+
+    private val EXPRESSION = Regex("\\{[^}]*}")
+    private const val HOLE = "zzheartexpr"
 
     /** The `_forms` of a Layer 1 body (L0) or of a Layer 2 affordance set (L1, L2). */
     fun forms(root: JsonObject, base: String): Map<String, AffordanceForm> {

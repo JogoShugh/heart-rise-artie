@@ -6,6 +6,7 @@ import com.artie.heart.ConcurrentWriteException
 import com.artie.heart.Finding
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
+import com.artie.heart.Hypermedia
 import com.artie.heart.ItemPath
 import com.artie.heart.Layers
 import com.artie.heart.Named
@@ -37,6 +38,8 @@ internal class DeclaredResource(
     private val calls: Upstream,
     read: (Answer) -> Reading,
     private val mapper: ObjectMapper,
+    /** Lifts the state's link members into HEART links, when the connector says which they are. */
+    private val lifter: LinkLifter? = null,
     /** Where a resource of another declared type lives, by its noun and the upstream's answer for it. */
     private val locate: (noun: String, body: JsonNode) -> String = { noun, _ -> error("no resource $noun") },
 ) {
@@ -73,8 +76,10 @@ internal class DeclaredResource(
             idOf = { it.id },
             // The ETag also names the representation's digest, so the body itself tells states apart.
             versionOf = { 0 },
-            bodyOf = { mapper.convertValue(it.json, BODY) },
+            // The state without its link members, which become links and embedded resources (Links.kt).
+            bodyOf = { mapper.convertValue(lifter?.lift(it.json)?.state ?: it.json, BODY) },
             itemPath = itemPath,
+            hypermediaOf = { lifter?.lift(it.json)?.hypermedia ?: Hypermedia.NONE },
         ),
         finding = listing?.let { search ->
             Finding(

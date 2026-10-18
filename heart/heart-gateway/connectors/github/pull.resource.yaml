@@ -3,11 +3,9 @@ noun: pull
 collection: pulls
 read: pulls/get
 search: pulls/list
-# Where each variable of the read's path is, in a pull request's state.
-pointers:
-  owner: /base/repo/owner/login
-  repo: /base/repo/name
-  pull_number: /number
+# A pull request's repository is embedded (connector.yaml, links), so its owner and name aren't in the state:
+# the gateway reads the read's path variables from its own URL, and keeps them in the state as hr:address.
+address: /url
 # The list's query parameters a search form offers; GitHub pages with Link, so page and per_page are not.
 filters: [state, sort, direction]
 title: /title

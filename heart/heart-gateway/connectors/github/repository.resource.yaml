@@ -3,10 +3,9 @@
 noun: repository
 collection: repos
 read: repos/get
-# Where each variable of the read's path is, in a repository's state.
-pointers:
-  owner: /owner/login
-  repo: /name
+# A repository's owner is embedded (connector.yaml, links): the gateway reads the read's path variables from
+# its own URL, and keeps them in the state as hr:address.
+address: /url
 acts:
   open-issue:
     operation: issues/create

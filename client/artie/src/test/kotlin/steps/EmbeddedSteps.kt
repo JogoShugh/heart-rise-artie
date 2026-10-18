@@ -22,6 +22,20 @@ class EmbeddedSteps(private val ctx: ClientContext) {
         assertEquals(rows, read)
     }
 
+    @Then("the resource links these templates")
+    fun linksTemplates(table: DataTable) = table.asMaps().forEach { row ->
+        val link = ctx.current.links(row.getValue("relation")).single()
+        assertEquals(row.getValue("href"), link.href)
+        assertEquals(true, link.templated, "${row.getValue("relation")} is not templated")
+    }
+
+    @Then("the embedded {string} links {string} to the template {string}")
+    fun embeddedTemplate(relation: String, rel: String, href: String) {
+        val link = ctx.current.embedded(relation).single().related.links.getValue(rel).single()
+        assertEquals(href, link.href)
+        assertEquals(true, link.templated)
+    }
+
     private companion object {
         val COLUMNS = setOf("relation", "href", "title")
     }

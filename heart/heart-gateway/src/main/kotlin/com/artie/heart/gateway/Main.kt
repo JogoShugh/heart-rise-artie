@@ -30,6 +30,14 @@ fun main() {
     val mapper = HeartSettings.defaultMapper()
     val connector = config.connector?.let { Connector.load(it, mapper) }
     val profile = connector?.profile ?: checkNotNull(config.profile)
-    val gateway = Gateway(GatewaySpec(spec, connector?.include), upstream, profile, settings.auth, mapper, connector)
+    val gateway = Gateway(
+        GatewaySpec(spec, connector?.include),
+        upstream,
+        profile,
+        settings.auth,
+        mapper,
+        connector,
+        upstreamUrl = settings.url,
+    )
     gateway.handler(config.credentials).asServer(Jetty(config.port)).start().block()
 }

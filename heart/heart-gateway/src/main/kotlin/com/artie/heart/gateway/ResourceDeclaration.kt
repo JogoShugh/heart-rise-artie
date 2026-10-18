@@ -36,6 +36,8 @@ class ResourceDeclaration(
     val lists: List<OperationId> = emptyList(),
     /** List operations under one of these resources that another resource file searches by: an issue's comments. */
     val links: List<OperationId> = emptyList(),
+    /** Nested objects these resources embed, when they differ from the connector's: `head/repo`. */
+    val embed: List<String>? = null,
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
@@ -70,6 +72,7 @@ class ResourceDeclaration(
                 address = node.path("address").asText(null)?.let { pointer(label, it) },
                 lists = node.path("lists").map { it.asText() },
                 links = node.path("links").map { it.asText() },
+                embed = node.path("embed").takeIf { it.isArray }?.map { it.asText() },
             )
         }
 

@@ -36,6 +36,9 @@ import java.util.concurrent.ConcurrentHashMap
  * state allows comes from the upstream itself: by the signal [connector]
  * names for its resource, or else by its HEART affordance link.
  */
+// The upstream, its description, its connector and how to call it are each its own part;
+// grouping them would only rename them.
+@Suppress("LongParameterList")
 class Gateway(
     spec: GatewaySpec,
     upstream: HttpHandler,
@@ -43,10 +46,22 @@ class Gateway(
     auth: UpstreamAuth = UpstreamAuth.None,
     private val mapper: ObjectMapper = HeartSettings.defaultMapper(),
     connector: Connector? = null,
+    /** Where the upstream is: its links under this address are links into its API (spec/PLAN-GATEWAY-URL-LINKS.md). */
+    upstreamUrl: String? = null,
 ) {
     private val calls = Upstream(upstream, auth, mapper, connector?.headers.orEmpty())
     private val links = AffordanceLinks(calls)
     private val vocabulary = Profile(profile, spec.title, spec.doc, relations(spec, connector))
+
+    /** Which members of the upstream's answers are only links (Links.kt), when the connector says. */
+    private val rules = connector?.links
+
+    /** Writes the links the connector's link rules lift: into the gateway where it serves them, typed. */
+    private val writer = rules?.let { rules ->
+        val served = spec.routes.values.filter { it.method == "GET" }
+            .map { ServedPath(it.path, vocabulary.key(it.operation.relation)) }
+        LinkWriter(rules, upstreamUrl.orEmpty().trimEnd('/'), served, profile)
+    }
 
     init {
         connector?.check(spec)
@@ -57,7 +72,8 @@ class Gateway(
         val standards = Standards(links.signal(byPath = emptyMap(), byRelation = emptyMap()))
         connector?.resources.orEmpty().associate { file ->
             val read = reader(connector, standards)
-            file.noun to DeclaredResource(file, spec, vocabulary, calls, read, mapper) { noun, body ->
+            val lifter = rules?.let { linked -> writer?.let { LinkLifter(linked.embedding(file.embed), it, profile) } }
+            file.noun to DeclaredResource(file, spec, vocabulary, calls, read, mapper, lifter) { noun, body ->
                 checkNotNull(declared[noun]) { "${file.file}: no resource $noun" }.location(body)
             }
         }
