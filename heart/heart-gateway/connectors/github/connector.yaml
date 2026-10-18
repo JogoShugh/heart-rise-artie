@@ -64,7 +64,9 @@ links:
     - { host: github.com, type: text/html }
     - { host: avatars.githubusercontent.com, type: "image/*" }
   embed: [user, owner, assignee, assignees, closed_by, merged_by, creator, milestone, labels,
-          requested_reviewers, head/user, head/repo, base/user, base/repo, author, committer]
+          requested_reviewers, head/user, head/repo, base/user, base/repo, author, committer,
+          parent, source, template_repository, repository, organization, pull_request,
+          performed_via_github_app, auto_merge/enabled_by, license, code_of_conduct, commit]
 # GitHub reads the gateway passes through without modelling them (spec/PLAN-GATEWAY-URL-LINKS.md): served at
 # GitHub's own path, as the caller, links lifted, no forms; a list as a HEART collection, each member titled
 # by its pointer. Links to them are named after the member they were (github:followers). No other GitHub

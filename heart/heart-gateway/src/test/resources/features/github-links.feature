@@ -111,6 +111,37 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | /repos/acme/rockets/pulls/482 |
       | /users/ada                    |
 
+  Scenario: Nested resources GitHub describes are embedded, so their links are never flattened into the parent's
+    A repository's parent, source and template, an issue's repository and
+    pull request, an organization, a GitHub App, the user who enabled
+    auto-merge, a licence, a code of conduct and a commit's git commit are each
+    a resource with its own address. Embedded, each keeps its own links;
+    flattened, a repository's forty links would come back once per nesting,
+    as parent-hooks, source-hooks and the rest.
+    When a client gets "/profiles/github" through the GitHub gateway
+    Then the profile describes these relations, among others
+      | relation                 |
+      | parent                   |
+      | source                   |
+      | template-repository      |
+      | repository               |
+      | organization             |
+      | pull-request             |
+      | performed-via-github-app |
+      | auto-merge-enabled-by    |
+      | license                  |
+      | code-of-conduct          |
+    And the profile describes none of these relations
+      | relation                                |
+      | parent-hooks                            |
+      | source-hooks                            |
+      | template-repository-hooks               |
+      | repository-hooks                        |
+      | organization-repos                      |
+      | pull-request-diff                       |
+      | performed-via-github-app-owner-followers |
+      | auto-merge-enabled-by-followers         |
+
   Scenario Outline: Every link into the gateway names HEART's profile by HAL's link profile, never by a media-type parameter
     SPEC §6.1 withdrew the media-type profile parameter: connegp reserves it
     for profiles of one media type, and heart-rise spans two. A link says what
