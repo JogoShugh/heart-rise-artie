@@ -27,31 +27,67 @@ heart(entry) {
 - a message written by hand that repeats the condition;
 - a failure that says "the bed should hold basil" but not what the bed held.
 
-### The proposal
+### The proposal (revised 2026-10-18 with the author)
 
-Keep `check(condition) { message }` as it is, for any condition. Add a second shape, a block
-of facts about the representation the script holds:
+Three pieces, each small.
+
+**1. `state[...]` takes a member name.** A bare name gets an implicit `/`; a leading `/` is a
+JSON Pointer, for nested state. `state["state_reason"]`, `state["/head/sha"]`.
+
+**2. `check` takes facts: member to value, or member to matcher.** Every fact is tested, and every
+failure is reported, in words the matcher carries:
 
 ```kotlin
-check {
-    "cropName" eq "basil"
-    "moistureLevel" above 0
-    "status" isOneOf listOf("PLANTED", "GROWING")
-    "/plot/soil" eq "loam"          // a leading slash: a JSON Pointer, for nested state
-}
+check("state" eq "closed", "state_reason" eq "completed")
+check("cropName" eq "basil", "moistureLevel" above 0)
+check(
+    "labels" has "bug",
+    "status" oneOf listOf("PLANTED", "GROWING"),
+    "closed_at" to present,
+    "/head/sha" matching Regex("[0-9a-f]{40}"),
+)
 ```
 
-- Keys are member names; a leading `/` makes them JSON Pointers.
-- Words: `eq`, `isNot`, `above`, `below`, `atLeast`, `atMost`, `isOneOf`, `contains`,
-  `exists`, `isMissing`. Numbers compare as numbers; no casts.
-- Each line is its own check step in the trace, with the expected and held values, so the run
-  report can show "cropName: expected basil, held basil".
-- A failure writes its own message: "stopped at step 5: cropName expected basil, held mint".
+- Each infix word makes a `Fact(member, matcher)`; `check(vararg Fact)` runs them all. The same
+  facts may come as pairs (`"state" to "closed"`, a plain value meaning equality, or
+  `"moistureLevel" to above(0)`) or as a `Map`, from data the script already has.
+- A failure says what was held: `moistureLevel: expected above 0, was 0`;
+  `labels: expected to contain bug, was [enhancement]`. No message is written by hand.
+- No casts: JSON numbers arrive as `Long` or `Double`; numeric matchers compare as numbers.
+- The trace records each fact as data (member, test, expected, held), so the run report can
+  show it as a row, not as a sentence.
+
+| Matcher | Tests |
+|---|---|
+| `eq`, `isNot` | equality |
+| `above`, `below`, `atLeast`, `atMost`, `between` | numbers, any JSON number type |
+| `has` | an array holds an item; a string contains a text |
+| `oneOf` | the value is in a set |
+| `matching` | a regular expression |
+| `present`, `absent` | the member exists, or not (`absent` is not `null`) |
+
+**3. `check(condition)` stays, for anything one member's test can't say**, such as two members
+compared or arithmetic, with Kotlin's Power-assert compiler plugin (Kotlin 2.0 and later)
+configured for `check`. A failure then prints the expression and each of its values, and the
+hand-written message becomes optional:
+
+```kotlin
+check(state["merged_at"] != null || state["state"] == "closed")
+```
+
+To verify first: that Power-assert can be enabled in the scripting host that compiles `.kts`.
 
 ### Alternatives considered
 
+- **A `check { }` block of facts** (this note's first proposal). A block adds nothing the facts
+  form doesn't: it defers evaluation, which `until { }` already covers, and it groups facts, which
+  a single `check(…)` call does too. The facts form is a plain call, so it composes (facts can be
+  built, stored and passed).
 - **A `holds { }` block.** The same, under another name. The author found the word odd;
   `check` reuses the word scripts already know.
+- **Bare indexing, `["state_reason"]`.** Not Kotlin: an index access needs a receiver, and `[...]`
+  alone is a collection literal, allowed only in annotations. `this["state_reason"]` would work,
+  with an `operator fun get` on the scope.
 - **Kotest-style matchers**, `state("cropName") shouldBe "basil"`. Familiar to Kotlin people,
   but reads like a test framework in everyday scripts.
 - **Typed reads with plain Kotlin**, `val crop by state<String>("cropName")`, then
@@ -133,5 +169,6 @@ forms whose ALPS descriptor says they create, if the profile says so.
 
 ## To decide
 
-1. Checks: `check { }` with these words, or another word or shape?
+1. Checks: decided in shape, 2026-10-18 (facts with matchers, `check(condition)` with Power-assert,
+   member names in `state[...]`). To settle when built: the matcher words' final spelling.
 2. Blocks after reason: A, B or C?
