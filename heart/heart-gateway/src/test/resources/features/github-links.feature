@@ -73,9 +73,24 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | head   |
       | base   |
 
-  Scenario: GitHub's own _links on a pull request become links too
+  Scenario: GitHub's own _links on a pull request become links too, and a template is never taken for a served path
+    GitHub's review_comment template, .../pulls/comments{/number}, would look
+    like the pull request read's path once its expression is set aside; a
+    template is a family of addresses, so the gateway never rewrites one.
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the answer links these, by type
-      | relation          | href                                                        | type                        | templated |
-      | github:commits    | https://api.github.com/repos/acme/rockets/pulls/482/commits | application/vnd.github+json |           |
-      | github:issues-get | /repos/acme/rockets/issues/482                              | application/hal+json        |           |
+      | relation              | href                                                              | type                        | templated |
+      | github:commits        | https://api.github.com/repos/acme/rockets/pulls/482/commits       | application/vnd.github+json |           |
+      | github:issues-get     | /repos/acme/rockets/issues/482                                    | application/hal+json        |           |
+      | github:review-comment | https://api.github.com/repos/acme/rockets/pulls/comments{/number} | application/vnd.github+json | true      |
+
+  Scenario: The users on a pull request's head and base are embedded, not flattened into its links
+    When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    Then the answer embeds "github:head-user" with its self at "https://api.github.com/users/acme" and these links
+      | relation         | href                                        | type                        |
+      | github:followers | https://api.github.com/users/acme/followers | application/vnd.github+json |
+    And the answer has none of these links
+      | relation                  |
+      | github:head-user-followers |
+      | github:base-user-followers |
+      | github:pulls-get          |

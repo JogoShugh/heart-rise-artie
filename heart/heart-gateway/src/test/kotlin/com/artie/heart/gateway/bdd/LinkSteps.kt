@@ -14,6 +14,11 @@ class LinkSteps(private val github: GitHubSteps) {
     @Then("the answer links these, by type")
     fun linksByType(table: DataTable) = assertLinks(answer.path("_links"), table)
 
+    @Then("the answer has none of these links")
+    fun noLinks(table: DataTable) = table.asMaps().forEach {
+        assertFalse(answer.path("_links").has(it.getValue("relation")), "${it.getValue("relation")} is linked")
+    }
+
     @Then("the answer's state has none of these members")
     fun noneOf(table: DataTable) = table.asMaps().forEach {
         assertFalse(answer.has(it.getValue("member")), "${it.getValue("member")} is in the state")

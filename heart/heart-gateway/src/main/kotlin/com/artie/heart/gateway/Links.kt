@@ -120,9 +120,10 @@ class LinkWriter(
         }
     }
 
+    /** The served GET at [href], if any. A template is a family of addresses, never one the gateway serves. */
     private fun servedBy(href: String): ServedPath? {
-        if (!href.startsWith(base)) return null
-        val path = href.removePrefix(base).replace(TEMPLATE, "").substringBefore('?')
+        if (!href.startsWith(base) || '{' in href) return null
+        val path = href.removePrefix(base).substringBefore('?')
         return served.firstOrNull { it.matches(path) }
     }
 

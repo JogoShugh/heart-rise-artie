@@ -81,3 +81,15 @@ The upstream's base URL (`UPSTREAM_URL`) is already configured; links under it a
 7. SPEC: a SHOULD for every HEART server: a member whose value is only a link belongs in `_links`.
 
 Commits local; the author pushes.
+
+## Decided 2026-10-18, after phase 2 (92fdc40)
+
+- **Order:** a live before-and-after report first (issue #10 and pull request #20, reads only), then
+  the pass-through.
+- **Pass-through scope:** a connector allowlist of GET operations (`users/get`, a user's followers, a
+  pull request's commits...). Nothing else is answered; links to any other API resource stay
+  external, typed as the API's.
+- **Passed-through lists** are served as HEART collections: `_links.item` per member, titled by a
+  configured member, `_embedded.item` summaries, paging from GitHub's Link header.
+- **Relations** of passed-through links are named after their member (`github:followers`); the profile
+  describes each, citing its operation.
