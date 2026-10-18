@@ -7,7 +7,6 @@ heart(entry) {
     act("garden:build-bed", "label" to "Herbs, scripted", "widthFt" to 4, "lengthFt" to 4) {
         act("garden:sow-seed", "seedType" to "basil", "depthCm" to 2)
         act("garden:water-cell", "milliliters" to 250)
-        check(state["/cropName"] == "basil") { "the bed should hold basil" }
-        check((state["/moistureLevel"] as Long) > 0) { "the bed should be watered" }
+        check("cropName" eq "basil", "moistureLevel" above 0)
     }
 }

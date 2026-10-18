@@ -11,9 +11,9 @@ heart(entry) {
     expect(InvalidInput) { act("garden:build-bed", "label" to name, "widthFt" to 0, "lengthFt" to 8) }
     expect(NewResource) {
         act("garden:build-bed", "label" to name, "widthFt" to 4, "lengthFt" to 8) {
-            check(state["/status"] == "EMPTY") { "a new bed should be empty" }
+            check("status" eq "EMPTY")
             act("garden:sow-seed", "seedType" to seed, "depthCm" to 2)
-            check(state["/cropName"] == seed) { "the bed should hold $seed" }
+            check("cropName" eq seed)
             expect(NotOffered) { act("garden:sow-seed", "seedType" to "mint") }
             note("offered once planted: ${held.offered}")
         }

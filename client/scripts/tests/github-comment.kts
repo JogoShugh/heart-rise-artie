@@ -8,11 +8,11 @@ val body by input(default = "Commented by a HEART script.")
 
 heart("http://localhost:8392/") {
     act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to number.toInt())
-    check(state["/state"] == "open") { "the issue should be open" }
+    check("state" eq "open")
     expect(NewResource) {
         act("github:comment", "body" to body) {
             act("github:edit", "body" to "$body (edited)")
-            check(state["/body"] == "$body (edited)") { "the comment should be edited" }
+            check("body" eq "$body (edited)")
         }
     }
     expect(NotOffered) { act("github:reopen") }

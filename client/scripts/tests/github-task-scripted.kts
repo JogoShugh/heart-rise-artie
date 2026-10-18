@@ -11,7 +11,7 @@ heart("http://localhost:8392/") {
     var pull = 0L
     act("github:repos-get", "owner" to owner, "repo" to repo) {
         act("github:open-issue", "title" to "Crash when a bed has no name (scripted)", "body" to "Opened by a HEART script.") {
-            issue = state["/number"] as Long
+            issue = state["number"] as Long
         }
     }
     // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
@@ -29,21 +29,20 @@ heart("http://localhost:8392/") {
                 "base" to "main",
                 "body" to "Relates to #$issue.",
             ) {
-                pull = state["/number"] as Long
+                pull = state["number"] as Long
                 // GitHub works out whether it can merge a new pull request a moment after it opens.
                 until(tries = 20) { offers("github:merge") }
                 act("github:merge", "merge_method" to "squash")
-                check(state["/merged"] == true) { "the pull request should be merged" }
+                check("merged" eq true)
             }
         }
     }
     act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to issue) {
         // The comment is a new resource: visit it, then come back to the issue to close it.
         act("github:comment", "body" to "Fixed in 1.2 by #$pull.") {
-            check(state["/body"] == "Fixed in 1.2 by #$pull.") { "the comment should say what fixed it" }
+            check("body" eq "Fixed in 1.2 by #$pull.")
         }
         act("github:close")
-        check(state["/state"] == "closed") { "the issue should be closed" }
-        check(state["/state_reason"] == "completed") { "the issue should be closed as completed" }
+        check("state" eq "closed", "state_reason" eq "completed")
     }
 }

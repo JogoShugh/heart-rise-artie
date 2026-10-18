@@ -12,7 +12,7 @@ heart("http://localhost:8392/") {
         note("#$ready offers ${held.offered}")
     }
     act("github:pulls-get", "owner" to owner, "repo" to repo, "pull_number" to draft.toInt()) {
-        check(state["/draft"] == true) { "#$draft should be a draft" }
+        check("draft" eq true)
         expect(NotOffered) { act("github:merge") }
         note("#$draft: merge not offered: ${why("github:merge")}")
     }
