@@ -197,7 +197,8 @@ data class SearchField(
  * type's search, so such a type is also found ([finding]). Each of
  * [subCollections] is a collection under a resource, by a relation of the
  * profile, at a URI template filled from the item path's variables: an
- * issue's comments. Each resource links them.
+ * issue's comments. Each resource links them. Each of [embedded] is part of
+ * the state that is another resource, embedded under `_embedded` (SPEC §6.1).
  */
 // A declaration names each of its parts once, by name; grouping them would only rename them.
 @Suppress("LongParameterList")
@@ -210,6 +211,7 @@ class ResourceType<S, K>(
     val finding: Finding? = null,
     val bookmarkActs: List<Act> = emptyList(),
     val subCollections: Map<String, UriTemplate> = emptyMap(),
+    val embedded: List<Embedded> = emptyList(),
 ) {
     /** Every act declared, the resources' and the bookmark's. */
     val allActs: List<Act> = acts + bookmarkActs
@@ -237,7 +239,11 @@ class ResourceType<S, K>(
                 require(it in itemPath.variables) { "$collection: the sub-collection $relation has no value for $it" }
             }
         }
+        embedded.flatMap { it.relations }.forEach { profile.relation(it) }
     }
+
+    /** Takes what [embedded] names out of [body], a mutable copy of a state, as HAL's `_embedded`. */
+    fun embeddedOf(body: MutableMap<String, Any?>): Map<String, Any?> = Embedded.take(body, embedded, profile)
 
     /** Each sub-collection of the resource whose state reads as [body], keyed by its relation's CURIE. */
     fun subCollectionLinks(body: Map<String, Any?>): Map<String, Map<String, String>> {

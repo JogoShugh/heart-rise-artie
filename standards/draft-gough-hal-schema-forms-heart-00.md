@@ -192,6 +192,18 @@ Template pointers let one affordance set serve every resource in a state: the
 set names no instance, and each client fills the instance in from the
 resource it read.
 
+## Embedded Resources
+
+HAL Schema Forms allows `_forms` in embedded HAL documents. This profile does
+not: a resource object inside `_embedded` MUST NOT carry `_forms` or an
+`hr:forms` link, and MUST carry a `self` link. Every act is conditional on the
+`ETag` of the resource it acts on, and an embedded copy has none, so a client
+follows an embedded resource's `self` before acting on it.
+
+The owning resource's state, against which template pointers resolve, is its
+JSON body without `_links`, `_embedded`, `_forms` and `_templates`. Pointers
+do not resolve into `_embedded`.
+
 ## Integrity
 
 A link MAY carry `integrity`, and a schema reference MAY carry

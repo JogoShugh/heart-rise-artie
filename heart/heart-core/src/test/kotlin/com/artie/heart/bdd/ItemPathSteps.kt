@@ -17,32 +17,30 @@ import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
 
 /** A pull request type, whose item path is its owner, its repository and its number. */
-class ItemPathSteps(private val world: LampWorld) {
+class ItemPathSteps(private val world: LampWorld, private val pull: PullWorld) {
     private val mapper = ObjectMapper()
-    private lateinit var layers: Layers<PullRequest, String>
-    private val pulls = mutableListOf<PullRequest>()
-    private val rendered = mutableListOf<JsonNode>()
+    private val layers: Layers<PullRequest, String> get() = pull.layers
+    private val pulls get() = pull.pulls
+    private val rendered get() = pull.rendered
     private lateinit var read: JsonNode
-    private var refusal: Throwable? = null
-
-    private lateinit var template: String
+    private var refusal: Throwable? by pull::refusal
 
     @Given("a pull request type declared with the item path {string}")
     fun declared(template: String) {
-        this.template = template
-        layers = Layers(PullRequests.type(ItemPath(template, PullRequests.POINTERS)))
+        pull.template = template
+        pull.declare()
     }
 
     @Given("the pull request type links these sub-collections")
     fun linksSubCollections(table: DataTable) {
-        val collections = table.asMaps().associate { it.getValue("relation") to it.getValue("path") }
-        layers = Layers(PullRequests.type(ItemPath(template, PullRequests.POINTERS), subCollections = collections))
+        pull.subCollections = table.asMaps().associate { it.getValue("relation") to it.getValue("path") }
+        pull.declare()
     }
 
     @When("a pull request type is declared linking {string} at {string}")
     fun declaredLinking(relation: String, path: String) {
         refusal = runCatching {
-            PullRequests.type(ItemPath(template, PullRequests.POINTERS), subCollections = mapOf(relation to path))
+            PullRequests.type(ItemPath(pull.template, PullRequests.POINTERS), subCollections = mapOf(relation to path))
         }.exceptionOrNull()
     }
 

@@ -293,6 +293,25 @@ A HAL-FORMS rendering of the same form (SPEC §6.10.6) carries the choices as
 HAL-FORMS `options`: those from a `pointer` inline, resolved from the owning
 resource, and those from a `link` as `options.link`.
 
+## Rule 9: embedded resources carry no forms
+
+HAL Schema Forms says `_forms` "MAY appear on any HAL document (including
+embedded HAL documents)". This profile narrows that: a resource object inside
+`_embedded` carries no `_forms`, and no `hr:forms` link. It carries
+`_links.self`, its state, and any other links.
+
+The reason is the precondition. Every act sends `If-Match` with the `ETag` of
+the resource it acts on (SPEC §6.3), and an embedded copy arrives with no
+`ETag`. A client that wants to act on an embedded resource follows its `self`,
+and acts from what that returns.
+
+Pointers don't reach into `_embedded`. Rule 1's template pointers and Rule 8's
+choices resolve against the owning resource's state, which is its body without
+`_links`, `_embedded`, `_forms` and `_templates`.
+
+(Decided 2026-10-18; SPEC §6.1. A possible remedy, embedded validators, is
+filed as `spec/ideas/embedded-forms-with-validators.md`.)
+
 ## Not covered here
 
 - Refusal bodies are RFC 9457 problem details; the five `type` URIs and the

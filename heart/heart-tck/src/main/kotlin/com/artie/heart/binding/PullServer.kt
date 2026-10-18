@@ -5,8 +5,10 @@ import com.artie.heart.Caller
 import com.artie.heart.CallerForbiddenException
 import com.artie.heart.CallerUnauthorizedException
 import com.artie.heart.ConcurrentWriteException
+import com.artie.heart.Embedded
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
+import com.artie.heart.ItemPath
 import com.artie.heart.Layers
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.fixtures.PullRequest
@@ -37,7 +39,14 @@ class PullStore {
  */
 object PullServer {
     fun resource(store: PullStore): HeartResource<PullRequest, String> = HeartResource(
-        layers = Layers(PullRequests.type(finding = PullRequests.finding(), subCollections = mapOf("stack" to STACK))),
+        layers = Layers(
+            PullRequests.type(
+                finding = PullRequests.finding(),
+                subCollections = mapOf("stack" to STACK),
+                // Its author is another resource, embedded (embedded.feature).
+                embedded = listOf(Embedded("author", "/author", AUTHOR)),
+            ),
+        ),
         loadAt = { at ->
             store.lastCaller = Caller.authorization()
             refuseIn(at.getValue("repo"))
@@ -88,6 +97,7 @@ object PullServer {
 
     private const val SPLIT_OFFSET = 1000L
     private const val STACK = "/repos/{owner}/{repo}/pulls/{number}/stack"
+    private val AUTHOR = ItemPath("/users/{login}", mapOf("login" to "/login"))
 
     private fun PullRequest.variables() = mapOf("owner" to owner, "repo" to repo, "number" to "$number")
 }

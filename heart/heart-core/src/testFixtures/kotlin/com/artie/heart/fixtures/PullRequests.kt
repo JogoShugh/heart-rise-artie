@@ -2,6 +2,7 @@ package com.artie.heart.fixtures
 
 import com.artie.heart.Act
 import com.artie.heart.AlpsType
+import com.artie.heart.Embedded
 import com.artie.heart.Finding
 import com.artie.heart.ItemPath
 import com.artie.heart.Named
@@ -12,8 +13,30 @@ import com.artie.heart.ResourceType
 import com.artie.heart.SearchField
 import com.artie.heart.StateView
 
-/** A pull request: identified by its owner, its repository and its number, as GitHub does. */
-data class PullRequest(val owner: String, val repo: String, val number: Long, val state: String, val version: Int)
+/**
+ * A pull request: identified by its owner, its repository and its number, as GitHub does. Its [author]
+ * and [reviewers], when it has them, are other resources its state holds; [nullAuthor] writes the author
+ * as JSON null.
+ */
+data class PullRequest(
+    val owner: String,
+    val repo: String,
+    val number: Long,
+    val state: String,
+    val version: Int,
+    val author: Map<String, Any?>? = null,
+    val reviewers: List<String> = emptyList(),
+    val nullAuthor: Boolean = false,
+) {
+    /** The state as plain JSON values. */
+    fun body(): Map<String, Any?> = buildMap {
+        put("number", number)
+        put("state", state)
+        put("base", mapOf("owner" to owner, "repo" to repo))
+        if (nullAuthor) put("author", null) else author?.let { put("author", it) }
+        if (reviewers.isNotEmpty()) put("reviewers", reviewers.map { mapOf("login" to it) })
+    }
+}
 
 /** A resource type whose item path is more than `/{collection}/{id}`. */
 object PullRequests {
@@ -32,6 +55,9 @@ object PullRequests {
             Relation("get", AlpsType.SAFE, "Get a pull request", "One pull request, by number.", "Reads it."),
             Relation("stack", AlpsType.SAFE, "Stack", "The pull requests split off it.", "Lists them."),
             Relation("comments", AlpsType.SAFE, "Comments", "The pull request's comments.", "Lists them."),
+            Relation("author", AlpsType.SAFE, "Author", "Who wrote the pull request.", "Reads them."),
+            Relation("reviewers", AlpsType.SAFE, "Reviewers", "Who is asked to review it.", "Reads them."),
+            Relation("organization", AlpsType.SAFE, "Organization", "The author's organization.", "Reads it."),
         ),
     )
 
@@ -56,6 +82,7 @@ object PullRequests {
         itemPath: ItemPath = ItemPath(TEMPLATE, POINTERS),
         finding: Finding? = null,
         subCollections: Map<String, String> = emptyMap(),
+        embedded: List<Embedded> = emptyList(),
     ): ResourceType<PullRequest, String> = ResourceType(
         collection = "pulls",
         profile = profile,
@@ -69,13 +96,12 @@ object PullRequests {
             keyOf = { it.state },
             idOf = { it.number },
             versionOf = { it.version },
-            bodyOf = {
-                mapOf("number" to it.number, "state" to it.state, "base" to mapOf("owner" to it.owner, "repo" to it.repo))
-            },
+            bodyOf = { it.body() },
             keyField = "state",
             itemPath = itemPath,
         ),
         finding = finding,
         subCollections = subCollections,
+        embedded = embedded,
     )
 }

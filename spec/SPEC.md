@@ -56,6 +56,8 @@
 
 - **Explaining absence (§6.12).** Decided 2026-10-10. An affordance set MAY link, with `integrity`, to a resource that lists the acts absent in this state and why. The client fetches it only when asked why, and never acts on it.
 
+- **Embedded resources, the HAL way (§6.1, §6.11).** Decided 2026-10-18 (`spec/PLAN-HAL-EMBEDDED.md`). A Layer 1 representation MAY carry HAL's `_embedded`: link relations to resource objects, each with its own `self`, state and links. Only resources are embedded; nested data with no address of its own stays state. Embedded resources carry no forms, though HAL Schema Forms allows them: every act needs `If-Match`, and an embedded copy has no `ETag`, so a client follows an embedded resource to act on it, and following always fetches. Clients take exactly `_links`, `_embedded`, `_forms` and `_templates` out of state. A collection MAY embed its items beside its `item` links.
+
 **Changes since 0.3:**
 
 - **Introduced the L0–L6 conformance ladder (§6.10)** as the normative structure for incremental adoption, with sequence diagrams per rung. L0 — everything embedded, zero headers — is an on-ramp, explicitly *not* conformance (§6.10.1).
@@ -338,6 +340,17 @@ A H.E.A.R.T. response is organised into three layers. Whether those layers arriv
 A client SHALL expand a CURIE key through `curies` before comparing it, so the full URI and any prefix that expands to it are the same relation. A link under any other name is not the affordance set. The diagrams' `_links.forms` is shorthand for this relation.
 
 **Resource (Layer 1).** Domain data for the current state. SHALL be revalidated on every request (`ETag`/`If-None-Match`); this layer changes, so it is never content-addressed. It is never fresh, for any length of time: the state can change the moment after it was read, so no `Cache-Control` a response carries makes it safe to reuse unchecked. The client says so itself on every request (§6.3). It carries the affordance set either inline (L0) or by link (L1+).
+
+**Embedded resources (decided 2026-10-18).** A Layer 1 representation MAY carry HAL's `_embedded` member, in either dialect:
+
+- Its keys are link relations, expanded through `_links.curies` as a link's are. Its values are a resource object or an array of resource objects.
+- Each embedded resource object is a full or partial representation of another resource. It SHALL carry `_links.self`, the address that resource is served at, and MAY carry its own other links and its own `_embedded`. A nested object with no address of its own is state, not an embedded resource.
+- An embedded resource object SHALL NOT carry `_forms` or `_templates`. HAL Schema Forms allows forms in embedded documents; this profile narrows that, because every act carries `If-Match` with its target's `ETag` (§6.3), and an embedded copy has none. A client that wants to act on an embedded resource follows its `self` first. (A remedy, embedded validators, is filed as `spec/ideas/embedded-forms-with-validators.md`.)
+- An embedded relation is also a relation the client may follow. Following it fetches the resource at `self`; the embedded copy is for reading.
+- Embedded content is part of the representation's bytes, so it counts in the Layer 1 `ETag` like any other member. A server SHOULD embed only what belongs with the resource's own state.
+- `_embedded` is not state. Template pointers (§6.9.1) and `hr:options` pointers resolve against the owning resource's state and never reach into it. A client takes exactly four members out of the body to find the state: `_links`, `_embedded`, `_forms` and `_templates`. Any other member, whatever its name, is state.
+- Layer 2 is unchanged: affordance sets carry no per-resource data, embedded or not.
+- The OpenAPI twin's plain JSON keeps the state as it is: an embedded resource stays where the state holds it, as a plain member, without links.
 
 **Affordance Set (Layer 2).** The complete set of transitions currently legal on the resource, in whichever dialect was negotiated. Each affordance entry SHALL contain, at minimum: a `rel`/name, a target `href` (which MAY be a URI Template — see §6.9), an HTTP method, and either an inline schema or a schema-by-reference pointer, depending on `Prefer` (§6.4).
 
@@ -834,6 +847,7 @@ A H.E.A.R.T. service SHALL have a **service index**: one resource whose URI is t
 - It carries its forms inline at every rung and ignores `Prefer`: it is one small resource, so there is nothing to share.
 - Lookup and search are **GET forms**. Their targets are templates filled from the form's own fields (HAL Schema Forms), with RFC 6570 form-style query expansion (`{?name}`) where the value belongs in the query. A GET form is safe (RFC 9110 §9.2.1): the client sends no body and no `If-Match`, and treats the target like any resource it syncs.
 - A collection lists its members under the IANA `item` relation (RFC 6573), each with a `title`. A client chooses a member by relation and title; it never builds a member's URI.
+- A collection MAY also embed its members (decided 2026-10-18): `_embedded.item`, each a summary of one member with its `self`, beside the `item` links, which stay. A client reads the summaries without one request per member, and follows a member to act on it.
 
 The index is served in both dialects, with the same form names:
 
