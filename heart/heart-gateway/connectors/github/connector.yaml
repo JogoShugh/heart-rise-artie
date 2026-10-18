@@ -57,7 +57,9 @@ readers:
 # to the gateway's address; any other keeps GitHub's, typed. Nested users, repositories, labels and
 # milestones are resources of their own, embedded. Nothing is dropped.
 links:
-  members: ["*_url", url]
+  # Every address is a link: *_url and url, and the two GitHub names otherwise (a repository's homepage,
+  # a user's blog).
+  members: ["*_url", url, homepage, blog]
   self: url
   upstream: _links
   relations:

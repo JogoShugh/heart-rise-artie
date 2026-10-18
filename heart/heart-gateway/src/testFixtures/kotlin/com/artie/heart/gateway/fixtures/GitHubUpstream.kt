@@ -342,7 +342,13 @@ class GitHubUpstream {
         val api = "https://api.github.com/repos/${branch.owner}/${branch.repo}"
         return mapper.createObjectNode().apply {
             put("name", branch.name)
-            putObject("commit").put("sha", branch.sha).put("url", "$api/commits/${branch.sha}")
+            // As GitHub writes a branch's head commit: its addresses, and its parents, each a sha and two addresses.
+            val web = "https://github.com/${branch.owner}/${branch.repo}"
+            putObject("commit").apply {
+                put("sha", branch.sha).put("url", "$api/commits/${branch.sha}").put("html_url", "$web/commit/${branch.sha}")
+                putArray("parents").addObject().put("sha", PARENT)
+                    .put("url", "$api/commits/$PARENT").put("html_url", "$web/commit/$PARENT")
+            }
             // As GitHub writes a branch's: each link a plain string, not a HAL link object as on a pull request.
             putObject("_links").apply {
                 put("self", "$api/branches/${branch.name}")
@@ -590,6 +596,9 @@ class GitHubUpstream {
     private companion object {
         const val ID_BASE = 1_000_000L
         const val FOLLOWERS_PAGE = 2
+
+        /** Every branch head's one parent, in the small GitHub. */
+        const val PARENT = "9999999999999999999999999999999999999999"
 
         /** The length of a commit's sha. */
         const val SHA = 40

@@ -9,8 +9,12 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
   and images stay GitHub's, typed as what they are. A URI template is a
   templated link. A nested object that is a resource of its own (a user, a
   repository) is embedded under _embedded, its links lifted the same way;
-  its data stays. git:// and ssh addresses have no HEART binding, so they
-  stay data.
+  its data stays. Every address is a link, whatever its scheme: a git: or
+  ssh address has no HEART binding, but it is still a link, never data
+  (decided 2026-10-18, replacing "they stay data"). GitHub writes ssh
+  addresses in scp's form, git@host:path, which is no URI; the link writes it
+  as the ssh URI it means, ssh://git@host/path. The items of a list are read
+  the same way: a commit's parents are links, one per parent.
 
   Background:
     Given the GitHub gateway reads GitHub's description with the shipped connector
@@ -62,14 +66,23 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | member |
       | user   |
 
-  Scenario: A pull request's repositories are embedded, served by the gateway, and git addresses stay data
+  Scenario: A pull request's repositories are embedded, served by the gateway, and their git and ssh addresses are links too
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway answers 200
     And the answer links "self" to "/repos/acme/rockets/pulls/482"
     And the answer embeds "github:base-repo" with its self at "/repos/acme/rockets" and these links
-      | relation  | href                                   | type      |
-      | alternate | https://github.com/acme/rockets        | text/html |
-    And the embedded "github:base-repo" still has the member "git_url" as "git:github.com/acme/rockets.git"
+      | relation     | href                                  | type      |
+      | alternate    | https://github.com/acme/rockets       | text/html |
+      | github:git   | git:github.com/acme/rockets.git       | (none)    |
+      | github:ssh   | ssh://git@github.com/acme/rockets.git | (none)    |
+      | github:clone | https://github.com/acme/rockets.git   |           |
+    And the embedded "github:base-repo" has none of these members
+      | member     |
+      | git_url    |
+      | ssh_url    |
+      | clone_url  |
+      | svn_url    |
+      | mirror_url |
     And the answer's state still has these members
       | member |
       | head   |
@@ -151,6 +164,18 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
     When "ada" gets "<path>" through the GitHub gateway
     Then every link to a HEART resource in the gateway, embedded ones too, has the profile "https://w3id.org/heart-rise/hal-schema-forms"
     And no link's type carries a parameter
+
+    Examples:
+      | path                          |
+      | /repos/acme/rockets/issues/10 |
+      | /repos/acme/rockets/pulls/482 |
+      | /users/ada                    |
+
+  Scenario Outline: No state holds an address, embedded ones and the items of lists included
+    Every address GitHub writes in an answer, whatever its scheme, is a link
+    once the gateway answers: none is left in a state, at any depth.
+    When "ada" gets "<path>" through the GitHub gateway
+    Then no state in the answer, embedded ones and list items too, holds an address
 
     Examples:
       | path                          |

@@ -10,10 +10,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import java.net.URI
 
-/** A media type for links whose URI has [host] (any when null) and ends with [suffix] (any when null). */
+/**
+ * A media type for web links whose URI has [host] (any when null) and ends with [suffix] (any when null). Only
+ * http and https links are typed by these: an ssh or git address on the same host is no web page.
+ */
 class TypeRule(val host: String?, val suffix: String?, val type: String) {
     fun matches(uri: URI): Boolean =
-        (host == null || uri.host.equals(host, ignoreCase = true)) &&
+        (uri.scheme == "http" || uri.scheme == "https") &&
+            (host == null || uri.host.equals(host, ignoreCase = true)) &&
             (suffix == null || uri.path.orEmpty().endsWith(suffix, ignoreCase = true))
 }
 
@@ -216,19 +220,23 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
         }
     }
 
-    /** Each link member of [obj], and of the objects in it, lifted out; [prefix] names the nesting. */
+    /**
+     * Each link member of [obj], of the objects in it, and of the objects in its lists, lifted out; [prefix]
+     * names the nesting. A list's items each give a link under the same relation: a commit's parents.
+     */
     private fun members(obj: ObjectNode, prefix: String, links: MutableMap<String, Any?>) {
         obj.properties().toList().forEach { (name, value) ->
-            if (value is ObjectNode) {
-                members(value, prefix + name.replace('_', '-') + "-", links)
-            } else if (rules.isLink(name) && value.isTextual && isHttp(value.asText())) {
-                lift(obj, name, prefix, links)
+            val nested = prefix + name.replace('_', '-') + "-"
+            when {
+                value is ObjectNode -> members(value, nested, links)
+                value is ArrayNode -> value.filterIsInstance<ObjectNode>().forEach { members(it, nested, links) }
+                rules.isLink(name) && value.isTextual && isAddress(value.asText()) -> lift(obj, name, prefix, links)
             }
         }
     }
 
     private fun lift(obj: ObjectNode, name: String, prefix: String, links: MutableMap<String, Any?>) {
-        val href = obj.remove(name).asText()
+        val href = uri(obj.remove(name).asText())
         if (prefix.isEmpty() && name == rules.self) return
         writer.add(links, prefix + stem(name), if (prefix.isEmpty()) name else prefix + name, href)
     }
@@ -238,6 +246,22 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
         private val MAPPER = ObjectMapper()
 
         private fun isHttp(text: String) = text.startsWith("https://") || text.startsWith("http://")
+
+        /** scp's form of an ssh address, user@host:path, as git and GitHub write it: no URI, but an address. */
+        private val SCP = Regex("^([\\w.-]+)@([\\w.-]+):(?!//)(.+)$")
+
+        /**
+         * A URI or URI template of any scheme (https:, git:, ssh:), or an ssh address in scp's form: every
+         * address is a link. A template's expressions are set aside to read its scheme.
+         */
+        private fun isAddress(text: String) = SCP.matches(text) || ' ' !in text &&
+            runCatching { URI(text.replace(EXPRESSION, "")).scheme != null }.getOrDefault(false)
+
+        private val EXPRESSION = Regex("\\{[^}]*}")
+
+        /** [text] as the URI it means: scp's user@host:path is ssh://user@host/path; any other, as it is. */
+        private fun uri(text: String): String =
+            SCP.matchEntire(text)?.destructured?.let { (user, host, path) -> "ssh://$user@$host/$path" } ?: text
 
         /** A member's name as a relation: `comments_url` is `comments`; `url` alone names nothing more. */
         fun stem(name: String): String = name.removeSuffix(URL).removeSuffix("url").replace('_', '-')
@@ -288,7 +312,8 @@ class LinkRelations(private val rules: LinkRules, private val writer: LinkWriter
     private fun walk(members: Map<String, Any?>, prefix: String, path: String) {
         members.forEach { (name, value) ->
             val schema = map(value)
-            val nested = properties(schema)
+            // A list of objects is walked as its items are: their link members link under one relation each.
+            val nested = properties(item(schema))
             when {
                 "$path$name" in rules.embed || name == rules.upstreamLinks -> Unit
                 nested.isNotEmpty() -> walk(nested, prefix + name.replace('_', '-') + "-", "$path$name/")

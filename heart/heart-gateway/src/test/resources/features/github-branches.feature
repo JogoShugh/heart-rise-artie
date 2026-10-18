@@ -37,6 +37,19 @@ Feature: Branches, commits and new pull requests, from acts a branch offers
     When "ada" gets "/repos/acme/rockets" through the GitHub gateway
     Then the answer links "github:repos-list-branches" to "/repos/acme/rockets/branches"
 
+  Scenario: A branch's head commit is embedded, and its parents are links, one per parent
+    GitHub lists a commit's parents as objects, each a sha and two addresses.
+    The addresses become links; the sha stays.
+    When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
+    Then the answer embeds "github:commit" with its self at "https://api.github.com/repos/acme/rockets/commits/2222222222222222222222222222222222222222" and these links
+      | relation            | href                                                                                       | type                        |
+      | alternate           | https://github.com/acme/rockets/commit/2222222222222222222222222222222222222222            | text/html                   |
+      | github:parents      | https://api.github.com/repos/acme/rockets/commits/9999999999999999999999999999999999999999 | application/vnd.github+json |
+      | github:parents-html | https://github.com/acme/rockets/commit/9999999999999999999999999999999999999999            | text/html                   |
+    And the embedded "github:commit" keeps only these members of each of its "parents"
+      | member |
+      | sha    |
+
   Scenario: The bookmark finds a repository: by its owner and name, or among a user's
     So a task can begin at the bookmark and reach a repository's branches, as
     issues and pull requests are found.

@@ -80,14 +80,62 @@ class LinkSteps(private val github: GitHubSteps) {
     fun embeddedHas(relation: String, member: String, value: String) =
         assertEquals(value, answer.path("_embedded").path(relation).path(member).asText())
 
+    @Then("the embedded {string} has none of these members")
+    fun embeddedNoneOf(relation: String, table: DataTable) {
+        val embedded = answer.path("_embedded").path(relation)
+        table.asMaps().forEach {
+            assertFalse(embedded.has(it.getValue("member")), "${it.getValue("member")} in $embedded")
+        }
+    }
+
+    @Then("the embedded {string} keeps only these members of each of its {string}")
+    fun embeddedItemsKeep(relation: String, list: String, table: DataTable) {
+        val items = answer.path("_embedded").path(relation).path(list)
+        assertTrue(items.isArray && !items.isEmpty, "no $list in ${answer.path("_embedded").path(relation)}")
+        val kept = table.asMaps().map { it.getValue("member") }.toSet()
+        items.forEach { assertEquals(kept, it.fieldNames().asSequence().toSet(), "$it") }
+    }
+
+    @Then("no state in the answer, embedded ones and list items too, holds an address")
+    fun noAddressInState() = assertEquals(emptyList<String>(), addresses(answer, ""), "addresses left in a state")
+
+    /** Each member of [node]'s state, at any depth, embedded resources' too, whose value is an address. */
+    private fun addresses(node: JsonNode, at: String): List<String> = when {
+        node.isObject -> node.properties().filter { it.key !in CONTROLS }.flatMap { (name, value) ->
+            if (name == "_embedded") {
+                value.properties().flatMap { (rel, e) -> addresses(e, "$at/_embedded/$rel") }
+            } else {
+                addresses(value, "$at/$name")
+            }
+        }
+        node.isArray -> node.flatMapIndexed { i, item -> addresses(item, "$at/$i") }
+        node.isTextual && ADDRESS.containsMatchIn(node.asText()) -> listOf("$at = ${node.asText()}")
+        else -> emptyList()
+    }
+
     private fun assertLinks(links: JsonNode, table: DataTable) = table.asMaps().forEach { row ->
         val relation = row.getValue("relation")
         val link = links.path(relation)
         assertEquals(row.getValue("href"), link.path("href").asText(), "$relation in $links")
         row["type"]?.takeIf { it.isNotEmpty() }?.let {
-            assertEquals(it, link.path("type").asText(), "$relation: $link")
+            if (it == "(none)") {
+                assertFalse(link.has("type"), "$relation: $link")
+            } else {
+                assertEquals(it, link.path("type").asText(), "$relation: $link")
+            }
         }
         val templated = row["templated"]?.takeIf { it.isNotEmpty() }?.toBoolean() ?: false
         assertEquals(templated, link.path("templated").asBoolean(false), "$relation: $link")
+    }
+
+    private companion object {
+        /** The members a client strips from a state (SPEC §6.1); _embedded is read, as its own states. */
+        val CONTROLS = setOf("_links", "_forms", "_templates")
+
+        /**
+         * An address in any scheme (https:, git:, ssh:) with a path after it, or scp's git@host:path. A
+         * name:name with no slash, such as a pull request's head label acme:new-topic, is no address.
+         */
+        val ADDRESS = Regex("""^([a-z][a-z0-9+.-]*:[^\s]*/[^\s]*|[\w.-]+@[\w.-]+:[^\s]+)$""")
     }
 }
