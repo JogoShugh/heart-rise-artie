@@ -2,6 +2,7 @@ package heart
 
 import heart.script.Answer
 import heart.script.Choice
+import heart.script.Embedded
 import heart.script.Navigator
 import heart.script.Reasoned
 import heart.script.Refusal
@@ -137,12 +138,18 @@ private fun plain(value: JsonElement): Any? {
     return if (primitive.isString) primitive.content else primitive.toString()
 }
 
-/** What ARTIE holds, as a script sees it: state, the acts offered, the links by relation and title. */
+/**
+ * What ARTIE holds, as a script sees it: state, the acts offered, the links by relation and title, and the
+ * resources it embeds (SPEC §6.1).
+ */
 private fun representation(held: HeartRepresentation) = Representation(
     address = held.url,
     state = held.state,
     offered = held.affordances.keys,
     links = held.linksByRel.mapValues { (_, links) -> links.map { it.title } },
+    embedded = held.embeddedByRel.mapValues { (_, resources) ->
+        resources.map { Embedded(it.title, it.state, it.href) }
+    },
 )
 
 /** A script's field value, as JSON. */

@@ -24,6 +24,9 @@ class ScriptedService : Navigator {
     val forms = mutableListOf<Form>()
     val links = mutableListOf<Link>()
 
+    /** Resources one embeds (SPEC §6.1): at an address, by relation, the embedded resource's address. */
+    val embeds = mutableListOf<Link>()
+
     /** Refusals an act meets, from the server or the client, by "relation at address". */
     val refusals = mutableMapOf<String, Answer.Refused>()
     val asked = mutableListOf<Pair<String, String>>()
@@ -47,7 +50,7 @@ class ScriptedService : Navigator {
 
     override fun follow(rel: String, title: String?): Answer {
         asked += "follow" to (if (title == null) rel else "$rel \"$title\"")
-        return at(links.first { it.at == held && it.relation == rel && it.title == title }.to)
+        return at((links + embeds).first { it.at == held && it.relation == rel && it.title == title }.to)
     }
 
     override fun visit(address: String): Answer {
@@ -90,7 +93,13 @@ class ScriptedService : Navigator {
             state,
             forms.filter { it.at == address }.map { it.relation }.toSet(),
             links.filter { it.at == address }.groupBy({ it.relation }, { it.title }),
+            embeds.filter { it.at == address }.groupBy({ it.relation }, { Embedded(it.title, stateOf(it.to), it.to) }),
         )
+    }
+
+    private fun stateOf(address: String): JsonObject {
+        val values = resources.getValue(address)
+        return buildJsonObject { values.filterValues { it.isNotEmpty() }.forEach { (k, v) -> put(k, v) } }
     }
 
     private fun json(fields: Map<String, Any?>): String =

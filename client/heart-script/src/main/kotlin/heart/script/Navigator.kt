@@ -5,16 +5,31 @@ import java.util.ServiceLoader
 
 /**
  * What a HEART client holds now (SPEC §6.8): a resource's state, the acts its
- * manifest offers, by relation, and its links, each relation with its links'
- * titles (null for a link with none). [address] is for the run's record only:
- * a script never sees it, and never names one.
+ * manifest offers, by relation, its links, each relation with its links'
+ * titles (null for a link with none), and the resources it embeds (SPEC §6.1),
+ * by relation. [address] is for the run's record only: a script never sees
+ * it, and never names one.
  */
 class Representation(
     val address: String,
     val state: JsonObject,
     val offered: Set<String>,
     val links: Map<String, List<String?>>,
+    val embedded: Map<String, List<Embedded>> = emptyMap(),
 )
+
+/**
+ * A resource the held one embeds (SPEC §6.1): its title and its state, read in
+ * place with no request. It has no forms: to act on it, a script follows its
+ * relation by its title. [address] is for the run's record only.
+ */
+class Embedded(val title: String?, val state: JsonObject, internal val address: String) {
+    /** Its state, read by JSON Pointer, as the held resource's is. */
+    val read: State get() = State(state)
+}
+
+/** The resources the held one embeds under [rel], read in place with no request (SPEC §6.1). */
+fun Here.embedded(rel: String): List<Embedded> = held.embedded[rel].orEmpty()
 
 /** Which side refused: the client, before sending anything, or the server. */
 enum class Side(val words: String) { CLIENT("the client"), SERVER("the server") }

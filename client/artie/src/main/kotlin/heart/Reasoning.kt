@@ -17,11 +17,12 @@ data class Offer(
 )
 
 /**
- * What the Reason step is shown of one link: its relation and title.
- * Deliberately no href, for the same reason as [Offer]: ARTIE follows the
- * link the reasoner names; the reasoner never sees or builds a URI.
+ * What the Reason step is shown of one link: its relation and title, and,
+ * for an embedded resource (SPEC §6.1), its [state]. Deliberately no href,
+ * for the same reason as [Offer]: ARTIE follows the link the reasoner names;
+ * the reasoner never sees or builds a URI.
  */
-data class LinkOffer(val rel: String, val title: String?)
+data class LinkOffer(val rel: String, val title: String?, val state: JsonObject? = null)
 
 /** The Reason step's entire output space (SPEC §6.8). It has no field for a URI, method, header or precondition. */
 sealed interface Selection {

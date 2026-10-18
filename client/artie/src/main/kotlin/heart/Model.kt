@@ -4,6 +4,7 @@ import kotlinx.serialization.json.JsonObject
 
 const val FORMS = "_forms"
 const val LINKS = "_links"
+const val EMBEDDED = "_embedded"
 const val PROPERTIES = "properties"
 const val REQUIRED = "required"
 

@@ -49,6 +49,7 @@ class TraceStep(
                 put("state", held.state)
                 put("forms", JsonArray(held.offered.map { JsonPrimitive(it) }))
                 put("links", JsonObject(held.links.mapValues { (_, titles) -> JsonArray(titles.map { element(it) }) }))
+                if (held.embedded.isNotEmpty()) put("embedded", embedded(held.embedded))
             })
         }
         refused?.let { r ->
@@ -60,6 +61,13 @@ class TraceStep(
         }
     }
 }
+
+/** What a step held embedded (SPEC §6.1): by relation, each resource's title and state. */
+internal fun embedded(byRel: Map<String, List<Embedded>>): JsonObject = JsonObject(
+    byRel.mapValues { (_, resources) ->
+        JsonArray(resources.map { buildJsonObject { put("title", element(it.title)); put("state", it.state) } })
+    },
+)
 
 /** A step the script itself takes, with no request: a check, or an act it refuses from the manifest. */
 internal fun Run.record(

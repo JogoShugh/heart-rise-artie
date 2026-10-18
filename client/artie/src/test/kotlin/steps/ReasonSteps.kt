@@ -130,6 +130,12 @@ class ReasonSteps(private val ctx: ClientContext) {
         assertFalse(links.toString().contains("/beds"), "links leaked a URI: $links")
     }
 
+    @Then("the reasoner was shown the {string} link titled {string} with the state member {string} as {string}")
+    fun shownEmbedded(rel: String, title: String, member: String, value: String) {
+        val link = (reasoner as ScriptedReasoner).shownLinks.single().single { it.rel == rel && it.title == title }
+        assertEquals(value, link.state?.get(member)?.jsonPrimitive?.content, "$link")
+    }
+
     @Then("the agent followed the link to {string}")
     fun followed(url: String) = assertEquals(url, assertIs<Decision.Followed>(decision).result.url)
 

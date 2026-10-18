@@ -102,6 +102,8 @@ class ClaudeReasoner(
                     buildJsonObject {
                         put("rel", link.rel)
                         link.title?.let { put("title", it) }
+                        // An embedded resource: what it says, so a link needn't be followed only to be read.
+                        link.state?.let { put("state", it) }
                     },
                 )
             }

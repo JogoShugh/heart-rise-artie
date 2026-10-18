@@ -49,7 +49,6 @@ class Here internal constructor(
 
     /** The titles of the links under [rel] (null for a link with none). */
     fun links(rel: String): List<String?> = held.links[rel].orEmpty()
-
     /** Why [rel] is not offered, as the server says; null when it says nothing. */
     fun why(rel: String): String? = navigator.why(rel)
 
@@ -89,10 +88,13 @@ class Here internal constructor(
         go(step, "\"$rel\"", navigator.act(rel, fields.toMap()), block)
     }
 
-    /** Select the link [rel] titled [title]; with a [block], visit it and return. */
+    /**
+     * Select the link [rel] titled [title], or the resource embedded under [rel] with that title, which
+     * fetches it; with a [block], visit it and return.
+     */
     fun follow(rel: String, title: String? = null, block: (Here.() -> Unit)? = null) {
         val step = ++run.step
-        if (title !in links(rel)) {
+        if (title !in links(rel) && title !in embedded(rel).map { it.title }) {
             val detail = "no \"$rel\" link" + (title?.let { " titled \"$it\"" } ?: "")
             val refusal = Answer.Refused(Refusal.NotOffered, Side.CLIENT, detail)
             run.record(followAsked(rel, title), "refused", held, refusal)

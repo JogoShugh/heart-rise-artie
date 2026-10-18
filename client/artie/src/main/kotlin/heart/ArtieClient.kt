@@ -89,7 +89,9 @@ class ArtieClient(
     /** Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI. */
     override fun follow(rel: String, title: String?): HeartRepresentation {
         val held = current ?: error("enter a service before following a link")
+        // SPEC §6.1: an embedded resource is followed like a link; following fetches it.
         val link = held.links(rel).firstOrNull { it.title == title }
+            ?: held.embedded(rel).firstOrNull { it.title == title }?.self
             ?: run {
                 decisions.absent("link", rel, held.url)
                 error("No '$rel' link titled '$title' in ${held.url}")

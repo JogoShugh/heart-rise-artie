@@ -30,7 +30,7 @@ object HeartResponseParser {
         val self = linkHref(root, "self")
         return HeartRepresentation(
             url = self?.let { URI(url).resolve(it).toString() } ?: url,
-            state = JsonObject(root.filterKeys { it !in setOf(FORMS, LINKS, HalFormsTemplates.TEMPLATES) }),
+            state = stateOf(root),
             manifest = if (dialect == Dialect.HAL_FORMS) {
                 Manifest(HalFormsTemplates.forms(root, url), base = url)
             } else {
@@ -38,8 +38,32 @@ object HeartResponseParser {
             },
             etag = received.validator,
             forms = linkObject(root, FORMS_REL)?.let { link(it, url) },
-            linksByRel = links(root, url),
+            related = related(root, url),
         )
+    }
+
+    /** SPEC §6.1: the state is the body without exactly these four; any other member is state. */
+    private val CONTROLS = setOf(LINKS, EMBEDDED, FORMS, HalFormsTemplates.TEMPLATES)
+
+    private val stateOf: (JsonObject) -> JsonObject = { body -> JsonObject(body.filterKeys { it !in CONTROLS }) }
+
+    /**
+     * A resource object's links and its embedded resources, each by the rel the server wrote: one
+     * object or an array of them. An embedded object without a self link names no resource, so it is skipped.
+     */
+    private fun related(root: JsonObject, base: String): Related {
+        fun resource(obj: JsonObject): HeartEmbedded? {
+            val self = linkObject(obj, "self")?.let { link(it, base) } ?: return null
+            return HeartEmbedded(self.href, self.title, stateOf(obj), related(obj, base))
+        }
+        val embedded = root[EMBEDDED]?.jsonObject.orEmpty().mapValues { (_, value) ->
+            when (value) {
+                is JsonArray -> value.mapNotNull { (it as? JsonObject)?.let(::resource) }
+                is JsonObject -> listOfNotNull(resource(value))
+                else -> emptyList()
+            }
+        }
+        return Related(links(root, base), embedded)
     }
 
     /**

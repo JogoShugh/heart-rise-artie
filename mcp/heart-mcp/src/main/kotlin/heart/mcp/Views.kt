@@ -38,8 +38,26 @@ internal object Views {
                 }
             }
         }
+        // SPEC §6.1: each embedded resource, by relation and title, with its state; followed like a link.
+        if (held.embeddedByRel.isNotEmpty()) {
+            putJsonArray("embedded") {
+                held.embeddedByRel.forEach { (rel, resources) ->
+                    resources.forEach { resource ->
+                        addJsonObject {
+                            put("rel", rel)
+                            resource.title?.let { put("title", it) }
+                            put("state", resource.state)
+                        }
+                    }
+                }
+            }
+        }
         extra.forEach { (name, value) -> put(name, value) }
     }
+
+    /** What a model may follow: the [links], and each embedded resource by its relation and title. */
+    fun followable(held: HeartRepresentation): List<Pair<String, String?>> =
+        links(held) + held.embeddedByRel.flatMap { (rel, resources) -> resources.map { rel to it.title } }
 
     /**
      * The links a model may follow: every one but `self`, the affordance-set

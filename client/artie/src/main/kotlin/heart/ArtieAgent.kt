@@ -80,11 +80,14 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
         }
     }
 
-    /** Every link but `self` and the affordance-set link, which are ARTIE's plumbing, not choices. */
+    /**
+     * Every link but `self` and the affordance-set link, which are ARTIE's plumbing, not choices; then
+     * each embedded resource, a link the reasoner may follow, with its state (SPEC §6.1).
+     */
     private fun linkOffers(synced: HeartRepresentation): List<LinkOffer> =
         synced.linksByRel.filterKeys { it != "self" }.flatMap { (rel, links) ->
             links.filter { it != synced.forms }.map { LinkOffer(rel, it.title) }
-        }
+        } + synced.embeddedByRel.flatMap { (rel, resources) -> resources.map { LinkOffer(rel, it.title, it.state) } }
 
     private fun check(selection: Selection.Act, synced: HeartRepresentation): Decision {
         val form = synced.affordance(selection.affordance)
@@ -95,7 +98,7 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
     }
 
     private fun check(selection: Selection.Follow, synced: HeartRepresentation): Decision =
-        if (LinkOffer(selection.rel, selection.title) in linkOffers(synced)) {
+        if (linkOffers(synced).any { it.rel == selection.rel && it.title == selection.title }) {
             Decision.Selected(selection)
         } else {
             Decision.Rejected(selection, listOf("no ${selection.rel} link titled ${selection.title} in ${synced.url}"))

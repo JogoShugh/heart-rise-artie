@@ -127,7 +127,9 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
 
     private fun follow(rel: String, title: String?): JsonObject {
         val held = held()
-        if ((rel to title) !in Views.links(held)) return rejected(held, "There is no $rel link titled '$title' here.")
+        if ((rel to title) !in Views.followable(held)) {
+            return rejected(held, "There is no $rel link titled '$title' here.")
+        }
         before.addLast(held.url)
         return Views.of(client.follow(rel, title))
     }
