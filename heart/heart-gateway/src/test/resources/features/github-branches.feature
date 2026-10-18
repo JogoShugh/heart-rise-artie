@@ -84,6 +84,14 @@ Feature: Branches, commits and new pull requests, from acts a branch offers
     Then the GitHub gateway answers 200
     And GitHub holds the file "NOTES.md" on "fix" of "acme/rockets", saying "Bed names may not be blank.\n", committed as "Refuse blank names"
 
+  Scenario: The commit form describes the file's text as plain text, since the gateway encodes it
+    Live, a reasoner read GitHub's own words for content, "The new file
+    content, using Base64 encoding.", encoded the text itself, and the gateway
+    encoded it again (2026-10-18): the file held base64. A field the gateway
+    encodes is described as what the client sends.
+    When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
+    Then the "github:commit-file" form's field "content" is described as "Plain text, as is: the gateway encodes it in base64 before sending it on."
+
   Scenario: Opening a pull request from this branch answers 201 naming the new pull request
     When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
     And the client sends "github:open-pull-request" with {"title":"Refuse blank names","base":"main"} and the ETag it holds

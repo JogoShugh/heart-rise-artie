@@ -28,7 +28,13 @@ internal class ActSchema(private val act: ActDeclaration, private val route: Spe
             "title" to act.title,
             // An input is the resource file's own field, with its own schema; the rest are the operation's.
             "properties" to act.inputs + act.fields.associateWith { field ->
-                checkNotNull(property(field)) { "$file: ${act.operation} has no field $field" }
+                val property = checkNotNull(property(field)) { "$file: ${act.operation} has no field $field" }
+                // A field the gateway encodes is described as what the client sends: plain text. The upstream's
+                // own words ("using Base64 encoding") would have the client encode it, and it be encoded twice.
+                act.encode[field]?.let { encoding ->
+                    (property as Map<*, *>) + ("description" to "Plain text, as is: the gateway encodes it in " +
+                        "$encoding before sending it on.")
+                } ?: property
             },
             "required" to (act.inputs.keys + act.fields).filter { it in required },
             "additionalProperties" to false,

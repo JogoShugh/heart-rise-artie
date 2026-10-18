@@ -18,6 +18,12 @@ class BranchSteps(private val github: GitHubSteps) {
         }
     }
 
+    @Then("the {string} form's field {string} is described as {string}")
+    fun described(key: String, field: String, description: String) {
+        val property = github.lastAnswer.path("_forms").path(key).path("schema").path("properties").path(field)
+        assertEquals(description, property.path("description").asText(), "$property")
+    }
+
     @Then("GitHub holds the file {string} on {string} of {string}, saying {string}, committed as {string}")
     fun holds(path: String, branch: String, repository: String, text: String, message: String) {
         val (owner, repo) = repository.split("/")
