@@ -25,7 +25,7 @@ In both modes, bytes are always checked against the integrity of the link they w
 
 1. **Per-form integrity, published by the server** (decided 2026-10-18). Each form in an affordance set
    carries its own `integrity`, over the form as served: target template, method, content type,
-   `hr:templatePointers`, title, and its schema or schema link. A set's integrity covers the whole set; a
+   `hr:templatePointers`, and its schema or schema link; not its title or description. A set's integrity covers the whole set; a
    form's lets a lenient replay tell "the set changed" from "my form changed". Computed in heart-core's
    layers, so the gateway and every HEART server get it alike. A client-side digest (JCS, RFC 8785) is the
    fallback for servers without it, and is weaker: it is the client's word, not the server's.
@@ -62,6 +62,6 @@ script that must run only against exactly what it was recorded against.
 
 - What a lenient replay reports when it acts on an unchanged form in a changed set: a warning in the
   capture and the report, with the set's two integrity values.
-- Whether `title` belongs inside a form's integrity: a retitled form behaves the same. Leaving it out lets
-  lenient replay survive retitles; keeping it in is the stricter reading.
+- Decided 2026-10-18: a form's integrity leaves out its title and description, so lenient replay
+  survives a retitled form.
 - Links: the same two modes for a followed relation (present, and its target template unchanged).

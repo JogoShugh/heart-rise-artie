@@ -91,8 +91,12 @@ plan's done condition for trace capture), and the report can show that compariso
 6. Live: the reasoned, scripted and hybrid GitHub tasks and one garden task, each reported this way;
    the skill updated.
 
-## Open questions
+## Decided 2026-10-18
 
-- Upstream pages: screenshots taken by `artie run --views` (needs Chrome), or links only by default?
-- The model's own exchange (prompt and answer): record it too (ARTIE has it before sending), or leave it out?
-- Garden over CoAP: no upstream; the same page without the upstream column.
+- Upstream pages: the report always shows the resource's `text/html` alternate link; screenshots only when
+  asked, `artie run --views` (headless Chrome).
+- The model's exchange: recorded for every reason step, what it was asked and what it answered, keys never
+  written; the report shows it one level deep.
+- A form's integrity leaves out its title and description: a retitled form behaves the same, so lenient
+  replay survives retitles (spec/ideas/replay-guards-lenient-strict.md).
+- Garden over CoAP has no upstream: the same page, without the upstream column.
