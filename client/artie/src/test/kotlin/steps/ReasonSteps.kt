@@ -292,6 +292,9 @@ class ReasonSteps(private val ctx: ClientContext) {
     fun claudeFollowed(rel: String, title: String) =
         assertEquals(Selection.Follow(rel, title), selection)
 
+    @Then("the Claude reasoner chose to follow the {string} link, with no title")
+    fun claudeFollowedUntitled(rel: String) = assertEquals(Selection.Follow(rel, null), selection)
+
     @Then("the Claude request contains no URI from the manifest")
     fun claudeNoUri() {
         val raw = ctx.transport.requests.last { it.url == ClaudeReasoner.ENDPOINT }.body.orEmpty()

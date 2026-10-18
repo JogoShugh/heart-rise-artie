@@ -177,6 +177,23 @@ Feature: L6: the Reason step picks; deterministic code acts
     Then the Claude request shows the link "item" titled "South border" and no href
     And the Claude reasoner chose to follow the "item" link titled "South border"
 
+  Scenario: A blank title from the model is no title, so an untitled link can be chosen
+    Live, Claude named the gateway's untitled branches link with the title ""
+    (2026-10-18), and ARTIE, matching "" against none, refused it.
+    Given the service answers GET "http://garden.test/repos/acme/rockets" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      name: rockets
+      _links:
+        github:repos-list-branches: {href: /repos/acme/rockets/branches, type: application/hal+json}
+      """
+    And the Claude API will answer with a tool call following the "github:repos-list-branches" link titled ""
+    When the Claude reasoner reasons about "look at the branches" over the manifest of "http://garden.test/repos/acme/rockets"
+    Then the Claude reasoner chose to follow the "github:repos-list-branches" link, with no title
+
   @llm
   Scenario: A real model picks the act from the manifest
     Given the reasoner is Claude, using the ANTHROPIC_API_KEY environment variable

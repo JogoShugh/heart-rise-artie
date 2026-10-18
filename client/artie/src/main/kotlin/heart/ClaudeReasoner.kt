@@ -120,7 +120,8 @@ class ClaudeReasoner(
         fun text(name: String) = input[name]?.jsonPrimitive?.content
         return when (text("action")) {
             "clarify" -> Selection.Clarify(text("question") ?: "Could you say more?")
-            "follow" -> Selection.Follow(rel = text("rel").orEmpty(), title = text("title"))
+            // A blank title is no title: models name an untitled link with "".
+            "follow" -> Selection.Follow(rel = text("rel").orEmpty(), title = text("title")?.ifBlank { null })
             "describe" -> Selection.Describe(text("affordance").orEmpty())
             "explain" -> Selection.Explain(text("affordance").orEmpty())
             else -> Selection.Act(
