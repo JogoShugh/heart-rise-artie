@@ -43,11 +43,15 @@ object SearchPages {
             if (pageNo > 1 && pageNo <= lastPage) put("prev", href(pageNo - 1))
         }
         val items = found.drop((pageNo - 1) * size).take(size)
-        return mapOf(
-            "count" to found.size,
-            "_links" to mapOf("self" to href(pageNo)) + paging +
-                ("item" to items.map { item(search, it) }),
-        )
+        // SPEC §6.11: each match the server summarised is embedded too, with its self link; no forms.
+        val embedded = items.mapNotNull { match ->
+            match.summary?.let { it + ("_links" to mapOf("self" to item(search, match))) }
+        }
+        return buildMap {
+            put("count", found.size)
+            put("_links", mapOf("self" to href(pageNo)) + paging + ("item" to items.map { item(search, it) }))
+            if (embedded.isNotEmpty()) put("_embedded", mapOf("item" to embedded))
+        }
     }
 
     /** Page [page] in plain JSON, the OpenAPI twin: each match by id and title, and no links. */

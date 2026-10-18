@@ -11,9 +11,16 @@ data class Acted<S>(val state: S, val headers: Map<String, String> = emptyMap(),
 
 /**
  * One search result: a resource's id, the title its `item` link carries, and
- * the values of its item path's variables; by default, its id.
+ * the values of its item path's variables; by default, its id. A [summary] of
+ * its state, when the server has one at hand, is embedded in the page beside
+ * the link (SPEC §6.11), so a client reads it without a request.
  */
-data class Found(val id: Long, val title: String, val variables: PathVariables = mapOf("id" to "$id"))
+data class Found(
+    val id: Long,
+    val title: String,
+    val variables: PathVariables = mapOf("id" to "$id"),
+    val summary: Map<String, Any?>? = null,
+)
 
 /** One thing that happened to a resource: its number in the resource's history, its type, when, and its data. */
 data class PastEvent(val sequenceNo: Int, val type: String, val occurredAt: Instant, val event: Any)

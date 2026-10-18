@@ -83,3 +83,15 @@ Feature: Garden beds
     And a client posts {} to harvest on bed 2 with If-Match *
     Then bed 2 is "EMPTY" with no crop and growth 0
     And bed 2 still has moisture 0
+
+  Scenario: A search embeds each bed's state beside its item link, so no bed needs a read of its own
+    SPEC §6.11, decided 2026-10-18. The beds are embedded the HAL way, each
+    with its self link and title, and no forms: a client follows a bed to act.
+    Given bed 1 is EMPTY
+    And bed 2 is PLANTED
+    When a client searches the beds for "bed"
+    Then the page embeds these beds
+      | self    | title | status  | cropName |
+      | /beds/1 | Bed 1 | EMPTY   |          |
+      | /beds/2 | Bed 2 | PLANTED | basil    |
+    And no embedded bed carries forms

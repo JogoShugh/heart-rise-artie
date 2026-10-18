@@ -1,5 +1,6 @@
 package com.artie.gardenbed.config
 
+import com.artie.gardenbed.domain.GardenBedAggregate
 import com.artie.gardenbed.domain.GardenBedState
 import com.artie.gardenbed.domain.GardenBedStatus
 import com.artie.gardenbed.declaration.BedActs
@@ -35,9 +36,15 @@ class HeartConfig(
     private val change = GardenChange.of(changeName)
 
     @Bean
-    fun gardenBeds(service: GardenBedService, acts: BedActs): HeartResource<GardenBedState, GardenBedStatus> =
-        HeartResource(
-            layers = GardenBeds.layers(frost, change),
+    fun gardenBeds(service: GardenBedService, acts: BedActs): HeartResource<GardenBedState, GardenBedStatus> {
+        val layers = GardenBeds.layers(frost, change)
+        // SPEC §6.11: each bed found carries its state, which the search page embeds beside its link.
+        suspend fun found(bed: GardenBedAggregate): Found {
+            val id = checkNotNull(bed.id)
+            return Found(id, bed.label, summary = layers.type.state.bodyOf(service.currentState(id)))
+        }
+        return HeartResource(
+            layers = layers,
             load = { id -> service.currentState(id) },
             perform = { bed, act, input ->
                 val done = acts.perform(bed, act, input)
@@ -48,10 +55,11 @@ class HeartConfig(
                 Acted(done.state, harvest.orEmpty())
             },
             // A stored bed always has its id; only a bed not yet saved has none.
-            find = { name, id -> service.findBeds(name, id).map { Found(checkNotNull(it.id), it.label) } },
+            find = { name, id -> service.findBeds(name, id).map { found(it) } },
             past = GARDEN_BEDS.past(at = { id, asOf -> service.currentState(id, asOf) }, history = service::history),
             performAtBookmark = { _, input -> Acted(acts.build(input)) },
         )
+    }
 
     /**
      * The garden's OpenAPI description: the frost is a change to the API, so it is a new version.
