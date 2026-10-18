@@ -77,7 +77,14 @@ class Connector(
     val resources: List<ResourceDeclaration> = emptyList(),
     /** Which members of the upstream's answers are only links, and how each becomes a HEART link. */
     val links: LinkRules? = null,
+    /**
+     * GET operations the gateway passes through without modelling them, each with where a listed
+     * member's title is (spec/PLAN-GATEWAY-URL-LINKS.md). They are read, so they are included.
+     */
+    val passthrough: Map<OperationId, JsonPointer?> = emptyMap(),
 ) {
+    /** The operations the gateway reads: those included, and those it passes through; none means every one. */
+    val reads: Set<OperationId>? get() = include?.let { it + passthrough.keys }
 
     /** The first reader that recognizes [answer], or none. */
     fun readerFor(answer: Answer): Reader? = readers.firstOrNull { it.match.holds(answer) }
@@ -131,7 +138,11 @@ class Connector(
             }
             val include = api.path("include").takeIf { it.isArray }?.map { it.asText() }?.toSet()
             val headers = api.path("headers").fields().asSequence().associate { it.key to it.value.asText() }
-            return Connector(name, profile, readers, include, headers, resources, LinkRules.of(api.path("links")))
+            val passthrough = api.path("passthrough").properties().associate { (operation, settings) ->
+                operation to settings.path("title").asText(null)?.let { JsonPointer.compile(it) }
+            }
+            val links = LinkRules.of(api.path("links"))
+            return Connector(name, profile, readers, include, headers, resources, links, passthrough)
         }
     }
 }

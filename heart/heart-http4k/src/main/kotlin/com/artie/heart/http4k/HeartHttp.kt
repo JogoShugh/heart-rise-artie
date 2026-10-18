@@ -58,6 +58,8 @@ class HeartHttp(
     resources: List<HeartResource<*, *>>,
     credentials: Credentials,
     settings: HeartSettings = HeartSettings(),
+    /** More routes, behind the same credentials and refusals, after HEART's own: a gateway's pass-through reads. */
+    extra: List<RoutingHttpHandler> = emptyList(),
 ) : HttpHandler {
     private val layers = resources.map { it.layers }
     private val index = ServiceIndex(layers.map { it.type }, settings.title, serviceDesc = OpenApiDocument.PATH)
@@ -72,7 +74,7 @@ class HeartHttp(
         .then(Refusals.filter(settings.mapper, realm))
         // Every read, act and search is handed the credential its request carried (Caller).
         .then(Filter { next -> { request -> Caller.during(request.header("Authorization")) { next(request) } } })
-        .then(routes(shared(settings.listings) + handlers.flatMap { routesOf(it) }))
+        .then(routes(shared(settings.listings) + handlers.flatMap { routesOf(it) } + extra))
 
     override fun invoke(request: Request): Response = app(request)
 

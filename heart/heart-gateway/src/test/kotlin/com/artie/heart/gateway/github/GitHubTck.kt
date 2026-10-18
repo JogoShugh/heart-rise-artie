@@ -37,7 +37,7 @@ class GitHubThroughGateway {
     private val connector = Connector.load(Path.of("connectors", "github"), mapper)
 
     private val gateway = Gateway(
-        GatewaySpec(checkNotNull(javaClass.getResource("/github/openapi.json")).readText(), connector.include),
+        GatewaySpec(checkNotNull(javaClass.getResource("/github/openapi.json")).readText(), connector.reads),
         github.handler,
         connector.profile,
         UpstreamAuth.Forwarded,

@@ -43,6 +43,9 @@ class GitHubSteps {
     /** The gateway's last answer, for the step classes beside this one. */
     internal val lastAnswer: JsonNode get() = json
 
+    /** The small GitHub behind the gateway, for the step classes beside this one. */
+    internal val upstream: GitHubUpstream get() = github
+
     @Given("the GitHub gateway reads GitHub's description with the connector {string}")
     fun reads(name: String) {
         connector = name
@@ -501,7 +504,7 @@ class GitHubSteps {
         val auth = if (forwarding) UpstreamAuth.Forwarded else UpstreamAuth.None
         val credentials =
             if (forwarding) Credentials.forwarded() else Credentials.parse(users = "", tokens = sha256(TOKEN))
-        val spec = GatewaySpec(description, loaded.include)
+        val spec = GatewaySpec(description, loaded.reads)
         Gateway(spec, github.handler, loaded.profile, auth, connector = loaded, upstreamUrl = "https://api.github.com")
             .handler(credentials)
     }

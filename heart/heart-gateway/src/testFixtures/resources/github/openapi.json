@@ -1,6 +1,89 @@
 {
  "components": {
   "examples": {
+   "commit-items": {
+    "value": [
+     {
+      "author": {
+       "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+       "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+       "followers_url": "https://api.github.com/users/octocat/followers",
+       "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+       "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+       "gravatar_id": "",
+       "html_url": "https://github.com/octocat",
+       "id": 1,
+       "login": "octocat",
+       "node_id": "MDQ6VXNlcjE=",
+       "organizations_url": "https://api.github.com/users/octocat/orgs",
+       "received_events_url": "https://api.github.com/users/octocat/received_events",
+       "repos_url": "https://api.github.com/users/octocat/repos",
+       "site_admin": false,
+       "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+       "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+       "type": "User",
+       "url": "https://api.github.com/users/octocat"
+      },
+      "comments_url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e/comments",
+      "commit": {
+       "author": {
+        "date": "2011-04-14T16:00:49Z",
+        "email": "support@github.com",
+        "name": "Monalisa Octocat"
+       },
+       "comment_count": 0,
+       "committer": {
+        "date": "2011-04-14T16:00:49Z",
+        "email": "support@github.com",
+        "name": "Monalisa Octocat"
+       },
+       "message": "Fix all the bugs",
+       "tree": {
+        "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+        "url": "https://api.github.com/repos/octocat/Hello-World/tree/6dcb09b5b57875f334f61aebed695e2e4193db5e"
+       },
+       "url": "https://api.github.com/repos/octocat/Hello-World/git/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+       "verification": {
+        "payload": null,
+        "reason": "unsigned",
+        "signature": null,
+        "verified": false,
+        "verified_at": null
+       }
+      },
+      "committer": {
+       "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+       "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+       "followers_url": "https://api.github.com/users/octocat/followers",
+       "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+       "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+       "gravatar_id": "",
+       "html_url": "https://github.com/octocat",
+       "id": 1,
+       "login": "octocat",
+       "node_id": "MDQ6VXNlcjE=",
+       "organizations_url": "https://api.github.com/users/octocat/orgs",
+       "received_events_url": "https://api.github.com/users/octocat/received_events",
+       "repos_url": "https://api.github.com/users/octocat/repos",
+       "site_admin": false,
+       "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+       "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+       "type": "User",
+       "url": "https://api.github.com/users/octocat"
+      },
+      "html_url": "https://github.com/octocat/Hello-World/commit/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "node_id": "MDY6Q29tbWl0NmRjYjA5YjViNTc4NzVmMzM0ZjYxYWViZWQ2OTVlMmU0MTkzZGI1ZQ==",
+      "parents": [
+       {
+        "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+        "url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e"
+       }
+      ],
+      "sha": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "url": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e"
+     }
+    ]
+   },
    "issue-comment": {
     "value": {
      "author_association": "COLLABORATOR",
@@ -35,6 +118,110 @@
       "url": "https://api.github.com/users/octocat"
      }
     }
+   },
+   "public-user-default-response": {
+    "summary": "Default response",
+    "value": {
+     "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+     "bio": "There once was...",
+     "blog": "https://github.com/blog",
+     "company": "GitHub",
+     "created_at": "2008-01-14T04:33:35Z",
+     "email": "octocat@github.com",
+     "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+     "followers": 20,
+     "followers_url": "https://api.github.com/users/octocat/followers",
+     "following": 0,
+     "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+     "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+     "gravatar_id": "",
+     "hireable": false,
+     "html_url": "https://github.com/octocat",
+     "id": 1,
+     "location": "San Francisco",
+     "login": "octocat",
+     "name": "monalisa octocat",
+     "node_id": "MDQ6VXNlcjE=",
+     "organizations_url": "https://api.github.com/users/octocat/orgs",
+     "public_gists": 1,
+     "public_repos": 2,
+     "received_events_url": "https://api.github.com/users/octocat/received_events",
+     "repos_url": "https://api.github.com/users/octocat/repos",
+     "site_admin": false,
+     "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+     "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+     "twitter_username": "monatheoctocat",
+     "type": "User",
+     "updated_at": "2008-01-14T04:33:35Z",
+     "url": "https://api.github.com/users/octocat"
+    }
+   },
+   "public-user-response-with-git-hub-plan-information": {
+    "summary": "Response with GitHub plan information",
+    "value": {
+     "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+     "bio": "There once was...",
+     "blog": "https://github.com/blog",
+     "company": "GitHub",
+     "created_at": "2008-01-14T04:33:35Z",
+     "email": "octocat@github.com",
+     "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+     "followers": 20,
+     "followers_url": "https://api.github.com/users/octocat/followers",
+     "following": 0,
+     "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+     "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+     "gravatar_id": "",
+     "hireable": false,
+     "html_url": "https://github.com/octocat",
+     "id": 1,
+     "location": "San Francisco",
+     "login": "octocat",
+     "name": "monalisa octocat",
+     "node_id": "MDQ6VXNlcjE=",
+     "organizations_url": "https://api.github.com/users/octocat/orgs",
+     "plan": {
+      "collaborators": 0,
+      "name": "pro",
+      "private_repos": 9999,
+      "space": 976562499
+     },
+     "public_gists": 1,
+     "public_repos": 2,
+     "received_events_url": "https://api.github.com/users/octocat/received_events",
+     "repos_url": "https://api.github.com/users/octocat/repos",
+     "site_admin": false,
+     "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+     "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+     "twitter_username": "monatheoctocat",
+     "type": "User",
+     "updated_at": "2008-01-14T04:33:35Z",
+     "url": "https://api.github.com/users/octocat"
+    }
+   },
+   "simple-user-items": {
+    "value": [
+     {
+      "avatar_url": "https://github.com/images/error/octocat_happy.gif",
+      "events_url": "https://api.github.com/users/octocat/events{/privacy}",
+      "followers_url": "https://api.github.com/users/octocat/followers",
+      "following_url": "https://api.github.com/users/octocat/following{/other_user}",
+      "gists_url": "https://api.github.com/users/octocat/gists{/gist_id}",
+      "gravatar_id": "",
+      "html_url": "https://github.com/octocat",
+      "id": 1,
+      "login": "octocat",
+      "node_id": "MDQ6VXNlcjE=",
+      "organizations_url": "https://api.github.com/users/octocat/orgs",
+      "received_events_url": "https://api.github.com/users/octocat/received_events",
+      "repos_url": "https://api.github.com/users/octocat/repos",
+      "site_admin": false,
+      "starred_url": "https://api.github.com/users/octocat/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/octocat/subscriptions",
+      "type": "User",
+      "url": "https://api.github.com/users/octocat"
+     }
+    ]
    }
   },
   "headers": {
@@ -140,6 +327,15 @@
     "required": false,
     "schema": {
      "format": "date-time",
+     "type": "string"
+    }
+   },
+   "username": {
+    "description": "The handle for the GitHub user account.",
+    "in": "path",
+    "name": "username",
+    "required": true,
+    "schema": {
      "type": "string"
     }
    }
@@ -365,6 +561,250 @@
      "html_url"
     ],
     "title": "Code Of Conduct Simple",
+    "type": "object"
+   },
+   "commit": {
+    "description": "Commit",
+    "properties": {
+     "author": {
+      "nullable": true,
+      "oneOf": [
+       {
+        "$ref": "#/components/schemas/simple-user"
+       },
+       {
+        "$ref": "#/components/schemas/empty-object"
+       }
+      ]
+     },
+     "comments_url": {
+      "example": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e/comments",
+      "format": "uri",
+      "type": "string"
+     },
+     "commit": {
+      "properties": {
+       "author": {
+        "$ref": "#/components/schemas/nullable-git-user"
+       },
+       "comment_count": {
+        "example": 0,
+        "type": "integer"
+       },
+       "committer": {
+        "$ref": "#/components/schemas/nullable-git-user"
+       },
+       "message": {
+        "example": "Fix all the bugs",
+        "type": "string"
+       },
+       "tree": {
+        "properties": {
+         "sha": {
+          "example": "827efc6d56897b048c772eb4087f854f46256132",
+          "type": "string"
+         },
+         "url": {
+          "example": "https://api.github.com/repos/octocat/Hello-World/tree/827efc6d56897b048c772eb4087f854f46256132",
+          "format": "uri",
+          "type": "string"
+         }
+        },
+        "required": [
+         "sha",
+         "url"
+        ],
+        "type": "object"
+       },
+       "url": {
+        "example": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+        "format": "uri",
+        "type": "string"
+       },
+       "verification": {
+        "$ref": "#/components/schemas/verification"
+       }
+      },
+      "required": [
+       "author",
+       "committer",
+       "comment_count",
+       "message",
+       "tree",
+       "url"
+      ],
+      "type": "object"
+     },
+     "committer": {
+      "nullable": true,
+      "oneOf": [
+       {
+        "$ref": "#/components/schemas/simple-user"
+       },
+       {
+        "$ref": "#/components/schemas/empty-object"
+       }
+      ]
+     },
+     "files": {
+      "items": {
+       "$ref": "#/components/schemas/diff-entry"
+      },
+      "type": "array"
+     },
+     "html_url": {
+      "example": "https://github.com/octocat/Hello-World/commit/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "format": "uri",
+      "type": "string"
+     },
+     "node_id": {
+      "example": "MDY6Q29tbWl0NmRjYjA5YjViNTc4NzVmMzM0ZjYxYWViZWQ2OTVlMmU0MTkzZGI1ZQ==",
+      "type": "string"
+     },
+     "parents": {
+      "items": {
+       "properties": {
+        "html_url": {
+         "example": "https://github.com/octocat/Hello-World/commit/7638417db6d59f3c431d3e1f261cc637155684cd",
+         "format": "uri",
+         "type": "string"
+        },
+        "sha": {
+         "example": "7638417db6d59f3c431d3e1f261cc637155684cd",
+         "type": "string"
+        },
+        "url": {
+         "example": "https://api.github.com/repos/octocat/Hello-World/commits/7638417db6d59f3c431d3e1f261cc637155684cd",
+         "format": "uri",
+         "type": "string"
+        }
+       },
+       "required": [
+        "sha",
+        "url"
+       ],
+       "type": "object"
+      },
+      "type": "array"
+     },
+     "sha": {
+      "example": "6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "type": "string"
+     },
+     "stats": {
+      "properties": {
+       "additions": {
+        "type": "integer"
+       },
+       "deletions": {
+        "type": "integer"
+       },
+       "total": {
+        "type": "integer"
+       }
+      },
+      "type": "object"
+     },
+     "url": {
+      "example": "https://api.github.com/repos/octocat/Hello-World/commits/6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "format": "uri",
+      "type": "string"
+     }
+    },
+    "required": [
+     "url",
+     "sha",
+     "node_id",
+     "html_url",
+     "comments_url",
+     "commit",
+     "author",
+     "committer",
+     "parents"
+    ],
+    "title": "Commit",
+    "type": "object"
+   },
+   "diff-entry": {
+    "description": "Diff Entry",
+    "properties": {
+     "additions": {
+      "example": 103,
+      "type": "integer"
+     },
+     "blob_url": {
+      "example": "https://github.com/octocat/Hello-World/blob/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
+      "format": "uri",
+      "type": "string"
+     },
+     "changes": {
+      "example": 124,
+      "type": "integer"
+     },
+     "contents_url": {
+      "example": "https://api.github.com/repos/octocat/Hello-World/contents/file1.txt?ref=6dcb09b5b57875f334f61aebed695e2e4193db5e",
+      "format": "uri",
+      "type": "string"
+     },
+     "deletions": {
+      "example": 21,
+      "type": "integer"
+     },
+     "filename": {
+      "example": "file1.txt",
+      "type": "string"
+     },
+     "patch": {
+      "example": "@@ -132,7 +132,7 @@ module Test @@ -1000,7 +1000,7 @@ module Test",
+      "type": "string"
+     },
+     "previous_filename": {
+      "example": "file.txt",
+      "type": "string"
+     },
+     "raw_url": {
+      "example": "https://github.com/octocat/Hello-World/raw/6dcb09b5b57875f334f61aebed695e2e4193db5e/file1.txt",
+      "format": "uri",
+      "type": "string"
+     },
+     "sha": {
+      "example": "bbcd538c8e72b8c175046e27cc8f907076331401",
+      "nullable": true,
+      "type": "string"
+     },
+     "status": {
+      "enum": [
+       "added",
+       "removed",
+       "modified",
+       "renamed",
+       "copied",
+       "changed",
+       "unchanged"
+      ],
+      "example": "added",
+      "type": "string"
+     }
+    },
+    "required": [
+     "additions",
+     "blob_url",
+     "changes",
+     "contents_url",
+     "deletions",
+     "filename",
+     "raw_url",
+     "sha",
+     "status"
+    ],
+    "title": "Diff Entry",
+    "type": "object"
+   },
+   "empty-object": {
+    "additionalProperties": false,
+    "description": "An object without any properties.",
+    "properties": {},
+    "title": "Empty Object",
     "type": "object"
    },
    "enterprise": {
@@ -1724,6 +2164,27 @@
      "href"
     ],
     "title": "Link",
+    "type": "object"
+   },
+   "nullable-git-user": {
+    "description": "Metaproperties for Git author/committer information.",
+    "nullable": true,
+    "properties": {
+     "date": {
+      "example": "\"2007-10-29T02:42:39.000-07:00\"",
+      "format": "date-time",
+      "type": "string"
+     },
+     "email": {
+      "example": "\"chris@ozmm.org\"",
+      "type": "string"
+     },
+     "name": {
+      "example": "\"Chris Wanstrath\"",
+      "type": "string"
+     }
+    },
+    "title": "Git User",
     "type": "object"
    },
    "nullable-integration": {
@@ -5837,6 +6298,37 @@
     ],
     "title": "Validation Error",
     "type": "object"
+   },
+   "verification": {
+    "properties": {
+     "payload": {
+      "nullable": true,
+      "type": "string"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "signature": {
+      "nullable": true,
+      "type": "string"
+     },
+     "verified": {
+      "type": "boolean"
+     },
+     "verified_at": {
+      "nullable": true,
+      "type": "string"
+     }
+    },
+    "required": [
+     "verified",
+     "reason",
+     "payload",
+     "signature",
+     "verified_at"
+    ],
+    "title": "Verification",
+    "type": "object"
    }
   }
  },
@@ -8106,6 +8598,68 @@
     }
    }
   },
+  "/repos/{owner}/{repo}/pulls/{pull_number}/commits": {
+   "get": {
+    "description": "Lists a maximum of 250 commits for a pull request. To receive a complete\ncommit list for pull requests with more than 250 commits, use the [List commits](https://docs.github.com/rest/commits/commits#list-commits)\nendpoint.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown body. Response will include `body`. This is the default if you do not pass any specific media type.\n- **`application/vnd.github.text+json`**: Returns a text only representation of the markdown body. Response will include `body_text`.\n- **`application/vnd.github.html+json`**: Returns HTML rendered from the body's markdown. Response will include `body_html`.\n- **`application/vnd.github.full+json`**: Returns raw, text, and HTML representations. Response will include `body`, `body_text`, and `body_html`.",
+    "externalDocs": {
+     "description": "API method documentation",
+     "url": "https://docs.github.com/rest/pulls/pulls#list-commits-on-a-pull-request"
+    },
+    "operationId": "pulls/list-commits",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/owner"
+     },
+     {
+      "$ref": "#/components/parameters/repo"
+     },
+     {
+      "$ref": "#/components/parameters/pull-number"
+     },
+     {
+      "$ref": "#/components/parameters/per-page"
+     },
+     {
+      "$ref": "#/components/parameters/page"
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "examples": {
+         "default": {
+          "$ref": "#/components/examples/commit-items"
+         }
+        },
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/commit"
+         },
+         "type": "array"
+        }
+       }
+      },
+      "description": "Response",
+      "headers": {
+       "Link": {
+        "$ref": "#/components/headers/link"
+       }
+      }
+     }
+    },
+    "summary": "List commits on a pull request",
+    "tags": [
+     "pulls"
+    ],
+    "x-github": {
+     "category": "pulls",
+     "enabledForGitHubApps": true,
+     "githubCloudOnly": false,
+     "subcategory": "pulls"
+    }
+   }
+  },
   "/repos/{owner}/{repo}/pulls/{pull_number}/merge": {
    "put": {
     "description": "> [!NOTE]\n> We recommend using the [asynchronous merge API](https://docs.github.com/rest/pulls/pulls#merge-a-pull-request-asynchronously) instead. This endpoint does not support stacked pull requests or merging with a merge queue.\n\nMerges a pull request into the base branch.\n\nThis endpoint triggers [notifications](https://docs.github.com/github/managing-subscriptions-and-notifications-on-github/about-notifications).\nCreating content too quickly using this endpoint may result in secondary rate limiting.\nFor more information, see \"[Rate limits for the API](https://docs.github.com/rest/using-the-rest-api/rate-limits-for-the-rest-api#about-secondary-rate-limits)\" and \"[Best practices for using the REST API](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api).\"\n",
@@ -8447,6 +9001,124 @@
      "enabledForGitHubApps": false,
      "githubCloudOnly": false,
      "subcategory": "users"
+    }
+   }
+  },
+  "/users/{username}": {
+   "get": {
+    "description": "Provides publicly available information about someone with a GitHub account.\n\nIf the specified user has a [private profile](https://docs.github.com/account-and-profile/concepts/personal-profile#private-profiles), the `followers` and `following` values are `0` unless the request is authenticated as that user. A request authenticated as the specified user returns the actual values even if the token has no OAuth scopes.\n\nThe `events_url` value is a URI template. Replace `{/privacy}` with `/public` to retrieve only public events. Omit it to retrieve public events and, when authenticated as the user, private events. For more information, see \"[List events for the authenticated user](https://docs.github.com/rest/activity/events#list-events-for-the-authenticated-user).\"\n\nIf you are requesting information about an [Enterprise Managed User](https://docs.github.com/enterprise-cloud@latest/admin/managing-iam/understanding-iam-for-enterprises/about-enterprise-managed-users), or a GitHub App bot that is installed in an organization that uses Enterprise Managed Users, your requests must be authenticated as a user or GitHub App that has access to the organization to view that account's information. If you are not authorized, the request will return a `404 Not Found` status.\n\nThe `email` key in the following response is the publicly visible email address from your GitHub [profile page](https://github.com/settings/profile). When setting up your profile, you can select a primary email address to be public which provides an email entry for this endpoint. If you do not set a public email address for `email`, then it will have a value of `null`. You only see publicly visible email addresses when authenticated with GitHub. For more information, see [Authentication](https://docs.github.com/rest/guides/getting-started-with-the-rest-api#authentication).\n\nThe Emails API enables you to list all of your email addresses, and toggle a primary email to be visible publicly. For more information, see [Emails API](https://docs.github.com/rest/users/emails).",
+    "externalDocs": {
+     "description": "API method documentation",
+     "url": "https://docs.github.com/rest/users/users#get-a-user"
+    },
+    "operationId": "users/get-by-username",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/username"
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "examples": {
+         "default-response": {
+          "$ref": "#/components/examples/public-user-default-response"
+         },
+         "response-with-git-hub-plan-information": {
+          "$ref": "#/components/examples/public-user-response-with-git-hub-plan-information"
+         }
+        },
+        "schema": {
+         "discriminator": {
+          "mapping": {
+           "private": "#/components/schemas/private-user",
+           "public": "#/components/schemas/public-user"
+          },
+          "propertyName": "user_view_type"
+         },
+         "oneOf": [
+          {
+           "$ref": "#/components/schemas/private-user"
+          },
+          {
+           "$ref": "#/components/schemas/public-user"
+          }
+         ]
+        }
+       }
+      },
+      "description": "Response"
+     },
+     "404": {
+      "$ref": "#/components/responses/not_found"
+     }
+    },
+    "summary": "Get a user",
+    "tags": [
+     "users"
+    ],
+    "x-github": {
+     "category": "users",
+     "enabledForGitHubApps": true,
+     "githubCloudOnly": false,
+     "subcategory": "users"
+    }
+   }
+  },
+  "/users/{username}/followers": {
+   "get": {
+    "description": "Lists the people following the specified user.\n\nIf the specified user has a [private profile](https://docs.github.com/account-and-profile/concepts/personal-profile#private-profiles), this endpoint returns an empty list unless the request is authenticated as that user. A request authenticated as the specified user returns the list even if the token has no OAuth scopes.",
+    "externalDocs": {
+     "description": "API method documentation",
+     "url": "https://docs.github.com/rest/users/followers#list-followers-of-a-user"
+    },
+    "operationId": "users/list-followers-for-user",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/username"
+     },
+     {
+      "$ref": "#/components/parameters/per-page"
+     },
+     {
+      "$ref": "#/components/parameters/page"
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "examples": {
+         "default": {
+          "$ref": "#/components/examples/simple-user-items"
+         }
+        },
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/simple-user"
+         },
+         "type": "array"
+        }
+       }
+      },
+      "description": "Response",
+      "headers": {
+       "Link": {
+        "$ref": "#/components/headers/link"
+       }
+      }
+     }
+    },
+    "summary": "List followers of a user",
+    "tags": [
+     "users"
+    ],
+    "x-github": {
+     "category": "users",
+     "enabledForGitHubApps": true,
+     "githubCloudOnly": false,
+     "subcategory": "followers"
     }
    }
   }

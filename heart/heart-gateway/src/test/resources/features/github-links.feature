@@ -50,11 +50,12 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
 
   Scenario: An issue's author is embedded, with its own typed links
     When "ada" gets "/repos/acme/rockets/issues/10" through the GitHub gateway
-    Then the answer embeds "github:user" with its self at "https://api.github.com/users/ada" and these links
+    Then the answer embeds "github:user" with its self at "/users/ada" and these links
       | relation         | href                                          | type                        |
       | alternate        | https://github.com/ada                        | text/html                   |
       | icon             | https://github.com/images/error/ada_happy.gif | image/gif                   |
-      | github:followers | https://api.github.com/users/ada/followers    | application/vnd.github+json |
+      | github:followers | /users/ada/followers                          | application/hal+json        |
+      | github:repos     | https://api.github.com/users/ada/repos        | application/vnd.github+json |
     And the embedded "github:user" still has the member "login" as "ada"
     And the answer's state has none of these members
       | member |
@@ -80,15 +81,15 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the answer links these, by type
       | relation              | href                                                              | type                        | templated |
-      | github:commits        | https://api.github.com/repos/acme/rockets/pulls/482/commits       | application/vnd.github+json |           |
+      | github:commits        | /repos/acme/rockets/pulls/482/commits                             | application/hal+json        |           |
       | github:issues-get     | /repos/acme/rockets/issues/482                                    | application/hal+json        |           |
       | github:review-comment | https://api.github.com/repos/acme/rockets/pulls/comments{/number} | application/vnd.github+json | true      |
 
   Scenario: The users on a pull request's head and base are embedded, not flattened into its links
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
-    Then the answer embeds "github:head-user" with its self at "https://api.github.com/users/acme" and these links
-      | relation         | href                                        | type                        |
-      | github:followers | https://api.github.com/users/acme/followers | application/vnd.github+json |
+    Then the answer embeds "github:head-user" with its self at "/users/acme" and these links
+      | relation         | href                  | type                 |
+      | github:followers | /users/acme/followers | application/hal+json |
     And the answer has none of these links
       | relation                  |
       | github:head-user-followers |

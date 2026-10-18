@@ -101,6 +101,9 @@ class GitHubUpstream {
     /** Heads that move just before GitHub merges: another push lands first. */
     val movesBeforeMerge = mutableMapOf<Long, String>()
 
+    /** Each user's followers, by login, in order; GitHub pages them [FOLLOWERS_PAGE] at a time. */
+    val followers = mutableMapOf<String, List<String>>()
+
     private val mapper = ObjectMapper()
 
     val handler: HttpHandler = { request: Request ->
@@ -151,6 +154,11 @@ class GitHubUpstream {
         },
         "/repos/{owner}/{repo}/pulls/{number}/update-branch" bind Method.PUT to { request ->
             pull(request)?.let { updateBranch(it, request) } ?: Response(Status.NOT_FOUND)
+        },
+        "/users/{login}/followers" bind Method.GET to { request -> followersOf(request) },
+        "/users/{login}" bind Method.GET to { request -> json(Response(Status.OK), user(request.path("login")!!)) },
+        "/repos/{owner}/{repo}/pulls/{number}/commits" bind Method.GET to { request ->
+            pull(request)?.let { json(Response(Status.OK), listOf(commit(it))) } ?: Response(Status.NOT_FOUND)
         },
         "/user" bind Method.GET to { request ->
             caller(request)?.let { json(Response(Status.OK), USER.deepCopy().put("login", it)) }
@@ -293,6 +301,35 @@ class GitHubUpstream {
             json(Response(Status.OK), listed.map { body(it) })
         },
     )
+
+    /** GitHub's own example user, as [login]: its addresses are its own. */
+    private fun user(login: String): JsonNode = addressed(USER.deepCopy(), login, login, 0, login)
+
+    /** A user's followers, a page at a time, with GitHub's Link to the next page when there is one. */
+    private fun followersOf(request: Request): Response {
+        val login = request.path("login")!!
+        val page = request.query("page")?.toIntOrNull() ?: 1
+        val all = followers[login].orEmpty()
+        val listed = all.drop((page - 1) * FOLLOWERS_PAGE).take(FOLLOWERS_PAGE)
+        val response = json(Response(Status.OK), listed.map { user(it) })
+        return if (page * FOLLOWERS_PAGE < all.size) {
+            response.header("Link", "<https://api.github.com/users/$login/followers?page=${page + 1}>; rel=\"next\"")
+        } else {
+            response
+        }
+    }
+
+    /** A pull request's one commit, its head, as GitHub lists a pull request's commits. */
+    private fun commit(pull: Pull): JsonNode {
+        val api = "https://api.github.com/repos/${pull.owner}/${pull.repo}"
+        return mapper.createObjectNode().apply {
+            put("sha", pull.head)
+            put("url", "$api/commits/${pull.head}")
+            put("html_url", "https://github.com/${pull.owner}/${pull.repo}/commit/${pull.head}")
+            putObject("commit").put("message", pull.title).put("url", "$api/git/commits/${pull.head}")
+            set<JsonNode>("author", user(pull.owner))
+        }
+    }
 
     /** As GitHub does: only collaborators can be asked, and the answer is the pull request. */
     private fun requestReviews(pull: Pull, request: Request): Response {
@@ -456,6 +493,7 @@ class GitHubUpstream {
 
     private companion object {
         const val ID_BASE = 1_000_000L
+        const val FOLLOWERS_PAGE = 2
 
         /** GitHub's own examples, from its description (github/rest-api-description, MIT licensed). */
         val PULL: ObjectNode = example("/github/pull-request.json")

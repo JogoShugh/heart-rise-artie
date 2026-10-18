@@ -56,11 +56,24 @@ class Gateway(
     /** Which members of the upstream's answers are only links (Links.kt), when the connector says. */
     private val rules = connector?.links
 
-    /** Writes the links the connector's link rules lift: into the gateway where it serves them, typed. */
+    /** GET operations passed through without modelling them, with where a listed member's title is. */
+    private val passed = connector?.passthrough.orEmpty()
+
+    /**
+     * Writes the links the connector's link rules lift: into the gateway where it serves them, typed. A link
+     * to a passed-through read is named after its member, not its operation (decided 2026-10-18).
+     */
     private val writer = rules?.let { rules ->
-        val served = spec.routes.values.filter { it.method == "GET" }
-            .map { ServedPath(it.path, vocabulary.key(it.operation.relation)) }
+        val served = spec.routes.values.filter { it.method == "GET" }.map { route ->
+            val relation = if (route.operation.name in passed) null else vocabulary.key(route.operation.relation)
+            ServedPath(route.path, relation)
+        }
         LinkWriter(rules, upstreamUrl.orEmpty().trimEnd('/'), served, profile)
+    }
+
+    /** The reads the connector passes through, served beside HEART's routes. */
+    private val passthrough = rules?.let { linked ->
+        writer?.let { Passthrough(spec, passed, calls, LinkLifter(linked, it, profile), it, mapper) }
     }
 
     init {
@@ -84,7 +97,8 @@ class Gateway(
      * first of the connector's readers that recognizes it, or else by a
      * standard the gateway detects by itself.
      */
-    val resources: List<HeartResource<*, *>> = spec.types.map { type ->
+    // A read passed through is not modelled, even where its path looks like a collection's (/users/{username}).
+    val resources: List<HeartResource<*, *>> = spec.types.filter { it.read.name !in passed }.map { type ->
         val standards = Standards(
             links.signal(
                 byPath = type.acts.associate { it.path to it.operation.name },
@@ -96,7 +110,7 @@ class Gateway(
 
     /** The gateway as one HTTP handler, admitting the callers [credentials] admits. */
     fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler =
-        HeartHttp(resources, credentials, settings)
+        HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
 
     private companion object {
         /** Each answer is read by the first of the connector's readers that recognizes it, or else by a standard. */
@@ -106,12 +120,14 @@ class Gateway(
         /**
          * Every operation's relation, as the description names it, or after its id: `switchOff` is `switch-off`.
          * A connector that includes only some operations has a relation for each act its resource files
-         * declare, and for each included operation no act is made of.
+         * declare, and for each included operation no act is made of. A read it passes through has none:
+         * links to it are named after the member they were.
          */
         fun relations(spec: GatewaySpec, connector: Connector?): List<Relation> =
             if (connector?.include != null) {
                 val acts = connector.resources.flatMap { it.acts }
-                spec.routes.values.filter { route -> acts.none { it.operation == route.operation.name } }.map { route ->
+                val modelled = spec.routes.values.filter { it.operation.name !in connector.passthrough }
+                modelled.filter { route -> acts.none { it.operation == route.operation.name } }.map { route ->
                     relation(route.operation, if (route.method == "GET") AlpsType.SAFE else AlpsType.UNSAFE)
                 } + acts.distinctBy { it.name }.map { act -> // close, reopen, edit: one relation, any resource
                     Relation(act.name, AlpsType.UNSAFE, act.title, act.description, act.description)

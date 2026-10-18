@@ -146,12 +146,15 @@ class Lifted(val state: JsonNode, val hypermedia: Hypermedia)
  */
 class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, private val curie: String) {
     fun lift(state: JsonNode): Lifted {
-        val (left, links, embedded) = resource(state.deepCopy())
+        val (left, links, embedded) = parts(state.deepCopy())
         return Lifted(left, Hypermedia(links, embedded))
     }
 
+    /** [node] as a whole HAL resource object, its self link from its own address; null when it names none. */
+    fun resource(node: JsonNode): Map<String, Any?>? = (node.deepCopy<JsonNode>() as? ObjectNode)?.let(::embedded)
+
     /** One resource object: its state left, its links, and its embedded resources. */
-    private fun resource(node: JsonNode): Triple<JsonNode, Map<String, Any?>, Map<String, Any?>> {
+    private fun parts(node: JsonNode): Triple<JsonNode, Map<String, Any?>, Map<String, Any?>> {
         val obj = node as? ObjectNode ?: return Triple(node, emptyMap(), emptyMap())
         val links = LinkedHashMap<String, Any?>()
         val embedded = LinkedHashMap<String, Any?>()
@@ -183,7 +186,7 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
     /** An embedded resource object: its own state, links and embedded ones, and its self link. None without self. */
     private fun embedded(value: ObjectNode): Map<String, Any?>? {
         val self = rules.self?.let { value.get(it)?.asText() }?.takeIf(::isHttp) ?: return null
-        val (left, links, embedded) = resource(value)
+        val (left, links, embedded) = parts(value)
         val body = MAPPER.convertValue(left, Map::class.java).mapKeys { it.key.toString() }.toMutableMap()
         body["_links"] = mapOf("self" to mapOf("href" to writer.address(self))) + links
         if (embedded.isNotEmpty()) body["_embedded"] = embedded

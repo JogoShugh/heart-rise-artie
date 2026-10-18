@@ -31,7 +31,7 @@ fun main() {
     val connector = config.connector?.let { Connector.load(it, mapper) }
     val profile = connector?.profile ?: checkNotNull(config.profile)
     val gateway = Gateway(
-        GatewaySpec(spec, connector?.include),
+        GatewaySpec(spec, connector?.reads),
         upstream,
         profile,
         settings.auth,
