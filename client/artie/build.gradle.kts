@@ -19,6 +19,8 @@ repositories {
 val cucumberVersion = "7.18.0"
 
 dependencies {
+    // The script DSL's contract, which ARTIE implements (heart.script.Navigator).
+    api(project(":heart-script"))
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     // SPEC §6.0.1: the CoAP binding (RFC 7252), for coap: URIs.
     api("org.eclipse.californium:californium-core:3.14.0")
@@ -35,6 +37,8 @@ dependencies {
     testImplementation("io.cucumber:cucumber-picocontainer:$cucumberVersion")
     // The GitHub gateway and a small GitHub, in process (github-gateway.feature).
     testImplementation(testFixtures("com.artie.heart:heart-gateway"))
+    // script-github.feature runs real scripts, through Kotlin's script engine.
+    testImplementation("org.jetbrains.kotlin:kotlin-scripting-jsr223:2.3.0")
     // bdd-gates: the client's architecture boundary as a failing test.
     testImplementation("com.lemonappdev:konsist:0.17.3")
 }

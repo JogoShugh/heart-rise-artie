@@ -2,9 +2,11 @@
 # Builds a run report: one self-contained HTML page from a trace (heart-run-report skill), with the viewer
 # inlined from this folder, so the page works on GitHub Pages and as an artifact alike.
 #
-#   build-run-report.sh TRACE.json OUT.html "Title" "One sentence saying what was run, against what."
+#   build-run-report.sh TRACE.json OUT.html "Title" "One sentence saying what was run, against what." [SCRIPT]
+#
+# SCRIPT, when given, is the script that made the trace (a heart-script .kts): shown on the page, as written.
 set -eu
-trace=$1 out=$2 title=$3 lede=$4
+trace=$1 out=$2 title=$3 lede=$4 script=${5:-}
 here=$(cd "$(dirname "$0")" && pwd)
 
 # Text for HTML: & < > escaped. JSON in a script element: "</" written "<\/", which JSON allows.
@@ -12,9 +14,21 @@ html_escape() { printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/
 safe_title=$(html_escape "$title")
 safe_lede=$(html_escape "$lede")
 
+# The script, escaped, in a block of its own; nothing at all when there is none.
+script_block=$(mktemp)
+trap 'rm -f "$script_block"' EXIT
+if [ -n "$script" ]; then
+  {
+    printf '    <details class="rr-script" open>\n      <summary>The script: <code>%s</code></summary>\n' "$(html_escape "$(basename "$script")")"
+    printf '      <pre><code>'
+    sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$script"
+    printf '</code></pre>\n    </details>\n'
+  } > "$script_block"
+fi
+
 TITLE=$safe_title LEDE=$safe_lede awk \
     -v rrcss="$here/run-report.css" -v jvcss="$here/json-view.css" \
-    -v jvjs="$here/json-view.js" -v rrjs="$here/run-report.js" -v trace="$trace" '
+    -v jvjs="$here/json-view.js" -v rrjs="$here/run-report.js" -v trace="$trace" -v scriptblock="$script_block" '
   BEGIN { title = ENVIRON["TITLE"]; lede = ENVIRON["LEDE"] }
   function emit(file,   line) { while ((getline line < file) > 0) print line; close(file) }
   function emit_trace(file,   line) {
@@ -25,6 +39,7 @@ TITLE=$safe_title LEDE=$safe_lede awk \
   /\/\*@JSON_VIEW_CSS@\*\//  { emit(jvcss); next }
   /\/\*@JSON_VIEW_JS@\*\//   { emit(jvjs); next }
   /\/\*@RUN_REPORT_JS@\*\//  { emit(rrjs); next }
+  /^@SCRIPT@$/ { emit(scriptblock); next }
   /@TRACE@/ {
     split($0, parts, "@TRACE@"); printf "%s", parts[1]; emit_trace(trace); print parts[2]; next
   }

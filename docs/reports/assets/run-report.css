@@ -131,3 +131,9 @@ mark.rr-param { background: var(--mark); color: var(--mark-fg); font-family: var
 .rr-section-title { font: 650 1.05rem var(--display); margin: 0; }
 .rr-section-note { margin: 0.1rem 0 0.5rem; font-size: 0.84rem; color: var(--muted); }
 .rr-section .rr-tiles { margin-bottom: 0; }
+/* The script that made the trace, when the report is given one: as written, collapsible. */
+.rr-script { margin: 0 0 1.4rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+.rr-script summary { cursor: pointer; padding: 0.6rem 0.9rem; font-weight: 600; font-size: 0.92rem; }
+.rr-script summary code { font: 500 0.88rem var(--mono); }
+.rr-script pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); border-top: 1px solid var(--rule);
+  border-radius: 0 0 8px 8px; font: 0.84rem/1.55 var(--mono); }

@@ -1,0 +1,108 @@
+package heart.cli
+
+import heart.script.Answer
+import heart.script.Refusal
+import heart.script.ScriptSteps
+import heart.script.Side
+import io.cucumber.datatable.DataTable
+import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
+import java.nio.file.Files
+import kotlin.test.assertEquals
+
+/** run.feature: artie run, in a folder of its own, against the DSL features' scripted service. */
+class CliSteps(private val script: ScriptSteps) {
+    private val folder = Files.createTempDirectory("artie-run")
+    private val typed = ArrayDeque<String>()
+    private var exit = -1
+    private var printed = listOf<String>()
+    private var askedRung: String? = null
+    private var askedReasoner: String? = null
+
+    @Given("the client cannot reach the server for {string} at {string}: {string}")
+    fun unreachable(rel: String, at: String, detail: String) {
+        script.service.refusals["$rel at $at"] = Answer.Refused(Refusal.Unreachable, Side.CLIENT, detail)
+    }
+
+    @Given("the script {string} is")
+    fun scriptIs(name: String, text: String) {
+        Files.writeString(folder.resolve(name), text)
+    }
+
+    @Given("the file {string} is")
+    fun fileIs(name: String, text: String) {
+        Files.writeString(folder.resolve(name), text)
+    }
+
+    @Given("the person will type")
+    fun willType(table: DataTable) = table.asMaps().forEach { typed.addLast(it.getValue("line")) }
+
+    @When("artie is run with")
+    fun artieRuns(table: DataTable) {
+        val bytes = ByteArrayOutputStream()
+        val args = table.asMaps().map { it["argument"].orEmpty() }.filter { it.isNotEmpty() }
+        val client = { settings: heart.script.ClientSettings ->
+            askedRung = settings.rung.orEmpty()
+            askedReasoner = settings.reasoner.orEmpty()
+            script.service
+        }
+        val cli = ArtieCli(folder, PrintStream(bytes, true), { typed.removeFirstOrNull() }, client, BUILDER)
+        exit = cli.run(args)
+        printed = bytes.toString().lines().filter { it.isNotBlank() }
+    }
+
+    @Then("artie exits {int}")
+    fun exits(code: Int) = assertEquals(code, exit, printed.joinToString("\n"))
+
+    @Then("artie prints")
+    fun prints(table: DataTable) = assertEquals(table.asMaps().map { it.getValue("line") }, printed)
+
+    @Then("the client was made to ask at rung {string}")
+    fun rung(rung: String) = assertEquals(rung, askedRung.orEmpty())
+
+    @Then("the client was made with the reasoner {string}")
+    fun reasoner(name: String) = assertEquals(name, askedReasoner.orEmpty())
+
+    @Then("artie's last line is: {}")
+    fun lastLine(line: String) = assertEquals(line, printed.lastOrNull(), printed.joinToString("\n"))
+
+    @Then("the trace {string} has these steps")
+    fun traceFile(name: String, table: DataTable) {
+        val steps = (Json.parseToJsonElement(Files.readString(folder.resolve(name))) as JsonObject)
+            .getValue("steps") as JsonArray
+        assertEquals(
+            table.asMaps().map { it.getValue("say") to it.getValue("outcome") },
+            steps.map { (it as JsonObject).let { s -> s.str("say") to s.str("outcome") } },
+        )
+    }
+
+    @Then("the run report {string} holds the script {string} and these steps")
+    fun report(name: String, script: String, table: DataTable) {
+        val page = Files.readString(folder.resolve(name))
+        val shown = Regex("""<summary>The script: <code>([^<]*)</code></summary>""").find(page)?.groupValues?.get(1)
+        assertEquals(script, shown, "the script the report shows")
+        val embedded = Regex("""id="run-trace">(.*?)</script>""", RegexOption.DOT_MATCHES_ALL)
+        val trace = embedded.find(page)?.groupValues?.get(1)?.replace("<\\/", "</")
+        val steps = (Json.parseToJsonElement(checkNotNull(trace) { "no trace in the report" }) as JsonObject)
+            .getValue("steps") as JsonArray
+        assertEquals(
+            table.asMaps().map { it.getValue("say") to it.getValue("outcome") },
+            steps.map { (it as JsonObject).let { s -> s.str("say") to s.str("outcome") } },
+        )
+    }
+
+    private fun JsonObject.str(name: String) = getValue(name).jsonPrimitive.content
+
+    private companion object {
+        /** The one copy of heart-run-report's code, as the installed command finds it beside itself. */
+        val BUILDER: java.nio.file.Path =
+            java.nio.file.Path.of("../../docs/reports/assets/build-run-report.sh").toAbsolutePath().normalize()
+    }
+}

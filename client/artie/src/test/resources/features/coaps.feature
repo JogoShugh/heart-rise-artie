@@ -40,3 +40,9 @@ Feature: ARTIE over coaps, with a pre-shared key
     When the client enters the coaps bed
     Then the coaps credential prints as "PreShared(****)"
     And the coaps key appears in no event
+
+  Scenario: The ARTIE a script host finds reads over coaps, with the key from the environment
+    Given the environment holds the coaps service's key for "artie"
+    When a script host's ARTIE enters the coaps bed
+    Then it holds the bed, "EMPTY", offered "sow"
+    And the coaps service received 1 request

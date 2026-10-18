@@ -227,7 +227,7 @@ ARTIE implements the client side of this section: its core works in the concepts
 
 #### 6.0.1 The CoAP binding (added 2026-10-10)
 
-> **Decided (2026-10-10).** The second binding is CoAP (RFC 7252), for the scheme `coap`. `coaps` (CoAP over DTLS) would use the same mapping; it is not implemented yet, so ARTIE refuses a `coaps:` URI as having no binding. CoAP has no header for a profile or a preference. The binding therefore carries them in CoAP options from the experimental range (65000–65535, RFC 7252 §12.2), one for one with their HTTP headers. They keep the same values and meaning, and they should be registered with IANA if this binding is adopted. Content-Formats unregistered for these media types use the experimental range too.
+> **Decided (2026-10-10).** The second binding is CoAP (RFC 7252), for the scheme `coap`. `coaps` (CoAP over DTLS) uses the same mapping, with a pre-shared key per client (§ on credentials over CoAP; built 2026-10-15 in the server's front door and ARTIE's binding, and in the client `artie run` finds since 2026-10-17). CoAP has no header for a profile or a preference. The binding therefore carries them in CoAP options from the experimental range (65000–65535, RFC 7252 §12.2), one for one with their HTTP headers. They keep the same values and meaning, and they should be registered with IANA if this binding is adopted. Content-Formats unregistered for these media types use the experimental range too.
 
 | Core concept | CoAP binding |
 |---|---|

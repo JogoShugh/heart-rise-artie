@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>One Script, Three Bindings</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the script once, then the two runs side by side, one row per step. */
+:root { --bg:#f6f5f1; --fg:#1d221f; --muted:#5f6a63; --surface:#fff; --rule:#dcdcd4; --code-bg:#f0efe9; --leaf:#2f7d4f; --mark:#e6efe0; --mark-fg:#1f5a36;
+  --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace; --display:"Literata",Georgia,serif; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#131816; --fg:#e4e8e3; --muted:#97a39c; --surface:#1b211e; --rule:#2e3732; --code-bg:#1f2622; --leaf:#7fcf98; --mark:#24402e; --mark-fg:#bfe8cc; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#131816; --fg:#e4e8e3; --muted:#97a39c; --surface:#1b211e; --rule:#2e3732; --code-bg:#1f2622; --leaf:#7fcf98; --mark:#24402e; --mark-fg:#bfe8cc; color-scheme:dark; }
+body { background:var(--bg); color:var(--fg); margin:0; font:15px/1.55 var(--body); }
+main { max-width:1100px; margin:0 auto; padding-block:2rem 4rem; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font:650 2rem/1.15 var(--display); margin:0 0 .4rem; text-wrap:balance; }
+h2 { font:650 1.3rem var(--display); margin:2rem 0 .5rem; }
+.lede { color:var(--muted); max-width:70ch; margin:0 0 1rem; }
+.verdict { background:var(--mark); color:var(--mark-fg); border-radius:8px; padding:.8rem 1rem; max-width:72ch; }
+pre { background:var(--code-bg); border:1px solid var(--rule); border-radius:8px; padding:1rem; overflow-x:auto; font:.84rem/1.55 var(--mono); }
+.cmd { font:.85rem var(--mono); background:var(--code-bg); border:1px solid var(--rule); border-radius:6px; padding:.5rem .7rem; overflow-x:auto; white-space:pre; }
+.wrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; min-width:900px; background:var(--surface); border:1px solid var(--rule); border-radius:8px; }
+th,td { text-align:left; vertical-align:top; padding:.6rem .7rem; border-bottom:1px solid var(--rule); }
+th { font:600 .74rem var(--body); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+td.n { color:var(--muted); font-variant-numeric:tabular-nums; }
+td.same { color:var(--leaf); font-weight:600; }
+mark { background:var(--mark); color:var(--mark-fg); border-radius:3px; padding:0 .2em; }
+.out { font-weight:500; margin-top:.2rem; }
+.at { font:.78rem var(--mono); color:var(--muted); margin-top:.2rem; word-break:break-all; }
+a { color:var(--leaf); }
+.pre { max-width:72ch; }
+blockquote { margin:1rem 0; padding:.3rem 0 .3rem 1rem; border-left:3px solid var(--leaf); font:500 1.05rem/1.6 var(--display); }
+blockquote cite { display:block; font:.84rem var(--body); color:var(--muted); font-style:normal; margin-top:.4rem; }
+h3 { font:600 1rem var(--body); margin:1.4rem 0 .3rem; }
+
+</style>
+</head>
+<body>
+<main>
+<h1>One script, three bindings</h1>
+<p class="lede">The same heart-script, run three times against the garden: over plain CoAP, over coaps (CoAP secured with DTLS and a pre-shared key), and over HTTP. Only its <code>entry</code> input differed. ARTIE chose the binding from the entry's scheme; the script knows no protocol.</p>
+<section class="pre">
+<h2>Why this matters</h2>
+<p>In 2008 Roy Fielding listed the rules an API must follow before it calls itself REST, in <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a>. The first rule is about protocol:</p>
+<blockquote>A REST API should not be dependent on any single communication protocol, though its successful mapping to a given protocol may be dependent on the availability of metadata, choice of methods, etc. In general, any protocol element that uses a URI for identification must allow any URI scheme to be used for the sake of that identification. <em>[Failure here implies that identification is not separated from interaction.]</em><cite>Roy T. Fielding, “REST APIs must be hypertext-driven”, October 20, 2008, his first rule, verbatim</cite></blockquote>
+<p>Almost every API that calls itself REST fails this one before it fails anything else. Its documentation is a list of HTTP methods on URL patterns, so the API <em>is</em> its HTTP mapping. HEART is built the other way round, at every layer, and this page is the proof.</p>
+<h3>The specification</h3>
+<p>HEART's core is written in protocol-free terms (SPEC §6.0): read, act, done, a new resource brought into being, and refusals by meaning: not offered, stale, invalid input, precondition required. HTTP is one binding of those concepts. CoAP is another (SPEC §6.0.1). Each binding does exactly the work Fielding allows a mapping to need, “metadata, choice of methods”: HTTP's 201 and Location header become CoAP's 2.01 and Location-Path option; an HTTP ETag becomes a CoAP ETag option. The meaning stays the same.</p>
+<h3>The server</h3>
+<p>The garden declares itself once to the HEART library: its state, its acts, the rules that say which acts its state allows, and the reason for each one it doesn't. It has no controllers. Two front doors serve those same declarations: heart-spring over HTTP, and heart-coap's front door over CoAP on UDP. Neither knows the garden; the garden knows neither.</p>
+<h3>The client</h3>
+<p>ARTIE's core never sees a status code or a header. It talks to bindings, one per URI scheme, and each fills the same protocol-free outcome from its own protocol; a binding's own word for what happened (an HTTP status, a CoAP code) is only ever reported, never acted on. So the client meets Fielding's second sentence directly: an entry is any URI, and its scheme chooses the binding. Identification, the bed's address, is separate from interaction, how that address is reached.</p>
+<h3>The script</h3>
+<p>The heart-script DSL sits above all of that and knows only the core's concepts: select a form, follow a link, expect a new resource, expect “not offered”. It never names a protocol. Below, the same file runs three times, with only its <code>entry</code> input changed between <code>coap://</code>, <code>coaps://</code> and <code>http://</code>. Different protocols, different transports (UDP, DTLS over UDP, and TCP), different adapters on both sides, and the same eight steps, the same outcomes, and the same refusals with the same reasons.</p>
+</section>
+<h2>The result</h2>
+<p class="verdict"><b>8 of 8 steps the same, three ways</b>: the same selections, the same outcomes, the same refusals with the same reasons, the same forms offered, and the same state, except each new bed's number and name. All three runs exit 0.</p>
+<h2>The commands</h2>
+<div class="cmd">artie run tests/garden-bed.kts entry=coap://localhost:5683/  name="Bed over CoAP"
+artie run tests/garden-bed.kts entry=coaps://localhost:5784/ name="Bed over coaps"
+artie run tests/garden-bed.kts entry=http://localhost:8080/  name="Bed over HTTP"</div>
+<h2>The script</h2>
+<pre><code>// Build a bed in the garden, sow it, and show what the garden refuses: a second sowing (not
+// offered once planted) and a bed with no width (invalid input). The entry chooses the binding:
+// the same script runs over CoAP or HTTP, unchanged.
+//   artie run tests/garden-bed.kts
+//   artie run tests/garden-bed.kts entry=http://localhost:8080/
+val entry by input(default = &quot;coap://localhost:5683/&quot;)
+val name by input(default = &quot;Scripted bed&quot;)
+val seed by input(default = &quot;basil&quot;)
+
+heart(entry) {
+    expect(InvalidInput) { act(&quot;garden:build-bed&quot;, &quot;label&quot; to name, &quot;widthFt&quot; to 0, &quot;lengthFt&quot; to 8) }
+    expect(NewResource) {
+        act(&quot;garden:build-bed&quot;, &quot;label&quot; to name, &quot;widthFt&quot; to 4, &quot;lengthFt&quot; to 8) {
+            check(state[&quot;/status&quot;] == &quot;EMPTY&quot;) { &quot;a new bed should be empty&quot; }
+            act(&quot;garden:sow-seed&quot;, &quot;seedType&quot; to seed, &quot;depthCm&quot; to 2)
+            check(state[&quot;/cropName&quot;] == seed) { &quot;the bed should hold $seed&quot; }
+            expect(NotOffered) { act(&quot;garden:sow-seed&quot;, &quot;seedType&quot; to &quot;mint&quot;) }
+            note(&quot;offered once planted: ${held.offered}&quot;)
+        }
+    }
+}
+</code></pre>
+<h2>The runs, step by step</h2>
+<div class="wrap"><table><thead><tr><th>#</th><th>Over CoAP</th><th>Over coaps (DTLS)</th><th>Over HTTP</th><th>Meaning</th></tr></thead><tbody>
+<tr><td class=n>1</td><td>enter <mark>coap://localhost:5683/</mark><div class=out>done</div><div class=at>coap://localhost:5683/ · 75 ms</div></td><td>enter <mark>coaps://localhost:5784/</mark><div class=out>done</div><div class=at>coaps://localhost:5784/ · 168 ms</div></td><td>enter <mark>http://localhost:8080/</mark><div class=out>done</div><div class=at>http://localhost:8080/ · 90 ms</div></td><td class=same>same</td></tr><tr><td class=n>2</td><td>act <mark>garden:build-bed</mark>, label <mark>Bed over CoAP</mark>, widthFt <mark>0</mark>, lengthFt <mark>8</mark><div class=out>refused, invalid input, by the client: “widthFt is below 1”</div><div class=at>coap://localhost:5683/ · 0 ms</div></td><td>act <mark>garden:build-bed</mark>, label <mark>Bed over coaps</mark>, widthFt <mark>0</mark>, lengthFt <mark>8</mark><div class=out>refused, invalid input, by the client: “widthFt is below 1”</div><div class=at>coaps://localhost:5784/ · 0 ms</div></td><td>act <mark>garden:build-bed</mark>, label <mark>Bed over HTTP</mark>, widthFt <mark>0</mark>, lengthFt <mark>8</mark><div class=out>refused, invalid input, by the client: “widthFt is below 1”</div><div class=at>http://localhost:8080/ · 0 ms</div></td><td class=same>same</td></tr><tr><td class=n>3</td><td>act <mark>garden:build-bed</mark>, label <mark>Bed over CoAP</mark>, widthFt <mark>4</mark>, lengthFt <mark>8</mark><div class=out>new resource</div><div class=at>coap://localhost:5683/beds/16 · 45 ms</div></td><td>act <mark>garden:build-bed</mark>, label <mark>Bed over coaps</mark>, widthFt <mark>4</mark>, lengthFt <mark>8</mark><div class=out>new resource</div><div class=at>coaps://localhost:5784/beds/17 · 24 ms</div></td><td>act <mark>garden:build-bed</mark>, label <mark>Bed over HTTP</mark>, widthFt <mark>4</mark>, lengthFt <mark>8</mark><div class=out>new resource</div><div class=at>http://localhost:8080/beds/18 · 12 ms</div></td><td class=same>same</td></tr><tr><td class=n>4</td><td>check<div class=out>held</div><div class=at>coap://localhost:5683/beds/16 · 0 ms</div></td><td>check<div class=out>held</div><div class=at>coaps://localhost:5784/beds/17 · 0 ms</div></td><td>check<div class=out>held</div><div class=at>http://localhost:8080/beds/18 · 0 ms</div></td><td class=same>same</td></tr><tr><td class=n>5</td><td>act <mark>garden:sow-seed</mark>, seedType <mark>basil</mark>, depthCm <mark>2</mark><div class=out>done</div><div class=at>coap://localhost:5683/beds/16 · 19 ms</div></td><td>act <mark>garden:sow-seed</mark>, seedType <mark>basil</mark>, depthCm <mark>2</mark><div class=out>done</div><div class=at>coaps://localhost:5784/beds/17 · 18 ms</div></td><td>act <mark>garden:sow-seed</mark>, seedType <mark>basil</mark>, depthCm <mark>2</mark><div class=out>done</div><div class=at>http://localhost:8080/beds/18 · 16 ms</div></td><td class=same>same</td></tr><tr><td class=n>6</td><td>check<div class=out>held</div><div class=at>coap://localhost:5683/beds/16 · 0 ms</div></td><td>check<div class=out>held</div><div class=at>coaps://localhost:5784/beds/17 · 0 ms</div></td><td>check<div class=out>held</div><div class=at>http://localhost:8080/beds/18 · 0 ms</div></td><td class=same>same</td></tr><tr><td class=n>7</td><td>act <mark>garden:sow-seed</mark>, seedType <mark>mint</mark><div class=out>refused, not offered, by the client: “The bed is already planted.”</div><div class=at>coap://localhost:5683/beds/16 · 0 ms</div></td><td>act <mark>garden:sow-seed</mark>, seedType <mark>mint</mark><div class=out>refused, not offered, by the client: “The bed is already planted.”</div><div class=at>coaps://localhost:5784/beds/17 · 0 ms</div></td><td>act <mark>garden:sow-seed</mark>, seedType <mark>mint</mark><div class=out>refused, not offered, by the client: “The bed is already planted.”</div><div class=at>http://localhost:8080/beds/18 · 0 ms</div></td><td class=same>same</td></tr><tr><td class=n>8</td><td>return to <mark>coap://localhost:5683/</mark><div class=out>done</div><div class=at>coap://localhost:5683/ · 2 ms</div></td><td>return to <mark>coaps://localhost:5784/</mark><div class=out>done</div><div class=at>coaps://localhost:5784/ · 3 ms</div></td><td>return to <mark>http://localhost:8080/</mark><div class=out>done</div><div class=at>http://localhost:8080/ · 1 ms</div></td><td class=same>same</td></tr>
+</tbody></table></div>
+<h2>Each run's own report</h2>
+<p><a href="coap/index.html">Over CoAP</a> · <a href="coaps/index.html">Over coaps</a> · <a href="http/index.html">Over HTTP</a></p>
+</main>
+</body>
+</html>

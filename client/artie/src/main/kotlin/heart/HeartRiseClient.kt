@@ -10,6 +10,9 @@ interface HeartRiseClient {
     /** The rung [current] arrived at, from its Preference-Applied header (SPEC §6.11.1). Null before enter(). */
     val appliedRung: Rung?
 
+    /** Whether the last act brought a resource into being, which [current] now is (SPEC §6.0, "New resource"). */
+    val broughtIntoBeing: Boolean get() = false
+
     /**
      * Reads the service index at [url] as a JSON Home document (SPEC §6.11.1)
      * and from then on asks for the best dialect and rung it offers, up to

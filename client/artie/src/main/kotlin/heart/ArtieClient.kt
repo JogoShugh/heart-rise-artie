@@ -45,6 +45,9 @@ class ArtieClient(
     override var appliedRung: Rung? = null
         private set
 
+    override var broughtIntoBeing: Boolean = false
+        private set
+
     /** The rendering asked for: the client's own ([dialect], [rung]), or less if discovery found less. */
     private var asking = Rendering(dialect, rung)
 
@@ -72,6 +75,7 @@ class ArtieClient(
             }
         // HAL-SCHEMA-FORMS-HR Rule 8: a value outside the form's choices is never sent.
         choices(rel)?.violations(payload)?.takeIf { it.isNotEmpty() }?.let { throw NotAChoice(rel, it) }
+        broughtIntoBeing = false
         if (form.method != "GET") return act(rel, payload, resendAllowed = true)
         // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
         // template a target; it puts the fields in the query (mutate-action-URL).
@@ -125,6 +129,7 @@ class ArtieClient(
         val act = Act(targetOf(form, held, payload), form.method, form.contentType, payload.toString(), validator)
         val outcome = bindings.forUri(act.url).act(act, asking)
         decisions.actSent(rel, act, held.url, outcome)
+        broughtIntoBeing = outcome is Outcome.Done && outcome.newResource != null
         // SPEC §6.0, "New resource": the act brought a resource into being, and the client holds it next:
         // the answer itself when it represents that resource, else read at its own address.
         if (outcome is Outcome.Done) return outcome.newResource?.let { made ->

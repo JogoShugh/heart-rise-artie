@@ -142,6 +142,12 @@ mark.rr-param { background: var(--mark); color: var(--mark-fg); font-family: var
 .rr-section-title { font: 650 1.05rem var(--display); margin: 0; }
 .rr-section-note { margin: 0.1rem 0 0.5rem; font-size: 0.84rem; color: var(--muted); }
 .rr-section .rr-tiles { margin-bottom: 0; }
+/* The script that made the trace, when the report is given one: as written, collapsible. */
+.rr-script { margin: 0 0 1.4rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+.rr-script summary { cursor: pointer; padding: 0.6rem 0.9rem; font-weight: 600; font-size: 0.92rem; }
+.rr-script summary code { font: 500 0.88rem var(--mono); }
+.rr-script pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); border-top: 1px solid var(--rule);
+  border-radius: 0 0 8px 8px; font: 0.84rem/1.55 var(--mono); }
 /* The JSON viewer (json-view.js): collapsed boxes, line diffs, unchanged runs folded behind buttons. */
 /* A column of boxes. */
 .stack { display: grid; gap: 0.5rem; min-width: 0; }
@@ -29118,8 +29124,54 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   };
   // RFC 9457: a problem document says type, title and status.
   const problem = (body) => !!body && typeof body === "object" && "type" in body && "title" in body && "status" in body;
+
+  // Two kinds of trace. An HTTP trace (live/github scripts) holds each exchange: request, response, status.
+  // A neutral trace (heart-script's, any binding) holds HEART's outcome by meaning: "done", "new resource",
+  // "refused" with its kind and side, "held" or "failed" for a check; the address the client was then at;
+  // and what it held there (now: state, forms, links). These accessors read either.
+  const neutral = (step) => !step.response;
+  const verbOf = (step) => (step.say || "").split(/[\s,]/)[0];
+  const reads = (step) => (neutral(step) ? ["enter", "follow", "return"].includes(verbOf(step)) : step.request.method === "GET");
+  const urlOf = (step) => (neutral(step) ? step.address || "" : step.request.url);
+  // What the step answered with, as a HAL-shaped body so counts and forms read it alike.
+  const bodyOf = (step) => {
+    if (!neutral(step)) return step.response.body;
+    if (!step.now) return undefined;
+    const forms = Object.fromEntries((step.now.forms || []).map((f) => [f, {}]));
+    const links = Object.fromEntries(Object.entries(step.now.links || {}).map(([rel, titles]) =>
+      [rel, titles.map((title) => (title === null ? {} : { title }))]));
+    return { ...step.now.state, _forms: forms, _links: links };
+  };
+  // The answer as one key: the status for HTTP, the outcome (and refusal kind) for a neutral trace.
+  const answerKey = (step) => (neutral(step)
+    ? (step.refused ? `refused: ${step.refused.kind}` : step.outcome)
+    : String(step.response.status));
+  // What the step expected: a status or "2xx" for HTTP; words for a neutral trace ("done" when unsaid).
+  const wantOf = (step) => (neutral(step)
+    ? step.expect || (step.outcome === "held" || step.outcome === "failed" ? "held" : "done")
+    : step.expect === undefined || step.expect === "2xx" ? "2xx" : Number(step.expect));
+  const NEUTRAL_MADE = ["done", "new resource", "unchanged"];
+  const wantsRefusal = (step) => (neutral(step) ? !NEUTRAL_MADE.includes(wantOf(step)) && wantOf(step) !== "held"
+    : typeof wantOf(step) === "number" && wantOf(step) >= 400);
+  const wantsCreation = (step) => (neutral(step) ? wantOf(step) === "new resource" : wantOf(step) === 201);
+  // A neutral "done" also meets "unchanged" here: the test add-on judged that when the run happened.
+  const neutralMet = (step) => {
+    const want = wantOf(step);
+    if (step.refused) return want === step.refused.kind;
+    if (want === "unchanged") return step.outcome === "done";
+    return want === step.outcome;
+  };
+
   const summary = (step) => {
     if (step.summary) return step.summary;
+    if (neutral(step)) {
+      const planned = step.expect && expected(step) ? " as planned" : "";
+      if (step.refused) return `Refused${planned} by ${step.refused.by}, ${step.refused.kind}: ${step.refused.detail}`;
+      if (step.outcome === "held" || step.outcome === "failed") return step.outcome === "held" ? "The check held." : "The check failed.";
+      const what = step.outcome === "new resource" ? `A new resource, ${pathOf(step.address)}.`
+        : reads(step) ? "Read." : "Done.";
+      return `${what} ${counts(bodyOf(step))}`.trim();
+    }
     const res = step.response, body = res.body, method = step.request.method;
     if (problem(body)) {
       const planned = typeof step.expect === "number" && step.expect === res.status;
@@ -29157,7 +29209,30 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     return node;
   };
 
-  const detail = (step) => {
+  // A neutral step's drill-down: where the client was, the values it gave, and what it then held, as what
+  // changed when it held the same resource the step before.
+  const neutralDetail = (step, index) => {
+    const body = el("div", "rr-detail");
+    const lines = el("div", "rr-lines");
+    lines.dataset.kind = "lines";
+    const values = Object.entries(step.params || {}).map(([k, v]) => `${k}: ${typeof v === "string" ? v : JSON.stringify(v)}`);
+    lines.append(line("asked", [verbOf(step), ...values].join("   ")),
+      line("answer", [answerKey(step), step.address].filter(Boolean).join("   ")));
+    body.append(lines);
+    const fields = Object.fromEntries(Object.entries(step.params || {}).filter(([k]) => k !== "relation"));
+    if (Object.keys(fields).length) body.append(box("request", { a: fields, labelA: "the values given", summary: "Values given" }));
+    if (step.now) {
+      const prior = trace.steps.slice(0, index).reverse().find((s) => s.now && s.address === step.address);
+      body.append(box("response", prior
+        ? { a: prior.now.state, b: step.now.state, labelA: "the state before", labelB: "the state now",
+            summary: "State, as what it changed" }
+        : { a: step.now.state, labelA: "the state", summary: "State held" }));
+    }
+    return body;
+  };
+
+  const detail = (step, index) => {
+    if (neutral(step)) return neutralDetail(step, index);
     const body = el("div", "rr-detail");
     const lines = el("div", "rr-lines");
     lines.dataset.kind = "lines";
@@ -29198,13 +29273,13 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     const ask = el("div", "rr-ask");
     ask.append(el("span", `rr-mode ${step.mode === "intent" ? "intent" : "script"}`, step.mode === "intent" ? "intent" : "script"), sentence(step));
     const answer = el("div", "rr-answer");
-    const badge = el("span", statusClass(step), String(step.response.status));
-    badge.title = expected(step) ? "as the step expected" : `the step expected ${step.expect}`;
+    const badge = el("span", statusClass(step), neutral(step) ? (step.refused ? "refused" : step.outcome) : String(step.response.status));
+    badge.title = expected(step) ? "as the step expected" : `the step expected ${wantOf(step)}`;
     answer.append(badge, el("span", null, ` ${summary(step)}`));
     head.append(el("span", "rr-n", String(index + 1)), time, ask, answer);
     item.append(head);
     item.addEventListener("toggle", () => {
-      if (item.open && !item.dataset.rendered) { item.dataset.rendered = "1"; item.append(detail(step)); applyAll(item); }
+      if (item.open && !item.dataset.rendered) { item.dataset.rendered = "1"; item.append(detail(step, index)); applyAll(item); }
     });
     return item;
   };
@@ -29242,12 +29317,16 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
 
   // ---- Summary tiles: the run at a glance; a tile that can filters the rows to its steps. ----
   const pathOf = (url) => { try { const u = new URL(url, "http://x"); return u.pathname + u.search; } catch { return url; } };
-  const expected = (step) => step.expect === undefined || step.expect === "2xx"
-    ? step.response.status < 300 : step.response.status === Number(step.expect);
-  const refused = (step) => step.response.status >= 400;
-  const created = (step) => step.response.status === 201;
-  const relationOf = (step) => (step.params && step.params.relation) || (step.request.method === "GET" ? "follow" : step.request.method);
-  const resourceOf = (step) => pathOf(step.request.url).split("?")[0].split("/actions/")[0];
+  function expected(step) {
+    if (neutral(step)) return neutralMet(step);
+    return step.expect === undefined || step.expect === "2xx"
+      ? step.response.status < 300 : step.response.status === Number(step.expect);
+  }
+  const refused = (step) => (neutral(step) ? !!step.refused : step.response.status >= 400);
+  const created = (step) => (neutral(step) ? step.outcome === "new resource" : step.response.status === 201);
+  const relationOf = (step) => (step.params && step.params.relation)
+    || (neutral(step) ? verbOf(step) : step.request.method === "GET" ? "follow" : step.request.method);
+  const resourceOf = (step) => pathOf(urlOf(step)).split("?")[0].split("/actions/")[0];
 
   // Every address an answer hands the client: hrefs and form targets anywhere in it, and Location headers.
   const addresses = (body, into) => {
@@ -29271,6 +29350,15 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
   // knew beforehand: its entry points.
   const provenance = () => {
     const known = new Set(), entries = new Set(), fromServer = new Set();
+    // A neutral trace's selections are by relation, on what the client holds: only an entry is an address
+    // the script knew. Every other step's address came from the server, or was one it already held.
+    if (trace.steps.every(neutral)) {
+      trace.steps.forEach((step, i) => {
+        if (verbOf(step) === "enter") entries.add(String((step.params || {}).entry || step.address));
+        else fromServer.add(i);
+      });
+      return { entries, fromServer };
+    }
     trace.steps.forEach((step, i) => {
       if (step.held) {
         if (!fits(step.held.url, known)) entries.add(pathOf(step.held.url));
@@ -29341,9 +29429,9 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     // Outcome
     const indexes = (test) => steps.map((st, i) => (test(st) ? i : -1)).filter((i) => i >= 0);
     const misses = indexes((st) => !expected(st));
-    const wantStatus = (st) => (st.expect === undefined || st.expect === "2xx" ? "2xx" : Number(st.expect));
-    const wantRefused = indexes((st) => typeof wantStatus(st) === "number" && wantStatus(st) >= 400);
-    const wantCreated = indexes((st) => wantStatus(st) === 201);
+    const wantStatus = wantOf;
+    const wantRefused = indexes(wantsRefusal);
+    const wantCreated = indexes(wantsCreation);
     Object.assign(facts, { misses: misses.length, wantRefused: wantRefused.length, wantCreated: wantCreated.length });
     const outcome = tile("Outcome", misses.length ? `✗ ${misses.length} of ${n}` : `✓ ${n} / ${n}`,
       misses.length ? `unexpected: ${numbered(misses)}` : "as expected",
@@ -29352,11 +29440,12 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       `expected: ${n - wantRefused.length - wantCreated.length} succeed, ${wantCreated.length} create, ` +
       `${wantRefused.length} refused on purpose`));
     // Steps
-    const follows = steps.filter((s) => s.request.method === "GET").length;
+    const follows = steps.filter(reads).length;
     const intents = steps.filter((s) => s.mode === "intent").length;
+    const checks = steps.filter((s) => neutral(s) && verbOf(s) === "check").length;
     Object.assign(facts, { follows, intents });
-    box.append(tile("Steps", String(n), `${plural(n - follows, "act")} · ${plural(follows, "follow")} · ` +
-      `${intents} intent / ${n - intents} script`));
+    box.append(tile("Steps", String(n), `${plural(n - follows - checks, "act")} · ${plural(follows, "follow")} · ` +
+      (checks ? `${plural(checks, "check")} · ` : "") + `${intents} intent / ${n - intents} script`));
     // Duration
     const times = steps.map((s) => s.at && new Date(s.at)).filter(Boolean);
     if (times.length) {
@@ -29365,35 +29454,40 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     }
     // Answers: a stacked bar, one segment per status, each a filter.
     const byStatus = {};
-    steps.forEach((s) => { byStatus[s.response.status] = (byStatus[s.response.status] || 0) + 1; });
+    steps.forEach((s) => { byStatus[answerKey(s)] = (byStatus[answerKey(s)] || 0) + 1; });
     const bar = el("span", "rr-bar"), legend = el("span", "rr-tile-note");
-    Object.entries(byStatus).sort(([a], [b]) => a - b).forEach(([status, count]) => {
-      const fine = steps.every((st) => st.response.status !== Number(status) || expected(st));
-      const planned = Number(status) >= 400 && fine;
+    const order = ([a], [b]) => (isNaN(a) || isNaN(b) ? a.localeCompare(b) : a - b);
+    Object.entries(byStatus).sort(order).forEach(([status, count]) => {
+      const sameKey = (s) => answerKey(s) === status;
+      const fine = steps.every((st) => !sameKey(st) || expected(st));
+      const planned = steps.some((st) => sameKey(st) && refused(st)) && fine;
       const seg = el("button", `rr-seg ${fine ? "ok" : "bad"}`);
       seg.type = "button";
       seg.style.flexGrow = count;
       seg.title = `${status} × ${count}`;
-      seg.addEventListener("click", (e) => { e.stopPropagation(); filterBy(`Status ${status}`, (s) => s.response.status === Number(status)); });
+      seg.addEventListener("click", (e) => { e.stopPropagation(); filterBy(status, sameKey); });
       bar.append(seg);
       const key = el("button", `rr-key ${fine ? "ok" : "bad"}`, `${status} ×${count}${planned ? " as planned" : fine ? "" : " unexpected"}`);
       key.type = "button";
-      key.addEventListener("click", (e) => { e.stopPropagation(); filterBy(`Status ${status}`, (s) => s.response.status === Number(status)); });
+      key.addEventListener("click", (e) => { e.stopPropagation(); filterBy(status, sameKey); });
       legend.append(key);
     });
     const answers = tile("Answers", "", legend);
     answers.querySelector(".rr-tile-value").replaceWith(bar);
     answers.classList.add("wide");
     box.append(judge(answers, misses.length, n, misses.length
-      ? `unexpected: ${firstFew(misses.map((i) => `#${i + 1} got ${steps[i].response.status}, expected ${wantStatus(steps[i])}`))}`
-      : "expected: every status as the run said"));
+      ? `unexpected: ${firstFew(misses.map((i) => `#${i + 1} got ${answerKey(steps[i])}, expected ${wantStatus(steps[i])}`))}`
+      : "expected: every answer as the run said"));
     // Created
     const made = steps.filter(created);
     const madeAt = indexes(created);
     facts.created = madeAt.length;
     const createMisses = wantCreated.filter((i) => !madeAt.includes(i)).length + madeAt.filter((i) => !wantCreated.includes(i)).length;
     box.append(judge(tile("Created", String(made.length),
-      made.map((st) => { const loc = header(st.response, "Location") || ""; return loc.split("/").slice(-2).join("/"); }).join(", ") || "nothing",
+      made.map((st) => {
+        const loc = (neutral(st) ? st.address : header(st.response, "Location")) || "";
+        return loc.split("/").slice(-2).join("/");
+      }).join(", ") || "nothing",
       made.length ? () => filterBy("Created", created) : undefined),
       createMisses, Math.max(wantCreated.length, madeAt.length, 1),
       `expected ${wantCreated.length} created${wantCreated.length ? ` (${numbered(wantCreated)})` : ""} · got ${madeAt.length}`));
@@ -29401,6 +29495,11 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     const no = steps.filter(refused);
     const why = {};
     no.forEach((s) => {
+      if (neutral(s)) {
+        const k = `${s.refused.kind}, by ${s.refused.by}`;
+        why[k] = (why[k] || 0) + 1;
+        return;
+      }
       const kind = s.response.status === 409 ? "not offered" : s.response.status === 412 ? "stale"
         : s.response.status === 428 ? "no validator" : s.response.status === 422 ? "invalid" : String(s.response.status);
       why[`${s.response.status} ${kind}`] = (why[`${s.response.status} ${kind}`] || 0) + 1;
@@ -29439,22 +29538,29 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     // Hypermedia: requests whose address came from the server.
     const { entries, fromServer } = provenance();
     Object.assign(facts, { fromServer: fromServer.size, entries: [...entries] });
-    const hyper = tile("Hypermedia", `${fromServer.size} / ${n}`,
+    // A script's own entry is its bookmark, the one address it may know: not judged.
+    const entering = steps.filter((s) => neutral(s) && verbOf(s) === "enter").length;
+    const judged = n - entering;
+    facts.hyperOf = judged;
+    const hyper = tile("Hypermedia", `${fromServer.size} / ${judged}`,
       `from the server · ${plural(entries.size, "entry address", "entry addresses")}`,
-      fromServer.size < n ? () => filterBy("Not from the server", (st, i) => !fromServer.has(i)) : undefined);
-    box.append(judge(hyper, n - fromServer.size, n, "expected: every address from a link, a form or a Location"));
+      fromServer.size < judged ? () => filterBy("Not from the server", (st, i) => !fromServer.has(i)) : undefined);
+    box.append(judge(hyper, judged - fromServer.size, judged,
+      entering ? "expected: every address after the entry from the server" : "expected: every address from a link, a form or a Location"));
     // Controls seen
-    const formCounts = steps.map((s) => s.response.body && typeof s.response.body === "object"
-      ? Object.keys(s.response.body._forms || s.response.body._templates || {}).length : null).filter((c) => c !== null);
+    // Where the most and the fewest were offered: a step and the resource it answered with.
+    const formsOf = (st) => {
+      const b = bodyOf(st);
+      return b && typeof b === "object" ? Object.keys(b._forms || b._templates || {}).length : null;
+    };
+    const formCounts = steps.map(formsOf).filter((c) => c !== null);
     const explained = steps.filter((s) => s.explanation).length;
     facts.formsMin = formCounts.length ? Math.min(...formCounts) : 0;
     facts.formsMax = formCounts.length ? Math.max(...formCounts) : 0;
-    // Where the most and the fewest were offered: a step and the resource it answered with.
-    const formsOf = (st) => (st.response.body && typeof st.response.body === "object"
-      ? Object.keys(st.response.body._forms || st.response.body._templates || {}).length : null);
     const where = (count) => {
       const i = steps.findIndex((st) => formsOf(st) === count);
-      return i < 0 ? "" : `step #${i + 1}, ${pathOf(header(steps[i].response, "Content-Location") || steps[i].request.url).split("/actions/")[0]}`;
+      const at = neutral(steps[i] || {}) ? urlOf(steps[i]) : i >= 0 && (header(steps[i].response, "Content-Location") || steps[i].request.url);
+      return i < 0 ? "" : `step #${i + 1}, ${pathOf(at).split("/actions/")[0]}`;
     };
     facts.formsMaxAt = where(facts.formsMax);
     facts.formsMinAt = where(facts.formsMin);
@@ -29495,8 +29601,8 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
       "Times are absolute and shown in your own time zone. Waits between steps count too, such as a client reading again until the server has settled.",
       "Not judged."],
     "Answers": (f) => [
-      "Every answer's HTTP status, as a bar: the wider a segment, the more steps got that status.",
-      "2xx: done (200 read or acted, 201 created). 4xx: refused (409 not offered now, 412 stale, 422 a body the form doesn't allow, 428 no validator sent).",
+      "Every answer, as a bar: the wider a segment, the more steps got that answer. An HTTP trace shows statuses; a script's trace shows HEART's outcomes, which name no protocol.",
+      "2xx or done: done (200 read or acted, 201 or new resource: created). 4xx or refused: refused (409 or not offered, 412 or stale, 422 or invalid input, 428 no validator sent). A check holds or fails.",
       f.misses ? `Here ${f.misses} statuses differ from what their steps expected.` : "Here every status is the one its step expected.",
       "Tap a status to show only those steps."],
     "Created": (f) => [
@@ -29519,7 +29625,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     "Hypermedia": (f) => [
       "Did the client get every address from the server?",
       "HEART's rule: a client starts from a known entry address and from then on uses only addresses the server hands it, in a link, a form's target, or a Location header. This counts the requests whose address came from an earlier answer.",
-      `Here ${f.fromServer} of ${f.n}, from ${f.entries.length} entry address${f.entries.length === 1 ? "" : "es"}: ${f.entries.join(", ")}.`,
+      `Here ${f.fromServer} of ${f.hyperOf}, from ${f.entries.length} entry address${f.entries.length === 1 ? "" : "es"}: ${f.entries.join(", ")}.`,
       "Green: no address was built or guessed by the client."],
     "Forms offered": (f) => [
       "How many acts each answer offered, as forms: the things the client may do now.",

@@ -45,6 +45,29 @@ class CoapsSteps(private val ctx: ClientContext) {
         ctx.lastError = runCatching { ctx.client.enter(coaps.url) }.exceptionOrNull()
     }
 
+    private val env = mutableMapOf<String, String>()
+    private var answer: heart.script.Answer? = null
+
+    @Given("the environment holds the coaps service's key for {string}")
+    fun environmentKey(identity: String) {
+        val names = heart.EnvironmentCredentials.namesFor(heart.Origin.of(coaps.url))
+        env[names.pskIdentity] = identity
+        env[names.pskKey] = java.util.Base64.getEncoder().encodeToString(KEY)
+    }
+
+    @When("a script host's ARTIE enters the coaps bed")
+    fun hostEnters() {
+        val home = java.nio.file.Files.createTempDirectory("artie-home")
+        answer = heart.ArtieNavigatorProvider.standard(env, home).enter(coaps.url)
+    }
+
+    @Then("it holds the bed, {string}, offered {string}")
+    fun holdsBed(status: String, offered: String) {
+        val done = answer as? heart.script.Answer.Done ?: error("not read: $answer")
+        val state = done.now.state["status"]?.toString()?.trim('"')
+        assertEquals(status to setOf(offered), state to done.now.offered)
+    }
+
     @Then("the coaps service received {int} request(s)")
     fun received(count: Int) = assertEquals(count, coaps.requests.size)
 

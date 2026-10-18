@@ -65,13 +65,52 @@ several rounds; under challenge, not yet committed to. Decided so far:
   `client/scripts/tests/`.
 - A model key, for `reason(…)` and the live reasoner run: `ANTHROPIC_API_KEY`
   in the environment first, else an entry in `~/.artie/credentials`; never
-  stored by ARTIE, never printed (today ClaudeReasoner is handed its key; no
-  source reads one yet).
+  stored by ARTIE, never printed. Built 2026-10-17 as `ModelKey.standard`;
+  it says where a key came from, never its value.
 - heart-mcp in step 3: both a scripted MCP host (repeatable, no model) and
   Claude Code as the host, asked in words.
 - Order: step 1 first (done 2026-10-17), then the DSL, the test add-on and
   `artie run`; a commit at each step. Java 25 and the typed layer's choices
   wait in `spec/ideas/`.
+
+**Built (2026-10-17), not yet committed:**
+
+- `heart-script`: the DSL (`heart`, `act`, `follow`, blocks that visit and
+  return, `check`, `note`, `until`, `members`, inputs and `ask`), its
+  `Navigator` contract found by ServiceLoader, and the trace in the
+  heart-run-report format, written by meaning: outcome, refusal kind and
+  side, what the client held. A missing link or an act the manifest lacks is
+  refused by the client, traced, before anything is sent.
+- `heart-script-test`: `expect(kind) { … }` for `Done`, `NewResource`,
+  `Unchanged` and each refusal; a test failure exits 1.
+- ARTIE implements the contract (`ArtieNavigator`), registered for
+  ServiceLoader, over http, https, coap and coaps; a network failure is
+  "unreachable", exit 4.
+- `artie run` (`client/artie-cli`, installed with `installDist`): inputs,
+  `--inputs` (JSON, YAML), `--inputs-of` (with inline questions counted),
+  `--interactive`, `--entry`, `--trace`, `--report` (the run report, with the
+  script in it), `--quiet`, `--output json`; exit codes 0 to 5. It checks for
+  Java 22 or newer before starting.
+- The run report reads script traces as well as HTTP ones.
+- Live: `client/scripts/tests/github-comment.kts` through the GitHub gateway
+  on JogoShugh/heart-github-test; `client/scripts/tests/garden-bed.kts` over
+  coap, coaps and http, unchanged, with only its `entry` input differing
+  (`docs/reports/heart-script-garden/both.html`).
+- `--rung L0|L1|L2` pins the rung through the contract (`NavigatorProvider.navigator(rung)`);
+  checked live against the garden (`Prefer` sent, affordance sets and schemas fetched at L2).
+- ARTIE checks a script's fields against the form's schema before sending: a value the
+  schema doesn't allow is refused by the client, nothing sent; a server's 422 is refused by
+  the server. An entry with no binding stops the run before its first request (exit 2).
+- Live: `client/scripts/tests/github-pulls.kts`, read-only: merge offered on a ready pull
+  request, refused on a draft with the gateway's reason.
+- `reason("…")`: one step. The client's reasoner chooses one selection from what is offered
+  (a form with its fields, or a link); ARTIE checks it against the manifest and the form's schema,
+  then makes it; the trace records an intent step, the words as said and the choice as its values.
+  `--reasoner claude` allows it, the key from `ModelKey`; without `--reasoner` a script that
+  reasons stops before its first request (exit 2); with no key, the step is refused, saying where
+  a key goes. Live: `client/scripts/tests/garden-reason.kts` over CoAP, Claude choosing
+  `garden:sow-seed` with `seedType` basil and `depthCm` 2 from "plant some basil in it, about two
+  centimetres deep".
 
 ### 3. Live: ARTIE scripted, ARTIE reasoning, heart-mcp (phase 11b)
 
@@ -239,16 +278,16 @@ act("github:close", "state_reason" to ask("Reason to close?", default = "complet
 Installed with the client (Gradle `installDist`); no Gradle at run time.
 
 ```
-artie run <script.main.kts> [name=value …] [options]
+artie run <script.kts> [name=value …] [options]
 
   name=value              an input
   --inputs <file>         more inputs, JSON or YAML; name=value wins
-  --inputs-of             list the script's inputs and questions, and exit
+  --inputs-of             list the script's inputs and questions (inline ones counted), and exit
   --interactive           let the run ask a person (off by default)
   --entry <uri>           another entry than the script's (an environment, CoAP …)
   --rung L0|L1|L2         pin the rung; default: the best both sides share
   --reasoner <name>       allow reason(…) steps to call a model (off by default)
-  --report <dir>          also build the run report (heart-run-report)
+  --report <dir>          also build the run report (heart-run-report), the script shown in it
   --trace <file>          the trace (default ./runs/<script>-<time>.trace.json)
   --quiet | --output json one summary line, or JSON for CI
 ```

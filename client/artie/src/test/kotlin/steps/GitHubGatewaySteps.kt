@@ -10,7 +10,8 @@ import java.nio.file.Path
 
 /** github-gateway.feature: the GitHub gateway and a small GitHub, in process, for ARTIE to drive. */
 class GitHubGatewaySteps(private val ctx: ClientContext) {
-    private val github = GitHubUpstream()
+    /** The small GitHub, as it stands: other steps read it after a run. */
+    val github = GitHubUpstream()
 
     @Given("a small GitHub knows these callers")
     fun callers(table: DataTable) =
