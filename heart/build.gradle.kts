@@ -45,14 +45,17 @@ subprojects {
                 // When the tests did not run (a server compiling this module, or a build
                 // that stopped before them), the result file is an older run's: nothing to log.
                 if (!tasks.named("test").get().state.executed) return@doLast
-                val resultFile = fileTree("build/test-results/test") { include("TEST-*RunCucumberTest.xml") }
-                    .files.singleOrNull()
-                if (resultFile == null) {
+                // Every runner's results, summed: a module may run its features in more than one runner
+                // (the gateway's own features, its GitHub TCK, the lamp TCK), and a failure in any is a failure.
+                val resultFiles = fileTree("build/test-results/test") { include("TEST-*.xml") }.files
+                if (resultFiles.isEmpty()) {
                     logFile.appendText("$timestamp BDD_RUN FAIL module=$module reason=no-results\n")
                     return@doLast
                 }
-                val xml = resultFile.readText()
-                fun attr(name: String) = Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1) ?: "0"
+                val xmls = resultFiles.map { it.readText() }
+                fun attr(name: String) = xmls.sumOf { xml ->
+                    Regex("""$name="(\d+)"""").find(xml)?.groupValues?.get(1)?.toInt() ?: 0
+                }.toString()
                 val status = if (attr("failures") == "0" && attr("errors") == "0") "PASS" else "FAIL"
                 logFile.appendText(
                     "$timestamp BDD_RUN $status module=$module total=${attr("tests")} " +
