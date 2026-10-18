@@ -1,7 +1,7 @@
 # Plan: members that are only links become links (gateway)
 
-Drafted 2026-10-18, revised the same day with the author. Not started. Waits on a precursor:
-`_embedded`, done properly across all of HEART (its own plan, next).
+Drafted 2026-10-18, revised the same day with the author. Built the same day: 92fdc40, 4bbeb1f, 8e03b4b, 2efcc27, 6f034e5; SPEC §6.1 "Links are links, not data". Its
+precursor, `_embedded` across HEART (spec/PLAN-HAL-EMBEDDED.md), was built first.
 
 ## The problem
 

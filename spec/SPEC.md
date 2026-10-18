@@ -56,6 +56,8 @@
 
 - **Explaining absence (§6.12).** Decided 2026-10-10. An affordance set MAY link, with `integrity`, to a resource that lists the acts absent in this state and why. The client fetches it only when asked why, and never acts on it.
 
+- **Links are links, not data (§6.1).** Decided 2026-10-18 (`spec/PLAN-GATEWAY-URL-LINKS.md`). A member whose value is only a link belongs in `_links`, typed; a nested resource in `_embedded`. A link to a HEART resource names its profile by HAL's link `profile`, never a media-type parameter. Every relation used is described in the profile. The gateway lifts an upstream's link members by its connector, never by scanning data.
+
 - **Embedded resources, the HAL way (§6.1, §6.11).** Decided 2026-10-18 (`spec/PLAN-HAL-EMBEDDED.md`). A Layer 1 representation MAY carry HAL's `_embedded`: link relations to resource objects, each with its own `self`, state and links. Only resources are embedded; nested data with no address of its own stays state. Embedded resources carry no forms, though HAL Schema Forms allows them: every act needs `If-Match`, and an embedded copy has no `ETag`, so a client follows an embedded resource to act on it, and following always fetches. Clients take exactly `_links`, `_embedded`, `_forms` and `_templates` out of state. A collection MAY embed its items beside its `item` links.
 
 **Changes since 0.3:**
@@ -351,6 +353,14 @@ A client SHALL expand a CURIE key through `curies` before comparing it, so the f
 - `_embedded` is not state. Template pointers (§6.9.1) and `hr:options` pointers resolve against the owning resource's state and never reach into it. A client takes exactly four members out of the body to find the state: `_links`, `_embedded`, `_forms` and `_templates`. Any other member, whatever its name, is state.
 - Layer 2 is unchanged: affordance sets carry no per-resource data, embedded or not.
 - The OpenAPI twin's plain JSON keeps the state as it is: an embedded resource stays where the state holds it, as a plain member, without links.
+
+**Links are links, not data (decided 2026-10-18).** A member whose value is only a link belongs in `_links`, not in the state; a nested object that is a resource of its own belongs in `_embedded`. A client finds what it can do next in the hypermedia controls, never by guessing which strings in the data are addresses.
+
+- A server SHOULD NOT put a link in the state as a plain member (GitHub's `comments_url`, `html_url`).
+- A link SHOULD carry `type`, the media type of what it leads to. A link to a HEART resource carries `type: application/hal+json` and HAL's link `profile`, the dialect's profile URI, as the affordance-set link does. It SHALL NOT name the profile in a media-type parameter (`application/hal+json;profile=…`), which this specification withdrew (§6.1).
+- A URI template is a link with `templated: true`.
+- Every relation a representation uses, in its links and what it embeds, SHOULD be described in its profile.
+- A gateway applies this to an upstream's answers by its connector: only the members the connector names are read as links, and no other data is scanned for addresses (`spec/PLAN-GATEWAY-URL-LINKS.md`).
 
 **Affordance Set (Layer 2).** The complete set of transitions currently legal on the resource, in whichever dialect was negotiated. Each affordance entry SHALL contain, at minimum: a `rel`/name, a target `href` (which MAY be a URI Template — see §6.9), an HTTP method, and either an inline schema or a schema-by-reference pointer, depending on `Prefer` (§6.4).
 
