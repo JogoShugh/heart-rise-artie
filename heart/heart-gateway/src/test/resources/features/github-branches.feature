@@ -34,6 +34,16 @@ Feature: Branches, commits and new pull requests, from acts a branch offers
     When "ada" gets "/repos/acme/rockets" through the GitHub gateway
     Then the answer links "github:repos-list-branches" to "/repos/acme/rockets/branches"
 
+  Scenario: A repository's branches are listed, each linked by its name
+    GitHub lists branches without their own addresses: the list's path names
+    the repository, and each item names its branch.
+    When "ada" gets "/repos/acme/rockets/branches" through the GitHub gateway
+    Then the GitHub gateway answers 200
+    And the answer lists
+      | href                              | title |
+      | /repos/acme/rockets/branches/main | main  |
+      | /repos/acme/rockets/branches/fix  | fix   |
+
   Scenario: The forms ask for what a person would say, not GitHub's plumbing
     When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
     Then the forms ask for these fields

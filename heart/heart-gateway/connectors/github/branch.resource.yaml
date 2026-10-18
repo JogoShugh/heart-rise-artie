@@ -8,6 +8,8 @@ search: repos/list-branches
 # A branch names its repository only in its own address: the gateway reads the read's path variables from
 # it, and keeps them in the state as hr:address.
 address: /_links/self/href
+# GitHub lists branches without their own address: each names only its branch; the list's path, the rest.
+listed: { branch: /name }
 title: /name
 filters: [protected]
 acts:

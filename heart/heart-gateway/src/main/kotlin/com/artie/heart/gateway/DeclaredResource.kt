@@ -98,7 +98,7 @@ internal class DeclaredResource(
         perform = { checked, name, input -> perform(checked, declared.acts.first { actName(it) == name }, input.json) },
         search = listing?.let { search -> { values -> find(search, values) } },
         lists = declared.lists.map { spec.route(it) }.associate { list ->
-            list.operation.relation to { at -> pages(ItemPath.fill(list.path, at)) }
+            list.operation.relation to { at -> pages(ItemPath.fill(list.path, at), at) }
         },
     )
 
@@ -164,16 +164,19 @@ internal class DeclaredResource(
         val query = declared.filters.mapNotNull { name ->
             values[name]?.let { "$name=" + URLEncoder.encode(it, Charsets.UTF_8) }
         }
-        return pages(if (query.isEmpty()) path else "$path?" + query.joinToString("&"))
+        return pages(if (query.isEmpty()) path else "$path?" + query.joinToString("&"), values)
     }
 
-    /** Every item listed at [first] and the pages after it, at each item's own path. */
-    private fun pages(first: String): List<Found> {
+    /**
+     * Every item listed at [first] and the pages after it, at each item's own path. [known] are the list's
+     * own path variables, for items that don't name them: GitHub's listed branches name only themselves.
+     */
+    private fun pages(first: String, known: Map<String, String>): List<Found> {
         val found = mutableListOf<Found>()
         var next: String? = first
         while (next != null) {
             val answer = calls.get(next)
-            found += answer.body.filterNot { skipped(it) }.map { found(it) }
+            found += answer.body.filterNot { skipped(it) }.map { found(it, known) }
             // GitHub's next link is absolute; the gateway calls its upstream by path.
             next = answer.links["next"]?.let { if (it.query.isEmpty()) it.path else "${it.path}?${it.query}" }
         }
@@ -183,9 +186,18 @@ internal class DeclaredResource(
     private fun skipped(item: JsonNode): Boolean =
         declared.skip.isNotEmpty() && declared.skip.all { it.holds(Answer(item, emptyMap(), "", null)) }
 
-    private fun found(item: JsonNode): Found {
-        val addressed = address?.of(item) ?: item
-        val variables = pointers.mapValues { (_, pointer) -> addressed.at(pointer).asText() }
+    private fun found(item: JsonNode, known: Map<String, String>): Found {
+        // A listed item without its own address names its path's variables where the file's listed says;
+        // the list's own path names the rest.
+        val unaddressed = declared.address?.let { item.at(it).isMissingNode } != false
+        val variables = if (declared.listed.isNotEmpty() && unaddressed) {
+            itemPath.variables.associateWith { name ->
+                declared.listed[name]?.let { item.at(it).asText() } ?: checkNotNull(known[name]) { "no $name" }
+            }
+        } else {
+            val addressed = address?.of(item) ?: item
+            pointers.mapValues { (_, pointer) -> addressed.at(pointer).asText() }
+        }
         val title = declared.title?.let { item.at(it).asText() } ?: ItemPath.fill(reading.path, variables)
         return Found(item.path("id").asLong(), title, variables)
     }

@@ -38,6 +38,11 @@ class ResourceDeclaration(
     val links: List<OperationId> = emptyList(),
     /** Nested objects these resources embed, when they differ from the connector's: `head/repo`. */
     val embed: List<String>? = null,
+    /**
+     * Where a listed item names a variable of the read's path, when the item has no address of its own;
+     * the list's own path names the rest. GitHub's listed branches: `branch: /name`.
+     */
+    val listed: Map<String, StatePointer> = emptyMap(),
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
@@ -73,6 +78,9 @@ class ResourceDeclaration(
                 lists = node.path("lists").map { it.asText() },
                 links = node.path("links").map { it.asText() },
                 embed = node.path("embed").takeIf { it.isArray }?.map { it.asText() },
+                listed = node.path("listed").properties().associate { (variable, at) ->
+                    variable to pointer(label, at.asText()).toString()
+                },
             )
         }
 

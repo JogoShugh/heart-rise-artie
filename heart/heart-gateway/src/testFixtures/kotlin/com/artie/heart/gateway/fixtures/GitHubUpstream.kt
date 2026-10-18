@@ -171,8 +171,9 @@ class GitHubUpstream {
             branch(request, request.path("branch"))?.let { json(Response(Status.OK), branchBody(it)) }
                 ?: message(Status.NOT_FOUND, "Branch not found")
         },
+        // As GitHub lists them: short branches, a name, a commit and whether protected, and no links of their own.
         "/repos/{owner}/{repo}/branches" bind Method.GET to { request ->
-            json(Response(Status.OK), inRepo(request).map { branchBody(it) })
+            json(Response(Status.OK), inRepo(request).map { shortBranch(it) })
         },
         "/repos/{owner}/{repo}/git/refs" bind Method.POST to { request -> createRef(request) },
         "/repos/{owner}/{repo}/contents/{path}" bind Method.PUT to { request -> commitFile(request) },
@@ -341,6 +342,14 @@ class GitHubUpstream {
             }
             put("protected", branch.protected)
         }
+    }
+
+    /** A branch as GitHub lists it (its short-branch schema): no links, so its address is nowhere in it. */
+    private fun shortBranch(branch: Branch): JsonNode = mapper.createObjectNode().apply {
+        put("name", branch.name)
+        putObject("commit").put("sha", branch.sha)
+            .put("url", "https://api.github.com/repos/${branch.owner}/${branch.repo}/commits/${branch.sha}")
+        put("protected", branch.protected)
     }
 
     /** As GitHub does: a ref under refs/heads/ at an existing commit is a new branch; a taken name is a 422. */
