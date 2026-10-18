@@ -74,18 +74,21 @@
   const answerKey = (step) => (neutral(step)
     ? (step.refused ? `refused: ${step.refused.kind}` : step.outcome)
     : String(step.response.status));
-  // What the step expected: a status or "2xx" for HTTP; words for a neutral trace ("done" when unsaid).
+  // What the step expected: a status or "2xx" for HTTP; words for a neutral trace. A step that says nothing
+  // expects any success, as "2xx" does over HTTP: done, a new resource, or a check that held.
+  const SUCCESS = "success";
   const wantOf = (step) => (neutral(step)
-    ? step.expect || (step.outcome === "held" || step.outcome === "failed" ? "held" : "done")
+    ? step.expect || SUCCESS
     : step.expect === undefined || step.expect === "2xx" ? "2xx" : Number(step.expect));
-  const NEUTRAL_MADE = ["done", "new resource", "unchanged"];
-  const wantsRefusal = (step) => (neutral(step) ? !NEUTRAL_MADE.includes(wantOf(step)) && wantOf(step) !== "held"
+  const NEUTRAL_MADE = [SUCCESS, "done", "new resource", "unchanged"];
+  const wantsRefusal = (step) => (neutral(step) ? !NEUTRAL_MADE.includes(wantOf(step))
     : typeof wantOf(step) === "number" && wantOf(step) >= 400);
   const wantsCreation = (step) => (neutral(step) ? wantOf(step) === "new resource" : wantOf(step) === 201);
   // A neutral "done" also meets "unchanged" here: the test add-on judged that when the run happened.
   const neutralMet = (step) => {
     const want = wantOf(step);
     if (step.refused) return want === step.refused.kind;
+    if (want === SUCCESS) return ["done", "new resource", "held"].includes(step.outcome);
     if (want === "unchanged") return step.outcome === "done";
     return want === step.outcome;
   };
@@ -410,7 +413,9 @@
     const made = steps.filter(created);
     const madeAt = indexes(created);
     facts.created = madeAt.length;
-    const createMisses = wantCreated.filter((i) => !madeAt.includes(i)).length + madeAt.filter((i) => !wantCreated.includes(i)).length;
+    // A creation counts against the run only when the step expected something else, in so many words.
+    const createMisses = wantCreated.filter((i) => !madeAt.includes(i)).length +
+      madeAt.filter((i) => !wantCreated.includes(i) && steps[i].expect !== undefined).length;
     box.append(judge(tile("Created", String(made.length),
       made.map((st) => {
         const loc = (neutral(st) ? st.address : header(st.response, "Location")) || "";

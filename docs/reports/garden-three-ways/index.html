@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Three Ways Through the Garden</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: summary table first, then the model's choices, then the three scripts, one under another. */
+:root { --bg:#f6f5f1; --fg:#1d221f; --muted:#5f6a63; --surface:#fff; --rule:#dcdcd4; --code-bg:#f0efe9; --leaf:#2f7d4f; --mark:#e6efe0; --mark-fg:#1f5a36;
+  --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace; --display:"Literata",Georgia,serif; --kt-kw:#8a3f8f; --kt-str:#2f6f3f; --kt-tpl:#b0641c; --kt-cm:#7b847e; --kt-fn:#1f5a8a; --kt-num:#a0522d; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#131816; --fg:#e4e8e3; --muted:#97a39c; --surface:#1b211e; --rule:#2e3732; --code-bg:#1f2622; --leaf:#7fcf98; --mark:#24402e; --mark-fg:#bfe8cc; --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#131816; --fg:#e4e8e3; --muted:#97a39c; --surface:#1b211e; --rule:#2e3732; --code-bg:#1f2622; --leaf:#7fcf98; --mark:#24402e; --mark-fg:#bfe8cc; --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; }
+body { background:var(--bg); color:var(--fg); margin:0; font:15px/1.55 var(--body); }
+main { max-width:1180px; margin:0 auto; padding-block:2rem 4rem; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font:650 2rem/1.15 var(--display); margin:0 0 .4rem; text-wrap:balance; }
+h2 { font:650 1.3rem var(--display); margin:2.2rem 0 .5rem; }
+h3 { font:600 1rem var(--body); margin:.2rem 0 .4rem; }
+p, li { max-width:75ch; }
+.lede { color:var(--muted); margin:0 0 1rem; }
+.verdict { background:var(--mark); color:var(--mark-fg); border-radius:8px; padding:.8rem 1rem; max-width:78ch; }
+.wrap { overflow-x:auto; }
+table { border-collapse:collapse; width:100%; min-width:760px; background:var(--surface); border:1px solid var(--rule); }
+th, td { text-align:left; vertical-align:top; padding:.55rem .7rem; border-bottom:1px solid var(--rule); font-variant-numeric:tabular-nums; }
+th { font:600 .74rem var(--body); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.sub { font-size:.82rem; color:var(--muted); margin-top:.15rem; }
+mark { background:var(--mark); color:var(--mark-fg); border-radius:3px; padding:0 .2em; }
+.cols { display:grid; grid-template-columns:1fr; gap:1.4rem; }
+.col { min-width:0; }
+pre { background:var(--code-bg); border:1px solid var(--rule); border-radius:8px; padding:.9rem 1rem; overflow-x:auto; font:.84rem/1.55 var(--mono); margin:0; }
+a { color:var(--leaf); }
+.kt-kw { color:var(--kt-kw); font-weight:500; } .kt-str { color:var(--kt-str); } .kt-tpl { color:var(--kt-tpl); }
+.kt-cm { color:var(--kt-cm); font-style:italic; } .kt-fn { color:var(--kt-fn); } .kt-num { color:var(--kt-num); }
+
+/* At phone width a table that stacks shows each row as a card, each cell labelled. */
+@media (max-width: 720px) {
+  table.stack, table.stack tbody, table.stack tr, table.stack td { display:block; width:auto; min-width:0; }
+  table.stack thead { display:none; }
+  table.stack tr { border-bottom:1px solid var(--rule); padding:.5rem .2rem; }
+  table.stack td { border:0; padding:.15rem .5rem; }
+  table.stack td::before { content:attr(data-l); display:inline-block; min-width:6.5rem; font:600 .7rem var(--body); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+}
+</style>
+</head>
+<body>
+<main>
+<h1>Three ways through the garden</h1>
+<p class="lede">One task: build a 4 by 4 herb bed, plant basil about 2 cm deep, water it with 250 ml per cell, and check the bed. Done three ways with the same DSL and the same client, ARTIE, against the garden over CoAP on this machine, each three times, on 2026-10-17. With the garden local, the time is almost all the model's.</p>
+<p class="verdict"><b>All 9 runs finished the task.</b> The scripted runs took a fraction of a second, with no model. The reasoned runs took 4 to 7 seconds and reached the same end, Claude choosing the same three acts with the same fields every time. The hybrid runs took about 2 seconds, and showed the one place a model's judgement varies: the planting depth.</p>
+<h2>The runs</h2>
+<div class="wrap"><table class="stack"><thead><tr><th>Way</th><th>Finished</th><th>Steps per run</th><th>Model choices per run</th><th>Time per run</th><th>Model's choices across runs</th></tr></thead><tbody>
+<tr><td data-l="Way"><b>Scripted</b><div class=sub>Every selection written in the script. No model.</div></td><td data-l="Finished">3 of 3</td><td data-l="Steps per run">7</td><td data-l="Model choices">0</td><td data-l="Time per run">142–250 ms<div class=sub>median 187 ms</div></td><td data-l="Model's choices">—</td></tr><tr><td data-l="Way"><b>Reasoned</b><div class=sub>Every move said in words; Claude chooses the form and its fields.</div></td><td data-l="Finished">3 of 3</td><td data-l="Steps per run">7</td><td data-l="Model choices">3</td><td data-l="Time per run">4,344–6,739 ms<div class=sub>median 5,190 ms</div></td><td data-l="Model's choices">the same every run</td></tr><tr><td data-l="Way"><b>Hybrid</b><div class=sub>The script builds and waters; Claude makes the one judgement call.</div></td><td data-l="Finished">3 of 3</td><td data-l="Steps per run">7</td><td data-l="Model choices">1</td><td data-l="Time per run">2,026–2,316 ms<div class=sub>median 2,052 ms</div></td><td data-l="Model's choices">2 different sets</td></tr>
+</tbody></table></div>
+<h2>Every selection, and who made it</h2>
+<p>Each act in each run: what the script said or wrote, the form and fields selected, and who chose them. ARTIE checked every selection against the manifest and the form's schema before sending it; none was refused.</p>
+<div class="wrap"><table class="stack"><thead><tr><th>Way</th><th>Run</th><th>Said</th><th>Selection</th><th>Chosen by</th><th>Took</th></tr></thead><tbody>
+<tr><td data-l="Way">Scripted</td><td data-l="Run">1</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, scripted</mark>, widthFt <mark>4</mark>, lengthFt <mark>4</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">48 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">1</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>2</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">19 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">1</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">67 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">2</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, scripted</mark>, widthFt <mark>4</mark>, lengthFt <mark>4</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">23 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">2</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>2</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">17 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">2</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">15 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">3</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, scripted</mark>, widthFt <mark>4</mark>, lengthFt <mark>4</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">20 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">3</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>2</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">14 ms</td></tr><tr><td data-l="Way">Scripted</td><td data-l="Run">3</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">15 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">1</td><td data-l="Said">“build a 4 by 4 foot herb bed called &quot;Herbs, reasoned&quot;”</td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, reasoned</mark>, lengthFt <mark>4</mark>, widthFt <mark>4</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,735 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">1</td><td data-l="Said">“plant basil in it, about 2 centimetres deep”</td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>2</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">3,715 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">1</td><td data-l="Said">“water it with 250 millilitres per cell”</td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,215 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">2</td><td data-l="Said">“build a 4 by 4 foot herb bed called &quot;Herbs, reasoned&quot;”</td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, reasoned</mark>, lengthFt <mark>4</mark>, widthFt <mark>4</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,654 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">2</td><td data-l="Said">“plant basil in it, about 2 centimetres deep”</td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>2</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,226 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">2</td><td data-l="Said">“water it with 250 millilitres per cell”</td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">2,239 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">3</td><td data-l="Said">“build a 4 by 4 foot herb bed called &quot;Herbs, reasoned&quot;”</td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, reasoned</mark>, lengthFt <mark>4</mark>, widthFt <mark>4</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,375 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">3</td><td data-l="Said">“plant basil in it, about 2 centimetres deep”</td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>2</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,619 ms</td></tr><tr><td data-l="Way">Reasoned</td><td data-l="Run">3</td><td data-l="Said">“water it with 250 millilitres per cell”</td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,224 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">1</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, hybrid</mark>, widthFt <mark>4</mark>, lengthFt <mark>4</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">20 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">1</td><td data-l="Said">“plant the herb that pesto is made from, at a sensible depth”</td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>2</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,923 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">1</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">16 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">2</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, hybrid</mark>, widthFt <mark>4</mark>, lengthFt <mark>4</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">25 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">2</td><td data-l="Said">“plant the herb that pesto is made from, at a sensible depth”</td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>1</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">1,892 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">2</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">14 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">3</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:build-bed</code>, label <mark>Herbs, hybrid</mark>, widthFt <mark>4</mark>, lengthFt <mark>4</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">20 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">3</td><td data-l="Said">“plant the herb that pesto is made from, at a sensible depth”</td><td data-l="Selection"><code>garden:sow-seed</code>, seedType <mark>basil</mark>, depthCm <mark>1</mark></td><td data-l="Chosen by">Claude</td><td data-l="Took">2,217 ms</td></tr><tr><td data-l="Way">Hybrid</td><td data-l="Run">3</td><td data-l="Said"><span class=sub>written in the script</span></td><td data-l="Selection"><code>garden:water-cell</code>, milliliters <mark>250</mark></td><td data-l="Chosen by">the script</td><td data-l="Took">12 ms</td></tr>
+</tbody></table></div>
+<h2>What it shows</h2>
+<ul>
+<li><b>Scripted is fast and exact.</b> 8 to 16 times faster than the hybrid runs here, and 17 to 47 times faster than the reasoned ones, the same every time, and free. It needs someone to know the relations and fields.</li>
+<li><b>Reasoned needs only words.</b> “Plant basil in it, about 2 centimetres deep” became <code>garden:sow-seed</code> with <code>seedType</code> basil and <code>depthCm</code> 2, from the forms the garden offered, with no relation or field named in the script. It costs a model call per move, and seconds.</li>
+<li><b>Hybrid puts judgement where it's wanted.</b> “The herb that pesto is made from, at a sensible depth” was basil every time, at 2 cm once and 1 cm twice. Both are within the form's schema, so ARTIE accepted both; the variation is the model's, and the trace shows it.</li>
+<li><b>Every choice is checked.</b> The model never sees an address and never builds a request; it picks among the forms offered, and ARTIE checks the pick before anything is sent.</li>
+</ul>
+<p class="sub">Not measured: model cost per run. “Model choices” counts reason steps; ARTIE asks the model once per step unless it first asks to describe a form.</p>
+<h2>The scripts</h2>
+<div class="cols"><div class=col><h3>Scripted</h3><pre><code class="kotlin">// The garden task, scripted: every selection written down. Build a 4 by 4 herb bed, plant basil about
+// 2 cm deep, water it with 250 ml per cell, and check the bed. No model.
+//   artie run tests/garden-task-scripted.kts
+val entry by input(default = &quot;coap://localhost:5683/&quot;)
+
+heart(entry) {
+    act(&quot;garden:build-bed&quot;, &quot;label&quot; to &quot;Herbs, scripted&quot;, &quot;widthFt&quot; to 4, &quot;lengthFt&quot; to 4) {
+        act(&quot;garden:sow-seed&quot;, &quot;seedType&quot; to &quot;basil&quot;, &quot;depthCm&quot; to 2)
+        act(&quot;garden:water-cell&quot;, &quot;milliliters&quot; to 250)
+        check(state[&quot;/cropName&quot;] == &quot;basil&quot;) { &quot;the bed should hold basil&quot; }
+        check((state[&quot;/moistureLevel&quot;] as Long) &gt; 0) { &quot;the bed should be watered&quot; }
+    }
+}
+</code></pre></div><div class=col><h3>Reasoned</h3><pre><code class="kotlin">// The garden task, reasoned: each move said in words; the model chooses the form and its fields from
+// what the garden offers, and ARTIE checks each choice before sending it. Needs --reasoner claude.
+//   artie run tests/garden-task-reasoned.kts --reasoner claude
+val entry by input(default = &quot;coap://localhost:5683/&quot;)
+
+heart(entry) {
+    reason(&quot;build a 4 by 4 foot herb bed called \&quot;Herbs, reasoned\&quot;&quot;) {
+        reason(&quot;plant basil in it, about 2 centimetres deep&quot;)
+        reason(&quot;water it with 250 millilitres per cell&quot;)
+        check(state[&quot;/cropName&quot;] == &quot;basil&quot;) { &quot;the bed should hold basil&quot; }
+        check((state[&quot;/moistureLevel&quot;] as Long) &gt; 0) { &quot;the bed should be watered&quot; }
+    }
+}
+</code></pre></div><div class=col><h3>Hybrid</h3><pre><code class="kotlin">// The garden task, hybrid: the script builds and waters, exactly; the model makes the one choice that
+// is a matter of judgement, what to plant for pesto and how deep. Needs --reasoner claude.
+//   artie run tests/garden-task-hybrid.kts --reasoner claude
+val entry by input(default = &quot;coap://localhost:5683/&quot;)
+
+heart(entry) {
+    act(&quot;garden:build-bed&quot;, &quot;label&quot; to &quot;Herbs, hybrid&quot;, &quot;widthFt&quot; to 4, &quot;lengthFt&quot; to 4) {
+        reason(&quot;plant the herb that pesto is made from, at a sensible depth&quot;)
+        act(&quot;garden:water-cell&quot;, &quot;milliliters&quot; to 250)
+        check(state[&quot;/cropName&quot;] == &quot;basil&quot;) { &quot;the bed should hold basil&quot; }
+        check((state[&quot;/moistureLevel&quot;] as Long) &gt; 0) { &quot;the bed should be watered&quot; }
+    }
+}
+</code></pre></div></div>
+<h2>Each way's run report</h2>
+<p><a href="scripted/index.html">Scripted</a> · <a href="reasoned/index.html">Reasoned</a> · <a href="hybrid/index.html">Hybrid</a> (the first run of each)</p>
+</main>
+<script>
+// Kotlin syntax colouring for heart-scripts shown in reports: comments, strings (with their $templates),
+// keywords, numbers, and calls, the DSL's verbs among them. Every <code class="kotlin"> on the page is
+// coloured in place, from its text, so the page needs no library. Colours are the page's own tokens:
+// .kt-cm, .kt-str, .kt-tpl, .kt-kw, .kt-num, .kt-fn.
+(() => {
+  const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
+    "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b(\s*(?=[({]))?/g;
+  const span = (cls, text) => {
+    const s = document.createElement("span");
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  };
+  // A string, its ${…} and $name templates marked inside it.
+  const string = (text) => {
+    const s = document.createElement("span");
+    s.className = "kt-str";
+    let last = 0;
+    text.replace(/\$\{[^}]*\}|\$[A-Za-z_]\w*/g, (m, at) => {
+      s.append(document.createTextNode(text.slice(last, at)), span("kt-tpl", m));
+      last = at + m.length;
+      return m;
+    });
+    s.append(document.createTextNode(text.slice(last)));
+    return s;
+  };
+  const colour = (code) => {
+    const text = code.textContent;
+    const out = document.createDocumentFragment();
+    let last = 0;
+    for (const m of text.matchAll(TOKEN)) {
+      out.append(document.createTextNode(text.slice(last, m.index)));
+      const [all, comment, str, num, word, call] = m;
+      if (comment) out.append(span("kt-cm", comment));
+      else if (str) out.append(string(str));
+      else if (num) out.append(span("kt-num", num));
+      else if (KEYWORDS.has(word)) out.append(span("kt-kw", word), document.createTextNode(call || ""));
+      else if (call !== undefined) out.append(span("kt-fn", word), document.createTextNode(call));
+      else out.append(document.createTextNode(all));
+      last = m.index + all.length;
+    }
+    out.append(document.createTextNode(text.slice(last)));
+    code.replaceChildren(out);
+  };
+  document.querySelectorAll("code.kotlin").forEach(colour);
+})();
+</script>
+</body>
+</html>

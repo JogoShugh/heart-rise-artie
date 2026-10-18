@@ -15,6 +15,7 @@
   --leaf: #2f7d4f; --gate: #b0641c; --mark: #e6efe0; --mark-fg: #1f5a36;
   --body: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
   --display: "Literata", Georgia, serif;
+  --kt-kw: #8a3f8f; --kt-str: #2f6f3f; --kt-tpl: #b0641c; --kt-cm: #7b847e; --kt-fn: #1f5a8a; --kt-num: #a0522d;
   --pass-bg: #d9f0e0; --pass-rule: #8cc9a0;
   --fail-1: #fdeef0; --fail-2: #f8d3d9; --fail-3: #f0a7b2; --fail-4: #d9596c; --fail-5: #b0233a; --fail-fg: #ffffff;
 }
@@ -22,6 +23,7 @@
   :root:not([data-theme="light"]) {
     --bg: #131816; --fg: #e4e8e3; --muted: #93a099; --surface: #1b211e; --rule: #2e3732; --code-bg: #202723;
     --leaf: #7fcf98; --gate: #e6a35c; --mark: #24402e; --mark-fg: #bfe8cc; color-scheme: dark;
+    --kt-kw: #d79ad9; --kt-str: #9fd6ac; --kt-tpl: #e6a35c; --kt-cm: #7f8b84; --kt-fn: #8cc0ea; --kt-num: #e0a080;
     --pass-bg: #1c3a27; --pass-rule: #3f7a52;
     --fail-1: #2e1e21; --fail-2: #45222a; --fail-3: #622631; --fail-4: #86283a; --fail-5: #a82a40; --fail-fg: #fff3f4;
   }
@@ -29,6 +31,7 @@
 :root[data-theme="dark"] {
   --bg: #131816; --fg: #e4e8e3; --muted: #93a099; --surface: #1b211e; --rule: #2e3732; --code-bg: #202723;
   --leaf: #7fcf98; --gate: #e6a35c; --mark: #24402e; --mark-fg: #bfe8cc; color-scheme: dark;
+    --kt-kw: #d79ad9; --kt-str: #9fd6ac; --kt-tpl: #e6a35c; --kt-cm: #7f8b84; --kt-fn: #8cc0ea; --kt-num: #e0a080;
     --pass-bg: #1c3a27; --pass-rule: #3f7a52;
     --fail-1: #2e1e21; --fail-2: #45222a; --fail-3: #622631; --fail-4: #86283a; --fail-5: #a82a40; --fail-fg: #fff3f4;
 }
@@ -148,6 +151,9 @@ mark.rr-param { background: var(--mark); color: var(--mark-fg); font-family: var
 .rr-script summary code { font: 500 0.88rem var(--mono); }
 .rr-script pre { margin: 0; padding: 0.9rem 1rem; overflow-x: auto; background: var(--code-bg); border-top: 1px solid var(--rule);
   border-radius: 0 0 8px 8px; font: 0.84rem/1.55 var(--mono); }
+/* Kotlin colouring (kotlin-view.js), from the tokens above. */
+.kt-kw { color: var(--kt-kw); font-weight: 500; } .kt-str { color: var(--kt-str); } .kt-tpl { color: var(--kt-tpl); }
+.kt-cm { color: var(--kt-cm); font-style: italic; } .kt-fn { color: var(--kt-fn); } .kt-num { color: var(--kt-num); }
 /* The JSON viewer (json-view.js): collapsed boxes, line diffs, unchanged runs folded behind buttons. */
 /* A column of boxes. */
 .stack { display: grid; gap: 0.5rem; min-width: 0; }
@@ -179,7 +185,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
     <p class="rr-lede">tests/garden-bed.kts, a heart-script in Kotlin, run with artie run against the garden over plain CoAP, no HTTP anywhere: a bed refused for its width before anything was sent, a bed built, sown, and sown again refused, each step by meaning.</p>
     <details class="rr-script" open>
       <summary>The script: <code>garden-bed.kts</code></summary>
-      <pre><code>// Build a bed in the garden, sow it, and show what the garden refuses: a second sowing (not
+      <pre><code class="kotlin">// Build a bed in the garden, sow it, and show what the garden refuses: a second sowing (not
 // offered once planted) and a bed with no width (invalid input). The entry chooses the binding:
 // the same script runs over CoAP or HTTP, unchanged.
 //   artie run tests/garden-bed.kts
@@ -447,18 +453,21 @@ heart(entry) {
   const answerKey = (step) => (neutral(step)
     ? (step.refused ? `refused: ${step.refused.kind}` : step.outcome)
     : String(step.response.status));
-  // What the step expected: a status or "2xx" for HTTP; words for a neutral trace ("done" when unsaid).
+  // What the step expected: a status or "2xx" for HTTP; words for a neutral trace. A step that says nothing
+  // expects any success, as "2xx" does over HTTP: done, a new resource, or a check that held.
+  const SUCCESS = "success";
   const wantOf = (step) => (neutral(step)
-    ? step.expect || (step.outcome === "held" || step.outcome === "failed" ? "held" : "done")
+    ? step.expect || SUCCESS
     : step.expect === undefined || step.expect === "2xx" ? "2xx" : Number(step.expect));
-  const NEUTRAL_MADE = ["done", "new resource", "unchanged"];
-  const wantsRefusal = (step) => (neutral(step) ? !NEUTRAL_MADE.includes(wantOf(step)) && wantOf(step) !== "held"
+  const NEUTRAL_MADE = [SUCCESS, "done", "new resource", "unchanged"];
+  const wantsRefusal = (step) => (neutral(step) ? !NEUTRAL_MADE.includes(wantOf(step))
     : typeof wantOf(step) === "number" && wantOf(step) >= 400);
   const wantsCreation = (step) => (neutral(step) ? wantOf(step) === "new resource" : wantOf(step) === 201);
   // A neutral "done" also meets "unchanged" here: the test add-on judged that when the run happened.
   const neutralMet = (step) => {
     const want = wantOf(step);
     if (step.refused) return want === step.refused.kind;
+    if (want === SUCCESS) return ["done", "new resource", "held"].includes(step.outcome);
     if (want === "unchanged") return step.outcome === "done";
     return want === step.outcome;
   };
@@ -783,7 +792,9 @@ heart(entry) {
     const made = steps.filter(created);
     const madeAt = indexes(created);
     facts.created = madeAt.length;
-    const createMisses = wantCreated.filter((i) => !madeAt.includes(i)).length + madeAt.filter((i) => !wantCreated.includes(i)).length;
+    // A creation counts against the run only when the step expected something else, in so many words.
+    const createMisses = wantCreated.filter((i) => !madeAt.includes(i)).length +
+      madeAt.filter((i) => !wantCreated.includes(i) && steps[i].expect !== undefined).length;
     box.append(judge(tile("Created", String(made.length),
       made.map((st) => {
         const loc = (neutral(st) ? st.address : header(st.response, "Location")) || "";
@@ -1049,6 +1060,55 @@ heart(entry) {
   );
   setLayout(layout);
   root.append(controls, tileBox, bar, filterBar, head, list, overlay);
+})();
+</script>
+<script>
+// Kotlin syntax colouring for heart-scripts shown in reports: comments, strings (with their $templates),
+// keywords, numbers, and calls, the DSL's verbs among them. Every <code class="kotlin"> on the page is
+// coloured in place, from its text, so the page needs no library. Colours are the page's own tokens:
+// .kt-cm, .kt-str, .kt-tpl, .kt-kw, .kt-num, .kt-fn.
+(() => {
+  const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
+    "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b(\s*(?=[({]))?/g;
+  const span = (cls, text) => {
+    const s = document.createElement("span");
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  };
+  // A string, its ${…} and $name templates marked inside it.
+  const string = (text) => {
+    const s = document.createElement("span");
+    s.className = "kt-str";
+    let last = 0;
+    text.replace(/\$\{[^}]*\}|\$[A-Za-z_]\w*/g, (m, at) => {
+      s.append(document.createTextNode(text.slice(last, at)), span("kt-tpl", m));
+      last = at + m.length;
+      return m;
+    });
+    s.append(document.createTextNode(text.slice(last)));
+    return s;
+  };
+  const colour = (code) => {
+    const text = code.textContent;
+    const out = document.createDocumentFragment();
+    let last = 0;
+    for (const m of text.matchAll(TOKEN)) {
+      out.append(document.createTextNode(text.slice(last, m.index)));
+      const [all, comment, str, num, word, call] = m;
+      if (comment) out.append(span("kt-cm", comment));
+      else if (str) out.append(string(str));
+      else if (num) out.append(span("kt-num", num));
+      else if (KEYWORDS.has(word)) out.append(span("kt-kw", word), document.createTextNode(call || ""));
+      else if (call !== undefined) out.append(span("kt-fn", word), document.createTextNode(call));
+      else out.append(document.createTextNode(all));
+      last = m.index + all.length;
+    }
+    out.append(document.createTextNode(text.slice(last)));
+    code.replaceChildren(out);
+  };
+  document.querySelectorAll("code.kotlin").forEach(colour);
 })();
 </script>
 </body>

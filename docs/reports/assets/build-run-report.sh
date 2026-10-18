@@ -20,7 +20,7 @@ trap 'rm -f "$script_block"' EXIT
 if [ -n "$script" ]; then
   {
     printf '    <details class="rr-script" open>\n      <summary>The script: <code>%s</code></summary>\n' "$(html_escape "$(basename "$script")")"
-    printf '      <pre><code>'
+    printf '      <pre><code class="kotlin">'
     sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$script"
     printf '</code></pre>\n    </details>\n'
   } > "$script_block"
@@ -28,7 +28,7 @@ fi
 
 TITLE=$safe_title LEDE=$safe_lede awk \
     -v rrcss="$here/run-report.css" -v jvcss="$here/json-view.css" \
-    -v jvjs="$here/json-view.js" -v rrjs="$here/run-report.js" -v trace="$trace" -v scriptblock="$script_block" '
+    -v jvjs="$here/json-view.js" -v rrjs="$here/run-report.js" -v ktjs="$here/kotlin-view.js" -v trace="$trace" -v scriptblock="$script_block" '
   BEGIN { title = ENVIRON["TITLE"]; lede = ENVIRON["LEDE"] }
   function emit(file,   line) { while ((getline line < file) > 0) print line; close(file) }
   function emit_trace(file,   line) {
@@ -40,6 +40,7 @@ TITLE=$safe_title LEDE=$safe_lede awk \
   /\/\*@JSON_VIEW_JS@\*\//   { emit(jvjs); next }
   /\/\*@RUN_REPORT_JS@\*\//  { emit(rrjs); next }
   /^@SCRIPT@$/ { emit(scriptblock); next }
+  /\/\*@KOTLIN_VIEW_JS@\*\//  { emit(ktjs); next }
   /@TRACE@/ {
     split($0, parts, "@TRACE@"); printf "%s", parts[1]; emit_trace(trace); print parts[2]; next
   }
