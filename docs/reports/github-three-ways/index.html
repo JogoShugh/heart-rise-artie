@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Three Ways Through GitHub</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="One GitHub task, from the bookmark through the HEART gateway, done scripted, reasoned by Claude, and hybrid, three live runs each: issue, branch, commit, pull request, merge, comment, close.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root { --bg:#f3f6f5; --surface:#fff; --fg:#17211d; --muted:#55645d; --rule:#d3ddd8; --link:#2f5f8f; --code-bg:#eef2f0;
+  --kt-kw:#8a3f8f; --kt-str:#2f6f3f; --kt-tpl:#b0641c; --kt-cm:#7b847e; --kt-fn:#1f5a8a; --kt-num:#a0522d;
+  --display:"Literata",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#111816; --surface:#18211e; --fg:#e2ebe6; --muted:#98a9a1; --rule:#2a3732; --link:#8ab8e6; --code-bg:#1d2622;
+  --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#111816; --surface:#18211e; --fg:#e2ebe6; --muted:#98a9a1; --rule:#2a3732; --link:#8ab8e6; --code-bg:#1d2622;
+  --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.6 var(--body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width:60rem; margin:0 auto; padding-block:3rem 4rem; display:grid; grid-template-columns:minmax(0,1fr); gap:1.4rem; }
+main > * { min-width:0; }
+h1 { font:650 2.1rem/1.15 var(--display); margin:0; text-wrap:balance; }
+h2 { font:650 1.35rem/1.25 var(--display); margin:.6rem 0 0; }
+p, li { max-width:44rem; } p { margin:0; } .lede, .muted { color:var(--muted); }
+ul { margin:0; padding-left:1.2rem; display:grid; gap:.35rem; }
+a { color:var(--link); } code { font-family:var(--mono); font-size:.86rem; }
+.scroll { overflow-x:auto; background:var(--surface); border:1px solid var(--rule); border-radius:8px; }
+table { border-collapse:collapse; width:100%; }
+th, td { text-align:left; padding:.45rem .7rem; border-bottom:1px solid var(--rule); vertical-align:top; font-size:.92rem; }
+th { font:600 .78rem/1.3 var(--body); letter-spacing:.03em; text-transform:uppercase; color:var(--muted); }
+tr:last-child td { border-bottom:0; } td { font-variant-numeric:tabular-nums; }
+table.choices td:first-child { min-width:14rem; }
+pre { margin:0; background:var(--code-bg); border:1px solid var(--rule); border-radius:8px; padding:1rem; overflow-x:auto; font:.8rem/1.5 var(--mono); }
+.reports { display:grid; gap:.5rem; }
+@media (max-width: 640px) { table.runs thead { display:none; } table.runs tr { display:grid; grid-template-columns:1fr 1fr; padding:.4rem 0; border-bottom:1px solid var(--rule); } table.runs td { border:0; padding:.15rem .7rem; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Three Ways Through GitHub</h1>
+  <p class="lede">One GitHub task from the bookmark, through the HEART gateway, into the scratch repository: open an issue, branch from main, commit the fix, open a pull request that relates to the issue, wait until GitHub can merge it and merge it, then comment on the issue and close it. Done three ways, three live runs each, on 2026-10-18: every selection scripted; every move said in words for Claude to choose; and scripted but for one judgement call.</p>
+  <h2>How each way did</h2>
+  <div class="scroll"><table class="num"><thead><tr><th>Way</th><th>Median time</th><th>Range</th><th>Model calls</th><th>Median time in reasoned steps</th><th>Finished</th></tr></thead><tbody><tr><td>Scripted</td><td>17.8 s</td><td>17.6 to 18.2 s</td><td>0</td><td>none</td><td>3 of 3</td></tr><tr><td>Reasoned</td><td>49.4 s</td><td>45.9 to 49.6 s</td><td>10</td><td>46.4 s</td><td>3 of 3</td></tr><tr><td>Hybrid</td><td>27.1 s</td><td>24.2 to 30.1 s</td><td>1</td><td>7.5 s</td><td>3 of 3</td></tr></tbody></table></div>
+  <p>Every run wrote to GitHub for real: 9 issues opened and closed, 9 branches, 9 commits, 9 pull requests merged. Each committed file was read back from GitHub afterwards: all nine say “Bed names may not be blank.” Time is GitHub's here, not the client's: each write takes GitHub one to three seconds, and a new pull request needs a moment before GitHub knows it can be merged. Saying every move in words costs about 32 seconds over a run, for 10 choices. The hybrid's one choice takes about 8 seconds, Claude and the request together; the hybrid's runs took about 9 seconds longer than the scripted ones, at the median. A reasoned step's time includes GitHub's own request as well as Claude's choice.</p>
+  <h2>Every run</h2>
+  <div class="scroll"><table class="runs"><thead><tr><th>Run</th><th>Time</th><th>Steps</th><th>Model calls</th><th>Issue</th><th>Pull request</th><th>Closed as</th></tr></thead><tbody><tr><td>Scripted 1</td><td>18.2 s</td><td>23</td><td>0</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/49">#49</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/50">#50</a></td><td>completed</td></tr><tr><td>Scripted 2</td><td>17.6 s</td><td>23</td><td>0</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/51">#51</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/52">#52</a></td><td>completed</td></tr><tr><td>Scripted 3</td><td>17.8 s</td><td>23</td><td>0</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/53">#53</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/54">#54</a></td><td>completed</td></tr><tr><td>Reasoned 1</td><td>49.4 s</td><td>23</td><td>10</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/55">#55</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/56">#56</a></td><td>completed</td></tr><tr><td>Reasoned 2</td><td>45.9 s</td><td>23</td><td>10</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/57">#57</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/58">#58</a></td><td>completed</td></tr><tr><td>Reasoned 3</td><td>49.6 s</td><td>23</td><td>10</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/59">#59</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/60">#60</a></td><td>completed</td></tr><tr><td>Hybrid 1</td><td>24.2 s</td><td>23</td><td>1</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/61">#61</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/62">#62</a></td><td>completed</td></tr><tr><td>Hybrid 2</td><td>30.1 s</td><td>23</td><td>1</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/63">#63</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/64">#64</a></td><td>completed</td></tr><tr><td>Hybrid 3</td><td>27.1 s</td><td>23</td><td>1</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/65">#65</a></td><td><a href="https://github.com/JogoShugh/heart-github-test/pull/66">#66</a></td><td>completed</td></tr></tbody></table></div>
+  <h2>What Claude chose, run by run</h2>
+  <p>The reasoned script says each move in words and names no form, link or field. These are the choices Claude made from what each answer offered; ARTIE checked each before sending it. Numbers that differ run to run (issue, pull request, time stamp) are shown as … in the words.</p>
+  <div class="scroll"><table class="choices"><thead><tr><th>Said</th><th>Run 1</th><th>Run 2</th><th>Run 3</th></tr></thead><tbody><tr><td>open the repository JogoShugh/heart-github-test</td><td><code>github:repos-get</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test</span></td><td><code>github:repos-get</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test</span></td><td><code>github:repos-get</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test</span></td></tr><tr><td>open an issue titled &quot;Crash when a bed has no name (reasoned)&quot;, saying it was opened by a HEART script</td><td><code>github:open-issue</code><br><span class="muted">title: Crash when a bed has no name (reasoned), body: Opened by a HEART script.</span></td><td><code>github:open-issue</code><br><span class="muted">title: Crash when a bed has no name (reasoned), body: Opened by a HEART script.</span></td><td><code>github:open-issue</code><br><span class="muted">title: Crash when a bed has no name (reasoned), body: Opened by a HEART script.</span></td></tr><tr><td>open the branch main of JogoShugh/heart-github-test</td><td><code>github:repos-get-branch</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test, branch: main</span></td><td><code>github:repos-get-branch</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test, branch: main</span></td><td><code>github:repos-get-branch</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test, branch: main</span></td></tr><tr><td>start a new branch from here, named fix-blank-names-reasoned-…</td><td><code>github:branch-from-here</code><br><span class="muted">name: fix-blank-names-reasoned-1018-152010</span></td><td><code>github:branch-from-here</code><br><span class="muted">name: fix-blank-names-reasoned-1018-152101</span></td><td><code>github:branch-from-here</code><br><span class="muted">name: fix-blank-names-reasoned-1018-152150</span></td></tr><tr><td>commit a file named fix-reasoned-….md, saying &quot;Bed names may not be blank.&quot;, with the message &quot;Refuse a bed with no name&quot;</td><td><code>github:commit-file</code><br><span class="muted">path: fix-reasoned-1018-152010.md, message: Refuse a bed with no name, content: Bed names may not be blank.</span></td><td><code>github:commit-file</code><br><span class="muted">path: fix-reasoned-1018-152101.md, message: Refuse a bed with no name, content: Bed names may not be blank.</span></td><td><code>github:commit-file</code><br><span class="muted">path: fix-reasoned-1018-152150.md, message: Refuse a bed with no name, content: Bed names may not be blank.</span></td></tr><tr><td>open a pull request into main titled &quot;Refuse a bed with no name (reasoned)&quot;, saying it relates to …</td><td><code>github:open-pull-request</code><br><span class="muted">base: main, title: Refuse a bed with no name (reasoned), body: Relates to #55</span></td><td><code>github:open-pull-request</code><br><span class="muted">base: main, title: Refuse a bed with no name (reasoned), body: Relates to #57</span></td><td><code>github:open-pull-request</code><br><span class="muted">base: main, title: Refuse a bed with no name (reasoned), body: Relates to #59</span></td></tr><tr><td>merge it, squashing its commits</td><td><code>github:merge</code><br><span class="muted">merge_method: squash</span></td><td><code>github:merge</code><br><span class="muted">merge_method: squash</span></td><td><code>github:merge</code><br><span class="muted">merge_method: squash</span></td></tr><tr><td>open issue … in JogoShugh/heart-github-test</td><td><code>github:issues-get</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test, issue_number: 55</span></td><td><code>github:issues-get</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test, issue_number: 57</span></td><td><code>github:issues-get</code><br><span class="muted">owner: JogoShugh, repo: heart-github-test, issue_number: 59</span></td></tr><tr><td>comment on it: Fixed in 1.2 by ….</td><td><code>github:comment</code><br><span class="muted">body: Fixed in 1.2 by #56.</span></td><td><code>github:comment</code><br><span class="muted">body: Fixed in 1.2 by #58.</span></td><td><code>github:comment</code><br><span class="muted">body: Fixed in 1.2 by #60.</span></td></tr><tr><td>close it, since the fix is done</td><td><code>github:close</code></td><td><code>github:close</code></td><td><code>github:close</code></td></tr></tbody></table></div>
+  <h2>The hybrid's one judgement call</h2>
+  <p>"Close it the right way: the fix shipped in 1.2." GitHub offers three ways to close an issue; Claude picked one.</p>
+  <div class="scroll"><table class="num"><thead><tr><th>Run</th><th>Claude chose</th><th>Model time</th></tr></thead><tbody><tr><td>Hybrid 1</td><td><code>github:close</code></td><td>5.5 s</td></tr><tr><td>Hybrid 2</td><td><code>github:close</code></td><td>9.8 s</td></tr><tr><td>Hybrid 3</td><td><code>github:close</code></td><td>7.5 s</td></tr></tbody></table></div>
+  <h2>What the live runs caught</h2>
+  <p>These nine runs are the third round. The first two found five things, each fixed test-first before the next round; their traces are kept beside the runs', outside the repository.</p>
+  <ul>
+    <li>A reasoned run chose GitHub's own <code>github:branches</code>, the template <code>…/branches{/branch}</code>, over the gateway's <code>github:repos-list-branches</code>, and ARTIE refused it: “no binding for the scheme null: https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch} was refused, and nothing was sent”. ARTIE and heart-mcp now offer a model only links they can follow: no templates, nothing outside HEART (a156baf).</li>
+    <li>Claude then named the gateway's untitled link with the title "", which ARTIE matched against none. A blank title is now no title (f494ff4).</li>
+    <li>Every reasoned run's committed file held base64, not the text: the form passed on GitHub's words for <code>content</code>, “using Base64 encoding”, so Claude encoded it, and the gateway encoded it again. The runs' checks never read the file, so they passed. A field the gateway encodes is now described as plain text (e171027), and every file is read back from GitHub after the runs.</li>
+    <li>After twenty-odd runs, <code>main</code> was on the second page of the repository's branches. A reasoned run, not finding it on the first, asked rather than guessed; the scripted way would have failed. The task now names the branch, through the bookmark's branch lookup, as a person would.</li>
+    <li>The live smoke test, before any run, caught two places the fake GitHub had GitHub wrong: branches are listed without their own address, and a branch writes its links as plain strings (b588100, 47b1a9f).</li>
+    <li>Left open in the scratch repository by stopped attempts: issues #22, #32 and #48.</li>
+  </ul>
+  <h2>The runs, step by step</h2>
+  <div class="reports">
+    <a href="scripted/index.html">Scripted, run 1: every step, its request and answer</a>
+    <a href="reasoned/index.html">Reasoned, run 1: every step, with the words Claude was given</a>
+    <a href="hybrid/index.html">Hybrid, run 1: every step, and the one call Claude made</a>
+  </div>
+  <h2>The scripts</h2>
+  <p>Scripted</p>
+  <pre><code class="kotlin">// The GitHub task, scripted: every selection written down, no model. From the bookmark: open an issue, branch
+// from main, commit the fix, open a pull request that relates to the issue, wait until GitHub can merge it and
+// merge it, then comment on the issue that it is fixed in 1.2 and close it. Real writes, to the repository given.
+//   artie run tests/github-task-scripted.kts owner=JogoShugh repo=heart-github-test
+val owner by input()
+val repo by input()
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issue = 0L
+    var pull = 0L
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo) {
+        act(&quot;github:open-issue&quot;, &quot;title&quot; to &quot;Crash when a bed has no name (scripted)&quot;, &quot;body&quot; to &quot;Opened by a HEART script.&quot;) {
+            issue = state[&quot;/number&quot;] as Long
+        }
+    }
+    // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
+    act(&quot;github:repos-get-branch&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;branch&quot; to &quot;main&quot;) {
+        act(&quot;github:branch-from-here&quot;, &quot;name&quot; to &quot;fix-blank-names-scripted-$stamp&quot;) {
+            act(
+                &quot;github:commit-file&quot;,
+                &quot;path&quot; to &quot;fix-scripted-$stamp.md&quot;,
+                &quot;message&quot; to &quot;Refuse a bed with no name&quot;,
+                &quot;content&quot; to &quot;Bed names may not be blank.\n&quot;,
+            )
+            act(
+                &quot;github:open-pull-request&quot;,
+                &quot;title&quot; to &quot;Refuse a bed with no name (scripted)&quot;,
+                &quot;base&quot; to &quot;main&quot;,
+                &quot;body&quot; to &quot;Relates to #$issue.&quot;,
+            ) {
+                pull = state[&quot;/number&quot;] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers(&quot;github:merge&quot;) }
+                act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)
+                check(state[&quot;/merged&quot;] == true) { &quot;the pull request should be merged&quot; }
+            }
+        }
+    }
+    act(&quot;github:issues-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;issue_number&quot; to issue) {
+        // The comment is a new resource: visit it, then come back to the issue to close it.
+        act(&quot;github:comment&quot;, &quot;body&quot; to &quot;Fixed in 1.2 by #$pull.&quot;) {
+            check(state[&quot;/body&quot;] == &quot;Fixed in 1.2 by #$pull.&quot;) { &quot;the comment should say what fixed it&quot; }
+        }
+        act(&quot;github:close&quot;)
+        check(state[&quot;/state&quot;] == &quot;closed&quot;) { &quot;the issue should be closed&quot; }
+        check(state[&quot;/state_reason&quot;] == &quot;completed&quot;) { &quot;the issue should be closed as completed&quot; }
+    }
+}
+</code></pre>
+  <p>Reasoned</p>
+  <pre><code class="kotlin">// The GitHub task, reasoned: each move said in words; the model chooses the form or link and its fields from what
+// the gateway offers, and ARTIE checks each choice before sending it. The same task as github-task-scripted.kts.
+// Needs --reasoner claude. Real writes, to the repository given.
+//   artie run tests/github-task-reasoned.kts owner=JogoShugh repo=heart-github-test --reasoner claude
+val owner by input()
+val repo by input()
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issue = 0L
+    var pull = 0L
+    reason(&quot;open the repository $owner/$repo&quot;) {
+        reason(&quot;open an issue titled \&quot;Crash when a bed has no name (reasoned)\&quot;, saying it was opened by a HEART script&quot;) {
+            issue = state[&quot;/number&quot;] as Long
+        }
+    }
+    reason(&quot;open the branch main of $owner/$repo&quot;) {
+        reason(&quot;start a new branch from here, named fix-blank-names-reasoned-$stamp&quot;) {
+            reason(&quot;commit a file named fix-reasoned-$stamp.md, saying \&quot;Bed names may not be blank.\&quot;, with the message \&quot;Refuse a bed with no name\&quot;&quot;)
+            reason(&quot;open a pull request into main titled \&quot;Refuse a bed with no name (reasoned)\&quot;, saying it relates to #$issue&quot;) {
+                pull = state[&quot;/number&quot;] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers(&quot;github:merge&quot;) }
+                reason(&quot;merge it, squashing its commits&quot;)
+                check(state[&quot;/merged&quot;] == true) { &quot;the pull request should be merged&quot; }
+            }
+        }
+    }
+    reason(&quot;open issue $issue in $owner/$repo&quot;) {
+        // The comment is a new resource: visit it, then come back to the issue to close it.
+        reason(&quot;comment on it: Fixed in 1.2 by #$pull.&quot;) {
+            check(state[&quot;/body&quot;] == &quot;Fixed in 1.2 by #$pull.&quot;) { &quot;the comment should say what fixed it&quot; }
+        }
+        reason(&quot;close it, since the fix is done&quot;)
+        check(state[&quot;/state&quot;] == &quot;closed&quot;) { &quot;the issue should be closed&quot; }
+        check(state[&quot;/state_reason&quot;] == &quot;completed&quot;) { &quot;the issue should be closed as completed&quot; }
+    }
+}
+</code></pre>
+  <p>Hybrid</p>
+  <pre><code class="kotlin">// The GitHub task, hybrid: the script does every step exactly, as github-task-scripted.kts does, but the one
+// choice that is a matter of judgement, which way to close the issue (completed, not planned, or a duplicate),
+// the model makes. Needs --reasoner claude. Real writes, to the repository given.
+//   artie run tests/github-task-hybrid.kts owner=JogoShugh repo=heart-github-test --reasoner claude
+val owner by input()
+val repo by input()
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issue = 0L
+    var pull = 0L
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo) {
+        act(&quot;github:open-issue&quot;, &quot;title&quot; to &quot;Crash when a bed has no name (hybrid)&quot;, &quot;body&quot; to &quot;Opened by a HEART script.&quot;) {
+            issue = state[&quot;/number&quot;] as Long
+        }
+    }
+    // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
+    act(&quot;github:repos-get-branch&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;branch&quot; to &quot;main&quot;) {
+        act(&quot;github:branch-from-here&quot;, &quot;name&quot; to &quot;fix-blank-names-hybrid-$stamp&quot;) {
+            act(
+                &quot;github:commit-file&quot;,
+                &quot;path&quot; to &quot;fix-hybrid-$stamp.md&quot;,
+                &quot;message&quot; to &quot;Refuse a bed with no name&quot;,
+                &quot;content&quot; to &quot;Bed names may not be blank.\n&quot;,
+            )
+            act(
+                &quot;github:open-pull-request&quot;,
+                &quot;title&quot; to &quot;Refuse a bed with no name (hybrid)&quot;,
+                &quot;base&quot; to &quot;main&quot;,
+                &quot;body&quot; to &quot;Relates to #$issue.&quot;,
+            ) {
+                pull = state[&quot;/number&quot;] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers(&quot;github:merge&quot;) }
+                act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)
+                check(state[&quot;/merged&quot;] == true) { &quot;the pull request should be merged&quot; }
+            }
+        }
+    }
+    act(&quot;github:issues-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;issue_number&quot; to issue) {
+        // The comment is a new resource: visit it, then come back to the issue to close it.
+        act(&quot;github:comment&quot;, &quot;body&quot; to &quot;Fixed in 1.2 by #$pull.&quot;) {
+            check(state[&quot;/body&quot;] == &quot;Fixed in 1.2 by #$pull.&quot;) { &quot;the comment should say what fixed it&quot; }
+        }
+        reason(&quot;close it the right way: the fix shipped in 1.2&quot;)
+        check(state[&quot;/state&quot;] == &quot;closed&quot;) { &quot;the issue should be closed&quot; }
+        check(state[&quot;/state_reason&quot;] == &quot;completed&quot;) { &quot;the issue should be closed as completed&quot; }
+    }
+}
+</code></pre>
+  <p class="muted">Every run: the gateway at commit e171027, ARTIE at f494ff4. Claude Sonnet 5.5 (claude-sonnet-5-5) as the reasoner. The scratch repository is JogoShugh/heart-github-test.</p>
+</main>
+<script>
+// Kotlin syntax colouring for heart-scripts shown in reports: comments, strings (with their $templates),
+// keywords, numbers, and calls, the DSL's verbs among them. Every <code class="kotlin"> on the page is
+// coloured in place, from its text, so the page needs no library. Colours are the page's own tokens:
+// .kt-cm, .kt-str, .kt-tpl, .kt-kw, .kt-num, .kt-fn.
+(() => {
+  const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
+    "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b(\s*(?=[({]))?/g;
+  const span = (cls, text) => {
+    const s = document.createElement("span");
+    s.className = cls;
+    s.textContent = text;
+    return s;
+  };
+  // A string, its ${…} and $name templates marked inside it.
+  const string = (text) => {
+    const s = document.createElement("span");
+    s.className = "kt-str";
+    let last = 0;
+    text.replace(/\$\{[^}]*\}|\$[A-Za-z_]\w*/g, (m, at) => {
+      s.append(document.createTextNode(text.slice(last, at)), span("kt-tpl", m));
+      last = at + m.length;
+      return m;
+    });
+    s.append(document.createTextNode(text.slice(last)));
+    return s;
+  };
+  const colour = (code) => {
+    const text = code.textContent;
+    const out = document.createDocumentFragment();
+    let last = 0;
+    for (const m of text.matchAll(TOKEN)) {
+      out.append(document.createTextNode(text.slice(last, m.index)));
+      const [all, comment, str, num, word, call] = m;
+      if (comment) out.append(span("kt-cm", comment));
+      else if (str) out.append(string(str));
+      else if (num) out.append(span("kt-num", num));
+      else if (KEYWORDS.has(word)) out.append(span("kt-kw", word), document.createTextNode(call || ""));
+      else if (call !== undefined) out.append(span("kt-fn", word), document.createTextNode(call));
+      else out.append(document.createTextNode(all));
+      last = m.index + all.length;
+    }
+    out.append(document.createTextNode(text.slice(last)));
+    code.replaceChildren(out);
+  };
+  document.querySelectorAll("code.kotlin").forEach(colour);
+})();
+
+</script>
+</body>
+</html>

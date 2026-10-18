@@ -13,18 +13,16 @@ heart("http://localhost:8392/") {
         reason("open an issue titled \"Crash when a bed has no name (reasoned)\", saying it was opened by a HEART script") {
             issue = state["/number"] as Long
         }
-        reason("look at the repository's branches") {
-            reason("open the branch main") {
-                reason("start a new branch from here, named fix-blank-names-reasoned-$stamp") {
-                    reason("commit a file named fix-reasoned-$stamp.md, saying \"Bed names may not be blank.\", with the message \"Refuse a bed with no name\"")
-                    reason("open a pull request into main titled \"Refuse a bed with no name (reasoned)\", saying it relates to #$issue") {
-                        pull = state["/number"] as Long
-                        // GitHub works out whether it can merge a new pull request a moment after it opens.
-                        until(tries = 20) { offers("github:merge") }
-                        reason("merge it, squashing its commits")
-                        check(state["/merged"] == true) { "the pull request should be merged" }
-                    }
-                }
+    }
+    reason("open the branch main of $owner/$repo") {
+        reason("start a new branch from here, named fix-blank-names-reasoned-$stamp") {
+            reason("commit a file named fix-reasoned-$stamp.md, saying \"Bed names may not be blank.\", with the message \"Refuse a bed with no name\"")
+            reason("open a pull request into main titled \"Refuse a bed with no name (reasoned)\", saying it relates to #$issue") {
+                pull = state["/number"] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers("github:merge") }
+                reason("merge it, squashing its commits")
+                check(state["/merged"] == true) { "the pull request should be merged" }
             }
         }
     }

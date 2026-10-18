@@ -13,28 +13,27 @@ heart("http://localhost:8392/") {
         act("github:open-issue", "title" to "Crash when a bed has no name (hybrid)", "body" to "Opened by a HEART script.") {
             issue = state["/number"] as Long
         }
-        follow("github:repos-list-branches") {
-            follow("item", title = "main") {
-                act("github:branch-from-here", "name" to "fix-blank-names-hybrid-$stamp") {
-                    act(
-                        "github:commit-file",
-                        "path" to "fix-hybrid-$stamp.md",
-                        "message" to "Refuse a bed with no name",
-                        "content" to "Bed names may not be blank.\n",
-                    )
-                    act(
-                        "github:open-pull-request",
-                        "title" to "Refuse a bed with no name (hybrid)",
-                        "base" to "main",
-                        "body" to "Relates to #$issue.",
-                    ) {
-                        pull = state["/number"] as Long
-                        // GitHub works out whether it can merge a new pull request a moment after it opens.
-                        until(tries = 20) { offers("github:merge") }
-                        act("github:merge", "merge_method" to "squash")
-                        check(state["/merged"] == true) { "the pull request should be merged" }
-                    }
-                }
+    }
+    // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
+    act("github:repos-get-branch", "owner" to owner, "repo" to repo, "branch" to "main") {
+        act("github:branch-from-here", "name" to "fix-blank-names-hybrid-$stamp") {
+            act(
+                "github:commit-file",
+                "path" to "fix-hybrid-$stamp.md",
+                "message" to "Refuse a bed with no name",
+                "content" to "Bed names may not be blank.\n",
+            )
+            act(
+                "github:open-pull-request",
+                "title" to "Refuse a bed with no name (hybrid)",
+                "base" to "main",
+                "body" to "Relates to #$issue.",
+            ) {
+                pull = state["/number"] as Long
+                // GitHub works out whether it can merge a new pull request a moment after it opens.
+                until(tries = 20) { offers("github:merge") }
+                act("github:merge", "merge_method" to "squash")
+                check(state["/merged"] == true) { "the pull request should be merged" }
             }
         }
     }
