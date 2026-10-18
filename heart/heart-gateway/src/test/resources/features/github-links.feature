@@ -55,7 +55,8 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | alternate        | https://github.com/ada                        | text/html                   |
       | icon             | https://github.com/images/error/ada_happy.gif | image/gif                   |
       | github:followers | /users/ada/followers                          | application/hal+json        |
-      | github:repos     | https://api.github.com/users/ada/repos        | application/vnd.github+json |
+      | github:repos-list-for-user | /users/ada/repos                    | application/hal+json        |
+      | github:subscriptions | https://api.github.com/users/ada/subscriptions | application/vnd.github+json |
     And the embedded "github:user" still has the member "login" as "ada"
     And the answer's state has none of these members
       | member |

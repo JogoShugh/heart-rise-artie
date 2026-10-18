@@ -187,6 +187,13 @@ class GitHubUpstream {
             caller(request)?.let { json(Response(Status.OK), USER.deepCopy().put("login", it)) }
                 ?: message(Status.UNAUTHORIZED, "Requires authentication")
         },
+        // A user's repositories: those the small GitHub knows of, by their issues, pull requests and branches.
+        "/users/{login}/repos" bind Method.GET to { request ->
+            val login = request.path("login")!!
+            val names = (issues.map { it.owner to it.repo } + pulls.map { it.owner to it.repo } +
+                branches.map { it.owner to it.repo }).filter { it.first == login }.distinct().sortedBy { it.second }
+            json(Response(Status.OK), names.map { (owner, repo) -> repository("$owner/$repo", push = true, triage = true) })
+        },
         "/repos/{owner}/{repo}" bind Method.GET to { request ->
             val name = "${request.path("owner")}/${request.path("repo")}"
             val caller = caller(request)

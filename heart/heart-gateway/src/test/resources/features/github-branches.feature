@@ -37,6 +37,17 @@ Feature: Branches, commits and new pull requests, from acts a branch offers
     When "ada" gets "/repos/acme/rockets" through the GitHub gateway
     Then the answer links "github:repos-list-branches" to "/repos/acme/rockets/branches"
 
+  Scenario: The bookmark finds a repository: by its owner and name, or among a user's
+    So a task can begin at the bookmark and reach a repository's branches, as
+    issues and pull requests are found.
+    When "ada" gets "/" through the GitHub gateway
+    Then the index form "github:repos-get" targets "/repos/{owner}/{repo}"
+    And the index form "github:repos-list-for-user" targets "/users/{username}/repos{?type,sort,direction}"
+    When "ada" gets "/users/acme/repos" through the GitHub gateway
+    Then the answer lists
+      | href                | title        |
+      | /repos/acme/rockets | acme/rockets |
+
   Scenario: A repository's branches are listed, each linked by its name
     GitHub lists branches without their own addresses: the list's path names
     the repository, and each item names its branch.

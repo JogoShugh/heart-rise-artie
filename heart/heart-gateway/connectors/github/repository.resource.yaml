@@ -3,6 +3,10 @@
 noun: repository
 collection: repos
 read: repos/get
+# Found from the bookmark, as issues and pull requests are: among a user's, or by its owner and name.
+search: repos/list-for-user
+filters: [type, sort, direction]
+title: /full_name
 # A repository's owner is embedded (connector.yaml, links): the gateway reads the read's path variables from
 # its own URL, and keeps them in the state as hr:address.
 address: /url

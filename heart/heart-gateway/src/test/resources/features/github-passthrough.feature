@@ -58,5 +58,5 @@ Feature: GitHub reads the connector lists, but doesn't model, pass through the g
     And the answer lists one item, titled "Fix the login bug", and embeds it
 
   Scenario: A GitHub read the connector doesn't list is not served, and its links keep GitHub's address
-    When "ada" gets "/users/ada/repos" through the GitHub gateway
+    When "ada" gets "/users/ada/subscriptions" through the GitHub gateway
     Then the GitHub gateway answers 404
