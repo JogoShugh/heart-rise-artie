@@ -1,7 +1,9 @@
 package com.artie.heart.gateway
 
+import com.artie.heart.AlpsType
 import com.artie.heart.Dialect
 import com.artie.heart.Hypermedia
+import com.artie.heart.Relation
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
@@ -125,6 +127,12 @@ class LinkWriter(
     }
 
     /** The served GET at [href], if any. A template is a family of addresses, never one the gateway serves. */
+    /** The relation of the operation that serves [href], when the gateway serves it under its operation's own. */
+    fun servedRelation(href: String): String? = servedBy(href)?.relation
+
+    /** Whether the gateway serves [href]: a path it answers itself, under any relation. */
+    fun serves(href: String): Boolean = servedBy(href) != null
+
     private fun servedBy(href: String): ServedPath? {
         if (!href.startsWith(base) || '{' in href) return null
         val path = href.removePrefix(base).substringBefore('?')
@@ -162,7 +170,7 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
         val obj = node as? ObjectNode ?: return Triple(node, emptyMap(), emptyMap())
         val links = LinkedHashMap<String, Any?>()
         val embedded = LinkedHashMap<String, Any?>()
-        rules.embed.forEach { path -> embed(obj, path)?.let { embedded["$curie:${path.replace('/', '-')}"] = it } }
+        rules.embed.forEach { path -> embed(obj, path)?.let { embedded["$curie:${embeddedName(path)}"] = it } }
         rules.upstreamLinks?.let { member -> upstream(obj.remove(member), links) }
         rules.drop.forEach { obj.remove(it) }
         members(obj, "", links)
@@ -222,13 +230,97 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
         writer.add(links, prefix + stem(name), if (prefix.isEmpty()) name else prefix + name, href)
     }
 
-    private companion object {
-        const val URL = "_url"
-        val MAPPER = ObjectMapper()
+    companion object {
+        private const val URL = "_url"
+        private val MAPPER = ObjectMapper()
 
-        fun isHttp(text: String) = text.startsWith("https://") || text.startsWith("http://")
+        private fun isHttp(text: String) = text.startsWith("https://") || text.startsWith("http://")
 
         /** A member's name as a relation: `comments_url` is `comments`; `url` alone names nothing more. */
         fun stem(name: String): String = name.removeSuffix(URL).removeSuffix("url").replace('_', '-')
+
+        /** An embedded resource's relation, from its path: `head/repo` is `head-repo`, `closed_by` is `closed-by`. */
+        fun embeddedName(path: String): String = path.replace('/', '-').replace('_', '-')
+    }
+}
+
+/**
+ * The relations a [LinkLifter] can make from an upstream's answers, worked out before any answer is read,
+ * from the schemas its description gives each read's answer, by the same [rules], so the profile describes
+ * each before it is used. A link the gateway serves under its operation's relation needs none: that one is
+ * already described. The words are the description's where it has them.
+ */
+class LinkRelations(private val rules: LinkRules, private val writer: LinkWriter) {
+    private val found = LinkedHashMap<String, Relation>()
+
+    /** Every relation the answers of [routes] can link or embed under, once each. */
+    fun of(routes: List<SpecRoute>): List<Relation> {
+        routes.mapNotNull { it.response }.forEach { schema -> resource(item(schema)) }
+        return found.values.toList()
+    }
+
+    private fun resource(schema: Map<String, Any?>) {
+        val members = properties(schema)
+        rules.embed.forEach { path -> embedded(members, path) }
+        val upstream = rules.upstreamLinks?.let { members[it] }?.let { properties(map(it)) }.orEmpty()
+        upstream.filterKeys { it != "self" }.forEach { (rel, link) ->
+            link(rel.replace('_', '-'), "${rel}_url", properties(map(link))["href"]?.let(::map))
+        }
+        walk(members, "", "")
+    }
+
+    private fun embedded(members: Map<String, Any?>, path: String) {
+        val names = path.split("/")
+        val parent = names.dropLast(1).fold(members as Map<String, Any?>?) { at, name ->
+            at?.get(name)?.let { properties(map(it)) }
+        }
+        val schema = parent?.get(names.last())?.let(::map) ?: return
+        val id = LinkLifter.embeddedName(path)
+        add(id, schema, "The ${path.replace('/', ' ').replace('_', ' ')} it holds, a resource of its own, embedded.")
+        resource(item(schema))
+    }
+
+    private fun walk(members: Map<String, Any?>, prefix: String, path: String) {
+        members.forEach { (name, value) ->
+            val schema = map(value)
+            val nested = properties(schema)
+            when {
+                "$path$name" in rules.embed || name == rules.upstreamLinks -> Unit
+                nested.isNotEmpty() -> walk(nested, prefix + name.replace('_', '-') + "-", "$path$name/")
+                rules.isLink(name) && !(prefix.isEmpty() && name == rules.self) ->
+                    link(prefix + LinkLifter.stem(name), prefix + name, schema)
+            }
+        }
+    }
+
+    private fun link(name: String, member: String, schema: Map<String, Any?>?) {
+        if (member in rules.relations) return
+        val example = schema?.get("example") as? String
+        if (example != null && writer.servedRelation(example) != null) return
+        val served = example != null && writer.serves(example)
+        val also = if (served) " The gateway serves it, passed through as it comes." else ""
+        add(name.trimEnd('-'), schema.orEmpty(), "A link GitHub gives as $member.$also")
+    }
+
+    private fun add(id: String, schema: Map<String, Any?>, fallback: String) {
+        if (id.isEmpty() || id in found) return
+        val words = (schema["description"] as? String)?.trim()?.ifEmpty { null } ?: fallback
+        val title = id.replace('-', ' ').replaceFirstChar { it.uppercase() }
+        found[id] = Relation(id, AlpsType.SAFE, title, words, words)
+    }
+
+    private companion object {
+        @Suppress("UNCHECKED_CAST")
+        fun map(value: Any?): Map<String, Any?> = value as? Map<String, Any?> ?: emptyMap()
+
+        /** An array's items, or the schema itself. */
+        fun item(schema: Map<String, Any?>): Map<String, Any?> = map(schema["items"]).ifEmpty { schema }
+
+        /** A schema's properties, with those of every allOf, oneOf and anyOf branch. */
+        fun properties(schema: Map<String, Any?>): Map<String, Any?> {
+            val own = map(schema["properties"])
+            val branches = listOf("allOf", "oneOf", "anyOf").flatMap { (schema[it] as? List<*>).orEmpty() }
+            return own + branches.fold(emptyMap()) { all, branch -> all + properties(map(branch)) }
+        }
     }
 }

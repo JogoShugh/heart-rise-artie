@@ -51,7 +51,6 @@ class Gateway(
 ) {
     private val calls = Upstream(upstream, auth, mapper, connector?.headers.orEmpty())
     private val links = AffordanceLinks(calls)
-    private val vocabulary = Profile(profile, spec.title, spec.doc, relations(spec, connector))
 
     /** Which members of the upstream's answers are only links (Links.kt), when the connector says. */
     private val rules = connector?.links
@@ -65,10 +64,27 @@ class Gateway(
      */
     private val writer = rules?.let { rules ->
         val served = spec.routes.values.filter { it.method == "GET" }.map { route ->
-            val relation = if (route.operation.name in passed) null else vocabulary.key(route.operation.relation)
+            val relation = if (route.operation.name in passed) null else "$profile:${route.operation.relation}"
             ServedPath(route.path, relation)
         }
         LinkWriter(rules, upstreamUrl.orEmpty().trimEnd('/'), served, profile)
+    }
+
+    /**
+     * The profile: every operation's and act's relation, and every relation the gateway's links and embedded
+     * resources can use, worked out from the reads' answers before any is read (LinkRelations).
+     */
+    private val vocabulary = Profile(
+        profile,
+        spec.title,
+        spec.doc,
+        (relations(spec, connector) + linkRelations(spec)).distinctBy { it.id },
+    )
+
+    private fun linkRelations(spec: GatewaySpec): List<Relation> {
+        val linked = rules ?: return emptyList()
+        val reads = spec.routes.values.filter { it.method == "GET" }
+        return writer?.let { LinkRelations(linked, it).of(reads) }.orEmpty()
     }
 
     /** The reads the connector passes through, served beside HEART's routes. */

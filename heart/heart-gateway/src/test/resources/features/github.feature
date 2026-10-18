@@ -18,9 +18,11 @@ Feature: The gateway in front of GitHub, known by its own description, sliced to
     And pull request 482 of "acme/rockets" is "open" upstream, titled "Fix the login bug"
     And pull request 7 of "acme/rockets" is "closed" upstream, titled "Bump the engines"
 
-  Scenario: The profile has a relation for each act, and for each included operation no act is made of
+  Scenario: The profile has a relation for each act, for each included operation no act is made of, and none for a read passed through
+    Beside these, it describes the relations the gateway's links and embedded
+    resources use (github-links.feature).
     When a client gets "/profiles/github" through the GitHub gateway
-    Then the profile describes exactly these relations
+    Then the profile describes these relations, among others
       | relation                |
       | pulls-list              |
       | pulls-get               |
@@ -50,6 +52,11 @@ Feature: The gateway in front of GitHub, known by its own description, sliced to
       | comment                 |
       | add-sub-issue           |
       | remove-sub-issue        |
+    And the profile describes none of these relations
+      | relation                      |
+      | users-get-by-username         |
+      | users-list-followers-for-user |
+      | pulls-list-commits            |
 
   Scenario: The bookmark offers the search and lookup the resource file declares
     When a client gets "/" through the GitHub gateway

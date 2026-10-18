@@ -24,6 +24,23 @@ class LinkSteps(private val github: GitHubSteps) {
         into.forEach { assertEquals(profile, it.path("profile").asText(), "$it") }
     }
 
+    @Then("every {string} relation the answer uses is described in the gateway's profile")
+    fun described(curie: String) {
+        val used = relations(answer).filter { it.startsWith("$curie:") }.map { it.removePrefix("$curie:") }.toSet()
+        val held = answer
+        github.getAs("ada", "/profiles/$curie")
+        val described = github.lastAnswer.path("alps").path("descriptor").map { it.path("id").asText() }.toSet()
+        assertTrue(used.isNotEmpty(), "no $curie relation in $held")
+        assertEquals(emptySet<String>(), used - described, "used but not described")
+    }
+
+    /** Every relation [resource] links or embeds under, and those of what it embeds, however deep. */
+    private fun relations(resource: JsonNode): Set<String> =
+        resource.path("_links").properties().map { it.key }.toSet() +
+            resource.path("_embedded").properties().flatMap { (rel, value) ->
+                listOf(rel) + (if (value.isArray) value.toList() else listOf(value)).flatMap(::relations)
+            }
+
     @Then("no link's type carries a parameter")
     fun typesBare() = links(answer).forEach { assertFalse(';' in it.path("type").asText(), "$it") }
 

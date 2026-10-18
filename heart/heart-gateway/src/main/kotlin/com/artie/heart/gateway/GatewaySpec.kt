@@ -35,13 +35,17 @@ class SpecType(
 /** A parameter of an operation: its name, where it goes (`path` or `query`), its words and its JSON Schema. */
 class SpecParameter(val name: String, val location: String, val description: String, val schema: Map<String, Any>)
 
-/** An operation where it is served: its method, its path template, its parameters, and its JSON body's schema. */
+/**
+ * An operation where it is served: its method, its path template, its parameters, its JSON body's schema,
+ * and the schema of its JSON answer when it succeeds.
+ */
 class SpecRoute(
     val operation: SpecOperation,
     val method: String,
     val path: PathTemplate,
     val parameters: List<SpecParameter>,
     val body: Map<String, Any>?,
+    val response: Map<String, Any>? = null,
 )
 
 /**
@@ -122,7 +126,8 @@ class GatewaySpec(text: String, include: Set<OperationId>? = null) {
             SpecParameter(parameter.name, parameter.`in`, parameter.description.orEmpty(), schema)
         }
         val body = plain(operation.requestBody?.content?.get(JSON)?.schema)
-        return SpecRoute(operation(operation), method, path, parameters, body)
+        val response = plain(operation.responses?.get("200")?.content?.get(JSON)?.schema)
+        return SpecRoute(operation(operation), method, path, parameters, body, response)
     }
 
     /** A schema as plain JSON values. */

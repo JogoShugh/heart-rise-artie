@@ -96,6 +96,21 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | github:base-user-followers |
       | github:pulls-get          |
 
+  Scenario Outline: Every relation an answer uses, in its links and what it embeds, is described in the profile
+    The relations the gateway makes from GitHub's members (github:followers,
+    github:diff, github:head-repo) are worked out when it starts, from the
+    answers its description says each read gives, by the same rules, so each
+    is described before it is ever used. The words are GitHub's where its
+    description has them.
+    When "ada" gets "<path>" through the GitHub gateway
+    Then every "github" relation the answer uses is described in the gateway's profile
+
+    Examples:
+      | path                          |
+      | /repos/acme/rockets/issues/10 |
+      | /repos/acme/rockets/pulls/482 |
+      | /users/ada                    |
+
   Scenario Outline: Every link into the gateway names HEART's profile by HAL's link profile, never by a media-type parameter
     SPEC §6.1 withdrew the media-type profile parameter: connegp reserves it
     for profiles of one media type, and heart-rise spans two. A link says what

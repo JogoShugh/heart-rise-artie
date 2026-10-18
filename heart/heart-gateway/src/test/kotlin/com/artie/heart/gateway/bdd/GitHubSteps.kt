@@ -217,10 +217,16 @@ class GitHubSteps {
     fun offers(table: DataTable) =
         assertEquals(table.column("act"), json.path("_forms").fieldNames().asSequence().toSet(), "$json")
 
-    @Then("the profile describes exactly these relations")
+    @Then("the profile describes these relations, among others")
     fun profile(table: DataTable) {
-        val descriptors = json.path("alps").path("descriptor").map { it.path("id").asText() }
-        assertEquals(table.column("relation"), descriptors.toSet())
+        val descriptors = json.path("alps").path("descriptor").map { it.path("id").asText() }.toSet()
+        assertEquals(emptySet<String>(), table.column("relation") - descriptors, "not described")
+    }
+
+    @Then("the profile describes none of these relations")
+    fun profileLacks(table: DataTable) {
+        val descriptors = json.path("alps").path("descriptor").map { it.path("id").asText() }.toSet()
+        assertEquals(emptySet<String>(), table.column("relation").intersect(descriptors), "described")
     }
 
     @Then("the index form {string} field {string} is one of")
