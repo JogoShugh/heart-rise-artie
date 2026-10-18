@@ -6,6 +6,9 @@ read: repos/get
 # A repository's owner is embedded (connector.yaml, links): the gateway reads the read's path variables from
 # its own URL, and keeps them in the state as hr:address.
 address: /url
+# Its branches, which the branch resource file searches by: each branch offers new branches, commits and
+# pull requests (branch.resource.yaml).
+links: [repos/list-branches]
 acts:
   open-issue:
     operation: issues/create

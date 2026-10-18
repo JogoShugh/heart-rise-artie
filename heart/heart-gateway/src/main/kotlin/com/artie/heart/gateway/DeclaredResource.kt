@@ -115,18 +115,21 @@ internal class DeclaredResource(
             throw ConcurrentWriteException("$item changed upstream since it was checked")
         }
         val route = spec.route(act.operation)
-        val fields = mapper.convertValue(input, BODY).filterKeys { it in act.fields }
+        val sent = mapper.convertValue(input, BODY)
+        val fields = sent.filterKeys { it in act.fields }.mapValues { (field, value) -> act.encoded(field, value) }
+        val inputs = sent.filterKeys { it in act.inputs }.mapValues { (_, value) -> value.toString() }
         // A path variable the state doesn't fill is the client's field of that name: remove-label's {name}.
         val inPath = ActSchema(act, route, declared.file).pathFields(pointers.keys).toSet()
         val variables = pointers.mapValues { (_, pointer) -> checked.json.at(pointer).asText() } +
             fields.filterKeys { it in inPath }.mapValues { (_, value) -> value.toString() }
-        val body = act.fixed + fields.filterKeys { it !in inPath } +
+        val body = act.filled(inputs) + fields.filterKeys { it !in inPath } +
             act.bound.mapValues { (_, pointer) -> mapper.convertValue(checked.json.at(pointer), Any::class.java) }
         val statuses = RefusalStatuses(act.stale, act.refused)
         val path = ItemPath.fill(route.path, variables)
         val answer = calls.act(route.method, path, mapper.writeValueAsString(body), statuses)
-        // An act that makes another resource answers with it; heart-core names it in Location (201).
-        val created = act.creates?.let { locate(it, answer.body) }
+        // An act that makes another resource names it in Location (201): where the act says it is, or as its answer.
+        val created = act.at?.let { ItemPath.fill(it, variables + inputs) }
+            ?: act.creates?.let { locate(it, answer.body) }
         return Acted(keys.state(calls.get(item)), created = created)
     }
 

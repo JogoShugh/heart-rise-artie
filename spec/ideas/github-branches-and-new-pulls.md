@@ -75,3 +75,20 @@ under the gate rules.
 4. The scripted, reasoned and hybrid runs, three each, with run reports and the comparison page.
 
 Estimate: half a day if the unknowns fit the configuration; about a day if one needs gateway code.
+
+## Decided 2026-10-18, before building
+
+The three unknowns each need a small, general gateway mechanism, declared in a resource file:
+
+1. **Inputs and body templates.** An act may declare `inputs`, fields the client fills that are no
+   member of the upstream's body, each with its own JSON Schema, and a `body` whose string values
+   are templates filled from them: `inputs: { name: {...} }`, `body: { ref: "refs/heads/{name}" }`.
+   The client never types `refs/heads/`.
+2. **Encoding.** An act may say `encode: { content: base64 }`: the form asks for plain text, and the
+   gateway encodes the field before sending.
+3. **Address templates.** An act that makes a resource whose answer isn't that resource says where
+   it is: `creates: branch` with `at: /repos/{owner}/{repo}/branches/{name}`, filled from the owning
+   resource's state and the act's fields, for the 201's Location.
+
+Known limit: GitHub's contents path is one path segment in the gateway's routes, so a file path
+with slashes is encoded as one segment. The first version commits files at the repository's root.

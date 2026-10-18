@@ -21,15 +21,16 @@ internal class ActSchema(private val act: ActDeclaration, private val route: Spe
 
     fun of(filled: Set<String>): Map<String, Any> {
         val inPath = pathFields(filled)
-        val required = (body["required"] as? List<*>).orEmpty().toSet() + inPath
+        val required = (body["required"] as? List<*>).orEmpty().toSet() + inPath + act.inputs.keys
         return mapOf(
             "\$schema" to "https://json-schema.org/draft/2020-12/schema",
             "type" to "object",
             "title" to act.title,
-            "properties" to act.fields.associateWith { field ->
+            // An input is the resource file's own field, with its own schema; the rest are the operation's.
+            "properties" to act.inputs + act.fields.associateWith { field ->
                 checkNotNull(property(field)) { "$file: ${act.operation} has no field $field" }
             },
-            "required" to act.fields.filter { it in required },
+            "required" to (act.inputs.keys + act.fields).filter { it in required },
             "additionalProperties" to false,
         ) + alternatives()
     }

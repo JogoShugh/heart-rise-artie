@@ -32,6 +32,12 @@ data class Pull(
     val requestedReviewers: MutableList<String> = mutableListOf(),
 )
 
+/** A branch as the small GitHub keeps it: its repository, name, head commit, and whether it is protected. */
+data class Branch(val owner: String, val repo: String, val name: String, var sha: String, var protected: Boolean = false)
+
+/** A file committed through the contents API: on which branch, at which path, its text, and the commit message. */
+data class Committed(val owner: String, val repo: String, val branch: String, val path: String, val text: String, val message: String)
+
 /** An issue as the small GitHub keeps it. */
 data class Issue(
     val owner: String,
@@ -104,6 +110,12 @@ class GitHubUpstream {
     /** Each user's followers, by login, in order; GitHub pages them [FOLLOWERS_PAGE] at a time. */
     val followers = mutableMapOf<String, List<String>>()
 
+    /** Branches, in every repository. */
+    val branches = mutableListOf<Branch>()
+
+    /** Files committed through the contents API, in order. */
+    val committed = mutableListOf<Committed>()
+
     private val mapper = ObjectMapper()
 
     val handler: HttpHandler = { request: Request ->
@@ -155,6 +167,16 @@ class GitHubUpstream {
         "/repos/{owner}/{repo}/pulls/{number}/update-branch" bind Method.PUT to { request ->
             pull(request)?.let { updateBranch(it, request) } ?: Response(Status.NOT_FOUND)
         },
+        "/repos/{owner}/{repo}/branches/{branch}" bind Method.GET to { request ->
+            branch(request, request.path("branch"))?.let { json(Response(Status.OK), branchBody(it)) }
+                ?: message(Status.NOT_FOUND, "Branch not found")
+        },
+        "/repos/{owner}/{repo}/branches" bind Method.GET to { request ->
+            json(Response(Status.OK), inRepo(request).map { branchBody(it) })
+        },
+        "/repos/{owner}/{repo}/git/refs" bind Method.POST to { request -> createRef(request) },
+        "/repos/{owner}/{repo}/contents/{path}" bind Method.PUT to { request -> commitFile(request) },
+        "/repos/{owner}/{repo}/pulls" bind Method.POST to { request -> openPull(request) },
         "/users/{login}/followers" bind Method.GET to { request -> followersOf(request) },
         "/users/{login}" bind Method.GET to { request -> json(Response(Status.OK), user(request.path("login")!!)) },
         "/repos/{owner}/{repo}/pulls/{number}/commits" bind Method.GET to { request ->
@@ -301,6 +323,63 @@ class GitHubUpstream {
             json(Response(Status.OK), listed.map { body(it) })
         },
     )
+
+    private fun inRepo(request: Request): List<Branch> =
+        branches.filter { it.owner == request.path("owner") && it.repo == request.path("repo") }
+
+    private fun branch(request: Request, name: String?): Branch? = inRepo(request).firstOrNull { it.name == name }
+
+    /** A branch as GitHub answers for it: its head commit, its own links, and whether it is protected. */
+    private fun branchBody(branch: Branch): JsonNode {
+        val api = "https://api.github.com/repos/${branch.owner}/${branch.repo}"
+        return mapper.createObjectNode().apply {
+            put("name", branch.name)
+            putObject("commit").put("sha", branch.sha).put("url", "$api/commits/${branch.sha}")
+            putObject("_links").apply {
+                putObject("self").put("href", "$api/branches/${branch.name}")
+                putObject("html").put("href", "https://github.com/${branch.owner}/${branch.repo}/tree/${branch.name}")
+            }
+            put("protected", branch.protected)
+        }
+    }
+
+    /** As GitHub does: a ref under refs/heads/ at an existing commit is a new branch; a taken name is a 422. */
+    private fun createRef(request: Request): Response {
+        val change = mapper.readTree(request.bodyString())
+        val ref = change.path("ref").asText()
+        val name = ref.removePrefix("refs/heads/")
+        if (!ref.startsWith("refs/heads/") || branch(request, name) != null) {
+            return message(Status.UNPROCESSABLE_ENTITY, "Reference already exists")
+        }
+        val made = Branch(request.path("owner")!!, request.path("repo")!!, name, change.path("sha").asText())
+        branches += made
+        val api = "https://api.github.com/repos/${made.owner}/${made.repo}"
+        return json(Response(Status.CREATED), mapOf("ref" to ref, "url" to "$api/git/refs/heads/$name",
+            "object" to mapOf("sha" to made.sha, "type" to "commit")))
+    }
+
+    /** As GitHub does: the content is base64; the commit moves the branch on; the answer is the content and commit. */
+    private fun commitFile(request: Request): Response {
+        val change = mapper.readTree(request.bodyString())
+        val branch = branch(request, change.path("branch").asText()) ?: return message(Status.NOT_FOUND, "Branch not found")
+        val text = String(java.util.Base64.getDecoder().decode(change.path("content").asText()))
+        val path = request.path("path")!!
+        committed += Committed(branch.owner, branch.repo, branch.name, path, text, change.path("message").asText())
+        branch.sha = sha256("${branch.sha}$path$text").take(SHA)
+        return json(Response(Status.CREATED), mapOf("content" to mapOf("path" to path),
+            "commit" to mapOf("sha" to branch.sha, "message" to change.path("message").asText())))
+    }
+
+    /** As GitHub does: a pull request from a branch into another, answered with the new pull request. */
+    private fun openPull(request: Request): Response {
+        val change = mapper.readTree(request.bodyString())
+        val head = branch(request, change.path("head").asText()) ?: return message(Status.UNPROCESSABLE_ENTITY, "Validation Failed")
+        val number = (pulls.maxOfOrNull { it.number } ?: 0) + 1
+        val pull = Pull(head.owner, head.repo, number, "open", change.path("title").asText(), head = head.sha,
+            body = change.path("body").asText(""), draft = change.path("draft").asBoolean(false))
+        pulls += pull
+        return json(Response(Status.CREATED), body(pull))
+    }
 
     /** GitHub's own example user, as [login]: its addresses are its own. */
     private fun user(login: String): JsonNode = addressed(USER.deepCopy(), login, login, 0, login)
@@ -494,6 +573,9 @@ class GitHubUpstream {
     private companion object {
         const val ID_BASE = 1_000_000L
         const val FOLLOWERS_PAGE = 2
+
+        /** The length of a commit's sha. */
+        const val SHA = 40
 
         /** GitHub's own examples, from its description (github/rest-api-description, MIT licensed). */
         val PULL: ObjectNode = example("/github/pull-request.json")
