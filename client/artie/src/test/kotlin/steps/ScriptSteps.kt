@@ -24,6 +24,11 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         reasoner = ScriptedReasoner(heart.Selection.Act(form, chosen))
     }
 
+    @io.cucumber.java.en.Given("ARTIE's reasoner is Claude, through the scripted Claude API")
+    fun reasonerIsClaude() {
+        reasoner = heart.ClaudeReasoner(ctx.transport, "test-key")
+    }
+
     @When("this script runs with ARTIE, allowed its reasoner")
     fun runsReasoning(script: String) = runs(script, ArtieNavigator(ctx.client, reasoner))
 

@@ -45,6 +45,15 @@ class ShapeSteps(private val steps: ScriptSteps) {
         assertEquals(table.asMaps(), read)
     }
 
+    @Then("trace step {int} keeps these model calls")
+    fun modelCalls(step: Int, table: DataTable) {
+        val calls = (traced()[step - 1]["model"] as? JsonArray).orEmpty().map { it.jsonObject }
+        val read = calls.map { call ->
+            listOf("model", "asked", "answered").associateWith { call[it]?.jsonPrimitive?.content.orEmpty() }
+        }
+        assertEquals(table.asMaps(), read)
+    }
+
     /** The trace's steps, as the trace file has them: some members are known only once the run is over. */
     private fun traced(): List<JsonObject> =
         (Json.parseToJsonElement(steps.run.traceJson()).jsonObject.getValue("steps") as JsonArray).map { it.jsonObject }

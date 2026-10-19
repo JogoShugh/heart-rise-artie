@@ -141,8 +141,14 @@ class Choice(
     val title: String? = null,
 )
 
-/** A reason step's outcome: what was [chosen] (null when nothing was), and the [answer] to making it. */
-class Reasoned(val chosen: Choice?, val answer: Answer)
+/**
+ * A reason step's outcome: what was [chosen] (null when nothing was), the [answer] to making it, and each call
+ * the client made to its [model] for it, for the run's record.
+ */
+class Reasoned(val chosen: Choice?, val answer: Answer, val model: List<ModelCall> = emptyList())
+
+/** One call to a reasoner's model: which [model], what it was [asked], and what it [answered]. No key. */
+class ModelCall(val model: String?, val asked: String, val answered: String)
 
 /** How a HEART client is found to run scripts: by ServiceLoader, as a JDBC driver is. */
 fun interface NavigatorProvider {

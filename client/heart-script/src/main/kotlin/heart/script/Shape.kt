@@ -21,6 +21,15 @@ internal fun TraceStep.shape(): Map<String, JsonElement> = buildMap {
     waited?.let { put("waited", it) }
     // A reason step chose a value its words didn't give: the reasoner's judgement, not the words'.
     if (asked.mode == "intent") put("judgement", JsonPrimitive(Shape.chose(step.values)))
+    if (model.isNotEmpty()) {
+        put("model", JsonArray(model.map { call ->
+            buildJsonObject {
+                call.model?.let { put("model", it) }
+                put("asked", call.asked)
+                put("answered", call.answered)
+            }
+        }))
+    }
     used?.let { used ->
         put("chose", chose(used))
         used.guard?.let { put("guard", guard(it)) }

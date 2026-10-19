@@ -65,3 +65,19 @@ Feature: The trace keeps a run's shape: blocks, waits, how links were picked, ju
     And trace step 2 keeps these members for later steps
       | pointer | read by |
       | /number | 3       |
+
+  Scenario: A reason step keeps what the model was asked and what it answered
+    Given the reasoner chooses
+      | intent             | selection | relation | fields                               |
+      | sow basil in bed 7 | act       | sow      | {"seedType": "basil", "depthCm": "2"} |
+    When this script runs, allowed a reasoner
+      """kotlin
+      heart("scripted://service/") {
+          act("bed-get", "id" to 1)
+          reason("sow basil in bed ${state["number"]}")
+      }
+      """
+    Then the script finished
+    And trace step 3 keeps these model calls
+      | model      | asked                      | answered   |
+      | scripted-1 | intent: sow basil in bed 7 | chose: sow |

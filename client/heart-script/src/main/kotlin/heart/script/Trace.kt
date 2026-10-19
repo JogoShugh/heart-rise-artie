@@ -50,6 +50,9 @@ class TraceStep(
     /** An until that held: what it waited for, as the script wrote it, and how many reads it took. */
     var waited: JsonObject? = null
 
+    /** A reason step's calls to the reasoner's model: what it was asked and what it answered. */
+    var model: List<ModelCall> = emptyList()
+
     /** When a step began, and how long it took. */
     class Began(val at: Instant, val ms: Long)
 
@@ -159,9 +162,12 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
 
     /** One intent step: the words, and the choice the reasoner made, known only once it has made it. */
     override fun reason(intent: String): Reasoned {
-        var chosen: Choice? = null
-        val answer = traced({ reasonAsked(intent, chosen) }) { inner.reason(intent).also { chosen = it.chosen }.answer }
-        return Reasoned(chosen, answer)
+        var reasoned: Reasoned? = null
+        val answer = traced({ reasonAsked(intent, reasoned?.chosen) }) {
+            inner.reason(intent).also { reasoned = it }.answer
+        }
+        reasoned?.model?.takeIf { it.isNotEmpty() }?.let { run.trace.last().model = it }
+        return Reasoned(reasoned?.chosen, answer, reasoned?.model.orEmpty())
     }
 
     /** Make the [call], and trace it as [asked], read after the call. */

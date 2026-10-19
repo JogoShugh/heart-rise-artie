@@ -35,6 +35,20 @@ Feature: A script run with ARTIE records the form or link each step used, as the
       | address  | https://github.gateway.test/repos/acme/rockets/issues/10/actions/close |
     And the run's step 3 guards on rung L2, and on the set, form and schema the gateway serves, with its If-Match
 
+  Scenario: A reason step keeps what Claude was asked and answered, and never the key
+    Given ARTIE's reasoner is Claude, through the scripted Claude API
+    And the Claude API will answer with a tool call selecting "github:comment" with {"body": "Thanks, fixed."}
+    When this script runs with ARTIE, allowed its reasoner
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          reason("thank them, and say it's fixed")
+      }
+      """
+    Then the script finished
+    And the run's step 3 kept one call to Claude, asked with "thank them, and say it's fixed" and answered with "github:comment"
+    And the run's trace never holds the key "test-key"
+
   Scenario: A reason step records the form the reasoner chose
     Given ARTIE's reasoner will choose to act on "github:comment" with {"body": "Thanks, fixed."}
     When this script runs with ARTIE, allowed its reasoner

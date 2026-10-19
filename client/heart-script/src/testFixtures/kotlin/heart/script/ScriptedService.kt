@@ -94,7 +94,8 @@ class ScriptedService : Navigator {
         asked += "reason" to intent
         val chosen = reasons.getValue(intent)
         val answer = if (chosen.follow) follow(chosen.relation, chosen.title) else act(chosen.relation, chosen.fields)
-        return Reasoned(chosen, answer)
+        // As a client reports its model's calls: the scripted reasoner's one, asked the words, answering its choice.
+        return Reasoned(chosen, answer, listOf(ModelCall("scripted-1", "intent: $intent", "chose: ${chosen.relation}")))
     }
 
     private fun at(address: String): Answer = Answer.Done(representation(address).also { held = address })

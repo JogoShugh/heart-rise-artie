@@ -37,6 +37,14 @@ sealed interface Selection {
     data class Clarify(val question: String) : Selection
 }
 
+/**
+ * A reasoner that keeps each call it makes to its model, for a run's record (spec/PLAN-LINE-BY-LINE-REPORT.md):
+ * [taken] hands them over and forgets them.
+ */
+interface KeepsModelCalls {
+    fun taken(): List<heart.script.ModelCall>
+}
+
 /** L6 (SPEC §6.10.7): intent plus manifest and links in, one selection out. Optional; ARTIE works without one. */
 fun interface Reasoner {
     fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection

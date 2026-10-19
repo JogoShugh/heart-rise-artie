@@ -45,6 +45,24 @@ class CaptureSteps(private val ctx: ClientContext) {
         assertTrue(guard["if-match"]?.jsonPrimitive?.content.orEmpty().contains(".L2."), "If-Match: $guard")
     }
 
+    @Then("the run's step {int} kept one call to Claude, asked with {string} and answered with {string}")
+    fun keptCall(step: Int, intent: String, chose: String) {
+        val calls = (traced()[step - 1]["model"] as? kotlinx.serialization.json.JsonArray).orEmpty()
+        assertEquals(1, calls.size, "model calls: $calls")
+        val call = calls.single().jsonObject
+        assertEquals(heart.ClaudeReasoner.DEFAULT_MODEL, call["model"]?.jsonPrimitive?.content)
+        assertTrue(intent in call.getValue("asked").jsonPrimitive.content, "asked: $call")
+        assertTrue(chose in call.getValue("answered").jsonPrimitive.content, "answered: $call")
+    }
+
+    @Then("the run's trace never holds the key {string}")
+    fun noKey(key: String) = assertTrue(key !in Run.current.traceJson(), "the key is in the trace")
+
+    private fun traced(): List<JsonObject> {
+        val steps = Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
+        return (steps as kotlinx.serialization.json.JsonArray).map { it.jsonObject }
+    }
+
     private fun step(step: Int): JsonObject = Run.current.trace[step - 1].json()
 
     /** A body the gateway serves at [href], as it serves it, read past ARTIE's cache. */

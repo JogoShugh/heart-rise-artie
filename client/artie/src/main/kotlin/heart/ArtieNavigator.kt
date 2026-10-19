@@ -74,6 +74,8 @@ class ArtieNavigator(
         var decided: Decision? = null
         val before = client.current
         val rung = client.appliedRung
+        val keeps = thinker as? KeepsModelCalls
+        keeps?.taken()
         val failed = answer("reason") { decided = ArtieAgent(client, thinker).handle(intent, at); client.current!! }
         val reasoned = when (val d = decided) {
             null -> Reasoned(null, failed)
@@ -88,7 +90,7 @@ class ArtieNavigator(
         }
         // The affordance the reasoner's choice used, as the representation it chose from offered it.
         val used = UsedAffordances.chosen(before, decided, rung)
-        return Reasoned(reasoned.chosen, UsedAffordances.with(reasoned.answer, used))
+        return Reasoned(reasoned.chosen, UsedAffordances.with(reasoned.answer, used), keeps?.taken().orEmpty())
     }
 
     private fun answer(what: String, select: () -> HeartRepresentation): Answer = try {

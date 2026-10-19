@@ -32,9 +32,19 @@ class ClaudeReasoner(
     private val transport: Transport,
     private val apiKey: String,
     private val model: String = DEFAULT_MODEL,
-) : Reasoner {
+) : Reasoner, KeepsModelCalls {
+
+    private val calls = mutableListOf<heart.script.ModelCall>()
+
+    /**
+     * Each call since the last were taken: the model, what it was asked (this turn's words: the state, offers,
+     * links and intent; the system prompt and tool are the same every call) and what it answered (its content:
+     * text, and the tool call with its input). The key travels in a header and is never kept.
+     */
+    override fun taken(): List<heart.script.ModelCall> = calls.toList().also { calls.clear() }
 
     override fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection {
+        val asked = turn(intent, state, offers, links)
         val response = transport.send(
             HeartRequest(
                 "POST",
@@ -46,7 +56,9 @@ class ClaudeReasoner(
         check(response.status in SUCCESS) {
             "Claude API answered ${response.status}: ${response.body.take(ERROR_EXCERPT)}"
         }
-        return selection(Json.parseToJsonElement(response.body).jsonObject)
+        val message = Json.parseToJsonElement(response.body).jsonObject
+        calls += heart.script.ModelCall(model, asked, message["content"].toString())
+        return selection(message)
     }
 
     private fun request(
