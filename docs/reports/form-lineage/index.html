@@ -228,6 +228,15 @@ header > div { min-width: 0; flex: 1 1 20rem; }
         <p>The comment goes through with the old forms. The gateway changes right after it.</p>
         <p>If close changed: both modes <span class="stop">stop at the close</span>. If only the set changed: lenient finishes, strict <span class="stop">stops at the close</span>.</p>
         <p>The close is checked against the set the issue offers now, not the one from before the comment.</p></div>
+      <div class="case"><h3>The same form, used twice, renamed in between</h3>
+        <p>On two fresh issues, the script comments twice. The first comment goes through with the comment form as recorded.</p>
+        <p>The gateway then renames the comment's field from body to content, as an API's next version might. It does this with a new connector setting: <code>rename: { content: body }</code>.</p>
+        <p>The second comment: both modes <span class="stop">stop</span>. The guard reports that github:comment changed, with the pinned hash and the offered one. Nothing is sent, and only the first comment exists.</p>
+        <p>Found on the way: the client used to check the fields against the new schema before asking the guard. It now asks the guard first, so the refusal names the real cause.</p></div>
+      <div class="case"><h3>What counts as a change</h3>
+        <p>Any change to what the form does changes its hash: a field added, even an optional one; a field dropped or renamed; a new method or target. Both modes stop.</p>
+        <p>A new title or description does not count. Wording is left out of the hash on purpose, so a reworded form is the same form.</p>
+        <p>Accepting an added optional field as compatible would need a schema comparison. That is not built.</p></div>
       <div class="case"><h3>Nothing changes</h3>
         <p>Strict: finishes, issue closed.</p></div>
       <div class="case"><h3>Re-pin after the unrelated change</h3>
