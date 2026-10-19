@@ -32,6 +32,12 @@ class TraceStep(
     /** The line of the block this step ran in; null at the script's top level. */
     var within: Int? = null
 
+    /** The affordance the client used for this step; null when it says nothing, or none was used. */
+    var used: Used? = null
+
+    /** What the representation the step chose from offered: its forms and its links' relations. */
+    var offered: Representation? = null
+
     /** When a step began, and how long it took. */
     class Began(val at: Instant, val ms: Long)
 
@@ -50,6 +56,13 @@ class TraceStep(
         within?.let { put("within", it) }
         put("params", JsonObject(asked.params.mapValues { (_, v) -> element(v) }))
         put("outcome", outcome)
+        used?.let { put("chose", chose(it)); it.guard?.let { guard -> put("guard", guard(guard)) } }
+        offered?.let { from ->
+            put("offered", buildJsonObject {
+                put("forms", JsonArray(from.offered.sorted().map { JsonPrimitive(it) }))
+                put("links", JsonArray(from.links.keys.sorted().map { JsonPrimitive(it) }))
+            })
+        }
         expect?.let { put("expect", it) }
         put("address", address)
         now?.let { held ->
@@ -68,6 +81,32 @@ class TraceStep(
             })
         }
     }
+}
+
+/** The affordance a step used; a field the form asks for that the step left out is "not sent". */
+private fun TraceStep.chose(used: Used): JsonObject = buildJsonObject {
+    put("kind", used.kind)
+    put("relation", used.relation)
+    used.title?.let { put("title", it) }
+    put("method", used.method)
+    put("target", used.target)
+    put("address", used.address)
+    val left = used.fields.filter { it !in asked.params }
+    if (left.isNotEmpty()) put("not sent", JsonArray(left.map { JsonPrimitive(it) }))
+}
+
+/** What a replay of this step would check before acting. */
+private fun guard(guard: Guard): JsonObject = buildJsonObject {
+    guard.rung?.let { put("rung", it) }
+    guard.set?.let { put("set", pinned(it)) }
+    guard.form?.let { put("form", it) }
+    guard.schema?.let { put("schema", pinned(it)) }
+    guard.ifMatch?.let { put("if-match", it) }
+}
+
+private fun pinned(at: Pinned): JsonObject = buildJsonObject {
+    put("href", at.href)
+    at.integrity?.let { put("integrity", it) }
 }
 
 /** What a step held embedded (SPEC §6.1): by relation, each resource's title and state. */
@@ -155,16 +194,18 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
             is Answer.NewResource -> answer.now
             is Answer.Refused -> null
         }
-        now?.let { at = it.address }
+        val from = held
+        now?.let { at = it.address; held = it }
         val ms = (System.nanoTime() - started) / NANOS_PER_MILLI
-        run.traced(
-            TraceStep(
-                TraceStep.Began(began, ms), asked(), outcomeOf(answer), at, now,
-                answer as? Answer.Refused,
-            ),
-        )
+        val step = TraceStep(TraceStep.Began(began, ms), asked(), outcomeOf(answer), at, now, answer as? Answer.Refused)
+        step.used = answer.used
+        step.offered = from.takeIf { answer.used != null }
+        run.traced(step)
         return answer
     }
+
+    /** What the client held before the step: what a selection chose from. */
+    private var held: Representation? = null
 
     private companion object {
         const val NANOS_PER_MILLI = 1_000_000L

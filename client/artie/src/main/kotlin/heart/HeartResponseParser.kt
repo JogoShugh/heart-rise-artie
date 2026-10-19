@@ -144,6 +144,7 @@ object HeartResponseParser {
                 .mapValues { (_, pointer) -> pointer.jsonPrimitive.content },
             title = obj["title"]?.jsonPrimitive?.content,
             description = obj["description"]?.jsonPrimitive?.content,
+            integrity = obj["hr:integrity"]?.jsonPrimitive?.content,
         )
     }
 }

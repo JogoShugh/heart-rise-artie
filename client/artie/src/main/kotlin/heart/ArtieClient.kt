@@ -191,11 +191,12 @@ class ArtieClient(
 
         /** What a list of choices is read as (HAL-SCHEMA-FORMS-HR Rule 8). */
         const val JSON_MEDIA_TYPE = "application/json"
-
-        fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
-            if (!form.templated) return form.target
-            val expanded = UriTemplate.expand(form.target, held.state, form.templatePointers, fields)
-            return URI(held.url).resolve(expanded).toString()
-        }
     }
+}
+
+/** The address [form] leads to from [held], its template filled from the state and [fields] (Rule 1). */
+internal fun targetOf(form: AffordanceForm, held: HeartRepresentation, fields: JsonObject): String {
+    if (!form.templated) return form.target
+    val expanded = UriTemplate.expand(form.target, held.state, form.templatePointers, fields)
+    return URI(held.url).resolve(expanded).toString()
 }

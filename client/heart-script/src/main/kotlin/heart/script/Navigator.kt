@@ -51,17 +51,53 @@ enum class Refusal(val words: String) {
     Unclear("unclear to the reasoner"),
 }
 
-/** What came of a selection, in the core's terms (SPEC §6.0). */
+/** What came of a selection, in the core's terms (SPEC §6.0); [used], the affordance the client used, if any. */
 sealed interface Answer {
+    val used: Used?
+
     /** Done: what the client holds now, the resource's new state or what a link led to. */
-    class Done(val now: Representation) : Answer
+    class Done(val now: Representation, override val used: Used? = null) : Answer
 
     /** The act brought a resource into being, and the client holds it now. */
-    class NewResource(val now: Representation) : Answer
+    class NewResource(val now: Representation, override val used: Used? = null) : Answer
 
     /** Refused, by [by], with HEART's own reason. */
-    class Refused(val kind: Refusal, val by: Side, val detail: String) : Answer
+    class Refused(val kind: Refusal, val by: Side, val detail: String, override val used: Used? = null) : Answer
 }
+
+/** A resource the server names by address and integrity (SPEC §6.5): an affordance set, a schema. */
+class Pinned(val href: String, val integrity: String?)
+
+/**
+ * What a replay checks before it acts (spec/ideas/replay-guards-lenient-strict.md): the [rung] read at, the
+ * affordance [set] the form came from, the [form]'s own integrity, its [schema], and the If-Match sent.
+ */
+class Guard(
+    val rung: String? = null,
+    val set: Pinned? = null,
+    val form: String? = null,
+    val schema: Pinned? = null,
+    val ifMatch: String? = null,
+)
+
+/**
+ * The affordance a selection used, as the client made it, for the run's record only
+ * (spec/PLAN-LINE-BY-LINE-REPORT.md): a form or a link, its relation and title, the method, the [target] as
+ * offered (a form's URI template, or a link's href), the [address] requested, the [fields] the form asks for,
+ * and what a replay would guard on. A script never reads it.
+ */
+// A record names each of its parts once, by name; grouping them would only rename them.
+@Suppress("LongParameterList")
+class Used(
+    val kind: String,
+    val relation: String,
+    val title: String? = null,
+    val method: String,
+    val target: String,
+    val address: String,
+    val fields: List<String> = emptyList(),
+    val guard: Guard? = null,
+)
 
 /**
  * A HEART client, as a script needs it: the contract any client implements

@@ -34,7 +34,10 @@ internal class SharedLayers(
                 val pointer = schemaPointer(form.schema) ?: return@mapValues form
                 val schemaUrl = URI(link).resolve(pointer).toString()
                 val pin = form.schema[SCHEMA_INTEGRITY]?.jsonPrimitive?.content
-                form.copy(schema = schemas.getOrPut(schemaUrl) { json(schemaUrl, pin) })
+                form.copy(
+                    schema = schemas.getOrPut(schemaUrl) { json(schemaUrl, pin) },
+                    schemaRef = HeartLink(schemaUrl, integrity = pin),
+                )
             },
         )
     }

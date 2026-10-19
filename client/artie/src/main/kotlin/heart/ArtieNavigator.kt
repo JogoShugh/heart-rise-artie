@@ -42,11 +42,16 @@ class ArtieNavigator(
         if (violations.isNotEmpty()) {
             return Answer.Refused(Refusal.InvalidInput, Side.CLIENT, violations.joinToString("; "))
         }
+        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung)
         val answered = answer(rel) { client.act(rel, body) }
-        return if (answered is Answer.Done && client.broughtIntoBeing) Answer.NewResource(answered.now) else answered
+        val made = answered is Answer.Done && client.broughtIntoBeing
+        return UsedAffordances.with(if (made) Answer.NewResource((answered as Answer.Done).now) else answered, used)
     }
 
-    override fun follow(rel: String, title: String?): Answer = answer(rel) { client.follow(rel, title) }
+    override fun follow(rel: String, title: String?): Answer {
+        val used = UsedAffordances.link(client.current, rel, title)
+        return UsedAffordances.with(answer(rel) { client.follow(rel, title) }, used)
+    }
 
     override fun visit(address: String): Answer = answer(address) { client.enter(address) }
 
@@ -67,8 +72,10 @@ class ArtieNavigator(
             return Reasoned(null, Answer.Refused(why.first, Side.CLIENT, why.second))
         }
         var decided: Decision? = null
+        val before = client.current
+        val rung = client.appliedRung
         val failed = answer("reason") { decided = ArtieAgent(client, thinker).handle(intent, at); client.current!! }
-        return when (val d = decided) {
+        val reasoned = when (val d = decided) {
             null -> Reasoned(null, failed)
             is Decision.Acted -> Reasoned(choice(d.selection), done(d.result, client.broughtIntoBeing))
             is Decision.Followed -> Reasoned(choice(d.selection), Answer.Done(representation(d.result)))
@@ -79,6 +86,9 @@ class ArtieNavigator(
                 Reasoned(null, Answer.Refused(Refusal.NotOffered, Side.SERVER, d.reason ?: "no reason given"))
             is Decision.Selected -> error("ARTIE makes every choice it accepts")
         }
+        // The affordance the reasoner's choice used, as the representation it chose from offered it.
+        val used = UsedAffordances.chosen(before, decided, rung)
+        return Reasoned(reasoned.chosen, UsedAffordances.with(reasoned.answer, used))
     }
 
     private fun answer(what: String, select: () -> HeartRepresentation): Answer = try {

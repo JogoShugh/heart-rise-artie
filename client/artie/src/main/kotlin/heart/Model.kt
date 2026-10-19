@@ -54,4 +54,8 @@ data class AffordanceForm(
     val relation: String = rel,
     val title: String? = null,
     val description: String? = null,
+    /** The form's own integrity, as the server gave it (HAL-SCHEMA-FORMS-HR Rule 10); null from older servers. */
+    val integrity: String? = null,
+    /** Where its schema came from, by `$ref`, and that schema's integrity (Rule 3); null when it came inline. */
+    val schemaRef: HeartLink? = null,
 )

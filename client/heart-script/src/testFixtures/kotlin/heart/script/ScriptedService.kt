@@ -30,6 +30,9 @@ class ScriptedService : Navigator {
     /** A resource's whole state, by address, where a feature gives one: numbers, arrays, nested objects. */
     val bodies = mutableMapOf<String, JsonObject>()
 
+    /** The fields a form asks for, by "relation at address". */
+    val fields = mutableMapOf<String, List<String>>()
+
     /** Refusals an act meets, from the server or the client, by "relation at address". */
     val refusals = mutableMapOf<String, Answer.Refused>()
     val asked = mutableListOf<Pair<String, String>>()
@@ -47,13 +50,21 @@ class ScriptedService : Navigator {
         asked += "act" to (if (fields.isEmpty()) rel else "$rel ${json(fields)}")
         refusals["$rel at $held"]?.let { return it }
         val form = forms.first { it.at == held && it.relation == rel }
+        // As a HEART client reports the form it used: its target a template, as an affordance set holds it.
+        val used = Used(
+            "form", rel, method = "POST", target = held.replace(Regex("/\\d+"), "/{id}") + "/actions/$rel",
+            address = "$held/actions/$rel", fields = this.fields["$rel at $held"].orEmpty(),
+            guard = Guard(form = "sha256-$rel", ifMatch = "\"$held\""),
+        )
         val now = representation(form.to).also { held = form.to }
-        return if (form.outcome == "new resource") Answer.NewResource(now) else Answer.Done(now)
+        return if (form.outcome == "new resource") Answer.NewResource(now, used) else Answer.Done(now, used)
     }
 
     override fun follow(rel: String, title: String?): Answer {
         asked += "follow" to (if (title == null) rel else "$rel \"$title\"")
-        return at((links + embeds).first { it.at == held && it.relation == rel && it.title == title }.to)
+        val to = (links + embeds).first { it.at == held && it.relation == rel && it.title == title }.to
+        val used = Used("link", rel, title, "GET", target = to, address = to)
+        return Answer.Done(representation(to).also { held = to }, used)
     }
 
     override fun visit(address: String): Answer {
