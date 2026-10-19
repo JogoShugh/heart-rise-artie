@@ -1,5 +1,6 @@
 package heart.cli
 
+import heart.cli.generate.generate
 import heart.script.ClientSettings
 import heart.script.Navigator
 import heart.script.Refusal
@@ -31,6 +32,7 @@ class ArtieCli(
     private val reportBuilder: Path? = null,
 ) {
     fun run(args: List<String>): Int {
+        if (args.firstOrNull() == "generate") return generated(args)
         val ended = try {
             val asked = arguments(args)
             val file = folder.resolve(asked.script)
@@ -45,6 +47,15 @@ class ArtieCli(
     }
 
     private var output = "words"
+
+    /** `artie generate`: a run's capture made a script with no model in it (spec/PLAN-SCRIPT-GENERATOR.md). */
+    private fun generated(args: List<String>): Int = try {
+        generate(args, folder, out)
+        0
+    } catch (e: BadArguments) {
+        out.println(e.message)
+        STOPPED_BEFORE
+    }
 
     private fun run(asked: Arguments, file: Path): Ended {
         output = asked.output

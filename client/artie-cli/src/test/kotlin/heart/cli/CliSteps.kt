@@ -89,6 +89,19 @@ class CliSteps(private val script: ScriptSteps) {
         assertEquals(guard, askedGuard)
     }
 
+    @Then("the file {string} reads")
+    fun fileReads(name: String, text: String) = assertEquals(text, Files.readString(folder.resolve(name)).trimEnd())
+
+    /** Each selection a trace made, in order: its relation and the values it sent, as text. */
+    private fun selections(trace: String): List<String> =
+        org.yaml.snakeyaml.Yaml().loadAll(Files.readString(folder.resolve(trace))).toList().drop(1)
+            .map { it as Map<*, *> }
+            .mapNotNull { step -> (step["params"] as? Map<*, *>)?.takeIf { "relation" in it } }
+            .map { params -> params.entries.joinToString(", ") { (k, v) -> "$k=$v" } }
+
+    @Then("the run traced in {string} made the same selections as the run traced in {string}")
+    fun sameSelections(made: String, from: String) = assertEquals(selections(from), selections(made))
+
     @Then("the client was made holding no lock file")
     fun holdsNoLock() {
         assertEquals(null, askedPins)
