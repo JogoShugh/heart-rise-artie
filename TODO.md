@@ -4,9 +4,10 @@
 
 What artie generate and the guards do that no live run has shown yet, as of 2026-10-18 (commit 42ac60d).
 
-- [ ] **Strict set check, live.** Both live GitHub captures were read at L0, where a resource's forms come inline
-      and there are no affordance sets, so their lock files pin no sets. Run github-task-reasoned.kts with
-      `--rung L2`, generate from that capture, and run the generated script with `--guard strict`.
+- [x] **Strict set check, live.** Done 2026-10-19 (commit a2609ff): both GitHub runs recorded again at `--rung L2`,
+      their lock files pin the sets of 7 of 10 forms, and the generated scripts ran strict live (issue #117 and
+      pull request #118, reasoned; #119 and #120, hybrid). The other 3 forms come from the service index, inline at
+      every rung.
 - [ ] **A changed form, live.** The guard refusing a changed form, and lenient going past a changed set with its
       warning, are shown only against the small GitHub in process (script-replay.feature, script-guard.feature).
       Live: edit a copy of the gateway's GitHub connector (a field on github:close), restart the gateway on it,
