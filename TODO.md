@@ -8,10 +8,14 @@ What artie generate and the guards do that no live run has shown yet, as of 2026
       their lock files pin the sets of 7 of 10 forms, and the generated scripts ran strict live (issue #117 and
       pull request #118, reasoned; #119 and #120, hybrid). The other 3 forms come from the service index, inline at
       every rung.
-- [ ] **A changed form, live.** The guard refusing a changed form, and lenient going past a changed set with its
-      warning, are shown only against the small GitHub in process (script-replay.feature, script-guard.feature).
-      Live: edit a copy of the gateway's GitHub connector (a field on github:close), restart the gateway on it,
-      and run a generated script lenient and strict against the scratch repository.
+- [x] **A changed form, live.** Done 2026-10-19: the live gateway restarted on a copy of the GitHub connector
+      whose comment act renames body to content (`rename: { content: body }`), and github-task-from-reasoned.kts
+      ran against the scratch repository. Lenient and strict both stopped at the comment, "github:comment
+      changed", nothing sent (issue #123, pull request #124; #125, #126). Reports:
+      docs/reports/line-by-line/github-renamed-lenient/ and github-renamed-strict/.
+- [ ] **A changed set, live.** Lenient going past a changed set with its warning, and re-pinning it, is still shown
+      only against the small GitHub in process (script-replay.feature). Live: change another act of the issue
+      (as edit takes no body), run lenient with `repin: auto` in a trial config, then strict.
 - [ ] **Waits and checks that use the script's own computed values.** Generated scripts copy until(…) and
       check(…) from the source script's lines. A check that reads a variable the source computed, one the
       generator doesn't declare, would not compile. Make the generator notice it: declare it, or mark the line.

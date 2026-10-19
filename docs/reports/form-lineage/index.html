@@ -233,6 +233,10 @@ header > div { min-width: 0; flex: 1 1 20rem; }
         <p>The gateway then renames the comment's field from body to content, as an API's next version might. It does this with a new connector setting: <code>rename: { content: body }</code>.</p>
         <p>The second comment: both modes <span class="stop">stop</span>. The guard reports that github:comment changed, with the pinned hash and the offered one. Nothing is sent, and only the first comment exists.</p>
         <p>Found on the way: the client used to check the fields against the new schema before asking the guard. It now asks the guard first, so the refusal names the real cause.</p></div>
+      <div class="case"><h3>Live: the real gateway, the comment renamed</h3>
+        <p>The live GitHub gateway restarted on a copy of its connector that renames the comment's body to content. The pinned script ran against the scratch repository.</p>
+        <p>It opened the issue, branched, committed, opened and merged the pull request. At the comment, both modes <span class="stop">stopped</span>: github:comment changed. Nothing was sent.</p>
+        <p>Lenient: issue #123, pull request #124. Strict: #125, #126. The offered hash matched the in-process test's exactly.</p></div>
       <div class="case"><h3>What counts as a change</h3>
         <p>Any change to what the form does changes its hash: a field added, even an optional one; a field dropped or renamed; a new method or target. Both modes stop.</p>
         <p>A new title or description does not count. Wording is left out of the hash on purpose, so a reworded form is the same form.</p>
