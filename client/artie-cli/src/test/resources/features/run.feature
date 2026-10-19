@@ -348,7 +348,12 @@ Feature: artie run: a script, run from the command line
       | --report  |
       | report    |
     Then artie exits 3
-    And the run report "report/index.html" holds the script "issue.kts" and these steps
+    And the run report "report/run.html" holds the script "issue.kts" and these steps
+      | say                             | outcome |
+      | enter {entry}                   | done    |
+      | act {relation}, number {number} | done    |
+      | act {relation}                  | refused |
+    And the line-by-line report "report/index.html" shows the script "issue.kts" first, then these steps
       | say                             | outcome |
       | enter {entry}                   | done    |
       | act {relation}, number {number} | done    |

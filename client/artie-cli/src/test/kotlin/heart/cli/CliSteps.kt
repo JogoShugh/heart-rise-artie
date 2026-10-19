@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.file.Files
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /** run.feature: artie run, in a folder of its own, against the DSL features' scripted service. */
 class CliSteps(private val script: ScriptSteps) {
@@ -102,6 +103,26 @@ class CliSteps(private val script: ScriptSteps) {
 
     /** Every document of a YAML stream, as plain maps and lists. */
     private fun yamlDocuments(text: String): List<Any?> = org.yaml.snakeyaml.Yaml().loadAll(text).toList()
+
+    @Then("the line-by-line report {string} shows the script {string} first, then these steps")
+    fun lineByLine(name: String, script: String, table: DataTable) {
+        val page = Files.readString(folder.resolve(name))
+        val text = Files.readString(folder.resolve(script))
+        val pre = Regex("""id="script-text">(.*?)</pre>""", RegexOption.DOT_MATCHES_ALL)
+        val shown = pre.find(page)?.groupValues?.get(1)
+            ?.replace("&lt;", "<")?.replace("&gt;", ">")?.replace("&amp;", "&")
+        // The builder ends the text with a line break, as every line in the page; nothing else may differ.
+        assertEquals(text.trimEnd('\n'), shown?.trimEnd('\n'), "the script the page shows first")
+        assertTrue(page.indexOf("id=\"script-text\"") < page.indexOf("id=\"run-trace\""), "the script comes first")
+        val embedded = Regex("""id="run-trace">(.*?)</pre>""", RegexOption.DOT_MATCHES_ALL)
+        val trace = embedded.find(page)?.groupValues?.get(1)
+            ?.replace("&lt;", "<")?.replace("&gt;", ">")?.replace("&amp;", "&")
+        val steps = yamlDocuments(checkNotNull(trace) { "no YAML trace in the page" }).drop(1).map { it as Map<*, *> }
+        assertEquals(
+            table.asMaps().map { it.getValue("say") to it.getValue("outcome") },
+            steps.map { it["say"].toString() to it["outcome"].toString() },
+        )
+    }
 
     @Then("the run report {string} holds the script {string} and these steps")
     fun report(name: String, script: String, table: DataTable) {

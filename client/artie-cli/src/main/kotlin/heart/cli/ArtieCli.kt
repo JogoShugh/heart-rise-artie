@@ -70,18 +70,37 @@ class ArtieCli(
         return ended
     }
 
-    /** The run report: heart-run-report's builder, given the trace and the script; one page, in [dir]. */
+    /**
+     * The reports, in [dir], from heart-run-report's builders, given the trace and the script: the line-by-line
+     * report as index.html (spec/PLAN-LINE-BY-LINE-REPORT.md: the script first, then what each line did), and
+     * the run report, its tiles and rows, as run.html.
+     */
     private fun report(dir: Path, trace: Path, script: Path, run: Run) {
         Files.createDirectories(dir)
-        val page = dir.resolve("index.html")
         val entry = run.trace.firstOrNull()?.asked?.params?.get("entry")
         val lede = "${script.fileName}, run with artie run" + (entry?.let { " from $it" } ?: "") + "."
         val title = script.fileName.toString().substringBefore('.')
-        val builder = ProcessBuilder("sh", "$reportBuilder", "$trace", "$page", title, lede, "$script")
+        val builder = checkNotNull(reportBuilder)
+        val lines = builder.resolveSibling("build-script-report.sh")
+        val built = listOf(
+            build(lines, trace, dir.resolve("index.html"), title, lede, script),
+            build(builder, trace, dir.resolve("run.html"), title, lede, script),
+        )
+        val failed = built.filterNotNull()
+        if (failed.isNotEmpty()) {
+            out.println("the report failed: ${failed.joinToString("; ")}")
+        } else if (output == "words") {
+            out.println("report: ${folder.relativize(dir.resolve("index.html").toAbsolutePath().normalize())}")
+        }
+    }
+
+    /** One page from [builder]; null when it was built, else what the builder said. */
+    @Suppress("LongParameterList") // A builder's own arguments, each once, in its order.
+    private fun build(builder: Path, trace: Path, page: Path, title: String, lede: String, script: Path): String? {
+        val process = ProcessBuilder("sh", "$builder", "$trace", "$page", title, lede, "$script")
             .redirectErrorStream(true).start()
-        val said = builder.inputStream.bufferedReader().readText()
-        if (builder.waitFor() != 0) out.println("the report failed: ${said.trim()}")
-        else if (output == "words") out.println("report: ${folder.relativize(page.toAbsolutePath().normalize())}")
+        val said = process.inputStream.bufferedReader().readText()
+        return if (process.waitFor() == 0) null else said.trim()
     }
 
     private fun execute(run: Run, script: String): Ended {
