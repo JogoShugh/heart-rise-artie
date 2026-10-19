@@ -5,6 +5,28 @@ Related: exhibits/openapi-vs-heart (the six Wednesday changes and the frost), th
 2026-10-11), "OpenAPI at its best", PLAN-SCRIPT-GENERATOR.md (lock files, guards), SPEC.md §6.5 and §6.9
 (Layers 2 and 3, content addressing).
 
+## Preface: how agents call APIs today
+
+This is an assessment from what was known up to mid-2026, not a survey. Most agents use a fixed, hand-picked set
+of tools: written or generated once, shipped with the agent, and changed only when someone ships it again.
+
+| Common approach | Examples | Variant here |
+|---|---|---|
+| **Fixed function or MCP tools, written by hand** (the most common) | Official vendor MCP servers (GitHub, Slack, Jira); the function-calling tools of most agent frameworks | **B0**: frozen; a change reaches the agent only when its tool code ships again |
+| **Tools generated once from OpenAPI** | The OpenAPI-to-tools converters common in agent frameworks | **B1**: frozen at generation time |
+| **A CLI or raw HTTP, plus training** | Coding agents running `gh`, `curl` or an SDK | **C**: what the model learned, plus reading error messages |
+| **Browser and computer-use agents** | Agents that click through web pages | Not entered. Hypermedia in fact (HTML links and forms), but read by eye, from pixels or the accessibility tree, with no schemas and no integrity: slow and fragile |
+| **Tools refreshed at run time** | MCP's `tools/list_changed`, which few clients act on | **B2**: rare in practice |
+| **Affordances driven by state** | Almost none | **A** (HEART) |
+
+What follows from it:
+- **The real baseline is a frozen, hand-picked tool set (B0).** Every change to the API needs a person to update
+  and redeploy the agent's tool code. That is exactly the axis of this face-off, evolution with no agent code
+  changes, and today's common approach fails it by design.
+- **B2 is the strongest rival, but uncommon.** Beating it shows that HEART beats OpenAPI at its best, not only the
+  typical agent.
+- **B0 is not one we built,** so the comparison can't be called a straw man.
+
 ## The question
 
 A service changes. URLs move, names change, limits tighten, a new input becomes required, a new state appears and
@@ -47,6 +69,7 @@ the token win depends on caching.**
 | **A1** | ARTIE over HEART, reasoning each step | The current state and the forms allowed now | Every step reads fresh forms | Every step |
 | **A2** | A1 with caching: Layers 2 and 3, plus the decision cache | The same, cached by integrity | A changed integrity misses the cache; only that step is re-reasoned | Only steps whose affordance set changed |
 | **A3** | A script from `artie generate`, held to its lock file, with the reasoner as fallback | The same, compiled | The guard refuses a changed form; the reasoner decides that one step | Only refused steps |
+| **B0** | A real, off-the-shelf MCP server, hand-written by its vendor (GitHub's official one); the GitHub round only, since the garden has none | Its hand-picked tools, every turn | It doesn't: 4xx answers, then retries; only a new release of the server catches up | Every step |
 | **B1** | An MCP tool bag from Monday's OpenAPI, frozen | Every tool, every turn | It doesn't: 4xx answers, then retries | Every step |
 | **B2** | An MCP tool bag rebuilt from the live OpenAPI on change (`tools/list_changed`): OpenAPI at its best | Every current tool, every turn | A new tool list: renames, paths, schemas; never state rules | Every step |
 | **C** | The model's training, with a raw fetch tool | The base URL only | Probing and 4xx answers | Every step, plus retries |
@@ -57,10 +80,10 @@ the token win depends on caching.**
 
 | | 1st | 2nd | 3rd | Last |
 |---|---|---|---|---|
-| **Robustness** | A1 ≈ A2 ≈ D | A3 (refused, never wrong) | B2 | X, B1 |
-| **Tokens, no release** | A3 ≈ A2 (near zero) | A1 ≈ D | B2 | B1 |
-| **Tokens at a release** | A2 ≈ A3 (only what changed) | A1 ≈ D | B2 | C, B1 |
-| **Latency** | B2, C | B1 | D, A3 | A1 |
+| **Robustness** | A1 ≈ A2 ≈ D | A3 (refused, never wrong) | B2 | X, B1, B0 |
+| **Tokens, no release** | A3 ≈ A2 (near zero) | A1 ≈ D | B0 ≈ B2 (B0 has fewer tools) | B1 |
+| **Tokens at a release** | A2 ≈ A3 (only what changed) | A1 ≈ D | B2 | C, B1, B0 (retries) |
+| **Latency** | B0, B2, C | B1 | D, A3 | A1 |
 
 The face-off exists to turn these predictions into numbers; until it runs, none of this is a claim.
 
@@ -182,7 +205,7 @@ run made 77 upstream calls; the script generated from it made 65, with no model)
 | `new-capability` | A1, A2, D see it when offered; B2 sees it in the list | B1, C, A3 (until it re-reasons) |
 | Canary | A1, A2, A3, D: `If-Match` refuses a write against the other version's state | B, C: whatever wins the race |
 
-**Overall estimate:** A2 ≈ A1 ≈ D > A3 > B2 > C > B1 > X.
+**Overall estimate:** A2 ≈ A1 ≈ D > A3 > B2 > C > B0 ≈ B1 > X. B0 breaks as B1 does: both are frozen.
 
 - A3 sits below A1 only because it must first be refused before it re-reasons. It never acts wrong in the
   meantime, though: refused, not wrong.
@@ -246,7 +269,8 @@ run made 77 upstream calls; the script generated from it made 65, with no model)
 4. **A3's fallback:** a guard refusal hands that one step to the reasoner, and the run offers a regenerated script
    and its new derivation report.
 5. **B1 and B2:** an MCP server from Monday's OpenAPI, and one that regenerates from the live description and sends
-   `tools/list_changed`. Then C's harness.
+   `tools/list_changed`. B0: GitHub's official MCP server, pointed at the fake GitHub and then the scratch
+   repository, at a pinned version that is never updated during the face-off. Then C's harness.
 6. **The garden rounds, then the fake GitHub through a changed connector, then one live round on the scratch
    repository.**
 7. **The report.**
