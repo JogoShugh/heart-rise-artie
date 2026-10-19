@@ -44,6 +44,12 @@ class TraceStep(
     /** A reason step's template and its slots, when the script's text is known (Sources). */
     var reason: JsonObject? = null
 
+    /** Whether the step opens a block: the script visits what it led to, then comes back. */
+    var opens = false
+
+    /** An until that held: what it waited for, as the script wrote it, and how many reads it took. */
+    var waited: JsonObject? = null
+
     /** When a step began, and how long it took. */
     class Began(val at: Instant, val ms: Long)
 
@@ -61,16 +67,8 @@ class TraceStep(
         line?.let { put("line", it) }
         within?.let { put("within", it) }
         put("params", JsonObject(asked.params.mapValues { (_, v) -> element(v) }))
-        values?.takeIf { it.isNotEmpty() }?.let { put("values", it) }
-        reason?.let { put("reason", it) }
+        shape().forEach { (name, value) -> put(name, value) }
         put("outcome", outcome)
-        used?.let { put("chose", chose(it)); it.guard?.let { guard -> put("guard", guard(guard)) } }
-        offered?.let { from ->
-            put("offered", buildJsonObject {
-                put("forms", JsonArray(from.offered.sorted().map { JsonPrimitive(it) }))
-                put("links", JsonArray(from.links.keys.sorted().map { JsonPrimitive(it) }))
-            })
-        }
         expect?.let { put("expect", it) }
         put("address", address)
         now?.let { held ->
@@ -89,32 +87,6 @@ class TraceStep(
             })
         }
     }
-}
-
-/** The affordance a step used; a field the form asks for that the step left out is "not sent". */
-private fun TraceStep.chose(used: Used): JsonObject = buildJsonObject {
-    put("kind", used.kind)
-    put("relation", used.relation)
-    used.title?.let { put("title", it) }
-    put("method", used.method)
-    put("target", used.target)
-    put("address", used.address)
-    val left = used.fields.filter { it !in asked.params }
-    if (left.isNotEmpty()) put("not sent", JsonArray(left.map { JsonPrimitive(it) }))
-}
-
-/** What a replay of this step would check before acting. */
-private fun guard(guard: Guard): JsonObject = buildJsonObject {
-    guard.rung?.let { put("rung", it) }
-    guard.set?.let { put("set", pinned(it)) }
-    guard.form?.let { put("form", it) }
-    guard.schema?.let { put("schema", pinned(it)) }
-    guard.ifMatch?.let { put("if-match", it) }
-}
-
-private fun pinned(at: Pinned): JsonObject = buildJsonObject {
-    put("href", at.href)
-    at.integrity?.let { put("integrity", it) }
 }
 
 /** What a step held embedded (SPEC §6.1): by relation, each resource's title and state. */

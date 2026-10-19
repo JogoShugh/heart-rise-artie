@@ -88,7 +88,7 @@ class Run(
                     }
                 },
             ),
-            "steps" to kotlinx.serialization.json.JsonArray(trace.map { it.json() }),
+            "steps" to kotlinx.serialization.json.JsonArray(withKeeps(trace.map { it.json() })),
         ),
     ).toString()
     private val values = mutableMapOf<String, String>()
@@ -124,6 +124,32 @@ class Run(
         inputsUsed[name] = value to given
         value
     }
+
+    /** [steps], each with the members of its state later steps read, known only once the run is over. */
+    private fun withKeeps(steps: List<kotlinx.serialization.json.JsonObject>) =
+        steps.zip(Shape.keeps(steps)).map { (step, keeps) ->
+            if (keeps.isEmpty()) {
+                step
+            } else {
+                val read = keeps.mapValues { (_, by) ->
+                    kotlinx.serialization.json.JsonArray(by.map { kotlinx.serialization.json.JsonPrimitive(it) })
+                }
+                kotlinx.serialization.json.JsonObject(step + ("keeps" to kotlinx.serialization.json.JsonObject(read)))
+            }
+        }
+
+    /**
+     * What the until just traced waited for, as the script wrote its condition on that line, and how many
+     * [reads] it took.
+     */
+    internal fun waitedFor(reads: Int): kotlinx.serialization.json.JsonObject =
+        kotlinx.serialization.json.buildJsonObject {
+            val written = trace.last().line?.let { source?.lines()?.getOrNull(it - 1) }
+            val condition = written?.substringAfter("until(", "")?.substringAfter("{", "")?.substringBeforeLast("}")
+            condition?.trim()?.takeIf { it.isNotEmpty() }
+                ?.let { put("for", kotlinx.serialization.json.JsonPrimitive(it)) }
+            put("reads", kotlinx.serialization.json.JsonPrimitive(reads))
+        }
 
     internal fun ask(question: String, default: String): String =
         if (interactive) prompt(question, default) else default.also { defaultsUsed += question to it }

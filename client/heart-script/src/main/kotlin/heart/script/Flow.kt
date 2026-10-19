@@ -11,7 +11,12 @@ import kotlin.time.Duration.Companion.seconds
 fun Here.until(tries: Int = 10, every: Duration = 1.seconds, condition: Here.() -> Boolean) {
     val step = ++run.step
     for (attempt in 1..tries) {
-        if (condition()) return
+        if (condition()) {
+            // A step of its own, even when it held at once: a script made from the run waits here too.
+            run.record(TraceStep.Asked("until", emptyMap()), "held", held)
+            run.trace.last().waited = run.waitedFor(attempt - 1)
+            return
+        }
         if (attempt == tries) break
         run.pause(every)
         held = arrived(step, "\"until\"", navigator.visit(held.address))

@@ -23,7 +23,9 @@ fun heart(entry: String, block: Here.() -> Unit) {
     run.checkInputs()
     val navigator = TracingNavigator(run.navigator(), run)
     val at = run.entry ?: entry
-    Here(navigator, run, arrived(0, at, navigator.enter(at))).block()
+    val entered = arrived(0, at, navigator.enter(at))
+    run.trace.lastOrNull()?.opens = true
+    Here(navigator, run, entered).block()
 }
 
 /**
@@ -122,6 +124,8 @@ class Here internal constructor(
             return
         }
         val from = held.address
+        // The step just traced is this selection's: it opens the block.
+        run.trace.lastOrNull()?.opens = true
         Here(navigator, run, now).block()
         held = arrived(step, what, navigator.visit(from))
     }
