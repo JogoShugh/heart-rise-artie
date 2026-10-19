@@ -47,7 +47,14 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     }
 
     private fun runs(script: String, navigator: ArtieNavigator) {
-        Run.current = Run(navigator = { navigator }).also { it.reasoning = true; it.source = script }
+        run(script, navigator, emptyMap())
+    }
+
+    /** [script] run with [navigator], given [inputs]; the run, for its capture (script-replay.feature). */
+    fun run(script: String, navigator: ArtieNavigator, inputs: Map<String, String>): Run {
+        stopped = null
+        val run = Run(inputs, navigator = { navigator }).also { it.reasoning = true; it.source = script }
+        Run.current = run
         val engine = ScriptHost.engine(listOf("heart.script.*"))
         try {
             engine.eval(script)
@@ -57,6 +64,7 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         } catch (e: ScriptStopped) {
             stopped = e
         }
+        return run
     }
 
     /** The network fails for [path] as Java's HTTP client does with nothing listening: no message. */

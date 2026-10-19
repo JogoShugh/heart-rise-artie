@@ -39,6 +39,8 @@ dependencies {
     testImplementation(testFixtures("com.artie.heart:heart-gateway"))
     // script-github.feature runs real scripts, through Kotlin's script engine.
     testImplementation(project(":heart-script-host"))
+    // script-replay.feature: artie generate's scripts and lock files, run with ARTIE against the gateway.
+    testImplementation(project(":artie-cli"))
     // bdd-gates: the client's architecture boundary as a failing test.
     testImplementation("com.lemonappdev:konsist:0.17.3")
 }

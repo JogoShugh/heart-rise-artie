@@ -53,7 +53,11 @@ class ClientContext {
     /** A server in this process, reached as over the network (github-gateway.feature); else live or fake. */
     var inProcess: Transport? = null
     val wireLog: RecordingTransport by lazy {
-        RecordingTransport(inProcess ?: if (baseUrl != null) HttpTransport() else transport)
+        val live = if (baseUrl != null) HttpTransport() else null
+        // The server in process is read at each request, so a scenario can change it between runs.
+        RecordingTransport(object : Transport {
+            override fun send(request: heart.HeartRequest) = (inProcess ?: live ?: transport).send(request)
+        })
     }
     /** The exchanges kept for a run's capture, next to the wire, when the scenario asks for them. */
     val exchangeLog: heart.ExchangeLog? by lazy { if (keepExchanges) heart.ExchangeLog(wireLog) else null }

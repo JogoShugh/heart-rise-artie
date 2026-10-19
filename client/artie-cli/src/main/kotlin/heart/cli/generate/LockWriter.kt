@@ -5,7 +5,8 @@ package heart.cli.generate
  * relation each form's own integrity and every affordance set it was offered in, and each link's target.
  */
 class LockWriter(capture: Capture) {
-    private val rung = capture.steps.firstNotNullOfOrNull { it.guard["rung"]?.toString() }
+    // The rung the run read at: the highest any step was answered at, since a bookmark answers at L0 whatever is asked.
+    private val rung = capture.steps.mapNotNull { it.guard["rung"]?.toString() }.maxOrNull()
     private val forms = linkedMapOf<String, Pair<String, LinkedHashSet<String>>>()
     private val links = linkedMapOf<String, String>()
 
