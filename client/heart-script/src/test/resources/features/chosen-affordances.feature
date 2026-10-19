@@ -49,6 +49,20 @@ Feature: Each step records the affordance it used, and what was offered where it
       | kind | relation |
       | form | water    |
 
+  Scenario: A step keeps the exchanges the client made for it, when the client keeps them
+    Given the client keeps its exchanges
+    When this script runs, written to a trace
+      """kotlin
+      heart("scripted://service/") {
+          act("bed-get", "id" to 1)
+          act("water", "milliliters" to 250)
+      }
+      """
+    Then the script finished
+    And trace step 3 kept these exchanges
+      | method | url                             | status | request body         |
+      | POST   | scripted://service/beds/1/actions/water | 200    | {"milliliters":250}  |
+
   Scenario: A follow records the link it used
     When this script runs, written to a trace
       """kotlin

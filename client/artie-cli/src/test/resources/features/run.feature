@@ -209,6 +209,28 @@ Feature: artie run: a script, run from the command line
       | enter | scripted://staging/      |
       | act   | issues-get {"number":10} |
 
+  Scenario Outline: The client keeps its exchanges for the run's capture only when asked
+    spec/PLAN-LINE-BY-LINE-REPORT.md: with --exchanges, each step of the
+    trace keeps the requests the client sent and their answers.
+    Given the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+      }
+      """
+    When artie is run with
+      | argument   |
+      | run        |
+      | issue.kts  |
+      | <argument> |
+    Then artie exits 0
+    And the client was made <keeping> its exchanges
+
+    Examples:
+      | argument    | keeping         |
+      | --exchanges | to keep         |
+      | --quiet     | not to keep     |
+
   Scenario Outline: The rung the client asks at, pinned by the run
     Given the script "issue.kts" is
       """kotlin

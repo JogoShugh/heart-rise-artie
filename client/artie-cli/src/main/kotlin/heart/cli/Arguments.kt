@@ -19,6 +19,9 @@ class Arguments(val script: String) {
     var rung: String? = null
     var reasoner: String? = null
 
+    /** Whether each step of the trace keeps the client's exchanges (spec/PLAN-LINE-BY-LINE-REPORT.md). */
+    var exchanges = false
+
     /** words, quiet or json: how the run reports itself. */
     var output = "words"
 }
@@ -39,6 +42,7 @@ private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
     "--inputs-of" to { it.inputsOf = true },
     "--interactive" to { it.interactive = true },
     "--quiet" to { it.output = "quiet" },
+    "--exchanges" to { it.exchanges = true },
 )
 
 /** The options that take a value. */

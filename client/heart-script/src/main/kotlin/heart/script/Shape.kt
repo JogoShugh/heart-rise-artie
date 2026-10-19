@@ -34,6 +34,7 @@ internal fun TraceStep.shape(): Map<String, JsonElement> = buildMap {
         put("chose", chose(used))
         used.guard?.let { put("guard", guard(it)) }
     }
+    if (exchanges.isNotEmpty()) put("exchanges", JsonArray(exchanges.map(::exchange)))
     offered?.let { from ->
         put("offered", buildJsonObject {
             put("forms", JsonArray(from.offered.sorted().map { JsonPrimitive(it) }))
@@ -55,6 +56,26 @@ private fun TraceStep.chose(used: Used): JsonObject = buildJsonObject {
     val left = used.fields.filter { it !in asked.params }
     if (left.isNotEmpty()) put("not sent", JsonArray(left.map { JsonPrimitive(it) }))
 }
+
+/** One exchange as the capture keeps it: a JSON body as data, so the YAML shows it as YAML. */
+private fun exchange(exchange: Exchange): JsonObject = buildJsonObject {
+    put("at", exchange.at.toString())
+    put("ms", exchange.ms)
+    put("request", buildJsonObject {
+        put("method", exchange.sent.method)
+        put("url", exchange.sent.url)
+        put("headers", JsonObject(exchange.sent.headers.mapValues { JsonPrimitive(it.value) }))
+        exchange.sent.body?.let { put("body", body(it)) }
+    })
+    put("response", buildJsonObject {
+        put("status", exchange.received.status)
+        put("headers", JsonObject(exchange.received.headers.mapValues { JsonPrimitive(it.value) }))
+        exchange.received.body?.takeIf { it.isNotEmpty() }?.let { put("body", body(it)) }
+    })
+}
+
+private fun body(text: String): JsonElement =
+    runCatching { kotlinx.serialization.json.Json.parseToJsonElement(text) }.getOrElse { JsonPrimitive(text) }
 
 /** What a replay of this step would check before acting. */
 private fun guard(guard: Guard): JsonObject = buildJsonObject {

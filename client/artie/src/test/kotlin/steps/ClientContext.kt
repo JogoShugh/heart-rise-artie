@@ -37,13 +37,18 @@ class ClientContext {
     /** True only for scenarios about older servers that send no integrity values. */
     var allowUncheckedLinks = false
 
+    /** Whether the scenario's client keeps its exchanges for a run's capture (script-capture.feature). */
+    var keepExchanges = false
+
     /** Everything that reached the wire (below each client's cache), live or fake. */
     /** A server in this process, reached as over the network (github-gateway.feature); else live or fake. */
     var inProcess: Transport? = null
     val wireLog: RecordingTransport by lazy {
         RecordingTransport(inProcess ?: if (baseUrl != null) HttpTransport() else transport)
     }
-    private val wire: Transport get() = wireLog
+    /** The exchanges kept for a run's capture, next to the wire, when the scenario asks for them. */
+    val exchangeLog: heart.ExchangeLog? by lazy { if (keepExchanges) heart.ExchangeLog(wireLog) else null }
+    private val wire: Transport get() = exchangeLog ?: wireLog
 
     /** The credentials every client in the scenario holds; a scenario sets them before the first request. */
     var credentials: CredentialSource = CredentialSources.NONE

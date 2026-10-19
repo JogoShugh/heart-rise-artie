@@ -39,6 +39,27 @@ class UsedSteps(private val steps: ScriptSteps) {
         assertEquals(table.asMaps(), read)
     }
 
+    @Given("the client keeps its exchanges")
+    fun keepsExchanges() {
+        steps.service.keepsExchanges = true
+    }
+
+    @Then("trace step {int} kept these exchanges")
+    fun exchanges(step: Int, table: DataTable) {
+        val kept = (json(step)["exchanges"] as? JsonArray).orEmpty().map { it as JsonObject }
+        val read = kept.map { exchange ->
+            val request = exchange.getValue("request") as JsonObject
+            val response = exchange.getValue("response") as JsonObject
+            mapOf(
+                "method" to text(request, "method"),
+                "url" to text(request, "url"),
+                "status" to text(response, "status"),
+                "request body" to request["body"]?.toString(),
+            )
+        }
+        assertEquals(table.asMaps(), read)
+    }
+
     private fun json(step: Int): JsonObject = steps.run.trace[step - 1].json()
 
     private fun rows(table: DataTable): Map<String, String> =

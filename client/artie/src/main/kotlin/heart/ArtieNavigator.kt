@@ -27,7 +27,11 @@ class ArtieNavigator(
     private val reasoner: Reasoner? = null,
     /** Why there is no [reasoner], when the run asked for one. */
     private val noReasoner: String = "this client has no reasoner",
+    /** Where ARTIE keeps its exchanges for a run's capture; null when the run doesn't ask for them. */
+    private val exchangeLog: ExchangeLog? = null,
 ) : Navigator {
+
+    override fun exchanges(): List<heart.script.Exchange> = exchangeLog?.taken().orEmpty()
 
     override fun enter(entry: String): Answer = answer("entry") { client.enter(entry) }
 
@@ -113,7 +117,8 @@ class ArtieNavigator(
     private fun refusal(what: String, refused: RuntimeException): Answer.Refused = when (refused) {
         // ARTIE refuses an act its manifest lacks with an IllegalStateException; the DSL checks first.
         is StaleAct -> Answer.Refused(Refusal.Stale, Side.SERVER, "the resource changed since it was read")
-        is IllegalTransition -> Answer.Refused(Refusal.NotOffered, Side.SERVER, whyAbsent(what))
+        is IllegalTransition ->
+            Answer.Refused(Refusal.NotOffered, Side.SERVER, client.explain(what) ?: "no reason given")
         // The server's 422: the body broke the form's schema, in the server's own check.
         is InvalidPayload -> Answer.Refused(Refusal.InvalidInput, Side.SERVER, refused.violations.joinToString("; "))
         is RuleRefused -> Answer.Refused(Refusal.InvalidInput, Side.SERVER, refused.violations.joinToString("; "))
@@ -122,8 +127,6 @@ class ArtieNavigator(
         is Forbidden -> Answer.Refused(Refusal.Forbidden, Side.SERVER, refused.message.orEmpty())
         else -> throw refused
     }
-
-    private fun whyAbsent(rel: String): String = client.explain(rel) ?: "no reason given"
 }
 
 /** A reasoner's selection, as a script's trace records the choice. */

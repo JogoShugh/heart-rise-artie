@@ -30,10 +30,11 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     }
 
     @When("this script runs with ARTIE, allowed its reasoner")
-    fun runsReasoning(script: String) = runs(script, ArtieNavigator(ctx.client, reasoner))
+    fun runsReasoning(script: String) =
+        runs(script, ArtieNavigator(ctx.client, reasoner, exchangeLog = ctx.exchangeLog))
 
     @When("this script runs with ARTIE")
-    fun runs(script: String) = runs(script, ArtieNavigator(ctx.client))
+    fun runs(script: String) = runs(script, ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog))
 
     private fun runs(script: String, navigator: ArtieNavigator) {
         Run.current = Run(navigator = { navigator }).also { it.reasoning = true; it.source = script }

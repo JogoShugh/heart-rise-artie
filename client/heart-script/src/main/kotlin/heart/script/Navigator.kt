@@ -126,6 +126,12 @@ interface Navigator {
     fun describe(rel: String): String?
 
     /**
+     * The exchanges the client made since it was last asked, when it keeps them for a run's capture
+     * (spec/PLAN-LINE-BY-LINE-REPORT.md): each request as sent and its answer, credentials never in them.
+     */
+    fun exchanges(): List<Exchange> = emptyList()
+
+    /**
      * Hand [intent] to the client's reasoner, which chooses one selection from what the held representation
      * offers; the client checks it and makes it. A client with no reasoner refuses.
      */
@@ -146,6 +152,15 @@ class Choice(
  * the client made to its [model] for it, for the run's record.
  */
 class Reasoned(val chosen: Choice?, val answer: Answer, val model: List<ModelCall> = emptyList())
+
+/** One exchange a client made: when, how long it took, the request it [sent] and what it [received]. */
+class Exchange(val at: java.time.Instant, val ms: Long, val sent: Sent, val received: Received)
+
+/** A request as sent: credentials written `<token>`. */
+class Sent(val method: String, val url: String, val headers: Map<String, String>, val body: String?)
+
+/** An answer as received. */
+class Received(val status: Int, val headers: Map<String, String>, val body: String?)
 
 /** One call to a reasoner's model: which [model], what it was [asked], and what it [answered]. No key. */
 class ModelCall(val model: String?, val asked: String, val answered: String)
@@ -169,4 +184,9 @@ fun interface NavigatorProvider {
  * What a run asks of the client it is given: the [rung] to read at (L0, L1, L2: SPEC §6.10), and the
  * [reasoner] to use for `reason(…)` steps (for ARTIE: `claude`). Null: the client's own choice, or none.
  */
-class ClientSettings(val rung: String? = null, val reasoner: String? = null)
+class ClientSettings(
+    val rung: String? = null,
+    val reasoner: String? = null,
+    /** Whether the client keeps its exchanges for the run's capture (`--exchanges`). */
+    val exchanges: Boolean = false,
+)

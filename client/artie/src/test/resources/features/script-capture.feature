@@ -35,6 +35,20 @@ Feature: A script run with ARTIE records the form or link each step used, as the
       | address  | https://github.gateway.test/repos/acme/rockets/issues/10/actions/close |
     And the run's step 3 guards on rung L2, and on the set, form and schema the gateway serves, with its If-Match
 
+  Scenario: Kept, the exchanges are ARTIE's requests and answers as sent, the credential written as a token
+    Given ARTIE keeps its exchanges
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the script finished
+    And the run's step 3 kept the exchange "POST" to "https://github.gateway.test/repos/acme/rockets/issues/10/actions/close", answered 200
+    And every exchange the run kept sends its credential as "<token>" and a traceparent
+    And the run's trace never holds the key "ada-token"
+
   Scenario: A reason step keeps what Claude was asked and answered, and never the key
     Given ARTIE's reasoner is Claude, through the scripted Claude API
     And the Claude API will answer with a tool call selecting "github:comment" with {"body": "Thanks, fixed."}

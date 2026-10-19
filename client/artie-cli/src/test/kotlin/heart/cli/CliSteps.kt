@@ -25,6 +25,7 @@ class CliSteps(private val script: ScriptSteps) {
     private var printed = listOf<String>()
     private var askedRung: String? = null
     private var askedReasoner: String? = null
+    private var askedExchanges: Boolean? = null
 
     @Given("the client cannot reach the server for {string} at {string}: {string}")
     fun unreachable(rel: String, at: String, detail: String) {
@@ -51,6 +52,7 @@ class CliSteps(private val script: ScriptSteps) {
         val client = { settings: heart.script.ClientSettings ->
             askedRung = settings.rung.orEmpty()
             askedReasoner = settings.reasoner.orEmpty()
+            askedExchanges = settings.exchanges
             script.service
         }
         val cli = ArtieCli(folder, PrintStream(bytes, true), { typed.removeFirstOrNull() }, client, BUILDER)
@@ -69,6 +71,12 @@ class CliSteps(private val script: ScriptSteps) {
 
     @Then("the client was made to ask at rung {string}")
     fun rung(rung: String) = assertEquals(rung, askedRung.orEmpty())
+
+    @Then("the client was made to keep its exchanges")
+    fun keepsExchanges() = assertEquals(true, askedExchanges)
+
+    @Then("the client was made not to keep its exchanges")
+    fun keepsNoExchanges() = assertEquals(false, askedExchanges)
 
     @Then("the client was made with the reasoner {string}")
     fun reasoner(name: String) = assertEquals(name, askedReasoner.orEmpty())

@@ -53,6 +53,9 @@ class TraceStep(
     /** A reason step's calls to the reasoner's model: what it was asked and what it answered. */
     var model: List<ModelCall> = emptyList()
 
+    /** The exchanges the client made for this step, when it keeps them. */
+    var exchanges: List<Exchange> = emptyList()
+
     /** When a step began, and how long it took. */
     class Began(val at: Instant, val ms: Long)
 
@@ -186,6 +189,7 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
         val step = TraceStep(TraceStep.Began(began, ms), asked(), outcomeOf(answer), at, now, answer as? Answer.Refused)
         step.used = answer.used
         step.offered = from.takeIf { answer.used != null }
+        step.exchanges = inner.exchanges()
         run.traced(step)
         return answer
     }

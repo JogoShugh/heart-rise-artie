@@ -30,6 +30,9 @@ class ScriptedService : Navigator {
     /** A resource's whole state, by address, where a feature gives one: numbers, arrays, nested objects. */
     val bodies = mutableMapOf<String, JsonObject>()
 
+    /** Whether the service, as a client, keeps the exchanges it makes for a run's capture. */
+    var keepsExchanges = false
+
     /** The fields a form asks for, by "relation at address". */
     val fields = mutableMapOf<String, List<String>>()
 
@@ -56,6 +59,10 @@ class ScriptedService : Navigator {
             address = "$held/actions/$rel", fields = this.fields["$rel at $held"].orEmpty(),
             guard = Guard(form = "sha256-$rel", ifMatch = "\"$held\""),
         )
+        if (keepsExchanges) {
+            val sent = Sent("POST", "scripted://service$held/actions/$rel", emptyMap(), json(fields))
+            kept += Exchange(java.time.Instant.now(), 1, sent, Received(200, emptyMap(), null))
+        }
         val now = representation(form.to).also { held = form.to }
         return if (form.outcome == "new resource") Answer.NewResource(now, used) else Answer.Done(now, used)
     }
@@ -86,6 +93,10 @@ class ScriptedService : Navigator {
     }
 
     override fun describe(rel: String): String? = null
+
+    private val kept = mutableListOf<Exchange>()
+
+    override fun exchanges(): List<Exchange> = kept.toList().also { kept.clear() }
 
     /** What the reasoner chooses, by the words it is given. */
     val reasons = mutableMapOf<String, Choice>()

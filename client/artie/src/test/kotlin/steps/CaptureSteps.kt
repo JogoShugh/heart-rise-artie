@@ -55,6 +55,35 @@ class CaptureSteps(private val ctx: ClientContext) {
         assertTrue(chose in call.getValue("answered").jsonPrimitive.content, "answered: $call")
     }
 
+    @io.cucumber.java.en.Given("ARTIE keeps its exchanges")
+    fun keepsExchanges() {
+        ctx.keepExchanges = true
+    }
+
+    @Then("the run's step {int} kept the exchange {string} to {string}, answered {int}")
+    fun keptExchange(step: Int, method: String, url: String, status: Int) {
+        val kept = exchanges(traced()[step - 1]).map { exchange ->
+            val request = exchange.getValue("request").jsonObject
+            Triple(request.getValue("method").jsonPrimitive.content, request.getValue("url").jsonPrimitive.content,
+                exchange.getValue("response").jsonObject.getValue("status").jsonPrimitive.content.toInt())
+        }
+        assertTrue(Triple(method, url, status) in kept, "kept: $kept")
+    }
+
+    @Then("every exchange the run kept sends its credential as {string} and a traceparent")
+    fun credentialAsToken(token: String) {
+        val all = traced().flatMap(::exchanges)
+        assertTrue(all.isNotEmpty(), "no exchanges kept")
+        all.forEach { exchange ->
+            val headers = exchange.getValue("request").jsonObject.getValue("headers").jsonObject
+            assertEquals(token, headers["Authorization"]?.jsonPrimitive?.content, "$headers")
+            assertTrue(headers["traceparent"]?.jsonPrimitive?.content.orEmpty().startsWith("00-"), "$headers")
+        }
+    }
+
+    private fun exchanges(step: JsonObject): List<JsonObject> =
+        (step["exchanges"] as? kotlinx.serialization.json.JsonArray).orEmpty().map { it.jsonObject }
+
     @Then("the run's trace never holds the key {string}")
     fun noKey(key: String) = assertTrue(key !in Run.current.traceJson(), "the key is in the trace")
 
