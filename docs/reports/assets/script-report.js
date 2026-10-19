@@ -198,6 +198,9 @@
         row("form integrity", s.guard.form);
         if (s.guard.schema) row("schema", `${s.guard.schema.href}  ${s.guard.schema.integrity || ""}`);
         row("If-Match", s.guard["if-match"]);
+        // What held the act to the lock file, when it passed: the set recorded for it, or the form's own integrity.
+        const HELD = { set: "its set, recorded for it in the lock file", form: "its form's own integrity alone (its set new, or none)" };
+        if (s.guard.held) row("held by", `${HELD[s.guard.held] || s.guard.held}${s.guard.checked ? `, ${s.guard.checked}` : ""}`);
       }
       Object.entries(s.values || {}).forEach(([k, v]) => row(`${k} from`, sources(v.from)));
       if (s.reason) {
