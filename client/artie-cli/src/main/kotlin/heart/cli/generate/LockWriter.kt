@@ -51,11 +51,11 @@ class LockWriter(capture: Capture) {
         appendLine(if (links.isEmpty()) "links: {}" else "links:")
         links.forEach { (relation, target) -> appendLine("  ${scalar(relation)}: ${scalar(target)}") }
     }
+}
 
-    /** [text] plain where YAML reads it back as the same string, single-quoted where it wouldn't. */
-    private fun scalar(text: String): String {
-        val plain = text.isNotEmpty() && text.first() !in "{[]},&*#?|-<>=!%@`'\" " && ": " !in text &&
-            " #" !in text && !text.endsWith(":")
-        return if (plain) text else "'" + text.replace("'", "''") + "'"
-    }
+/** [text] plain where YAML reads it back as the same string, single-quoted where it wouldn't. */
+internal fun scalar(text: String): String {
+    val plain = text.isNotEmpty() && text.first() !in "{[]},&*#?|-<>=!%@`'\" " && ": " !in text &&
+        " #" !in text && !text.endsWith(":")
+    return if (plain) text else "'" + text.replace("'", "''") + "'"
 }

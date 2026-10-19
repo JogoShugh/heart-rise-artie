@@ -60,7 +60,8 @@ class ArtieCli(
     private fun run(asked: Arguments, file: Path): Ended {
         output = asked.output
         val given = asked.inputsFile?.let { inputsFile(folder.resolve(it)) }.orEmpty() + asked.inputs
-        val lock = lockFile(asked, folder, file, config(asked, folder, file))
+        val config = config(asked, folder, file)
+        val lock = lockFile(asked, folder, file, config)
         val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, lock.guard)
         val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { navigator(settings) })
         run.reasoning = asked.reasoner != null
@@ -78,6 +79,8 @@ class ArtieCli(
         val trace = folder.resolve(asked.trace ?: "runs/$name-${Instant.now().epochSecond}.trace.yaml")
         Files.createDirectories(trace.toAbsolutePath().parent)
         Files.writeString(trace, run.traceYaml())
+        val repinned = repin(asked, folder, file, config, run.traceYaml())
+        if (output == "words") repinned.forEach(out::println)
         asked.report?.let { report(folder.resolve(it), trace, file, run) }
         return ended
     }

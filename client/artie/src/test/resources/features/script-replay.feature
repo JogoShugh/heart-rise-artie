@@ -13,6 +13,7 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | number | title                 | state | author |
       | 10     | Login fails on Safari | open  | ada    |
       | 11     | Crash on start        | open  | ada    |
+      | 12     | Docs typo             | open  | ada    |
     And "acme/lasers" has these issues on the small GitHub
       | number | title       | state | author |
       | 7      | Beam drifts | open  | ada    |
@@ -85,3 +86,35 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | edit takes no body      | lenient | finished                           | closed |
       | edit takes no body      | strict  | was stopped at step 2 by its guard | open   |
       | nothing                 | strict  | finished                           | closed |
+
+  Scenario Outline: A lenient run past a changed set re-pins it, as the config beside the script says
+    spec/ideas/replay-guards-lenient-strict.md, the walk's step 3: the forms
+    the script used kept their integrity, but the set they were offered in
+    changed. With repin: auto, the lock file then records the new set beside
+    the old, so a strict run holds; propose says what it would re-pin and
+    writes nothing; never, the default, and --no-repin do neither.
+    Given the gateway's issue forms change: edit takes no body
+    And the file "gen.config.yaml" is
+      """
+      repin: <repin>
+      """
+    When "gen.kts" runs with ARTIE, held "lenient" to its lock file<flag>, captured in "gen.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 11      |
+    Then the run finished
+    And about its pins, the run said "<said>"
+    When "gen.kts" runs with ARTIE, held "strict" to its lock file, captured in "strict.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 12      |
+    Then the run <strict>
+
+    Examples:
+      | repin   | flag            | said                                                                                                  | strict                             |
+      | auto    |                 | re-pinned github:comment: offered in a new set; re-pinned github:close: offered in a new set          | finished                           |
+      | propose |                 | would re-pin github:comment: offered in a new set; would re-pin github:close: offered in a new set    | was stopped at step 2 by its guard |
+      | never   |                 |                                                                                                       | was stopped at step 2 by its guard |
+      | auto    | , with no-repin |                                                                                                       | was stopped at step 2 by its guard |

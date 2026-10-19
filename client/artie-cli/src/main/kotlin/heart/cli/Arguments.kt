@@ -28,6 +28,9 @@ class Arguments(val script: String) {
     /** The config, when it isn't NAME.config.yaml beside the script: for a trial run that leaves the default alone. */
     var config: String? = null
 
+    /** Whether the run must leave its lock file as it is, whatever the config says. */
+    var noRepin = false
+
     /** Whether each step of the trace keeps the client's exchanges (spec/PLAN-LINE-BY-LINE-REPORT.md). */
     var exchanges = false
 
@@ -55,6 +58,7 @@ private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
     "--interactive" to { it.interactive = true },
     "--quiet" to { it.output = "quiet" },
     "--exchanges" to { it.exchanges = true },
+    "--no-repin" to { it.noRepin = true },
 )
 
 /** The options that take a value. */

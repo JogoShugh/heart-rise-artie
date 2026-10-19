@@ -24,14 +24,16 @@ fun lockFile(asked: Arguments, folder: Path, script: Path, config: Config = Conf
         if (wanted != null) throw BadArguments("$STOPPED: $wanted, but no lock file at $name")
         return LockFile(null, null, asked.rung)
     }
-    val pins = pins(Yaml().load<Map<String, Any?>>(Files.readString(file)).orEmpty())
+    val pins = pins(Files.readString(file))
     if (asked.rung != null && pins.rung != null && asked.rung != pins.rung) {
         throw BadArguments("$STOPPED: the lock file was recorded at ${pins.rung}, not ${asked.rung}")
     }
     return LockFile(pins, asked.guard ?: config.guard ?: "lenient", asked.rung ?: pins.rung)
 }
 
-private fun pins(doc: Map<String, Any?>): Pins {
+/** The lock file whose text is [text], read. */
+internal fun pins(text: String): Pins {
+    val doc = Yaml().load<Map<String, Any?>>(text).orEmpty()
     val forms = (doc["forms"] as? Map<*, *>).orEmpty().entries.associate { (rel, pin) ->
         val fields = pin as? Map<*, *>
         rel.toString() to FormPin(

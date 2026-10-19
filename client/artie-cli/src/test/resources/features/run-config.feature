@@ -3,7 +3,9 @@ Feature: artie run's config: how strictly a run holds to its lock file, set by a
   NAME.kts and its lock file NAME.pins.yaml, a person may keep NAME.config.yaml: how
   strict to be. The tool never writes it. --config names another one, for a trial
   run that leaves the default alone. With none, a run behaves as it did before
-  there was a config. A flag wins over the config.
+  there was a config. A flag wins over the config. Its settings: guard (lenient
+  or strict) and repin (auto, propose or never; --no-repin wins), which
+  script-replay.feature shows at work.
 
   Background:
     Given a service holds these resources
@@ -68,4 +70,5 @@ Feature: artie run's config: how strictly a run holds to its lock file, set by a
       | file              | setting       | option   | value        | why                                             |
       | issue.config.yaml | guard: loose  |          |              | issue.config.yaml: guard is lenient or strict   |
       | issue.config.yaml | budget: 5     |          |              | issue.config.yaml: no setting budget            |
+      | issue.config.yaml | repin: often  |          |              | issue.config.yaml: repin is auto or propose or never |
       | issue.config.yaml | guard: strict | --config | missing.yaml | --config, but no config at missing.yaml         |

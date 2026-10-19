@@ -3,9 +3,11 @@ package steps
 import com.artie.heart.gateway.fixtures.GitHubGateway
 import heart.ArtieNavigator
 import heart.ScriptGuard
-import heart.cli.Arguments
+import heart.cli.arguments
+import heart.cli.config
 import heart.cli.generate.generate
 import heart.cli.lockFile
+import heart.cli.repin
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
@@ -41,17 +43,42 @@ class ReplaySteps(
     fun runsGuarded(script: String, mode: String, capture: String, table: DataTable) =
         run(script, capture, table, guard = mode)
 
-    private fun run(script: String, capture: String, table: DataTable, guard: String?) {
+    @When("{string} runs with ARTIE, held {string} to its lock file, with no-repin, captured in {string}, given")
+    fun runsGuardedNoRepin(script: String, mode: String, capture: String, table: DataTable) =
+        run(script, capture, table, guard = mode, options = listOf("--no-repin"))
+
+    @Given("the file {string} is")
+    fun fileIs(name: String, text: String) {
+        Files.writeString(folder.resolve(name), text)
+    }
+
+    /** What the run said about its lock file after it ran, as artie run says it. */
+    private var aboutPins = listOf<String>()
+
+    /** A run as artie run makes it: its arguments read, its config and lock file found beside the script. */
+    private fun run(
+        script: String,
+        capture: String,
+        table: DataTable,
+        guard: String?,
+        options: List<String> = emptyList(),
+    ) {
         val file = folder.resolve(script)
-        val held = guard?.let { mode ->
-            val asked = Arguments(script).also { it.guard = mode }
-            val lock = lockFile(asked, folder, file)
+        val guarded = guard?.let { listOf("--guard", it) }.orEmpty()
+        val asked = arguments(listOf("run", script) + guarded + options)
+        val config = config(asked, folder, file)
+        val held = guard?.let {
+            val lock = lockFile(asked, folder, file, config)
             ScriptGuard(checkNotNull(lock.pins) { "no lock file beside $script" }, strict = lock.guard == "strict")
         }
         val given = table.asMaps().associate { it.getValue("name") to it.getValue("value") }
         val run = scripts.run(Files.readString(file), ArtieNavigator(ctx.client, guard = held), given)
         Files.writeString(folder.resolve(capture), run.traceYaml())
+        aboutPins = if (guard == null) emptyList() else repin(asked, folder, file, config, run.traceYaml())
     }
+
+    @Then("about its pins, the run said {string}")
+    fun saidAboutPins(said: String) = assertEquals(said, aboutPins.joinToString("; "))
 
     @Given("artie generated {string} from {string} and {string}")
     fun generated(script: String, capture: String, source: String) {
