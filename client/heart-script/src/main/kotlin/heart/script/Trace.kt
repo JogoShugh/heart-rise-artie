@@ -38,6 +38,12 @@ class TraceStep(
     /** What the representation the step chose from offered: its forms and its links' relations. */
     var offered: Representation? = null
 
+    /** Each value sent, with every source it has (Sources). */
+    var values: JsonObject? = null
+
+    /** A reason step's template and its slots, when the script's text is known (Sources). */
+    var reason: JsonObject? = null
+
     /** When a step began, and how long it took. */
     class Began(val at: Instant, val ms: Long)
 
@@ -55,6 +61,8 @@ class TraceStep(
         line?.let { put("line", it) }
         within?.let { put("within", it) }
         put("params", JsonObject(asked.params.mapValues { (_, v) -> element(v) }))
+        values?.takeIf { it.isNotEmpty() }?.let { put("values", it) }
+        reason?.let { put("reason", it) }
         put("outcome", outcome)
         used?.let { put("chose", chose(it)); it.guard?.let { guard -> put("guard", guard(guard)) } }
         offered?.let { from ->

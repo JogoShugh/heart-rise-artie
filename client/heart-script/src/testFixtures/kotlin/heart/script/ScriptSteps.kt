@@ -66,7 +66,11 @@ class ScriptSteps {
     }
 
     @When("the script runs unattended, given")
-    fun unattended(table: DataTable) = execute(Run(inputs(table), navigator = { service }, pause = {}))
+    fun unattended(table: DataTable) = runUnattended(table, reasoning = false)
+
+    /** The script run with [table]'s inputs, unattended; a reasoner allowed when [reasoning]. */
+    fun runUnattended(table: DataTable, reasoning: Boolean) =
+        execute(Run(inputs(table), navigator = { service }, pause = {}).also { it.reasoning = reasoning })
 
     @When("the script runs interactively, given")
     fun interactively(table: DataTable) {
@@ -202,6 +206,7 @@ class ScriptSteps {
     /** Runs the script as a script: Kotlin's script engine, the DSL imported, the run current. */
     private fun execute(with: Run) {
         run = with
+        with.source = script
         Run.current = with
         val engine = ScriptHost.engine(imports)
         try {

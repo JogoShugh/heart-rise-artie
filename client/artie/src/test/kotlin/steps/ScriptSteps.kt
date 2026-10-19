@@ -31,7 +31,7 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     fun runs(script: String) = runs(script, ArtieNavigator(ctx.client))
 
     private fun runs(script: String, navigator: ArtieNavigator) {
-        Run.current = Run(navigator = { navigator }).also { it.reasoning = true }
+        Run.current = Run(navigator = { navigator }).also { it.reasoning = true; it.source = script }
         val engine = ScriptHost.engine(listOf("heart.script.*"))
         try {
             engine.eval(script)

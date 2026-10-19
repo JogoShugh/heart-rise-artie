@@ -57,6 +57,12 @@ class Run(
     /** Every step of the run, in order, for its run report. */
     val trace = mutableListOf<TraceStep>()
 
+    /** The script's own text, when the host gives it: a reason step's template is read from it. */
+    var source: String? = null
+
+    /** Each input the run read: its value, and how it was given ("given", "default" or "asked"). */
+    val inputsUsed = linkedMapOf<String, Pair<String, String>>()
+
     internal fun traced(step: TraceStep) {
         // spec/PLAN-LINE-BY-LINE-REPORT.md: the script's own frames, innermost first, name the step's line and
         // its block's; a block's end is traced from inside the call that opened it, so it names that line.
@@ -65,13 +71,25 @@ class Run(
         }
         step.line = lines.firstOrNull()
         step.within = lines.getOrNull(1)
+        step.values = Sources.values(step, this, trace)
+        if (step.asked.mode == "intent") step.reason = Sources.reason(source, step.line, step.asked.say, this, trace)
         trace += step
         onStep(step)
     }
 
     /** The trace as heart-run-report reads it: `{"steps": [...]}`. */
     fun traceJson(): String = kotlinx.serialization.json.JsonObject(
-        mapOf("steps" to kotlinx.serialization.json.JsonArray(trace.map { it.json() })),
+        mapOf(
+            "inputs" to kotlinx.serialization.json.JsonObject(
+                inputsUsed.mapValues { (_, used) ->
+                    kotlinx.serialization.json.buildJsonObject {
+                        put("value", kotlinx.serialization.json.JsonPrimitive(used.first))
+                        put("given", kotlinx.serialization.json.JsonPrimitive(used.second))
+                    }
+                },
+            ),
+            "steps" to kotlinx.serialization.json.JsonArray(trace.map { it.json() }),
+        ),
     ).toString()
     private val values = mutableMapOf<String, String>()
 
@@ -90,7 +108,7 @@ class Run(
     internal fun checkInputs() {
         declared.filter { it.kind == "required" && it.name !in inputs }.forEach { input ->
             if (!interactive) throw ScriptStopped(0, "", "missing input: ${input.name}")
-            values[input.name] = prompt(input.name, null)
+            values[input.name] = prompt(input.name, null).also { inputsUsed[input.name] = it to ASKED }
         }
         declared.firstOrNull { it.kind == "question" && it.name !in inputs && !interactive }?.let {
             throw ScriptStopped(0, "", "${it.name} needs --interactive or a value")
@@ -100,7 +118,11 @@ class Run(
     /** The input [name]'s value: given, asked before the run, its default, or asked when first read. */
     internal fun value(name: String): String = values.getOrPut(name) {
         val input = declared.first { it.name == name }
-        inputs[name] ?: input.default ?: prompt(checkNotNull(input.question), null)
+        val (value, given) = inputs[name]?.let { it to "given" }
+            ?: input.default?.let { it to "default" }
+            ?: (prompt(checkNotNull(input.question), null) to ASKED)
+        inputsUsed[name] = value to given
+        value
     }
 
     internal fun ask(question: String, default: String): String =
@@ -112,6 +134,9 @@ class Run(
 
         /** What a script's frames are named after: its source, a .kts. */
         private const val SCRIPT = ".kts"
+
+        /** An input a person gave when asked. */
+        private const val ASKED = "asked"
     }
 }
 

@@ -84,6 +84,8 @@ class ArtieCli(
     }
 
     private fun execute(run: Run, script: String): Ended {
+        // A reason step's template is read from the script's own text.
+        run.source = script
         Run.current = run
         val engine = ScriptHost.engine(IMPORTS)
         return try {
