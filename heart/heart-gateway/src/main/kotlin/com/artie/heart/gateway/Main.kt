@@ -38,6 +38,7 @@ fun main() {
         mapper,
         connector,
         upstreamUrl = settings.url,
+        record = config.record?.let { UpstreamRecord(it, mapper, settings.url) },
     )
     gateway.handler(config.credentials).asServer(Jetty(config.port)).start().block()
 }

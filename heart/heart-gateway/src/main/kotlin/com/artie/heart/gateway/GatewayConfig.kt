@@ -21,6 +21,8 @@ class GatewayConfig private constructor(
     val connector: Path?,
     val port: Int,
     val credentials: Credentials,
+    /** Where to keep the record of upstream calls (GATEWAY_RECORD); none keeps no record. */
+    val record: Path? = null,
 ) {
     companion object {
         const val DEFAULT_PORT = 8090
@@ -44,7 +46,8 @@ class GatewayConfig private constructor(
                     value("HEART_AUTH_BEARER_TOKENS").orEmpty(),
                 )
             }
-            return GatewayConfig(upstream, profile, connector, port, credentials)
+            val record = value("GATEWAY_RECORD")?.let { Path.of(it) }
+            return GatewayConfig(upstream, profile, connector, port, credentials, record)
         }
 
         private fun auth(value: (String) -> String?): UpstreamAuth = when (val scheme = value("UPSTREAM_AUTH")) {

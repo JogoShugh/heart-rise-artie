@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.core.type.TypeReference
 import org.http4k.core.HttpHandler
+import org.http4k.core.then
 import java.net.URLEncoder
 import java.util.concurrent.ConcurrentHashMap
 
@@ -48,8 +49,10 @@ class Gateway(
     connector: Connector? = null,
     /** Where the upstream is: its links under this address are links into its API (spec/PLAN-GATEWAY-URL-LINKS.md). */
     upstreamUrl: String? = null,
+    /** Where the gateway keeps its record of upstream calls (GATEWAY_RECORD); null when it keeps none. */
+    private val record: UpstreamRecord? = null,
 ) {
-    private val calls = Upstream(upstream, auth, mapper, connector?.headers.orEmpty())
+    private val calls = Upstream(record?.around(upstream) ?: upstream, auth, mapper, connector?.headers.orEmpty())
     private val links = AffordanceLinks(calls)
 
     /** Which members of the upstream's answers are only links (Links.kt), when the connector says. */
@@ -125,8 +128,10 @@ class Gateway(
     } + declared.values.map { it.resource }
 
     /** The gateway as one HTTP handler, admitting the callers [credentials] admits. */
-    fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler =
-        HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
+    fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler {
+        val served = HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
+        return record?.servingFilter?.then(served) ?: served
+    }
 
     private companion object {
         /** Each answer is read by the first of the connector's readers that recognizes it, or else by a standard. */

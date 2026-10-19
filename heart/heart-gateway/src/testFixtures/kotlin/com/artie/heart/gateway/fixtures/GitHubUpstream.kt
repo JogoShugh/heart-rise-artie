@@ -120,7 +120,8 @@ class GitHubUpstream {
 
     val handler: HttpHandler = { request: Request ->
         requests += request
-        answer(request).also { statuses += it.status.code }
+        // As GitHub answers every call: with the headers it lets a browser read, one long value.
+        answer(request).header("Access-Control-Expose-Headers", EXPOSED).also { statuses += it.status.code }
     }
 
     /** A token GitHub doesn't know is refused; a GET whose If-None-Match names the body's ETag is a 304. */
@@ -596,6 +597,12 @@ class GitHubUpstream {
     private companion object {
         const val ID_BASE = 1_000_000L
         const val FOLLOWERS_PAGE = 2
+
+        /** GitHub's Access-Control-Expose-Headers, as it sends it. */
+        const val EXPOSED = "ETag, Link, Location, Retry-After, X-GitHub-OTP, X-RateLimit-Limit, " +
+            "X-RateLimit-Remaining, X-RateLimit-Used, X-RateLimit-Resource, X-RateLimit-Reset, X-OAuth-Scopes, " +
+            "X-Accepted-OAuth-Scopes, X-Poll-Interval, X-GitHub-Media-Type, X-GitHub-SSO, X-GitHub-Request-Id, " +
+            "Deprecation, Sunset, Warning"
 
         /** Every branch head's one parent, in the small GitHub. */
         const val PARENT = "9999999999999999999999999999999999999999"

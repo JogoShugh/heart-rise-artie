@@ -4,6 +4,7 @@ import com.artie.heart.gateway.Connector
 import com.artie.heart.gateway.Gateway
 import com.artie.heart.gateway.GatewaySpec
 import com.artie.heart.gateway.UpstreamAuth
+import com.artie.heart.gateway.UpstreamRecord
 import com.artie.heart.gateway.fixtures.Comment
 import com.artie.heart.gateway.fixtures.GitHubUpstream
 import com.artie.heart.gateway.fixtures.Issue
@@ -90,12 +91,23 @@ class GitHubSteps {
     }
 
     @When("{string} gets {string} through the GitHub gateway")
-    fun getAs(caller: String, path: String) {
+    fun getAs(caller: String, path: String) = getAs(caller, path, null)
+
+    /** A read as [caller], carrying the W3C [traceparent] a client sends, when given. */
+    internal fun getAs(caller: String, path: String, traceparent: String?) {
         authorization = "Bearer $caller-token"
-        responses += gateway(
-            Request(Method.GET, path).header("Authorization", "Bearer $caller-token")
-                .header("Accept", "application/hal+json"),
-        )
+        val request = Request(Method.GET, path).header("Authorization", "Bearer $caller-token")
+            .header("Accept", "application/hal+json")
+        responses += gateway(traceparent?.let { request.header("traceparent", it) } ?: request)
+    }
+
+    /** Where the gateway keeps its record of upstream calls, when a scenario asks for one. */
+    internal var record: java.nio.file.Path? = null
+        private set
+
+    internal fun recordAt(file: java.nio.file.Path) {
+        record = file
+        started = null
     }
 
     @When("a client with no credential gets {string} through the GitHub gateway")
@@ -511,8 +523,12 @@ class GitHubSteps {
         val credentials =
             if (forwarding) Credentials.forwarded() else Credentials.parse(users = "", tokens = sha256(TOKEN))
         val spec = GatewaySpec(description, loaded.reads)
-        Gateway(spec, github.handler, loaded.profile, auth, connector = loaded, upstreamUrl = "https://api.github.com")
-            .handler(credentials)
+        val upstreamUrl = "https://api.github.com"
+        val keeping = record?.let { UpstreamRecord(it, mapper, upstreamUrl) }
+        Gateway(
+            spec, github.handler, loaded.profile, auth,
+            connector = loaded, upstreamUrl = upstreamUrl, record = keeping,
+        ).handler(credentials)
     }
 
     private companion object {
