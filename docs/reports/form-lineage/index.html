@@ -224,6 +224,10 @@ header > div { min-width: 0; flex: 1 1 20rem; }
       <div class="case"><h3>An unrelated edit form changes</h3>
         <p>The set changed, our forms didn't.</p>
         <p>Lenient: finishes, issue closed. Strict: <span class="stop">stops at the comment</span>, issue open.</p></div>
+      <div class="case"><h3>Forms change in the middle of the run</h3>
+        <p>The comment goes through with the old forms. The gateway changes right after it.</p>
+        <p>If close changed: both modes <span class="stop">stop at the close</span>. If only the set changed: lenient finishes, strict <span class="stop">stops at the close</span>.</p>
+        <p>The close is checked against the set the issue offers now, not the one from before the comment.</p></div>
       <div class="case"><h3>Nothing changes</h3>
         <p>Strict: finishes, issue closed.</p></div>
       <div class="case"><h3>Re-pin after the unrelated change</h3>
