@@ -87,6 +87,30 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | edit takes no body      | strict  | was stopped at step 2 by its guard | open   |
       | nothing                 | strict  | finished                           | closed |
 
+  Scenario Outline: When the forms change in the middle of a run, the next step meets the new ones
+    The comment is made with the forms as recorded; the gateway changes
+    right after it. The close, the next step, is checked against the set the
+    issue offers now, not the one it offered before the comment: a changed
+    close stops both modes there, and a changed set stops strict there.
+    Given the gateway's issue forms change once the comment is made: <change>
+    When "gen.kts" runs with ARTIE, held "<guard>" to its lock file, captured in "gen.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 11      |
+    Then the run <ends>
+    And issue 11 of "acme/rockets" is now "<issue>" on the small GitHub
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                   |
+      | ada    | Fixed in 1.2, see #11. |
+
+    Examples:
+      | change                  | guard   | ends                               | issue  |
+      | close takes a milestone | lenient | was stopped at step 3 by its guard | open   |
+      | close takes a milestone | strict  | was stopped at step 3 by its guard | open   |
+      | edit takes no body      | lenient | finished                           | closed |
+      | edit takes no body      | strict  | was stopped at step 3 by its guard | open   |
+
   Scenario Outline: A lenient run past a changed set re-pins it, as the config beside the script says
     spec/ideas/replay-guards-lenient-strict.md, the walk's step 3: the forms
     the script used kept their integrity, but the set they were offered in

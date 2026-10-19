@@ -88,6 +88,30 @@ class ReplaySteps(
 
     @Given("the gateway's issue forms change: {}")
     fun formsChange(change: String) {
+        ctx.inProcess = changed(change)
+    }
+
+    /**
+     * The change made in the middle of a run: the gateway serves its forms as shipped until it has answered the
+     * comment, and changed from the next request on, so the run's later steps meet the new forms.
+     */
+    @Given("the gateway's issue forms change once the comment is made: {}")
+    fun formsChangeMidRun(change: String) {
+        val before = checkNotNull(ctx.inProcess) { "no gateway in process" }
+        val after = changed(change)
+        ctx.inProcess = object : heart.Transport {
+            override fun send(request: heart.HeartRequest): heart.HeartResponse {
+                val answer = before.send(request)
+                if (request.method == "POST" && request.url.endsWith("/actions/comment") && answer.status in OK) {
+                    ctx.inProcess = after
+                }
+                return answer
+            }
+        }
+    }
+
+    /** The gateway in process on a copy of the shipped GitHub connector, its issue resource changed by [change]. */
+    private fun changed(change: String): InProcessTransport {
         val (was, now) = CHANGES.getValue(change)
         val shipped = Path.of("..", "..", "heart", "heart-gateway", "connectors", "github")
         val connector = Files.createTempDirectory("github-connector")
@@ -96,7 +120,7 @@ class ReplaySteps(
         val text = Files.readString(issue)
         check(was in text) { "issue.resource.yaml has no \"$was\" to change" }
         Files.writeString(issue, text.replaceFirst(was, now))
-        ctx.inProcess = InProcessTransport(GitHubGateway.handler(gateway.github, connector))
+        return InProcessTransport(GitHubGateway.handler(gateway.github, connector))
     }
 
     @Then("the lock file {string} pins rung {string}")
@@ -122,6 +146,9 @@ class ReplaySteps(
             .map { params -> params.entries.joinToString(", ") { (k, v) -> "$k=$v" } }
 
     private companion object {
+        /** The statuses of an act that was done. */
+        val OK = 200..299
+
         /** Each change to the issue resource the gateway serves: the connector's text, and what it becomes. */
         val CHANGES = mapOf(
             "nothing" to ("noun: issue" to "noun: issue"),
