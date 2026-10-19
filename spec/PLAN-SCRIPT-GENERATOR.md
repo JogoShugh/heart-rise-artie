@@ -6,7 +6,7 @@ step 5 (slot filling); spec/PLAN-LINE-BY-LINE-REPORT.md (the capture).
 
 ## What it does
 
-`artie generate CAPTURE.yaml [--script SOURCE.kts] [--freeze] > NEW.kts`: a script with no model in it,
+`artie generate CAPTURE.yaml --out NEW.kts [--script SOURCE.kts] [--keep-reason] [--inputs a,b]`: a script with no model in it,
 run with `artie run NEW.kts name=value …` against other resources: other owners, repositories, issues. Every
 reason step becomes the act or follow it made, nested as the run nested; every value is an input, a value read
 again from an earlier answer, or a constant, by the rules below. A person reviews the lines it marks, then keeps
@@ -28,9 +28,12 @@ it.
    4. the reason words: a constant.
 3. **Inside a string**, every slot value and input value is put back as its variable: `"fix-reasoned-$stamp.md"`,
    `"Relates to #$issue"`, `"Fixed in 1.2 by #$pull."`.
-4. **A value the words don't give**, or only paraphrase (`squash` for "squashing", `Opened by a HEART script.` for
-   "saying it was opened by a HEART script"): that step stays a `reason(...)` (decided). With `--freeze`, it is
-   written as the act it made, its values constants, each marked `// review:` with the words beside it.
+4. **As few reason steps as there can be** (decided 2026-10-18, replacing "keep reason"): a paraphrase of the
+   words (`squash` for "squashing", `Opened by a HEART script.` for "saying it was opened by a HEART script")
+   is the words, a constant with no mark. A value the words don't give at all (the reasoner's own judgement)
+   is frozen as the constant it was, marked `// review:` with the words beside it: the script replays the run
+   exactly. Only with `--keep-reason` does such a step stay a `reason(...)`, for a choice that should depend
+   on the state at run time.
 4a. **Literal text the words gave** (titles, messages, file content) is a constant (decided); `--inputs title,body`
    makes those inputs, the run's text their default.
 5. **Two sources that tie** (two members of the same answer holding one value) take the first by the capture's
@@ -59,7 +62,7 @@ selection against the lock file (spec/ideas/replay-guards-lenient-strict.md):
 | both | a fetched body doesn't hash to its link's integrity (Rule 2, always) |
 
 A refusal is a new kind, "guard": by the client, naming the pinned and the offered integrity. A run at another
-rung than the lock file's says so before its first request. A kept reason step whose model chooses a relation
+rung than the lock file's says so before its first request. A reason step kept with `--keep-reason` whose model chooses a relation
 the lock file doesn't hold: lenient goes on and the capture and report mark it unpinned; strict refuses it
 (decided). A script with no lock file beside it runs unguarded, as today; `--guard` given with no lock file
 stops before the first request, saying the lock is missing (decided). `artie generate CAPTURE.yaml --out
@@ -97,7 +100,7 @@ NAME.kts` writes NAME.kts and NAME.pins.yaml together.
 3. `artie generate` in artie-cli: features first, from captures the features write (scripted service), the
    mockup's script as the expected output for the reasoned GitHub capture.
 4. The capture comparison and the replay against the fake GitHub (artie feature, in-process gateway).
-5. Live: generate from the reasoned and hybrid GitHub captures, run each generated script (with `--freeze`, no model; without, a model only on its kept reason steps), report
+5. Live: generate from the reasoned and hybrid GitHub captures, run each generated script with no model, report
    both runs line by line beside the runs they came from.
 6. The idea's open item, what a lenient run reports when it acts on an unchanged form in a changed set: a warning
    in the capture and the report, with both set integrities.
