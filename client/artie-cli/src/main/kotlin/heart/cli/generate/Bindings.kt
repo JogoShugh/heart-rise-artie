@@ -40,7 +40,11 @@ class Bindings(
     private val source: List<String>?,
     /** The fields whose text is an input of the same name (`--inputs`). */
     private val asInputs: Set<String> = emptySet(),
+    /** Where each binding is noted, as the script is written. */
+    private val derivations: Derivations = Derivations(source),
 ) {
+    private val why = Why(derivations)
+
     /** The variables, by the step and pointer they are read from, in the order they were first needed. */
     val variables = linkedMapOf<Pair<Int, String>, Variable>()
 
@@ -66,14 +70,21 @@ class Bindings(
         val text = value?.toString().orEmpty()
         val input = from.firstNotNullOfOrNull { it.map()["input"]?.toString() }
         val held = sources.first(from)
+        val marked = Marked(source, step, field, why)
         return when {
-            input != null -> Argument(field, inputAs(input, type))
-            field in asInputs -> Argument(field, inputAs(field, type))
-            literal(step, field, text) -> Argument(field, constant(value, type))
-            held != null -> Argument(field, variableAs(variable(held.first, held.second), type), tie(from, held))
-            "chosen" in from -> Argument(field, constant(value, type), "the reasoner chose it, asked \"${step.say}\"")
-            value is String -> Argument(field, KotlinText.templated(text, names(step, text, from)))
-            else -> Argument(field, constant(value, type))
+            input != null -> Argument(field, marked.input(input, inputAs(input, type)))
+            field in asInputs -> Argument(field, marked.madeInput(field, text, inputAs(field, type)))
+            literal(step, field, text) -> Argument(field, marked.words(text, constant(value, type)))
+            held != null -> variable(held.first, held.second).let { variable ->
+                val tie = tie(from, held)
+                val named = slotted[held] ?: variable.name
+                Argument(field, marked.answer(variable, named, tie, variableAs(variable, type)), tie)
+            }
+            "chosen" in from ->
+                Argument(field, marked.model(constant(value, type)), "the reasoner chose it, asked \"${step.say}\"")
+            value is String -> names(step, text, from)
+                .let { Argument(field, marked.string(KotlinText.templated(text, it), it.values, from)) }
+            else -> Argument(field, marked.said(constant(value, type), from))
         }
     }
 
@@ -86,7 +97,8 @@ class Bindings(
             .filter { from -> from.list().none { it.map()["input"] != null } }
             .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
         val words = step.template ?: KotlinText.quoted(step.say).removeSurrounding("\"")
-        return "reason(\"$words\")"
+        val call = Written(source, step).find(Regex("""reason\("(?:\\.|[^"\\])*"\)"""))
+        return why.mark(why.kept(step), "reason(\"$words\")", listOf(call))
     }
 
     /** The variable read from [pointer] in the answer of [step], made the first time it is needed. */

@@ -52,6 +52,14 @@ it.
    whole target is not pinned; a changed set of variables is refused in both modes, an unpinned link by strict. Keyed by relation, not by line, so editing the
    script never misaligns a pin, and a form's integrity is the same whichever resource offers it.
 
+10. **How each value was derived is written beside the script too** (2026-10-19): `NAME.derivation.yaml` lists
+   each derivation, numbered in the order the script first shows it, with its kind (input, words, paraphrase,
+   answer, template, model, relation, kept, until, check, constant), the rule above that bound it, and where it
+   stands in the run's script and in the generated one; and where each step of the run begins in both. It is noted
+   by the same code that binds each value, so it can't drift from what the generator did. `--report DIR` (with
+   `--script`) builds the derivation report from it: both scripts side by side, row by row, each derivation
+   numbered on both sides, its note one click away (`docs/reports/assets/build-derivation-report.sh`).
+
 ## Guards, when a generated script runs
 
 `artie run --guard lenient|strict` (lenient by default, decided). Before sending anything, ARTIE checks the

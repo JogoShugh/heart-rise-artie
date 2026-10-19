@@ -16,7 +16,10 @@ class ScriptWriter(
     /** `--keep-reason`, and `--inputs` with each named field's text, the run's, as its default. */
     class Options(val keepReason: Boolean = false, val asInputs: Map<String, String> = emptyMap())
 
-    private val bindings = Bindings(capture, source, options.asInputs.keys)
+    /** How each value and line was derived, noted as the script is written. */
+    val derivations = Derivations(source)
+    private val why = Why(derivations)
+    private val bindings = Bindings(capture, source, options.asInputs.keys, derivations)
 
     /** How many values the script marks for a person to review. */
     var reviews = 0
@@ -33,19 +36,26 @@ class ScriptWriter(
         block(root, 1)
         reviews = 0
         kept = 0
+        derivations.clear()
         val body = block(root, 1)
-        return buildString {
-            header().forEach { appendLine(it) }
-            inputs().forEach { appendLine(it) }
-            appendLine()
-            appendLine("heart(${KotlinText.quoted(capture.entry)}) {")
-            bindings.variables.values.forEach {
-                appendLine("${INDENT}var ${it.name} = ${it.kind.initial} // step ${it.step}'s ${it.pointer}")
-            }
-            if (bindings.variables.isNotEmpty()) appendLine()
-            body.forEach { appendLine(it) }
-            appendLine("}")
-        }
+        val entry = capture.steps.first()
+        val heart = "heart(${KotlinText.quoted(capture.entry)}) {"
+        return derivations.strip(
+            buildString {
+                header().forEach { appendLine(it) }
+                inputs().forEach { appendLine(it) }
+                appendLine()
+                appendLine(derivations.anchor("${entry.number}", entry.line, heart))
+                bindings.variables.values.forEach {
+                    val declared = derivations.lines(Regex("^\\s*var\\s+${it.name}\\b"))
+                    val line = why.mark(why.answer(it, null), "var ${it.name} = ${it.kind.initial}", listOf(declared))
+                    appendLine("$INDENT$line // step ${it.step}'s ${it.pointer}")
+                }
+                if (bindings.variables.isNotEmpty()) appendLine()
+                body.forEach { appendLine(it) }
+                appendLine("}")
+            },
+        )
     }
 
     private fun header(): List<String> = listOfNotNull(
@@ -64,27 +74,50 @@ class ScriptWriter(
             (if (kept > 0) " --reasoner claude" else ""),
     )
 
-    private fun inputs(): List<String> = capture.inputs.map { (name, input) ->
-        source?.firstOrNull { Regex("""^\s*val\s+$name\s+by\s+input\(""").containsMatchIn(it) }?.trim()
-            ?: declared(name, input)
-    } + options.asInputs.map { (name, text) -> "val $name by input(default = ${KotlinText.quoted(text)})" }
+    /** The inputs, each as the run's script declared it, else as the capture kept it; the first begins a row. */
+    private fun inputs(): List<String> {
+        val declared = capture.inputs.mapValues { (name, _) ->
+            derivations.lines(Regex("""^\s*val\s+$name\s+by\s+input\(""")).firstOrNull()
+        }
+        val lines = capture.inputs.map { (name, input) ->
+            val at = declared[name]
+            why.mark(why.input(name), at?.text ?: declared(name, input), listOfNotNull(at?.let(::listOf)))
+        } + options.asInputs.map { (name, text) ->
+            why.mark(why.input(name, text), "val $name by input(default = ${KotlinText.quoted(text)})")
+        }
+        val first = declared.values.mapNotNull { it?.line }.minOrNull()
+        return lines.mapIndexed { i, line -> if (i == 0) derivations.anchor("inputs", first, line) else line }
+    }
 
     /** The statements of [node]'s block, at [depth]: what it reads, then the steps nested in it. */
     private fun block(node: Node, depth: Int): List<String> =
         reads(node.step.number, depth) + node.children.flatMap { statement(it, depth) }
 
-    private fun reads(step: Int, depth: Int): List<String> =
-        bindings.variables.values.filter { it.step == step }.map { "${INDENT.repeat(depth)}${it.name} = ${it.read}" }
+    private fun reads(step: Int, depth: Int): List<String> = bindings.variables.values.filter { it.step == step }.map {
+        val set = derivations.lines(Regex("^\\s*${it.name}\\s*=[^=]"))
+        INDENT.repeat(depth) + why.mark(why.answer(it, null), "${it.name} = ${it.read}", listOf(set))
+    }
 
+    /** The lines of [node]'s step, the first of which begins its row. */
     private fun statement(node: Node, depth: Int): List<String> {
         val step = node.step
         val pad = INDENT.repeat(depth)
-        return when {
+        val lines = when {
             step.relation != null -> selection(node, depth)
             step.say == "sync" -> listOf("${pad}sync()")
-            step.say == "until" || step.say == "check" -> Waits.of(step, source).map { pad + it }
+            step.say == "until" || step.say == "check" -> waits(step, pad)
             else -> emptyList()
         }
+        return lines.mapIndexed { i, line ->
+            if (i == 0) derivations.anchor("${step.number}", step.line, line) else line
+        }
+    }
+
+    /** A wait or a check, each line where the run's script wrote it. */
+    private fun waits(step: Step, pad: String): List<String> = Waits.of(step, source).mapIndexed { i, line ->
+        val at = (step.line ?: 0) + i
+        val copied = source?.getOrNull(at - 1)?.let { Span(at, it.length - it.trimStart().length + 1, it.trim()) }
+        pad + why.mark(why.copied(step.say, source != null), line, listOfNotNull(copied?.let(::listOf)))
     }
 
     private fun selection(node: Node, depth: Int): List<String> {
@@ -107,17 +140,17 @@ class ScriptWriter(
 
     private fun follow(step: Step): String {
         val title = step.params["title"]?.let { ", ${KotlinText.quoted(it.toString())}" }.orEmpty()
-        return "follow(${KotlinText.quoted(step.relation.orEmpty())}$title)"
+        return "follow(${why.relation(step, source)}$title)"
     }
 
     /** `act("rel", "field" to value, …)` on one line, or one argument a line when one is marked or it is long. */
     private fun act(step: Step, pad: String): List<String> {
-        val relation = KotlinText.quoted(step.relation.orEmpty())
+        val relation = why.relation(step, source)
         val arguments = bindings.arguments(step)
         reviews += arguments.count { it.review != null }
         val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" })
             .joinToString(", ") + ")"
-        val long = arguments.any { it.review != null } || oneLine.length > WIDTH
+        val long = arguments.any { it.review != null } || Derivations.visible(oneLine) > WIDTH
         return if (!long) listOf(oneLine) else listOf("${pad}act(", "$pad$INDENT$relation,") + arguments.map {
             "$pad$INDENT\"${it.field}\" to ${it.expression}," + (it.review?.let { why -> " // review: $why" } ?: "")
         } + "$pad)"

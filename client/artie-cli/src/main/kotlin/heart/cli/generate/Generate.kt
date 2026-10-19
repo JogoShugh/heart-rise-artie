@@ -10,11 +10,15 @@ import java.nio.file.Path
  * (spec/PLAN-SCRIPT-GENERATOR.md): the script a run's capture gives, and its lock file beside it, NEW.pins.yaml,
  * both written in [folder].
  */
-fun generate(args: List<String>, folder: Path, out: PrintStream) {
+fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? = null) {
     val options = options(args)
     val captureName = args.getOrNull(1) ?: throw BadArguments(GENERATE_USAGE)
     val script = options["--out"] ?: throw BadArguments("--out names the script to write")
     val sourceName = options["--script"]
+    val report = options["--report"]
+    asked(report == null || sourceName != null) {
+        "--report needs --script: the report shows the run's script beside the one generated"
+    }
     val source = sourceName?.let { Files.readAllLines(existing(folder, it, "script")) }
     val pins = script.substringBeforeLast('.') + ".pins.yaml"
     val capture = Capture(captureName, Files.readString(existing(folder, captureName, "capture")))
@@ -24,17 +28,46 @@ fun generate(args: List<String>, folder: Path, out: PrintStream) {
     val writer = ScriptWriter(capture, source, sourceName, script, pins, chosen)
     val text = writer.write()
     val lock = LockWriter(capture)
+    val derivation = DerivationWriter(writer.derivations)
+    val derived = script.substringBeforeLast('.') + ".derivation.yaml"
     Files.writeString(folder.resolve(script), text)
     Files.writeString(folder.resolve(pins), lock.write(script, captureName))
+    Files.writeString(folder.resolve(derived), derivation.write(script, sourceName, captureName))
     val kept = if (writer.kept > 0) ", ${count(writer.kept, "reason step")} kept" else ""
     out.println("wrote $script: ${count(writer.reviews, "value")} to review$kept")
     out.println("wrote $pins: ${count(lock.formCount, "form")} and ${count(lock.linkCount, "link")} pinned")
+    out.println("wrote $derived: ${count(derivation.count, "derivation")}")
+    if (report != null && sourceName != null) {
+        val page = "$report/index.html"
+        derivationReport(builder, folder, listOf(sourceName, script, derived, page), captureName)
+        out.println("wrote $page")
+    }
+}
+
+/**
+ * The derivation report, from heart-run-report's builder beside [builder]: the run's script beside the generated
+ * one, each derivation numbered on both sides. [files] are the source script, the generated one, the derivation
+ * file and the page, in [folder].
+ */
+private fun derivationReport(builder: Path?, folder: Path, files: List<String>, captureName: String) {
+    val build = builder?.resolveSibling("build-derivation-report.sh")?.takeIf { Files.exists(it) }
+        ?: throw BadArguments("--report: no report builder")
+    val (source, script) = files
+    Files.createDirectories(folder.resolve(files.last()).parent)
+    val title = "From $source to $script"
+    val lede = "$script, which artie generate wrote from $captureName, the run of $source, beside it: each number " +
+        "marks one derivation on both sides, and its note says which rule bound it."
+    val process = ProcessBuilder(listOf("sh", "$build") + files.map { "${folder.resolve(it)}" } + listOf(title, lede))
+        .redirectErrorStream(true).start()
+    val said = process.inputStream.bufferedReader().readText()
+    if (process.waitFor() != 0) throw BadArguments("the report failed: ${said.trim()}")
 }
 
 const val GENERATE_USAGE =
-    "usage: artie generate <capture.yaml> --out <script.kts> [--script <source.kts>] [--keep-reason] [--inputs a,b]"
+    "usage: artie generate <capture.yaml> --out <script.kts> [--script <source.kts>] [--keep-reason] [--inputs a,b]" +
+        " [--report <dir>]"
 
-private val VALUED = setOf("--out", "--script", "--inputs")
+private val VALUED = setOf("--out", "--script", "--inputs", "--report")
 private val FLAGS = setOf("--keep-reason")
 
 private fun options(args: List<String>): Map<String, String> {
@@ -59,6 +92,11 @@ private fun sentOnce(capture: Capture, name: String): String {
         else -> null
     }
     return if (problem == null) sent.single() else throw BadArguments("--inputs $name: $problem")
+}
+
+/** Stops when the arguments ask for what can't be done, saying why. */
+private fun asked(possible: Boolean, why: () -> String) {
+    if (!possible) throw BadArguments(why())
 }
 
 private fun existing(folder: Path, name: String, what: String): Path =

@@ -102,6 +102,46 @@ class CliSteps(private val script: ScriptSteps) {
     @Then("the run traced in {string} made the same selections as the run traced in {string}")
     fun sameSelections(made: String, from: String) = assertEquals(selections(from), selections(made))
 
+    /** A derivation file, read as YAML. */
+    private fun derivation(name: String): Map<*, *> =
+        org.yaml.snakeyaml.Yaml().load<Any?>(Files.readString(folder.resolve(name))) as Map<*, *>
+
+    /** Spans as a table writes them: `line:column text`, joined by "; ". */
+    private fun spans(spans: Any?): String = (spans as? List<*>).orEmpty().map { it as Map<*, *> }
+        .joinToString("; ") { "${it["line"]}:${it["column"]} ${it["text"]}" }
+
+    @Then("the derivation {string} has these derivations")
+    fun derivations(name: String, table: DataTable) {
+        val derivations = (derivation(name)["derivations"] as List<*>).map { it as Map<*, *> }
+        val found = derivations.map {
+            mapOf(
+                "n" to it["n"].toString(), "kind" to it["kind"].toString(), "rule" to it["rule"].toString(),
+                "title" to it["title"].toString(), "source" to spans(it["source"]),
+                "generated" to spans(it["generated"]),
+            )
+        }
+        assertEquals(table.asMaps().map { row -> row.mapValues { it.value.orEmpty() } }, found)
+        assertTrue(derivations.all { !(it["why"] as? String).isNullOrBlank() }, "each derivation says why")
+    }
+
+    @Then("the derivation {string} lines up these rows")
+    fun rows(name: String, table: DataTable) {
+        val found = (derivation(name)["rows"] as List<*>).map { it as Map<*, *> }
+            .map { mapOf("at" to it["at"].toString(), "source" to it["source"].toString(),
+                "generated" to it["generated"].toString()) }
+        assertEquals(table.asMaps(), found)
+    }
+
+    @Then("the derivation report {string} shows {string} beside {string}, by {string}")
+    fun derivationReport(name: String, source: String, generated: String, derivation: String) {
+        val page = Files.readString(folder.resolve(name))
+        fun embedded(id: String) = Regex("""id="$id">(.*?)</pre>""", RegexOption.DOT_MATCHES_ALL).find(page)
+            ?.groupValues?.get(1)?.replace("&lt;", "<")?.replace("&gt;", ">")?.replace("&amp;", "&")?.trimEnd('\n')
+        assertEquals(Files.readString(folder.resolve(source)).trimEnd('\n'), embedded("source-text"), "the run's")
+        assertEquals(Files.readString(folder.resolve(generated)).trimEnd('\n'), embedded("generated-text"), "made")
+        assertEquals(Files.readString(folder.resolve(derivation)).trimEnd('\n'), embedded("derivation"), "how")
+    }
+
     @Then("the client was made holding no lock file")
     fun holdsNoLock() {
         assertEquals(null, askedPins)

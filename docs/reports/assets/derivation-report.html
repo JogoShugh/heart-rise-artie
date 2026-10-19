@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>@TITLE@</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="@LEDE@">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem("dr-theme") || "light"; } catch (e) { document.documentElement.dataset.theme = "light"; }</script>
+<style>
+/*@DERIVATION_REPORT_CSS@*/
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>@TITLE@</h1><p class="lede">@LEDE@</p></div>
+    <div class="theme" role="group" aria-label="Theme"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div>
+  </header>
+  <div class="facts" id="facts"></div>
+  <div class="bar">
+    <label><input type="checkbox" id="all"> Show every derivation</label>
+    <div class="key" id="key"></div>
+  </div>
+  <div class="diff" id="diff"><div class="cols"></div></div>
+</main>
+<pre hidden id="source-text">@SOURCE@</pre>
+<pre hidden id="generated-text">@GENERATED@</pre>
+<pre hidden id="derivation">@DERIVATION@</pre>
+<script>
+/*@JS_YAML@*/
+</script>
+<script>
+/*@KOTLIN_VIEW_JS@*/
+</script>
+<script>
+/*@DERIVATION_REPORT_JS@*/
+</script>
+</body>
+</html>

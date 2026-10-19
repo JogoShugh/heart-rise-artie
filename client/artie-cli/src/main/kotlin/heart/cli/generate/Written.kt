@@ -18,10 +18,27 @@ internal class Written(source: List<String>?, step: Step) {
         taken.toString()
     }.orEmpty()
 
+    private val first: Int = step.line ?: 0
+
     /** The expression the script wrote for [field], as written; null when the call doesn't name it. */
     fun expression(field: String): String? {
-        val at = Regex("\"${Regex.escape(field)}\"\\s+to\\s+").find(call)?.range?.last?.plus(1) ?: return null
+        val at = start(field) ?: return null
         return if (call.getOrNull(at) == '"') literal(at) else call.substring(at).takeWhile { it !in ",)\n" }.trim()
+    }
+
+    /** Where the expression the script wrote for [field] stands in the script. */
+    fun spanOf(field: String): Span? = start(field)?.let { at -> expression(field)?.let { span(at, it) } }
+
+    /** Everywhere [pattern] matches in the call, in the order it is written. */
+    fun find(pattern: Regex): List<Span> = pattern.findAll(call).map { span(it.range.first, it.value) }.toList()
+
+    private fun start(field: String): Int? =
+        Regex("\"${Regex.escape(field)}\"\\s+to\\s+").find(call)?.range?.last?.plus(1)
+
+    /** The text at [at] in the call, by its line and column in the script. */
+    private fun span(at: Int, text: String): Span {
+        val before = call.substring(0, at)
+        return Span(first + before.count { it == '\n' }, at - (before.lastIndexOf('\n') + 1) + 1, text)
     }
 
     /** The string literal that begins at [from], to its closing quote, a `${…}` inside it skipped. */

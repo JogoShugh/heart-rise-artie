@@ -50,7 +50,7 @@ class ArtieCli(
 
     /** `artie generate`: a run's capture made a script with no model in it (spec/PLAN-SCRIPT-GENERATOR.md). */
     private fun generated(args: List<String>): Int = try {
-        generate(args, folder, out)
+        generate(args, folder, out, reportBuilder)
         0
     } catch (e: BadArguments) {
         out.println(e.message)
