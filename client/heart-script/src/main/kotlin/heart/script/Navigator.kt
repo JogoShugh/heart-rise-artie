@@ -49,7 +49,23 @@ enum class Refusal(val words: String) {
     Unreachable("unreachable"),
     NoReasoner("no reasoner"),
     Unclear("unclear to the reasoner"),
+
+    /** A script's lock file refused the act: what it is about to use is not what the script was recorded with. */
+    Guard("guard"),
 }
+
+/**
+ * What a script was recorded against, from its lock file (spec/PLAN-SCRIPT-GENERATOR.md): the [rung] it read at,
+ * each form's own integrity and the sets it was offered in, by relation, and each link's target template.
+ */
+class Pins(
+    val rung: String? = null,
+    val forms: Map<String, FormPin> = emptyMap(),
+    val links: Map<String, String> = emptyMap(),
+)
+
+/** One form's pin: its own integrity (HAL-SCHEMA-FORMS-HR Rule 10), and the affordance sets it was offered in. */
+class FormPin(val integrity: String?, val sets: List<String> = emptyList())
 
 /** What came of a selection, in the core's terms (SPEC §6.0); [used], the affordance the client used, if any. */
 sealed interface Answer {
@@ -72,12 +88,18 @@ class Pinned(val href: String, val integrity: String?)
  * What a replay checks before it acts (spec/ideas/replay-guards-lenient-strict.md): the [rung] read at, the
  * affordance [set] the form came from, the [form]'s own integrity, its [schema], and the If-Match sent.
  */
+// A record names each of its parts once, by name; grouping them would only rename them.
+@Suppress("LongParameterList")
 class Guard(
     val rung: String? = null,
     val set: Pinned? = null,
     val form: String? = null,
     val schema: Pinned? = null,
     val ifMatch: String? = null,
+    /** How a lock file was held to when the act was checked: lenient or strict; null when unguarded. */
+    val checked: String? = null,
+    /** Whether the lock file pinned nothing for this relation, and a lenient run went on. */
+    val unpinned: Boolean = false,
 )
 
 /**
@@ -191,4 +213,8 @@ class ClientSettings(
     val reasoner: String? = null,
     /** Whether the client keeps its exchanges for the run's capture (`--exchanges`). */
     val exchanges: Boolean = false,
+    /** The script's lock file, when it has one; the client checks each act against it before sending. */
+    val pins: Pins? = null,
+    /** How the lock file is held to: "lenient" (the default) or "strict". */
+    val guard: String? = null,
 )

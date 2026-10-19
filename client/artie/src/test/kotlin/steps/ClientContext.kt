@@ -37,6 +37,12 @@ class ClientContext {
     /** True only for scenarios about older servers that send no integrity values. */
     var allowUncheckedLinks = false
 
+    /** The run's guard (script-guard.feature): lenient or strict; null when the run is not guarded. */
+    var guard: String? = null
+
+    /** The lock file's pins, by relation: the form's integrity and its set's (script-guard.feature). */
+    var pins: Map<String, Pair<String, String?>>? = null
+
     /** Whether the scenario's client keeps its exchanges for a run's capture (script-capture.feature). */
     var keepExchanges = false
 

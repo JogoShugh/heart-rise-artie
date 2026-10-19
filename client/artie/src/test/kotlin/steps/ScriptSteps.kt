@@ -16,6 +16,9 @@ import kotlin.test.assertEquals
 class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGatewaySteps) {
     private var stopped: ScriptStopped? = null
 
+    /** How the last run stopped, in its own words; null when it finished. */
+    fun stoppedMessage(): String? = stopped?.message
+
     private var reasoner: heart.Reasoner? = null
 
     @io.cucumber.java.en.Given("ARTIE's reasoner will choose to act on {string} with {}")
@@ -31,10 +34,17 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
 
     @When("this script runs with ARTIE, allowed its reasoner")
     fun runsReasoning(script: String) =
-        runs(script, ArtieNavigator(ctx.client, reasoner, exchangeLog = ctx.exchangeLog))
+        runs(script, ArtieNavigator(ctx.client, reasoner, exchangeLog = ctx.exchangeLog, guard = guard()))
 
     @When("this script runs with ARTIE")
-    fun runs(script: String) = runs(script, ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog))
+    fun runs(script: String) =
+        runs(script, ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog, guard = guard()))
+
+    /** The scenario's lock file and how it is held to (script-guard.feature); null when the run is not guarded. */
+    private fun guard(): heart.ScriptGuard? = ctx.pins?.let { pins ->
+        val forms = pins.mapValues { (_, pin) -> heart.script.FormPin(pin.first, listOfNotNull(pin.second)) }
+        heart.ScriptGuard(heart.script.Pins(forms = forms), strict = ctx.guard == "strict")
+    }
 
     private fun runs(script: String, navigator: ArtieNavigator) {
         Run.current = Run(navigator = { navigator }).also { it.reasoning = true; it.source = script }

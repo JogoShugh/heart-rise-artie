@@ -84,6 +84,8 @@ private fun guard(guard: Guard): JsonObject = buildJsonObject {
     guard.form?.let { put("form", it) }
     guard.schema?.let { put("schema", pinned(it)) }
     guard.ifMatch?.let { put("if-match", it) }
+    guard.checked?.let { put("checked", it) }
+    if (guard.unpinned) put("unpinned", true)
 }
 
 private fun pinned(at: Pinned): JsonObject = buildJsonObject {

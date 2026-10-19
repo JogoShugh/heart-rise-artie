@@ -19,7 +19,13 @@ internal object UsedAffordances {
      * The form [rel] of [held], acted on with [fields]; null when [held] offers no such form. [rung] is the rung
      * the server applied to [held] (SPEC §6.10): a bookmark's lookup forms come inline at every rung.
      */
-    fun form(held: HeartRepresentation?, rel: String, fields: JsonObject, rung: Rung?): Used? {
+    fun form(
+        held: HeartRepresentation?,
+        rel: String,
+        fields: JsonObject,
+        rung: Rung?,
+        guard: ScriptGuard? = null,
+    ): Used? {
         val form = held?.affordance(rel) ?: return null
         val sends = form.method != "GET"
         return Used(
@@ -40,6 +46,8 @@ internal object UsedAffordances {
                 form = form.integrity,
                 schema = form.schemaRef?.let { Pinned(it.href, it.integrity) },
                 ifMatch = held.etag.takeIf { sends },
+                checked = guard?.mode,
+                unpinned = guard != null && !guard.strict && guard.unpinned(rel),
             ),
         )
     }

@@ -29,6 +29,8 @@ class ArtieNavigator(
     private val noReasoner: String = "this client has no reasoner",
     /** Where ARTIE keeps its exchanges for a run's capture; null when the run doesn't ask for them. */
     private val exchangeLog: ExchangeLog? = null,
+    /** The script's lock file, held to before each act; null when the run is not guarded. */
+    private val guard: ScriptGuard? = null,
 ) : Navigator {
 
     override fun exchanges(): List<heart.script.Exchange> = exchangeLog?.taken().orEmpty()
@@ -46,10 +48,12 @@ class ArtieNavigator(
         if (violations.isNotEmpty()) {
             return Answer.Refused(Refusal.InvalidInput, Side.CLIENT, violations.joinToString("; "))
         }
-        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung)
-        val answered = answer(rel) { client.act(rel, body) }
-        val made = answered is Answer.Done && client.broughtIntoBeing
-        return UsedAffordances.with(if (made) Answer.NewResource((answered as Answer.Done).now) else answered, used)
+        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, guard)
+        // The lock file, before anything is sent: a refusal here is the guard's, by the client.
+        val answered = guard?.refusal(client.current, rel) ?: answer(rel) { client.act(rel, body) }.let {
+            if (it is Answer.Done && client.broughtIntoBeing) Answer.NewResource(it.now) else it
+        }
+        return UsedAffordances.with(answered, used)
     }
 
     override fun follow(rel: String, title: String?): Answer {
