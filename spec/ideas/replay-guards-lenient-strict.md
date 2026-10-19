@@ -214,6 +214,31 @@ compatible (the client always uses the target the server gives); a changed metho
 leaves out its title and description, so a change of meaning with the same names and schema is invisible to any
 hash: a server that changes what a field means must change its name or its schema.
 
+### Stage 2 is protobuf's question; borrow its answers, not its machinery (added 2026-10-19)
+
+Protocol Buffers settled schema evolution for a compiled contract shared out of band: field numbers on the wire,
+optional fields, unknown fields kept, and a list of changes that are safe or not. HEART's contract is served at
+run time and self-describing, and the pins only notice a change, so none of protobuf's machinery carries over.
+Its experience does: what went wrong for its users is a checklist for stage 2.
+
+- **Never reinterpret silently.** A reused field number made old clients read new data as the old field.
+  Stage 2 must refuse when a field it relies on now means something else (a changed type, format or enum), never
+  coerce.
+- **Required is forever.** proto3 dropped `required` because a field once required can never be removed. A new
+  required field without a default is a break; one made optional is not.
+- **Presence differs from a default.** proto3 at first could not tell 0 from unset, and `optional` came back in
+  3.15. A script that omits a field relies on the server's default; a changed default is a change of meaning.
+- **Enums change on both sides.** A value added to a request's enum widens it (safe to send); one removed may be
+  the value the script sends. A value added to a response's enum can surprise a check.
+- **Unknown members pass through.** proto3 once dropped unknown fields, losing data through intermediaries.
+  Clients and the gateway keep members they don't know.
+- **Tooling keeps people honest.** `buf breaking` exists because hand review missed breaks. Stage 2 should use
+  published JSON Schema compatibility rules (Confluent Schema Registry checks backward and forward compatibility
+  of JSON Schemas), not rules of our own.
+- **Old clients live forever.** Mobile apps never all update, so protobuf's rules assume any old version still
+  runs. A pinned script is the same: the server can't know who still holds an old form, which is why the client,
+  not the server, decides.
+
 ## Open
 
 - What a lenient replay reports when it acts on an unchanged form in a changed set: a warning in the
