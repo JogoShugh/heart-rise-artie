@@ -83,9 +83,9 @@ Feature: artie generate says how it derived each value, and shows it beside the 
       | n | kind     | rule   | title                                       | source                                                                                | generated                                                                                 |
       | 1 | input    | 1, 2.1 | title, an input                             | 1:1 val title by input(); 5:40 $title                                                 | 6:1 val title by input(); 11:34 title                                                     |
       | 2 | answer   | 2.3    | issue, read from step 2's answer            | 4:5 var issue = 0L; 6:9 issue = state.long("number"); 8:30 $issue                | 9:5 var issue = 0L; 12:9 issue = state.long("number"); 14:35 issue                        |
-      | 3 | relation | 9      | The relation each reason step chose, named  | 5:5 act; 8:5 act; 9:9 act; 10:9 act                                                  | 11:9 "open-issue"; 14:9 "issues-get"; 15:13 "comment"; 17:13 "close"                      |
+      | 3 | relation | 9      | The relation each reason step chose, named  | 5:5 act; 8:5 act; 9:9 act; 10:9 act                                                  | 11:9 "open-issue"; 14:9 "issues-get"; 15:13 "comment"; 16:13 "close"                      |
       | 4 | template | 3      | A string, its values put back as their names | 9:47 $issue                                                                          | 15:34 "Seen in #$issue."                                                                  |
-      | 5 | model    | 4      | "completed", the reasoner's own choice      |                                                                                       | 18:25 "completed"                                                                         |
+      | 5 | model    | 4      | "completed", the reasoner's own choice      |                                                                                       | 17:25 "completed"                                                                    |
     And the derivation "gen.derivation.yaml" lines up these rows
       | at     | source | generated |
       | inputs | 1      | 6         |

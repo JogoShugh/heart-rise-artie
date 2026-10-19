@@ -92,11 +92,9 @@ Feature: artie generate: a run's capture, made a script with no model in it
           }
           act("issues-get", "number" to issue, intent = "open issue $issue") {
               act("comment", "body" to "Seen in #$issue.", intent = "comment on it: Seen in #$issue.") {}
-              act(
-                  "close",
-                  "reason" to "completed", // review: the reasoner chose it, asked "close it, since it's done"
-                  intent = "close it, since it's done",
-              )
+              act("close", intent = "close it, since it's done", fields = {
+                  "reason" to "completed" // review: the reasoner chose it, asked "close it, since it's done"
+              })
           }
       }
       """
@@ -384,12 +382,10 @@ Feature: artie generate: a run's capture, made a script with no model in it
               follow("branches", intent = "follow its branches")
               act("start-branch", "name" to "fix-$stamp", intent = "start a branch named fix-$stamp") {
                   until { offers("merge") }
-                  act(
-                      "merge",
-                      "sha" to headSha,
-                      "merge_method" to "squash", // review: the reasoner chose it, asked "merge it"
-                      intent = "merge it",
-                  )
+                  act("merge", intent = "merge it", fields = {
+                      "sha" to headSha
+                      "merge_method" to "squash" // review: the reasoner chose it, asked "merge it"
+                  })
                   check("merged" eq true)
               }
           }
@@ -511,13 +507,11 @@ Feature: artie generate: a run's capture, made a script with no model in it
 
       heart("http://localhost:8392/") {
           until { offers("commit-file") }
-          act(
-              "commit-file",
-              "path" to "fix-$stamp.md",
-              "message" to "Fixed in 1.2",
-              "sha" to "abc123",
-              intent = "commit fix-$stamp.md as 1, saying it was fixed in 1.2",
-          )
+          act("commit-file", intent = "commit fix-$stamp.md as 1, saying it was fixed in 1.2", fields = {
+              "path" to "fix-$stamp.md"
+              "message" to "Fixed in 1.2"
+              "sha" to "abc123"
+          })
       }
       """
 

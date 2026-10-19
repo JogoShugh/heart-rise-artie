@@ -11,28 +11,25 @@ heart("http://localhost:8392/") {
     var pull = 0L // step 9's /number
 
     act("github:repos-get", "owner" to owner, "repo" to repo) {
-        act(
-            "github:open-issue",
-            "title" to "Crash when a bed has no name (hybrid)",
-            "body" to "Opened by a HEART script.",
-        ) {
+        act("github:open-issue", fields = {
+            "title" to "Crash when a bed has no name (hybrid)"
+            "body" to "Opened by a HEART script."
+        }) {
             issue = state.long("number")
         }
     }
     act("github:repos-get-branch", "owner" to owner, "repo" to repo, "branch" to "main") {
         act("github:branch-from-here", "name" to "fix-blank-names-hybrid-$stamp") {
-            act(
-                "github:commit-file",
-                "path" to "fix-hybrid-$stamp.md",
-                "message" to "Refuse a bed with no name",
-                "content" to "Bed names may not be blank.\n",
-            )
-            act(
-                "github:open-pull-request",
-                "title" to "Refuse a bed with no name (hybrid)",
-                "base" to "main",
-                "body" to "Relates to #$issue.",
-            ) {
+            act("github:commit-file", fields = {
+                "path" to "fix-hybrid-$stamp.md"
+                "message" to "Refuse a bed with no name"
+                "content" to "Bed names may not be blank.\n"
+            })
+            act("github:open-pull-request", fields = {
+                "title" to "Refuse a bed with no name (hybrid)"
+                "base" to "main"
+                "body" to "Relates to #$issue."
+            }) {
                 pull = state.long("number")
                 until(tries = 20) { offers("github:merge") }
                 act("github:merge", "merge_method" to "squash")

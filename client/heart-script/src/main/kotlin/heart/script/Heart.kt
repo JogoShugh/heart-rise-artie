@@ -91,17 +91,19 @@ class Here internal constructor(
      * client, before anything is sent. With a [block], the script visits what the act led to, then
      * returns to where it was, read again. [intent] says, in words, what the act is for; the trace keeps
      * it. With no [rel], the words are handed to the client's reasoner, which chooses one selection from
-     * what is offered here (a form with its fields, or a link); a run must allow it (`--reasoner`).
+     * what is offered here (a form with its fields, or a link); a run must allow it (`--reasoner`). A long act
+     * gives its values in [fields], a block, one a line: `fields = { "title" to title }`, after any in [values].
      */
     fun act(
         rel: String? = null,
-        vararg fields: Pair<String, Any?>,
+        vararg values: Pair<String, Any?>,
         intent: String? = null,
+        fields: (Fields.() -> Unit)? = null,
         block: (Here.() -> Unit)? = null,
     ) {
         val step = ++run.step
         when {
-            rel != null -> acted(step, rel, fields.toMap(), intent, block)
+            rel != null -> acted(step, rel, values.toMap() + Fields().also { fields?.invoke(it) }.values, intent, block)
             intent != null -> reasoned(step, intent, block)
             else -> throw ScriptStopped(step, "\"act\"", "\"act needs a relation, or an intent\"")
         }

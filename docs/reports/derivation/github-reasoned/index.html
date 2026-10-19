@@ -142,41 +142,31 @@ heart("http://localhost:8392/") {
     var pull = 0L // step 9's /number
 
     act("github:repos-get", "owner" to owner, "repo" to repo, intent = "open the repository $owner/$repo") {
-        act(
-            "github:open-issue",
-            "title" to "Crash when a bed has no name (reasoned)",
-            "body" to "Opened by a HEART script.",
-            intent = "open an issue titled \"Crash when a bed has no name (reasoned)\", saying it was opened by a HEART script",
-        ) {
+        act("github:open-issue", intent = "open an issue titled \"Crash when a bed has no name (reasoned)\", saying it was opened by a HEART script", fields = {
+            "title" to "Crash when a bed has no name (reasoned)"
+            "body" to "Opened by a HEART script."
+        }) {
             issue = state.long("number")
         }
     }
-    act(
-        "github:repos-get-branch",
-        "owner" to owner,
-        "repo" to repo,
-        "branch" to "main",
-        intent = "open the branch main of $owner/$repo",
-    ) {
-        act(
-            "github:branch-from-here",
-            "name" to "fix-blank-names-reasoned-$stamp",
-            intent = "start a new branch from here, named fix-blank-names-reasoned-$stamp",
-        ) {
-            act(
-                "github:commit-file",
-                "path" to "fix-reasoned-$stamp.md",
-                "message" to "Refuse a bed with no name",
-                "content" to "Bed names may not be blank.",
-                intent = "commit a file named fix-reasoned-$stamp.md, saying \"Bed names may not be blank.\", with the message \"Refuse a bed with no name\"",
-            )
-            act(
-                "github:open-pull-request",
-                "base" to "main",
-                "title" to "Refuse a bed with no name (reasoned)",
-                "body" to "Relates to #$issue",
-                intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\", saying it relates to #$issue",
-            ) {
+    act("github:repos-get-branch", intent = "open the branch main of $owner/$repo", fields = {
+        "owner" to owner
+        "repo" to repo
+        "branch" to "main"
+    }) {
+        act("github:branch-from-here", intent = "start a new branch from here, named fix-blank-names-reasoned-$stamp", fields = {
+            "name" to "fix-blank-names-reasoned-$stamp"
+        }) {
+            act("github:commit-file", intent = "commit a file named fix-reasoned-$stamp.md, saying \"Bed names may not be blank.\", with the message \"Refuse a bed with no name\"", fields = {
+                "path" to "fix-reasoned-$stamp.md"
+                "message" to "Refuse a bed with no name"
+                "content" to "Bed names may not be blank."
+            })
+            act("github:open-pull-request", intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\", saying it relates to #$issue", fields = {
+                "base" to "main"
+                "title" to "Refuse a bed with no name (reasoned)"
+                "body" to "Relates to #$issue"
+            }) {
                 pull = state.long("number")
                 until(tries = 20) { offers("github:merge") }
                 act("github:merge", "merge_method" to "squash", intent = "merge it, squashing its commits")
@@ -184,13 +174,11 @@ heart("http://localhost:8392/") {
             }
         }
     }
-    act(
-        "github:issues-get",
-        "owner" to owner,
-        "repo" to repo,
-        "issue_number" to issue,
-        intent = "open issue $issue in $owner/$repo",
-    ) {
+    act("github:issues-get", intent = "open issue $issue in $owner/$repo", fields = {
+        "owner" to owner
+        "repo" to repo
+        "issue_number" to issue
+    }) {
         act("github:comment", "body" to "Fixed in 1.2 by #$pull.", intent = "comment on it: Fixed in 1.2 by #$pull.") {
             check("body" eq "Fixed in 1.2 by #$pull.")
         }
@@ -210,18 +198,18 @@ rows:
   - {at: '1', source: 9, generated: 9}
   - {at: '2', source: 12, generated: 13}
   - {at: '3', source: 13, generated: 14}
-  - {at: '6', source: 17, generated: 23}
-  - {at: '7', source: 18, generated: 30}
-  - {at: '8', source: 19, generated: 35}
-  - {at: '9', source: 20, generated: 42}
-  - {at: '11', source: 23, generated: 50}
-  - {at: '12', source: 24, generated: 51}
-  - {at: '13', source: 25, generated: 52}
-  - {at: '17', source: 29, generated: 56}
-  - {at: '18', source: 31, generated: 63}
-  - {at: '19', source: 32, generated: 64}
-  - {at: '21', source: 34, generated: 66}
-  - {at: '22', source: 35, generated: 67}
+  - {at: '6', source: 17, generated: 21}
+  - {at: '7', source: 18, generated: 26}
+  - {at: '8', source: 19, generated: 29}
+  - {at: '9', source: 20, generated: 34}
+  - {at: '11', source: 23, generated: 40}
+  - {at: '12', source: 24, generated: 41}
+  - {at: '13', source: 25, generated: 42}
+  - {at: '17', source: 29, generated: 46}
+  - {at: '18', source: 31, generated: 51}
+  - {at: '19', source: 32, generated: 52}
+  - {at: '21', source: 34, generated: 54}
+  - {at: '22', source: 35, generated: 55}
 derivations:
   - n: 1
     kind: input
@@ -236,8 +224,8 @@ derivations:
     generated:
       - {line: 5, column: 1, text: 'val owner by input()'}
       - {line: 13, column: 40, text: 'owner'}
-      - {line: 25, column: 20, text: 'owner'}
-      - {line: 58, column: 20, text: 'owner'}
+      - {line: 22, column: 20, text: 'owner'}
+      - {line: 47, column: 20, text: 'owner'}
   - n: 2
     kind: input
     rule: '1, 2.1'
@@ -251,8 +239,8 @@ derivations:
     generated:
       - {line: 6, column: 1, text: 'val repo by input()'}
       - {line: 13, column: 57, text: 'repo'}
-      - {line: 26, column: 19, text: 'repo'}
-      - {line: 59, column: 19, text: 'repo'}
+      - {line: 23, column: 19, text: 'repo'}
+      - {line: 48, column: 19, text: 'repo'}
   - n: 3
     kind: input
     rule: '1, 2.1'
@@ -273,8 +261,8 @@ derivations:
       - {line: 29, column: 30, text: '$issue'}
     generated:
       - {line: 10, column: 5, text: 'var issue = 0L'}
-      - {line: 20, column: 13, text: 'issue = state.long("number")'}
-      - {line: 60, column: 27, text: 'issue'}
+      - {line: 18, column: 13, text: 'issue = state.long("number")'}
+      - {line: 49, column: 27, text: 'issue'}
   - n: 5
     kind: answer
     rule: '2.3'
@@ -285,7 +273,7 @@ derivations:
       - {line: 21, column: 17, text: 'pull = state["number"] as Long'}
     generated:
       - {line: 11, column: 5, text: 'var pull = 0L'}
-      - {line: 49, column: 17, text: 'pull = state.long("number")'}
+      - {line: 39, column: 17, text: 'pull = state.long("number")'}
   - n: 6
     kind: relation
     rule: '9'
@@ -304,15 +292,15 @@ derivations:
       - {line: 34, column: 9, text: 'act'}
     generated:
       - {line: 13, column: 9, text: '"github:repos-get"'}
-      - {line: 15, column: 13, text: '"github:open-issue"'}
-      - {line: 24, column: 9, text: '"github:repos-get-branch"'}
-      - {line: 31, column: 13, text: '"github:branch-from-here"'}
-      - {line: 36, column: 17, text: '"github:commit-file"'}
-      - {line: 43, column: 17, text: '"github:open-pull-request"'}
-      - {line: 51, column: 21, text: '"github:merge"'}
-      - {line: 57, column: 9, text: '"github:issues-get"'}
-      - {line: 63, column: 13, text: '"github:comment"'}
-      - {line: 66, column: 13, text: '"github:close"'}
+      - {line: 14, column: 13, text: '"github:open-issue"'}
+      - {line: 21, column: 9, text: '"github:repos-get-branch"'}
+      - {line: 26, column: 13, text: '"github:branch-from-here"'}
+      - {line: 29, column: 17, text: '"github:commit-file"'}
+      - {line: 34, column: 17, text: '"github:open-pull-request"'}
+      - {line: 41, column: 21, text: '"github:merge"'}
+      - {line: 46, column: 9, text: '"github:issues-get"'}
+      - {line: 51, column: 13, text: '"github:comment"'}
+      - {line: 54, column: 13, text: '"github:close"'}
   - n: 7
     kind: words
     rule: '2.2'
@@ -321,7 +309,7 @@ derivations:
     source:
       - {line: 13, column: 46, text: 'Crash when a bed has no name (reasoned)'}
     generated:
-      - {line: 16, column: 24, text: '"Crash when a bed has no name (reasoned)"'}
+      - {line: 15, column: 24, text: '"Crash when a bed has no name (reasoned)"'}
   - n: 8
     kind: paraphrase
     rule: '4'
@@ -329,7 +317,7 @@ derivations:
     why: 'The words, "open an issue titled "Crash when a bed has no name (reasoned)", saying it was opened by a HEART script", said another way: a constant with no mark, since nothing was judged.'
     source: []
     generated:
-      - {line: 17, column: 23, text: '"Opened by a HEART script."'}
+      - {line: 16, column: 23, text: '"Opened by a HEART script."'}
   - n: 9
     kind: words
     rule: '2.2'
@@ -339,8 +327,8 @@ derivations:
       - {line: 17, column: 35, text: 'main'}
       - {line: 20, column: 52, text: 'main'}
     generated:
-      - {line: 27, column: 21, text: '"main"'}
-      - {line: 44, column: 27, text: '"main"'}
+      - {line: 24, column: 21, text: '"main"'}
+      - {line: 35, column: 27, text: '"main"'}
   - n: 10
     kind: template
     rule: '3'
@@ -349,7 +337,7 @@ derivations:
     source:
       - {line: 18, column: 84, text: '$stamp'}
     generated:
-      - {line: 32, column: 23, text: '"fix-blank-names-reasoned-$stamp"'}
+      - {line: 27, column: 23, text: '"fix-blank-names-reasoned-$stamp"'}
   - n: 11
     kind: template
     rule: '3'
@@ -358,7 +346,7 @@ derivations:
     source:
       - {line: 19, column: 60, text: '$stamp'}
     generated:
-      - {line: 37, column: 27, text: '"fix-reasoned-$stamp.md"'}
+      - {line: 30, column: 27, text: '"fix-reasoned-$stamp.md"'}
   - n: 12
     kind: words
     rule: '2.2'
@@ -367,7 +355,7 @@ derivations:
     source:
       - {line: 19, column: 130, text: 'Refuse a bed with no name'}
     generated:
-      - {line: 38, column: 30, text: '"Refuse a bed with no name"'}
+      - {line: 31, column: 30, text: '"Refuse a bed with no name"'}
   - n: 13
     kind: words
     rule: '2.2'
@@ -376,7 +364,7 @@ derivations:
     source:
       - {line: 19, column: 80, text: 'Bed names may not be blank.'}
     generated:
-      - {line: 39, column: 30, text: '"Bed names may not be blank."'}
+      - {line: 32, column: 30, text: '"Bed names may not be blank."'}
   - n: 14
     kind: words
     rule: '2.2'
@@ -385,7 +373,7 @@ derivations:
     source:
       - {line: 20, column: 66, text: 'Refuse a bed with no name (reasoned)'}
     generated:
-      - {line: 45, column: 28, text: '"Refuse a bed with no name (reasoned)"'}
+      - {line: 36, column: 28, text: '"Refuse a bed with no name (reasoned)"'}
   - n: 15
     kind: template
     rule: '3'
@@ -394,7 +382,7 @@ derivations:
     source:
       - {line: 20, column: 128, text: '$issue'}
     generated:
-      - {line: 46, column: 27, text: '"Relates to #$issue"'}
+      - {line: 37, column: 27, text: '"Relates to #$issue"'}
   - n: 16
     kind: until
     rule: '7'
@@ -403,7 +391,7 @@ derivations:
     source:
       - {line: 23, column: 17, text: 'until(tries = 20) { offers("github:merge") }'}
     generated:
-      - {line: 50, column: 17, text: 'until(tries = 20) { offers("github:merge") }'}
+      - {line: 40, column: 17, text: 'until(tries = 20) { offers("github:merge") }'}
   - n: 17
     kind: paraphrase
     rule: '4'
@@ -411,7 +399,7 @@ derivations:
     why: 'The words, "merge it, squashing its commits", said another way: a constant with no mark, since nothing was judged.'
     source: []
     generated:
-      - {line: 51, column: 55, text: '"squash"'}
+      - {line: 41, column: 55, text: '"squash"'}
   - n: 18
     kind: check
     rule: '7'
@@ -422,9 +410,9 @@ derivations:
       - {line: 32, column: 13, text: 'check("body" eq "Fixed in 1.2 by #$pull.")'}
       - {line: 35, column: 9, text: 'check("state" eq "closed", "state_reason" eq "completed")'}
     generated:
-      - {line: 52, column: 17, text: 'check("merged" eq true)'}
-      - {line: 64, column: 13, text: 'check("body" eq "Fixed in 1.2 by #$pull.")'}
-      - {line: 67, column: 9, text: 'check("state" eq "closed", "state_reason" eq "completed")'}
+      - {line: 42, column: 17, text: 'check("merged" eq true)'}
+      - {line: 52, column: 13, text: 'check("body" eq "Fixed in 1.2 by #$pull.")'}
+      - {line: 55, column: 9, text: 'check("state" eq "closed", "state_reason" eq "completed")'}
   - n: 19
     kind: template
     rule: '3'
@@ -433,7 +421,7 @@ derivations:
     source:
       - {line: 31, column: 55, text: '$pull'}
     generated:
-      - {line: 63, column: 41, text: '"Fixed in 1.2 by #$pull."'}
+      - {line: 51, column: 41, text: '"Fixed in 1.2 by #$pull."'}
 </pre>
 <script>
 /*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */

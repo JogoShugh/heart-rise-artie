@@ -149,8 +149,8 @@ class ScriptWriter(
         get() = capture.inputs.keys + options.asInputs.keys + bindings.variables.values.map { it.name }
 
     /**
-     * `act("rel", "field" to value, …, intent = "…")` on one line, or one argument a line when one is marked or it
-     * is long.
+     * `act("rel", "field" to value, …, intent = "…")` on one line; when a value is marked or the line is long, its
+     * values in a block, one a line: `act("rel", intent = "…", fields = { "field" to value })`.
      */
     private fun act(step: Step, pad: String): List<String> {
         val relation = why.relation(step, source)
@@ -160,9 +160,11 @@ class ScriptWriter(
         val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
             listOfNotNull(intent)).joinToString(", ") + ")"
         val long = arguments.any { it.review != null } || Derivations.visible(oneLine) > WIDTH
-        return if (!long) listOf(oneLine) else listOf("${pad}act(", "$pad$INDENT$relation,") + arguments.map {
-            "$pad$INDENT\"${it.field}\" to ${it.expression}," + (it.review?.let { why -> " // review: $why" } ?: "")
-        } + listOfNotNull(intent?.let { "$pad$INDENT$it," }) + "$pad)"
+        if (!long) return listOf(oneLine)
+        val head = "${pad}act(" + (listOf(relation) + listOfNotNull(intent) + "fields = {").joinToString(", ")
+        return listOf(head) + arguments.map {
+            "$pad$INDENT\"${it.field}\" to ${it.expression}" + (it.review?.let { why -> " // review: $why" } ?: "")
+        } + "$pad})"
     }
 
     private companion object {

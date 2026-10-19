@@ -156,7 +156,11 @@ heart("http://localhost:8080/") {
 // water.kts, after artie generate pinned it in place
 heart("http://localhost:8080/") {
     act("garden:bed", "bed" to bed, intent = "open bed $bed") {
-        act("garden:water", "milliliters" to 250, "method" to "drip", intent = "water it with 250 ml, by drip")
+        // A long act gives its values in a block, one a line (built 2026-10-19); the block after still visits.
+        act("garden:water", intent = "water it with 250 ml, by drip", fields = {
+            "milliliters" to 250
+            "method" to "drip"      // review: the reasoner chose it
+        })
     }
 }
 ```

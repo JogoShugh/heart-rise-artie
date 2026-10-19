@@ -9,18 +9,18 @@ rows:
   - {at: '1', source: 9, generated: 9}
   - {at: '2', source: 12, generated: 13}
   - {at: '3', source: 13, generated: 14}
-  - {at: '6', source: 18, generated: 22}
-  - {at: '7', source: 19, generated: 23}
-  - {at: '8', source: 20, generated: 24}
-  - {at: '9', source: 26, generated: 30}
-  - {at: '11', source: 34, generated: 37}
-  - {at: '12', source: 35, generated: 38}
-  - {at: '13', source: 36, generated: 39}
-  - {at: '17', source: 40, generated: 43}
-  - {at: '18', source: 42, generated: 44}
-  - {at: '19', source: 43, generated: 45}
-  - {at: '21', source: 45, generated: 47}
-  - {at: '22', source: 46, generated: 48}
+  - {at: '6', source: 18, generated: 21}
+  - {at: '7', source: 19, generated: 22}
+  - {at: '8', source: 20, generated: 23}
+  - {at: '9', source: 26, generated: 28}
+  - {at: '11', source: 34, generated: 34}
+  - {at: '12', source: 35, generated: 35}
+  - {at: '13', source: 36, generated: 36}
+  - {at: '17', source: 40, generated: 40}
+  - {at: '18', source: 42, generated: 41}
+  - {at: '19', source: 43, generated: 42}
+  - {at: '21', source: 45, generated: 44}
+  - {at: '22', source: 46, generated: 45}
 derivations:
   - n: 1
     kind: input
@@ -35,8 +35,8 @@ derivations:
     generated:
       - {line: 5, column: 1, text: 'val owner by input()'}
       - {line: 13, column: 40, text: 'owner'}
-      - {line: 22, column: 47, text: 'owner'}
-      - {line: 43, column: 41, text: 'owner'}
+      - {line: 21, column: 47, text: 'owner'}
+      - {line: 40, column: 41, text: 'owner'}
   - n: 2
     kind: input
     rule: '1, 2.1'
@@ -50,8 +50,8 @@ derivations:
     generated:
       - {line: 6, column: 1, text: 'val repo by input()'}
       - {line: 13, column: 57, text: 'repo'}
-      - {line: 22, column: 64, text: 'repo'}
-      - {line: 43, column: 58, text: 'repo'}
+      - {line: 21, column: 64, text: 'repo'}
+      - {line: 40, column: 58, text: 'repo'}
   - n: 3
     kind: input
     rule: '1, 2.1'
@@ -72,8 +72,8 @@ derivations:
       - {line: 40, column: 82, text: 'issue'}
     generated:
       - {line: 10, column: 5, text: 'var issue = 0L'}
-      - {line: 19, column: 13, text: 'issue = state.long("number")'}
-      - {line: 43, column: 82, text: 'issue'}
+      - {line: 18, column: 13, text: 'issue = state.long("number")'}
+      - {line: 40, column: 82, text: 'issue'}
   - n: 5
     kind: answer
     rule: '2.3'
@@ -84,7 +84,7 @@ derivations:
       - {line: 32, column: 17, text: 'pull = state["number"] as Long'}
     generated:
       - {line: 11, column: 5, text: 'var pull = 0L'}
-      - {line: 36, column: 17, text: 'pull = state.long("number")'}
+      - {line: 33, column: 17, text: 'pull = state.long("number")'}
   - n: 6
     kind: words
     rule: '2.2'
@@ -93,7 +93,7 @@ derivations:
     source:
       - {line: 13, column: 45, text: '"Crash when a bed has no name (hybrid)"'}
     generated:
-      - {line: 16, column: 24, text: '"Crash when a bed has no name (hybrid)"'}
+      - {line: 15, column: 24, text: '"Crash when a bed has no name (hybrid)"'}
   - n: 7
     kind: words
     rule: '2.2'
@@ -102,7 +102,7 @@ derivations:
     source:
       - {line: 13, column: 96, text: '"Opened by a HEART script."'}
     generated:
-      - {line: 17, column: 23, text: '"Opened by a HEART script."'}
+      - {line: 16, column: 23, text: '"Opened by a HEART script."'}
   - n: 8
     kind: words
     rule: '2.2'
@@ -112,8 +112,8 @@ derivations:
       - {line: 18, column: 82, text: '"main"'}
       - {line: 29, column: 27, text: '"main"'}
     generated:
-      - {line: 22, column: 82, text: '"main"'}
-      - {line: 33, column: 27, text: '"main"'}
+      - {line: 21, column: 82, text: '"main"'}
+      - {line: 30, column: 27, text: '"main"'}
   - n: 9
     kind: template
     rule: '3'
@@ -122,7 +122,7 @@ derivations:
     source:
       - {line: 19, column: 50, text: '"fix-blank-names-hybrid-$stamp"'}
     generated:
-      - {line: 23, column: 50, text: '"fix-blank-names-hybrid-$stamp"'}
+      - {line: 22, column: 50, text: '"fix-blank-names-hybrid-$stamp"'}
   - n: 10
     kind: template
     rule: '3'
@@ -131,7 +131,7 @@ derivations:
     source:
       - {line: 22, column: 27, text: '"fix-hybrid-$stamp.md"'}
     generated:
-      - {line: 26, column: 27, text: '"fix-hybrid-$stamp.md"'}
+      - {line: 24, column: 27, text: '"fix-hybrid-$stamp.md"'}
   - n: 11
     kind: words
     rule: '2.2'
@@ -140,7 +140,7 @@ derivations:
     source:
       - {line: 23, column: 30, text: '"Refuse a bed with no name"'}
     generated:
-      - {line: 27, column: 30, text: '"Refuse a bed with no name"'}
+      - {line: 25, column: 30, text: '"Refuse a bed with no name"'}
   - n: 12
     kind: words
     rule: '2.2'
@@ -149,7 +149,7 @@ derivations:
     source:
       - {line: 24, column: 30, text: '"Bed names may not be blank.\n"'}
     generated:
-      - {line: 28, column: 30, text: '"Bed names may not be blank.\n"'}
+      - {line: 26, column: 30, text: '"Bed names may not be blank.\n"'}
   - n: 13
     kind: words
     rule: '2.2'
@@ -158,7 +158,7 @@ derivations:
     source:
       - {line: 28, column: 28, text: '"Refuse a bed with no name (hybrid)"'}
     generated:
-      - {line: 32, column: 28, text: '"Refuse a bed with no name (hybrid)"'}
+      - {line: 29, column: 28, text: '"Refuse a bed with no name (hybrid)"'}
   - n: 14
     kind: template
     rule: '3'
@@ -167,7 +167,7 @@ derivations:
     source:
       - {line: 30, column: 27, text: '"Relates to #$issue."'}
     generated:
-      - {line: 34, column: 27, text: '"Relates to #$issue."'}
+      - {line: 31, column: 27, text: '"Relates to #$issue."'}
   - n: 15
     kind: until
     rule: '7'
@@ -176,7 +176,7 @@ derivations:
     source:
       - {line: 34, column: 17, text: 'until(tries = 20) { offers("github:merge") }'}
     generated:
-      - {line: 37, column: 17, text: 'until(tries = 20) { offers("github:merge") }'}
+      - {line: 34, column: 17, text: 'until(tries = 20) { offers("github:merge") }'}
   - n: 16
     kind: words
     rule: '2.2'
@@ -185,7 +185,7 @@ derivations:
     source:
       - {line: 35, column: 55, text: '"squash"'}
     generated:
-      - {line: 38, column: 55, text: '"squash"'}
+      - {line: 35, column: 55, text: '"squash"'}
   - n: 17
     kind: check
     rule: '7'
@@ -196,9 +196,9 @@ derivations:
       - {line: 43, column: 13, text: 'check("body" eq "Fixed in 1.2 by #$pull.")'}
       - {line: 46, column: 9, text: 'check("state" eq "closed", "state_reason" eq "completed")'}
     generated:
-      - {line: 39, column: 17, text: 'check("merged" eq true)'}
-      - {line: 45, column: 13, text: 'check("body" eq "Fixed in 1.2 by #$pull.")'}
-      - {line: 48, column: 9, text: 'check("state" eq "closed", "state_reason" eq "completed")'}
+      - {line: 36, column: 17, text: 'check("merged" eq true)'}
+      - {line: 42, column: 13, text: 'check("body" eq "Fixed in 1.2 by #$pull.")'}
+      - {line: 45, column: 9, text: 'check("state" eq "closed", "state_reason" eq "completed")'}
   - n: 18
     kind: template
     rule: '3'
@@ -207,7 +207,7 @@ derivations:
     source:
       - {line: 42, column: 41, text: '"Fixed in 1.2 by #$pull."'}
     generated:
-      - {line: 44, column: 41, text: '"Fixed in 1.2 by #$pull."'}
+      - {line: 41, column: 41, text: '"Fixed in 1.2 by #$pull."'}
   - n: 19
     kind: relation
     rule: '9'
@@ -216,4 +216,4 @@ derivations:
     source:
       - {line: 45, column: 9, text: 'act'}
     generated:
-      - {line: 47, column: 13, text: '"github:close"'}
+      - {line: 44, column: 13, text: '"github:close"'}

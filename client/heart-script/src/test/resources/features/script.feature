@@ -54,6 +54,29 @@ Feature: A HEART script: the Reason step written in advance
       | return | /issues/10                                |
       | act    | close                                     |
 
+  Scenario: A long act's values in a block, one a line, which may be left out; the block after still visits
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          val draft = false
+          act("comment", intent = "say it's fixed", fields = {
+              "body" to "Fixed in 1.2."   // as the release notes say
+              if (draft) "draft" to true
+          }) {
+              act("edit", "body" to "Fixed in 1.2. (edited)")
+          }
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                                   |
+      | enter  | scripted://service/                    |
+      | act    | issues-get {"number":10}               |
+      | act    | comment {"body":"Fixed in 1.2."}       |
+      | act    | edit {"body":"Fixed in 1.2. (edited)"} |
+      | return | /issues/10                             |
+
   Scenario: Reading the representation: state, offers, links, and why an act is absent
     When this script runs
       """kotlin
