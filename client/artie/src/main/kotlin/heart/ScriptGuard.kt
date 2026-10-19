@@ -31,8 +31,34 @@ class ScriptGuard(private val pins: Pins, val strict: Boolean) {
         }
     }
 
+    /**
+     * Why the link [rel] titled [title] of [held] may not be followed, by the lock file; null when it may. A link's
+     * target names one resource, and differs from one resource to the next: what is pinned is what a script relies
+     * on, the variables the target leaves to fill (none for a plain link), checked in either mode.
+     */
+    fun linkRefusal(held: HeartRepresentation?, rel: String, title: String?): Answer.Refused? {
+        val link = held?.links(rel)?.firstOrNull { it.title == title }
+            ?: held?.embedded(rel)?.firstOrNull { it.title == title }?.self
+            ?: return null
+        val pinned = pins.links[rel]
+        val offered = variables(link.href)
+        return when {
+            pinned == null -> refused("$rel is not in the script's lock file").takeIf { strict }
+            pinned != offered -> refused("$rel changed: pinned '$pinned' to fill, offered '$offered'")
+            else -> null
+        }
+    }
+
     /** Whether the lock file pins nothing for [rel]: a lenient run goes on, and says so. */
     fun unpinned(rel: String): Boolean = rel !in pins.forms
 
+    /** Whether the lock file pins nothing for the link [rel]. */
+    fun unpinnedLink(rel: String): Boolean = rel !in pins.links
+
     private fun refused(why: String) = Answer.Refused(Refusal.Guard, Side.CLIENT, why)
+
+    companion object {
+        /** The variables [target] leaves to fill, as its template writes them (`{/name}`); empty for a plain link. */
+        fun variables(target: String): String = Regex("\\{[^}]*}").findAll(target).joinToString("") { it.value }
+    }
 }

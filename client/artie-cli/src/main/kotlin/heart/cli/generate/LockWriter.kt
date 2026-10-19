@@ -15,7 +15,9 @@ class LockWriter(capture: Capture) {
             val target = step.chose["target"]?.toString()
             val form = step.guard["form"]?.toString()
             when {
-                step.follows && target != null -> links.putIfAbsent(relation, target)
+                // A link's target names one resource; what a script relies on is what it leaves to fill.
+                step.follows && target != null ->
+                    links.putIfAbsent(relation, Regex("\\{[^}]*}").findAll(target).joinToString("") { it.value })
                 !step.follows && form != null -> {
                     val sets = forms.getOrPut(relation) { form to linkedSetOf() }.second
                     step.guard["set"].map()["integrity"]?.let { sets += it.toString() }

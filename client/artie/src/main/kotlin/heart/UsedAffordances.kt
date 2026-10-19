@@ -53,11 +53,14 @@ internal object UsedAffordances {
     }
 
     /** The link [rel] titled [title] of [held], or the embedded resource followed as one; null when none. */
-    fun link(held: HeartRepresentation?, rel: String, title: String?): Used? {
+    fun link(held: HeartRepresentation?, rel: String, title: String?, guard: ScriptGuard? = null): Used? {
         val link = held?.links(rel)?.firstOrNull { it.title == title }
             ?: held?.embedded(rel)?.firstOrNull { it.title == title }?.self
             ?: return null
-        return Used("link", rel, title, "GET", target = link.href, address = link.href)
+        val checked = guard?.let {
+            Guard(checked = it.mode, unpinned = !it.strict && it.unpinnedLink(rel))
+        }
+        return Used("link", rel, title, "GET", target = link.href, address = link.href, guard = checked)
     }
 
     /** The affordance a reasoner's [decision] used, made from [before], read at [rung]; null with no selection. */

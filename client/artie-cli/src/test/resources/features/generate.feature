@@ -350,7 +350,7 @@ Feature: artie generate: a run's capture, made a script with no model in it
           sets:
             - sha256-set2
       links:
-        branches: /repos/{owner}/branches
+        branches: '{owner}'
       """
 
   Scenario: A name is put back inside a word, never inside a number; only a selection brings a value in

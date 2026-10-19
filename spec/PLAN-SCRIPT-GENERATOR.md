@@ -46,8 +46,10 @@ it.
 9. **What the run was offered is pinned beside the script**, never in it (decided: the script stays as it reads):
    `NAME.pins.yaml`, a lock file as Gradle's verification metadata and npm's lock are, found by the script's
    name (or `--pins FILE`). It holds the rung the run read at, and by relation: each form's own integrity
-   (HAL-SCHEMA-FORMS-HR Rule 10, which covers its schema's) and every affordance set it was offered in; each
-   link's target template (decided; links have no integrity). Keyed by relation, not by line, so editing the
+   (HAL-SCHEMA-FORMS-HR Rule 10, which covers its schema's) and every affordance set it was offered in; for each
+   link, what its target leaves to fill (decided; links have no integrity): its template's expressions, `{/name}`,
+   or nothing for a plain link. A target names one resource and differs from one resource to the next, so the
+   whole target is not pinned; a changed set of variables is refused in both modes, an unpinned link by strict. Keyed by relation, not by line, so editing the
    script never misaligns a pin, and a form's integrity is the same whichever resource offers it.
 
 ## Guards, when a generated script runs

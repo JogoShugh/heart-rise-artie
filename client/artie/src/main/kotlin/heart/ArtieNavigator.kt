@@ -57,8 +57,10 @@ class ArtieNavigator(
     }
 
     override fun follow(rel: String, title: String?): Answer {
-        val used = UsedAffordances.link(client.current, rel, title)
-        return UsedAffordances.with(answer(rel) { client.follow(rel, title) }, used)
+        val used = UsedAffordances.link(client.current, rel, title, guard)
+        // The lock file, before anything is fetched: a refusal here is the guard's, by the client.
+        val answered = guard?.linkRefusal(client.current, rel, title) ?: answer(rel) { client.follow(rel, title) }
+        return UsedAffordances.with(answered, used)
     }
 
     override fun visit(address: String): Answer = answer(address) { client.enter(address) }

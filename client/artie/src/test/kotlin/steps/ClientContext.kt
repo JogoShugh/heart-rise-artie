@@ -43,6 +43,9 @@ class ClientContext {
     /** The lock file's pins, by relation: the form's integrity and its set's (script-guard.feature). */
     var pins: Map<String, Pair<String, String?>>? = null
 
+    /** The lock file's link pins, by relation: what each link's target leaves to fill (script-guard.feature). */
+    var linkPins: Map<String, String> = emptyMap()
+
     /** Whether the scenario's client keeps its exchanges for a run's capture (script-capture.feature). */
     var keepExchanges = false
 

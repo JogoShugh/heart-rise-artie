@@ -39,6 +39,28 @@ Feature: A script's lock file guards each act before ARTIE sends it
       | strict  | as offered | changed    | was stopped at step 2 by its guard | open   |
       | strict  | as offered | as offered | finished                      | closed |
 
+  Scenario Outline: A link followed is checked by what its target leaves to fill; with strict, it must be pinned
+    A link's target names one resource, and differs from one resource to the
+    next; a lock file pins what a script relies on: the variables the target
+    leaves to fill (none, for a plain link), checked in both modes.
+    Given ARTIE guards the run "<guard>", pinning the link "github:repos-get" <pin>
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          follow("github:repos-get")
+      }
+      """
+    Then the run <ends>
+
+    Examples:
+      | guard   | pin          | ends                               |
+      | lenient | as offered   | finished                           |
+      | lenient | to "{/name}" | was stopped at step 2 by its guard |
+      | lenient | not at all   | finished, step 3 marked unpinned   |
+      | strict  | not at all   | was stopped at step 2 by its guard |
+      | strict  | as offered   | finished                           |
+
   Scenario Outline: A relation the lock file doesn't pin: lenient goes on, marked; strict refuses
     Given ARTIE guards the run "<guard>", pinning everything it offers but "github:close"
     When this script runs with ARTIE

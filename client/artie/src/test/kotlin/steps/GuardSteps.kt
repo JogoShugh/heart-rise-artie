@@ -28,6 +28,17 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
         ctx.pins = bookmark() - relation
     }
 
+    @Given("ARTIE guards the run {string}, pinning the link {string} {}")
+    fun pinningLink(guard: String, relation: String, pin: String) {
+        ctx.guard = guard
+        ctx.pins = bookmark()
+        ctx.linkPins = when (pin) {
+            "not at all" -> emptyMap()
+            "as offered" -> mapOf(relation to "")
+            else -> mapOf(relation to pin.removePrefix("to ").trim('"'))
+        }
+    }
+
     /** The bookmark's forms, pinned as offered now: offered inline, by the bookmark, in no set. */
     private fun bookmark(): Map<String, Pair<String, String?>> =
         read("/").getValue("_forms").jsonObject.mapValues { (_, form) ->
