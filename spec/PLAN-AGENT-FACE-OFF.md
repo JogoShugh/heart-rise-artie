@@ -23,6 +23,47 @@ now, at run time, should not.
 - When the service evolves, the addresses change, and only the changed steps cost tokens. The rest stay cached,
   with no retraining and no code change.
 
+## In short
+
+**The expected winner is ARTIE over HEART, on robustness and on tokens. This is a prediction, not a result, and
+the token win depends on caching.**
+
+- **Robustness: a clear win, expected.** Under every kind of release, ARTIE should stay correct. The nearest
+  rival, B2 (a tool bag rebuilt from the live OpenAPI), keeps up with shape (renames, moved paths, new schemas) but
+  not with state rules such as "no planting in a frost": OpenAPI can say those only in prose, while HEART simply
+  doesn't offer the act.
+- **Tokens: a clear win only with caching (A2, A3).**
+  - Plain ARTIE (A1) reads each step's representation and forms, about 1–3k tokens. On a small API like the
+    garden, that is close to B2's cost: no clear win.
+  - The big win comes from the decision cache or a generated script. The model is then asked only about steps
+    whose affordance set changed, and costs almost nothing otherwise.
+- **Where it loses: latency.** Layer 1 is revalidated on every step, a round trip the others skip.
+- **The real risk:** B2 may come close on releases that only change shape. If it does, that is reported.
+
+### The variants
+
+| Variant | Who | What it sees | How it notices a release | Model calls |
+|---|---|---|---|---|
+| **A1** | ARTIE over HEART, reasoning each step | The current state and the forms allowed now | Every step reads fresh forms | Every step |
+| **A2** | A1 with caching: Layers 2 and 3, plus the decision cache | The same, cached by integrity | A changed integrity misses the cache; only that step is re-reasoned | Only steps whose affordance set changed |
+| **A3** | A script from `artie generate`, held to its lock file, with the reasoner as fallback | The same, compiled | The guard refuses a changed form; the reasoner decides that one step | Only refused steps |
+| **B1** | An MCP tool bag from Monday's OpenAPI, frozen | Every tool, every turn | It doesn't: 4xx answers, then retries | Every step |
+| **B2** | An MCP tool bag rebuilt from the live OpenAPI on change (`tools/list_changed`): OpenAPI at its best | Every current tool, every turn | A new tool list: renames, paths, schemas; never state rules | Every step |
+| **C** | The model's training, with a raw fetch tool | The base URL only | Probing and 4xx answers | Every step, plus retries |
+| **D** | HEART through heart-mcp | Tools that are the forms allowed now | A new tool list per state | Every step |
+| **X** | Control: a script naming `garden:water-cell` and `milliliters` | Nothing | It doesn't; it breaks on renames | None |
+
+### Predicted ranking (not measured)
+
+| | 1st | 2nd | 3rd | Last |
+|---|---|---|---|---|
+| **Robustness** | A1 ≈ A2 ≈ D | A3 (refused, never wrong) | B2 | X, B1 |
+| **Tokens, no release** | A3 ≈ A2 (near zero) | A1 ≈ D | B2 | B1 |
+| **Tokens at a release** | A2 ≈ A3 (only what changed) | A1 ≈ D | B2 | C, B1 |
+| **Latency** | B2, C | B1 | D, A3 | A1 |
+
+The face-off exists to turn these predictions into numbers; until it runs, none of this is a claim.
+
 ## What stays fixed (enforced, not promised)
 
 - **No retraining.** The same model and weights for the whole face-off; its cut-off is before every release we make.
@@ -65,20 +106,8 @@ The first six already exist as restart variants (exhibits/openapi-vs-heart); the
 
 ## Contestants
 
-The same model, the same task wording, the same starting state, the same budget; N runs per cell.
-
-| | Contestant | How it learns of a release |
-|---|---|---|
-| A1 | HEART with ARTIE's reasoner, no caching beyond what HTTP requires | Every step reads the current representation and its forms |
-| A2 | A1 at L2/L3, with the decision cache (below) | The address of a step's affordance set changes; only that step is re-reasoned |
-| A3 | A script generated from an earlier run (`artie generate`), held to its lock file, with the reasoner as a fallback | The guard refuses a changed form; the reasoner decides that one step |
-| B1 | MCP tool bag generated from Monday's OpenAPI, static | It doesn't. 4xx answers, then retries |
-| B2 | MCP tool bag generated from the live OpenAPI, refreshed on a change (`tools/list_changed`): OpenAPI at its best | A new tool list; the whole list is read again |
-| C | Training only: a fetch tool and the base URL | Probing and 4xx answers |
-| D | HEART through heart-mcp: tools that are the current affordances | A new tool list per state |
-| X | Control: an early-bound script naming `garden:water-cell` and `milliliters` | It doesn't; it shows what early binding costs whatever the protocol |
-
-D separates protocol from client: D close to A1 means the gain is hypermedia's, not ARTIE's.
+The variants are defined in "In short" above. Every contestant gets the same model, the same task wording, the
+same starting state and the same budget, with N runs per cell. D separates protocol from client: D close to A1 means the gain is hypermedia's, not ARTIE's.
 
 ### The decision cache (A2): caching taken up to the model
 
