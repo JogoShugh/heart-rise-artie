@@ -60,7 +60,10 @@ selection against the lock file (spec/ideas/replay-guards-lenient-strict.md):
 
 A refusal is a new kind, "guard": by the client, naming the pinned and the offered integrity. A run at another
 rung than the lock file's says so before its first request. A kept reason step whose model chooses a relation
-the lock file doesn't hold: lenient goes on and the capture marks it unpinned; strict refuses it.
+the lock file doesn't hold: lenient goes on and the capture and report mark it unpinned; strict refuses it
+(decided). A script with no lock file beside it runs unguarded, as today; `--guard` given with no lock file
+stops before the first request, saying the lock is missing (decided). `artie generate CAPTURE.yaml --out
+NAME.kts` writes NAME.kts and NAME.pins.yaml together.
 
 ## Capture changes first (each test first)
 
