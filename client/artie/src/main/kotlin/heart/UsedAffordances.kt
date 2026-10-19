@@ -5,6 +5,7 @@ import heart.script.Guard
 import heart.script.Pinned
 import heart.script.Used
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonObject
 
 /**
@@ -29,6 +30,10 @@ internal object UsedAffordances {
             target = form.target,
             address = targetOf(form, held, fields),
             fields = form.schema["properties"]?.jsonObject?.keys?.toList().orEmpty(),
+            // Each field's type as the schema says, so a script made from the run writes 91, not "91".
+            types = form.schema["properties"]?.jsonObject.orEmpty().mapNotNull { (name, property) ->
+                ((property as? JsonObject)?.get("type") as? JsonPrimitive)?.content?.let { name to it }
+            }.toMap(),
             guard = Guard(
                 rung = rung?.name,
                 set = held.forms?.let { Pinned(it.href, it.integrity) },

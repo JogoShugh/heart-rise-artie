@@ -33,6 +33,9 @@ class ScriptedService : Navigator {
     /** Whether the service, as a client, keeps the exchanges it makes for a run's capture. */
     var keepsExchanges = false
 
+    /** The JSON Schema type of each field a form asks for, by "relation at address". */
+    val types = mutableMapOf<String, Map<String, String>>()
+
     /** The fields a form asks for, by "relation at address". */
     val fields = mutableMapOf<String, List<String>>()
 
@@ -58,6 +61,7 @@ class ScriptedService : Navigator {
             "form", rel, method = "POST", target = held.replace(Regex("/\\d+"), "/{id}") + "/actions/$rel",
             address = "$held/actions/$rel", fields = this.fields["$rel at $held"].orEmpty(),
             guard = Guard(form = "sha256-$rel", ifMatch = "\"$held\""),
+            types = types["$rel at $held"].orEmpty(),
         )
         if (keepsExchanges) {
             val sent = Sent("POST", "scripted://service$held/actions/$rel", emptyMap(), json(fields))
@@ -124,9 +128,11 @@ class ScriptedService : Navigator {
         )
     }
 
+    /** An embedded resource's state: its whole body where a feature gives one, as a held resource's is. */
     private fun stateOf(address: String): JsonObject {
         val values = resources.getValue(address)
-        return buildJsonObject { values.filterValues { it.isNotEmpty() }.forEach { (k, v) -> put(k, v) } }
+        return bodies[address]
+            ?: buildJsonObject { values.filterValues { it.isNotEmpty() }.forEach { (k, v) -> put(k, v) } }
     }
 
     private fun json(fields: Map<String, Any?>): String =

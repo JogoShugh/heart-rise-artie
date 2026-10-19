@@ -97,6 +97,8 @@ class Used(
     val address: String,
     val fields: List<String> = emptyList(),
     val guard: Guard? = null,
+    /** Each field's JSON Schema type, as the form's schema says, by name. */
+    val types: Map<String, String> = emptyMap(),
 )
 
 /**

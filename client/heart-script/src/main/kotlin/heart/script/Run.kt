@@ -81,10 +81,14 @@ class Run(
     fun traceJson(): String = kotlinx.serialization.json.JsonObject(
         mapOf(
             "inputs" to kotlinx.serialization.json.JsonObject(
-                inputsUsed.mapValues { (_, used) ->
+                inputsUsed.mapValues { (name, used) ->
+                    // As the script declared it, so a script made from the run declares it alike.
+                    val declaration = declared.firstOrNull { it.name == name }
                     kotlinx.serialization.json.buildJsonObject {
                         put("value", kotlinx.serialization.json.JsonPrimitive(used.first))
                         put("given", kotlinx.serialization.json.JsonPrimitive(used.second))
+                        declaration?.default?.let { put("default", kotlinx.serialization.json.JsonPrimitive(it)) }
+                        declaration?.question?.let { put("question", kotlinx.serialization.json.JsonPrimitive(it)) }
                     }
                 },
             ),

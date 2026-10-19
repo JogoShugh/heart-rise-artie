@@ -55,6 +55,16 @@ class CaptureSteps(private val ctx: ClientContext) {
         assertTrue(chose in call.getValue("answered").jsonPrimitive.content, "answered: $call")
     }
 
+    @Then("the run's step {int} sends its values typed as the form's schema says")
+    fun typed(step: Int, table: DataTable) {
+        val values = step(step)["values"]?.jsonObject
+        val read = table.asMaps().map { row ->
+            mapOf("field" to row.getValue("field"),
+                "type" to values?.get(row.getValue("field"))?.jsonObject?.get("type")?.jsonPrimitive?.content)
+        }
+        assertEquals(table.asMaps(), read)
+    }
+
     @io.cucumber.java.en.Given("ARTIE keeps its exchanges")
     fun keepsExchanges() {
         ctx.keepExchanges = true

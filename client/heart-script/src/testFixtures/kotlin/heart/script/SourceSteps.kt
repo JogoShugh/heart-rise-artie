@@ -41,6 +41,31 @@ class SourceSteps(private val steps: ScriptSteps) {
         assertEquals(table.asMaps(), read)
     }
 
+    @Then("trace step {int} sends no values")
+    fun noValues(step: Int) = assertEquals(null, steps.run.trace[step - 1].json()["values"])
+
+    @Then("trace step {int}'s values are typed")
+    fun typed(step: Int, table: DataTable) {
+        val values = steps.run.trace[step - 1].json()["values"]?.jsonObject
+        val read = table.asMaps().map { row ->
+            val type = values?.get(row.getValue("field"))?.jsonObject?.get("type")?.let(::text)
+            mapOf("field" to row.getValue("field"), "type" to type)
+        }
+        assertEquals(table.asMaps(), read)
+    }
+
+    @Then("the run's inputs are declared as")
+    fun declared(table: DataTable) {
+        val inputs = kotlinx.serialization.json.Json.parseToJsonElement(steps.run.traceJson()).jsonObject["inputs"]
+            ?.jsonObject
+        val read = table.asMaps().map { row ->
+            val input = inputs?.get(row.getValue("input"))?.jsonObject
+            listOf("value", "given", "default", "question").associateWith { input?.get(it)?.let(::text).orEmpty() } +
+                ("input" to row.getValue("input"))
+        }
+        assertEquals(table.asMaps().map { row -> row.mapValues { it.value.orEmpty() } }, read)
+    }
+
     @Then("the run's inputs are")
     fun inputs(table: DataTable) {
         val inputs = kotlinx.serialization.json.Json.parseToJsonElement(steps.run.traceJson()).jsonObject["inputs"]

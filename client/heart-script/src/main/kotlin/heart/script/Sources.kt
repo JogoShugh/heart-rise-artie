@@ -16,13 +16,15 @@ import kotlinx.serialization.json.put
  */
 internal object Sources {
     /** The members of a step's values that name what was selected, not what was sent. */
-    private val SELECTION = setOf("relation", "entry", "address")
+    private val SELECTION = setOf("relation", "entry", "address", "facts")
 
     fun values(step: TraceStep, run: Run, earlier: List<TraceStep>): JsonObject = buildJsonObject {
         val words = step.asked.say.takeIf { step.asked.mode == "intent" }
         step.asked.params.filterKeys { it !in SELECTION }.forEach { (name, value) ->
             put(name, buildJsonObject {
                 put("value", element(value))
+                // Its type, as the form's schema says: a generator writes "91" sent for an integer as 91.
+                step.used?.types?.get(name)?.let { put("type", it) }
                 put("from", JsonArray(of(text(value), run, earlier, words)))
             })
         }
@@ -56,13 +58,14 @@ internal object Sources {
         val none = listOf(JsonPrimitive(if (words != null) "chosen" else "constant"))
         val whole = inputs(run).filter { it.second == value }.map { input(it.first) } +
             states(earlier).filter { it.value == value }.map { it.source } +
-            listOfNotNull(JsonPrimitive("words").takeIf { words != null && word(value).containsMatchIn(words) })
+            listOfNotNull(JsonPrimitive("words").takeIf { words != null && Words.whole(value).containsMatchIn(words) })
         val parts = (inputs(run).map { it.second to input(it.first) } + states(earlier).map { it.value to it.source })
-            .filter { (part, _) -> part.isNotEmpty() && part != value && word(part).containsMatchIn(value) }
+            .filter { (part, _) -> part.isNotEmpty() && part != value && Words.whole(part).containsMatchIn(value) }
             .distinctBy { it.first }
         return when {
             value.isEmpty() -> none
             whole.isNotEmpty() -> whole.distinct()
+            words != null && Words.paraphrases(value, words) -> listOf(JsonPrimitive("paraphrase"))
             parts.isNotEmpty() -> listOf(buildJsonObject { put("parts", JsonObject(parts.toMap())) })
             else -> none
         }
@@ -73,10 +76,23 @@ internal object Sources {
     private fun input(name: String): JsonObject = buildJsonObject { put("input", name) }
 
     /** Each scalar of each earlier step's state, the nearest step first, with where it is. */
+    /**
+     * Each scalar a selection brought into the run, the earliest step first, with where it is: its state, and the
+     * state of each resource it embeds, by pointer into `_embedded`. A check, an until or a block end's re-read
+     * of what was already held brings nothing in (spec/PLAN-SCRIPT-GENERATOR.md).
+     */
     private fun states(earlier: List<TraceStep>): List<Held> =
-        earlier.withIndex().reversed().flatMap { (i, step) ->
-            step.now?.let { scalars(it.state, "").map { (pointer, value) -> Held(value, i + 1, pointer) } }.orEmpty()
-        }
+        earlier.withIndex().filter { (_, step) -> step.used != null || step.asked.say.startsWith("enter") }
+            .flatMap { (i, step) ->
+                val now = step.now ?: return@flatMap emptyList()
+                val own = scalars(now.state, "")
+                val embedded = now.embedded.flatMap { (rel, resources) ->
+                    resources.flatMapIndexed { at, resource ->
+                        scalars(resource.state, "/_embedded/${escape(rel)}/$at")
+                    }
+                }
+                (own + embedded).map { (pointer, value) -> Held(value, i + 1, pointer) }
+            }
 
     private fun scalars(node: JsonElement, at: String): List<Pair<String, String>> = when (node) {
         is JsonObject -> node.entries.flatMap { (name, value) -> scalars(value, "$at/${escape(name)}") }
@@ -87,7 +103,6 @@ internal object Sources {
     private fun escape(name: String) = name.replace("~", "~0").replace("/", "~1")
 
     /** [part] as a whole word: not inside a longer word or number. */
-    private fun word(part: String) = Regex("(?<![\\w])" + Regex.escape(part) + "(?![\\w])")
 
     private fun text(value: Any?): String = when (value) {
         null -> ""

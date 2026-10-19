@@ -18,6 +18,12 @@ class UsedSteps(private val steps: ScriptSteps) {
         steps.service.fields["$relation at $at"] = table.asMaps().map { it.getValue("field") }
     }
 
+    @Given("the form {string} at {string} asks for these fields, typed")
+    fun typedFields(relation: String, at: String, table: DataTable) {
+        steps.service.fields["$relation at $at"] = table.asMaps().map { it.getValue("field") }
+        steps.service.types["$relation at $at"] = table.asMaps().associate { it.getValue("field") to it.getValue("type") }
+    }
+
     @Then("trace step {int} used")
     fun used(step: Int, table: DataTable) = assertEquals(
         rows(table),

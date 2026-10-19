@@ -35,6 +35,9 @@ class ShapeSteps(private val steps: ScriptSteps) {
     @Then("trace step {int} is a judgement")
     fun judgement(step: Int) = assertEquals("true", traced()[step - 1]["judgement"]?.jsonPrimitive?.content)
 
+    @Then("trace step {int} is no judgement")
+    fun noJudgement(step: Int) = assertEquals("false", traced()[step - 1]["judgement"]?.jsonPrimitive?.content)
+
     @Then("trace step {int} keeps these members for later steps")
     fun keeps(step: Int, table: DataTable) {
         val keeps = traced()[step - 1]["keeps"] as? JsonObject

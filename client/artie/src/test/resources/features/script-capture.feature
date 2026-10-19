@@ -34,6 +34,11 @@ Feature: A script run with ARTIE records the form or link each step used, as the
       | target   | /repos/{owner}/{repo}/issues/{issue_number}/actions/close              |
       | address  | https://github.gateway.test/repos/acme/rockets/issues/10/actions/close |
     And the run's step 3 guards on rung L2, and on the set, form and schema the gateway serves, with its If-Match
+    And the run's step 2 sends its values typed as the form's schema says
+      | field        | type    |
+      | owner        | string  |
+      | repo         | string  |
+      | issue_number | integer |
 
   Scenario: Kept, the exchanges are ARTIE's requests and answers as sent, the credential written as a token
     Given ARTIE keeps its exchanges
