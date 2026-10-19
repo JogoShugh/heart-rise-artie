@@ -314,9 +314,10 @@ filed as `spec/ideas/embedded-forms-with-validators.md`.)
 
 ## Rule 10: each form's own integrity
 
-Every form a server writes carries `hr:integrity`: the integrity (Rule 2's
-`sha256-` form) of a JSON object holding these members of the form, in
-canonical form (RFC 8785):
+Every form a server writes carries `hr:integrity`, the bookmark's (the
+service index's lookups, searches and acts) as much as a resource's: the
+integrity (Rule 2's `sha256-` form) of a JSON object holding the members the
+form has of these, in canonical form (RFC 8785):
 
 | Member | Value |
 |---|---|
@@ -324,7 +325,7 @@ canonical form (RFC 8785):
 | `hr:templatePointers` | the form's template pointers (Rule 1) |
 | `method` | the form's method |
 | `contentType` | the form's content type |
-| `schema` | the integrity of the form's schema body |
+| `schema` | the integrity of the form's schema body; for a schema written inline, of its canonical text as served |
 
 Not the form's `title` or `description`: a retitled form does the same. The
 value is the same at every rung, whether the schema is embedded or referred to

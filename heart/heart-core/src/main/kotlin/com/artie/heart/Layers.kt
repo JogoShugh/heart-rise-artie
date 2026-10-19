@@ -180,17 +180,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
      * embedded or referred to.
      */
     private fun formIntegrity(target: String, schemaIntegrity: String): String =
-        ContentAddress.integrity(
-            ContentAddress.canonical(
-                mapOf(
-                    "target" to target,
-                    TEMPLATE_POINTERS to type.itemPath.pointers,
-                    "method" to "POST",
-                    "contentType" to "application/json",
-                    "schema" to schemaIntegrity,
-                ),
-            ),
-        )
+        FormIntegrity.of(target, "POST", schemaIntegrity, type.itemPath.pointers, "application/json")
 
     /** At L0 a form belongs to one resource: its target is concrete and needs no pointers. */
     private fun resolved(form: Any?, item: String): Map<String, Any?> {

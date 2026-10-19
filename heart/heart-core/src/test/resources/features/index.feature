@@ -17,6 +17,18 @@ Feature: The service index, the home document and search pages, from the declara
       | home:search-lamps | /lamps{?name} | name           |
       | home:get-lamp     | /lamps/{id}   | id             |
 
+  Scenario: Every form the index offers carries its own integrity, as a resource's forms do
+    HAL-SCHEMA-FORMS-HR Rule 10: a replaying client pins the forms it uses, the
+    bookmark's lookups and searches among them. A form's hr:integrity is the
+    integrity, in canonical form, of the members it has of these: its target,
+    its template pointers, its method, its content type, and its schema's
+    integrity. Not its title or description.
+    When the service index is rendered in HAL Schema Forms
+    Then every form it offers carries the integrity of what it does
+      | form              |
+      | home:search-lamps |
+      | home:get-lamp     |
+
   Scenario: In HAL-FORMS, the same two forms are GET templates whose fields go in the query
     When the service index is rendered in HAL-FORMS
     Then it offers these GET templates

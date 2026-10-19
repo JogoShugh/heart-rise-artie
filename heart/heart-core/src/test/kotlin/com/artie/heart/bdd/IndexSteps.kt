@@ -3,6 +3,7 @@ package com.artie.heart.bdd
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.Found
+import com.artie.heart.JsonTrees
 import com.artie.heart.Rung
 import com.artie.heart.Search
 import com.artie.heart.SearchPages
@@ -48,6 +49,28 @@ class IndexSteps(private val world: LampWorld) {
     @Then("it offers these GET forms")
     fun getForms(table: DataTable) = table.asMaps().forEach {
         getForm(it.getValue("form"), it.getValue("target"), it.getValue("required field"))
+    }
+
+    @Then("every form it offers carries the integrity of what it does")
+    fun formIntegrity(table: DataTable) {
+        val forms = json.path("_forms")
+        val keys = forms.fieldNames().asSequence().toList()
+        assertTrue(table.asMaps().map { it.getValue("form") }.all { it in keys }, "forms: $keys")
+        keys.forEach { key ->
+            val form = forms.path(key)
+            val written = JsonTrees.plain(form.path("schema").toString())
+            val schema = ContentAddress.integrity(ContentAddress.canonical(written))
+            val members = buildMap {
+                put("target", form.path("_links").path("target").path("href").asText())
+                form.path("hr:templatePointers").takeIf { !it.isMissingNode }
+                    ?.let { put("hr:templatePointers", JsonTrees.plain(it.toString())) }
+                put("method", form.path("method").asText())
+                form.path("contentType").takeIf { !it.isMissingNode }?.let { put("contentType", it.asText()) }
+                put("schema", schema)
+            }
+            val expected = ContentAddress.integrity(ContentAddress.canonical(members))
+            assertEquals(expected, form.path("hr:integrity").asText(null), key)
+        }
     }
 
     private fun getForm(key: String, target: String, field: String) {

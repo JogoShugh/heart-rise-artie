@@ -118,6 +118,8 @@ class ServiceIndex(
         "title" to type.profile.relation(relation).title,
         "description" to type.profile.relation(relation).description,
         "schema" to schema,
+        // HAL-SCHEMA-FORMS-HR Rule 10: the bookmark's forms are pinned as a resource's are.
+        FORM_INTEGRITY to FormIntegrity.of(target, "GET", FormIntegrity.ofSchema(schema)),
     )
 
     /** A HAL-FORMS GET template: its properties become the query string of the collection. */
@@ -158,8 +160,14 @@ private fun actForm(type: ResourceType<*, *>, act: Act): Map<String, Any> {
         "title" to relation.title,
         "description" to relation.description,
         "schema" to inline,
+        // Rule 10: over the schema as served, its $id with it, as the client reads it.
+        FORM_INTEGRITY to
+            FormIntegrity.of(ACTIONS + act.path, "POST", FormIntegrity.ofSchema(inline), contentType = JSON),
     )
 }
+
+/** HAL-SCHEMA-FORMS-HR Rule 10: a form's own integrity. */
+private const val FORM_INTEGRITY = "hr:integrity"
 
 /** SPEC §6.11.1: the index as a JSON Home document, for the types that can be found. */
 internal class HomeDocument(
