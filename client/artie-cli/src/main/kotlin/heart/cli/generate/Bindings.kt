@@ -46,9 +46,9 @@ class Bindings(
 
     private val sources = Sources(capture)
 
-    /** The variable each reason slot names, by the step and pointer it came from. */
+    /** The variable each slot names, a reason step's or a scripted step's, by the step and pointer it came from. */
     private val slotted: Map<Pair<Int, String>, String> = capture.steps.flatMap { step ->
-        step.slots.entries.mapNotNull { (name, slot) ->
+        Written.slots(source, step).entries.mapNotNull { (name, slot) ->
             val from = sources.first(slot.map()["from"])
             if (from == null || !IDENTIFIER.matches(name.toString())) null else from to name.toString()
         }
@@ -69,7 +69,7 @@ class Bindings(
         return when {
             input != null -> Argument(field, inputAs(input, type))
             field in asInputs -> Argument(field, inputAs(field, type))
-            literal(step, text, value) -> Argument(field, constant(value, type))
+            literal(step, field, text) -> Argument(field, constant(value, type))
             held != null -> Argument(field, variableAs(variable(held.first, held.second), type), tie(from, held))
             "chosen" in from -> Argument(field, constant(value, type), "the reasoner chose it, asked \"${step.say}\"")
             value is String -> Argument(field, KotlinText.templated(text, names(step, text, from)))
@@ -98,21 +98,23 @@ class Bindings(
     }
 
     /** Rule 2.2: text the script wrote literally, outside any slot of its reason template, or in its own line. */
-    private fun literal(step: Step, text: String, value: Any?): Boolean {
+    private fun literal(step: Step, field: String, text: String): Boolean {
         val words = step.template?.let(KotlinText::plain)
-        val written = step.line?.let { source?.getOrNull(it - 1) }.orEmpty()
+        val written = Written(source, step).takeIf { step.mode == "script" }?.expression(field)
         return when {
             text.isEmpty() -> false
             words != null -> KotlinText.whole(text).containsMatchIn(words)
-            value is String -> KotlinText.quoted(text) in written
-            else -> Regex("""\bto\s+${Regex.escape(text)}\b""").containsMatchIn(written)
+            written == null -> false
+            // A string with no slot in it, as the script wrote it; or a number or a truth, written as it is.
+            written.startsWith("\"") -> KotlinText.match(written, text)?.isEmpty() == true
+            else -> written == text
         }
     }
 
     /** Each value a string may hold that the script has a name for: its slots, and the parts the capture names. */
     private fun names(step: Step, text: String, from: List<*>): Map<String, String> {
         val names = linkedMapOf<String, String>()
-        step.slots.forEach { (name, slot) ->
+        Written.slots(source, step).forEach { (name, slot) ->
             // A slot whose value the text doesn't hold names nothing here, and makes no variable.
             val value = slot.map()["value"]?.toString()?.takeIf { KotlinText.whole(it).containsMatchIn(text) }
                 ?: return@forEach

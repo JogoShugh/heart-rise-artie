@@ -32,6 +32,22 @@ internal object KotlinText {
     /** [value] as a whole word: not inside a longer word or number (`1` is not in `1.2`; `1018` is in `1018.md`). */
     fun whole(value: String): Regex = Regex("(?<!\\w)(?<!\\d\\.)" + Regex.escape(value) + "(?!\\w)(?!\\.\\d)")
 
+    /**
+     * Each slot of the Kotlin string literal [literal] (`"Relates to #$issue."`), by its name, as [value] fills it;
+     * null when the value doesn't fit the literal. A `${…}` slot is named by what is inside it.
+     */
+    fun match(literal: String, value: String): Map<String, String>? {
+        val body = literal.removePrefix("\"").removeSuffix("\"")
+        val slot = Regex("""\$\{([^}]*)}|\$([A-Za-z_][A-Za-z0-9_]*)""")
+        val names = slot.findAll(body).map { it.groupValues[1].ifEmpty { it.groupValues[2] } }.toList()
+        val pattern = slot.split(body).joinToString("(.+?)") { Regex.escape(unescape(it)) }
+        val found = Regex("^$pattern$", RegexOption.DOT_MATCHES_ALL).matchEntire(value) ?: return null
+        return names.zip(found.groupValues.drop(1)).toMap()
+    }
+
+    private fun unescape(text: String): String = text
+        .replace("\\n", "\n").replace("\\t", "\t").replace("\\\"", "\"").replace("\\$", "$").replace("\\\\", "\\")
+
     /** The words of a reason(…) template with its slots taken out and its escapes undone. */
     fun plain(template: String): String = template
         .replace(Regex("""\$\{[^}]*}"""), "\u0000")
