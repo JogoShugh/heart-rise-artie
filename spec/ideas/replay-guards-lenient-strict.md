@@ -109,6 +109,79 @@ Either way, the old script never runs wrong in the meantime: it is refused, neve
 | Remembers the answer | A code edit and a redeploy | An input of the regenerated script |
 | Who changes code | A developer | No one; a person approves the proposed script |
 
+## Script, lock file and config: the shape agreed (2026-10-19)
+
+Agreed with the author, not built. The schema compatibility check (stage 2 below) is deferred: it needs a
+schema diff, a separate piece of work.
+
+### Three files, each with one job, one author, and one reason to change
+
+| File | What it holds | Found by default at | Override for a trial run | Written by |
+|---|---|---|---|---|
+| The script | What to do and why: each step's relation, values and intent words | The path given to `artie run` | — | A person, or an AI; `artie generate` pins it |
+| The lock file | What the server offered: affordance-set and form integrities | `NAME.pins.yaml`, beside the script (exists) | `--pins FILE` (exists) | The tool only |
+| The config | How strict to be and how much to spend: guard, fallback, budget, re-pinning, per-relation overrides | `NAME.config.yaml`, beside the script (new) | `--config FILE` (new) | A person only |
+
+They are kept apart because each changes for a different reason, at a different pace, by a different
+author. In one file, a regeneration would wipe a person's tuning, or a person's edits would fight the tool's.
+
+- **Trial runs leave the defaults alone.** With `--pins` or `--config` given, re-pinning writes only to the
+  file named. `--no-repin` runs with no re-pinning at all.
+- **A missing config means today's behaviour:** refuse on a changed form, never fall back.
+- **Precedence:** a flag, then the config's rule for the relation, then the config's default, then the
+  built-in default. `--guard` stays as a flag, and is also a config setting.
+
+### The script: one verb, `act`, for its whole life
+
+- `act(intent = "merge it, squashing its commits")`, with no relation, reasons. It replaces `reason(...)`,
+  which goes away, with no alias.
+- `act("github:merge", "merge_method" to "squash", intent = "merge it, squashing its commits")` is pinned. It
+  runs with no model while its pin holds, and falls back to its intent words when it doesn't.
+- An act written by hand with no intent never falls back. It refuses, unless the config allows the form's own
+  title and description to stand as the words.
+
+A script starts as intent only, written by a person or an AI. A run pins it, and a later run re-pins it when
+the service changes.
+
+### `artie generate` pins in place
+
+- **It adds the relation and values in front of each `intent =`, and changes nothing else.** The words,
+  nesting and checks stay byte for byte.
+- **It refuses a script with uncommitted changes, and prints the diff.** `--check` shows the diff without
+  writing; `--out` writes a new file, as today, for comparisons such as the derivation report.
+- **A re-pin proposed by a self-repair needs approval:** a flag, or a commit. A self-repair never pins itself
+  silently.
+
+### The config
+
+- `guard`: lenient or strict.
+- `fallback`: never; only when every value can be justified; ask a person; always.
+- `budget`: the most model calls in one run.
+- `repin`: automatic, propose only, or never.
+- Per relation, overrides, e.g. `github:merge: { fallback: ask, repin: propose }`.
+
+### The walk at run time, per step (a Merkle walk)
+
+Content-addressed means immutable: a changed schema gets a new address, so the change shows as a different link
+in its parent, up to the affordance set. Only the root, the resource (Layer 1), is revalidated; schemas need no
+`ETag` of their own.
+
+1. Revalidate the resource (a 304 is cheap). It links to its affordance set.
+2. **The set's integrity is the one pinned:** everything under it is unchanged, by definition. Act from the
+   cache, with no fetch and no model. This is the common case.
+3. **The set changed, but the form's integrity is the one pinned** (another act was added or removed, say):
+   act, and add the new set to the lock file.
+4. **The form changed:** fetch only its new schema. Today: fall back to the intent words, or refuse, as the
+   config says. Deferred, stage 2: check the values the script sends against the new schema. If the fields are
+   still there, with types and limits the values meet, and there is no new required field without a default,
+   act and re-pin with no model; otherwise fall back or ask.
+
+Strict mode stops at step 3. Re-pinning happens only after the act succeeds, and only where the config allows
+it. A form's integrity also covers its target template, method and template pointers: a moved target is still
+compatible (the client always uses the target the server gives); a changed method is not. A form's integrity
+leaves out its title and description, so a change of meaning with the same names and schema is invisible to any
+hash: a server that changes what a field means must change its name or its schema.
+
 ## Open
 
 - What a lenient replay reports when it acts on an unchanged form in a changed set: a warning in the
