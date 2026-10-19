@@ -75,6 +75,34 @@ Feature: Checks as facts: a member and a value, or a member and a matcher
             40
       """
 
+  Scenario: A member read typed, with no cast: a whole number, a decimal, a text
+    A script carries a value from one step to a later one in a typed
+    variable (spec/PLAN-SCRIPT-GENERATOR.md): state.long, state.double,
+    state.text and state.bool read a member as that type, by the same names
+    as state[...].
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("bed-get", "id" to 1)
+          var moisture = 0L
+          var soil = ""
+          moisture = state.long("moisture")
+          soil = state.text("/plot/soil")
+          note("${moisture + 1}, ${soil.uppercase()}, ${state.double("ratio") * 2}")
+      }
+      """
+    Then the script noted "41, LOAM, 1.5"
+
+  Scenario: A member read as a type it isn't stops the script, saying so
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("bed-get", "id" to 1)
+          note("${state.long("label")}")
+      }
+      """
+    Then the script failed: "label is not a number: Herbs"
+
   Scenario: The trace keeps each fact as data
     When this script runs, written to a trace
       """kotlin

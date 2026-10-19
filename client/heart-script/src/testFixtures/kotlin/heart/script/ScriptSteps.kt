@@ -212,10 +212,18 @@ class ScriptSteps {
         try {
             engine.eval(script)
         } catch (e: ScriptException) {
-            stopped = generateSequence(e as Throwable) { it.cause }.filterIsInstance<ScriptStopped>().firstOrNull()
-                ?: throw e
+            val causes = generateSequence(e as Throwable) { it.cause }
+            stopped = causes.filterIsInstance<ScriptStopped>().firstOrNull()
+            // A script that failed on its own, not stopped by a step: kept, for a feature to say so.
+            if (stopped == null) failed = causes.last().message ?: throw e
         } catch (e: ScriptStopped) {
             stopped = e
         }
     }
+
+    /** Why the script failed on its own (an error in it, not a step's stop); null when it didn't. */
+    var failed: String? = null
+
+    @Then("the script failed: {string}")
+    fun scriptFailed(message: String) = assertEquals(message, failed)
 }
