@@ -128,9 +128,14 @@ Feature: artie generate's options: reason steps kept, text made inputs
       val owner by input()
 
       heart("http://localhost:8392/") {
-          act("repos-get", "owner" to owner) {
-              act("open-issue", "title" to "Crash on start", "body" to "Opened by a script.") {
-                  act("comment", "body" to "Thanks.") {}
+          act("repos-get", "owner" to owner, intent = "open the repository $owner") {
+              act(
+                  "open-issue",
+                  "title" to "Crash on start",
+                  "body" to "Opened by a script.",
+                  intent = "open an issue titled \"Crash on start\", saying it was opened by a script",
+              ) {
+                  act("comment", "body" to "Thanks.", intent = "comment on it: Thanks.") {}
                   act(intent = "close it, since it's done")
               }
           }
@@ -158,12 +163,18 @@ Feature: artie generate's options: reason steps kept, text made inputs
       val title by input(default = "Crash on start")
 
       heart("http://localhost:8392/") {
-          act("repos-get", "owner" to owner) {
-              act("open-issue", "title" to title, "body" to "Opened by a script.") {
-                  act("comment", "body" to "Thanks.") {}
+          act("repos-get", "owner" to owner, intent = "open the repository $owner") {
+              act(
+                  "open-issue",
+                  "title" to title,
+                  "body" to "Opened by a script.",
+                  intent = "open an issue titled \"Crash on start\", saying it was opened by a script",
+              ) {
+                  act("comment", "body" to "Thanks.", intent = "comment on it: Thanks.") {}
                   act(
                       "close",
                       "reason" to "completed", // review: the reasoner chose it, asked "close it, since it's done"
+                      intent = "close it, since it's done",
                   )
               }
           }

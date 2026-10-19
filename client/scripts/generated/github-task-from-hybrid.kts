@@ -44,7 +44,7 @@ heart("http://localhost:8392/") {
         act("github:comment", "body" to "Fixed in 1.2 by #$pull.") {
             check("body" eq "Fixed in 1.2 by #$pull.")
         }
-        act("github:close")
+        act("github:close", intent = "close it the right way: the fix shipped in 1.2")
         check("state" eq "closed", "state_reason" eq "completed")
     }
 }

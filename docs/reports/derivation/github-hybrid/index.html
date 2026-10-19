@@ -135,7 +135,7 @@ heart("http://localhost:8392/") {
         act("github:comment", "body" to "Fixed in 1.2 by #$pull.") {
             check("body" eq "Fixed in 1.2 by #$pull.")
         }
-        reason("close it the right way: the fix shipped in 1.2")
+        act(intent = "close it the right way: the fix shipped in 1.2")
         check("state" eq "closed", "state_reason" eq "completed")
     }
 }
@@ -186,7 +186,7 @@ heart("http://localhost:8392/") {
         act("github:comment", "body" to "Fixed in 1.2 by #$pull.") {
             check("body" eq "Fixed in 1.2 by #$pull.")
         }
-        act("github:close")
+        act("github:close", intent = "close it the right way: the fix shipped in 1.2")
         check("state" eq "closed", "state_reason" eq "completed")
     }
 }
@@ -407,7 +407,7 @@ derivations:
     title: 'The relation each reason step chose, named'
     why: 'Where the run''s script reasoned, the reasoner chose among the forms and links offered. The generated script names the relation it chose; the lock file pins what was offered with it.'
     source:
-      - {line: 45, column: 9, text: 'reason'}
+      - {line: 45, column: 9, text: 'act'}
     generated:
       - {line: 47, column: 13, text: '"github:close"'}
 </pre>
@@ -574,7 +574,8 @@ derivations:
   });
 
   // The facts, from the texts and the record.
-  const reasons = (lines) => lines.filter((l) => /\breason\(/.test(l)).length;
+  // A reason step: an act with only its intent, no relation (the older reason(…) too, in pages built before).
+  const reasons = (lines) => lines.filter((l) => /\bact\(\s*intent\s*=|\breason\(/.test(l)).length;
   const reviews = generated.filter((l) => /\/\/ review:/.test(l)).length;
   document.getElementById("facts").innerHTML = [
     `<span><b>${reasons(source)}</b> reason steps → <b>${reasons(generated)}</b></span>`,

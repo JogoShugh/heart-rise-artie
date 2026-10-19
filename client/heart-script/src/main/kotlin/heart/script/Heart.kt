@@ -110,17 +110,21 @@ class Here internal constructor(
 
     /**
      * Select the link [rel] titled [title], or the resource embedded under [rel] with that title, which
-     * fetches it; with a [block], visit it and return.
+     * fetches it; with a [block], visit it and return. [intent] says, in words, what the follow is for; the
+     * trace keeps it.
      */
-    fun follow(rel: String, title: String? = null, block: (Here.() -> Unit)? = null) {
+    fun follow(rel: String, title: String? = null, intent: String? = null, block: (Here.() -> Unit)? = null) {
         val step = ++run.step
         if (title !in links(rel) && title !in embedded(rel).map { it.title }) {
             val detail = "no \"$rel\" link" + (title?.let { " titled \"$it\"" } ?: "")
             val refusal = Answer.Refused(Refusal.NotOffered, Side.CLIENT, detail)
             run.record(followAsked(rel, title), "refused", held, refusal)
+            run.trace.lastOrNull()?.intent = intent
             throw refused(step, "\"$rel\"", refusal)
         }
-        go(step, "\"$rel\"", navigator.follow(rel, title), block)
+        val answer = navigator.follow(rel, title)
+        run.trace.lastOrNull()?.intent = intent
+        go(step, "\"$rel\"", answer, block)
     }
 
     internal fun go(step: Int, what: String, answer: Answer, block: (Here.() -> Unit)?) {

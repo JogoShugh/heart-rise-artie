@@ -20,6 +20,9 @@ Feature: A script's reason step: a model chooses one selection from what is offe
       | /          | issues-get | /issues/10 | done         |
       | /issues/10 | comment    | /c/502     | new resource |
       | /issues/10 | close      | /issues/10 | done         |
+    And these links
+      | at         | relation | title | to     |
+      | /issues/10 | comments |       | /c/502 |
     And the reasoner chooses
       | intent                       | selection | relation | fields                       |
       | thank them and say it's done | act       | comment  | {"body": "Thanks, fixed."}   |
@@ -59,11 +62,12 @@ Feature: A script's reason step: a model chooses one selection from what is offe
       | relation | comment        |
       | body     | Thanks, fixed. |
 
-  Scenario: An act with a relation and its intent is made as written, with no reasoner, and keeps its words
+  Scenario: An act or a follow with its intent is made as written, with no reasoner, and keeps its words
     When this script runs, written to a trace
       """kotlin
       heart("scripted://service/") {
           act("issues-get", "number" to 10) {
+              follow("comments", intent = "read what they said") {}
               act("close", intent = "we're done with this one")
           }
       }
@@ -73,9 +77,12 @@ Feature: A script's reason step: a model chooses one selection from what is offe
       | call   | what                     |
       | enter  | scripted://service/      |
       | act    | issues-get {"number":10} |
+      | follow | comments                 |
+      | return | /issues/10               |
       | act    | close                    |
       | return | /                        |
-    And trace step 3 keeps the intent "we're done with this one"
+    And trace step 3 keeps the intent "read what they said"
+    And trace step 5 keeps the intent "we're done with this one"
 
   Scenario: A run not allowed a reasoner stops at the reason step
     When this script runs

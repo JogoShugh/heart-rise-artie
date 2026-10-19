@@ -10,41 +10,60 @@ heart("http://localhost:8392/") {
     var issue = 0L // step 3's /number
     var pull = 0L // step 9's /number
 
-    act("github:repos-get", "owner" to owner, "repo" to repo) {
+    act("github:repos-get", "owner" to owner, "repo" to repo, intent = "open the repository $owner/$repo") {
         act(
             "github:open-issue",
             "title" to "Crash when a bed has no name (reasoned)",
             "body" to "Opened by a HEART script.",
+            intent = "open an issue titled \"Crash when a bed has no name (reasoned)\", saying it was opened by a HEART script",
         ) {
             issue = state.long("number")
         }
     }
-    act("github:repos-get-branch", "owner" to owner, "repo" to repo, "branch" to "main") {
-        act("github:branch-from-here", "name" to "fix-blank-names-reasoned-$stamp") {
+    act(
+        "github:repos-get-branch",
+        "owner" to owner,
+        "repo" to repo,
+        "branch" to "main",
+        intent = "open the branch main of $owner/$repo",
+    ) {
+        act(
+            "github:branch-from-here",
+            "name" to "fix-blank-names-reasoned-$stamp",
+            intent = "start a new branch from here, named fix-blank-names-reasoned-$stamp",
+        ) {
             act(
                 "github:commit-file",
                 "path" to "fix-reasoned-$stamp.md",
                 "message" to "Refuse a bed with no name",
                 "content" to "Bed names may not be blank.",
+                intent = "commit a file named fix-reasoned-$stamp.md, saying \"Bed names may not be blank.\", with the message \"Refuse a bed with no name\"",
             )
             act(
                 "github:open-pull-request",
                 "base" to "main",
                 "title" to "Refuse a bed with no name (reasoned)",
                 "body" to "Relates to #$issue",
+                intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\", saying it relates to #$issue",
             ) {
                 pull = state.long("number")
                 until(tries = 20) { offers("github:merge") }
-                act("github:merge", "merge_method" to "squash")
+                act("github:merge", "merge_method" to "squash", intent = "merge it, squashing its commits")
                 check("merged" eq true)
             }
         }
     }
-    act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to issue) {
-        act("github:comment", "body" to "Fixed in 1.2 by #$pull.") {
+    act(
+        "github:issues-get",
+        "owner" to owner,
+        "repo" to repo,
+        "issue_number" to issue,
+        intent = "open issue $issue in $owner/$repo",
+    ) {
+        act("github:comment", "body" to "Fixed in 1.2 by #$pull.", intent = "comment on it: Fixed in 1.2 by #$pull.") {
             check("body" eq "Fixed in 1.2 by #$pull.")
         }
-        act("github:close")
+        act("github:close", intent = "close it, since the fix is done")
         check("state" eq "closed", "state_reason" eq "completed")
     }
 }

@@ -140,20 +140,29 @@ class ScriptWriter(
 
     private fun follow(step: Step): String {
         val title = step.params["title"]?.let { ", ${KotlinText.quoted(it.toString())}" }.orEmpty()
-        return "follow(${why.relation(step, source)}$title)"
+        val intent = intent(step, names)?.let { ", intent = \"$it\"" }.orEmpty()
+        return "follow(${why.relation(step, source)}$title$intent)"
     }
 
-    /** `act("rel", "field" to value, …)` on one line, or one argument a line when one is marked or it is long. */
+    /** The names the script knows, which a step's intent may keep: its inputs and its variables. */
+    private val names: Set<String>
+        get() = capture.inputs.keys + options.asInputs.keys + bindings.variables.values.map { it.name }
+
+    /**
+     * `act("rel", "field" to value, …, intent = "…")` on one line, or one argument a line when one is marked or it
+     * is long.
+     */
     private fun act(step: Step, pad: String): List<String> {
         val relation = why.relation(step, source)
         val arguments = bindings.arguments(step)
+        val intent = intent(step, names)?.let { "intent = \"$it\"" }
         reviews += arguments.count { it.review != null }
-        val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" })
-            .joinToString(", ") + ")"
+        val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
+            listOfNotNull(intent)).joinToString(", ") + ")"
         val long = arguments.any { it.review != null } || Derivations.visible(oneLine) > WIDTH
         return if (!long) listOf(oneLine) else listOf("${pad}act(", "$pad$INDENT$relation,") + arguments.map {
             "$pad$INDENT\"${it.field}\" to ${it.expression}," + (it.review?.let { why -> " // review: $why" } ?: "")
-        } + "$pad)"
+        } + listOfNotNull(intent?.let { "$pad$INDENT$it," }) + "$pad)"
     }
 
     private companion object {

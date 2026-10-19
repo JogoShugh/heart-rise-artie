@@ -87,14 +87,15 @@ Feature: artie generate: a run's capture, made a script with no model in it
       heart("scripted://service/") {
           var issue = 0L // step 2's /number
 
-          act("open-issue", "title" to title) {
+          act("open-issue", "title" to title, intent = "open an issue titled $title") {
               issue = state.long("number")
           }
-          act("issues-get", "number" to issue) {
-              act("comment", "body" to "Seen in #$issue.") {}
+          act("issues-get", "number" to issue, intent = "open issue $issue") {
+              act("comment", "body" to "Seen in #$issue.", intent = "comment on it: Seen in #$issue.") {}
               act(
                   "close",
                   "reason" to "completed", // review: the reasoner chose it, asked "close it, since it's done"
+                  intent = "close it, since it's done",
               )
           }
       }
@@ -378,15 +379,16 @@ Feature: artie generate: a run's capture, made a script with no model in it
       heart("http://localhost:8392/") {
           var headSha = "" // step 2's /head_sha
 
-          act("repos-get", "owner" to owner) {
+          act("repos-get", "owner" to owner, intent = "open the repository $owner") {
               headSha = state.text("head_sha")
-              follow("branches")
-              act("start-branch", "name" to "fix-$stamp") {
+              follow("branches", intent = "follow its branches")
+              act("start-branch", "name" to "fix-$stamp", intent = "start a branch named fix-$stamp") {
                   until { offers("merge") }
                   act(
                       "merge",
                       "sha" to headSha,
                       "merge_method" to "squash", // review: the reasoner chose it, asked "merge it"
+                      intent = "merge it",
                   )
                   check("merged" eq true)
               }
@@ -509,7 +511,13 @@ Feature: artie generate: a run's capture, made a script with no model in it
 
       heart("http://localhost:8392/") {
           until { offers("commit-file") }
-          act("commit-file", "path" to "fix-$stamp.md", "message" to "Fixed in 1.2", "sha" to "abc123")
+          act(
+              "commit-file",
+              "path" to "fix-$stamp.md",
+              "message" to "Fixed in 1.2",
+              "sha" to "abc123",
+              intent = "commit fix-$stamp.md as 1, saying it was fixed in 1.2",
+          )
       }
       """
 

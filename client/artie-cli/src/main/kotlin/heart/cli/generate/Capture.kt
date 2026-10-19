@@ -49,6 +49,9 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     val chose: Map<*, *> = doc["chose"].map()
     val guard: Map<*, *> = doc["guard"].map()
     val template: String? = doc["reason"].map()["template"]?.toString()
+
+    /** What a scripted act or follow was for, in words, as its script said (`intent = …`), with values filled. */
+    val intent: String? = doc["intent"]?.toString()
     val slots: Map<*, *> = doc["reason"].map()["slots"].map()
     val waitedFor: String? = doc["waited"].map()["for"]?.toString()
     val state: Map<*, *> = doc["now"].map()["state"].map()
