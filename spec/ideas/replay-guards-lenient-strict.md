@@ -143,6 +143,34 @@ author. In one file, a regeneration would wipe a person's tuning, or a person's 
 A script starts as intent only, written by a person or an AI. A run pins it, and a later run re-pins it when
 the service changes.
 
+A sketch (not yet the DSL):
+
+```kotlin
+// water.kts, as written: intent only
+heart("http://localhost:8080/") {
+    act(intent = "open bed $bed") {
+        act(intent = "water it with 250 ml, by drip")
+    }
+}
+
+// water.kts, after artie generate pinned it in place
+heart("http://localhost:8080/") {
+    act("garden:bed", "bed" to bed, intent = "open bed $bed") {
+        act("garden:water", "milliliters" to 250, "method" to "drip", intent = "water it with 250 ml, by drip")
+    }
+}
+```
+
+```yaml
+# water.config.yaml: written by a person; absent means today's behaviour
+guard: lenient
+fallback: justified        # never | justified | ask | always
+budget: 5                  # model calls per run
+repin: propose             # auto | propose | never
+relations:
+  github:merge: { fallback: ask, repin: propose }
+```
+
 ### `artie generate` pins in place
 
 - **It adds the relation and values in front of each `intent =`, and changes nothing else.** The words,
