@@ -39,6 +39,19 @@ Feature: A script's lock file guards each act before ARTIE sends it
       | strict  | as offered | changed    | was stopped at step 2 by its guard | open   |
       | strict  | as offered | as offered | finished                      | closed |
 
+  Scenario: Lenient, past an unchanged form in a changed set: the capture warns, naming both sets
+    spec/ideas/replay-guards-lenient-strict.md, the open item, decided: a
+    lenient run goes on, and its capture and report say the set changed.
+    Given ARTIE guards the run "lenient", pinning "github:close" to its form "as offered" in a set "changed"
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run finished, step 3 warned that the set holding "github:close" is not the one pinned
+
   Scenario Outline: A link followed is checked by what its target leaves to fill; with strict, it must be pinned
     A link's target names one resource, and differs from one resource to the
     next; a lock file pins what a script relies on: the variables the target

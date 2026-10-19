@@ -49,6 +49,19 @@ class ScriptGuard(private val pins: Pins, val strict: Boolean) {
         }
     }
 
+    /**
+     * What a lenient run goes past when it uses the form [rel] of [held] unchanged, but offered in a set the lock
+     * file didn't record for it (spec/ideas/replay-guards-lenient-strict.md): both sets; null when nothing is.
+     */
+    fun warning(held: HeartRepresentation?, rel: String): String? {
+        val form = held?.affordance(rel)
+        val pin = pins.forms[rel]
+        val set = held?.formsIntegrity
+        val changed = form != null && pin != null && pin.sets.isNotEmpty() && set !in pin.sets
+        return "the set holding $rel changed: pinned ${pin?.sets?.joinToString(" or ")}, offered $set"
+            .takeIf { !strict && changed && pin?.integrity == form?.integrity }
+    }
+
     /** Whether the lock file pins nothing for [rel]: a lenient run goes on, and says so. */
     fun unpinned(rel: String): Boolean = rel !in pins.forms
 

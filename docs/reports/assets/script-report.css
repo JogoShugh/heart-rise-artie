@@ -41,6 +41,7 @@ p { margin:0; max-width:46rem; } .lede, .muted { color:var(--muted); } a { color
 .sel.link { border-color:var(--link-c); } .sel.facts, .sel.waited { border-color:var(--leaf); }
 .kind { font:600 .68rem var(--mono); text-transform:uppercase; letter-spacing:.04em; padding:.05rem .35rem; border-radius:4px; color:var(--surface); background:var(--form); }
 .sel.link .kind { background:var(--link-c); } .sel.facts .kind, .sel.waited .kind { background:var(--leaf); }
+.sel.warn { border-color:var(--write); } .sel.warn .kind { background:var(--write); } .sel.warn .pv { overflow-wrap:anywhere; }
 .kind.claude { background:var(--claude); }
 .rel { font:600 .9rem var(--mono); }
 .pv { font:.82rem var(--mono); overflow-wrap:anywhere; min-width:0; } .pv .k { color:var(--muted); }

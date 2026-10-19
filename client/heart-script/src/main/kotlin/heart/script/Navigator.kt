@@ -100,6 +100,8 @@ class Guard(
     val checked: String? = null,
     /** Whether the lock file pinned nothing for this relation, and a lenient run went on. */
     val unpinned: Boolean = false,
+    /** What a lenient run went past: an unchanged form in a set the lock file didn't record, with both sets. */
+    val warning: String? = null,
 )
 
 /**

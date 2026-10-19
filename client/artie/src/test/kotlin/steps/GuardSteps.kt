@@ -13,10 +13,13 @@ import kotlin.test.assertTrue
 
 /** script-guard.feature: a lock file, made from what the gateway offers now, or changed on purpose. */
 class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptSteps) {
+    /** The set the issue's forms were offered in before the run, read when the lock file was made. */
+    private var offeredSet: String? = null
 
     @Given("ARTIE guards the run {string}, pinning {string} to its form {string} in a set {string}")
     fun pinning(guard: String, relation: String, form: String, set: String) {
         val (formNow, setNow) = offeredNow(relation)
+        offeredSet = setNow
         ctx.guard = guard
         val pinnedForm = if (form == "changed") CHANGED else formNow
         ctx.pins = bookmark() + (relation to (pinnedForm to if (set == "changed") CHANGED else setNow))
@@ -61,6 +64,19 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
             as kotlinx.serialization.json.JsonArray).map { it.jsonObject }
         val guard = steps[step - 1]["guard"] as? JsonObject
         assertEquals("true", guard?.get("unpinned")?.jsonPrimitive?.content, "guard: $guard")
+    }
+
+    @Then("the run finished, step {int} warned that the set holding {string} is not the one pinned")
+    fun warned(step: Int, relation: String) {
+        finished()
+        val steps = (Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
+            as kotlinx.serialization.json.JsonArray).map { it.jsonObject }
+        val guard = steps[step - 1]["guard"] as? JsonObject
+        assertEquals(
+            "the set holding $relation changed: pinned $CHANGED, offered $offeredSet",
+            guard?.get("warning")?.jsonPrimitive?.content,
+            "guard: $guard",
+        )
     }
 
     /** The integrity of [relation]'s form, and of its set, as the gateway offers them on issue 10 now, at L2. */

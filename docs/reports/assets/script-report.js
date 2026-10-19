@@ -163,6 +163,13 @@
       body.append(f);
     }
 
+    // What a lenient guard went past, on the row itself: a changed set, or a relation the lock file doesn't pin.
+    if (s.guard && (s.guard.warning || s.guard.unpinned)) {
+      const w = el("div", "sel warn"); w.append(el("span", "kind", "guard"),
+        el("span", "pv", s.guard.warning || `${s.chose ? s.chose.relation : "this"} is not in the lock file`));
+      body.append(w);
+    }
+
     // Line 3: what it took.
     const ups = upAll(s);
     const tally = [sentOf(s).length ? plural(sentOf(s).length, "HEART call") : (kind === "check" || kind === "until" ? "no request" : ""),

@@ -48,6 +48,7 @@ internal object UsedAffordances {
                 ifMatch = held.etag.takeIf { sends },
                 checked = guard?.mode,
                 unpinned = guard != null && !guard.strict && guard.unpinned(rel),
+                warning = guard?.warning(held, rel),
             ),
         )
     }
