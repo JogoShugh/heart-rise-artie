@@ -35,7 +35,12 @@ class Argument(val field: String, val expression: String, val review: String? = 
  * words, as a constant. A value inside a string puts each slot and input back as its name. A value the reasoner
  * chose, which the words don't give, is the constant it was, marked for review.
  */
-class Bindings(private val capture: Capture, private val source: List<String>?) {
+class Bindings(
+    private val capture: Capture,
+    private val source: List<String>?,
+    /** The fields whose text is an input of the same name (`--inputs`). */
+    private val asInputs: Set<String> = emptySet(),
+) {
     /** The variables, by the step and pointer they are read from, in the order they were first needed. */
     val variables = linkedMapOf<Pair<Int, String>, Variable>()
 
@@ -63,12 +68,25 @@ class Bindings(private val capture: Capture, private val source: List<String>?) 
         val held = sources.first(from)
         return when {
             input != null -> Argument(field, inputAs(input, type))
+            field in asInputs -> Argument(field, inputAs(field, type))
             literal(step, text, value) -> Argument(field, constant(value, type))
             held != null -> Argument(field, variableAs(variable(held.first, held.second), type), tie(from, held))
             "chosen" in from -> Argument(field, constant(value, type), "the reasoner chose it, asked \"${step.say}\"")
             value is String -> Argument(field, KotlinText.templated(text, names(step, text, from)))
             else -> Argument(field, constant(value, type))
         }
+    }
+
+    /**
+     * [step] kept as the reason step it was (`--keep-reason`), its words as the script wrote them: each slot an
+     * earlier answer filled is a variable the script reads, as the source script did.
+     */
+    fun kept(step: Step): String {
+        step.slots.values.map { it.map()["from"] }
+            .filter { from -> from.list().none { it.map()["input"] != null } }
+            .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
+        val words = step.template ?: KotlinText.quoted(step.say).removeSurrounding("\"")
+        return "reason(\"$words\")"
     }
 
     /** The variable read from [pointer] in the answer of [step], made the first time it is needed. */

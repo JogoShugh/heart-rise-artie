@@ -56,6 +56,9 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     /** The relation a selection selected; null for a step that selected nothing. */
     val relation: String? get() = params["relation"]?.toString()
 
+    /** Whether the reasoner chose a value of this step that its words don't give. */
+    val judged: Boolean get() = values.values.any { "chosen" in it.map()["from"].list() }
+
     /** Whether this selection followed a link, rather than acting on a form. */
     val follows: Boolean get() = chose["kind"] == "link" || (mode == "script" && say.startsWith("follow"))
 
