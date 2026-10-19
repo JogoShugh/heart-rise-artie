@@ -1,5 +1,5 @@
 Feature: The model key ARTIE reasons with
-  spec/PLAN-ARTIE-SCRIPTS.md, decisions: a model key, for reason(…) and the
+  spec/PLAN-ARTIE-SCRIPTS.md, decisions: a model key, for act(intent = …) and the
   live reasoner run, comes from ANTHROPIC_API_KEY in the environment first,
   else from the credentials file (ARTIE_HOME's, or ~/.artie's), in the
   section for https://api.anthropic.com. ARTIE never stores it and never

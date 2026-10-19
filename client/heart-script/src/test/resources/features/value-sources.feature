@@ -55,7 +55,7 @@ Feature: Each value a step sends says where it came from, and a reason step its 
       val crop by input()
       heart("scripted://service/") {
           act("bed-get", "id" to 1)
-          reason("sow $crop about 2 cm deep in bed ${state["number"]}")
+          act(intent = "sow $crop about 2 cm deep in bed ${state["number"]}")
       }
       """
     When the script runs unattended, allowed a reasoner, given

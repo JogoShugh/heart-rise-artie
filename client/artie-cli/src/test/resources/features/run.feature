@@ -337,7 +337,7 @@ Feature: artie run: a script, run from the command line
       """kotlin
       heart("scripted://service/") {
           act("issues-get", "number" to 10)
-          reason("we're done with this one")
+          act(intent = "we're done with this one")
       }
       """
     When artie is run with
@@ -345,7 +345,7 @@ Feature: artie run: a script, run from the command line
       | run       |
       | close.kts |
     Then artie exits 2
-    And artie's last line is: stopped before the first request: reason(…) needs --reasoner
+    And artie's last line is: stopped before the first request: act(intent = …) needs --reasoner
     And the client was asked nothing
 
   Scenario: With --reasoner, the client is made with that reasoner, and the reason step is an intent
@@ -353,7 +353,7 @@ Feature: artie run: a script, run from the command line
       """kotlin
       heart("scripted://service/") {
           act("issues-get", "number" to 10)
-          reason("we're done with this one")
+          act(intent = "we're done with this one")
       }
       """
     And the reasoner chooses

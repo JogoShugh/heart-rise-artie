@@ -63,7 +63,7 @@ several rounds; under challenge, not yet committed to. Decided so far:
   moved), `client/heart-script`, `client/heart-script-test`,
   `client/artie-cli`; our scripts in `client/scripts/`, test scripts in
   `client/scripts/tests/`.
-- A model key, for `reason(…)` and the live reasoner run: `ANTHROPIC_API_KEY`
+- A model key, for `act(intent = …)` and the live reasoner run: `ANTHROPIC_API_KEY`
   in the environment first, else an entry in `~/.artie/credentials`; never
   stored by ARTIE, never printed. Built 2026-10-17 as `ModelKey.standard`;
   it says where a key came from, never its value.
@@ -103,7 +103,8 @@ several rounds; under challenge, not yet committed to. Decided so far:
   the server. An entry with no binding stops the run before its first request (exit 2).
 - Live: `client/scripts/tests/github-pulls.kts`, read-only: merge offered on a ready pull
   request, refused on a draft with the gateway's reason.
-- `reason("…")`: one step. The client's reasoner chooses one selection from what is offered
+- `act(intent = "…")`, an act with no relation (it replaced `reason("…")` on 2026-10-19; an act with a relation
+  may carry its intent too, kept in the trace): one step. The client's reasoner chooses one selection from what is offered
   (a form with its fields, or a link); ARTIE checks it against the manifest and the form's schema,
   then makes it; the trace records an intent step, the words as said and the choice as its values.
   `--reasoner claude` allows it, the key from `ModelKey`; without `--reasoner` a script that
@@ -181,7 +182,7 @@ title, or a question; deterministic code does the rest.
 |---|---|---|
 | Sync | `heart(entry) { … }`; `sync()`; implicitly after every selection | the entry's scheme chooses the binding (http, https, coap); no binding: refused before anything is sent |
 | Reason, in advance | the script itself | |
-| Reason, now | `reason(intent)` | hands one decision to the reasoner; its selection runs like any other and is recorded as an intent step (optional, L6) |
+| Reason, now | `act(intent = …)` | hands one decision to the reasoner; its selection runs like any other and is recorded as an intent step (optional, L6) |
 | Act: a form | `act(rel, field to value…)` | any form; a safe form (search, lookup) only syncs its target |
 | Act: a link | `follow(rel, title)` | `item`, `next`, any relation |
 | Act: a question | inputs, and `ask(question, default)` | see "Inputs and questions" below: the slots |
@@ -286,7 +287,7 @@ artie run <script.kts> [name=value …] [options]
   --interactive           let the run ask a person (off by default)
   --entry <uri>           another entry than the script's (an environment, CoAP …)
   --rung L0|L1|L2         pin the rung; default: the best both sides share
-  --reasoner <name>       allow reason(…) steps to call a model (off by default)
+  --reasoner <name>       allow act(intent = …) steps to call a model (off by default)
   --report <dir>          also build the run report (heart-run-report), the script shown in it
   --trace <file>          the trace (default ./runs/<script>-<time>.trace.json)
   --quiet | --output json one summary line, or JSON for CI
@@ -296,7 +297,7 @@ artie run <script.kts> [name=value …] [options]
 |---|---|
 | 0 | every step done; in a test, every expectation met |
 | 1 | a test expectation not met (`heart-script-test`) |
-| 2 | stopped before the first request: a missing input, a question with no `--interactive`, bad arguments, no binding for the entry's scheme, `reason(…)` without `--reasoner` |
+| 2 | stopped before the first request: a missing input, a question with no `--interactive`, bad arguments, no binding for the entry's scheme, `act(intent = …)` without `--reasoner` |
 | 3 | HEART refused a step: not offered, stale, invalid input, not authenticated, forbidden, not found; the refusing side named, client or server |
 | 4 | the client failed: unreachable, integrity mismatch |
 | 5 | an error in the script's own code |

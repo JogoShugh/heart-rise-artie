@@ -56,7 +56,7 @@ Feature: The trace keeps a run's shape: blocks, waits, how links were picked, ju
       """kotlin
       heart("scripted://service/") {
           follow("beds", title = "All beds")
-          reason("sow basil in bed ${state["number"]}")
+          act(intent = "sow basil in bed ${state["number"]}")
       }
       """
     Then the script finished
@@ -74,7 +74,7 @@ Feature: The trace keeps a run's shape: blocks, waits, how links were picked, ju
       """kotlin
       heart("scripted://service/") {
           act("bed-get", "id" to 1)
-          reason("sow basil in bed ${state["number"]}")
+          act(intent = "sow basil in bed ${state["number"]}")
       }
       """
     Then the script finished

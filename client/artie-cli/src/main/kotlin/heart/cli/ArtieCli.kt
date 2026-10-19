@@ -68,9 +68,10 @@ class ArtieCli(
         run.entry = asked.entry
         if (output == "words") run.onStep = { out.println(line(run.trace.size, it)) }
         val text = Files.readString(file)
-        // A script that reasons is known before it runs, by its text: without --reasoner, nothing is sent.
-        if (!asked.inputsOf && asked.reasoner == null && Regex("""\breason\(""").containsMatchIn(text)) {
-            throw BadArguments("stopped before the first request: reason(…) needs --reasoner")
+        // A script that reasons, an act with an intent and no relation, is known before it runs, by its text:
+        // without --reasoner, nothing is sent.
+        if (!asked.inputsOf && asked.reasoner == null && REASONS.containsMatchIn(text)) {
+            throw BadArguments("stopped before the first request: act(intent = …) needs --reasoner")
         }
         val ended = execute(run, text)
         if (asked.inputsOf) return listed(run, text)
@@ -199,6 +200,9 @@ class ArtieCli(
     private companion object {
         val IMPORTS = listOf("heart.script.*", "heart.script.test.*")
         val CLIENT_FAILED = setOf(Refusal.Unreachable, Refusal.IntegrityMismatch)
+
+        /** An act that names no relation, only its intent: a step the reasoner chooses. */
+        val REASONS = Regex("""\bact\(\s*intent\s*=""")
         const val NOT_MET = 1
         const val STOPPED_BEFORE = 2
         const val REFUSED = 3

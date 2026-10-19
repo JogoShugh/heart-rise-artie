@@ -42,7 +42,7 @@ class Run(
     /** Another entry than the script's: an environment, another binding. Set before the run. */
     var entry: String? = null
 
-    /** Whether the run allows `reason(…)` steps: off unless the runner says so (`--reasoner`). */
+    /** Whether `act(intent = …)` with no relation may run: only when the runner allows it (`--reasoner`). */
     var reasoning = false
 
     /** Told of each step as it is traced: a runner prints it. */

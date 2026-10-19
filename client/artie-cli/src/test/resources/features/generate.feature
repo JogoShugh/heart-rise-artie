@@ -36,12 +36,12 @@ Feature: artie generate: a run's capture, made a script with no model in it
 
       heart("scripted://service/") {
           var issue = 0L
-          reason("open an issue titled $title") {
+          act(intent = "open an issue titled $title") {
               issue = state.long("number")
           }
-          reason("open issue $issue") {
-              reason("comment on it: Seen in #$issue.") {}
-              reason("close it, since it's done")
+          act(intent = "open issue $issue") {
+              act(intent = "comment on it: Seen in #$issue.") {}
+              act(intent = "close it, since it's done")
           }
       }
       """

@@ -92,7 +92,8 @@
   });
 
   // The facts, from the texts and the record.
-  const reasons = (lines) => lines.filter((l) => /\breason\(/.test(l)).length;
+  // A reason step: an act with only its intent, no relation (the older reason(…) too, in pages built before).
+  const reasons = (lines) => lines.filter((l) => /\bact\(\s*intent\s*=|\breason\(/.test(l)).length;
   const reviews = generated.filter((l) => /\/\/ review:/.test(l)).length;
   document.getElementById("facts").innerHTML = [
     `<span><b>${reasons(source)}</b> reason steps → <b>${reasons(generated)}</b></span>`,

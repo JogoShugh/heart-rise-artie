@@ -208,7 +208,7 @@ fun interface NavigatorProvider {
 
 /**
  * What a run asks of the client it is given: the [rung] to read at (L0, L1, L2: SPEC §6.10), and the
- * [reasoner] to use for `reason(…)` steps (for ARTIE: `claude`). Null: the client's own choice, or none.
+ * [reasoner] to use for `act(intent = …)` steps (for ARTIE: `claude`). Null: the client's own choice, or none.
  */
 class ClientSettings(
     val rung: String? = null,

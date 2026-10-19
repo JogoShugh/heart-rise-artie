@@ -89,18 +89,24 @@ class Here internal constructor(
     /**
      * Select the form [rel] with [fields]. An act the manifest does not offer is refused here, by the
      * client, before anything is sent. With a [block], the script visits what the act led to, then
-     * returns to where it was, read again.
+     * returns to where it was, read again. [intent] says, in words, what the act is for; the trace keeps
+     * it. With no [rel], the words are handed to the client's reasoner, which chooses one selection from
+     * what is offered here (a form with its fields, or a link); a run must allow it (`--reasoner`).
      */
-    fun act(rel: String, vararg fields: Pair<String, Any?>, block: (Here.() -> Unit)? = null) {
+    fun act(
+        rel: String? = null,
+        vararg fields: Pair<String, Any?>,
+        intent: String? = null,
+        block: (Here.() -> Unit)? = null,
+    ) {
         val step = ++run.step
-        if (rel !in held.offered) {
-            val reason = navigator.why(rel) ?: "no reason given"
-            val refusal = Answer.Refused(Refusal.NotOffered, Side.CLIENT, reason)
-            run.record(actAsked(rel, fields.toMap()), "refused", held, refusal)
-            throw refused(step, "\"$rel\"", refusal)
+        when {
+            rel != null -> acted(step, rel, fields.toMap(), intent, block)
+            intent != null -> reasoned(step, intent, block)
+            else -> throw ScriptStopped(step, "\"act\"", "\"act needs a relation, or an intent\"")
         }
-        go(step, "\"$rel\"", navigator.act(rel, fields.toMap()), block)
     }
+
 
     /**
      * Select the link [rel] titled [title], or the resource embedded under [rel] with that title, which

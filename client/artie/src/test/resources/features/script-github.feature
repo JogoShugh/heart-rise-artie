@@ -56,7 +56,7 @@ Feature: A HEART script drives GitHub issues through the gateway, with ARTIE as 
       """kotlin
       heart("https://github.gateway.test/") {
           act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
-          reason("thank them, and say it's fixed") {
+          act(intent = "thank them, and say it's fixed") {
               check(state["/body"] == "Thanks, fixed.")
           }
       }
@@ -72,10 +72,10 @@ Feature: A HEART script drives GitHub issues through the gateway, with ARTIE as 
       """kotlin
       heart("https://github.gateway.test/") {
           act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
-          reason("open it again")
+          act(intent = "open it again")
       }
       """
-    Then the script stopped at step 2, "reason": not offered, refused by the client: "github:reopen is not in the current manifest"
+    Then the script stopped at step 2, "intent": not offered, refused by the client: "github:reopen is not in the current manifest"
     And issue 10 of "acme/rockets" is now "open" on the small GitHub
 
   Scenario: A server ARTIE can't reach stops the script as the client's failure, not a bug in the script

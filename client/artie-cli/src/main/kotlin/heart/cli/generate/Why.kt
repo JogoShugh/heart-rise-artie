@@ -39,7 +39,7 @@ internal class Why(private val derivations: Derivations) {
             "Where the run's script reasoned, the reasoner chose among the forms and links offered. The generated " +
                 "script names the relation it chose; the lock file pins what was offered with it.",
         )
-        return mark(derivation, quoted, listOf(Written(source, step).find(Regex("\\breason\\b")).take(1)))
+        return mark(derivation, quoted, listOf(Written(source, step).find(Regex("\\bact\\b")).take(1)))
     }
 
     fun words(expression: String, scripted: Boolean): Derivation = derivations.of(

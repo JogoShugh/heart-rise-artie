@@ -6,7 +6,7 @@ val entry by input(default = "coap://localhost:5683/")
 
 heart(entry) {
     act("garden:build-bed", "label" to "Reasoned bed", "widthFt" to 4, "lengthFt" to 4) {
-        reason("plant some basil in it, about two centimetres deep")
+        act(intent = "plant some basil in it, about two centimetres deep")
         check("cropName" eq "basil")
         note("the bed is ${state["status"]}, with ${state["cropName"]}")
     }

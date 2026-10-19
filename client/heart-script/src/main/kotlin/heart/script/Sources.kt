@@ -31,8 +31,8 @@ internal object Sources {
     }
 
     /**
-     * A reason step's template, the reason(…) literal on its [line] of [source] as the script wrote it, and each
-     * slot's value, read by matching the template against the [words], with its source.
+     * A reason step's template, the `act(intent = …)` literal on its [line] of [source] as the script wrote it,
+     * and each slot's value, read by matching the template against the [words], with its source.
      */
     fun reason(source: String?, line: Int?, words: String, run: Run, earlier: List<TraceStep>): JsonObject? {
         val written = line?.let { source?.lines()?.getOrNull(it - 1) }
@@ -120,7 +120,7 @@ internal object Sources {
 }
 
 /**
- * The words of a reason(…) call as the script wrote them, before Kotlin filled them in: plain text and slots,
+ * The words of an `act(intent = …)` call as the script wrote them, before Kotlin filled them in: plain text and slots,
  * `$name` or `${expression}`. Matching it against the words the run said gives each slot's value.
  */
 internal class Template private constructor(val text: String, private val parts: List<Pair<Boolean, String>>) {
@@ -134,9 +134,9 @@ internal class Template private constructor(val text: String, private val parts:
     }
 
     companion object {
-        private const val CALL = "reason(\""
+        private const val CALL = "intent = \""
 
-        /** The template of the reason(…) call on [line], or null when it has none. */
+        /** The template of the `act(intent = …)` call on [line], or null when it has none. */
         fun of(line: String): Template? {
             val start = line.indexOf(CALL).takeIf { it >= 0 }?.plus(CALL.length) ?: return null
             val parts = mutableListOf<Pair<Boolean, String>>()

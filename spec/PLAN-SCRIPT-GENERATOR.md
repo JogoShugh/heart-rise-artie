@@ -32,7 +32,7 @@ it.
    words (`squash` for "squashing", `Opened by a HEART script.` for "saying it was opened by a HEART script")
    is the words, a constant with no mark. A value the words don't give at all (the reasoner's own judgement)
    is frozen as the constant it was, marked `// review:` with the words beside it: the script replays the run
-   exactly. Only with `--keep-reason` does such a step stay a `reason(...)`, for a choice that should depend
+   exactly. Only with `--keep-reason` does such a step stay an `act(intent = ...)` with no relation, for a choice that should depend
    on the state at run time.
 4a. **Literal text the words gave** (titles, messages, file content) is a constant (decided); `--inputs title,body`
    makes those inputs, the run's text their default.

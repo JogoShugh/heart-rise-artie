@@ -61,7 +61,7 @@ Feature: A script run with ARTIE records the form or link each step used, as the
       """kotlin
       heart("https://github.gateway.test/") {
           act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
-          reason("thank them, and say it's fixed")
+          act(intent = "thank them, and say it's fixed")
       }
       """
     Then the script finished
@@ -74,7 +74,7 @@ Feature: A script run with ARTIE records the form or link each step used, as the
       """kotlin
       heart("https://github.gateway.test/") {
           act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
-          reason("thank them, and say it's fixed")
+          act(intent = "thank them, and say it's fixed")
       }
       """
     Then the script finished

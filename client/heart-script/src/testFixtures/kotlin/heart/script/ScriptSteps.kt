@@ -160,6 +160,14 @@ class ScriptSteps {
         run.trace.mapIndexed { i, s -> listOf("${i + 1}", s.asked.say, s.outcome, s.address) },
     )
 
+    @Then("trace step {int} keeps the intent {string}")
+    fun traceIntent(step: Int, words: String) {
+        // The trace's YAML, one document a step after the run's own; the intent is a top-level member, as written.
+        val documents = run.traceYaml().split(Regex("(?m)^---$")).filter { it.isNotBlank() }
+        val intent = Regex("(?m)^intent: (.*)$").find(documents[step])?.groupValues?.get(1)
+        assertEquals(words, intent?.removeSurrounding("'")?.removeSurrounding("\""), documents[step])
+    }
+
     @Then("trace step {int}'s values are")
     fun traceValues(step: Int, table: DataTable) = assertEquals(
         table.asMaps().associate { it.getValue("name") to it.getValue("value") },

@@ -71,7 +71,7 @@ Feature: Value sources a script generator can bind to, without guessing
       """kotlin
       heart("scripted://service/") {
           act("bed-get", "id" to 1)
-          reason("sow basil, pressing it in")
+          act(intent = "sow basil, pressing it in")
       }
       """
     Then the script finished

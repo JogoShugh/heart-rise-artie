@@ -97,8 +97,8 @@ class Bindings(
             .filter { from -> from.list().none { it.map()["input"] != null } }
             .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
         val words = step.template ?: KotlinText.quoted(step.say).removeSurrounding("\"")
-        val call = Written(source, step).find(Regex("""reason\("(?:\\.|[^"\\])*"\)"""))
-        return why.mark(why.kept(step), "reason(\"$words\")", listOf(call))
+        val call = Written(source, step).find(Regex("""act\(intent = "(?:\\.|[^"\\])*"\)"""))
+        return why.mark(why.kept(step), "act(intent = \"$words\")", listOf(call))
     }
 
     /** The variable read from [pointer] in the answer of [step], made the first time it is needed. */

@@ -1,7 +1,7 @@
 Feature: artie generate's options: reason steps kept, text made inputs
   spec/PLAN-SCRIPT-GENERATOR.md, rules 4 and 4a. By default a value the
   reasoner chose is frozen as the constant it was. With --keep-reason, a step
-  where the reasoner chose a value stays a reason(...) step, for a choice that
+  where the reasoner chose a value stays an act(intent = ...) step, for a choice that
   should depend on the state at run time; the script then needs a reasoner.
   With --inputs, literal text the run sent under a field's name becomes an
   input of that name, the run's text its default.
@@ -131,7 +131,7 @@ Feature: artie generate's options: reason steps kept, text made inputs
           act("repos-get", "owner" to owner) {
               act("open-issue", "title" to "Crash on start", "body" to "Opened by a script.") {
                   act("comment", "body" to "Thanks.") {}
-                  reason("close it, since it's done")
+                  act(intent = "close it, since it's done")
               }
           }
       }

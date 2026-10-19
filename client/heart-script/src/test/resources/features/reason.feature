@@ -1,10 +1,13 @@
 Feature: A script's reason step: a model chooses one selection from what is offered
-  spec/PLAN-ARTIE-SCRIPTS.md. reason("…") hands the words to the client's
+  spec/PLAN-ARTIE-SCRIPTS.md. act(intent = "…") hands the words to the client's
   reasoner, which chooses one selection from what the held representation
   offers: a form with its fields, or a link. The client checks the choice
   and makes it, and the script holds what it led to, as after any act or
   follow. The trace records it as an intent step: the words as said, and
-  the choice as its values. A run allows it only when told to.
+  the choice as its values. A run allows it only when told to. An act given
+  both a relation and an intent makes the act as written, and keeps the
+  words in the trace, so a script pinned by artie generate says what each
+  act was for (spec/ideas/replay-guards-lenient-strict.md).
 
   Background:
     Given a service holds these resources
@@ -27,10 +30,10 @@ Feature: A script's reason step: a model chooses one selection from what is offe
       """kotlin
       heart("scripted://service/") {
           act("issues-get", "number" to 10)
-          reason("thank them and say it's done") {
+          act(intent = "thank them and say it's done") {
               check(state["/title"] == "Fixed in 1.2.")
           }
-          reason("we're done with this one")
+          act(intent = "we're done with this one")
       }
       """
     Then the script finished
@@ -56,12 +59,30 @@ Feature: A script's reason step: a model chooses one selection from what is offe
       | relation | comment        |
       | body     | Thanks, fixed. |
 
+  Scenario: An act with a relation and its intent is made as written, with no reasoner, and keeps its words
+    When this script runs, written to a trace
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10) {
+              act("close", intent = "we're done with this one")
+          }
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                     |
+      | enter  | scripted://service/      |
+      | act    | issues-get {"number":10} |
+      | act    | close                    |
+      | return | /                        |
+    And trace step 3 keeps the intent "we're done with this one"
+
   Scenario: A run not allowed a reasoner stops at the reason step
     When this script runs
       """kotlin
       heart("scripted://service/") {
           act("issues-get", "number" to 10)
-          reason("we're done with this one")
+          act(intent = "we're done with this one")
       }
       """
-    Then the script stopped at step 2, "reason": "reason(…) needs a reasoner, and this run has none"
+    Then the script stopped at step 2, "intent": "act(intent = …) needs a reasoner, and this run has none"

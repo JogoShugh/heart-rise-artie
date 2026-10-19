@@ -48,7 +48,7 @@ internal object KotlinText {
     private fun unescape(text: String): String = text
         .replace("\\n", "\n").replace("\\t", "\t").replace("\\\"", "\"").replace("\\$", "$").replace("\\\\", "\\")
 
-    /** The words of a reason(…) template with its slots taken out and its escapes undone. */
+    /** The words of an `act(intent = …)` template with its slots taken out and its escapes undone. */
     fun plain(template: String): String = template
         .replace(Regex("""\$\{[^}]*}"""), "\u0000")
         .replace(Regex("""\$[A-Za-z_][A-Za-z0-9_]*"""), "\u0000")

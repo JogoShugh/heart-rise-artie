@@ -4,9 +4,9 @@
 val entry by input(default = "coap://localhost:5683/")
 
 heart(entry) {
-    reason("build a 4 by 4 foot herb bed called \"Herbs, reasoned\"") {
-        reason("plant basil in it, about 2 centimetres deep")
-        reason("water it with 250 millilitres per cell")
+    act(intent = "build a 4 by 4 foot herb bed called \"Herbs, reasoned\"") {
+        act(intent = "plant basil in it, about 2 centimetres deep")
+        act(intent = "water it with 250 millilitres per cell")
         check("cropName" eq "basil", "moistureLevel" above 0)
     }
 }
