@@ -62,9 +62,10 @@ class ArtieCli(
         val ended = execute(run, text)
         if (asked.inputsOf) return listed(run, text)
         val name = file.fileName.toString().substringBefore('.')
-        val trace = folder.resolve(asked.trace ?: "runs/$name-${Instant.now().epochSecond}.trace.json")
+        // The run's capture, as a person reads it: YAML (spec/PLAN-LINE-BY-LINE-REPORT.md).
+        val trace = folder.resolve(asked.trace ?: "runs/$name-${Instant.now().epochSecond}.trace.yaml")
         Files.createDirectories(trace.toAbsolutePath().parent)
-        Files.writeString(trace, run.traceJson())
+        Files.writeString(trace, run.traceYaml())
         asked.report?.let { report(folder.resolve(it), trace, file, run) }
         return ended
     }

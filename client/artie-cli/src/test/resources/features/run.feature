@@ -302,9 +302,10 @@ Feature: artie run: a script, run from the command line
       | run        |
       | issue.kts  |
       | --trace    |
-      | run.json   |
+      | run.yaml   |
     Then artie exits 3
-    And the trace "run.json" has these steps
+    And the trace "run.yaml" is YAML: one document for the run, then one for each step
+    And the trace "run.yaml" has these steps
       | say                             | outcome |
       | enter {entry}                   | done    |
       | act {relation}, number {number} | done    |

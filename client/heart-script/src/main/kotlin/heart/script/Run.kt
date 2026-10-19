@@ -125,6 +125,19 @@ class Run(
         value
     }
 
+    /**
+     * The run's capture as a person reads it (spec/PLAN-LINE-BY-LINE-REPORT.md, "The capture is YAML"): one
+     * YAML document for the run, its inputs, then one for each step.
+     */
+    fun traceYaml(): String {
+        val trace = kotlinx.serialization.json.Json.parseToJsonElement(traceJson())
+            as kotlinx.serialization.json.JsonObject
+        val run = kotlinx.serialization.json.buildJsonObject {
+            put("run", kotlinx.serialization.json.buildJsonObject { put("inputs", trace.getValue("inputs")) })
+        }
+        return Yaml.stream(listOf(run) + (trace.getValue("steps") as kotlinx.serialization.json.JsonArray))
+    }
+
     /** [steps], each with the members of its state later steps read, known only once the run is over. */
     private fun withKeeps(steps: List<kotlinx.serialization.json.JsonObject>) =
         steps.zip(Shape.keeps(steps)).map { (step, keeps) ->

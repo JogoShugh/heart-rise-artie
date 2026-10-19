@@ -1,10 +1,14 @@
 // A run report: what a client asked, step by step, and what came back. Reads the trace in
-// <script type="application/json" id="run-trace"> (format: heart-run-report skill) and renders one row
+// <pre id="run-trace">: YAML, one document for the run and one per step (format: heart-run-report skill);
+// a trace written before as one JSON document reads too, JSON being YAML. It renders one row
 // per step: when, what was asked (an intent in words, or a scripted relation request) with its parameter
 // values marked, and the answer in one sentence. Each row opens to the request and answer lines, and
 // those to the documents, through json-view.js. Toggles at the top open or close each kind at once.
 (() => {
-  const trace = JSON.parse(document.getElementById("run-trace").textContent);
+  const documents = window.jsyaml.loadAll(document.getElementById("run-trace").textContent);
+  const trace = documents.length === 1 && documents[0].steps
+    ? documents[0]
+    : { inputs: (documents[0] && documents[0].run && documents[0].run.inputs) || {}, steps: documents.slice(1) };
   const root = document.getElementById("run-report");
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
@@ -667,7 +671,8 @@
     else document.documentElement.dataset.theme = theme;
     remember("rr-theme", theme);
   };
-  const theme = recall("rr-theme") || "system";
+  // Light unless the reader chose otherwise: the author's default for every report.
+  const theme = recall("rr-theme") || "light";
   setTheme(theme);
   let tileBox;
   const setLayout = (layout) => {
@@ -678,7 +683,7 @@
   const controls = el("div", "rr-controls");
   controls.append(
     switchOf("Tiles", [["grid", "Grid"], ["list", "List with explanations"]], layout, setLayout),
-    switchOf("Theme", [["system", "System"], ["light", "Light"], ["dark", "Dark"]], theme, setTheme),
+    switchOf("Theme", [["light", "Light"], ["dark", "Dark"], ["system", "System"]], theme, setTheme),
   );
 
   const head = el("div", "rr-head");

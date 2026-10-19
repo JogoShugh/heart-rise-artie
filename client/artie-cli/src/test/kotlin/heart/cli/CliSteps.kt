@@ -76,32 +76,40 @@ class CliSteps(private val script: ScriptSteps) {
     @Then("artie's last line is: {}")
     fun lastLine(line: String) = assertEquals(line, printed.lastOrNull(), printed.joinToString("\n"))
 
+    @Then("the trace {string} is YAML: one document for the run, then one for each step")
+    fun traceIsYaml(name: String) {
+        val documents = yamlDocuments(Files.readString(folder.resolve(name)))
+        assertEquals(true, (documents.firstOrNull() as? Map<*, *>)?.containsKey("run"), "the first document: run")
+        assertEquals(printed.count { Regex("^\\d+ ").containsMatchIn(it) }, documents.size - 1, "one per step")
+    }
+
     @Then("the trace {string} has these steps")
     fun traceFile(name: String, table: DataTable) {
-        val steps = (Json.parseToJsonElement(Files.readString(folder.resolve(name))) as JsonObject)
-            .getValue("steps") as JsonArray
+        val steps = yamlDocuments(Files.readString(folder.resolve(name))).drop(1).map { it as Map<*, *> }
         assertEquals(
             table.asMaps().map { it.getValue("say") to it.getValue("outcome") },
-            steps.map { (it as JsonObject).let { s -> s.str("say") to s.str("outcome") } },
+            steps.map { it["say"].toString() to it["outcome"].toString() },
         )
     }
+
+    /** Every document of a YAML stream, as plain maps and lists. */
+    private fun yamlDocuments(text: String): List<Any?> = org.yaml.snakeyaml.Yaml().loadAll(text).toList()
 
     @Then("the run report {string} holds the script {string} and these steps")
     fun report(name: String, script: String, table: DataTable) {
         val page = Files.readString(folder.resolve(name))
         val shown = Regex("""<summary>The script: <code>([^<]*)</code></summary>""").find(page)?.groupValues?.get(1)
         assertEquals(script, shown, "the script the report shows")
-        val embedded = Regex("""id="run-trace">(.*?)</script>""", RegexOption.DOT_MATCHES_ALL)
-        val trace = embedded.find(page)?.groupValues?.get(1)?.replace("<\\/", "</")
-        val steps = (Json.parseToJsonElement(checkNotNull(trace) { "no trace in the report" }) as JsonObject)
-            .getValue("steps") as JsonArray
+        // The trace, as YAML, in the page as text (HTML-escaped), never as JSON.
+        val embedded = Regex("""id="run-trace">(.*?)</pre>""", RegexOption.DOT_MATCHES_ALL)
+        val trace = embedded.find(page)?.groupValues?.get(1)
+            ?.replace("&lt;", "<")?.replace("&gt;", ">")?.replace("&amp;", "&")
+        val steps = yamlDocuments(checkNotNull(trace) { "no YAML trace in the report" }).drop(1).map { it as Map<*, *> }
         assertEquals(
             table.asMaps().map { it.getValue("say") to it.getValue("outcome") },
-            steps.map { (it as JsonObject).let { s -> s.str("say") to s.str("outcome") } },
+            steps.map { it["say"].toString() to it["outcome"].toString() },
         )
     }
-
-    private fun JsonObject.str(name: String) = getValue(name).jsonPrimitive.content
 
     private companion object {
         /** The one copy of heart-run-report's code, as the installed command finds it beside itself. */
