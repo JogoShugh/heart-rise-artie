@@ -13,10 +13,10 @@ import java.nio.file.Path
  */
 class LockFile(val pins: Pins?, val guard: String?, val rung: String?)
 
-private const val STOPPED = "stopped before the first request"
+internal const val STOPPED = "stopped before the first request"
 
-/** The lock file for [asked], whose script is [script], found in [folder]. */
-fun lockFile(asked: Arguments, folder: Path, script: Path): LockFile {
+/** The lock file for [asked], whose script is [script], found in [folder], held to as the flag, then [config], says. */
+fun lockFile(asked: Arguments, folder: Path, script: Path, config: Config = Config()): LockFile {
     val name = asked.pins ?: (script.fileName.toString().substringBeforeLast('.') + ".pins.yaml")
     val file = folder.resolve(name)
     if (!Files.exists(file)) {
@@ -28,7 +28,7 @@ fun lockFile(asked: Arguments, folder: Path, script: Path): LockFile {
     if (asked.rung != null && pins.rung != null && asked.rung != pins.rung) {
         throw BadArguments("$STOPPED: the lock file was recorded at ${pins.rung}, not ${asked.rung}")
     }
-    return LockFile(pins, asked.guard ?: "lenient", asked.rung ?: pins.rung)
+    return LockFile(pins, asked.guard ?: config.guard ?: "lenient", asked.rung ?: pins.rung)
 }
 
 private fun pins(doc: Map<String, Any?>): Pins {
