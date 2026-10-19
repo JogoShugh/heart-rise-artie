@@ -95,6 +95,10 @@ Feature: artie generate says how it derived each value, and shows it beside the 
       | 5      | 9      | 15        |
       | 7      | 10     | 16        |
     And the derivation report "derivation/index.html" shows "close.kts" beside "gen.kts", by "gen.derivation.yaml"
+    And after the two scripts, the derivation report "derivation/index.html" shows these files, in order
+      | file                |
+      | gen.pins.yaml       |
+      | gen.derivation.yaml |
 
   Scenario: A scripted run's derivations: each value where its call wrote it
     Given the script "close.kts" is

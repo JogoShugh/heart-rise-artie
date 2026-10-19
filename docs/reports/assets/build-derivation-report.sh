@@ -4,18 +4,28 @@
 # numbered on both sides, its note one click away. Every asset is inlined from this folder, so the page works on
 # GitHub Pages and as an artifact alike.
 #
-#   build-derivation-report.sh SOURCE.kts GENERATED.kts NAME.derivation.yaml OUT.html "Title" "One sentence."
+#   build-derivation-report.sh SOURCE.kts GENERATED.kts NAME.derivation.yaml OUT.html "Title" "One sentence." [FILE …]
+#
+# Each FILE after them (the lock file, the derivation, a run's trace) is shown after the two scripts, by its name.
 set -eu
 source=$1 generated=$2 derivation=$3 out=$4 title=$5 lede=$6
+shift 6
 here=$(cd "$(dirname "$0")" && pwd)
 
 html_escape() { printf '%s' "$1" | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' -e 's/"/\&quot;/g'; }
 safe_title=$(html_escape "$title")
 safe_lede=$(html_escape "$lede")
+beside=$(mktemp)
+trap 'rm -f "$beside"' EXIT
+for file in "$@"; do
+  printf '<pre hidden class="beside" data-name="%s">' "$(html_escape "$(basename "$file")")" >> "$beside"
+  sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$file" >> "$beside"
+  printf '</pre>\n' >> "$beside"
+done
 
 TITLE=$safe_title LEDE=$safe_lede awk \
     -v drcss="$here/derivation-report.css" -v jsyaml="$here/js-yaml.min.js" -v ktjs="$here/kotlin-view.js" \
-    -v drjs="$here/derivation-report.js" -v source="$source" -v generated="$generated" -v derivation="$derivation" '
+    -v drjs="$here/derivation-report.js" -v beside="$beside" -v source="$source" -v generated="$generated" -v derivation="$derivation" '
   BEGIN { title = ENVIRON["TITLE"]; lede = ENVIRON["LEDE"] }
   function emit(file,   line) { while ((getline line < file) > 0) print line; close(file) }
   # Text in the page, read back by its textContent: & < > escaped.
@@ -31,6 +41,7 @@ TITLE=$safe_title LEDE=$safe_lede awk \
   /@SOURCE@/     { inline("@SOURCE@", source); next }
   /@GENERATED@/  { inline("@GENERATED@", generated); next }
   /@DERIVATION@/ { inline("@DERIVATION@", derivation); next }
+  /@BESIDE@/     { emit(beside); next }
   function swap(s, from, to,   i, out) {
     out = ""
     while ((i = index(s, from)) > 0) { out = out substr(s, 1, i - 1) to; s = substr(s, i + length(from)) }

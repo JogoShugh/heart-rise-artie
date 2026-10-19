@@ -142,6 +142,19 @@ class CliSteps(private val script: ScriptSteps) {
         assertEquals(Files.readString(folder.resolve(derivation)).trimEnd('\n'), embedded("derivation"), "how")
     }
 
+    @Then("after the two scripts, the derivation report {string} shows these files, in order")
+    fun derivationReportFiles(name: String, table: DataTable) {
+        val page = Files.readString(folder.resolve(name))
+        val files = Regex("""<pre hidden class="beside" data-name="([^"]*)">(.*?)</pre>""", RegexOption.DOT_MATCHES_ALL)
+            .findAll(page).map { it.groupValues[1] to it.groupValues[2] }.toList()
+        assertEquals(table.asMaps().map { it.getValue("file") }, files.map { it.first })
+        files.forEach { (file, shown) ->
+            val text = shown.replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&").trimEnd('\n')
+            assertEquals(Files.readString(folder.resolve(file)).trimEnd('\n'), text, file)
+        }
+        assertTrue(page.indexOf("id=\"generated-text\"") < page.indexOf("class=\"beside\""), "the scripts come first")
+    }
+
     @Then("the client was made holding no lock file")
     fun holdsNoLock() {
         assertEquals(null, askedPins)

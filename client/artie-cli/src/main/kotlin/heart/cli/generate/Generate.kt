@@ -39,25 +39,28 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     out.println("wrote $derived: ${count(derivation.count, "derivation")}")
     if (report != null && sourceName != null) {
         val page = "$report/index.html"
-        derivationReport(builder, folder, listOf(sourceName, script, derived, page), captureName)
+        derivationReport(builder, folder, page, listOf(sourceName, script, derived, pins), captureName)
         out.println("wrote $page")
     }
 }
 
 /**
  * The derivation report, from heart-run-report's builder beside [builder]: the run's script beside the generated
- * one, each derivation numbered on both sides. [files] are the source script, the generated one, the derivation
- * file and the page, in [folder].
+ * one, each derivation numbered on both sides, then the lock file and the derivation file, as [page]. [files] are
+ * the source script, the generated one, the derivation file and the lock file, in [folder].
  */
-private fun derivationReport(builder: Path?, folder: Path, files: List<String>, captureName: String) {
+private fun derivationReport(builder: Path?, folder: Path, page: String, files: List<String>, captureName: String) {
     val build = builder?.resolveSibling("build-derivation-report.sh")?.takeIf { Files.exists(it) }
         ?: throw BadArguments("--report: no report builder")
-    val (source, script) = files
-    Files.createDirectories(folder.resolve(files.last()).parent)
+    val (source, script, derived) = files
+    val pins = files.last()
+    Files.createDirectories(folder.resolve(page).parent)
     val title = "From $source to $script"
     val lede = "$script, which artie generate wrote from $captureName, the run of $source, beside it: each number " +
         "marks one derivation on both sides, and its note says which rule bound it."
-    val process = ProcessBuilder(listOf("sh", "$build") + files.map { "${folder.resolve(it)}" } + listOf(title, lede))
+    val paths = listOf(source, script, derived, page).map { "${folder.resolve(it)}" }
+    val beside = listOf(pins, derived).map { "${folder.resolve(it)}" }
+    val process = ProcessBuilder(listOf("sh", "$build") + paths + listOf(title, lede) + beside)
         .redirectErrorStream(true).start()
     val said = process.inputStream.bufferedReader().readText()
     if (process.waitFor() != 0) throw BadArguments("the report failed: ${said.trim()}")

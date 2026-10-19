@@ -107,6 +107,41 @@
     return `<span style="--k:${colour(kind)}">${esc(label)}</span>`;
   }).join("");
 
+  // The files beside the scripts (the lock file, the derivation, a run's trace), each closed, by its name.
+  const ABOUT = [
+    [/\.pins\.yaml$/, "The lock file: what the run was offered, held to before every act"],
+    [/\.derivation\.yaml$/, "How each value was derived, and where it stands in both scripts"],
+    [/\.config\.yaml$/, "The config: how strictly a run holds to its lock file"],
+    [/\.trace\.yaml$/, "A run's capture: every step, what it asked and what it held"],
+    [/\.kts$/, "A script"],
+  ];
+  const files = document.getElementById("files");
+  document.querySelectorAll("pre.beside").forEach((pre) => {
+    const name = pre.dataset.name;
+    const text = pre.textContent.replace(/\n$/, "");
+    const about = (ABOUT.find(([match]) => match.test(name)) || [null, "A file"])[1];
+    const box = document.createElement("details");
+    box.className = "file";
+    const lines = text.split("\n");
+    const body = name.endsWith(".kts")
+      ? lines.map((l) => {
+        const cls = window.KotlinView.classes(l);
+        let out = "";
+        for (let j = 0; j < l.length;) {
+          let k = j;
+          while (k < l.length && cls[k] === cls[j]) k++;
+          out += cls[j] ? `<span class="${cls[j]}">${esc(l.slice(j, k))}</span>` : esc(l.slice(j, k));
+          j = k;
+        }
+        return out;
+      }).join("\n")
+      : lines.map((l) => (/^\s*#/.test(l) ? `<span class="kt-cm">${esc(l)}</span>` : esc(l))).join("\n");
+    box.innerHTML = `<summary><code>${esc(name)}</code> <span class="about">${esc(about)} · ${lines.length} lines</span>` +
+      `</summary><pre>${body}</pre>`;
+    files.append(box);
+    files.hidden = false;
+  });
+
   // Toggles: a number opens its notes in every row it marks, and lights its marks on both sides.
   const sync = () => document.querySelectorAll(".notes").forEach((ns) => {
     ns.hidden = ![...ns.children].some((n) => !n.hidden);
