@@ -11,7 +11,7 @@ heart("http://localhost:8392/") {
     var pull = 0L
     act("github:repos-get", "owner" to owner, "repo" to repo) {
         act("github:open-issue", "title" to "Crash when a bed has no name (scripted)", "body" to "Opened by a HEART script.") {
-            issue = state["number"] as Long
+            issue = state.long("number")
         }
     }
     // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
@@ -29,7 +29,7 @@ heart("http://localhost:8392/") {
                 "base" to "main",
                 "body" to "Relates to #$issue.",
             ) {
-                pull = state["number"] as Long
+                pull = state.long("number")
                 // GitHub works out whether it can merge a new pull request a moment after it opens.
                 until(tries = 20) { offers("github:merge") }
                 act("github:merge", "merge_method" to "squash")

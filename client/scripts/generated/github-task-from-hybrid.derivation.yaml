@@ -68,7 +68,7 @@ derivations:
     why: 'Step 3 brought /number into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
     source:
       - {line: 10, column: 5, text: 'var issue = 0L'}
-      - {line: 14, column: 13, text: 'issue = state["number"] as Long'}
+      - {line: 14, column: 13, text: 'issue = state.long("number")'}
       - {line: 40, column: 82, text: 'issue'}
     generated:
       - {line: 10, column: 5, text: 'var issue = 0L'}
@@ -81,7 +81,7 @@ derivations:
     why: 'Step 9 brought /number into the run: declared once, read with state.long in that step''s block, and sent from it wherever the run sent its value.'
     source:
       - {line: 11, column: 5, text: 'var pull = 0L'}
-      - {line: 32, column: 17, text: 'pull = state["number"] as Long'}
+      - {line: 32, column: 17, text: 'pull = state.long("number")'}
     generated:
       - {line: 11, column: 5, text: 'var pull = 0L'}
       - {line: 33, column: 17, text: 'pull = state.long("number")'}

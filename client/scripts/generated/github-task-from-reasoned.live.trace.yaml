@@ -8,12 +8,12 @@ run:
       value: heart-github-test
       given: given
     stamp:
-      value: 1019-100315
+      value: 1019-115643
       given: default
-      default: 1019-100315
+      default: 1019-115643
 ---
-at: '2026-10-19T14:03:15.370513Z'
-ms: 68
+at: '2026-10-19T15:56:44.046243Z'
+ms: 43
 mode: script
 say: enter {entry}
 line: 9
@@ -42,8 +42,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-10-19T14:03:15.443514Z'
-ms: 421
+at: '2026-10-19T15:56:44.093814Z'
+ms: 517
 mode: script
 say: act {relation}, owner {owner}, repo {repo}
 intent: open the repository JogoShugh/heart-github-test
@@ -104,10 +104,10 @@ now:
     description: null
     fork: false
     created_at: '2026-10-17T01:37:34Z'
-    updated_at: '2026-10-19T03:10:25Z'
-    pushed_at: '2026-10-19T03:10:21Z'
+    updated_at: '2026-10-19T15:55:44Z'
+    pushed_at: '2026-10-19T15:55:39Z'
     homepage: null
-    size: 50
+    size: 53
     stargazers_count: 0
     watchers_count: 0
     language: null
@@ -172,7 +172,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     github:repos-list-branches:
       - null
@@ -286,8 +286,8 @@ keeps:
     - 6
     - 9
 ---
-at: '2026-10-19T14:03:15.866087Z'
-ms: 1964
+at: '2026-10-19T15:56:44.613969Z'
+ms: 1657
 mode: script
 say: act {relation}, title {title}, body {body}
 intent: open an issue titled "Crash when a bed has no name (reasoned)", saying it was opened by a HEART script
@@ -313,7 +313,7 @@ chose:
   relation: github:open-issue
   title: Open an issue
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+  target: /repos/{owner}/{repo}/actions/open-issue
   address: http://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
   picked: relation
   not sent:
@@ -321,9 +321,15 @@ chose:
     - labels
     - milestone
 guard:
-  rung: L0
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/b7cdf9d9bd2f16e8
+    integrity: sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
   form: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
-  if-match: '"seq-0.hsf.L0.c4b1a34c6d78e8d3"'
+  schema:
+    href: http://localhost:8392/schemas/f7a8db931b33fcf1
+    integrity: sha256-96jbkxsz/PG3PVDvXBkQMk/mpIId+DfmGRMwWHa2zQE=
+  if-match: '"seq-0.hsf.L2.5f4283810507c9f5"'
   checked: strict
 offered:
   forms:
@@ -371,15 +377,15 @@ offered:
     - github:tags
     - github:teams
     - github:trees
-    - hr:unavailable
+    - hr:forms
     - self
 outcome: new resource
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117
 now:
   state:
-    id: 5925332389
-    node_id: I_kwDOVM7WJc8AAAABYS1lpQ
-    number: 109
+    id: 5927156248
+    node_id: I_kwDOVM7WJc8AAAABYUk6GA
+    number: 117
     title: Crash when a bed has no name (reasoned)
     labels: []
     state: open
@@ -387,8 +393,8 @@ now:
     assignees: []
     milestone: null
     comments: 0
-    created_at: '2026-10-19T14:03:16Z'
-    updated_at: '2026-10-19T14:03:16Z'
+    created_at: '2026-10-19T15:56:45Z'
+    updated_at: '2026-10-19T15:56:45Z'
     closed_at: null
     assignee: null
     author_association: OWNER
@@ -420,25 +426,25 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      issue_number: '109'
+      issue_number: '117'
   forms:
-    - github:close
-    - github:close-not-planned
-    - github:close-duplicate
-    - github:edit
-    - github:lock
-    - github:label
-    - github:unlabel
-    - github:assign
-    - github:unassign
-    - github:set-milestone
-    - github:comment
     - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
     - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     github:issues-list-sub-issues:
       - null
@@ -483,8 +489,8 @@ keeps:
   /hr:address/issue_number:
     - 17
 ---
-at: '2026-10-19T14:03:17.834183Z'
-ms: 261
+at: '2026-10-19T15:56:46.275365Z'
+ms: 193
 mode: script
 say: return to {address}
 line: 14
@@ -503,10 +509,10 @@ now:
     description: null
     fork: false
     created_at: '2026-10-17T01:37:34Z'
-    updated_at: '2026-10-19T03:10:25Z'
-    pushed_at: '2026-10-19T03:10:21Z'
+    updated_at: '2026-10-19T15:55:44Z'
+    pushed_at: '2026-10-19T15:55:39Z'
     homepage: null
-    size: 50
+    size: 53
     stargazers_count: 0
     watchers_count: 0
     language: null
@@ -571,7 +577,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     github:repos-list-branches:
       - null
@@ -669,7 +675,7 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-10-19T14:03:18.096058Z'
+at: '2026-10-19T15:56:46.468725Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -699,8 +705,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-10-19T14:03:18.099025Z'
-ms: 244
+at: '2026-10-19T15:56:46.471413Z'
+ms: 194
 mode: script
 say: act {relation}, owner {owner}, repo {repo}, branch {branch}
 intent: open the branch main of JogoShugh/heart-github-test
@@ -793,7 +799,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -803,10 +809,10 @@ now:
     github:commit:
       - title: null
         state:
-          sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
-          node_id: C_kwDOVM7WJdoAKGI3MzliYTE2ODVjY2UyYTc4NGFiYzBmOWIxNDlkN2VmMDIxNGEyYTQ
+          sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
+          node_id: C_kwDOVM7WJdoAKDFjYzc2ZDkyMGVhYjIwMmFhZmVhYzQ2MWU1ZDk0YWEzMmZiYjA3YmE
           parents:
-            - sha: e89a0a8875e191f66c093946322ddca816033e42
+            - sha: 341070226c6d3c3efc502edb7db04becc13776fb
 keeps:
   /name:
     - 9
@@ -817,23 +823,23 @@ keeps:
   /hr:address/repo:
     - 17
 ---
-at: '2026-10-19T14:03:18.347192Z'
-ms: 1630
+at: '2026-10-19T15:56:46.668782Z'
+ms: 1350
 mode: script
 say: act {relation}, name {name}
-intent: start a new branch from here, named fix-blank-names-reasoned-1019-100315
+intent: start a new branch from here, named fix-blank-names-reasoned-1019-115643
 line: 26
 within: 21
 params:
   relation: github:branch-from-here
-  name: fix-blank-names-reasoned-1019-100315
+  name: fix-blank-names-reasoned-1019-115643
 values:
   name:
-    value: fix-blank-names-reasoned-1019-100315
+    value: fix-blank-names-reasoned-1019-115643
     type: string
     from:
       - parts:
-          '1019-100315':
+          '1019-115643':
             input: stamp
 opens: true
 chose:
@@ -841,13 +847,19 @@ chose:
   relation: github:branch-from-here
   title: Branch from here
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main/actions/branch-from-here
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/branch-from-here
   address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main/actions/branch-from-here
   picked: relation
 guard:
-  rung: L0
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/4d2642fc0a6bfba1
+    integrity: sha256-TSZC/Apr+6H5aTYEEe6uk80IO1TJtjCZKuNINXOnC1g=
   form: sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
-  if-match: '"seq-0.hsf.L0.e718d53c160b2187"'
+  schema:
+    href: http://localhost:8392/schemas/222e354902f56b39
+    integrity: sha256-Ii41SQL1azknua6MirSv0GWeOOGMJhEv0gNcLxGWRfA=
+  if-match: '"seq-0.hsf.L2.855bb699fd160690"'
   checked: strict
 offered:
   forms:
@@ -857,13 +869,13 @@ offered:
   links:
     - alternate
     - github:protection
-    - hr:unavailable
+    - hr:forms
     - self
 outcome: new resource
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-115643
 now:
   state:
-    name: fix-blank-names-reasoned-1019-100315
+    name: fix-blank-names-reasoned-1019-115643
     protected: false
     protection:
       enabled: false
@@ -874,7 +886,7 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      branch: fix-blank-names-reasoned-1019-100315
+      branch: fix-blank-names-reasoned-1019-115643
   forms:
     - github:branch-from-here
     - github:commit-file
@@ -882,7 +894,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -892,35 +904,35 @@ now:
     github:commit:
       - title: null
         state:
-          sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
-          node_id: C_kwDOVM7WJdoAKGI3MzliYTE2ODVjY2UyYTc4NGFiYzBmOWIxNDlkN2VmMDIxNGEyYTQ
+          sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
+          node_id: C_kwDOVM7WJdoAKDFjYzc2ZDkyMGVhYjIwMmFhZmVhYzQ2MWU1ZDk0YWEzMmZiYjA3YmE
           parents:
-            - sha: e89a0a8875e191f66c093946322ddca816033e42
+            - sha: 341070226c6d3c3efc502edb7db04becc13776fb
 keeps:
   /hr:address/owner:
     - 17
   /hr:address/repo:
     - 17
 ---
-at: '2026-10-19T14:03:19.979586Z'
-ms: 1847
+at: '2026-10-19T15:56:48.022683Z'
+ms: 1462
 mode: script
 say: act {relation}, path {path}, message {message}, content {content}
-intent: commit a file named fix-reasoned-1019-100315.md, saying "Bed names may not be blank.", with the message "Refuse a bed with no name"
+intent: commit a file named fix-reasoned-1019-115643.md, saying "Bed names may not be blank.", with the message "Refuse a bed with no name"
 line: 29
 within: 26
 params:
   relation: github:commit-file
-  path: fix-reasoned-1019-100315.md
+  path: fix-reasoned-1019-115643.md
   message: Refuse a bed with no name
   content: Bed names may not be blank.
 values:
   path:
-    value: fix-reasoned-1019-100315.md
+    value: fix-reasoned-1019-115643.md
     type: string
     from:
       - parts:
-          '1019-100315':
+          '1019-115643':
             input: stamp
   message:
     value: Refuse a bed with no name
@@ -937,13 +949,19 @@ chose:
   relation: github:commit-file
   title: Commit a file
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315/actions/commit-file
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315/actions/commit-file
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/commit-file
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-115643/actions/commit-file
   picked: relation
 guard:
-  rung: L0
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/4d2642fc0a6bfba1
+    integrity: sha256-TSZC/Apr+6H5aTYEEe6uk80IO1TJtjCZKuNINXOnC1g=
   form: sha256-h7FKmN5m1aBLCTNu06T7Crdpy5AEPcc2jK7l8IOwo+g=
-  if-match: '"seq-0.hsf.L0.ad487d90499f1097"'
+  schema:
+    href: http://localhost:8392/schemas/b2f56ca079a95386
+    integrity: sha256-svVsoHmpU4YbdX2cRd0MWqU1hqDTwVtlLUibmkyUd7g=
+  if-match: '"seq-0.hsf.L2.0e337c80b8365c5e"'
   checked: strict
 offered:
   forms:
@@ -953,13 +971,13 @@ offered:
   links:
     - alternate
     - github:protection
-    - hr:unavailable
+    - hr:forms
     - self
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-115643
 now:
   state:
-    name: fix-blank-names-reasoned-1019-100315
+    name: fix-blank-names-reasoned-1019-115643
     protected: false
     protection:
       enabled: false
@@ -970,7 +988,7 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      branch: fix-blank-names-reasoned-1019-100315
+      branch: fix-blank-names-reasoned-1019-115643
   forms:
     - github:branch-from-here
     - github:commit-file
@@ -978,7 +996,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -988,28 +1006,28 @@ now:
     github:commit:
       - title: null
         state:
-          sha: 01415b6a8d43dc854fc164ec04c2fc3ce84b6728
-          node_id: C_kwDOVM7WJdoAKDAxNDE1YjZhOGQ0M2RjODU0ZmMxNjRlYzA0YzJmYzNjZTg0YjY3Mjg
+          sha: 023b7ba610f833e7cd73bc0dc4e28829194d258d
+          node_id: C_kwDOVM7WJdoAKDAyM2I3YmE2MTBmODMzZTdjZDczYmMwZGM0ZTI4ODI5MTk0ZDI1OGQ
           parents:
-            - sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+            - sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
 keeps:
   /hr:address/owner:
     - 17
   /hr:address/repo:
     - 17
 ---
-at: '2026-10-19T14:03:21.829695Z'
-ms: 2772
+at: '2026-10-19T15:56:49.488802Z'
+ms: 2265
 mode: script
 say: act {relation}, base {base}, title {title}, body {body}
-intent: 'open a pull request into main titled "Refuse a bed with no name (reasoned)", saying it relates to #109'
+intent: 'open a pull request into main titled "Refuse a bed with no name (reasoned)", saying it relates to #117'
 line: 34
 within: 26
 params:
   relation: github:open-pull-request
   base: main
   title: Refuse a bed with no name (reasoned)
-  body: 'Relates to #109'
+  body: 'Relates to #117'
 values:
   base:
     value: main
@@ -1027,11 +1045,11 @@ values:
     from:
       - constant
   body:
-    value: 'Relates to #109'
+    value: 'Relates to #117'
     type: string
     from:
       - parts:
-          '109':
+          '117':
             step: 3
             pointer: /number
 opens: true
@@ -1040,15 +1058,21 @@ chose:
   relation: github:open-pull-request
   title: Open a pull request
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315/actions/open-pull-request
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315/actions/open-pull-request
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/open-pull-request
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-115643/actions/open-pull-request
   picked: relation
   not sent:
     - draft
 guard:
-  rung: L0
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/4d2642fc0a6bfba1
+    integrity: sha256-TSZC/Apr+6H5aTYEEe6uk80IO1TJtjCZKuNINXOnC1g=
   form: sha256-PE4HJf8D9pKBuS8GjywYA5kUlxGDtzJU9LtqfoDdBMI=
-  if-match: '"seq-0.hsf.L0.5f5de422615305b5"'
+  schema:
+    href: http://localhost:8392/schemas/991c0e30445a0adc
+    integrity: sha256-mRwOMERaCtzoWpSH8i+m5OfeNAQuH9W/rfaoInELWjs=
+  if-match: '"seq-0.hsf.L2.f9fce93da91c8b4f"'
   checked: strict
 offered:
   forms:
@@ -1058,21 +1082,21 @@ offered:
   links:
     - alternate
     - github:protection
-    - hr:unavailable
+    - hr:forms
     - self
 outcome: new resource
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/118
 now:
   state:
-    id: 4922180534
-    node_id: PR_kwDOVM7WJc8AAAABJWKDtg
-    number: 110
+    id: 4923722320
+    node_id: PR_kwDOVM7WJc8AAAABJXoKUA
+    number: 118
     state: open
     locked: false
     title: Refuse a bed with no name (reasoned)
-    body: 'Relates to #109'
-    created_at: '2026-10-19T14:03:22Z'
-    updated_at: '2026-10-19T14:03:22Z'
+    body: 'Relates to #117'
+    created_at: '2026-10-19T15:56:50Z'
+    updated_at: '2026-10-19T15:56:50Z'
     closed_at: null
     merged_at: null
     merge_commit_sha: null
@@ -1083,13 +1107,13 @@ now:
     milestone: null
     draft: false
     head:
-      label: JogoShugh:fix-blank-names-reasoned-1019-100315
-      ref: fix-blank-names-reasoned-1019-100315
-      sha: 01415b6a8d43dc854fc164ec04c2fc3ce84b6728
+      label: JogoShugh:fix-blank-names-reasoned-1019-115643
+      ref: fix-blank-names-reasoned-1019-115643
+      sha: 023b7ba610f833e7cd73bc0dc4e28829194d258d
     base:
       label: JogoShugh:main
       ref: main
-      sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+      sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
     author_association: OWNER
     auto_merge: null
     assignee: null
@@ -1109,7 +1133,7 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      pull_number: '110'
+      pull_number: '118'
   forms:
     - github:close
     - github:edit
@@ -1118,7 +1142,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -1170,10 +1194,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1221,10 +1245,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1271,30 +1295,30 @@ keeps:
   /commits:
     - 18
 ---
-at: '2026-10-19T14:03:25.607400Z'
-ms: 664
+at: '2026-10-19T15:56:52.759616Z'
+ms: 526
 mode: script
 say: return to {address}
 line: 40
 within: 34
 params:
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/118
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/118
 now:
   state:
-    id: 4922180534
-    node_id: PR_kwDOVM7WJc8AAAABJWKDtg
-    number: 110
+    id: 4923722320
+    node_id: PR_kwDOVM7WJc8AAAABJXoKUA
+    number: 118
     state: open
     locked: false
     title: Refuse a bed with no name (reasoned)
-    body: 'Relates to #109'
-    created_at: '2026-10-19T14:03:22Z'
-    updated_at: '2026-10-19T14:03:22Z'
+    body: 'Relates to #117'
+    created_at: '2026-10-19T15:56:50Z'
+    updated_at: '2026-10-19T15:56:50Z'
     closed_at: null
     merged_at: null
-    merge_commit_sha: b56fe6e9692e7d297c86fb60fa276e6980f55748
+    merge_commit_sha: 302c9b8c88bae109d1ab84c9b04ed4572ec8e552
     assignees: []
     requested_reviewers: []
     requested_teams: []
@@ -1302,13 +1326,13 @@ now:
     milestone: null
     draft: false
     head:
-      label: JogoShugh:fix-blank-names-reasoned-1019-100315
-      ref: fix-blank-names-reasoned-1019-100315
-      sha: 01415b6a8d43dc854fc164ec04c2fc3ce84b6728
+      label: JogoShugh:fix-blank-names-reasoned-1019-115643
+      ref: fix-blank-names-reasoned-1019-115643
+      sha: 023b7ba610f833e7cd73bc0dc4e28829194d258d
     base:
       label: JogoShugh:main
       ref: main
-      sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+      sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
     author_association: OWNER
     auto_merge: null
     assignee: null
@@ -1328,17 +1352,17 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      pull_number: '110'
+      pull_number: '118'
   forms:
     - github:close
-    - github:merge
     - github:edit
+    - github:merge
     - github:request-review
     - github:update-branch
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -1390,10 +1414,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1441,10 +1465,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1472,7 +1496,7 @@ now:
           watchers: 0
           default_branch: main
 ---
-at: '2026-10-19T14:03:26.272634Z'
+at: '2026-10-19T15:56:53.286960Z'
 ms: 0
 mode: script
 say: until
@@ -1483,21 +1507,21 @@ waited:
   for: offers("github:merge")
   reads: 1
 outcome: held
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/118
 now:
   state:
-    id: 4922180534
-    node_id: PR_kwDOVM7WJc8AAAABJWKDtg
-    number: 110
+    id: 4923722320
+    node_id: PR_kwDOVM7WJc8AAAABJXoKUA
+    number: 118
     state: open
     locked: false
     title: Refuse a bed with no name (reasoned)
-    body: 'Relates to #109'
-    created_at: '2026-10-19T14:03:22Z'
-    updated_at: '2026-10-19T14:03:22Z'
+    body: 'Relates to #117'
+    created_at: '2026-10-19T15:56:50Z'
+    updated_at: '2026-10-19T15:56:50Z'
     closed_at: null
     merged_at: null
-    merge_commit_sha: b56fe6e9692e7d297c86fb60fa276e6980f55748
+    merge_commit_sha: 302c9b8c88bae109d1ab84c9b04ed4572ec8e552
     assignees: []
     requested_reviewers: []
     requested_teams: []
@@ -1505,13 +1529,13 @@ now:
     milestone: null
     draft: false
     head:
-      label: JogoShugh:fix-blank-names-reasoned-1019-100315
-      ref: fix-blank-names-reasoned-1019-100315
-      sha: 01415b6a8d43dc854fc164ec04c2fc3ce84b6728
+      label: JogoShugh:fix-blank-names-reasoned-1019-115643
+      ref: fix-blank-names-reasoned-1019-115643
+      sha: 023b7ba610f833e7cd73bc0dc4e28829194d258d
     base:
       label: JogoShugh:main
       ref: main
-      sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+      sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
     author_association: OWNER
     auto_merge: null
     assignee: null
@@ -1531,17 +1555,17 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      pull_number: '110'
+      pull_number: '118'
   forms:
     - github:close
-    - github:merge
     - github:edit
+    - github:merge
     - github:request-review
     - github:update-branch
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -1593,10 +1617,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1644,10 +1668,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1675,8 +1699,8 @@ now:
           watchers: 0
           default_branch: main
 ---
-at: '2026-10-19T14:03:26.273230Z'
-ms: 5183
+at: '2026-10-19T15:56:53.287669Z'
+ms: 3974
 mode: script
 say: act {relation}, merge_method {merge_method}
 intent: merge it, squashing its commits
@@ -1696,16 +1720,22 @@ chose:
   relation: github:merge
   title: Merge
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110/actions/merge
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110/actions/merge
+  target: /repos/{owner}/{repo}/pulls/{pull_number}/actions/merge
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/118/actions/merge
   picked: relation
   not sent:
     - commit_message
     - commit_title
 guard:
-  rung: L0
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/37cdf2b1ba217596
+    integrity: sha256-N83ysbohdZYZmLEPGv6vDi700n5VsXCXuObdk3OtTTo=
   form: sha256-9uvk6g8UGLrpgoWdCsjzgyGS4M6/2yVpVwhHffj2Kf4=
-  if-match: '"seq-0.hsf.L0.b28444ee502b7d67"'
+  schema:
+    href: http://localhost:8392/schemas/0f68e71ca6a8837d
+    integrity: sha256-D2jnHKaog30eN9l15vAwZrWapDF8CrLyMG7Tzd7mK7c=
+  if-match: '"seq-0.hsf.L2.c76e7b9366a343e3"'
   checked: strict
 offered:
   forms:
@@ -1724,24 +1754,24 @@ offered:
     - github:review-comment
     - github:review-comments
     - github:statuses
-    - hr:unavailable
+    - hr:forms
     - self
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/118
 now:
   state:
-    id: 4922180534
-    node_id: PR_kwDOVM7WJc8AAAABJWKDtg
-    number: 110
+    id: 4923722320
+    node_id: PR_kwDOVM7WJc8AAAABJXoKUA
+    number: 118
     state: closed
     locked: false
     title: Refuse a bed with no name (reasoned)
-    body: 'Relates to #109'
-    created_at: '2026-10-19T14:03:22Z'
-    updated_at: '2026-10-19T14:03:29Z'
-    closed_at: '2026-10-19T14:03:29Z'
-    merged_at: '2026-10-19T14:03:29Z'
-    merge_commit_sha: 3b12d6a1bdc9ac312174812fac2fcaa7f53967b3
+    body: 'Relates to #117'
+    created_at: '2026-10-19T15:56:50Z'
+    updated_at: '2026-10-19T15:56:56Z'
+    closed_at: '2026-10-19T15:56:56Z'
+    merged_at: '2026-10-19T15:56:55Z'
+    merge_commit_sha: ade358557f9e1dbf0be4519407eba49018929a63
     assignees: []
     requested_reviewers: []
     requested_teams: []
@@ -1749,13 +1779,13 @@ now:
     milestone: null
     draft: false
     head:
-      label: JogoShugh:fix-blank-names-reasoned-1019-100315
-      ref: fix-blank-names-reasoned-1019-100315
-      sha: 01415b6a8d43dc854fc164ec04c2fc3ce84b6728
+      label: JogoShugh:fix-blank-names-reasoned-1019-115643
+      ref: fix-blank-names-reasoned-1019-115643
+      sha: 023b7ba610f833e7cd73bc0dc4e28829194d258d
     base:
       label: JogoShugh:main
       ref: main
-      sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+      sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
     author_association: OWNER
     auto_merge: null
     assignee: null
@@ -1774,13 +1804,13 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      pull_number: '110'
+      pull_number: '118'
   forms:
     - github:edit
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -1842,10 +1872,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1893,10 +1923,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -1941,7 +1971,7 @@ keeps:
   /_embedded/github:base-repo/0/name:
     - 17
 ---
-at: '2026-10-19T14:03:31.460003Z'
+at: '2026-10-19T15:56:57.265507Z'
 ms: 0
 mode: script
 say: check
@@ -1954,21 +1984,21 @@ params:
       held: 'true'
       holds: true
 outcome: held
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/110
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/118
 now:
   state:
-    id: 4922180534
-    node_id: PR_kwDOVM7WJc8AAAABJWKDtg
-    number: 110
+    id: 4923722320
+    node_id: PR_kwDOVM7WJc8AAAABJXoKUA
+    number: 118
     state: closed
     locked: false
     title: Refuse a bed with no name (reasoned)
-    body: 'Relates to #109'
-    created_at: '2026-10-19T14:03:22Z'
-    updated_at: '2026-10-19T14:03:29Z'
-    closed_at: '2026-10-19T14:03:29Z'
-    merged_at: '2026-10-19T14:03:29Z'
-    merge_commit_sha: 3b12d6a1bdc9ac312174812fac2fcaa7f53967b3
+    body: 'Relates to #117'
+    created_at: '2026-10-19T15:56:50Z'
+    updated_at: '2026-10-19T15:56:56Z'
+    closed_at: '2026-10-19T15:56:56Z'
+    merged_at: '2026-10-19T15:56:55Z'
+    merge_commit_sha: ade358557f9e1dbf0be4519407eba49018929a63
     assignees: []
     requested_reviewers: []
     requested_teams: []
@@ -1976,13 +2006,13 @@ now:
     milestone: null
     draft: false
     head:
-      label: JogoShugh:fix-blank-names-reasoned-1019-100315
-      ref: fix-blank-names-reasoned-1019-100315
-      sha: 01415b6a8d43dc854fc164ec04c2fc3ce84b6728
+      label: JogoShugh:fix-blank-names-reasoned-1019-115643
+      ref: fix-blank-names-reasoned-1019-115643
+      sha: 023b7ba610f833e7cd73bc0dc4e28829194d258d
     base:
       label: JogoShugh:main
       ref: main
-      sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+      sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
     author_association: OWNER
     auto_merge: null
     assignee: null
@@ -2001,13 +2031,13 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      pull_number: '110'
+      pull_number: '118'
   forms:
     - github:edit
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -2069,10 +2099,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -2120,10 +2150,10 @@ now:
           description: null
           fork: false
           created_at: '2026-10-17T01:37:34Z'
-          updated_at: '2026-10-19T03:10:25Z'
-          pushed_at: '2026-10-19T14:03:21Z'
+          updated_at: '2026-10-19T15:55:44Z'
+          pushed_at: '2026-10-19T15:56:49Z'
           homepage: null
-          size: 50
+          size: 53
           stargazers_count: 0
           watchers_count: 0
           language: null
@@ -2151,19 +2181,19 @@ now:
           watchers: 0
           default_branch: main
 ---
-at: '2026-10-19T14:03:31.460276Z'
-ms: 299
+at: '2026-10-19T15:56:57.265647Z'
+ms: 162
 mode: script
 say: return to {address}
 line: 34
 within: 26
 params:
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-115643
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-100315
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-115643
 now:
   state:
-    name: fix-blank-names-reasoned-1019-100315
+    name: fix-blank-names-reasoned-1019-115643
     protected: false
     protection:
       enabled: false
@@ -2174,7 +2204,7 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      branch: fix-blank-names-reasoned-1019-100315
+      branch: fix-blank-names-reasoned-1019-115643
   forms:
     - github:branch-from-here
     - github:commit-file
@@ -2182,7 +2212,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -2192,13 +2222,13 @@ now:
     github:commit:
       - title: null
         state:
-          sha: 01415b6a8d43dc854fc164ec04c2fc3ce84b6728
-          node_id: C_kwDOVM7WJdoAKDAxNDE1YjZhOGQ0M2RjODU0ZmMxNjRlYzA0YzJmYzNjZTg0YjY3Mjg
+          sha: 023b7ba610f833e7cd73bc0dc4e28829194d258d
+          node_id: C_kwDOVM7WJdoAKDAyM2I3YmE2MTBmODMzZTdjZDczYmMwZGM0ZTI4ODI5MTk0ZDI1OGQ
           parents:
-            - sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+            - sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
 ---
-at: '2026-10-19T14:03:31.759811Z'
-ms: 302
+at: '2026-10-19T15:56:57.428795Z'
+ms: 200
 mode: script
 say: return to {address}
 line: 26
@@ -2228,7 +2258,7 @@ now:
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -2238,12 +2268,12 @@ now:
     github:commit:
       - title: null
         state:
-          sha: 3b12d6a1bdc9ac312174812fac2fcaa7f53967b3
-          node_id: C_kwDOVM7WJdoAKDNiMTJkNmExYmRjOWFjMzEyMTc0ODEyZmFjMmZjYWE3ZjUzOTY3YjM
+          sha: ade358557f9e1dbf0be4519407eba49018929a63
+          node_id: C_kwDOVM7WJdoAKGFkZTM1ODU1N2Y5ZTFkYmYwYmU0NTE5NDA3ZWJhNDkwMTg5MjlhNjM
           parents:
-            - sha: b739ba1685cce2a784abc0f9b149d7ef0214a2a4
+            - sha: 1cc76d920eab202aafeac461e5d94aa32fbb07ba
 ---
-at: '2026-10-19T14:03:32.062240Z'
+at: '2026-10-19T15:56:57.629525Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -2273,18 +2303,18 @@ now:
     service-desc:
       - null
 ---
-at: '2026-10-19T14:03:32.065056Z'
-ms: 534
+at: '2026-10-19T15:56:57.632369Z'
+ms: 494
 mode: script
 say: act {relation}, owner {owner}, repo {repo}, issue_number {issue_number}
-intent: open issue 109 in JogoShugh/heart-github-test
+intent: open issue 117 in JogoShugh/heart-github-test
 line: 46
 within: 9
 params:
   relation: github:issues-get
   owner: JogoShugh
   repo: heart-github-test
-  issue_number: 109
+  issue_number: 117
 values:
   owner:
     value: JogoShugh
@@ -2353,7 +2383,7 @@ values:
       - step: 12
         pointer: /_embedded/github:base-repo/0/name
   issue_number:
-    value: 109
+    value: 117
     type: integer
     from:
       - step: 3
@@ -2367,7 +2397,7 @@ chose:
   title: Get an issue
   method: GET
   target: /repos/{owner}/{repo}/issues/{issue_number}
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117
   picked: relation
 guard:
   rung: L0
@@ -2389,12 +2419,12 @@ offered:
     - self
     - service-desc
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117
 now:
   state:
-    id: 5925332389
-    node_id: I_kwDOVM7WJc8AAAABYS1lpQ
-    number: 109
+    id: 5927156248
+    node_id: I_kwDOVM7WJc8AAAABYUk6GA
+    number: 117
     title: Crash when a bed has no name (reasoned)
     labels: []
     state: open
@@ -2402,8 +2432,8 @@ now:
     assignees: []
     milestone: null
     comments: 0
-    created_at: '2026-10-19T14:03:16Z'
-    updated_at: '2026-10-19T14:03:16Z'
+    created_at: '2026-10-19T15:56:45Z'
+    updated_at: '2026-10-19T15:56:45Z'
     closed_at: null
     assignee: null
     author_association: OWNER
@@ -2435,25 +2465,25 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      issue_number: '109'
+      issue_number: '117'
   forms:
-    - github:close
-    - github:close-not-planned
-    - github:close-duplicate
-    - github:edit
-    - github:lock
-    - github:label
-    - github:unlabel
-    - github:assign
-    - github:unassign
-    - github:set-milestone
-    - github:comment
     - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
     - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     github:issues-list-sub-issues:
       - null
@@ -2483,23 +2513,23 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-10-19T14:03:32.603214Z'
-ms: 3734
+at: '2026-10-19T15:56:58.131738Z'
+ms: 2803
 mode: script
 say: act {relation}, body {body}
-intent: 'comment on it: Fixed in 1.2 by #110.'
+intent: 'comment on it: Fixed in 1.2 by #118.'
 line: 51
 within: 46
 params:
   relation: github:comment
-  body: 'Fixed in 1.2 by #110.'
+  body: 'Fixed in 1.2 by #118.'
 values:
   body:
-    value: 'Fixed in 1.2 by #110.'
+    value: 'Fixed in 1.2 by #118.'
     type: string
     from:
       - parts:
-          '110':
+          '118':
             step: 9
             pointer: /number
           '1':
@@ -2511,13 +2541,19 @@ chose:
   relation: github:comment
   title: Comment
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109/actions/comment
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109/actions/comment
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/comment
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117/actions/comment
   picked: relation
 guard:
-  rung: L0
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/a2d2fde567da02a0
+    integrity: sha256-otL95WfaAqBvpizW5luVdqgfX3ezHO4V7zxlF3sz/vw=
   form: sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
-  if-match: '"seq-0.hsf.L0.85d052b0002ddfec"'
+  schema:
+    href: http://localhost:8392/schemas/ed35e5c584ac8de1
+    integrity: sha256-7TXlxYSsjeGU+EYIxodHAFtCYel24Fb0XIH1qDwdV0k=
+  if-match: '"seq-0.hsf.L2.3debfa001acf3960"'
   checked: strict
 offered:
   forms:
@@ -2543,18 +2579,18 @@ offered:
     - github:reactions
     - github:repos-get
     - github:timeline
-    - hr:unavailable
+    - hr:forms
     - self
 outcome: new resource
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6269094111
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6271435009
 now:
   state:
-    id: 6269094111
-    node_id: IC_kwDOVM7WJc8AAAABdarI3w
-    created_at: '2026-10-19T14:03:34Z'
-    updated_at: '2026-10-19T14:03:34Z'
+    id: 6271435009
+    node_id: IC_kwDOVM7WJc8AAAABdc6BAQ
+    created_at: '2026-10-19T15:56:59Z'
+    updated_at: '2026-10-19T15:56:59Z'
     author_association: OWNER
-    body: 'Fixed in 1.2 by #110.'
+    body: 'Fixed in 1.2 by #118.'
     reactions:
       total_count: 0
       '+1': 0
@@ -2571,13 +2607,13 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      comment_id: '6269094111'
+      comment_id: '6271435009'
   forms:
     - github:edit
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -2597,7 +2633,7 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-10-19T14:03:36.340306Z'
+at: '2026-10-19T15:57:00.936799Z'
 ms: 0
 mode: script
 say: check
@@ -2606,19 +2642,19 @@ within: 51
 params:
   facts:
     - member: body
-      test: 'eq Fixed in 1.2 by #110.'
-      held: 'Fixed in 1.2 by #110.'
+      test: 'eq Fixed in 1.2 by #118.'
+      held: 'Fixed in 1.2 by #118.'
       holds: true
 outcome: held
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6269094111
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6271435009
 now:
   state:
-    id: 6269094111
-    node_id: IC_kwDOVM7WJc8AAAABdarI3w
-    created_at: '2026-10-19T14:03:34Z'
-    updated_at: '2026-10-19T14:03:34Z'
+    id: 6271435009
+    node_id: IC_kwDOVM7WJc8AAAABdc6BAQ
+    created_at: '2026-10-19T15:56:59Z'
+    updated_at: '2026-10-19T15:56:59Z'
     author_association: OWNER
-    body: 'Fixed in 1.2 by #110.'
+    body: 'Fixed in 1.2 by #118.'
     reactions:
       total_count: 0
       '+1': 0
@@ -2635,13 +2671,13 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      comment_id: '6269094111'
+      comment_id: '6271435009'
   forms:
     - github:edit
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     alternate:
       - null
@@ -2661,21 +2697,21 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-10-19T14:03:36.340594Z'
-ms: 760
+at: '2026-10-19T15:57:00.936960Z'
+ms: 517
 mode: script
 say: return to {address}
 line: 51
 within: 46
 params:
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117
 now:
   state:
-    id: 5925332389
-    node_id: I_kwDOVM7WJc8AAAABYS1lpQ
-    number: 109
+    id: 5927156248
+    node_id: I_kwDOVM7WJc8AAAABYUk6GA
+    number: 117
     title: Crash when a bed has no name (reasoned)
     labels: []
     state: open
@@ -2683,8 +2719,8 @@ now:
     assignees: []
     milestone: null
     comments: 1
-    created_at: '2026-10-19T14:03:16Z'
-    updated_at: '2026-10-19T14:03:34Z'
+    created_at: '2026-10-19T15:56:45Z'
+    updated_at: '2026-10-19T15:56:59Z'
     closed_at: null
     assignee: null
     author_association: OWNER
@@ -2716,25 +2752,25 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      issue_number: '109'
+      issue_number: '117'
   forms:
-    - github:close
-    - github:close-not-planned
-    - github:close-duplicate
-    - github:edit
-    - github:lock
-    - github:label
-    - github:unlabel
-    - github:assign
-    - github:unassign
-    - github:set-milestone
-    - github:comment
     - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
     - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     github:issues-list-sub-issues:
       - null
@@ -2764,8 +2800,8 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-10-19T14:03:37.101318Z'
-ms: 2641
+at: '2026-10-19T15:57:01.454974Z'
+ms: 2297
 mode: script
 say: act {relation}
 intent: close it, since the fix is done
@@ -2778,13 +2814,19 @@ chose:
   relation: github:close
   title: Close
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109/actions/close
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109/actions/close
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/close
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117/actions/close
   picked: relation
 guard:
-  rung: L0
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/a2d2fde567da02a0
+    integrity: sha256-otL95WfaAqBvpizW5luVdqgfX3ezHO4V7zxlF3sz/vw=
   form: sha256-LxczFWnl8Y1IitGHklbparPlYcWRRjCzdCGspvG2gUA=
-  if-match: '"seq-0.hsf.L0.c80687e4d52e837b"'
+  schema:
+    href: http://localhost:8392/schemas/91c3b4ed90232223
+    integrity: sha256-kcO07ZAjIiNEsnLOU1aO2JC/CKNiwa+6Gqu1/F9I7EQ=
+  if-match: '"seq-0.hsf.L2.c87b71d83b1d8366"'
   checked: strict
 offered:
   forms:
@@ -2810,15 +2852,15 @@ offered:
     - github:reactions
     - github:repos-get
     - github:timeline
-    - hr:unavailable
+    - hr:forms
     - self
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117
 now:
   state:
-    id: 5925332389
-    node_id: I_kwDOVM7WJc8AAAABYS1lpQ
-    number: 109
+    id: 5927156248
+    node_id: I_kwDOVM7WJc8AAAABYUk6GA
+    number: 117
     title: Crash when a bed has no name (reasoned)
     labels: []
     state: closed
@@ -2826,9 +2868,9 @@ now:
     assignees: []
     milestone: null
     comments: 1
-    created_at: '2026-10-19T14:03:16Z'
-    updated_at: '2026-10-19T14:03:38Z'
-    closed_at: '2026-10-19T14:03:38Z'
+    created_at: '2026-10-19T15:56:45Z'
+    updated_at: '2026-10-19T15:57:02Z'
+    closed_at: '2026-10-19T15:57:02Z'
     assignee: null
     author_association: OWNER
     active_lock_reason: null
@@ -2858,23 +2900,23 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      issue_number: '109'
+      issue_number: '117'
   forms:
-    - github:reopen
-    - github:edit
-    - github:lock
-    - github:label
-    - github:unlabel
-    - github:assign
-    - github:unassign
-    - github:set-milestone
-    - github:comment
     - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
     - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     github:issues-list-sub-issues:
       - null
@@ -2914,7 +2956,7 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-10-19T14:03:39.743496Z'
+at: '2026-10-19T15:57:03.752703Z'
 ms: 0
 mode: script
 say: check
@@ -2931,12 +2973,12 @@ params:
       held: completed
       holds: true
 outcome: held
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/109
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/117
 now:
   state:
-    id: 5925332389
-    node_id: I_kwDOVM7WJc8AAAABYS1lpQ
-    number: 109
+    id: 5927156248
+    node_id: I_kwDOVM7WJc8AAAABYUk6GA
+    number: 117
     title: Crash when a bed has no name (reasoned)
     labels: []
     state: closed
@@ -2944,9 +2986,9 @@ now:
     assignees: []
     milestone: null
     comments: 1
-    created_at: '2026-10-19T14:03:16Z'
-    updated_at: '2026-10-19T14:03:38Z'
-    closed_at: '2026-10-19T14:03:38Z'
+    created_at: '2026-10-19T15:56:45Z'
+    updated_at: '2026-10-19T15:57:02Z'
+    closed_at: '2026-10-19T15:57:02Z'
     assignee: null
     author_association: OWNER
     active_lock_reason: null
@@ -2976,23 +3018,23 @@ now:
     hr:address:
       owner: JogoShugh
       repo: heart-github-test
-      issue_number: '109'
+      issue_number: '117'
   forms:
-    - github:reopen
-    - github:edit
-    - github:lock
-    - github:label
-    - github:unlabel
-    - github:assign
-    - github:unassign
-    - github:set-milestone
-    - github:comment
     - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
     - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
   links:
     self:
       - null
-    hr:unavailable:
+    hr:forms:
       - null
     github:issues-list-sub-issues:
       - null
@@ -3032,8 +3074,8 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-10-19T14:03:39.743600Z'
-ms: 2
+at: '2026-10-19T15:57:03.752784Z'
+ms: 1
 mode: script
 say: return to {address}
 line: 46
