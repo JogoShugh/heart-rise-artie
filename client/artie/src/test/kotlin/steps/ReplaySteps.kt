@@ -158,7 +158,9 @@ class ReplaySteps(
                     "    body: { state: closed, state_reason: completed }\n    fields: [milestone]\n"
                 ),
             "edit takes no body" to ("fields: [title, body]" to "fields: [title]"),
-            "comment takes no body" to ("fields: [body]" to "fields: []"),
+            "comment's body is renamed content" to (
+                "    fields: [body]\n" to "    fields: [content]\n    rename: { content: body }\n"
+                ),
         )
     }
 }

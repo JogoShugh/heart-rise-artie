@@ -42,7 +42,12 @@ class ActDeclaration(
      * this resource's path variables and the act's fields, as a new branch's `/repos/{owner}/{repo}/branches/{name}`.
      */
     val at: UriTemplate? = null,
+    /** Fields the form names otherwise than the operation does, each with the operation's own name. */
+    val rename: Map<String, String> = emptyMap(),
 ) {
+    /** The operation's own name for the form's [field]: as written, or as [rename] maps it. */
+    fun upstream(field: String): String = rename[field] ?: field
+
     /** A field's value as the upstream takes it: as the client wrote it, or encoded as the act says. */
     fun encoded(field: String, value: Any?): Any? =
         if (encode[field] == BASE64) Base64.getEncoder().encodeToString(value.toString().toByteArray()) else value
@@ -82,6 +87,12 @@ class ActDeclaration(
                     field to encoding.asText()
                 },
                 at = node.path("at").asText(null),
+                rename = node.path("rename").properties().associate { (field, upstream) ->
+                    check(field in node.path("fields").map { it.asText() }) {
+                        "$label: act $name renames $field, which is not one of its fields"
+                    }
+                    field to upstream.asText()
+                },
             )
         }
 

@@ -120,9 +120,11 @@ internal class DeclaredResource(
         val inputs = sent.filterKeys { it in act.inputs }.mapValues { (_, value) -> value.toString() }
         // A path variable the state doesn't fill is the client's field of that name: remove-label's {name}.
         val inPath = ActSchema(act, route, declared.file).pathFields(pointers.keys).toSet()
+        // The form's names are the client's; the operation takes its own (a connector's rename).
         val variables = pointers.mapValues { (_, pointer) -> checked.json.at(pointer).asText() } +
-            fields.filterKeys { it in inPath }.mapValues { (_, value) -> value.toString() }
-        val body = act.filled(inputs) + fields.filterKeys { it !in inPath } +
+            fields.filterKeys { it in inPath }.entries.associate { (field, value) -> act.upstream(field) to "$value" }
+        val body = act.filled(inputs) +
+            fields.filterKeys { it !in inPath }.mapKeys { (field, _) -> act.upstream(field) } +
             act.bound.mapValues { (_, pointer) -> mapper.convertValue(checked.json.at(pointer), Any::class.java) }
         val statuses = RefusalStatuses(act.stale, act.refused)
         val path = ItemPath.fill(route.path, variables)

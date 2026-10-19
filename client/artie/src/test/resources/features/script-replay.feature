@@ -113,7 +113,8 @@ Feature: A generated script makes the same requests, holds to its lock file, and
 
   Scenario Outline: A form used once, then changed, is refused the second time it is used
     The script comments twice. The first comment is made with the comment
-    form as recorded; the gateway then changes that same form. The second
+    form as recorded; the gateway then renames that same form's body to
+    content, as an API's next version might. The second
     comment is checked against the form the issue offers now, so both modes
     stop there, and only the first comment is made. Its own issues, fresh:
     one to record on, one to run on.
@@ -141,7 +142,7 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | repo   | rockets |
       | number | 20      |
     And artie generated "twice-gen.kts" from "twice.trace.yaml" and "twice.kts"
-    And the gateway's issue forms change once the comment is made: comment takes no body
+    And the gateway's issue forms change once the comment is made: comment's body is renamed content
     When "twice-gen.kts" runs with ARTIE, held "<guard>" to its lock file, captured in "twice-gen.trace.yaml", given
       | name   | value   |
       | owner  | acme    |

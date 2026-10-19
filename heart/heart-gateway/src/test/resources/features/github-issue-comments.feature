@@ -62,6 +62,19 @@ Feature: An issue's comments, linked from it, and commenting
     And the answer's Location is "/repos/acme/rockets/issues/comments/503"
     And GitHub was asked to POST "/repos/acme/rockets/issues/10/comments" with {"body":"Fixed in 1.2."}
 
+  Scenario: A field the connector renames is offered by its new name, and sent to GitHub by its own
+    A connector may give an operation's field another name. The comment
+    form then asks for content, described as GitHub describes body, and the
+    gateway sends it on as body.
+    Given the GitHub gateway reads GitHub's description with the shipped connector, its act "comment" renaming "body" to "content"
+    When "bob" gets "/repos/acme/rockets/issues/10" through the GitHub gateway
+    Then the "github:comment" form asks for these fields
+      | field   | required | description                  |
+      | content | yes      | The contents of the comment. |
+    When the client sends "github:comment" with {"content":"Fixed in 1.2."} and the ETag it holds
+    Then the GitHub gateway answers 201
+    And GitHub was asked to POST "/repos/acme/rockets/issues/10/comments" with {"body":"Fixed in 1.2."}
+
   Scenario: Who may comment on a locked conversation, and why not
     Given issue 10 of "acme/rockets" is locked upstream
     Then issue 10 of "acme/rockets" offers each caller

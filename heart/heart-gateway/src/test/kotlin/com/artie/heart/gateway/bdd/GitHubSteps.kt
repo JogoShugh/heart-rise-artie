@@ -50,8 +50,17 @@ class GitHubSteps {
     @Given("the GitHub gateway reads GitHub's description with the connector {string}")
     fun reads(name: String) {
         connector = name
+        folder = null
         started = null
     }
+
+    /** A connector the scenario made, in [made]: a changed copy of one that ships. */
+    internal fun readsFrom(made: Path) {
+        folder = made
+        started = null
+    }
+
+    private var folder: Path? = null
 
     @Given("the GitHub gateway reads GitHub's description with the shipped connector")
     fun shipped() = reads("github")
@@ -515,7 +524,8 @@ class GitHubSteps {
 
     private fun start(): Result<HttpHandler> = runCatching {
         // A connector the tests make up is a test resource; one that ships is the gateway's own.
-        val folder = javaClass.getResource("/connectors/$connector")?.let { Path.of(it.toURI()) }
+        val folder = folder
+            ?: javaClass.getResource("/connectors/$connector")?.let { Path.of(it.toURI()) }
             ?: Path.of("connectors", connector).also { check(it.toFile().isDirectory) { "no connector $connector" } }
         val loaded = Connector.load(folder, mapper)
         val description = checkNotNull(javaClass.getResource("/github/openapi.json")).readText()

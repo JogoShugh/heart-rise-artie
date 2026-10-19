@@ -15,20 +15,26 @@ internal class ActSchema(private val act: ActDeclaration, private val route: Spe
     @Suppress("UNCHECKED_CAST")
     private val body: Map<String, Any?> = route.body.orEmpty()
 
-    /** The operation's path variables the client fills: those the state's pointers don't. */
-    fun pathFields(filled: Set<String>): List<String> =
-        ItemPath.variablesOf(route.path).filter { it !in filled && it in act.fields }
+    /** The form's fields that fill the operation's path variables: those the state's pointers don't. */
+    fun pathFields(filled: Set<String>): List<String> {
+        val variables = ItemPath.variablesOf(route.path).filter { it !in filled }
+        return act.fields.filter { act.upstream(it) in variables }
+    }
 
     fun of(filled: Set<String>): Map<String, Any> {
         val inPath = pathFields(filled)
-        val required = (body["required"] as? List<*>).orEmpty().toSet() + inPath + act.inputs.keys
+        // The operation requires its own names; a renamed field is required when its upstream name is.
+        val upstreamRequired = (body["required"] as? List<*>).orEmpty().toSet()
+        val required = act.fields.filter { act.upstream(it) in upstreamRequired }.toSet() + inPath + act.inputs.keys
         return mapOf(
             "\$schema" to "https://json-schema.org/draft/2020-12/schema",
             "type" to "object",
             "title" to act.title,
             // An input is the resource file's own field, with its own schema; the rest are the operation's.
             "properties" to act.inputs + act.fields.associateWith { field ->
-                val property = checkNotNull(property(field)) { "$file: ${act.operation} has no field $field" }
+                val property = checkNotNull(property(act.upstream(field))) {
+                    "$file: ${act.operation} has no field ${act.upstream(field)}"
+                }
                 // A field the gateway encodes is described as what the client sends: plain text. The upstream's
                 // own words ("using Base64 encoding") would have the client encode it, and it be encoded twice.
                 act.encode[field]?.let { encoding ->
