@@ -49,7 +49,8 @@ class ArtieCli(
     private fun run(asked: Arguments, file: Path): Ended {
         output = asked.output
         val given = asked.inputsFile?.let { inputsFile(folder.resolve(it)) }.orEmpty() + asked.inputs
-        val settings = ClientSettings(asked.rung, asked.reasoner, asked.exchanges)
+        val lock = lockFile(asked, folder, file)
+        val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, lock.guard)
         val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { navigator(settings) })
         run.reasoning = asked.reasoner != null
         run.entry = asked.entry

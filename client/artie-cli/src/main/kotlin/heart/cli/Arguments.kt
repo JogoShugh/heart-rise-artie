@@ -19,6 +19,12 @@ class Arguments(val script: String) {
     var rung: String? = null
     var reasoner: String? = null
 
+    /** The lock file, when it isn't NAME.pins.yaml beside the script (spec/PLAN-SCRIPT-GENERATOR.md). */
+    var pins: String? = null
+
+    /** How the lock file is held to: lenient or strict; asking for it needs a lock file. */
+    var guard: String? = null
+
     /** Whether each step of the trace keeps the client's exchanges (spec/PLAN-LINE-BY-LINE-REPORT.md). */
     var exchanges = false
 
@@ -37,6 +43,9 @@ private val RUNGS = setOf("L0", "L1", "L2")
 /** The reasoners a run may allow `reason(…)` steps to use. */
 private val REASONERS = setOf("claude")
 
+/** How a run may hold to its lock file. */
+private val GUARDS = setOf("lenient", "strict")
+
 /** The options that stand alone. */
 private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
     "--inputs-of" to { it.inputsOf = true },
@@ -53,6 +62,8 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--report" to { a, v -> a.report = v },
     "--rung" to { a, v -> a.rung = v.takeIf { it in RUNGS } ?: throw BadArguments("--rung is L0, L1 or L2") },
     "--reasoner" to { a, v -> a.reasoner = v.takeIf { it in REASONERS } ?: throw BadArguments("--reasoner is claude") },
+    "--pins" to { a, v -> a.pins = v },
+    "--guard" to { a, v -> a.guard = v.takeIf { it in GUARDS } ?: throw BadArguments("--guard is lenient or strict") },
     "--output" to { a, v -> a.output = v.takeIf { it == "json" } ?: throw BadArguments("--output json only") },
 )
 

@@ -15,7 +15,8 @@ class ArtieNavigatorProvider : NavigatorProvider {
     override fun navigator(settings: ClientSettings): Navigator {
         val rung = settings.rung?.let(Rung::valueOf) ?: Rung.L0
         val home = Path.of(System.getProperty("user.home"))
-        return standard(System.getenv(), home, rung, settings.reasoner, settings.exchanges)
+        val guard = settings.pins?.let { ScriptGuard(it, strict = settings.guard == "strict") }
+        return standard(System.getenv(), home, rung, settings.reasoner, settings.exchanges, guard)
     }
 
     companion object {
@@ -28,14 +29,16 @@ class ArtieNavigatorProvider : NavigatorProvider {
          * ask Claude, with the model key from [ModelKey.standard]; with no key, they are refused, saying where
          * one goes. Every request carries its W3C traceparent, so a server's own record of what it did for it
          * (the gateway's upstream calls) can be tied to the step. With [exchanges], the exchanges on the wire
-         * are kept for the run's capture.
+         * are kept for the run's capture. With [guard], each act is held to the script's lock file first.
          */
+        @Suppress("LongParameterList") // each is one thing a run asks of its client
         fun standard(
             env: Map<String, String>,
             userHome: Path,
             rung: Rung = Rung.L0,
             reasoner: String? = null,
             exchanges: Boolean = false,
+            guard: ScriptGuard? = null,
         ): Navigator {
             val credentials = CredentialSources.standard(env, userHome)
             val log = if (exchanges) ExchangeLog(HttpTransport()) else null
@@ -45,9 +48,9 @@ class ArtieNavigatorProvider : NavigatorProvider {
             val client = ArtieClient(transport, rung, bindings = coaps)
             val key = if (reasoner == "claude") ModelKey.standard(env, userHome) else null
             return when {
-                reasoner != "claude" -> ArtieNavigator(client, exchangeLog = log)
-                key == null -> ArtieNavigator(client, null, NO_KEY, log)
-                else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), exchangeLog = log)
+                reasoner != "claude" -> ArtieNavigator(client, exchangeLog = log, guard = guard)
+                key == null -> ArtieNavigator(client, null, NO_KEY, log, guard)
+                else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), NO_KEY, log, guard)
             }
         }
     }

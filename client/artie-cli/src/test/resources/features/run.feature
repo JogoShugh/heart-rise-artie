@@ -231,6 +231,85 @@ Feature: artie run: a script, run from the command line
       | --exchanges | to keep         |
       | --quiet     | not to keep     |
 
+  Scenario Outline: A lock file beside the script is held to, lenient unless the run says strict
+    spec/PLAN-SCRIPT-GENERATOR.md, "Guards": NAME.pins.yaml beside NAME.kts,
+    or the file --pins names. The client is made with it, and with how it is
+    held to; the run reads at the lock file's rung.
+    Given the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+      }
+      """
+    And the file "<lock>" is
+      """
+      rung: L2
+      forms:
+        issues-get:
+          integrity: sha256-abc
+          sets: []
+      links: {}
+      """
+    When artie is run with
+      | argument   |
+      | run        |
+      | issue.kts  |
+      | <option>   |
+      | <value>    |
+    Then artie exits 0
+    And the client was made holding the lock file pinning "issues-get" to "sha256-abc", "<guard>"
+    And the client was made to ask at rung "L2"
+
+    Examples:
+      | lock            | option  | value           | guard   |
+      | issue.pins.yaml | --guard | lenient         | lenient |
+      | issue.pins.yaml | --guard | strict          | strict  |
+      | other.yaml      | --pins  | other.yaml      | lenient |
+
+  Scenario: A run asked at another rung than its lock file's stops before its first request
+    Given the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+      }
+      """
+    And the file "issue.pins.yaml" is
+      """
+      rung: L2
+      forms: {}
+      links: {}
+      """
+    When artie is run with
+      | argument  |
+      | run       |
+      | issue.kts |
+      | --rung    |
+      | L0        |
+    Then artie exits 2
+    And artie's last line is: stopped before the first request: the lock file was recorded at L2, not L0
+
+  Scenario: --guard with no lock file beside the script stops before the first request; without --guard, none is held to
+    Given the script "bare.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+      }
+      """
+    When artie is run with
+      | argument |
+      | run      |
+      | bare.kts |
+      | --guard  |
+      | strict   |
+    Then artie exits 2
+    And artie's last line is: stopped before the first request: --guard, but no lock file at bare.pins.yaml
+    When artie is run with
+      | argument |
+      | run      |
+      | bare.kts |
+    Then artie exits 0
+    And the client was made holding no lock file
+
   Scenario Outline: The rung the client asks at, pinned by the run
     Given the script "issue.kts" is
       """kotlin
