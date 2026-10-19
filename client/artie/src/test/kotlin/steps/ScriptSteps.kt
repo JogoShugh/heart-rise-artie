@@ -32,9 +32,9 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
 
     private fun runs(script: String, navigator: ArtieNavigator) {
         Run.current = Run(navigator = { navigator }).also { it.reasoning = true }
-        val engine = ScriptHost.engine()
+        val engine = ScriptHost.engine(listOf("heart.script.*"))
         try {
-            engine.eval("import heart.script.*\n$script")
+            engine.eval(script)
         } catch (e: ScriptException) {
             stopped = generateSequence(e as Throwable) { it.cause }.filterIsInstance<ScriptStopped>().firstOrNull()
                 ?: throw e

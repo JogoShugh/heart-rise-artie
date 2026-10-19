@@ -58,6 +58,13 @@ class Run(
     val trace = mutableListOf<TraceStep>()
 
     internal fun traced(step: TraceStep) {
+        // spec/PLAN-LINE-BY-LINE-REPORT.md: the script's own frames, innermost first, name the step's line and
+        // its block's; a block's end is traced from inside the call that opened it, so it names that line.
+        val lines = StackWalker.getInstance().walk { frames ->
+            frames.filter { it.fileName?.endsWith(SCRIPT) == true }.map { it.lineNumber }.toList()
+        }
+        step.line = lines.firstOrNull()
+        step.within = lines.getOrNull(1)
         trace += step
         onStep(step)
     }
@@ -102,6 +109,9 @@ class Run(
     companion object {
         /** The run the current script belongs to. */
         var current: Run = Run()
+
+        /** What a script's frames are named after: its source, a .kts. */
+        private const val SCRIPT = ".kts"
     }
 }
 

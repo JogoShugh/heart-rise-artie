@@ -203,9 +203,9 @@ class ScriptSteps {
     private fun execute(with: Run) {
         run = with
         Run.current = with
-        val engine = ScriptHost.engine()
+        val engine = ScriptHost.engine(imports)
         try {
-            engine.eval(imports.joinToString("") { "import $it\n" } + script)
+            engine.eval(script)
         } catch (e: ScriptException) {
             stopped = generateSequence(e as Throwable) { it.cause }.filterIsInstance<ScriptStopped>().firstOrNull()
                 ?: throw e

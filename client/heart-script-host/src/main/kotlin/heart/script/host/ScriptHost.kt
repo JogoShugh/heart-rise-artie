@@ -4,6 +4,7 @@ import javax.script.ScriptEngine
 import javax.script.ScriptEngineManager
 import kotlin.script.experimental.api.ScriptCompilationConfiguration
 import kotlin.script.experimental.api.compilerOptions
+import kotlin.script.experimental.api.defaultImports
 import kotlin.script.experimental.jsr223.KotlinJsr223DefaultScriptCompilationConfiguration
 import kotlin.script.experimental.jsr223.KotlinJsr223DefaultScriptEvaluationConfiguration
 import kotlin.script.experimental.jvm.dependenciesFromCurrentContext
@@ -21,11 +22,15 @@ object ScriptHost {
     private const val PLUGIN = "org/jetbrains/kotlin/powerassert/PowerAssertCompilerPluginRegistrar.class"
     private const val DRAW = "plugin:org.jetbrains.kotlin.powerassert:function=$CHECK"
 
-    /** A new engine: one per run, as every run starts afresh. */
-    fun engine(): ScriptEngine {
+    /**
+     * A new engine: one per run, as every run starts afresh. [imports] are the compiler's default imports,
+     * never lines put before the script, so a script's line numbers are its author's.
+     */
+    fun engine(imports: List<String>): ScriptEngine {
         val kotlin = checkNotNull(ScriptEngineManager().getEngineByExtension("kts")) { "no Kotlin script engine" }
         val compilation = ScriptCompilationConfiguration(KotlinJsr223DefaultScriptCompilationConfiguration) {
             jvm { dependenciesFromCurrentContext(wholeClasspath = true) }
+            defaultImports(imports)
             compilerOptions.append("-Xplugin=${plugin()}", "-P", DRAW)
         }
         return KotlinJsr223ScriptEngineImpl(

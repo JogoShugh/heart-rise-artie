@@ -26,6 +26,12 @@ class TraceStep(
     /** What a test script expected this step to answer, in words (heart-script-test); null when nothing. */
     var expect: String? = null
 
+    /** The script line this step came from, as its author numbers it; null when run outside a script. */
+    var line: Int? = null
+
+    /** The line of the block this step ran in; null at the script's top level. */
+    var within: Int? = null
+
     /** When a step began, and how long it took. */
     class Began(val at: Instant, val ms: Long)
 
@@ -40,6 +46,8 @@ class TraceStep(
         put("ms", began.ms)
         put("mode", asked.mode)
         put("say", asked.say)
+        line?.let { put("line", it) }
+        within?.let { put("within", it) }
         put("params", JsonObject(asked.params.mapValues { (_, v) -> element(v) }))
         put("outcome", outcome)
         expect?.let { put("expect", it) }

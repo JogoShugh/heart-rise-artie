@@ -85,9 +85,9 @@ class ArtieCli(
 
     private fun execute(run: Run, script: String): Ended {
         Run.current = run
-        val engine = ScriptHost.engine()
+        val engine = ScriptHost.engine(IMPORTS)
         return try {
-            engine.eval(IMPORTS.joinToString("") { "import $it\n" } + script)
+            engine.eval(script)
             Ended(0, "finished", "finished, ${run.trace.size} steps", run.trace.size)
         } catch (e: ScriptException) {
             stopIn(e)?.let { stopped(it, run) }
