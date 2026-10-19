@@ -87,6 +87,28 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | edit takes no body      | strict  | was stopped at step 2 by its guard | open   |
       | nothing                 | strict  | finished                           | closed |
 
+  Scenario Outline: A guarded run records what held each act: its set, or its form alone
+    An act offered in a set the lock file recorded for it is held by the
+    set, which covers every form in it. One whose set is new, or that comes
+    with no set (the service index's lookup forms are inline at every rung),
+    is held by its own form's integrity alone.
+    Given the gateway's issue forms change: <change>
+    When "gen.kts" runs with ARTIE, held "lenient" to its lock file, captured in "gen.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 11      |
+    Then the run captured in "gen.trace.yaml" held its acts by
+      | relation          | held   |
+      | github:issues-get | form   |
+      | github:comment    | <held> |
+      | github:close      | <held> |
+
+    Examples:
+      | change             | held |
+      | nothing            | set  |
+      | edit takes no body | form |
+
   Scenario Outline: When the forms change in the middle of a run, the next step meets the new ones
     The comment is made with the forms as recorded; the gateway changes
     right after it. The close, the next step, is checked against the set the

@@ -102,6 +102,11 @@ class Guard(
     val unpinned: Boolean = false,
     /** What a lenient run went past: an unchanged form in a set the lock file didn't record, with both sets. */
     val warning: String? = null,
+    /**
+     * What held the act to the lock file, when it passed: `set`, offered in a set recorded for it, which covers every
+     * form in it; `form`, its own integrity alone, its set new or none (a lookup form of the service index).
+     */
+    val held: String? = null,
 )
 
 /**

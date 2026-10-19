@@ -32,6 +32,20 @@ class ScriptGuard(private val pins: Pins, val strict: Boolean) {
     }
 
     /**
+     * What holds the pinned form [rel] of [held] to the lock file, when it may be used: `set` when it is offered in
+     * a set recorded for it, `form` when only its own integrity is (its set new, or none); null otherwise.
+     */
+    fun heldBy(held: HeartRepresentation?, rel: String): String? {
+        val pin = pins.forms[rel]
+        val passed = pin != null && held?.affordance(rel) != null && refusal(held, rel) == null
+        return when {
+            !passed -> null
+            held?.formsIntegrity in pin?.sets.orEmpty() -> "set"
+            else -> "form"
+        }
+    }
+
+    /**
      * Why the link [rel] titled [title] of [held] may not be followed, by the lock file; null when it may. A link's
      * target names one resource, and differs from one resource to the next: what is pinned is what a script relies
      * on, the variables the target leaves to fill (none for a plain link), checked in either mode.

@@ -77,6 +77,19 @@ class ReplaySteps(
         aboutPins = if (guard == null) emptyList() else repin(asked, folder, file, config, run.traceYaml())
     }
 
+    @Then("the run captured in {string} held its acts by")
+    fun heldBy(capture: String, table: DataTable) {
+        val held = Yaml().loadAll(Files.readString(folder.resolve(capture))).toList().drop(1)
+            .map { it as Map<*, *> }
+            .mapNotNull { step ->
+                val guard = step["guard"] as? Map<*, *> ?: return@mapNotNull null
+                val relation = (step["chose"] as? Map<*, *>)?.get("relation")
+                    ?: (step["params"] as? Map<*, *>)?.get("relation")
+                mapOf("relation" to "$relation", "held" to "${guard["held"]}")
+            }
+        assertEquals(table.asMaps(), held)
+    }
+
     @Then("about its pins, the run said {string}")
     fun saidAboutPins(said: String) = assertEquals(said, aboutPins.joinToString("; "))
 
