@@ -99,11 +99,12 @@ class ReplaySteps(
     fun formsChangeMidRun(change: String) {
         val before = checkNotNull(ctx.inProcess) { "no gateway in process" }
         val after = changed(change)
+        var serving: heart.Transport = before
         ctx.inProcess = object : heart.Transport {
             override fun send(request: heart.HeartRequest): heart.HeartResponse {
-                val answer = before.send(request)
+                val answer = serving.send(request)
                 if (request.method == "POST" && request.url.endsWith("/actions/comment") && answer.status in OK) {
-                    ctx.inProcess = after
+                    serving = after
                 }
                 return answer
             }
@@ -157,6 +158,7 @@ class ReplaySteps(
                     "    body: { state: closed, state_reason: completed }\n    fields: [milestone]\n"
                 ),
             "edit takes no body" to ("fields: [title, body]" to "fields: [title]"),
+            "comment takes no body" to ("fields: [body]" to "fields: []"),
         )
     }
 }

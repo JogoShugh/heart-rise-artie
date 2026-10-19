@@ -38,21 +38,21 @@ class ArtieNavigator(
     override fun enter(entry: String): Answer = answer("entry") { client.enter(entry) }
 
     /**
-     * The fields are checked against the form's schema first (SPEC §6.3), as ARTIE's reasoner path does: a value
-     * the schema doesn't allow is refused here, by the client, and nothing is sent.
+     * The lock file first: a form that is not the one pinned is the guard's refusal, whatever its fields. Then the
+     * fields are checked against the form's schema (SPEC §6.3), as ARTIE's reasoner path does: a value the schema
+     * doesn't allow is refused here, by the client. Either way nothing is sent.
      */
     override fun act(rel: String, fields: Map<String, Any?>): Answer {
         val body = JsonObject(fields.mapValues { (_, v) -> json(v) })
+        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, guard)
         val form = client.current?.affordance(rel)
         val violations = form?.let { SchemaCheck.violations(body, it.schema) }.orEmpty()
-        if (violations.isNotEmpty()) {
-            return Answer.Refused(Refusal.InvalidInput, Side.CLIENT, violations.joinToString("; "))
-        }
-        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, guard)
-        // The lock file, before anything is sent: a refusal here is the guard's, by the client.
-        val answered = guard?.refusal(client.current, rel) ?: answer(rel) { client.act(rel, body) }.let {
-            if (it is Answer.Done && client.broughtIntoBeing) Answer.NewResource(it.now) else it
-        }
+        val answered = guard?.refusal(client.current, rel)
+            ?: violations.takeIf { it.isNotEmpty() }
+                ?.let { Answer.Refused(Refusal.InvalidInput, Side.CLIENT, it.joinToString("; ")) }
+            ?: answer(rel) { client.act(rel, body) }.let {
+                if (it is Answer.Done && client.broughtIntoBeing) Answer.NewResource(it.now) else it
+            }
         return UsedAffordances.with(answered, used)
     }
 

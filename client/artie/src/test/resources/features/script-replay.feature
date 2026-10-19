@@ -111,6 +111,53 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | edit takes no body      | lenient | finished                           | closed |
       | edit takes no body      | strict  | was stopped at step 3 by its guard | open   |
 
+  Scenario Outline: A form used once, then changed, is refused the second time it is used
+    The script comments twice. The first comment is made with the comment
+    form as recorded; the gateway then changes that same form. The second
+    comment is checked against the form the issue offers now, so both modes
+    stop there, and only the first comment is made. Its own issues, fresh:
+    one to record on, one to run on.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title             | state | author |
+      | 20     | Fuel gauge sticks | open  | ada    |
+      | 21     | Hatch won't seal  | open  | ada    |
+    And the script "twice.kts" is
+      """kotlin
+      val owner by input()
+      val repo by input()
+      val number by input()
+
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to number.toLong()) {
+              act("github:comment", "body" to "First pass.") {}
+              act("github:comment", "body" to "Second pass.") {}
+              act("github:close")
+          }
+      }
+      """
+    And "twice.kts" ran with ARTIE, captured in "twice.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 20      |
+    And artie generated "twice-gen.kts" from "twice.trace.yaml" and "twice.kts"
+    And the gateway's issue forms change once the comment is made: comment takes no body
+    When "twice-gen.kts" runs with ARTIE, held "<guard>" to its lock file, captured in "twice-gen.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 21      |
+    Then the run was stopped at step 3 by its guard
+    And issue 21 of "acme/rockets" is now "open" on the small GitHub
+    And issue 21 of "acme/rockets" now has these comments on the small GitHub
+      | author | body        |
+      | ada    | First pass. |
+
+    Examples:
+      | guard   |
+      | lenient |
+      | strict  |
+
   Scenario Outline: A lenient run past a changed set re-pins it, as the config beside the script says
     spec/ideas/replay-guards-lenient-strict.md, the walk's step 3: the forms
     the script used kept their integrity, but the set they were offered in
