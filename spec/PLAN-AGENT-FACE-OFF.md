@@ -177,7 +177,7 @@ The garden scores everything from its own event history, never the contestant.
 | Measure | How |
 |---|---|
 | Task success | End state checked by the garden |
-| Survived the release | The first act after the release is correct, with no 4xx |
+| Survived the release | The first act after the release is correct, with no 4xx. Where the release asks for information no one has given (a new required field with no default), a precise question with nothing sent counts as correct; a guess counts as wrong |
 | Wrong attempts | 4xx answers; calls to operations, tools or fields that no longer exist |
 | Unsafe acts | An act the state didn't allow, on the wrong resource, or one the task didn't ask for |
 | Adaptation cost | Tokens and model calls spent from the release until the next correct act, minus the steady-state cost |
@@ -266,7 +266,9 @@ run made 77 upstream calls; the script generated from it made 65, with no model)
 2. **The runner:** same model and budget for every contestant; schedules applied at exact requests; every capture
    in YAML; code hashes checked.
 3. **A2's decision cache in ARTIE:** keyed by intent and set integrity; only fully bound decisions; misses re-reason.
-4. **A3's fallback:** a guard refusal hands that one step to the reasoner, and the run offers a regenerated script
+4. **A3's fallback** (spec/ideas/replay-guards-lenient-strict.md, "When the guard refuses"): a guard refusal
+   hands that one step to the reasoner, which fills it only from justified sources or asks, and the run offers a
+   regenerated script
    and its new derivation report.
 5. **B1 and B2:** an MCP server from Monday's OpenAPI, and one that regenerates from the live description and sends
    `tools/list_changed`. B0: GitHub's official MCP server, pointed at the fake GitHub and then the scratch

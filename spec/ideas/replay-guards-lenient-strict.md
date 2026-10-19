@@ -58,10 +58,61 @@ used either has the integrity it had, or it doesn't. Lenient replay survives eve
 the forms a script uses (new acts, removed acts it never used, reworded others); strict replay is for a
 script that must run only against exactly what it was recorded against.
 
+## When the guard refuses: repair on the fly, or ask (added 2026-10-19)
+
+A refusal is not the end of a run. Today it stops the run (a generated script needs no model); with the
+reasoner allowed, the refused step can be repaired on the fly. Not built yet; this is the A3 contestant of
+spec/PLAN-AGENT-FACE-OFF.md.
+
+1. Before sending, the guard finds the form changed (or a link's template variables changed). Nothing is
+   sent: no 4xx, no silent wrong value.
+2. That one step goes to the reasoner, with the form as served now (its schema, `required`, titles,
+   descriptions, examples) and the step's original words, inputs and the state.
+3. The reasoner fills the step from what it can justify, or asks. The run goes on; the steps whose forms are
+   unchanged stay scripted, with no model call.
+4. After the run, `artie generate` proposes a new script, lock file and derivation report, and the person
+   approves it. No one edits code.
+
+**Self-repair can't invent information.** A new required field is filled only from a justified source; when
+there is none, the honest repair is a precise question, asked once:
+
+| Where the new field's value comes from | Example | Asks? |
+|---|---|---|
+| The schema's `default` | `method` required, default `"drip"` | No; the derivation says "default from the schema" |
+| One choice allowed | `enum: ["drip"]`, or `hr:options` with one item | No |
+| The current state or the inputs | `hr:templatePointers`, or a value an earlier answer brought in | No |
+| The step's own words | The intent said "drip-water bed 2" | No; the words give it, so no review mark |
+| None of these: new information | `method: drip or spray?`, no default, no hint | **Yes**: a person, or a configured source. Never a guess |
+
+Seen live: under the garden's `new-required-input` change (exhibits/openapi-vs-heart), Claude asked "drip or
+spray?" and sent nothing. That is the correct outcome. HEART makes the question precise, since the form
+carries the field's title, description, allowed values and examples.
+
+**The answer is asked once, not on every run.** It becomes an input of the regenerated script,
+`val method by input(default = "drip")`, and the derivation report shows where it came from.
+
+**Policy decides what is automatic.**
+
+- **Accept on its own** when every value is justified by a default, the state, the inputs or the words.
+  This covers renames, moves, retitles, a new field with a default or one choice, and a tighter limit the
+  value still meets.
+- **Ask, then propose** when a value is new information or the reasoner's own judgement. The same line
+  `artie generate` draws with `review:`.
+
+Either way, the old script never runs wrong in the meantime: it is refused, never wrong.
+
+| | A hard-coded script | Guard, then repair |
+|---|---|---|
+| Notices the change | No: a 422 in production, or silently wrong | Yes, before sending |
+| Says what changed | No | Which form, which field, old and new schema |
+| Asks the right question | Someone digs through docs and logs | One question, from the schema |
+| Remembers the answer | A code edit and a redeploy | An input of the regenerated script |
+| Who changes code | A developer | No one; a person approves the proposed script |
+
 ## Open
 
 - What a lenient replay reports when it acts on an unchanged form in a changed set: a warning in the
-  capture and the report, with the set's two integrity values.
+  capture and the report, with the set's two integrity values. (Built 2026-10-19: commit 1c16f7d.)
 - Decided 2026-10-18: a form's integrity leaves out its title and description, so lenient replay
   survives a retitled form.
 - Links: the same two modes for a followed relation (present, and its target template unchanged).
