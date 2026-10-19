@@ -29,8 +29,8 @@ internal object KotlinText {
         return out.append('"').toString()
     }
 
-    /** [value] as a whole word: not inside a longer word or number. */
-    fun whole(value: String): Regex = Regex("(?<![\\w.])" + Regex.escape(value) + "(?![\\w]|\\.\\w)")
+    /** [value] as a whole word: not inside a longer word or number (`1` is not in `1.2`; `1018` is in `1018.md`). */
+    fun whole(value: String): Regex = Regex("(?<!\\w)(?<!\\d\\.)" + Regex.escape(value) + "(?!\\w)(?!\\.\\d)")
 
     /** The words of a reason(…) template with its slots taken out and its escapes undone. */
     fun plain(template: String): String = template

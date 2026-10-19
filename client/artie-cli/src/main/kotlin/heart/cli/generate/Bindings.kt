@@ -39,10 +39,12 @@ class Bindings(private val capture: Capture, private val source: List<String>?) 
     /** The variables, by the step and pointer they are read from, in the order they were first needed. */
     val variables = linkedMapOf<Pair<Int, String>, Variable>()
 
+    private val sources = Sources(capture)
+
     /** The variable each reason slot names, by the step and pointer it came from. */
     private val slotted: Map<Pair<Int, String>, String> = capture.steps.flatMap { step ->
         step.slots.entries.mapNotNull { (name, slot) ->
-            val from = stepSource(slot.map()["from"])
+            val from = sources.first(slot.map()["from"])
             if (from == null || !IDENTIFIER.matches(name.toString())) null else from to name.toString()
         }
     }.distinctBy { it.first }.toMap()
@@ -58,13 +60,13 @@ class Bindings(private val capture: Capture, private val source: List<String>?) 
         val from = info["from"] as? List<*> ?: emptyList<Any?>()
         val text = value?.toString().orEmpty()
         val input = from.firstNotNullOfOrNull { it.map()["input"]?.toString() }
-        val held = stepSource(from)
+        val held = sources.first(from)
         return when {
             input != null -> Argument(field, inputAs(input, type))
             literal(step, text, value) -> Argument(field, constant(value, type))
             held != null -> Argument(field, variableAs(variable(held.first, held.second), type), tie(from, held))
             "chosen" in from -> Argument(field, constant(value, type), "the reasoner chose it, asked \"${step.say}\"")
-            value is String -> Argument(field, KotlinText.templated(text, names(step, from)))
+            value is String -> Argument(field, KotlinText.templated(text, names(step, text, from)))
             else -> Argument(field, constant(value, type))
         }
     }
@@ -90,12 +92,14 @@ class Bindings(private val capture: Capture, private val source: List<String>?) 
     }
 
     /** Each value a string may hold that the script has a name for: its slots, and the parts the capture names. */
-    private fun names(step: Step, from: List<*>): Map<String, String> {
+    private fun names(step: Step, text: String, from: List<*>): Map<String, String> {
         val names = linkedMapOf<String, String>()
         step.slots.forEach { (name, slot) ->
-            val value = slot.map()["value"]?.toString() ?: return@forEach
+            // A slot whose value the text doesn't hold names nothing here, and makes no variable.
+            val value = slot.map()["value"]?.toString()?.takeIf { KotlinText.whole(it).containsMatchIn(text) }
+                ?: return@forEach
             val input = slot.map()["from"].list().firstNotNullOfOrNull { it.map()["input"]?.toString() }
-            val held = stepSource(slot.map()["from"])?.takeIf { IDENTIFIER.matches(name.toString()) }
+            val held = sources.first(slot.map()["from"])?.takeIf { IDENTIFIER.matches(name.toString()) }
             when {
                 input != null -> names[value] = input
                 held != null -> names[value] = variable(held.first, held.second).name
@@ -103,7 +107,7 @@ class Bindings(private val capture: Capture, private val source: List<String>?) 
         }
         from.flatMap { it.map()["parts"].map().entries }.forEach { (part, source) ->
             source.map()["input"]?.let { names.putIfAbsent(part.toString(), it.toString()) }
-            stepSource(listOf(source))?.takeIf { it in slotted }
+            sources.first(listOf(source))?.takeIf { it in slotted }
                 ?.let { names.putIfAbsent(part.toString(), variable(it.first, it.second).name) }
         }
         return names
@@ -111,7 +115,7 @@ class Bindings(private val capture: Capture, private val source: List<String>?) 
 
     /** Rule 5: the step that brought the value in holds it at another member too; the first is taken. */
     private fun tie(from: List<*>, held: Pair<Int, String>): String? {
-        val others = usable(from).filter { it.first == held.first && it != held }.map { it.second }
+        val others = sources.usable(from).filter { it.first == held.first && it != held }.map { it.second }
         return others.takeIf { it.isNotEmpty() }
             ?.let { "step ${held.first} holds it at ${held.second}, and at ${it.joinToString(", ")} too" }
     }
@@ -139,18 +143,6 @@ class Bindings(private val capture: Capture, private val source: List<String>?) 
 
     private companion object {
         val IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
-
-        /** Members a script doesn't read with state: the address's own, and embedded resources'. */
-        val UNREAD = listOf("/hr:", "/_embedded/")
-
-        /** The earliest step source a script can read again: the state's own, not the address's or an embedded one. */
-        fun stepSource(from: Any?): Pair<Int, String>? = usable(from.list()).firstOrNull()
-
-        fun usable(from: List<*>): List<Pair<Int, String>> = from.mapNotNull { source ->
-            val step = (source.map()["step"] as? Number)?.toInt()
-            val pointer = source.map()["pointer"]?.toString()?.takeUnless { at -> UNREAD.any { at.startsWith(it) } }
-            if (step == null || pointer == null) null else step to pointer
-        }
 
         fun camel(member: String): String = member.split('_', '-').filter { it.isNotEmpty() }
             .mapIndexed { i, word -> if (i == 0) word else word.replaceFirstChar(Char::uppercase) }
