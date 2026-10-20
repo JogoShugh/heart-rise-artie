@@ -245,7 +245,7 @@ ARTIE implements the client side of this section: its core works in the concepts
 | Unchanged | The request `ETag` option → `2.03 Valid` |
 | Immutable | `Max-Age: 31536000` |
 | Integrity | The link's `integrity` value, as in every binding. There is no `Repr-Digest`. |
-| Act | `POST` (0.02) with `If-Match` (the 8-byte validator) |
+| Act | The form's method: `POST` (0.02), `PUT` (0.03), `DELETE` (0.04) or `PATCH` (0.06, RFC 8132), with `If-Match` (the 8-byte validator). Another method at that path is `4.05 Method Not Allowed`. A JSON Merge Patch is Content-Format 52; a `DELETE` has no payload, its fields in `Uri-Query` |
 | Act done | `2.04 Changed`, with the resource's new representation. CoAP has no `Content-Location`; the representation's `self` link names the resource. |
 | New resource | `2.01 Created`, with `Location-Path` naming the new resource; the body's `self` link names what it represents, the new resource or the one acted on |
 | Precondition required | `4.00 Bad Request` with the problem type `precondition-required`. CoAP has no 4.28. |
@@ -387,6 +387,9 @@ A H.E.A.R.T. compliant server SHALL:
 - **Send `Link: <profile-uri>; rel="profile"` on every Layer 1 response, identifying which composite profile (§6.1) was actually served.** This is connegp R.1.2.a and is not optional: without it, a client that sent `Accept-Profile` has no way to confirm what it got, and a client that sent nothing has no way to discover that a profile applies at all. A server MAY additionally list the parent `heart-rise` URI in a second `Link: rel="profile"` for hierarchy discoverability (§6.1).
 - Echo `Preference-Applied` when a `Prefer` token is honoured
 - If serving both dialects, generate both from one shared source of truth for which affordances are currently legal — never two independently-maintained descriptions that could silently disagree
+- Serve each act by the one method its form says, and refuse any other at that target with `405` and an `Allow` header naming it (decided 2026-10-20, below)
+
+**Act methods (decided 2026-10-20).** An act is served by `POST`, `PUT`, `PATCH` or `DELETE`, never `GET`. The method says what HTTP says it means (RFC 9110 §9.2): `PUT` and `DELETE` are idempotent, so a client or intermediary may repeat one whose answer was lost; `POST` and `PATCH` are not. The act's relation's ALPS descriptor `type` SHALL agree: `idempotent` for `PUT` and `DELETE`, `unsafe` for `POST` and `PATCH`. A `PATCH` takes a JSON Merge Patch (RFC 7396, `application/merge-patch+json`). A `DELETE` takes no body, since a `DELETE`'s content has no defined semantics (RFC 9110 §9.3.5): its fields are its target's query, written as a URI template (`{?tag,count}`) the client fills (HAL-SCHEMA-FORMS-HR Rule 1), and in HAL-FORMS the client puts them in the query, as a `GET`'s. A bookmark's act brings a resource into being, so it is a `POST`. A gateway serves each act by its upstream operation's own method. The method is part of the form's own integrity (HAL-SCHEMA-FORMS-HR Rule 10), so a script pinned to a form notices when it changes. Before this, every act was a `POST`; a form always said its method, and a client always honoured it.
 
 Business rules SHALL be enforced through affordance presence and absence. An action not present in the current manifest CANNOT be exercised. This is the primary mechanism for structural reliability.
 

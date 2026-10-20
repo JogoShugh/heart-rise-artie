@@ -212,6 +212,13 @@ Text is part of the bytes, so it is covered by the set's or the schema's
 `integrity` value like everything else, and it is cached with them. It SHALL
 NOT include instance identifiers (SPEC §6.9.4).
 
+A form's `method` is the one its act is served by (SPEC §6.2, "Act
+methods"): `POST`, `PUT`, `PATCH` or `DELETE`, agreeing with its relation's
+ALPS `type`. A `PATCH` form's `contentType` is `application/merge-patch+json`.
+A `DELETE` form has no `contentType`; its schema describes the fields of its
+target's query, which its target names as a URI template (`{?tag,count}`),
+filled by Rule 1 like any other variable, from the fields the client gives.
+
 ## Rule 8: choices from state
 
 A property of a form's schema MAY carry `hr:options`: the choices for that
