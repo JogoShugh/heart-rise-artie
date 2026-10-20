@@ -15,7 +15,7 @@ connector's `rename` carries over, since templates are built from the same schem
 
 ## What it doesn't have
 
-Everything about scripts and replay since 2026-10-15 was built and tested on HAL Schema Forms only.
+Everything about scripts and replay in the last few days was built and tested on HAL Schema Forms only.
 
 1. **Templates are keyed differently.** `_forms` keys an act by its relation (`github:comment`); `_templates` by
    the act's name (`issue-comment`). A script that says `act("github:comment")` can't run against HAL-FORMS. The
