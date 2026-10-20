@@ -49,7 +49,7 @@ internal object UsedAffordances {
                 checked = guard?.mode,
                 unpinned = guard != null && !guard.strict && guard.unpinned(rel),
                 warning = guard?.warning(held, rel),
-                held = guard?.heldBy(held, rel),
+                held = guard?.heldBy(held, rel, fields),
             ),
         )
     }

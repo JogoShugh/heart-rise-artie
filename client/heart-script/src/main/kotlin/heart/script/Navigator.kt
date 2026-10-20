@@ -64,8 +64,11 @@ class Pins(
     val links: Map<String, String> = emptyMap(),
 )
 
-/** One form's pin: its own integrity (HAL-SCHEMA-FORMS-HR Rule 10), and the affordance sets it was offered in. */
-class FormPin(val integrity: String?, val sets: List<String> = emptyList())
+/**
+ * One form's pin: its own integrity (HAL-SCHEMA-FORMS-HR Rule 10), the affordance sets it was offered in, and its
+ * [method], which a form that changed must keep for a run to go past it by the values it sends.
+ */
+class FormPin(val integrity: String?, val sets: List<String> = emptyList(), val method: String? = null)
 
 /** What came of a selection, in the core's terms (SPEC §6.0); [used], the affordance the client used, if any. */
 sealed interface Answer {
@@ -104,7 +107,8 @@ class Guard(
     val warning: String? = null,
     /**
      * What held the act to the lock file, when it passed: `set`, offered in a set recorded for it, which covers every
-     * form in it; `form`, its own integrity alone, its set new or none (a lookup form of the service index).
+     * form in it; `form`, its own integrity alone, its set new or none (a lookup form of the service index);
+     * `values`, the form changed, but kept its method, and what the script sent fits it (`on-change: values`).
      */
     val held: String? = null,
 )
@@ -224,4 +228,9 @@ class ClientSettings(
     val pins: Pins? = null,
     /** How the lock file is held to: "lenient" (the default) or "strict". */
     val guard: String? = null,
+    /**
+     * What a lenient run does when a form it uses changed: "refuse" (the default), or "values", act when the form
+     * keeps its pinned method and what the script sends fits its new schema.
+     */
+    val onChange: String? = null,
 )

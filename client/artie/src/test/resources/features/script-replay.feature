@@ -212,3 +212,77 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | propose |                 | would re-pin github:comment: offered in a new set; would re-pin github:close: offered in a new set    | was stopped at step 2 by its guard |
       | never   |                 |                                                                                                       | was stopped at step 2 by its guard |
       | auto    | , with no-repin |                                                                                                       | was stopped at step 2 by its guard |
+
+  Scenario Outline: With on-change: values, a lenient run goes past a changed form while what it sends still fits it
+    spec/ideas/replay-guards-lenient-strict.md, the walk's step 4: the form
+    the script is about to use changed. With on-change: values in the config,
+    a lenient run acts anyway when the form's method is the one pinned and
+    the values the script sends fit its new schema: every field sent is one
+    it names, every field it requires is sent. Anything else stops the run
+    before it sends. Strict holds as before: a changed form is a changed set.
+    Given the gateway's issue forms change: <change>
+    And the file "gen.config.yaml" is
+      """
+      on-change: values
+      """
+    When "gen.kts" runs with ARTIE, held "<guard>" to its lock file, captured in "gen.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 11      |
+    Then the run <ends>
+    And issue 11 of "acme/rockets" is now "<issue>" on the small GitHub
+
+    Examples:
+      | change                            | guard   | ends                                                                                                                                   | issue  |
+      | close takes a milestone           | lenient | finished                                                                                                                               | closed |
+      | close requires a reason           | lenient | was stopped at step 3 by its guard, saying "github:close changed, and what the script sends doesn't fit it: reason is required"         | open   |
+      | comment's body is renamed content | lenient | was stopped at step 2 by its guard, saying "github:comment changed, and what the script sends doesn't fit it: content is required; body is not in the schema" | open   |
+      | close takes a milestone           | strict  | was stopped at step 2 by its guard                                                                                                     | open   |
+
+  Scenario: A changed form that no longer takes the method pinned stops the run, even with on-change: values
+    The gateway's acts are all POST, whatever GitHub's own method, so the
+    lock file is the one changed here: it says close was recorded as a
+    DELETE. A form that changed its method changed what the act means.
+    Given the gateway's issue forms change: close takes a milestone
+    And the lock file "gen.pins.yaml" pins "github:close" to the method "DELETE"
+    And the file "gen.config.yaml" is
+      """
+      on-change: values
+      """
+    When "gen.kts" runs with ARTIE, held "lenient" to its lock file, captured in "gen.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 11      |
+    Then the run was stopped at step 3 by its guard, saying "github:close changed its method: pinned DELETE, offered POST"
+    And issue 11 of "acme/rockets" is now "open" on the small GitHub
+
+  Scenario: A form held by its values is re-pinned, and the next run holds to it strictly
+    With repin: auto, a form that changed but held by the values sent is
+    written into the lock file as offered now: its new integrity, its method
+    and its set. A strict run on another issue then finishes.
+    Given the gateway's issue forms change: close takes a milestone
+    And the file "gen.config.yaml" is
+      """
+      on-change: values
+      repin: auto
+      """
+    When "gen.kts" runs with ARTIE, held "lenient" to its lock file, captured in "gen.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 11      |
+    Then the run captured in "gen.trace.yaml" held its acts by
+      | relation          | held   |
+      | github:issues-get | form   |
+      | github:comment    | form   |
+      | github:close      | values |
+    And about its pins, the run said "re-pinned github:comment: offered in a new set; re-pinned github:close: changed, and what the script sends still fits it"
+    When "gen.kts" runs with ARTIE, held "strict" to its lock file, captured in "strict.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 12      |
+    Then the run finished
+    And issue 12 of "acme/rockets" is now "closed" on the small GitHub

@@ -2,12 +2,13 @@ package heart.cli.generate
 
 /**
  * Rule 9: what the run was offered, pinned beside the script it gives, never in it: the rung it read at, and by
- * relation each form's own integrity and every affordance set it was offered in, and each link's target.
+ * relation each form's own integrity, its method and every affordance set it was offered in, and each link's target.
  */
 class LockWriter(capture: Capture) {
     // The rung the run read at: the highest any step was answered at, since a bookmark answers at L0 whatever is asked.
     private val rung = capture.steps.mapNotNull { it.guard["rung"]?.toString() }.maxOrNull()
     private val forms = linkedMapOf<String, Pair<String, LinkedHashSet<String>>>()
+    private val methods = mutableMapOf<String, String>()
     private val links = linkedMapOf<String, String>()
 
     init {
@@ -22,6 +23,7 @@ class LockWriter(capture: Capture) {
                 !step.follows && form != null -> {
                     val sets = forms.getOrPut(relation) { form to linkedSetOf() }.second
                     step.guard["set"].map()["integrity"]?.let { sets += it.toString() }
+                    step.chose["method"]?.let { methods.putIfAbsent(relation, it.toString()) }
                 }
             }
         }
@@ -45,6 +47,7 @@ class LockWriter(capture: Capture) {
         forms.forEach { (relation, pin) ->
             appendLine("  ${scalar(relation)}:")
             appendLine("    integrity: ${scalar(pin.first)}")
+            methods[relation]?.let { appendLine("    method: ${scalar(it)}") }
             appendLine(if (pin.second.isEmpty()) "    sets: []" else "    sets:")
             pin.second.forEach { appendLine("      - ${scalar(it)}") }
         }

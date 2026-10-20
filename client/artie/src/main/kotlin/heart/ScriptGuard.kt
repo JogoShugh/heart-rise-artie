@@ -1,45 +1,64 @@
 package heart
 
 import heart.script.Answer
+import heart.script.FormPin
 import heart.script.Pins
 import heart.script.Refusal
 import heart.script.Side
+import kotlinx.serialization.json.JsonObject
 
 /**
  * A script's lock file, held to before ARTIE sends an act (spec/PLAN-SCRIPT-GENERATOR.md, "Guards";
  * spec/ideas/replay-guards-lenient-strict.md). Lenient: the form about to be used must have its pinned integrity,
- * in whatever set holds it now; a relation the lock doesn't pin goes on, marked unpinned. [strict]: the set must
- * also be one recorded for it, and an unpinned relation is refused. Bytes are checked against their links'
- * integrity as always (Rule 2), whatever the mode.
+ * in whatever set holds it now; a relation the lock doesn't pin goes on, marked unpinned. With [values]
+ * (`on-change: values`), a lenient run also goes past a changed form that kept its pinned method, when what the
+ * script sends fits its new schema. [strict]: the set must also be one recorded for it, and an unpinned relation
+ * is refused. Bytes are checked against their links' integrity as always (Rule 2), whatever the mode.
  */
-class ScriptGuard(private val pins: Pins, val strict: Boolean) {
+class ScriptGuard(private val pins: Pins, val strict: Boolean, val values: Boolean = false) {
     val mode: String get() = if (strict) "strict" else "lenient"
 
-    /** Why the form [rel] of [held] may not be used, by the lock file; null when it may. */
-    fun refusal(held: HeartRepresentation?, rel: String): Answer.Refused? {
+    /** Why the form [rel] of [held] may not be used to send [sent], by the lock file; null when it may. */
+    fun refusal(held: HeartRepresentation?, rel: String, sent: JsonObject = NOTHING): Answer.Refused? {
         // A form not offered at all is the client's own refusal, as without a lock file.
         val form = held?.affordance(rel) ?: return null
         val pin = pins.forms[rel]
         val set = held.formsIntegrity
         return when {
             pin == null -> refused("$rel is not in the script's lock file").takeIf { strict }
-            pin.integrity != null && pin.integrity != form.integrity ->
-                refused("$rel changed: pinned ${pin.integrity}, offered ${form.integrity}")
+            pin.integrity != null && pin.integrity != form.integrity -> changed(rel, pin, form, sent)
             strict && pin.sets.isNotEmpty() && set !in pin.sets ->
                 refused("$rel is offered in another set: pinned ${pin.sets.joinToString(" or ")}, offered $set")
             else -> null
         }
     }
 
+    /** Why the changed [form] [rel], pinned as [pin], may not be used to send [sent]; null when its values hold it. */
+    private fun changed(rel: String, pin: FormPin, form: AffordanceForm, sent: JsonObject): Answer.Refused? {
+        val misfits = SchemaCheck.violations(sent, form.schema)
+        return when {
+            strict || !values -> refused("$rel changed: pinned ${pin.integrity}, offered ${form.integrity}")
+            pin.method == null -> refused("$rel changed, and the lock file doesn't pin its method")
+            pin.method != form.method ->
+                refused("$rel changed its method: pinned ${pin.method}, offered ${form.method}")
+            misfits.isNotEmpty() ->
+                refused("$rel changed, and what the script sends doesn't fit it: ${misfits.joinToString("; ")}")
+            else -> null
+        }
+    }
+
     /**
-     * What holds the pinned form [rel] of [held] to the lock file, when it may be used: `set` when it is offered in
-     * a set recorded for it, `form` when only its own integrity is (its set new, or none); null otherwise.
+     * What holds the pinned form [rel] of [held] to the lock file, when it may be used to send [sent]: `set` when it
+     * is offered in a set recorded for it, `form` when only its own integrity is (its set new, or none), `values`
+     * when it changed and what is sent fits it; null otherwise.
      */
-    fun heldBy(held: HeartRepresentation?, rel: String): String? {
+    fun heldBy(held: HeartRepresentation?, rel: String, sent: JsonObject = NOTHING): String? {
         val pin = pins.forms[rel]
-        val passed = pin != null && held?.affordance(rel) != null && refusal(held, rel) == null
+        val form = held?.affordance(rel)
+        val passed = pin != null && form != null && refusal(held, rel, sent) == null
         return when {
             !passed -> null
+            pin?.integrity != null && pin.integrity != form?.integrity -> "values"
             held?.formsIntegrity in pin?.sets.orEmpty() -> "set"
             else -> "form"
         }
@@ -85,6 +104,8 @@ class ScriptGuard(private val pins: Pins, val strict: Boolean) {
     private fun refused(why: String) = Answer.Refused(Refusal.Guard, Side.CLIENT, why)
 
     companion object {
+        private val NOTHING = JsonObject(emptyMap())
+
         /** The variables [target] leaves to fill, as its template writes them (`{/name}`); empty for a plain link. */
         fun variables(target: String): String = Regex("\\{[^}]*}").findAll(target).joinToString("") { it.value }
     }

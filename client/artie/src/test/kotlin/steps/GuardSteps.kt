@@ -57,6 +57,13 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
         assertTrue(said.startsWith("stopped at step $step,") && "guard, refused by the client" in said, said)
     }
 
+    @Then("the run was stopped at step {int} by its guard, saying {string}")
+    fun stoppedByGuardSaying(step: Int, why: String) {
+        stoppedByGuard(step)
+        val said = scripts.stoppedMessage().orEmpty()
+        assertTrue(said.endsWith(": \"$why\""), said)
+    }
+
     @Then("the run finished, step {int} marked unpinned")
     fun unpinned(step: Int) {
         finished()

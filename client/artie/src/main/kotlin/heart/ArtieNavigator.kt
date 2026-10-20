@@ -47,7 +47,7 @@ class ArtieNavigator(
         val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, guard)
         val form = client.current?.affordance(rel)
         val violations = form?.let { SchemaCheck.violations(body, it.schema) }.orEmpty()
-        val answered = guard?.refusal(client.current, rel)
+        val answered = guard?.refusal(client.current, rel, body)
             ?: violations.takeIf { it.isNotEmpty() }
                 ?.let { Answer.Refused(Refusal.InvalidInput, Side.CLIENT, it.joinToString("; ")) }
             ?: answer(rel) { client.act(rel, body) }.let {

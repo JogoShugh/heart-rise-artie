@@ -69,7 +69,11 @@ class ReplaySteps(
         val config = config(asked, folder, file)
         val held = guard?.let {
             val lock = lockFile(asked, folder, file, config)
-            ScriptGuard(checkNotNull(lock.pins) { "no lock file beside $script" }, strict = lock.guard == "strict")
+            ScriptGuard(
+                checkNotNull(lock.pins) { "no lock file beside $script" },
+                strict = lock.guard == "strict",
+                values = config.onChange == "values",
+            )
         }
         val given = table.asMaps().associate { it.getValue("name") to it.getValue("value") }
         val run = scripts.run(Files.readString(file), ArtieNavigator(ctx.client, guard = held), given)
@@ -137,6 +141,15 @@ class ReplaySteps(
         return InProcessTransport(GitHubGateway.handler(gateway.github, connector))
     }
 
+    @Given("the lock file {string} pins {string} to the method {string}")
+    fun pinsMethod(lock: String, relation: String, method: String) {
+        val file = folder.resolve(lock)
+        val text = Files.readString(file)
+        val at = Regex("(?m)^  ${Regex.escape(relation)}:\\n    integrity: .*\\n    method: .*$").find(text)
+        val was = checkNotNull(at) { "$lock pins no method for $relation" }.value
+        Files.writeString(file, text.replace(was, was.substringBeforeLast("method: ") + "method: $method"))
+    }
+
     @Then("the lock file {string} pins rung {string}")
     fun lockRung(lock: String, rung: String) =
         assertEquals(rung, Yaml().load<Map<String, Any?>>(Files.readString(folder.resolve(lock)))["rung"])
@@ -171,6 +184,10 @@ class ReplaySteps(
                     "    body: { state: closed, state_reason: completed }\n    fields: [milestone]\n"
                 ),
             "edit takes no body" to ("fields: [title, body]" to "fields: [title]"),
+            "close requires a reason" to (
+                "    body: { state: closed, state_reason: completed }\n" to
+                    "    body: { state: closed, state_reason: completed }\n    inputs: { reason: { type: string } }\n"
+                ),
             "comment's body is renamed content" to (
                 "    fields: [body]\n" to "    fields: [content]\n    rename: { content: body }\n"
                 ),

@@ -203,10 +203,12 @@ in its parent, up to the affordance set. Only the root, the resource (Layer 1), 
    cache, with no fetch and no model. This is the common case.
 3. **The set changed, but the form's integrity is the one pinned** (another act was added or removed, say):
    act, and add the new set to the lock file.
-4. **The form changed:** fetch only its new schema. Today: fall back to the intent words, or refuse, as the
-   config says. Deferred, stage 2: check the values the script sends against the new schema. If the fields are
-   still there, with types and limits the values meet, and there is no new required field without a default,
-   act and re-pin with no model; otherwise fall back or ask.
+4. **The form changed:** fetch only its new schema. By default (`on-change: refuse`), refuse. Built 2026-10-19,
+   `on-change: values` in the config: a lenient run acts when the form keeps the method the lock file pins and
+   the values the script sends fit the new schema (every field sent is one it names, every field it requires is
+   sent, types and limits met); the trace says `held: values`, and `repin: auto` writes the new integrity,
+   method and set. Otherwise it refuses, saying which. Later values of the same setting: fall back to the intent
+   words, or ask. Compatibility of whole schemas is not needed: a run checks the values it actually sends.
 
 Strict mode stops at step 3. Re-pinning happens only after the act succeeds, and only where the config allows
 it. A form's integrity also covers its target template, method and template pointers: a moved target is still

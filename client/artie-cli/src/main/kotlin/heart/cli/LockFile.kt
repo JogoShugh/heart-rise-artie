@@ -39,6 +39,7 @@ internal fun pins(text: String): Pins {
         rel.toString() to FormPin(
             fields?.get("integrity")?.toString(),
             (fields?.get("sets") as? List<*>).orEmpty().map { it.toString() },
+            fields?.get("method")?.toString(),
         )
     }
     val links = (doc["links"] as? Map<*, *>).orEmpty().entries

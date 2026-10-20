@@ -13,12 +13,18 @@ class Config(
     val guard: String? = null,
     /** Whether a run writes what it was newly offered into the lock file: auto, propose (says it), never. */
     val repin: String? = null,
+    /**
+     * What a lenient run does when a form it uses changed: refuse, the default, or values: act when the form keeps
+     * its pinned method and what the script sends fits it.
+     */
+    val onChange: String? = null,
 )
 
 /** The settings a config may hold, and the values each may take. */
 private val SETTINGS: Map<String, Set<String>> = mapOf(
     "guard" to GUARDS,
     "repin" to setOf("auto", "propose", "never"),
+    "on-change" to setOf("refuse", "values"),
 )
 
 /** The config for [asked], whose script is [script], found in [folder]. */
@@ -31,7 +37,11 @@ fun config(asked: Arguments, folder: Path, script: Path): Config {
     }
     val doc = Yaml().load<Map<String, Any?>>(Files.readString(file)).orEmpty()
     doc.forEach { (setting, value) -> held(name, setting, value) }
-    return Config(guard = doc["guard"]?.toString(), repin = doc["repin"]?.toString())
+    return Config(
+        guard = doc["guard"]?.toString(),
+        repin = doc["repin"]?.toString(),
+        onChange = doc["on-change"]?.toString(),
+    )
 }
 
 /** Stops the run when [setting] isn't one a config may hold, or [value] isn't one it may take. */

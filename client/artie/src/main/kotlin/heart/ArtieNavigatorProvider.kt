@@ -15,7 +15,9 @@ class ArtieNavigatorProvider : NavigatorProvider {
     override fun navigator(settings: ClientSettings): Navigator {
         val rung = settings.rung?.let(Rung::valueOf) ?: Rung.L0
         val home = Path.of(System.getProperty("user.home"))
-        val guard = settings.pins?.let { ScriptGuard(it, strict = settings.guard == "strict") }
+        val guard = settings.pins?.let {
+            ScriptGuard(it, strict = settings.guard == "strict", values = settings.onChange == "values")
+        }
         return standard(System.getenv(), home, rung, settings.reasoner, settings.exchanges, guard)
     }
 
