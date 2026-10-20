@@ -240,7 +240,20 @@ header > div { min-width: 0; flex: 1 1 20rem; }
       <div class="case"><h3>What counts as a change</h3>
         <p>Any change to what the form does changes its hash: a field added, even an optional one; a field dropped or renamed; a new method or target. Both modes stop.</p>
         <p>A new title or description does not count. Wording is left out of the hash on purpose, so a reworded form is the same form.</p>
-        <p>Accepting an added optional field as compatible would need a schema comparison. That is not built.</p></div>
+        <p>By default, that's where it ends. With <code>on-change: values</code>, a lenient run looks closer, as the next two cards show.</p></div>
+      <div class="case"><h3>With on-change: values</h3>
+        <p>The config beside the script says <code>on-change: values</code>. When a form changed, a lenient run checks what it is about to send, not the whole schema.</p>
+        <p>It acts only if three things hold. The method is the one the lock file pins. Every field sent is one the new form names. Every field the new form requires is sent.</p>
+        <p>Close takes an optional milestone: lenient finishes, issue closed. The trace says close was held by its values.</p>
+        <p>Close now requires a reason: <span class="stop">stops at the close</span>, "reason is required".</p>
+        <p>Comment's body renamed to content: <span class="stop">stops at the comment</span>, "content is required; body is not in the schema".</p>
+        <p>Lock file says close was a DELETE: <span class="stop">stops at the close</span>, "pinned DELETE, offered POST".</p>
+        <p>Strict: <span class="stop">stops at the comment</span>, as before. A changed form means a changed set.</p>
+        <p>With <code>repin: auto</code>, the changed form's new hash, method and set go into the lock file. A strict run afterwards finishes.</p></div>
+      <div class="case"><h3>Live: close takes a milestone, held by its values</h3>
+        <p>The live gateway restarted on a copy of its connector where close takes an optional milestone. The lock file was regenerated, now with each form's method. The config said <code>on-change: values</code> and <code>repin: auto</code>.</p>
+        <p>Lenient: finished. Close was held by its values, the comment by its form, the rest by their set. The run re-pinned close and comment. Issue #127, pull request #128.</p>
+        <p>Strict, on the re-pinned lock file: finished, every act held by its set or form. Issue #129, pull request #130.</p></div>
       <div class="case"><h3>Nothing changes</h3>
         <p>Strict: finishes, issue closed.</p></div>
       <div class="case"><h3>Re-pin after the unrelated change</h3>

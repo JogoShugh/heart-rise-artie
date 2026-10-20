@@ -13,6 +13,10 @@ What artie generate and the guards do that no live run has shown yet, as of 2026
       ran against the scratch repository. Lenient and strict both stopped at the comment, "github:comment
       changed", nothing sent (issue #123, pull request #124; #125, #126). Reports:
       docs/reports/line-by-line/github-renamed-lenient/ and github-renamed-strict/.
+- [x] **A changed form held by its values, live.** Done 2026-10-19: with `on-change: values` and `repin: auto`,
+      the gateway on a connector copy whose close takes an optional milestone, the lenient run finished, close
+      held by its values and re-pinned (issue #127, pull request #128); strict then finished on the re-pinned
+      lock file (#129, #130). Reports: docs/reports/line-by-line/github-values-lenient/ and github-values-strict/.
 - [ ] **A changed set, live.** Lenient going past a changed set with its warning, and re-pinning it, is still shown
       only against the small GitHub in process (script-replay.feature). Live: change another act of the issue
       (as edit takes no body), run lenient with `repin: auto` in a trial config, then strict.
