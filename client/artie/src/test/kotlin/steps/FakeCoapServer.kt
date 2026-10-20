@@ -126,7 +126,7 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
                "contentType": "application/json",
                "schema": {"type": "object", "properties": {"seedType": {"type": "string"}}}}"""
         } else {
-            """"water": {"_links": {"target": {"href": "/beds/1/water"}}, "method": "POST",
+            """"water": {"_links": {"target": {"href": "/beds/1/water"}}, "method": "PUT",
                "contentType": "application/json",
                "schema": {"type": "object", "properties": {"milliliters": {"type": "integer"}}}}"""
         }

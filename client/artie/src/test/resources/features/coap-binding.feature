@@ -36,6 +36,22 @@ Feature: ARTIE over CoAP (SPEC §6.0.1)
     And the manifest offers exactly "water"
     And nothing went over HTTP
 
+  Scenario: An act goes over CoAP by the method its form says
+    The bed's sow form says POST; once planted, its water form says PUT.
+    When the client enters the CoAP bed
+    And the client acts on "sow" with:
+      """yaml
+      seedType: tomato
+      """
+    And the client acts on "water" with:
+      """yaml
+      milliliters: 250
+      """
+    Then the CoAP acts were
+      | code | path         |
+      | POST | beds/1/sow   |
+      | PUT  | beds/1/water |
+
   Scenario: An act that brings a resource into being over CoAP: ARTIE then holds the new resource
     SPEC §6.0, "New resource": 2.01 Created, the new resource at its
     Location-Path. The client holds that resource next, as over HTTP.

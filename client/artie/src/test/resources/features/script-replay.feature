@@ -241,9 +241,12 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | close takes a milestone           | strict  | was stopped at step 2 by its guard                                                                                                     | open   |
 
   Scenario: A changed form that no longer takes the method pinned stops the run, even with on-change: values
-    The gateway's acts are all POST, whatever GitHub's own method, so the
-    lock file is the one changed here: it says close was recorded as a
-    DELETE. A form that changed its method changed what the act means.
+    The gateway serves each act by its GitHub operation's method, and one
+    relation has one method on every resource: an issue's close and a pull
+    request's are both github:close, and the gateway refuses to start if
+    they disagree. So the lock file is changed here: it says close was
+    recorded as a DELETE. A form that changed its method changed what the
+    act means, even when what the script sends still fits it.
     Given the gateway's issue forms change: close takes a milestone
     And the lock file "gen.pins.yaml" pins "github:close" to the method "DELETE"
     And the file "gen.config.yaml" is
@@ -255,7 +258,7 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | owner  | acme    |
       | repo   | rockets |
       | number | 11      |
-    Then the run was stopped at step 3 by its guard, saying "github:close changed its method: pinned DELETE, offered POST"
+    Then the run was stopped at step 3 by its guard, saying "github:close changed its method: pinned DELETE, offered PATCH"
     And issue 11 of "acme/rockets" is now "open" on the small GitHub
 
   Scenario: A form held by its values is re-pinned, and the next run holds to it strictly

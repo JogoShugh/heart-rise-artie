@@ -30,7 +30,7 @@ Feature: A script run with ARTIE records the form or link each step used, as the
       | what     | value                                                                  |
       | kind     | form                                                                   |
       | relation | github:close                                                           |
-      | method   | POST                                                                   |
+      | method   | PATCH                                                                  |
       | target   | /repos/{owner}/{repo}/issues/{issue_number}/actions/close              |
       | address  | https://github.gateway.test/repos/acme/rockets/issues/10/actions/close |
     And the run's step 3 guards on rung L2, and on the set, form and schema the gateway serves, with its If-Match
@@ -50,7 +50,7 @@ Feature: A script run with ARTIE records the form or link each step used, as the
       }
       """
     Then the script finished
-    And the run's step 3 kept the exchange "POST" to "https://github.gateway.test/repos/acme/rockets/issues/10/actions/close", answered 200
+    And the run's step 3 kept the exchange "PATCH" to "https://github.gateway.test/repos/acme/rockets/issues/10/actions/close", answered 200
     And every exchange the run kept sends its credential as "<token>" and a traceparent
     And the run's trace never holds the key "ada-token"
 

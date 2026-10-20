@@ -95,6 +95,12 @@ class CoapSteps(private val ctx: ClientContext) {
         assertEquals(listOf(span), spans)
     }
 
+    @Then("the CoAP acts were")
+    fun actsWere(table: io.cucumber.datatable.DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("code") to it.getValue("path") },
+        coap.requests.filter { it.code.name != "GET" }.map { it.code.name to it.options.uriPathString },
+    )
+
     @Then("the client holds the CoAP bed's validator")
     fun holdsValidator() = assertEquals(hex(coap.validator), ctx.client.current?.etag)
 

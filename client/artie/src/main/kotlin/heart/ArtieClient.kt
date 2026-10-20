@@ -128,7 +128,15 @@ class ArtieClient(
         val held = current ?: error("enter a service before acting")
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
         val validator = held.etag ?: error("no validator held for ${held.url}; an act needs one")
-        val act = Act(targetOf(form, held, payload), form.method, form.contentType, payload.toString(), validator)
+        // A DELETE has no body: its fields fill its target's query, a template in HAL Schema Forms, and the
+        // query itself in HAL-FORMS, as a GET's do (SPEC §6.2).
+        val deletes = form.method == "DELETE"
+        val target = if (deletes && asking.dialect == Dialect.HAL_FORMS) {
+            HalFormsTemplates.getTarget(form.target, payload)
+        } else {
+            targetOf(form, held, payload)
+        }
+        val act = Act(target, form.method, form.contentType, payload.toString().takeUnless { deletes }, validator)
         val outcome = bindings.forUri(act.url).act(act, asking)
         decisions.actSent(rel, act, held.url, outcome)
         broughtIntoBeing = outcome is Outcome.Done && outcome.newResource != null

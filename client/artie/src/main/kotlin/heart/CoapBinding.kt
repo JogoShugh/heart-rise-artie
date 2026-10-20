@@ -1,6 +1,7 @@
 package heart
 
 import org.eclipse.californium.core.CoapClient
+import org.eclipse.californium.core.coap.CoAP
 import org.eclipse.californium.core.coap.CoAP.ResponseCode
 import org.eclipse.californium.core.coap.Option
 import org.eclipse.californium.core.coap.Request
@@ -81,12 +82,15 @@ class CoapBinding(
             accept.mapNotNull { FORMATS[it] }.singleOrNull()?.let { options.accept = it }
         })
 
+    /** An act by its form's method: POST, PUT, PATCH or DELETE, the last with no payload (SPEC §6.2). */
     override fun act(act: Act, rendering: Rendering): Outcome =
-        send(act.url, Request.newPost().apply {
+        send(act.url, Request(CoAP.Code.valueOf(act.method)).apply {
             ask(rendering)
-            options.contentFormat = FORMATS[act.contentType] ?: JSON
             options.addIfMatch(hexBytes(act.validator))
-            setPayload(act.body)
+            act.body?.let {
+                options.contentFormat = FORMATS[act.contentType] ?: JSON
+                setPayload(it)
+            }
         })
 
     private fun Request.ask(rendering: Rendering) {
@@ -150,6 +154,8 @@ class CoapBinding(
             "application/json-home" to 65_003,
             "application/alps+json" to 65_004,
             "application/json" to JSON,
+            // RFC 7396's JSON Merge Patch, a PATCH's body, as IANA registers it for CoAP.
+            "application/merge-patch+json" to 52,
         )
         val MEDIA_TYPES = FORMATS.entries.associate { (type, format) -> format to type }
 

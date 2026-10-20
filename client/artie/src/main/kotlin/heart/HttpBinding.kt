@@ -18,7 +18,9 @@ class HttpBinding(private val transport: Transport) : Binding {
     }
 
     override fun act(act: Act, rendering: Rendering): Outcome {
-        val headers = negotiation(rendering) + mapOf("Content-Type" to act.contentType, "If-Match" to act.validator)
+        // A body says its type; a DELETE has none.
+        val type = act.body?.let { mapOf("Content-Type" to act.contentType) }.orEmpty()
+        val headers = negotiation(rendering) + type + mapOf("If-Match" to act.validator)
         return outcome(transport.send(HeartRequest(act.method, act.url, headers, act.body)), act.url)
     }
 
