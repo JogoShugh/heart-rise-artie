@@ -17,6 +17,10 @@ What artie generate and the guards do that no live run has shown yet, as of 2026
       the gateway on a connector copy whose close takes an optional milestone, the lenient run finished, close
       held by its values and re-pinned (issue #127, pull request #128); strict then finished on the re-pinned
       lock file (#129, #130). Reports: docs/reports/line-by-line/github-values-lenient/ and github-values-strict/.
+- [ ] **Methods in the other lock files.** Only github-task-from-reasoned.pins.yaml was regenerated with each
+      form's method. github-task-from-hybrid.pins.yaml has none, so with `on-change: values` every changed form is
+      refused, "the lock file doesn't pin its method". Regenerate it from github-hybrid.trace.yaml (the script
+      should come out the same) and check the diff adds only `method:` lines.
 - [ ] **A changed set, live.** Lenient going past a changed set with its warning, and re-pinning it, is still shown
       only against the small GitHub in process (script-replay.feature). Live: change another act of the issue
       (as edit takes no body), run lenient with `repin: auto` in a trial config, then strict.
