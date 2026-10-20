@@ -120,10 +120,14 @@ export class HeartClient {
             }
             return this.sync(target.toString());
         }
+        // A DELETE has no body: its fields filled its target's query (SPEC §6.2).
+        const deletes = form.method === "DELETE";
         const response = await this.send(target.toString(), {
             method: form.method,
-            headers: { ...this.negotiation(), "Content-Type": form.contentType, "If-Match": held.etag },
-            body: JSON.stringify(fields),
+            headers: deletes
+                ? { ...this.negotiation(), "If-Match": held.etag }
+                : { ...this.negotiation(), "Content-Type": form.contentType, "If-Match": held.etag },
+            body: deletes ? undefined : JSON.stringify(fields),
         });
         if (response.ok) {
             const url = response.headers.get("Content-Location")
@@ -214,7 +218,16 @@ export class HeartClient {
     private expand(form: Form, held: Representation, fields: JsonObject): string {
         if (!form.templated) return form.target;
         return form.target.replace(/\{([^}]+)\}/g, (_, name: string) => {
-            if (name.startsWith("?")) return "";
+            // A query expression ({?tag,count}): each field given, by name; none given, nothing.
+            if (name.startsWith("?")) {
+                const pairs = name.slice(1).split(",").filter((key) => fields[key] !== undefined && fields[key] !== null)
+                    .flatMap((key) => {
+                        const value = fields[key];
+                        const values = Array.isArray(value) ? value : [value];
+                        return values.map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(String(v))}`);
+                    });
+                return pairs.length ? `?${pairs.join("&")}` : "";
+            }
             const pointer = form.templatePointers[name];
             const value = pointer !== undefined ? resolve(held.state, pointer) : fields[name] ?? held.state[name];
             if (typeof value !== "string" && typeof value !== "number") {
