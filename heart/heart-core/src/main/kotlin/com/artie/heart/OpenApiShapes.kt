@@ -98,8 +98,29 @@ internal object OpenApiShapes {
     fun idParameter(noun: String): Map<String, Any> =
         mapOf("name" to "id", "in" to "path", "required" to true, "description" to "The $noun's id", "schema" to ID)
 
-    fun requestBody(schema: String): Map<String, Any> =
-        mapOf("required" to true, "content" to mapOf(JSON to mapOf("schema" to ref(schema))))
+    /** A DELETE's fields, as query parameters, each with its schema as the act's schema gives it. */
+    fun queryParameters(act: Act): List<Map<String, Any>> {
+        if (act.queryFields.isEmpty()) return emptyList()
+        @Suppress("UNCHECKED_CAST")
+        val schema = JsonTrees.plain(act.schema) as Map<String, Any?>
+        @Suppress("UNCHECKED_CAST")
+        val properties = schema["properties"] as Map<String, Map<String, Any>>
+        val required = (schema["required"] as? List<*>).orEmpty()
+        return act.queryFields.map { name ->
+            val property = properties.getValue(name)
+            mapOf(
+                "name" to name,
+                "in" to "query",
+                "required" to (name in required),
+                "description" to (property["description"] ?: property["title"] ?: name),
+                "schema" to property,
+            )
+        }
+    }
+
+    /** A required body of [mediaType], JSON unless said: a PATCH's is a JSON Merge Patch. */
+    fun requestBody(schema: String, mediaType: String = JSON): Map<String, Any> =
+        mapOf("required" to true, "content" to mapOf(mediaType to mapOf("schema" to ref(schema))))
 
     private fun content(description: String, mediaType: String, schema: Map<String, Any> = ref("Problem")) =
         mapOf("description" to description, "content" to mapOf(mediaType to mapOf("schema" to schema)))

@@ -34,8 +34,8 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
       | GET    | /lamps/{id}/history            | getLampHistory |
       | POST   | /lamps/{id}/actions/switch-on  | switchOn      |
       | POST   | /lamps/{id}/actions/switch-off | switchOff     |
-      | POST   | /lamps/{id}/actions/dim        | dim           |
-      | POST   | /lamps/{id}/actions/brighten   | dimFormer     |
+      | PUT    | /lamps/{id}/actions/dim        | dim           |
+      | PUT    | /lamps/{id}/actions/brighten   | dimFormer     |
       | POST   | /actions/install-lamp          | installLamp   |
 
   Scenario: The description says where to learn which acts a resource allows now

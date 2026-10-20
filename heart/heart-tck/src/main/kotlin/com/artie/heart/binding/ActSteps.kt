@@ -12,13 +12,13 @@ import org.springframework.http.HttpStatus
 /** Acting on a lamp or at the bookmark, and what the answer says. */
 class ActSteps(private val http: HttpWorld) {
 
-    @When("^a client posts (.*) to \"(.+)\" as (\\S+) with If-Match \"(.*)\"$")
-    fun post(body: String, path: String, dialect: String, ifMatch: String) {
+    @When("^a client (posts|puts|patches|deletes) (.*) to \"(.+)\" as (\\S+) with If-Match \"(.*)\"$")
+    fun post(verb: String, body: String, path: String, dialect: String, ifMatch: String) {
         // A regex step keeps Gherkin's \" escapes; a validator's quotes are part of it.
         val validator = ifMatch.takeIf { it.isNotEmpty() }?.let { http.expand(it.replace("\\\"", "\"")) }
         val headers = mapOf(HttpHeaders.ACCEPT to accept(dialect)) +
             listOfNotNull(validator?.let { HttpHeaders.IF_MATCH to it })
-        http.post(path, body, headers)
+        http.send(method(verb), path, body, headers)
     }
 
     /** A bookmark act's owning resource is the service index: the client syncs it, then sends its ETag. */
@@ -71,6 +71,16 @@ class ActSteps(private val http: HttpWorld) {
         table.asMaps().map { it.getValue("target") }.toSet(),
         http.json.path("_templates").map { it.path("target").asText() }.toSet(),
     )
+
+    companion object {
+        /** The method a step's verb names: posts, puts, patches, deletes. */
+        fun method(verb: String): String = when (verb) {
+            "puts" -> "PUT"
+            "patches" -> "PATCH"
+            "deletes" -> "DELETE"
+            else -> "POST"
+        }
+    }
 
     @Then("the response links its profile {string}")
     fun linksProfile(profile: String) {

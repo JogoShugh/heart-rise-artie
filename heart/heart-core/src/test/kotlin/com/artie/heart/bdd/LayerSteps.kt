@@ -44,12 +44,12 @@ class LayerSteps(private val world: LampWorld) {
     @Then("the body has no forms")
     fun noForms() = assertFalse("_forms" in body)
 
-    @Then("the {string} form targets {string} with POST")
-    fun formTargets(key: String, href: String) {
+    @Then("the {string} form targets {string} with {word}")
+    fun formTargets(key: String, href: String, method: String) {
         val form = forms(body).getValue(key) as Map<String, Any?>
         assertEquals(href, link(form, "target")["href"])
         assertFalse("templated" in link(form, "target"))
-        assertEquals("POST", form["method"])
+        assertEquals(method, form["method"])
         assertFalse("hr:templatePointers" in form)
     }
 

@@ -72,7 +72,11 @@ class Profile(val name: String, val title: String, val doc: String, val relation
  * only [path], and the OpenAPI description marks each one deprecated.
  * [options] says where a property's choices are (HAL-SCHEMA-FORMS-HR Rule 8);
  * its schema carries them as `hr:options`, and a value outside them is refused.
+ * [method] is the HTTP method the act is served by (SPEC §6.2): POST, the
+ * default, PUT, PATCH or DELETE, as its relation's ALPS type agrees.
  */
+// A declaration names each of its parts once, by name; grouping them would only rename them.
+@Suppress("LongParameterList")
 data class Act(
     val name: String,
     val relation: String,
@@ -81,6 +85,7 @@ data class Act(
     val input: Class<*>? = null,
     val formerPaths: List<String> = emptyList(),
     val options: Map<String, Options> = emptyMap(),
+    val method: String = POST,
 ) {
     /** This act with choices for some of its properties: its schema carries them as `hr:options`. */
     fun withOptions(choices: Map<String, Options>): Act =
@@ -89,7 +94,33 @@ data class Act(
     /** Whether a request to [segment] reaches this act: its path, or one it was served at before. */
     fun answersAt(segment: String): Boolean = segment == path || segment in formerPaths
 
+    /** The body the act takes: a JSON Merge Patch for a PATCH (RFC 7396), JSON otherwise; none for a DELETE. */
+    val contentType: String?
+        get() = when (method) {
+            DELETE -> null
+            PATCH -> MERGE_PATCH
+            else -> JSON
+        }
+
+    /** The fields a DELETE takes as its query, in its schema's order; none for any other method. */
+    val queryFields: List<String>
+        get() = if (method == DELETE) InputSchemas.propertyNames(schema) else emptyList()
+
+    /** What follows the act's path in its target: a DELETE's query, as a URI template (`{?tag,count}`). */
+    val querySuffix: String
+        get() = queryFields.takeIf { it.isNotEmpty() }?.joinToString(",", "{?", "}").orEmpty()
+
     companion object {
+        const val POST = "POST"
+        const val PUT = "PUT"
+        const val PATCH = "PATCH"
+        const val DELETE = "DELETE"
+        const val JSON = "application/json"
+        const val MERGE_PATCH = "application/merge-patch+json"
+
+        /** The methods an act may be served by. */
+        val METHODS: List<String> = listOf(POST, PUT, PATCH, DELETE)
+
         /** An act whose body is [input]: its schema is generated from the class (see InputSchemas). */
         fun of(
             name: String,
@@ -97,7 +128,8 @@ data class Act(
             input: Class<*>,
             path: String = relation,
             formerPaths: List<String> = emptyList(),
-        ): Act = Act(name, relation, InputSchemas.of(input), path, input, formerPaths)
+            method: String = POST,
+        ): Act = Act(name, relation, InputSchemas.of(input), path, input, formerPaths, method = method)
     }
 }
 
@@ -236,6 +268,12 @@ class ResourceType<S, K>(
 
     init {
         allActs.forEach { profile.relation(it.relation) }
+        acts.forEach { checkMethod(it, profile.relation(it.relation).type) }
+        bookmarkActs.forEach {
+            require(it.method == Act.POST) {
+                "bookmark act ${it.name} brings a resource into being, so it is a POST"
+            }
+        }
         finding?.let { profile.relation(it.search.relation) }
         finding?.let { profile.relation(it.lookup.relation) }
         require(bookmarkActs.isEmpty() || finding != null) { "$collection has bookmark acts, so it is found too" }
@@ -255,6 +293,21 @@ class ResourceType<S, K>(
             }
         }
         embedded.flatMap { it.relations }.forEach { profile.relation(it) }
+    }
+
+    /**
+     * Refuses [act] when its method is none an act may have, or its relation's ALPS [type] disagrees with it
+     * (HAL-SCHEMA-FORMS-HR Rule 7): a PUT or a DELETE is idempotent, a POST or a PATCH unsafe.
+     */
+    private fun checkMethod(act: Act, type: AlpsType) {
+        val method = act.method
+        require(method in Act.METHODS) {
+            "act ${act.name} can't be a $method: an act is served by POST, PUT, PATCH or DELETE"
+        }
+        val wanted = if (method == Act.PUT || method == Act.DELETE) AlpsType.IDEMPOTENT else AlpsType.UNSAFE
+        require(type == wanted) {
+            "act ${act.name} is a $method, so its relation ${act.relation} must be ${wanted.name.lowercase()}"
+        }
     }
 
     /** Takes what [embedded] names out of [body], a mutable copy of a state, as HAL's `_embedded`. */

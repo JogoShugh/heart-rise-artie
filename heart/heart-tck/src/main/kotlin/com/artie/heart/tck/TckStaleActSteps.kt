@@ -51,7 +51,7 @@ class TckStaleActSteps(
         world.hold(asSchemaForms)
         val ifMatch = HttpHeaders.IF_MATCH to checkNotNull(world.heldETag)
         val target = "${world.resource}/actions/${fixture.offered.path}"
-        val answer = world.post(target, fixture.offered.body, asSchemaForms + ifMatch)
+        val answer = world.post(target, fixture.offered.body, asSchemaForms + ifMatch, fixture.offered.method)
         assertEquals(HttpStatus.OK, answer.status, "the other client's act was refused")
         otherETag = answer.responseHeaders.eTag
     }

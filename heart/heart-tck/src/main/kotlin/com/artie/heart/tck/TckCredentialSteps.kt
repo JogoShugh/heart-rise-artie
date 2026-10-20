@@ -18,7 +18,8 @@ class TckCredentialSteps(private val fixture: TckFixture, private val world: Tck
 
     @When("a client with no credential sends the offered act with its valid body")
     fun act() = bare {
-        world.post("${world.resource}/actions/${fixture.offered.path}", fixture.offered.body, emptyMap())
+        val offered = fixture.offered
+        world.post("${world.resource}/actions/${offered.path}", offered.body, emptyMap(), offered.method)
     }
 
     @When("a client with no credential follows the {string} link")

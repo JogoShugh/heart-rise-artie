@@ -20,7 +20,7 @@ Feature: A resource knows who asks, and may refuse them
 
   Scenario: An act is handed the caller's credential
     When a client gets "/repos/acme/rockets/pulls/482" as hal-schema-forms
-    And the client posts {} to "/repos/acme/rockets/pulls/482/actions/close" with the ETag and headers it synced with
+    And the client puts {} to "/repos/acme/rockets/pulls/482/actions/close" with the ETag and headers it synced with
     Then the response status is 200
     And the pull request server was last asked by "Bearer lamp-token"
 

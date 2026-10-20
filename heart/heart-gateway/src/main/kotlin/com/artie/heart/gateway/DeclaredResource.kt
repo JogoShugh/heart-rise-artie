@@ -54,7 +54,11 @@ internal class DeclaredResource(
     // An act's relation is the file's name for it, shared by every resource that does it (github:close);
     // its own name is the resource's (issue-close), so OpenAPI's operations and schemas stay apart.
     private val actName = { act: ActDeclaration -> "${declared.noun}-${act.name}" }
-    private val acts = declared.acts.map { Act(actName(it), it.name, schema(it, spec.route(it.operation)), it.name) }
+    // Each act is served by its operation's own method, as GitHub serves it (SPEC §6.2).
+    private val acts = declared.acts.map {
+        val route = spec.route(it.operation)
+        Act(actName(it), it.name, schema(it, route), it.name, method = route.method)
+    }
     private val keys = OfferKeys(acts, { answer ->
         val addressed = address?.of(answer) ?: answer
         read(addressed.with(facts(addressed.body)))

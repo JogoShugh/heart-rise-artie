@@ -38,7 +38,23 @@ class HttpWorld(
         exchange(client.get().uri(path), headers)
 
     fun post(path: String, body: String, headers: Map<String, String>): EntityExchangeResult<ByteArray> =
-        exchange(client.post().uri(path).header(HttpHeaders.CONTENT_TYPE, "application/json").bodyValue(body), headers)
+        send("POST", path, body, headers)
+
+    /**
+     * An act sent by [method]: a POST or a PUT with a JSON [body], a PATCH with a JSON Merge Patch, a DELETE with
+     * none, its fields being its query.
+     */
+    fun send(
+        method: String,
+        path: String,
+        body: String,
+        headers: Map<String, String>,
+    ): EntityExchangeResult<ByteArray> {
+        val request = client.method(org.springframework.http.HttpMethod.valueOf(method)).uri(path)
+        val type = if (method == "PATCH") "application/merge-patch+json" else "application/json"
+        val sent = if (method == "DELETE") request else request.header(HttpHeaders.CONTENT_TYPE, type).bodyValue(body)
+        return exchange(sent, headers)
+    }
 
     /** The latest read of a resource's Layer 1, a lamp's or a pull request's, whatever came after it. */
     fun layer1(): EntityExchangeResult<ByteArray> =

@@ -30,7 +30,7 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
 
   Scenario Outline: An act sent with the headers it read with matches the ETag it holds: <dialect>, Prefer "<prefer>"
     When a client gets "/lamps/7" as <dialect> with Prefer "<prefer>"
-    And the client posts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag and headers it synced with
+    And the client puts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag and headers it synced with
     Then the response status is 200
     And the response has ETag "<etag>"
 
@@ -45,7 +45,7 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
     The lamp has not changed, but the client read L2 and now asks for L0.
     Strong comparison sees two different entity-tags.
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "forms=link, schema=link"
-    And the client posts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag it holds but Prefer ""
+    And the client puts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag it holds but Prefer ""
     Then the response status is 412
     And lamp 7 is still at version 3
 
@@ -54,21 +54,21 @@ Feature: Conditional requests over HTTP: revalidating Layer 1, and acting on wha
     on the state whose ETag matched, never on one read again afterwards, so
     a write that lands between the check and the act is caught too.
     Given another client's dim to 80 lands on lamp 7 just after the server checks the next act's If-Match
-    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    When a client puts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 412
     And lamp 7 has brightness 80 at version 4
 
   Scenario: If-Match * matches whatever representation the act's headers select
-    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "*"
+    When a client puts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "*"
     Then the response status is 200
 
   Scenario: A body that is not JSON at all is a bad request, not a schema failure, and changes nothing
-    When a client posts {"brightness": to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    When a client puts {"brightness": to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 400
     And lamp 7 is still at version 3
 
   Scenario: A refusal names what it refused: the act not offered, or each field that failed
     When a client posts {} to "/lamps/7/actions/switch-on" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the problem's "rel" member is "/profiles/home#switch-on"
-    When a client posts {"brightness": 0} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    When a client puts {"brightness": 0} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the problem lists a violation at "/brightness"

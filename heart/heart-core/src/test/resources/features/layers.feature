@@ -20,7 +20,7 @@ Feature: A declared resource type is rendered in three layers
       | act             |
       | home:switch-off |
       | home:dim        |
-    And the "home:dim" form targets "/lamps/7/actions/dim" with POST
+    And the "home:dim" form targets "/lamps/7/actions/dim" with PUT
     And the "home:dim" form embeds its schema, with its address as "$id"
     And the body links "hr:unavailable" to an explanation, with its integrity
 
@@ -55,7 +55,7 @@ Feature: A declared resource type is rendered in three layers
       | member              | value                                  |
       | target              | /lamps/{id}/actions/dim                |
       | hr:templatePointers | {"id": "/id"}                          |
-      | method              | POST                                   |
+      | method              | PUT                                    |
       | contentType         | application/json                       |
       | schema              | the integrity of the "home:dim" schema |
     And the forms "home:dim" and "home:switch-off" have different integrities

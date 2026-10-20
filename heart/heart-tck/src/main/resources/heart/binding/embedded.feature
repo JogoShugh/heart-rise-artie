@@ -28,5 +28,5 @@ Feature: A binding serves the resources a state embeds
   Scenario: A change to the embedded author makes the held ETag stale
     When a client gets "/repos/acme/rockets/pulls/482" as hal-schema-forms
     And the author of pull request 482 of "acme/rockets" becomes "bo" in the pull request server
-    And the client posts {} to "/repos/acme/rockets/pulls/482/actions/close" with the ETag and headers it synced with
+    And the client puts {} to "/repos/acme/rockets/pulls/482/actions/close" with the ETag and headers it synced with
     Then the response status is 412

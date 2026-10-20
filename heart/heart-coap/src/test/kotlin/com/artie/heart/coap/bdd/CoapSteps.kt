@@ -143,11 +143,17 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
         send(read(path).apply { options.addOption(Option(CoapOptions.ACCEPT_PROFILE, "<$HAL_FORMS_PROFILE>")) })
 
     /** [ifMatch] is "no If-Match", "If-Match \"<text>\"" or "the ETag it holds". */
-    @When("the CoAP client posts {} to {string} with {}")
-    fun post(body: String, path: String, ifMatch: String) {
-        val request = Request.newPost().apply {
+    @When("^the CoAP client (posts|puts|patches|deletes) (.*) to \"(.+)\" with (.*)$")
+    fun post(verb: String, body: String, path: String, ifMatch: String) {
+        val code = when (verb) {
+            "puts" -> org.eclipse.californium.core.coap.CoAP.Code.PUT
+            "patches" -> org.eclipse.californium.core.coap.CoAP.Code.PATCH
+            "deletes" -> org.eclipse.californium.core.coap.CoAP.Code.DELETE
+            else -> org.eclipse.californium.core.coap.CoAP.Code.POST
+        }
+        val request = Request(code).apply {
             setURI(uri(path))
-            setPayload(body)
+            if (verb != "deletes") setPayload(body)
             options.contentFormat = CoapOptions.JSON
             if (prefer.isNotEmpty()) options.addOption(Option(CoapOptions.PREFER, prefer))
         }

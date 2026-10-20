@@ -60,13 +60,13 @@ Feature: The OpenAPI 3.1 description, served and linked from the bookmark
       | GET    | /lamps/{id}/history                                 |
       | POST   | /lamps/{id}/actions/switch-on                       |
       | POST   | /lamps/{id}/actions/switch-off                      |
-      | POST   | /lamps/{id}/actions/dim                             |
-      | POST   | /lamps/{id}/actions/brighten                        |
+      | PUT    | /lamps/{id}/actions/dim                             |
+      | PUT    | /lamps/{id}/actions/brighten                        |
       | POST   | /actions/install-lamp                               |
       | GET    | /repos/{owner}/{repo}/pulls                         |
       | GET    | /repos/{owner}/{repo}/pulls/{number}                |
-      | POST   | /repos/{owner}/{repo}/pulls/{number}/actions/close  |
-      | POST   | /repos/{owner}/{repo}/pulls/{number}/actions/reopen |
+      | PUT    | /repos/{owner}/{repo}/pulls/{number}/actions/close  |
+      | PUT    | /repos/{owner}/{repo}/pulls/{number}/actions/reopen |
       | POST   | /repos/{owner}/{repo}/pulls/{number}/actions/split  |
 
   Scenario: The description says what a plain client gets, and the server answers just that

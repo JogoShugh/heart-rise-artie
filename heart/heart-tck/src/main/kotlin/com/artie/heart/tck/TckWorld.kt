@@ -34,10 +34,18 @@ class TckWorld(private val client: WebTestClient, private val fixture: TckFixtur
         return spec.exchange().expectBody().returnResult().also { results += it }
     }
 
-    fun post(path: String, body: String, headers: Map<String, String>): EntityExchangeResult<ByteArray> {
-        val spec = sender().post().uri(path).header(HttpHeaders.CONTENT_TYPE, "application/json")
+    /** An act sent by [method], as its form says: a PATCH's body is a JSON Merge Patch, a DELETE has none. */
+    fun post(
+        path: String,
+        body: String,
+        headers: Map<String, String>,
+        method: String = "POST",
+    ): EntityExchangeResult<ByteArray> {
+        val spec = sender().method(org.springframework.http.HttpMethod.valueOf(method)).uri(path)
         (credential() + headers).forEach { (name, value) -> spec.header(name, value) }
-        return spec.bodyValue(body).exchange().expectBody().returnResult().also { results += it }
+        val type = if (method == "PATCH") "application/merge-patch+json" else "application/json"
+        val sent = if (method == "DELETE") spec else spec.header(HttpHeaders.CONTENT_TYPE, type).bodyValue(body)
+        return sent.exchange().expectBody().returnResult().also { results += it }
     }
 
     private fun credential(): Map<String, String> =

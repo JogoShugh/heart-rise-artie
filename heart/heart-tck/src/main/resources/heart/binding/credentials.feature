@@ -25,7 +25,7 @@ Feature: A HEART service admits only callers with a credential
       | unknown token         | with Bearer "other-token" sends         | GET    | /lamps/7                 | 401    |
       | not Base64            | with the Authorization "Basic %%%" sends | GET   | /lamps/7                 | 401    |
       | another scheme        | with the Authorization "Digest x" sends | GET    | /lamps/7                 | 401    |
-      | an act                | with no credential sends                | POST   | /lamps/7/actions/dim     | 401    |
+      | an act                | with no credential sends                | PUT    | /lamps/7/actions/dim     | 401    |
       | the bookmark          | with no credential sends                | GET    | /                        | 401    |
       | a search              | with no credential sends                | GET    | /lamps?name=Lamp         | 401    |
       | a past state          | with no credential sends                | GET    | /lamps/7/history         | 401    |

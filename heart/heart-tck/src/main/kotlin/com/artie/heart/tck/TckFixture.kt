@@ -62,7 +62,8 @@ interface TckFixture {
 /**
  * An act as the features use it: its relation as a form key (`garden:water-cell`),
  * its action path, a body, and for the offered act a body its schema refuses
- * and the JSON Pointer that refusal names; for the absent act, its reason.
+ * and the JSON Pointer that refusal names; for the absent act, its reason; and the
+ * [method] its form says it is served by.
  */
 data class TckAct(
     val key: String,
@@ -71,4 +72,5 @@ data class TckAct(
     val invalidBody: String? = null,
     val invalidPointer: String? = null,
     val reason: String? = null,
+    val method: String = "POST",
 )

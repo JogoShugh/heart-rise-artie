@@ -17,15 +17,16 @@ class FollowSteps(private val http: HttpWorld) {
         http.get(held.url.path, headers)
     }
 
-    @When("the client posts {} to {string} with the ETag and headers it synced with")
-    fun postSynced(body: String, path: String) {
-        http.post(path, body, http.negotiation(http.layer1()) + ifMatch())
+    @When("^the client (posts|puts|patches|deletes) (.*) to \"(.+)\" with the ETag and headers it synced with$")
+    fun postSynced(verb: String, body: String, path: String) {
+        http.send(ActSteps.method(verb), path, body, http.negotiation(http.layer1()) + ifMatch())
     }
 
-    @When("the client posts {} to {string} with the ETag it holds but Prefer {string}")
-    fun postWithOtherPrefer(body: String, path: String, prefer: String) {
+    @When("^the client (posts|puts|patches|deletes) (.*) to \"(.+)\" with the ETag it holds but Prefer \"(.*)\"$")
+    fun postWithOtherPrefer(verb: String, body: String, path: String, prefer: String) {
         val synced = http.negotiation(http.layer1()) - "Prefer"
-        http.post(path, body, (if (prefer.isBlank()) synced else synced + ("Prefer" to prefer)) + ifMatch())
+        val headers = (if (prefer.isBlank()) synced else synced + ("Prefer" to prefer)) + ifMatch()
+        http.send(ActSteps.method(verb), path, body, headers)
     }
 
     @When("the client follows the {string} link")
@@ -39,7 +40,8 @@ class FollowSteps(private val http: HttpWorld) {
         http.get(http.json(http.layer1()).path("_links").path(rel).path("href").asText(), mapOf("Prefer" to prefer))
     }
 
-    @When("the client expands {string} by its template pointers and posts {} with the ETag it holds")
+    /** The form says its method; the client sends by it. */
+    @When("the client expands {string} by its template pointers and sends {} with the ETag it holds")
     fun expandAndPost(key: String, body: String) {
         val held = http.layer1()
         val form = http.json.path("_forms").path(key)
@@ -47,7 +49,7 @@ class FollowSteps(private val http: HttpWorld) {
         val target = VARIABLE.replace(form.path("_links").path("target").path("href").asText()) {
             http.json(held).at(pointers.path(it.groupValues[1]).asText()).asText()
         }
-        http.post(target, body, http.negotiation(held) + ifMatch())
+        http.send(form.path("method").asText(), target, body, http.negotiation(held) + ifMatch())
     }
 
     @When("the client fills the {string} form with id {long} and follows it")

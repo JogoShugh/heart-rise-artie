@@ -58,6 +58,26 @@ Feature: GitHub issues through the gateway: reading them, and closing, reopening
       | closed, locked | close-not-planned | The issue is already closed.       |
       | closed, locked | close-duplicate   | The issue is already closed.       |
 
+  Scenario: Each act's form takes GitHub's own method
+    SPEC §6.2: the gateway serves an act by the method of the GitHub
+    operation it projects. A PATCH takes a JSON Merge Patch; a DELETE takes
+    no body, its fields being its target's query.
+    When "ada" gets "/repos/acme/rockets/issues/10" through the GitHub gateway
+    Then the issue's forms say
+      | form            | method | contentType                  | target                                                    |
+      | github:close    | PATCH  | application/merge-patch+json | /repos/acme/rockets/issues/10/actions/close               |
+      | github:edit     | PATCH  | application/merge-patch+json | /repos/acme/rockets/issues/10/actions/edit                |
+      | github:lock     | PUT    | application/json             | /repos/acme/rockets/issues/10/actions/lock                |
+      | github:comment  | POST   | application/json             | /repos/acme/rockets/issues/10/actions/comment             |
+      | github:unlabel  | DELETE |                              | /repos/acme/rockets/issues/10/actions/unlabel{?name}      |
+      | github:unassign | DELETE |                              | /repos/acme/rockets/issues/10/actions/unassign{?assignees} |
+
+  Scenario: An act sent by another method than its form's is refused, and GitHub is never asked
+    When "ada" gets "/repos/acme/rockets/issues/10" through the GitHub gateway
+    And the client sends "github:close" by POST with {} and the ETag it holds
+    Then the GitHub gateway answers 405
+    And GitHub was never asked to PATCH "/repos/acme/rockets/issues/10"
+
   Scenario Outline: Each act is GitHub's operation with its own body
     When "ada" gets "/repos/acme/rockets/issues/<issue>" through the GitHub gateway
     And the client sends "github:<act>" with <sent> and the ETag it holds

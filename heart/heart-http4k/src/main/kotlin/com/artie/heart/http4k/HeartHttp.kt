@@ -105,7 +105,8 @@ class HeartHttp(
                 indexHandler.listed(resource, relation, it)
             }
         } + listOfNotNull(
-            "$item/actions/{path}" bind POST to handler::act,
+            // Any method: the act says which it is served by, and refuses another with 405 (SPEC §6.2).
+            "$item/actions/{path}" bind { request: Request -> handler.act(request) },
             resource.past?.let { "$item/history" bind GET to handler::history },
         )
     }

@@ -1,6 +1,8 @@
 package com.artie.heart.coap
 
+import com.artie.heart.Act
 import com.artie.heart.ActPipeline
+import com.artie.heart.ActRequests
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
@@ -48,7 +50,7 @@ internal class CoapRoutes(
         val typed = segments.firstOrNull()?.let { types[it] }
         return when {
             !acceptable(request) -> replies.error(ResponseCode.NOT_ACCEPTABLE, "only hal-schema-forms is served")
-            request.code == Code.POST -> post(request, typed, segments)
+            request.code in ACT_CODES -> post(request, typed, segments)
             request.code != Code.GET -> replies.error(ResponseCode.METHOD_NOT_ALLOWED, "${request.code} $path")
             typed != null && segments.size == 1 -> search(typed, request)
             typed != null && segments.size == 2 -> typed.read(request, id(segments[1]))
@@ -56,13 +58,18 @@ internal class CoapRoutes(
         }
     }
 
-    /** An act at `/{collection}/{id}/actions/{path}`, or one the bookmark offers at `/actions/{path}`. */
+    /**
+     * An act at `/{collection}/{id}/actions/{path}`, by the method it is served by, or one the bookmark offers at
+     * `/actions/{path}`, always a POST.
+     */
     private suspend fun post(request: Request, typed: Typed?, segments: List<String>): Response {
         val atBookmark = segments.size == 2 && segments[0] == ACTIONS
         val owner = if (atBookmark) types.values.firstOrNull { it.offersAtBookmark(segments[1]) } else null
         return when {
             typed != null && segments.size == ACT_SEGMENTS && segments[2] == ACTIONS ->
                 typed.act(request, id(segments[1]), segments[ACT_SEGMENTS - 1])
+            owner != null && request.code != Code.POST ->
+                replies.error(ResponseCode.METHOD_NOT_ALLOWED, "${request.code} ${request.options.uriPathString}")
             owner != null -> owner.actAtBookmark(request, segments[1])
             atBookmark -> replies.error(ResponseCode.NOT_FOUND, request.options.uriPathString)
             else -> replies.error(ResponseCode.METHOD_NOT_ALLOWED, "POST ${request.options.uriPathString}")
@@ -120,14 +127,24 @@ internal class CoapRoutes(
         /** SPEC §6.2 over CoAP: the same checks, in the same order, with the 8-byte validator. */
         suspend fun act(request: Request, id: Long, path: String): Response {
             val act = resource.layers.type.acts.firstOrNull { it.answersAt(path) }
-                ?: return replies.error(ResponseCode.NOT_FOUND, path)
+            return when {
+                act == null -> replies.error(ResponseCode.NOT_FOUND, path)
+                !ActRequests.allowed(act, request.code.name) ->
+                    replies.error(ResponseCode.METHOD_NOT_ALLOWED, "${request.code} $path: it is a ${act.method}")
+                else -> performed(request, id, act)
+            }
+        }
+
+        /** [act], checked and performed on resource [id]. */
+        private suspend fun performed(request: Request, id: Long, act: Act): Response {
             val rung = rung(request)
             val held = request.options.ifMatch.takeIf { it.isNotEmpty() }
             val checked = pipeline.check(act.name, held, { resource.load(id) }) { current, validators ->
                 validators.any { it.contentEquals(validatorOf(current, rung)) }
             }
             // The act is performed on the state whose validator matched, so a write since is stale.
-            val done = pipeline.run(act.name, request.payloadString, checked) { input ->
+            val sent = ActRequests.input(act, request.payloadString, request.options.uriQueryString)
+            val done = pipeline.run(act.name, sent, checked) { input ->
                 resource.perform(checked, act.name, input)
             }
             val body = resource.layers.layer1(done.state, rung)
@@ -172,6 +189,9 @@ internal class CoapRoutes(
 
     private companion object {
         const val ACT_SEGMENTS = 4
+
+        /** The codes an act may be sent by; each act takes only its own. */
+        val ACT_CODES = setOf(Code.POST, Code.PUT, Code.PATCH, Code.DELETE)
         const val ACTIONS = "actions"
         const val DAY = 86_400L
         const val HAL = CoapOptions.HAL_JSON

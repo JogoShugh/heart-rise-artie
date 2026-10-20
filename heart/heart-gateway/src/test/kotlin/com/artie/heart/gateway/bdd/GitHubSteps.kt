@@ -469,15 +469,28 @@ class GitHubSteps {
     fun absent(key: String, reason: String) =
         assertEquals(reason, reasons()["/profiles/github#${key.substringAfter(':')}"], "${reasons()}")
 
+    /** The client sends by the form's method, as its form says: a DELETE's fields fill its target's query. */
     @When("the client sends {string} with {} and the ETag it holds")
-    fun send(key: String, body: String) {
+    fun send(key: String, body: String) = sendBy(key, null, body)
+
+    @When("the client sends {string} by {word} with {} and the ETag it holds")
+    fun sendBy(key: String, method: String?, body: String) {
         val etag = checkNotNull(responses.last().header("ETag"))
-        val target = json.path("_forms").path(key).path("_links").path("target").path("href").asText()
-        responses += gateway(
-            Request(Method.POST, target).header("Authorization", authorization)
-                .header("Accept", "application/hal+json").header("If-Match", etag)
-                .header("Content-Type", "application/json").body(body),
-        )
+        val form = json.path("_forms").path(key)
+        val by = method ?: form.path("method").asText()
+        val target = Forms.filled(form.path("_links").path("target").path("href").asText(), mapper.readTree(body))
+        val type = form.path("contentType").asText("application/json")
+        val request = Request(Method.valueOf(by), target).header("Authorization", authorization)
+            .header("Accept", "application/hal+json").header("If-Match", etag)
+        responses += gateway(if (by == "DELETE") request else request.header("Content-Type", type).body(body))
+    }
+
+    @Then("the issue's forms say")
+    fun formsSay(table: io.cucumber.datatable.DataTable) = table.asMaps().forEach { row ->
+        val form = json.path("_forms").path(row.getValue("form"))
+        assertEquals(row.getValue("method"), form.path("method").asText(), "$row")
+        assertEquals(row["contentType"].orEmpty(), form.path("contentType").asText(""), "$row")
+        assertEquals(row.getValue("target"), form.path("_links").path("target").path("href").asText(), "$row")
     }
 
     @Given("pull request {long}'s branch is behind its base")

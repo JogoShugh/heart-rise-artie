@@ -16,8 +16,11 @@ import io.swagger.v3.parser.core.models.ParseOptions
  */
 class SpecOperation(val name: String, val title: String, val doc: String, val relation: String)
 
-/** An act: its operation, its segment under `/actions/`, and its body's JSON Schema, every `$ref` resolved. */
-class SpecAct(val operation: SpecOperation, val path: String, val schema: String)
+/**
+ * An act: its operation, its segment under `/actions/`, its input's JSON Schema, every `$ref` resolved (a
+ * DELETE's from its query parameters), and the [method] it is served by.
+ */
+class SpecAct(val operation: SpecOperation, val path: String, val schema: String, val method: String = "POST")
 
 /** A search: its operation, and what its `name` and `id` parameters are. */
 class SpecSearch(val operation: SpecOperation, val nameDescription: String, val idDescription: String)
@@ -80,7 +83,7 @@ class GatewaySpec(text: String, include: Set<OperationId>? = null) {
 
     /** Each (path, method, operation) the gateway can use. */
     private val operations = api.paths.orEmpty().flatMap { (path, item) ->
-        listOfNotNull(item.get?.let { Triple(path, "GET", it) }, item.post?.let { Triple(path, "POST", it) })
+        item.readOperationsMap().map { (method, operation) -> Triple(path, method.name, operation) }
     }.filter { (_, _, operation) -> operation.deprecated != true }
 
     val types: List<SpecType> = operations.mapNotNull { (path, method, _) ->
@@ -98,8 +101,8 @@ class GatewaySpec(text: String, include: Set<OperationId>? = null) {
             )
         }
         val acts = operations.mapNotNull { (path, method, operation) ->
-            ACT.matchEntire(path)?.takeIf { method == "POST" && it.groupValues[1] == collection }
-                ?.let { act(operation, it.groupValues[2]) }
+            ACT.matchEntire(path)?.takeIf { method in ACT_METHODS && it.groupValues[1] == collection }
+                ?.let { act(operation, it.groupValues[2], method) }
         }
         val bookmarkActs = operations.mapNotNull { (path, method, operation) ->
             val tag = operation.tags.orEmpty().firstOrNull()
@@ -115,9 +118,24 @@ class GatewaySpec(text: String, include: Set<OperationId>? = null) {
         m == method && at.replace(PARAMETER, "{id}") == path
     }?.third
 
-    private fun act(operation: Operation, path: String): SpecAct {
-        val schema = operation.requestBody?.content?.get(JSON)?.schema
-        return SpecAct(operation(operation), path, schema?.let { mapper.writeValueAsString(it) } ?: "{}")
+    /** An act served by [method]: its input is its JSON (or JSON Merge Patch) body, or a DELETE's query. */
+    private fun act(operation: Operation, path: String, method: String = "POST"): SpecAct {
+        val content = operation.requestBody?.content
+        val body = (content?.get(JSON) ?: content?.get(MERGE_PATCH))?.schema
+        val schema = if (method == "DELETE") queryInput(operation) else body?.let { mapper.writeValueAsString(it) }
+        return SpecAct(operation(operation), path, schema ?: "{}", method)
+    }
+
+    /** The schema of a DELETE's input: one property per query parameter, required as the parameter is. */
+    private fun queryInput(operation: Operation): String? {
+        val query = operation.parameters.orEmpty().filter { it.`in` == "query" }
+        if (query.isEmpty()) return null
+        val properties = query.associate { it.name to plain(it.schema).orEmpty() }
+        val required = query.filter { it.required == true }.map { it.name }
+        return mapper.writeValueAsString(
+            mapOf("type" to "object", "properties" to properties) +
+                (if (required.isEmpty()) emptyMap() else mapOf("required" to required)),
+        )
     }
 
     private fun route(path: String, method: String, operation: Operation): SpecRoute {
@@ -145,6 +163,10 @@ class GatewaySpec(text: String, include: Set<OperationId>? = null) {
 
     private companion object {
         const val JSON = "application/json"
+        const val MERGE_PATCH = "application/merge-patch+json"
+
+        /** The methods an act is served by; a GET reads. */
+        val ACT_METHODS = setOf("POST", "PUT", "PATCH", "DELETE")
 
         /** The extension a HEART server's description names each operation's relation in. */
         const val RELATION = "x-heart-relation"

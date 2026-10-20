@@ -2,6 +2,7 @@ package com.artie.heart.spring
 
 import com.artie.heart.Act
 import com.artie.heart.ActPipeline
+import com.artie.heart.ActRequests
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
@@ -95,7 +96,10 @@ class HeartResourceHandler<S, K>(
         val act = type.acts.firstOrNull { it.answersAt(request.pathVariable("path")) }
         return when {
             act == null -> ServerResponse.notFound().buildAndAwait()
-            HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders()) -> actPlain(act.name, request)
+            !ActRequests.allowed(act, request.method().name()) ->
+                ServerResponse.status(HttpStatus.METHOD_NOT_ALLOWED).header(HttpHeaders.ALLOW, act.method)
+                    .buildAndAwait()
+            HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders()) -> actPlain(act, request)
             else -> actHeart(act, request)
         }
     }
@@ -110,7 +114,7 @@ class HeartResourceHandler<S, K>(
         val checked = pipeline.check(act.name, ifMatch, { resource.locate(variables) }) { current, held ->
             StateETag.matches(held, Rendered(current, dialect, rung).etag)
         }
-        val body = request.awaitBodyOrNull<String>()
+        val body = input(act, request)
         // The act is performed on the state whose ETag matched, so a write since is stale (SPEC §6.2).
         val done = pipeline.run(act.name, body, checked) { input -> resource.perform(checked, act.name, input) }
         return Rendered(done.state, dialect, rung).respond(
@@ -160,10 +164,11 @@ class HeartResourceHandler<S, K>(
      * the act is checked only against the state now, and refused after it
      * is sent when that state does not offer it.
      */
-    private suspend fun actPlain(name: String, request: ServerRequest): ServerResponse {
+    private suspend fun actPlain(act: Act, request: ServerRequest): ServerResponse {
+        val name = act.name
         val variables = variables(request)
         val checked = pipeline.checkOffered(name) { resource.locate(variables) }
-        val body = request.awaitBodyOrNull<String>()
+        val body = input(act, request)
         val done = pipeline.run(name, body, checked) { input -> resource.perform(checked, name, input) }
         return PlainJson.respond(
             (done.created?.let { ServerResponse.created(URI.create(it)) } ?: ServerResponse.ok())
@@ -221,4 +226,10 @@ class HeartResourceHandler<S, K>(
             Dialect.HALFORMS -> "${HttpHeaders.ACCEPT}, ${HttpNegotiation.ACCEPT_PROFILE}"
         }
     }
+}
+
+/** The act's input: the body, or a DELETE's query (SPEC §6.2). */
+private suspend fun input(act: Act, request: ServerRequest): String? {
+    val body = if (act.method == Act.DELETE) null else request.awaitBodyOrNull<String>()
+    return ActRequests.input(act, body, request.uri().rawQuery)
 }

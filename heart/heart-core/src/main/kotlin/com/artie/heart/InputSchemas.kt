@@ -82,6 +82,16 @@ object InputSchemas {
     /** The schema of [type], as JSON text. */
     fun of(type: Class<*>): String = generator.generateSchema(type).toString()
 
+    /** The names of the properties [schema] declares, in its order. */
+    fun propertyNames(schema: String): List<String> =
+        mapper.readTree(schema).path("properties").fieldNames().asSequence().toList()
+
+    /** The JSON Schema type [schema] gives property [name], or of its items when it is an array; null when none. */
+    fun propertyType(schema: String, name: String): Pair<String?, String?> {
+        val property = mapper.readTree(schema).path("properties").path(name)
+        return property.path("type").asText(null) to property.path("items").path("type").asText(null)
+    }
+
     private fun exampleValue(text: String): JsonNode =
         try {
             mapper.readTree(text)

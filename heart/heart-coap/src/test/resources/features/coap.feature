@@ -31,28 +31,39 @@ Feature: A declared resource over CoAP, served by heart-coap
 
   Scenario Outline: An act over CoAP: <case>
     Given a CoAP client got "/lamps/7" with Prefer ""
-    When the CoAP client posts <body> to "/lamps/7/actions/<action>" with <if-match>
+    When the CoAP client <sends> <body> to "/lamps/7/actions/<action>" with <if-match>
     Then the CoAP response is <code>
     And the CoAP problem type is "<problem>"
 
     Examples:
-      | case                  | action    | if-match          | body              | code | problem               |
-      | no validator          | dim       | no If-Match       | {"brightness": 5} | 4.00 | precondition-required |
-      | a stale validator     | dim       | If-Match "0000"   | {"brightness": 5} | 4.12 | stale                 |
-      | an act not offered    | switch-on | the ETag it holds | {}                | 4.09 | not-offered           |
-      | a body the form fails | dim       | the ETag it holds | {"brightness": 0} | 4.22 | invalid-input         |
-      | a rule of the lamp    | dim       | the ETag it holds | {"brightness": 50} | 4.22 | rule-refused          |
+      | case                  | sends | action    | if-match          | body              | code | problem               |
+      | no validator          | puts  | dim       | no If-Match       | {"brightness": 5} | 4.00 | precondition-required |
+      | a stale validator     | puts  | dim       | If-Match "0000"   | {"brightness": 5} | 4.12 | stale                 |
+      | an act not offered    | posts | switch-on | the ETag it holds | {}                | 4.09 | not-offered           |
+      | a body the form fails | puts  | dim       | the ETag it holds | {"brightness": 0} | 4.22 | invalid-input         |
+      | a rule of the lamp    | puts  | dim       | the ETag it holds | {"brightness": 50} | 4.22 | rule-refused          |
+
+  Scenario Outline: An act asked by a method not its own is refused with 4.05: <sends> <action>
+    Given a CoAP client got "/lamps/7" with Prefer ""
+    When the CoAP client <sends> <body> to "/lamps/7/actions/<action>" with the ETag it holds
+    Then the CoAP response is 4.05
+    And lamp 7 is at version 3
+
+    Examples:
+      | sends   | action     | body               |
+      | posts   | dim        | {"brightness": 20} |
+      | deletes | switch-off | {}                 |
 
   Scenario: A successful act answers with the lamp's new representation
     Given a CoAP client got "/lamps/7" with Prefer ""
-    When the CoAP client posts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag it holds
+    When the CoAP client puts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag it holds
     Then the CoAP response is 2.04
     And the CoAP body links self to "/lamps/7"
     And lamp 7 is at version 4
 
   Scenario: An act still answers at the path it moved from
     Given a CoAP client got "/lamps/7" with Prefer ""
-    When the CoAP client posts {"brightness": 20} to "/lamps/7/actions/brighten" with the ETag it holds
+    When the CoAP client puts {"brightness": 20} to "/lamps/7/actions/brighten" with the ETag it holds
     Then the CoAP response is 2.04
     And lamp 7 is at version 4
 

@@ -2,6 +2,7 @@ package com.artie.heart.http4k
 
 import com.artie.heart.Act
 import com.artie.heart.ActPipeline
+import com.artie.heart.ActRequests
 import com.artie.heart.Acted
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
@@ -83,10 +84,15 @@ class ResourceHandler<S, K>(
         val act = type.acts.firstOrNull { it.answersAt(checkNotNull(request.path("path"))) }
         return when {
             act == null -> Response(Status.NOT_FOUND)
-            Negotiation.wantsPlainJson(request.header(ACCEPT)) -> actPlain(act.name, request)
+            !ActRequests.allowed(act, request.method.name) ->
+                Response(Status.METHOD_NOT_ALLOWED).header(ALLOW, act.method)
+            Negotiation.wantsPlainJson(request.header(ACCEPT)) -> actPlain(act, request)
             else -> actHeart(act, request)
         }
     }
+
+    /** The act's input: the body, or a DELETE's query (SPEC §6.2). */
+    private fun input(act: Act, request: Request): String? = ActRequests.input(act, body(request), request.uri.query)
 
     /** An act in HEART: its validator checked first, as SPEC §6.2 says. */
     private fun actHeart(act: Act, request: Request): Response {
@@ -100,7 +106,9 @@ class ResourceHandler<S, K>(
                 StateETag.matches(held, Rendered(current, dialect, rung).etag)
             }
             // The act is performed on the state whose ETag matched, so a write since is stale (SPEC §6.2).
-            pipeline.run(act.name, body(request), checked) { input -> resource.perform(checked, act.name, input) }
+            pipeline.run(act.name, input(act, request), checked) { input ->
+                resource.perform(checked, act.name, input)
+            }
         }
         return Rendered(done.state, dialect, rung)
             .respond(added(Response(Status.OK).header(CONTENT_LOCATION, resource.location(done.state)), done))
@@ -138,11 +146,12 @@ class ResourceHandler<S, K>(
      * the act is checked only against the state now, and refused after it
      * is sent when that state does not offer it.
      */
-    private fun actPlain(name: String, request: Request): Response {
+    private fun actPlain(act: Act, request: Request): Response {
         val variables = variables(request)
+        val name = act.name
         val done = runBlocking {
             val checked = pipeline.checkOffered(name) { resource.locate(variables) }
-            pipeline.run(name, body(request), checked) { input -> resource.perform(checked, name, input) }
+            pipeline.run(name, input(act, request), checked) { input -> resource.perform(checked, name, input) }
         }
         val answered = added(Response(Status.OK).header(CONTENT_LOCATION, resource.location(done.state)), done)
         return plain(answered, done.state)
@@ -215,6 +224,7 @@ class ResourceHandler<S, K>(
 }
 
 internal const val ACCEPT = "Accept"
+internal const val ALLOW = "Allow"
 internal const val CONTENT_TYPE = "Content-Type"
 internal const val CONTENT_LOCATION = "Content-Location"
 internal const val IF_MATCH = "If-Match"

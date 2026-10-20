@@ -20,7 +20,7 @@ Feature: A binding serves each resource at its item path
 
   Scenario: An act at the L0 form's target closes the pull request
     When a client gets "/repos/acme/rockets/pulls/482" as hal-schema-forms
-    And the client posts {} to "/repos/acme/rockets/pulls/482/actions/close" with the ETag and headers it synced with
+    And the client puts {} to "/repos/acme/rockets/pulls/482/actions/close" with the ETag and headers it synced with
     Then the response status is 200
     And the response has Content-Location "/repos/acme/rockets/pulls/482"
     And pull request 482 of "acme/rockets" is now "closed" in the pull request server
@@ -28,7 +28,7 @@ Feature: A binding serves each resource at its item path
   Scenario: A client fills a shared form's target from the state, by its template pointers
     When a client gets "/repos/acme/rockets/pulls/482" as hal-schema-forms with Prefer "forms=link"
     And the client follows the "hr:forms" link
-    And the client expands "pulls:close" by its template pointers and posts {} with the ETag it holds
+    And the client expands "pulls:close" by its template pointers and sends {} with the ETag it holds
     Then the response status is 200
     And pull request 482 of "acme/rockets" is now "closed" in the pull request server
 

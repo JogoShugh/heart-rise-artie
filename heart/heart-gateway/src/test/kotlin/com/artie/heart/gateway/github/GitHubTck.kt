@@ -71,12 +71,15 @@ class GitHubThroughGateway {
             body = """{"merge_method": "squash"}""",
             invalidBody = """{"merge_method": "sideways"}""",
             invalidPointer = "/merge_method",
+            // GitHub merges by PUT, and reopens by PATCH: the gateway serves each act by its operation's method.
+            method = "PUT",
         )
         override val absent = TckAct(
             key = "github:reopen",
             path = "reopen",
             body = "{}",
             reason = "The pull request is already open.",
+            method = "PATCH",
         )
         override val credential = CREDENTIAL
         override val searchTerm = "Amazing"

@@ -120,17 +120,18 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         if (embedded.isNotEmpty()) body["_embedded"] = embedded
         val templates = offered(type.state.keyOf(state)).associate { name ->
             val act = type.act(name)
-            name to mapOf(
-                "title" to type.profile.relation(act.relation).title,
-                "method" to "POST",
-                "contentType" to JSON_CONTENT,
-                "target" to "$item/actions/${act.path}",
+            // A DELETE's properties go in the query, as a HAL-FORMS client sends a GET's.
+            name to buildMap {
+                put("title", type.profile.relation(act.relation).title)
+                put("method", act.method)
+                act.contentType?.let { put("contentType", it) }
+                put("target", "$item/actions/${act.path}")
                 // HAL-SCHEMA-FORMS-HR Rule 8: each property's choices for this state, as HAL-FORMS options.
-                "properties" to HalFormsProperties.of(
-                    act.schema,
-                    Options.halForms(act, state, type.state.bodyOf(state)),
-                ),
-            )
+                put(
+                    "properties",
+                    HalFormsProperties.of(act.schema, Options.halForms(act, state, type.state.bodyOf(state))),
+                )
+            }
         }
         if (templates.isNotEmpty()) body["_templates"] = templates
         return body
@@ -160,17 +161,17 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
             // HAL-SCHEMA-FORMS-HR Rule 3: a reference, pinned by the schema's integrity.
             mapOf("\$ref" to id, "hr:integrity" to ContentAddress.integrity(body))
         }
-        val target = "${type.itemPath.template}/actions/${act.path}"
-        return mapOf(
-            "title" to relation.title,
-            "description" to relation.description,
-            "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
-            TEMPLATE_POINTERS to type.itemPath.pointers,
-            "method" to "POST",
-            "contentType" to "application/json",
-            "schema" to schema,
-            FORM_INTEGRITY to formIntegrity(target, ContentAddress.integrity(body)),
-        )
+        val target = "${type.itemPath.template}/actions/${act.path}${act.querySuffix}"
+        return buildMap {
+            put("title", relation.title)
+            put("description", relation.description)
+            put("_links", mapOf("target" to mapOf("href" to target, "templated" to true)))
+            put(TEMPLATE_POINTERS, type.itemPath.pointers)
+            put("method", act.method)
+            act.contentType?.let { put("contentType", it) }
+            put("schema", schema)
+            put(FORM_INTEGRITY, formIntegrity(act, target, ContentAddress.integrity(body)))
+        }
     }
 
     /**
@@ -179,17 +180,21 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
      * title or description, so a retitled form keeps it; the same at every rung, whether the schema is
      * embedded or referred to.
      */
-    private fun formIntegrity(target: String, schemaIntegrity: String): String =
-        FormIntegrity.of(target, "POST", schemaIntegrity, type.itemPath.pointers, "application/json")
+    private fun formIntegrity(act: Act, target: String, schemaIntegrity: String): String =
+        FormIntegrity.of(target, act.method, schemaIntegrity, type.itemPath.pointers, act.contentType)
 
-    /** At L0 a form belongs to one resource: its target is concrete and needs no pointers. */
+    /**
+     * At L0 a form belongs to one resource: its target is concrete and needs no pointers, but for a DELETE's
+     * query, which stays a template the client fills.
+     */
     private fun resolved(form: Any?, item: String): Map<String, Any?> {
         @Suppress("UNCHECKED_CAST")
         val entry = form as Map<String, Any?>
         @Suppress("UNCHECKED_CAST")
         val target = (entry.getValue("_links") as Map<String, Map<String, Any?>>).getValue("target")
         val href = (target.getValue("href") as String).replace(type.itemPath.template, item)
-        return (entry - TEMPLATE_POINTERS) + ("_links" to mapOf("target" to mapOf("href" to href)))
+        val link = if ('{' in href) mapOf("href" to href, "templated" to true) else mapOf("href" to href)
+        return (entry - TEMPLATE_POINTERS) + ("_links" to mapOf("target" to link))
     }
 
     private fun explanationLink(key: K): Map<String, Any> = content.explanationLink(key)
@@ -204,7 +209,6 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         const val UNAVAILABLE_REL = "hr:unavailable"
         private const val TEMPLATE_POINTERS = "hr:templatePointers"
         private const val FORM_INTEGRITY = "hr:integrity"
-        private const val JSON_CONTENT = "application/json"
         internal val HR_CURIE: Map<String, Any> =
             mapOf("name" to "hr", "href" to "$HEART_RISE_PROFILE/rels/{rel}", "templated" to true)
     }

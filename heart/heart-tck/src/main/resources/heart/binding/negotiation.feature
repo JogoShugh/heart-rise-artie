@@ -61,5 +61,5 @@ Feature: Choosing the representation over HTTP: dialect, profile and rung
   Scenario: At a capped server, an act carrying the headers it synced with still matches its ETag
     Given the server serves rungs up to L0
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "forms=link, schema=link"
-    And the client posts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag and headers it synced with
+    And the client puts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag and headers it synced with
     Then the response status is 200

@@ -36,11 +36,12 @@ internal class OpenApiType(
         put(item, mapOf("get" to read()))
         if (keepsPast) put("$item/history", mapOf("get" to history()))
         type.acts.forEach { act ->
-            put("$item/actions/${act.path}", mapOf("post" to act(act)))
+            val method = act.method.lowercase()
+            put("$item/actions/${act.path}", mapOf(method to act(act)))
             // A path the act moved from still answers; it is its own operation, deprecated.
             act.formerPaths.forEach { former ->
                 val operation = act(act) + mapOf("operationId" to "${act.name}Former", "deprecated" to true)
-                put("$item/actions/$former", mapOf("post" to operation))
+                put("$item/actions/$former", mapOf(method to operation))
             }
         }
         type.bookmarkActs.forEach { put("$ACTIONS${it.path}", mapOf("post" to bookmarkAct(it))) }
@@ -114,8 +115,7 @@ internal class OpenApiType(
             "tags" to listOf(type.collection),
             "summary" to relation.title,
             "description" to "${relation.doc}\n\n${onlyWhen(act)}${Options.prose(act)}",
-            "parameters" to itemParameters,
-            "requestBody" to OpenApiShapes.requestBody(inputName(act)),
+            "parameters" to itemParameters + OpenApiShapes.queryParameters(act),
             "responses" to mapOf(
                 "200" to OpenApiShapes.withFormsLink(
                     OpenApiShapes.json("The $noun after the act", OpenApiShapes.ref(stateName)),
@@ -126,7 +126,11 @@ internal class OpenApiType(
                 "409" to OpenApiShapes.response("NotOffered"),
                 "422" to OpenApiShapes.response("Unprocessable"),
             ),
-        ).named(act.relation)
+        ).let { operation ->
+            // A DELETE takes no body: its fields are its query. A PATCH's body is a JSON Merge Patch.
+            act.contentType?.let { operation + ("requestBody" to OpenApiShapes.requestBody(inputName(act), it)) }
+                ?: operation
+        }.named(act.relation)
     }
 
     private fun bookmarkAct(act: Act): Map<String, Any> {

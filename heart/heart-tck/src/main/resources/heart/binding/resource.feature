@@ -59,7 +59,7 @@ Feature: A declared resource and its acts, served over HTTP
     Then the response status is 404
 
   Scenario: An act answers with the resource's new Layer 1, which it names
-    When a client posts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    When a client puts {"brightness": 20} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 200
     And the response has Content-Location "/lamps/7"
     And the response has ETag "\"seq-4.hsf.L0.{digest}\""
@@ -68,7 +68,7 @@ Feature: A declared resource and its acts, served over HTTP
   Scenario: An act still answers at the path it moved from, while its forms name only the new one
     The lamp's dim act used to be at "brighten". A client that kept the
     former target still reaches the act, with the same checks.
-    When a client posts {"brightness": 20} to "/lamps/7/actions/brighten" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    When a client puts {"brightness": 20} to "/lamps/7/actions/brighten" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 200
     And the response has Content-Location "/lamps/7"
     And the response body has "brightness" 20
@@ -79,23 +79,36 @@ Feature: A declared resource and its acts, served over HTTP
       | /lamps/7/actions/dim        |
 
   Scenario Outline: A refused act is a problem: <case>
-    When a client posts <body> to "/lamps/7/actions/<path>" as hal-schema-forms with If-Match "<ifMatch>"
+    When a client <sends> <body> to "/lamps/7/actions/<path>" as hal-schema-forms with If-Match "<ifMatch>"
     Then the response status is <status>
     And the response is a problem of type "<type>"
     And lamp 7 is still at version 3
 
     Examples:
-      | case                 | path      | ifMatch           | body              | status | type                  |
-      | no If-Match          | dim       |                   | {"brightness": 5} | 428    | precondition-required |
-      | stale If-Match       | dim       | "seq-2.hsf.L0"    | {"brightness": 5} | 412    | stale                 |
-      | not offered          | switch-on | "seq-3.hsf.L0.{digest}" | {}          | 409    | not-offered           |
-      | body breaks schema   | dim       | "seq-3.hsf.L0.{digest}" | {"brightness": 0} | 422 | invalid-input       |
+      | case                 | sends | path      | ifMatch           | body              | status | type                  |
+      | no If-Match          | puts  | dim       |                   | {"brightness": 5} | 428    | precondition-required |
+      | stale If-Match       | puts  | dim       | "seq-2.hsf.L0"    | {"brightness": 5} | 412    | stale                 |
+      | not offered          | posts | switch-on | "seq-3.hsf.L0.{digest}" | {}          | 409    | not-offered           |
+      | body breaks schema   | puts  | dim       | "seq-3.hsf.L0.{digest}" | {"brightness": 0} | 422 | invalid-input       |
+
+  Scenario Outline: An act asked by a method not its own is refused, and Allow names its own: <sends> <path>
+    SPEC §6.2: an act is served by the method its form says, and only by it.
+    When a client <sends> <body> to "/lamps/7/actions/<path>" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    Then the response status is 405
+    And the response has Allow "<allow>"
+    And lamp 7 is still at version 3
+
+    Examples:
+      | sends   | path       | body               | allow |
+      | posts   | dim        | {"brightness": 20} | PUT   |
+      | deletes | switch-off | {}                 | POST  |
+      | patches | dim        | {"brightness": 20} | PUT   |
 
   Scenario: A body the schema accepts but a rule of the lamp refuses is its own problem, naming the field
     SPEC §6.2. The lamp is at 50, and dimming it to 50 is a rule only the
     lamp knows; the body is valid. invalid-input would tell the client its
     form handling is wrong, so the refusal says what it is: rule-refused.
-    When a client posts {"brightness": 50} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
+    When a client puts {"brightness": 50} to "/lamps/7/actions/dim" as hal-schema-forms with If-Match "\"seq-3.hsf.L0.{digest}\""
     Then the response status is 422
     And the response is a problem of type "rule-refused"
     And the problem lists a violation at "/brightness"

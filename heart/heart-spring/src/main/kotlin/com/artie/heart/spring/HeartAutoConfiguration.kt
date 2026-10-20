@@ -73,7 +73,8 @@ class HeartAutoConfiguration {
                 resource.lists.keys.forEach { relation ->
                     GET(resource.layers.type.subCollections.getValue(relation)) { index.listed(resource, relation, it) }
                 }
-                POST("$item/actions/{path}") { handler.act(it) }
+                // Any method: the act says which it is served by, and refuses another with 405 (SPEC §6.2).
+                path("$item/actions/{path}").invoke { handler.act(it) }
                 if (resource.past != null) {
                     GET(item, queryParam("asOf") { true }) { handler.readAsOf(it) }
                     GET("$item/history") { handler.history(it) }

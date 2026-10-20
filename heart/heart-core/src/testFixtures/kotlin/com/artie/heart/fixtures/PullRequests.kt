@@ -88,7 +88,12 @@ object PullRequests {
     ): ResourceType<PullRequest, String> = ResourceType(
         collection = "pulls",
         profile = profile,
-        acts = listOf(Act("close", "close", "{}"), Act("reopen", "reopen", "{}"), Act("split", "split", "{}")),
+        // Closing and reopening are idempotent: their relations say so, and they are PUTs.
+        acts = listOf(
+            Act("close", "close", "{}", method = Act.PUT),
+            Act("reopen", "reopen", "{}", method = Act.PUT),
+            Act("split", "split", "{}"),
+        ),
         offers = Offers(
             keys = listOf("open", "closed"),
             offered = { if (it == "open") listOf("close", "split") else listOf("reopen") },

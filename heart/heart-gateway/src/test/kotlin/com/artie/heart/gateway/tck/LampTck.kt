@@ -117,6 +117,7 @@ class LampThroughGateway {
             body = """{"brightness": 20}""",
             invalidBody = """{"brightness": 0}""",
             invalidPointer = "/brightness",
+            method = "PUT",
         )
         override val absent = TckAct(
             key = "home:switch-on",

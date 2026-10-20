@@ -25,7 +25,7 @@ Feature: Forms over HTTP: named by relations, shared, and accepted where their t
   Scenario: A form's template, expanded by its pointers into Layer 1, is where the act is accepted
     When a client gets "/lamps/7" as hal-schema-forms with Prefer "forms=link, schema=link"
     And the client follows the "hr:forms" link
-    And the client expands "home:dim" by its template pointers and posts {"brightness": 20} with the ETag it holds
+    And the client expands "home:dim" by its template pointers and sends {"brightness": 20} with the ETag it holds
     Then the response status is 200
     And the response has Content-Location "/lamps/7"
 

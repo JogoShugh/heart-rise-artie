@@ -20,7 +20,7 @@ class TckActSteps(private val fixture: TckFixture, private val world: TckWorld) 
             "an If-Match that is stale" -> mapOf(HttpHeaders.IF_MATCH to "\"stale\"")
             else -> mapOf(HttpHeaders.IF_MATCH to checkNotNull(world.heldETag))
         }
-        world.post("${world.resource}/actions/${chosen.path}", text, world.heldHeaders + ifMatch)
+        world.post("${world.resource}/actions/${chosen.path}", text, world.heldHeaders + ifMatch, chosen.method)
     }
 
     @Then("the explanation gives the absent act's reason")

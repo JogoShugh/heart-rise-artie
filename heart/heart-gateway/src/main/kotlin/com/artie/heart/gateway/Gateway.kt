@@ -149,19 +149,28 @@ class Gateway(
                 val acts = connector.resources.flatMap { it.acts }
                 val modelled = spec.routes.values.filter { it.operation.name !in connector.passthrough }
                 modelled.filter { route -> acts.none { it.operation == route.operation.name } }.map { route ->
-                    relation(route.operation, if (route.method == "GET") AlpsType.SAFE else AlpsType.UNSAFE)
+                    relation(route.operation, alpsType(route.method))
                 } + acts.distinctBy { it.name }.map { act -> // close, reopen, edit: one relation, any resource
-                    Relation(act.name, AlpsType.UNSAFE, act.title, act.description, act.description)
+                    // An operation the description lacks is refused later, naming the connector's file.
+                    val type = alpsType(spec.routes[act.operation]?.method ?: Act.POST)
+                    Relation(act.name, type, act.title, act.description, act.description)
                 }
             } else {
                 spec.types.flatMap { type ->
-                    (type.acts + type.bookmarkActs).map { relation(it.operation, AlpsType.UNSAFE) } +
+                    (type.acts + type.bookmarkActs).map { relation(it.operation, alpsType(it.method)) } +
                         listOfNotNull(type.search?.operation, type.read).map { relation(it, AlpsType.SAFE) }
                 }.distinctBy { it.id }
             }
 
         fun relation(operation: SpecOperation, type: AlpsType) =
             Relation(id = operation.relation, type, operation.title, operation.doc, operation.doc)
+
+        /** What a request by [method] is (RFC 9110 §9.2): a GET safe, a PUT or a DELETE idempotent, else unsafe. */
+        fun alpsType(method: String): AlpsType = when (method) {
+            "GET" -> AlpsType.SAFE
+            Act.PUT, Act.DELETE -> AlpsType.IDEMPOTENT
+            else -> AlpsType.UNSAFE
+        }
     }
 }
 
@@ -246,8 +255,8 @@ internal class GatewayResource(
             if (read(calls.get("/${spec.collection}/${checked.id}")).state != checked.json) {
                 throw ConcurrentWriteException("${spec.noun} ${checked.id} changed upstream since it was checked")
             }
-            val path = acts.first { it.name == name }.path
-            Acted(state(calls.post("/${spec.collection}/${checked.id}/actions/$path", input.json.toString())))
+            val act = acts.first { it.name == name }
+            Acted(state(sent(act, "/${spec.collection}/${checked.id}/actions/${act.path}", input.json)))
         },
         find = if (spec.search == null) null else { name, id -> find(name, id) },
         performAtBookmark = if (bookmarkActs.isEmpty()) null else { name, input ->
@@ -257,6 +266,14 @@ internal class GatewayResource(
     )
 
     private fun state(answer: Answer): UpstreamState = keys.state(answer)
+
+    /** [act] sent to the upstream's twin at [target] by its own method: a DELETE with [input] as its query. */
+    private fun sent(act: Act, target: String, input: JsonNode): Answer =
+        if (act.method == Act.DELETE) {
+            calls.act(Act.DELETE, target + Queries.of(input), "{}", RefusalStatuses())
+        } else {
+            calls.act(act.method, target, input.toString(), RefusalStatuses())
+        }
 
     /** Every match, a page at a time, as the upstream's plain search pages list them. */
     private fun find(name: String?, id: Long?): List<Found> {
@@ -279,6 +296,7 @@ internal class GatewayResource(
         val BODY = object : TypeReference<Map<String, Any?>>() {}
 
         /** An operation as an act, known by the relation the description names. */
-        fun act(spec: SpecAct) = Act(spec.operation.name, spec.operation.relation, spec.schema, spec.path)
+        fun act(spec: SpecAct) =
+            Act(spec.operation.name, spec.operation.relation, spec.schema, spec.path, method = spec.method)
     }
 }

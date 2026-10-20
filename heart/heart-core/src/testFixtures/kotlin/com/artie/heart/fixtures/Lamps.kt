@@ -105,7 +105,8 @@ object Lamps {
             Act.of("switchOn", "switch-on", SwitchOff::class.java),
             Act.of("switchOff", "switch-off", SwitchOff::class.java),
             // Dimming used to be at "brighten"; that path still works (SPEC §6.2, former paths).
-            Act.of("dim", "dim", Dim::class.java, formerPaths = listOf("brighten")),
+            // Dimming sets the brightness: the same request twice leaves the lamp as once, so it is a PUT.
+            Act.of("dim", "dim", Dim::class.java, formerPaths = listOf("brighten"), method = Act.PUT),
         ),
         offers = Offers(
             keys = listOf("ON", "OFF"),
