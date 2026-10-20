@@ -113,7 +113,7 @@ flowchart TB
   decl --> dres
   schema --> dres
   dres --> core
-  client -- "GET, POST /actions/..." --> core
+  client -- "GET, and each act by its own method" --> core
   core --> dres
   dres --> up
   up -- "the operation, renamed fields mapped back" --> gh
@@ -156,7 +156,7 @@ sequenceDiagram
   G-->>A: 200 state, links, set link, ETag
   Note over A: set and schemas cached by hash,<br/>checked against hr:integrity
   Note over A: guard: form pinned, values fit
-  A->>G: POST /actions/comment, If-Match, body
+  A->>G: POST /actions/comment, as its form says, If-Match, body
   G->>G: pipeline: 428, 412, 409, 422 checks
   G->>H: POST comments, body
   H-->>G: 201 comment
@@ -167,7 +167,9 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-  req["POST to an act"] --> pre{"If-Match sent?"}
+  req["A request to an act"] --> meth{"By the act's own method?<br/>POST, PUT, PATCH or DELETE"}
+  meth -- no --> e405["405, Allow names it"]
+  meth -- yes --> pre{"If-Match sent?"}
   pre -- no --> e428["428 precondition required"]
   pre -- yes --> fresh{"Matches the state now?"}
   fresh -- no --> e412["412 stale"]

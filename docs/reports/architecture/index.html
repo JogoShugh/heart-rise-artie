@@ -202,13 +202,13 @@ flowchart TB
   decl --> dres
   schema --> dres
   dres --> core
-  client -- "GET, POST /actions/..." --> core
+  client -- "GET, and each act by its own method" --> core
   core --> dres
   dres --> up
   up -- "the operation, renamed fields mapped back" --> gh
 </pre>
     <ul class="notes">
-      <li>Every act is a POST to an action address, whatever GitHub's own method.</li>
+      <li>Each act is served by its GitHub operation's own method: close and edit are PATCH, merge and lock PUT, unlabel and unassign DELETE, their fields in the query.</li>
       <li>A bound field, like merge's head SHA, is filled from the state the client's validator matched, never by the client.</li>
       <li><code>rename: { content: body }</code> offers a field by one name and sends it by the operation's own.</li>
       <li>The caller's own GitHub token is passed through; the gateway holds none.</li>
@@ -262,7 +262,7 @@ sequenceDiagram
   G-->>A: 200 state, links, set link, ETag
   Note over A: set and schemas cached by hash,&lt;br/&gt;checked against hr:integrity
   Note over A: guard: form pinned, values fit
-  A->>G: POST /actions/comment, If-Match, body
+  A->>G: POST /actions/comment, as its form says, If-Match, body
   G->>G: pipeline: 428, 412, 409, 422 checks
   G->>H: POST comments, body
   H-->>G: 201 comment
@@ -276,11 +276,13 @@ sequenceDiagram
 
   <section id="pipeline">
     <h2>6. The act pipeline</h2>
-    <p>What a HEART server checks, in order, before it does anything.</p>
+    <p>What a HEART server checks, in order, before it does anything. An act is served by one method, and its relation's ALPS type agrees: a PUT or a DELETE is idempotent, a POST or a PATCH is not. A PATCH takes a JSON Merge Patch; a DELETE takes no body, its fields being its query.</p>
     <div class="diagram" data-diagram="pipeline"></div>
 <pre class="mm-src" data-name="pipeline" hidden>
 flowchart TB
-  req["POST to an act"] --> pre{"If-Match sent?"}
+  req["A request to an act"] --> meth{"By the act's own method?&lt;br/&gt;POST, PUT, PATCH or DELETE"}
+  meth -- no --> e405["405, Allow names it"]
+  meth -- yes --> pre{"If-Match sent?"}
   pre -- no --> e428["428 precondition required"]
   pre -- yes --> fresh{"Matches the state now?"}
   fresh -- no --> e412["412 stale"]

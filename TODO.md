@@ -17,10 +17,15 @@ What artie generate and the guards do that no live run has shown yet, as of 2026
       the gateway on a connector copy whose close takes an optional milestone, the lenient run finished, close
       held by its values and re-pinned (issue #127, pull request #128); strict then finished on the re-pinned
       lock file (#129, #130). Reports: docs/reports/line-by-line/github-values-lenient/ and github-values-strict/.
-- [ ] **Methods in the other lock files.** Only github-task-from-reasoned.pins.yaml was regenerated with each
-      form's method. github-task-from-hybrid.pins.yaml has none, so with `on-change: values` every changed form is
-      refused, "the lock file doesn't pin its method". Regenerate it from github-hybrid.trace.yaml (the script
-      should come out the same) and check the diff adds only `method:` lines.
+- [ ] **The hybrid lock file, re-recorded.** Since 2026-10-20 acts are served by their own method (close is a
+      PATCH, merge a PUT), so every form hash a lock file pinned before then changed.
+      github-task-from-reasoned.pins.yaml was re-recorded live (issue #131) and held strictly (#133).
+      github-task-from-hybrid.pins.yaml still pins the POST forms, with no methods: re-record it from a live run
+      at L2 the same way, keeping the script.
+- [ ] **Act methods in the other clients and exhibits.** heart-ts sends a DELETE with no body and fills a query
+      template, but its conformance features only meet the garden's POST acts. heart-mcp goes through ARTIE. The
+      OpenAPI exhibits (openapi-live, openapi-affordances, the bespoke dashboards) keep only `post` operations;
+      the garden's acts are all POST, so nothing changes for them today.
 - [ ] **A changed set, live.** Lenient going past a changed set with its warning, and re-pinning it, is still shown
       only against the small GitHub in process (script-replay.feature). Live: change another act of the issue
       (as edit takes no body), run lenient with `repin: auto` in a trial config, then strict.
