@@ -56,9 +56,21 @@ ARTIE runs.
 
 ### Front matter
 
-Between `---` lines, first in the file. Keys `start` (required) and `inputs` (optional), with the input forms of
-today's goal file: `name: value`, `name:`, `name: {default, question}`, `default: {now: PATTERN}`. Any other key
-stops the run.
+Between `---` lines, first in the file. Keys `start` (required), `inputs` and `limits` (optional), with the input
+forms of today's goal file: `name: value`, `name:`, `name: {default, question}`, `default: {now: PATTERN}`. Any
+other key stops the run.
+
+### Limits
+
+A goal run's moves are the model's choices, made with no one watching, so a run has caps: a planner stuck on a
+refused act, or one that misreads "done" and acts again, stops with a message instead of calling the model and
+acting on a live service without end.
+
+- **The run:** at most 50 moves (was 40). `limits: {moves: N}` in the front matter, or `--max-moves N`, changes it.
+- **A step:** at most 10 moves for one item, so a stuck item stops the run early, named by its line.
+  `limits: {step: N}` sets it for every step; `` `moves N` `` at an item's end sets it for that item alone.
+- The command line wins over the front matter, the item over both. A limit that is not a whole number above 0
+  stops the run before its first request.
 
 ### Body
 
@@ -101,7 +113,8 @@ Each stops the run before its first request, naming the file, the line and what 
 4. Markers: an item starting `Word:` where `Word` is not `Wait` or `Verify`. A colon later in the words is words.
 5. `Wait:` with sub-items; `Verify:` with both a fact after the colon and fact sub-items, or with neither; a fact
    with sub-items of its own.
-6. Backticks: anything but one `` `as name` `` at an item's end; a name given twice; a name an input already has.
+6. Backticks: anything but `` `as name` `` and `` `moves N` ``, each at most once, at an item's end; a name given
+   twice; a name an input already has.
 7. Braces: `{x}` that is no input and no `as` name; `{x}` used before (above, or outside of) the step that names
    it; an unclosed brace.
 
@@ -171,13 +184,14 @@ Features first in each, red at test level, then code.
    model. Compared with the paragraph run: reason steps, refused tries, detours left out.
 7. **`.goal.yaml` goes**: its reading, its tests, its file; spec/PLAN-PLAIN-TEXT-RUN.md points here.
 
+## Decided (2026-10-21)
+
+- **`{issue}` in words is the resource's address.** The planner also sees it under `<named>`.
+- **Facts are words.** "it merged"; the planner turns each into a Check move.
+- **Limits:** 50 moves a run, 10 a step, each settable (above).
+- **`.goal.yaml` goes** once `.goal.md` works.
+
 ## Open
 
-- **`{issue}` in words.** Its address is exact but reads badly to the planner; its title reads well but isn't
-  unique. Start with the address and see what the planner does with it live.
-- **A fact in words.** "it merged" still needs the planner to turn it into a member and a value. A fact written
-  `merged is true` could skip that; leave it until live runs show whether it matters.
-- **A step that fails.** A refused act today is told to the planner and retried. Should a step have a limit of its
-  own, under the run's 40 moves?
 - **Promotion.** `artie generate --steps` writing a `.goal.md` in steps from a free goal's run: free words, then
   steps, then a script, each firmer.
