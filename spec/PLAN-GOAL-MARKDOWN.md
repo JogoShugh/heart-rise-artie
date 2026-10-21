@@ -121,6 +121,18 @@ Each stops the run before its first request, naming the file, the line and what 
 7. Braces: `{x}` that is no input and no `as` name; `{x}` used before (above, or outside of) the step that names
    it; an unclosed brace.
 
+### Case
+
+- **Ignored in the file's own words:** the markers (`wait:`, `VERIFY:`), the backtick keywords (`` `As issue` ``,
+  `` `Reasoned` ``, `` `Moves 15` ``), and the front matter's keys (`Start`, `Inputs`, `limits`, `default`,
+  `question`, `now`, `moves`, `step`). A key given twice in different cases stops the run. Guard 4 matches any
+  case, so `verfy:` is caught as `Verfy:` is.
+- **Kept exact in the person's data:** the `now` pattern (`MM` is the month, `mm` the minutes), the start address,
+  quoted words and relation names.
+- **Kept exact in names:** inputs and `as` names become Kotlin variables, and `{pr.number}` reads a state member
+  whose case matters. Two names that differ only in case stop the run; a brace that matches a name only when case
+  is ignored stops it too, with a hint: `{Issue}: did you mean {issue}?`.
+
 `artie run NAME.goal.md --plan-only` reads the file, applies the guards, and prints the tree it read, each step with
 its kind and depth. It sends nothing.
 
@@ -202,6 +214,7 @@ Features first in each, red at test level, then code.
 - **Limits:** 50 moves a run, 10 a step, each settable (above).
 - **`` `reasoned` `` marks a leaf step to stay an intent** in the generated script.
 - **`.goal.yaml` goes** once `.goal.md` works.
+- **Case:** the file's keywords ignore it; names keep it, guarded (above).
 
 ## Open
 
