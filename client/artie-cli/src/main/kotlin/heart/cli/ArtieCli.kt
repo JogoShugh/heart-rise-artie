@@ -64,18 +64,22 @@ class ArtieCli(
         val lock = lockFile(asked, folder, file, config)
         val settings =
             ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, lock.guard, config.onChange)
-        val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { navigator(settings) })
+        val client by lazy { navigator(settings) }
+        val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { client })
         run.reasoning = asked.reasoner != null
         run.entry = asked.entry
         if (output == "words") run.onStep = { out.println(line(run.trace.size, it)) }
         val text = Files.readString(file)
-        // A script that reasons, an act with an intent and no relation, is known before it runs, by its text:
-        // without --reasoner, nothing is sent.
-        if (!asked.inputsOf && asked.reasoner == null && REASONS.containsMatchIn(text)) {
-            throw BadArguments("stopped before the first request: act(intent = …) needs --reasoner")
+        val ended = if (file.fileName.toString().endsWith(GOAL)) {
+            pursued(asked, file, run) { client.planner() }
+        } else {
+            // A script that reasons, an act with an intent and no relation, is known before it runs, by its text:
+            // without --reasoner, nothing is sent.
+            if (!asked.inputsOf && asked.reasoner == null && REASONS.containsMatchIn(text)) {
+                throw BadArguments("stopped before the first request: act(intent = …) needs --reasoner")
+            }
+            execute(run, text).also { if (asked.inputsOf) return listed(run, text) }
         }
-        val ended = execute(run, text)
-        if (asked.inputsOf) return listed(run, text)
         val name = file.fileName.toString().substringBefore('.')
         // The run's capture, as a person reads it: YAML (spec/PLAN-LINE-BY-LINE-REPORT.md).
         val trace = folder.resolve(asked.trace ?: "runs/$name-${Instant.now().epochSecond}.trace.yaml")
@@ -111,13 +115,21 @@ class ArtieCli(
         }
     }
 
-    /** One page from [builder]; null when it was built, else what the builder said. */
-    @Suppress("LongParameterList") // A builder's own arguments, each once, in its order.
-    private fun build(builder: Path, trace: Path, page: Path, title: String, lede: String, script: Path): String? {
-        val process = ProcessBuilder("sh", "$builder", "$trace", "$page", title, lede, "$script")
-            .redirectErrorStream(true).start()
-        val said = process.inputStream.bufferedReader().readText()
-        return if (process.waitFor() == 0) null else said.trim()
+    /**
+     * A goal file done move by move (spec/PLAN-PLAIN-TEXT-RUN.md): the client's planner makes each move, its
+     * reasoner each act, so a goal needs --reasoner.
+     */
+    private fun pursued(asked: Arguments, file: Path, run: Run, planner: () -> heart.script.Planner?): Ended {
+        if (asked.reasoner == null) throw BadArguments("$STOPPED: a goal needs --reasoner")
+        val goal = goalFile(file.fileName.toString(), Files.readString(file))
+        val planning = planner() ?: throw BadArguments("$STOPPED: this client has no planner")
+        Run.current = run
+        return try {
+            heart.script.runGoal(goal, planning)
+            Ended(0, "finished", "finished, ${run.trace.size} steps", run.trace.size)
+        } catch (e: ScriptStopped) {
+            stopped(e, run)
+        }
     }
 
     private fun execute(run: Run, script: String): Ended {
@@ -204,12 +216,24 @@ class ArtieCli(
 
         /** An act that names no relation, only its intent: a step the reasoner chooses. */
         val REASONS = Regex("""\bact\(\s*intent\s*=""")
+
+        /** A goal file's name ends so (spec/PLAN-PLAIN-TEXT-RUN.md). */
+        const val GOAL = ".goal.yaml"
         const val NOT_MET = 1
         const val STOPPED_BEFORE = 2
         const val REFUSED = 3
         const val CLIENT_FAILURE = 4
         const val SCRIPT_ERROR = 5
     }
+}
+
+/** One page from [builder]; null when it was built, else what the builder said. */
+@Suppress("LongParameterList") // A builder's own arguments, each once, in its order.
+private fun build(builder: Path, trace: Path, page: Path, title: String, lede: String, script: Path): String? {
+    val process = ProcessBuilder("sh", "$builder", "$trace", "$page", title, lede, "$script")
+        .redirectErrorStream(true).start()
+    val said = process.inputStream.bufferedReader().readText()
+    return if (process.waitFor() == 0) null else said.trim()
 }
 
 /** The stop a script engine's failure carries, if a stop is what failed it. */

@@ -120,8 +120,10 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
         return lines.size
     }
 
-    private fun view(here: Here) =
-        PlanView(filled, sentences, done.toSet(), moves.toList(), path.toList(), here.held, answers.toList())
+    private fun view(here: Here) = PlanView(
+        filled, sentences, done.toSet(), moves.toList(), path.toList(), here.held, answers.toList(),
+        goal.inputs.associate { it.name to run.value(it.name) },
+    )
 
     companion object {
         const val FINISHED = Int.MAX_VALUE

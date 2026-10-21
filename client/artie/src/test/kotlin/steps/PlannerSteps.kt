@@ -1,0 +1,99 @@
+package steps
+
+import heart.ClaudePlanner
+import heart.ClaudeReasoner
+import heart.HeartResponse
+import heart.script.Move
+import heart.script.PlanView
+import heart.script.Representation
+import io.cucumber.datatable.DataTable
+import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
+
+/** goal-planner.feature: the Claude planner, against the scripted Claude API. */
+class PlannerSteps(private val ctx: ClientContext) {
+    private var planner: ClaudePlanner? = null
+    private var held = Representation("", JsonObject(emptyMap()), emptySet(), emptyMap())
+    private var view: PlanView? = null
+    private var move: Move? = null
+
+    @Given("the planner is Claude, through the scripted Claude API")
+    fun plannerIsClaude() {
+        planner = ClaudePlanner(ctx.transport, "test-key")
+    }
+
+    @Given("the planner holds {string} with the state {}, offering")
+    fun holds(address: String, state: String, table: DataTable) {
+        val forms = table.asMaps().map { it.getValue("form") }.toSet()
+        held = Representation(address, Json.parseToJsonElement(state) as JsonObject, forms, emptyMap())
+    }
+
+    @Given("the goal is {string} with the input number = {int}, the first sentence done")
+    fun goal(text: String, number: Int) {
+        val filled = text.replace("\$number", "$number").replace("\$owner/\$repo", "acme/rockets")
+        val sentences = heart.script.Goal("", emptyList(), filled).sentences(filled)
+        view = PlanView(
+            filled, sentences, setOf(1), listOf("open issue 10 of acme/rockets: at ${held.address}"),
+            listOf("https://github.gateway.test/", held.address), held, emptyList(), mapOf("number" to "$number"),
+        )
+    }
+
+    @Given("the Claude API will answer with the move {}")
+    fun answersMove(input: String) {
+        val body = """{"id":"msg_1","type":"message","role":"assistant","content":[""" +
+            """{"type":"tool_use","id":"t1","name":"move","input":$input}],"stop_reason":"tool_use"}"""
+        ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
+    }
+
+    @When("the planner is asked its next move")
+    fun asked() {
+        move = checkNotNull(planner).next(checkNotNull(view))
+    }
+
+    @Then("the move is {}")
+    fun moveIs(said: String) = assertEquals(said, words(checkNotNull(move)))
+
+    @Then("the planner's request says")
+    fun requestSays(table: DataTable) {
+        val text = request().getValue("messages").jsonArray.last().jsonObject.getValue("content").jsonArray
+            .first().jsonObject.getValue("text").jsonPrimitive.content
+        table.asMaps().map { it.getValue("part") }.forEach { assertTrue(it in text, "no \"$it\" in:\n$text") }
+    }
+
+    @Then("the planner's request caches its system prompt and tool")
+    fun caches() {
+        val request = request()
+        assertNotNull(request.getValue("system").jsonArray.first().jsonObject["cache_control"])
+        assertNotNull(request.getValue("tools").jsonArray.first().jsonObject["cache_control"])
+    }
+
+    private fun request(): JsonObject = Json.parseToJsonElement(
+        ctx.transport.requests.last { it.url == ClaudeReasoner.ENDPOINT }.body.orEmpty(),
+    ).jsonObject
+
+    /** A move as the feature says it. */
+    private fun words(move: Move): String = when (move) {
+        is Move.Act -> "act \"${move.words}\" for sentence ${move.sentence}" +
+            if (move.opens) ", opening a block" else ""
+        is Move.Back -> "back to \"${move.to}\""
+        is Move.Wait -> "wait until \"${move.relation}\" is offered"
+        is Move.Check -> "check ${move.facts}"
+        is Move.Done -> "sentence ${move.sentence} done"
+        is Move.Finish -> "finished"
+        is Move.Stop -> "stopped: ${move.why}"
+        is Move.Clarify -> "a question: ${move.question}"
+    }
+
+    private companion object {
+        const val OK = 200
+    }
+}

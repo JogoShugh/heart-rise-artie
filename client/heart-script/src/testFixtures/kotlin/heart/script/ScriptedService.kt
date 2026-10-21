@@ -105,6 +105,11 @@ class ScriptedService : Navigator {
     /** What the reasoner chooses, by the words it is given. */
     val reasons = mutableMapOf<String, Choice>()
 
+    /** A goal run's moves, in order; once they run out, finished. */
+    val moves = ArrayDeque<Move>()
+
+    override fun planner(): Planner = Planner { moves.removeFirstOrNull() ?: Move.Finish }
+
     override fun reason(intent: String): Reasoned {
         asked += "reason" to intent
         val chosen = reasons.getValue(intent)

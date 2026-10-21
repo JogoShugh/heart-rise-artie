@@ -1,0 +1,78 @@
+Feature: artie run a goal file: a goal in words, planned by the client's planner
+  spec/PLAN-PLAIN-TEXT-RUN.md. artie run takes a goal file, NAME.goal.yaml,
+  as it takes a script: its inputs from the command line, a line per step,
+  the capture with --trace. The client's planner makes each move, and its
+  reasoner each act, so a goal file needs --reasoner. artie generate then
+  writes the script from the capture, the goal file named as its source.
+
+  Background:
+    Given a service holds these resources
+      | address    | title                 | state |
+      | /          | Repositories          |       |
+      | /issues/10 | Login fails on Safari | open  |
+    And these forms
+      | at         | relation   | leads to   | outcome |
+      | /          | issues-get | /issues/10 | done    |
+      | /issues/10 | close      | /issues/10 | done    |
+    And the file "close.goal.yaml" is
+      """
+      start: scripted://service/
+      inputs:
+        number:
+      goal: |
+        Open issue $number. Close it.
+      """
+
+  Scenario: A goal file runs move by move, and artie generate writes its script
+    Given the planner will move
+      | move   | words              | sentence | opens |
+      | act    | open issue $number | 1        | yes   |
+      | done   |                    | 1        |       |
+      | act    | close it           | 2        |       |
+      | done   |                    | 2        |       |
+      | finish |                    |          |       |
+    And the reasoner chooses
+      | intent        | selection | relation   | fields           |
+      | open issue 10 | act       | issues-get | {"number": "10"} |
+      | close it      | act       | close      | {}               |
+    When artie is run with
+      | argument        |
+      | run             |
+      | close.goal.yaml |
+      | number=10       |
+      | --reasoner      |
+      | claude          |
+      | --trace         |
+      | goal.trace.yaml |
+    Then artie exits 0
+    And artie prints
+      | line                              |
+      | 1 enter scripted://service/: done |
+      | 2 open issue 10: done             |
+      | 3 close it: done                  |
+      | 4 return to /: done               |
+      | finished, 4 steps                 |
+    When artie is run with
+      | argument        |
+      | generate        |
+      | goal.trace.yaml |
+      | --out           |
+      | gen.kts         |
+      | --script        |
+      | close.goal.yaml |
+    Then artie exits 0
+    And the file "gen.kts" has these lines
+      | line                                                    |
+      | val number by input()                                   |
+      | heart("scripted://service/") {                          |
+      | act("issues-get", "number" to number, intent = "open issue $number") { |
+      | act("close", intent = "close it")                       |
+
+  Scenario: A goal file needs a reasoner
+    When artie is run with
+      | argument        |
+      | run             |
+      | close.goal.yaml |
+      | number=10       |
+    Then artie exits 2
+    And artie's last line is: stopped before the first request: a goal needs --reasoner

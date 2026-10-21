@@ -43,6 +43,9 @@ class ClaudeReasoner(
      */
     override fun taken(): List<heart.script.ModelCall> = calls.toList().also { calls.clear() }
 
+    /** A planner for goal runs on the same model, key and transport. */
+    fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model)
+
     override fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection {
         val asked = turn(intent, state, offers, links)
         val response = transport.send(

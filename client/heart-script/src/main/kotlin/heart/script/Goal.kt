@@ -43,6 +43,8 @@ class PlanView(
     val path: List<String>,
     val held: Representation,
     val answers: List<Pair<String, String>>,
+    /** The goal's inputs and their values: a move's words name each as `$name`, so a script made keeps it one. */
+    val inputs: Map<String, String> = emptyMap(),
 )
 
 /** One move of a goal run. Sentences are numbered from 1. */

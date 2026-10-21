@@ -35,6 +35,9 @@ class ArtieNavigator(
 
     override fun exchanges(): List<heart.script.Exchange> = exchangeLog?.taken().orEmpty()
 
+    /** A goal run's planner: Claude's, when the reasoner is (spec/PLAN-PLAIN-TEXT-RUN.md). */
+    override fun planner(): heart.script.Planner? = (reasoner as? ClaudeReasoner)?.planner()
+
     override fun enter(entry: String): Answer = answer("entry") { client.enter(entry) }
 
     /**
@@ -91,7 +94,7 @@ class ArtieNavigator(
             null -> Reasoned(null, failed)
             is Decision.Acted -> Reasoned(choice(d.selection), done(d.result, client.broughtIntoBeing))
             is Decision.Followed -> Reasoned(choice(d.selection), Answer.Done(representation(d.result)))
-            is Decision.Refused -> Reasoned(choice(d.selection), refusal(d.selection.affordance, d.refusal))
+            is Decision.Refused -> Reasoned(choice(d.selection), refusal(client, d.selection.affordance, d.refusal))
             is Decision.Rejected -> Reasoned(choice(d.selection), rejected(d.reasons))
             is Decision.Asked -> Reasoned(null, Answer.Refused(Refusal.Unclear, Side.CLIENT, d.question))
             is Decision.Explained ->
@@ -106,9 +109,9 @@ class ArtieNavigator(
     private fun answer(what: String, select: () -> HeartRepresentation): Answer = try {
         Answer.Done(representation(select()))
     } catch (refused: ActRefused) {
-        refusal(what, refused)
+        refusal(client, what, refused)
     } catch (refused: AccessRefused) {
-        refusal(what, refused)
+        refusal(client, what, refused)
     } catch (failed: java.io.IOException) {
         // Java's HTTP client says nothing when nothing listens: a ConnectException with no message.
         Answer.Refused(Refusal.Unreachable, Side.CLIENT, failed.message ?: "could not reach the server")
@@ -118,9 +121,11 @@ class ArtieNavigator(
     } catch (failed: IntegrityException) {
         Answer.Refused(Refusal.IntegrityMismatch, Side.CLIENT, failed.message.orEmpty())
     }
+}
 
-    /** ARTIE's refusals, as the DSL's kinds; a reason the server gave for an absent act is asked for. */
-    private fun refusal(what: String, refused: RuntimeException): Answer.Refused = when (refused) {
+/** ARTIE's refusals, as the DSL's kinds; a reason the server gave for an absent act is asked of [client]. */
+private fun refusal(client: HeartRiseClient, what: String, refused: RuntimeException): Answer.Refused =
+    when (refused) {
         // ARTIE refuses an act its manifest lacks with an IllegalStateException; the DSL checks first.
         is StaleAct -> Answer.Refused(Refusal.Stale, Side.SERVER, "the resource changed since it was read")
         is IllegalTransition ->
@@ -133,7 +138,6 @@ class ArtieNavigator(
         is Forbidden -> Answer.Refused(Refusal.Forbidden, Side.SERVER, refused.message.orEmpty())
         else -> throw refused
     }
-}
 
 /** A reasoner's selection, as a script's trace records the choice. */
 private fun choice(selection: Selection): Choice? = when (selection) {

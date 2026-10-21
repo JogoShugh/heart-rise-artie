@@ -166,6 +166,9 @@ interface Navigator {
      */
     fun exchanges(): List<Exchange> = emptyList()
 
+    /** The client's planner for a goal run (spec/PLAN-PLAIN-TEXT-RUN.md); null when it has none. */
+    fun planner(): Planner? = null
+
     /**
      * Hand [intent] to the client's reasoner, which chooses one selection from what the held representation
      * offers; the client checks it and makes it. A client with no reasoner refuses.

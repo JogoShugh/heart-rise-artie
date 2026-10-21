@@ -1,0 +1,182 @@
+package heart
+
+import heart.script.Move
+import heart.script.PlanView
+import heart.script.Planner
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.doubleOrNull
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
+
+/**
+ * A goal run's planner on the Claude Messages API, through ARTIE's own Transport (spec/PLAN-PLAIN-TEXT-RUN.md).
+ * As the Reason step's prompt: the tool and the system prompt never change, a cached prefix; what changes is the
+ * last user message: the goal sentence by sentence, each marked done or not, the inputs, the moves made, the path
+ * of resources the run is in, and what is held (its state, the forms it offers, its links). An answer in words
+ * alone is a question for the person, never a move. It chooses no form and no value: each act's words go to the
+ * reasoner, as a reason step's do.
+ */
+class ClaudePlanner(
+    private val transport: Transport,
+    private val apiKey: String,
+    private val model: String = ClaudeReasoner.DEFAULT_MODEL,
+) : Planner {
+
+    override fun next(view: PlanView): Move {
+        val response = transport.send(
+            HeartRequest(
+                "POST",
+                ClaudeReasoner.ENDPOINT,
+                mapOf("x-api-key" to apiKey, "anthropic-version" to API_VERSION, "Content-Type" to "application/json"),
+                request(view).toString(),
+            ),
+        )
+        check(response.status in SUCCESS) {
+            "Claude API answered ${response.status}: ${response.body.take(ERROR_EXCERPT)}"
+        }
+        return move(Json.parseToJsonElement(response.body).jsonObject)
+    }
+
+    private fun request(view: PlanView): JsonObject = buildJsonObject {
+        put("model", model)
+        put("max_tokens", MAX_TOKENS)
+        putJsonArray("tools") { add(TOOL) }
+        putJsonObject("tool_choice") { put("type", "auto") }
+        putJsonArray("system") {
+            add(
+                buildJsonObject {
+                    put("type", "text")
+                    put("text", SYSTEM)
+                    putJsonObject("cache_control") { put("type", "ephemeral") }
+                },
+            )
+        }
+        putJsonArray("messages") {
+            add(
+                buildJsonObject {
+                    put("role", "user")
+                    putJsonArray("content") {
+                        add(buildJsonObject { put("type", "text"); put("text", turn(view)) })
+                    }
+                },
+            )
+        }
+    }
+
+    /** What changes from move to move, in tagged parts. */
+    internal fun turn(view: PlanView): String {
+        val goal = view.sentences.withIndex().joinToString("\n") { (i, sentence) ->
+            "${i + 1}. [${if (i + 1 in view.done) "done" else " "}] $sentence"
+        }
+        val inputs = view.inputs.entries.joinToString("\n") { (name, value) -> "\$$name = $value" }
+        val held = view.held
+        val links = held.links.entries.joinToString("\n") { (rel, titles) ->
+            titles.joinToString("\n") { title -> "$rel" + (title?.let { " \"$it\"" } ?: "") }
+        }
+        val state = held.state.toString().let { if (it.length > STATE_LIMIT) it.take(STATE_LIMIT) + "…" else it }
+        val answers = view.answers.joinToString("\n") { (q, a) -> "Q: $q\nA: $a" }
+        return "<goal>\n$goal\n</goal>\n<inputs>\n$inputs\n</inputs>\n" +
+            "<moves>\n${view.moves.joinToString("\n")}\n</moves>\n<path>\n${view.path.joinToString("\n")}\n</path>\n" +
+            "<held>\n${held.address}\n<state>\n$state\n</state>\n<forms>\n${held.offered.sorted().joinToString("\n")}" +
+            "\n</forms>\n<links>\n$links\n</links>\n</held>\n<answers>\n$answers\n</answers>"
+    }
+
+    private fun move(message: JsonObject): Move {
+        val content = message.getValue("content").jsonArray.map { it.jsonObject }
+        val call = content.firstOrNull { it["type"]?.jsonPrimitive?.content == "tool_use" }
+            ?: return Move.Clarify(ClaudeReasoner.words(content))
+        val input = call.getValue("input").jsonObject
+        fun text(name: String) = input[name]?.jsonPrimitive?.content
+        val sentence = input["sentence"]?.jsonPrimitive?.intOrNull
+        return when (text("move")) {
+            "act" -> Move.Act(text("words").orEmpty(), sentence, input["opens"]?.jsonPrimitive?.booleanOrNull == true)
+            "back" -> Move.Back(text("to").orEmpty())
+            "wait" -> Move.Wait(text("relation").orEmpty())
+            "check" -> Move.Check((input["facts"] as? JsonObject).orEmpty().mapValues { (_, v) -> plain(v) })
+            "done" -> Move.Done(sentence ?: 0)
+            "finish" -> Move.Finish
+            "stop" -> Move.Stop(text("why") ?: "the planner stopped")
+            else -> Move.Clarify(text("question") ?: "Could you say more?")
+        }
+    }
+
+    private fun plain(value: kotlinx.serialization.json.JsonElement): Any? {
+        val primitive = value as? JsonPrimitive ?: return value.toString()
+        return if (primitive.isString) primitive.content else
+            primitive.booleanOrNull ?: primitive.longOrNull ?: primitive.doubleOrNull
+    }
+
+    companion object {
+        private const val API_VERSION = "2023-06-01"
+        private const val MAX_TOKENS = 1024
+        private const val ERROR_EXCERPT = 300
+        private const val STATE_LIMIT = 4000
+        private val SUCCESS = 200..299
+        private val MOVES = listOf("act", "back", "wait", "check", "done", "finish", "stop", "clarify")
+
+        private val SYSTEM = """
+            You plan a task for a user against a hypermedia service, one move at a time. The service offers,
+            at each resource, the actions allowed now (forms) and its links. A separate step carries out each
+            act: it reads your words, chooses the form and fills its fields. You choose what to do next.
+            The user message has parts: <goal> is the task, numbered by sentence, each marked [done] or [ ];
+            <inputs> are values the user gave, by name; <moves> are the moves made so far; <path> is the
+            resources the run is in, the start first and the one held last; <held> is the resource held now:
+            its address, <state>, the <forms> it offers by name, and its <links>; <answers> are the user's
+            answers to your questions.
+            Call the move tool exactly once, with one of these moves:
+            - "act": words for one act at the resource held, as a person would ask it, with every value the
+              act needs (for example "comment on it: Fixed in 1.2 by #132."). Write a value that is one of the
+              inputs as ${'$'}name, never its value. Give the number of the sentence it serves. Set opens to
+              true when you will make more moves at what the act leads to, or will come back here after it
+              (an act that makes a new resource, such as a comment, leads to that resource).
+            - "back": to a resource on the <path>, by its address, closing what was opened since.
+            - "wait": until the resource held offers a form, by its exact name, before acting on it.
+            - "check": facts the goal asks to make sure of, each a member of <state> and the value it must
+              have.
+            - "done": a sentence is fully done, by its number. Mark each sentence done once it is.
+            - "finish": every sentence is done.
+            - "stop": the goal can't be done here, saying why.
+            - "clarify": one short question for the user, when the goal and what is offered leave the next
+              move open, or a value is missing. Never guess.
+            Only act on forms in <forms>. Do each sentence once, in order where order matters.
+        """.trimIndent()
+
+        private val TOOL: JsonObject = buildJsonObject {
+            put("name", "move")
+            put(
+                "description",
+                "Make the next move of the task: one act, back, wait, check, done, finish, stop or a question.",
+            )
+            putJsonObject("input_schema") {
+                put("type", "object")
+                putJsonObject("properties") {
+                    putJsonObject("move") {
+                        put("type", "string")
+                        put("enum", JsonArray(MOVES.map(::JsonPrimitive)))
+                    }
+                    putJsonObject("words") { put("type", "string") }
+                    putJsonObject("sentence") { put("type", "integer") }
+                    putJsonObject("opens") { put("type", "boolean") }
+                    putJsonObject("to") { put("type", "string") }
+                    putJsonObject("relation") { put("type", "string") }
+                    putJsonObject("facts") { put("type", "object") }
+                    putJsonObject("why") { put("type", "string") }
+                    putJsonObject("question") { put("type", "string") }
+                }
+                put("required", JsonArray(listOf(JsonPrimitive("move"))))
+            }
+            putJsonObject("cache_control") { put("type", "ephemeral") }
+        }
+    }
+}

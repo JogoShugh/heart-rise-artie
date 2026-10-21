@@ -45,6 +45,23 @@ class CliSteps(private val script: ScriptSteps) {
         Files.writeString(folder.resolve(name), text)
     }
 
+    @Given("the planner will move")
+    fun plannerMoves(table: DataTable) = table.asMaps().forEach { row ->
+        val sentence = row["sentence"]?.takeIf { it.isNotBlank() }?.toInt()
+        script.service.moves += when (val kind = row.getValue("move")) {
+            "act" -> heart.script.Move.Act(row.getValue("words"), sentence, row["opens"] == "yes")
+            "done" -> heart.script.Move.Done(checkNotNull(sentence))
+            "finish" -> heart.script.Move.Finish
+            else -> error("no move $kind")
+        }
+    }
+
+    @Then("the file {string} has these lines")
+    fun hasLines(name: String, table: DataTable) {
+        val lines = Files.readAllLines(folder.resolve(name)).map { it.trim() }
+        table.asMaps().map { it.getValue("line") }.forEach { assertTrue(it in lines, "no \"$it\" in:\n$lines") }
+    }
+
     @Given("the person will type")
     fun willType(table: DataTable) = table.asMaps().forEach { typed.addLast(it.getValue("line")) }
 
