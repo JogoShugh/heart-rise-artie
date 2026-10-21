@@ -44,7 +44,7 @@ p { margin: 0; }
 .seg button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr)); gap: 1.2rem; }
 figure { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 12px; padding: 1rem 1rem 1.1rem;
-  display: grid; gap: .7rem; min-width: 0; }
+  display: grid; gap: .7rem; min-width: 0; align-content: start; }
 figure.native h3 { color: var(--native); } figure.heart h3 { color: var(--heart); }
 figcaption { color: var(--muted); font-size: .92rem; max-width: 60ch; }
 .svg-wrap { overflow-x: auto; }
@@ -81,6 +81,17 @@ code { font: .86em var(--mono); }
 .limits { border-left: 3px solid var(--native); padding-left: 1rem; }
 .limits ul { margin: .4rem 0 0; padding-left: 1.2rem; display: grid; gap: .45rem; max-width: 66ch; }
 .close { max-width: 62ch; font-family: var(--display); font-size: 1.15rem; line-height: 1.5; }
+.sub { max-width: 66ch; color: var(--muted); margin: 0 0 .8rem; }
+.key { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem .9rem; font-size: .88rem; color: var(--muted); margin: 0 0 .8rem; }
+.sw { display: inline-block; width: .9rem; height: .9rem; border-radius: 3px; border: 1px solid; margin-right: -.4rem; vertical-align: -2px; }
+.sw.m { background: var(--model-soft); border-color: var(--model); } .sw.h { background: var(--heart-soft); border-color: var(--heart); }
+.trio { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem; margin-bottom: .8rem; }
+figure.mode svg { min-width: 18rem; }
+figure.mode h3 { color: var(--fg); }
+svg .step { fill: var(--fg); font-size: 10.5px; font-weight: 500; }
+dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .35rem .8rem; font-size: .88rem; }
+dt { font-weight: 600; color: var(--muted); white-space: nowrap; } dd { margin: 0; min-width: 0; }
+@media (max-width: 30rem) { dl { grid-template-columns: 1fr; } dd { margin-bottom: .3rem; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
@@ -90,7 +101,7 @@ code { font: .86em var(--mono); }
   <header>
     <div>
       <h1>Native or HEART-Shaped</h1>
-      <p class="lede">Give Claude a goal and some tools, and it works the task out from what it already knows. Give the same goal to ARTIE in front of a HEART service, and Claude only chooses among what the service offers, once. After that, a script does the task with no model.</p>
+      <p class="lede">Give Claude a goal and some tools, and it works the task out from what it already knows. Give the same goal to ARTIE in front of a HEART service, and Claude only chooses among what the service offers. A run can then become a script that needs no model, or keep the model for just the steps that need judgement.</p>
     </div>
     <div class="seg"><span class="seg-label" id="theme-label">Theme</span><div role="group" aria-labelledby="theme-label" style="display:flex;gap:.3rem"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div>
   </header>
@@ -202,8 +213,9 @@ code { font: .86em var(--mono); }
         <text class="s" x="198" y="393">artie generate</text>
 
         <rect class="box h" x="366" y="350" width="138" height="62" rx="8"/>
-        <text class="t" x="378" y="374">Every later run</text>
-        <text class="s" x="378" y="393">no model</text>
+        <text class="t" x="378" y="374">Later runs</text>
+        <text class="s" x="378" y="393">no model, or only</text>
+        <text class="s" x="378" y="406">at steps kept as intents</text>
 
         <path class="ar" d="M40,302 L40,348" marker-end="url(#bg)"/>
         <path class="ar" d="M156,381 L184,381" marker-end="url(#bg)"/>
@@ -213,8 +225,127 @@ code { font: .86em var(--mono); }
         <text class="lbl h" x="443" y="343">the pins</text>
       </svg>
       </div>
-      <figcaption>The representation says what can be done next. Claude chooses among those offers, and only on the first run. The service vouches for every request.</figcaption>
+      <figcaption>The representation says what can be done next. Claude chooses among those offers. The service vouches for every request, whether the model or a script made it.</figcaption>
     </figure>
+  </section>
+
+  <section aria-labelledby="modes-title">
+    <h2 id="modes-title">At run time, three ways to mix</h2>
+    <p class="sub">The second diagram shows a first run turning into a script with no model. That is one option, not the only one. A step can stay an intent inside a script, and the model is then called for that step on every run. Below, the seven steps of the GitHub task, coloured by who decides each one.</p>
+    <p class="key"><span class="sw m"></span>the model decides, every run <span class="sw h"></span>the script decides</p>
+    <div class="trio">
+    <figure class="mode">
+      <h3>Reasoned</h3>
+      <div class="svg-wrap"><svg viewBox="0 0 360 222" role="img" aria-labelledby="t-reasoned"><title id="t-reasoned">Every step decided by the model, each run.</title>
+<defs><marker id="k-reasoned" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="head m" d="M0,0L10,5L0,10z"/></marker></defs>
+<rect class="box m" x="105" y="10" width="150" height="44" rx="10"/>
+<text class="t" x="180" y="30" text-anchor="middle">Claude</text>
+<text class="s" x="180" y="46" text-anchor="middle">called at these steps</text>
+<path class="ar m" d="M180,54 L30,96" marker-end="url(#k-reasoned)"/>
+<rect class="box m" x="8" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="30" y="117" text-anchor="middle">repo</text>
+<path class="ar" d="M30,128 L30,158"/>
+<path class="ar m" d="M180,54 L79,96" marker-end="url(#k-reasoned)"/>
+<rect class="box m" x="57" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="79" y="117" text-anchor="middle">issue</text>
+<path class="ar" d="M79,128 L79,158"/>
+<path class="ar m" d="M180,54 L128,96" marker-end="url(#k-reasoned)"/>
+<rect class="box m" x="106" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="128" y="117" text-anchor="middle">branch</text>
+<path class="ar" d="M128,128 L128,158"/>
+<path class="ar m" d="M180,54 L177,96" marker-end="url(#k-reasoned)"/>
+<rect class="box m" x="155" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="177" y="117" text-anchor="middle">commit</text>
+<path class="ar" d="M177,128 L177,158"/>
+<path class="ar m" d="M180,54 L226,96" marker-end="url(#k-reasoned)"/>
+<rect class="box m" x="204" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="226" y="117" text-anchor="middle">PR</text>
+<path class="ar" d="M226,128 L226,158"/>
+<path class="ar m" d="M180,54 L275,96" marker-end="url(#k-reasoned)"/>
+<rect class="box m" x="253" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="275" y="117" text-anchor="middle">merge</text>
+<path class="ar" d="M275,128 L275,158"/>
+<path class="ar m" d="M180,54 L324,96" marker-end="url(#k-reasoned)"/>
+<rect class="box m" x="302" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="324" y="117" text-anchor="middle">close</text>
+<path class="ar" d="M324,128 L324,158"/>
+<rect class="box h" x="8" y="158" width="338" height="40" rx="8"/>
+<text class="t" x="20" y="176">HEART service</text>
+<text class="s" x="20" y="191">every request on an offered form or link; the rest refused</text>
+</svg></div>
+      <dl><dt>Written as</dt><dd>a goal.md, in steps or in words, or a script of <code>act(intent = …)</code> calls</dd><dt>Model each run</dt><dd>at every step; the live goal run made 22 reason steps</dd><dt>Use it when</dt><dd>exploring, on a first run, or when the service changes often</dd></dl>
+    </figure>
+    <figure class="mode">
+      <h3>Hybrid</h3>
+      <div class="svg-wrap"><svg viewBox="0 0 360 222" role="img" aria-labelledby="t-hybrid"><title id="t-hybrid">The script decides every step but one; the model decides how to close the issue.</title>
+<defs><marker id="k-hybrid" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="head m" d="M0,0L10,5L0,10z"/></marker></defs>
+<rect class="box m" x="105" y="10" width="150" height="44" rx="10"/>
+<text class="t" x="180" y="30" text-anchor="middle">Claude</text>
+<text class="s" x="180" y="46" text-anchor="middle">called at these steps</text>
+<rect class="box h" x="8" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="30" y="117" text-anchor="middle">repo</text>
+<path class="ar" d="M30,128 L30,158"/>
+<rect class="box h" x="57" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="79" y="117" text-anchor="middle">issue</text>
+<path class="ar" d="M79,128 L79,158"/>
+<rect class="box h" x="106" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="128" y="117" text-anchor="middle">branch</text>
+<path class="ar" d="M128,128 L128,158"/>
+<rect class="box h" x="155" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="177" y="117" text-anchor="middle">commit</text>
+<path class="ar" d="M177,128 L177,158"/>
+<rect class="box h" x="204" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="226" y="117" text-anchor="middle">PR</text>
+<path class="ar" d="M226,128 L226,158"/>
+<rect class="box h" x="253" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="275" y="117" text-anchor="middle">merge</text>
+<path class="ar" d="M275,128 L275,158"/>
+<path class="ar m" d="M180,54 L324,96" marker-end="url(#k-hybrid)"/>
+<rect class="box m" x="302" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="324" y="117" text-anchor="middle">close</text>
+<path class="ar" d="M324,128 L324,158"/>
+<rect class="box h" x="8" y="158" width="338" height="40" rx="8"/>
+<text class="t" x="20" y="176">HEART service</text>
+<text class="s" x="20" y="191">every request on an offered form or link; the rest refused</text>
+</svg></div>
+      <dl><dt>Written as</dt><dd>a script with an <code>act(intent = …)</code> where judgement matters, or what <code>artie generate --keep-reason</code> writes</dd><dt>Model each run</dt><dd>only at those steps; in the GitHub hybrid, once: how to close the issue (completed, not planned, a duplicate)</dd><dt>Use it when</dt><dd>one choice depends on the situation, and the rest is routine</dd></dl>
+    </figure>
+    <figure class="mode">
+      <h3>Deterministic</h3>
+      <div class="svg-wrap"><svg viewBox="0 0 360 222" role="img" aria-labelledby="t-scripted"><title id="t-scripted">The script decides every step; the model is not called.</title>
+<defs><marker id="k-scripted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path class="head m" d="M0,0L10,5L0,10z"/></marker></defs>
+<rect class="box out" x="105" y="10" width="150" height="44" rx="10"/>
+<text class="t" x="180" y="30" text-anchor="middle">Claude</text>
+<text class="s" x="180" y="46" text-anchor="middle">not called</text>
+<rect class="box h" x="8" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="30" y="117" text-anchor="middle">repo</text>
+<path class="ar" d="M30,128 L30,158"/>
+<rect class="box h" x="57" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="79" y="117" text-anchor="middle">issue</text>
+<path class="ar" d="M79,128 L79,158"/>
+<rect class="box h" x="106" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="128" y="117" text-anchor="middle">branch</text>
+<path class="ar" d="M128,128 L128,158"/>
+<rect class="box h" x="155" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="177" y="117" text-anchor="middle">commit</text>
+<path class="ar" d="M177,128 L177,158"/>
+<rect class="box h" x="204" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="226" y="117" text-anchor="middle">PR</text>
+<path class="ar" d="M226,128 L226,158"/>
+<rect class="box h" x="253" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="275" y="117" text-anchor="middle">merge</text>
+<path class="ar" d="M275,128 L275,158"/>
+<rect class="box h" x="302" y="98" width="44" height="30" rx="6"/>
+<text class="step" x="324" y="117" text-anchor="middle">close</text>
+<path class="ar" d="M324,128 L324,158"/>
+<rect class="box h" x="8" y="158" width="338" height="40" rx="8"/>
+<text class="t" x="20" y="176">HEART service</text>
+<text class="s" x="20" y="191">every request on an offered form or link; the rest refused</text>
+</svg></div>
+      <dl><dt>Written as</dt><dd>what <code>artie generate</code> writes from a run, or a script written by hand</dd><dt>Model each run</dt><dd>none; held to the pins in its lock file</dd><dt>Use it when</dt><dd>the task is routine and should cost nothing to repeat</dd></dl>
+    </figure>
+    </div>
+    <p class="sub">In all three, the service still bounds every request: the model, where it is called, only chooses among what is offered.</p>
   </section>
 
   <section class="cols" aria-label="How each works">
@@ -231,7 +362,7 @@ code { font: .86em var(--mono); }
       <ol>
         <li><b>The service says what's possible, one step at a time.</b> Claude chooses only among the forms and links in hand. If a merge isn't offered, Claude can't send a merge.</li>
         <li><b>The model's role is narrowed twice.</b> The planner picks the next move, and the reasoner fills an offered form. The runner refuses moves the step doesn't allow, and the server refuses stale or unoffered acts.</li>
-        <li><b>The run becomes a script that needs no model.</b> Each value records where it came from. The script follows relations, not URLs, and a lock file pins what was offered.</li>
+        <li><b>The run can become a script.</b> Each value records where it came from. The script follows relations, not URLs, and a lock file pins what was offered. Steps that need judgement can stay intents.</li>
       </ol>
     </div>
   </section>
@@ -260,8 +391,8 @@ code { font: .86em var(--mono); }
           <tr><td>Where knowledge comes from</td><td>training data, docs, guesses</td><td class="h">the representation in hand</td></tr>
           <tr><td>What actions are possible</td><td>anything the tools allow</td><td class="h">only what's offered right now</td></tr>
           <tr><td>Who enforces the rules</td><td>Claude, by remembering them</td><td class="h">the server, with each offer</td></tr>
-          <tr><td>Repeat runs</td><td>reasoned again each time, or a fixed script nobody checks</td><td class="h">a generated script, no model, deterministic</td></tr>
-          <tr><td>Model cost per run</td><td>every run</td><td class="h">only the first</td></tr>
+          <tr><td>Repeat runs</td><td>reasoned again each time, or a fixed script nobody checks</td><td class="h">your choice per step: reasoned, hybrid, or a generated script with no model</td></tr>
+          <tr><td>Model cost per run</td><td>every run, every step</td><td class="h">only at the steps left as intents; none for a generated script</td></tr>
           <tr><td>When the service changes</td><td>fails late, or silently</td><td class="h">stops before acting (pins)</td></tr>
           <tr><td>Audit</td><td>a chat log</td><td class="h">a YAML capture where each value names its source, a derivation report, review marks</td></tr>
           <tr><td>How far mistakes reach</td><td>Claude's judgement</td><td class="h">step and run limits, the strict guard, refusal before side effects</td></tr>
@@ -276,12 +407,12 @@ code { font: .86em var(--mono); }
     <h2>Where it isn't better</h2>
     <ul>
       <li><b>It needs a HEART service, or a gateway in front of one.</b> The GitHub connector was real work. Against a plain REST API, Claude alone is the only option.</li>
-      <li><b>The first run isn't cheaper.</b> The live paragraph run took 22 reason steps; Claude alone would likely use fewer calls. The cost is paid back from the second run on.</li>
+      <li><b>A reasoned run isn't cheaper.</b> The live goal run took 22 reason steps; Claude alone would likely use fewer calls. The saving comes from the steps that stop needing the model.</li>
       <li><b>It's less flexible.</b> Claude alone can mix in other tools: reading a file, running tests, posting a message. A goal run only does what the service offers.</li>
     </ul>
   </section>
 
-  <p class="close">The trade: some flexibility goes. In return, the model's role shrinks to choosing among options the service vouches for, and to nothing at all once the script exists.</p>
+  <p class="close">The trade: some flexibility goes. In return, the model's role shrinks to choosing among options the service vouches for, at the steps where you still want it, and to nothing where you don't.</p>
 </main>
 
 <script>
