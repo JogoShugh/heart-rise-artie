@@ -31,7 +31,7 @@ Fix the blank-bed-name crash, start to finish.
       - Verify: it merged
   - On {issue}
     - Comment "Fixed in 1.2 by #{pr.number}."
-    - Close it as completed
+    - Close it the right way: the fix shipped in 1.2 `reasoned`
     - Verify:
       - it is closed
       - its reason is completed
@@ -107,7 +107,8 @@ A bullet is `-`, `*` or `+`; siblings use the same one.
 Each stops the run before its first request, naming the file, the line and what to write instead
 (`task.goal.md:14: "Verfy:" is no marker: write Wait: or Verify:, or put the words another way`):
 
-1. Front matter: missing, not first, not YAML, a key other than `start` and `inputs`, an input form not listed.
+1. Front matter: missing, not first, not YAML, a key other than `start`, `inputs` and `limits`, an input form not
+   listed, a limit that is not a whole number above 0.
 2. Body shape: a heading, a table, a code block, a quote, a numbered list, a second list, or a paragraph after the
    list.
 3. Bullets: siblings with different markers; indentation that is not 2 spaces a level.
@@ -200,12 +201,11 @@ Features first in each, red at test level, then code.
 - **Facts are words.** "it merged"; the planner turns each into a Check move.
 - **Limits:** 50 moves a run, 10 a step, each settable (above).
 - **`` `reasoned` `` marks a leaf step to stay an intent** in the generated script.
-
-Later, if needed: a narrower kept step that fixes the relation and lets the model choose only the values
-(`act("github:close", intent = …)`); and a `` `fixed` `` mark, should `--keep-reason` turn out to keep too much.
 - **`.goal.yaml` goes** once `.goal.md` works.
 
 ## Open
 
+- **Narrower kept steps**, if needed: one that fixes the relation and lets the model choose only the values
+  (`act("github:close", intent = …)`); and a `` `fixed` `` mark, should `--keep-reason` turn out to keep too much.
 - **Promotion.** `artie generate --steps` writing a `.goal.md` in steps from a free goal's run: free words, then
   steps, then a script, each firmer.
