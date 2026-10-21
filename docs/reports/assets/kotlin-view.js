@@ -8,7 +8,7 @@
 (() => {
   const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
     "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
-  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b/g;
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("""[\s\S]*?"""(?!")|"(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b/g;
   // Each token of the text: its class ("" for plain) and its text, in order, covering every character.
   const tokens = (text) => {
     const out = [];

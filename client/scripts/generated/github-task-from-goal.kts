@@ -11,7 +11,7 @@ heart("http://localhost:8392/") {
     var number13 = 0L // step 13's /number
 
     act("github:repos-get", "owner" to owner, "repo" to repo, intent = "get repository $owner/$repo") {
-        act("github:open-issue", intent = "open an issue titled \"Crash when a bed has no name (reasoned)\" with body \"Opened by a HEART script.\"", fields = {
+        act("github:open-issue", intent = """open an issue titled "Crash when a bed has no name (reasoned)" with body "Opened by a HEART script."""", fields = {
             "title" to "Crash when a bed has no name (reasoned)"
             "body" to "Opened by a HEART script."
         }) {
@@ -26,12 +26,12 @@ heart("http://localhost:8392/") {
         act("github:branch-from-here", intent = "start a new branch named fix-blank-names-reasoned-$stamp", fields = {
             "name" to "fix-blank-names-reasoned-$stamp"
         }) {
-            act("github:commit-file", intent = "commit a file named fix-reasoned-$stamp.md with content \"Bed names may not be blank.\" and commit message \"Refuse a bed with no name\"", fields = {
+            act("github:commit-file", intent = """commit a file named fix-reasoned-$stamp.md with content "Bed names may not be blank." and commit message "Refuse a bed with no name"""", fields = {
                 "path" to "fix-reasoned-$stamp.md"
                 "message" to "Refuse a bed with no name"
                 "content" to "Bed names may not be blank."
             }) {
-                act("github:open-pull-request", intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\" with body \"Relates to #${number}.\"", fields = {
+                act("github:open-pull-request", intent = """open a pull request into main titled "Refuse a bed with no name (reasoned)" with body "Relates to #${number}."""", fields = {
                     "base" to "main"
                     "title" to "Refuse a bed with no name (reasoned)"
                     "body" to "Relates to #$number."

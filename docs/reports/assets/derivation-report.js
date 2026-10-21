@@ -84,7 +84,7 @@
       note.hidden = true;
       note.style.setProperty("--k", colour(d.kind));
       note.innerHTML = `<span class="b">${n}</span><div><span class="kind">${esc(KINDS[d.kind] || d.kind)}</span> ` +
-        `<b>${esc(d.title)}</b> <span class="rule">rule ${esc(d.rule)}</span><p>${esc(d.why)}</p></div>`;
+        `<b>${esc(d.title)}</b><span class="full"> <span class="rule">rule ${esc(d.rule)}</span><p>${esc(d.why)}</p></span></div>`;
       notes.append(note);
     });
     row.append(notes);
@@ -169,4 +169,14 @@
   };
   document.querySelectorAll(".theme button").forEach((b) => b.addEventListener("click", () => theme(b.dataset.th)));
   theme(document.documentElement.dataset.theme || "light");
+  // Notes: brief shows what each derivation is; full adds its rule, why, and the page's longer explanations.
+  const detail = (v) => {
+    document.documentElement.dataset.detail = v;
+    document.querySelectorAll(".detail button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.d === v)));
+    try { localStorage.setItem("dr-detail", v); } catch (e) { /* the page works without it */ }
+  };
+  document.querySelectorAll(".detail button").forEach((b) => b.addEventListener("click", () => detail(b.dataset.d)));
+  let saved = "brief";
+  try { saved = localStorage.getItem("dr-detail") || "brief"; } catch (e) { /* brief */ }
+  detail(saved);
 })();

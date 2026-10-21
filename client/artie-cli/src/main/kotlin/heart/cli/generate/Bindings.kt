@@ -105,9 +105,9 @@ class Bindings(
         step.slots.values.map { it.map()["from"] }
             .filter { from -> from.list().none { it.map()["input"] != null } }
             .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
-        val words = step.template ?: KotlinText.quoted(step.say).removeSurrounding("\"")
-        val call = Written(source, step).find(Regex("""act\(intent = "(?:\\.|[^"\\])*"\)"""))
-        return why.mark(why.kept(step), "act(intent = \"$words\")", listOf(call))
+        val words = step.template ?: KotlinText.dollars(step.say)
+        val call = Written(source, step).find(KEPT)
+        return why.mark(why.kept(step), "act(intent = ${heart.script.kotlinString(words)})", listOf(call))
     }
 
     /** The variable read from [pointer] in the answer of [step], made the first time it is needed. */
@@ -188,6 +188,9 @@ class Bindings(
 
     private companion object {
         val IDENTIFIER = Regex("[A-Za-z_][A-Za-z0-9_]*")
+
+        /** A kept reason step's call as the script wrote it, its words a raw string or a plain one. */
+        val KEPT = Regex("act\\(intent = (?:\"\"\".*?\"\"\"(?!\")|\"(?:\\\\.|[^\"\\\\])*\")\\)")
 
         fun camel(member: String): String = member.split('_', '-').filter { it.isNotEmpty() }
             .mapIndexed { i, word -> if (i == 0) word else word.replaceFirstChar(Char::uppercase) }

@@ -70,3 +70,24 @@ Feature: Each value a step sends says where it came from, and a reason step its 
       | slot            | value | from           |
       | crop            | basil | input crop     |
       | state["number"] | 7     | step 2 /number |
+
+  Scenario: A reason step written as a raw string keeps its quotes in its template, as words, not escapes
+    Given the reasoner chooses
+      | intent                                  | selection | relation | fields                                |
+      | sow basil "about" 2 cm deep in bed 7    | act       | sow      | {"seedType": "basil", "depthCm": "2"} |
+    And the script is
+      ```kotlin
+      val crop by input()
+      heart("scripted://service/") {
+          act("bed-get", "id" to 1)
+          act(intent = """sow $crop "about" 2 cm deep in bed ${state["number"]}""")
+      }
+      ```
+    When the script runs unattended, allowed a reasoner, given
+      | input | value |
+      | crop  | basil |
+    Then the script finished
+    And trace step 3's reason template is 'sow $crop "about" 2 cm deep in bed ${state["number"]}', with these slots
+      | slot            | value | from           |
+      | crop            | basil | input crop     |
+      | state["number"] | 7     | step 2 /number |

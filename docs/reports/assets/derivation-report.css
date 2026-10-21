@@ -72,3 +72,14 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .file .about { color: var(--muted); font-size: .86rem; }
 .file pre { margin: 0; padding: .6rem .9rem; border-top: 1px solid var(--rule); font: .78rem/1.6 var(--mono);
   white-space: pre; overflow-x: auto; max-height: 36rem; overflow-y: auto; }
+.toggles { display: flex; gap: .6rem; flex-wrap: wrap; }
+:root[data-detail="brief"] .full { display: none; }
+:root:not([data-detail="brief"]) .brief { display: none; }
+.goal { margin: 1rem 0 0; } .goal h2 { font: 600 .8rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; }
+.goal pre { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .8rem 1rem; overflow-x: auto; font-size: .85rem; white-space: pre-wrap; }
+.goal .explain { max-width: 68ch; font-size: .92rem; line-height: 1.55; margin: 0 0 .7rem; } .goal .explain p { margin: .3rem 0; }
+.goal .explain ul { margin: .3rem 0 .6rem; padding-left: 1.2rem; display: grid; gap: .3rem; }
+.goal .explain code { font: .85em var(--mono); background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .25em; }
+.goal pre.cmd { font: .78rem/1.6 var(--mono); white-space: pre; padding: .6rem .9rem; }
+.y-k { color: var(--kt-kw); } .y-s { color: var(--kt-str); } .y-u { color: var(--kt-fn); } .y-v { color: var(--kt-tpl); font-weight: 600; } .y-p { color: var(--kt-cm); }
+.more { max-width: 68ch; color: var(--muted); font-size: .92rem; line-height: 1.55; margin: .2rem 0 0; }

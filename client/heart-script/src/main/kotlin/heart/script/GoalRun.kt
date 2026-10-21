@@ -159,12 +159,12 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
 internal object GoalText {
     private val SLOT = Regex("""\$\{([A-Za-z_][A-Za-z0-9_]*)}|\$([A-Za-z_][A-Za-z0-9_]*)""")
 
-    fun act(words: String) = "act(intent = \"${escaped(words)}\")"
+    fun act(words: String) = "act(intent = ${kotlinString(words)})"
 
-    fun until(relation: String, tries: Int) = "until(tries = $tries) { offers(\"${escaped(relation)}\") }"
+    fun until(relation: String, tries: Int) = "until(tries = $tries) { offers(${kotlinString(relation, false)}) }"
 
-    fun check(facts: Map<String, Any?>) =
-        "check(" + facts.entries.joinToString { (member, value) -> "\"${escaped(member)}\" to ${literal(value)}" } + ")"
+    fun check(facts: Map<String, Any?>) = "check(" +
+        facts.entries.joinToString { (member, value) -> "${kotlinString(member, false)} to ${literal(value)}" } + ")"
 
     /** [text] with each `$name` or `${name}` of one of [inputs] put as its [value]. */
     fun fill(text: String, inputs: Set<String>, value: (String) -> String): String = SLOT.replace(text) { slot ->
@@ -172,11 +172,9 @@ internal object GoalText {
         if (name in inputs) value(name) else slot.value
     }
 
-    private fun escaped(text: String) = text.replace("\\", "\\\\").replace("\"", "\\\"")
-
     private fun literal(value: Any?): String = when (value) {
         null -> "null"
-        is String -> "\"${escaped(value)}\""
+        is String -> kotlinString(value, false)
         else -> value.toString()
     }
 }

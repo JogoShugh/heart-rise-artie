@@ -41,8 +41,19 @@ internal class Written(source: List<String>?, step: Step) {
         return Span(first + before.count { it == '\n' }, at - (before.lastIndexOf('\n') + 1) + 1, text)
     }
 
-    /** The string literal that begins at [from], to its closing quote, a `${…}` inside it skipped. */
-    private fun literal(from: Int): String {
+    /**
+     * The string literal that begins at [from], to its closing quote, a `${…}` inside it skipped. A raw string,
+     * `"""…"""`, ends at the last three quotes of its closing run.
+     */
+    private fun literal(from: Int): String = if (call.startsWith(RAW, from)) raw(from) else plain(from)
+
+    private fun raw(from: Int): String {
+        var end = call.indexOf(RAW, from + RAW.length).takeIf { it >= 0 } ?: return call.substring(from)
+        while (call.startsWith(RAW + "\"", end)) end++
+        return call.substring(from, end + RAW.length)
+    }
+
+    private fun plain(from: Int): String {
         var i = from + 1
         var depth = 0
         while (i < call.length) {
@@ -60,6 +71,7 @@ internal class Written(source: List<String>?, step: Step) {
 
     companion object {
         val NAME = Regex("[A-Za-z_][A-Za-z0-9_]*")
+        private const val RAW = "\"\"\""
 
         /**
          * The slots of [step] its script wrote, as a reason step's are: each `$name` of a string it sent, with the

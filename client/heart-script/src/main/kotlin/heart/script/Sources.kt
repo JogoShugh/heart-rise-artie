@@ -139,35 +139,52 @@ internal class Template private constructor(val text: String, private val parts:
 
     companion object {
         private const val CALL = "intent = \""
+        private const val RAW = "\"\"\""
+        private const val DOLLAR = "\${'$'}"
 
-        /** The template of the `act(intent = …)` call on [line], or null when it has none. */
+        /**
+         * The template of the `act(intent = …)` call on [line], or null when it has none. A raw string, `"""…"""`,
+         * has no escapes: its quotes are words as written, and `${'$'}` is a dollar.
+         */
         fun of(line: String): Template? {
-            val start = line.indexOf(CALL).takeIf { it >= 0 }?.plus(CALL.length) ?: return null
+            val opened = line.indexOf(CALL).takeIf { it >= 0 }?.plus(CALL.length) ?: return null
+            val raw = line.startsWith(RAW, opened - 1)
+            val start = if (raw) opened + 2 else opened
             val parts = mutableListOf<Pair<Boolean, String>>()
             val plain = StringBuilder()
             var i = start
-            while (i < line.length && line[i] != '"') {
+            while (i < line.length && !closes(line, i, raw)) {
+                val slot = slot(line, i)
                 when {
-                    line[i] == '\\' && i + 1 < line.length -> { plain.append(line[i + 1]); i += 2 }
-                    line.startsWith("\${", i) -> {
-                        val end = closing(line, i + 2)
+                    !raw && line[i] == '\\' && i + 1 < line.length -> { plain.append(line[i + 1]); i += 2 }
+                    line.startsWith(DOLLAR, i) -> { plain.append('$'); i += DOLLAR.length }
+                    slot != null -> {
                         parts.flush(plain)
-                        parts += true to line.substring(i + 2, end)
-                        i = end + 1
-                    }
-                    line[i] == '$' && i + 1 < line.length && line[i + 1].isJavaIdentifierStart() -> {
-                        var j = i + 1
-                        while (j < line.length && line[j].isJavaIdentifierPart()) j++
-                        parts.flush(plain)
-                        parts += true to line.substring(i + 1, j)
-                        i = j
+                        parts += true to slot.first
+                        i = slot.second
                     }
                     else -> { plain.append(line[i]); i++ }
                 }
             }
             parts.flush(plain)
-            return Template(line.substring(start, i), parts)
+            val written = line.substring(start, i)
+            return Template(if (raw) written else written.replace("\\\"", "\"").replace("\\\\", "\\"), parts)
         }
+
+        /** The slot that begins at [i], `${expression}` or `$name`, and where it ends; null when none does. */
+        private fun slot(line: String, i: Int): Pair<String, Int>? = when {
+            line.startsWith("\${", i) -> closing(line, i + 2).let { end -> line.substring(i + 2, end) to end + 1 }
+            line[i] == '$' && i + 1 < line.length && line[i + 1].isJavaIdentifierStart() -> {
+                var j = i + 1
+                while (j < line.length && line[j].isJavaIdentifierPart()) j++
+                line.substring(i + 1, j) to j
+            }
+            else -> null
+        }
+
+        /** Whether the literal ends at [i]: a plain one at its quote; a raw one at the last three of its quotes. */
+        private fun closes(line: String, i: Int, raw: Boolean): Boolean =
+            if (raw) line.startsWith(RAW, i) && !line.startsWith(RAW + "\"", i) else line[i] == '"'
 
         private fun MutableList<Pair<Boolean, String>>.flush(plain: StringBuilder) {
             if (plain.isNotEmpty()) add(false to plain.toString())

@@ -149,6 +149,10 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     And the script "open-gen.kts" has a line with "\"Fixed in 2.12 for #$number in $stamp.\""
     And the script "open-gen.kts" has a line with "intent = \"comment on it: Fixed in 2.12 for #${number} in ${stamp}.\""
     And the script "open-gen.kts" has a line with "ofPattern(\"yyyy\")"
+    And the run's script kept in "open.trace.yaml" has a line with 'act(intent = """open an issue titled "Beam drifts $stamp"""")'
+    And the run's script kept in "open.trace.yaml" has no escaped quote
+    And the script "open-gen.kts" has a line with 'intent = """open an issue titled "Beam drifts $stamp""""'
+    And the script "open-gen.kts" has no escaped quote
 
   Scenario: A detour the planner took is left out of the script made from its run
     The planner looks at issue 11 first, which the goal never asked for, and

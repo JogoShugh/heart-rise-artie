@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>From a Goal to a Script</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="github-task-from-goal.kts, which artie generate wrote from github-task-goal.trace.yaml, the run of github-task.goal.moves.kts, beside it: each number marks one derivation on both sides, and its note says which rule bound it.">
+<meta name="description" content="A goal in words, done live by Claude; then the script made from that run, which does it again with no model.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <script>try { document.documentElement.dataset.theme = localStorage.getItem("dr-theme") || "light"; } catch (e) { document.documentElement.dataset.theme = "light"; }</script>
@@ -84,19 +84,31 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .file .about { color: var(--muted); font-size: .86rem; }
 .file pre { margin: 0; padding: .6rem .9rem; border-top: 1px solid var(--rule); font: .78rem/1.6 var(--mono);
   white-space: pre; overflow-x: auto; max-height: 36rem; overflow-y: auto; }
-.goal { margin: 1rem 0 0; } .goal h2 { font: 600 .8rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; } .goal pre { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .8rem 1rem; overflow-x: auto; font-size: .85rem; white-space: pre-wrap; }
-.goal .explain { max-width: 68ch; font-size: .92rem; line-height: 1.55; margin: 0 0 .7rem; } .goal .explain p { margin: .3rem 0; } .goal .explain ul { margin: .3rem 0 .6rem; padding-left: 1.2rem; display: grid; gap: .3rem; } .goal .explain code { font: .85em var(--mono); background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .25em; } .goal pre.cmd { font: .78rem/1.6 var(--mono); white-space: pre; padding: .6rem .9rem; } .y-k { color: var(--kt-kw); } .y-s { color: var(--kt-str); } .y-u { color: var(--kt-fn); } .y-v { color: var(--kt-tpl); font-weight: 600; } .y-p { color: var(--kt-cm); }
+.toggles { display: flex; gap: .6rem; flex-wrap: wrap; }
+:root[data-detail="brief"] .full { display: none; }
+:root:not([data-detail="brief"]) .brief { display: none; }
+.goal { margin: 1rem 0 0; } .goal h2 { font: 600 .8rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; }
+.goal pre { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .8rem 1rem; overflow-x: auto; font-size: .85rem; white-space: pre-wrap; }
+.goal .explain { max-width: 68ch; font-size: .92rem; line-height: 1.55; margin: 0 0 .7rem; } .goal .explain p { margin: .3rem 0; }
+.goal .explain ul { margin: .3rem 0 .6rem; padding-left: 1.2rem; display: grid; gap: .3rem; }
+.goal .explain code { font: .85em var(--mono); background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .25em; }
+.goal pre.cmd { font: .78rem/1.6 var(--mono); white-space: pre; padding: .6rem .9rem; }
+.y-k { color: var(--kt-kw); } .y-s { color: var(--kt-str); } .y-u { color: var(--kt-fn); } .y-v { color: var(--kt-tpl); font-weight: 600; } .y-p { color: var(--kt-cm); }
+.more { max-width: 68ch; color: var(--muted); font-size: .92rem; line-height: 1.55; margin: .2rem 0 0; }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <div><h1>From a Goal to a Script</h1><p class="lede">The goal below is all a person wrote. Claude planned it move by move against the live GitHub gateway (issue #144, pull request #145); each move is a line of github-task.goal.moves.kts, on the left, refused tries and detours included, which changed nothing. artie generate wrote github-task-from-goal.kts, on the right, from the run, leaving the detours out: each number marks one derivation on both sides, and its note says which rule bound it. That script then did the task again with no model, held strictly (#146, #147).</p></div>
-    <div class="theme" role="group" aria-label="Theme"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div>
+    <div><h1>From a Goal to a Script</h1><p class="lede">A goal in words, done live by Claude; then the script made from that run, which does it again with no model.</p></div>
+    <div class="toggles"><div class="detail theme" role="group" aria-label="Notes"><button type="button" data-d="brief">Brief</button><button type="button" data-d="full">Full</button></div>
+    <div class="theme" role="group" aria-label="Theme"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div>
   </header>
-  
+  <p class="full more">Claude planned the goal below move by move against the live GitHub gateway (issue #144, pull request #145); each move is a line of github-task.goal.moves.kts, on the left, refused tries and detours included, which changed nothing. artie generate wrote github-task-from-goal.kts, on the right, from the run, leaving the detours out: each number marks one derivation on both sides, and its note says which rule bound it. That script then did the task again with no model, held strictly (#146, #147).</p>
   <section class="goal"><h2>The goal: github-task.goal.yaml</h2>
   <div class="explain">
+    <p class="brief">All a person writes: where to start, the inputs, and the goal in words.</p>
+    <div class="full">
     <p>All a person writes. Three keys, nothing else:</p>
     <ul>
       <li><code>start</code>: the bookmark, the one address the run begins from. Every other address comes from what the server hands over.</li>
@@ -108,6 +120,7 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
   --reasoner claude --rung L2 --trace github-task.trace.yaml
 artie generate github-task.trace.yaml \
   --out github-task-from-goal.kts --script github-task.goal.yaml</pre>
+    </div>
   </div>
   <pre class="yaml"><span class="y-k">start</span>: <span class="y-u">http://localhost:8392/</span>
 <span class="y-k">inputs</span>:
@@ -137,14 +150,14 @@ artie generate github-task.trace.yaml \
   <section class="files" id="files" hidden><h2>Beside the scripts</h2></section>
 </main>
 <pre hidden id="source-text">act(intent = "get repository $owner/$repo")
-act(intent = "open an issue titled \"Crash when a bed has no name (reasoned)\" with body \"Opened by a HEART script.\"")
+act(intent = """open an issue titled "Crash when a bed has no name (reasoned)" with body "Opened by a HEART script."""")
 act(intent = "get repository $owner/$repo")
 act(intent = "create a branch named fix-blank-names-reasoned-1020-225446 from the main branch")
 act(intent = "create a git ref named refs/heads/fix-blank-names-reasoned-1020-225446 from the tip of the main branch")
 act(intent = "follow the git-refs link to look for a form to create a branch ref")
 act(intent = "follow the github:git-refs link of this repository")
 act(intent = "follow the github:branches link")
-act(intent = "follow the github:git-refs link (the \"git-refs\" relation in the links list)")
+act(intent = """follow the github:git-refs link (the "git-refs" relation in the links list)""")
 act(intent = "follow the github:git-refs link to reach the git references")
 act(intent = "follow the git-refs link")
 act(intent = "follow the github:git link")
@@ -152,8 +165,8 @@ act(intent = "follow the github:git-refs link")
 act(intent = "follow the github:git-refs link")
 act(intent = "get the branch main of repository $owner/$repo")
 act(intent = "start a new branch named fix-blank-names-reasoned-$stamp")
-act(intent = "commit a file named fix-reasoned-$stamp.md with content \"Bed names may not be blank.\" and commit message \"Refuse a bed with no name\"")
-act(intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\" with body \"Relates to #144.\"")
+act(intent = """commit a file named fix-reasoned-$stamp.md with content "Bed names may not be blank." and commit message "Refuse a bed with no name"""")
+act(intent = """open a pull request into main titled "Refuse a bed with no name (reasoned)" with body "Relates to #144."""")
 until(tries = 20) { offers("github:merge") }
 act(intent = "merge the pull request by squashing its commits")
 check("merged" to true)
@@ -162,7 +175,7 @@ act(intent = "comment on it: Fixed in 1.2 by #145.")
 act(intent = "close the issue as completed")
 check("state" to "closed", "state_reason" to "completed")
 </pre>
-<pre hidden id="generated-text">// Generated by artie generate from github-task-goal.trace.yaml, the run of github-task.goal.moves.kts.
+<pre hidden id="generated-text">// Generated by artie generate from github-task-goal.trace.yaml, the run of github-task.goal.yaml.
 // Every selection as that run made it, nested as it nested, with no model.
 // What it was offered is pinned in github-task-from-goal.pins.yaml, held to before every act.
 //   artie run github-task-from-goal.kts owner=JogoShugh
@@ -175,7 +188,7 @@ heart("http://localhost:8392/") {
     var number13 = 0L // step 13's /number
 
     act("github:repos-get", "owner" to owner, "repo" to repo, intent = "get repository $owner/$repo") {
-        act("github:open-issue", intent = "open an issue titled \"Crash when a bed has no name (reasoned)\" with body \"Opened by a HEART script.\"", fields = {
+        act("github:open-issue", intent = """open an issue titled "Crash when a bed has no name (reasoned)" with body "Opened by a HEART script."""", fields = {
             "title" to "Crash when a bed has no name (reasoned)"
             "body" to "Opened by a HEART script."
         }) {
@@ -190,12 +203,12 @@ heart("http://localhost:8392/") {
         act("github:branch-from-here", intent = "start a new branch named fix-blank-names-reasoned-$stamp", fields = {
             "name" to "fix-blank-names-reasoned-$stamp"
         }) {
-            act("github:commit-file", intent = "commit a file named fix-reasoned-$stamp.md with content \"Bed names may not be blank.\" and commit message \"Refuse a bed with no name\"", fields = {
+            act("github:commit-file", intent = """commit a file named fix-reasoned-$stamp.md with content "Bed names may not be blank." and commit message "Refuse a bed with no name"""", fields = {
                 "path" to "fix-reasoned-$stamp.md"
                 "message" to "Refuse a bed with no name"
                 "content" to "Bed names may not be blank."
             }) {
-                act("github:open-pull-request", intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\" with body \"Relates to #${number}.\"", fields = {
+                act("github:open-pull-request", intent = """open a pull request into main titled "Refuse a bed with no name (reasoned)" with body "Relates to #${number}."""", fields = {
                     "base" to "main"
                     "title" to "Refuse a bed with no name (reasoned)"
                     "body" to "Relates to #$number."
@@ -224,11 +237,11 @@ heart("http://localhost:8392/") {
     }
 }
 </pre>
-<pre hidden id="derivation"># How github-task-from-goal.kts was derived from github-task-goal.trace.yaml, the run of github-task.goal.moves.kts: each derivation, numbered
+<pre hidden id="derivation"># How github-task-from-goal.kts was derived from github-task-goal.trace.yaml, the run of github-task.goal.yaml: each derivation, numbered
 # in the order github-task-from-goal.kts first shows it, with the rule of spec/PLAN-SCRIPT-GENERATOR.md that bound it, and where it
 # stands in both scripts (line and column, from 1); rows: where each step of the run begins in both.
 script: 'github-task-from-goal.kts'
-source: 'github-task.goal.moves.kts'
+source: 'github-task.goal.yaml'
 capture: 'github-task-goal.trace.yaml'
 rows:
   - {at: 'inputs', source: null, generated: 5}
@@ -335,7 +348,7 @@ derivations:
     title: '"Crash when a bed has no name (reasoned)", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 2, column: 38, text: 'Crash when a bed has no name (reasoned)'}
+      - {line: 2, column: 39, text: 'Crash when a bed has no name (reasoned)'}
     generated:
       - {line: 15, column: 24, text: '"Crash when a bed has no name (reasoned)"'}
   - n: 8
@@ -353,7 +366,7 @@ derivations:
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
       - {line: 15, column: 30, text: 'main'}
-      - {line: 18, column: 40, text: 'main'}
+      - {line: 18, column: 42, text: 'main'}
     generated:
       - {line: 24, column: 21, text: '"main"'}
       - {line: 35, column: 31, text: '"main"'}
@@ -372,7 +385,7 @@ derivations:
     title: 'A string, its values put back as their names'
     why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
     source:
-      - {line: 17, column: 48, text: '$stamp'}
+      - {line: 17, column: 50, text: '$stamp'}
     generated:
       - {line: 30, column: 27, text: '"fix-reasoned-$stamp.md"'}
   - n: 12
@@ -381,7 +394,7 @@ derivations:
     title: '"Refuse a bed with no name", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 17, column: 124, text: 'Refuse a bed with no name'}
+      - {line: 17, column: 123, text: 'Refuse a bed with no name'}
     generated:
       - {line: 31, column: 30, text: '"Refuse a bed with no name"'}
   - n: 13
@@ -390,7 +403,7 @@ derivations:
     title: '"Bed names may not be blank.", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 17, column: 73, text: 'Bed names may not be blank.'}
+      - {line: 17, column: 74, text: 'Bed names may not be blank.'}
     generated:
       - {line: 32, column: 30, text: '"Bed names may not be blank."'}
   - n: 14
@@ -399,7 +412,7 @@ derivations:
     title: '"Refuse a bed with no name (reasoned)", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 18, column: 54, text: 'Refuse a bed with no name (reasoned)'}
+      - {line: 18, column: 55, text: 'Refuse a bed with no name (reasoned)'}
     generated:
       - {line: 36, column: 32, text: '"Refuse a bed with no name (reasoned)"'}
   - n: 15
@@ -502,11 +515,11 @@ forms:
 links:
   github:repos-list-branches: ''
 </pre>
-<pre hidden class="beside" data-name="github-task-from-goal.derivation.yaml"># How github-task-from-goal.kts was derived from github-task-goal.trace.yaml, the run of github-task.goal.moves.kts: each derivation, numbered
+<pre hidden class="beside" data-name="github-task-from-goal.derivation.yaml"># How github-task-from-goal.kts was derived from github-task-goal.trace.yaml, the run of github-task.goal.yaml: each derivation, numbered
 # in the order github-task-from-goal.kts first shows it, with the rule of spec/PLAN-SCRIPT-GENERATOR.md that bound it, and where it
 # stands in both scripts (line and column, from 1); rows: where each step of the run begins in both.
 script: 'github-task-from-goal.kts'
-source: 'github-task.goal.moves.kts'
+source: 'github-task.goal.yaml'
 capture: 'github-task-goal.trace.yaml'
 rows:
   - {at: 'inputs', source: null, generated: 5}
@@ -613,7 +626,7 @@ derivations:
     title: '"Crash when a bed has no name (reasoned)", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 2, column: 38, text: 'Crash when a bed has no name (reasoned)'}
+      - {line: 2, column: 39, text: 'Crash when a bed has no name (reasoned)'}
     generated:
       - {line: 15, column: 24, text: '"Crash when a bed has no name (reasoned)"'}
   - n: 8
@@ -631,7 +644,7 @@ derivations:
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
       - {line: 15, column: 30, text: 'main'}
-      - {line: 18, column: 40, text: 'main'}
+      - {line: 18, column: 42, text: 'main'}
     generated:
       - {line: 24, column: 21, text: '"main"'}
       - {line: 35, column: 31, text: '"main"'}
@@ -650,7 +663,7 @@ derivations:
     title: 'A string, its values put back as their names'
     why: 'Each value inside the string that an input or an earlier answer gave is put back as that name.'
     source:
-      - {line: 17, column: 48, text: '$stamp'}
+      - {line: 17, column: 50, text: '$stamp'}
     generated:
       - {line: 30, column: 27, text: '"fix-reasoned-$stamp.md"'}
   - n: 12
@@ -659,7 +672,7 @@ derivations:
     title: '"Refuse a bed with no name", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 17, column: 124, text: 'Refuse a bed with no name'}
+      - {line: 17, column: 123, text: 'Refuse a bed with no name'}
     generated:
       - {line: 31, column: 30, text: '"Refuse a bed with no name"'}
   - n: 13
@@ -668,7 +681,7 @@ derivations:
     title: '"Bed names may not be blank.", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 17, column: 73, text: 'Bed names may not be blank.'}
+      - {line: 17, column: 74, text: 'Bed names may not be blank.'}
     generated:
       - {line: 32, column: 30, text: '"Bed names may not be blank."'}
   - n: 14
@@ -677,7 +690,7 @@ derivations:
     title: '"Refuse a bed with no name (reasoned)", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 18, column: 54, text: 'Refuse a bed with no name (reasoned)'}
+      - {line: 18, column: 55, text: 'Refuse a bed with no name (reasoned)'}
     generated:
       - {line: 36, column: 32, text: '"Refuse a bed with no name (reasoned)"'}
   - n: 15
@@ -740,7 +753,7 @@ derivations:
 (() => {
   const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
     "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
-  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b/g;
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("""[\s\S]*?"""(?!")|"(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b/g;
   // Each token of the text: its class ("" for plain) and its text, in order, covering every character.
   const tokens = (text) => {
     const out = [];
@@ -880,7 +893,7 @@ derivations:
       note.hidden = true;
       note.style.setProperty("--k", colour(d.kind));
       note.innerHTML = `<span class="b">${n}</span><div><span class="kind">${esc(KINDS[d.kind] || d.kind)}</span> ` +
-        `<b>${esc(d.title)}</b> <span class="rule">rule ${esc(d.rule)}</span><p>${esc(d.why)}</p></div>`;
+        `<b>${esc(d.title)}</b><span class="full"> <span class="rule">rule ${esc(d.rule)}</span><p>${esc(d.why)}</p></span></div>`;
       notes.append(note);
     });
     row.append(notes);
@@ -965,6 +978,16 @@ derivations:
   };
   document.querySelectorAll(".theme button").forEach((b) => b.addEventListener("click", () => theme(b.dataset.th)));
   theme(document.documentElement.dataset.theme || "light");
+  // Notes: brief shows what each derivation is; full adds its rule, why, and the page's longer explanations.
+  const detail = (v) => {
+    document.documentElement.dataset.detail = v;
+    document.querySelectorAll(".detail button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.d === v)));
+    try { localStorage.setItem("dr-detail", v); } catch (e) { /* the page works without it */ }
+  };
+  document.querySelectorAll(".detail button").forEach((b) => b.addEventListener("click", () => detail(b.dataset.d)));
+  let saved = "brief";
+  try { saved = localStorage.getItem("dr-detail") || "brief"; } catch (e) { /* brief */ }
+  detail(saved);
 })();
 </script>
 </body>

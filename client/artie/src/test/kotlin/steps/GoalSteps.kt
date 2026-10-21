@@ -17,6 +17,7 @@ import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
+import org.yaml.snakeyaml.Yaml
 import java.nio.file.Files
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -100,6 +101,30 @@ class GoalSteps(
     fun hasNoLine(script: String, text: String) {
         val lines = Files.readAllLines(replay.folder.resolve(script))
         assertTrue(lines.none { text in it }, lines.joinToString("\n"))
+    }
+
+    @Then("the script {string} has no escaped quote")
+    fun noEscapedQuote(script: String) {
+        val lines = Files.readAllLines(replay.folder.resolve(script))
+        assertTrue(lines.none { "\\\"" in it }, lines.joinToString("\n"))
+    }
+
+    @Then("the run's script kept in {string} has a line with {string}")
+    fun keptHasLine(capture: String, text: String) {
+        val lines = kept(capture)
+        assertTrue(lines.any { text in it }, lines.joinToString("\n"))
+    }
+
+    @Then("the run's script kept in {string} has no escaped quote")
+    fun keptNoEscapedQuote(capture: String) {
+        val lines = kept(capture)
+        assertTrue(lines.none { "\\\"" in it }, lines.joinToString("\n"))
+    }
+
+    /** The lines of the script a goal run wrote, one a move, as its capture keeps it under `run: source:`. */
+    private fun kept(capture: String): List<String> {
+        val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>
+        return ((head["run"] as Map<*, *>)["source"] as String).lines()
     }
 
     /** The scripted moves, one a call; once they run out, a "loop" planner makes a move that does nothing. */

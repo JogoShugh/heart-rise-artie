@@ -1,5 +1,7 @@
 package heart.cli.generate
 
+import heart.script.kotlinString
+
 /**
  * The script a capture gives (spec/PLAN-SCRIPT-GENERATOR.md): its inputs, then every selection the run made,
  * nested as the run nested them, each variable read in the block of the step that brought its value in. With the
@@ -141,7 +143,7 @@ class ScriptWriter(
 
     private fun follow(step: Step): String {
         val title = step.params["title"]?.let { ", ${KotlinText.quoted(it.toString())}" }.orEmpty()
-        val intent = intent(step, names)?.let { ", intent = \"$it\"" }.orEmpty()
+        val intent = intent(step, names)?.let { ", intent = ${kotlinString(it)}" }.orEmpty()
         return "follow(${why.relation(step, source)}$title$intent)"
     }
 
@@ -156,7 +158,8 @@ class ScriptWriter(
     private fun act(step: Step, pad: String): List<String> {
         val relation = why.relation(step, source)
         val arguments = bindings.arguments(step)
-        val intent = intent(step, names)?.let { "intent = \"${spoken(it, arguments, capture.source != null)}\"" }
+        val goal = capture.source != null
+        val intent = intent(step, names)?.let { "intent = " + kotlinString(spoken(it, arguments, goal)) }
         reviews += arguments.count { it.review != null }
         val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
             listOfNotNull(intent)).joinToString(", ") + ")"
