@@ -150,6 +150,36 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     And the script "open-gen.kts" has a line with "intent = \"comment on it: Fixed in 2.12 for #${number} in ${stamp}.\""
     And the script "open-gen.kts" has a line with "ofPattern(\"yyyy\")"
 
+  Scenario: A detour the planner took is left out of the script made from its run
+    The planner looks at issue 11 first, which the goal never asked for, and
+    reads nothing there that a later step uses; then it does the goal. The
+    script made from the run does only what the goal needed. A read a later
+    step takes a value from stays.
+    Given the planner will move
+      | move   | words                              | sentence | opens | to                           |
+      | act    | look at issue 11 of acme/rockets   | 1        | yes   |                              |
+      | back   |                                    |          |       | https://github.gateway.test/ |
+      | act    | open issue $number of $owner/$repo | 1        | yes   |                              |
+      | done   |                                    | 1        |       |                              |
+      | act    | close it                           | 2        |       |                              |
+      | done   |                                    | 2        |       |                              |
+      | finish |                                    |          |       |                              |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                 |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 11} |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:close      | {}                                                     |
+    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+      | name   | value |
+      | number | 10    |
+    Then the run finished
+    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.yaml"
+    Then the script "goal-gen.kts" nests its acts as
+      | relation          | depth |
+      | github:issues-get | 1     |
+      | github:close      | 2     |
+    And the script "goal-gen.kts" has no line with "look at issue 11"
+
   Scenario: An act refused before anything is sent is told to the planner, which tries another way
     The reasoner picks merge, which an issue doesn't offer; ARTIE refuses it
     before sending. The planner is told, and closes the issue instead. The

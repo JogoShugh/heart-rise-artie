@@ -18,9 +18,6 @@ heart("http://localhost:8392/") {
             number = state.long("number")
         }
     }
-    act("github:repos-get", "owner" to owner, "repo" to repo, intent = "get repository $owner/$repo") {
-        follow("github:repos-list-branches", intent = "follow the github:branches link") {}
-    }
     act("github:repos-get-branch", intent = "get the branch main of repository $owner/$repo", fields = {
         "owner" to owner
         "repo" to repo

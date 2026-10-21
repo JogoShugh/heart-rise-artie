@@ -38,6 +38,9 @@ class ArtieNavigator(
     /** A goal run's planner: Claude's, when the reasoner is (spec/PLAN-PLAIN-TEXT-RUN.md). */
     override fun planner(): heart.script.Planner? = (reasoner as? ClaudeReasoner)?.planner()
 
+    /** Why there is no planner: the reason there is no reasoner, such as where the model key goes. */
+    override val noPlanner: String get() = noReasoner
+
     override fun enter(entry: String): Answer = answer("entry") { client.enter(entry) }
 
     /**

@@ -68,6 +68,18 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | act("issues-get", "number" to number, intent = "open issue $number") { |
       | act("close", intent = "close it")                       |
 
+  Scenario: A client with no planner says why, and where the model key goes
+    Given the client has no planner, because "no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials"
+    When artie is run with
+      | argument        |
+      | run             |
+      | close.goal.yaml |
+      | number=10       |
+      | --reasoner      |
+      | claude          |
+    Then artie exits 2
+    And artie's last line is: stopped before the first request: no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials
+
   Scenario: A goal file needs a reasoner
     When artie is run with
       | argument        |

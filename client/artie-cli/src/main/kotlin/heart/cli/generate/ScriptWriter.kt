@@ -31,7 +31,8 @@ class ScriptWriter(
 
     fun write(): String {
         capture.finished()
-        val root = Node.of(capture)
+        // A goal run's detours are left out: the script does only what the goal needed.
+        val root = Node.of(capture).let { if (capture.source != null) Detours.trimmed(it, capture) else it }
         // Twice: the first pass meets every variable, so the second can read each in the block it belongs to.
         block(root, 1)
         reviews = 0

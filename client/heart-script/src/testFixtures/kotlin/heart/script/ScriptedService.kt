@@ -108,7 +108,13 @@ class ScriptedService : Navigator {
     /** A goal run's moves, in order; once they run out, finished. */
     val moves = ArrayDeque<Move>()
 
-    override fun planner(): Planner = Planner { moves.removeFirstOrNull() ?: Move.Finish }
+    /** Why this client has no planner, when a scenario says it has none. */
+    var missingPlanner: String? = null
+
+    override val noPlanner: String get() = missingPlanner ?: super.noPlanner
+
+    override fun planner(): Planner? =
+        if (missingPlanner != null) null else Planner { moves.removeFirstOrNull() ?: Move.Finish }
 
     override fun reason(intent: String): Reasoned {
         asked += "reason" to intent

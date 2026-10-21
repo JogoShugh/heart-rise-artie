@@ -56,6 +56,11 @@ class CliSteps(private val script: ScriptSteps) {
         }
     }
 
+    @Given("the client has no planner, because {string}")
+    fun noPlanner(why: String) {
+        script.service.missingPlanner = why
+    }
+
     @Then("the file {string} has these lines")
     fun hasLines(name: String, table: DataTable) {
         val lines = Files.readAllLines(folder.resolve(name)).map { it.trim() }

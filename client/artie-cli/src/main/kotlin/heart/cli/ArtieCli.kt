@@ -71,7 +71,7 @@ class ArtieCli(
         if (output == "words") run.onStep = { out.println(line(run.trace.size, it)) }
         val text = Files.readString(file)
         val ended = if (file.fileName.toString().endsWith(GOAL)) {
-            pursued(asked, file, run) { client.planner() }
+            pursued(asked, file, run) { client }
         } else {
             // A script that reasons, an act with an intent and no relation, is known before it runs, by its text:
             // without --reasoner, nothing is sent.
@@ -119,10 +119,11 @@ class ArtieCli(
      * A goal file done move by move (spec/PLAN-PLAIN-TEXT-RUN.md): the client's planner makes each move, its
      * reasoner each act, so a goal needs --reasoner.
      */
-    private fun pursued(asked: Arguments, file: Path, run: Run, planner: () -> heart.script.Planner?): Ended {
+    private fun pursued(asked: Arguments, file: Path, run: Run, client: () -> Navigator): Ended {
         if (asked.reasoner == null) throw BadArguments("$STOPPED: a goal needs --reasoner")
         val goal = goalFile(file.fileName.toString(), Files.readString(file))
-        val planning = planner() ?: throw BadArguments("$STOPPED: this client has no planner")
+        // Without a planner, the client says why: for ARTIE, where the model key goes.
+        val planning = client().planner() ?: throw BadArguments("$STOPPED: ${client().noPlanner}")
         Run.current = run
         return try {
             heart.script.runGoal(goal, planning)
