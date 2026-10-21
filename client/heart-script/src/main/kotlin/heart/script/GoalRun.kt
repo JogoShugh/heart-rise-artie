@@ -54,11 +54,7 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
     private fun made(move: Move, here: Here, opener: Int?): Int = when (move) {
         is Move.Act -> act(here, move, opener)
         is Move.Back -> back(move.to)
-        is Move.Wait -> 0.also {
-            written(GoalText.until(move.relation, move.tries), opener)
-            here.until(move.tries, condition = { offers(move.relation) })
-            moves += "waited until ${move.relation} was offered"
-        }
+        is Move.Wait -> 0.also { wait(here, move, opener) }
         is Move.Check -> 0.also {
             written(GoalText.check(move.facts), opener)
             here.check(move.facts)
@@ -67,7 +63,22 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
         is Move.Done -> 0.also { done += move.sentence }
         is Move.Finish -> finish()
         is Move.Stop -> stop(move.why)
-        is Move.Clarify -> 0.also { answers += move.question to ask(move.question) }
+        is Move.Clarify -> 0.also {
+            val asked = move.question
+            val answer = if (run.interactive) run.prompt(asked, null) else stop("the planner asks: $asked")
+            answers += move.question to answer
+        }
+    }
+
+    /** A wait until [here] offers the form named; a wait for no form would never end, so the planner is told. */
+    private fun wait(here: Here, move: Move.Wait, opener: Int?) {
+        if (move.relation.isBlank()) {
+            moves += "wait: refused, a wait names a form"
+            return
+        }
+        written(GoalText.until(move.relation, move.tries), opener)
+        here.until(move.tries, condition = { offers(move.relation) })
+        moves += "waited until ${move.relation} was offered"
     }
 
     /**
@@ -120,9 +131,6 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
         if (undone.isNotEmpty()) stop("not every sentence is done: ${undone.joinToString()}")
         return FINISHED
     }
-
-    private fun ask(question: String): String =
-        if (run.interactive) run.prompt(question, null) else stop("the planner asks: $question")
 
     private fun stop(why: String): Nothing = throw ScriptStopped(run.step, "\"goal\"", "\"$why\"")
 

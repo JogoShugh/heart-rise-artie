@@ -146,7 +146,8 @@ class ClaudePlanner(
               true when you will make more moves at what the act leads to, or will come back here after it
               (an act that makes a new resource, such as a comment, leads to that resource).
             - "back": to a resource on the <path>, by its address, closing what was opened since.
-            - "wait": until the resource held offers a form, by its exact name, before acting on it.
+            - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
+              as in <forms> or as it will be named there, in relation (for example "github:merge").
             - "check": facts the goal asks to make sure of, each a member of <state> and the value it must
               have.
             - "done": a sentence is fully done, by its number. Mark each sentence done once it is.

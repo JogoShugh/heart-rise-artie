@@ -111,7 +111,7 @@ class GoalSteps(
             "act" -> Move.Act(row.getValue("words"), sentence, row["opens"] == "yes")
             "done" -> Move.Done(checkNotNull(sentence))
             "back" -> Move.Back(row.getValue("to"))
-            "wait" -> Move.Wait(row.getValue("relation"), tries = 3)
+            "wait" -> Move.Wait(row["relation"].orEmpty(), tries = 3)
             "check" -> Move.Check(facts(row.getValue("facts")))
             "clarify" -> Move.Clarify(row.getValue("question"))
             "finish" -> Move.Finish

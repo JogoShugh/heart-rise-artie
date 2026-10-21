@@ -135,6 +135,26 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | github:issues-get | 1     |
       | github:close      | 2     |
 
+  Scenario: A wait that names no form is told to the planner, and waits for nothing
+    Given the planner will move
+      | move   | words                              | sentence | opens | relation     |
+      | act    | open issue $number of $owner/$repo | 1        | yes   |              |
+      | wait   |                                    |          |       |              |
+      | wait   |                                    |          |       | github:close |
+      | act    | close it                           | 2        |       |              |
+      | done   |                                    | 1        |       |              |
+      | done   |                                    | 2        |       |              |
+      | finish |                                    |          |       |              |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                 |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:close      | {}                                                     |
+    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+      | name   | value |
+      | number | 10    |
+    Then the run finished
+    And the planner was told "wait: refused, a wait names a form"
+
   Scenario: The planner is shown what each form offered is for
     Given the planner will move
       | move   | words                              | sentence | opens |
