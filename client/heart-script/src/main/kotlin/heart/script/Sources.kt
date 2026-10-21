@@ -53,12 +53,17 @@ internal object Sources {
         }
     }
 
-    /** Every source of [value]: inputs, earlier states, the [words]; else its parts; else a constant or a choice. */
+    /**
+     * Every source of [value]: inputs, earlier states, the [words]; else its parts; else a constant or a choice. In
+     * a goal run the words are the planner's, not the person's, so they are no source: a value they hold is an
+     * earlier state's, or the reasoner's choice.
+     */
     private fun of(value: String, run: Run, earlier: List<TraceStep>, words: String?): List<JsonElement> {
         val none = listOf(JsonPrimitive(if (words != null) "chosen" else "constant"))
+        val said = words?.takeIf { run.place == null }
         val whole = inputs(run).filter { it.second == value }.map { input(it.first) } +
             states(earlier).filter { it.value == value }.map { it.source } +
-            listOfNotNull(JsonPrimitive("words").takeIf { words != null && Words.whole(value).containsMatchIn(words) })
+            listOfNotNull(JsonPrimitive("words").takeIf { said != null && Words.whole(value).containsMatchIn(said) })
         val parts = (inputs(run).map { it.second to input(it.first) } + states(earlier).map { it.value to it.source })
             .filter { (part, _) -> part.isNotEmpty() && part != value && Words.whole(part).containsMatchIn(value) }
             .distinctBy { it.first }

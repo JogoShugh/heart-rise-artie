@@ -27,7 +27,13 @@ class Variable(val name: String, val step: Int, val pointer: String, val kind: K
 }
 
 /** One value a selection sends, as the script writes it, and why a person should look at it, if they should. */
-class Argument(val field: String, val expression: String, val review: String? = null)
+class Argument(
+    val field: String,
+    val expression: String,
+    val review: String? = null,
+    /** The value's text and the variable the script reads it from, when an earlier answer gave it. */
+    val held: Pair<String, String>? = null,
+)
 
 /**
  * Each value's binding (spec/PLAN-SCRIPT-GENERATOR.md, "The rules"), in this order: an input with that value; text
@@ -74,11 +80,13 @@ class Bindings(
         return when {
             input != null -> Argument(field, marked.input(input, inputAs(input, type)))
             field in asInputs -> Argument(field, marked.madeInput(field, text, inputAs(field, type)))
-            literal(step, field, text) -> Argument(field, marked.words(text, constant(value, type)))
+            // A goal run's words are the planner's: a value an earlier answer holds is that answer's, not theirs.
+            literal(step, field, text) && !(capture.source != null && held != null) ->
+                Argument(field, marked.words(text, constant(value, type)))
             held != null -> variable(held.first, held.second).let { variable ->
                 val tie = tie(from, held)
                 val named = slotted[held] ?: variable.name
-                Argument(field, marked.answer(variable, named, tie, variableAs(variable, type)), tie)
+                Argument(field, marked.answer(variable, named, tie, variableAs(variable, type)), tie, text to named)
             }
             "chosen" in from ->
                 Argument(field, marked.model(constant(value, type)), "the reasoner chose it, asked \"${step.say}\"")

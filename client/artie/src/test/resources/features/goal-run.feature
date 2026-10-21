@@ -105,6 +105,45 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     And the script "goal-gen.kts" has a line with "until"
     And the script "goal-gen.kts" has a line with "check("
 
+  Scenario: A value an earlier step brought in is the generated script's, not the number the planner wrote
+    In a goal run the words are the planner's, not the person's: a number
+    it wrote that an earlier state holds is that state's, so the script
+    reads it there and works on the next issue opened. An input with a
+    default { now: PATTERN } is fresh in the generated script too.
+    Given the file "open.goal.yaml" is
+      """
+      start: https://github.gateway.test/
+      inputs:
+        stamp:
+          default: { now: yyyy }
+      goal: |
+        In acme/rockets, open an issue titled "Beam drifts $stamp". Then get that issue again and close it.
+      """
+    And the planner will move
+      | move   | words                                    | sentence | opens | to                           |
+      | act    | get the repository acme/rockets          | 1        | yes   |                              |
+      | act    | open an issue titled "Beam drifts $stamp" | 1        | yes   |                              |
+      | done   |                                          | 1        |       |                              |
+      | back   |                                          |          |       | https://github.gateway.test/ |
+      | act    | get issue 12 of acme/rockets             | 2        | yes   |                              |
+      | act    | close it                                 | 2        |       |                              |
+      | done   |                                          | 2        |       |                              |
+      | finish |                                          |          |       |                              |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:repos-get  | {"owner": "acme", "repo": "rockets"}                     |
+      | github:open-issue | {"title": "Beam drifts 2026"}                            |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 12} |
+      | github:close      | {}                                                       |
+    When the goal "open.goal.yaml" runs with ARTIE, captured in "open.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 12 of "acme/rockets" is now "closed" on the small GitHub
+    When artie generated "open-gen.kts" from "open.trace.yaml" and "open.goal.yaml"
+    Then the script "open-gen.kts" has a line with "state.long(\"number\")"
+    And the script "open-gen.kts" has no line with "to 12"
+    And the script "open-gen.kts" has a line with "ofPattern(\"yyyy\")"
+
   Scenario: An act refused before anything is sent is told to the planner, which tries another way
     The reasoner picks merge, which an issue doesn't offer; ARTIE refuses it
     before sending. The planner is told, and closes the issue instead. The

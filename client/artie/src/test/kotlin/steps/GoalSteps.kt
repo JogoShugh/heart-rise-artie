@@ -96,6 +96,12 @@ class GoalSteps(
         assertTrue(lines.any { text in it }, lines.joinToString("\n"))
     }
 
+    @Then("the script {string} has no line with {string}")
+    fun hasNoLine(script: String, text: String) {
+        val lines = Files.readAllLines(replay.folder.resolve(script))
+        assertTrue(lines.none { text in it }, lines.joinToString("\n"))
+    }
+
     /** The scripted moves, one a call; once they run out, a "loop" planner makes a move that does nothing. */
     private fun planner(): Planner {
         val left = ArrayDeque(moves)

@@ -36,12 +36,12 @@ private fun declared(file: String, input: String, value: Any?): Declared {
     (given.keys.map { it.toString() } - INPUT_KEYS).firstOrNull()?.let {
         throw BadArguments("$file: input $input has no key $it")
     }
-    val default = when (val d = given["default"]) {
-        is Map<*, *> -> d["now"]?.let { LocalDateTime.now().format(DateTimeFormatter.ofPattern(it.toString())) }
-            ?: throw BadArguments("$file: input $input's default is a value or { now: PATTERN }")
-        else -> d?.toString()
+    val d = given["default"]
+    val now = (d as? Map<*, *>)?.let {
+        it["now"]?.toString() ?: throw BadArguments("$file: input $input's default is a value or { now: PATTERN }")
     }
-    return Declared(input, default, given["question"]?.toString())
+    val default = now?.let { LocalDateTime.now().format(DateTimeFormatter.ofPattern(it)) } ?: d?.toString()
+    return Declared(input, default, given["question"]?.toString(), now)
 }
 
 private val KEYS = setOf("start", "inputs", "goal")

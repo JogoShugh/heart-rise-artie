@@ -155,7 +155,7 @@ class ScriptWriter(
     private fun act(step: Step, pad: String): List<String> {
         val relation = why.relation(step, source)
         val arguments = bindings.arguments(step)
-        val intent = intent(step, names)?.let { "intent = \"$it\"" }
+        val intent = intent(step, names)?.let { "intent = \"${spoken(it, arguments, capture.source != null)}\"" }
         reviews += arguments.count { it.review != null }
         val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
             listOfNotNull(intent)).joinToString(", ") + ")"
@@ -173,14 +173,30 @@ class ScriptWriter(
     }
 }
 
+/**
+ * A goal run's ([goal]) intent [words], each value an earlier answer gave put as the variable the script reads it
+ * from, so the words say what the script does on another run: "get issue ${'$'}{number}", not the number it held.
+ */
+private fun spoken(words: String, arguments: List<Argument>, goal: Boolean): String {
+    if (!goal) return words
+    return arguments.mapNotNull { it.held }.filter { it.first.isNotEmpty() }.fold(words) { said, (text, name) ->
+        Regex("(?<![\\w$])${Regex.escape(text)}(?![\\w])").replace(said) { "\${$name}" }
+    }
+}
+
 /** [value] as one shell word. */
 private fun shell(value: String): String = if (value.matches(Regex("[A-Za-z0-9._/:@=+-]+"))) value else
     "'" + value.replace("'", "'\\''") + "'"
 
 /** An input as the capture kept its declaration: required, or with its default or its question. */
 private fun declared(name: String, input: Map<*, *>): String {
+    // A default made fresh each run is made fresh in the script too: the time now, by its pattern.
+    val now = input["now"]?.let {
+        "default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(" +
+            "${KotlinText.quoted(it.toString())}))"
+    }
     val named = listOfNotNull(
-        input["default"]?.let { "default = ${KotlinText.quoted(it.toString())}" },
+        now ?: input["default"]?.let { "default = ${KotlinText.quoted(it.toString())}" },
         input["question"]?.let { "question = ${KotlinText.quoted(it.toString())}" },
     )
     return "val $name by input(${named.joinToString(", ")})"

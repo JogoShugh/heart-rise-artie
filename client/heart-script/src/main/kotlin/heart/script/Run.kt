@@ -14,8 +14,11 @@ open class ScriptStopped(
     if (step == 0) "stopped before the first request: $reason" else "stopped at step $step, $what: $reason",
 )
 
-/** One input a script declares: [default] when not given; [question] asked of a person, if the run allows. */
-class Declared(val name: String, val default: String?, val question: String?) {
+/**
+ * One input a script declares: [default] when not given; [question] asked of a person, if the run allows. A
+ * default made fresh each run, the time now, keeps its [now] pattern, so a script made from the run makes it too.
+ */
+class Declared(val name: String, val default: String?, val question: String?, val now: String? = null) {
     val kind: String get() = when {
         default != null -> "optional"
         question != null -> "question"
@@ -96,6 +99,7 @@ class Run(
                         put("value", kotlinx.serialization.json.JsonPrimitive(used.first))
                         put("given", kotlinx.serialization.json.JsonPrimitive(used.second))
                         declaration?.default?.let { put("default", kotlinx.serialization.json.JsonPrimitive(it)) }
+                        declaration?.now?.let { put("now", kotlinx.serialization.json.JsonPrimitive(it)) }
                         declaration?.question?.let { put("question", kotlinx.serialization.json.JsonPrimitive(it)) }
                     }
                 },
