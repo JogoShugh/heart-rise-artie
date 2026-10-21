@@ -28,6 +28,40 @@ exception: `until(…)` and `check(…)` lines of the source script are copied a
    where they diverge into a `when`. Which difference in state caused the divergence is the hard part: with 3's
    stated reasons it's plausible, without them it's a guess. Research.
 
+## Worked through: the garden bed, growing branches by use (added 2026-10-20)
+
+Option 2 with a light option 4. The intent is one sentence: "give bed 2 its basic care". In a reasoned run the
+reasoner sees what the bed offers at each step and picks one; the capture already holds both, what was offered
+and what was chosen. That is the branch's condition: the offer. The server decided the bed was frozen; the script
+only reads the offer.
+
+From a run where the bed was frozen, generate writes the branch it saw, and falls back to the words otherwise:
+
+```kotlin
+when {
+    offers("garden:thaw") -> act("garden:thaw", intent = "thaw the bed")
+    else -> reason("give bed 2 its basic care")
+}
+```
+
+On a day the bed isn't frozen, the run takes the else, the reasoner picks water, and the next generate, from both
+captures, adds that branch:
+
+```kotlin
+when {
+    offers("garden:thaw") -> act("garden:thaw", intent = "thaw the bed")
+    offers("garden:water-cell") -> act("garden:water-cell", "milliliters" to 250, intent = "water about 250 ml")
+    else -> reason("give bed 2 its basic care")
+}
+```
+
+So the script grows by use: a run takes a branch it knows, with no model, or teaches it a new one.
+
+- **Order.** Where two acts were offered together, the branch the reasoner picked comes first. Captures that
+  disagree leave that choice to the reasoner.
+- **Values that depend on state.** A fixed value (250 ml) is copied; one the reasoner judged from the state stays
+  a reason step, or is marked for review, as judged values are today.
+
 ## Open
 
 - Whether the else branch of 2 stops, asks, or falls back to the intent words: the same choice as `on-change`
