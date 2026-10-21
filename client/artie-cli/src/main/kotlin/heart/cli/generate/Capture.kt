@@ -16,6 +16,9 @@ class Capture(val name: String, text: String) {
 
     val steps: List<Step> = documents.drop(1).mapIndexed { i, doc -> Step(i + 1, doc) }
 
+    /** A goal run's moves, as the script they amount to (spec/PLAN-PLAIN-TEXT-RUN.md); null for a script's run. */
+    val source: String? = (documents.firstOrNull()?.get("run") as? Map<*, *>)?.get("source")?.toString()
+
     /** The step [number]; the generator only names steps the capture holds. */
     fun step(number: Int): Step? = steps.getOrNull(number - 1)
 

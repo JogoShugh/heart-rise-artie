@@ -60,6 +60,12 @@ class Run(
     /** The script's own text, when the host gives it: a reason step's template is read from it. */
     var source: String? = null
 
+    /**
+     * For a run with no script frames (a goal, planned move by move): the line of [source] the next step stands
+     * for, and the line of the block it is within, as a script's frames would say them.
+     */
+    var place: (() -> Pair<Int?, Int?>)? = null
+
     /** Each input the run read: its value, and how it was given ("given", "default" or "asked"). */
     val inputsUsed = linkedMapOf<String, Pair<String, String>>()
 
@@ -69,8 +75,10 @@ class Run(
         val lines = StackWalker.getInstance().walk { frames ->
             frames.filter { it.fileName?.endsWith(SCRIPT) == true }.map { it.lineNumber }.toList()
         }
-        step.line = lines.firstOrNull()
-        step.within = lines.getOrNull(1)
+        // A run with no script text of its own (a goal) says where each step stands itself.
+        val placed = if (lines.isEmpty()) place?.invoke() else null
+        step.line = lines.firstOrNull() ?: placed?.first
+        step.within = lines.getOrNull(1) ?: placed?.second
         step.values = Sources.values(step, this, trace)
         if (step.asked.mode == "intent") step.reason = Sources.reason(source, step.line, step.asked.say, this, trace)
         trace += step
@@ -137,7 +145,11 @@ class Run(
         val trace = kotlinx.serialization.json.Json.parseToJsonElement(traceJson())
             as kotlinx.serialization.json.JsonObject
         val run = kotlinx.serialization.json.buildJsonObject {
-            put("run", kotlinx.serialization.json.buildJsonObject { put("inputs", trace.getValue("inputs")) })
+            put("run", kotlinx.serialization.json.buildJsonObject {
+                put("inputs", trace.getValue("inputs"))
+                // A goal run's moves, as the script they amount to: its steps' lines are this text's.
+                if (place != null) source?.let { put("source", kotlinx.serialization.json.JsonPrimitive(it)) }
+            })
         }
         return Yaml.stream(listOf(run) + (trace.getValue("steps") as kotlinx.serialization.json.JsonArray))
     }

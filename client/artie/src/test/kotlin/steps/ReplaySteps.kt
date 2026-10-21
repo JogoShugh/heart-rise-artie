@@ -28,7 +28,8 @@ class ReplaySteps(
     private val scripts: ScriptSteps,
     private val gateway: GitHubGatewaySteps,
 ) {
-    private val folder: Path = Files.createTempDirectory("artie-replay")
+    /** The scenario's own folder: its scripts, goal files, captures and lock files. */
+    internal val folder: Path = Files.createTempDirectory("artie-replay")
 
     @Given("the script {string} is")
     fun scriptIs(name: String, text: String) {

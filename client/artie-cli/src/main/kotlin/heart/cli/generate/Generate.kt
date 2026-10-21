@@ -19,9 +19,12 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     asked(report == null || sourceName != null) {
         "--report needs --script: the report shows the run's script beside the one generated"
     }
-    val source = sourceName?.let { Files.readAllLines(existing(folder, it, "script")) }
     val pins = script.substringBeforeLast('.') + ".pins.yaml"
     val capture = Capture(captureName, Files.readString(existing(folder, captureName, "capture")))
+    // A goal run's steps stand for the lines of the script its moves amount to, which its capture keeps.
+    val source = sourceName?.let { existing(folder, it, "script") }?.let { file ->
+        capture.source?.takeIf { sourceName.endsWith(".goal.yaml") }?.lines() ?: Files.readAllLines(file)
+    }
     val asInputs = options["--inputs"]?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()
         .associateWith { sentOnce(capture, it) }
     val chosen = ScriptWriter.Options(keepReason = "--keep-reason" in options, asInputs = asInputs)

@@ -50,6 +50,24 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         run(script, navigator, emptyMap())
     }
 
+    /** [goal] done move by move as [planner] chooses, with [navigator], given [inputs] (goal-run.feature). */
+    fun runGoal(
+        goal: heart.script.Goal,
+        planner: heart.script.Planner,
+        navigator: ArtieNavigator,
+        inputs: Map<String, String>,
+    ): Run {
+        stopped = null
+        val run = Run(inputs, navigator = { navigator })
+        Run.current = run
+        try {
+            heart.script.runGoal(goal, planner)
+        } catch (e: ScriptStopped) {
+            stopped = e
+        }
+        return run
+    }
+
     /** [script] run with [navigator], given [inputs]; the run, for its capture (script-replay.feature). */
     fun run(script: String, navigator: ArtieNavigator, inputs: Map<String, String>): Run {
         stopped = null
