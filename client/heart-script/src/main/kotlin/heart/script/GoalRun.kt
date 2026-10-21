@@ -70,21 +70,35 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
         is Move.Clarify -> 0.also { answers += move.question to ask(move.question) }
     }
 
-    /** An act as a reason step; with a block, the moves after it are made where it led, until the planner leaves. */
+    /**
+     * An act as a reason step; with a block, the moves after it are made where it led, until the planner leaves.
+     * Refused before its block was entered, it changed nothing: the planner is told, and the capture keeps none
+     * of it, so a script made from the run has only the acts that were done.
+     */
     private fun act(here: Here, move: Move.Act, opener: Int?): Int {
         val line = written(GoalText.act(move.words), opener)
         val words = GoalText.fill(move.words, goal.inputs.map { it.name }.toSet(), run::value)
         var exits = 0
-        if (move.opens) {
-            here.act(intent = words) {
-                path += held.address
-                moves += "$words: at ${held.address}"
-                exits = plan(this, line)
-                path.removeAt(path.lastIndex)
+        var entered = false
+        val traced = run.trace.size
+        try {
+            if (move.opens) {
+                here.act(intent = words) {
+                    entered = true
+                    path += held.address
+                    moves += "$words: at ${held.address}"
+                    exits = plan(this, line)
+                    path.removeAt(path.lastIndex)
+                }
+            } else {
+                here.act(intent = words)
+                moves += "$words: now at ${here.held.address}"
             }
-        } else {
-            here.act(intent = words)
-            moves += "$words: now at ${here.held.address}"
+        } catch (stopped: ScriptStopped) {
+            val refused = stopped.refused?.takeUnless { entered } ?: throw stopped
+            while (run.trace.size > traced) run.trace.removeAt(run.trace.lastIndex)
+            moves += "$words: refused, ${refused.kind.words}: ${refused.detail}"
+            return 0
         }
         // The block just left was one of the blocks to leave.
         return if (exits == FINISHED) FINISHED else maxOf(exits - 1, 0)
@@ -123,6 +137,7 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
     private fun view(here: Here) = PlanView(
         filled, sentences, done.toSet(), moves.toList(), path.toList(), here.held, answers.toList(),
         goal.inputs.associate { it.name to run.value(it.name) },
+        here.held.offered.sorted().associateWith { here.describe(it) },
     )
 
     companion object {

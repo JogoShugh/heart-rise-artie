@@ -45,6 +45,8 @@ class PlanView(
     val answers: List<Pair<String, String>>,
     /** The goal's inputs and their values: a move's words name each as `$name`, so a script made keeps it one. */
     val inputs: Map<String, String> = emptyMap(),
+    /** What each form [held] offers is for, as its relation's profile says; null where it says nothing. */
+    val described: Map<String, String?> = emptyMap(),
 )
 
 /** One move of a goal run. Sentences are numbered from 1. */

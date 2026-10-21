@@ -64,6 +64,18 @@ class GoalSteps(
     fun sentencesShown(table: DataTable) =
         assertEquals(table.asMaps().map { it.getValue("sentence") }, shown.first().sentences)
 
+    @Then("the planner was told {string}")
+    fun told(words: String) {
+        val said = shown.last().moves
+        assertTrue(said.any { it.startsWith(words) }, said.joinToString("\n"))
+    }
+
+    @Then("the planner was last shown {string} described as {string}")
+    fun describedAs(form: String, words: String) {
+        val described = shown.last().described[form].orEmpty()
+        assertTrue(words in described, "$form: \"$described\"")
+    }
+
     @Then("the goal run stopped, saying {string}")
     fun stoppedSaying(said: String) {
         val message = refused ?: checkNotNull(scripts.stoppedMessage()) { "the goal run finished" }

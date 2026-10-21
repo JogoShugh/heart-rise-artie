@@ -105,6 +105,51 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     And the script "goal-gen.kts" has a line with "until"
     And the script "goal-gen.kts" has a line with "check("
 
+  Scenario: An act refused before anything is sent is told to the planner, which tries another way
+    The reasoner picks merge, which an issue doesn't offer; ARTIE refuses it
+    before sending. The planner is told, and closes the issue instead. The
+    refused act was never done, so the capture leaves it out, and the
+    script generated from it has only the acts that were.
+    Given the planner will move
+      | move   | words                              | sentence | opens |
+      | act    | open issue $number of $owner/$repo | 1        | yes   |
+      | done   |                                    | 1        |       |
+      | act    | finish it off                      | 2        |       |
+      | act    | close it                           | 2        |       |
+      | done   |                                    | 2        |       |
+      | finish |                                    |          |       |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                 |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:merge      | {}                                                     |
+      | github:close      | {}                                                     |
+    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+      | name   | value |
+      | number | 10    |
+    Then the run finished
+    And the planner was told "finish it off: refused"
+    And issue 10 of "acme/rockets" is now "closed" on the small GitHub
+    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.yaml"
+    Then the script "goal-gen.kts" nests its acts as
+      | relation          | depth |
+      | github:issues-get | 1     |
+      | github:close      | 2     |
+
+  Scenario: The planner is shown what each form offered is for
+    Given the planner will move
+      | move   | words                              | sentence | opens |
+      | act    | open issue $number of $owner/$repo | 1        | yes   |
+      | done   |                                    | 1        |       |
+      | done   |                                    | 2        |       |
+      | finish |                                    |          |       |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                 |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+      | name   | value |
+      | number | 10    |
+    Then the planner was last shown "github:close" described as "Close"
+
   Scenario Outline: A goal run stops, before its harm is done, when <case>
     Given the planner will move
       | move   | words                              | sentence | opens | question     |

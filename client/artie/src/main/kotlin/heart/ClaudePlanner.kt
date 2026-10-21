@@ -88,8 +88,13 @@ class ClaudePlanner(
         val answers = view.answers.joinToString("\n") { (q, a) -> "Q: $q\nA: $a" }
         return "<goal>\n$goal\n</goal>\n<inputs>\n$inputs\n</inputs>\n" +
             "<moves>\n${view.moves.joinToString("\n")}\n</moves>\n<path>\n${view.path.joinToString("\n")}\n</path>\n" +
-            "<held>\n${held.address}\n<state>\n$state\n</state>\n<forms>\n${held.offered.sorted().joinToString("\n")}" +
+            "<held>\n${held.address}\n<state>\n$state\n</state>\n<forms>\n${forms(view)}" +
             "\n</forms>\n<links>\n$links\n</links>\n</held>\n<answers>\n$answers\n</answers>"
+    }
+
+    /** Each form held offers, a line each: its name, and what it is for where its profile says. */
+    private fun forms(view: PlanView): String = view.held.offered.sorted().joinToString("\n") { name ->
+        name + (view.described[name]?.let { " — ${it.lines().first()}" } ?: "")
     }
 
     private fun move(message: JsonObject): Move {
@@ -150,6 +155,9 @@ class ClaudePlanner(
             - "clarify": one short question for the user, when the goal and what is offered leave the next
               move open, or a value is missing. Never guess.
             Only act on forms in <forms>. Do each sentence once, in order where order matters.
+            A move in <moves> marked refused changed nothing: try another way. The start, first on <path>,
+            often offers forms that go straight to a resource by its names or numbers (a repository, a branch,
+            an issue): go back to it when the resource held doesn't lead where you need.
         """.trimIndent()
 
         private val TOOL: JsonObject = buildJsonObject {
