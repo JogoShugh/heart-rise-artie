@@ -126,7 +126,7 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | done   |                                          | 1        |       |                              |
       | back   |                                          |          |       | https://github.gateway.test/ |
       | act    | get issue 12 of acme/rockets             | 2        | yes   |                              |
-      | act    | comment on it: Fixed for #12 in 2026.    | 2        | yes   |                              |
+      | act    | comment on it: Fixed in 2.12 for #12 in 2026. | 2   | yes   |                              |
       | back   |                                          |          |       | the issue                    |
       | act    | close it                                 | 2        |       |                              |
       | done   |                                          | 2        |       |                              |
@@ -136,7 +136,7 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | github:repos-get  | {"owner": "acme", "repo": "rockets"}                     |
       | github:open-issue | {"title": "Beam drifts 2026"}                            |
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 12} |
-      | github:comment    | {"body": "Fixed for #12 in 2026."}                       |
+      | github:comment    | {"body": "Fixed in 2.12 for #12 in 2026."}               |
       | github:close      | {}                                                       |
     When the goal "open.goal.yaml" runs with ARTIE, captured in "open.trace.yaml", given
       | name | value |
@@ -146,7 +146,8 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     Then the script "open-gen.kts" has a line with "state.long(\"number\")"
     And the script "open-gen.kts" has no line with "to 12"
     And the script "open-gen.kts" has no line with "#12"
-    And the script "open-gen.kts" has a line with "in $stamp."
+    And the script "open-gen.kts" has a line with "\"Fixed in 2.12 for #$number in $stamp.\""
+    And the script "open-gen.kts" has a line with "intent = \"comment on it: Fixed in 2.12 for #${number} in ${stamp}.\""
     And the script "open-gen.kts" has a line with "ofPattern(\"yyyy\")"
 
   Scenario: An act refused before anything is sent is told to the planner, which tries another way

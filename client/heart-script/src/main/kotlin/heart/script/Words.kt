@@ -4,8 +4,8 @@ package heart.script
 internal object Words {
     private val WORD = Regex("[\\w-]+")
 
-    /** [part] as a whole word: not inside a longer word or number. */
-    fun whole(part: String) = Regex("(?<![\\w])" + Regex.escape(part) + "(?![\\w])")
+    /** [part] as a whole word: not inside a longer word or number, a decimal's (the 1 of 1.2) included. */
+    fun whole(part: String) = Regex("(?<![\\w])(?<!\\d\\.)" + Regex.escape(part) + "(?![\\w])(?!\\.\\d)")
 
     /**
      * Whether [value] is [words] again, whatever its case, its closing stop, or its words' endings: "Basil" for

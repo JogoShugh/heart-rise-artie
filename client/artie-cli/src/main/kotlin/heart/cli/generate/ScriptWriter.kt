@@ -180,7 +180,7 @@ class ScriptWriter(
 private fun spoken(words: String, arguments: List<Argument>, goal: Boolean): String {
     if (!goal) return words
     return arguments.flatMap { it.named.entries }.filter { it.key.isNotEmpty() }.fold(words) { said, (text, name) ->
-        Regex("(?<![\\w$])${Regex.escape(text)}(?![\\w])").replace(said) { "\${$name}" }
+        Regex("(?<![\\w$])(?<!\\d\\.)${Regex.escape(text)}(?![\\w])(?!\\.\\d)").replace(said) { "\${$name}" }
     }
 }
 
