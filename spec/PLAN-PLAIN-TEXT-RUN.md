@@ -94,6 +94,22 @@ Each move is a step as today, plus:
    one; run the generated script strict, live. Report: the text, the run line by line, the script generated, side
    by side with the hand-written reasoned one.
 
+## The goal file (decided 2026-10-20)
+
+A YAML file, `NAME.goal.yaml`, with three keys. Example: `client/scripts/tests/github-task.goal.yaml`.
+
+- `start`: the bookmark.
+- `inputs`: what varies per run, each as a script's `input()` declares it. `name: value` is short for a default;
+  `name:` with nothing has none, so it must be given or asked; `name: { default, question }` gives either or both;
+  `default: { now: PATTERN }` is a fresh value each run, the time now as a `java.time` pattern. A value given when
+  running wins, then the default; with neither the run asks the question, or stops before its first request.
+- `goal`: the task in words, a `|` block, a paragraph or one step per line. `$name` is an input. It is `goal`,
+  not `intent`: `intent` stays the words of one step, which generate cuts from the goal.
+
+Room to grow: an input's map takes more keys later (choices, a type) without changing the short forms, and the file
+takes more top-level keys (a rung, a reasoner). A key ARTIE doesn't know stops the run, naming it, rather than being
+ignored, so a file written for a later ARTIE never runs half-understood.
+
 ## Decided (2026-10-20, with the author)
 
 - **Text shape:** a paragraph or one step per line, both split into numbered sentences; line order is a hint, not
