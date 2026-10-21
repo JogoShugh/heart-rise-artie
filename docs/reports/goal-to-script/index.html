@@ -85,6 +85,7 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .file pre { margin: 0; padding: .6rem .9rem; border-top: 1px solid var(--rule); font: .78rem/1.6 var(--mono);
   white-space: pre; overflow-x: auto; max-height: 36rem; overflow-y: auto; }
 .goal { margin: 1rem 0 0; } .goal h2 { font: 600 .8rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; } .goal pre { margin: 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .8rem 1rem; overflow-x: auto; font-size: .85rem; white-space: pre-wrap; }
+.goal .explain { max-width: 68ch; font-size: .92rem; line-height: 1.55; margin: 0 0 .7rem; } .goal .explain p { margin: .3rem 0; } .goal .explain ul { margin: .3rem 0 .6rem; padding-left: 1.2rem; display: grid; gap: .3rem; } .goal .explain code { font: .85em var(--mono); background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .25em; } .goal pre.cmd { font: .78rem/1.6 var(--mono); white-space: pre; padding: .6rem .9rem; } .y-k { color: var(--kt-kw); } .y-s { color: var(--kt-str); } .y-u { color: var(--kt-fn); } .y-v { color: var(--kt-tpl); font-weight: 600; } .y-p { color: var(--kt-cm); }
 </style>
 </head>
 <body>
@@ -94,34 +95,38 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
     <div class="theme" role="group" aria-label="Theme"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div>
   </header>
   
-  <section class="goal"><h2>The goal: github-task.goal.yaml</h2><pre># A plain-text task (spec/PLAN-PLAIN-TEXT-RUN.md): where to start, what varies per run, and the goal in words.
-#   artie run github-task.goal.yaml owner=JogoShugh --reasoner claude --rung L2 --trace github-task.trace.yaml
-#   artie generate github-task.trace.yaml --out github-task-from-goal.kts --script github-task.goal.yaml
-#
-# Inputs, as a script&#x27;s input() declares them. A value given when running (owner=JogoShugh) wins; then the
-# default; with neither, the run asks the question, or stops before its first request when no one can answer.
-#   name: value                 short for a default
-#   name:                       no default: must be given, or asked
-#   name: { default, question } either or both
-#   default: { now: PATTERN }   a fresh value each run: the time now, as a java.time pattern
-start: http://localhost:8392/
-inputs:
-  owner:
-    question: Whose repository?
-  repo:
-    default: heart-github-test
-    question: Which repository?
-  stamp:
-    default: { now: MMdd-HHmmss }
-goal: |
-  In $owner/$repo, open an issue titled &quot;Crash when a bed has no name (reasoned)&quot;, saying it was opened by a
+  <section class="goal"><h2>The goal: github-task.goal.yaml</h2>
+  <div class="explain">
+    <p>All a person writes. Three keys, nothing else:</p>
+    <ul>
+      <li><code>start</code>: the bookmark, the one address the run begins from. Every other address comes from what the server hands over.</li>
+      <li><code>inputs</code>: what varies per run, declared as a script&#x27;s <code>input()</code> would. A value given on the command line (<code>owner=JogoShugh</code>) wins, then the default, then the question. With none of these, and no one to answer, the run stops before its first request. Four forms: <code>name: value</code> (a default), <code>name:</code> (must be given), <code>name: {default, question}</code>, and <code>default: {now: PATTERN}</code>, a fresh value each run, as a java.time pattern.</li>
+      <li><code>goal</code>: the task in words, one paragraph or one step per line. <code>$name</code> reads an input.</li>
+    </ul>
+    <p>Run, then generate:</p>
+    <pre class="cmd">artie run github-task.goal.yaml owner=JogoShugh \
+  --reasoner claude --rung L2 --trace github-task.trace.yaml
+artie generate github-task.trace.yaml \
+  --out github-task-from-goal.kts --script github-task.goal.yaml</pre>
+  </div>
+  <pre class="yaml"><span class="y-k">start</span>: <span class="y-u">http://localhost:8392/</span>
+<span class="y-k">inputs</span>:
+  <span class="y-k">owner</span>:
+    <span class="y-k">question</span>: <span class="y-s">Whose repository?</span>
+  <span class="y-k">repo</span>:
+    <span class="y-k">default</span>: <span class="y-s">heart-github-test</span>
+    <span class="y-k">question</span>: <span class="y-s">Which repository?</span>
+  <span class="y-k">stamp</span>:
+    <span class="y-k">default</span>: { <span class="y-k">now</span>: <span class="y-s">MMdd-HHmmss</span> }
+<span class="y-k">goal</span>: <span class="y-p">|</span>
+<span class="y-s">  In <span class="y-v">$owner</span>/<span class="y-v">$repo</span>, open an issue titled &quot;Crash when a bed has no name (reasoned)&quot;, saying it was opened by a
   HEART script.
-  From the main branch, start a new branch named fix-blank-names-reasoned-$stamp, commit a file named
-  fix-reasoned-$stamp.md to it saying &quot;Bed names may not be blank.&quot; with the message &quot;Refuse a bed with no name&quot;,
+  From the main branch, start a new branch named fix-blank-names-reasoned-<span class="y-v">$stamp</span>, commit a file named
+  fix-reasoned-<span class="y-v">$stamp</span>.md to it saying &quot;Bed names may not be blank.&quot; with the message &quot;Refuse a bed with no name&quot;,
   and open a pull request into main titled &quot;Refuse a bed with no name (reasoned)&quot;, saying it relates to the issue.
   Wait until the pull request can be merged, merge it by squashing its commits, and make sure it merged.
   Then go back to the issue, comment &quot;Fixed in 1.2 by #&lt;the pull request&#x27;s number&gt;.&quot;, and close it as completed.
-  Make sure it is closed as completed.
+  Make sure it is closed as completed.</span>
 </pre></section>
   <div class="facts" id="facts"></div>
   <div class="bar">
