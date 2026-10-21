@@ -1,6 +1,10 @@
 # Plan: a plain-text run, from a bookmark and a paragraph to the final script
 
-Status: plan, 2026-10-20. Nothing built.
+Status: built and proven live, 2026-10-20 (commits cee2197 to 58e9087). The GitHub goal
+(`client/scripts/tests/github-task.goal.yaml`) was done live by Claude's planner (issue #144, pull request #145);
+`artie generate` made `client/scripts/generated/github-task-from-goal.kts` from it, which ran live, strict, with
+no model (#146, #147). Reports: `docs/reports/line-by-line/github-goal-goal/` and `github-goal-gen/`. What the
+live runs taught is under "Learned live"; what is left, under "Open".
 
 ## The idea
 
@@ -94,6 +98,18 @@ Each move is a step as today, plus:
    one; run the generated script strict, live. Report: the text, the run line by line, the script generated, side
    by side with the hand-written reasoned one.
 
+## Learned live (2026-10-20)
+
+- **A refused act is a turn, not an end.** The planner kept reaching for GitHub's `git://` refs link to make a
+  branch, which ARTIE refuses before sending. Each refusal is now told to the planner, which then goes back to
+  the start and looks the branch up; the capture keeps none of it, so the script has only the acts done.
+- **A wait must name its form.** Once the planner waited without naming merge, and the run waited for nothing.
+- **The person's words are the goal, not the planner's.** A value the goal says is a constant; one only the
+  planner wrote (an issue's number, "#141") is the earlier answer's, so the script reads it there, its intent
+  words too. A number inside a decimal ("1.2") is no whole value.
+- **The planner wanders.** Runs still show a detour or two (the branches list, a repository read twice), which
+  the generated script repeats faithfully. Cheap to replay; worth trimming later.
+
 ## The goal file (decided 2026-10-20)
 
 A YAML file, `NAME.goal.yaml`, with three keys. Example: `client/scripts/tests/github-task.goal.yaml`.
@@ -125,3 +141,9 @@ ignored, so a file written for a later ARTIE never runs half-understood.
   descriptors keeps it down.
 - **Other services.** The garden first after GitHub: "water bed 2 with about 250 ml, then check it's watered", the
   same text over HTTP and CoAP.
+- **Trimming detours.** Generate could drop reads and follows that led nowhere (a block with no act, no read of a
+  value used later), so the script does only what the goal needed.
+- **A clearer stop without a model key.** `artie run` says "this client has no planner" when the reason is a
+  missing model key; it should say where the key goes, as reason steps do.
+- **A side-by-side report.** The goal text beside the script generated, as the derivation report shows a
+  reasoned script beside its generated one.
