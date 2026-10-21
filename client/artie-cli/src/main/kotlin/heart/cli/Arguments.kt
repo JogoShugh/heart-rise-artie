@@ -36,10 +36,13 @@ class Arguments(val script: String) {
 
     /** words, quiet or json: how the run reports itself. */
     var output = "words"
+
+    /** Whether a goal file is only read, checked and printed, nothing sent (spec/PLAN-GOAL-MARKDOWN.md). */
+    var planOnly = false
 }
 
 /** Arguments that can't be run, with the line that says why. */
-class BadArguments(message: String) : RuntimeException(message)
+class BadArguments(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 const val USAGE = "usage: artie run <script> [name=value …] [options]"
 
@@ -55,6 +58,7 @@ internal val GUARDS = setOf("lenient", "strict")
 /** The options that stand alone. */
 private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
     "--inputs-of" to { it.inputsOf = true },
+    "--plan-only" to { it.planOnly = true },
     "--interactive" to { it.interactive = true },
     "--quiet" to { it.output = "quiet" },
     "--exchanges" to { it.exchanges = true },

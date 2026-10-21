@@ -45,6 +45,17 @@ class CliSteps(private val script: ScriptSteps) {
         Files.writeString(folder.resolve(name), text)
     }
 
+    /**
+     * Line [number] of [name] put as [text], [indent] spaces before it, each `\n` in it a line break: one file,
+     * broken one way. A table trims its cells, so the indent is its own column.
+     */
+    @Given("line {int} of {string} reads {string}, indented {int}")
+    fun lineReads(number: Int, name: String, text: String, indent: Int) {
+        val lines = Files.readAllLines(folder.resolve(name))
+        lines[number - 1] = " ".repeat(indent) + text.replace("\\n", "\n")
+        Files.writeString(folder.resolve(name), lines.joinToString("\n") + "\n")
+    }
+
     @Given("the planner will move")
     fun plannerMoves(table: DataTable) = table.asMaps().forEach { row ->
         val sentence = row["sentence"]?.takeIf { it.isNotBlank() }?.toInt()

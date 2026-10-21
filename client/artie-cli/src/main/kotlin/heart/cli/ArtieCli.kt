@@ -38,7 +38,12 @@ class ArtieCli(
             val file = folder.resolve(asked.script)
             if (!Files.exists(file)) throw BadArguments("no script at ${asked.script}")
             if (asked.report != null && reportBuilder == null) throw BadArguments("--report: no report builder")
-            run(asked, file)
+            // --plan-only: the goal file read, checked and printed; nothing sent.
+            if (asked.planOnly) {
+                Ended(0, "listed", "", 0).also { planned(file).forEach(out::println) }
+            } else {
+                run(asked, file)
+            }
         } catch (e: BadArguments) {
             Ended(STOPPED_BEFORE, "stopped", e.message.orEmpty(), 0)
         }
@@ -70,7 +75,7 @@ class ArtieCli(
         run.entry = asked.entry
         if (output == "words") run.onStep = { out.println(line(run.trace.size, it)) }
         val text = Files.readString(file)
-        val ended = if (file.fileName.toString().endsWith(GOAL)) {
+        val ended = if (isGoal(file)) {
             pursued(asked, file, run) { client }
         } else {
             // A script that reasons, an act with an intent and no relation, is known before it runs, by its text:
@@ -121,7 +126,7 @@ class ArtieCli(
      */
     private fun pursued(asked: Arguments, file: Path, run: Run, client: () -> Navigator): Ended {
         if (asked.reasoner == null) throw BadArguments("$STOPPED: a goal needs --reasoner")
-        val goal = goalFile(file.fileName.toString(), Files.readString(file))
+        val goal = readGoal(file)
         // Without a planner, the client says why: for ARTIE, where the model key goes.
         val planning = client().planner() ?: throw BadArguments("$STOPPED: ${client().noPlanner}")
         Run.current = run

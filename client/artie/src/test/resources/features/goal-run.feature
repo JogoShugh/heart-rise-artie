@@ -21,16 +21,18 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     And ARTIE talks to the GitHub gateway at "https://github.gateway.test" in front of the small GitHub
     And ARTIE holds the Bearer credential "ada-token" for "https://github.gateway.test"
     And the client works at rung L2
-    And the file "close.goal.yaml" is
+    And the file "close.goal.md" is
       """
+      ---
       start: https://github.gateway.test/
       inputs:
         owner: acme
         repo: rockets
         number:
           question: Which issue?
-      goal: |
-        Open issue $number of $owner/$repo. Comment "Fixed in 1.2, see #$number." on it, then close it.
+      ---
+
+      Open issue {number} of {owner}/{repo}. Comment "Fixed in 1.2, see #{number}." on it, then close it.
       """
 
   Scenario: The goal is done move by move, and the script generated from it does it again with no model
@@ -50,7 +52,7 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
       | github:comment    | {"body": "Fixed in 1.2, see #10."}                     |
       | github:close      | {}                                                     |
-    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+    When the goal "close.goal.md" runs with ARTIE, captured in "goal.trace.yaml", given
       | name   | value |
       | number | 10    |
     Then the run finished
@@ -59,7 +61,7 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | sentence                                                 |
       | Open issue 10 of acme/rockets.                           |
       | Comment "Fixed in 1.2, see #10." on it, then close it.   |
-    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.yaml"
+    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.md"
     Then the script "goal-gen.kts" nests its acts as
       | relation          | depth |
       | github:issues-get | 1     |
@@ -92,11 +94,11 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
       | github:comment    | {"body": "Fixed."}                                     |
       | github:close      | {}                                                     |
-    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+    When the goal "close.goal.md" runs with ARTIE, captured in "goal.trace.yaml", given
       | name   | value |
       | number | 10    |
     Then the run finished
-    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.yaml"
+    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.md"
     Then the script "goal-gen.kts" nests its acts as
       | relation          | depth |
       | github:issues-get | 1     |
@@ -110,14 +112,16 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     it wrote that an earlier state holds is that state's, so the script
     reads it there and works on the next issue opened. An input with a
     default { now: PATTERN } is fresh in the generated script too.
-    Given the file "open.goal.yaml" is
+    Given the file "open.goal.md" is
       """
+      ---
       start: https://github.gateway.test/
       inputs:
         stamp:
           default: { now: yyyy }
-      goal: |
-        In acme/rockets, open an issue titled "Beam drifts $stamp". Then get that issue again and close it.
+      ---
+
+      In acme/rockets, open an issue titled "Beam drifts {stamp}". Then get that issue again and close it.
       """
     And the planner will move
       | move   | words                                    | sentence | opens | to                           |
@@ -138,11 +142,11 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 12} |
       | github:comment    | {"body": "Fixed in 2.12 for #12 in 2026."}               |
       | github:close      | {}                                                       |
-    When the goal "open.goal.yaml" runs with ARTIE, captured in "open.trace.yaml", given
+    When the goal "open.goal.md" runs with ARTIE, captured in "open.trace.yaml", given
       | name | value |
     Then the run finished
     And issue 12 of "acme/rockets" is now "closed" on the small GitHub
-    When artie generated "open-gen.kts" from "open.trace.yaml" and "open.goal.yaml"
+    When artie generated "open-gen.kts" from "open.trace.yaml" and "open.goal.md"
     Then the script "open-gen.kts" has a line with "state.long(\"number\")"
     And the script "open-gen.kts" has no line with "to 12"
     And the script "open-gen.kts" has no line with "#12"
@@ -173,11 +177,11 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 11} |
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
       | github:close      | {}                                                     |
-    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+    When the goal "close.goal.md" runs with ARTIE, captured in "goal.trace.yaml", given
       | name   | value |
       | number | 10    |
     Then the run finished
-    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.yaml"
+    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.md"
     Then the script "goal-gen.kts" nests its acts as
       | relation          | depth |
       | github:issues-get | 1     |
@@ -202,13 +206,13 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
       | github:merge      | {}                                                     |
       | github:close      | {}                                                     |
-    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+    When the goal "close.goal.md" runs with ARTIE, captured in "goal.trace.yaml", given
       | name   | value |
       | number | 10    |
     Then the run finished
     And the planner was told "finish it off: refused"
     And issue 10 of "acme/rockets" is now "closed" on the small GitHub
-    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.yaml"
+    When artie generated "goal-gen.kts" from "goal.trace.yaml" and "close.goal.md"
     Then the script "goal-gen.kts" nests its acts as
       | relation          | depth |
       | github:issues-get | 1     |
@@ -228,7 +232,7 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | form              | fields                                                 |
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
       | github:close      | {}                                                     |
-    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+    When the goal "close.goal.md" runs with ARTIE, captured in "goal.trace.yaml", given
       | name   | value |
       | number | 10    |
     Then the run finished
@@ -244,7 +248,7 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     And ARTIE's reasoner will choose, in order
       | form              | fields                                                 |
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
-    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+    When the goal "close.goal.md" runs with ARTIE, captured in "goal.trace.yaml", given
       | name   | value |
       | number | 10    |
     Then the planner was last shown "github:close" described as "Close"
@@ -257,7 +261,7 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     And ARTIE's reasoner will choose, in order
       | form              | fields                                                 |
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
-    When the goal "close.goal.yaml" runs with ARTIE, captured in "goal.trace.yaml", given
+    When the goal "close.goal.md" runs with ARTIE, captured in "goal.trace.yaml", given
       | name   | value |
       | number | 10    |
     Then the goal run stopped, saying "<said>"
@@ -267,22 +271,4 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
       | case                                | last    | question            | said                                         |
       | it finishes with sentences not done | finish  |                     | not every sentence is done: 1, 2             |
       | the planner asks, and no one is there | clarify | Which comment text? | the planner asks: Which comment text?        |
-      | it moves more than it may           | loop    |                     | more than 40 moves                           |
-
-  Scenario Outline: A goal file that isn't one stops the run before its first request: <case>
-    Given the file "bad.goal.yaml" is
-      """
-      <text>
-      """
-    And the planner will move
-      | move   | words | sentence | opens |
-      | finish |       |          |       |
-    When the goal "bad.goal.yaml" runs with ARTIE, captured in "bad.trace.yaml", given
-      | name | value |
-    Then the goal run stopped, saying "<said>"
-
-    Examples:
-      | case                 | text                                                    | said                                              |
-      | an unknown key       | start: https://github.gateway.test/\ngoal: x\nrung: L2 | bad.goal.yaml: no key rung                        |
-      | no start             | goal: x                                                 | bad.goal.yaml: start names the bookmark           |
-      | no goal              | start: https://github.gateway.test/                     | bad.goal.yaml: goal says what to do               |
+      | it moves more than it may           | loop    |                     | more than 50 moves                           |

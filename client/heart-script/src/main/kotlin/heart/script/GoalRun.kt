@@ -1,7 +1,7 @@
 package heart.script
 
-/** The most moves a goal run makes before it stops, as a loop. */
-const val MAX_MOVES = 40
+/** The most moves a goal run makes before it stops, as a loop, unless its goal says otherwise. */
+const val MAX_MOVES = 50
 
 /**
  * Does [goal] in the current run, move by move as [planner] chooses (spec/PLAN-PLAIN-TEXT-RUN.md). Each act is a
@@ -9,7 +9,7 @@ const val MAX_MOVES = 40
  * run keeps, as its [Run.source], the script the moves amount to, one line a move, so its capture reads as a
  * reasoned script's, nested as the planner nested it, and `artie generate` writes the script from it.
  */
-fun runGoal(goal: Goal, planner: Planner, maxMoves: Int = MAX_MOVES) {
+fun runGoal(goal: Goal, planner: Planner, maxMoves: Int = goal.limits.moves) {
     val run = Run.current
     goal.inputs.forEach { run.declare(it) }
     GoalRun(goal, planner, run, maxMoves).start()
@@ -157,7 +157,9 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
 
 /** The lines of the script a goal run's moves amount to, and its inputs filled in its words. */
 internal object GoalText {
-    private val SLOT = Regex("""\$\{([A-Za-z_][A-Za-z0-9_]*)}|\$([A-Za-z_][A-Za-z0-9_]*)""")
+    private val SLOT = Regex(
+        """\{\{|}}|\$\{([A-Za-z_][A-Za-z0-9_]*)}|\$([A-Za-z_][A-Za-z0-9_]*)|\{([A-Za-z_][A-Za-z0-9_]*)}""",
+    )
 
     fun act(words: String) = "act(intent = ${kotlinString(words)})"
 
@@ -166,10 +168,17 @@ internal object GoalText {
     fun check(facts: Map<String, Any?>) = "check(" +
         facts.entries.joinToString { (member, value) -> "${kotlinString(member, false)} to ${literal(value)}" } + ")"
 
-    /** [text] with each `$name` or `${name}` of one of [inputs] put as its [value]. */
+    /**
+     * [text] with each `{name}`, `$name` or `${name}` of one of [inputs] put as its [value]; `{{` and `}}`, a goal
+     * file's braces, put as one.
+     */
     fun fill(text: String, inputs: Set<String>, value: (String) -> String): String = SLOT.replace(text) { slot ->
-        val name = slot.groupValues[1].ifEmpty { slot.groupValues[2] }
-        if (name in inputs) value(name) else slot.value
+        val name = slot.groupValues.drop(1).firstOrNull { it.isNotEmpty() }
+        when {
+            name == null -> slot.value.take(1)
+            name in inputs -> value(name)
+            else -> slot.value
+        }
     }
 
     private fun literal(value: Any?): String = when (value) {

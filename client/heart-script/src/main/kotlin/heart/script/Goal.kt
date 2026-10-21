@@ -1,10 +1,21 @@
 package heart.script
 
 /**
- * A goal in words (spec/PLAN-PLAIN-TEXT-RUN.md): where to [start], the [inputs] a run takes, and the [text] of what
- * to do, `$name` naming an input. Read from a goal file by the runner that has one; a planner does it move by move.
+ * A goal (spec/PLAN-PLAIN-TEXT-RUN.md, spec/PLAN-GOAL-MARKDOWN.md): where to [start], the [inputs] a run takes, and
+ * what to do: the [text] of a goal in words, or [steps], with the [context] the person wrote above them. A name in
+ * braces, `{name}` (or `$name`), is an input or a resource a step named. Read from a goal file by the runner that
+ * has one; a planner does it move by move, within its [limits].
  */
-class Goal(val start: String, val inputs: List<Declared>, val text: String) {
+// A record names each of its parts once, by name.
+@Suppress("LongParameterList")
+class Goal(
+    val start: String,
+    val inputs: List<Declared>,
+    val text: String,
+    val context: String = "",
+    val steps: List<Step> = emptyList(),
+    val limits: Limits = Limits(),
+) {
     /** The goal's sentences, in order: each line, then each sentence in a line, a quotation never split. */
     fun sentences(filled: String): List<String> = filled.lines().map { it.trim() }.filter { it.isNotEmpty() }
         .flatMap(::split)
@@ -26,6 +37,36 @@ class Goal(val start: String, val inputs: List<Declared>, val text: String) {
         current.toString().trim().takeIf { it.isNotEmpty() }?.let { out += it }
         return out
     }
+}
+
+/** How far a goal run may go: [moves] in all, and [step] for one step of a goal in steps. */
+class Limits(val moves: Int = 50, val step: Int = 10)
+
+/** One step of a goal in steps, at its [line] of the goal file. */
+sealed interface Step {
+    val line: Int
+
+    /**
+     * An intent: one or more acts that do its [words]; then its [children], inside what it led to. [name], given
+     * by `as name`, names the resource it led to; [moves] is its own limit; [reasoned], that the model decides it
+     * on every run of the script made from the run.
+     */
+    // A record names each of its parts once, by name.
+    @Suppress("LongParameterList")
+    class Intent(
+        val words: String,
+        override val line: Int,
+        val name: String? = null,
+        val moves: Int? = null,
+        val reasoned: Boolean = false,
+        val children: List<Step> = emptyList(),
+    ) : Step
+
+    /** Read the held resource again until [condition] holds. */
+    class Wait(val condition: String, override val line: Int) : Step
+
+    /** Each of [facts] must hold of the held resource now. */
+    class Verify(val facts: List<String>, override val line: Int) : Step
 }
 
 /**

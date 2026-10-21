@@ -1,5 +1,5 @@
 Feature: artie run a goal file: a goal in words, planned by the client's planner
-  spec/PLAN-PLAIN-TEXT-RUN.md. artie run takes a goal file, NAME.goal.yaml,
+  spec/PLAN-PLAIN-TEXT-RUN.md. artie run takes a goal file, NAME.goal.md,
   as it takes a script: its inputs from the command line, a line per step,
   the capture with --trace. The client's planner makes each move, and its
   reasoner each act, so a goal file needs --reasoner. artie generate then
@@ -14,13 +14,15 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | at         | relation   | leads to   | outcome |
       | /          | issues-get | /issues/10 | done    |
       | /issues/10 | close      | /issues/10 | done    |
-    And the file "close.goal.yaml" is
+    And the file "close.goal.md" is
       """
+      ---
       start: scripted://service/
       inputs:
         number:
-      goal: |
-        Open issue $number. Close it.
+      ---
+
+      Open issue {number}. Close it.
       """
 
   Scenario: A goal file runs move by move, and artie generate writes its script
@@ -38,7 +40,7 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
     When artie is run with
       | argument        |
       | run             |
-      | close.goal.yaml |
+      | close.goal.md   |
       | number=10       |
       | --reasoner      |
       | claude          |
@@ -59,7 +61,7 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | --out           |
       | gen.kts         |
       | --script        |
-      | close.goal.yaml |
+      | close.goal.md   |
     Then artie exits 0
     And the file "gen.kts" has these lines
       | line                                                    |
@@ -73,7 +75,7 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
     When artie is run with
       | argument        |
       | run             |
-      | close.goal.yaml |
+      | close.goal.md   |
       | number=10       |
       | --reasoner      |
       | claude          |
@@ -84,7 +86,7 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
     When artie is run with
       | argument        |
       | run             |
-      | close.goal.yaml |
+      | close.goal.md   |
       | number=10       |
     Then artie exits 2
     And artie's last line is: stopped before the first request: a goal needs --reasoner

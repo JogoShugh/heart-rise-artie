@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter
  * file written for a later ARTIE never runs half-understood.
  */
 fun goalFile(name: String, text: String): Goal {
+    if (name.endsWith(".goal.md")) return heart.cli.goal.markdownGoal(name, text)
     val doc = Yaml().load<Any?>(text) as? Map<*, *>
     val start = doc?.get("start")?.toString()
     val goal = doc?.get("goal")?.toString()?.takeIf { it.isNotBlank() }
@@ -25,6 +26,24 @@ fun goalFile(name: String, text: String): Goal {
     if (problem != null) throw BadArguments("$name: $problem")
     val inputs = (doc?.get("inputs") as? Map<*, *>).orEmpty().map { (input, value) -> declared(name, "$input", value) }
     return Goal(checkNotNull(start), inputs, checkNotNull(goal))
+}
+
+/** Whether [file] is a goal file, in Markdown or in YAML. */
+internal fun isGoal(file: java.nio.file.Path): Boolean = file.fileName.toString().let {
+    it.endsWith(".goal.md") || it.endsWith(".goal.yaml")
+}
+
+/** The goal [file] holds; a rule it breaks stops the run before its first request, saying so. */
+internal fun readGoal(file: java.nio.file.Path): Goal = try {
+    goalFile(file.fileName.toString(), java.nio.file.Files.readString(file))
+} catch (e: BadArguments) {
+    throw BadArguments("$STOPPED: ${e.message}", e)
+}
+
+/** `--plan-only`: what goal [file] holds, as lines to print; nothing is sent. */
+internal fun planned(file: java.nio.file.Path): List<String> {
+    if (!isGoal(file)) throw BadArguments("--plan-only reads a goal file")
+    return heart.cli.goal.planned(readGoal(file))
 }
 
 /**
