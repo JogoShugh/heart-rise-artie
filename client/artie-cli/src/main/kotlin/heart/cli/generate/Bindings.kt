@@ -31,8 +31,8 @@ class Argument(
     val field: String,
     val expression: String,
     val review: String? = null,
-    /** The value's text and the variable the script reads it from, when an earlier answer gave it. */
-    val held: Pair<String, String>? = null,
+    /** Each text in the value an input or an earlier answer gave, with the name the script knows it by. */
+    val named: Map<String, String> = emptyMap(),
 )
 
 /**
@@ -80,18 +80,19 @@ class Bindings(
         return when {
             input != null -> Argument(field, marked.input(input, inputAs(input, type)))
             field in asInputs -> Argument(field, marked.madeInput(field, text, inputAs(field, type)))
-            // A goal run's words are the planner's: a value an earlier answer holds is that answer's, not theirs.
-            literal(step, field, text) && !(capture.source != null && held != null) ->
+            // A goal run's step words are the planner's: what the person said is the goal, its "words" source.
+            if (capture.source != null) "words" in from else literal(step, field, text) ->
                 Argument(field, marked.words(text, constant(value, type)))
             held != null -> variable(held.first, held.second).let { variable ->
                 val tie = tie(from, held)
                 val named = slotted[held] ?: variable.name
-                Argument(field, marked.answer(variable, named, tie, variableAs(variable, type)), tie, text to named)
+                val expression = marked.answer(variable, named, tie, variableAs(variable, type))
+                Argument(field, expression, tie, mapOf(text to named))
             }
             "chosen" in from ->
                 Argument(field, marked.model(constant(value, type)), "the reasoner chose it, asked \"${step.say}\"")
             value is String -> names(step, text, from)
-                .let { Argument(field, marked.string(KotlinText.templated(text, it), it.values, from)) }
+                .let { Argument(field, marked.string(KotlinText.templated(text, it), it.values, from), named = it) }
             else -> Argument(field, marked.said(constant(value, type), from))
         }
     }
@@ -112,7 +113,10 @@ class Bindings(
     /** The variable read from [pointer] in the answer of [step], made the first time it is needed. */
     fun variable(step: Int, pointer: String): Variable = variables.getOrPut(step to pointer) {
         val taken = variables.values.map { it.name }.toSet() + capture.inputs.keys
-        val base = slotted[step to pointer] ?: camel(pointer.substringAfterLast('/'))
+        // A member named as no identifier can be (an array's index, `/topics/0`) is named with its parent's name.
+        val last = camel(pointer.substringAfterLast('/'))
+        val named = last.takeIf { IDENTIFIER.matches(it) } ?: camel(pointer.removePrefix("/").replace('/', '_'))
+        val base = slotted[step to pointer] ?: named
         val name = if (base in taken) "$base$step" else base
         Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)))
     }
@@ -147,7 +151,8 @@ class Bindings(
         }
         from.flatMap { it.map()["parts"].map().entries }.forEach { (part, source) ->
             source.map()["input"]?.let { names.putIfAbsent(part.toString(), it.toString()) }
-            sources.first(listOf(source))?.takeIf { it in slotted }
+            // A goal run has no script of its own to have named it: an earlier answer's part is its variable.
+            sources.first(listOf(source))?.takeIf { it in slotted || capture.source != null }
                 ?.let { names.putIfAbsent(part.toString(), variable(it.first, it.second).name) }
         }
         return names

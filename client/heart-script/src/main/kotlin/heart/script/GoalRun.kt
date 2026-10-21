@@ -32,6 +32,8 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
         run.place = { place }
         heart(goal.start) {
             filled = GoalText.fill(goal.text, goal.inputs.map { it.name }.toSet(), run::value)
+            // As the person wrote it, each input a name: a value made of inputs is theirs by its parts.
+            run.goal = goal.text
             sentences = goal.sentences(filled)
             path += held.address
             plan(this, null)

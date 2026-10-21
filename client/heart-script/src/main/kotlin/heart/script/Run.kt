@@ -69,6 +69,9 @@ class Run(
      */
     var place: (() -> Pair<Int?, Int?>)? = null
 
+    /** A goal run's goal, as written, each input a `$name`: the person's own words; a step's are the planner's. */
+    var goal: String? = null
+
     /** Each input the run read: its value, and how it was given ("given", "default" or "asked"). */
     val inputsUsed = linkedMapOf<String, Pair<String, String>>()
 

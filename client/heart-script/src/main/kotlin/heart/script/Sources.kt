@@ -55,12 +55,11 @@ internal object Sources {
 
     /**
      * Every source of [value]: inputs, earlier states, the [words]; else its parts; else a constant or a choice. In
-     * a goal run the words are the planner's, not the person's, so they are no source: a value they hold is an
-     * earlier state's, or the reasoner's choice.
+     * a goal run a step's words are the planner's, not the person's: the person's are the goal's.
      */
     private fun of(value: String, run: Run, earlier: List<TraceStep>, words: String?): List<JsonElement> {
         val none = listOf(JsonPrimitive(if (words != null) "chosen" else "constant"))
-        val said = words?.takeIf { run.place == null }
+        val said = if (run.place != null) words?.let { run.goal } else words
         val whole = inputs(run).filter { it.second == value }.map { input(it.first) } +
             states(earlier).filter { it.value == value }.map { it.source } +
             listOfNotNull(JsonPrimitive("words").takeIf { said != null && Words.whole(value).containsMatchIn(said) })
@@ -70,7 +69,7 @@ internal object Sources {
         return when {
             value.isEmpty() -> none
             whole.isNotEmpty() -> whole.distinct()
-            words != null && Words.paraphrases(value, words) -> listOf(JsonPrimitive("paraphrase"))
+            said != null && Words.paraphrases(value, said) -> listOf(JsonPrimitive("paraphrase"))
             parts.isNotEmpty() -> listOf(buildJsonObject { put("parts", JsonObject(parts.toMap())) })
             else -> none
         }
