@@ -87,6 +87,7 @@ One of two shapes:
 | `- words` | an intent: one or more acts that do it | `act(intent = …)` |
 | an item with sub-items | an intent, then its sub-items inside the resource it led to | a block `{ … }` |
 | `` `as name` `` at an item's end | names the resource the item led to | a variable named `name` |
+| `` `reasoned` `` at a leaf item's end | the model decides this step on every run of the generated script | `act(intent = …)`, kept |
 | `- Wait: condition` | read again until the condition holds | `until { … }` |
 | `- Verify: fact` or `- Verify:` with fact sub-items | each fact must hold now | `check(…)` |
 
@@ -113,8 +114,9 @@ Each stops the run before its first request, naming the file, the line and what 
 4. Markers: an item starting `Word:` where `Word` is not `Wait` or `Verify`. A colon later in the words is words.
 5. `Wait:` with sub-items; `Verify:` with both a fact after the colon and fact sub-items, or with neither; a fact
    with sub-items of its own.
-6. Backticks: anything but `` `as name` `` and `` `moves N` ``, each at most once, at an item's end; a name given
-   twice; a name an input already has.
+6. Backticks: anything but `` `as name` ``, `` `moves N` `` and `` `reasoned` ``, each at most once, at an item's
+   end; a name given twice; a name an input already has; `` `reasoned` `` on an item with sub-items, or on a
+   `Wait:` or `Verify:` item.
 7. Braces: `{x}` that is no input and no `as` name; `{x}` used before (above, or outside of) the step that names
    it; an unclosed brace.
 
@@ -159,6 +161,13 @@ the current step allows, so a wrong kind cannot be chosen.
 
 - Nesting comes from the steps: a step with sub-items is a block.
 - An `as name` gives the variable its name: `issue`, `pr`, not `number13`.
+- **A `` `reasoned` `` step stays an intent.** The author marks, up front, a choice that depends on the situation
+  (how to close the issue); one run can't tell that from a value that happened to match the words. The generated
+  script keeps it as `act(intent = …)`, whatever the run's values looked like; every other step is fixed.
+  `--keep-reason` may still keep more steps it detects. The script's header says how many steps call the model on
+  every run, and that it needs `--reasoner`. The first run is unchanged: every step is reasoned then anyway.
+- A marked item with sub-items would mean planning a subtree on every run, a goal inside the script; that is
+  refused for now.
 - `Wait:` and `Verify:` steps become `until` and `check` lines as the capture kept them.
 - Detours (spec/PLAN-PLAIN-TEXT-RUN.md) are still left out; there should be fewer.
 
@@ -177,7 +186,8 @@ Features first in each, red at test level, then code.
    `.goal.yaml` one does (`goal-run.feature`, moved to braces).
 2. **Steps, run** (heart-script, artie): scripted planner. Nesting and the runner's own way back; moves a step
    allows; `as` names and `{name.member}`; `Wait:` and `Verify:`; the run ending at the last step.
-3. **Steps, generated** (artie-cli): blocks from the steps; variables named by `as`; until and check.
+3. **Steps, generated** (artie-cli): blocks from the steps; variables named by `as`; until and check; a
+   `` `reasoned` `` step kept as an intent, and the header's count of them.
 4. **ClaudePlanner** for steps: the turn's tags, the narrowed move kinds (`goal-planner.feature`).
 5. **The report**: the goal section from the file, Brief and Full.
 6. **Live**: `github-task.goal.md` in steps, by Claude, on the scratch repository; generated; again strict with no
@@ -189,6 +199,10 @@ Features first in each, red at test level, then code.
 - **`{issue}` in words is the resource's address.** The planner also sees it under `<named>`.
 - **Facts are words.** "it merged"; the planner turns each into a Check move.
 - **Limits:** 50 moves a run, 10 a step, each settable (above).
+- **`` `reasoned` `` marks a leaf step to stay an intent** in the generated script.
+
+Later, if needed: a narrower kept step that fixes the relation and lets the model choose only the values
+(`act("github:close", intent = …)`); and a `` `fixed` `` mark, should `--keep-reason` turn out to keep too much.
 - **`.goal.yaml` goes** once `.goal.md` works.
 
 ## Open
