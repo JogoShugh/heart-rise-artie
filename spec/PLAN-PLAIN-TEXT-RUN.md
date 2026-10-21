@@ -94,14 +94,17 @@ Each move is a step as today, plus:
    one; run the generated script strict, live. Report: the text, the run line by line, the script generated, side
    by side with the hand-written reasoned one.
 
-## Open
+## Decided (2026-10-20, with the author)
 
-- **Where the text may say structure.** Plain paragraphs only, or also lines and bullets as hints of order? Lines
-  first; the planner gets both.
+- **Text shape:** a paragraph or one step per line, both split into numbered sentences; line order is a hint, not
+  a rule.
+- **Inputs:** declared on the `inputs:` line; `$name` in the text uses them. Generate proposes none of its own.
+- **Ambiguity:** the planner asks the person (clarify), as reason steps can; it never guesses.
+- **First proof:** the GitHub task, against the hand-nested reasoned script.
+
+## Open
 - **Value judgement.** "Fixed in 1.2 by #<the pull request>": the planner fills it from the pull request's number;
   generate traces it. A value the planner judged (not quoted, not traced) is marked for review, as today.
-- **Inputs not declared.** A literal the text gives (a repository name) stays a literal unless declared; generate
-  could propose inputs for literals that appear in addresses. Later.
 - **Cost.** One model call per move on the first run only. Prompt caching of the text and the profile's
   descriptors keeps it down.
 - **Other services.** The garden first after GitHub: "water bed 2 with about 250 ml, then check it's watered", the
