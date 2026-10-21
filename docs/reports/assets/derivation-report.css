@@ -20,10 +20,10 @@ main { max-width: 96rem; margin: 0 auto; padding-block: 1.5rem 4rem; display: gr
 header { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: space-between; align-items: start; }
 h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .lede { color: var(--muted); margin: .3rem 0 0; max-width: 52rem; }
-.theme { display: flex; gap: .3rem; }
-.theme button { font: 500 .8rem var(--body); background: var(--surface); color: var(--fg); border: 1px solid var(--rule);
+.theme, .detail { display: flex; gap: .3rem; }
+.theme button, .detail button { font: 500 .8rem var(--body); background: var(--surface); color: var(--fg); border: 1px solid var(--rule);
   border-radius: 6px; padding: .25rem .6rem; cursor: pointer; }
-.theme button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.theme button[aria-pressed="true"], .detail button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
 .facts { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; font-size: .9rem; color: var(--muted); }
 .facts b { color: var(--fg); }
 .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); display: flex;
@@ -83,3 +83,6 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .goal pre.cmd { font: .78rem/1.6 var(--mono); white-space: pre; padding: .6rem .9rem; }
 .y-k { color: var(--kt-kw); } .y-s { color: var(--kt-str); } .y-u { color: var(--kt-fn); } .y-v { color: var(--kt-tpl); font-weight: 600; } .y-p { color: var(--kt-cm); }
 .more { max-width: 68ch; color: var(--muted); font-size: .92rem; line-height: 1.55; margin: .2rem 0 0; }
+.toggles { align-items: center; }
+.seg { display: flex; align-items: center; gap: .4rem; }
+.seg-label { font: 600 .7rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
