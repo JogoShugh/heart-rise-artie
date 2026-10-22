@@ -70,6 +70,12 @@ class ConfigurationSteps {
         assertFalse(config.credentials.admits("Bearer "))
     }
 
+    @Then("acts need a validator")
+    fun validatorNeeded() = assertTrue(config.validatorRequired)
+
+    @Then("acts may come with no validator")
+    fun noValidatorNeeded() = assertFalse(config.validatorRequired)
+
     @Then("it refuses to start, saying {string}")
     fun refuses(says: String) = assertEquals(says, read.exceptionOrNull()?.message)
 }

@@ -25,6 +25,9 @@ class Arguments(val script: String) {
     /** How the lock file is held to: lenient or strict; asking for it needs a lock file. */
     var guard: String? = null
 
+    /** The validator each act carries: last, the default, or none (spec/ideas/off-the-rails.md). */
+    var validators: String? = null
+
     /** The config, when it isn't NAME.config.yaml beside the script: for a trial run that leaves the default alone. */
     var config: String? = null
 
@@ -55,6 +58,9 @@ private val REASONERS = setOf("claude")
 /** How a run may hold to its lock file. */
 internal val GUARDS = setOf("strict", "lenient", "look-then-leap", "off-the-rails")
 
+/** The validators a run's acts may carry. */
+internal val VALIDATORS = setOf("last", "none")
+
 /** The options that stand alone. */
 private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
     "--inputs-of" to { it.inputsOf = true },
@@ -76,6 +82,9 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--pins" to { a, v -> a.pins = v },
     "--config" to { a, v -> a.config = v },
     "--guard" to { a, v -> a.guard = v.takeIf { it in GUARDS } ?: throw BadArguments("--guard is ${said(GUARDS)}") },
+    "--validators" to { a, v ->
+        a.validators = v.takeIf { it in VALIDATORS } ?: throw BadArguments("--validators is ${said(VALIDATORS)}")
+    },
     "--output" to { a, v -> a.output = v.takeIf { it == "json" } ?: throw BadArguments("--output json only") },
 )
 

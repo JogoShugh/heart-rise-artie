@@ -13,6 +13,7 @@ class UpstreamSettings(val url: String, val spec: String, val auth: UpstreamAuth
  * it. A missing or wrong setting stops the gateway at start, naming the
  * variable and never a value.
  */
+@Suppress("LongParameterList") // each is one variable of the environment
 class GatewayConfig private constructor(
     val upstream: UpstreamSettings,
     /** The profile its relations are named in; a connector names its own, and wins. */
@@ -23,6 +24,8 @@ class GatewayConfig private constructor(
     val credentials: Credentials,
     /** Where to keep the record of upstream calls (GATEWAY_RECORD); none keeps no record. */
     val record: Path? = null,
+    /** Whether an act must carry a validator; only HEART_ACTS_WITHOUT_VALIDATOR=allowed, for a trial, says no. */
+    val validatorRequired: Boolean = true,
 ) {
     companion object {
         const val DEFAULT_PORT = 8090
@@ -47,7 +50,12 @@ class GatewayConfig private constructor(
                 )
             }
             val record = value("GATEWAY_RECORD")?.let { Path.of(it) }
-            return GatewayConfig(upstream, profile, connector, port, credentials, record)
+            val required = when (val switch = value("HEART_ACTS_WITHOUT_VALIDATOR")) {
+                null -> true
+                "allowed" -> false
+                else -> error("HEART_ACTS_WITHOUT_VALIDATOR must be allowed, or unset, not $switch")
+            }
+            return GatewayConfig(upstream, profile, connector, port, credentials, record, required)
         }
 
         private fun auth(value: (String) -> String?): UpstreamAuth = when (val scheme = value("UPSTREAM_AUTH")) {

@@ -1,5 +1,6 @@
 package com.artie.heart.gateway
 
+import com.artie.heart.ServingLimits
 import com.artie.heart.http4k.HeartSettings
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method
@@ -40,5 +41,6 @@ fun main() {
         upstreamUrl = settings.url,
         record = config.record?.let { UpstreamRecord(it, mapper, settings.url) },
     )
-    gateway.handler(config.credentials).asServer(Jetty(config.port)).start().block()
+    val serving = HeartSettings(mapper = mapper, limits = ServingLimits(validatorRequired = config.validatorRequired))
+    gateway.handler(config.credentials, serving).asServer(Jetty(config.port)).start().block()
 }

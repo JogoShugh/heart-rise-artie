@@ -240,6 +240,7 @@ fun interface NavigatorProvider {
  * What a run asks of the client it is given: the [rung] to read at (L0, L1, L2: SPEC §6.10), and the
  * [reasoner] to use for `act(intent = …)` steps (for ARTIE: `claude`). Null: the client's own choice, or none.
  */
+@Suppress("LongParameterList") // each is one thing a run asks of its client
 class ClientSettings(
     val rung: String? = null,
     val reasoner: String? = null,
@@ -254,4 +255,9 @@ class ClientSettings(
      * keeps its pinned method and what the script sends fits its new schema.
      */
     val onChange: String? = null,
+    /**
+     * The validator each act carries (spec/ideas/off-the-rails.md): "last" (the default), the last one the run was
+     * given for the resource, or "none", a blind write, which only a server's development switch takes.
+     */
+    val validators: String? = null,
 )

@@ -181,6 +181,8 @@ private fun refusal(client: HeartRiseClient, what: String, refused: RuntimeExcep
     when (refused) {
         // ARTIE refuses an act its manifest lacks with an IllegalStateException; the DSL checks first.
         is StaleAct -> Answer.Refused(Refusal.Stale, Side.SERVER, "the resource changed since it was read")
+        is ValidatorRequired ->
+            Answer.Refused(Refusal.PreconditionRequired, Side.SERVER, "the act was sent with no validator")
         is IllegalTransition ->
             Answer.Refused(Refusal.NotOffered, Side.SERVER, client.explain(what) ?: "no reason given")
         // The server's 422: the body broke the form's schema, in the server's own check.

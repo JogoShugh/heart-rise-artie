@@ -86,7 +86,7 @@ class CoapBinding(
     override fun act(act: Act, rendering: Rendering): Outcome =
         send(act.url, Request(CoAP.Code.valueOf(act.method)).apply {
             ask(rendering)
-            options.addIfMatch(hexBytes(act.validator))
+            act.validator?.let { options.addIfMatch(hexBytes(it)) }
             act.body?.let {
                 options.contentFormat = FORMATS[act.contentType] ?: JSON
                 setPayload(it)

@@ -10,6 +10,9 @@ sealed class ActRefused(message: String) : RuntimeException(message)
 /** 412: someone else wrote first. The client has re-synced; the act is dropped, never resent. */
 class StaleAct(rel: String) : ActRefused("$rel was refused as stale (412); re-synced, act dropped")
 
+/** 428: a blind write, sent with no validator, to a server that takes none (spec/ideas/off-the-rails.md). */
+class ValidatorRequired(rel: String) : ActRefused("$rel was sent with no validator, and the server asks for one (428)")
+
 /** 409: the act is not legal in the resource's current state. The client has re-synced. */
 class IllegalTransition(rel: String) : ActRefused("$rel is not legal in the current state (409); re-synced")
 

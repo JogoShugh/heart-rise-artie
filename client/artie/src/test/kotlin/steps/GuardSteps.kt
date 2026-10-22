@@ -36,6 +36,21 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
         ctx.pins = bookmark() + (relation to (CHANGED to null))
     }
 
+    @Given("ARTIE runs with the guard {string} and the validators {string}")
+    fun runsWithValidators(guard: String, validators: String) {
+        ctx.guard = guard
+        ctx.validators = validators != "none"
+    }
+
+    @Then("the client sent the comment with If-Match")
+    fun commentWithIfMatch() = assertTrue("If-Match" in comment().headers, "${comment().headers}")
+
+    @Then("the client sent the comment with no If-Match")
+    fun commentBlind() = assertTrue("If-Match" !in comment().headers, "${comment().headers}")
+
+    private fun comment(): HeartRequest =
+        (ctx.inProcess as InProcessTransport).sent.last { it.method == "POST" }
+
     @Then("the client read {string} {int} time(s)")
     fun readTimes(url: String, times: Int) {
         val sent = (ctx.inProcess as InProcessTransport).sent

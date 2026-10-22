@@ -1,5 +1,6 @@
 package com.artie.heart.gateway.bdd
 
+import com.artie.heart.ServingLimits
 import com.artie.heart.gateway.Connector
 import com.artie.heart.gateway.Gateway
 import com.artie.heart.gateway.GatewaySpec
@@ -10,6 +11,7 @@ import com.artie.heart.gateway.fixtures.GitHubUpstream
 import com.artie.heart.gateway.fixtures.Issue
 import com.artie.heart.gateway.fixtures.Pull
 import com.artie.heart.http4k.Credentials
+import com.artie.heart.http4k.HeartSettings
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.datatable.DataTable
@@ -32,6 +34,7 @@ class GitHubSteps {
     private val mapper = ObjectMapper()
     private var connector = ""
     private var forwarding = false
+    private var validatorRequired = true
     private var started: Result<HttpHandler>? = null
     private val responses = mutableListOf<Response>()
 
@@ -86,6 +89,12 @@ class GitHubSteps {
     @Given("the GitHub gateway calls GitHub as each caller")
     fun forwarding() {
         forwarding = true
+        started = null
+    }
+
+    @Given("the GitHub gateway's switch for acts with no validator is {word}")
+    fun noValidatorSwitch(switch: String) {
+        validatorRequired = switch != "on"
         started = null
     }
 
@@ -473,6 +482,16 @@ class GitHubSteps {
     @When("the client sends {string} with {} and the ETag it holds")
     fun send(key: String, body: String) = sendBy(key, null, body)
 
+    @When("the client sends {string} with {} and no validator")
+    fun sendBlind(key: String, body: String) {
+        val form = json.path("_forms").path(key)
+        val target = Forms.filled(form.path("_links").path("target").path("href").asText(), mapper.readTree(body))
+        val request = Request(Method.valueOf(form.path("method").asText()), target)
+            .header("Authorization", authorization).header("Accept", "application/hal+json")
+            .header("Content-Type", form.path("contentType").asText("application/json")).body(body)
+        responses += gateway(request)
+    }
+
     @When("the client sends {string} by {word} with {} and the ETag it holds")
     fun sendBy(key: String, method: String?, body: String) {
         val etag = checkNotNull(responses.last().header("ETag"))
@@ -551,7 +570,7 @@ class GitHubSteps {
         Gateway(
             spec, github.handler, loaded.profile, auth,
             connector = loaded, upstreamUrl = upstreamUrl, record = keeping,
-        ).handler(credentials)
+        ).handler(credentials, HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired)))
     }
 
     private companion object {

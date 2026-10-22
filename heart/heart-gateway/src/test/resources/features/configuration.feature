@@ -84,6 +84,32 @@ Feature: The gateway is configured by its environment
       | http://garden:8080 | bearer  | garden  | UPSTREAM_AUTH is bearer, so set UPSTREAM_TOKEN           |
       | http://garden:8080 | forward | garden  | UPSTREAM_AUTH must be none, bearer, basic or caller, not forward |
 
+  Scenario Outline: A development switch lets acts come with no validator, for a trial: <case>
+    spec/ideas/off-the-rails.md. Never by default: HEART asks every act for
+    the validator of the state it was chosen from. A trial that measures
+    what that costs may turn it off, and only by saying so.
+    Given the environment
+      | UPSTREAM_URL               | http://garden:8080 |
+      | GATEWAY_PROFILE            | garden             |
+      | HEART_ACTS_WITHOUT_VALIDATOR | <switch>         |
+      | HEART_AUTH_BEARER_TOKENS   | 5e884898da28047151d0e56f8dc6292773603d0d6aff2bdcb2c38e8f3b2ba4c1 |
+    When the gateway reads its configuration
+    Then acts <need>
+
+    Examples:
+      | case     | switch  | need                          |
+      | unset    |         | need a validator              |
+      | switched | allowed | may come with no validator    |
+
+  Scenario: The switch says only allowed
+    Given the environment
+      | UPSTREAM_URL                 | http://garden:8080 |
+      | GATEWAY_PROFILE              | garden             |
+      | HEART_ACTS_WITHOUT_VALIDATOR | yes                |
+      | HEART_AUTH_BEARER_TOKENS     | 5e884898da28047151d0e56f8dc6292773603d0d6aff2bdcb2c38e8f3b2ba4c1 |
+    When the gateway reads its configuration
+    Then it refuses to start, saying "HEART_ACTS_WITHOUT_VALIDATOR must be allowed, or unset, not yes"
+
   Scenario: Who may call the gateway is required, as on every HEART server
     Given the environment
       | UPSTREAM_URL    | http://garden:8080 |

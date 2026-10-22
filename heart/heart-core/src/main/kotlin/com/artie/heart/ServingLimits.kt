@@ -11,6 +11,9 @@ package com.artie.heart
  * - [affordanceLinks]: whether each plain JSON answer about a resource links
  *   its state's affordance set, and the OpenAPI description says so. Off by
  *   default, since it changes a published description's bytes.
+ * - [validatorRequired] (SPEC §6.2, step 1): whether an act must carry a
+ *   validator. True unless a development switch says otherwise, for a fixture
+ *   or a trial (spec/ideas/off-the-rails.md).
  *
  * The Spring bindings read them from `heart.max-rung`, `heart.page-size` and
  * `heart.affordance-links` (environment `HEART_MAX_RUNG`, `HEART_PAGE_SIZE`,
@@ -20,6 +23,7 @@ class ServingLimits(
     maxRung: Rung = Rung.L2,
     pageSize: Int = DEFAULT_PAGE_SIZE,
     val affordanceLinks: Boolean = false,
+    val validatorRequired: Boolean = true,
 ) {
     @Volatile
     var maxRung: Rung = maxRung

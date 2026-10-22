@@ -40,9 +40,17 @@ class GitHubGatewaySteps(private val ctx: ClientContext) {
     @Given("ARTIE talks to the GitHub gateway at {string} in front of the small GitHub")
     fun gateway(origin: String) {
         // The gateway as shipped: its own connector folder, beside this build.
-        val connector = Path.of("..", "..", "heart", "heart-gateway", "connectors", "github")
-        ctx.inProcess = InProcessTransport(GitHubGateway.handler(github, connector))
+        ctx.inProcess = InProcessTransport(GitHubGateway.handler(github, CONNECTOR))
         ctx.baseUrl = null
         check(origin.startsWith("http")) { "an http origin, as the gateway serves" }
+    }
+
+    @Given("the GitHub gateway's switch for acts with no validator is {word}")
+    fun noValidatorSwitch(switch: String) {
+        ctx.inProcess = InProcessTransport(GitHubGateway.handler(github, CONNECTOR, validatorRequired = switch != "on"))
+    }
+
+    private companion object {
+        val CONNECTOR: Path = Path.of("..", "..", "heart", "heart-gateway", "connectors", "github")
     }
 }

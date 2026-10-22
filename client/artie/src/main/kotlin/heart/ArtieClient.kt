@@ -16,6 +16,7 @@ import java.net.URI
  * replaces these. For caching and integrity checks, give it a
  * transport built as CachingTransport(IntegrityCheck(wire)).
  */
+@Suppress("LongParameterList") // each is one thing the client is made with
 class ArtieClient(
     transport: Transport,
     private val rung: Rung = Rung.L0,
@@ -26,6 +27,8 @@ class ArtieClient(
     events: EventLog = EventLog.OFF,
     /** Bindings for other URI schemes, by scheme (SPEC §6.0). */
     bindings: Map<String, Binding> = emptyMap(),
+    /** Whether each act carries the validator held; false sends blind writes (spec/ideas/off-the-rails.md). */
+    private val validators: Boolean = true,
 ) : HeartRiseClient {
     init {
         require(rung <= dialect.maxRung) {
@@ -140,7 +143,7 @@ class ArtieClient(
     private fun act(rel: String, payload: JsonObject, resendAllowed: Boolean): HeartRepresentation {
         val held = current ?: error("enter a service before acting")
         val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
-        val validator = held.etag ?: error("no validator held for ${held.url}; an act needs one")
+        val validator = validatorFor(held)
         // A DELETE has no body: its fields fill its target's query, a template in HAL Schema Forms, and the
         // query itself in HAL-FORMS, as a GET's do (SPEC §6.2).
         val deletes = form.method == "DELETE"
@@ -158,12 +161,18 @@ class ArtieClient(
         if (outcome is Outcome.Done) return outcome.newResource?.let { made ->
             if (outcome.represents == made) sync(made, outcome.received) else sync(made)
         } ?: sync(act.url, outcome.received)
-        if (outcome is Outcome.PreconditionRequired && resendAllowed) {
+        // A blind write (validator null) asked for one is refused as it is: sending none again would be refused again.
+        if (outcome is Outcome.PreconditionRequired && resendAllowed && validator != null) {
             sync(held.url)
             decisions.actRefused(rel, act.url, outcome, "re-synced and resent once")
             return act(rel, payload, resendAllowed = false)
         }
         throw refusal(rel, act.url, outcome, held)
+    }
+
+    /** The validator an act on [held] carries: the one held, or none when the run sends blind writes. */
+    private val validatorFor: (HeartRepresentation) -> String? = { held ->
+        if (validators) held.etag ?: error("no validator held for ${held.url}; an act needs one") else null
     }
 
     /** Stale and not offered re-sync first, so the client never keeps a manifest the server has refused. */
@@ -173,6 +182,7 @@ class ArtieClient(
             is Outcome.Denied -> outcome.refusal(target) to "reported"
             is Outcome.Stale -> StaleAct(rel).also { sync(held.url) } to "discarded after re-sync"
             is Outcome.NotOffered -> IllegalTransition(rel).also { sync(held.url) } to "re-synced and reported"
+            is Outcome.PreconditionRequired -> ValidatorRequired(rel) to "reported"
             is Outcome.Invalid if outcome.problemType == RULE_REFUSED ->
                 RuleRefused(rel, outcome.violations) to "reported"
             is Outcome.Invalid -> InvalidPayload(rel, outcome.violations) to "reported"

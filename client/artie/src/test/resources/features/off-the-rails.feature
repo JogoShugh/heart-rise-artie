@@ -59,3 +59,26 @@ Feature: Off the rails: a run that reads only what it must, checks only what the
       | guard         | whom       | said                                  |
       | lenient       | the client | "colour is not in the schema"         |
       | off-the-rails | the server | ": property 'colour' is not defined in the schema and the schema does not allow additional properties" |
+
+  Scenario Outline: Validators <validators>, the gateway's switch <switch>: the comment is sent <how>
+    By default each act carries the last validator the run was given. With
+    --validators none it carries none: a blind write, which a HEART server
+    takes only by its development switch, for a trial, and refuses otherwise.
+    Given ARTIE runs with the guard "off-the-rails" and the validators "<validators>"
+    And the GitHub gateway's switch for acts with no validator is <switch>
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
+              act("github:comment", "body" to "Thanks.")
+          }
+      }
+      """
+    Then the client sent the comment <how>
+    And <outcome>
+
+    Examples:
+      | validators | switch | how            | outcome                                                          |
+      | last       | off    | with If-Match  | the run finished                                                 |
+      | none       | on     | with no If-Match | the run finished                                               |
+      | none       | off    | with no If-Match | the script stopped at step 2, "github:comment": precondition required, refused by the server: "the act was sent with no validator" |

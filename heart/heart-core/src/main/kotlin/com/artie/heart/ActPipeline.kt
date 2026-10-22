@@ -23,7 +23,15 @@ class ActInput(val json: JsonNode, private val mapper: ObjectMapper) {
  * The first failure wins, and nothing is performed after a refusal. A
  * [ConcurrentWriteException] while the act runs is stale too.
  */
-class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper: ObjectMapper = ObjectMapper()) {
+class ActPipeline<S, K>(
+    private val type: ResourceType<S, K>,
+    private val mapper: ObjectMapper = ObjectMapper(),
+    /**
+     * Whether an act must carry a validator (step 1). False only by a development switch, for a fixture or a trial
+     * (spec/ideas/off-the-rails.md): an act sent with none is checked against the state now, steps 3 and 4 as ever.
+     */
+    private val validatorRequired: Boolean = true,
+) {
     private val checks: Map<String, BodyCheck> = type.allActs.associate { it.name to BodyCheck(it.schema) }
 
     /**
@@ -35,7 +43,8 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
      */
     suspend fun <V : Any> check(act: String, validator: V?, current: suspend () -> S, matches: (S, V) -> Boolean): S {
         require(!type.atBookmark(act)) { "$act is offered by the bookmark; use checkAtBookmark" }
-        var state: S? = null
+        // With no validator asked for and none sent, the act is checked against the state as it is now.
+        var state: S? = if (validator == null && !validatorRequired) current() else null
         steps(act, validator, { held -> current().also { state = it }.let { matches(it, held) } }) {
             val key = type.state.keyOf(checkNotNull(state))
             if (act in type.offers.offered(key)) null else type.offers.whyAbsent(key, act)
@@ -86,9 +95,9 @@ class ActPipeline<S, K>(private val type: ResourceType<S, K>, private val mapper
         val relation = type.act(act).relation
         val curie = type.profile.key(relation)
         val refusal = when {
-            validator == null ->
+            validator == null && validatorRequired ->
                 PreconditionRequiredException("$curie needs a validator: the current one of the resource offering it")
-            !matches(validator) ->
+            validator != null && !matches(validator) ->
                 StaleWriteConflict("the validator does not match the current one of the selected representation")
             else -> notOffered()?.let { why ->
                 NotOfferedException("$curie is not offered now: $why", rel = type.profile.reference(relation))

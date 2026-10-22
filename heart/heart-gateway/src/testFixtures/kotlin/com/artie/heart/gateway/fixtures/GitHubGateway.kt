@@ -1,10 +1,12 @@
 package com.artie.heart.gateway.fixtures
 
+import com.artie.heart.ServingLimits
 import com.artie.heart.gateway.Connector
 import com.artie.heart.gateway.Gateway
 import com.artie.heart.gateway.GatewaySpec
 import com.artie.heart.gateway.UpstreamAuth
 import com.artie.heart.http4k.Credentials
+import com.artie.heart.http4k.HeartSettings
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.HttpHandler
 import java.nio.file.Path
@@ -16,7 +18,8 @@ import java.nio.file.Path
  * forwarded to [github]. For clients' tests, in process, with no network.
  */
 object GitHubGateway {
-    fun handler(github: GitHubUpstream, connector: Path): HttpHandler {
+    /** With [validatorRequired] false, the gateway's development switch for acts with no validator is on. */
+    fun handler(github: GitHubUpstream, connector: Path, validatorRequired: Boolean = true): HttpHandler {
         val mapper = ObjectMapper()
         val loaded = Connector.load(connector, mapper)
         val description = checkNotNull(GitHubUpstream::class.java.getResource("/github/openapi.json")).readText()
@@ -26,6 +29,7 @@ object GitHubGateway {
             // As the gateway runs: links under GitHub's API address are links into the API it serves.
             upstreamUrl = "https://api.github.com",
         )
-        return gateway.handler(Credentials.forwarded())
+        val settings = HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired))
+        return gateway.handler(Credentials.forwarded(), settings)
     }
 }

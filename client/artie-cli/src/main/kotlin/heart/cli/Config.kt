@@ -18,6 +18,8 @@ class Config(
      * its pinned method and what the script sends fits it.
      */
     val onChange: String? = null,
+    /** The validator each act carries: last, the default, or none, a blind write (spec/ideas/off-the-rails.md). */
+    val validators: String? = null,
 )
 
 /** The settings a config may hold, and the values each may take. */
@@ -25,6 +27,7 @@ private val SETTINGS: Map<String, Set<String>> = mapOf(
     "guard" to GUARDS,
     "repin" to setOf("auto", "propose", "never"),
     "on-change" to setOf("refuse", "values"),
+    "validators" to VALIDATORS,
 )
 
 /** The config for [asked], whose script is [script], found in [folder]. */
@@ -41,6 +44,7 @@ fun config(asked: Arguments, folder: Path, script: Path): Config {
         guard = doc["guard"]?.toString(),
         repin = doc["repin"]?.toString(),
         onChange = doc["on-change"]?.toString(),
+        validators = doc["validators"]?.toString(),
     )
 }
 

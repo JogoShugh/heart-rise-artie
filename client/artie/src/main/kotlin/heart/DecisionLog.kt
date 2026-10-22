@@ -47,7 +47,7 @@ internal class DecisionLog(private val events: EventLog) {
     /** An act sent, with the validator it carried and the resource it was derived from. */
     fun actSent(rel: String, act: Act, owner: String, outcome: Outcome) =
         events.emit(
-            "act.sent", "sent $rel with validator ${act.validator}", act.url,
+            "act.sent", "sent $rel with " + (act.validator?.let { "validator $it" } ?: "no validator"), act.url,
             mapOf(
                 "heart.rel" to rel,
                 "heart.method" to act.method,

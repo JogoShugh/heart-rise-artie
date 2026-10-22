@@ -18,7 +18,9 @@ class ArtieNavigatorProvider : NavigatorProvider {
         val guard = settings.pins?.let {
             ScriptGuard(it, strict = settings.guard == "strict", values = settings.onChange == "values")
         }
-        return standard(System.getenv(), home, rung, settings.reasoner, settings.exchanges, guard, settings.guard)
+        val blind = settings.validators == "none"
+        val env = System.getenv()
+        return standard(env, home, rung, settings.reasoner, settings.exchanges, guard, settings.guard, blind)
     }
 
     companion object {
@@ -43,13 +45,15 @@ class ArtieNavigatorProvider : NavigatorProvider {
             guard: ScriptGuard? = null,
             /** The run's guard by name: off-the-rails and look-then-leap turn ARTIE's own care off. */
             guarding: String? = null,
+            /** Whether acts carry no validator: blind writes, which only a server's development switch takes. */
+            blind: Boolean = false,
         ): Navigator {
             val credentials = CredentialSources.standard(env, userHome)
             val log = if (exchanges) ExchangeLog(HttpTransport()) else null
             val wire = TraceContextTransport(Trace(), UserAgentTransport(next = log ?: HttpTransport()))
             val transport = CachingTransport(IntegrityCheck(AuthTransport(credentials, wire)))
             val coaps = mapOf("coaps" to CoapBinding(credentials = credentials))
-            val client = ArtieClient(transport, rung, bindings = coaps)
+            val client = ArtieClient(transport, rung, bindings = coaps, validators = !blind)
             val key = if (reasoner == "claude") ModelKey.standard(env, userHome) else null
             return when {
                 reasoner != "claude" -> ArtieNavigator(client, exchangeLog = log, guard = guard, guarding = guarding)

@@ -103,7 +103,7 @@ interface Binding {
  * An act as the core builds it from a form (SPEC §6.0): the form's method, its target and content type, and its
  * body: none for a DELETE, whose fields are its target's query (SPEC §6.2).
  */
-data class Act(val url: String, val method: String, val contentType: String, val body: String?, val validator: String)
+data class Act(val url: String, val method: String, val contentType: String, val body: String?, val validator: String?)
 
 /** A URI whose scheme the client has no binding for (SPEC §6.0 rule 4). */
 class NoBindingException(url: String, scheme: String?) :

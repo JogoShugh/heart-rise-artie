@@ -29,6 +29,7 @@ class CliSteps(private val script: ScriptSteps) {
     private var askedExchanges: Boolean? = null
     private var askedPins: heart.script.Pins? = null
     private var askedGuard: String? = null
+    private var askedValidators: String? = null
 
     @Given("the client cannot reach the server for {string} at {string}: {string}")
     fun unreachable(rel: String, at: String, detail: String) {
@@ -117,6 +118,7 @@ class CliSteps(private val script: ScriptSteps) {
             askedExchanges = settings.exchanges
             askedPins = settings.pins
             askedGuard = settings.guard
+            askedValidators = settings.validators
             script.service
         }
         val cli = ArtieCli(folder, PrintStream(bytes, true), { typed.removeFirstOrNull() }, client, BUILDER)
@@ -219,6 +221,15 @@ class CliSteps(private val script: ScriptSteps) {
         assertEquals(null, askedPins)
         assertEquals(null, askedGuard)
     }
+
+    @Then("the client was made holding no lock file, off the rails")
+    fun holdsNoLockOffRails() {
+        assertEquals(null, askedPins)
+        assertEquals("off-the-rails", askedGuard)
+    }
+
+    @Then("the client was made to send validators {string}")
+    fun validators(validators: String) = assertEquals(validators, askedValidators)
 
     @Then("the client was made with the reasoner {string}")
     fun reasoner(name: String) = assertEquals(name, askedReasoner.orEmpty())

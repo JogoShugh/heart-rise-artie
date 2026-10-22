@@ -71,4 +71,5 @@ Feature: artie run's config: how strictly a run holds to its lock file, set by a
       | issue.config.yaml | guard: loose  |          |              | issue.config.yaml: guard is strict, lenient, look-then-leap or off-the-rails |
       | issue.config.yaml | budget: 5     |          |              | issue.config.yaml: no setting budget            |
       | issue.config.yaml | repin: often  |          |              | issue.config.yaml: repin is auto, propose or never |
+      | issue.config.yaml | validators: some |       |              | issue.config.yaml: validators is last or none   |
       | issue.config.yaml | guard: strict | --config | missing.yaml | --config, but no config at missing.yaml         |

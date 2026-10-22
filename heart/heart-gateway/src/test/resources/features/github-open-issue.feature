@@ -45,6 +45,20 @@ Feature: A repository offers to open an issue
     Then the GitHub gateway answers 200
     And the pull request's title is now "Add dark mode"
 
+  Scenario Outline: An act with no validator, with the development switch <switch>
+    spec/ideas/off-the-rails.md. By default an act with no validator is
+    refused, 428. With HEART_ACTS_WITHOUT_VALIDATOR=allowed, for a trial, it
+    is checked against the state now and sent on.
+    Given the GitHub gateway's switch for acts with no validator is <switch>
+    When "ada" gets "/repos/acme/rockets" through the GitHub gateway
+    And the client sends "github:open-issue" with {"title":"Add dark mode"} and no validator
+    Then the GitHub gateway answers <status>
+
+    Examples:
+      | switch | status |
+      | off    | 428    |
+      | on     | 201    |
+
   Scenario Outline: A repository that won't take issues says why
     Given the repository "acme/rockets" <condition> upstream
     When "ada" gets "/repos/acme/rockets" through the GitHub gateway

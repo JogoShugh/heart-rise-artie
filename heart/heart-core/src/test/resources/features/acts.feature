@@ -22,6 +22,23 @@ Feature: An act is checked in SPEC order, then performed
       | offered, but the body breaks the schema     | dim      | current   | {"brightness": 0}  | invalid at "/brightness" |
       | offered, but the body is not JSON           | dim      | current   | {"brightness":     | malformed              |
 
+  Scenario Outline: A server that takes acts with no validator, a development switch: <case>
+    spec/ideas/off-the-rails.md. For a fixture or a trial only, never by
+    default: a server may take an act sent with no validator, as an API
+    without HEART does. The act is still checked against the state now: not
+    offered is still 409, a bad body still 422. A validator sent is still
+    compared.
+    Given the server takes acts with no validator
+    When a client acts on lamp 7 with "<act>", validator <validator>, and body <body>
+    Then <outcome>
+
+    Examples:
+      | case                         | act      | validator | body               | outcome                                             |
+      | offered: performed           | dim      | none      | {"brightness": 20} | the act was performed                               |
+      | not offered: still 409       | switchOn | none      | {}                 | the act is refused as not offered "home:switch-on"  |
+      | a bad body: still 422        | dim      | none      | {"brightness": 0}  | the act is refused as invalid at "/brightness"      |
+      | a validator sent is compared | dim      | stale     | {"brightness": 20} | the act is refused as stale                         |
+
   Scenario Outline: A refusal's detail names the act by its relation, and says why it is not offered: <case>
     The detail is for a person reading the problem. It names the act as
     the forms do, never by a name in the code, and gives the same reason

@@ -316,7 +316,32 @@ Feature: artie run: a script, run from the command line
       | --guard       |
       | off-the-rails |
     Then artie exits 0
-    And the client was made holding no lock file
+    And the client was made holding no lock file, off the rails
+
+  Scenario Outline: The validators each act carries: <validators>
+    spec/ideas/off-the-rails.md. By default, the last one the run was given
+    for the resource; none, a blind write, only where the server's
+    development switch takes one.
+    Given the script "bare.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+      }
+      """
+    When artie is run with
+      | argument     |
+      | run          |
+      | bare.kts     |
+      | --validators |
+      | <validators> |
+    Then artie exits <exit>
+    And <made>
+
+    Examples:
+      | validators | exit | made                                                              |
+      | last       | 0    | the client was made to send validators "last"                     |
+      | none       | 0    | the client was made to send validators "none"                     |
+      | some       | 2    | artie's last line is: --validators is last or none                |
 
   Scenario Outline: The rung the client asks at, pinned by the run
     Given the script "issue.kts" is

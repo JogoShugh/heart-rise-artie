@@ -23,6 +23,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 class ActSteps(private val world: LampWorld) {
     private var outcome: Result<Unit>? = null
     private var concurrentWriter = false
+    private var validatorRequired = true
+
+    @Given("the server takes acts with no validator")
+    fun noValidatorNeeded() {
+        validatorRequired = false
+    }
 
     @Given("someone else writes to lamp {long} while the next act runs")
     fun someoneElseWrites(id: Long) {
@@ -32,7 +38,7 @@ class ActSteps(private val world: LampWorld) {
 
     @When("^a client acts on lamp (\\d+) with \"(\\w+)\", validator (none|stale|current), and body (.*)$")
     fun act(id: Long, act: String, validator: String, body: String) {
-        val pipeline = ActPipeline(world.type)
+        val pipeline = ActPipeline(world.type, validatorRequired = validatorRequired)
         val sent = when (validator) {
             "none" -> null
             "stale" -> "v0"

@@ -40,7 +40,7 @@ class ResourceHandler<S, K>(
     private val index: ServiceIndex,
 ) {
     private val type = resource.layers.type
-    private val pipeline = ActPipeline(type, mapper)
+    private val pipeline = ActPipeline(type, mapper, limits.validatorRequired)
 
     /** The current state, or as of `?asOf=` for a type that keeps its past; any other query is not a route. */
     fun read(request: Request): Response {

@@ -40,6 +40,9 @@ class ClientContext {
     /** The run's guard (script-guard.feature): lenient or strict; null when the run is not guarded. */
     var guard: String? = null
 
+    /** Whether the client's acts carry the validator held; false sends blind writes (off-the-rails.feature). */
+    var validators = true
+
     /** The lock file's pins, by relation: the form's integrity and its set's (script-guard.feature). */
     var pins: Map<String, Pair<String, String?>>? = null
 
@@ -116,7 +119,8 @@ class ClientContext {
             "coaps" to CoapBinding(trace = trace, credentials = credentials),
         )
         val bindings = coap + bindings
-        return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events, bindings).also { created += it }
+        return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events, bindings, validators)
+            .also { created += it }
     }
 
     /** Bindings for schemes other than HTTP's, by scheme (SPEC §6.0); a scenario adds them before entering. */

@@ -20,11 +20,12 @@ fun lockFile(asked: Arguments, folder: Path, script: Path, config: Config = Conf
     val name = asked.pins ?: (script.fileName.toString().substringBeforeLast('.') + ".pins.yaml")
     val file = folder.resolve(name)
     if (!Files.exists(file)) {
-        // Off the rails holds to no lock file, so it needs none.
+        // Off the rails holds to no lock file, so it needs none, and is still off the rails.
         val held = asked.guard !in setOf(null, "off-the-rails")
         val wanted = if (asked.pins != null) "--pins" else "--guard".takeIf { held }
         if (wanted != null) throw BadArguments("$STOPPED: $wanted, but no lock file at $name")
-        return LockFile(null, null, asked.rung)
+        val offRails = (asked.guard ?: config.guard).takeIf { it == "off-the-rails" }
+        return LockFile(null, offRails, asked.rung)
     }
     val pins = pins(Files.readString(file))
     if (asked.rung != null && pins.rung != null && asked.rung != pins.rung) {
