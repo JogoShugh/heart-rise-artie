@@ -71,6 +71,7 @@ class ArtieNavigator(
         if (held?.waiting(client.current, rel) == true) catchUp.until(rel)
         val used = UsedAffordances.form(reading(client), rel, body, held, client.sendsValidators)
         val form = client.current?.affordance(rel)
+        val read = client.current?.state
         // Off the rails, the body goes as it is: the server checks it, the client doesn't.
         val violations = form?.takeUnless { offRails }?.let { SchemaCheck.violations(body, it.schema) }.orEmpty()
         val send = {
@@ -88,7 +89,9 @@ class ArtieNavigator(
                     if (offered) catchUp.until(rel)
                     offered && guard?.refusal(client.current, rel, body) == null
                 }
-                if (offRails) first else decidedAgain(first, holds, send)
+                // What the act writes, changed by someone else since it was read: sending it again would overwrite.
+                val overwrites = { body.keys.filter { read?.get(it) != client.current?.state?.get(it) } }
+                if (offRails) first else decidedAgain(first, holds, overwrites, send)
             }
         return UsedAffordances.with(answered, used)
     }
@@ -173,10 +176,29 @@ private fun answered(client: HeartRiseClient, what: String, select: () -> HeartR
  * A script's act refused 412 ([first]), decided again: ARTIE has read the resource again, and a script's decision
  * is its script, so when the form is still offered and the guard still holds ([holds]), the act is sent once more
  * ([send]), with the new ETag. A second 412, a form no longer offered, a guard that refuses: the first answer stands.
+ * A member the act writes that someone else changed since it was read ([overwrites]) is refused, by the client: the
+ * script's value sent again would overwrite theirs unseen, the lost update a validator is there to prevent.
  */
-private fun decidedAgain(first: Answer, holds: () -> Boolean, send: () -> Answer): Answer {
+private fun decidedAgain(
+    first: Answer,
+    holds: () -> Boolean,
+    overwrites: () -> List<String>,
+    send: () -> Answer,
+): Answer {
     val stale = first is Answer.Refused && first.kind == Refusal.Stale
-    return if (stale && holds()) send() else first
+    if (!stale || !holds()) return first
+    val theirs = overwrites()
+    return if (theirs.isEmpty()) {
+        send()
+    } else {
+        val changed = theirs.joinToString(", ")
+        Answer.Refused(
+            Refusal.Stale,
+            Side.CLIENT,
+            "since it was read, someone else changed $changed, which this act writes; " +
+                "sending it again would overwrite theirs",
+        )
+    }
 }
 
 /** ARTIE's refusals, as the DSL's kinds; a reason the server gave for an absent act is asked of [client]. */

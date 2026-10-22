@@ -9,7 +9,10 @@ Feature: A script keeps going where the service moved under it: a list paged on,
   moment after it opens), is decided again: ARTIE has read it again, and
   when the form is still offered and the lock file still holds, the
   script's act is sent once more, with the new ETag. A second 412 stops
-  the script, as does a form no longer offered.
+  the script, as does a form no longer offered, and so does a change to a
+  member the act itself writes: someone else wrote it since the script
+  read it, and sending the script's value again would overwrite theirs
+  unseen, a lost update (RFC 9110 §13.1.1).
 
   Scenario: A titled link not on the page held is found on the pages after it, by their next links
     Given the service answers GET "http://garden.test/beds" with:
@@ -93,6 +96,7 @@ Feature: A script keeps going where the service moved under it: a list paged on,
       Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
 
       id: 2
+      <now>
       _links:
         self: {href: /beds/2}
       _forms:
@@ -132,8 +136,9 @@ Feature: A script keeps going where the service moved under it: a list paged on,
     Then <ended>
 
     Examples:
-      | case                                   | guard         | forms                                                                                                 | second                  | ended                                                                                                                  |
-      | the form still offered: sent again     | lenient       | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script finished                                                                                                    |
-      | no longer offered: the script stops    | lenient       | {}                                                                                                    | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |
-      | a second 412: the script stops         | lenient       | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 412 Precondition Failed | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |
-      | off the rails: the first 412 stops it  | off-the-rails | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |
+      | case                                            | guard         | now               | forms                                                                                                 | second                  | ended                                                                                                                                                                  |
+      | the form still offered: sent again              | lenient       | watered: today    | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script finished                                                                                                                                                    |
+      | no longer offered: the script stops             | lenient       | watered: today    | {}                                                                                                    | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"                                                          |
+      | a second 412: the script stops                  | lenient       | watered: today    | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 412 Precondition Failed | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"                                                          |
+      | someone else wrote what it writes: it stops     | lenient       | milliliters: 250  | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script stopped at step 1, "water": stale, refused by the client: "since it was read, someone else changed milliliters, which this act writes; sending it again would overwrite theirs" |
+      | off the rails: the first 412 stops it           | off-the-rails | watered: today    | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"                                                          |
