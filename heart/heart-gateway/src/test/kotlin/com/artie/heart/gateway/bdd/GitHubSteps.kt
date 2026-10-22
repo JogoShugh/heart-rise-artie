@@ -111,6 +111,13 @@ class GitHubSteps {
     @When("{string} gets {string} through the GitHub gateway")
     fun getAs(caller: String, path: String) = getAs(caller, path, null)
 
+    /** [request] sent to the gateway as it is; its answer is the last, for the step classes beside this one. */
+    internal fun send(request: Request) {
+        responses += gateway(request)
+    }
+
+    internal val lastResponse: Response get() = responses.last()
+
     /** A read as [caller], carrying the W3C [traceparent] a client sends, when given. */
     internal fun getAs(caller: String, path: String, traceparent: String?) {
         authorization = "Bearer $caller-token"

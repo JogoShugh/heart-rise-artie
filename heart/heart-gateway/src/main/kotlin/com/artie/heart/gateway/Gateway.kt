@@ -44,7 +44,7 @@ class Gateway(
     spec: GatewaySpec,
     upstream: HttpHandler,
     profile: String,
-    auth: UpstreamAuth = UpstreamAuth.None,
+    private val auth: UpstreamAuth = UpstreamAuth.None,
     private val mapper: ObjectMapper = HeartSettings.defaultMapper(),
     connector: Connector? = null,
     /** Where the upstream is: its links under this address are links into its API (spec/PLAN-GATEWAY-URL-LINKS.md). */
@@ -52,7 +52,8 @@ class Gateway(
     /** Where the gateway keeps its record of upstream calls (GATEWAY_RECORD); null when it keeps none. */
     private val record: UpstreamRecord? = null,
 ) {
-    private val calls = Upstream(record?.around(upstream) ?: upstream, auth, mapper, connector?.headers.orEmpty())
+    private val recorded = record?.around(upstream) ?: upstream
+    private val calls = Upstream(recorded, auth, mapper, connector?.headers.orEmpty())
     private val links = AffordanceLinks(calls)
 
     /** Which members of the upstream's answers are only links (Links.kt), when the connector says. */
@@ -127,9 +128,13 @@ class Gateway(
         GatewayResource(type, vocabulary, calls, reader(connector, standards), mapper).resource
     } + declared.values.map { it.resource }
 
-    /** The gateway as one HTTP handler, admitting the callers [credentials] admits. */
+    /**
+     * The gateway as one HTTP handler, admitting the callers [credentials] admits: HEART, and beside it, for a
+     * request that asks, the upstream passed through untouched ([PassThroughMode]).
+     */
     fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler {
-        val served = HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
+        val heart = HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
+        val served = PassThroughMode(recorded, auth, credentials).then(heart)
         return record?.servingFilter?.then(served) ?: served
     }
 
