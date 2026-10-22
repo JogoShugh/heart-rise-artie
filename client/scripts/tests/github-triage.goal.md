@@ -28,7 +28,7 @@ the crash's conversation is locked.
     - Verify: it is open
   - Open an issue titled "Test blank bed names ({stamp})", saying it is part of #{issue.number} `as test`
   - Open an issue titled "Garden crashes on an empty bed name ({stamp})", saying it was seen on the demo garden `as dupe`
-  - From the main branch, start a new branch named fix-blank-names-{stamp} `moves 8`
+  - From the main branch, start a new branch named fix-blank-names-{stamp} `moves 15`
     - Commit a file named fix-{stamp}.md saying "Bed names may not be blank." with the message "Refuse a bed with no name"
     - Commit a file named test-{stamp}.md saying "A bed with a blank name is refused." with the message "Test that a blank bed name is refused"
     - Open a pull request into main titled "Refuse a bed with no name ({stamp})", saying it fixes #{issue.number} `as pr`
