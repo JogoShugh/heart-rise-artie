@@ -43,6 +43,9 @@ class ArtieNavigator(
     /** The lock file, unless the run is off the rails. */
     private val held: ScriptGuard? get() = guard.takeUnless { offRails }
 
+    /** Reading again while the server catches up, before the lock file refuses a form for its set ([CatchUp]). */
+    private val catchUp = CatchUp(client) { held }
+
     override fun exchanges(): List<heart.script.Exchange> = exchangeLog?.taken().orEmpty()
 
     override val usage: Map<String, Long> get() = (reasoner as? ClaudeReasoner)?.usage?.counts().orEmpty()
@@ -65,6 +68,7 @@ class ArtieNavigator(
      */
     override fun act(rel: String, fields: Map<String, Any?>): Answer {
         val body = JsonObject(fields.mapValues { (_, v) -> json(v) })
+        if (held?.waiting(client.current, rel) == true) catchUp.until(rel)
         val used = UsedAffordances.form(reading(client), rel, body, held, client.sendsValidators)
         val form = client.current?.affordance(rel)
         // Off the rails, the body goes as it is: the server checks it, the client doesn't.
@@ -77,7 +81,15 @@ class ArtieNavigator(
         val answered = held?.refusal(client.current, rel, body)
             ?: violations.takeIf { it.isNotEmpty() }
                 ?.let { Answer.Refused(Refusal.InvalidInput, Side.CLIENT, it.joinToString("; ")) }
-            ?: send().let { first -> if (offRails) first else decidedAgain(first, client, guard, rel, body, send) }
+            ?: send().let { first ->
+                // Decided again after a 412: the form still offered, once the server has caught up, the guard holding.
+                val holds = {
+                    val offered = client.current?.affordance(rel) != null
+                    if (offered) catchUp.until(rel)
+                    offered && guard?.refusal(client.current, rel, body) == null
+                }
+                if (offRails) first else decidedAgain(first, holds, send)
+            }
         return UsedAffordances.with(answered, used)
     }
 
@@ -159,21 +171,12 @@ private fun answered(client: HeartRiseClient, what: String, select: () -> HeartR
 
 /**
  * A script's act refused 412 ([first]), decided again: ARTIE has read the resource again, and a script's decision
- * is its script, so when the form [rel] is still offered and the [guard] still holds, the act is sent once more
+ * is its script, so when the form is still offered and the guard still holds ([holds]), the act is sent once more
  * ([send]), with the new ETag. A second 412, a form no longer offered, a guard that refuses: the first answer stands.
  */
-@Suppress("LongParameterList") // the act, its client and its guard, each once
-private fun decidedAgain(
-    first: Answer,
-    client: HeartRiseClient,
-    guard: ScriptGuard?,
-    rel: String,
-    body: JsonObject,
-    send: () -> Answer,
-): Answer {
+private fun decidedAgain(first: Answer, holds: () -> Boolean, send: () -> Answer): Answer {
     val stale = first is Answer.Refused && first.kind == Refusal.Stale
-    val offered = client.current?.affordance(rel) != null
-    return if (stale && offered && guard?.refusal(client.current, rel, body) == null) send() else first
+    return if (stale && holds()) send() else first
 }
 
 /** ARTIE's refusals, as the DSL's kinds; a reason the server gave for an absent act is asked of [client]. */

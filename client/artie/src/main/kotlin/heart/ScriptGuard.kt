@@ -104,6 +104,17 @@ class ScriptGuard(private val pins: Pins, val strict: Boolean, val values: Boole
             .takeIf { !strict && changed && pin?.integrity == form?.integrity }
     }
 
+    /**
+     * Whether the strict guard refuses [rel] of [held] only for its set: its form as pinned, offered in a set the
+     * lock file didn't record. A server still catching up may yet offer it in a recorded one.
+     */
+    fun waiting(held: HeartRepresentation?, rel: String): Boolean {
+        val pin = pins.forms[rel]
+        val form = held?.affordance(rel)
+        return strict && pin != null && form != null && pin.sets.isNotEmpty() &&
+            held.formsIntegrity !in pin.sets && pin.integrity == form.integrity
+    }
+
     /** Whether the lock file pins nothing for [rel]: a lenient run goes on, and says so. */
     fun unpinned(rel: String): Boolean = rel !in pins.forms
 
