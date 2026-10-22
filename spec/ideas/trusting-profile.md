@@ -1,4 +1,4 @@
-# Idea: a trusting profile, for speed where nothing changes, and to show what the safeguards cost
+# Idea: off the rails, a guard for speed where nothing changes, and to show what the safeguards cost
 
 Status: idea, 2026-10-22. From the native trial (spec/PLAN-NATIVE-VS-HEART-TRIAL.md,
 `docs/reports/native-vs-heart-trial/`): the ARTIE script took 68 s and 58 steps where the Python Claude wrote took
@@ -69,10 +69,19 @@ A fourth and fifth column in the report's scripted table:
 | Today's GitHub | 22 s, 23 requests | 68 s, 58 steps | measured | expected near the Python | trusting + 1 read |
 | A changed gateway (chaos) | fails late or silently | refuses before harm | refuses before harm | fails like the Python | falls back, refuses before harm |
 
+## Decided (2026-10-22)
+
+- **One dial, `--guard`, from most to least careful:** `strict | lenient | look-then-leap | off-the-rails`, and
+  `guard:` in `NAME.config.yaml`. Where this note says *trusting*, read `off-the-rails`; *trusting-checked* is
+  `look-then-leap`.
+- **Validators, chosen per run:** by default the ETag of the last answer for that resource, with no read again,
+  a 412 stopping the run; blind writes, no `If-Match` at all, only where the server's development switch allows
+  them, which the gateway gets for the trial.
+- **Both built:** `off-the-rails` and `look-then-leap`.
+- **Routes:** the recorded address fetched directly; a list hop on the way is skipped. URLs baked in, on purpose.
+
 ## Open
 
-- **Names.** `trusting` says what it does; `fast` says why it's wanted; `unguarded` warns. The report would show
-  it beside the others, so the name should carry the warning.
 - **The recorded route.** Skipping a follow whose page gives no value later (the branch list on the way to main)
   is the generator's Detours rule applied at run time; fetching the recorded address directly is a URL baked in,
   which is exactly the Python's weakness, on purpose.
