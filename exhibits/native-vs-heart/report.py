@@ -206,6 +206,83 @@ STRICTNESS = [
 ]
 
 
+# What the Python would have to build, against GitHub's own API, to do what ARTIE does in its lenient mode: the
+# check, what ARTIE has from HEART, what the Python would need, and whether GitHub lets it at all.
+MATCHING = [
+    ("The act allowed now",
+     "Offered or not, in the representation held, by the server's own rules.",
+     "Read the resource first, then re-implement GitHub's rules for each act: an issue's state and lock, the "
+     "caller's permission (GET /repos → permissions), branch protection (GET /branches/{b}/protection), required "
+     "checks and reviews before a merge. Server logic, copied into every client, drifting from GitHub's.",
+     "partly"),
+    ("The body valid",
+     "Each form carries its JSON Schema; ARTIE checks the body against it, and a field it doesn't name is refused.",
+     "Fetch GitHub's OpenAPI description (github/rest-api-description, megabytes), find the operation by path and "
+     "method, resolve its $refs, and validate with a JSON Schema library (not in Python's standard library). It "
+     "still wouldn't refuse an unknown field: GitHub's schemas don't close them, so that list is hand-kept.",
+     "partly"),
+    ("The form unchanged since the script was made",
+     "The lock file pins each form's integrity (a hash of its definition), checked before every act.",
+     "Hash each operation's schema from the description at record time; at run time fetch the description again "
+     "and compare. The description changes often; X-GitHub-Api-Version pins behaviour, not what a hash can check.",
+     "partly"),
+    ("The resource unchanged since it was read",
+     "If-Match on every act; the gateway compares it with what it reads upstream, and answers 412.",
+     "GitHub's REST API takes no If-Match on writes: ETags are for conditional GETs. The script can read, compare "
+     "updated_at or the ETag, and write, leaving a race between; only refs, contents and merges take a sha to hold "
+     "to. The gateway narrows the same gap; it can't close it either, upstream doesn't let it.",
+     "no"),
+    ("What a refusal means",
+     "409 not allowed now, 412 stale, 422 invalid or a rule said no, 428 precondition wanted, each with HEART's "
+     "meaning and the server's detail.",
+     "A table of GitHub's own: 404 for no permission, 422 for most things, 405 for a merge not allowed, 409 for a "
+     "conflict, 403 for rate limits and abuse detection; the message text parsed to tell them apart.",
+     "partly"),
+    ("What was made",
+     "201 with a Location: what was made is held and named, and its address is the server's.",
+     "Read the number and url from each body, operation by operation; some answer 201 with a Location, some 200.",
+     "yes"),
+    ("Reading again after a block",
+     "The resource the block began at is read again, so the next step acts on what is.",
+     "A GET after each nested sequence, by an address the script builds.",
+     "yes"),
+    ("Links followed only where offered",
+     "Addresses come from the representation; the script names relations.",
+     "Follow GitHub's *_url fields instead of building paths: most are RFC 6570 templates ({/sha}), so a template "
+     "expander is needed; they say where, never whether it is allowed now.",
+     "partly"),
+    ("Lists paged on",
+     "next links, followed until the titled link is found.",
+     "Parse the Link header for rel=\"next\", page by page.",
+     "yes"),
+    ("Waiting on the service's word",
+     "until { offers(\"github:merge\") }: merge is offered or it isn't.",
+     "Poll mergeable and interpret mergeable_state, knowing which states are safe (the trial's script took "
+     "\"unstable\").",
+     "partly"),
+    ("Deciding again after a 412",
+     "Read again; if the form is still offered and the lock file holds, the act once more.",
+     "With no 412 to get, nothing to decide again; a write that raced is simply applied.",
+     "no"),
+    ("A record of what it did and why",
+     "The capture: each step, each value's source, the exchanges; the lock file; the derivation.",
+     "Logging written for it: requests, answers, where each value came from.",
+     "yes"),
+]
+
+
+def matching():
+    words = {"yes": "GitHub allows it", "partly": "partly", "no": "GitHub doesn't allow it"}
+    rows = "".join(
+        f'<tr><td>{esc(c)}</td><td>{esc(a)}</td><td>{esc(p)}</td>'
+        f'<td><span class="verdict {"good" if g == "yes" else "note" if g == "partly" else "weak"}">'
+        f'{esc(words[g])}</span></td></tr>'
+        for c, a, p, g in MATCHING)
+    return ('<div class="wrap"><table class="match"><thead><tr><th>Check</th><th><span class="tag heart">HEART</span> '
+            'what ARTIE has</th><th><span class="tag native">Native</span> what the Python would have to build</th>'
+            f'<th>Against GitHub</th></tr></thead><tbody>{rows}</tbody></table></div>')
+
+
 def strictness():
     rows = "".join(f'<tr><td>{esc(q)}</td><td>{esc(a)}</td><td>{esc(p)}</td></tr>' for q, a, p in STRICTNESS)
     return ('<div class="wrap"><table class="strict"><thead><tr><th>Check</th><th><span class="tag heart">HEART</span> '
@@ -235,6 +312,16 @@ def scripts():
   the Python never does: it won't send what it can't stand behind, and a refusal stops it before its harm. The
   Python is fast because it trusts its memory and takes any 2xx as success, which is how an ignored field passed.</p>
   {strictness()}</section>
+
+  <section><h2>To do what ARTIE does, the Python would have to…</h2>
+  <p class="sub full">Against GitHub's own API, with no gateway: what the Python would have to build, check by
+  check, to match ARTIE in its lenient mode. Some of it GitHub doesn't allow at all: it takes no validator on a
+  write, so no client can be sure a write didn't race. The rest is GitHub's own rules and descriptions, rebuilt in
+  every client, per API; HEART puts them in one place, the server, and every client reads them there.</p>
+  {matching()}
+  <p class="full">Tallied: of twelve, GitHub allows four outright, six in part, and two not at all. Doing the six
+  in part means an OpenAPI description, a schema validator, a template expander, and GitHub's rules per act,
+  kept up to date by hand. That is a gateway, built inside one client.</p></section>
 
   <section><h2>The Python, read closely</h2>
   <p class="sub full">It is good code for what it is: what one model remembers of one API, written down. Its weaknesses
@@ -347,6 +434,8 @@ ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { 
 .hljs-keyword, .hljs-built_in, .hljs-literal { color: var(--kw); } .hljs-string { color: var(--str); }
 .hljs-comment { color: var(--muted); font-style: italic; } .hljs-number { color: var(--num); }
 .hljs-title, .hljs-function .hljs-title { color: var(--fn); } .hljs-subst, .hljs-variable, .hljs-template-variable { color: var(--tpl); }
+table.match { min-width: 60rem; } table.match td:first-child { font-weight: 600; width: 16%; }
+table.match td:nth-child(2) { width: 26%; } table.match td:last-child { white-space: nowrap; }
 table.strict { min-width: 44rem; } table.strict td:first-child { font-weight: 600; width: 22%; }
 .pair2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 34rem), 1fr)); gap: 1rem; }
 .pair2 > * { min-width: 0; }
