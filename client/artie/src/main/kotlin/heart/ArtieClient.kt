@@ -88,6 +88,11 @@ class ArtieClient(
 
     override val reaches: (HeartLink) -> Boolean = { link -> link.followable && this.bindings.reaches(link.href) }
 
+    /** Each resource as last read or answered, by address. */
+    private val held = mutableMapOf<String, HeartRepresentation>()
+
+    override val recall: (String) -> HeartRepresentation = { url -> held[url]?.also { current = it } ?: enter(url) }
+
     /** Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI. */
     override fun follow(rel: String, title: String?): HeartRepresentation {
         var held = current ?: error("enter a service before following a link")
@@ -198,6 +203,8 @@ class ArtieClient(
             layer1.withManifest(layers.manifest(link, layer1.formsIntegrity))
         } ?: layer1
         appliedRung = applied
+        // Kept by every address it answers for, for a run off the rails to come back to with no read.
+        (listOf(url, synced.url) + synced.links("self").map { it.href }).forEach { held[it] = synced }
         return synced.also { current = it }
     }
 

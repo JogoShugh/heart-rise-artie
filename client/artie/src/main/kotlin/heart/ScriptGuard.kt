@@ -18,6 +18,15 @@ import kotlinx.serialization.json.JsonObject
 class ScriptGuard(private val pins: Pins, val strict: Boolean, val values: Boolean = false) {
     val mode: String get() = if (strict) "strict" else "lenient"
 
+    /**
+     * Whether every form [held] offers that the lock file pins has its pinned integrity: look-then-leap's one look
+     * (spec/ideas/off-the-rails.md), at the entry.
+     */
+    fun unchanged(held: HeartRepresentation?): Boolean = held != null && held.affordances.keys.all { rel ->
+        val pinned = pins.forms[rel]?.integrity
+        pinned == null || pinned == held.affordance(rel)?.integrity
+    }
+
     /** Why the form [rel] of [held] may not be used to send [sent], by the lock file; null when it may. */
     fun refusal(held: HeartRepresentation?, rel: String, sent: JsonObject = NOTHING): Answer.Refused? {
         // A form not offered at all is the client's own refusal, as without a lock file.

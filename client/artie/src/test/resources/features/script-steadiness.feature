@@ -122,6 +122,7 @@ Feature: A script keeps going where the service moved under it: a list paged on,
         self: {href: /beds/2}
       _forms: {}
       """
+    And ARTIE runs with the guard "<guard>"
     When this script runs with ARTIE
       """kotlin
       heart("http://garden.test/beds/2") {
@@ -131,7 +132,8 @@ Feature: A script keeps going where the service moved under it: a list paged on,
     Then <ended>
 
     Examples:
-      | case                                   | forms                                                                                                 | second                  | ended                                                                                                                  |
-      | the form still offered: sent again     | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script finished                                                                                                    |
-      | no longer offered: the script stops    | {}                                                                                                    | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |
-      | a second 412: the script stops         | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 412 Precondition Failed | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |
+      | case                                   | guard         | forms                                                                                                 | second                  | ended                                                                                                                  |
+      | the form still offered: sent again     | lenient       | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script finished                                                                                                    |
+      | no longer offered: the script stops    | lenient       | {}                                                                                                    | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |
+      | a second 412: the script stops         | lenient       | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 412 Precondition Failed | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |
+      | off the rails: the first 412 stops it  | off-the-rails | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"          |

@@ -44,12 +44,16 @@ fun config(asked: Arguments, folder: Path, script: Path): Config {
     )
 }
 
+/** [values] as a person lists them: `a, b or c`. */
+internal fun said(values: Collection<String>): String =
+    if (values.size < 2) values.joinToString() else values.toList().dropLast(1).joinToString() + " or " + values.last()
+
 /** Stops the run when [setting] isn't one a config may hold, or [value] isn't one it may take. */
 private fun held(name: String, setting: String, value: Any?) {
     val allowed = SETTINGS[setting]
     val problem = when {
         allowed == null -> "no setting $setting"
-        value.toString() !in allowed -> "$setting is ${allowed.joinToString(" or ")}"
+        value.toString() !in allowed -> "$setting is ${said(allowed)}"
         else -> return
     }
     throw BadArguments("$STOPPED: $name: $problem")

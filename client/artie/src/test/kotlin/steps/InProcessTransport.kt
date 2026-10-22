@@ -13,7 +13,11 @@ import org.http4k.core.Request
  * Nothing in between interprets them.
  */
 class InProcessTransport(private val server: HttpHandler) : Transport {
+    /** Every request sent, in order: what a scenario counts. */
+    val sent = mutableListOf<HeartRequest>()
+
     override fun send(request: HeartRequest): HeartResponse {
+        sent += request
         val sent = request.headers.entries
             .fold(Request(Method.valueOf(request.method), request.url)) { r, (name, value) -> r.header(name, value) }
         val answer = server(request.body?.let { sent.body(it) } ?: sent)

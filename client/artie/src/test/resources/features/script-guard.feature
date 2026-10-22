@@ -38,6 +38,33 @@ Feature: A script's lock file guards each act before ARTIE sends it
       | lenient | changed    | as offered | was stopped at step 2 by its guard | open   |
       | strict  | as offered | changed    | was stopped at step 2 by its guard | open   |
       | strict  | as offered | as offered | finished                      | closed |
+      | off-the-rails | changed | as offered | finished                 | closed |
+
+  Scenario: Look then leap: the entry's forms as pinned, the run leaves the rails; a changed form further on isn't looked at
+    spec/ideas/off-the-rails.md. One look, at the entry: when its forms are
+    as the lock file pins them, the run leaves the rails.
+    Given ARTIE guards the run "look-then-leap", pinning "github:close" to its form "changed" in a set "as offered"
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run finished
+    And issue 10 of "acme/rockets" is now "closed" on the small GitHub
+
+  Scenario: Look then leap: a form at the entry changed, the run stays lenient, and its guard refuses that form
+    Given ARTIE guards the run "look-then-leap", the entry's "github:issues-get" pinned as it was before a change
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run was stopped at step 1 by its guard
+    And issue 10 of "acme/rockets" is now "open" on the small GitHub
 
   Scenario: Lenient, past an unchanged form in a changed set: the capture warns, naming both sets
     spec/ideas/replay-guards-lenient-strict.md, the open item, decided: a

@@ -163,6 +163,9 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
     override fun visit(address: String): Answer =
         traced({ TraceStep.Asked("return to {address}", mapOf("address" to address)) }) { inner.visit(address) }
 
+    override fun recall(address: String): Answer =
+        traced({ TraceStep.Asked("return to {address}", mapOf("address" to address)) }) { inner.recall(address) }
+
     override fun why(rel: String): String? = inner.why(rel)
 
     override fun describe(rel: String): String? = inner.describe(rel)

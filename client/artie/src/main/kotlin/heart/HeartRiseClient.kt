@@ -33,6 +33,12 @@ interface HeartRiseClient {
     val reaches: (HeartLink) -> Boolean get() = { it.followable }
 
     /**
+     * The resource at a URL as this client last held it, read only when it never held it: what a run off the rails
+     * (spec/ideas/off-the-rails.md) acts on, with the last validator it was given for it.
+     */
+    val recall: (String) -> HeartRepresentation get() = { enter(it) }
+
+    /**
      * The ALPS descriptor's doc for the offered form [rel] (SPEC §6.1, §8.5):
      * its relation URI, fetched and cached as HTTP allows. Null when the form's
      * relation is not a URI or names no descriptor. It describes; it never

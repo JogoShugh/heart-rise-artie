@@ -31,7 +31,17 @@ class ArtieNavigator(
     private val exchangeLog: ExchangeLog? = null,
     /** The script's lock file, held to before each act; null when the run is not guarded. */
     private val guard: ScriptGuard? = null,
+    /**
+     * The run's guard by name (spec/ideas/off-the-rails.md): `off-the-rails` turns ARTIE's own care off, and
+     * `look-then-leap` does once the entry's forms are as the lock file pins them; any other keeps it.
+     */
+    private val guarding: String? = null,
 ) : Navigator {
+    /** Whether this run is off the rails: no lock file, no schema check, no reading again, a 412 stops it. */
+    private var offRails = guarding == OFF_THE_RAILS
+
+    /** The lock file, unless the run is off the rails. */
+    private val held: ScriptGuard? get() = guard.takeUnless { offRails }
 
     override fun exchanges(): List<heart.script.Exchange> = exchangeLog?.taken().orEmpty()
 
@@ -43,7 +53,10 @@ class ArtieNavigator(
     /** Why there is no planner: the reason there is no reasoner, such as where the model key goes. */
     override val noPlanner: String get() = noReasoner
 
-    override fun enter(entry: String): Answer = answer("entry") { client.enter(entry) }
+    /** The entry; for look-then-leap, its one look: the entry's forms as pinned, the run leaves the rails. */
+    override fun enter(entry: String): Answer = answer("entry") { client.enter(entry) }.also {
+        if (guarding == LOOK_THEN_LEAP) offRails = guard?.unchanged(client.current) == true
+    }
 
     /**
      * The lock file first: a form that is not the one pinned is the guard's refusal, whatever its fields. Then the
@@ -52,29 +65,34 @@ class ArtieNavigator(
      */
     override fun act(rel: String, fields: Map<String, Any?>): Answer {
         val body = JsonObject(fields.mapValues { (_, v) -> json(v) })
-        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, guard)
+        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, held)
         val form = client.current?.affordance(rel)
-        val violations = form?.let { SchemaCheck.violations(body, it.schema) }.orEmpty()
+        // Off the rails, the body goes as it is: the server checks it, the client doesn't.
+        val violations = form?.takeUnless { offRails }?.let { SchemaCheck.violations(body, it.schema) }.orEmpty()
         val send = {
             answer(rel) { client.act(rel, body) }.let {
                 if (it is Answer.Done && client.broughtIntoBeing) Answer.NewResource(it.now) else it
             }
         }
-        val answered = guard?.refusal(client.current, rel, body)
+        val answered = held?.refusal(client.current, rel, body)
             ?: violations.takeIf { it.isNotEmpty() }
                 ?.let { Answer.Refused(Refusal.InvalidInput, Side.CLIENT, it.joinToString("; ")) }
-            ?: decidedAgain(send(), client, guard, rel, body, send)
+            ?: send().let { first -> if (offRails) first else decidedAgain(first, client, guard, rel, body, send) }
         return UsedAffordances.with(answered, used)
     }
 
     override fun follow(rel: String, title: String?): Answer {
-        val used = UsedAffordances.link(client.current, rel, title, guard)
+        val used = UsedAffordances.link(client.current, rel, title, held)
         // The lock file, before anything is fetched: a refusal here is the guard's, by the client.
-        val answered = guard?.linkRefusal(client.current, rel, title) ?: answer(rel) { client.follow(rel, title) }
+        val answered = held?.linkRefusal(client.current, rel, title) ?: answer(rel) { client.follow(rel, title) }
         return UsedAffordances.with(answered, used)
     }
 
     override fun visit(address: String): Answer = answer(address) { client.enter(address) }
+
+    /** Off the rails, the resource as last held, nothing read; else read again. */
+    override fun recall(address: String): Answer =
+        if (offRails) answer(address) { client.recall(address) } else visit(address)
 
     override fun why(rel: String): String? = client.explain(rel)
 
@@ -114,21 +132,29 @@ class ArtieNavigator(
         return Reasoned(reasoned.chosen, UsedAffordances.with(reasoned.answer, used), keeps?.taken().orEmpty())
     }
 
-    private fun answer(what: String, select: () -> HeartRepresentation): Answer = try {
-        Answer.Done(representation(select(), client.reaches))
-    } catch (refused: ActRefused) {
-        refusal(client, what, refused)
-    } catch (refused: AccessRefused) {
-        refusal(client, what, refused)
-    } catch (failed: java.io.IOException) {
-        // Java's HTTP client says nothing when nothing listens: a ConnectException with no message.
-        Answer.Refused(Refusal.Unreachable, Side.CLIENT, failed.message ?: "could not reach the server")
-    } catch (refused: NoBindingException) {
-        // SPEC §6.0 rule 4: a scheme ARTIE has no binding for is refused before anything is sent.
-        Answer.Refused(Refusal.NoBinding, Side.CLIENT, refused.message.orEmpty())
-    } catch (failed: IntegrityException) {
-        Answer.Refused(Refusal.IntegrityMismatch, Side.CLIENT, failed.message.orEmpty())
-    }
+    private val answer: (String, () -> HeartRepresentation) -> Answer =
+        { what, select -> answered(client, what, select) }
+}
+
+/** The guards a run may name (spec/ideas/off-the-rails.md), beyond lenient and strict. */
+const val OFF_THE_RAILS = "off-the-rails"
+const val LOOK_THEN_LEAP = "look-then-leap"
+
+/** What [client]'s [select] came to, as the DSL's answer: what it holds, or why it was refused. */
+private fun answered(client: HeartRiseClient, what: String, select: () -> HeartRepresentation): Answer = try {
+    Answer.Done(representation(select(), client.reaches))
+} catch (refused: ActRefused) {
+    refusal(client, what, refused)
+} catch (refused: AccessRefused) {
+    refusal(client, what, refused)
+} catch (failed: java.io.IOException) {
+    // Java's HTTP client says nothing when nothing listens: a ConnectException with no message.
+    Answer.Refused(Refusal.Unreachable, Side.CLIENT, failed.message ?: "could not reach the server")
+} catch (refused: NoBindingException) {
+    // SPEC §6.0 rule 4: a scheme ARTIE has no binding for is refused before anything is sent.
+    Answer.Refused(Refusal.NoBinding, Side.CLIENT, refused.message.orEmpty())
+} catch (failed: IntegrityException) {
+    Answer.Refused(Refusal.IntegrityMismatch, Side.CLIENT, failed.message.orEmpty())
 }
 
 /**

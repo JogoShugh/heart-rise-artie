@@ -159,6 +159,13 @@ interface Navigator {
     /** Read again a resource the client held before, at [address]: never one it wasn't given. */
     fun visit(address: String): Answer
 
+    /**
+     * The resource at [address] again, where the script reads it again for care, not because the task asks: on
+     * leaving a block, and at sync(). A client off the rails (spec/ideas/off-the-rails.md) gives what it last held
+     * there, reading nothing; any other reads it again.
+     */
+    fun recall(address: String): Answer = visit(address)
+
     /** Why the act [rel] is not offered, as the server says (SPEC §6.12); null when it says nothing. */
     fun why(rel: String): String?
 

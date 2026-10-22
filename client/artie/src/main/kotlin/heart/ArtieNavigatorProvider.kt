@@ -18,7 +18,7 @@ class ArtieNavigatorProvider : NavigatorProvider {
         val guard = settings.pins?.let {
             ScriptGuard(it, strict = settings.guard == "strict", values = settings.onChange == "values")
         }
-        return standard(System.getenv(), home, rung, settings.reasoner, settings.exchanges, guard)
+        return standard(System.getenv(), home, rung, settings.reasoner, settings.exchanges, guard, settings.guard)
     }
 
     companion object {
@@ -41,6 +41,8 @@ class ArtieNavigatorProvider : NavigatorProvider {
             reasoner: String? = null,
             exchanges: Boolean = false,
             guard: ScriptGuard? = null,
+            /** The run's guard by name: off-the-rails and look-then-leap turn ARTIE's own care off. */
+            guarding: String? = null,
         ): Navigator {
             val credentials = CredentialSources.standard(env, userHome)
             val log = if (exchanges) ExchangeLog(HttpTransport()) else null
@@ -50,9 +52,9 @@ class ArtieNavigatorProvider : NavigatorProvider {
             val client = ArtieClient(transport, rung, bindings = coaps)
             val key = if (reasoner == "claude") ModelKey.standard(env, userHome) else null
             return when {
-                reasoner != "claude" -> ArtieNavigator(client, exchangeLog = log, guard = guard)
-                key == null -> ArtieNavigator(client, null, NO_KEY, log, guard)
-                else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), NO_KEY, log, guard)
+                reasoner != "claude" -> ArtieNavigator(client, exchangeLog = log, guard = guard, guarding = guarding)
+                key == null -> ArtieNavigator(client, null, NO_KEY, log, guard, guarding)
+                else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), NO_KEY, log, guard, guarding)
             }
         }
     }

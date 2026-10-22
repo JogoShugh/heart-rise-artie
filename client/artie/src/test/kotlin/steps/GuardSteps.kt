@@ -25,6 +25,24 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
         ctx.pins = bookmark() + (relation to (pinnedForm to if (set == "changed") CHANGED else setNow))
     }
 
+    @Given("ARTIE runs with the guard {string}")
+    fun runsWith(guard: String) {
+        ctx.guard = guard
+    }
+
+    @Given("ARTIE guards the run {string}, the entry's {string} pinned as it was before a change")
+    fun entryChanged(guard: String, relation: String) {
+        ctx.guard = guard
+        ctx.pins = bookmark() + (relation to (CHANGED to null))
+    }
+
+    @Then("the client read {string} {int} time(s)")
+    fun readTimes(url: String, times: Int) {
+        val sent = (ctx.inProcess as InProcessTransport).sent
+        val gets = sent.count { it.method == "GET" && it.url == url }
+        assertEquals(times, gets, sent.joinToString("\n") { "${it.method} ${it.url}" })
+    }
+
     @Given("ARTIE guards the run {string}, pinning everything it offers but {string}")
     fun pinningAllBut(guard: String, relation: String) {
         ctx.guard = guard

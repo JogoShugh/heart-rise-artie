@@ -83,7 +83,7 @@ class Here internal constructor(
 
     /** Read the held resource again. */
     fun sync() {
-        held = arrived(++run.step, "sync", navigator.visit(held.address))
+        held = arrived(++run.step, "sync", navigator.recall(held.address))
     }
 
     /**
@@ -140,7 +140,7 @@ class Here internal constructor(
         // The step just traced is this selection's: it opens the block.
         run.trace.lastOrNull()?.opens = true
         Here(navigator, run, now).block()
-        held = arrived(step, what, navigator.visit(from))
+        held = arrived(step, what, navigator.recall(from))
     }
 }
 

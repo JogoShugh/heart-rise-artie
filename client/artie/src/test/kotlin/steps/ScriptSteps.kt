@@ -38,7 +38,7 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
 
     @When("this script runs with ARTIE")
     fun runs(script: String) =
-        runs(script, ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog, guard = guard()))
+        runs(script, ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog, guard = guard(), guarding = ctx.guard))
 
     /** The scenario's lock file and how it is held to (script-guard.feature); null when the run is not guarded. */
     private fun guard(): heart.ScriptGuard? = ctx.pins?.let { pins ->

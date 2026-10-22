@@ -308,6 +308,14 @@ Feature: artie run: a script, run from the command line
       | run      |
       | bare.kts |
     Then artie exits 0
+    # Off the rails holds to no lock file, so it needs none (spec/ideas/off-the-rails.md).
+    When artie is run with
+      | argument      |
+      | run           |
+      | bare.kts      |
+      | --guard       |
+      | off-the-rails |
+    Then artie exits 0
     And the client was made holding no lock file
 
   Scenario Outline: The rung the client asks at, pinned by the run

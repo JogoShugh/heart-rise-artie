@@ -53,7 +53,7 @@ private val RUNGS = setOf("L0", "L1", "L2")
 private val REASONERS = setOf("claude")
 
 /** How a run may hold to its lock file. */
-internal val GUARDS = setOf("lenient", "strict")
+internal val GUARDS = setOf("strict", "lenient", "look-then-leap", "off-the-rails")
 
 /** The options that stand alone. */
 private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
@@ -75,7 +75,7 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--reasoner" to { a, v -> a.reasoner = v.takeIf { it in REASONERS } ?: throw BadArguments("--reasoner is claude") },
     "--pins" to { a, v -> a.pins = v },
     "--config" to { a, v -> a.config = v },
-    "--guard" to { a, v -> a.guard = v.takeIf { it in GUARDS } ?: throw BadArguments("--guard is lenient or strict") },
+    "--guard" to { a, v -> a.guard = v.takeIf { it in GUARDS } ?: throw BadArguments("--guard is ${said(GUARDS)}") },
     "--output" to { a, v -> a.output = v.takeIf { it == "json" } ?: throw BadArguments("--output json only") },
 )
 
