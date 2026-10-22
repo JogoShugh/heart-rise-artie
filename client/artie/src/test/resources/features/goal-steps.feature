@@ -93,7 +93,7 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
       |   [now] Close it                                      |
     And the capture "fix.trace.yaml" keeps the planner's moves, the first
       | move                                                       |
-      | open issue 10 of acme/rockets: at https://github.gateway.test/repos/acme/rockets/issues/10 |
+      | open issue 10 of acme/rockets: acted github:issues-get, done, at https://github.gateway.test/repos/acme/rockets/issues/10 |
       | done: Open issue 10 of acme/rockets                        |
 
   Scenario: The script made from a goal in steps names values by the steps' names, and keeps a reasoned step's intent

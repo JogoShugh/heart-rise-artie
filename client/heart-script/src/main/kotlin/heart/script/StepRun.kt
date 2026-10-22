@@ -105,7 +105,10 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 entered = true
                 marks.acted(step, line)
                 path += held.address
-                moves += "$words: at ${held.address}"
+                // What was done, not only where it led: a follow is no act, whatever the words asked.
+                val taken = run.trace.getOrNull(traced)
+                val did = taken?.used?.let { (if (it.kind == "link") "followed " else "acted ") + it.relation + ", " }
+                moves += "$words: ${did.orEmpty()}${taken?.outcome?.let { "$it, " }.orEmpty()}at ${held.address}"
                 exits = intent(step, this, line)
                 path.removeAt(path.lastIndex)
             }
