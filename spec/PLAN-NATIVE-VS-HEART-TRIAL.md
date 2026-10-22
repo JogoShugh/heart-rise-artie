@@ -81,13 +81,13 @@ feature, so both arms count the same way.
 
 ## The runs
 
-1. **Arm by arm, 5 runs each**, each with a fresh stamp, alternating arms so neither has the API's quieter hour.
-   A success rate and a spread, not one anecdote.
-2. **Repeatable, 5 runs each, no model:**
-   - HEART: `artie generate` from one successful run, the script run 5 times (two such runs already: #178 to #185).
+1. **Arm by arm, 3 runs each**, each with a fresh stamp, alternating arms so neither has the API's quieter hour:
+   enough to see a pattern, not a firm rate.
+2. **Repeatable, 3 runs each, no model:**
+   - HEART: `artie generate` from one successful run, the script run 3 times (two such runs already: #178 to #185).
    - Native: the model is given its own successful transcript and asked to write a script that does the task again
-     with no model (Python, standard library only, the token from the environment), that script run 5 times.
-3. **Drift (optional), 1 run each:** between runs, change one thing the scripts depend on: the label made required,
+     with no model (Python, standard library only, the token from the environment), that script run 3 times.
+3. **Drift, later (decided 2026-10-22), 1 run each:** between runs, change one thing the scripts depend on: the label made required,
    main protected, the merge method squash turned off. Does each script refuse before its harm, or do something
    wrong, or stop half done?
 
@@ -107,8 +107,14 @@ one HEART run side by side, call by call. Listed in the reports index, published
 2. The checker, run against the two HEART runs already done (#165 to #168, #182 to #185): it must pass them.
 3. Tokens in ARTIE's captures, if missing.
 4. The native harness: the loop, the tool, the safety, the transcript. One run.
-5. The 5 + 5 runs; then the scripts and their 5 + 5 runs; then drift, if wanted.
+5. The 3 + 3 runs; then the scripts and their 3 + 3 runs. Drift after, on its own.
 6. The report.
+
+## Decided (2026-10-22)
+
+- **3 runs per arm**, goal runs and script runs alike.
+- **Drift later**, as a follow-up of its own.
+- **The third arm later**, after this trial.
 
 ## Open
 
