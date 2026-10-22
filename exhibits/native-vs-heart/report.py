@@ -94,6 +94,128 @@ def tile(label, native, heart, unit=""):
             f'<div><span class="tag heart">HEART</span><b>{heart}</b>{unit}</div></div></div>')
 
 
+HERE = Path(__file__).parent
+
+# What the native script leans on, and where it is weak: each a verdict, a claim, the code it is about, and why.
+PYTHON_POINTS = [
+    ("weak", "Every address and field is the model's memory of GitHub.",
+     '"/git/ref/heads/main", "/git/refs", "/contents/…", "/pulls/%d/merge", "sub_issue_id", "state_reason"',
+     "Nothing in the script was read from the service: each path, each field, each value of state_reason is what "
+     "the model learned of GitHub's REST API. Move one path, rename one field, add one required field, and the "
+     "script fails at that line, or worse, sends something the service quietly ignores. It can't tell which."),
+    ("weak", "Where its memory runs out, it guesses, and a guess that is ignored passes.",
+     '"duplicate_of": crash_id, "duplicate_of_issue_id": crash_id',
+     "It sends two field names for the duplicate's original, hoping one is right. GitHub ignored both: the "
+     "duplicate is closed as a duplicate of nothing. Its own check asks only for state_reason, so the script says "
+     "done. A field the service doesn't know is never refused, only dropped."),
+    ("weak", "No validators: every write is blind.",
+     "req(…) sends no If-Match on any PATCH, PUT or POST",
+     "It never meets a 412 because it never says what it read. That is why it never stalled on GitHub's late "
+     "change to a new pull request; it is also why it would overwrite a change someone else made between its "
+     "read and its write, and never know."),
+    ("weak", "It reads GitHub's internals to decide when to merge, and merges past failing checks.",
+     'mergeable_state in ("clean", "unstable", "has_hooks")',
+     "GitHub's word for whether a pull request can be merged is a field the model interprets, not an action the "
+     "service offers. \"unstable\" means a check is failing or still running (one the branch doesn't require): "
+     "the script merges it anyway, as it would one with no checks at all."),
+    ("weak", "It does what was already done, and code the task never needed.",
+     'PATCH … {"state": "closed", "state_reason": "completed"} on the crash issue; the reopen branch after creating it',
+     "The merge has already closed the crash issue; the script closes it again, as a fixed step. It reopens the "
+     "crash issue if it isn't open just after making it, a case that can't happen. A script that can't see what "
+     "is possible does everything, in case."),
+    ("weak", "It stops half done, and running it again makes a second set.",
+     'sys.exit("FAILED: …") at the first error; nothing checks what an earlier run left',
+     "A failure leaves issues, a branch and maybe a pull request behind, with nothing to say which. Run again with "
+     "the same stamp, it opens the issues again; there is no record of what it did beyond the lines it printed."),
+    ("weak", "No retries, no rate limits, a pinned API version.",
+     '"X-GitHub-Api-Version": "2022-11-28"; urlopen with no retry',
+     "A 502 or a secondary rate limit ends the run. The API version header pins it to the GitHub the model "
+     "remembers; a version that drops a field it uses is found by failing."),
+    ("good", "It reads every number, id and sha from the answers.",
+     'crash_no, crash_id = crash["number"], crash["id"]; "sha": pr_now["head"]["sha"]',
+     "Nothing from the run that taught it is written in: issue numbers, ids, the head sha the merge is held to, "
+     "all come from GitHub's answers as it goes. It merges only the head it saw."),
+    ("good", "It goes straight to what it needs.",
+     'GET /git/ref/heads/main, then POST /git/refs',
+     "23 requests where the ARTIE script makes 58: no list to page through, no block to come back to. On a "
+     "GitHub that matches its memory, that is why it is three times faster."),
+    ("note", "It checks its end state, its own way.",
+     "the three GETs at the end",
+     "It reads the three issues back and checks state, state reason and the lock: a good habit, but only for what "
+     "it thought to check, and not the duplicate's original, which it had guessed at."),
+]
+
+KOTLIN_POINTS = [
+    ("good", "Relations, not addresses.",
+     'act("github:open-issue", …), follow("github:repos-list-branches"), act("github:close-duplicate", …)',
+     "Each step names what the service offers; ARTIE finds the form or link in the representation it holds and "
+     "builds the request from it. A moved path, a new required field, is the service's to say."),
+    ("good", "Held to what was offered.",
+     "heart-script.pins.yaml: each form's integrity, checked before every act",
+     "A form that changed, or is no longer offered, stops the script before it sends anything: it refuses before "
+     "its harm, never after."),
+    ("good", "Every write says what it read.",
+     "If-Match on every act; sync() after making a resource; a 412 decided again once",
+     "It can't overwrite what it didn't see. Where GitHub changes something on its own, it reads again and "
+     "decides again, within what its lock file allows."),
+    ("good", "It waits on the service's word.",
+     'until(tries = 20) { offers("github:merge") }',
+     "Whether the pull request can be merged is whether merge is offered, not a field it interprets."),
+    ("good", "Every value has a source.",
+     "issueNumber = state.long(\"number\"); heart-script.derivation.yaml",
+     "Each variable is read where the run found it, and the derivation file says, for each value, where it came "
+     "from and by which rule."),
+    ("weak", "It replays the run's route, not the shortest.",
+     'follow("github:repos-list-branches") { follow("item", "main") { … } }',
+     "The planner got to main by the branch list, so the script does too: 58 steps to the Python's 23, and the list "
+     "pages as it grows. It is slower for every request going through the gateway."),
+    ("weak", "It leans on what the service did on its own.",
+     "no close of the crash issue",
+     "The run made no act at the crash issue's close: the merge had closed it. The script relies on that, and on "
+     "its check to catch it if GitHub ever doesn't."),
+    ("note", "Its words can carry a value from the run.",
+     'intent = "close it as a duplicate of the issue with id ${issueId} (#215)"',
+     "An intent's words are only words: the act's values are its fields, here issueId, read fresh. But the "
+     "words still say #215, the run's number."),
+]
+
+
+def points(items):
+    return "<dl class=\"points\">" + "".join(
+        f'<div><dt><span class="verdict {v}">{ {"weak": "weak", "good": "strong", "note": "note"}[v] }</span>'
+        f'{esc(claim)}</dt><dd><code>{esc(code)}</code></dd><dd>{esc(why)}</dd></div>'
+        for v, claim, code, why in items) + "</dl>"
+
+
+def scripts():
+    python = (HERE / "runs" / "native-script.py").read_text()
+    kotlin = (HERE / "runs" / "heart-script.kts").read_text()
+    return f"""
+  <section><h2>Two scripts, one task</h2>
+  <p class="sub">Both do the triage task with no model; both passed every run made on the code as it ended. Claude
+  wrote the Python in one call from its own run's transcript. <code>artie generate</code> wrote the Kotlin from one
+  HEART run's capture, with a lock file beside it.</p>
+  <div class="pair2">
+    <div class="code"><div class="head"><span><span class="tag native">Native</span> native-script.py</span>
+      <span>{python.count(chr(10))} lines · 23 requests · 22 s</span></div>
+      <pre><code class="language-python">{esc(python)}</code></pre></div>
+    <div class="code"><div class="head"><span><span class="tag heart">HEART</span> heart-script.kts</span>
+      <span>{kotlin.count(chr(10))} lines · 58 steps · 68 s</span></div>
+      <pre><code class="language-kotlin">{esc(kotlin)}</code></pre></div>
+  </div></section>
+
+  <section><h2>The Python, read closely</h2>
+  <p class="sub">It is good code for what it is: what one model remembers of one API, written down. Its weaknesses
+  are the weaknesses of that.</p>
+  {points(PYTHON_POINTS)}</section>
+
+  <section><h2>The Kotlin, for fairness</h2>
+  {points(KOTLIN_POINTS)}</section>
+
+  <p class="close">The Python is faster because it knows GitHub. The Kotlin is slower because it asks. The trial
+  ran against the GitHub the model knows; the next one changes it.</p>"""
+
+
 def main():
     out = Path(sys.argv[1])
     nr, hr = final("native", "reasoned"), final("heart", "reasoned")
@@ -110,7 +232,7 @@ def main():
     fixes = "".join(f'<li><b>{esc(t)}</b> <span class="commit">{esc(c)}</span><p>{esc(why)}</p></li>'
                     for c, t, why in FIXES)
     page = TEMPLATE.replace("@TILES@", tiles).replace("@REASONED@", table("reasoned")) \
-        .replace("@SCRIPTED@", table("scripted")).replace("@FIXES@", fixes)
+        .replace("@SCRIPTED@", table("scripted")).replace("@FIXES@", fixes).replace("@SCRIPTS@", scripts())
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(page)
     print(f"wrote {out}")
@@ -135,15 +257,18 @@ TEMPLATE = """<!doctype html>
   --ok: #2f6f3f; --ok-soft: #e1f0e3; --bad: #b4403a; --bad-soft: #f8e1df;
   --display: "Literata", Georgia, serif; --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --kw: #8a3f8f; --str: #2f6f3f; --num: #a0522d; --fn: #1f5a8a; --tpl: #b0641c;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
   --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
-  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d; color-scheme: dark; } }
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d;
+  --kw: #d79ad9; --str: #9fd6ac; --num: #e0a080; --fn: #8cc0ea; --tpl: #e6a35c; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
   --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
-  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d; color-scheme: dark; }
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d;
+  --kw: #d79ad9; --str: #9fd6ac; --num: #e0a080; --fn: #8cc0ea; --tpl: #e6a35c; color-scheme: dark; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
 main { max-width: 74rem; margin: 0 auto; padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 2rem; }
@@ -174,6 +299,25 @@ tr.failed td { background: var(--bad-soft); }
 .setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem 2rem; }
 ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { max-width: 68ch; } li p { color: var(--muted); }
 .commit { font: .75rem var(--mono); color: var(--muted); }
+.tabs { display: flex; gap: .4rem; border-bottom: 1px solid var(--rule); }
+.tabs button { font: 600 .95rem var(--body); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: .4rem .2rem .6rem; margin-right: 1rem; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabs button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.tab { display: grid; gap: 2rem; }
+[hidden] { display: none !important; }
+.code { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.code .head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 1rem; padding: .55rem .9rem; border-bottom: 1px solid var(--rule); background: var(--bg); font-size: .85rem; color: var(--muted); }
+.code pre { margin: 0; padding: .8rem .9rem; overflow: auto; max-height: 34rem; font: .78rem/1.55 var(--mono); }
+.code pre code { background: none; padding: 0; }
+.hljs-keyword, .hljs-built_in, .hljs-literal { color: var(--kw); } .hljs-string { color: var(--str); }
+.hljs-comment { color: var(--muted); font-style: italic; } .hljs-number { color: var(--num); }
+.hljs-title, .hljs-function .hljs-title { color: var(--fn); } .hljs-subst, .hljs-variable, .hljs-template-variable { color: var(--tpl); }
+.pair2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 34rem), 1fr)); gap: 1rem; }
+.pair2 > * { min-width: 0; }
+dl.points { display: grid; gap: .9rem; margin: 0; } dl.points dt { font-weight: 600; } dl.points dd { margin: .2rem 0 0; color: var(--muted); max-width: 72ch; }
+dl.points code, .tab p code, li code { font: .85em var(--mono); color: var(--fg); }
+.verdict { display: inline-block; font: 600 .68rem var(--body); letter-spacing: .05em; text-transform: uppercase; border-radius: 4px; padding: .05rem .35rem; margin-right: .4rem; vertical-align: .1em; }
+.verdict.weak { background: var(--bad-soft); color: var(--bad); } .verdict.good { background: var(--ok-soft); color: var(--ok); } .verdict.note { background: var(--bg); color: var(--muted); border: 1px solid var(--rule); }
 .close { max-width: 66ch; font-family: var(--display); font-size: 1.1rem; line-height: 1.5; }
 </style>
 </head>
@@ -185,6 +329,12 @@ ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { 
     <div class="seg"><span class="seg-label" id="theme-label">Theme</span><div role="group" aria-labelledby="theme-label" style="display:flex;gap:.3rem"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div>
   </header>
 
+  <nav class="tabs" role="tablist" aria-label="Report">
+    <button type="button" role="tab" id="tab-results" aria-controls="results" data-tab="results">Results</button>
+    <button type="button" role="tab" id="tab-scripts" aria-controls="scripts" data-tab="scripts">The scripts</button>
+  </nav>
+
+  <div class="tab" id="results" role="tabpanel" aria-labelledby="tab-results">
   <section class="tiles" aria-label="Summary, on the code as it ended">@TILES@</section>
 
   <section class="setup">
@@ -216,9 +366,23 @@ ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { 
   </ul></section>
 
   <p class="close">On a GitHub it knows, Claude alone was faster, needed fewer model calls, and got it right every time from the start. HEART got there too, after the three fixes these runs found, and is slower for the gateway and its two calls a move. The case for HEART is the service that moves, which this trial left still.</p>
+  </div>
+
+  <div class="tab" id="scripts" role="tabpanel" aria-labelledby="tab-scripts" hidden>
+@SCRIPTS@
+  </div>
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 (() => {
+  try { document.querySelectorAll("pre code").forEach((c) => hljs.highlightElement(c)); } catch (e) { /* plain text then */ }
+  const tabs = document.querySelectorAll("[data-tab]");
+  const show = (id) => {
+    tabs.forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
+    document.querySelectorAll(".tab").forEach((t) => { t.hidden = t.id !== id; });
+  };
+  tabs.forEach((b) => b.addEventListener("click", () => show(b.dataset.tab)));
+  show(location.hash === "#scripts" ? "scripts" : "results");
   const theme = (t) => {
     document.documentElement.dataset.theme = t;
     document.querySelectorAll("[data-th]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.th === t)));

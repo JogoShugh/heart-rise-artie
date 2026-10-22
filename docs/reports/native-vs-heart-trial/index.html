@@ -17,15 +17,18 @@
   --ok: #2f6f3f; --ok-soft: #e1f0e3; --bad: #b4403a; --bad-soft: #f8e1df;
   --display: "Literata", Georgia, serif; --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --kw: #8a3f8f; --str: #2f6f3f; --num: #a0522d; --fn: #1f5a8a; --tpl: #b0641c;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
   --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
-  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d; color-scheme: dark; } }
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d;
+  --kw: #d79ad9; --str: #9fd6ac; --num: #e0a080; --fn: #8cc0ea; --tpl: #e6a35c; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
   --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
-  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d; color-scheme: dark; }
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d;
+  --kw: #d79ad9; --str: #9fd6ac; --num: #e0a080; --fn: #8cc0ea; --tpl: #e6a35c; color-scheme: dark; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
 main { max-width: 74rem; margin: 0 auto; padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 2rem; }
@@ -56,6 +59,25 @@ tr.failed td { background: var(--bad-soft); }
 .setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem 2rem; }
 ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { max-width: 68ch; } li p { color: var(--muted); }
 .commit { font: .75rem var(--mono); color: var(--muted); }
+.tabs { display: flex; gap: .4rem; border-bottom: 1px solid var(--rule); }
+.tabs button { font: 600 .95rem var(--body); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--muted); padding: .4rem .2rem .6rem; margin-right: 1rem; cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--fg); }
+.tabs button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.tab { display: grid; gap: 2rem; }
+[hidden] { display: none !important; }
+.code { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); overflow: hidden; }
+.code .head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 1rem; padding: .55rem .9rem; border-bottom: 1px solid var(--rule); background: var(--bg); font-size: .85rem; color: var(--muted); }
+.code pre { margin: 0; padding: .8rem .9rem; overflow: auto; max-height: 34rem; font: .78rem/1.55 var(--mono); }
+.code pre code { background: none; padding: 0; }
+.hljs-keyword, .hljs-built_in, .hljs-literal { color: var(--kw); } .hljs-string { color: var(--str); }
+.hljs-comment { color: var(--muted); font-style: italic; } .hljs-number { color: var(--num); }
+.hljs-title, .hljs-function .hljs-title { color: var(--fn); } .hljs-subst, .hljs-variable, .hljs-template-variable { color: var(--tpl); }
+.pair2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 34rem), 1fr)); gap: 1rem; }
+.pair2 > * { min-width: 0; }
+dl.points { display: grid; gap: .9rem; margin: 0; } dl.points dt { font-weight: 600; } dl.points dd { margin: .2rem 0 0; color: var(--muted); max-width: 72ch; }
+dl.points code, .tab p code, li code { font: .85em var(--mono); color: var(--fg); }
+.verdict { display: inline-block; font: 600 .68rem var(--body); letter-spacing: .05em; text-transform: uppercase; border-radius: 4px; padding: .05rem .35rem; margin-right: .4rem; vertical-align: .1em; }
+.verdict.weak { background: var(--bad-soft); color: var(--bad); } .verdict.good { background: var(--ok-soft); color: var(--ok); } .verdict.note { background: var(--bg); color: var(--muted); border: 1px solid var(--rule); }
 .close { max-width: 66ch; font-family: var(--display); font-size: 1.1rem; line-height: 1.5; }
 </style>
 </head>
@@ -67,6 +89,12 @@ ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { 
     <div class="seg"><span class="seg-label" id="theme-label">Theme</span><div role="group" aria-labelledby="theme-label" style="display:flex;gap:.3rem"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div>
   </header>
 
+  <nav class="tabs" role="tablist" aria-label="Report">
+    <button type="button" role="tab" id="tab-results" aria-controls="results" data-tab="results">Results</button>
+    <button type="button" role="tab" id="tab-scripts" aria-controls="scripts" data-tab="scripts">The scripts</button>
+  </nav>
+
+  <div class="tab" id="results" role="tabpanel" aria-labelledby="tab-results">
   <section class="tiles" aria-label="Summary, on the code as it ended"><div class="tile"><div class="label">Reasoned runs that did the task</div><div class="pair"><div><span class="tag native">Native</span><b>3 of 3</b></div><div><span class="tag heart">HEART</span><b>3 of 3</b></div></div></div><div class="tile"><div class="label">Reasoned, mean time</div><div class="pair"><div><span class="tag native">Native</span><b>70</b> s</div><div><span class="tag heart">HEART</span><b>261</b> s</div></div></div><div class="tile"><div class="label">Reasoned, model calls a run</div><div class="pair"><div><span class="tag native">Native</span><b>13</b></div><div><span class="tag heart">HEART</span><b>77</b></div></div></div><div class="tile"><div class="label">Reasoned, tokens out a run</div><div class="pair"><div><span class="tag native">Native</span><b>4,861</b></div><div><span class="tag heart">HEART</span><b>11,359</b></div></div></div><div class="tile"><div class="label">Scripted runs that did the task</div><div class="pair"><div><span class="tag native">Native</span><b>3 of 3</b></div><div><span class="tag heart">HEART</span><b>3 of 3</b></div></div></div><div class="tile"><div class="label">Scripted, mean time</div><div class="pair"><div><span class="tag native">Native</span><b>22</b> s</div><div><span class="tag heart">HEART</span><b>68</b> s</div></div></div></section>
 
   <section class="setup">
@@ -98,9 +126,326 @@ ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { 
   </ul></section>
 
   <p class="close">On a GitHub it knows, Claude alone was faster, needed fewer model calls, and got it right every time from the start. HEART got there too, after the three fixes these runs found, and is slower for the gateway and its two calls a move. The case for HEART is the service that moves, which this trial left still.</p>
+  </div>
+
+  <div class="tab" id="scripts" role="tabpanel" aria-labelledby="tab-scripts" hidden>
+
+  <section><h2>Two scripts, one task</h2>
+  <p class="sub">Both do the triage task with no model; both passed every run made on the code as it ended. Claude
+  wrote the Python in one call from its own run's transcript. <code>artie generate</code> wrote the Kotlin from one
+  HEART run's capture, with a lock file beside it.</p>
+  <div class="pair2">
+    <div class="code"><div class="head"><span><span class="tag native">Native</span> native-script.py</span>
+      <span>162 lines · 23 requests · 22 s</span></div>
+      <pre><code class="language-python">#!/usr/bin/env python3
+import sys, os, json, time, base64
+import urllib.request, urllib.error
+
+if len(sys.argv) != 5:
+    sys.exit(&quot;usage: script.py OWNER REPO LABEL STAMP&quot;)
+OWNER, REPO, LABEL, STAMP = sys.argv[1:5]
+TOKEN = os.environ.get(&quot;GITHUB_TOKEN&quot;)
+if not TOKEN:
+    sys.exit(&quot;GITHUB_TOKEN is not set&quot;)
+
+API = &quot;https://api.github.com&quot;
+R = &quot;/repos/%s/%s&quot; % (OWNER, REPO)
+
+
+def req(method, path, body=None, ok=(200, 201, 204)):
+    print(&quot;%s %s&quot; % (method, path), flush=True)
+    data = json.dumps(body).encode() if body is not None else None
+    r = urllib.request.Request(API + path, data=data, method=method)
+    r.add_header(&quot;Authorization&quot;, &quot;Bearer &quot; + TOKEN)
+    r.add_header(&quot;Accept&quot;, &quot;application/vnd.github+json&quot;)
+    r.add_header(&quot;X-GitHub-Api-Version&quot;, &quot;2022-11-28&quot;)
+    r.add_header(&quot;User-Agent&quot;, &quot;triage-script&quot;)
+    if data is not None:
+        r.add_header(&quot;Content-Type&quot;, &quot;application/json&quot;)
+    try:
+        with urllib.request.urlopen(r) as resp:
+            status = resp.status
+            raw = resp.read()
+    except urllib.error.HTTPError as e:
+        status = e.code
+        raw = e.read()
+    if status not in ok:
+        sys.exit(&quot;FAILED: %s %s -&gt; HTTP %d: %s&quot; % (method, path, status, raw.decode(errors=&quot;replace&quot;)[:500]))
+    if raw:
+        try:
+            return json.loads(raw)
+        except ValueError:
+            return None
+    return None
+
+
+def b64(s):
+    return base64.b64encode(s.encode()).decode()
+
+
+branch = &quot;fix-blank-names-&quot; + STAMP
+
+# main sha
+main = req(&quot;GET&quot;, R + &quot;/git/ref/heads/main&quot;)
+main_sha = main[&quot;object&quot;][&quot;sha&quot;]
+
+# crash issue
+crash = req(&quot;POST&quot;, R + &quot;/issues&quot;, {
+    &quot;title&quot;: &quot;Crash when a bed has no name (%s)&quot; % STAMP,
+    &quot;body&quot;: &quot;A bed with a blank name crashes the garden.&quot;,
+    &quot;labels&quot;: [LABEL],
+    &quot;assignees&quot;: [OWNER],
+})
+crash_no, crash_id = crash[&quot;number&quot;], crash[&quot;id&quot;]
+if crash.get(&quot;state&quot;) != &quot;open&quot;:
+    crash = req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % crash_no, {&quot;state&quot;: &quot;open&quot;})
+    if crash.get(&quot;state&quot;) != &quot;open&quot;:
+        sys.exit(&quot;crash issue is not open&quot;)
+
+# test issue
+test = req(&quot;POST&quot;, R + &quot;/issues&quot;, {
+    &quot;title&quot;: &quot;Test blank bed names (%s)&quot; % STAMP,
+    &quot;body&quot;: &quot;This is part of #%d.&quot; % crash_no,
+})
+test_no, test_id = test[&quot;number&quot;], test[&quot;id&quot;]
+
+# duplicate issue
+dup = req(&quot;POST&quot;, R + &quot;/issues&quot;, {
+    &quot;title&quot;: &quot;Garden crashes on an empty bed name (%s)&quot; % STAMP,
+    &quot;body&quot;: &quot;This was seen on the demo garden.&quot;,
+})
+dup_no = dup[&quot;number&quot;]
+
+# branch
+req(&quot;POST&quot;, R + &quot;/git/refs&quot;, {&quot;ref&quot;: &quot;refs/heads/&quot; + branch, &quot;sha&quot;: main_sha})
+
+# commits
+req(&quot;PUT&quot;, R + &quot;/contents/fix-%s.md&quot; % STAMP, {
+    &quot;message&quot;: &quot;Refuse a bed with no name&quot;,
+    &quot;content&quot;: b64(&quot;Bed names may not be blank.\n&quot;),
+    &quot;branch&quot;: branch,
+})
+req(&quot;PUT&quot;, R + &quot;/contents/test-%s.md&quot; % STAMP, {
+    &quot;message&quot;: &quot;Test that a blank bed name is refused&quot;,
+    &quot;content&quot;: b64(&quot;A bed with a blank name is refused.\n&quot;),
+    &quot;branch&quot;: branch,
+})
+
+# pull request
+pr = req(&quot;POST&quot;, R + &quot;/pulls&quot;, {
+    &quot;title&quot;: &quot;Refuse a bed with no name (%s)&quot; % STAMP,
+    &quot;head&quot;: branch,
+    &quot;base&quot;: &quot;main&quot;,
+    &quot;body&quot;: &quot;Fixes #%d.&quot; % crash_no,
+})
+pr_no = pr[&quot;number&quot;]
+req(&quot;PATCH&quot;, R + &quot;/pulls/%d&quot; % pr_no, {
+    &quot;body&quot;: &quot;Fixes #%d and is tested by #%d.&quot; % (crash_no, test_no),
+})
+
+# wait for mergeable
+pr_now = None
+for _ in range(30):
+    pr_now = req(&quot;GET&quot;, R + &quot;/pulls/%d&quot; % pr_no)
+    if pr_now.get(&quot;mergeable&quot;) is True and pr_now.get(&quot;mergeable_state&quot;) in (&quot;clean&quot;, &quot;unstable&quot;, &quot;has_hooks&quot;):
+        break
+    if pr_now.get(&quot;mergeable&quot;) is False:
+        sys.exit(&quot;pull request is not mergeable (state %s)&quot; % pr_now.get(&quot;mergeable_state&quot;))
+    time.sleep(2)
+else:
+    sys.exit(&quot;pull request did not become mergeable in time&quot;)
+
+# merge
+m = req(&quot;PUT&quot;, R + &quot;/pulls/%d/merge&quot; % pr_no, {
+    &quot;merge_method&quot;: &quot;squash&quot;,
+    &quot;commit_title&quot;: &quot;Refuse a bed with no name (#%d)&quot; % pr_no,
+    &quot;sha&quot;: pr_now[&quot;head&quot;][&quot;sha&quot;],
+})
+if not m.get(&quot;merged&quot;):
+    sys.exit(&quot;merge response did not say merged&quot;)
+req(&quot;GET&quot;, R + &quot;/pulls/%d/merge&quot; % pr_no, ok=(204,))
+
+# crash issue: sub-issue, comment, close, lock
+req(&quot;POST&quot;, R + &quot;/issues/%d/sub_issues&quot; % crash_no, {&quot;sub_issue_id&quot;: test_id})
+req(&quot;POST&quot;, R + &quot;/issues/%d/comments&quot; % crash_no,
+    {&quot;body&quot;: &quot;Fixed in #%d, tested in #%d.&quot; % (pr_no, test_no)})
+req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % crash_no, {&quot;state&quot;: &quot;closed&quot;, &quot;state_reason&quot;: &quot;completed&quot;})
+req(&quot;PUT&quot;, R + &quot;/issues/%d/lock&quot; % crash_no, {&quot;lock_reason&quot;: &quot;resolved&quot;}, ok=(204,))
+
+# test issue
+req(&quot;POST&quot;, R + &quot;/issues/%d/comments&quot; % test_no,
+    {&quot;body&quot;: &quot;The test went in with #%d.&quot; % pr_no})
+req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % test_no, {&quot;state&quot;: &quot;closed&quot;, &quot;state_reason&quot;: &quot;completed&quot;})
+
+# duplicate issue
+req(&quot;POST&quot;, R + &quot;/issues/%d/comments&quot; % dup_no,
+    {&quot;body&quot;: &quot;Same crash as #%d.&quot; % crash_no})
+req(&quot;PATCH&quot;, R + &quot;/issues/%d&quot; % dup_no, {
+    &quot;state&quot;: &quot;closed&quot;,
+    &quot;state_reason&quot;: &quot;duplicate&quot;,
+    &quot;duplicate_of&quot;: crash_id,
+    &quot;duplicate_of_issue_id&quot;: crash_id,
+})
+
+# verification
+c = req(&quot;GET&quot;, R + &quot;/issues/%d&quot; % crash_no)
+if not (c[&quot;state&quot;] == &quot;closed&quot; and c[&quot;state_reason&quot;] == &quot;completed&quot; and c[&quot;locked&quot;]):
+    sys.exit(&quot;crash issue check failed: state=%s reason=%s locked=%s&quot; % (c[&quot;state&quot;], c[&quot;state_reason&quot;], c[&quot;locked&quot;]))
+t = req(&quot;GET&quot;, R + &quot;/issues/%d&quot; % test_no)
+if t[&quot;state&quot;] != &quot;closed&quot;:
+    sys.exit(&quot;test issue is not closed&quot;)
+d = req(&quot;GET&quot;, R + &quot;/issues/%d&quot; % dup_no)
+if not (d[&quot;state&quot;] == &quot;closed&quot; and d[&quot;state_reason&quot;] == &quot;duplicate&quot;):
+    sys.exit(&quot;duplicate issue check failed: state=%s reason=%s&quot; % (d[&quot;state&quot;], d[&quot;state_reason&quot;]))
+
+print(&quot;done: crash #%d, test #%d, duplicate #%d, pull request #%d&quot; % (crash_no, test_no, dup_no, pr_no))
+</code></pre></div>
+    <div class="code"><div class="head"><span><span class="tag heart">HEART</span> heart-script.kts</span>
+      <span>118 lines · 58 steps · 68 s</span></div>
+      <pre><code class="language-kotlin">// Generated by artie generate from ../../exhibits/native-vs-heart/runs/heart-5-1022-070410.yaml, the run of tests/github-triage.goal.md.
+// Every selection as that run made it, nested as it nested, with no model.
+// What it was offered is pinned in ../../exhibits/native-vs-heart/runs/heart-script.pins.yaml, held to before every act.
+//   artie run ../../exhibits/native-vs-heart/runs/heart-script.kts owner=JogoShugh stamp=1022-070410
+val owner by input(question = &quot;Whose repository?&quot;)
+val repo by input(default = &quot;heart-github-test&quot;, question = &quot;Which repository?&quot;)
+val label by input(default = &quot;bug&quot;, question = &quot;Which label marks a bug?&quot;)
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)))
+
+heart(&quot;http://localhost:8392/&quot;) {
+    var issueNumber = 0L // step 3&#x27;s /number
+    var testNumber = 0L // step 10&#x27;s /number
+    var prBody = &quot;&quot; // step 21&#x27;s /body
+    var prNumber = 0L // step 21&#x27;s /number
+    var testId = 0L // step 10&#x27;s /id
+    var dupeNumber = 0L // step 12&#x27;s /number
+    var issueId = 0L // step 3&#x27;s /id
+
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, intent = &quot;get the repository $owner/$repo&quot;) {
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Crash when a bed has no name ($stamp)&quot; with the body: a bed with a blank name crashes the garden&quot;&quot;&quot;, fields = {
+            &quot;title&quot; to &quot;Crash when a bed has no name ($stamp)&quot;
+            &quot;body&quot; to &quot;a bed with a blank name crashes the garden&quot;
+        }) {
+            sync()
+            issueNumber = state.long(&quot;number&quot;)
+            issueId = state.long(&quot;id&quot;)
+            act(&quot;github:label&quot;, &quot;labels&quot; to listOf(label), intent = &quot;Label it with $label&quot;) {}
+            act(&quot;github:assign&quot;, &quot;assignees&quot; to listOf(owner), intent = &quot;assign it to $owner&quot;) {}
+            check(&quot;state&quot; to &quot;open&quot;)
+        }
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Test blank bed names ($stamp)&quot; with the body: part of #${issueNumber}&quot;&quot;&quot;, fields = {
+            &quot;title&quot; to &quot;Test blank bed names ($stamp)&quot;
+            &quot;body&quot; to &quot;part of #$issueNumber&quot;
+        }) {
+            testNumber = state.long(&quot;number&quot;)
+            testId = state.long(&quot;id&quot;)
+        }
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Garden crashes on an empty bed name ($stamp)&quot; with the body: seen on the demo garden&quot;&quot;&quot;, fields = {
+            &quot;title&quot; to &quot;Garden crashes on an empty bed name ($stamp)&quot;
+            &quot;body&quot; to &quot;seen on the demo garden&quot;
+        }) {
+            dupeNumber = state.long(&quot;number&quot;)
+        }
+        follow(&quot;github:repos-list-branches&quot;, intent = &quot;follow the link to list the branches&quot;) {
+            follow(&quot;item&quot;, &quot;main&quot;, intent = &quot;follow the link to the main branch&quot;) {
+                act(&quot;github:branch-from-here&quot;, intent = &quot;start a new branch named fix-blank-names-$stamp from here&quot;, fields = {
+                    &quot;name&quot; to &quot;fix-blank-names-$stamp&quot;
+                }) {
+                    sync()
+                    act(&quot;github:commit-file&quot;, intent = &quot;&quot;&quot;Commit a file named fix-$stamp.md with the content &quot;Bed names may not be blank.&quot; and the commit message &quot;Refuse a bed with no name&quot;&quot;&quot;&quot;, fields = {
+                        &quot;path&quot; to &quot;fix-$stamp.md&quot;
+                        &quot;message&quot; to &quot;Refuse a bed with no name&quot;
+                        &quot;content&quot; to &quot;Bed names may not be blank.&quot;
+                    }) {}
+                    act(&quot;github:commit-file&quot;, intent = &quot;&quot;&quot;Commit a file named test-$stamp.md with the content &quot;A bed with a blank name is refused.&quot; and the commit message &quot;Test that a blank bed name is refused&quot;&quot;&quot;&quot;, fields = {
+                        &quot;path&quot; to &quot;test-$stamp.md&quot;
+                        &quot;message&quot; to &quot;Test that a blank bed name is refused&quot;
+                        &quot;content&quot; to &quot;A bed with a blank name is refused.&quot;
+                    }) {}
+                    act(&quot;github:open-pull-request&quot;, intent = &quot;&quot;&quot;Open a pull request into main titled &quot;Refuse a bed with no name ($stamp)&quot; with the body: fixes #${issueNumber}&quot;&quot;&quot;, fields = {
+                        &quot;base&quot; to &quot;main&quot;
+                        &quot;title&quot; to &quot;Refuse a bed with no name ($stamp)&quot;
+                        &quot;body&quot; to &quot;fixes #$issueNumber&quot;
+                    }) {
+                        sync()
+                        prBody = state.text(&quot;body&quot;)
+                        prNumber = state.long(&quot;number&quot;)
+                        act(&quot;github:edit&quot;, intent = &quot;change its description to: fixes #${issueNumber} and is tested by #${testNumber}&quot;, fields = {
+                            &quot;body&quot; to &quot;$prBody and is tested by #$testNumber&quot;
+                        }) {}
+                        until(tries = 20) { offers(&quot;github:merge&quot;) }
+                        act(&quot;github:merge&quot;, intent = &quot;&quot;&quot;merge it by squashing its commits, with the commit title &quot;Refuse a bed with no name (#${prNumber})&quot;&quot;&quot;&quot;, fields = {
+                            &quot;merge_method&quot; to &quot;squash&quot;
+                            &quot;commit_title&quot; to &quot;Refuse a bed with no name (#$prNumber)&quot;
+                        }) {}
+                        check(&quot;merged&quot; to true)
+                    }
+                }
+            }
+        }
+    }
+    act(&quot;github:issues-get&quot;, intent = &quot;get issue ${issueNumber} of $owner/$repo&quot;, fields = {
+        &quot;owner&quot; to owner
+        &quot;repo&quot; to repo
+        &quot;issue_number&quot; to issueNumber
+    }) {
+        act(&quot;github:add-sub-issue&quot;, &quot;sub_issue_id&quot; to testId, intent = &quot;add sub-issue by id ${testId}&quot;) {}
+        act(&quot;github:comment&quot;, intent = &quot;comment on it: Fixed in #${prNumber}, tested in #${testNumber}.&quot;, fields = {
+            &quot;body&quot; to &quot;Fixed in #$prNumber, tested in #$testNumber.&quot;
+        }) {}
+        act(&quot;github:lock&quot;, &quot;lock_reason&quot; to &quot;resolved&quot;, intent = &quot;lock the conversation as resolved&quot;) {}
+        check(&quot;state&quot; to &quot;closed&quot;, &quot;state_reason&quot; to &quot;completed&quot;, &quot;locked&quot; to true)
+    }
+    act(&quot;github:issues-get&quot;, intent = &quot;get issue ${testNumber} of $owner/$repo&quot;, fields = {
+        &quot;owner&quot; to owner
+        &quot;repo&quot; to repo
+        &quot;issue_number&quot; to testNumber
+    }) {
+        act(&quot;github:comment&quot;, intent = &quot;comment on it: The test went in with #${prNumber}.&quot;, fields = {
+            &quot;body&quot; to &quot;The test went in with #$prNumber.&quot;
+        }) {}
+        act(&quot;github:close&quot;, intent = &quot;close it as completed&quot;) {}
+        check(&quot;state&quot; to &quot;closed&quot;)
+    }
+    act(&quot;github:issues-get&quot;, intent = &quot;get issue ${dupeNumber} of $owner/$repo&quot;, fields = {
+        &quot;owner&quot; to owner
+        &quot;repo&quot; to repo
+        &quot;issue_number&quot; to dupeNumber
+    }) {
+        act(&quot;github:comment&quot;, intent = &quot;comment on it: Same crash as #${issueNumber}.&quot;, fields = {
+            &quot;body&quot; to &quot;Same crash as #$issueNumber.&quot;
+        }) {}
+        act(&quot;github:close-duplicate&quot;, intent = &quot;close it as a duplicate of the issue with id ${issueId} (#215)&quot;, fields = {
+            &quot;duplicate_issue_id&quot; to issueId
+        }) {}
+        check(&quot;state&quot; to &quot;closed&quot;, &quot;state_reason&quot; to &quot;duplicate&quot;)
+    }
+}
+</code></pre></div>
+  </div></section>
+
+  <section><h2>The Python, read closely</h2>
+  <p class="sub">It is good code for what it is: what one model remembers of one API, written down. Its weaknesses
+  are the weaknesses of that.</p>
+  <dl class="points"><div><dt><span class="verdict weak">weak</span>Every address and field is the model&#x27;s memory of GitHub.</dt><dd><code>&quot;/git/ref/heads/main&quot;, &quot;/git/refs&quot;, &quot;/contents/…&quot;, &quot;/pulls/%d/merge&quot;, &quot;sub_issue_id&quot;, &quot;state_reason&quot;</code></dd><dd>Nothing in the script was read from the service: each path, each field, each value of state_reason is what the model learned of GitHub&#x27;s REST API. Move one path, rename one field, add one required field, and the script fails at that line, or worse, sends something the service quietly ignores. It can&#x27;t tell which.</dd></div><div><dt><span class="verdict weak">weak</span>Where its memory runs out, it guesses, and a guess that is ignored passes.</dt><dd><code>&quot;duplicate_of&quot;: crash_id, &quot;duplicate_of_issue_id&quot;: crash_id</code></dd><dd>It sends two field names for the duplicate&#x27;s original, hoping one is right. GitHub ignored both: the duplicate is closed as a duplicate of nothing. Its own check asks only for state_reason, so the script says done. A field the service doesn&#x27;t know is never refused, only dropped.</dd></div><div><dt><span class="verdict weak">weak</span>No validators: every write is blind.</dt><dd><code>req(…) sends no If-Match on any PATCH, PUT or POST</code></dd><dd>It never meets a 412 because it never says what it read. That is why it never stalled on GitHub&#x27;s late change to a new pull request; it is also why it would overwrite a change someone else made between its read and its write, and never know.</dd></div><div><dt><span class="verdict weak">weak</span>It reads GitHub&#x27;s internals to decide when to merge, and merges past failing checks.</dt><dd><code>mergeable_state in (&quot;clean&quot;, &quot;unstable&quot;, &quot;has_hooks&quot;)</code></dd><dd>GitHub&#x27;s word for whether a pull request can be merged is a field the model interprets, not an action the service offers. &quot;unstable&quot; means a check is failing or still running (one the branch doesn&#x27;t require): the script merges it anyway, as it would one with no checks at all.</dd></div><div><dt><span class="verdict weak">weak</span>It does what was already done, and code the task never needed.</dt><dd><code>PATCH … {&quot;state&quot;: &quot;closed&quot;, &quot;state_reason&quot;: &quot;completed&quot;} on the crash issue; the reopen branch after creating it</code></dd><dd>The merge has already closed the crash issue; the script closes it again, as a fixed step. It reopens the crash issue if it isn&#x27;t open just after making it, a case that can&#x27;t happen. A script that can&#x27;t see what is possible does everything, in case.</dd></div><div><dt><span class="verdict weak">weak</span>It stops half done, and running it again makes a second set.</dt><dd><code>sys.exit(&quot;FAILED: …&quot;) at the first error; nothing checks what an earlier run left</code></dd><dd>A failure leaves issues, a branch and maybe a pull request behind, with nothing to say which. Run again with the same stamp, it opens the issues again; there is no record of what it did beyond the lines it printed.</dd></div><div><dt><span class="verdict weak">weak</span>No retries, no rate limits, a pinned API version.</dt><dd><code>&quot;X-GitHub-Api-Version&quot;: &quot;2022-11-28&quot;; urlopen with no retry</code></dd><dd>A 502 or a secondary rate limit ends the run. The API version header pins it to the GitHub the model remembers; a version that drops a field it uses is found by failing.</dd></div><div><dt><span class="verdict good">strong</span>It reads every number, id and sha from the answers.</dt><dd><code>crash_no, crash_id = crash[&quot;number&quot;], crash[&quot;id&quot;]; &quot;sha&quot;: pr_now[&quot;head&quot;][&quot;sha&quot;]</code></dd><dd>Nothing from the run that taught it is written in: issue numbers, ids, the head sha the merge is held to, all come from GitHub&#x27;s answers as it goes. It merges only the head it saw.</dd></div><div><dt><span class="verdict good">strong</span>It goes straight to what it needs.</dt><dd><code>GET /git/ref/heads/main, then POST /git/refs</code></dd><dd>23 requests where the ARTIE script makes 58: no list to page through, no block to come back to. On a GitHub that matches its memory, that is why it is three times faster.</dd></div><div><dt><span class="verdict note">note</span>It checks its end state, its own way.</dt><dd><code>the three GETs at the end</code></dd><dd>It reads the three issues back and checks state, state reason and the lock: a good habit, but only for what it thought to check, and not the duplicate&#x27;s original, which it had guessed at.</dd></div></dl></section>
+
+  <section><h2>The Kotlin, for fairness</h2>
+  <dl class="points"><div><dt><span class="verdict good">strong</span>Relations, not addresses.</dt><dd><code>act(&quot;github:open-issue&quot;, …), follow(&quot;github:repos-list-branches&quot;), act(&quot;github:close-duplicate&quot;, …)</code></dd><dd>Each step names what the service offers; ARTIE finds the form or link in the representation it holds and builds the request from it. A moved path, a new required field, is the service&#x27;s to say.</dd></div><div><dt><span class="verdict good">strong</span>Held to what was offered.</dt><dd><code>heart-script.pins.yaml: each form&#x27;s integrity, checked before every act</code></dd><dd>A form that changed, or is no longer offered, stops the script before it sends anything: it refuses before its harm, never after.</dd></div><div><dt><span class="verdict good">strong</span>Every write says what it read.</dt><dd><code>If-Match on every act; sync() after making a resource; a 412 decided again once</code></dd><dd>It can&#x27;t overwrite what it didn&#x27;t see. Where GitHub changes something on its own, it reads again and decides again, within what its lock file allows.</dd></div><div><dt><span class="verdict good">strong</span>It waits on the service&#x27;s word.</dt><dd><code>until(tries = 20) { offers(&quot;github:merge&quot;) }</code></dd><dd>Whether the pull request can be merged is whether merge is offered, not a field it interprets.</dd></div><div><dt><span class="verdict good">strong</span>Every value has a source.</dt><dd><code>issueNumber = state.long(&quot;number&quot;); heart-script.derivation.yaml</code></dd><dd>Each variable is read where the run found it, and the derivation file says, for each value, where it came from and by which rule.</dd></div><div><dt><span class="verdict weak">weak</span>It replays the run&#x27;s route, not the shortest.</dt><dd><code>follow(&quot;github:repos-list-branches&quot;) { follow(&quot;item&quot;, &quot;main&quot;) { … } }</code></dd><dd>The planner got to main by the branch list, so the script does too: 58 steps to the Python&#x27;s 23, and the list pages as it grows. It is slower for every request going through the gateway.</dd></div><div><dt><span class="verdict weak">weak</span>It leans on what the service did on its own.</dt><dd><code>no close of the crash issue</code></dd><dd>The run made no act at the crash issue&#x27;s close: the merge had closed it. The script relies on that, and on its check to catch it if GitHub ever doesn&#x27;t.</dd></div><div><dt><span class="verdict note">note</span>Its words can carry a value from the run.</dt><dd><code>intent = &quot;close it as a duplicate of the issue with id ${issueId} (#215)&quot;</code></dd><dd>An intent&#x27;s words are only words: the act&#x27;s values are its fields, here issueId, read fresh. But the words still say #215, the run&#x27;s number.</dd></div></dl></section>
+
+  <p class="close">The Python is faster because it knows GitHub. The Kotlin is slower because it asks. The trial
+  ran against the GitHub the model knows; the next one changes it.</p>
+  </div>
 </main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script>
 (() => {
+  try { document.querySelectorAll("pre code").forEach((c) => hljs.highlightElement(c)); } catch (e) { /* plain text then */ }
+  const tabs = document.querySelectorAll("[data-tab]");
+  const show = (id) => {
+    tabs.forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
+    document.querySelectorAll(".tab").forEach((t) => { t.hidden = t.id !== id; });
+  };
+  tabs.forEach((b) => b.addEventListener("click", () => show(b.dataset.tab)));
+  show(location.hash === "#scripts" ? "scripts" : "results");
   const theme = (t) => {
     document.documentElement.dataset.theme = t;
     document.querySelectorAll("[data-th]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.th === t)));
