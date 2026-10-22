@@ -2,7 +2,9 @@
 # The care ladder (spec/ideas/off-the-rails.md): the triage task by each arm, over https, ROUNDS times, interleaved.
 # Python arms: plain and careful, direct to GitHub and through the gateway passed through. HEART arms: the
 # heart-script off the rails with blind writes, the gateway restarted for each with GATEWAY_CARE as the arm says.
-# Usage: ladder.sh ROUNDS ARM... ; arms: py-direct py-via careful-direct careful-via heart:<care>
+# Usage: ladder.sh ROUNDS ARM... ; arms: py-direct py-via careful-direct careful-via heart:<care> careful-heart
+# careful-heart: ARTIE at its most careful (--guard strict --validators last), the gateway taking every kind of
+# care and refusing any act without a validator.
 # Writes each run's output to <arm>-<stamp>.out beside this script and a line per run to ladder.tsv.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -16,11 +18,11 @@ GATEWAY_PID=""
 stop_gateway() { [ -n "$GATEWAY_PID" ] && kill "$GATEWAY_PID" 2>/dev/null && wait "$GATEWAY_PID" 2>/dev/null; GATEWAY_PID=""; }
 trap stop_gateway EXIT
 
-start_gateway() { # care
+start_gateway() { # care [blind writes: allowed, or empty for none]
   stop_gateway
   (cd "$ROOT/heart/heart-gateway" && JAVA_HOME="$HOME/.sdkman/candidates/java/21.0.12-graal" \
     GATEWAY_TLS_KEYSTORE="$TLS/gateway.p12" GATEWAY_TLS_PASSWORD="$(cat "$TLS/password")" \
-    HEART_ACTS_WITHOUT_VALIDATOR=allowed GATEWAY_CARE="$1" \
+    HEART_ACTS_WITHOUT_VALIDATOR="${2-allowed}" GATEWAY_CARE="$1" \
     GATEWAY_RECORD="$HOME/.cache/artie/runs/upstream.record.yaml" UPSTREAM_URL=https://api.github.com \
     UPSTREAM_SPEC="$HOME/.cache/artie/ghdesc/api.github.com.json" \
     GATEWAY_CONNECTOR=build/install/heart-gateway/connectors/github UPSTREAM_AUTH=caller PORT=8392 \
@@ -45,6 +47,11 @@ run() { # arm stamp
     careful-direct)  python3 "$HERE/native-script-careful.py" JogoShugh heart-github-test bug "$S" ;;
     careful-via)     SSL_CERT_FILE="$TLS/gateway.pem" GITHUB_API=https://localhost:8392 \
                        python3 "$HERE/native-script-careful.py" JogoShugh heart-github-test bug "$S" ;;
+    careful-heart)   (cd "$ROOT/client/scripts" && . ./.env && \
+                       JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
+                       artie run "$HERE/heart-script.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
+                       --rung L2 --guard strict --validators last --pins "$HERE/heart-script.pins.yaml" \
+                       --trace "$HERE/$name-$S.yaml") ;;
     heart:*)         (cd "$ROOT/client/scripts" && . ./.env && \
                        JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
                        artie run "$HERE/heart-script.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
@@ -62,6 +69,7 @@ run() { # arm stamp
 for round in $(seq "$ROUNDS"); do
   for arm in "$@"; do
     case "$arm" in
+      careful-heart) start_gateway "" "" ;;
       heart:every) start_gateway "" ;;
       heart:*) start_gateway "${arm#heart:}" ;;
       *-via) start_gateway "" ;;
