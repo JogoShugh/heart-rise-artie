@@ -37,8 +37,9 @@ class GatewayCareSteps(private val github: GitHubSteps) {
         }
     }
 
-    @Then("the answer's state is {string}")
-    fun state(state: String) = assertEquals(state, github.lastAnswer.path("state").asText(), "${github.lastAnswer}")
+    @Then("the answer says {word} is {string}")
+    fun member(name: String, value: String) =
+        assertEquals(value, github.lastAnswer.path(name).asText(), "${github.lastAnswer}")
 
     @Then("the form {string} is shown")
     fun shown(key: String) = assertTrue(github.lastAnswer.path("_forms").has(key), "${github.lastAnswer}")

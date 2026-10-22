@@ -13,8 +13,8 @@ Feature: A trial may turn off the care the gateway takes, one kind at a time
 
   - no-offers: the repository and the caller aren't read; every form is shown
   - no-race: the issue isn't read again just before the act
-  - no-reread: the act's own answer is the state, where it is the resource
-    (its offers are still worked out, so the repository and the caller are
+  - no-reread: the act's own answer is the state, where it is the resource,
+    and only there (its offers are still worked out, so the repository and the caller are
     still read, unless no-offers says otherwise)
   - trust-copies=SECONDS: a copy read that recently is used without asking
   - off-the-rails: all four, trusting copies for 60 seconds
@@ -41,7 +41,7 @@ Feature: A trial may turn off the care the gateway takes, one kind at a time
     And GitHub's requests are counted from here
     And the client sends "github:close" with {} and no validator
     Then the GitHub gateway answers 200
-    And the answer's state is "closed"
+    And the answer says state is "closed"
     And GitHub was asked
       | request                                | times        |
       | GET /repos/acme/rockets/issues/10      | <issue>      |
@@ -59,6 +59,21 @@ Feature: A trial may turn off the care the gateway takes, one kind at a time
       | no-offers, no-race, no-reread | its environment | 1     | 0          | 0    |
       | off-the-rails                 | its environment | 0     | 0          | 0    |
       | off-the-rails                 | the request     | 0     | 0          | 0    |
+
+  Scenario: An act whose answer isn't the resource is still read again: a merge
+    GitHub answers a merge with {"merged": true, "sha": ...}, not the pull
+    request, so the pull request is read again even with no-reread.
+    Given pull request 482 of "acme/rockets" is "open" upstream, titled "Fix the login bug"
+    And the GitHub gateway takes care as "off-the-rails", by its environment
+    When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    And GitHub's requests are counted from here
+    And the client sends "github:merge" with {} and no validator
+    Then the GitHub gateway answers 200
+    And the answer says merged is "true"
+    And GitHub was asked
+      | request                                  | times |
+      | PUT /repos/acme/rockets/pulls/482/merge  | 1     |
+      | GET /repos/acme/rockets/pulls/482        | 1     |
 
   Scenario: With no offers worked out, every form is shown, and GitHub says what it allows
     Given the GitHub gateway takes care as "no-offers", by its environment

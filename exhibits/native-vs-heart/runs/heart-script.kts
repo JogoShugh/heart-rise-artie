@@ -6,8 +6,9 @@ val owner by input(question = "Whose repository?")
 val repo by input(default = "heart-github-test", question = "Which repository?")
 val label by input(default = "bug", question = "Which label marks a bug?")
 val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd-HHmmss")))
+val gateway by input(default = "http://localhost:8392/", question = "Where is the gateway?")
 
-heart("http://localhost:8392/") {
+heart(gateway) {
     var issueNumber = 0L // step 3's /number
     var testNumber = 0L // step 10's /number
     var prBody = "" // step 21's /body

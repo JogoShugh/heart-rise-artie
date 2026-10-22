@@ -119,7 +119,7 @@ internal class DeclaredResource(
      * since an operation's answer may not be the resource (a merge's isn't).
      * A trial may take neither care (GatewayCare): with no reread, the act's
      * own answer is the state where its operation is at the resource's own
-     * path, and the state checked is, unchanged, where it isn't.
+     * path; where it isn't (a merge's), the resource is still read again.
      */
     private fun perform(checked: UpstreamState, act: ActDeclaration, input: JsonNode): Acted<UpstreamState> {
         val item = itemPath.expand(mapper.convertValue(checked.json, BODY))
@@ -145,12 +145,8 @@ internal class DeclaredResource(
         // An act that makes another resource names it in Location (201): where the act says it is, or as its answer.
         val created = act.at?.let { ItemPath.fill(it, variables + inputs) }
             ?: act.creates?.let { locate(it, answer.body) }
-        val left = when {
-            care.reread -> keys.state(calls.get(item))
-            route.path == reading.path -> keys.state(answer)
-            else -> checked
-        }
-        return Acted(left, created = created)
+        val left = if (!care.reread && route.path == reading.path) answer else calls.get(item)
+        return Acted(keys.state(left), created = created)
     }
 
     /** Where the resource the upstream answered [body] for lives, by this type's item path. */
