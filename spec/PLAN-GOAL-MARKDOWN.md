@@ -1,7 +1,11 @@
 # Plan: a goal in Markdown, with a little structure and strict guards
 
-Status: planned, 2026-10-21. Follows spec/PLAN-PLAIN-TEXT-RUN.md (a goal in words, built and proven live) and
-replaces its `.goal.yaml` file. Pre-release: `.goal.yaml` goes once this works; no compatibility.
+Status: built and proven live, 2026-10-21. `client/scripts/tests/github-task.goal.md`, in steps, was done live by
+Claude's planner (issue #155, pull request #156); `artie generate` made `client/scripts/generated/
+github-task-from-steps.kts` from it, which did the task again, held strictly to its lock file, the model deciding
+only the step marked reasoned (#157, #158). Report: `docs/reports/goal-steps-to-script/`. Follows
+spec/PLAN-PLAIN-TEXT-RUN.md and replaced its `.goal.yaml` file, which now stops a run, saying where to go. What
+the live runs taught is under "Learned live".
 
 ## The idea
 
@@ -216,8 +220,34 @@ Features first in each, red at test level, then code.
 - **`.goal.yaml` goes** once `.goal.md` works.
 - **Case:** the file's keywords ignore it; names keep it, guarded (above).
 
+## Learned live
+
+Six live runs of the GitHub goal in steps (issues #148 to #155) before one went clean; each lesson is a change and
+a scenario in `goal-steps.feature`:
+
+- **The capture keeps the planner's moves** (`run: moves:`), refused tries included. Without them a stopped run
+  says what was sent, not what the planner tried.
+- **A step limit earns its keep.** The first run stopped at line 18, "more than 10 moves for one step", before
+  anything worse than a stray branch.
+- **Shown every step, the planner does the next ones early.** On "In {owner}/{repo}" it also opened the issue,
+  then marked the step done, so the sub-steps started from the issue. The planner is now shown only the steps
+  done, the steps it is inside (`[in]`), and the one now (`[now]`), with its sub-steps counted, not listed.
+- **No back at all leaves a planner stuck.** `back` is allowed within the step now, as far as where it began.
+- **An act that leads to a new resource, with no block, leaves it held.** After a comment the next step started
+  at the comment. In a goal in steps every act opens a block, so what it led to is held until the step is done,
+  and the run is back where the step began; the generated script writes those blocks (`act(…) {}`), each left
+  with a read of where it was.
+- **A reasoned step is kept in the person's words.** The planner's ("close the issue as completed") say how
+  this run decided it, which is what the model is to decide on every run.
+- **`{name.member}` reads the state a step named as it was when that step was done**, not read again: enough
+  for a number; read again only if a live run shows it is needed.
+
+The clean run made 25 moves: two refused tries at the git refs link, nothing else wasted.
+
 ## Open
 
+- **The lock file beside the script.** `artie run generated/x.kts` looked for `x.pins.yaml` in the folder, not
+  beside the script; the live run passed `--pins`.
 - **Narrower kept steps**, if needed: one that fixes the relation and lets the model choose only the values
   (`act("github:close", intent = …)`); and a `` `fixed` `` mark, should `--keep-reason` turn out to keep too much.
 - **Promotion.** `artie generate --steps` writing a `.goal.md` in steps from a free goal's run: free words, then

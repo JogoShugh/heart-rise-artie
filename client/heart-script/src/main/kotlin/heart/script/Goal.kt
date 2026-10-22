@@ -88,6 +88,14 @@ class PlanView(
     val inputs: Map<String, String> = emptyMap(),
     /** What each form [held] offers is for, as its relation's profile says; null where it says nothing. */
     val described: Map<String, String?> = emptyMap(),
+    /** A goal in steps: the step now, its names filled, and its kind's marker if it has one (`Wait: …`). */
+    val current: String = "",
+    /** A goal in steps: every step, a line each, indented as nested, done ones and the one now marked. */
+    val steps: List<String> = emptyList(),
+    /** A goal in steps: the moves the step now allows, by kind: act, done, wait, check, clarify, stop. */
+    val allowed: Set<String> = emptySet(),
+    /** A goal in steps: each resource a step named, by its name, at its address. */
+    val named: Map<String, String> = emptyMap(),
 )
 
 /** One move of a goal run. Sentences are numbered from 1. */

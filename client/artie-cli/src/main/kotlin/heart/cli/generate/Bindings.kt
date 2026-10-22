@@ -105,7 +105,9 @@ class Bindings(
         step.slots.values.map { it.map()["from"] }
             .filter { from -> from.list().none { it.map()["input"] != null } }
             .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
-        val words = step.template ?: KotlinText.dollars(step.say)
+        // A goal step marked reasoned is kept in the person's words, each input in braces a slot.
+        val words = capture.marks(step)["reasoned"]?.toString()?.let { slotted(it, capture.inputs.keys) }
+            ?: step.template ?: KotlinText.dollars(step.say)
         val call = Written(source, step).find(KEPT)
         return why.mark(why.kept(step), "act(intent = ${heart.script.kotlinString(words)})", listOf(call))
     }
@@ -116,7 +118,10 @@ class Bindings(
         // A member named as no identifier can be (an array's index, `/topics/0`) is named with its parent's name.
         val last = camel(pointer.substringAfterLast('/'))
         val named = last.takeIf { IDENTIFIER.matches(it) } ?: camel(pointer.removePrefix("/").replace('/', '_'))
-        val base = slotted[step to pointer] ?: named
+        // A goal step's name names what is read from where it led: issue's number is issueNumber.
+        val given = capture.step(step)?.let { capture.marks(it)["as"] }
+            ?.let { "$it${named.replaceFirstChar(Char::uppercase)}" }
+        val base = slotted[step to pointer] ?: given ?: named
         val name = if (base in taken) "$base$step" else base
         Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)))
     }
@@ -199,3 +204,14 @@ class Bindings(
 }
 
 internal fun Any?.list(): List<*> = this as? List<*> ?: emptyList<Any?>()
+
+/** A goal file's [words] as a literal's: `{name}` of one of [inputs] a slot, `{{` and `}}` a brace, `$` a dollar. */
+private fun slotted(words: String, inputs: Set<String>): String =
+    Regex("""\{\{|}}|\{([A-Za-z_][A-Za-z0-9_]*)}""").replace(KotlinText.dollars(words)) { found ->
+        val name = found.groupValues[1]
+        when {
+            name.isEmpty() -> found.value.take(1)
+            name in inputs -> "\${$name}"
+            else -> found.value
+        }
+    }

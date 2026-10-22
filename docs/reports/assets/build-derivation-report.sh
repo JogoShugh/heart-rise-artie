@@ -7,7 +7,8 @@
 #   build-derivation-report.sh SOURCE.kts GENERATED.kts NAME.derivation.yaml OUT.html "Title" "One sentence." [FILE …]
 #
 # Each FILE after them (the lock file, the derivation, a run's trace) is shown after the two scripts, by its name.
-# With INTRO set to an HTML fragment's path, the fragment is put under the title: what the run began from.
+# With INTRO set to an HTML fragment's path, the fragment is put under the title. With GOAL set to a goal file
+# (NAME.goal.md), the goal is shown from the file itself: rendered, and under Full, its source and what it says.
 set -eu
 source=$1 generated=$2 derivation=$3 out=$4 title=$5 lede=$6
 shift 6
@@ -26,7 +27,7 @@ done
 
 TITLE=$safe_title LEDE=$safe_lede awk \
     -v drcss="$here/derivation-report.css" -v jsyaml="$here/js-yaml.min.js" -v ktjs="$here/kotlin-view.js" \
-    -v drjs="$here/derivation-report.js" -v beside="$beside" -v source="$source" -v generated="$generated" -v derivation="$derivation" -v intro="${INTRO:-}" '
+    -v drjs="$here/derivation-report.js" -v beside="$beside" -v source="$source" -v generated="$generated" -v derivation="$derivation" -v intro="${INTRO:-}" -v goal="${GOAL:-}" -v goaljs="$here/goal-view.js" -v goalabout="$here/goal-about.html" '
   BEGIN { title = ENVIRON["TITLE"]; lede = ENVIRON["LEDE"] }
   function emit(file,   line) { while ((getline line < file) > 0) print line; close(file) }
   # Text in the page, read back by its textContent: & < > escaped.
@@ -44,6 +45,16 @@ TITLE=$safe_title LEDE=$safe_lede awk \
   /@DERIVATION@/ { inline("@DERIVATION@", derivation); next }
   /@BESIDE@/     { emit(beside); next }
   /^@INTRO@$/    { if (intro != "") emit(intro); next }
+  /^@GOAL@$/     {
+    if (goal == "") next
+    n = split(goal, path, "/")
+    printf "<section class=\"goal\" id=\"goal\"><h2>The goal: %s</h2>\n", path[n]
+    emit(goalabout)
+    print "</section>"
+    printf "<pre hidden id=\"goal-text\">"; emit_text(goal); print "</pre>"
+    next
+  }
+  /\/\*@GOAL_VIEW_JS@\*\// { emit(goaljs); next }
   function swap(s, from, to,   i, out) {
     out = ""
     while ((i = index(s, from)) > 0) { out = out substr(s, 1, i - 1) to; s = substr(s, i + length(from)) }

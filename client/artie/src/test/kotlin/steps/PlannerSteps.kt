@@ -69,6 +69,26 @@ class PlannerSteps(private val ctx: ClientContext) {
         table.asMaps().map { it.getValue("part") }.forEach { assertTrue(it in text, "no \"$it\" in:\n$text") }
     }
 
+    @Given("the goal is in steps, now at {string}, with {string} named at {string}")
+    fun goalInSteps(now: String, name: String, address: String) {
+        view = PlanView(
+            "Fix the Safari issue.", emptyList(), emptySet(), listOf("done: Open issue 10 of acme/rockets"),
+            listOf("https://github.gateway.test/", held.address), held, emptyList(), mapOf("number" to "10"),
+            current = now,
+            steps = listOf("[done] Open issue 10 of acme/rockets (as issue)", "  [now] $now"),
+            allowed = setOf("check", "clarify", "stop"),
+            named = mapOf(name to address),
+        )
+    }
+
+    @Then("the planner's tool offers only the moves")
+    fun toolOffers(table: DataTable) {
+        val tool = request().getValue("tools").jsonArray.first().jsonObject
+        val offered = tool.getValue("input_schema").jsonObject.getValue("properties").jsonObject
+            .getValue("move").jsonObject.getValue("enum").jsonArray.map { it.jsonPrimitive.content }
+        assertEquals(table.asMaps().map { it.getValue("move") }, offered)
+    }
+
     @Then("the planner's request caches its system prompt and tool")
     fun caches() {
         val request = request()

@@ -223,8 +223,6 @@ class ArtieCli(
         /** An act that names no relation, only its intent: a step the reasoner chooses. */
         val REASONS = Regex("""\bact\(\s*intent\s*=""")
 
-        /** A goal file's name ends so (spec/PLAN-PLAIN-TEXT-RUN.md). */
-        const val GOAL = ".goal.yaml"
         const val NOT_MET = 1
         const val STOPPED_BEFORE = 2
         const val REFUSED = 3

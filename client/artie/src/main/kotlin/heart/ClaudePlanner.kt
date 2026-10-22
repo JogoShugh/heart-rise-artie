@@ -51,7 +51,8 @@ class ClaudePlanner(
     private fun request(view: PlanView): JsonObject = buildJsonObject {
         put("model", model)
         put("max_tokens", MAX_TOKENS)
-        putJsonArray("tools") { add(TOOL) }
+        // A goal in steps offers only the moves the step now allows: a cached prefix for each kind of step.
+        putJsonArray("tools") { add(tool(view.allowed.toList().ifEmpty { MOVES })) }
         putJsonObject("tool_choice") { put("type", "auto") }
         putJsonArray("system") {
             add(
@@ -74,10 +75,19 @@ class ClaudePlanner(
         }
     }
 
-    /** What changes from move to move, in tagged parts. */
+    /**
+     * What changes from move to move, in tagged parts: the goal by sentence, or, for a goal in steps, its context,
+     * its steps with the one now marked, and the resources they named.
+     */
     internal fun turn(view: PlanView): String {
-        val goal = view.sentences.withIndex().joinToString("\n") { (i, sentence) ->
-            "${i + 1}. [${if (i + 1 in view.done) "done" else " "}] $sentence"
+        val goal = if (view.steps.isEmpty()) {
+            "<goal>\n" + view.sentences.withIndex().joinToString("\n") { (i, sentence) ->
+                "${i + 1}. [${if (i + 1 in view.done) "done" else " "}] $sentence"
+            } + "\n</goal>\n"
+        } else {
+            "<context>\n${view.goal}\n</context>\n<steps>\n${view.steps.joinToString("\n")}\n</steps>\n" +
+                "<now>\n${view.current}\n</now>\n<named>\n" +
+                view.named.entries.joinToString("\n") { (name, address) -> "$name = $address" } + "\n</named>\n"
         }
         val inputs = view.inputs.entries.joinToString("\n") { (name, value) -> "\$$name = $value" }
         val held = view.held
@@ -86,7 +96,7 @@ class ClaudePlanner(
         }
         val state = held.state.toString().let { if (it.length > STATE_LIMIT) it.take(STATE_LIMIT) + "…" else it }
         val answers = view.answers.joinToString("\n") { (q, a) -> "Q: $q\nA: $a" }
-        return "<goal>\n$goal\n</goal>\n<inputs>\n$inputs\n</inputs>\n" +
+        return "$goal<inputs>\n$inputs\n</inputs>\n" +
             "<moves>\n${view.moves.joinToString("\n")}\n</moves>\n<path>\n${view.path.joinToString("\n")}\n</path>\n" +
             "<held>\n${held.address}\n<state>\n$state\n</state>\n<forms>\n${forms(view)}" +
             "\n</forms>\n<links>\n$links\n</links>\n</held>\n<answers>\n$answers\n</answers>"
@@ -159,9 +169,21 @@ class ClaudePlanner(
             A move in <moves> marked refused changed nothing: try another way. The start, first on <path>,
             often offers forms that go straight to a resource by its names or numbers (a repository, a branch,
             an issue): go back to it when the resource held doesn't lead where you need.
+            A goal in steps comes as <context>, the user's words around the steps; <steps>, the steps so far as
+            a tree: [done] ones, [in] the steps the one now is inside, and [now], with how many sub-steps come
+            after it; <now>, the step to do now; and <named>, resources earlier steps named, each at its
+            address. Do only the step now: for an intent, act (as many times as it
+            takes) and then "done"; for "Wait: …", one "wait"; for "Verify: …", one "check" of its facts. The
+            runner moves from step to step: in a goal in steps every act leads on to what it led to (opens
+            needn't be set), the step's sub-steps run where the run is when it is done, and after the step the
+            runner comes back to where it began by itself: never "finish" in a goal in steps. For a step with sub-steps, act only to
+            reach the resource its sub-steps start from (an act that opens), then "done": never do a sub-step's
+            work early, since each comes next as a step of its own. "back" goes to a resource on <path> this
+            step opened, or to where it began, no further.
         """.trimIndent()
 
-        private val TOOL: JsonObject = buildJsonObject {
+        /** The move tool, offering [moves]. */
+        private fun tool(moves: List<String>): JsonObject = buildJsonObject {
             put("name", "move")
             put(
                 "description",
@@ -172,7 +194,7 @@ class ClaudePlanner(
                 putJsonObject("properties") {
                     putJsonObject("move") {
                         put("type", "string")
-                        put("enum", JsonArray(MOVES.map(::JsonPrimitive)))
+                        put("enum", JsonArray(moves.map(::JsonPrimitive)))
                     }
                     putJsonObject("words") { put("type", "string") }
                     putJsonObject("sentence") { put("type", "integer") }

@@ -12,7 +12,11 @@ const val MAX_MOVES = 50
 fun runGoal(goal: Goal, planner: Planner, maxMoves: Int = goal.limits.moves) {
     val run = Run.current
     goal.inputs.forEach { run.declare(it) }
-    GoalRun(goal, planner, run, maxMoves).start()
+    if (goal.steps.isEmpty()) {
+        GoalRun(goal, planner, run, maxMoves).start()
+    } else {
+        StepRun(goal, planner, run, maxMoves).start()
+    }
 }
 
 private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val maxMoves: Int) {
@@ -30,6 +34,7 @@ private class GoalRun(val goal: Goal, val planner: Planner, val run: Run, val ma
         run.reasoning = true
         run.source = ""
         run.place = { place }
+        run.planned = moves
         heart(goal.start) {
             filled = GoalText.fill(goal.text, goal.inputs.map { it.name }.toSet(), run::value)
             // As the person wrote it, each input a name: a value made of inputs is theirs by its parts.

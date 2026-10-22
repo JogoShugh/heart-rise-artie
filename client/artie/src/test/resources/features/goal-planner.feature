@@ -51,3 +51,25 @@ Feature: Claude plans a goal run, one move at a time
       | github:close                                                      |
       | "state":"open"                                                    |
     And the planner's request caches its system prompt and tool
+
+  Scenario: In a goal in steps, the model is shown the steps, the step now and the names, and may make only its moves
+    spec/PLAN-GOAL-MARKDOWN.md. The runner keeps the structure: the model
+    sees the steps as a tree, the step now marked, the resources the steps
+    named, and the context the person wrote; its tool offers only the moves
+    the step now allows, so a wrong kind of move can't be chosen.
+    Given the goal is in steps, now at "Verify: it is closed", with "issue" named at "https://github.gateway.test/repos/acme/rockets/issues/10"
+    And the Claude API will answer with the move {"move": "check", "facts": {"state": "closed"}}
+    When the planner is asked its next move
+    Then the move is check {state=closed}
+    And the planner's request says
+      | part                                                             |
+      | <context>                                                        |
+      | Fix the Safari issue.                                            |
+      | [done] Open issue 10 of acme/rockets (as issue)                  |
+      | [now] Verify: it is closed                                       |
+      | issue = https://github.gateway.test/repos/acme/rockets/issues/10 |
+    And the planner's tool offers only the moves
+      | move    |
+      | check   |
+      | clarify |
+      | stop    |

@@ -19,6 +19,16 @@ class Capture(val name: String, text: String) {
     /** A goal run's moves, as the script they amount to (spec/PLAN-PLAIN-TEXT-RUN.md); null for a script's run. */
     val source: String? = (documents.firstOrNull()?.get("run") as? Map<*, *>)?.get("source")?.toString()
 
+    /**
+     * A goal in steps' marks on the lines of [source] (spec/PLAN-GOAL-MARKDOWN.md), by line: `as`, the name its
+     * step gave what the act on that line led to; `reasoned`, that the act stays an intent in the script made.
+     */
+    private val marks: Map<Int, Map<*, *>> = (documents.firstOrNull()?.get("run") as? Map<*, *>)?.get("marks").map()
+        .entries.mapNotNull { (line, mark) -> line.toString().toIntOrNull()?.let { it to mark.map() } }.toMap()
+
+    /** The marks on [step]'s line of a goal run's script, if it has any. */
+    fun marks(step: Step): Map<*, *> = step.line?.takeIf { source != null }?.let { marks[it] }.orEmpty()
+
     /** The step [number]; the generator only names steps the capture holds. */
     fun step(number: Int): Step? = steps.getOrNull(number - 1)
 

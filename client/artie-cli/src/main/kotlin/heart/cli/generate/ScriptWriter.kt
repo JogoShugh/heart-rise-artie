@@ -70,6 +70,9 @@ class ScriptWriter(
                 "where the reasoner chose a value, its reason step is kept."
         },
         "// What it was offered is pinned in $pins, held to before every act.",
+        // How often the script calls the model, said where a person sees it first.
+        (if (kept == 1) "// 1 step calls" else "// $kept steps call")
+            .let { "$it the model on every run: artie run needs --reasoner." }.takeIf { kept > 0 },
         ("// A line marked \"review:\" holds a value the reasoner chose: check it before keeping the script.")
             .takeIf { reviews > 0 },
         "//   artie run $out" + capture.inputs.filter { it.value["given"] == "given" }
@@ -126,7 +129,9 @@ class ScriptWriter(
     private fun selection(node: Node, depth: Int): List<String> {
         val step = node.step
         val pad = INDENT.repeat(depth)
-        val keep = options.keepReason && step.mode == "intent" && step.judged
+        // A goal step marked reasoned stays an intent, whatever its values looked like; --keep-reason keeps more.
+        val keep = step.mode == "intent" &&
+            (options.keepReason && step.judged || capture.marks(step)["reasoned"] != null)
         if (keep) kept++
         val call = when {
             keep -> listOf(pad + bindings.kept(step))

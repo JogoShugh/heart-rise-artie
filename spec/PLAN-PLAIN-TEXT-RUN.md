@@ -1,5 +1,8 @@
 # Plan: a plain-text run, from a bookmark and a paragraph to the final script
 
+Superseded in part, 2026-10-21: the goal file is Markdown now, NAME.goal.md, in words or in steps
+(spec/PLAN-GOAL-MARKDOWN.md); NAME.goal.yaml stops a run, saying where to go.
+
 Status: built and proven live, 2026-10-20 (commits cee2197 to 58e9087). The GitHub goal
 (`client/scripts/tests/github-task.goal.yaml`) was done live by Claude's planner (issue #144, pull request #145);
 `artie generate` made `client/scripts/generated/github-task-from-goal.kts` from it, which ran live, strict, with

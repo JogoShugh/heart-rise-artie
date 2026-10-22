@@ -72,6 +72,15 @@ class Run(
     /** A goal run's goal, as written, each input a `$name`: the person's own words; a step's are the planner's. */
     var goal: String? = null
 
+    /**
+     * A goal in steps' marks on the lines of [source] (spec/PLAN-GOAL-MARKDOWN.md): `as`, the name its step gave
+     * what that line's act led to; `reasoned`, that the act is for a step the model decides on every run.
+     */
+    val marks = sortedMapOf<Int, MutableMap<String, Any>>()
+
+    /** A goal run's moves in words, as its planner was told them, refused tries included, for its capture. */
+    var planned: List<String> = emptyList()
+
     /** Each input the run read: its value, and how it was given ("given", "default" or "asked"). */
     val inputsUsed = linkedMapOf<String, Pair<String, String>>()
 
@@ -156,6 +165,8 @@ class Run(
                 put("inputs", trace.getValue("inputs"))
                 // A goal run's moves, as the script they amount to: its steps' lines are this text's.
                 if (place != null) source?.let { put("source", kotlinx.serialization.json.JsonPrimitive(it)) }
+                if (marks.isNotEmpty()) put("marks", element(marks.mapKeys { "${it.key}" }))
+                if (planned.isNotEmpty()) put("moves", element(planned))
             })
         }
         return Yaml.stream(listOf(run) + (trace.getValue("steps") as kotlinx.serialization.json.JsonArray))

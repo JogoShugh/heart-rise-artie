@@ -103,6 +103,42 @@ class GoalSteps(
         assertTrue(lines.none { text in it }, lines.joinToString("\n"))
     }
 
+    /** Line [number] of [name] put as [text], [indent] spaces before it, each `\n` in it a line break. */
+    @Given("line {int} of {string} reads {string}, indented {int}")
+    fun lineReads(number: Int, name: String, text: String, indent: Int) {
+        val file = replay.folder.resolve(name)
+        val lines = Files.readAllLines(file)
+        lines[number - 1] = " ".repeat(indent) + text.replace("\\n", "\n")
+        Files.writeString(file, lines.joinToString("\n") + "\n")
+    }
+
+    @Then("at move {int} the planner was shown the steps")
+    fun stepsAt(move: Int, table: DataTable) =
+        assertEquals(table.asMaps().map { it.getValue("line") }, shown[move - 1].steps.map { it.trim() })
+
+    @Then("the capture {string} keeps the planner's moves, the first")
+    fun keptMoves(capture: String, table: DataTable) {
+        val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>
+        val kept = ((head["run"] as Map<*, *>)["moves"] as? List<*>).orEmpty().map { it.toString() }
+        val expected = table.asMaps().map { it.getValue("move") }
+        assertEquals(expected, kept.take(expected.size), kept.joinToString("\n"))
+    }
+
+    @Then("the planner was shown these steps, move by move")
+    fun stepsShown(table: DataTable) {
+        val rows = table.asMaps()
+        assertEquals(rows.map { it.getValue("step") }, shown.map { it.current })
+        rows.zip(shown).forEach { (row, view) ->
+            assertTrue(row.getValue("at") in view.held.address, "${row["step"]}: at ${view.held.address}")
+        }
+    }
+
+    @Then("the planner was last shown {string} named, at an address ending {string}")
+    fun named(name: String, ending: String) {
+        val address = shown.last().named[name]
+        assertTrue(address?.endsWith(ending) == true, "$name: $address")
+    }
+
     @Then("the script {string} has no escaped quote")
     fun noEscapedQuote(script: String) {
         val lines = Files.readAllLines(replay.folder.resolve(script))
@@ -140,8 +176,10 @@ class GoalSteps(
         val sentence = row["sentence"]?.takeIf { it.isNotBlank() }?.toInt()
         return when (val kind = row.getValue("move")) {
             "act" -> Move.Act(row.getValue("words"), sentence, row["opens"] == "yes")
-            "done" -> Move.Done(checkNotNull(sentence))
-            "back" -> Move.Back(row.getValue("to"))
+            // A goal in steps' done is for the step now, whatever sentence it names.
+            "done" -> Move.Done(sentence ?: 0)
+            "back" -> Move.Back(row["to"] ?: row.getValue("words"))
+            "stop" -> Move.Stop(row.getValue("words"))
             "wait" -> Move.Wait(row["relation"].orEmpty(), tries = 3)
             "check" -> Move.Check(facts(row.getValue("facts")))
             "clarify" -> Move.Clarify(row.getValue("question"))
@@ -159,8 +197,8 @@ class GoalSteps(
         }
 
     private companion object {
-        /** A move that does nothing, made again and again: a planner in a loop. */
-        val LOOP = Move.Done(1)
+        /** A move that does nothing, made again and again: a planner in a loop, waiting for no form. */
+        val LOOP = Move.Wait("")
 
         val ACT = Regex("""^( *)act\("([^"]+)"""")
     }

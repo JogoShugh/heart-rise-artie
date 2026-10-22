@@ -76,6 +76,21 @@ Feature: A goal file in Markdown: front matter, then words or steps, every rule 
       | sentence 2: Close it.                   |
       | a goal in words: 2 sentences, nothing sent |
 
+  Scenario: A goal file is Markdown: the YAML goal file it replaced says where to go
+    Given the file "task.goal.yaml" is
+      """
+      start: scripted://service/
+      goal: Close it.
+      """
+    When artie is run with
+      | argument       |
+      | run            |
+      | task.goal.yaml |
+      | --reasoner     |
+      | claude         |
+    Then artie exits 2
+    And artie's last line is: stopped before the first request: a goal file is NAME.goal.md now: a front matter, then the goal in Markdown
+
   Scenario Outline: A goal file that breaks a rule stops before its first request: <case>
     Given line <line> of "task.goal.md" reads '<reads>', indented <indent>
     When artie is run with

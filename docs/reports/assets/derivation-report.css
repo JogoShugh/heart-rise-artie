@@ -86,3 +86,10 @@ h1 { font: 650 1.9rem/1.15 var(--display); margin: 0; text-wrap: balance; }
 .toggles { align-items: center; }
 .seg { display: flex; align-items: center; gap: .4rem; }
 .seg-label { font: 600 .7rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.goal-rendered { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .7rem 1rem; margin: 0 0 .6rem; max-width: 72rem; }
+.goal-rendered p { margin: .2rem 0 .5rem; }
+.goal-rendered ul { margin: .15rem 0; padding-left: 1.3rem; }
+.goal-rendered li { margin: .15rem 0; }
+.goal .chip { font: .82em var(--mono); background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; padding: 0 .3em; color: var(--kt-kw); }
+.goal .marker { color: var(--kt-fn); font-weight: 600; }
+.goal pre.yaml { white-space: pre; }
