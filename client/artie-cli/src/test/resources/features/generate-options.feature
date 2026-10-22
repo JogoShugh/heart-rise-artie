@@ -134,6 +134,7 @@ Feature: artie generate's options: reason steps kept, text made inputs
                   "title" to "Crash on start"
                   "body" to "Opened by a script."
               }) {
+                  sync()
                   act("comment", "body" to "Thanks.", intent = "comment on it: Thanks.") {}
                   act(intent = "close it, since it's done")
               }
@@ -167,6 +168,7 @@ Feature: artie generate's options: reason steps kept, text made inputs
                   "title" to title
                   "body" to "Opened by a script."
               }) {
+                  sync()
                   act("comment", "body" to "Thanks.", intent = "comment on it: Thanks.") {}
                   act("close", intent = "close it, since it's done", fields = {
                       "reason" to "completed" // review: the reasoner chose it, asked "close it, since it's done"

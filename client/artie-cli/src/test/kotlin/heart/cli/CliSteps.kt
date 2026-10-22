@@ -72,6 +72,19 @@ class CliSteps(private val script: ScriptSteps) {
         script.service.missingPlanner = why
     }
 
+    @Then("the file {string} has these lines, in order")
+    fun hasLinesInOrder(name: String, table: DataTable) {
+        val lines = Files.readAllLines(folder.resolve(name)).map { it.trim() }
+        val found = table.asMaps().map { it.getValue("line") }.map { line ->
+            lines.indexOf(line).also { assertTrue(it >= 0, "no \"$line\" in:\n${lines.joinToString("\n")}") }
+        }
+        assertEquals(found.sorted(), found, lines.joinToString("\n"))
+    }
+
+    @Then("the file {string} has {int} line(s) that read(s) {string}")
+    fun hasCount(name: String, count: Int, line: String) =
+        assertEquals(count, Files.readAllLines(folder.resolve(name)).count { it.trim() == line })
+
     @Then("the file {string} has these lines")
     fun hasLines(name: String, table: DataTable) {
         val lines = Files.readAllLines(folder.resolve(name)).map { it.trim() }

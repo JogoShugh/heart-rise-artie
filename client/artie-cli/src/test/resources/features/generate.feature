@@ -381,6 +381,7 @@ Feature: artie generate: a run's capture, made a script with no model in it
               headSha = state.text("head_sha")
               follow("branches", intent = "follow its branches")
               act("start-branch", "name" to "fix-$stamp", intent = "start a branch named fix-$stamp") {
+                  sync()
                   until { offers("merge") }
                   act("merge", intent = "merge it", fields = {
                       "sha" to headSha

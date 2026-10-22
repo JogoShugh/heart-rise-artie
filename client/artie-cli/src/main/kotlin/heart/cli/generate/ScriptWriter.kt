@@ -138,7 +138,10 @@ class ScriptWriter(
             step.follows -> listOf(pad + follow(step))
             else -> act(step, pad)
         }
-        val inner = block(node, depth + 1)
+        // A resource just made may change on its own (GitHub works out a new pull request's mergeability): an
+        // act in its block reads it again first, as a reasoned run did, or its validator is stale.
+        val fresh = step.outcome == "new resource" && node.children.any { acts(it.step) }
+        val inner = listOfNotNull("${INDENT.repeat(depth + 1)}sync()".takeIf { fresh }) + block(node, depth + 1)
         return when {
             !step.opens -> call + reads(step.number, depth)
             inner.isEmpty() -> call.dropLast(1) + (call.last() + " {}")
@@ -192,6 +195,10 @@ private fun spoken(words: String, arguments: List<Argument>, goal: Boolean): Str
         Regex("(?<![\\w$])(?<!\\d\\.)${Regex.escape(text)}(?![\\w])(?!\\.\\d)").replace(said) { "\${$name}" }
     }
 }
+
+/** Whether [step] acts: a form, not a link, and not a read. */
+private fun acts(step: Step): Boolean = !step.follows && (step.relation != null || step.mode == "intent") &&
+    step.chose["method"]?.toString()?.uppercase() != "GET"
 
 /** [value] as one shell word. */
 private fun shell(value: String): String = if (value.matches(Regex("[A-Za-z0-9._/:@=+-]+"))) value else
