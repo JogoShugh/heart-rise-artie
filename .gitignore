@@ -52,6 +52,8 @@ buster/
 ### Development credentials (scripts/dev-credentials.sh) ###
 server-spring/.env
 domains/*/.env
+# Any .env, anywhere: they hold or fetch credentials.
+.env
 
 # Python bytecode (the live scripts)
 __pycache__/
