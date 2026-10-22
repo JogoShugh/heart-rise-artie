@@ -8,6 +8,7 @@ the names the task gave them, checks each thing the task asked for, and counts w
 
 The GitHub token is read from ~/.artie/credentials, section [https://api.github.com], key bearer; never printed.
 """
+import time
 import base64
 import json
 import re
@@ -52,10 +53,20 @@ def get(path):
     return body if status == 200 else None
 
 
+def listed(path):
+    """One page of a list; a failed read is retried, and never taken for an empty page."""
+    for attempt in range(4):
+        status, body = call("GET", path)
+        if status == 200 and isinstance(body, list):
+            return body
+        time.sleep(2 * (attempt + 1))
+    sys.exit(f"GET {path}: {status}")
+
+
 def pages(path):
     out, page = [], 1
     while True:
-        got = get(f"{path}{'&' if '?' in path else '?'}per_page=100&page={page}") or []
+        got = listed(f"{path}{'&' if '?' in path else '?'}per_page=100&page={page}")
         out += got
         if len(got) < 100:
             return out
@@ -65,7 +76,12 @@ def pages(path):
 def made(owner, repo, stamp):
     """Every issue and pull request whose title, and every branch whose name, holds the run's stamp."""
     repo_path = f"/repos/{owner}/{repo}"
-    items = [i for i in pages(f"{repo_path}/issues?state=all&sort=created&direction=desc") if stamp in i["title"]]
+    # GitHub's list is sometimes served from a copy that lacks the newest items: look again before saying none.
+    for attempt in range(5):
+        items = [i for i in pages(f"{repo_path}/issues?state=all&sort=created&direction=desc") if stamp in i["title"]]
+        if len(items) >= 4:
+            break
+        time.sleep(3 * (attempt + 1))
     branches = [b["name"] for b in pages(f"{repo_path}/branches") if stamp in b["name"]]
     return items, branches
 
