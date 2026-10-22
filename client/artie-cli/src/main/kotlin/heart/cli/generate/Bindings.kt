@@ -91,8 +91,10 @@ class Bindings(
             }
             "chosen" in from ->
                 Argument(field, marked.model(constant(value, type)), "the reasoner chose it, asked \"${step.say}\"")
-            value is String -> names(step, text, from)
-                .let { Argument(field, marked.string(KotlinText.templated(text, it), it.values, from), named = it) }
+            value is String -> names(step, text, from).let {
+                val written = structured(text, type, it) ?: KotlinText.templated(text, it)
+                Argument(field, marked.string(written, it.values, from), named = it)
+            }
             else -> Argument(field, marked.said(constant(value, type), from))
         }
     }
@@ -187,7 +189,7 @@ class Bindings(
         value == null -> "null"
         value is Number || value is Boolean -> value.toString()
         value is String && type in setOf("integer", "number", "boolean") -> value
-        value is String -> KotlinText.quoted(value)
+        value is String -> structured(value, type, emptyMap()) ?: KotlinText.quoted(value)
         else -> throw BadArguments("can't write a value that is a ${value::class.simpleName} yet: $value")
     }
 
@@ -204,6 +206,25 @@ class Bindings(
 }
 
 internal fun Any?.list(): List<*> = this as? List<*> ?: emptyList<Any?>()
+
+/**
+ * [text], the JSON a field of [type] array or object was sent as, as Kotlin: `listOf(…)`, `mapOf(…)`, each string
+ * in it that is one of [names]' values that name, else a literal with them put back; null for any other type.
+ */
+private fun structured(text: String, type: String?, names: Map<String, String>): String? {
+    if (type != "array" && type != "object") return null
+    fun write(element: kotlinx.serialization.json.JsonElement): String = when (element) {
+        is kotlinx.serialization.json.JsonArray -> element.joinToString(", ", "listOf(", ")") { write(it) }
+        is kotlinx.serialization.json.JsonObject ->
+            element.entries.joinToString(", ", "mapOf(", ")") { (k, v) -> "${KotlinText.quoted(k)} to ${write(v)}" }
+        is kotlinx.serialization.json.JsonNull -> "null"
+        is kotlinx.serialization.json.JsonPrimitive -> when {
+            !element.isString -> element.content
+            else -> names[element.content] ?: KotlinText.templated(element.content, names)
+        }
+    }
+    return runCatching { kotlinx.serialization.json.Json.parseToJsonElement(text) }.getOrNull()?.let(::write)
+}
 
 /** A goal file's [words] as a literal's: `{name}` of one of [inputs] a slot, `{{` and `}}` a brace, `$` a dollar. */
 private fun slotted(words: String, inputs: Set<String>): String =
