@@ -167,7 +167,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 allowed = StepText.allowed(step),
                 named = named.mapValues { it.value.address },
             ),
-        )
+        ).also { move -> move.reason?.let { moves += "why: $it" } }
     }
 
     private fun fill(text: String) = StepText.fill(text, named, inputs, run::value)

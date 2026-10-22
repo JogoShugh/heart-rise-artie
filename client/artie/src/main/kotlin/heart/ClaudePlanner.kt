@@ -119,12 +119,15 @@ class ClaudePlanner(
         val input = call.getValue("input").jsonObject
         fun text(name: String) = input[name]?.jsonPrimitive?.content
         val sentence = input["sentence"]?.jsonPrimitive?.intOrNull
+        val why = text("why")
         return when (text("move")) {
-            "act" -> Move.Act(text("words").orEmpty(), sentence, input["opens"]?.jsonPrimitive?.booleanOrNull == true)
-            "back" -> Move.Back(text("to").orEmpty())
-            "wait" -> Move.Wait(text("relation").orEmpty())
-            "check" -> Move.Check((input["facts"] as? JsonObject).orEmpty().mapValues { (_, v) -> plain(v) })
-            "done" -> Move.Done(sentence ?: 0)
+            "act" -> Move.Act(
+                text("words").orEmpty(), sentence, input["opens"]?.jsonPrimitive?.booleanOrNull == true, why,
+            )
+            "back" -> Move.Back(text("to").orEmpty(), why)
+            "wait" -> Move.Wait(text("relation").orEmpty(), reason = why)
+            "check" -> Move.Check((input["facts"] as? JsonObject).orEmpty().mapValues { (_, v) -> plain(v) }, why)
+            "done" -> Move.Done(sentence ?: 0, why)
             "finish" -> Move.Finish
             "stop" -> Move.Stop(text("why") ?: "the planner stopped")
             else -> Move.Clarify(text("question") ?: "Could you say more?")
@@ -200,6 +203,11 @@ class ClaudePlanner(
             putJsonObject("input_schema") {
                 put("type", "object")
                 putJsonObject("properties") {
+                    // The reason first: said before the move, it is what the move follows from.
+                    putJsonObject("why") {
+                        put("type", "string")
+                        put("description", "Why this move, in one sentence, from what is held and the step now.")
+                    }
                     putJsonObject("move") {
                         put("type", "string")
                         put("enum", JsonArray(moves.map(::JsonPrimitive)))
@@ -210,10 +218,9 @@ class ClaudePlanner(
                     putJsonObject("to") { put("type", "string") }
                     putJsonObject("relation") { put("type", "string") }
                     putJsonObject("facts") { put("type", "object") }
-                    putJsonObject("why") { put("type", "string") }
                     putJsonObject("question") { put("type", "string") }
                 }
-                put("required", JsonArray(listOf(JsonPrimitive("move"))))
+                put("required", JsonArray(listOf(JsonPrimitive("why"), JsonPrimitive("move"))))
             }
             putJsonObject("cache_control") { put("type", "ephemeral") }
         }

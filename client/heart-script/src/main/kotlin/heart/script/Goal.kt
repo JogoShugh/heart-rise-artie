@@ -100,23 +100,31 @@ class PlanView(
 
 /** One move of a goal run. Sentences are numbered from 1. */
 sealed interface Move {
+    /** Why the planner made it, in its own words, when it said; kept with the move in the run's capture. */
+    val reason: String? get() = null
+
     /**
      * An act, in [words] (`$name` an input), for sentence [sentence]: the client's reasoner chooses the form and
      * values from what is held. With [opens], the moves after it are made at what it led to, until a [Back].
      */
-    class Act(val words: String, val sentence: Int?, val opens: Boolean = false) : Move
+    class Act(
+        val words: String,
+        val sentence: Int?,
+        val opens: Boolean = false,
+        override val reason: String? = null,
+    ) : Move
 
     /** Back to [to], an address on the path or a word naming one ("the issue"), closing the blocks since. */
-    class Back(val to: String) : Move
+    class Back(val to: String, override val reason: String? = null) : Move
 
     /** Read the held resource again until it offers [relation]. */
-    class Wait(val relation: String, val tries: Int = 20) : Move
+    class Wait(val relation: String, val tries: Int = 20, override val reason: String? = null) : Move
 
     /** Check [facts] of the held state: each member and the value it must have. */
-    class Check(val facts: Map<String, Any?>) : Move
+    class Check(val facts: Map<String, Any?>, override val reason: String? = null) : Move
 
     /** Sentence [sentence] is done. */
-    class Done(val sentence: Int) : Move
+    class Done(val sentence: Int, override val reason: String? = null) : Move
 
     /** The goal is done: every sentence must be. */
     object Finish : Move

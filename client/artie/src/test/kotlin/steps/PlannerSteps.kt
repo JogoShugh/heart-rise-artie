@@ -103,6 +103,17 @@ class PlannerSteps(private val ctx: ClientContext) {
         assertEquals(table.asMaps().map { it.getValue("move") }, offered)
     }
 
+    @Then("the planner's tool asks first for")
+    fun toolAsksFirst(table: DataTable) {
+        val schema = request().getValue("tools").jsonArray.first().jsonObject.getValue("input_schema").jsonObject
+        val expected = table.asMaps().map { it.getValue("property") }
+        assertEquals(expected, schema.getValue("properties").jsonObject.keys.take(expected.size))
+        assertEquals(expected, schema.getValue("required").jsonArray.map { it.jsonPrimitive.content })
+    }
+
+    @Then("the move's reason is {string}")
+    fun reason(why: String) = assertEquals(why, checkNotNull(move).reason)
+
     @Then("the planner's system prompt says")
     fun systemSays(table: DataTable) {
         val system = request().getValue("system").jsonArray.first().jsonObject.getValue("text").jsonPrimitive.content

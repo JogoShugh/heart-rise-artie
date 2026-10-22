@@ -72,6 +72,19 @@ Feature: Claude plans a goal run, one move at a time
       | A follow moves you and makes nothing                                            |
       | from a list, follow on to the item you need (a branch, an issue), then act there |
 
+  Scenario: The planner gives its reason first, then the move; the reason is kept with the move
+    Live, the planner at a list of branches went back about one time in four
+    instead of on to main; asked to say why first, it went on to main every
+    time. The move tool asks for the reason before anything else.
+    Given the Claude API will answer with the move {"why": "the branch starts from main", "move": "act", "words": "open the main branch", "opens": true}
+    When the planner is asked its next move
+    Then the move is act "open the main branch" for sentence null, opening a block
+    And the planner's tool asks first for
+      | property |
+      | why      |
+      | move     |
+    And the move's reason is "the branch starts from main"
+
   Scenario: In a goal in steps, the model is shown the steps, the step now and the names, and may make only its moves
     spec/PLAN-GOAL-MARKDOWN.md. The runner keeps the structure: the model
     sees the steps as a tree, the step now marked, the resources the steps
