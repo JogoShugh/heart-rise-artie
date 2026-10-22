@@ -107,6 +107,9 @@ class GitHubUpstream {
     /** Heads that move just before GitHub merges: another push lands first. */
     val movesBeforeMerge = mutableMapOf<Long, String>()
 
+    /** What happens to a pull request just after it is next read: GitHub works something out, or someone writes. */
+    val afterNextRead = mutableMapOf<Long, (Pull) -> Unit>()
+
     /** Each user's followers, by login, in order; GitHub pages them [FOLLOWERS_PAGE] at a time. */
     val followers = mutableMapOf<String, List<String>>()
 
@@ -151,7 +154,9 @@ class GitHubUpstream {
             pull(request)?.let { merge(it, request) } ?: Response(Status.NOT_FOUND)
         },
         "/repos/{owner}/{repo}/pulls/{number}" bind Method.GET to { request ->
-            pull(request)?.let { json(Response(Status.OK), body(it)) } ?: Response(Status.NOT_FOUND)
+            pull(request)?.let { pull ->
+                json(Response(Status.OK), body(pull)).also { afterNextRead.remove(pull.number)?.invoke(pull) }
+            } ?: Response(Status.NOT_FOUND)
         },
         "/repos/{owner}/{repo}/pulls/{number}" bind Method.PATCH to { request ->
             pull(request)?.let { pull ->

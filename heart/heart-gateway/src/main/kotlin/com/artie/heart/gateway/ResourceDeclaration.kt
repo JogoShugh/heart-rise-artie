@@ -3,6 +3,7 @@ package com.artie.heart.gateway
 import com.artie.heart.StatePointer
 import com.fasterxml.jackson.core.JsonPointer
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 
 /**
  * One resource of an upstream whose paths aren't HEART's, from its
@@ -43,10 +44,22 @@ class ResourceDeclaration(
      * the list's own path names the rest. GitHub's listed branches: `branch: /name`.
      */
     val listed: Map<String, StatePointer> = emptyMap(),
+    /**
+     * Members the upstream changes by itself, with no write: a pull request's mergeability. Left out when the
+     * state is compared just before an act; the act must instead still be offered.
+     */
+    val volatile: List<JsonPointer> = emptyList(),
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
         facts.values.map { it.operation } + lists + links
+
+    /** [state] without its [volatile] members, the members the upstream changes by itself. */
+    fun steady(state: JsonNode): JsonNode = state.deepCopy<JsonNode>().also { copy ->
+        volatile.forEach { pointer ->
+            (copy.at(pointer.head()) as? ObjectNode)?.remove(pointer.last().matchingProperty)
+        }
+    }
 
     companion object {
         /** The declaration in [node], from the file [label], or a refusal naming it. */
@@ -81,6 +94,7 @@ class ResourceDeclaration(
                 listed = node.path("listed").properties().associate { (variable, at) ->
                     variable to pointer(label, at.asText()).toString()
                 },
+                volatile = node.path("volatile").map { pointer(label, it.asText()) },
             )
         }
 

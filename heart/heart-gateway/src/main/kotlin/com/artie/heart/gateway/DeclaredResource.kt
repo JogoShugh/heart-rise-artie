@@ -10,6 +10,7 @@ import com.artie.heart.Hypermedia
 import com.artie.heart.ItemPath
 import com.artie.heart.Layers
 import com.artie.heart.Named
+import com.artie.heart.NotOfferedException
 import com.artie.heart.Profile
 import com.artie.heart.ResourceType
 import com.artie.heart.SearchField
@@ -124,9 +125,7 @@ internal class DeclaredResource(
     private fun perform(checked: UpstreamState, act: ActDeclaration, input: JsonNode): Acted<UpstreamState> {
         val item = itemPath.expand(mapper.convertValue(checked.json, BODY))
         val care = GatewayCare.now()
-        if (care.race && keys.state(calls.get(item)).json != checked.json) {
-            throw ConcurrentWriteException("$item changed upstream since it was checked")
-        }
+        if (care.race) raced(item, checked, actName(act))
         val route = spec.route(act.operation)
         val sent = mapper.convertValue(input, BODY)
         val fields = sent.filterKeys { it in act.fields }.mapValues { (field, value) -> act.encoded(field, value) }
@@ -147,6 +146,18 @@ internal class DeclaredResource(
             ?: act.creates?.let { locate(it, answer.body) }
         val left = if (!care.reread && route.path == reading.path) answer else calls.get(item)
         return Acted(keys.state(left), created = created)
+    }
+
+    /**
+     * [item] read again just before the act [name]: stale if it changed since [checked], its volatile members
+     * aside; refused if those members, worked out meanwhile, mean the act is no longer offered.
+     */
+    private fun raced(item: String, checked: UpstreamState, name: String) {
+        val now = keys.state(calls.get(item))
+        if (declared.steady(now.json) != declared.steady(checked.json)) {
+            throw ConcurrentWriteException("$item changed upstream since it was checked")
+        }
+        if (name !in keys.offers.offered(now.key)) throw NotOfferedException(keys.offers.whyAbsent(now.key, name))
     }
 
     /** Where the resource the upstream answered [body] for lives, by this type's item path. */

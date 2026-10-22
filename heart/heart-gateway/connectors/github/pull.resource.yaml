@@ -56,3 +56,7 @@ facts:
     pointers:
       owner: /base/repo/owner/login
       repo: /base/repo/name
+# Members GitHub works out by itself, in the background, with no write: a new pull request reads
+# "mergeable": null, then true a second later. They don't make the state an act was checked against stale;
+# the act must instead still be offered.
+volatile: [/mergeable, /mergeable_state, /merge_commit_sha, /rebaseable]
