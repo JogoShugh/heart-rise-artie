@@ -112,7 +112,8 @@ class Upstream(
         val reading = request.method == Method.GET
         val at = request.uri.toString()
         val held = if (reading) copies.held(authorization, at) else null
-        val response = http(held?.let { sent.header("If-None-Match", it.etag) } ?: sent)
+        val conditional = held?.let { sent.header("If-None-Match", it.etag) } ?: sent
+        val response = if (reading) caughtUp(conditional, authorization, at) else http(conditional)
         if (held != null && response.status == Status.NOT_MODIFIED) {
             return held.answer.also { copies.keep(authorization, at, held.etag, it) }
         }
@@ -125,6 +126,22 @@ class Upstream(
             copies.drop(authorization, request.uri.path)
         }
         return answer
+    }
+
+    /**
+     * The read [sent], asked again a few times, a moment apart, while its answer is a state [at] has been seen
+     * replaced in: a copy the upstream hasn't caught up yet. After those tries the answer is taken as it is.
+     */
+    private fun caughtUp(sent: Request, authorization: String?, at: String): Response {
+        var response = http(sent)
+        var tries = 0
+        val behind = { answer: Response -> answer.header("ETag")?.let { copies.stepsBack(authorization, at, it) } }
+        while (tries < CATCH_UP_TRIES && behind(response) == true) {
+            Thread.sleep(CATCH_UP_PAUSE_MS)
+            response = http(sent)
+            tries++
+        }
+        return response
     }
 
     private fun refusal(request: Request, response: Response, statuses: RefusalStatuses): RuntimeException {
@@ -152,5 +169,9 @@ class Upstream(
 
     private companion object {
         const val JSON = "application/json"
+
+        /** How many times a read from a copy that is behind is asked again, and how long apart. */
+        const val CATCH_UP_TRIES = 3
+        const val CATCH_UP_PAUSE_MS = 250L
     }
 }

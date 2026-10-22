@@ -110,6 +110,15 @@ class GitHubUpstream {
     /** What happens to a pull request just after it is next read: GitHub works something out, or someone writes. */
     val afterNextRead = mutableMapOf<Long, (Pull) -> Unit>()
 
+    /** Each pull request as it was before its last change. */
+    val beforeChange = mutableMapOf<Long, JsonNode>()
+
+    /** Pull requests whose next read is answered once with this, a copy behind: a replica not caught up. */
+    val replayOnce = mutableMapOf<Long, JsonNode>()
+
+    /** Pull requests whose read after the next write is answered from a copy from before it. */
+    val lagAfterWrite = mutableSetOf<Long>()
+
     /** Each user's followers, by login, in order; GitHub pages them [FOLLOWERS_PAGE] at a time. */
     val followers = mutableMapOf<String, List<String>>()
 
@@ -155,11 +164,18 @@ class GitHubUpstream {
         },
         "/repos/{owner}/{repo}/pulls/{number}" bind Method.GET to { request ->
             pull(request)?.let { pull ->
-                json(Response(Status.OK), body(pull)).also { afterNextRead.remove(pull.number)?.invoke(pull) }
+                // A read answered from a copy behind the last change, as GitHub's replicas sometimes do.
+                replayOnce.remove(pull.number)?.let { behind -> return@to json(Response(Status.OK), behind) }
+                val read = body(pull)
+                json(Response(Status.OK), read).also {
+                    afterNextRead.remove(pull.number)?.let { change -> beforeChange[pull.number] = read; change(pull) }
+                }
             } ?: Response(Status.NOT_FOUND)
         },
         "/repos/{owner}/{repo}/pulls/{number}" bind Method.PATCH to { request ->
             pull(request)?.let { pull ->
+                beforeChange[pull.number] = body(pull)
+                if (lagAfterWrite.remove(pull.number)) replayOnce[pull.number] = body(pull)
                 val change = mapper.readTree(request.bodyString())
                 change.path("state").asText(null)?.let { pull.state = it }
                 change.path("title").asText(null)?.let { pull.title = it }
