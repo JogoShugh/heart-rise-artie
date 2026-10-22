@@ -102,6 +102,11 @@ class ScriptedService : Navigator {
 
     override fun exchanges(): List<Exchange> = kept.toList().also { kept.clear() }
 
+    /** What the client counts its model calls took, when a scenario says. */
+    var counted: Map<String, Long> = emptyMap()
+
+    override val usage: Map<String, Long> get() = counted
+
     /** What the reasoner chooses, by the words it is given. */
     val reasons = mutableMapOf<String, Choice>()
 

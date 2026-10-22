@@ -70,6 +70,35 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | act("issues-get", "number" to number, intent = "open issue $number") { |
       | act("close", intent = "close it")                       |
 
+  Scenario: The capture keeps the client's count of model calls and tokens
+    Given the planner will move
+      | move   | words              | sentence | opens |
+      | act    | open issue $number | 1        | yes   |
+      | done   |                    | 1        |       |
+      | act    | close it           | 2        |       |
+      | done   |                    | 2        |       |
+      | finish |                    |          |       |
+    And the reasoner chooses
+      | intent        | selection | relation   | fields           |
+      | open issue 10 | act       | issues-get | {"number": "10"} |
+      | close it      | act       | close      | {}               |
+    And the client counted these model tokens
+      | calls | input | output | cache_read | cache_write |
+      | 6     | 5000  | 400    | 12000      | 3000        |
+    When artie is run with
+      | argument        |
+      | run             |
+      | close.goal.md   |
+      | number=10       |
+      | --reasoner      |
+      | claude          |
+      | --trace         |
+      | goal.trace.yaml |
+    Then artie exits 0
+    And the trace "goal.trace.yaml" counts these model tokens
+      | calls | input | output | cache_read | cache_write |
+      | 6     | 5000  | 400    | 12000      | 3000        |
+
   Scenario: A client with no planner says why, and where the model key goes
     Given the client has no planner, because "no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials"
     When artie is run with

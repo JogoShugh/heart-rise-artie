@@ -52,6 +52,15 @@ Feature: Claude plans a goal run, one move at a time
       | "state":"open"                                                    |
     And the planner's request caches its system prompt and tool
 
+  Scenario: Each call's tokens are counted as the Claude API says them, the reasoner's and the planner's together
+    A run's cost is its model calls and their tokens. The planner the
+    reasoner makes shares its count, so one count says what the run took.
+    Given the Claude API will answer, using {"input_tokens": 120, "output_tokens": 30, "cache_read_input_tokens": 900, "cache_creation_input_tokens": 40}, with the move {"move": "finish"}
+    When the planner is asked its next move
+    Then the planner counted
+      | calls | input | output | cache_read | cache_write |
+      | 1     | 120   | 30     | 900        | 40          |
+
   Scenario: In a goal in steps, the model is shown the steps, the step now and the names, and may make only its moves
     spec/PLAN-GOAL-MARKDOWN.md. The runner keeps the structure: the model
     sees the steps as a tree, the step now marked, the resources the steps

@@ -72,6 +72,19 @@ class CliSteps(private val script: ScriptSteps) {
         script.service.missingPlanner = why
     }
 
+    @Given("the client counted these model tokens")
+    fun counted(table: DataTable) {
+        script.service.counted = table.asMaps().single().mapValues { it.value.toLong() }
+    }
+
+    @Then("the trace {string} counts these model tokens")
+    fun traceCounts(name: String, table: DataTable) {
+        val head = org.yaml.snakeyaml.Yaml().loadAll(Files.readString(folder.resolve(name))).first() as Map<*, *>
+        val usage = ((head["run"] as Map<*, *>)["usage"] as Map<*, *>).mapKeys { "${it.key}" }
+            .mapValues { (it.value as Number).toLong() }
+        assertEquals(table.asMaps().single().mapValues { it.value.toLong() }, usage)
+    }
+
     @Then("the file {string} has these lines, in order")
     fun hasLinesInOrder(name: String, table: DataTable) {
         val lines = Files.readAllLines(folder.resolve(name)).map { it.trim() }

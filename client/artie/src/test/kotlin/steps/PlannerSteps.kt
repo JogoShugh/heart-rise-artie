@@ -54,6 +54,20 @@ class PlannerSteps(private val ctx: ClientContext) {
         ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
     }
 
+    @Given("the Claude API will answer, using {}, with the move {}")
+    fun answersMoveUsing(usage: String, input: String) {
+        val body = """{"id":"msg_1","type":"message","role":"assistant","content":[""" +
+            """{"type":"tool_use","id":"t1","name":"move","input":$input}],"stop_reason":"tool_use",""" +
+            """"usage":$usage}"""
+        ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
+    }
+
+    @Then("the planner counted")
+    fun counted(table: DataTable) = assertEquals(
+        table.asMaps().single().mapValues { it.value.toLong() },
+        (checkNotNull(planner) as ClaudePlanner).usage.counts(),
+    )
+
     @When("the planner is asked its next move")
     fun asked() {
         move = checkNotNull(planner).next(checkNotNull(view))

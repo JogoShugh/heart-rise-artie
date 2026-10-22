@@ -35,6 +35,8 @@ class ArtieNavigator(
 
     override fun exchanges(): List<heart.script.Exchange> = exchangeLog?.taken().orEmpty()
 
+    override val usage: Map<String, Long> get() = (reasoner as? ClaudeReasoner)?.usage?.counts().orEmpty()
+
     /** A goal run's planner: Claude's, when the reasoner is (spec/PLAN-PLAIN-TEXT-RUN.md). */
     override fun planner(): heart.script.Planner? = (reasoner as? ClaudeReasoner)?.planner()
 

@@ -69,7 +69,8 @@ class ArtieCli(
         val lock = lockFile(asked, folder, file, config)
         val settings =
             ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, lock.guard, config.onChange)
-        val client by lazy { navigator(settings) }
+        val made = lazy { navigator(settings) }
+        val client by made
         val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { client })
         run.reasoning = asked.reasoner != null
         run.entry = asked.entry
@@ -89,6 +90,8 @@ class ArtieCli(
         // The run's capture, as a person reads it: YAML (spec/PLAN-LINE-BY-LINE-REPORT.md).
         val trace = folder.resolve(asked.trace ?: "runs/$name-${Instant.now().epochSecond}.trace.yaml")
         Files.createDirectories(trace.toAbsolutePath().parent)
+        // What the run's model calls took, as its client counted them: a client never made took nothing.
+        if (made.isInitialized()) run.usage = client.usage
         Files.writeString(trace, run.traceYaml())
         val repinned = repin(asked, folder, file, config, run.traceYaml())
         if (output == "words") repinned.forEach(out::println)

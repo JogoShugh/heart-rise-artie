@@ -81,6 +81,9 @@ class Run(
     /** A goal run's moves in words, as its planner was told them, refused tries included, for its capture. */
     var planned: List<String> = emptyList()
 
+    /** What the run's model calls took, as its client counted them (Navigator.usage), for its capture. */
+    var usage: Map<String, Long> = emptyMap()
+
     /** Each input the run read: its value, and how it was given ("given", "default" or "asked"). */
     val inputsUsed = linkedMapOf<String, Pair<String, String>>()
 
@@ -167,6 +170,7 @@ class Run(
                 if (place != null) source?.let { put("source", kotlinx.serialization.json.JsonPrimitive(it)) }
                 if (marks.isNotEmpty()) put("marks", element(marks.mapKeys { "${it.key}" }))
                 if (planned.isNotEmpty()) put("moves", element(planned))
+                if (usage.isNotEmpty()) put("usage", element(usage))
             })
         }
         return Yaml.stream(listOf(run) + (trace.getValue("steps") as kotlinx.serialization.json.JsonArray))

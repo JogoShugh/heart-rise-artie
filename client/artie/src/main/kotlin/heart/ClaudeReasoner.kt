@@ -43,8 +43,11 @@ class ClaudeReasoner(
      */
     override fun taken(): List<heart.script.ModelCall> = calls.toList().also { calls.clear() }
 
-    /** A planner for goal runs on the same model, key and transport. */
-    fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model)
+    /** What this reasoner's calls, and its planner's, took. */
+    val usage = ModelUsage()
+
+    /** A planner for goal runs on the same model, key and transport, its calls counted with this reasoner's. */
+    fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model, usage)
 
     override fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection {
         val asked = turn(intent, state, offers, links)
@@ -60,6 +63,7 @@ class ClaudeReasoner(
             "Claude API answered ${response.status}: ${response.body.take(ERROR_EXCERPT)}"
         }
         val message = Json.parseToJsonElement(response.body).jsonObject
+        usage.add(message["usage"] as? JsonObject)
         calls += heart.script.ModelCall(model, asked, message["content"].toString())
         return selection(message)
     }

@@ -31,6 +31,8 @@ class ClaudePlanner(
     private val transport: Transport,
     private val apiKey: String,
     private val model: String = ClaudeReasoner.DEFAULT_MODEL,
+    /** What its calls took, counted with its reasoner's when it has one. */
+    val usage: ModelUsage = ModelUsage(),
 ) : Planner {
 
     override fun next(view: PlanView): Move {
@@ -45,7 +47,9 @@ class ClaudePlanner(
         check(response.status in SUCCESS) {
             "Claude API answered ${response.status}: ${response.body.take(ERROR_EXCERPT)}"
         }
-        return move(Json.parseToJsonElement(response.body).jsonObject)
+        val message = Json.parseToJsonElement(response.body).jsonObject
+        usage.add(message["usage"] as? JsonObject)
+        return move(message)
     }
 
     private fun request(view: PlanView): JsonObject = buildJsonObject {
