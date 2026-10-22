@@ -70,6 +70,12 @@ class ConfigurationSteps {
         assertFalse(config.serving.credentials.admits("Bearer "))
     }
 
+    @Then("the gateway serves plain http")
+    fun plainHttp() = assertNull(config.serving.tls)
+
+    @Then("the gateway serves https from {string}")
+    fun https(keystore: String) = assertEquals(keystore, config.serving.tls?.keystore?.toString())
+
     @Then("acts need a validator")
     fun validatorNeeded() = assertTrue(config.serving.limits.validatorRequired)
 

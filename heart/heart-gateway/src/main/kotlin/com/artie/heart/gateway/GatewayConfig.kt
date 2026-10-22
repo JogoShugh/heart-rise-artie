@@ -11,7 +11,12 @@ class UpstreamSettings(val url: String, val spec: String, val auth: UpstreamAuth
  * How a gateway serves its callers: its [port], who may call it, and its [limits] (ServingLimits;
  * a validator on every act unless HEART_ACTS_WITHOUT_VALIDATOR=allowed, for a trial, says no).
  */
-class Serving(val port: Int, val credentials: Credentials, val limits: ServingLimits)
+class Serving(val port: Int, val credentials: Credentials, val limits: ServingLimits, val tls: Tls? = null)
+
+/** A keystore to serve https from (GATEWAY_TLS_KEYSTORE), and its password, a secret never written back. */
+class Tls(val keystore: Path, val password: String) {
+    override fun toString() = "Tls($keystore)"
+}
 
 /**
  * Everything a gateway needs, from its environment (spec/PLAN-OPENAPI-GATEWAY.md,
@@ -58,7 +63,13 @@ class GatewayConfig private constructor(
                 "allowed" -> false
                 else -> error("HEART_ACTS_WITHOUT_VALIDATOR must be allowed, or unset, not $switch")
             }
-            val serving = Serving(port, credentials, ServingLimits(validatorRequired = required))
+            val tls = value("GATEWAY_TLS_KEYSTORE")?.let { keystore ->
+                val password = checkNotNull(value("GATEWAY_TLS_PASSWORD")) {
+                    "GATEWAY_TLS_KEYSTORE is set, so set GATEWAY_TLS_PASSWORD"
+                }
+                Tls(Path.of(keystore), password)
+            }
+            val serving = Serving(port, credentials, ServingLimits(validatorRequired = required), tls)
             return GatewayConfig(upstream, profile, connector, serving, record)
         }
 

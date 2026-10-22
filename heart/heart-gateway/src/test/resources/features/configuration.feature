@@ -110,6 +110,25 @@ Feature: The gateway is configured by its environment
     When the gateway reads its configuration
     Then it refuses to start, saying "HEART_ACTS_WITHOUT_VALIDATOR must be allowed, or unset, not yes"
 
+  Scenario Outline: The gateway serves https from a keystore, or plain http without one: <case>
+    A local gateway in front of an https upstream should not be the only hop
+    without TLS: a client then pays a handshake to it, as it would to the
+    upstream. The keystore's password is a secret, never written back.
+    Given the environment
+      | UPSTREAM_URL             | http://garden:8080 |
+      | GATEWAY_PROFILE          | garden             |
+      | GATEWAY_TLS_KEYSTORE     | <keystore>         |
+      | GATEWAY_TLS_PASSWORD     | <password>         |
+      | HEART_AUTH_BEARER_TOKENS | 5e884898da28047151d0e56f8dc6292773603d0d6aff2bdcb2c38e8f3b2ba4c1 |
+    When the gateway reads its configuration
+    Then <serves>
+
+    Examples:
+      | case             | keystore             | password          | serves                                                    |
+      | no keystore      |                      |                   | the gateway serves plain http                             |
+      | a keystore       | /config/gateway.p12  | not-a-real-secret | the gateway serves https from "/config/gateway.p12"       |
+      | no password      | /config/gateway.p12  |                   | it refuses to start, saying "GATEWAY_TLS_KEYSTORE is set, so set GATEWAY_TLS_PASSWORD" |
+
   Scenario: Who may call the gateway is required, as on every HEART server
     Given the environment
       | UPSTREAM_URL    | http://garden:8080 |

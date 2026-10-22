@@ -7,7 +7,6 @@ import org.http4k.core.Request
 import org.http4k.core.Uri
 import org.http4k.core.then
 import org.http4k.filter.ClientFilters
-import org.http4k.server.Jetty
 import org.http4k.server.asServer
 import java.io.File
 
@@ -42,5 +41,5 @@ fun main() {
     )
     val serving = config.serving
     val heart = HeartSettings(mapper = mapper, limits = serving.limits)
-    gateway.handler(serving.credentials, heart).asServer(Jetty(serving.port)).start().block()
+    gateway.handler(serving.credentials, heart).asServer(listener(serving)).start().block()
 }
