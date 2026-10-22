@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Native and HEART, Measured</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="The GitHub triage task, run by Claude alone and by Claude through ARTIE and HEART, three times each, reasoned and scripted, judged by one checker.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem("nt-theme") || "light"; } catch (e) { document.documentElement.dataset.theme = "light"; }</script>
+<style>
+/* One reading column; tiles, then a table a phase, then what HEART needed fixed. Rust is Claude alone, teal is HEART. */
+:root {
+  --bg: #f3f6f5; --surface: #ffffff; --fg: #17211d; --muted: #55645d; --rule: #d3ddd8; --link: #2f5f8f;
+  --native: #a4502c; --native-soft: #f6e7df; --heart: #1f6f6b; --heart-soft: #dcefec;
+  --ok: #2f6f3f; --ok-soft: #e1f0e3; --bad: #b4403a; --bad-soft: #f8e1df;
+  --display: "Literata", Georgia, serif; --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
+  --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
+  --native: #e39a76; --native-soft: #33231c; --heart: #7fd0c8; --heart-soft: #16302d;
+  --ok: #9fd6ac; --ok-soft: #1b2e21; --bad: #e58a84; --bad-soft: #3a1f1d; color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+main { max-width: 74rem; margin: 0 auto; padding-block: 2rem 4rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 2rem; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; align-items: start; }
+h1 { font: 650 2.2rem/1.15 var(--display); margin: 0 0 .5rem; text-wrap: balance; }
+h2 { font: 650 1.35rem/1.25 var(--display); margin: 0 0 .7rem; }
+p { margin: 0; } .lede, .sub { color: var(--muted); max-width: 66ch; } .sub { margin: 0 0 .8rem; }
+.seg { display: flex; align-items: center; gap: .4rem; }
+.seg-label { font: 600 .7rem var(--body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.seg button { font: 500 .8rem var(--body); background: var(--surface); color: var(--fg); border: 1px solid var(--rule); border-radius: 6px; padding: .25rem .6rem; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .8rem; }
+.tile { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .7rem .9rem; display: grid; gap: .4rem; }
+.tile .label { font: 600 .74rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.tile .pair { display: grid; gap: .2rem; } .tile b { font: 600 1.25rem var(--body); margin-left: .4rem; font-variant-numeric: tabular-nums; }
+.tag { display: inline-block; font: 600 .7rem var(--body); letter-spacing: .05em; text-transform: uppercase; border-radius: 4px; padding: .05rem .4rem; }
+.tag.native { background: var(--native-soft); color: var(--native); } .tag.heart { background: var(--heart-soft); color: var(--heart); }
+.wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 58rem; font-size: .9rem; }
+th, td { text-align: left; vertical-align: top; padding: .5rem .7rem; border-bottom: 1px solid var(--rule); }
+tr:last-child td { border-bottom: 0; }
+thead th { font: 600 .7rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--bg); }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; } td.note { color: var(--muted); max-width: 26rem; }
+tr.failed td { background: var(--bad-soft); }
+.stamp { font: .75rem var(--mono); color: var(--muted); }
+.pill { font: 600 .82rem var(--body); border-radius: 999px; padding: .05rem .5rem; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); } .pill.bad { background: var(--bad-soft); color: var(--bad); }
+.setup { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem 2rem; }
+ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { max-width: 68ch; } li p { color: var(--muted); }
+.commit { font: .75rem var(--mono); color: var(--muted); }
+.close { max-width: 66ch; font-family: var(--display); font-size: 1.1rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>Native and HEART, Measured</h1>
+    <p class="lede">The GitHub triage task, 29 steps, done by Claude alone from what it knows of GitHub's REST API, and by Claude through ARTIE and the HEART gateway. Three runs each with a model choosing every move, then three each by a script made from a run, with no model. One checker judged every run by what GitHub held after it: 23 checks.</p></div>
+    <div class="seg"><span class="seg-label" id="theme-label">Theme</span><div role="group" aria-labelledby="theme-label" style="display:flex;gap:.3rem"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div>
+  </header>
+
+  <section class="tiles" aria-label="Summary, on the code as it ended"><div class="tile"><div class="label">Reasoned runs that did the task</div><div class="pair"><div><span class="tag native">Native</span><b>3 of 3</b></div><div><span class="tag heart">HEART</span><b>3 of 3</b></div></div></div><div class="tile"><div class="label">Reasoned, mean time</div><div class="pair"><div><span class="tag native">Native</span><b>70</b> s</div><div><span class="tag heart">HEART</span><b>261</b> s</div></div></div><div class="tile"><div class="label">Reasoned, model calls a run</div><div class="pair"><div><span class="tag native">Native</span><b>13</b></div><div><span class="tag heart">HEART</span><b>77</b></div></div></div><div class="tile"><div class="label">Reasoned, tokens out a run</div><div class="pair"><div><span class="tag native">Native</span><b>4,861</b></div><div><span class="tag heart">HEART</span><b>11,359</b></div></div></div><div class="tile"><div class="label">Scripted runs that did the task</div><div class="pair"><div><span class="tag native">Native</span><b>3 of 3</b></div><div><span class="tag heart">HEART</span><b>3 of 3</b></div></div></div><div class="tile"><div class="label">Scripted, mean time</div><div class="pair"><div><span class="tag native">Native</span><b>22</b> s</div><div><span class="tag heart">HEART</span><b>68</b> s</div></div></div></section>
+
+  <section class="setup">
+    <div><h2>The arms</h2><ul>
+      <li><span class="tag native">Native</span> <code>claude-sonnet-5-5</code>, one <code>http</code> tool aimed at api.github.com, no documentation, no gh, no MCP server. The task with HEART's marks put in words.</li>
+      <li><span class="tag heart">HEART</span> the same model, as ARTIE's planner and reasoner, through the gateway in front of GitHub. The task as the goal file, <code>github-triage.goal.md</code>.</li>
+    </ul></div>
+    <div><h2>Made repeatable</h2><ul>
+      <li><span class="tag native">Native</span> one model call: its own run's transcript in, a 162-line Python script out (53,306 tokens in, 3,471 out).</li>
+      <li><span class="tag heart">HEART</span> <code>artie generate</code> from one run's capture: no model, a script and its lock file.</li>
+    </ul></div>
+  </section>
+
+  <section><h2>Reasoned: the model chooses every move</h2>
+  <p class="sub">Native's input tokens are nearly all read from its prompt cache: one conversation that grows. HEART sends each call a fresh view of the resource held, and makes two calls a move, the planner's and the reasoner's.</p>
+  <div class="wrap"><table><thead><tr><th>Arm</th><th>Run</th><th>Checks</th><th>Seconds</th><th>Requests / steps</th><th>Model calls</th><th>Tokens in</th><th>Out</th><th>Cache read</th><th>Cache written</th><th>Note</th></tr></thead><tbody><tr class="native"><td><span class="tag native">Native</span></td><td>1<div class="stamp">1022-062745</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">70.3</td><td class="num">22</td><td class="num">14</td><td class="num">30</td><td class="num">5,062</td><td class="num">279,947</td><td class="num">48,608</td><td class="note"></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>2<div class="stamp">1022-064648</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">69.2</td><td class="num">24</td><td class="num">12</td><td class="num">26</td><td class="num">4,662</td><td class="num">274,290</td><td class="num">52,541</td><td class="note"></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>3<div class="stamp">1022-070245</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">71.4</td><td class="num">24</td><td class="num">12</td><td class="num">26</td><td class="num">4,858</td><td class="num">275,123</td><td class="num">52,726</td><td class="note"></td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>1<div class="stamp">1022-062915</div></td><td class="num"><span class="pill bad">6/18</span></td><td class="num">146</td><td class="num"></td><td class="num">41</td><td class="num">77,733</td><td class="num">8,050</td><td class="num">51,064</td><td class="num">3,987</td><td class="note">before the fix: went back from the branch list again and again; the step ran out of moves</td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>2<div class="stamp">1022-063415</div></td><td class="num"><span class="pill bad">7/18</span></td><td class="num">139</td><td class="num"></td><td class="num">42</td><td class="num">77,796</td><td class="num">8,061</td><td class="num">53,560</td><td class="num">3,204</td><td class="note">before the fix: the same</td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>3<div class="stamp">1022-064219</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">246</td><td class="num">55</td><td class="num">77</td><td class="num">234,895</td><td class="num">11,426</td><td class="num">101,061</td><td class="num">5,733</td><td class="note"></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>4<div class="stamp">1022-065759</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">270</td><td class="num">55</td><td class="num">77</td><td class="num">235,189</td><td class="num">11,293</td><td class="num">101,061</td><td class="num">5,733</td><td class="note"></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>5<div class="stamp">1022-070410</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">266</td><td class="num">55</td><td class="num">77</td><td class="num">236,909</td><td class="num">11,359</td><td class="num">105,166</td><td class="num">1,628</td><td class="note"></td></tr></tbody></table></div></section>
+
+  <section><h2>Scripted: no model</h2>
+  <p class="sub">HEART's script runs 1 to 3 came before the fixes below; 4 to 6 after.</p>
+  <div class="wrap"><table><thead><tr><th>Arm</th><th>Run</th><th>Checks</th><th>Seconds</th><th>Requests / steps</th><th>Model calls</th><th>Tokens in</th><th>Out</th><th>Cache read</th><th>Cache written</th><th>Note</th></tr></thead><tbody><tr class="native"><td><span class="tag native">Native</span></td><td>1<div class="stamp">1022-071000</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">22.6</td><td class="num">23</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>2<div class="stamp">1022-071143</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">22.0</td><td class="num">23</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"></td></tr><tr class="native"><td><span class="tag native">Native</span></td><td>3<div class="stamp">1022-071244</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">21.2</td><td class="num">23</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>1<div class="stamp">1022-071029</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">68.0</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note">before the fixes</td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>2<div class="stamp">1022-071213</div></td><td class="num"><span class="pill bad">7/18</span></td><td class="num">26.4</td><td class="num"></td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note">before the fixes: the new pull request&#x27;s edit refused 412, GitHub having changed it a moment after making it</td></tr><tr class="heart failed"><td><span class="tag heart">HEART</span></td><td>3<div class="stamp">1022-071312</div></td><td class="num"><span class="pill bad">3/13</span></td><td class="num">18.4</td><td class="num"></td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note">before the fixes: main had moved to the branch list&#x27;s second page</td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>4<div class="stamp">1022-072058</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">68.7</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>5<div class="stamp">1022-072213</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">70.1</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"></td></tr><tr class="heart"><td><span class="tag heart">HEART</span></td><td>6<div class="stamp">1022-072329</div></td><td class="num"><span class="pill ok">23/23</span></td><td class="num">66.2</td><td class="num">58</td><td class="num">–</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="note"></td></tr></tbody></table></div></section>
+
+  <section><h2>What HEART needed, found by these runs</h2>
+  <p class="sub">Native needed nothing changed. Each fix below is in ARTIE, test first, and the runs after it are on the fixed code.</p>
+  <ul><li><b>The planner says why before each move.</b> <span class="commit">1079117, 0ca4df2</span><p>At the branch list it went back about one time in four instead of on to main; each wasted pair of moves ran its step out. Asked for its reason first, it went on to main every time. HEART reasoned runs 1 and 2 are from before this.</p></li><li><b>A follow reads a list&#x27;s next pages to find a titled link.</b> <span class="commit">4b75a7c</span><p>The script followed the branch list to main as the run had; once the list grew, main was on its second page. The list offers next links; ARTIE follows them, building no address.</p></li><li><b>A script&#x27;s act refused 412 is decided again once.</b> <span class="commit">4b75a7c</span><p>GitHub changes a new pull request a moment after making it; the script&#x27;s edit, sent with the ETag it had just read, was refused. ARTIE has read it again; when the form is still offered and the lock file still holds, the act is sent once more. A second 412 stops the script.</p></li></ul></section>
+
+  <section><h2>What this trial does not test</h2><ul>
+    <li><b>A service that changes.</b> Today's GitHub is the GitHub the native model learned. New features, moved paths, renamed fields in the gateway: where knowledge from training goes stale and what the service offers doesn't. That is the next trial.</li>
+    <li><b>The duplicate's link.</b> Both arms closed the duplicate as a duplicate; native sent the original's id and GitHub kept no link to it. The checker asks for the reason, not the link.</li>
+  </ul></section>
+
+  <p class="close">On a GitHub it knows, Claude alone was faster, needed fewer model calls, and got it right every time from the start. HEART got there too, after the three fixes these runs found, and is slower for the gateway and its two calls a move. The case for HEART is the service that moves, which this trial left still.</p>
+</main>
+<script>
+(() => {
+  const theme = (t) => {
+    document.documentElement.dataset.theme = t;
+    document.querySelectorAll("[data-th]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.th === t)));
+    try { localStorage.setItem("nt-theme", t); } catch (e) { /* the page works without it */ }
+  };
+  document.querySelectorAll("[data-th]").forEach((b) => b.addEventListener("click", () => theme(b.dataset.th)));
+  theme(document.documentElement.dataset.theme || "light");
+})();
+</script>
+</body>
+</html>

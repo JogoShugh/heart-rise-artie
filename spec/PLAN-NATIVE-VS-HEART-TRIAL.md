@@ -1,6 +1,7 @@
 # Plan: the triage task, done by Claude alone, beside the same task done through HEART
 
-Status: planned, 2026-10-22. Follows spec/PLAN-GOAL-MARKDOWN.md, whose triage goal
+Status: run, 2026-10-22. Report: `docs/reports/native-vs-heart-trial/`; harness, checker and runs in
+`exhibits/native-vs-heart/` (Python, standard library: live GitHub tooling). Planned as below; Follows spec/PLAN-GOAL-MARKDOWN.md, whose triage goal
 (`client/scripts/tests/github-triage.goal.md`) Claude did live through ARTIE and the GitHub gateway (#165 to #168),
 and whose generated script did again with no model (#178 to #185). The comparison drawn in
 `docs/reports/native-vs-heart/` says what each way is good at; this trial measures it, on one task, run for run.
