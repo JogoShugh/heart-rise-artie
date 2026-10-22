@@ -27,6 +27,12 @@ interface HeartRiseClient {
     fun follow(rel: String, title: String?): HeartRepresentation
 
     /**
+     * Whether [link] leads somewhere this client can go: one it can follow as it stands (SPEC §6.0), by a binding
+     * it has for the link's scheme. A model is shown only these.
+     */
+    val reaches: (HeartLink) -> Boolean get() = { it.followable }
+
+    /**
      * The ALPS descriptor's doc for the offered form [rel] (SPEC §6.1, §8.5):
      * its relation URI, fetched and cached as HTTP allows. Null when the form's
      * relation is not a URI or names no descriptor. It describes; it never

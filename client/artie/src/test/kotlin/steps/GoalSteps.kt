@@ -116,6 +116,25 @@ class GoalSteps(
     fun stepsAt(move: Int, table: DataTable) =
         assertEquals(table.asMaps().map { it.getValue("line") }, shown[move - 1].steps.map { it.trim() })
 
+    private var entered: heart.script.Representation? = null
+
+    @When("ARTIE's navigator enters {string}")
+    fun navigatorEnters(url: String) {
+        entered = (ArtieNavigator(ctx.client).enter(url) as heart.script.Answer.Done).now
+    }
+
+    @Then("the models are shown these links")
+    fun modelsShown(table: DataTable) {
+        val shown = checkNotNull(entered).followable.flatMap { (rel, titles) ->
+            titles.map { mapOf("relation" to rel, "title" to it.orEmpty()) }
+        }
+        assertEquals(table.asMaps(), shown)
+    }
+
+    @Then("the run keeps these relations: {}")
+    fun keeps(relations: String) =
+        assertEquals(relations.split(",").map { it.trim() }, checkNotNull(entered).links.keys.toList())
+
     @Then("the capture {string} keeps the planner's moves, the first")
     fun keptMoves(capture: String, table: DataTable) {
         val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>

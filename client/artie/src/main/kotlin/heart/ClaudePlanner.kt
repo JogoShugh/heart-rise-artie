@@ -91,7 +91,8 @@ class ClaudePlanner(
         }
         val inputs = view.inputs.entries.joinToString("\n") { (name, value) -> "\$$name = $value" }
         val held = view.held
-        val links = held.links.entries.joinToString("\n") { (rel, titles) ->
+        // Only the links the client can follow: a model shown the others chases them.
+        val links = held.followable.entries.joinToString("\n") { (rel, titles) ->
             titles.joinToString("\n") { title -> "$rel" + (title?.let { " \"$it\"" } ?: "") }
         }
         val state = held.state.toString().let { if (it.length > STATE_LIMIT) it.take(STATE_LIMIT) + "…" else it }

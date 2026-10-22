@@ -86,6 +86,8 @@ class ArtieClient(
         return sync(target)
     }
 
+    override val reaches: (HeartLink) -> Boolean = { link -> link.followable && this.bindings.reaches(link.href) }
+
     /** Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI. */
     override fun follow(rel: String, title: String?): HeartRepresentation {
         val held = current ?: error("enter a service before following a link")

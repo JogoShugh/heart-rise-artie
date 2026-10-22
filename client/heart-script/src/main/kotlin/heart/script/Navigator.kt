@@ -16,6 +16,11 @@ class Representation(
     val offered: Set<String>,
     val links: Map<String, List<String?>>,
     val embedded: Map<String, List<Embedded>> = emptyMap(),
+    /**
+     * The links the client can follow, by relation and title: what a model is shown. A link it has no binding
+     * for, a template that needs values, a link out of HEART: [links] keeps them, as the server sent them.
+     */
+    val followable: Map<String, List<String?>> = links,
 )
 
 /**

@@ -49,6 +49,33 @@ Feature: Identification is separate from interaction (SPEC §6.0)
     Then the client holds "mem://garden/beds/1"
     And the client's last request was GET "http://garden.test/"
 
+  Scenario: The models are shown only the links ARTIE can follow; the run keeps every link
+    A link whose scheme ARTIE has no binding for, a template that needs
+    values, and a link typed as something other than a HEART resource are
+    links ARTIE can't follow. A model shown them chases them; it is shown
+    only the links that lead somewhere. The run's record keeps them all, as
+    the server sent them.
+    Given the service answers GET "http://garden.test/" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Cache-Control: no-cache
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      _links:
+        self: {href: /}
+        item:
+          - {href: /beds/1, title: Bed one}
+        clone: {href: "git://garden.test/garden.git"}
+        search: {href: "/beds{?q}", templated: true}
+        upstream: {href: "https://api.garden.test/beds", type: application/vnd.garden+json}
+      """
+    When ARTIE's navigator enters "http://garden.test/"
+    Then the models are shown these links
+      | relation | title   |
+      | item     | Bed one |
+    And the run keeps these relations: self, item, clone, search, upstream
+
   Scenario: A URI whose scheme has no binding is refused before anything is sent
     Given the service answers GET "http://garden.test/" with:
       """

@@ -95,8 +95,8 @@ class ArtieNavigator(
         val failed = answer("reason") { decided = ArtieAgent(client, thinker).handle(intent, at); client.current!! }
         val reasoned = when (val d = decided) {
             null -> Reasoned(null, failed)
-            is Decision.Acted -> Reasoned(choice(d.selection), done(d.result, client.broughtIntoBeing))
-            is Decision.Followed -> Reasoned(choice(d.selection), Answer.Done(representation(d.result)))
+            is Decision.Acted -> Reasoned(choice(d.selection), done(d.result, client.broughtIntoBeing, client.reaches))
+            is Decision.Followed -> Reasoned(choice(d.selection), Answer.Done(representation(d.result, client.reaches)))
             is Decision.Refused -> Reasoned(choice(d.selection), refusal(client, d.selection.affordance, d.refusal))
             is Decision.Rejected -> Reasoned(choice(d.selection), rejected(d.reasons))
             is Decision.Asked -> Reasoned(null, Answer.Refused(Refusal.Unclear, Side.CLIENT, d.question))
@@ -110,7 +110,7 @@ class ArtieNavigator(
     }
 
     private fun answer(what: String, select: () -> HeartRepresentation): Answer = try {
-        Answer.Done(representation(select()))
+        Answer.Done(representation(select(), client.reaches))
     } catch (refused: ActRefused) {
         refusal(client, what, refused)
     } catch (refused: AccessRefused) {
@@ -150,8 +150,8 @@ private fun choice(selection: Selection): Choice? = when (selection) {
 }
 
 /** What an accepted act led to: a new resource when it brought one into being ([made]). */
-private fun done(result: HeartRepresentation, made: Boolean): Answer =
-    if (made) Answer.NewResource(representation(result)) else Answer.Done(representation(result))
+private fun done(result: HeartRepresentation, made: Boolean, reaches: (HeartLink) -> Boolean): Answer =
+    representation(result, reaches).let { if (made) Answer.NewResource(it) else Answer.Done(it) }
 
 /** A choice ARTIE's checks rejected: not offered when nothing matched it, else input the schema doesn't allow. */
 private fun rejected(reasons: List<String>): Answer.Refused {
@@ -168,9 +168,10 @@ private fun plain(value: JsonElement): Any? {
 
 /**
  * What ARTIE holds, as a script sees it: state, the acts offered, the links by relation and title, and the
- * resources it embeds (SPEC §6.1).
+ * resources it embeds (SPEC §6.1); and, for a model, only the links it [reaches], `self` and the forms link,
+ * ARTIE's plumbing, left out.
  */
-private fun representation(held: HeartRepresentation) = Representation(
+private fun representation(held: HeartRepresentation, reaches: (HeartLink) -> Boolean) = Representation(
     address = held.url,
     state = held.state,
     offered = held.affordances.keys,
@@ -178,6 +179,9 @@ private fun representation(held: HeartRepresentation) = Representation(
     embedded = held.embeddedByRel.mapValues { (_, resources) ->
         resources.map { Embedded(it.title, it.state, it.href) }
     },
+    followable = held.linksByRel.filterKeys { it != "self" }
+        .mapValues { (_, links) -> links.filter { it != held.forms && reaches(it) }.map { it.title } }
+        .filterValues { it.isNotEmpty() },
 )
 
 /** A script's field value, as JSON. */

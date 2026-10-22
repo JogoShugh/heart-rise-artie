@@ -87,7 +87,7 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
      */
     private fun linkOffers(synced: HeartRepresentation): List<LinkOffer> =
         synced.linksByRel.filterKeys { it != "self" }.flatMap { (rel, links) ->
-            links.filter { it != synced.forms && it.followable }.map { LinkOffer(rel, it.title) }
+            links.filter { it != synced.forms && client.reaches(it) }.map { LinkOffer(rel, it.title) }
         } + synced.embeddedByRel.flatMap { (rel, resources) -> resources.map { LinkOffer(rel, it.title, it.state) } }
 
     private fun check(selection: Selection.Act, synced: HeartRepresentation): Decision {

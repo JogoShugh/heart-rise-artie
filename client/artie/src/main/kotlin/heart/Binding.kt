@@ -117,4 +117,8 @@ class Bindings(byScheme: Map<String, Binding>) {
         val scheme = runCatching { URI(url).scheme }.getOrNull()?.lowercase()
         return byScheme[scheme] ?: throw NoBindingException(url, scheme)
     }
+
+    /** Whether there is a binding for [url]'s scheme. */
+    fun reaches(url: String): Boolean = runCatching { URI(url).scheme }.getOrNull()?.lowercase() in byScheme
+
 }
