@@ -130,11 +130,16 @@ class Gateway(
 
     /**
      * The gateway as one HTTP handler, admitting the callers [credentials] admits: HEART, and beside it, for a
-     * request that asks, the upstream passed through untouched ([PassThroughMode]).
+     * request that asks, the upstream passed through untouched ([PassThroughMode]). HEART is served taking [care],
+     * or the care a request names for itself ([CareAsked]).
      */
-    fun handler(credentials: Credentials, settings: HeartSettings = HeartSettings(mapper = mapper)): HttpHandler {
+    fun handler(
+        credentials: Credentials,
+        settings: HeartSettings = HeartSettings(mapper = mapper),
+        care: GatewayCare = GatewayCare.EVERY,
+    ): HttpHandler {
         val heart = HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
-        val served = PassThroughMode(recorded, auth, credentials).then(heart)
+        val served = PassThroughMode(recorded, auth, credentials).then(CareAsked(care)).then(heart)
         return record?.servingFilter?.then(served) ?: served
     }
 

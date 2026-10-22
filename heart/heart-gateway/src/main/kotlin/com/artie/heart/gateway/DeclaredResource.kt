@@ -59,9 +59,14 @@ internal class DeclaredResource(
         val route = spec.route(it.operation)
         Act(actName(it), it.name, schema(it, route), it.name, method = route.method)
     }
+    // A trial taking no care over offers reads no facts, and offers every act: the upstream says what it allows.
     private val keys = OfferKeys(acts, { answer ->
         val addressed = address?.of(answer) ?: answer
-        read(addressed.with(facts(addressed.body)))
+        if (GatewayCare.now().offers) {
+            read(addressed.with(facts(addressed.body)))
+        } else {
+            Reading(Allowed(acts.map { it.relation }.toSet()), read(addressed).state)
+        }
     }) { it.relation }
 
     // Lists under a resource, each linked from it by its operation's relation: this file's lists, served here,
@@ -112,10 +117,14 @@ internal class DeclaredResource(
      * The resource is read again first; if it is no longer that state, the
      * act is stale. Then the resource is read again, as the act left it,
      * since an operation's answer may not be the resource (a merge's isn't).
+     * A trial may take neither care (GatewayCare): with no reread, the act's
+     * own answer is the state where its operation is at the resource's own
+     * path, and the state checked is, unchanged, where it isn't.
      */
     private fun perform(checked: UpstreamState, act: ActDeclaration, input: JsonNode): Acted<UpstreamState> {
         val item = itemPath.expand(mapper.convertValue(checked.json, BODY))
-        if (keys.state(calls.get(item)).json != checked.json) {
+        val care = GatewayCare.now()
+        if (care.race && keys.state(calls.get(item)).json != checked.json) {
             throw ConcurrentWriteException("$item changed upstream since it was checked")
         }
         val route = spec.route(act.operation)
@@ -136,7 +145,12 @@ internal class DeclaredResource(
         // An act that makes another resource names it in Location (201): where the act says it is, or as its answer.
         val created = act.at?.let { ItemPath.fill(it, variables + inputs) }
             ?: act.creates?.let { locate(it, answer.body) }
-        return Acted(keys.state(calls.get(item)), created = created)
+        val left = when {
+            care.reread -> keys.state(calls.get(item))
+            route.path == reading.path -> keys.state(answer)
+            else -> checked
+        }
+        return Acted(left, created = created)
     }
 
     /** Where the resource the upstream answered [body] for lives, by this type's item path. */

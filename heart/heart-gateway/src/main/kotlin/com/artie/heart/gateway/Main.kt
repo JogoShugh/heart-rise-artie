@@ -41,5 +41,5 @@ fun main() {
     )
     val serving = config.serving
     val heart = HeartSettings(mapper = mapper, limits = serving.limits)
-    gateway.handler(serving.credentials, heart).asServer(listener(serving)).start().block()
+    gateway.handler(serving.credentials, heart, serving.care).asServer(listener(serving)).start().block()
 }

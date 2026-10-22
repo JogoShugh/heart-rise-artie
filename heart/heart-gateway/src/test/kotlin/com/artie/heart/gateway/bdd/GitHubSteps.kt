@@ -3,6 +3,7 @@ package com.artie.heart.gateway.bdd
 import com.artie.heart.ServingLimits
 import com.artie.heart.gateway.Connector
 import com.artie.heart.gateway.Gateway
+import com.artie.heart.gateway.GatewayCare
 import com.artie.heart.gateway.GatewaySpec
 import com.artie.heart.gateway.UpstreamAuth
 import com.artie.heart.gateway.UpstreamRecord
@@ -41,7 +42,18 @@ class GitHubSteps {
     /** The credential of the last read, which the client then acts with. */
     private var authorization = "Bearer $TOKEN"
 
-    private val gateway: HttpHandler get() = (started ?: start().also { started = it }).getOrThrow()
+    /** The care the gateway takes by its environment (GATEWAY_CARE), and the care each request names, if any. */
+    internal var standingCare = GatewayCare.EVERY
+        set(care) {
+            field = care
+            started = null
+        }
+    internal var careAsked: String? = null
+
+    private val gateway: HttpHandler get() {
+        val handler = (started ?: start().also { started = it }).getOrThrow()
+        return { request -> handler(careAsked?.let { request.header(GatewayCare.HEADER, it) } ?: request) }
+    }
     private val json: JsonNode get() = mapper.readTree(responses.last().bodyString())
 
     /** The gateway's last answer, for the step classes beside this one. */
@@ -577,7 +589,11 @@ class GitHubSteps {
         Gateway(
             spec, github.handler, loaded.profile, auth,
             connector = loaded, upstreamUrl = upstreamUrl, record = keeping,
-        ).handler(credentials, HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired)))
+        ).handler(
+            credentials,
+            HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired)),
+            standingCare,
+        )
     }
 
     private companion object {

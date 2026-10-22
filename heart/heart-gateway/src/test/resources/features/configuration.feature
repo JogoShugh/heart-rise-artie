@@ -129,6 +129,23 @@ Feature: The gateway is configured by its environment
       | a keystore       | /config/gateway.p12  | not-a-real-secret | the gateway serves https from "/config/gateway.p12"       |
       | no password      | /config/gateway.p12  |                   | it refuses to start, saying "GATEWAY_TLS_KEYSTORE is set, so set GATEWAY_TLS_PASSWORD" |
 
+  Scenario Outline: A trial may turn off kinds of care the gateway takes: <case>
+    spec/ideas/off-the-rails.md, and github-care.feature. Never by default.
+    Given the environment
+      | UPSTREAM_URL             | http://garden:8080 |
+      | GATEWAY_PROFILE          | garden             |
+      | GATEWAY_CARE             | <care>             |
+      | HEART_AUTH_BEARER_TOKENS | 5e884898da28047151d0e56f8dc6292773603d0d6aff2bdcb2c38e8f3b2ba4c1 |
+    When the gateway reads its configuration
+    Then <takes>
+
+    Examples:
+      | case          | care                     | takes                                                                  |
+      | unset         |                          | the gateway takes every kind of care                                   |
+      | some off      | no-offers, no-race       | the gateway takes care as "no-offers, no-race"                         |
+      | all off       | off-the-rails            | the gateway takes care as "no-offers, no-race, no-reread, trust-copies=60" |
+      | a word it doesn't know | no-manners      | it refuses to start, saying "GATEWAY_CARE names no-offers, no-race, no-reread, trust-copies=SECONDS or off-the-rails, not no-manners" |
+
   Scenario: Who may call the gateway is required, as on every HEART server
     Given the environment
       | UPSTREAM_URL    | http://garden:8080 |

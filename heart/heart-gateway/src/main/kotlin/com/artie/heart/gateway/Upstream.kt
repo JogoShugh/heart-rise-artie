@@ -100,14 +100,29 @@ class Upstream(
         val authorization = auth.authorization()
         val signed = authorization?.let { request.header("Authorization", it) } ?: request
         val sent = headers.entries.fold(signed.header("Accept", JSON)) { r, (name, value) -> r.header(name, value) }
-        val held = if (request.method == Method.GET) copies.held(authorization, request.uri.toString()) else null
+        // A trial that trusts copies uses one read recently enough without asking (GatewayCare).
+        val trusted = GatewayCare.now().trustCopies?.takeIf { request.method == Method.GET }?.let { within ->
+            copies.fresh(authorization, request.uri.toString(), within)
+        }
+        return trusted?.answer ?: asked(sent, request, authorization, statuses)
+    }
+
+    /** [sent] to the upstream, conditionally where a copy is held, as [request] asked by [authorization]. */
+    private fun asked(sent: Request, request: Request, authorization: String?, statuses: RefusalStatuses): Answer {
+        val reading = request.method == Method.GET
+        val at = request.uri.toString()
+        val held = if (reading) copies.held(authorization, at) else null
         val response = http(held?.let { sent.header("If-None-Match", it.etag) } ?: sent)
-        if (held != null && response.status == Status.NOT_MODIFIED) return held.answer
+        if (held != null && response.status == Status.NOT_MODIFIED) {
+            return held.answer.also { copies.keep(authorization, at, held.etag, it) }
+        }
         if (!response.status.successful) throw refusal(request, response, statuses)
         val mediaType = response.header("Content-Type")?.substringBefore(';')?.trim()?.lowercase()
         val answer = Answer(mapper.readTree(response.bodyString()), Header.LINK(response), request.uri.path, mediaType)
-        if (request.method == Method.GET) {
-            response.header("ETag")?.let { copies.keep(authorization, request.uri.toString(), it, answer) }
+        if (reading) {
+            response.header("ETag")?.let { copies.keep(authorization, at, it, answer) }
+        } else {
+            copies.drop(authorization, request.uri.path)
         }
         return answer
     }

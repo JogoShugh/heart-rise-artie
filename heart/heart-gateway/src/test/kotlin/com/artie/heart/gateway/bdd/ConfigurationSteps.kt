@@ -1,6 +1,7 @@
 package com.artie.heart.gateway.bdd
 
 import com.artie.heart.Caller
+import com.artie.heart.gateway.GatewayCare
 import com.artie.heart.gateway.GatewayConfig
 import com.artie.heart.gateway.UpstreamAuth
 import io.cucumber.datatable.DataTable
@@ -81,6 +82,12 @@ class ConfigurationSteps {
 
     @Then("acts may come with no validator")
     fun noValidatorNeeded() = assertFalse(config.serving.limits.validatorRequired)
+
+    @Then("the gateway takes every kind of care")
+    fun everyCare() = assertEquals(GatewayCare.EVERY, config.serving.care)
+
+    @Then("the gateway takes care as {string}")
+    fun care(care: String) = assertEquals(care, config.serving.care.toString())
 
     @Then("it refuses to start, saying {string}")
     fun refuses(says: String) = assertEquals(says, read.exceptionOrNull()?.message)

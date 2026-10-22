@@ -9,9 +9,16 @@ class UpstreamSettings(val url: String, val spec: String, val auth: UpstreamAuth
 
 /**
  * How a gateway serves its callers: its [port], who may call it, and its [limits] (ServingLimits;
- * a validator on every act unless HEART_ACTS_WITHOUT_VALIDATOR=allowed, for a trial, says no).
+ * a validator on every act unless HEART_ACTS_WITHOUT_VALIDATOR=allowed, for a trial, says no), and the [care] it
+ * takes unless a request names its own (GATEWAY_CARE; every kind unless a trial says otherwise).
  */
-class Serving(val port: Int, val credentials: Credentials, val limits: ServingLimits, val tls: Tls? = null)
+class Serving(
+    val port: Int,
+    val credentials: Credentials,
+    val limits: ServingLimits,
+    val tls: Tls? = null,
+    val care: GatewayCare = GatewayCare.EVERY,
+)
 
 /** A keystore to serve https from (GATEWAY_TLS_KEYSTORE), and its password, a secret never written back. */
 class Tls(val keystore: Path, val password: String) {
@@ -47,9 +54,15 @@ class GatewayConfig private constructor(
                 "set GATEWAY_PROFILE, or GATEWAY_CONNECTOR to a connector naming one"
             }
             val upstream = UpstreamSettings(url, value("UPSTREAM_SPEC") ?: "$url/openapi.json", auth(::value))
+            val record = value("GATEWAY_RECORD")?.let { Path.of(it) }
+            return GatewayConfig(upstream, profile, connector, serving(::value, upstream.auth), record)
+        }
+
+        /** How the gateway serves its callers, from [value]s, calling the upstream as [auth] says. */
+        private fun serving(value: (String) -> String?, auth: UpstreamAuth): Serving {
             val port = value("PORT")?.let { checkNotNull(it.toIntOrNull()) { "PORT must be a number" } } ?: DEFAULT_PORT
             // Calling the upstream as each caller, the gateway lets the upstream say whose credential is good.
-            val credentials = if (upstream.auth == UpstreamAuth.Forwarded) {
+            val credentials = if (auth == UpstreamAuth.Forwarded) {
                 Credentials.forwarded()
             } else {
                 Credentials.parse(
@@ -57,7 +70,6 @@ class GatewayConfig private constructor(
                     value("HEART_AUTH_BEARER_TOKENS").orEmpty(),
                 )
             }
-            val record = value("GATEWAY_RECORD")?.let { Path.of(it) }
             val required = when (val switch = value("HEART_ACTS_WITHOUT_VALIDATOR")) {
                 null -> true
                 "allowed" -> false
@@ -69,8 +81,14 @@ class GatewayConfig private constructor(
                 }
                 Tls(Path.of(keystore), password)
             }
-            val serving = Serving(port, credentials, ServingLimits(validatorRequired = required), tls)
-            return GatewayConfig(upstream, profile, connector, serving, record)
+            val care = value("GATEWAY_CARE")?.let { words ->
+                try {
+                    GatewayCare.parse(words)
+                } catch (unknown: IllegalArgumentException) {
+                    error("GATEWAY_CARE ${unknown.message}")
+                }
+            } ?: GatewayCare.EVERY
+            return Serving(port, credentials, ServingLimits(validatorRequired = required), tls, care)
         }
 
         private fun auth(value: (String) -> String?): UpstreamAuth = when (val scheme = value("UPSTREAM_AUTH")) {
