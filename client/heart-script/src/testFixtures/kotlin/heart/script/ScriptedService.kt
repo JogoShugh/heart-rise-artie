@@ -41,6 +41,9 @@ class ScriptedService : Navigator {
 
     /** Refusals an act meets, from the server or the client, by "relation at address". */
     val refusals = mutableMapOf<String, Answer.Refused>()
+
+    /** How many more times a refusal is met, by "relation at address"; absent, every time. */
+    val refusedTimes = mutableMapOf<String, Int>()
     val asked = mutableListOf<Pair<String, String>>()
 
     /** States a resource takes after a number of further reads: address to (reads left, state). */
@@ -54,7 +57,11 @@ class ScriptedService : Navigator {
 
     override fun act(rel: String, fields: Map<String, Any?>): Answer {
         asked += "act" to (if (fields.isEmpty()) rel else "$rel ${json(fields)}")
-        refusals["$rel at $held"]?.let { return it }
+        val key = "$rel at $held"
+        refusals[key]?.takeIf { (refusedTimes[key] ?: 1) > 0 }?.let { refusal ->
+            refusedTimes[key]?.let { refusedTimes[key] = it - 1 }
+            return refusal
+        }
         val form = forms.first { it.at == held && it.relation == rel }
         // As a HEART client reports the form it used: its target a template, as an affordance set holds it.
         val used = Used(

@@ -25,6 +25,23 @@ fun Here.until(tries: Int = 10, every: Duration = 1.seconds, condition: Here.() 
 }
 
 /**
+ * Run [block]; when an act in it is refused as stale, someone changed the resource since it was read, read the
+ * held resource again and run [block] again, at most [tries] times in all: its values worked out anew from what
+ * is there now. Any other refusal stops the script at once; after its tries, so does a stale one.
+ */
+fun Here.decide(tries: Int = 3, block: Here.() -> Unit) {
+    for (attempt in 1..tries) {
+        try {
+            block()
+            return
+        } catch (stopped: ScriptStopped) {
+            if (stopped.refused?.kind != Refusal.Stale || attempt == tries) throw stopped
+        }
+        sync()
+    }
+}
+
+/**
  * Visit each member the held list links under [rel], page after page by
  * `next`, coming back to its page after each; then back where it began.
  */

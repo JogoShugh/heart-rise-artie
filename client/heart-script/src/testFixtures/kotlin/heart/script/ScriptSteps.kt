@@ -49,6 +49,12 @@ class ScriptSteps {
         service.refusals["$rel at $at"] = Answer.Refused(Refusal.Stale, Side.SERVER, detail)
     }
 
+    @Given("the server will refuse {string} at {string} as stale {int} times: {string}")
+    fun refuseStaleTimes(rel: String, at: String, times: Int, detail: String) {
+        refuseStale(rel, at, detail)
+        service.refusedTimes["$rel at $at"] = times
+    }
+
     @Given("{string} becomes {string} after {int} more reads")
     fun settles(address: String, state: String, reads: Int) {
         service.settles[address] = reads to state
