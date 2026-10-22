@@ -117,7 +117,8 @@ class Here internal constructor(
      */
     fun follow(rel: String, title: String? = null, intent: String? = null, block: (Here.() -> Unit)? = null) {
         val step = ++run.step
-        if (title !in links(rel) && title !in embedded(rel).map { it.title }) {
+        // A list with a next page may hold the link further on: the client follows its next links to find it.
+        if (title !in links(rel) && title !in embedded(rel).map { it.title } && links("next").isEmpty()) {
             val detail = "no \"$rel\" link" + (title?.let { " titled \"$it\"" } ?: "")
             val refusal = Answer.Refused(Refusal.NotOffered, Side.CLIENT, detail)
             run.record(followAsked(rel, title), "refused", held, refusal)

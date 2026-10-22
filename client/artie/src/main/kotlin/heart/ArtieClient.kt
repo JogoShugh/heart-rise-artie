@@ -90,10 +90,16 @@ class ArtieClient(
 
     /** Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI. */
     override fun follow(rel: String, title: String?): HeartRepresentation {
-        val held = current ?: error("enter a service before following a link")
+        var held = current ?: error("enter a service before following a link")
         // SPEC §6.1: an embedded resource is followed like a link; following fetches it.
-        val link = held.links(rel).firstOrNull { it.title == title }
-            ?: held.embedded(rel).firstOrNull { it.title == title }?.self
+        fun found(page: HeartRepresentation) = page.links(rel).firstOrNull { it.title == title }
+            ?: page.embedded(rel).firstOrNull { it.title == title }?.self
+        // A list paged by next links may hold it further on: each next page is followed, as the list offers it.
+        var pages = 0
+        while (found(held) == null && pages++ < MAX_PAGES) {
+            held = held.links("next").firstOrNull()?.let { sync(it.href) } ?: break
+        }
+        val link = found(held)
             ?: run {
                 decisions.absent("link", rel, held.url)
                 error("No '$rel' link titled '$title' in ${held.url}")
@@ -196,6 +202,9 @@ class ArtieClient(
     }
 
     private companion object {
+        /** The most next pages a follow reads to find a titled link. */
+        const val MAX_PAGES = 20
+
         /** SPEC §6.2: the problem type of a 422 whose body was valid but a rule refused. */
         const val RULE_REFUSED = ProblemDetails.BASE + "rule-refused"
 

@@ -55,12 +55,15 @@ class ArtieNavigator(
         val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, guard)
         val form = client.current?.affordance(rel)
         val violations = form?.let { SchemaCheck.violations(body, it.schema) }.orEmpty()
+        val send = {
+            answer(rel) { client.act(rel, body) }.let {
+                if (it is Answer.Done && client.broughtIntoBeing) Answer.NewResource(it.now) else it
+            }
+        }
         val answered = guard?.refusal(client.current, rel, body)
             ?: violations.takeIf { it.isNotEmpty() }
                 ?.let { Answer.Refused(Refusal.InvalidInput, Side.CLIENT, it.joinToString("; ")) }
-            ?: answer(rel) { client.act(rel, body) }.let {
-                if (it is Answer.Done && client.broughtIntoBeing) Answer.NewResource(it.now) else it
-            }
+            ?: decidedAgain(send(), client, guard, rel, body, send)
         return UsedAffordances.with(answered, used)
     }
 
@@ -126,6 +129,25 @@ class ArtieNavigator(
     } catch (failed: IntegrityException) {
         Answer.Refused(Refusal.IntegrityMismatch, Side.CLIENT, failed.message.orEmpty())
     }
+}
+
+/**
+ * A script's act refused 412 ([first]), decided again: ARTIE has read the resource again, and a script's decision
+ * is its script, so when the form [rel] is still offered and the [guard] still holds, the act is sent once more
+ * ([send]), with the new ETag. A second 412, a form no longer offered, a guard that refuses: the first answer stands.
+ */
+@Suppress("LongParameterList") // the act, its client and its guard, each once
+private fun decidedAgain(
+    first: Answer,
+    client: HeartRiseClient,
+    guard: ScriptGuard?,
+    rel: String,
+    body: JsonObject,
+    send: () -> Answer,
+): Answer {
+    val stale = first is Answer.Refused && first.kind == Refusal.Stale
+    val offered = client.current?.affordance(rel) != null
+    return if (stale && offered && guard?.refusal(client.current, rel, body) == null) send() else first
 }
 
 /** ARTIE's refusals, as the DSL's kinds; a reason the server gave for an absent act is asked of [client]. */
