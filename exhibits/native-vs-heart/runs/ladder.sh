@@ -5,6 +5,10 @@
 # Usage: ladder.sh ROUNDS ARM... ; arms: py-direct py-via careful-direct careful-via heart:<care> careful-heart
 # careful-heart: ARTIE at its most careful (--guard strict --validators last), the gateway taking every kind of
 # care and refusing any act without a validator.
+# artie-goal: ARTIE careful (--guard lenient --validators last) running heart-script-goal.kts, which acts only on
+# what the resource still offers; the gateway as for careful-heart.
+# MEDDLE=M1,M2,... runs meddler.py beside each run, a teammate moving the world under it, and judges the run by
+# what it kept of the teammate's moves (checker.py respect); a line per run goes to meddle.tsv instead.
 # Writes each run's output to <arm>-<stamp>.out beside this script and a line per run to ladder.tsv.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -39,6 +43,13 @@ run() { # arm stamp
   local arm="$1" S="$2" start end rc
   local name="${arm//[:=, ]/_}"
   local out="$HERE/$name-$S.out"
+  local meddler=""
+  if [ -n "${MEDDLE-}" ]; then
+    python3 "$HERE/../meddler.py" JogoShugh heart-github-test "$S" "$MEDDLE" "$HERE/meddle-$name-$S.json" \
+      >"$HERE/meddle-$name-$S.out" 2>&1 &
+    meddler=$!
+    sleep 3  # the meddler finds the newest number first
+  fi
   start=$(perl -MTime::HiRes=time -e 'printf "%.1f", time')
   case "$arm" in
     py-direct)       python3 "$HERE/native-script.py" JogoShugh heart-github-test bug "$S" ;;
@@ -47,6 +58,11 @@ run() { # arm stamp
     careful-direct)  python3 "$HERE/native-script-careful.py" JogoShugh heart-github-test bug "$S" ;;
     careful-via)     SSL_CERT_FILE="$TLS/gateway.pem" GITHUB_API=https://localhost:8392 \
                        python3 "$HERE/native-script-careful.py" JogoShugh heart-github-test bug "$S" ;;
+    artie-goal)      (cd "$ROOT/client/scripts" && . ./.env && \
+                       JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
+                       artie run "$HERE/heart-script-goal.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
+                       --rung L2 --guard lenient --validators last --pins "$HERE/heart-script.pins.yaml" \
+                       --trace "$HERE/$name-$S.yaml") ;;
     careful-heart)   (cd "$ROOT/client/scripts" && . ./.env && \
                        JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
                        artie run "$HERE/heart-script.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
@@ -60,6 +76,19 @@ run() { # arm stamp
   esac >"$out" 2>&1
   rc=$?
   end=$(perl -MTime::HiRes=time -e 'printf "%.1f", time')
+  if [ -n "$meddler" ]; then
+    for _ in $(seq 30); do kill -0 "$meddler" 2>/dev/null || break; sleep 1; done
+    kill "$meddler" 2>/dev/null; wait "$meddler" 2>/dev/null
+    sleep 10
+    local verdict
+    verdict=$(python3 "$HERE/../checker.py" respect JogoShugh heart-github-test "$S" "$HERE/meddle-$name-$S.json" "$rc" \
+      2>/dev/null | python3 -c 'import json,sys; r=json.load(sys.stdin); print("%s\t%s\t%s\t%s" % (r["verdict"],
+      ",".join(r["landed"]) or "-", ",".join(r["late"]) or "-", "; ".join(r["damage"] + ["undone: " + u for u in r["left_undone"]]) or "-"))' \
+      2>/dev/null || echo "no verdict")
+    printf '%s\t%s\t%s\t%s\t%.1f\t%s\n' "$name" "$S" "$MEDDLE" "$rc" "$(echo "$end - $start" | bc)" "$verdict" \
+      | tee -a "$HERE/meddle.tsv"
+    return
+  fi
   local check
   sleep 10  # GitHub's lists catch up with its writes a few seconds late
   check=$(python3 "$HERE/../checker.py" check JogoShugh heart-github-test "$S" 2>/dev/null | python3 -c "import json,sys; r=json.load(sys.stdin); print(\"%d/%d\" % (r[\"held\"], r[\"of\"]))" 2>/dev/null || echo "no check")
@@ -69,7 +98,7 @@ run() { # arm stamp
 for round in $(seq "$ROUNDS"); do
   for arm in "$@"; do
     case "$arm" in
-      careful-heart) start_gateway "" "" ;;
+      careful-heart|artie-goal) start_gateway "" "" ;;
       heart:every) start_gateway "" ;;
       heart:*) start_gateway "${arm#heart:}" ;;
       *-via) start_gateway "" ;;
