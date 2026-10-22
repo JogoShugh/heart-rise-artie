@@ -65,7 +65,7 @@ class ArtieNavigator(
      */
     override fun act(rel: String, fields: Map<String, Any?>): Answer {
         val body = JsonObject(fields.mapValues { (_, v) -> json(v) })
-        val used = UsedAffordances.form(client.current, rel, body, client.appliedRung, held)
+        val used = UsedAffordances.form(reading(client), rel, body, held, client.sendsValidators)
         val form = client.current?.affordance(rel)
         // Off the rails, the body goes as it is: the server checks it, the client doesn't.
         val violations = form?.takeUnless { offRails }?.let { SchemaCheck.violations(body, it.schema) }.orEmpty()
@@ -128,7 +128,7 @@ class ArtieNavigator(
             is Decision.Selected -> error("ARTIE makes every choice it accepts")
         }
         // The affordance the reasoner's choice used, as the representation it chose from offered it.
-        val used = UsedAffordances.chosen(before, decided, rung)
+        val used = UsedAffordances.chosen(UsedAffordances.Reading(before, rung), decided, client.sendsValidators)
         return Reasoned(reasoned.chosen, UsedAffordances.with(reasoned.answer, used), keeps?.taken().orEmpty())
     }
 
@@ -177,6 +177,9 @@ private fun decidedAgain(
 }
 
 /** ARTIE's refusals, as the DSL's kinds; a reason the server gave for an absent act is asked of [client]. */
+/** What [client] holds now, at the rung the server applied: what a step's record says it chose from. */
+private fun reading(client: HeartRiseClient) = UsedAffordances.Reading(client.current, client.appliedRung)
+
 private fun refusal(client: HeartRiseClient, what: String, refused: RuntimeException): Answer.Refused =
     when (refused) {
         // ARTIE refuses an act its manifest lacks with an IllegalStateException; the DSL checks first.

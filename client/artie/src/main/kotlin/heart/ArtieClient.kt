@@ -16,19 +16,16 @@ import java.net.URI
  * replaces these. For caching and integrity checks, give it a
  * transport built as CachingTransport(IntegrityCheck(wire)).
  */
-@Suppress("LongParameterList") // each is one thing the client is made with
 class ArtieClient(
     transport: Transport,
     private val rung: Rung = Rung.L0,
     private val dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
-    /** Follow forms links and schema references that carry no integrity value (older servers only). */
-    allowUncheckedLinks: Boolean = false,
+    /** What it takes care over: links with integrity, and validators on acts. */
+    private val care: Care = Care(),
     /** Where ARTIE reports its decisions; off by default. */
     events: EventLog = EventLog.OFF,
     /** Bindings for other URI schemes, by scheme (SPEC §6.0). */
     bindings: Map<String, Binding> = emptyMap(),
-    /** Whether each act carries the validator held; false sends blind writes (spec/ideas/off-the-rails.md). */
-    private val validators: Boolean = true,
 ) : HeartRiseClient {
     init {
         require(rung <= dialect.maxRung) {
@@ -40,7 +37,7 @@ class ArtieClient(
         Bindings(mapOf("http" to http, "https" to http, "coap" to CoapBinding()) + bindings)
     }
     private val decisions = DecisionLog(events)
-    private val layers = SharedLayers(this.bindings, allowUncheckedLinks, decisions)
+    private val layers = SharedLayers(this.bindings, !care.checkedLinks, decisions)
 
     override var current: HeartRepresentation? = null
         private set
@@ -170,9 +167,11 @@ class ArtieClient(
         throw refusal(rel, act.url, outcome, held)
     }
 
+    override val sendsValidators: Boolean get() = care.validators
+
     /** The validator an act on [held] carries: the one held, or none when the run sends blind writes. */
     private val validatorFor: (HeartRepresentation) -> String? = { held ->
-        if (validators) held.etag ?: error("no validator held for ${held.url}; an act needs one") else null
+        if (care.validators) held.etag ?: error("no validator held for ${held.url}; an act needs one") else null
     }
 
     /** Stale and not offered re-sync first, so the client never keeps a manifest the server has refused. */

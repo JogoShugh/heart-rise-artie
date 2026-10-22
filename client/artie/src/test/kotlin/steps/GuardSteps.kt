@@ -1,5 +1,6 @@
 package steps
 
+import heart.Care
 import heart.HeartRequest
 import heart.script.Run
 import io.cucumber.java.en.Given
@@ -39,7 +40,7 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
     @Given("ARTIE runs with the guard {string} and the validators {string}")
     fun runsWithValidators(guard: String, validators: String) {
         ctx.guard = guard
-        ctx.validators = validators != "none"
+        ctx.care = Care(ctx.care.checkedLinks, validators = validators != "none")
     }
 
     @Then("the client sent the comment with If-Match")

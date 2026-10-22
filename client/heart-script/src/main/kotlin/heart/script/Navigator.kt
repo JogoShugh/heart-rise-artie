@@ -240,7 +240,6 @@ fun interface NavigatorProvider {
  * What a run asks of the client it is given: the [rung] to read at (L0, L1, L2: SPEC §6.10), and the
  * [reasoner] to use for `act(intent = …)` steps (for ARTIE: `claude`). Null: the client's own choice, or none.
  */
-@Suppress("LongParameterList") // each is one thing a run asks of its client
 class ClientSettings(
     val rung: String? = null,
     val reasoner: String? = null,
@@ -248,7 +247,13 @@ class ClientSettings(
     val exchanges: Boolean = false,
     /** The script's lock file, when it has one; the client checks each act against it before sending. */
     val pins: Pins? = null,
-    /** How the lock file is held to: "lenient" (the default) or "strict". */
+    /** How careful the run is: how it holds to the lock file, and what its acts carry. */
+    val guarding: Guarding = Guarding(),
+)
+
+/** How careful a run is (spec/ideas/replay-guards-lenient-strict.md, spec/ideas/off-the-rails.md). */
+class Guarding(
+    /** How the lock file is held to: "lenient" (the default), "strict", "look-then-leap" or "off-the-rails". */
     val guard: String? = null,
     /**
      * What a lenient run does when a form it uses changed: "refuse" (the default), or "values", act when the form

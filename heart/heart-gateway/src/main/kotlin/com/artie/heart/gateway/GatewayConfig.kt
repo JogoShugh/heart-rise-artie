@@ -1,5 +1,6 @@
 package com.artie.heart.gateway
 
+import com.artie.heart.ServingLimits
 import com.artie.heart.http4k.Credentials
 import java.nio.file.Path
 
@@ -7,25 +8,27 @@ import java.nio.file.Path
 class UpstreamSettings(val url: String, val spec: String, val auth: UpstreamAuth)
 
 /**
+ * How a gateway serves its callers: its [port], who may call it, and its [limits] (ServingLimits;
+ * a validator on every act unless HEART_ACTS_WITHOUT_VALIDATOR=allowed, for a trial, says no).
+ */
+class Serving(val port: Int, val credentials: Credentials, val limits: ServingLimits)
+
+/**
  * Everything a gateway needs, from its environment (spec/PLAN-OPENAPI-GATEWAY.md,
  * Container): its upstream, the profile its relations are named in, the
- * connector that says how the upstream signals, its port, and who may call
- * it. A missing or wrong setting stops the gateway at start, naming the
+ * connector that says how the upstream signals, and how it serves its
+ * callers. A missing or wrong setting stops the gateway at start, naming the
  * variable and never a value.
  */
-@Suppress("LongParameterList") // each is one variable of the environment
 class GatewayConfig private constructor(
     val upstream: UpstreamSettings,
     /** The profile its relations are named in; a connector names its own, and wins. */
     val profile: String?,
     /** The folder of the connector that says how the upstream signals; none means its affordance link alone. */
     val connector: Path?,
-    val port: Int,
-    val credentials: Credentials,
+    val serving: Serving,
     /** Where to keep the record of upstream calls (GATEWAY_RECORD); none keeps no record. */
     val record: Path? = null,
-    /** Whether an act must carry a validator; only HEART_ACTS_WITHOUT_VALIDATOR=allowed, for a trial, says no. */
-    val validatorRequired: Boolean = true,
 ) {
     companion object {
         const val DEFAULT_PORT = 8090
@@ -55,7 +58,8 @@ class GatewayConfig private constructor(
                 "allowed" -> false
                 else -> error("HEART_ACTS_WITHOUT_VALIDATOR must be allowed, or unset, not $switch")
             }
-            return GatewayConfig(upstream, profile, connector, port, credentials, record, required)
+            val serving = Serving(port, credentials, ServingLimits(validatorRequired = required))
+            return GatewayConfig(upstream, profile, connector, serving, record)
         }
 
         private fun auth(value: (String) -> String?): UpstreamAuth = when (val scheme = value("UPSTREAM_AUTH")) {

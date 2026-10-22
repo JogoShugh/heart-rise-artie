@@ -45,6 +45,15 @@ class CaptureSteps(private val ctx: ClientContext) {
         assertTrue(guard["if-match"]?.jsonPrimitive?.content.orEmpty().contains(".L2."), "If-Match: $guard")
     }
 
+    /** The trace records the If-Match that went on the wire, and none for a blind write. */
+    @Then("the run's step {int} records the comment sent with If-Match")
+    fun recordsIfMatch(step: Int) = assertTrue(ifMatch(step) != null, "${step(step)}")
+
+    @Then("the run's step {int} records the comment sent with no If-Match")
+    fun recordsNoIfMatch(step: Int) = assertEquals(null, ifMatch(step), "${step(step)}")
+
+    private fun ifMatch(step: Int): String? = step(step)["guard"]?.jsonObject?.get("if-match")?.jsonPrimitive?.content
+
     @Then("the run's step {int} kept one call to Claude, asked with {string} and answered with {string}")
     fun keptCall(step: Int, intent: String, chose: String) {
         val calls = (traced()[step - 1]["model"] as? kotlinx.serialization.json.JsonArray).orEmpty()

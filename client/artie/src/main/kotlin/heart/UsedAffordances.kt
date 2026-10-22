@@ -15,19 +15,25 @@ import kotlinx.serialization.json.jsonObject
  */
 internal object UsedAffordances {
 
+    /** A representation as the client held it: [held], at the [rung] the server applied (SPEC §6.10). */
+    class Reading(val held: HeartRepresentation?, val rung: Rung?)
+
     /**
-     * The form [rel] of [held], acted on with [fields]; null when [held] offers no such form. [rung] is the rung
-     * the server applied to [held] (SPEC §6.10): a bookmark's lookup forms come inline at every rung.
+     * The form [rel] of [reading], acted on with [fields]; null when it offers no such form. A bookmark's lookup
+     * forms come inline at every rung. The If-Match recorded is the one sent: none when not [validated], a blind
+     * write.
      */
     fun form(
-        held: HeartRepresentation?,
+        reading: Reading,
         rel: String,
         fields: JsonObject,
-        rung: Rung?,
         guard: ScriptGuard? = null,
+        validated: Boolean = true,
     ): Used? {
+        val held = reading.held
+        val rung = reading.rung
         val form = held?.affordance(rel) ?: return null
-        val sends = form.method != "GET"
+        val sends = form.method != "GET" && validated
         return Used(
             kind = "form",
             relation = rel,
@@ -65,8 +71,11 @@ internal object UsedAffordances {
         return Used("link", rel, title, "GET", target = link.href, address = link.href, guard = checked)
     }
 
-    /** The affordance a reasoner's [decision] used, made from [before], read at [rung]; null with no selection. */
-    fun chosen(before: HeartRepresentation?, decision: Decision?, rung: Rung?): Used? {
+    /**
+     * The affordance a reasoner's [decision] used, made from [before]; null with no selection. Not [validated]: the
+     * act was a blind write.
+     */
+    fun chosen(before: Reading, decision: Decision?, validated: Boolean): Used? {
         val selection = when (decision) {
             is Decision.Acted -> decision.selection
             is Decision.Followed -> decision.selection
@@ -74,8 +83,8 @@ internal object UsedAffordances {
             else -> null
         }
         return when (selection) {
-            is Selection.Act -> form(before, selection.affordance, selection.fields, rung)
-            is Selection.Follow -> link(before, selection.rel, selection.title)
+            is Selection.Act -> form(before, selection.affordance, selection.fields, validated = validated)
+            is Selection.Follow -> link(before.held, selection.rel, selection.title)
             else -> null
         }
     }

@@ -117,8 +117,8 @@ class CliSteps(private val script: ScriptSteps) {
             askedReasoner = settings.reasoner.orEmpty()
             askedExchanges = settings.exchanges
             askedPins = settings.pins
-            askedGuard = settings.guard
-            askedValidators = settings.validators
+            askedGuard = settings.guarding.guard
+            askedValidators = settings.guarding.validators
             script.service
         }
         val cli = ArtieCli(folder, PrintStream(bytes, true), { typed.removeFirstOrNull() }, client, BUILDER)

@@ -13,14 +13,8 @@ class ArtieNavigatorProvider : NavigatorProvider {
     override fun navigator(): Navigator = navigator(ClientSettings())
 
     override fun navigator(settings: ClientSettings): Navigator {
-        val rung = settings.rung?.let(Rung::valueOf) ?: Rung.L0
         val home = Path.of(System.getProperty("user.home"))
-        val guard = settings.pins?.let {
-            ScriptGuard(it, strict = settings.guard == "strict", values = settings.onChange == "values")
-        }
-        val blind = settings.validators == "none"
-        val env = System.getenv()
-        return standard(env, home, rung, settings.reasoner, settings.exchanges, guard, settings.guard, blind)
+        return standard(System.getenv(), home, settings)
     }
 
     companion object {
@@ -29,36 +23,33 @@ class ArtieNavigatorProvider : NavigatorProvider {
 
         /**
          * ARTIE with the credentials [env] and [userHome] hold: over HTTP and HTTPS, plain CoAP, and coaps,
-         * whose pre-shared keys stay inside its DTLS connector. With [reasoner] `claude`, its `reason(…)` steps
-         * ask Claude, with the model key from [ModelKey.standard]; with no key, they are refused, saying where
-         * one goes. Every request carries its W3C traceparent, so a server's own record of what it did for it
-         * (the gateway's upstream calls) can be tied to the step. With [exchanges], the exchanges on the wire
-         * are kept for the run's capture. With [guard], each act is held to the script's lock file first.
+         * whose pre-shared keys stay inside its DTLS connector, as [settings] ask. With the reasoner `claude`, its
+         * `reason(…)` steps ask Claude, with the model key from [ModelKey.standard]; with no key, they are refused,
+         * saying where one goes. Every request carries its W3C traceparent, so a server's own record of what it did
+         * for it (the gateway's upstream calls) can be tied to the step. With exchanges asked for, those on the wire
+         * are kept for the run's capture. With pins, each act is held to the script's lock file first.
          */
-        @Suppress("LongParameterList") // each is one thing a run asks of its client
-        fun standard(
-            env: Map<String, String>,
-            userHome: Path,
-            rung: Rung = Rung.L0,
-            reasoner: String? = null,
-            exchanges: Boolean = false,
-            guard: ScriptGuard? = null,
-            /** The run's guard by name: off-the-rails and look-then-leap turn ARTIE's own care off. */
-            guarding: String? = null,
-            /** Whether acts carry no validator: blind writes, which only a server's development switch takes. */
-            blind: Boolean = false,
-        ): Navigator {
+        fun standard(env: Map<String, String>, userHome: Path, settings: ClientSettings = ClientSettings()):
+            Navigator {
+            val rung = settings.rung?.let(Rung::valueOf) ?: Rung.L0
+            val guarding = settings.guarding
+            val guard = settings.pins?.let {
+                ScriptGuard(it, strict = guarding.guard == "strict", values = guarding.onChange == "values")
+            }
             val credentials = CredentialSources.standard(env, userHome)
-            val log = if (exchanges) ExchangeLog(HttpTransport()) else null
+            val log = if (settings.exchanges) ExchangeLog(HttpTransport()) else null
             val wire = TraceContextTransport(Trace(), UserAgentTransport(next = log ?: HttpTransport()))
             val transport = CachingTransport(IntegrityCheck(AuthTransport(credentials, wire)))
             val coaps = mapOf("coaps" to CoapBinding(credentials = credentials))
-            val client = ArtieClient(transport, rung, bindings = coaps, validators = !blind)
-            val key = if (reasoner == "claude") ModelKey.standard(env, userHome) else null
+            val care = Care(validators = guarding.validators != "none")
+            val client = ArtieClient(transport, rung, care = care, bindings = coaps)
+            val claude = settings.reasoner == "claude"
+            val key = if (claude) ModelKey.standard(env, userHome) else null
+            val named = guarding.guard
             return when {
-                reasoner != "claude" -> ArtieNavigator(client, exchangeLog = log, guard = guard, guarding = guarding)
-                key == null -> ArtieNavigator(client, null, NO_KEY, log, guard, guarding)
-                else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), NO_KEY, log, guard, guarding)
+                !claude -> ArtieNavigator(client, exchangeLog = log, guard = guard, guarding = named)
+                key == null -> ArtieNavigator(client, null, NO_KEY, log, guard, named)
+                else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), NO_KEY, log, guard, named)
             }
         }
     }

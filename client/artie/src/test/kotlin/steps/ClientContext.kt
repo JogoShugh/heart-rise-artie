@@ -1,6 +1,7 @@
 package steps
 
 import heart.ArtieClient
+import heart.Care
 import heart.Binding
 import heart.CachingTransport
 import heart.AuthTransport
@@ -34,14 +35,11 @@ class ClientContext {
     var rung: Rung = Rung.L0
     var dialect: Dialect = Dialect.HAL_SCHEMA_FORMS
 
-    /** True only for scenarios about older servers that send no integrity values. */
-    var allowUncheckedLinks = false
+    /** What the client takes care over: unchecked links only for older servers, blind writes off the rails. */
+    var care = Care()
 
     /** The run's guard (script-guard.feature): lenient or strict; null when the run is not guarded. */
     var guard: String? = null
-
-    /** Whether the client's acts carry the validator held; false sends blind writes (off-the-rails.feature). */
-    var validators = true
 
     /** The lock file's pins, by relation: the form's integrity and its set's (script-guard.feature). */
     var pins: Map<String, Pair<String, String?>>? = null
@@ -119,7 +117,7 @@ class ClientContext {
             "coaps" to CoapBinding(trace = trace, credentials = credentials),
         )
         val bindings = coap + bindings
-        return ArtieClient(transport, rung, dialect, allowUncheckedLinks, events, bindings, validators)
+        return ArtieClient(transport, rung, dialect, care, events, bindings)
             .also { created += it }
     }
 

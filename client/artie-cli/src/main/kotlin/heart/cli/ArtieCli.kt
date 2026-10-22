@@ -2,6 +2,7 @@ package heart.cli
 
 import heart.cli.generate.generate
 import heart.script.ClientSettings
+import heart.script.Guarding
 import heart.script.Navigator
 import heart.script.Refusal
 import heart.script.Run
@@ -67,10 +68,8 @@ class ArtieCli(
         val given = asked.inputsFile?.let { inputsFile(folder.resolve(it)) }.orEmpty() + asked.inputs
         val config = config(asked, folder, file)
         val lock = lockFile(asked, folder, file, config)
-        val validators = asked.validators ?: config.validators
-        val settings = ClientSettings(
-            lock.rung, asked.reasoner, asked.exchanges, lock.pins, lock.guard, config.onChange, validators,
-        )
+        val guarding = Guarding(lock.guard, config.onChange, asked.validators ?: config.validators)
+        val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, guarding)
         val made = lazy { navigator(settings) }
         val client by made
         val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { client })

@@ -75,6 +75,7 @@ Feature: Off the rails: a run that reads only what it must, checks only what the
       }
       """
     Then the client sent the comment <how>
+    And the run's step 3 records the comment sent <how>
     And <outcome>
 
     Examples:

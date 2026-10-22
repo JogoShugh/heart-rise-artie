@@ -38,6 +38,9 @@ interface HeartRiseClient {
      */
     val recall: (String) -> HeartRepresentation get() = { enter(it) }
 
+    /** Whether each act carries the validator held; false when this client sends blind writes. */
+    val sendsValidators: Boolean get() = true
+
     /**
      * The ALPS descriptor's doc for the offered form [rel] (SPEC §6.1, §8.5):
      * its relation URI, fetched and cached as HTTP allows. Null when the form's

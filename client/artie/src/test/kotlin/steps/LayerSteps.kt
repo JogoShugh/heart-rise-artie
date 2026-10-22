@@ -2,6 +2,7 @@ package steps
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import heart.Care
 import heart.HeartResponse
 import heart.Rung
 import io.cucumber.java.en.Given
@@ -69,7 +70,7 @@ class LayerSteps(private val ctx: ClientContext) {
 
     @Given("the client accepts links without integrity")
     fun acceptUnchecked() {
-        ctx.allowUncheckedLinks = true
+        ctx.care = Care(checkedLinks = false, validators = ctx.care.validators)
     }
 
     private fun serveBed(bed: Int, link: String) {

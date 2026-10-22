@@ -43,7 +43,8 @@ class ModelKeySteps {
 
     @When("a script host's ARTIE, allowed the claude reasoner, is asked to reason")
     fun reasonWithoutKey() {
-        reasoned = heart.ArtieNavigatorProvider.standard(env, home, reasoner = "claude").reason("tidy up")
+        val settings = heart.script.ClientSettings(reasoner = "claude")
+        reasoned = heart.ArtieNavigatorProvider.standard(env, home, settings).reason("tidy up")
     }
 
     @Then("the reason step was refused as {string}, by {string}: {string}")

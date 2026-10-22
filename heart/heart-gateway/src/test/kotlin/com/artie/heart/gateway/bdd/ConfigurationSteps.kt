@@ -54,7 +54,7 @@ class ConfigurationSteps {
     fun noConnector() = assertNull(config.connector)
 
     @Then("the gateway listens on port {int}")
-    fun port(port: Int) = assertEquals(port, config.port)
+    fun port(port: Int) = assertEquals(port, config.serving.port)
 
     @Then("the gateway calls the upstream with each caller's own credential")
     fun forwarded() {
@@ -64,17 +64,17 @@ class ConfigurationSteps {
 
     @Then("the gateway admits any Basic or Bearer credential, for the upstream to judge, and no request without one")
     fun admitsAny() {
-        assertTrue(config.credentials.admits("Bearer anyone's-token"))
-        assertTrue(config.credentials.admits("Basic YW55b25lOnNlY3JldA=="))
-        assertFalse(config.credentials.admits(null))
-        assertFalse(config.credentials.admits("Bearer "))
+        assertTrue(config.serving.credentials.admits("Bearer anyone's-token"))
+        assertTrue(config.serving.credentials.admits("Basic YW55b25lOnNlY3JldA=="))
+        assertFalse(config.serving.credentials.admits(null))
+        assertFalse(config.serving.credentials.admits("Bearer "))
     }
 
     @Then("acts need a validator")
-    fun validatorNeeded() = assertTrue(config.validatorRequired)
+    fun validatorNeeded() = assertTrue(config.serving.limits.validatorRequired)
 
     @Then("acts may come with no validator")
-    fun noValidatorNeeded() = assertFalse(config.validatorRequired)
+    fun noValidatorNeeded() = assertFalse(config.serving.limits.validatorRequired)
 
     @Then("it refuses to start, saying {string}")
     fun refuses(says: String) = assertEquals(says, read.exceptionOrNull()?.message)
