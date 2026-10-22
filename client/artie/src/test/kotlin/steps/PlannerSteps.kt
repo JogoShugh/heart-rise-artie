@@ -103,6 +103,13 @@ class PlannerSteps(private val ctx: ClientContext) {
         assertEquals(table.asMaps().map { it.getValue("move") }, offered)
     }
 
+    @Then("the planner's system prompt says")
+    fun systemSays(table: DataTable) {
+        val system = request().getValue("system").jsonArray.first().jsonObject.getValue("text").jsonPrimitive.content
+            .replace(Regex("\\s+"), " ")
+        table.asMaps().map { it.getValue("part") }.forEach { assertTrue(it in system, "no \"$it\" in:\n$system") }
+    }
+
     @Then("the planner's request caches its system prompt and tool")
     fun caches() {
         val request = request()

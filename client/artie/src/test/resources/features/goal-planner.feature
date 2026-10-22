@@ -61,6 +61,17 @@ Feature: Claude plans a goal run, one move at a time
       | calls | input | output | cache_read | cache_write |
       | 1     | 120   | 30     | 900        | 40          |
 
+  Scenario: The planner is told a follow moves it and makes nothing, so from a list it follows on to the item
+    Live, told only that following a link to a list makes no branch, the
+    planner went back from the branch list each time it got there, never on
+    to main, until the step ran out of moves.
+    Given the Claude API will answer with the move {"move": "finish"}
+    When the planner is asked its next move
+    Then the planner's system prompt says
+      | part                                                                            |
+      | A follow moves you and makes nothing                                            |
+      | from a list, follow on to the item you need (a branch, an issue), then act there |
+
   Scenario: In a goal in steps, the model is shown the steps, the step now and the names, and may make only its moves
     spec/PLAN-GOAL-MARKDOWN.md. The runner keeps the structure: the model
     sees the steps as a tree, the step now marked, the resources the steps

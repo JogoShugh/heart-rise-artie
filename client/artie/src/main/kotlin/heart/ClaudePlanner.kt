@@ -184,8 +184,9 @@ class ClaudePlanner(
             runner comes back to where it began by itself: never "finish" in a goal in steps. For a step with sub-steps, act only to
             reach the resource its sub-steps start from (an act that opens), then "done": never do a sub-step's
             work early, since each comes next as a step of its own. Each act in <moves> says what was done:
-            "acted" a form, or "followed" a link, and what came of it. Say "done" only once a move did the
-            step's work: following a link to a list is no branch made, no file committed. "back" goes to a resource on <path> this
+            "acted" a form, or "followed" a link, and what came of it. A follow moves you and makes nothing:
+            from a list, follow on to the item you need (a branch, an issue), then act there. Say "done" only
+            once a move did the step's work, never because a follow came back done. "back" goes to a resource on <path> this
             step opened, or to where it began, no further.
         """.trimIndent()
 
