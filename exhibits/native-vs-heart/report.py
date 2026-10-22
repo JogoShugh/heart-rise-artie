@@ -83,7 +83,7 @@ def table(phase):
             f'<td class="num"><span class="pill {"ok" if ok else "bad"}">{held}/{of}</span></td>'
             f'<td class="num">{seconds}</td><td class="num">{"" if steps is None else steps}</td>'
             f'<td class="num">{calls or "–"}</td><td class="num">{tin:,}</td><td class="num">{tout:,}</td>'
-            f'<td class="num">{cread:,}</td><td class="num">{cwrite:,}</td><td class="note">{esc(note)}</td></tr>')
+            f'<td class="num">{cread:,}</td><td class="num">{cwrite:,}</td><td class="note"><span class="full">{esc(note)}</span></td></tr>')
     out.append("</tbody></table></div>")
     return "".join(out)
 
@@ -183,8 +183,34 @@ KOTLIN_POINTS = [
 def points(items):
     return "<dl class=\"points\">" + "".join(
         f'<div><dt><span class="verdict {v}">{ {"weak": "weak", "good": "strong", "note": "note"}[v] }</span>'
-        f'{esc(claim)}</dt><dd><code>{esc(code)}</code></dd><dd>{esc(why)}</dd></div>'
+        f'{esc(claim)}</dt><dd class="full"><code>{esc(code)}</code></dd><dd class="full">{esc(why)}</dd></div>'
         for v, claim, code, why in items) + "</dl>"
+
+
+STRICTNESS = [
+    ("Is the act allowed now?", "The form must be in the representation held, or it refuses before sending.",
+     "Sends regardless; learns from the status."),
+    ("Is the body valid?", "Each field checked against the form's JSON Schema before sending; one it doesn't name is refused.",
+     "Sends any field; GitHub drops the ones it doesn't know, quietly (duplicate_of)."),
+    ("Has the form changed since the script was made?", "The lock file pins each form's integrity, checked before every act.",
+     "Can't tell."),
+    ("Has the resource changed since it was read?", "If-Match on every act; a 412 is read again and decided again.",
+     "Writes blind."),
+    ("What does a refusal mean?", "409 not allowed here, 412 stale, 422 invalid or a rule said no, 428 precondition "
+     "wanted: each its own handling.", "Anything but 200, 201 or 204 ends it; within those it goes on."),
+    ("Was something made?", "201 with a Location is told from 200: what was made is held, and named.",
+     "Any success is the same."),
+    ("After a block", "The resource the block began at is read again (\"return to\"): the next step acts on what is.",
+     "Acts on what it last saw."),
+    ("Links", "Followed only where offered.", "Builds every address itself."),
+]
+
+
+def strictness():
+    rows = "".join(f'<tr><td>{esc(q)}</td><td>{esc(a)}</td><td>{esc(p)}</td></tr>' for q, a, p in STRICTNESS)
+    return ('<div class="wrap"><table class="strict"><thead><tr><th>Check</th><th><span class="tag heart">HEART</span> '
+            'ARTIE script</th><th><span class="tag native">Native</span> Python script</th></tr></thead>'
+            f'<tbody>{rows}</tbody></table></div>')
 
 
 def scripts():
@@ -192,7 +218,7 @@ def scripts():
     kotlin = (HERE / "runs" / "heart-script.kts").read_text()
     return f"""
   <section><h2>Two scripts, one task</h2>
-  <p class="sub">Both do the triage task with no model; both passed every run made on the code as it ended. Claude
+  <p class="sub full">Both do the triage task with no model; both passed every run made on the code as it ended. Claude
   wrote the Python in one call from its own run's transcript. <code>artie generate</code> wrote the Kotlin from one
   HEART run's capture, with a lock file beside it.</p>
   <div class="pair2">
@@ -204,8 +230,14 @@ def scripts():
       <pre><code class="language-kotlin">{esc(kotlin)}</code></pre></div>
   </div></section>
 
+  <section><h2>What each checks, step by step</h2>
+  <p class="sub full">Much of the time between them is strictness. Before and after each act, ARTIE checks what
+  the Python never does: it won't send what it can't stand behind, and a refusal stops it before its harm. The
+  Python is fast because it trusts its memory and takes any 2xx as success, which is how an ignored field passed.</p>
+  {strictness()}</section>
+
   <section><h2>The Python, read closely</h2>
-  <p class="sub">It is good code for what it is: what one model remembers of one API, written down. Its weaknesses
+  <p class="sub full">It is good code for what it is: what one model remembers of one API, written down. Its weaknesses
   are the weaknesses of that.</p>
   {points(PYTHON_POINTS)}</section>
 
@@ -229,7 +261,7 @@ def main():
         tile("Scripted runs that did the task", passed(ns), passed(hs)),
         tile("Scripted, mean time", f"{mean(r[6] for r in ns):.0f}", f"{mean(r[6] for r in hs):.0f}", " s"),
     ])
-    fixes = "".join(f'<li><b>{esc(t)}</b> <span class="commit">{esc(c)}</span><p>{esc(why)}</p></li>'
+    fixes = "".join(f'<li><b>{esc(t)}</b> <span class="commit">{esc(c)}</span><p class="full">{esc(why)}</p></li>'
                     for c, t, why in FIXES)
     page = TEMPLATE.replace("@TILES@", tiles).replace("@REASONED@", table("reasoned")) \
         .replace("@SCRIPTED@", table("scripted")).replace("@FIXES@", fixes).replace("@SCRIPTS@", scripts())
@@ -280,6 +312,7 @@ p { margin: 0; } .lede, .sub { color: var(--muted); max-width: 66ch; } .sub { ma
 .seg-label { font: 600 .7rem var(--body); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
 .seg button { font: 500 .8rem var(--body); background: var(--surface); color: var(--fg); border: 1px solid var(--rule); border-radius: 6px; padding: .25rem .6rem; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+.seg button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .8rem; }
 .tile { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: .7rem .9rem; display: grid; gap: .4rem; }
 .tile .label { font: 600 .74rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
@@ -305,6 +338,8 @@ ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { 
 .tabs button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
 .tab { display: grid; gap: 2rem; }
 [hidden] { display: none !important; }
+:root:not([data-detail="full"]) .full { display: none !important; }
+.toggles { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; }
 .code { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); overflow: hidden; }
 .code .head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 1rem; padding: .55rem .9rem; border-bottom: 1px solid var(--rule); background: var(--bg); font-size: .85rem; color: var(--muted); }
 .code pre { margin: 0; padding: .8rem .9rem; overflow: auto; max-height: 34rem; font: .78rem/1.55 var(--mono); }
@@ -312,6 +347,7 @@ ul { margin: .3rem 0 0; padding-left: 1.2rem; display: grid; gap: .5rem; } li { 
 .hljs-keyword, .hljs-built_in, .hljs-literal { color: var(--kw); } .hljs-string { color: var(--str); }
 .hljs-comment { color: var(--muted); font-style: italic; } .hljs-number { color: var(--num); }
 .hljs-title, .hljs-function .hljs-title { color: var(--fn); } .hljs-subst, .hljs-variable, .hljs-template-variable { color: var(--tpl); }
+table.strict { min-width: 44rem; } table.strict td:first-child { font-weight: 600; width: 22%; }
 .pair2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 34rem), 1fr)); gap: 1rem; }
 .pair2 > * { min-width: 0; }
 dl.points { display: grid; gap: .9rem; margin: 0; } dl.points dt { font-weight: 600; } dl.points dd { margin: .2rem 0 0; color: var(--muted); max-width: 72ch; }
@@ -326,7 +362,8 @@ dl.points code, .tab p code, li code { font: .85em var(--mono); color: var(--fg)
   <header>
     <div><h1>Native and HEART, Measured</h1>
     <p class="lede">The GitHub triage task, 29 steps, done by Claude alone from what it knows of GitHub's REST API, and by Claude through ARTIE and the HEART gateway. Three runs each with a model choosing every move, then three each by a script made from a run, with no model. One checker judged every run by what GitHub held after it: 23 checks.</p></div>
-    <div class="seg"><span class="seg-label" id="theme-label">Theme</span><div role="group" aria-labelledby="theme-label" style="display:flex;gap:.3rem"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div>
+    <div class="toggles"><div class="seg"><span class="seg-label" id="detail-label">Detail</span><div role="group" aria-labelledby="detail-label" style="display:flex;gap:.3rem"><button type="button" data-detail="brief">Brief</button><button type="button" data-detail="full">Full</button></div></div>
+    <div class="seg"><span class="seg-label" id="theme-label">Theme</span><div role="group" aria-labelledby="theme-label" style="display:flex;gap:.3rem"><button type="button" data-th="light">Light</button><button type="button" data-th="dark">Dark</button></div></div></div>
   </header>
 
   <nav class="tabs" role="tablist" aria-label="Report">
@@ -349,15 +386,15 @@ dl.points code, .tab p code, li code { font: .85em var(--mono); color: var(--fg)
   </section>
 
   <section><h2>Reasoned: the model chooses every move</h2>
-  <p class="sub">Native's input tokens are nearly all read from its prompt cache: one conversation that grows. HEART sends each call a fresh view of the resource held, and makes two calls a move, the planner's and the reasoner's.</p>
+  <p class="sub full">Native's input tokens are nearly all read from its prompt cache: one conversation that grows. HEART sends each call a fresh view of the resource held, and makes two calls a move, the planner's and the reasoner's.</p>
   @REASONED@</section>
 
   <section><h2>Scripted: no model</h2>
-  <p class="sub">HEART's script runs 1 to 3 came before the fixes below; 4 to 6 after.</p>
+  <p class="sub full">HEART's script runs 1 to 3 came before the fixes below; 4 to 6 after.</p>
   @SCRIPTED@</section>
 
   <section><h2>What HEART needed, found by these runs</h2>
-  <p class="sub">Native needed nothing changed. Each fix below is in ARTIE, test first, and the runs after it are on the fixed code.</p>
+  <p class="sub full">Native needed nothing changed. Each fix below is in ARTIE, test first, and the runs after it are on the fixed code.</p>
   <ul>@FIXES@</ul></section>
 
   <section><h2>What this trial does not test</h2><ul>
@@ -383,6 +420,15 @@ dl.points code, .tab p code, li code { font: .85em var(--mono); color: var(--fg)
   };
   tabs.forEach((b) => b.addEventListener("click", () => show(b.dataset.tab)));
   show(location.hash === "#scripts" ? "scripts" : "results");
+  const detail = (d) => {
+    document.documentElement.dataset.detail = d;
+    document.querySelectorAll("[data-detail]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.detail === d)));
+    try { localStorage.setItem("nt-detail", d); } catch (e) { /* the page works without it */ }
+  };
+  document.querySelectorAll("[data-detail]").forEach((b) => b.addEventListener("click", () => detail(b.dataset.detail)));
+  let kept = "brief";
+  try { kept = localStorage.getItem("nt-detail") || "brief"; } catch (e) { /* brief */ }
+  detail(kept);
   const theme = (t) => {
     document.documentElement.dataset.theme = t;
     document.querySelectorAll("[data-th]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.th === t)));
