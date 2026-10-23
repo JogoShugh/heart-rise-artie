@@ -1,6 +1,7 @@
 # Idea: bare runs — a reasoned ARTIE run replayed as plain HTTP, every guardrail off
 
-Status: plan, 2026-10-22. Waiting for the author's go before any code goes into the client.
+Status: target A built, 2026-10-22 (commits 9479893, 00e3e01, 9ae84bc, 56eaac1). The meddler runs and the rest
+are ideas, below.
 
 ## The point
 
@@ -61,26 +62,49 @@ Translating a run is mechanical:
 - **heart-script gets a bare vocabulary:** `call(method, url, body, retry)`, the answers as JSON, `answer["number"]`
   by pointer, and `b64(text)`. It runs on ARTIE's HTTP client, so credentials, timing and the trace work as in any
   run.
-- **`artie generate --bare RUN.trace.yaml --upstream RECORD`** writes `NAME.bare.kts` (target A), or works from the
-  trace alone (target B). A bare script has no lock file, because it pins nothing.
+- **`artie generate RUN.yaml --bare UPSTREAM.yaml --out NAME.bare.kts`** writes the bare script (target A) from a
+  capture kept with `--exchanges` and the gateway's upstream record. Target B would work from the trace alone. A bare script has no lock file, because it pins nothing.
 - **`artie run NAME.bare.kts`** with `inputs` as usual. Generated, never hand-edited: the chain stays
   goal, recorded run, generated script.
 
-## Steps
+## Done
 
-1. Features first, red at test level, then green, for each of these:
-   - heart-script's bare vocabulary;
-   - `generate --bare` from a fixture trace and upstream record: what is kept, what is dropped, values by pointer,
-     and the wait becoming a retry.
-2. Generate from a clean recorded run, then add the `artie-bare` arm to `runs/ladder.sh`.
-3. Run the ladder: `artie-bare` beside `py-direct`, `careful-heart` and `artie-goal`, 3 rounds, checked by
-   `checker.py check`.
-4. Run the meddle ladder: storm and M4, 3 rounds. Expected: `artie-bare` goes off the rails like `py-direct`, and
-   the same run with its guardrails on doesn't.
-5. Write the report under `docs/reports/native-vs-heart-trial/` and update its artifact. Link this note from
-   `off-the-rails.md`.
+1. heart-script's `bare { call(...) }` (`bare.feature`), then ARTIE sending bare calls through `WiredNavigator`
+   (`bare-script.feature`), then `artie generate --bare` (`generate-bare.feature`): each red at test level, then
+   green.
+2. `runs/heart-script.bare.kts`, generated from `careful-heart` 1022-205149: 19 of its 237 GitHub calls (18 writes,
+   1 read), every value an input or an earlier answer by pointer, only the merge retried. The ladder's
+   `artie-bare` arm runs it.
+3. The ladder, three interleaved rounds, each run 23/23:
 
-## Research so far
+   | Round | artie-bare (s) | py-direct (s) |
+   |---|---|---|
+   | 1 | 23.6 | 21.9 |
+   | 2 | 21.0 | 23.5 |
+   | 3 | 19.0 | 21.7 |
+   | Median | 21.0 | 21.9 |
+
+   ARTIE with every guardrail off is as fast as the Python, compiling the script included (about 2 s a run). The
+   guardrails are what the careful runs' 58 to 81 s pay for.
+
+## Next (ideas, not started)
+
+- **The meddler on `artie-bare`.** `MEDDLE=M1,M2,M3,M5` and `MEDDLE=M4`, 3 rounds each, beside `py-direct` and
+  `artie-goal`. Expected: `artie-bare` goes off the rails like `py-direct` (overwrites the teammate's close, its
+  duplicate reason, its comment), and `artie-goal` keeps everything. That shows it is the safeguards that save
+  ARTIE, not the runtime. Then write it up under `docs/reports/native-vs-heart-trial/`, update its artifact, and
+  link this note from `off-the-rails.md`.
+- **Generator blemishes.** The header names the upstream record by the path given (a scratch path, in the
+  committed script); name it by its file name. Inputs the calls never use (`gateway`) are declared; drop them.
+- **Retry only on "not yet".** A waited-for write is tried again on any non-2xx; trying again only on 405 and 409
+  would stop at once on a real error.
+- **Compiled scripts cached.** `artie run` compiles a script every run, about 2 s even for a small one; a cache by
+  the script's hash would save most of it, for every script, bare or not.
+- **Target B: a bare run over HEART.** The calls from ARTIE's own trace, to the gateway's addresses, with no
+  validators: between `off-the-rails` and bare.
+- **Mixed scripts.** `bare { }` and `heart { }` blocks in one script: HEART for most steps, bare calls for a hot few.
+
+## Research before building
 
 A prototype translator, `exhibits/native-vs-heart/bare.kts`, is run by `artie run`, outside the client.
 - **Input:** the clean `heart:every` run of 1022-130257, with 176 GitHub calls.
@@ -101,7 +125,8 @@ The 2830 s run stalled somewhere unknown, and its output has no per-request time
 include starting the JVM and compiling the script, which hasn't been measured apart. For comparison, the
 `py-direct` median is 25.7 s, and `careful-heart` is 76.1 s.
 
-The prototype's output calls `java.net.http` directly, not ARTIE's client. That is what step 1 replaces.
+The prototype's output called `java.net.http` directly, not ARTIE's client, and is replaced by the generated
+script (Done, above), which runs on ARTIE's.
 
 **The join between ARTIE's steps and the gateway's calls is exact.** The prototype found a run's calls by the
 run's trace id and its start time. A run recorded with `artie run --exchanges` (`EXCHANGES=1 ladder.sh`) keeps
@@ -116,6 +141,6 @@ each request's `traceparent` in its own trace. For `careful-heart` 1022-205149 (
 - Target A first: directly to GitHub, the most bare-metal correlate. A gateway-mediated bare run, still over
   HEART, is for later.
 
-## Open questions
-- Should a bare run keep the `until` waits? (Recommended: yes, as above.)
-- Should the bare vocabulary live in heart-script, or in a separate small module that the bare scripts import?
+- Waits are kept, as retrying the waited-for write: the service's own "not yet" is the signal, with no reads
+  spent polling. The native Python polls instead; a bare run doesn't copy what the Python does worse.
+- The bare vocabulary lives in heart-script (`Bare.kt`), and a client sends it through `Wire`, beside `Navigator`.
