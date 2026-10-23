@@ -105,7 +105,7 @@ Feature: A goal file in Markdown: front matter, then words or steps, every rule 
       | case                           | line | indent | reads                                              | at | said                                                                       |
       | no front matter                | 1    | 0      |                                                    | 1  | a goal file begins with its front matter, between --- lines                |
       | no start                       | 2    | 0      |                                                    | 1  | start names the bookmark                                                   |
-      | a key it doesn't know          | 2    | 0      | start: scripted://service/\nrung: L2               | 3  | no key rung: the front matter has start, inputs and limits                 |
+      | a key it doesn't know          | 2    | 0      | start: scripted://service/\nrung: L2               | 3  | no key rung: the front matter has start, inputs, limits and manners       |
       | a key given twice              | 2    | 0      | start: scripted://service/\nStart: x               | 3  | Start is start again                                                       |
       | an input form it doesn't know  | 5    | 2      | repo: { default: rockets, ask: which }             | 5  | input repo has no key ask                                                  |
       | names differing only in case   | 5    | 2      | Owner: x                                           | 5  | Owner differs from owner only in case                                      |

@@ -1,5 +1,6 @@
 package heart.cli.goal
 
+import heart.script.Once
 import heart.script.Step
 import org.commonmark.node.BlockQuote
 import org.commonmark.node.BulletList
@@ -81,7 +82,7 @@ private class StepReader(val file: String, val inputs: List<String>, val line: (
 
     /** A paragraph above the list, or a goal in words: plain words, its braces naming inputs only. */
     fun paragraph(paragraph: Paragraph): String {
-        val (words, marks) = inline(paragraph, "\n")
+        val (words, marks) = inline(paragraph, "\n") { fail(paragraph, it) }
         if (marks.isNotEmpty()) fail(paragraph, "backticks mark steps: a paragraph has none")
         Braces(inputs, inputs, emptyMap()).check(words) { fail(paragraph, it) }
         return words
@@ -89,35 +90,70 @@ private class StepReader(val file: String, val inputs: List<String>, val line: (
 
     /** The steps of [list], read; then their braces, each against what is given above it. */
     fun steps(list: BulletList): List<Step> {
-        val steps = items(list)
+        val steps = items(list, top = true)
+        steps.filterIsInstance<Step.Until>().firstOrNull()?.takeIf { steps.none(::watches) }?.let {
+            fail(file, it.line, "Until ends a watch: the goal has no Whenever")
+        }
         val given = inputs.toMutableList()
         fun walk(step: Step) {
             val braces = Braces(inputs, given, named)
+            val check = { words: String -> braces.check(words) { fail(file, step.line, it) } }
             when (step) {
-                is Step.Intent -> braces.check(step.words) { fail(file, step.line, it) }
-                is Step.Wait -> braces.check(step.condition) { fail(file, step.line, it) }
-                is Step.Verify -> step.facts.forEach { fact -> braces.check(fact) { fail(file, step.line, it) } }
+                is Step.Intent -> (listOf(step.words) + listOfNotNull(step.once?.condition, step.otherwise?.words))
+                    .forEach(check)
+                is Step.Wait -> check(step.condition)
+                is Step.Verify -> step.facts.forEach(check)
+                is Step.Whenever -> check(step.match)
+                is Step.Until -> check(step.condition)
             }
-            if (step is Step.Intent) {
-                step.name?.let { given += it }
-                step.children.forEach(::walk)
-            }
+            (step as? Step.Intent)?.name?.let { given += it }
+            (step as? Step.Whenever)?.name?.let { given += it }
+            under(step).forEach(::walk)
         }
         steps.forEach(::walk)
         return steps
     }
 
-    private fun items(list: BulletList): List<Step> = children(list).map { item(it as ListItem) }
+    private fun items(list: BulletList, top: Boolean = false): List<Step> =
+        children(list).map { item(it as ListItem, top) }
 
-    private fun item(item: ListItem): Step {
+    private fun item(item: ListItem, top: Boolean): Step {
         val words = item.firstChild as? Paragraph ?: fail(item, "an item holds words")
         val sub = sublist(words)
-        val (text, marks) = inline(words, " ")
-        MARKER.matchEntire(text)?.let { return marked(item, it, marks, sub) }
-        val given = Marks.of(marks) { fail(item, it) }
+        val read = ItemWords.of(itemLines(words) { fail(words, it) }) { fail(item, it) }
+        val tailOf = { waits: Boolean ->
+            tail(read.tail, line(item) + read.cut, waits) { at, what -> fail(file, at, what) }
+        }
+        val step = MARKER.matchEntire(read.text)?.let { marked(item, it, read.marks, sub) }
+            ?: opened(WHENEVER, read.text)?.let { whenever(item, it, read.marks, sub) }
+            ?: opened(UNTIL, read.text)?.let { condition ->
+                until(top, sub, read.marks) { fail(item, it) }
+                Step.Until(condition, line(item))
+            }
+        return step?.also { tailOf(false) } ?: intent(item, read, sub, tailOf)
+    }
+
+    /** A step of words, maybe `Once CONDITION, WORDS`, with what it gives up after and does otherwise. */
+    private fun intent(item: ListItem, read: ItemWords, sub: BulletList?, tailOf: (Boolean) -> Tail): Step {
+        val once = once(read.text)
+        if (once != null && once.second.isEmpty()) fail(item, "Once says what to wait for, a comma, then what to do")
+        val given = Marks.of(read.marks) { fail(item, it) }
         if (given.reasoned && sub != null) fail(item, "reasoned marks a step with no sub-items")
         given.name?.let { name(it, item) }
-        return Step.Intent(text, line(item), given.name, given.moves, given.reasoned, sub?.let(::items).orEmpty())
+        val tail = tailOf(once != null)
+        return Step.Intent(
+            once?.second ?: read.text, line(item), given.name, given.moves, given.reasoned,
+            sub?.let(::items).orEmpty(), once?.let { Once(it.first, tail.giveUp) }, tail.otherwise,
+        )
+    }
+
+    /** `Whenever MATCH`: the steps under it done on each change it matches; its marks name the changed resource. */
+    private fun whenever(item: ListItem, match: String, marks: List<String>, sub: BulletList?): Step {
+        val given = Marks.of(marks) { fail(item, it) }
+        if (given.moves != null || given.reasoned) fail(item, "Whenever takes only as NAME")
+        if (sub == null) fail(item, "Whenever has steps under it: what to do each time")
+        given.name?.let { name(it, item) }
+        return Step.Whenever(match, line(item), given.name, items(sub))
     }
 
     /** The one list under an item's [words], if it has one. */
@@ -149,17 +185,9 @@ private class StepReader(val file: String, val inputs: List<String>, val line: (
             if (rest.isEmpty()) fail(item, "Wait: says what to wait for")
             return Step.Wait(rest, line(item))
         }
-        val facts = sub?.let(::facts)
+        val facts = sub?.let { facts(it) { node, what -> fail(node, what) } }
         if (rest.isEmpty() == (facts == null)) fail(item, "Verify: has a fact after it, or facts under it, not both")
         return Step.Verify(facts ?: listOf(rest), line(item))
-    }
-
-    private fun facts(list: BulletList): List<String> = children(list).map { fact ->
-        val words = fact.firstChild as? Paragraph ?: fail(fact, "a fact is words")
-        if (words.next != null) fail(fact, "a fact has no sub-items")
-        val (text, marks) = inline(words, " ")
-        if (marks.isNotEmpty()) fail(fact, "a fact takes no backticks")
-        text
     }
 
     /** A name an `as` gives: not an input's, not given before, nor either in another case. */
@@ -171,9 +199,15 @@ private class StepReader(val file: String, val inputs: List<String>, val line: (
         }
         named[name] = line(item)
     }
+}
 
-    private fun inline(paragraph: Paragraph, breaks: String): Pair<String, List<String>> =
-        inline(paragraph, breaks) { fail(paragraph, it) }
+/** The facts a `Verify:` lists under it, each plain words; a rule one breaks is told to [refuse], at its node. */
+private fun facts(list: BulletList, refuse: (Node, String) -> Nothing): List<String> = children(list).map { fact ->
+    val words = fact.firstChild as? Paragraph ?: refuse(fact, "a fact is words")
+    if (words.next != null) refuse(fact, "a fact has no sub-items")
+    val (text, marks) = inline(words, " ") { refuse(words, it) }
+    if (marks.isNotEmpty()) refuse(fact, "a fact takes no backticks")
+    text
 }
 
 /**

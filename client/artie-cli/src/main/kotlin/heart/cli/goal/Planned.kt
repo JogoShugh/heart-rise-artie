@@ -10,6 +10,7 @@ import heart.script.Step
 fun planned(goal: Goal): List<String> {
     val head = listOfNotNull(
         "start ${goal.start}",
+        goal.manners?.let { "manners $it" },
         goal.inputs.takeIf { it.isNotEmpty() }?.joinToString(prefix = "inputs ") { it.name },
     )
     if (goal.steps.isEmpty()) {
@@ -19,20 +20,33 @@ fun planned(goal: Goal): List<String> {
     }
     val steps = goal.steps.flatMap { lines(it, 0) }
     return head + listOfNotNull(goal.context.takeIf { it.isNotBlank() }?.let { "context: $it" }) + steps +
-        "a goal in steps: ${steps.size} steps, nothing sent"
+        "a goal in steps: ${goal.steps.sumOf(::count)} steps, nothing sent"
 }
 
-/** [step] and the steps under it, a line each, indented 2 spaces a level of [depth]. */
+/** [step] and the steps under it, each a line, its tail lines under it, indented 2 spaces a level of [depth]. */
 private fun lines(step: Step, depth: Int): List<String> {
+    val pad = "  ".repeat(depth)
     val said = when (step) {
-        is Step.Intent -> step.words + listOfNotNull(
-            step.name?.let { " (as $it)" },
-            step.moves?.let { " (moves $it)" },
-            " (reasoned)".takeIf { step.reasoned },
-        ).joinToString("")
+        is Step.Intent -> (step.once?.let { "once: ${it.condition}, then: " }.orEmpty()) + step.words + marks(step)
         is Step.Wait -> "wait: ${step.condition}"
         is Step.Verify -> "verify: ${step.facts.joinToString("; ")}"
+        is Step.Whenever -> "whenever: ${step.match}" + step.name?.let { " (as $it)" }.orEmpty()
+        is Step.Until -> "until: ${step.condition}"
     }
-    val own = "line ${step.line}: ${"  ".repeat(depth)}$said"
-    return listOf(own) + (step as? Step.Intent)?.children.orEmpty().flatMap { lines(it, depth + 1) }
+    val intent = step as? Step.Intent
+    // The tail as the file orders it: give-up and otherwise, each at its own line.
+    val tail = listOfNotNull(
+        intent?.once?.giveUp?.let { it.line to "give up after ${said(it.after)}" },
+        intent?.otherwise?.let { it.line to "otherwise: ${it.words}" },
+    ).sortedBy { it.first }.map { (line, words) -> "line $line: $pad  $words" }
+    return listOf("line ${step.line}: $pad$said") + tail + under(step).flatMap { lines(it, depth + 1) }
 }
+
+private fun marks(step: Step.Intent): String = listOfNotNull(
+    step.name?.let { " (as $it)" },
+    step.moves?.let { " (moves $it)" },
+    " (reasoned)".takeIf { step.reasoned },
+).joinToString("")
+
+/** How many steps [step] is, with the steps under it. */
+private fun count(step: Step): Int = 1 + under(step).sumOf(::count)

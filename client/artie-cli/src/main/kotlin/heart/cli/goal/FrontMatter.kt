@@ -13,7 +13,14 @@ import java.time.format.DateTimeFormatter
  * input() declares it; `limits`. Its keys ignore case; the names of its inputs keep it. [end] is the index of its
  * closing `---`, where the body begins after.
  */
-internal class FrontMatter(val start: String, val inputs: List<Declared>, val limits: Limits, val end: Int)
+internal class FrontMatter(
+    val start: String,
+    val inputs: List<Declared>,
+    val limits: Limits,
+    val end: Int,
+    /** `manners`: the run's manners by name; null for none. */
+    val manners: String? = null,
+)
 
 /** The front matter of [file], whose [lines] are the whole file; a rule it breaks stops the run, at its line. */
 internal fun frontMatter(file: String, lines: List<String>): FrontMatter {
@@ -32,7 +39,10 @@ internal fun frontMatter(file: String, lines: List<String>): FrontMatter {
     val start = keys["start"]?.toString()?.takeIf { it.isNotBlank() } ?: fail(file, 1, "start names the bookmark")
     val inputs = inputs(file, keys["inputs"], at)
     val limits = limits(file, keys["limits"], at("limits", 0))
-    return FrontMatter(start, inputs, limits, end)
+    val manners = keys["manners"]?.toString()?.also {
+        if (it !in MANNERS) fail(file, at("manners", 0), "manners: ${MANNERS.joinToString()} is the one there is")
+    }
+    return FrontMatter(start, inputs, limits, end, manners)
 }
 
 private fun inputs(file: String, given: Any?, at: (String, Int) -> Int): List<Declared> {
@@ -86,7 +96,7 @@ private fun keyed(map: Map<*, *>, known: Set<String>, refuse: (String, String) -
     map.forEach { (k, v) ->
         val key = k.toString()
         val lower = key.lowercase()
-        if (lower !in known) refuse(key, "no key $key: the front matter has start, inputs and limits")
+        if (lower !in known) refuse(key, "no key $key: the front matter has start, inputs, limits and manners")
         spelled[lower]?.let { refuse(key, "$key is $it again") }
         spelled[lower] = key
         out[lower] = v
@@ -105,5 +115,8 @@ private fun lineOf(yaml: List<String>, key: String, from: Int): Int {
 /** Stops the run before its first request: [what] is wrong at [line] of [file]. */
 internal fun fail(file: String, line: Int, what: String): Nothing = throw BadArguments("$file:$line: $what")
 
-private val KEYS = setOf("start", "inputs", "limits")
+private val KEYS = setOf("start", "inputs", "limits", "manners")
+
+/** The manners a goal may name (spec/ideas/goals-that-work-alongside-others.md). */
+private val MANNERS = listOf("alongside-others")
 private val INPUT_KEYS = setOf("default", "question")

@@ -15,6 +15,8 @@ class Goal(
     val context: String = "",
     val steps: List<Step> = emptyList(),
     val limits: Limits = Limits(),
+    /** The run's manners by name (`alongside-others`), as the front matter gives them; null for none. */
+    val manners: String? = null,
 ) {
     /** The goal's sentences, in order: each line, then each sentence in a line, a quotation never split. */
     fun sentences(filled: String): List<String> = filled.lines().map { it.trim() }.filter { it.isNotEmpty() }
@@ -39,6 +41,15 @@ class Goal(
     }
 }
 
+/** What a `Once` step waits for, its [condition], and when it gives up: [giveUp], or null for no limit. */
+class Once(val condition: String, val giveUp: GiveUp? = null)
+
+/** `Or give up after …`, on its own [line] under a `Once` step: the wait ends [after] that long. */
+class GiveUp(val after: kotlin.time.Duration, val line: Int)
+
+/** `Otherwise, …`, on its own [line] under a step: what to do, in [words], when the step's words can't be done. */
+class Otherwise(val words: String, val line: Int)
+
 /** How far a goal run may go: [moves] in all, and [step] for one step of a goal in steps. */
 class Limits(val moves: Int = 50, val step: Int = 10)
 
@@ -60,7 +71,25 @@ sealed interface Step {
         val moves: Int? = null,
         val reasoned: Boolean = false,
         val children: List<Step> = emptyList(),
+        /** `Once …,`: what it waits for before its words, and when it gives up; null when it waits for nothing. */
+        val once: Once? = null,
+        /** `Otherwise, …`: what to do instead when the step's words can't be done. */
+        val otherwise: Otherwise? = null,
     ) : Step
+
+    /**
+     * `Whenever …`: the steps under it, its [children], done again on each change that matches [match], the
+     * changed resource named [name]. A goal with one keeps watching, until its [Until].
+     */
+    class Whenever(
+        val match: String,
+        override val line: Int,
+        val name: String? = null,
+        val children: List<Step> = emptyList(),
+    ) : Step
+
+    /** `Until …`: when the watch ends: once [condition] holds. */
+    class Until(val condition: String, override val line: Int) : Step
 
     /** Read the held resource again until [condition] holds. */
     class Wait(val condition: String, override val line: Int) : Step

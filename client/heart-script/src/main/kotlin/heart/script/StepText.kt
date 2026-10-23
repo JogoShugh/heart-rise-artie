@@ -40,6 +40,8 @@ internal object StepText {
         is Step.Intent -> step.words
         is Step.Wait -> "Wait: ${step.condition}"
         is Step.Verify -> "Verify: ${step.facts.joinToString("; ")}"
+        is Step.Whenever -> "Whenever ${step.match}"
+        is Step.Until -> "Until ${step.condition}"
     }
 
     /**
@@ -78,6 +80,8 @@ internal object StepText {
         is Step.Intent -> setOf("act", "back", "done", "clarify", "stop")
         is Step.Wait -> setOf("wait", "clarify", "stop")
         is Step.Verify -> setOf("check", "clarify", "stop")
+        // A watch isn't planned move by move: a run refuses one before its first request.
+        is Step.Whenever, is Step.Until -> setOf("stop")
     }
 
     /** Why [move] is refused at [step], in the words the planner is told. */

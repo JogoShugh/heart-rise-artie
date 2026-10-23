@@ -40,6 +40,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         when (step) {
             is Step.Intent -> intent(step, here, opener)
             is Step.Wait, is Step.Verify -> single(step, here, opener)
+            is Step.Whenever, is Step.Until ->
+                throw ScriptStopped(run.step, "\"${StepText.said(step)}\"", "\"a watch isn't run yet\"")
         }
         done += step
     }
