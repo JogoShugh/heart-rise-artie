@@ -53,13 +53,16 @@ internal fun tail(lines: List<ItemLine>, first: Int, waits: Boolean, refuse: (In
 }
 
 /** `Once CONDITION, WORDS`: the condition and the words, split at the first comma outside quotes; null for none. */
-internal fun once(text: String): Pair<String, String>? = opened(ONCE, text)?.let { rest ->
+internal fun once(text: String): Pair<String, String>? = opened(ONCE, text)?.let { comma(it) ?: ("" to "") }
+
+/** [words] split at their first comma outside quotes, each side trimmed; null when they have none. */
+internal fun comma(words: String): Pair<String, String>? {
     var quoted = false
-    val comma = rest.indices.firstOrNull { i ->
-        if (rest[i] == '"') quoted = !quoted
-        rest[i] == ',' && !quoted
+    val at = words.indices.firstOrNull { i ->
+        if (words[i] == '"') quoted = !quoted
+        words[i] == ',' && !quoted
     }
-    comma?.let { rest.substring(0, it).trim() to rest.substring(it + 1).trim() } ?: ("" to "")
+    return at?.let { words.substring(0, it).trim() to words.substring(it + 1).trim() }
 }
 
 /** The words after `Whenever`, `Until` or `Once` opening [text]; null when another word opens it. */

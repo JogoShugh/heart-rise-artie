@@ -10,5 +10,8 @@ fun markdownGoal(file: String, text: String): Goal {
     val lines = text.lines()
     val front = frontMatter(file, lines)
     val body = body(file, lines, front.end + 1, front.inputs.map { it.name })
-    return Goal(front.start, front.inputs, body.text, body.context, body.steps, front.limits, front.manners)
+    return Goal(
+        front.start, front.inputs, body.text, body.context, body.steps, front.limits, front.manners,
+        body.alongside, body.done,
+    )
 }

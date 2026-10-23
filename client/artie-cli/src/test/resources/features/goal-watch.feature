@@ -77,6 +77,32 @@ Feature: A goal that keeps watching: Whenever, Until, Once, Or give up and Other
       | line 18: until: someone closes {watch}                               |
       | a goal in steps: 5 steps, nothing sent                               |
 
+  Scenario: A Whenever on one line says what to do each time after a comma, as a step under it
+    Given the file "short.goal.md" is
+      """
+      ---
+      start: scripted://service/
+      ---
+
+      - On the pull request `as pr`
+        - Whenever someone requests changes, leave it, and say so.
+      - Until {pr} is closed
+      """
+    When artie is run with
+      | argument      |
+      | run           |
+      | short.goal.md |
+      | --plan-only   |
+    Then artie exits 0
+    And artie prints
+      | line                                         |
+      | start scripted://service/                    |
+      | line 5: On the pull request (as pr)          |
+      | line 6:   whenever: someone requests changes |
+      | line 6:     leave it, and say so.            |
+      | line 7: until: {pr} is closed                |
+      | a goal in steps: 4 steps, nothing sent       |
+
   Scenario: A run doesn't run a watch yet, and says so before its first request
     When artie is run with
       | argument      |
@@ -98,7 +124,7 @@ Feature: A goal that keeps watching: Whenever, Until, Once, Or give up and Other
     Examples:
       | case                              | line | indent | reads                                            | at | said                                                          |
       | manners it doesn't know           | 3    | 0      | manners: polite                                  | 3  | manners: alongside-others is the one there is                 |
-      | a Whenever with nothing under it  | 13   | 2      | - Whenever an issue opens                        | 13 | Whenever has steps under it: what to do each time             |
+      | a Whenever with nothing under it  | 13   | 2      | - Whenever an issue opens                        | 13 | Whenever says what to do each time: steps under it, or a comma then the step |
       | a Whenever with a limit           | 14   | 2      | - Whenever a pull request changes `as pr` `moves 3` | 14 | Whenever takes only as NAME                                |
       | an Until inside the list          | 13   | 2      | - Until someone closes it                        | 13 | Until ends the watch: it goes at the top of the list          |
       | an Until with sub-items           | 18   | 0      | - Until someone closes {watch}\n  - soon         | 18 | Until has no sub-items                                        |

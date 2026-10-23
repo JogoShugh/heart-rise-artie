@@ -17,6 +17,10 @@ class Goal(
     val limits: Limits = Limits(),
     /** The run's manners by name (`alongside-others`), as the front matter gives them; null for none. */
     val manners: String? = null,
+    /** `## Working alongside others`: the manners in words; null when the goal has no such section. */
+    val alongside: Alongside? = null,
+    /** `## Done when`: the outcomes the goal ends with, a fact each, each at its line. */
+    val done: List<Step.Verify> = emptyList(),
 ) {
     /** The goal's sentences, in order: each line, then each sentence in a line, a quotation never split. */
     fun sentences(filled: String): List<String> = filled.lines().map { it.trim() }.filter { it.isNotEmpty() }
@@ -40,6 +44,9 @@ class Goal(
         return out
     }
 }
+
+/** A goal's manners in words, its section's paragraphs then each manner, the section's heading at [line]. */
+class Alongside(val words: List<String>, val line: Int)
 
 /** What a `Once` step waits for, its [condition], and when it gives up: [giveUp], or null for no limit. */
 class Once(val condition: String, val giveUp: GiveUp? = null)

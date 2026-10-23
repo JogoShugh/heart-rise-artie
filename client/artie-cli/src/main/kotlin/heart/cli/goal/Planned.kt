@@ -19,8 +19,10 @@ fun planned(goal: Goal): List<String> {
             "a goal in words: ${sentences.size} sentences, nothing sent"
     }
     val steps = goal.steps.flatMap { lines(it, 0) }
-    return head + listOfNotNull(goal.context.takeIf { it.isNotBlank() }?.let { "context: $it" }) + steps +
-        "a goal in steps: ${goal.steps.sumOf(::count)} steps, nothing sent"
+    val alongside = goal.alongside?.words.orEmpty().map { "alongside: $it" }
+    val done = goal.done.map { "line ${it.line}: done when: ${it.facts.joinToString("; ")}" }
+    return head + listOfNotNull(goal.context.takeIf { it.isNotBlank() }?.let { "context: $it" }) + alongside +
+        steps + done + "a goal in steps: ${goal.steps.sumOf(::count)} steps, nothing sent"
 }
 
 /** [step] and the steps under it, each a line, its tail lines under it, indented 2 spaces a level of [depth]. */

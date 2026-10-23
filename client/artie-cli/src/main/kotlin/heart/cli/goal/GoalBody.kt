@@ -1,5 +1,6 @@
 package heart.cli.goal
 
+import heart.script.Alongside
 import heart.script.Once
 import heart.script.Step
 import org.commonmark.node.BlockQuote
@@ -19,20 +20,32 @@ import org.commonmark.node.ThematicBreak
 import org.commonmark.parser.IncludeSourceSpans
 import org.commonmark.parser.Parser
 
-/** A goal file's body: [text], a goal in words; or the [context] paragraphs above [steps], a goal in steps. */
-internal class GoalBody(val text: String, val context: String, val steps: List<Step>)
+/**
+ * A goal file's body: [text], a goal in words; or the [context] paragraphs above [steps], a goal in steps; in
+ * sections, also the manners in words, [alongside], and the outcomes it ends with, [done].
+ */
+internal class GoalBody(
+    val text: String,
+    val context: String,
+    val steps: List<Step>,
+    val alongside: Alongside? = null,
+    val done: List<Step.Verify> = emptyList(),
+)
 
 /**
  * The body of [file], its [lines] from index [from] on, read as Markdown renders it (spec/PLAN-GOAL-MARKDOWN.md):
- * paragraphs, then at most one bulleted list. Each rule it breaks stops the run, at its line.
+ * paragraphs, then at most one bulleted list; or, with a ## heading, paragraphs then sections. Each rule it breaks
+ * stops the run, at its line.
  */
 internal fun body(file: String, lines: List<String>, from: Int, inputs: List<String>): GoalBody {
     indents(file, lines, from)
     val doc = PARSER.parse(lines.drop(from).joinToString("\n"))
     val reader = StepReader(file, inputs) { node -> from + (node.sourceSpans.firstOrNull()?.lineIndex ?: 0) + 1 }
+    val nodes = generateSequence(doc.firstChild) { it.next }.toList()
+    if (nodes.any { it is Heading && it.level == SECTION }) return sections(nodes, reader)
     val paragraphs = mutableListOf<Paragraph>()
     var list: BulletList? = null
-    generateSequence(doc.firstChild) { it.next }.forEach { node ->
+    nodes.forEach { node ->
         when {
             node is Paragraph && list != null -> reader.fail(node, "a paragraph after the list: the list ends the goal")
             node is Paragraph -> paragraphs += node
@@ -74,9 +87,9 @@ private fun indents(file: String, lines: List<String>, from: Int) {
  * The steps of one goal file's list, each item read as its words, its marker and its marks; the names its steps
  * give, by the line that gives them; and every brace checked against the inputs and the names given above it.
  */
-private class StepReader(val file: String, val inputs: List<String>, val line: (Node) -> Int) {
+internal class StepReader(val file: String, val inputs: List<String>, val line: (Node) -> Int) {
     /** The names the steps give, in the order the file gives them, each with its line. */
-    private val named = linkedMapOf<String, Int>()
+    val named = linkedMapOf<String, Int>()
 
     fun fail(node: Node, what: String): Nothing = fail(file, line(node), what)
 
@@ -147,13 +160,20 @@ private class StepReader(val file: String, val inputs: List<String>, val line: (
         )
     }
 
-    /** `Whenever MATCH`: the steps under it done on each change it matches; its marks name the changed resource. */
+    /**
+     * `Whenever MATCH`: the steps under it done on each change it matches, or, on one line, `Whenever MATCH, STEP`;
+     * its marks name the changed resource.
+     */
     private fun whenever(item: ListItem, match: String, marks: List<String>, sub: BulletList?): Step {
         val given = Marks.of(marks) { fail(item, it) }
         if (given.moves != null || given.reasoned) fail(item, "Whenever takes only as NAME")
-        if (sub == null) fail(item, "Whenever has steps under it: what to do each time")
+        val inline = if (sub == null) comma(match)?.takeIf { it.second.isNotEmpty() } else null
+        if (sub == null && inline == null) {
+            fail(item, "Whenever says what to do each time: steps under it, or a comma then the step")
+        }
         given.name?.let { name(it, item) }
-        return Step.Whenever(match, line(item), given.name, items(sub))
+        val children = sub?.let(::items) ?: listOfNotNull(inline?.let { Step.Intent(it.second, line(item)) })
+        return Step.Whenever(inline?.first ?: match, line(item), given.name, children)
     }
 
     /** The one list under an item's [words], if it has one. */
@@ -185,7 +205,7 @@ private class StepReader(val file: String, val inputs: List<String>, val line: (
             if (rest.isEmpty()) fail(item, "Wait: says what to wait for")
             return Step.Wait(rest, line(item))
         }
-        val facts = sub?.let { facts(it) { node, what -> fail(node, what) } }
+        val facts = sub?.let { list -> plain(list, "a fact") { node, what -> fail(node, what) }.map { it.first } }
         if (rest.isEmpty() == (facts == null)) fail(item, "Verify: has a fact after it, or facts under it, not both")
         return Step.Verify(facts ?: listOf(rest), line(item))
     }
@@ -201,14 +221,18 @@ private class StepReader(val file: String, val inputs: List<String>, val line: (
     }
 }
 
-/** The facts a `Verify:` lists under it, each plain words; a rule one breaks is told to [refuse], at its node. */
-private fun facts(list: BulletList, refuse: (Node, String) -> Nothing): List<String> = children(list).map { fact ->
-    val words = fact.firstChild as? Paragraph ?: refuse(fact, "a fact is words")
-    if (words.next != null) refuse(fact, "a fact has no sub-items")
-    val (text, marks) = inline(words, " ") { refuse(words, it) }
-    if (marks.isNotEmpty()) refuse(fact, "a fact takes no backticks")
-    text
-}
+/**
+ * The items of [list], each plain words, with its item: a `Verify:`'s facts, Done when's, or the manners. [noun]
+ * names one in what a rule it breaks is told to [refuse], at its node.
+ */
+internal fun plain(list: BulletList, noun: String, refuse: (Node, String) -> Nothing): List<Pair<String, Node>> =
+    children(list).map { item ->
+        val words = item.firstChild as? Paragraph ?: refuse(item, "$noun is words")
+        if (words.next != null) refuse(item, "$noun has no sub-items")
+        val (text, marks) = inline(words, " ") { refuse(words, it) }
+        if (marks.isNotEmpty()) refuse(item, "$noun takes no backticks")
+        text to item
+    }
 
 /**
  * [paragraph]'s words, line breaks put as [breaks], and the backticks at its end. Anything else Markdown would
@@ -235,3 +259,6 @@ private val PARSER = Parser.builder().includeSourceSpans(IncludeSourceSpans.BLOC
 private val BULLET = Regex("""^([ \t]*)[-*+][ \t]""")
 private val MARKER = Regex("""^([A-Za-z]+):\s*(.*)$""", RegexOption.DOT_MATCHES_ALL)
 private const val NUMBERED = "a numbered list: steps are bullets, and their order is the order"
+
+/** The level of a section's heading: ##. */
+internal const val SECTION = 2

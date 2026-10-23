@@ -29,8 +29,9 @@ internal fun readGoal(file: Path): Goal = try {
 }
 
 /**
- * A goal that keeps watching, or waits with `Once`, isn't run yet (spec/ideas/goals-that-work-alongside-others.md):
- * the first such step of [goal], read from [file], stops the run before its first request, saying so.
+ * A goal that keeps watching, waits with `Once`, or is written in sections with the manners in words or Done when,
+ * isn't run yet (spec/ideas/goals-that-work-alongside-others.md): the first such part of [goal], read from [file],
+ * stops the run before its first request, saying so.
  */
 internal fun unwatched(goal: Goal, file: Path) {
     fun first(steps: List<Step>): Pair<Int, String>? = steps.firstNotNullOfOrNull { step ->
@@ -42,7 +43,12 @@ internal fun unwatched(goal: Goal, file: Path) {
             else -> null
         } ?: first(heart.cli.goal.under(step))
     }
-    first(goal.steps)?.let { (line, word) ->
+    val parts = listOfNotNull(
+        goal.alongside?.let { it.line to "Working alongside others" },
+        first(goal.steps),
+        goal.done.firstOrNull()?.let { it.line to "Done when" },
+    )
+    parts.minByOrNull { it.first }?.let { (line, word) ->
         val how = "--plan-only shows how the goal reads"
         throw BadArguments("$STOPPED: ${file.fileName}:$line: $word isn't run yet; $how")
     }
