@@ -55,6 +55,14 @@ class ScriptSteps {
         service.refusedTimes["$rel at $at"] = times
     }
 
+    @Given("the server answers, in order")
+    fun answersInOrder(table: DataTable) = table.asMaps().forEach {
+        service.answers.addLast(
+            "${it.getValue("method")} ${it.getValue("url")}" to
+                Received(it.getValue("status").toInt(), emptyMap(), it.getValue("body")),
+        )
+    }
+
     @Given("{string} becomes {string} after {int} more reads")
     fun settles(address: String, state: String, reads: Int) {
         service.settles[address] = reads to state
