@@ -32,6 +32,12 @@ fun Here.tell(text: String) {
     println("  note: $text")
 }
 
+/** How each comment the watch leaves begins, so a later watch knows what was said. */
+val WATCH = "Not merged by the auto-merge watch"
+
+/** Whether the server's reason for not offering an act says it will pass by itself. */
+fun passing(why: String?): Boolean = why.orEmpty().contains("read it again")
+
 /** What the watch says, once, of a pull request a person objected to. */
 fun leftAlone(number: Long) = "#$number is labelled $hold: left alone until the label goes."
 
@@ -110,13 +116,22 @@ heart(gateway) {
                                 }) {}
                                 finished += number
                             }
-                            waited.toMinutes() >= giveUp.toLong() -> {
+                            // A reason that says to read again is a passing one (GitHub working mergeability out):
+                            // giving up on it would tell the pull request something untrue, so wait one more look.
+                            // The words stand in for a mark hr:unavailable doesn't have yet: temporary or not.
+                            waited.toMinutes() >= giveUp.toLong() && !passing(why("github:merge")) -> {
                                 // Otherwise: say why it wasn't merged, in the gateway's words.
                                 val why = why("github:merge") ?: "the merge was never offered"
                                 follow("github:issues-get") {
-                                    act("github:comment", intent = "say why #$number wasn't merged", fields = {
-                                        "body" to
-                                            "Not merged by the auto-merge watch (#$watch) after $giveUp minutes: $why"
+                                    // Said already, by this watch or an earlier one: not said again.
+                                    var said = false
+                                    follow("github:issues-list-comments") {
+                                        said = links("item").filterNotNull()
+                                            .any { it.startsWith(WATCH) && it.endsWith(": $why") }
+                                    }
+                                    if (said) tell("#$number: already told why, by an earlier watch.")
+                                    else act("github:comment", intent = "say why #$number wasn't merged", fields = {
+                                        "body" to "$WATCH (#$watch) after $giveUp minutes: $why"
                                     }) {}
                                 }
                                 finished += number

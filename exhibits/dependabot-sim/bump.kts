@@ -10,6 +10,8 @@ val from by input(default = "1.0.0", question = "Bump from which version?")
 val to by input(question = "Bump to which version?")
 val label by input(default = "dependabot", question = "Which labels mark it, comma-separated?")
 val draft by input(default = "false", question = "Open it as a draft?")
+// Bumps that change one file conflict once one of them merges; give each its own file to keep them apart.
+val file by input(default = "deps.txt", question = "Which file holds the version?")
 val stamp by input(
     default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd-HHmmss")),
 )
@@ -20,13 +22,12 @@ val branch = "deps/left-pad-$to-$stamp"
 bare {
     val base = call("GET", "$api/branches/deps-main")
     call("POST", "$api/git/refs", mapOf("ref" to "refs/heads/$branch", "sha" to base["commit"]["sha"].text))
-    val file = call("GET", "$api/contents/deps.txt?ref=$branch")
-    call("PUT", "$api/contents/deps.txt", mapOf(
+    val now = runCatching { call("GET", "$api/contents/$file?ref=$branch") }.getOrNull()
+    call("PUT", "$api/contents/$file", mapOf(
         "message" to "Bump left-pad from $from to $to",
         "content" to b64("left-pad $to\n"),
-        "sha" to file["sha"].text,
         "branch" to branch,
-    ))
+    ) + (now?.let { mapOf("sha" to it["sha"].text) } ?: emptyMap()))
     val pull = call("POST", "$api/pulls", mapOf(
         "base" to "deps-main",
         "head" to branch,

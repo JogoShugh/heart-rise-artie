@@ -1,6 +1,6 @@
 // The required check and the rival for the Dependabot stand-in (setup.kts first). The token must be allowed to write
 // workflows and commit statuses; a fine-grained token without them is refused with 403.
-//   - deps-check: an Actions check on every pull request into deps-main; it fails when deps.txt says "broken".
+//   - deps-check: an Actions check on every pull request into deps-main; it fails when any .txt says "broken".
 //   - deps-auto-merge: the rival, GitHub's own way: on the label dependabot-actions, gh pr merge --auto.
 //   - deps-main is protected: deps-check must pass, for admins too, so nothing merges before it does.
 //   artie run checks.kts owner=JogoShugh
@@ -21,7 +21,7 @@ val check = """
           - uses: actions/checkout@v4
           - run: sleep 20
           - name: The bumped version must not be broken
-            run: "! grep -q broken deps.txt"
+            run: "! grep -rqs broken --include='*.txt' ."
 """.trimIndent() + "\n"
 
 val rival = """
@@ -45,6 +45,8 @@ val rival = """
 """.trimIndent() + "\n"
 
 bare {
+    // A protected deps-main takes no direct commits, so a second run lifts the protection first and sets it again last.
+    runCatching { call("DELETE", "$api/branches/deps-main/protection") }
     // Each file as it should be: written over when it is there, with the sha GitHub asks for.
     fun put(path: String, content: String, message: String) {
         val now = runCatching { call("GET", "$api/contents/$path?ref=deps-main") }.getOrNull()
