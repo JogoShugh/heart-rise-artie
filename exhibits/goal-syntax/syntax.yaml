@@ -1,6 +1,6 @@
 # Every element of the goal syntax, decided (spec/ideas/goals-that-work-alongside-others.md, "Review, 2026-10-23").
 # status: today (parsed now), proposed (in the first draft), new (added in the review).
-# verdict: keep, add, or drop. goals.kts lays this out, one element after another.
+# verdict: keep, add, drop, or open (still to decide). goals.kts lays this out, one element after another.
 
 asOf: "2026-10-23"
 
@@ -50,6 +50,12 @@ elements:
     means: Text that depends on an outcome is sent only once that outcome happened.
     verdict: keep
     note: Recognised as a fixed phrase.
+  - name: "Manners: don't say it again"
+    status: new
+    example: Don't say again what has already been said.
+    means: Before writing, read what is there; a remark already made, by this run or an earlier one, isn't made again.
+    verdict: add
+    note: "Learned from the Dependabot simulation: a restarted watch commented on three pull requests a second time."
   - name: Step
     status: today
     example: Open an issue titled "…", saying …
@@ -123,6 +129,12 @@ elements:
     means: Repeat the bullets under it on each matching change, once per match.
     verdict: add
     note: Fan-out at the top level; behaviour per resource when nested.
+  - name: If
+    status: new
+    example: If it's labelled {hold}, leave it, and say so once.
+    means: A condition on what the step holds now, read again each time the step runs.
+    verdict: open
+    note: Not one of the five words. Either a sixth word, or the manners' "leave it" said for one case; to decide.
   - name: Until
     status: new
     example: Until {owner} closes the issue "Auto-merge watch"
@@ -155,6 +167,9 @@ goals:
   - file: dependabot.goal.md
     tab: Dependabot
     about: The workflow to build it on, a long-running watch.
+  - file: dependabot-sim.goal.md
+    tab: Dependabot, as run
+    about: The Dependabot goal as exhibits/dependabot-sim/watch.kts ran it, with labels for authors and objections.
   - file: jenkins.goal.md
     tab: Jenkins
     about: The same words for another service, behind a Jenkins gateway.

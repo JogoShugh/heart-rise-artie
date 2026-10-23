@@ -122,7 +122,7 @@ ul.watching { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; max-width
 <div class="wrap">
   <div class="top"><div>
     <h1>Goals in five words: On, Once, Whenever, Until, Otherwise</h1>
-    <p class="lede">How a goal is written for ARTIE: in words a person would write to a colleague, that work alongside others and can keep watching. Three goals in it, every element decided, and what watching asks. Reviewed 2026-10-23.</p>
+    <p class="lede">How a goal is written for ARTIE: in words a person would write to a colleague, that work alongside others and can keep watching. Four goals in it, every element decided, and what watching asks. Reviewed 2026-10-23.</p>
   </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
 
   <section>
@@ -131,9 +131,9 @@ ul.watching { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; max-width
     <p class="sub">Anything that needs more than these is written in the generated Kotlin, not in the goal.</p>
   </section>
   <section>
-    <h2>Three goals in them</h2>
+    <h2>Four goals in them</h2>
     <div class="bar">
-      <div class="seg" role="group" aria-label="Goal" id="goal-tabs"><button type="button" data-goal="0" aria-pressed="true">Triage</button><button type="button" data-goal="1" aria-pressed="false">Dependabot</button><button type="button" data-goal="2" aria-pressed="false">Jenkins</button></div>
+      <div class="seg" role="group" aria-label="Goal" id="goal-tabs"><button type="button" data-goal="0" aria-pressed="true">Triage</button><button type="button" data-goal="1" aria-pressed="false">Dependabot</button><button type="button" data-goal="2" aria-pressed="false">Dependabot, as run</button><button type="button" data-goal="3" aria-pressed="false">Jenkins</button></div>
       <div class="seg" role="group" aria-label="View" id="view-tabs"><button type="button" data-view="read" aria-pressed="true">As read</button><button type="button" data-view="source" aria-pressed="false">Source</button></div>
     </div>
     <div class="goals" id="goals" data-view="read">
@@ -233,6 +233,48 @@ Other people work in this repository while you do. What they decide stands.
 </pre></div>
     </article>
 <article class="goal" data-goal="2" hidden>
+      <p class="sub">The Dependabot goal as exhibits/dependabot-sim/watch.kts ran it, with labels for authors and objections. <span class="mono">goals/dependabot-sim.goal.md</span></p>
+      <div class="paper read"><p class="kicker">Goal · starts at https://localhost:8392/</p><p class="sub">manners: <span class="val">alongside-others</span></p><div class="scroll inputs"><table><thead><tr><th>Asks for</th><th>Question</th><th>Unless given</th></tr></thead><tbody><tr><td><span class="val">{owner}</span></td><td>Whose repository?</td><td>–</td></tr><tr><td><span class="val">{repo}</span></td><td>Which repository?</td><td>heart-github-test</td></tr><tr><td><span class="val">{label}</span></td><td>Which label marks a pull request to merge?</td><td>dependabot</td></tr><tr><td><span class="val">{hold}</span></td><td>Which label means a person objects?</td><td>hold</td></tr></tbody></table></div><p class="brief">Merge the pull requests labelled <span class="val">{label}</span> once they can be merged, unless a person labels them <span class="val">{hold}</span>. Keep watching until the watch's own issue is closed.</p><h3>Working alongside others</h3><div class="manners"><p>Other people work in this repository while you do. What they decide stands.</p><ul><li><div>Don't undo or write over anything someone else changed since you looked. Look again, and work from what's there now.</div></li><li><div>When a step no longer makes sense because of what someone did, leave it, and say why.</div></li><li><div>Nothing you write may claim something that isn't so: &quot;merged&quot; only once it is.</div></li><li><div>Don't say again what has already been said.</div></li></ul></div><h3>The work</h3><div class="work"><ul><li><div><span class="kw">In</span> <span class="val">{owner}</span>/<span class="val">{repo}</span></div><ul><li><div>Open an issue titled &quot;Auto-merge watch&quot;, saying &quot;Close this issue to stop the watch.&quot; <span class="as">as watch</span></div></li><li><div><span class="kw">Whenever</span> a pull request labelled <span class="val">{label}</span> changes <span class="as">as pr</span></div><ul><li><div><span class="kw">If</span> it's labelled <span class="val">{hold}</span>, leave it, and say so once.</div></li><li><div><span class="kw">Once</span> it can be merged, merge it by squashing.</div><div class="alt"><span class="kw">Or give up</span> after 10 minutes.</div><div class="alt"><span class="kw">Otherwise,</span> say on <span class="val">{pr}</span> why it wasn't merged.</div></li></ul></li></ul></li><li><div><span class="kw">Until</span> someone closes <span class="val">{watch}</span></div></li></ul></div><h3>Done when</h3><div class="done"><ul><li><div>Every pull request labelled <span class="val">{label}</span> during the watch is merged, or says why not</div></li><li><div>Nothing anyone else decided was undone: no pull request labelled <span class="val">{hold}</span> was merged</div></li></ul></div></div>
+      <div class="paper source"><pre class="src">---
+start: https://localhost:8392/
+inputs:
+  owner: { question: &quot;Whose repository?&quot; }
+  repo:  { default: heart-github-test, question: &quot;Which repository?&quot; }
+  label: { default: dependabot, question: &quot;Which label marks a pull request to merge?&quot; }
+  hold:  { default: hold, question: &quot;Which label means a person objects?&quot; }
+manners: alongside-others
+---
+
+Merge the pull requests labelled {label} once they can be merged, unless a person labels them {hold}. Keep
+watching until the watch's own issue is closed.
+
+## Working alongside others
+
+Other people work in this repository while you do. What they decide stands.
+
+- Don't undo or write over anything someone else changed since you looked. Look again, and work from what's there now.
+- When a step no longer makes sense because of what someone did, leave it, and say why.
+- Nothing you write may claim something that isn't so: &quot;merged&quot; only once it is.
+- Don't say again what has already been said.
+
+## The work
+
+- In {owner}/{repo}
+  - Open an issue titled &quot;Auto-merge watch&quot;, saying &quot;Close this issue to stop the watch.&quot; `as watch`
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 10 minutes.
+      Otherwise, say on {pr} why it wasn't merged.
+- Until someone closes {watch}
+
+## Done when
+
+- Every pull request labelled {label} during the watch is merged, or says why not
+- Nothing anyone else decided was undone: no pull request labelled {hold} was merged
+</pre></div>
+    </article>
+<article class="goal" data-goal="3" hidden>
       <p class="sub">The same words for another service, behind a Jenkins gateway. <span class="mono">goals/jenkins.goal.md</span></p>
       <div class="paper read"><p class="kicker">Goal · starts at https://localhost:8393/</p><p class="sub">manners: <span class="val">alongside-others</span></p><div class="scroll inputs"><table><thead><tr><th>Asks for</th><th>Question</th><th>Unless given</th></tr></thead><tbody><tr><td><span class="val">{job}</span></td><td>Which job?</td><td>–</td></tr><tr><td><span class="val">{branch}</span></td><td>Which branch?</td><td>main</td></tr><tr><td><span class="val">{release}</span></td><td>Which release?</td><td>–</td></tr></tbody></table></div><p class="brief">Build <span class="val">{release}</span> from <span class="val">{branch}</span>, and take it to staging once it passes and someone may approve it. Keep watching <span class="val">{branch}</span> until the release is tagged.</p><h3>Working alongside others</h3><div class="manners"><p>Other people work in this Jenkins while you do. What they decide stands.</p><ul><li><div>Don't undo or write over anything someone else changed since you looked. Look again, and work from what's there now.</div></li><li><div>When a step no longer makes sense because of what someone did, leave it, and say why in the run's notes.</div></li><li><div>Nothing you write may claim something that isn't so: &quot;deployed&quot; only once the deploy stage passed.</div></li></ul></div><h3>The work</h3><div class="work"><ul><li><div><span class="kw">On</span> job <span class="val">{job}</span></div><ul><li><div>Build it with branch <span class="val">{branch}</span> and release <span class="val">{release}</span> <span class="as">as build</span></div><ul><li><div>Add to its description that it builds <span class="val">{release}</span></div></li><li><div><span class="kw">Once</span> it finishes, check it passed.</div><div class="alt"><span class="kw">Otherwise,</span> say which stage failed, and leave the rest.</div></li><li><div><span class="kw">Once</span> it asks for approval to deploy to staging, approve it as <span class="val">{release}</span>.</div><div class="alt"><span class="kw">Otherwise,</span> say who decided instead.</div><div class="alt"><span class="kw">Or give up</span> after 30 minutes.</div></li></ul></li><li><div><span class="kw">Whenever</span> a build of <span class="val">{branch}</span> fails <span class="as">as broken</span></div><ul><li><div>Add to its description that it blocks <span class="val">{release}</span></div></li></ul></li></ul></li><li><div><span class="kw">Until</span> <span class="val">{release}</span> is tagged</div></li></ul></div><h3>Done when</h3><div class="done"><ul><li><div><span class="val">{build}</span> passed and its deploy stage ran; or someone declined it, and the notes say who</div></li><li><div>Nothing anyone else decided was undone: no aborted build restarted, no declined approval approved</div></li></ul></div></div>
       <div class="paper source"><pre class="src">---
@@ -288,6 +330,7 @@ Other people work in this Jenkins while you do. What they decide stands.
 <li class="element safe"><div class="head"><b>Manners: don't overwrite</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">Don't undo or write over anything someone else changed since you looked.</p><p>On a 412, read again and decide again; never send again over a member someone else changed.</p><p class="sub">Recognised as a fixed phrase, not interpreted.</p></li>
 <li class="element safe"><div class="head"><b>Manners: leave and say why</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">When a step no longer makes sense because of what someone did, leave it, and say why.</p><p>Skip an act that isn't offered, and note the server's reason from hr:unavailable.</p><p class="sub">Recognised as a fixed phrase.</p></li>
 <li class="element safe"><div class="head"><b>Manners: no false claims</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">Nothing you write may claim something that isn't so.</p><p>Text that depends on an outcome is sent only once that outcome happened.</p><p class="sub">Recognised as a fixed phrase.</p></li>
+<li class="element good"><div class="head"><b>Manners: don't say it again</b><span class="tag quiet">new</span><span class="tag good">add</span></div><p class="example">Don't say again what has already been said.</p><p>Before writing, read what is there; a remark already made, by this run or an earlier one, isn't made again.</p><p class="sub">Learned from the Dependabot simulation: a restarted watch commented on three pull requests a second time.</p></li>
 <li class="element safe"><div class="head"><b>Step</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example">Open an issue titled &quot;…&quot;, saying …</p><p>One act, as a plain sentence.</p></li>
 <li class="element safe"><div class="head"><b>Scope</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example"><span class="kw">In</span> <span class="val">{owner}</span>/<span class="val">{repo}</span> · On <span class="val">{issue}</span></p><p>The resource the bullets under it act on, once, now.</p><p class="sub">&quot;On&quot; is a scope only. It never means an event; that word is &quot;Whenever&quot;.</p></li>
 <li class="element safe"><div class="head"><b>Nesting</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example">An indented bullet</p><p>Done on what its parent step made or reached; then back up.</p></li>
@@ -301,6 +344,7 @@ Other people work in this Jenkins while you do. What they decide stands.
 <li class="element good"><div class="head"><b>Otherwise</b><span class="tag quiet">new</span><span class="tag good">add</span></div><p class="example">Say it's fixed in #<span class="val">{pr.number}</span>. Otherwise, say it waits on #<span class="val">{pr.number}</span>.</p><p>The step's other outcome, as a sentence of its own under the step.</p></li>
 <li class="element good"><div class="head"><b>Give up</b><span class="tag quiet">new</span><span class="tag good">add</span></div><p class="example"><span class="kw">Or give up</span> after 10 minutes.</p><p>Ends a wait. A wait also ends early, with the server's reason, when hr:unavailable says the offer won't come.</p><p class="sub">The M4 lesson: artie-bare sent the merge 30 times against a draft.</p></li>
 <li class="element good"><div class="head"><b>Whenever</b><span class="tag quiet">new</span><span class="tag good">add</span></div><p class="example"><span class="kw">Whenever</span> a pull request from dependabot opens <span class="as">as pr</span></p><p>Repeat the bullets under it on each matching change, once per match.</p><p class="sub">Fan-out at the top level; behaviour per resource when nested.</p></li>
+<li class="element warn"><div class="head"><b>If</b><span class="tag quiet">new</span><span class="tag warn">open</span></div><p class="example"><span class="kw">If</span> it's labelled <span class="val">{hold}</span>, leave it, and say so once.</p><p>A condition on what the step holds now, read again each time the step runs.</p><p class="sub">Not one of the five words. Either a sixth word, or the manners' &quot;leave it&quot; said for one case; to decide.</p></li>
 <li class="element good"><div class="head"><b>Until</b><span class="tag quiet">new</span><span class="tag good">add</span></div><p class="example"><span class="kw">Until</span> <span class="val">{owner}</span> closes the issue &quot;Auto-merge watch&quot;</p><p>When a watch ends.</p></li>
 <li class="element safe"><div class="head"><b>Done when</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">The crash issue is closed and the pull request is merged</p><p>The final checks, written as outcomes.</p></li>
 <li class="element safe"><div class="head"><b>Done when: others kept</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">Nothing anyone else decided was undone</p><p>What others decided, compared with what the run left.</p><p class="sub">Needs the resource's history to check (GitHub's timeline; generically a history link relation).</p></li>
@@ -314,7 +358,7 @@ Other people work in this Jenkins while you do. What they decide stands.
     <h2>How this page is made</h2>
     <details class="box"><summary>syntax.yaml: the decisions</summary><div class="scroll"><pre class="src"># Every element of the goal syntax, decided (spec/ideas/goals-that-work-alongside-others.md, &quot;Review, 2026-10-23&quot;).
 # status: today (parsed now), proposed (in the first draft), new (added in the review).
-# verdict: keep, add, or drop. goals.kts lays this out, one element after another.
+# verdict: keep, add, drop, or open (still to decide). goals.kts lays this out, one element after another.
 
 asOf: &quot;2026-10-23&quot;
 
@@ -364,6 +408,12 @@ elements:
     means: Text that depends on an outcome is sent only once that outcome happened.
     verdict: keep
     note: Recognised as a fixed phrase.
+  - name: &quot;Manners: don't say it again&quot;
+    status: new
+    example: Don't say again what has already been said.
+    means: Before writing, read what is there; a remark already made, by this run or an earlier one, isn't made again.
+    verdict: add
+    note: &quot;Learned from the Dependabot simulation: a restarted watch commented on three pull requests a second time.&quot;
   - name: Step
     status: today
     example: Open an issue titled &quot;…&quot;, saying …
@@ -437,6 +487,12 @@ elements:
     means: Repeat the bullets under it on each matching change, once per match.
     verdict: add
     note: Fan-out at the top level; behaviour per resource when nested.
+  - name: If
+    status: new
+    example: If it's labelled {hold}, leave it, and say so once.
+    means: A condition on what the step holds now, read again each time the step runs.
+    verdict: open
+    note: Not one of the five words. Either a sixth word, or the manners' &quot;leave it&quot; said for one case; to decide.
   - name: Until
     status: new
     example: Until {owner} closes the issue &quot;Auto-merge watch&quot;
@@ -469,11 +525,14 @@ goals:
   - file: dependabot.goal.md
     tab: Dependabot
     about: The workflow to build it on, a long-running watch.
+  - file: dependabot-sim.goal.md
+    tab: Dependabot, as run
+    about: The Dependabot goal as exhibits/dependabot-sim/watch.kts ran it, with labels for authors and objections.
   - file: jenkins.goal.md
     tab: Jenkins
     about: The same words for another service, behind a Jenkins gateway.
 </pre></div></details>
-    <details class="box"><summary>goals.kts: the script that lays them out</summary><div class="scroll"><pre class="src">// The goal syntax as a page: three goals written in it (as read, and as source), every element decided one after
+    <details class="box"><summary>goals.kts: the script that lays them out</summary><div class="scroll"><pre class="src">// The goal syntax as a page: four goals written in it (as read, and as source), every element decided one after
 // another, and what watching for a long time asks of a goal. The decisions live in syntax.yaml and the goals in
 // goals/*.goal.md; this script only lays them out (spec/ideas/goals-that-work-alongside-others.md, &quot;Review&quot;).
 //   artie run goals.kts out=../../docs/reports/goal-syntax/index.html artifact=/tmp/goal-syntax.html
@@ -497,7 +556,7 @@ fun esc(s: String) = s.replace(&quot;&amp;&quot;, &quot;&amp;amp;&quot;).replace
 val yaml = Yaml().load&lt;Any?&gt;(File(data).readText()).map()
 
 /** The words that open a step or a line under it, each shown as a keyword. */
-val keywords = Regex(&quot;&quot;&quot;^(In|On|Once|Whenever|Until|Otherwise,|Or give up)(?!\w)&quot;&quot;&quot;)
+val keywords = Regex(&quot;&quot;&quot;^(In|On|Once|Whenever|Until|If|Otherwise,|Or give up)(?!\w)&quot;&quot;&quot;)
 
 /** A line of a goal as read: values as chips, names as tags, its opening keyword marked. */
 fun inline(line: String): String = esc(line)
@@ -580,7 +639,7 @@ val panels = goals.mapIndexed { i, g -&gt;
     &lt;/article&gt;&quot;&quot;&quot;
 }.joinToString(&quot;\n&quot;)
 
-val verdictTone = mapOf(&quot;keep&quot; to &quot;safe&quot;, &quot;add&quot; to &quot;good&quot;, &quot;drop&quot; to &quot;bad&quot;)
+val verdictTone = mapOf(&quot;keep&quot; to &quot;safe&quot;, &quot;add&quot; to &quot;good&quot;, &quot;drop&quot; to &quot;bad&quot;, &quot;open&quot; to &quot;warn&quot;)
 val elements = yaml[&quot;elements&quot;].list().map { it.map() }.joinToString(&quot;\n&quot;) { e -&gt;
     val note = e.text(&quot;note&quot;).let { if (it.isEmpty()) &quot;&quot; else &quot;&quot;&quot;&lt;p class=&quot;sub&quot;&gt;${esc(it)}&lt;/p&gt;&quot;&quot;&quot; }
     &quot;&quot;&quot;&lt;li class=&quot;element ${verdictTone[e.text(&quot;verdict&quot;)] ?: &quot;quiet&quot;}&quot;&gt;&lt;div class=&quot;head&quot;&gt;&lt;b&gt;${esc(e.text(&quot;name&quot;))}&lt;/b&gt;&quot;&quot;&quot; +
@@ -632,7 +691,7 @@ val body = &quot;&quot;&quot;
     &lt;p class=&quot;sub&quot;&gt;Anything that needs more than these is written in the generated Kotlin, not in the goal.&lt;/p&gt;
   &lt;/section&gt;
   &lt;section&gt;
-    &lt;h2&gt;Three goals in them&lt;/h2&gt;
+    &lt;h2&gt;Four goals in them&lt;/h2&gt;
     &lt;div class=&quot;bar&quot;&gt;
       &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label=&quot;Goal&quot; id=&quot;goal-tabs&quot;&gt;$tabs&lt;/div&gt;
       &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-label=&quot;View&quot; id=&quot;view-tabs&quot;&gt;&lt;button type=&quot;button&quot; data-view=&quot;read&quot; aria-pressed=&quot;true&quot;&gt;As read&lt;/button&gt;&lt;button type=&quot;button&quot; data-view=&quot;source&quot; aria-pressed=&quot;false&quot;&gt;Source&lt;/button&gt;&lt;/div&gt;
@@ -684,7 +743,7 @@ val page = File(assets, &quot;report-shell.html&quot;).readText()
     .replace(&quot;@@TITLE@@&quot;, &quot;Goals in Five Words&quot;)
     .replace(&quot;@@HEADING@@&quot;, &quot;Goals in five words: On, Once, Whenever, Until, Otherwise&quot;)
     .replace(&quot;@@LEDE@@&quot;, &quot;How a goal is written for ARTIE: in words a person would write to a colleague, that work &quot; +
-        &quot;alongside others and can keep watching. Three goals in it, every element decided, and what watching asks. &quot; +
+        &quot;alongside others and can keep watching. Four goals in it, every element decided, and what watching asks. &quot; +
         &quot;Reviewed ${yaml.text(&quot;asOf&quot;)}.&quot;)
     .replace(&quot;@@BASE@@&quot;, File(assets, &quot;report-base.css&quot;).readText())
     .replace(&quot;@@THEME@@&quot;, File(assets, &quot;theme-switch.js&quot;).readText())

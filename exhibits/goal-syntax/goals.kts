@@ -1,4 +1,4 @@
-// The goal syntax as a page: three goals written in it (as read, and as source), every element decided one after
+// The goal syntax as a page: four goals written in it (as read, and as source), every element decided one after
 // another, and what watching for a long time asks of a goal. The decisions live in syntax.yaml and the goals in
 // goals/*.goal.md; this script only lays them out (spec/ideas/goals-that-work-alongside-others.md, "Review").
 //   artie run goals.kts out=../../docs/reports/goal-syntax/index.html artifact=/tmp/goal-syntax.html
@@ -22,7 +22,7 @@ fun esc(s: String) = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "
 val yaml = Yaml().load<Any?>(File(data).readText()).map()
 
 /** The words that open a step or a line under it, each shown as a keyword. */
-val keywords = Regex("""^(In|On|Once|Whenever|Until|Otherwise,|Or give up)(?!\w)""")
+val keywords = Regex("""^(In|On|Once|Whenever|Until|If|Otherwise,|Or give up)(?!\w)""")
 
 /** A line of a goal as read: values as chips, names as tags, its opening keyword marked. */
 fun inline(line: String): String = esc(line)
@@ -105,7 +105,7 @@ val panels = goals.mapIndexed { i, g ->
     </article>"""
 }.joinToString("\n")
 
-val verdictTone = mapOf("keep" to "safe", "add" to "good", "drop" to "bad")
+val verdictTone = mapOf("keep" to "safe", "add" to "good", "drop" to "bad", "open" to "warn")
 val elements = yaml["elements"].list().map { it.map() }.joinToString("\n") { e ->
     val note = e.text("note").let { if (it.isEmpty()) "" else """<p class="sub">${esc(it)}</p>""" }
     """<li class="element ${verdictTone[e.text("verdict")] ?: "quiet"}"><div class="head"><b>${esc(e.text("name"))}</b>""" +
@@ -157,7 +157,7 @@ val body = """
     <p class="sub">Anything that needs more than these is written in the generated Kotlin, not in the goal.</p>
   </section>
   <section>
-    <h2>Three goals in them</h2>
+    <h2>Four goals in them</h2>
     <div class="bar">
       <div class="seg" role="group" aria-label="Goal" id="goal-tabs">$tabs</div>
       <div class="seg" role="group" aria-label="View" id="view-tabs"><button type="button" data-view="read" aria-pressed="true">As read</button><button type="button" data-view="source" aria-pressed="false">Source</button></div>
@@ -209,7 +209,7 @@ val page = File(assets, "report-shell.html").readText()
     .replace("@@TITLE@@", "Goals in Five Words")
     .replace("@@HEADING@@", "Goals in five words: On, Once, Whenever, Until, Otherwise")
     .replace("@@LEDE@@", "How a goal is written for ARTIE: in words a person would write to a colleague, that work " +
-        "alongside others and can keep watching. Three goals in it, every element decided, and what watching asks. " +
+        "alongside others and can keep watching. Four goals in it, every element decided, and what watching asks. " +
         "Reviewed ${yaml.text("asOf")}.")
     .replace("@@BASE@@", File(assets, "report-base.css").readText())
     .replace("@@THEME@@", File(assets, "theme-switch.js").readText())
