@@ -60,6 +60,7 @@ class Here internal constructor(
     /** A remark, kept in the run's record. */
     fun note(text: String) {
         run.notes += text
+        run.onNote(text)
     }
 
     /**

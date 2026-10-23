@@ -57,6 +57,9 @@ class Run(
     /** Told of each step as it is traced: a runner prints it. */
     var onStep: (TraceStep) -> Unit = {}
 
+    /** Told of each note as the script makes it: a runner prints it. */
+    var onNote: (String) -> Unit = {}
+
     val declared = mutableListOf<Declared>()
     val notes = mutableListOf<String>()
 

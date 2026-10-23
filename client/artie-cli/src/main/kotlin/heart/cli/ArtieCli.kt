@@ -75,7 +75,10 @@ class ArtieCli(
         val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { client })
         run.reasoning = asked.reasoner != null
         run.entry = asked.entry
-        if (output == "words") run.onStep = { out.println(line(run.trace.size, it)) }
+        if (output == "words") {
+            run.onStep = { out.println(line(run.trace.size, it)) }
+            run.onNote = { out.println("note: $it") }
+        }
         val text = Files.readString(file)
         val ended = if (isGoal(file)) {
             pursued(asked, file, run) { client }

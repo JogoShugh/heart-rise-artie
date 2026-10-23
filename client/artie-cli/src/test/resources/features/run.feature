@@ -39,6 +39,28 @@ Feature: artie run: a script, run from the command line
       | 3 act close: done                  |
       | finished, 3 steps                  |
 
+  Scenario: A note the script makes is a line of its own, where it was made
+    A watch notes what it left and why; a note no one sees is a failure no
+    one sees.
+    Given the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          note("left the issue open: someone is still on it")
+      }
+      """
+    When artie is run with
+      | argument  |
+      | run       |
+      | issue.kts |
+    Then artie exits 0
+    And artie prints
+      | line                                                |
+      | 1 enter scripted://service/: done                   |
+      | 2 act issues-get, number 10: done                   |
+      | note: left the issue open: someone is still on it   |
+      | finished, 2 steps                                   |
+
   Scenario Outline: The exit says how the run ended
     Given the script "issue.kts" is
       """kotlin
