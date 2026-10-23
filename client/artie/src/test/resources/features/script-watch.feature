@@ -1,0 +1,131 @@
+Feature: A script that keeps watching: watch, whenever and once, the goal words in heart-script
+  spec/ideas/goals-that-work-alongside-others.md, "Watching for a long time".
+  watch looks again and again, a pause apart, until its condition holds:
+  each look reads the held resource again and runs its block; a look that
+  fails is noted, and the next one tries again. whenever visits the members
+  of the held list that are new or changed since the last look, and those a
+  once under it still waits on. once does its block when the act is offered,
+  one time for each resource; in a watch, a wait that isn't over is left for
+  the next look, so one resource never holds up the others; outside a watch,
+  it reads the resource again until the wait is over. When the wait outlasts
+  its give-up, once does otherwise, told why the act isn't offered, in the
+  server's words. The run's clock here moves only when the run pauses. The
+  gateway and a small GitHub run in process.
+
+  Background:
+    Given a small GitHub knows these callers
+      | token     | caller |
+      | ada-token | ada    |
+    And "acme/rockets" has pull request 1 on the small GitHub, open, titled "Bump left-pad to 1.0.1"
+    And "acme/rockets" has pull request 2 on the small GitHub, open, titled "Bump left-pad to 1.0.2"
+    And ARTIE talks to the GitHub gateway at "https://github.gateway.test" in front of the small GitHub
+    And ARTIE holds the Bearer credential "ada-token" for "https://github.gateway.test"
+    And the client works at rung L2
+    And the run's clock moves only when the run pauses
+
+  Scenario: A watch merges each pull request at the look it can be merged, and stops when its condition holds
+    Pull request 1 is a draft at the first look, and marked ready just after;
+    pull request 2 can be merged at once. Each is merged once, at its look.
+    Given pull request 1 is a draft on the small GitHub until it is next read
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 10.seconds, until = { ++looks == 3 }) {
+                  whenever {
+                      once("github:merge") {
+                          act("github:merge", "merge_method" to "squash") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 2      |
+      | 1      |
+
+  Scenario: A wait that outlasts its give-up does otherwise, told why in the gateway's words, and never merges
+    Given pull request 1 is a draft on the small GitHub
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 10.seconds, until = { ++looks == 4 }) {
+                  whenever {
+                      once("github:merge", giveUp = 15.seconds, otherwise = { why -> note("#${state["number"]}: $why") }) {
+                          act("github:merge", "merge_method" to "squash") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted
+      | note                                                         |
+      | #1: A draft can't be merged; mark it ready for review first. |
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 2      |
+
+  Scenario: A look that fails is noted, and the next look tries again
+    Given the small GitHub answers the 2nd read of "/repos/acme/rockets/pulls" with 500
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 10.seconds, until = { ++looks == 2 }) {
+                  whenever {
+                      once("github:merge") {
+                          act("github:merge", "merge_method" to "squash") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted one note beginning "A look failed:"
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 2      |
+      | 1      |
+
+  Scenario Outline: Outside a watch, once reads the resource again until the wait is over: <case>
+    Given pull request 1 is <draft>
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          act("github:pulls-get", "owner" to "acme", "repo" to "rockets", "pull_number" to 1) {
+              once("github:merge", giveUp = 5.seconds, otherwise = { why -> note("not merged: $why") }) {
+                  act("github:merge", "merge_method" to "squash") {}
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted
+      | note   |
+      | <note> |
+    And the small GitHub was asked to merge these pull requests, in order
+      | number   |
+      | <merged> |
+
+    Examples:
+      | case                           | draft                                            | note                                                                 | merged |
+      | it is marked ready, and merged | a draft on the small GitHub until it is next read |                                                                      | 1      |
+      | it stays a draft, and gives up | a draft on the small GitHub                      | not merged: A draft can't be merged; mark it ready for review first. |        |

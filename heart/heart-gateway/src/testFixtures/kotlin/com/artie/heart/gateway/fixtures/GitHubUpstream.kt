@@ -104,6 +104,16 @@ class GitHubUpstream {
     /** The status GitHub answered each request with, in order. */
     val statuses = mutableListOf<Int>()
 
+    /** Paths whose nth read, counted from 1, GitHub answers with a 500, once. */
+    val failRead = mutableMapOf<String, Int>()
+    private val reads = mutableMapOf<String, Int>()
+
+    private fun failing(path: String): Boolean {
+        val n = failRead[path] ?: return false
+        val read = reads.merge(path, 1, Int::plus)
+        return read == n
+    }
+
     /** Heads that move just before GitHub merges: another push lands first. */
     val movesBeforeMerge = mutableMapOf<Long, String>()
 
@@ -139,10 +149,14 @@ class GitHubUpstream {
     /** A token GitHub doesn't know is refused; a GET whose If-None-Match names the body's ETag is a 304. */
     private fun answer(request: Request): Response {
         val token = request.header("Authorization")?.removePrefix("Bearer ")
-        if (callers.isNotEmpty() && (token == null || token !in callers)) {
-            return message(Status.UNAUTHORIZED, "Bad credentials")
+        val refused = when {
+            request.method == Method.GET && failing(request.uri.path) ->
+                message(Status.INTERNAL_SERVER_ERROR, "Server Error")
+            callers.isNotEmpty() && (token == null || token !in callers) ->
+                message(Status.UNAUTHORIZED, "Bad credentials")
+            else -> null
         }
-        return tagged(request, routes(request))
+        return refused ?: tagged(request, routes(request))
     }
 
     private fun tagged(request: Request, response: Response): Response {
@@ -348,8 +362,9 @@ class GitHubUpstream {
         },
         "/repos/{owner}/{repo}/pulls" bind Method.GET to { request ->
             val state = request.query("state") ?: "open"
+            // As GitHub lists them by default: newest first.
             val listed = pulls.filter { it.owner == request.path("owner") && it.repo == request.path("repo") }
-                .filter { state == "all" || it.state == state }
+                .filter { state == "all" || it.state == state }.sortedByDescending { it.number }
             json(Response(Status.OK), listed.map { body(it) })
         },
     )

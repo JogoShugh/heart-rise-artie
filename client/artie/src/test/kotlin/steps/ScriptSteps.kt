@@ -69,10 +69,32 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         return run
     }
 
+    /** The last script's run, for what it noted (script-watch.feature). */
+    var lastRun: Run? = null
+
+    /** Whether the run's pauses are instant, its clock moved by them alone (script-watch.feature). */
+    var clocked = false
+
+    /** The run's clock, when [clocked]: the time its pauses add up to. */
+    var now: java.time.Instant = java.time.Instant.parse("2026-10-23T12:00:00Z")
+
+    @io.cucumber.java.en.Given("the run's clock moves only when the run pauses")
+    fun clockMovesWithPauses() {
+        clocked = true
+    }
+
     /** [script] run with [navigator], given [inputs]; the run, for its capture (script-replay.feature). */
     fun run(script: String, navigator: Navigator, inputs: Map<String, String>): Run {
         stopped = null
-        val run = Run(inputs, navigator = { navigator }).also { it.reasoning = true; it.source = script }
+        val run = (
+            if (clocked) {
+                Run(inputs, navigator = { navigator }, pause = { now = now.plusMillis(it.inWholeMilliseconds) })
+                    .also { it.clock = { now } }
+            } else {
+                Run(inputs, navigator = { navigator })
+            }
+            ).also { it.reasoning = true; it.source = script }
+        lastRun = run
         Run.current = run
         val engine = ScriptHost.engine(listOf("heart.script.*"))
         try {

@@ -42,6 +42,12 @@ class Run(
     /** How the run waits between tries of `until`; a test can make it instant. */
     val pause: (kotlin.time.Duration) -> Unit = { Thread.sleep(it.inWholeMilliseconds) },
 ) {
+    /** The time now, as `watch` and `once` read it; a test can move it with [pause] alone. Set before the run. */
+    var clock: () -> java.time.Instant = java.time.Instant::now
+
+    /** What a `watch` remembers from look to look: what each resource was, what waits, what is done. */
+    internal val watching = Watching()
+
     /** Another entry than the script's: an environment, another binding. Set before the run. */
     var entry: String? = null
 
