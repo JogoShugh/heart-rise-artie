@@ -45,6 +45,14 @@ class GitHubGatewaySteps(private val ctx: ClientContext) {
         check(origin.startsWith("http")) { "an http origin, as the gateway serves" }
     }
 
+    @Given("ARTIE talks straight to the small GitHub at {string}")
+    fun straight(origin: String) {
+        // No gateway: a bare script's calls (bare-script.feature) reach GitHub's own REST API.
+        ctx.inProcess = InProcessTransport(github.handler)
+        ctx.baseUrl = null
+        check(origin.startsWith("http")) { "an http origin, as GitHub serves" }
+    }
+
     @Given("the GitHub gateway's switch for acts with no validator is {word}")
     fun noValidatorSwitch(switch: String) {
         ctx.inProcess = InProcessTransport(GitHubGateway.handler(github, CONNECTOR, validatorRequired = switch != "on"))

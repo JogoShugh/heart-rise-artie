@@ -70,6 +70,12 @@ class ClientContext {
     /** A client's own stack below its name and trace: its cache, the integrity check, then its credentials. */
     private fun stack() = CachingTransport(IntegrityCheck(AuthTransport(credentials, wire)))
     val cache: CachingTransport by lazy { stack() }
+
+    /** A bare script's way out (bare-script.feature): ARTIE's name, trace and credentials, no cache, no check. */
+    val bare: Transport by lazy {
+        UserAgentTransport("${UserAgentTransport.DEFAULT} ($scenario; bare)",
+            TraceContextTransport(Trace(), AuthTransport(credentials, wire)))
+    }
     val client: HeartRiseClient by lazy { build("first", cache, rung, dialect) }
 
     /** When true, the second client sits behind the first client's cache, as two

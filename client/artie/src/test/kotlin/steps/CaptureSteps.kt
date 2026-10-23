@@ -89,6 +89,25 @@ class CaptureSteps(private val ctx: ClientContext) {
         assertTrue(Triple(method, url, status) in kept, "kept: $kept")
     }
 
+    @Then("the run kept these exchanges")
+    fun keptInOrder(table: DataTable) = assertEquals(
+        table.asMaps().map { listOf(it["step"], it["method"], it["url"], it["status"]) },
+        traced().flatMapIndexed { i, step ->
+            exchanges(step).map { exchange ->
+                val request = exchange.getValue("request").jsonObject
+                listOf("${i + 1}", request.getValue("method").jsonPrimitive.content,
+                    request.getValue("url").jsonPrimitive.content,
+                    exchange.getValue("response").jsonObject.getValue("status").jsonPrimitive.content)
+            }
+        },
+    )
+
+    @Then("no exchange the run kept sends {string} or {string}")
+    fun sendsNeither(first: String, second: String) = traced().flatMap(::exchanges).forEach { exchange ->
+        val headers = exchange.getValue("request").jsonObject.getValue("headers").jsonObject.keys
+        assertTrue(headers.none { it.equals(first, true) || it.equals(second, true) }, "$headers")
+    }
+
     @Then("every exchange the run kept sends its credential as {string} and a traceparent")
     fun credentialAsToken(token: String) {
         val all = traced().flatMap(::exchanges)

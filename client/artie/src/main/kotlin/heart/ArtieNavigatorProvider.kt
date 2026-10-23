@@ -27,7 +27,8 @@ class ArtieNavigatorProvider : NavigatorProvider {
          * `reason(…)` steps ask Claude, with the model key from [ModelKey.standard]; with no key, they are refused,
          * saying where one goes. Every request carries its W3C traceparent, so a server's own record of what it did
          * for it (the gateway's upstream calls) can be tied to the step. With exchanges asked for, those on the wire
-         * are kept for the run's capture. With pins, each act is held to the script's lock file first.
+         * are kept for the run's capture. With pins, each act is held to the script's lock file first. A bare
+         * script's calls (spec/ideas/bare-runs.md) go out with the same credentials, trace and log, and nothing else.
          */
         fun standard(env: Map<String, String>, userHome: Path, settings: ClientSettings = ClientSettings()):
             Navigator {
@@ -46,11 +47,13 @@ class ArtieNavigatorProvider : NavigatorProvider {
             val claude = settings.reasoner == "claude"
             val key = if (claude) ModelKey.standard(env, userHome) else null
             val named = guarding.guard
-            return when {
+            val navigator = when {
                 !claude -> ArtieNavigator(client, exchangeLog = log, guard = guard, guarding = named)
                 key == null -> ArtieNavigator(client, null, NO_KEY, log, guard, named)
                 else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), NO_KEY, log, guard, named)
             }
+            // A bare script's calls go out below ARTIE's cache and integrity check, on the same trace and log.
+            return WiredNavigator(navigator, AuthTransport(credentials, wire))
         }
     }
 }

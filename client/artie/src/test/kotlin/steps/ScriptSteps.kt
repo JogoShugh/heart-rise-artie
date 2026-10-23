@@ -47,7 +47,8 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     }
 
     private fun runs(script: String, navigator: ArtieNavigator) {
-        run(script, navigator, emptyMap())
+        // As the provider makes it: a bare script's calls go out on the scenario's bare wire.
+        run(script, heart.WiredNavigator(navigator, ctx.bare), emptyMap())
     }
 
     /** [goal] done move by move as [planner] chooses, with [navigator], given [inputs] (goal-run.feature). */
@@ -69,7 +70,7 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     }
 
     /** [script] run with [navigator], given [inputs]; the run, for its capture (script-replay.feature). */
-    fun run(script: String, navigator: ArtieNavigator, inputs: Map<String, String>): Run {
+    fun run(script: String, navigator: Navigator, inputs: Map<String, String>): Run {
         stopped = null
         val run = Run(inputs, navigator = { navigator }).also { it.reasoning = true; it.source = script }
         Run.current = run
@@ -103,7 +104,8 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     }
 
     @Then("it finds ARTIE")
-    fun findsArtie() = assertEquals(ArtieNavigator::class, found?.let { it::class })
+    fun findsArtie() =
+        assertEquals(ArtieNavigator::class, (found as? heart.WiredNavigator)?.navigator?.let { it::class })
 
     @Then("the script stopped before its first request: {}")
     fun stoppedBefore(reason: String) {
