@@ -1,0 +1,160 @@
+# Every element of the goal syntax, decided (spec/ideas/goals-that-work-alongside-others.md, "Review, 2026-10-23").
+# status: today (parsed now), proposed (in the first draft), new (added in the review).
+# verdict: keep, add, or drop. goals.kts lays this out, one element after another.
+
+asOf: "2026-10-23"
+
+words:
+  - word: "On"
+    says: the resource the bullets under it act on, once, now
+  - word: "Once"
+    says: wait for one offer, then act, one time
+  - word: "Whenever"
+    says: repeat the bullets under it on each matching change
+  - word: "Until"
+    says: when a watch ends
+  - word: "Otherwise"
+    says: the step's other outcome, as a sentence of its own
+
+elements:
+  - name: Header
+    status: today
+    example: "--- start: … inputs: … ---"
+    means: The entry address and the run's values, each with a question or a default.
+    verdict: keep
+  - name: Manners setting
+    status: new
+    example: "manners: alongside-others"
+    means: Names the run-wide policy exactly, beside the sentences that say it to a person.
+    verdict: add
+  - name: Brief
+    status: today
+    example: The first paragraph
+    means: The task in words. The reasoner reads it; no rule is taken from it.
+    verdict: keep
+  - name: "Manners: don't overwrite"
+    status: proposed
+    example: Don't undo or write over anything someone else changed since you looked.
+    means: On a 412, read again and decide again; never send again over a member someone else changed.
+    verdict: keep
+    note: Recognised as a fixed phrase, not interpreted.
+  - name: "Manners: leave and say why"
+    status: proposed
+    example: When a step no longer makes sense because of what someone did, leave it, and say why.
+    means: Skip an act that isn't offered, and note the server's reason from hr:unavailable.
+    verdict: keep
+    note: Recognised as a fixed phrase.
+  - name: "Manners: no false claims"
+    status: proposed
+    example: Nothing you write may claim something that isn't so.
+    means: Text that depends on an outcome is sent only once that outcome happened.
+    verdict: keep
+    note: Recognised as a fixed phrase.
+  - name: Step
+    status: today
+    example: Open an issue titled "…", saying …
+    means: One act, as a plain sentence.
+    verdict: keep
+  - name: Scope
+    status: today
+    example: "In {owner}/{repo} · On {issue}"
+    means: The resource the bullets under it act on, once, now.
+    verdict: keep
+    note: '"On" is a scope only. It never means an event; that word is "Whenever".'
+  - name: Nesting
+    status: today
+    example: An indented bullet
+    means: Done on what its parent step made or reached; then back up.
+    verdict: keep
+  - name: Value
+    status: today
+    example: "{owner} · {issue.number}"
+    means: An input, or a member of what an earlier step made.
+    verdict: keep
+  - name: Name
+    status: today
+    example: "`as issue`"
+    means: Names what a step made, so later steps can say {issue}.
+    verdict: keep
+    note: Step numbers stay dropped.
+  - name: Quoted text
+    status: today
+    example: '"Refuse a bed with no name"'
+    means: Sent exactly as written.
+    verdict: keep
+  - name: Once
+    status: proposed
+    example: Once it can be merged, merge it by squashing.
+    means: Wait for one offer, then act, one time.
+    verdict: keep
+    note: The phrase must map to exactly one offer, and every wait must be able to end (Give up).
+  - name: Add to
+    status: proposed
+    example: Add to its description that it is tested by #{test.number}
+    means: Append; never replace.
+    verdict: keep
+    note: GitHub refuses If-Match on writes, so append is the only safe edit of shared text.
+  - name: '"; or, …"'
+    status: proposed
+    example: …; or, while that's still unmerged, that it waits on #{pr.number}
+    means: A second outcome, carried by a semicolon and a comma.
+    verdict: drop
+    note: Too fragile to parse. Replaced by Otherwise.
+  - name: '"Held back as …"'
+    status: proposed
+    example: Held back as a draft, it stays unmerged.
+    means: A second outcome, stated as a fact.
+    verdict: drop
+    note: Reads as a fact, so a parser can't tell an expectation from a step. Replaced by Otherwise.
+  - name: Otherwise
+    status: new
+    example: "Say it's fixed in #{pr.number}. Otherwise, say it waits on #{pr.number}."
+    means: The step's other outcome, as a sentence of its own under the step.
+    verdict: add
+  - name: Give up
+    status: new
+    example: Or give up after 10 minutes.
+    means: Ends a wait. A wait also ends early, with the server's reason, when hr:unavailable says the offer won't come.
+    verdict: add
+    note: "The M4 lesson: artie-bare sent the merge 30 times against a draft."
+  - name: Whenever
+    status: new
+    example: Whenever a pull request from dependabot opens `as pr`
+    means: Repeat the bullets under it on each matching change, once per match.
+    verdict: add
+    note: Fan-out at the top level; behaviour per resource when nested.
+  - name: Until
+    status: new
+    example: Until {owner} closes the issue "Auto-merge watch"
+    means: When a watch ends.
+    verdict: add
+  - name: Done when
+    status: proposed
+    example: The crash issue is closed and the pull request is merged
+    means: The final checks, written as outcomes.
+    verdict: keep
+  - name: "Done when: others kept"
+    status: proposed
+    example: Nothing anyone else decided was undone
+    means: What others decided, compared with what the run left.
+    verdict: keep
+    note: Needs the resource's history to check (GitHub's timeline; generically a history link relation).
+
+watching:
+  - Events are hints. Read the resource as it is now, act only on what is offered, with its validator.
+  - Polling, SSE and websockets all come down to "this resource may have changed; read it again".
+  - Polling uses If-None-Match; on GitHub a 304 doesn't count against the rate limit.
+  - The run trace is the watcher's journal; it resumes from it after a restart.
+  - No model call per event. The goal is reasoned once; the generated script handles every event.
+  - One handler at a time per resource, so two events for one pull request don't race.
+
+goals:
+  - file: triage.goal.md
+    tab: Triage
+    about: The first draft, rewritten with Otherwise and Give up.
+  - file: dependabot.goal.md
+    tab: Dependabot
+    about: The workflow to build it on, a long-running watch.
+  - file: jenkins.goal.md
+    tab: Jenkins
+    about: The same words for another service, behind a Jenkins gateway.

@@ -31,9 +31,9 @@ programming language. This note proposes words a person would write to a colleag
 ---
 start: http://localhost:8392/
 inputs:
-  owner: { question: Whose repository? }
-  repo:  { default: heart-github-test, question: Which repository? }
-  label: { default: bug, question: Which label marks a bug? }
+  owner: { question: "Whose repository?" }
+  repo:  { default: heart-github-test, question: "Which repository?" }
+  label: { default: bug, question: "Which label marks a bug?" }
   stamp: { default: { now: MMdd-HHmmss } }
 ---
 
@@ -236,9 +236,9 @@ appears only in the step sentences and the relation names. The same goal, for a 
 ---
 start: https://localhost:8393/
 inputs:
-  job:     { question: Which job? }
+  job:     { question: "Which job?" }
   branch:  { default: main }
-  release: { question: Which release? }
+  release: { question: "Which release?" }
 manners: alongside-others
 ---
 
