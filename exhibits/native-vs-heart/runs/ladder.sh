@@ -9,6 +9,7 @@
 # what the resource still offers; the gateway as for careful-heart.
 # MEDDLE=M1,M2,... runs meddler.py beside each run, a teammate moving the world under it, and judges the run by
 # what it kept of the teammate's moves (checker.py respect); a line per run goes to meddle.tsv instead.
+# EXCHANGES=1 keeps each ARTIE step's exchanges, with their traceparent, in its trace (artie run --exchanges).
 # Writes each run's output to <arm>-<stamp>.out beside this script and a line per run to ladder.tsv.
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
@@ -62,17 +63,17 @@ run() { # arm stamp
                        JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
                        artie run "$HERE/heart-script-goal.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
                        --rung L2 --guard lenient --validators last --pins "$HERE/heart-script.pins.yaml" \
-                       --trace "$HERE/$name-$S.yaml") ;;
+                       --trace "$HERE/$name-$S.yaml" ${EXCHANGES:+--exchanges}) ;;
     careful-heart)   (cd "$ROOT/client/scripts" && . ./.env && \
                        JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
                        artie run "$HERE/heart-script.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
                        --rung L2 --guard strict --validators last --pins "$HERE/heart-script.pins.yaml" \
-                       --trace "$HERE/$name-$S.yaml") ;;
+                       --trace "$HERE/$name-$S.yaml" ${EXCHANGES:+--exchanges}) ;;
     heart:*)         (cd "$ROOT/client/scripts" && . ./.env && \
                        JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
                        artie run "$HERE/heart-script.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
                        --rung L2 --guard off-the-rails --validators none --pins "$HERE/heart-script.pins.yaml" \
-                       --trace "$HERE/$name-$S.yaml") ;;
+                       --trace "$HERE/$name-$S.yaml" ${EXCHANGES:+--exchanges}) ;;
   esac >"$out" 2>&1
   rc=$?
   end=$(perl -MTime::HiRes=time -e 'printf "%.1f", time')
