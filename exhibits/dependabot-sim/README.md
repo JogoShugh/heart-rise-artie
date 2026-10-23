@@ -62,6 +62,21 @@ request's comments and says nothing that any watch has already said. It also no 
 reason ("GitHub is still checking… read it again shortly"), which once told #683 something untrue. A fourth watch,
 with a give-up time of 1 minute, said nothing new on any of them.
 
+## The same watch in heart-script's own words (`watch-dsl.kts`, `runs/watch-dsl-1023-dsl2.out`)
+
+Since then heart-script has `watch`, `whenever` and `once` (`client/heart-script/.../Watching.kt`). `watch-dsl.kts`
+is the same goal written with them, with no loop, maps or clock of its own.
+
+- **The first run was wrong, and only a note said so.** It checked Until from the pull request list, which doesn't
+  offer `github:issues-get`. Each check was refused and noted, nobody saw the notes, and the watch kept going after
+  its issue was closed. It was stopped by hand. Even so, before it was stopped, it merged #694, gave #695 (a draft)
+  and #697 (a failed check) their reasons, left #696 (held) alone, and said nothing again on the old pull requests.
+- **Two fixes followed.** `artie run` now prints each note as it is made. The watch now stands at the entry, where
+  both the list and the watch's issue are reached.
+- **The second run merged #699 once its check passed, and stopped at the next look after #698 was closed.** It
+  finished in 165 steps.
+- **A look reads every open pull request, about 30 here, one at a time,** so it takes 30 to 40 seconds.
+
 ## What it showed
 
 - **The five words come down to small, plain code.** Whenever is a loop over open pull requests, most recently
