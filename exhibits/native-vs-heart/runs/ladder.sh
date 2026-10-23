@@ -5,6 +5,8 @@
 # Usage: ladder.sh ROUNDS ARM... ; arms: py-direct py-via careful-direct careful-via heart:<care> careful-heart
 # careful-heart: ARTIE at its most careful (--guard strict --validators last), the gateway taking every kind of
 # care and refusing any act without a validator.
+# artie-bare: heart-script.bare.kts, which artie generate --bare made from a careful-heart run: its GitHub calls,
+# sent straight to GitHub by ARTIE, with no gateway and every guardrail off (spec/ideas/bare-runs.md).
 # artie-goal: ARTIE careful (--guard lenient --validators last) running heart-script-goal.kts, which acts only on
 # what the resource still offers; the gateway as for careful-heart.
 # MEDDLE=M1,M2,... runs meddler.py beside each run, a teammate moving the world under it, and judges the run by
@@ -63,6 +65,9 @@ run() { # arm stamp
                        JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
                        artie run "$HERE/heart-script-goal.kts" owner=JogoShugh stamp="$S" gateway=https://localhost:8392/ \
                        --rung L2 --guard lenient --validators last --pins "$HERE/heart-script.pins.yaml" \
+                       --trace "$HERE/$name-$S.yaml" ${EXCHANGES:+--exchanges}) ;;
+    artie-bare)      (cd "$ROOT/client/scripts" && . ./.env && \
+                       artie run "$HERE/heart-script.bare.kts" owner=JogoShugh stamp="$S" \
                        --trace "$HERE/$name-$S.yaml" ${EXCHANGES:+--exchanges}) ;;
     careful-heart)   (cd "$ROOT/client/scripts" && . ./.env && \
                        JAVA_OPTS="-Djavax.net.ssl.trustStore=$TLS/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit" \
