@@ -2,7 +2,8 @@
 // (runs/ladder.tsv) and what it did when a teammate moved the world under it (runs/meddle.tsv, meddler.py).
 //   artie run care-dial.kts runs=runs out=../../docs/reports/care-dial/index.html artifact=/tmp/care-dial.html
 // out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
-// The page carries this script's own text at the bottom (source), and a light and dark switch that remembers.
+// The page carries this script's own text at the bottom (source). Its look comes from the reports' shared assets
+// (report-shell.html, report-base.css, theme-switch.js), inlined, so the page needs nothing else at runtime.
 import java.io.File
 import java.time.LocalDate
 
@@ -10,6 +11,7 @@ val runs by input(default = "runs", question = "Where are ladder.tsv and meddle.
 val out by input(question = "Where to write the page?")
 val artifact by input(default = "", question = "Where to write the artifact copy, if anywhere?")
 val source by input(default = "care-dial.kts", question = "Where is this script, to show it on the page?")
+val assets by input(default = "../../docs/reports/assets", question = "Where are the reports' shared assets?")
 
 /** One arm of the ladder, in the dial's order: its name in the tables, what it is, and how it reaches GitHub. */
 class Arm(val name: String, val label: String, val what: String, val kind: String, val note: String = "")
@@ -81,7 +83,7 @@ fun worst(list: List<Meddled>) = list.maxByOrNull { m -> verdicts.indexOfFirst {
 fun verdictCell(list: List<Meddled>): String {
     if (list.isEmpty()) return """<span class="none">not run</span>"""
     return verdicts.reversed().mapNotNull { (v, t) ->
-        list.count { it.verdict == v }.takeIf { it > 0 }?.let { """<span class="v $t">$it × ${esc(v)}</span>""" }
+        list.count { it.verdict == v }.takeIf { it > 0 }?.let { """<span class="tag $t">$it × ${esc(v)}</span>""" }
     }.joinToString(" ")
 }
 
@@ -95,7 +97,6 @@ fun harmCell(list: List<Meddled>): String {
 
 val storm = "M1,M2,M3,M5"
 val maxCalm = calm.filter { a -> arms.any { it.name == a.arm } }.maxOf { it.seconds }.coerceAtMost(100.0)
-val maxStorm = meddled.maxOf { it.seconds }
 
 fun strip(xs: List<Double>, max: Double, cls: String) =
     """<div class="strip $cls">""" + xs.joinToString("") { x ->
@@ -119,7 +120,7 @@ val dialRows = arms.joinToString("\n") { a ->
 val allRuns = meddled.sortedBy { it.stamp }.joinToString("\n") { m ->
     val label = arms.firstOrNull { it.name == m.arm }?.label ?: m.arm
     """<tr><td class="mono">${esc(m.stamp)}</td><td><code>${esc(label)}</code></td><td class="mono">${esc(m.moves)}</td>""" +
-        """<td class="num">${m.rc}</td><td class="num">${s(m.seconds)}</td><td><span class="v ${tone(m.verdict)}">${esc(m.verdict)}</span></td>""" +
+        """<td class="num">${m.rc}</td><td class="num">${s(m.seconds)}</td><td><span class="tag ${tone(m.verdict)}">${esc(m.verdict)}</span></td>""" +
         """<td>${(m.damage.map { esc(it) } + m.undone.map { "left undone: " + esc(it) }).joinToString("<br>").ifEmpty { "–" }}</td></tr>"""
 }
 
@@ -150,51 +151,11 @@ val tiles = listOf(
 
 val moveList = moves.entries.joinToString("") { (k, v) -> "<li><b>$k</b> ${esc(v)}</li>" }
 
-val page = """<title>Care Dial</title>
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<style>
-/* Layout: one column; the dial as one table, most careful at the top; every run below behind disclosures. */
-:root {
-  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
-  --heart: #4b4fc4; --python: #b8650b; --bare: #0f7d76;
-  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
-  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2;
-  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
-  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
-  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
-  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
-  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark } }
-:root[data-theme="dark"] {
-  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
-  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
-  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
-  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark }
-body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
-.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
-h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
-h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 20px; }
-.lede { color: var(--muted); max-width: 70ch; margin: 6px 0 0; }
-section { display: grid; gap: 12px; min-width: 0; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-.tile { background: var(--panel); border: 1px solid var(--rule); border-top: 3px solid var(--c, var(--rule));
-  border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
-.tile .name { font: 500 13px var(--mono); color: var(--muted); }
-.tile b { font: 600 22px/1.2 var(--display); color: var(--c, var(--ink)); }
-.tile.good { --c: var(--good); } .tile.safe { --c: var(--safe); } .tile.warn { --c: var(--warn); }
-.tile.bad { --c: var(--bad); } .tile.bare { --c: var(--bare); }
-.sub, .none { color: var(--muted); font-size: 13px; }
-.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
-thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-tbody tr:last-child > * { border-bottom: 0; }
+val style = """
+:root { --heart: #4b4fc4; --python: #b8650b; --bare: #0f7d76; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6; } }
+:root[data-theme="dark"] { --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6; }
+.tile.bare { --c: var(--bare); }
 tbody th { font-weight: 400; min-width: 220px; border-left: 4px solid var(--k); }
 tr.heart { --k: var(--heart); } tr.python { --k: var(--python); } tr.bare { --k: var(--bare); }
 tbody th code { font: 500 14px var(--mono); color: var(--k); }
@@ -202,35 +163,16 @@ tbody th code { font: 500 14px var(--mono); color: var(--k); }
 .dial td:nth-child(2) { min-width: 190px; }
 .dial td:nth-child(3), .dial td:nth-child(5) { min-width: 170px; }
 .dial td:nth-child(4) { min-width: 240px; }
-.v { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0; white-space: nowrap; }
-.v.good { color: var(--good); background: var(--good-bg); } .v.safe { color: var(--safe); background: var(--safe-bg); }
-.v.warn { color: var(--warn); background: var(--warn-bg); } .v.bad { color: var(--bad); background: var(--bad-bg); }
-.harm { font-size: 13px; } .note { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 36ch; } .harm .n { font: 12px var(--mono); color: var(--muted); }
+.harm { font-size: 13px; } .harm .n { font: 12px var(--mono); color: var(--muted); }
+.note { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 36ch; }
 .strip { position: relative; height: 10px; margin-top: 6px; background: var(--track); border-radius: 5px; }
 .strip i { position: absolute; top: 1px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--k); opacity: .8; }
-.mono, .num { font-family: var(--mono); font-size: 13px; } .num { text-align: right; font-variant-numeric: tabular-nums; }
 ul.moves { margin: 0; padding-left: 20px; display: grid; gap: 2px; } ul.moves b { font-family: var(--mono); }
-details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
-details > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
-details > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
-header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
-header > div { min-width: 0; }
-.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
-  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
-.theme:focus-visible, details > summary:focus-visible { outline: 2px solid var(--heart); outline-offset: 2px; }
-pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
 .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
 .key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--k); }
-</style>
+"""
 
-<div class="wrap">
-  <header><div>
-    <h1>The care dial: what each safeguard costs, and what it saves</h1>
-    <p class="lede">The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every
-    arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under the run
-    as a teammate would, and checker.py judges what the run kept of the teammate's moves. From runs/ladder.tsv and
-    runs/meddle.tsv, ${LocalDate.now()}.</p>
-  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></header>
+val body = """
   <div class="tiles">$tiles</div>
   <section>
     <h2>The dial</h2>
@@ -248,45 +190,38 @@ $dialRows
     <h2>The teammate's moves</h2>
     <ul class="moves">$moveList</ul>
     <p class="sub">Each move is made on the state the teammate reads first, once the run's pull request is open. A move the
-    run had already overtaken is "late" and says nothing about the run. Verdicts: <span class="v good">succeeded</span>
-    finished and kept every move; <span class="v safe">stopped safely</span> stopped before overwriting any;
-    <span class="v warn">damaged, then failed</span> overwrote one, then stopped; <span class="v bad">off the rails: exit 0 over damage</span>
+    run had already overtaken is "late" and says nothing about the run. Verdicts: <span class="tag good">succeeded</span>
+    finished and kept every move; <span class="tag safe">stopped safely</span> stopped before overwriting any;
+    <span class="tag warn">damaged, then failed</span> overwrote one, then stopped; <span class="tag bad">off the rails: exit 0 over damage</span>
     overwrote and reported success.</p>
   </section>
   <section>
     <h2>Every run</h2>
-    <details><summary>Storm and M4 runs (${meddled.size})</summary><div class="scroll"><table>
+    <details class="box"><summary>Storm and M4 runs (${meddled.size})</summary><div class="scroll"><table>
       <thead><tr><th>Stamp</th><th>Arm</th><th>Moves</th><th class="num">Exit</th><th class="num">Seconds</th><th>Verdict</th><th>Harm and left undone</th></tr></thead>
       <tbody>
 $allRuns
       </tbody></table></div></details>
-    <details><summary>Calm runs (${calm.count { a -> arms.any { it.name == a.arm } }})</summary><div class="scroll"><table>
+    <details class="box"><summary>Calm runs (${calm.count { a -> arms.any { it.name == a.arm } }})</summary><div class="scroll"><table>
       <thead><tr><th>Stamp</th><th>Arm</th><th class="num">Exit</th><th class="num">Seconds</th><th class="num">Checks</th></tr></thead>
       <tbody>
 $calmRuns
       </tbody></table></div></details>
-    <details><summary>The script that made this page: care-dial.kts</summary><div class="scroll"><pre class="src">${esc(File(source).readText())}</pre></div></details>
+    <details class="box"><summary>The script that made this page: care-dial.kts</summary><div class="scroll"><pre class="src">${esc(File(source).readText())}</pre></div></details>
   </section>
-</div>
-<script>
-// The switch: the viewer's system theme until they choose; the choice is kept in this browser where it can be.
-(function () {
-  var root = document.documentElement, button = document.getElementById('theme'), key = 'care-dial-theme';
-  function current() {
-    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  }
-  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
-  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
-  label();
-  button.addEventListener('click', function () {
-    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
-    label();
-  });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
-})();
-</script>
 """
+
+/** The page: the reports' shared shell, filled with this page's own parts. */
+val page = File(assets, "report-shell.html").readText()
+    .replace("@@TITLE@@", "Care Dial")
+    .replace("@@HEADING@@", "The care dial: what each safeguard costs, and what it saves")
+    .replace("@@LEDE@@", "The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every " +
+        "arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under " +
+        "the run as a teammate would, and checker.py judges what the run kept of the teammate's moves. From " +
+        "runs/ladder.tsv and runs/meddle.tsv, ${LocalDate.now()}.")
+    .replace("@@BASE@@", File(assets, "report-base.css").readText())
+    .replace("@@THEME@@", File(assets, "theme-switch.js").readText())
+    .replace("@@STYLE@@", style).replace("@@SCRIPT@@", "").replace("@@BODY@@", body)
 
 File(out).apply { parentFile.mkdirs() }.writeText(
     "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" +

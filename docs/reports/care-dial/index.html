@@ -3,47 +3,91 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: one column; the dial as one table, most careful at the top; every run below behind disclosures. */
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
 :root {
   --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
-  --heart: #4b4fc4; --python: #b8650b; --bare: #0f7d76;
+  --accent: #4b4fc4;
   --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
-  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
   --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
-  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
+  --accent: #8f93f2;
   --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
-  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark } }
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
-  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
+  --accent: #8f93f2;
   --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
-  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark }
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
 body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
-.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px;
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
-h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
-h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 20px; }
-.lede { color: var(--muted); max-width: 70ch; margin: 6px 0 0; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
 section { display: grid; gap: 12px; min-width: 0; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-.tile { background: var(--panel); border: 1px solid var(--rule); border-top: 3px solid var(--c, var(--rule));
-  border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
-.tile .name { font: 500 13px var(--mono); color: var(--muted); }
-.tile b { font: 600 22px/1.2 var(--display); color: var(--c, var(--ink)); }
-.tile.good { --c: var(--good); } .tile.safe { --c: var(--safe); } .tile.warn { --c: var(--warn); }
-.tile.bad { --c: var(--bad); } .tile.bare { --c: var(--bare); }
 .sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
 .scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
 table { border-collapse: collapse; width: 100%; font-size: 14px; }
 th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
 thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
 tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* This page's own. */
+
+:root { --heart: #4b4fc4; --python: #b8650b; --bare: #0f7d76; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6; } }
+:root[data-theme="dark"] { --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6; }
+.tile.bare { --c: var(--bare); }
 tbody th { font-weight: 400; min-width: 220px; border-left: 4px solid var(--k); }
 tr.heart { --k: var(--heart); } tr.python { --k: var(--python); } tr.bare { --k: var(--bare); }
 tbody th code { font: 500 14px var(--mono); color: var(--k); }
@@ -51,35 +95,21 @@ tbody th code { font: 500 14px var(--mono); color: var(--k); }
 .dial td:nth-child(2) { min-width: 190px; }
 .dial td:nth-child(3), .dial td:nth-child(5) { min-width: 170px; }
 .dial td:nth-child(4) { min-width: 240px; }
-.v { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0; white-space: nowrap; }
-.v.good { color: var(--good); background: var(--good-bg); } .v.safe { color: var(--safe); background: var(--safe-bg); }
-.v.warn { color: var(--warn); background: var(--warn-bg); } .v.bad { color: var(--bad); background: var(--bad-bg); }
-.harm { font-size: 13px; } .note { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 36ch; } .harm .n { font: 12px var(--mono); color: var(--muted); }
+.harm { font-size: 13px; } .harm .n { font: 12px var(--mono); color: var(--muted); }
+.note { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 36ch; }
 .strip { position: relative; height: 10px; margin-top: 6px; background: var(--track); border-radius: 5px; }
 .strip i { position: absolute; top: 1px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--k); opacity: .8; }
-.mono, .num { font-family: var(--mono); font-size: 13px; } .num { text-align: right; font-variant-numeric: tabular-nums; }
 ul.moves { margin: 0; padding-left: 20px; display: grid; gap: 2px; } ul.moves b { font-family: var(--mono); }
-details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
-details > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
-details > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
-header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
-header > div { min-width: 0; }
-.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
-  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
-.theme:focus-visible, details > summary:focus-visible { outline: 2px solid var(--heart); outline-offset: 2px; }
-pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
 .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
 .key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--k); }
-</style>
 
+</style>
 <div class="wrap">
-  <header><div>
+  <div class="top"><div>
     <h1>The care dial: what each safeguard costs, and what it saves</h1>
-    <p class="lede">The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every
-    arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under the run
-    as a teammate would, and checker.py judges what the run kept of the teammate's moves. From runs/ladder.tsv and
-    runs/meddle.tsv, 2026-10-23.</p>
-  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></header>
+    <p class="lede">The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under the run as a teammate would, and checker.py judges what the run kept of the teammate's moves. From runs/ladder.tsv and runs/meddle.tsv, 2026-10-23.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+
   <div class="tiles"><div class="tile bare"><span class="name">artie-bare, calm</span><b>21.0 s</b><span class="sub">median of 3 runs, no checks</span></div><div class="tile bad"><span class="name">artie-bare, storm</span><b>off the rails: exit 0 over damage</b><span class="sub">4 of 4 runs did harm</span></div><div class="tile bad"><span class="name">py-direct, storm</span><b>off the rails: exit 0 over damage</b><span class="sub">4 of 4 runs did harm</span></div><div class="tile good"><span class="name">artie-goal, storm</span><b>59.0 s</b><span class="sub">4 of 5 succeeded, no harm</span></div></div>
   <section>
     <h2>The dial</h2>
@@ -87,8 +117,8 @@ pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: va
     <div class="scroll"><table class="dial">
       <thead><tr><th>Arm</th><th>Calm: time, whole runs</th><th>Storm (M1,M2,M3,M5)</th><th>Harm done in the storm</th><th>M4 alone</th></tr></thead>
       <tbody>
-<tr class="heart"><th scope="row"><code>artie-goal</code><div class="what">ARTIE with the goal script: acts only on what the resource still offers</div></th><td><span class="none">in the storm only</span></td><td><span class="v safe">1 × stopped safely</span> <span class="v good">4 × succeeded</span><div class="sub">59.0 s median</div></td><td><span class="none">none</span></td><td><span class="v good">2 × succeeded</span></td></tr>
-<tr class="heart"><th scope="row"><code>careful-heart</code><div class="what">the generated script, guard strict, validators from the last answer, the gateway taking every care</div></th><td><b>41.9 s</b> <span class="sub">32.1–88.4, 13 runs, 6 whole</span><div class="strip heart"><i style="left:46.0%" title="40.7 s"></i><i style="left:42.6%" title="37.7 s"></i><i style="left:38.5%" title="34.0 s"></i><i style="left:100.0%" title="88.4 s"></i><i style="left:85.3%" title="75.4 s"></i><i style="left:36.3%" title="32.1 s"></i><i style="left:47.4%" title="41.9 s"></i><i style="left:46.3%" title="40.9 s"></i><i style="left:45.9%" title="40.6 s"></i><i style="left:86.1%" title="76.1 s"></i><i style="left:76.8%" title="67.9 s"></i><i style="left:91.7%" title="81.1 s"></i><i style="left:66.1%" title="58.4 s"></i></div></td><td><span class="v warn">1 × damaged, then failed</span> <span class="v safe">2 × stopped safely</span><div class="sub">52.8 s median</div></td><td><div class="harm">pull: the reviewer's note overwritten <span class="n">1/3</span></div></td><td><span class="v safe">2 × stopped safely</span></td></tr>
+<tr class="heart"><th scope="row"><code>artie-goal</code><div class="what">ARTIE with the goal script: acts only on what the resource still offers</div></th><td><span class="none">in the storm only</span></td><td><span class="tag safe">1 × stopped safely</span> <span class="tag good">4 × succeeded</span><div class="sub">59.0 s median</div></td><td><span class="none">none</span></td><td><span class="tag good">2 × succeeded</span></td></tr>
+<tr class="heart"><th scope="row"><code>careful-heart</code><div class="what">the generated script, guard strict, validators from the last answer, the gateway taking every care</div></th><td><b>41.9 s</b> <span class="sub">32.1–88.4, 13 runs, 6 whole</span><div class="strip heart"><i style="left:46.0%" title="40.7 s"></i><i style="left:42.6%" title="37.7 s"></i><i style="left:38.5%" title="34.0 s"></i><i style="left:100.0%" title="88.4 s"></i><i style="left:85.3%" title="75.4 s"></i><i style="left:36.3%" title="32.1 s"></i><i style="left:47.4%" title="41.9 s"></i><i style="left:46.3%" title="40.9 s"></i><i style="left:45.9%" title="40.6 s"></i><i style="left:86.1%" title="76.1 s"></i><i style="left:76.8%" title="67.9 s"></i><i style="left:91.7%" title="81.1 s"></i><i style="left:66.1%" title="58.4 s"></i></div></td><td><span class="tag warn">1 × damaged, then failed</span> <span class="tag safe">2 × stopped safely</span><div class="sub">52.8 s median</div></td><td><div class="harm">pull: the reviewer's note overwritten <span class="n">1/3</span></div></td><td><span class="tag safe">2 × stopped safely</span></td></tr>
 <tr class="heart"><th scope="row"><code>heart:every</code><div class="what">the generated script off the rails, the gateway taking every care</div></th><td><b>66.9 s</b> <span class="sub">25.5–71.2, 9 runs, 7 whole</span><div class="strip heart"><i style="left:78.5%" title="69.4 s"></i><i style="left:66.5%" title="58.8 s"></i><i style="left:36.3%" title="32.1 s"></i><i style="left:28.8%" title="25.5 s"></i><i style="left:76.5%" title="67.6 s"></i><i style="left:76.5%" title="67.6 s"></i><i style="left:75.7%" title="66.9 s"></i><i style="left:70.9%" title="62.7 s"></i><i style="left:80.5%" title="71.2 s"></i></div></td><td><span class="none">not run</span></td><td></td><td><span class="none">not run</span></td></tr>
 <tr class="heart"><th scope="row"><code>heart:no-reread</code><div class="what">as heart:every, the gateway not reading again before a write</div></th><td><b>61.5 s</b> <span class="sub">59.7–64.7, 3 runs, 3 whole</span><div class="strip heart"><i style="left:69.6%" title="61.5 s"></i><i style="left:67.5%" title="59.7 s"></i><i style="left:73.2%" title="64.7 s"></i></div></td><td><span class="none">not run</span></td><td></td><td><span class="none">not run</span></td></tr>
 <tr class="heart"><th scope="row"><code>heart:no-race</code><div class="what">as heart:every, the gateway not checking for a race</div></th><td><b>57.3 s</b> <span class="sub">57.1–60.1, 3 runs, 2 whole</span><div class="strip heart"><i style="left:68.0%" title="60.1 s"></i><i style="left:64.6%" title="57.1 s"></i><i style="left:64.8%" title="57.3 s"></i></div></td><td><span class="none">not run</span></td><td></td><td><span class="none">not run</span></td></tr>
@@ -96,10 +126,10 @@ pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: va
 <tr class="heart"><th scope="row"><code>heart:trust-copies=60</code><div class="what">as heart:every, the gateway trusting its copies for 60 s</div></th><td><b>34.3 s</b> <span class="sub">32.4–40.7, 3 runs, 1 whole</span><div class="strip heart"><i style="left:46.0%" title="40.7 s"></i><i style="left:36.7%" title="32.4 s"></i><i style="left:38.8%" title="34.3 s"></i></div></td><td><span class="none">not run</span></td><td></td><td><span class="none">not run</span></td></tr>
 <tr class="heart"><th scope="row"><code>heart:off-the-rails</code><div class="what">every care off, client and gateway, still HEART</div></th><td><b>34.3 s</b> <span class="sub">33.9–35.4, 3 runs, 2 whole</span><div class="strip heart"><i style="left:38.8%" title="34.3 s"></i><i style="left:40.0%" title="35.4 s"></i><i style="left:38.3%" title="33.9 s"></i></div></td><td><span class="none">not run</span></td><td></td><td><span class="none">not run</span></td></tr>
 <tr class="python"><th scope="row"><code>careful-via</code><div class="what">Claude's careful Python, through the gateway passed through</div></th><td><b>37.7 s</b> <span class="sub">36.8–40.6, 3 runs, 1 whole</span><div class="strip python"><i style="left:45.9%" title="40.6 s"></i><i style="left:42.6%" title="37.7 s"></i><i style="left:41.6%" title="36.8 s"></i></div></td><td><span class="none">not run</span></td><td></td><td><span class="none">not run</span></td></tr>
-<tr class="python"><th scope="row"><code>careful-direct</code><div class="what">Claude's careful Python, straight to GitHub</div></th><td><b>45.9 s</b> <span class="sub">42.9–46.5, 3 runs, 1 whole</span><div class="strip python"><i style="left:51.9%" title="45.9 s"></i><i style="left:48.5%" title="42.9 s"></i><i style="left:52.6%" title="46.5 s"></i></div></td><td><span class="v warn">3 × damaged, then failed</span><div class="sub">29.7 s median</div></td><td><div class="harm">crash: the team's 'not planned' overwritten with 'completed' <span class="n">3/3</span></div><div class="harm">pull: the reviewer's note overwritten <span class="n">3/3</span></div></td><td><span class="v safe">2 × stopped safely</span></td></tr>
+<tr class="python"><th scope="row"><code>careful-direct</code><div class="what">Claude's careful Python, straight to GitHub</div></th><td><b>45.9 s</b> <span class="sub">42.9–46.5, 3 runs, 1 whole</span><div class="strip python"><i style="left:51.9%" title="45.9 s"></i><i style="left:48.5%" title="42.9 s"></i><i style="left:52.6%" title="46.5 s"></i></div></td><td><span class="tag warn">3 × damaged, then failed</span><div class="sub">29.7 s median</div></td><td><div class="harm">crash: the team's 'not planned' overwritten with 'completed' <span class="n">3/3</span></div><div class="harm">pull: the reviewer's note overwritten <span class="n">3/3</span></div></td><td><span class="tag safe">2 × stopped safely</span></td></tr>
 <tr class="python"><th scope="row"><code>py-via</code><div class="what">Claude's plain Python, through the gateway passed through</div></th><td><b>25.4 s</b> <span class="sub">22.7–30.6, 3 runs, 1 whole</span><div class="strip python"><i style="left:34.6%" title="30.6 s"></i><i style="left:25.7%" title="22.7 s"></i><i style="left:28.7%" title="25.4 s"></i></div></td><td><span class="none">not run</span></td><td></td><td><span class="none">not run</span></td></tr>
-<tr class="bare"><th scope="row"><code>artie-bare</code><div class="what">the careful run brought down to its GitHub calls by artie generate --bare, sent by ARTIE with no checks</div></th><td><b>21.0 s</b> <span class="sub">19.0–23.6, 3 runs, 3 whole</span><div class="strip bare"><i style="left:26.7%" title="23.6 s"></i><i style="left:23.8%" title="21.0 s"></i><i style="left:21.5%" title="19.0 s"></i></div></td><td><span class="v bad">4 × off the rails: exit 0 over damage</span><div class="sub">22.5 s median</div></td><td><div class="harm">dupe: the team's 'completed' overwritten with 'duplicate' <span class="n">4/4</span></div><div class="harm">dupe: called the same crash after the team said it isn't <span class="n">4/4</span></div><div class="note">It never writes the crash issue's state itself, so M1 had nothing to overwrite. Under M4 it stopped only because the merge, retried 30 times a second apart, kept getting 405 &quot;still a draft&quot;.</div></td><td><span class="v safe">2 × stopped safely</span></td></tr>
-<tr class="python"><th scope="row"><code>py-direct</code><div class="what">Claude's plain Python, straight to GitHub</div></th><td><b>24.3 s</b> <span class="sub">21.7–25.9, 6 runs, 5 whole</span><div class="strip python"><i style="left:28.4%" title="25.1 s"></i><i style="left:29.3%" title="25.9 s"></i><i style="left:29.1%" title="25.7 s"></i><i style="left:24.8%" title="21.9 s"></i><i style="left:26.6%" title="23.5 s"></i><i style="left:24.5%" title="21.7 s"></i></div></td><td><span class="v bad">4 × off the rails: exit 0 over damage</span><div class="sub">21.0 s median</div></td><td><div class="harm">crash: the team's 'not planned' overwritten with 'completed' <span class="n">4/4</span></div><div class="harm">dupe: the team's 'completed' overwritten with 'duplicate' <span class="n">4/4</span></div><div class="harm">dupe: called the same crash after the team said it isn't <span class="n">4/4</span></div></td><td><span class="v safe">2 × stopped safely</span></td></tr>
+<tr class="bare"><th scope="row"><code>artie-bare</code><div class="what">the careful run brought down to its GitHub calls by artie generate --bare, sent by ARTIE with no checks</div></th><td><b>21.0 s</b> <span class="sub">19.0–23.6, 3 runs, 3 whole</span><div class="strip bare"><i style="left:26.7%" title="23.6 s"></i><i style="left:23.8%" title="21.0 s"></i><i style="left:21.5%" title="19.0 s"></i></div></td><td><span class="tag bad">4 × off the rails: exit 0 over damage</span><div class="sub">22.5 s median</div></td><td><div class="harm">dupe: the team's 'completed' overwritten with 'duplicate' <span class="n">4/4</span></div><div class="harm">dupe: called the same crash after the team said it isn't <span class="n">4/4</span></div><div class="note">It never writes the crash issue's state itself, so M1 had nothing to overwrite. Under M4 it stopped only because the merge, retried 30 times a second apart, kept getting 405 &quot;still a draft&quot;.</div></td><td><span class="tag safe">2 × stopped safely</span></td></tr>
+<tr class="python"><th scope="row"><code>py-direct</code><div class="what">Claude's plain Python, straight to GitHub</div></th><td><b>24.3 s</b> <span class="sub">21.7–25.9, 6 runs, 5 whole</span><div class="strip python"><i style="left:28.4%" title="25.1 s"></i><i style="left:29.3%" title="25.9 s"></i><i style="left:29.1%" title="25.7 s"></i><i style="left:24.8%" title="21.9 s"></i><i style="left:26.6%" title="23.5 s"></i><i style="left:24.5%" title="21.7 s"></i></div></td><td><span class="tag bad">4 × off the rails: exit 0 over damage</span><div class="sub">21.0 s median</div></td><td><div class="harm">crash: the team's 'not planned' overwritten with 'completed' <span class="n">4/4</span></div><div class="harm">dupe: the team's 'completed' overwritten with 'duplicate' <span class="n">4/4</span></div><div class="harm">dupe: called the same crash after the team said it isn't <span class="n">4/4</span></div></td><td><span class="tag safe">2 × stopped safely</span></td></tr>
       </tbody>
     </table></div>
     <p class="sub">"Whole" counts the calm runs where all of checker.py's checks held. The early part-runs (3/7, 9/22) are
@@ -109,47 +139,47 @@ pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: va
     <h2>The teammate's moves</h2>
     <ul class="moves"><li><b>M1</b> closes the crash issue as not planned</li><li><b>M2</b> locks the crash issue's conversation as off-topic</li><li><b>M3</b> closes the duplicate as completed: a different crash</li><li><b>M4</b> converts the pull request to a draft</li><li><b>M5</b> adds a reviewer's note to the pull request</li></ul>
     <p class="sub">Each move is made on the state the teammate reads first, once the run's pull request is open. A move the
-    run had already overtaken is "late" and says nothing about the run. Verdicts: <span class="v good">succeeded</span>
-    finished and kept every move; <span class="v safe">stopped safely</span> stopped before overwriting any;
-    <span class="v warn">damaged, then failed</span> overwrote one, then stopped; <span class="v bad">off the rails: exit 0 over damage</span>
+    run had already overtaken is "late" and says nothing about the run. Verdicts: <span class="tag good">succeeded</span>
+    finished and kept every move; <span class="tag safe">stopped safely</span> stopped before overwriting any;
+    <span class="tag warn">damaged, then failed</span> overwrote one, then stopped; <span class="tag bad">off the rails: exit 0 over damage</span>
     overwrote and reported success.</p>
   </section>
   <section>
     <h2>Every run</h2>
-    <details><summary>Storm and M4 runs (29)</summary><div class="scroll"><table>
+    <details class="box"><summary>Storm and M4 runs (29)</summary><div class="scroll"><table>
       <thead><tr><th>Stamp</th><th>Arm</th><th>Moves</th><th class="num">Exit</th><th class="num">Seconds</th><th>Verdict</th><th>Harm and left undone</th></tr></thead>
       <tbody>
-<tr><td class="mono">1022-170035</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">20.5</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1022-170115</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">32.2</td><td><span class="v safe">stopped safely</span></td><td>left undone: pull: merged<br>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
-<tr><td class="mono">1022-170537</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">57.6</td><td><span class="v good">succeeded</span></td><td>–</td></tr>
-<tr><td class="mono">1022-170700</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">23.1</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1022-170740</td><td><code>careful-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">1</td><td class="num">30.2</td><td><span class="v warn">damaged, then failed</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>pull: the reviewer's note overwritten<br>left undone: test: closed as completed</td></tr>
-<tr><td class="mono">1022-170830</td><td><code>careful-heart</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">53.5</td><td><span class="v warn">damaged, then failed</span></td><td>pull: the reviewer's note overwritten<br>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
-<tr><td class="mono">1022-170943</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">60.6</td><td><span class="v good">succeeded</span></td><td>–</td></tr>
-<tr><td class="mono">1022-171101</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">21.4</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1022-171139</td><td><code>careful-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">1</td><td class="num">29.7</td><td><span class="v warn">damaged, then failed</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>pull: the reviewer's note overwritten<br>left undone: test: closed as completed</td></tr>
-<tr><td class="mono">1022-171229</td><td><code>careful-heart</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">52.8</td><td><span class="v safe">stopped safely</span></td><td>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
-<tr><td class="mono">1022-171341</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">64.7</td><td><span class="v good">succeeded</span></td><td>–</td></tr>
-<tr><td class="mono">1022-171503</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">20.0</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1022-171541</td><td><code>careful-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">1</td><td class="num">26.7</td><td><span class="v warn">damaged, then failed</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>pull: the reviewer's note overwritten<br>left undone: test: closed as completed</td></tr>
-<tr><td class="mono">1022-171627</td><td><code>careful-heart</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">36.2</td><td><span class="v safe">stopped safely</span></td><td>left undone: pull: merged<br>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
-<tr><td class="mono">1022-171727</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">59.0</td><td><span class="v good">succeeded</span></td><td>–</td></tr>
-<tr><td class="mono">1022-171844</td><td><code>py-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">10.2</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
-<tr><td class="mono">1022-171911</td><td><code>careful-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">19.1</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
-<tr><td class="mono">1022-171949</td><td><code>careful-heart</code></td><td class="mono">M4</td><td class="num">3</td><td class="num">41.3</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
-<tr><td class="mono">1022-172050</td><td><code>artie-goal</code></td><td class="mono">M4</td><td class="num">0</td><td class="num">58.4</td><td><span class="v good">succeeded</span></td><td>–</td></tr>
-<tr><td class="mono">1022-172206</td><td><code>py-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">9.9</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
-<tr><td class="mono">1022-172232</td><td><code>careful-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">18.7</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
-<tr><td class="mono">1022-172311</td><td><code>careful-heart</code></td><td class="mono">M4</td><td class="num">3</td><td class="num">34.9</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
-<tr><td class="mono">1022-172405</td><td><code>artie-goal</code></td><td class="mono">M4</td><td class="num">0</td><td class="num">49.8</td><td><span class="v good">succeeded</span></td><td>–</td></tr>
-<tr><td class="mono">1023-075319</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">23.9</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1023-075400</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">22.0</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1023-075439</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">23.0</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1023-075520</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">20.6</td><td><span class="v bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
-<tr><td class="mono">1023-075557</td><td><code>artie-bare</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">62.0</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
-<tr><td class="mono">1023-075716</td><td><code>artie-bare</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">64.0</td><td><span class="v safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1022-170035</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">20.5</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1022-170115</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">32.2</td><td><span class="tag safe">stopped safely</span></td><td>left undone: pull: merged<br>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
+<tr><td class="mono">1022-170537</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">57.6</td><td><span class="tag good">succeeded</span></td><td>–</td></tr>
+<tr><td class="mono">1022-170700</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">23.1</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1022-170740</td><td><code>careful-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">1</td><td class="num">30.2</td><td><span class="tag warn">damaged, then failed</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>pull: the reviewer's note overwritten<br>left undone: test: closed as completed</td></tr>
+<tr><td class="mono">1022-170830</td><td><code>careful-heart</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">53.5</td><td><span class="tag warn">damaged, then failed</span></td><td>pull: the reviewer's note overwritten<br>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
+<tr><td class="mono">1022-170943</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">60.6</td><td><span class="tag good">succeeded</span></td><td>–</td></tr>
+<tr><td class="mono">1022-171101</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">21.4</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1022-171139</td><td><code>careful-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">1</td><td class="num">29.7</td><td><span class="tag warn">damaged, then failed</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>pull: the reviewer's note overwritten<br>left undone: test: closed as completed</td></tr>
+<tr><td class="mono">1022-171229</td><td><code>careful-heart</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">52.8</td><td><span class="tag safe">stopped safely</span></td><td>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
+<tr><td class="mono">1022-171341</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">64.7</td><td><span class="tag good">succeeded</span></td><td>–</td></tr>
+<tr><td class="mono">1022-171503</td><td><code>py-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">20.0</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1022-171541</td><td><code>careful-direct</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">1</td><td class="num">26.7</td><td><span class="tag warn">damaged, then failed</span></td><td>crash: the team's 'not planned' overwritten with 'completed'<br>pull: the reviewer's note overwritten<br>left undone: test: closed as completed</td></tr>
+<tr><td class="mono">1022-171627</td><td><code>careful-heart</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">3</td><td class="num">36.2</td><td><span class="tag safe">stopped safely</span></td><td>left undone: pull: merged<br>left undone: test: closed as completed<br>left undone: crash: a comment naming the pull request</td></tr>
+<tr><td class="mono">1022-171727</td><td><code>artie-goal</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">59.0</td><td><span class="tag good">succeeded</span></td><td>–</td></tr>
+<tr><td class="mono">1022-171844</td><td><code>py-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">10.2</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1022-171911</td><td><code>careful-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">19.1</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1022-171949</td><td><code>careful-heart</code></td><td class="mono">M4</td><td class="num">3</td><td class="num">41.3</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1022-172050</td><td><code>artie-goal</code></td><td class="mono">M4</td><td class="num">0</td><td class="num">58.4</td><td><span class="tag good">succeeded</span></td><td>–</td></tr>
+<tr><td class="mono">1022-172206</td><td><code>py-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">9.9</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1022-172232</td><td><code>careful-direct</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">18.7</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1022-172311</td><td><code>careful-heart</code></td><td class="mono">M4</td><td class="num">3</td><td class="num">34.9</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1022-172405</td><td><code>artie-goal</code></td><td class="mono">M4</td><td class="num">0</td><td class="num">49.8</td><td><span class="tag good">succeeded</span></td><td>–</td></tr>
+<tr><td class="mono">1023-075319</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">23.9</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1023-075400</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">22.0</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1023-075439</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">23.0</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1023-075520</td><td><code>artie-bare</code></td><td class="mono">M1,M2,M3,M5</td><td class="num">0</td><td class="num">20.6</td><td><span class="tag bad">off the rails: exit 0 over damage</span></td><td>dupe: the team's 'completed' overwritten with 'duplicate'<br>dupe: called the same crash after the team said it isn't</td></tr>
+<tr><td class="mono">1023-075557</td><td><code>artie-bare</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">62.0</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
+<tr><td class="mono">1023-075716</td><td><code>artie-bare</code></td><td class="mono">M4</td><td class="num">1</td><td class="num">64.0</td><td><span class="tag safe">stopped safely</span></td><td>–</td></tr>
       </tbody></table></div></details>
-    <details><summary>Calm runs (55)</summary><div class="scroll"><table>
+    <details class="box"><summary>Calm runs (55)</summary><div class="scroll"><table>
       <thead><tr><th>Stamp</th><th>Arm</th><th class="num">Exit</th><th class="num">Seconds</th><th class="num">Checks</th></tr></thead>
       <tbody>
 <tr><td class="mono">1022-110436</td><td><code>py-direct</code></td><td class="num">0</td><td class="num">25.1</td><td class="num">3/7</td></tr>
@@ -208,11 +238,12 @@ pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: va
 <tr><td class="mono">1022-211615</td><td><code>artie-bare</code></td><td class="num">0</td><td class="num">19.0</td><td class="num">23/23</td></tr>
 <tr><td class="mono">1022-211658</td><td><code>py-direct</code></td><td class="num">0</td><td class="num">21.7</td><td class="num">23/23</td></tr>
       </tbody></table></div></details>
-    <details><summary>The script that made this page: care-dial.kts</summary><div class="scroll"><pre class="src">// The care dial as a page: every arm of the ladder from most careful to least, with what it cost on a calm GitHub
+    <details class="box"><summary>The script that made this page: care-dial.kts</summary><div class="scroll"><pre class="src">// The care dial as a page: every arm of the ladder from most careful to least, with what it cost on a calm GitHub
 // (runs/ladder.tsv) and what it did when a teammate moved the world under it (runs/meddle.tsv, meddler.py).
 //   artie run care-dial.kts runs=runs out=../../docs/reports/care-dial/index.html artifact=/tmp/care-dial.html
 // out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
-// The page carries this script's own text at the bottom (source), and a light and dark switch that remembers.
+// The page carries this script's own text at the bottom (source). Its look comes from the reports' shared assets
+// (report-shell.html, report-base.css, theme-switch.js), inlined, so the page needs nothing else at runtime.
 import java.io.File
 import java.time.LocalDate
 
@@ -220,6 +251,7 @@ val runs by input(default = &quot;runs&quot;, question = &quot;Where are ladder.
 val out by input(question = &quot;Where to write the page?&quot;)
 val artifact by input(default = &quot;&quot;, question = &quot;Where to write the artifact copy, if anywhere?&quot;)
 val source by input(default = &quot;care-dial.kts&quot;, question = &quot;Where is this script, to show it on the page?&quot;)
+val assets by input(default = &quot;../../docs/reports/assets&quot;, question = &quot;Where are the reports' shared assets?&quot;)
 
 /** One arm of the ladder, in the dial's order: its name in the tables, what it is, and how it reaches GitHub. */
 class Arm(val name: String, val label: String, val what: String, val kind: String, val note: String = &quot;&quot;)
@@ -291,7 +323,7 @@ fun worst(list: List&lt;Meddled&gt;) = list.maxByOrNull { m -&gt; verdicts.index
 fun verdictCell(list: List&lt;Meddled&gt;): String {
     if (list.isEmpty()) return &quot;&quot;&quot;&lt;span class=&quot;none&quot;&gt;not run&lt;/span&gt;&quot;&quot;&quot;
     return verdicts.reversed().mapNotNull { (v, t) -&gt;
-        list.count { it.verdict == v }.takeIf { it &gt; 0 }?.let { &quot;&quot;&quot;&lt;span class=&quot;v $t&quot;&gt;$it × ${esc(v)}&lt;/span&gt;&quot;&quot;&quot; }
+        list.count { it.verdict == v }.takeIf { it &gt; 0 }?.let { &quot;&quot;&quot;&lt;span class=&quot;tag $t&quot;&gt;$it × ${esc(v)}&lt;/span&gt;&quot;&quot;&quot; }
     }.joinToString(&quot; &quot;)
 }
 
@@ -305,7 +337,6 @@ fun harmCell(list: List&lt;Meddled&gt;): String {
 
 val storm = &quot;M1,M2,M3,M5&quot;
 val maxCalm = calm.filter { a -&gt; arms.any { it.name == a.arm } }.maxOf { it.seconds }.coerceAtMost(100.0)
-val maxStorm = meddled.maxOf { it.seconds }
 
 fun strip(xs: List&lt;Double&gt;, max: Double, cls: String) =
     &quot;&quot;&quot;&lt;div class=&quot;strip $cls&quot;&gt;&quot;&quot;&quot; + xs.joinToString(&quot;&quot;) { x -&gt;
@@ -329,7 +360,7 @@ val dialRows = arms.joinToString(&quot;\n&quot;) { a -&gt;
 val allRuns = meddled.sortedBy { it.stamp }.joinToString(&quot;\n&quot;) { m -&gt;
     val label = arms.firstOrNull { it.name == m.arm }?.label ?: m.arm
     &quot;&quot;&quot;&lt;tr&gt;&lt;td class=&quot;mono&quot;&gt;${esc(m.stamp)}&lt;/td&gt;&lt;td&gt;&lt;code&gt;${esc(label)}&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;mono&quot;&gt;${esc(m.moves)}&lt;/td&gt;&quot;&quot;&quot; +
-        &quot;&quot;&quot;&lt;td class=&quot;num&quot;&gt;${m.rc}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${s(m.seconds)}&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;v ${tone(m.verdict)}&quot;&gt;${esc(m.verdict)}&lt;/span&gt;&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td class=&quot;num&quot;&gt;${m.rc}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${s(m.seconds)}&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;tag ${tone(m.verdict)}&quot;&gt;${esc(m.verdict)}&lt;/span&gt;&lt;/td&gt;&quot;&quot;&quot; +
         &quot;&quot;&quot;&lt;td&gt;${(m.damage.map { esc(it) } + m.undone.map { &quot;left undone: &quot; + esc(it) }).joinToString(&quot;&lt;br&gt;&quot;).ifEmpty { &quot;–&quot; }}&lt;/td&gt;&lt;/tr&gt;&quot;&quot;&quot;
 }
 
@@ -360,51 +391,11 @@ val tiles = listOf(
 
 val moveList = moves.entries.joinToString(&quot;&quot;) { (k, v) -&gt; &quot;&lt;li&gt;&lt;b&gt;$k&lt;/b&gt; ${esc(v)}&lt;/li&gt;&quot; }
 
-val page = &quot;&quot;&quot;&lt;title&gt;Care Dial&lt;/title&gt;
-&lt;meta name=&quot;claude:viewport-fit-sides&quot; content=&quot;cover&quot;&gt;
-&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&amp;family=IBM+Plex+Sans:wght@400;500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap&quot;&gt;
-&lt;style&gt;
-/* Layout: one column; the dial as one table, most careful at the top; every run below behind disclosures. */
-:root {
-  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
-  --heart: #4b4fc4; --python: #b8650b; --bare: #0f7d76;
-  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
-  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2;
-  --display: &quot;IBM Plex Sans Condensed&quot;, &quot;Arial Narrow&quot;, system-ui, sans-serif;
-  --body: &quot;IBM Plex Sans&quot;, system-ui, -apple-system, &quot;Segoe UI&quot;, sans-serif;
-  --mono: &quot;IBM Plex Mono&quot;, ui-monospace, Menlo, monospace;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme=&quot;light&quot;]) {
-  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
-  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
-  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
-  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark } }
-:root[data-theme=&quot;dark&quot;] {
-  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
-  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
-  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
-  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark }
-body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
-.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
-h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
-h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 20px; }
-.lede { color: var(--muted); max-width: 70ch; margin: 6px 0 0; }
-section { display: grid; gap: 12px; min-width: 0; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
-.tile { background: var(--panel); border: 1px solid var(--rule); border-top: 3px solid var(--c, var(--rule));
-  border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
-.tile .name { font: 500 13px var(--mono); color: var(--muted); }
-.tile b { font: 600 22px/1.2 var(--display); color: var(--c, var(--ink)); }
-.tile.good { --c: var(--good); } .tile.safe { --c: var(--safe); } .tile.warn { --c: var(--warn); }
-.tile.bad { --c: var(--bad); } .tile.bare { --c: var(--bare); }
-.sub, .none { color: var(--muted); font-size: 13px; }
-.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
-table { border-collapse: collapse; width: 100%; font-size: 14px; }
-th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
-thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
-tbody tr:last-child &gt; * { border-bottom: 0; }
+val style = &quot;&quot;&quot;
+:root { --heart: #4b4fc4; --python: #b8650b; --bare: #0f7d76; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme=&quot;light&quot;]) { --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6; } }
+:root[data-theme=&quot;dark&quot;] { --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6; }
+.tile.bare { --c: var(--bare); }
 tbody th { font-weight: 400; min-width: 220px; border-left: 4px solid var(--k); }
 tr.heart { --k: var(--heart); } tr.python { --k: var(--python); } tr.bare { --k: var(--bare); }
 tbody th code { font: 500 14px var(--mono); color: var(--k); }
@@ -412,35 +403,16 @@ tbody th code { font: 500 14px var(--mono); color: var(--k); }
 .dial td:nth-child(2) { min-width: 190px; }
 .dial td:nth-child(3), .dial td:nth-child(5) { min-width: 170px; }
 .dial td:nth-child(4) { min-width: 240px; }
-.v { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0; white-space: nowrap; }
-.v.good { color: var(--good); background: var(--good-bg); } .v.safe { color: var(--safe); background: var(--safe-bg); }
-.v.warn { color: var(--warn); background: var(--warn-bg); } .v.bad { color: var(--bad); background: var(--bad-bg); }
-.harm { font-size: 13px; } .note { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 36ch; } .harm .n { font: 12px var(--mono); color: var(--muted); }
+.harm { font-size: 13px; } .harm .n { font: 12px var(--mono); color: var(--muted); }
+.note { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 36ch; }
 .strip { position: relative; height: 10px; margin-top: 6px; background: var(--track); border-radius: 5px; }
 .strip i { position: absolute; top: 1px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--k); opacity: .8; }
-.mono, .num { font-family: var(--mono); font-size: 13px; } .num { text-align: right; font-variant-numeric: tabular-nums; }
 ul.moves { margin: 0; padding-left: 20px; display: grid; gap: 2px; } ul.moves b { font-family: var(--mono); }
-details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
-details &gt; summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
-details &gt; .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
-header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
-header &gt; div { min-width: 0; }
-.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
-  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
-.theme:focus-visible, details &gt; summary:focus-visible { outline: 2px solid var(--heart); outline-offset: 2px; }
-pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
 .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
 .key span::before { content: &quot;&quot;; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--k); }
-&lt;/style&gt;
+&quot;&quot;&quot;
 
-&lt;div class=&quot;wrap&quot;&gt;
-  &lt;header&gt;&lt;div&gt;
-    &lt;h1&gt;The care dial: what each safeguard costs, and what it saves&lt;/h1&gt;
-    &lt;p class=&quot;lede&quot;&gt;The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every
-    arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under the run
-    as a teammate would, and checker.py judges what the run kept of the teammate's moves. From runs/ladder.tsv and
-    runs/meddle.tsv, ${LocalDate.now()}.&lt;/p&gt;
-  &lt;/div&gt;&lt;button class=&quot;theme&quot; id=&quot;theme&quot; type=&quot;button&quot; aria-label=&quot;Switch between light and dark&quot;&gt;◐ Dark&lt;/button&gt;&lt;/header&gt;
+val body = &quot;&quot;&quot;
   &lt;div class=&quot;tiles&quot;&gt;$tiles&lt;/div&gt;
   &lt;section&gt;
     &lt;h2&gt;The dial&lt;/h2&gt;
@@ -458,45 +430,38 @@ $dialRows
     &lt;h2&gt;The teammate's moves&lt;/h2&gt;
     &lt;ul class=&quot;moves&quot;&gt;$moveList&lt;/ul&gt;
     &lt;p class=&quot;sub&quot;&gt;Each move is made on the state the teammate reads first, once the run's pull request is open. A move the
-    run had already overtaken is &quot;late&quot; and says nothing about the run. Verdicts: &lt;span class=&quot;v good&quot;&gt;succeeded&lt;/span&gt;
-    finished and kept every move; &lt;span class=&quot;v safe&quot;&gt;stopped safely&lt;/span&gt; stopped before overwriting any;
-    &lt;span class=&quot;v warn&quot;&gt;damaged, then failed&lt;/span&gt; overwrote one, then stopped; &lt;span class=&quot;v bad&quot;&gt;off the rails: exit 0 over damage&lt;/span&gt;
+    run had already overtaken is &quot;late&quot; and says nothing about the run. Verdicts: &lt;span class=&quot;tag good&quot;&gt;succeeded&lt;/span&gt;
+    finished and kept every move; &lt;span class=&quot;tag safe&quot;&gt;stopped safely&lt;/span&gt; stopped before overwriting any;
+    &lt;span class=&quot;tag warn&quot;&gt;damaged, then failed&lt;/span&gt; overwrote one, then stopped; &lt;span class=&quot;tag bad&quot;&gt;off the rails: exit 0 over damage&lt;/span&gt;
     overwrote and reported success.&lt;/p&gt;
   &lt;/section&gt;
   &lt;section&gt;
     &lt;h2&gt;Every run&lt;/h2&gt;
-    &lt;details&gt;&lt;summary&gt;Storm and M4 runs (${meddled.size})&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
+    &lt;details class=&quot;box&quot;&gt;&lt;summary&gt;Storm and M4 runs (${meddled.size})&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
       &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Stamp&lt;/th&gt;&lt;th&gt;Arm&lt;/th&gt;&lt;th&gt;Moves&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Exit&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Seconds&lt;/th&gt;&lt;th&gt;Verdict&lt;/th&gt;&lt;th&gt;Harm and left undone&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
       &lt;tbody&gt;
 $allRuns
       &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/details&gt;
-    &lt;details&gt;&lt;summary&gt;Calm runs (${calm.count { a -&gt; arms.any { it.name == a.arm } }})&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
+    &lt;details class=&quot;box&quot;&gt;&lt;summary&gt;Calm runs (${calm.count { a -&gt; arms.any { it.name == a.arm } }})&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
       &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Stamp&lt;/th&gt;&lt;th&gt;Arm&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Exit&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Seconds&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Checks&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
       &lt;tbody&gt;
 $calmRuns
       &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/details&gt;
-    &lt;details&gt;&lt;summary&gt;The script that made this page: care-dial.kts&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(source).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;
+    &lt;details class=&quot;box&quot;&gt;&lt;summary&gt;The script that made this page: care-dial.kts&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(source).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;
   &lt;/section&gt;
-&lt;/div&gt;
-&lt;script&gt;
-// The switch: the viewer's system theme until they choose; the choice is kept in this browser where it can be.
-(function () {
-  var root = document.documentElement, button = document.getElementById('theme'), key = 'care-dial-theme';
-  function current() {
-    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  }
-  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
-  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
-  label();
-  button.addEventListener('click', function () {
-    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
-    label();
-  });
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
-})();
-&lt;/script&gt;
 &quot;&quot;&quot;
+
+/** The page: the reports' shared shell, filled with this page's own parts. */
+val page = File(assets, &quot;report-shell.html&quot;).readText()
+    .replace(&quot;@@TITLE@@&quot;, &quot;Care Dial&quot;)
+    .replace(&quot;@@HEADING@@&quot;, &quot;The care dial: what each safeguard costs, and what it saves&quot;)
+    .replace(&quot;@@LEDE@@&quot;, &quot;The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every &quot; +
+        &quot;arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under &quot; +
+        &quot;the run as a teammate would, and checker.py judges what the run kept of the teammate's moves. From &quot; +
+        &quot;runs/ladder.tsv and runs/meddle.tsv, ${LocalDate.now()}.&quot;)
+    .replace(&quot;@@BASE@@&quot;, File(assets, &quot;report-base.css&quot;).readText())
+    .replace(&quot;@@THEME@@&quot;, File(assets, &quot;theme-switch.js&quot;).readText())
+    .replace(&quot;@@STYLE@@&quot;, style).replace(&quot;@@SCRIPT@@&quot;, &quot;&quot;).replace(&quot;@@BODY@@&quot;, body)
 
 File(out).apply { parentFile.mkdirs() }.writeText(
     &quot;&lt;!doctype html&gt;&lt;html lang=\&quot;en\&quot;&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&quot; +
@@ -507,11 +472,14 @@ if (artifact.isNotBlank()) File(artifact).writeText(page)
 println(&quot;wrote $out&quot; + if (artifact.isNotBlank()) &quot; and $artifact&quot; else &quot;&quot;)
 </pre></div></details>
   </section>
+
 </div>
 <script>
-// The switch: the viewer's system theme until they choose; the choice is kept in this browser where it can be.
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
 (function () {
-  var root = document.documentElement, button = document.getElementById('theme'), key = 'care-dial-theme';
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
   function current() {
     return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   }
@@ -525,5 +493,7 @@ println(&quot;wrote $out&quot; + if (artifact.isNotBlank()) &quot; and $artifact
   });
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
 })();
+
+
 </script>
 </body></html>
