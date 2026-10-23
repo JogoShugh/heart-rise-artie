@@ -50,7 +50,7 @@ when a pull request is labelled `dependabot-actions`. Each bump wrote its own fi
 | #688, a broken bump | `dependabot` | The check failed. After 4 minutes the watch commented: "Branch protection blocks the merge: a required check or review is missing." | nobody |
 | #689 | `dependabot`, then `hold` | A person added `hold` within seconds; the watch left it alone and said so once | nobody |
 | #690 | `dependabot-actions` | Auto-merge was turned on; GitHub merged it once the check passed | github-actions[bot] |
-| #691 | `dependabot-actions`, then `hold` | Auto-merge was on 6 seconds after the label. A person added `hold` at 16:52:31, but GitHub merged it anyway at 16:53:02 | github-actions[bot] |
+| #691 | `dependabot-actions`, then `hold` | Auto-merge was on 10 seconds after the label. A person added `hold` at 16:52:36, but GitHub merged it anyway at 16:53:02 | github-actions[bot] |
 
 **The rival can't be told "no".** Once auto-merge is on, GitHub merges as soon as the check passes, and the
 person's `hold` counts for nothing. The watch reads the pull request again on each look, and acts only on what it

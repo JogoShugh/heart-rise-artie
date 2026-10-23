@@ -1,0 +1,637 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>Dependabot, Simulated</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --accent: #4b4fc4;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* This page's own. */
+
+section, .tiles { margin-top: 28px; }
+.tile { cursor: default; }
+.headline { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.timeline { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px;
+  min-width: 0; }
+.timeline h3 { margin: 0 0 10px; }
+.timeline ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.timeline li { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding-left: 10px;
+  border-left: 3px solid var(--c, var(--rule)); }
+.timeline li.quiet { --c: var(--rule); }
+.timeline .at { font: 12.5px var(--mono); color: var(--muted); }
+ol.pulls, ol.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pull, ol.plain > li { background: var(--panel); border: 1px solid var(--rule);
+  border-left: 4px solid var(--c, var(--rule));
+  border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.pull .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.outcome { color: var(--c, var(--ink)); }
+ol.plain > li .outcome { color: var(--good); }
+ol.words { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+ol.words li { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 12px 14px; min-width: 0; }
+ol.words code { font: 12.5px/1.5 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+
+</style>
+<div class="wrap">
+  <div class="top"><div>
+    <h1>Dependabot, simulated: a watch that can be told no</h1>
+    <p class="lede">Dependabot-style pull requests opened with our own account on a scratch repository, merged by a heart-script watch through the HEART gateway, beside GitHub's own auto-merge. Run 2026-10-23.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+
+  <div class="tiles"><div class="tile good"><b>5</b><span class="sub">the watch did the right thing: merged, or left a held one alone</span></div><div class="tile safe"><b>4</b><span class="sub">the watch gave up and said why, in the gateway's words</span></div><div class="tile bad"><b>0</b><span class="sub">the watch did harm</span></div><div class="tile bad"><b>1</b><span class="sub">GitHub's auto-merge merged over a person's hold</span></div></div>
+  <section>
+    <h2>A person says no</h2>
+    <p>Two bumps, each labelled <span class="mono">hold</span> by a person after it was taken up, with the required
+    check passing on both. The watch reads the pull request again at each look, and acts only on what it holds now.
+    GitHub's auto-merge decided once, when it was turned on.</p>
+    <div class="headline"><div class="timeline"><h3><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/689" rel="noopener" target="_blank">#689</a> with the watch</h3><ol><li class="quiet"><span class="at">16:51:54</span><span>Opened by the Dependabot stand-in</span></li><li class="quiet"><span class="at">16:51:56</span><span>Labelled dependabot</span></li><li class="warn"><span class="at">16:52:01</span><span>Labelled hold by a person</span></li><li class="quiet"><span class="at">16:52:26</span><span>deps-check passed</span></li><li class="good"><span class="at">-</span><span>Not merged: the watch reads the labels again at each look, and left it alone</span></li></ol></div>
+<div class="timeline"><h3><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/691" rel="noopener" target="_blank">#691</a> with GitHub's auto-merge</h3><ol><li class="quiet"><span class="at">16:52:18</span><span>Opened by the Dependabot stand-in</span></li><li class="quiet"><span class="at">16:52:19</span><span>Labelled dependabot-actions</span></li><li class="quiet"><span class="at">16:52:29</span><span>Auto-merge turned on by github-actions[bot]</span></li><li class="warn"><span class="at">16:52:36</span><span>Labelled hold by a person</span></li><li class="quiet"><span class="at">16:52:49</span><span>deps-check passed</span></li><li class="bad"><span class="at">16:53:02</span><span>Merged by github-actions[bot]</span></li></ol></div></div>
+    <p class="sub">Times are GitHub's own (UTC), from each pull request's timeline and check runs.</p>
+  </section>
+<section><h2>Round 1, no required check</h2><p class="sub">The watch looked every 10 seconds and gave up after 2 minutes. deps-main had no protection, so &quot;can be merged&quot; meant only what GitHub worked out about the branch. Output: <span class="mono">runs/watch-1023-watch2.out</span>.</p><ol class="pulls"><li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/678" rel="noopener" target="_blank">#678</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump, open and labelled before the watch started</div><div class="outcome">Merged on the first look</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/681" rel="noopener" target="_blank">#681</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump opened while the watch ran</div><div class="outcome">Merged at the next look</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/682" rel="noopener" target="_blank">#682</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>A bump opened as a draft</div><div class="outcome">After 2 minutes, commented: A draft can't be merged; mark it ready for review first.</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/683" rel="noopener" target="_blank">#683</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>Opened already labelled hold; a person removed hold later</div><div class="outcome">Left alone while held. Once released, it conflicted, so the watch commented with that reason.</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/684" rel="noopener" target="_blank">#684</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump opened together with #685, from the same base</div><div class="outcome">Merged</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/685" rel="noopener" target="_blank">#685</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>The other of the pair; it conflicted once #684 was in</div><div class="outcome">Commented: The branch has conflicts with its base; resolve them first.</div></li></ol></section>
+<section><h2>Round 2, a required check, and GitHub's auto-merge beside the watch</h2><p class="sub">The watch looked every 10 seconds and gave up after 4 minutes. deps-main required deps-check, for admins too. Pull requests labelled dependabot-actions were left to GitHub's auto-merge. Output: <span class="mono">runs/watch-1023-watch3.out</span>.</p><ol class="pulls"><li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/687" rel="noopener" target="_blank">#687</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump</div><div class="outcome">Merged 36 seconds after the check passed</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/688" rel="noopener" target="_blank">#688</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>A broken bump; the check failed</div><div class="outcome">After 4 minutes, commented: Branch protection blocks the merge: a required check or review is missing.</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/689" rel="noopener" target="_blank">#689</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump a person labelled hold 5 seconds after it was labelled dependabot</div><div class="outcome">Left alone, though its check passed; the watch said so once</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/690" rel="noopener" target="_blank">#690</a> <span class="tag good">right</span><span class="sub">GitHub's auto-merge</span></div><div>A bump labelled dependabot-actions</div><div class="outcome">Merged by github-actions[bot] once the check passed</div></li>
+<li class="pull bad"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/691" rel="noopener" target="_blank">#691</a> <span class="tag bad">harm</span><span class="sub">GitHub's auto-merge</span></div><div>A bump labelled dependabot-actions, then hold by a person</div><div class="outcome">Merged by github-actions[bot] anyway, 26 seconds after the hold</div></li></ol></section>
+  <section>
+    <h2>The goal words, as the code they came down to</h2>
+    <p>The goal grammar doesn't know these words yet, so <span class="mono">watch.kts</span> writes each by hand in
+    heart-script, through the HEART gateway.</p>
+    <ol class="words"><li><b>Whenever</b><code>act(&quot;github:pulls-list&quot;, … &quot;sort&quot; to &quot;updated&quot;, &quot;direction&quot; to &quot;desc&quot;), read down to the first one older than the last look</code></li>
+<li><b>Once</b><code>offers(&quot;github:merge&quot;), then act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)</code></li>
+<li><b>Give up</b><code>the time since it was taken up, against giveUp minutes; never on a reason that says to read again</code></li>
+<li><b>Otherwise</b><code>act(&quot;github:comment&quot;) with why(&quot;github:merge&quot;), the gateway's hr:unavailable reason, unless a watch already said it</code></li>
+<li><b>Until</b><code>the watch opens its own issue, and reads it at the end of every look; closed, it stops</code></li>
+<li><b>Manners</b><code>hold in the labels it holds now leaves the pull request alone; a refused act is read again next look, never sent again blind</code></li></ol>
+  </section>
+  <section>
+    <h2>Found and fixed on the way</h2>
+    <ol class="plain"><li><div>The first watch died on one look the gateway answered with 500 while GitHub was slow.</div><div class="outcome">Each look catches a failure, says so, and the next look tries again.</div><div class="sub mono">runs/watch-1023-watch1.out</div></li>
+<li><div>Restarted, the watch commented on #682, #683 and #685 a second time.</div><div class="outcome">Before it comments, it reads the pull request's comments and says nothing a watch already said. A fourth watch said nothing new.</div><div class="sub mono">runs/watch-1023-watch4.out</div></li>
+<li><div>It once gave up on &quot;GitHub is still checking… read it again shortly&quot;, telling #683 something untrue.</div><div class="outcome">It doesn't give up on a reason that says to read again; it waits one more look.</div><div class="sub mono">runs/watch-1023-watch3.out</div></li></ol>
+  </section>
+  <section>
+    <h2>Still missing</h2>
+    <ul class="gaps"><li><span class="tag quiet">gateway</span> No checks resource. A failed check and a pending one give the same reason, &quot;a required check or review is missing&quot;.</li>
+<li><span class="tag quiet">HEART</span> hr:unavailable has no mark for a reason that passes by itself; the watch reads the words &quot;read it again&quot;.</li>
+<li><span class="tag quiet">gateway</span> No reviews resource, so a person objects with a label rather than &quot;changes requested&quot;.</li>
+<li><span class="tag quiet">gateway</span> Pull requests can't be listed by label, and list pages carry no ETag; the watch reads each changed pull request to see its labels.</li>
+<li><span class="tag quiet">heart-script</span> note() is kept but never written to the trace or shown; watch.kts works around it with tell().</li>
+<li><span class="tag quiet">heart-script</span> The trace keeps every representation in full, 3.6 MB for six minutes; a long watch's journal must keep only what changed, and resume from it.</li>
+<li><span class="tag quiet">goal grammar</span> Whenever, Until, Once, Otherwise and Give up are written by hand here; Goal.kt doesn't know them yet.</li></ul>
+  </section>
+  <section>
+    <h2>How this page is made</h2>
+    <details class="box"><summary>results.yaml: what happened</summary><div class="scroll"><pre class="src"># What the Dependabot simulation did, 2026-10-23, on JogoShugh/heart-github-test. report.kts lays this out.
+# Outcomes are from the runs' outputs (runs/*.out); times are GitHub's own, read back from each pull request's
+# timeline and check runs after the runs (UTC).
+# tone: good (did the right thing), safe (stopped, and said why), bad (did harm), quiet (nothing to do).
+
+asOf: &quot;2026-10-23&quot;
+
+rounds:
+  - name: Round 1, no required check
+    out: runs/watch-1023-watch2.out
+    setting: The watch looked every 10 seconds and gave up after 2 minutes. deps-main had no protection, so &quot;can be merged&quot; meant only what GitHub worked out about the branch.
+    pulls:
+      - number: 678
+        by: watch
+        what: A bump, open and labelled before the watch started
+        outcome: Merged on the first look
+        tone: good
+      - number: 681
+        by: watch
+        what: A bump opened while the watch ran
+        outcome: Merged at the next look
+        tone: good
+      - number: 682
+        by: watch
+        what: A bump opened as a draft
+        outcome: &quot;After 2 minutes, commented: A draft can't be merged; mark it ready for review first.&quot;
+        tone: safe
+      - number: 683
+        by: watch
+        what: Opened already labelled hold; a person removed hold later
+        outcome: Left alone while held. Once released, it conflicted, so the watch commented with that reason.
+        tone: safe
+      - number: 684
+        by: watch
+        what: &quot;A bump opened together with #685, from the same base&quot;
+        outcome: Merged
+        tone: good
+      - number: 685
+        by: watch
+        what: &quot;The other of the pair; it conflicted once #684 was in&quot;
+        outcome: &quot;Commented: The branch has conflicts with its base; resolve them first.&quot;
+        tone: safe
+  - name: Round 2, a required check, and GitHub's auto-merge beside the watch
+    out: runs/watch-1023-watch3.out
+    setting: The watch looked every 10 seconds and gave up after 4 minutes. deps-main required deps-check, for admins too. Pull requests labelled dependabot-actions were left to GitHub's auto-merge.
+    pulls:
+      - number: 687
+        by: watch
+        what: A bump
+        outcome: Merged 36 seconds after the check passed
+        tone: good
+      - number: 688
+        by: watch
+        what: A broken bump; the check failed
+        outcome: &quot;After 4 minutes, commented: Branch protection blocks the merge: a required check or review is missing.&quot;
+        tone: safe
+      - number: 689
+        by: watch
+        what: A bump a person labelled hold 5 seconds after it was labelled dependabot
+        outcome: Left alone, though its check passed; the watch said so once
+        tone: good
+      - number: 690
+        by: rival
+        what: A bump labelled dependabot-actions
+        outcome: Merged by github-actions[bot] once the check passed
+        tone: good
+      - number: 691
+        by: rival
+        what: A bump labelled dependabot-actions, then hold by a person
+        outcome: Merged by github-actions[bot] anyway, 26 seconds after the hold
+        tone: bad
+
+# The two pull requests a person objected to, side by side in time.
+timelines:
+  - number: 689
+    by: the watch
+    events:
+      - { at: &quot;16:51:54&quot;, what: Opened by the Dependabot stand-in }
+      - { at: &quot;16:51:56&quot;, what: Labelled dependabot }
+      - { at: &quot;16:52:01&quot;, what: Labelled hold by a person, tone: warn }
+      - { at: &quot;16:52:26&quot;, what: deps-check passed }
+      - { at: &quot;-&quot;, what: &quot;Not merged: the watch reads the labels again at each look, and left it alone&quot;, tone: good }
+  - number: 691
+    by: GitHub's auto-merge
+    events:
+      - { at: &quot;16:52:18&quot;, what: Opened by the Dependabot stand-in }
+      - { at: &quot;16:52:19&quot;, what: Labelled dependabot-actions }
+      - { at: &quot;16:52:29&quot;, what: &quot;Auto-merge turned on by github-actions[bot]&quot; }
+      - { at: &quot;16:52:36&quot;, what: Labelled hold by a person, tone: warn }
+      - { at: &quot;16:52:49&quot;, what: deps-check passed }
+      - { at: &quot;16:53:02&quot;, what: &quot;Merged by github-actions[bot]&quot;, tone: bad }
+
+# Each goal word, and what it came down to in watch.kts.
+words:
+  - word: Whenever
+    code: act(&quot;github:pulls-list&quot;, … &quot;sort&quot; to &quot;updated&quot;, &quot;direction&quot; to &quot;desc&quot;), read down to the first one older than the last look
+  - word: Once
+    code: offers(&quot;github:merge&quot;), then act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)
+  - word: Give up
+    code: the time since it was taken up, against giveUp minutes; never on a reason that says to read again
+  - word: Otherwise
+    code: act(&quot;github:comment&quot;) with why(&quot;github:merge&quot;), the gateway's hr:unavailable reason, unless a watch already said it
+  - word: Until
+    code: the watch opens its own issue, and reads it at the end of every look; closed, it stops
+  - word: Manners
+    code: hold in the labels it holds now leaves the pull request alone; a refused act is read again next look, never sent again blind
+
+# Found and fixed on the way.
+fixed:
+  - what: The first watch died on one look the gateway answered with 500 while GitHub was slow.
+    fix: Each look catches a failure, says so, and the next look tries again.
+    out: runs/watch-1023-watch1.out
+  - what: &quot;Restarted, the watch commented on #682, #683 and #685 a second time.&quot;
+    fix: Before it comments, it reads the pull request's comments and says nothing a watch already said. A fourth watch said nothing new.
+    out: runs/watch-1023-watch4.out
+  - what: 'It once gave up on &quot;GitHub is still checking… read it again shortly&quot;, telling #683 something untrue.'
+    fix: It doesn't give up on a reason that says to read again; it waits one more look.
+    out: runs/watch-1023-watch3.out
+
+# Still missing, with whose to build it is.
+gaps:
+  - where: gateway
+    what: No checks resource. A failed check and a pending one give the same reason, &quot;a required check or review is missing&quot;.
+  - where: HEART
+    what: hr:unavailable has no mark for a reason that passes by itself; the watch reads the words &quot;read it again&quot;.
+  - where: gateway
+    what: No reviews resource, so a person objects with a label rather than &quot;changes requested&quot;.
+  - where: gateway
+    what: Pull requests can't be listed by label, and list pages carry no ETag; the watch reads each changed pull request to see its labels.
+  - where: heart-script
+    what: note() is kept but never written to the trace or shown; watch.kts works around it with tell().
+  - where: heart-script
+    what: The trace keeps every representation in full, 3.6 MB for six minutes; a long watch's journal must keep only what changed, and resume from it.
+  - where: goal grammar
+    what: Whenever, Until, Once, Otherwise and Give up are written by hand here; Goal.kt doesn't know them yet.
+</pre></div></details>
+    <details class="box"><summary>watch.kts: the watch</summary><div class="scroll"><pre class="src">// The Dependabot goal (exhibits/goal-syntax/goals/dependabot.goal.md), written by hand in heart-script before the
+// goal words Whenever, Until, Once, Otherwise and Give up exist (spec/ideas/goals-that-work-alongside-others.md,
+// &quot;Review, 2026-10-23&quot;). Each word is the loop or the branch it will come down to:
+//   Until    the watch opens its own issue and stops when someone closes it (or after hours, a safety stop).
+//   Whenever the open pull requests, most recently updated first, are read down to the last one seen unchanged;
+//            each labelled label is taken up. Events are hints: this is the polling kind, and the gateway asks
+//            GitHub with its copy's ETag, so a look at an unchanged pull request costs nothing against the limit.
+//   Once     a pull request taken up is merged by squashing as soon as it offers github:merge.
+//   Manners  one labelled hold is left alone, and the watch says so once; a refused merge is read again and
+//            decided again next time round, never sent again blind.
+//   Give up  after giveUp minutes without the merge offered;
+//   Otherwise the pull request is told why, in the gateway's own words (hr:unavailable).
+//   artie run watch.kts owner=JogoShugh gateway=https://localhost:8392/
+val owner by input(question = &quot;Whose repository?&quot;)
+val repo by input(default = &quot;heart-github-test&quot;, question = &quot;Which repository?&quot;)
+val label by input(default = &quot;dependabot&quot;, question = &quot;Which label marks a pull request to merge?&quot;)
+val hold by input(default = &quot;hold&quot;, question = &quot;Which label means a person objects?&quot;)
+val every by input(default = &quot;15&quot;, question = &quot;How many seconds between looks?&quot;)
+val giveUp by input(default = &quot;10&quot;, question = &quot;Give up on a pull request after how many minutes?&quot;)
+val hours by input(default = &quot;2&quot;, question = &quot;Stop the watch after how many hours at most?&quot;)
+val stamp by input(
+    default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)),
+)
+val gateway by input(default = &quot;http://localhost:8392/&quot;, question = &quot;Where is the gateway?&quot;)
+
+val repository = arrayOf(&quot;owner&quot; to owner, &quot;repo&quot; to repo)
+val deadline = java.time.Instant.now().plusSeconds(hours.toLong() * 3600)
+
+/** A remark, kept in the run's record and shown as the run goes (a note alone is not shown). */
+fun Here.tell(text: String) {
+    note(text)
+    println(&quot;  note: $text&quot;)
+}
+
+/** How each comment the watch leaves begins, so a later watch knows what was said. */
+val WATCH = &quot;Not merged by the auto-merge watch&quot;
+
+/** Whether the server's reason for not offering an act says it will pass by itself. */
+fun passing(why: String?): Boolean = why.orEmpty().contains(&quot;read it again&quot;)
+
+/** What the watch says, once, of a pull request a person objected to. */
+fun leftAlone(number: Long) = &quot;#$number is labelled $hold: left alone until the label goes.&quot;
+
+/** The names of the labels the held pull request carries, read from the labels it embeds. */
+fun Here.labelled(): Set&lt;String&gt; = embedded(&quot;github:labels&quot;).mapNotNull { it.read[&quot;name&quot;] as? String }.toSet()
+
+heart(gateway) {
+    var watch = 0L
+    act(&quot;github:repos-get&quot;, *repository, intent = &quot;get the repository $owner/$repo&quot;) {
+        act(&quot;github:open-issue&quot;, intent = &quot;open the issue that keeps the watch going&quot;, fields = {
+            &quot;title&quot; to &quot;Auto-merge watch ($stamp)&quot;
+            &quot;body&quot; to &quot;Pull requests labelled `$label` are merged once they can be; `$hold` keeps one back. &quot; +
+                &quot;Close this issue to stop the watch.&quot;
+        }) {
+            watch = state.long(&quot;number&quot;)
+        }
+    }
+
+    val waiting = mutableMapOf&lt;Long, java.time.Instant&gt;() // taken up, not yet merged: since when
+    val heldBack = mutableSetOf&lt;Long&gt;() // left alone for the hold label, said once
+    val finished = mutableSetOf&lt;Long&gt;() // merged, or given up on
+    var seen: String? = null // the newest updated_at read so far
+    var open = true
+
+    while (open &amp;&amp; java.time.Instant.now() &lt; deadline) {
+        // A look that fails (GitHub answered 5xx, the network dropped) is noted; the next one tries again.
+        try {
+            // Whenever: what changed since the last look, newest first, down to the first one older than that.
+            act(&quot;github:pulls-list&quot;, *repository, &quot;state&quot; to &quot;open&quot;, &quot;sort&quot; to &quot;updated&quot;, &quot;direction&quot; to &quot;desc&quot;) {
+                var newest = seen
+                for (title in links(&quot;item&quot;).filterNotNull()) {
+                    var older = false
+                    follow(&quot;item&quot;, title) {
+                        val updated = state.text(&quot;updated_at&quot;)
+                        val number = state.long(&quot;number&quot;)
+                        older = seen != null &amp;&amp; updated &lt; seen!!
+                        if (!older) {
+                            if (newest == null || updated &gt; newest!!) newest = updated
+                            val labels = labelled()
+                            when {
+                                number in finished || label !in labels -&gt; Unit
+                                hold in labels -&gt; {
+                                    waiting.remove(number)
+                                    if (heldBack.add(number)) tell(leftAlone(number))
+                                }
+                                else -&gt; {
+                                    heldBack.remove(number)
+                                    waiting.putIfAbsent(number, java.time.Instant.now())
+                                }
+                            }
+                        }
+                    }
+                    if (older) break
+                }
+                seen = newest
+            }
+
+            // Once each one waiting can be merged, merge it; or give up after giveUp minutes.
+            for ((number, since) in waiting.toMap()) {
+                try {
+                    act(&quot;github:pulls-get&quot;, *repository, &quot;pull_number&quot; to number) {
+                        val waited = java.time.Duration.between(since, java.time.Instant.now())
+                        when {
+                            state[&quot;state&quot;] != &quot;open&quot; -&gt; {
+                                tell(&quot;#$number was closed or merged by someone else: left as it is.&quot;)
+                                finished += number
+                            }
+                            hold in labelled() -&gt; {
+                                if (heldBack.add(number)) tell(leftAlone(number))
+                                waiting.remove(number)
+                            }
+                            offers(&quot;github:merge&quot;) -&gt; {
+                                act(&quot;github:merge&quot;, intent = &quot;merge #$number by squashing&quot;, fields = {
+                                    &quot;merge_method&quot; to &quot;squash&quot;
+                                    &quot;commit_title&quot; to &quot;${state.text(&quot;title&quot;)} (#$number)&quot;
+                                }) {}
+                                finished += number
+                            }
+                            // A reason that says to read again is a passing one (GitHub working mergeability out):
+                            // giving up on it would tell the pull request something untrue, so wait one more look.
+                            // The words stand in for a mark hr:unavailable doesn't have yet: temporary or not.
+                            waited.toMinutes() &gt;= giveUp.toLong() &amp;&amp; !passing(why(&quot;github:merge&quot;)) -&gt; {
+                                // Otherwise: say why it wasn't merged, in the gateway's words.
+                                val why = why(&quot;github:merge&quot;) ?: &quot;the merge was never offered&quot;
+                                follow(&quot;github:issues-get&quot;) {
+                                    // Said already, by this watch or an earlier one: not said again.
+                                    var said = false
+                                    follow(&quot;github:issues-list-comments&quot;) {
+                                        said = links(&quot;item&quot;).filterNotNull()
+                                            .any { it.startsWith(WATCH) &amp;&amp; it.endsWith(&quot;: $why&quot;) }
+                                    }
+                                    if (said) tell(&quot;#$number: already told why, by an earlier watch.&quot;)
+                                    else act(&quot;github:comment&quot;, intent = &quot;say why #$number wasn't merged&quot;, fields = {
+                                        &quot;body&quot; to &quot;$WATCH (#$watch) after $giveUp minutes: $why&quot;
+                                    }) {}
+                                }
+                                finished += number
+                            }
+                        }
+                    }
+                } catch (stopped: ScriptStopped) {
+                    // Refused (someone moved it since it was read): read again and decide again next time round.
+                    tell(&quot;#$number: ${stopped.reason}; looked at again next time.&quot;)
+                }
+                if (number in finished) waiting.remove(number)
+            }
+
+            // Until someone closes the watch's issue.
+            act(&quot;github:issues-get&quot;, *repository, &quot;issue_number&quot; to watch) {
+                open = state[&quot;state&quot;] == &quot;open&quot;
+            }
+        } catch (failed: Exception) {
+            tell(&quot;A look failed: ${failed.message}; looking again next time.&quot;)
+        }
+        if (open) Thread.sleep(every.toLong() * 1000)
+    }
+}
+</pre></div></details>
+    <details class="box"><summary>report.kts: the script that lays it out</summary><div class="scroll"><pre class="src">// The Dependabot simulation as a page: what the watch and GitHub's auto-merge did with the same kinds of pull
+// request, and what is still missing. The facts live in results.yaml; this script only lays them out. The look comes
+// from the reports' shared assets (report-shell.html, report-base.css, theme-switch.js), inlined.
+//   artie run report.kts out=../../docs/reports/dependabot-sim/index.html artifact=/tmp/dependabot-sim.html
+// out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
+import java.io.File
+import org.yaml.snakeyaml.Yaml
+
+val data by input(default = &quot;results.yaml&quot;, question = &quot;Where are the results?&quot;)
+val out by input(question = &quot;Where to write the page?&quot;)
+val artifact by input(default = &quot;&quot;, question = &quot;Where to write the artifact copy, if anywhere?&quot;)
+val source by input(default = &quot;report.kts&quot;, question = &quot;Where is this script, to show it on the page?&quot;)
+val watcher by input(default = &quot;watch.kts&quot;, question = &quot;Where is the watch, to show it on the page?&quot;)
+val assets by input(default = &quot;../../docs/reports/assets&quot;, question = &quot;Where are the reports' shared assets?&quot;)
+val repo by input(default = &quot;https://github.com/JogoShugh/heart-github-test&quot;, question = &quot;Which repository ran it?&quot;)
+
+fun Any?.map(): Map&lt;String, Any?&gt; = (this as? Map&lt;*, *&gt;).orEmpty().entries.associate { it.key.toString() to it.value }
+fun Any?.list(): List&lt;Map&lt;String, Any?&gt;&gt; = (this as? List&lt;*&gt;).orEmpty().map { it.map() }
+fun Map&lt;String, Any?&gt;.text(key: String) = this[key]?.toString().orEmpty()
+fun esc(s: String) = s.replace(&quot;&amp;&quot;, &quot;&amp;amp;&quot;).replace(&quot;&lt;&quot;, &quot;&amp;lt;&quot;).replace(&quot;&gt;&quot;, &quot;&amp;gt;&quot;).replace(&quot;\&quot;&quot;, &quot;&amp;quot;&quot;)
+
+val yaml = Yaml().load&lt;Any?&gt;(File(data).readText()).map()
+val rounds = yaml[&quot;rounds&quot;].list()
+val pulls = rounds.flatMap { it[&quot;pulls&quot;].list() }
+
+fun pr(number: Any?) = &quot;&quot;&quot;&lt;a class=&quot;mono&quot; href=&quot;$repo/pull/$number&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;#$number&lt;/a&gt;&quot;&quot;&quot;
+fun tag(tone: String, words: String) = &quot;&quot;&quot;&lt;span class=&quot;tag $tone&quot;&gt;${esc(words)}&lt;/span&gt;&quot;&quot;&quot;
+val outcomeWords = mapOf(&quot;good&quot; to &quot;right&quot;, &quot;safe&quot; to &quot;stopped, said why&quot;, &quot;bad&quot; to &quot;harm&quot;, &quot;quiet&quot; to &quot;nothing&quot;)
+
+fun count(by: String, tone: String) = pulls.count { it.text(&quot;by&quot;) == by &amp;&amp; it.text(&quot;tone&quot;) == tone }
+val tiles = listOf(
+    Triple(&quot;good&quot;, count(&quot;watch&quot;, &quot;good&quot;), &quot;the watch did the right thing: merged, or left a held one alone&quot;),
+    Triple(&quot;safe&quot;, count(&quot;watch&quot;, &quot;safe&quot;), &quot;the watch gave up and said why, in the gateway's words&quot;),
+    Triple(&quot;bad&quot;, count(&quot;watch&quot;, &quot;bad&quot;), &quot;the watch did harm&quot;),
+    Triple(&quot;bad&quot;, count(&quot;rival&quot;, &quot;bad&quot;), &quot;GitHub's auto-merge merged over a person's hold&quot;),
+).joinToString(&quot;&quot;) { (tone, n, says) -&gt;
+    &quot;&quot;&quot;&lt;div class=&quot;tile $tone&quot;&gt;&lt;b&gt;$n&lt;/b&gt;&lt;span class=&quot;sub&quot;&gt;${esc(says)}&lt;/span&gt;&lt;/div&gt;&quot;&quot;&quot;
+}
+
+val timelines = yaml[&quot;timelines&quot;].list().joinToString(&quot;\n&quot;) { t -&gt;
+    val events = t[&quot;events&quot;].list().joinToString(&quot;&quot;) { e -&gt;
+        val tone = e.text(&quot;tone&quot;).ifEmpty { &quot;quiet&quot; }
+        &quot;&quot;&quot;&lt;li class=&quot;$tone&quot;&gt;&lt;span class=&quot;at&quot;&gt;${esc(e.text(&quot;at&quot;))}&lt;/span&gt;&lt;span&gt;${esc(e.text(&quot;what&quot;))}&lt;/span&gt;&lt;/li&gt;&quot;&quot;&quot;
+    }
+    &quot;&quot;&quot;&lt;div class=&quot;timeline&quot;&gt;&lt;h3&gt;${pr(t[&quot;number&quot;])} with ${esc(t.text(&quot;by&quot;))}&lt;/h3&gt;&lt;ol&gt;$events&lt;/ol&gt;&lt;/div&gt;&quot;&quot;&quot;
+}
+
+val roundSections = rounds.joinToString(&quot;\n&quot;) { r -&gt;
+    val rows = r[&quot;pulls&quot;].list().joinToString(&quot;\n&quot;) { p -&gt;
+        val tone = p.text(&quot;tone&quot;)
+        val who = if (p.text(&quot;by&quot;) == &quot;rival&quot;) &quot;GitHub's auto-merge&quot; else &quot;the watch&quot;
+        &quot;&quot;&quot;&lt;li class=&quot;pull $tone&quot;&gt;&lt;div class=&quot;head&quot;&gt;${pr(p[&quot;number&quot;])} ${tag(tone, outcomeWords[tone] ?: tone)}&quot;&quot;&quot; +
+            &quot;&quot;&quot;&lt;span class=&quot;sub&quot;&gt;${esc(who)}&lt;/span&gt;&lt;/div&gt;&lt;div&gt;${esc(p.text(&quot;what&quot;))}&lt;/div&gt;&quot;&quot;&quot; +
+            &quot;&quot;&quot;&lt;div class=&quot;outcome&quot;&gt;${esc(p.text(&quot;outcome&quot;))}&lt;/div&gt;&lt;/li&gt;&quot;&quot;&quot;
+    }
+    &quot;&quot;&quot;&lt;section&gt;&lt;h2&gt;${esc(r.text(&quot;name&quot;))}&lt;/h2&gt;&lt;p class=&quot;sub&quot;&gt;${esc(r.text(&quot;setting&quot;))} &quot;&quot;&quot; +
+        &quot;&quot;&quot;Output: &lt;span class=&quot;mono&quot;&gt;${esc(r.text(&quot;out&quot;))}&lt;/span&gt;.&lt;/p&gt;&lt;ol class=&quot;pulls&quot;&gt;$rows&lt;/ol&gt;&lt;/section&gt;&quot;&quot;&quot;
+}
+
+val words = yaml[&quot;words&quot;].list().joinToString(&quot;\n&quot;) { w -&gt;
+    &quot;&quot;&quot;&lt;li&gt;&lt;b&gt;${esc(w.text(&quot;word&quot;))}&lt;/b&gt;&lt;code&gt;${esc(w.text(&quot;code&quot;))}&lt;/code&gt;&lt;/li&gt;&quot;&quot;&quot;
+}
+val fixed = yaml[&quot;fixed&quot;].list().joinToString(&quot;\n&quot;) { f -&gt;
+    &quot;&quot;&quot;&lt;li&gt;&lt;div&gt;${esc(f.text(&quot;what&quot;))}&lt;/div&gt;&lt;div class=&quot;outcome&quot;&gt;${esc(f.text(&quot;fix&quot;))}&lt;/div&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;div class=&quot;sub mono&quot;&gt;${esc(f.text(&quot;out&quot;))}&lt;/div&gt;&lt;/li&gt;&quot;&quot;&quot;
+}
+val gaps = yaml[&quot;gaps&quot;].list().joinToString(&quot;\n&quot;) { g -&gt;
+    &quot;&quot;&quot;&lt;li&gt;${tag(&quot;quiet&quot;, g.text(&quot;where&quot;))} ${esc(g.text(&quot;what&quot;))}&lt;/li&gt;&quot;&quot;&quot;
+}
+
+fun shown(name: String, path: String) = &quot;&quot;&quot;&lt;details class=&quot;box&quot;&gt;&lt;summary&gt;$name&lt;/summary&gt;&quot;&quot;&quot; +
+    &quot;&quot;&quot;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(path).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;&quot;&quot;&quot;
+
+val style = &quot;&quot;&quot;
+section, .tiles { margin-top: 28px; }
+.tile { cursor: default; }
+.headline { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.timeline { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px;
+  min-width: 0; }
+.timeline h3 { margin: 0 0 10px; }
+.timeline ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.timeline li { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding-left: 10px;
+  border-left: 3px solid var(--c, var(--rule)); }
+.timeline li.quiet { --c: var(--rule); }
+.timeline .at { font: 12.5px var(--mono); color: var(--muted); }
+ol.pulls, ol.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pull, ol.plain &gt; li { background: var(--panel); border: 1px solid var(--rule);
+  border-left: 4px solid var(--c, var(--rule));
+  border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.pull .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.outcome { color: var(--c, var(--ink)); }
+ol.plain &gt; li .outcome { color: var(--good); }
+ol.words { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+ol.words li { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 12px 14px; min-width: 0; }
+ol.words code { font: 12.5px/1.5 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+&quot;&quot;&quot;
+
+val body = &quot;&quot;&quot;
+  &lt;div class=&quot;tiles&quot;&gt;$tiles&lt;/div&gt;
+  &lt;section&gt;
+    &lt;h2&gt;A person says no&lt;/h2&gt;
+    &lt;p&gt;Two bumps, each labelled &lt;span class=&quot;mono&quot;&gt;hold&lt;/span&gt; by a person after it was taken up, with the required
+    check passing on both. The watch reads the pull request again at each look, and acts only on what it holds now.
+    GitHub's auto-merge decided once, when it was turned on.&lt;/p&gt;
+    &lt;div class=&quot;headline&quot;&gt;$timelines&lt;/div&gt;
+    &lt;p class=&quot;sub&quot;&gt;Times are GitHub's own (UTC), from each pull request's timeline and check runs.&lt;/p&gt;
+  &lt;/section&gt;
+$roundSections
+  &lt;section&gt;
+    &lt;h2&gt;The goal words, as the code they came down to&lt;/h2&gt;
+    &lt;p&gt;The goal grammar doesn't know these words yet, so &lt;span class=&quot;mono&quot;&gt;watch.kts&lt;/span&gt; writes each by hand in
+    heart-script, through the HEART gateway.&lt;/p&gt;
+    &lt;ol class=&quot;words&quot;&gt;$words&lt;/ol&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Found and fixed on the way&lt;/h2&gt;
+    &lt;ol class=&quot;plain&quot;&gt;$fixed&lt;/ol&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Still missing&lt;/h2&gt;
+    &lt;ul class=&quot;gaps&quot;&gt;$gaps&lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;How this page is made&lt;/h2&gt;
+    ${shown(&quot;results.yaml: what happened&quot;, data)}
+    ${shown(&quot;watch.kts: the watch&quot;, watcher)}
+    ${shown(&quot;report.kts: the script that lays it out&quot;, source)}
+  &lt;/section&gt;
+&quot;&quot;&quot;
+
+/** The page: the reports' shared shell, filled with this page's own parts. */
+val page = File(assets, &quot;report-shell.html&quot;).readText()
+    .replace(&quot;@@TITLE@@&quot;, &quot;Dependabot, Simulated&quot;)
+    .replace(&quot;@@HEADING@@&quot;, &quot;Dependabot, simulated: a watch that can be told no&quot;)
+    .replace(&quot;@@LEDE@@&quot;, &quot;Dependabot-style pull requests opened with our own account on a scratch repository, merged &quot; +
+        &quot;by a heart-script watch through the HEART gateway, beside GitHub's own auto-merge. Run ${yaml.text(&quot;asOf&quot;)}.&quot;)
+    .replace(&quot;@@BASE@@&quot;, File(assets, &quot;report-base.css&quot;).readText())
+    .replace(&quot;@@THEME@@&quot;, File(assets, &quot;theme-switch.js&quot;).readText())
+    .replace(&quot;@@STYLE@@&quot;, style).replace(&quot;@@SCRIPT@@&quot;, &quot;&quot;).replace(&quot;@@BODY@@&quot;, body)
+
+File(out).apply { parentFile.mkdirs() }.writeText(
+    &quot;&lt;!doctype html&gt;&lt;html lang=\&quot;en\&quot;&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&quot; +
+        &quot;&lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width,initial-scale=1,viewport-fit=cover\&quot;&gt;&lt;/head&gt;&quot; +
+        &quot;&lt;body style=\&quot;margin:0\&quot;&gt;\n&quot; + page + &quot;&lt;/body&gt;&lt;/html&gt;\n&quot;
+)
+if (artifact.isNotBlank()) File(artifact).writeText(page)
+println(&quot;wrote $out&quot; + if (artifact.isNotBlank()) &quot; and $artifact&quot; else &quot;&quot;)
+</pre></div></details>
+  </section>
+
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+
+
+</script>
+</body></html>

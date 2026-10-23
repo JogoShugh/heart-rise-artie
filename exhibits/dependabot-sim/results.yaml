@@ -1,0 +1,135 @@
+# What the Dependabot simulation did, 2026-10-23, on JogoShugh/heart-github-test. report.kts lays this out.
+# Outcomes are from the runs' outputs (runs/*.out); times are GitHub's own, read back from each pull request's
+# timeline and check runs after the runs (UTC).
+# tone: good (did the right thing), safe (stopped, and said why), bad (did harm), quiet (nothing to do).
+
+asOf: "2026-10-23"
+
+rounds:
+  - name: Round 1, no required check
+    out: runs/watch-1023-watch2.out
+    setting: The watch looked every 10 seconds and gave up after 2 minutes. deps-main had no protection, so "can be merged" meant only what GitHub worked out about the branch.
+    pulls:
+      - number: 678
+        by: watch
+        what: A bump, open and labelled before the watch started
+        outcome: Merged on the first look
+        tone: good
+      - number: 681
+        by: watch
+        what: A bump opened while the watch ran
+        outcome: Merged at the next look
+        tone: good
+      - number: 682
+        by: watch
+        what: A bump opened as a draft
+        outcome: "After 2 minutes, commented: A draft can't be merged; mark it ready for review first."
+        tone: safe
+      - number: 683
+        by: watch
+        what: Opened already labelled hold; a person removed hold later
+        outcome: Left alone while held. Once released, it conflicted, so the watch commented with that reason.
+        tone: safe
+      - number: 684
+        by: watch
+        what: "A bump opened together with #685, from the same base"
+        outcome: Merged
+        tone: good
+      - number: 685
+        by: watch
+        what: "The other of the pair; it conflicted once #684 was in"
+        outcome: "Commented: The branch has conflicts with its base; resolve them first."
+        tone: safe
+  - name: Round 2, a required check, and GitHub's auto-merge beside the watch
+    out: runs/watch-1023-watch3.out
+    setting: The watch looked every 10 seconds and gave up after 4 minutes. deps-main required deps-check, for admins too. Pull requests labelled dependabot-actions were left to GitHub's auto-merge.
+    pulls:
+      - number: 687
+        by: watch
+        what: A bump
+        outcome: Merged 36 seconds after the check passed
+        tone: good
+      - number: 688
+        by: watch
+        what: A broken bump; the check failed
+        outcome: "After 4 minutes, commented: Branch protection blocks the merge: a required check or review is missing."
+        tone: safe
+      - number: 689
+        by: watch
+        what: A bump a person labelled hold 5 seconds after it was labelled dependabot
+        outcome: Left alone, though its check passed; the watch said so once
+        tone: good
+      - number: 690
+        by: rival
+        what: A bump labelled dependabot-actions
+        outcome: Merged by github-actions[bot] once the check passed
+        tone: good
+      - number: 691
+        by: rival
+        what: A bump labelled dependabot-actions, then hold by a person
+        outcome: Merged by github-actions[bot] anyway, 26 seconds after the hold
+        tone: bad
+
+# The two pull requests a person objected to, side by side in time.
+timelines:
+  - number: 689
+    by: the watch
+    events:
+      - { at: "16:51:54", what: Opened by the Dependabot stand-in }
+      - { at: "16:51:56", what: Labelled dependabot }
+      - { at: "16:52:01", what: Labelled hold by a person, tone: warn }
+      - { at: "16:52:26", what: deps-check passed }
+      - { at: "-", what: "Not merged: the watch reads the labels again at each look, and left it alone", tone: good }
+  - number: 691
+    by: GitHub's auto-merge
+    events:
+      - { at: "16:52:18", what: Opened by the Dependabot stand-in }
+      - { at: "16:52:19", what: Labelled dependabot-actions }
+      - { at: "16:52:29", what: "Auto-merge turned on by github-actions[bot]" }
+      - { at: "16:52:36", what: Labelled hold by a person, tone: warn }
+      - { at: "16:52:49", what: deps-check passed }
+      - { at: "16:53:02", what: "Merged by github-actions[bot]", tone: bad }
+
+# Each goal word, and what it came down to in watch.kts.
+words:
+  - word: Whenever
+    code: act("github:pulls-list", … "sort" to "updated", "direction" to "desc"), read down to the first one older than the last look
+  - word: Once
+    code: offers("github:merge"), then act("github:merge", "merge_method" to "squash")
+  - word: Give up
+    code: the time since it was taken up, against giveUp minutes; never on a reason that says to read again
+  - word: Otherwise
+    code: act("github:comment") with why("github:merge"), the gateway's hr:unavailable reason, unless a watch already said it
+  - word: Until
+    code: the watch opens its own issue, and reads it at the end of every look; closed, it stops
+  - word: Manners
+    code: hold in the labels it holds now leaves the pull request alone; a refused act is read again next look, never sent again blind
+
+# Found and fixed on the way.
+fixed:
+  - what: The first watch died on one look the gateway answered with 500 while GitHub was slow.
+    fix: Each look catches a failure, says so, and the next look tries again.
+    out: runs/watch-1023-watch1.out
+  - what: "Restarted, the watch commented on #682, #683 and #685 a second time."
+    fix: Before it comments, it reads the pull request's comments and says nothing a watch already said. A fourth watch said nothing new.
+    out: runs/watch-1023-watch4.out
+  - what: 'It once gave up on "GitHub is still checking… read it again shortly", telling #683 something untrue.'
+    fix: It doesn't give up on a reason that says to read again; it waits one more look.
+    out: runs/watch-1023-watch3.out
+
+# Still missing, with whose to build it is.
+gaps:
+  - where: gateway
+    what: No checks resource. A failed check and a pending one give the same reason, "a required check or review is missing".
+  - where: HEART
+    what: hr:unavailable has no mark for a reason that passes by itself; the watch reads the words "read it again".
+  - where: gateway
+    what: No reviews resource, so a person objects with a label rather than "changes requested".
+  - where: gateway
+    what: Pull requests can't be listed by label, and list pages carry no ETag; the watch reads each changed pull request to see its labels.
+  - where: heart-script
+    what: note() is kept but never written to the trace or shown; watch.kts works around it with tell().
+  - where: heart-script
+    what: The trace keeps every representation in full, 3.6 MB for six minutes; a long watch's journal must keep only what changed, and resume from it.
+  - where: goal grammar
+    what: Whenever, Until, Once, Otherwise and Give up are written by hand here; Goal.kt doesn't know them yet.
