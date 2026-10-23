@@ -62,18 +62,24 @@ ul.moves { margin: 0; padding-left: 20px; display: grid; gap: 2px; } ul.moves b 
 details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
 details > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
 details > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+header > div { min-width: 0; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible, details > summary:focus-visible { outline: 2px solid var(--heart); outline-offset: 2px; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
 .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
 .key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--k); }
 </style>
 
 <div class="wrap">
-  <header>
+  <header><div>
     <h1>The care dial: what each safeguard costs, and what it saves</h1>
     <p class="lede">The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every
     arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under the run
     as a teammate would, and checker.py judges what the run kept of the teammate's moves. From runs/ladder.tsv and
     runs/meddle.tsv, 2026-10-23.</p>
-  </header>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></header>
   <div class="tiles"><div class="tile bare"><span class="name">artie-bare, calm</span><b>21.0 s</b><span class="sub">median of 3 runs, no checks</span></div><div class="tile bad"><span class="name">artie-bare, storm</span><b>off the rails: exit 0 over damage</b><span class="sub">4 of 4 runs did harm</span></div><div class="tile bad"><span class="name">py-direct, storm</span><b>off the rails: exit 0 over damage</b><span class="sub">4 of 4 runs did harm</span></div><div class="tile good"><span class="name">artie-goal, storm</span><b>59.0 s</b><span class="sub">4 of 5 succeeded, no harm</span></div></div>
   <section>
     <h2>The dial</h2>
@@ -202,6 +208,322 @@ details > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius:
 <tr><td class="mono">1022-211615</td><td><code>artie-bare</code></td><td class="num">0</td><td class="num">19.0</td><td class="num">23/23</td></tr>
 <tr><td class="mono">1022-211658</td><td><code>py-direct</code></td><td class="num">0</td><td class="num">21.7</td><td class="num">23/23</td></tr>
       </tbody></table></div></details>
+    <details><summary>The script that made this page: care-dial.kts</summary><div class="scroll"><pre class="src">// The care dial as a page: every arm of the ladder from most careful to least, with what it cost on a calm GitHub
+// (runs/ladder.tsv) and what it did when a teammate moved the world under it (runs/meddle.tsv, meddler.py).
+//   artie run care-dial.kts runs=runs out=../../docs/reports/care-dial/index.html artifact=/tmp/care-dial.html
+// out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
+// The page carries this script's own text at the bottom (source), and a light and dark switch that remembers.
+import java.io.File
+import java.time.LocalDate
+
+val runs by input(default = &quot;runs&quot;, question = &quot;Where are ladder.tsv and meddle.tsv?&quot;)
+val out by input(question = &quot;Where to write the page?&quot;)
+val artifact by input(default = &quot;&quot;, question = &quot;Where to write the artifact copy, if anywhere?&quot;)
+val source by input(default = &quot;care-dial.kts&quot;, question = &quot;Where is this script, to show it on the page?&quot;)
+
+/** One arm of the ladder, in the dial's order: its name in the tables, what it is, and how it reaches GitHub. */
+class Arm(val name: String, val label: String, val what: String, val kind: String, val note: String = &quot;&quot;)
+
+val arms = listOf(
+    Arm(&quot;artie-goal&quot;, &quot;artie-goal&quot;, &quot;ARTIE with the goal script: acts only on what the resource still offers&quot;, &quot;heart&quot;),
+    Arm(&quot;careful-heart&quot;, &quot;careful-heart&quot;, &quot;the generated script, guard strict, validators from the last answer, &quot; +
+        &quot;the gateway taking every care&quot;, &quot;heart&quot;),
+    Arm(&quot;heart_every&quot;, &quot;heart:every&quot;, &quot;the generated script off the rails, the gateway taking every care&quot;, &quot;heart&quot;),
+    Arm(&quot;heart_no-reread&quot;, &quot;heart:no-reread&quot;, &quot;as heart:every, the gateway not reading again before a write&quot;, &quot;heart&quot;),
+    Arm(&quot;heart_no-race&quot;, &quot;heart:no-race&quot;, &quot;as heart:every, the gateway not checking for a race&quot;, &quot;heart&quot;),
+    Arm(&quot;heart_no-offers&quot;, &quot;heart:no-offers&quot;, &quot;as heart:every, the gateway not working out what is offered&quot;, &quot;heart&quot;),
+    Arm(&quot;heart_trust-copies_60&quot;, &quot;heart:trust-copies=60&quot;, &quot;as heart:every, the gateway trusting its copies &quot; +
+        &quot;for 60 s&quot;, &quot;heart&quot;),
+    Arm(&quot;heart_off-the-rails&quot;, &quot;heart:off-the-rails&quot;, &quot;every care off, client and gateway, still HEART&quot;, &quot;heart&quot;),
+    Arm(&quot;careful-via&quot;, &quot;careful-via&quot;, &quot;Claude's careful Python, through the gateway passed through&quot;, &quot;python&quot;),
+    Arm(&quot;careful-direct&quot;, &quot;careful-direct&quot;, &quot;Claude's careful Python, straight to GitHub&quot;, &quot;python&quot;),
+    Arm(&quot;py-via&quot;, &quot;py-via&quot;, &quot;Claude's plain Python, through the gateway passed through&quot;, &quot;python&quot;),
+    Arm(&quot;artie-bare&quot;, &quot;artie-bare&quot;, &quot;the careful run brought down to its GitHub calls by artie generate --bare, &quot; +
+        &quot;sent by ARTIE with no checks&quot;, &quot;bare&quot;,
+        &quot;It never writes the crash issue's state itself, so M1 had nothing to overwrite. Under M4 it stopped only &quot; +
+            &quot;because the merge, retried 30 times a second apart, kept getting 405 \&quot;still a draft\&quot;.&quot;),
+    Arm(&quot;py-direct&quot;, &quot;py-direct&quot;, &quot;Claude's plain Python, straight to GitHub&quot;, &quot;python&quot;),
+)
+
+/** The moves meddler.py makes, as it says them. */
+val moves = mapOf(
+    &quot;M1&quot; to &quot;closes the crash issue as not planned&quot;,
+    &quot;M2&quot; to &quot;locks the crash issue's conversation as off-topic&quot;,
+    &quot;M3&quot; to &quot;closes the duplicate as completed: a different crash&quot;,
+    &quot;M4&quot; to &quot;converts the pull request to a draft&quot;,
+    &quot;M5&quot; to &quot;adds a reviewer's note to the pull request&quot;,
+)
+
+/** How bad a verdict is, from best to worst, and the class that colours it. */
+val verdicts = listOf(
+    &quot;succeeded&quot; to &quot;good&quot;,
+    &quot;stopped safely&quot; to &quot;safe&quot;,
+    &quot;exit 0, task left undone&quot; to &quot;warn&quot;,
+    &quot;damaged, then failed&quot; to &quot;warn&quot;,
+    &quot;off the rails: exit 0 over damage&quot; to &quot;bad&quot;,
+)
+
+class Calm(val arm: String, val stamp: String, val rc: Int, val seconds: Double, val held: Int, val of: Int)
+class Meddled(
+    val arm: String, val stamp: String, val moves: String, val rc: Int, val seconds: Double,
+    val verdict: String, val damage: List&lt;String&gt;, val undone: List&lt;String&gt;,
+)
+
+fun rows(name: String) = File(runs, name).readLines().filter { it.isNotBlank() }.map { it.split('\t') }
+
+val calm = rows(&quot;ladder.tsv&quot;).map { c -&gt;
+    val (held, of) = c[4].split('/').let { (it.getOrNull(0)?.toIntOrNull() ?: 0) to (it.getOrNull(1)?.toIntOrNull() ?: 0) }
+    Calm(c[0], c[1], c[2].toInt(), c[3].toDouble(), held, of)
+}
+val meddled = rows(&quot;meddle.tsv&quot;).map { c -&gt;
+    val said = c.getOrElse(8) { &quot;-&quot; }.split(&quot;; &quot;).filter { it != &quot;-&quot; &amp;&amp; it.isNotBlank() }
+    Meddled(c[0], c[1], c[2], c[3].toInt(), c[4].toDouble(), c[5],
+        said.filterNot { it.startsWith(&quot;undone: &quot;) }, said.filter { it.startsWith(&quot;undone: &quot;) }.map { it.removePrefix(&quot;undone: &quot;) })
+}
+
+fun esc(s: String) = s.replace(&quot;&amp;&quot;, &quot;&amp;amp;&quot;).replace(&quot;&lt;&quot;, &quot;&amp;lt;&quot;).replace(&quot;&gt;&quot;, &quot;&amp;gt;&quot;).replace(&quot;\&quot;&quot;, &quot;&amp;quot;&quot;)
+fun median(xs: List&lt;Double&gt;) = xs.sorted().let { if (it.size % 2 == 1) it[it.size / 2] else (it[it.size / 2 - 1] + it[it.size / 2]) / 2 }
+fun s(x: Double) = &quot;%.1f&quot;.format(x)
+fun tone(verdict: String) = verdicts.firstOrNull { it.first == verdict }?.second ?: &quot;warn&quot;
+fun worst(list: List&lt;Meddled&gt;) = list.maxByOrNull { m -&gt; verdicts.indexOfFirst { it.first == m.verdict } }
+
+/** A cell of verdict counts, worst first: &quot;4 × exit 0 over damage&quot;. */
+fun verdictCell(list: List&lt;Meddled&gt;): String {
+    if (list.isEmpty()) return &quot;&quot;&quot;&lt;span class=&quot;none&quot;&gt;not run&lt;/span&gt;&quot;&quot;&quot;
+    return verdicts.reversed().mapNotNull { (v, t) -&gt;
+        list.count { it.verdict == v }.takeIf { it &gt; 0 }?.let { &quot;&quot;&quot;&lt;span class=&quot;v $t&quot;&gt;$it × ${esc(v)}&lt;/span&gt;&quot;&quot;&quot; }
+    }.joinToString(&quot; &quot;)
+}
+
+/** The distinct harms across a set of runs, each with how many runs did it. */
+fun harmCell(list: List&lt;Meddled&gt;): String {
+    val harms = list.flatMap { it.damage }.groupingBy { it }.eachCount()
+    if (list.isEmpty()) return &quot;&quot;
+    if (harms.isEmpty()) return &quot;&quot;&quot;&lt;span class=&quot;none&quot;&gt;none&lt;/span&gt;&quot;&quot;&quot;
+    return harms.entries.joinToString(&quot;&quot;) { (h, n) -&gt; &quot;&quot;&quot;&lt;div class=&quot;harm&quot;&gt;${esc(h)} &lt;span class=&quot;n&quot;&gt;$n/${list.size}&lt;/span&gt;&lt;/div&gt;&quot;&quot;&quot; }
+}
+
+val storm = &quot;M1,M2,M3,M5&quot;
+val maxCalm = calm.filter { a -&gt; arms.any { it.name == a.arm } }.maxOf { it.seconds }.coerceAtMost(100.0)
+val maxStorm = meddled.maxOf { it.seconds }
+
+fun strip(xs: List&lt;Double&gt;, max: Double, cls: String) =
+    &quot;&quot;&quot;&lt;div class=&quot;strip $cls&quot;&gt;&quot;&quot;&quot; + xs.joinToString(&quot;&quot;) { x -&gt;
+        val left = (x.coerceAtMost(max) / max * 100)
+        &quot;&quot;&quot;&lt;i style=&quot;left:${&quot;%.1f&quot;.format(left)}%&quot; title=&quot;${s(x)} s&quot;&gt;&lt;/i&gt;&quot;&quot;&quot;
+    } + &quot;&lt;/div&gt;&quot;
+
+val dialRows = arms.joinToString(&quot;\n&quot;) { a -&gt;
+    val c = calm.filter { it.arm == a.name }
+    val st = meddled.filter { it.arm == a.name &amp;&amp; it.moves == storm }
+    val m4 = meddled.filter { it.arm == a.name &amp;&amp; it.moves == &quot;M4&quot; }
+    val calmCell = if (c.isEmpty()) &quot;&quot;&quot;&lt;span class=&quot;none&quot;&gt;in the storm only&lt;/span&gt;&quot;&quot;&quot; else
+        &quot;&quot;&quot;&lt;b&gt;${s(median(c.map { it.seconds }))} s&lt;/b&gt; &lt;span class=&quot;sub&quot;&gt;${s(c.minOf { it.seconds })}–${s(c.maxOf { it.seconds })}, ${c.size} runs, &quot;&quot;&quot; +
+            &quot;&quot;&quot;${c.count { it.held == it.of &amp;&amp; it.of &gt; 0 }} whole&lt;/span&gt;&quot;&quot;&quot; + strip(c.map { it.seconds }, maxCalm, a.kind)
+    val stormTime = if (st.isEmpty()) &quot;&quot; else &quot;&quot;&quot;&lt;div class=&quot;sub&quot;&gt;${s(median(st.map { it.seconds }))} s median&lt;/div&gt;&quot;&quot;&quot;
+    &quot;&quot;&quot;&lt;tr class=&quot;${a.kind}&quot;&gt;&lt;th scope=&quot;row&quot;&gt;&lt;code&gt;${esc(a.label)}&lt;/code&gt;&lt;div class=&quot;what&quot;&gt;${esc(a.what)}&lt;/div&gt;&lt;/th&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td&gt;$calmCell&lt;/td&gt;&lt;td&gt;${verdictCell(st)}$stormTime&lt;/td&gt;&lt;td&gt;${harmCell(st)}${if (a.note.isEmpty()) &quot;&quot; else &quot;&quot;&quot;&lt;div class=&quot;note&quot;&gt;${esc(a.note)}&lt;/div&gt;&quot;&quot;&quot;}&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td&gt;${verdictCell(m4)}&lt;/td&gt;&lt;/tr&gt;&quot;&quot;&quot;
+}
+
+val allRuns = meddled.sortedBy { it.stamp }.joinToString(&quot;\n&quot;) { m -&gt;
+    val label = arms.firstOrNull { it.name == m.arm }?.label ?: m.arm
+    &quot;&quot;&quot;&lt;tr&gt;&lt;td class=&quot;mono&quot;&gt;${esc(m.stamp)}&lt;/td&gt;&lt;td&gt;&lt;code&gt;${esc(label)}&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;mono&quot;&gt;${esc(m.moves)}&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td class=&quot;num&quot;&gt;${m.rc}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${s(m.seconds)}&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;v ${tone(m.verdict)}&quot;&gt;${esc(m.verdict)}&lt;/span&gt;&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td&gt;${(m.damage.map { esc(it) } + m.undone.map { &quot;left undone: &quot; + esc(it) }).joinToString(&quot;&lt;br&gt;&quot;).ifEmpty { &quot;–&quot; }}&lt;/td&gt;&lt;/tr&gt;&quot;&quot;&quot;
+}
+
+val calmRuns = calm.filter { a -&gt; arms.any { it.name == a.arm } }.sortedBy { it.stamp }.joinToString(&quot;\n&quot;) { c -&gt;
+    val label = arms.first { it.name == c.arm }.label
+    &quot;&quot;&quot;&lt;tr&gt;&lt;td class=&quot;mono&quot;&gt;${esc(c.stamp)}&lt;/td&gt;&lt;td&gt;&lt;code&gt;${esc(label)}&lt;/code&gt;&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${c.rc}&lt;/td&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;td class=&quot;num&quot;&gt;${s(c.seconds)}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${c.held}/${c.of}&lt;/td&gt;&lt;/tr&gt;&quot;&quot;&quot;
+}
+
+val bare = meddled.filter { it.arm == &quot;artie-bare&quot; &amp;&amp; it.moves == storm }
+val py = meddled.filter { it.arm == &quot;py-direct&quot; &amp;&amp; it.moves == storm }
+val goal = meddled.filter { it.arm == &quot;artie-goal&quot; &amp;&amp; it.moves == storm }
+val bareCalm = calm.filter { it.arm == &quot;artie-bare&quot; }.map { it.seconds }
+val goalStorm = goal.map { it.seconds }
+
+fun tile(big: String, label: String, sub: String, cls: String) =
+    &quot;&quot;&quot;&lt;div class=&quot;tile $cls&quot;&gt;&lt;span class=&quot;name&quot;&gt;$label&lt;/span&gt;&lt;b&gt;$big&lt;/b&gt;&lt;span class=&quot;sub&quot;&gt;$sub&lt;/span&gt;&lt;/div&gt;&quot;&quot;&quot;
+
+val tiles = listOf(
+    tile(if (bareCalm.isEmpty()) &quot;–&quot; else &quot;${s(median(bareCalm))} s&quot;, &quot;artie-bare, calm&quot;, &quot;median of ${bareCalm.size} runs, no checks&quot;, &quot;bare&quot;),
+    tile(worst(bare)?.verdict?.let { esc(it) } ?: &quot;not run&quot;, &quot;artie-bare, storm&quot;,
+        &quot;${bare.count { it.damage.isNotEmpty() }} of ${bare.size} runs did harm&quot;, worst(bare)?.verdict?.let { tone(it) } ?: &quot;&quot;),
+    tile(worst(py)?.verdict?.let { esc(it) } ?: &quot;not run&quot;, &quot;py-direct, storm&quot;,
+        &quot;${py.count { it.damage.isNotEmpty() }} of ${py.size} runs did harm&quot;, worst(py)?.verdict?.let { tone(it) } ?: &quot;&quot;),
+    tile(if (goalStorm.isEmpty()) &quot;–&quot; else &quot;${s(median(goalStorm))} s&quot;, &quot;artie-goal, storm&quot;,
+        &quot;${goal.count { it.verdict == &quot;succeeded&quot; }} of ${goal.size} succeeded, no harm&quot;, &quot;good&quot;),
+).joinToString(&quot;&quot;)
+
+val moveList = moves.entries.joinToString(&quot;&quot;) { (k, v) -&gt; &quot;&lt;li&gt;&lt;b&gt;$k&lt;/b&gt; ${esc(v)}&lt;/li&gt;&quot; }
+
+val page = &quot;&quot;&quot;&lt;title&gt;Care Dial&lt;/title&gt;
+&lt;meta name=&quot;claude:viewport-fit-sides&quot; content=&quot;cover&quot;&gt;
+&lt;link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&amp;family=IBM+Plex+Sans:wght@400;500&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap&quot;&gt;
+&lt;style&gt;
+/* Layout: one column; the dial as one table, most careful at the top; every run below behind disclosures. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --heart: #4b4fc4; --python: #b8650b; --bare: #0f7d76;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2;
+  --display: &quot;IBM Plex Sans Condensed&quot;, &quot;Arial Narrow&quot;, system-ui, sans-serif;
+  --body: &quot;IBM Plex Sans&quot;, system-ui, -apple-system, &quot;Segoe UI&quot;, sans-serif;
+  --mono: &quot;IBM Plex Mono&quot;, ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme=&quot;light&quot;]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark } }
+:root[data-theme=&quot;dark&quot;] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --heart: #8f93f2; --python: #e4953b; --bare: #3cc1b6;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 20px; }
+.lede { color: var(--muted); max-width: 70ch; margin: 6px 0 0; }
+section { display: grid; gap: 12px; min-width: 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-top: 3px solid var(--c, var(--rule));
+  border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+.tile b { font: 600 22px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile.good { --c: var(--good); } .tile.safe { --c: var(--safe); } .tile.warn { --c: var(--warn); }
+.tile.bad { --c: var(--bad); } .tile.bare { --c: var(--bare); }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child &gt; * { border-bottom: 0; }
+tbody th { font-weight: 400; min-width: 220px; border-left: 4px solid var(--k); }
+tr.heart { --k: var(--heart); } tr.python { --k: var(--python); } tr.bare { --k: var(--bare); }
+tbody th code { font: 500 14px var(--mono); color: var(--k); }
+.what { color: var(--muted); font-size: 13px; margin-top: 2px; max-width: 34ch; }
+.dial td:nth-child(2) { min-width: 190px; }
+.dial td:nth-child(3), .dial td:nth-child(5) { min-width: 170px; }
+.dial td:nth-child(4) { min-width: 240px; }
+.v { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0; white-space: nowrap; }
+.v.good { color: var(--good); background: var(--good-bg); } .v.safe { color: var(--safe); background: var(--safe-bg); }
+.v.warn { color: var(--warn); background: var(--warn-bg); } .v.bad { color: var(--bad); background: var(--bad-bg); }
+.harm { font-size: 13px; } .note { font-size: 12px; color: var(--muted); margin-top: 6px; max-width: 36ch; } .harm .n { font: 12px var(--mono); color: var(--muted); }
+.strip { position: relative; height: 10px; margin-top: 6px; background: var(--track); border-radius: 5px; }
+.strip i { position: absolute; top: 1px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--k); opacity: .8; }
+.mono, .num { font-family: var(--mono); font-size: 13px; } .num { text-align: right; font-variant-numeric: tabular-nums; }
+ul.moves { margin: 0; padding-left: 20px; display: grid; gap: 2px; } ul.moves b { font-family: var(--mono); }
+details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details &gt; summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details &gt; .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+header &gt; div { min-width: 0; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible, details &gt; summary:focus-visible { outline: 2px solid var(--heart); outline-offset: 2px; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+.key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.key span::before { content: &quot;&quot;; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--k); }
+&lt;/style&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;&lt;div&gt;
+    &lt;h1&gt;The care dial: what each safeguard costs, and what it saves&lt;/h1&gt;
+    &lt;p class=&quot;lede&quot;&gt;The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every
+    arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under the run
+    as a teammate would, and checker.py judges what the run kept of the teammate's moves. From runs/ladder.tsv and
+    runs/meddle.tsv, ${LocalDate.now()}.&lt;/p&gt;
+  &lt;/div&gt;&lt;button class=&quot;theme&quot; id=&quot;theme&quot; type=&quot;button&quot; aria-label=&quot;Switch between light and dark&quot;&gt;◐ Dark&lt;/button&gt;&lt;/header&gt;
+  &lt;div class=&quot;tiles&quot;&gt;$tiles&lt;/div&gt;
+  &lt;section&gt;
+    &lt;h2&gt;The dial&lt;/h2&gt;
+    &lt;div class=&quot;key&quot;&gt;&lt;span style=&quot;--k:var(--heart)&quot;&gt;HEART, through the gateway&lt;/span&gt;&lt;span style=&quot;--k:var(--bare)&quot;&gt;bare ARTIE, straight to GitHub&lt;/span&gt;&lt;span style=&quot;--k:var(--python)&quot;&gt;Claude's Python&lt;/span&gt;&lt;/div&gt;
+    &lt;div class=&quot;scroll&quot;&gt;&lt;table class=&quot;dial&quot;&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Arm&lt;/th&gt;&lt;th&gt;Calm: time, whole runs&lt;/th&gt;&lt;th&gt;Storm ($storm)&lt;/th&gt;&lt;th&gt;Harm done in the storm&lt;/th&gt;&lt;th&gt;M4 alone&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+$dialRows
+      &lt;/tbody&gt;
+    &lt;/table&gt;&lt;/div&gt;
+    &lt;p class=&quot;sub&quot;&gt;&quot;Whole&quot; counts the calm runs where all of checker.py's checks held. The early part-runs (3/7, 9/22) are
+    GitHub's merge lag from before the scripts waited for it. A dot is one run, drawn to one scale up to ${s(maxCalm)} s.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;The teammate's moves&lt;/h2&gt;
+    &lt;ul class=&quot;moves&quot;&gt;$moveList&lt;/ul&gt;
+    &lt;p class=&quot;sub&quot;&gt;Each move is made on the state the teammate reads first, once the run's pull request is open. A move the
+    run had already overtaken is &quot;late&quot; and says nothing about the run. Verdicts: &lt;span class=&quot;v good&quot;&gt;succeeded&lt;/span&gt;
+    finished and kept every move; &lt;span class=&quot;v safe&quot;&gt;stopped safely&lt;/span&gt; stopped before overwriting any;
+    &lt;span class=&quot;v warn&quot;&gt;damaged, then failed&lt;/span&gt; overwrote one, then stopped; &lt;span class=&quot;v bad&quot;&gt;off the rails: exit 0 over damage&lt;/span&gt;
+    overwrote and reported success.&lt;/p&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Every run&lt;/h2&gt;
+    &lt;details&gt;&lt;summary&gt;Storm and M4 runs (${meddled.size})&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Stamp&lt;/th&gt;&lt;th&gt;Arm&lt;/th&gt;&lt;th&gt;Moves&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Exit&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Seconds&lt;/th&gt;&lt;th&gt;Verdict&lt;/th&gt;&lt;th&gt;Harm and left undone&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+$allRuns
+      &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/details&gt;
+    &lt;details&gt;&lt;summary&gt;Calm runs (${calm.count { a -&gt; arms.any { it.name == a.arm } }})&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;table&gt;
+      &lt;thead&gt;&lt;tr&gt;&lt;th&gt;Stamp&lt;/th&gt;&lt;th&gt;Arm&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Exit&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Seconds&lt;/th&gt;&lt;th class=&quot;num&quot;&gt;Checks&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;
+      &lt;tbody&gt;
+$calmRuns
+      &lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/details&gt;
+    &lt;details&gt;&lt;summary&gt;The script that made this page: care-dial.kts&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(source).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;
+  &lt;/section&gt;
+&lt;/div&gt;
+&lt;script&gt;
+// The switch: the viewer's system theme until they choose; the choice is kept in this browser where it can be.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'care-dial-theme';
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+&lt;/script&gt;
+&quot;&quot;&quot;
+
+File(out).apply { parentFile.mkdirs() }.writeText(
+    &quot;&lt;!doctype html&gt;&lt;html lang=\&quot;en\&quot;&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&quot; +
+        &quot;&lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width,initial-scale=1,viewport-fit=cover\&quot;&gt;&lt;/head&gt;&quot; +
+        &quot;&lt;body style=\&quot;margin:0\&quot;&gt;\n&quot; + page + &quot;&lt;/body&gt;&lt;/html&gt;\n&quot;
+)
+if (artifact.isNotBlank()) File(artifact).writeText(page)
+println(&quot;wrote $out&quot; + if (artifact.isNotBlank()) &quot; and $artifact&quot; else &quot;&quot;)
+</pre></div></details>
   </section>
 </div>
+<script>
+// The switch: the viewer's system theme until they choose; the choice is kept in this browser where it can be.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'care-dial-theme';
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
 </body></html>

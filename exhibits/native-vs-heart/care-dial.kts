@@ -2,12 +2,14 @@
 // (runs/ladder.tsv) and what it did when a teammate moved the world under it (runs/meddle.tsv, meddler.py).
 //   artie run care-dial.kts runs=runs out=../../docs/reports/care-dial/index.html artifact=/tmp/care-dial.html
 // out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
+// The page carries this script's own text at the bottom (source), and a light and dark switch that remembers.
 import java.io.File
 import java.time.LocalDate
 
 val runs by input(default = "runs", question = "Where are ladder.tsv and meddle.tsv?")
 val out by input(question = "Where to write the page?")
 val artifact by input(default = "", question = "Where to write the artifact copy, if anywhere?")
+val source by input(default = "care-dial.kts", question = "Where is this script, to show it on the page?")
 
 /** One arm of the ladder, in the dial's order: its name in the tables, what it is, and how it reaches GitHub. */
 class Arm(val name: String, val label: String, val what: String, val kind: String, val note: String = "")
@@ -211,18 +213,24 @@ ul.moves { margin: 0; padding-left: 20px; display: grid; gap: 2px; } ul.moves b 
 details { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
 details > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
 details > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+header { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+header > div { min-width: 0; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible, details > summary:focus-visible { outline: 2px solid var(--heart); outline-offset: 2px; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
 .key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
 .key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--k); }
 </style>
 
 <div class="wrap">
-  <header>
+  <header><div>
     <h1>The care dial: what each safeguard costs, and what it saves</h1>
     <p class="lede">The same GitHub triage (3 issues, a branch, 2 commits, a pull request merged, 23 checks) by every
     arm of the ladder, most careful at the top. Calm: GitHub left alone. Storm: meddler.py moves the world under the run
     as a teammate would, and checker.py judges what the run kept of the teammate's moves. From runs/ladder.tsv and
     runs/meddle.tsv, ${LocalDate.now()}.</p>
-  </header>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></header>
   <div class="tiles">$tiles</div>
   <section>
     <h2>The dial</h2>
@@ -257,8 +265,27 @@ $allRuns
       <tbody>
 $calmRuns
       </tbody></table></div></details>
+    <details><summary>The script that made this page: care-dial.kts</summary><div class="scroll"><pre class="src">${esc(File(source).readText())}</pre></div></details>
   </section>
 </div>
+<script>
+// The switch: the viewer's system theme until they choose; the choice is kept in this browser where it can be.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'care-dial-theme';
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
 """
 
 File(out).apply { parentFile.mkdirs() }.writeText(
