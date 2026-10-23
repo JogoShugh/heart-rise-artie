@@ -69,6 +69,10 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     val waitedFor: String? = doc["waited"].map()["for"]?.toString()
     val state: Map<*, *> = doc["now"].map()["state"].map()
 
+    /** The traceparent of each request the step sent, when the run kept its exchanges (`--exchanges`). */
+    val traceparents: List<String> = (doc["exchanges"] as? List<*>).orEmpty()
+        .mapNotNull { it.map()["request"].map()["headers"].map()["traceparent"]?.toString() }
+
     /** The relation a selection selected; null for a step that selected nothing. */
     val relation: String? get() = params["relation"]?.toString()
 

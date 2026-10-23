@@ -19,8 +19,9 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     asked(report == null || sourceName != null) {
         "--report needs --script: the report shows the run's script beside the one generated"
     }
-    val pins = script.substringBeforeLast('.') + ".pins.yaml"
     val capture = Capture(captureName, Files.readString(existing(folder, captureName, "capture")))
+    options["--bare"]?.let { upstream -> return bare(capture, upstream, folder, script, out) }
+    val pins = script.substringBeforeLast('.') + ".pins.yaml"
     // A goal run's steps stand for the lines of the script its moves amount to, which its capture keeps.
     val source = sourceName?.let { existing(folder, it, "script") }?.let { file ->
         capture.source?.takeIf { heart.cli.isGoal(file) }?.lines() ?: Files.readAllLines(file)
@@ -73,7 +74,22 @@ const val GENERATE_USAGE =
     "usage: artie generate <capture.yaml> --out <script.kts> [--script <source.kts>] [--keep-reason] [--inputs a,b]" +
         " [--report <dir>]"
 
-private val VALUED = setOf("--out", "--script", "--inputs", "--report")
+private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare")
+
+/**
+ * `--bare UPSTREAM.yaml` (spec/ideas/bare-runs.md): the run as the calls the gateway made to the service, from its
+ * upstream record, sent straight to the service: a script with no lock file, since it pins nothing.
+ */
+private fun bare(capture: Capture, upstream: String, folder: Path, script: String, out: PrintStream) {
+    val run = BareRun(capture, Files.readString(existing(folder, upstream, "upstream record")))
+    val writer = BareWriter(run, upstream)
+    Files.writeString(folder.resolve(script), writer.write())
+    val kept = run.writes.size + writer.reads
+    out.println(
+        "wrote $script: $kept calls of the run's ${run.calls.size} to the service, " +
+            "${count(run.writes.size, "write")} and ${count(writer.reads, "read")}",
+    )
+}
 private val FLAGS = setOf("--keep-reason")
 
 private fun options(args: List<String>): Map<String, String> {
