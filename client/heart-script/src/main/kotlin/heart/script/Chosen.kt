@@ -64,6 +64,10 @@ internal fun Here.replay(chosen: Chosen, sources: Map<String, Any?>, block: Here
 
 /** A reasoner's choice, kept to be made again: the link or form, and each value bound to where it came from. */
 internal class Chosen(val kind: String, val relation: String, val title: String?, val values: Map<String, Bound>) {
+    /** Whether [other] is this choice made again: the same link or form, with the same values. */
+    fun same(other: Chosen): Boolean = kind == other.kind && relation == other.relation && title == other.title &&
+        values.mapValues { it.value.kept.toString() } == other.values.mapValues { it.value.kept.toString() }
+
     companion object {
         /** The choice a reason step [taken] made, its values bound to [sources]; null when it chose nothing. */
         fun of(taken: TraceStep, sources: Map<String, Any?>): Chosen? {

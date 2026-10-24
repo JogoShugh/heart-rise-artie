@@ -828,6 +828,73 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And at move 6 the planner was told the step now includes "an act the server answered is done, even where a read just after it doesn't show it yet"
     And the planner was asked 10 times
 
+  Scenario: A check's values are the planner's own, and an act decided twice in a row is kept once
+    Found by the live seed bench run b5: the first alert already had the
+    watch's comment, and the planner checked that its comments numbered 1.
+    The alert's own comment count was 1 too, so the check was kept as "as many
+    as the alert says it has", which holds on every alert: a new alert was
+    never told. A check's values come from the run's inputs, or are kept as
+    the planner said them, never read again from the member. The planner
+    also assigned the alert four times; an act made again just as the one
+    before it is kept once.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 11 of "acme/rockets" has these comments on the small GitHub
+      | id | author | body                     |
+      | 1  | ada    | Seen by the bench watch. |
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "count.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once, and hand it to ada.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, unless it's said already.
+        - Assign it to ada.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts               |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                     |
+      | done  |                                                     |       |          |                     |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                     |
+      | check |                                                     |       |          | {"state": "open"}   |
+      | act   | read its comments                                   |       |          |                     |
+      | check |                                                     |       |          | {"count": 1}        |
+      | act   | assign it to ada                                    |       |          |                     |
+      | act   | assign it to ada                                    |       |          |                     |
+      | done  |                                                     |       |          |                     |
+      | act   | say on it that the watch has seen it                |       |          |                     |
+      | done  |                                                     |       |          |                     |
+      | check |                                                     |       |          | {"state": "closed"} |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      |                             | github:issues-list-comments | {}                                                                       |
+      | github:assign               |                             | {"assignees": ["ada"]}                                                   |
+      | github:assign               |                             | {"assignees": ["ada"]}                                                   |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+    When the goal "count.goal.md" runs with ARTIE, captured in "count.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
+    And the planner was told "assign it to ada: made again just as the act before it, kept once"
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

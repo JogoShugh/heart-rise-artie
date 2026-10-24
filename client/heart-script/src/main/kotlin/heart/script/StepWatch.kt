@@ -269,7 +269,10 @@ internal class StepWatch(
 
         /** A check kept; whether it holds on [reached], which leaves the rest undone here. */
         private fun checked(move: Move.Check, here: Here, reached: Representation): Boolean {
-            val check = Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, sources(here, why)) })
+            // Its values from the run's inputs, or as the planner said them: one read again from the member, as the
+            // member's own count that happened to equal the planner's, would hold on every member after.
+            val inputs = sources(here, why).filterKeys { it.startsWith("input:") }
+            val check = Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, inputs) })
             // A check after acts that write, made on what reads among them reached, can keep none of them from being
             // done: it is kept before the first act that writes since the last check, with those reads, so a replay
             // reads, checks, and only then writes.
@@ -296,7 +299,13 @@ internal class StepWatch(
             var inside = false
             acted(here, move, why) { chosen ->
                 if (chosen == null) return@acted
-                chain.parts += Chain.Act(chosen, move.opens)
+                // Made again just as the act before it, it is kept once: a replay makes it once.
+                val before = (chain.parts.lastOrNull() as? Chain.Act)?.takeIf { it.opens == move.opens }
+                if (before != null && before.chosen.same(chosen)) {
+                    moves += "${host.fill(move.words)}: made again just as the act before it, kept once"
+                } else {
+                    chain.parts += Chain.Act(chosen, move.opens)
+                }
                 if (move.opens) {
                     inside = true
                     further(this, held)
