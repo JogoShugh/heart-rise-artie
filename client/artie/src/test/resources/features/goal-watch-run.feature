@@ -421,6 +421,68 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 12 times
     And ARTIE's reasoner was asked 5 times
 
+  Scenario: Whenevers side by side whose lists aren't reached from where they stand each go back to the start, and listen from there
+    Found by the live run g12: the Whenevers are under the issue, which
+    leads to no list; the planner goes back to the start for each list, and
+    each listener looks from where its list is reached.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                | state | author |
+      | 11     | Veracode scan failed | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "scan" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its pull requests are listed 4 times
+    And the file "under.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label: dependabot
+      ---
+
+      Close the failed scans, and merge the pull requests labelled {label}.
+
+      - Open issue 10 of acme/rockets `as watch`
+        - Whenever an issue labelled scan changes `as scan`
+          - Close it.
+        - Whenever a pull request labelled {label} changes `as pr`
+          - Once it can be merged, merge it by squashing.
+            Or give up after 1 hour.
+            Otherwise, close it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                              | opens | relation     | facts                             | to        |
+      | act   | open issue 10 of acme/rockets                      | yes   |              |                                   |           |
+      | done  |                                                    |       |              |                                   |           |
+      | back  |                                                    |       |              |                                   | the start |
+      | act   | list the open issues of acme/rockets labelled scan | yes   |              |                                   |           |
+      | check |                                                    |       |              | {"state": "open"}                 |           |
+      | act   | close it                                           |       |              |                                   |           |
+      | done  |                                                    |       |              |                                   |           |
+      | back  |                                                    |       |              |                                   | the start |
+      | act   | list the open pull requests of acme/rockets        | yes   |              |                                   |           |
+      | check |                                                    |       |              | {"github:labels": ["dependabot"]} |           |
+      | wait  |                                                    |       | github:merge |                                   |           |
+      | act   | merge it by squashing                              |       |              |                                   |           |
+      | done  |                                                    |       |              |                                   |           |
+      | check |                                                    |       |              | {"state": "closed"}               |           |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                  |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "scan"} |
+      | github:close                | {}                                                                      |
+      | github:pulls-list           | {"owner": "acme", "repo": "rockets", "state": "open"}                   |
+      | github:merge                | {"merge_method": "squash"}                                              |
+    When the goal "under.goal.md" runs with ARTIE, captured in "under.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And issue 11 of "acme/rockets" is now "closed" on the small GitHub
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 3      |
+      | 2      |
+    And the planner was asked 14 times
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

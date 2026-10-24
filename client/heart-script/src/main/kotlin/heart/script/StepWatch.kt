@@ -53,18 +53,18 @@ internal class StepWatch(
             run.watching.active = true
             val watched = try {
                 steps.map { step ->
+                    // Each from where the watch stands, read again, as the look before may have left it.
+                    where.held = arrived(++run.step, "\"watch\"", where.navigator.recall(where.held.address))
+                    // Its first look from where its list is reached: there, or the start.
                     Watched(step, where).also { first ->
-                        if (first.scope !== where) {
-                            run.goalStop("line ${step.line}: Whenevers side by side watch from where they stand")
-                        }
-                        where.attempt(where.held.address, "A look failed") { first.look(this) }
+                        first.scope.attempt(first.scope.held.address, "A look failed") { first.look(this) }
                     }
                 }
             } finally {
                 run.watching.active = false
             }
             where.listeners(until = done) {
-                watched.forEach { listen(host.fill(it.step.match)) { it.look(this) } }
+                watched.forEach { listen(host.fill(it.step.match), from = it.scope.held.address) { it.look(this) } }
             }
         }
         val ended = until?.let { host.fill(it.condition) } ?: "its time ran out"

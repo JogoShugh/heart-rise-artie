@@ -20,13 +20,16 @@ import kotlin.time.toJavaDuration
 class Listeners internal constructor() {
     internal val named = mutableListOf<Listener>()
 
-    /** A listener, [name]d: [look] at where the watch stands, read again, every [every], on a thread of its own. */
-    fun listen(name: String, every: Duration = 15.seconds, look: Here.() -> Unit) {
-        named += Listener(name, every, look)
+    /**
+     * A listener, [name]d: [look] at where the watch stands, or at the address [from], read again, every [every], on
+     * a thread of its own.
+     */
+    fun listen(name: String, every: Duration = 15.seconds, from: String? = null, look: Here.() -> Unit) {
+        named += Listener(name, every, from, look)
     }
 }
 
-internal class Listener(val name: String, val every: Duration, val look: Here.() -> Unit)
+internal class Listener(val name: String, val every: Duration, val from: String?, val look: Here.() -> Unit)
 
 /**
  * Watch with the listeners [block] names, each on its own, until [until] holds where the watch stands, read every
@@ -75,11 +78,12 @@ private fun Here.looking(watch: Watch, every: Duration, until: Here.() -> Boolea
 
 /** One listener's loop, on its own thread, with a client of its own: [listener]'s look, a pause apart. */
 private fun Run.listening(listener: Listener, watch: Watch) {
+    val start = listener.from ?: watch.start
     val navigator = TracingNavigator(navigator(), this)
-    val here = Here(navigator, this, arrived(0, watch.start, navigator.enter(watch.start)))
+    val here = Here(navigator, this, arrived(0, start, navigator.enter(start)))
     watching.active = true
     while (watch.on(this)) {
-        here.attempt(watch.start, "${listener.name}: a look failed") { listener.look(this) }
+        here.attempt(start, "${listener.name}: a look failed") { listener.look(this) }
         if (watch.on(this)) pause(listener.every)
     }
 }
