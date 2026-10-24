@@ -898,6 +898,63 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was told "assign it to ada: made again just as the act before it, kept once"
     And at move 5 the planner was told the step now includes "whether something was said is checked on the words said, among the titles of what is listed, not on how many there are"
 
+  Scenario: A link followed in a chain is a read, though the planner says it opens: the acts after it are done on the member
+    Found by the live seed bench run b7: the planner read the first alert's
+    comments as an act that opens, and checked there. On a new alert the
+    check failed, and the planner, asked inside the comments, found no form
+    to say the words with, and stopped. A link followed is kept as a read:
+    the check after it is made on what it reached, and the acts after that
+    are done on the member.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 11 of "acme/rockets" has these comments on the small GitHub
+      | id | author | body                     |
+      | 1  | ada    | Seen by the bench watch. |
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "read.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, unless it's said already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                                |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                      |
+      | done  |                                                     |       |          |                                      |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                      |
+      | check |                                                     |       |          | {"state": "open"}                    |
+      | act   | read its comments                                   | yes   |          |                                      |
+      | check |                                                     |       |          | {"item": "Seen by the bench watch."} |
+      | act   | say on it that the watch has seen it                |       |          |                                      |
+      | done  |                                                     |       |          |                                      |
+      | check |                                                     |       |          | {"state": "closed"}                  |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      |                             | github:issues-list-comments | {}                                                                       |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+    When the goal "read.goal.md" runs with ARTIE, captured in "read.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

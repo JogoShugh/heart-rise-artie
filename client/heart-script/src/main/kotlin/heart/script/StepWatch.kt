@@ -300,14 +300,17 @@ internal class StepWatch(
             var inside = false
             acted(here, move, why) { chosen ->
                 if (chosen == null) return@acted
+                // A link followed is a read, though the planner says it opens: the check after it is made on what
+                // it reached, and the acts after that on the member, where the step's forms are.
+                val opens = move.opens && chosen.kind != LINK
                 // Made again just as the act before it, it is kept once: a replay makes it once.
-                val before = (chain.parts.lastOrNull() as? Chain.Act)?.takeIf { it.opens == move.opens }
+                val before = (chain.parts.lastOrNull() as? Chain.Act)?.takeIf { it.opens == opens }
                 if (before != null && before.chosen.same(chosen)) {
                     moves += "${host.fill(move.words)}: made again just as the act before it, kept once"
                 } else {
-                    chain.parts += Chain.Act(chosen, move.opens)
+                    chain.parts += Chain.Act(chosen, opens)
                 }
-                if (move.opens) {
+                if (opens) {
                     inside = true
                     further(this, held)
                 } else {
