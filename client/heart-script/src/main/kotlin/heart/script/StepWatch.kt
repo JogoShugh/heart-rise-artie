@@ -198,7 +198,8 @@ internal class StepWatch(
         then: Here.(Chosen?) -> Unit = {},
     ): Chosen? = synchronized(host) {
         // One decision at a time, as the planner is asked: the reasoner is the run's, whichever thread acts.
-        val words = host.fill(move.words)
+        // An act of an Otherwise is told the wait gave up, and why, in the server's words.
+        val words = host.fill(move.words) + gaveUp(why)?.let { ". ${it.replaceFirstChar(Char::uppercase)}." }.orEmpty()
         val sources = sources(here, why)
         val traced = here.run.trace.size
         var chosen: Chosen? = null
@@ -241,7 +242,8 @@ internal class StepWatch(
         /** The chain decided further at [here], each of the planner's moves kept in order, until it says done. */
         private fun further(here: Here, reached: Representation) {
             val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
-            val told = "$part: ${host.fill(words)}: one act or more, in order, then done; the acts after an act " +
+            val told = "$part: ${host.fill(words)}: ${gaveUp(why)?.let { "$it; " }.orEmpty()}" +
+                "one act or more, in order, then done; the acts after an act " +
                 "that opens are done on what it reached; a check is made on what the act before it reached, and " +
                 "where it holds, the acts after it are left undone: so a check that is to keep an act from being " +
                 "done, such as whether it was said already, comes before that act"
@@ -326,6 +328,15 @@ internal class StepWatch(
         val CHECK = setOf("check", "stop")
         val BRACE = Regex("""\{(\w+)""")
     }
+}
+
+/**
+ * What an Otherwise is told when its wait gave up, with the server's reason, [why]: so its words say that reason,
+ * not one made up from the state, and promise nothing the watch won't do. Null outside an Otherwise.
+ */
+private fun gaveUp(why: String?): String? = why?.let {
+    "the wait gave up, and the server says why: $it Say that reason in the server's words, and claim nothing the " +
+        "watch won't do"
 }
 
 /** The goal run stopped here, saying [why]. */

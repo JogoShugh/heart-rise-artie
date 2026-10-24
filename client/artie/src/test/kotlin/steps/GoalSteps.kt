@@ -61,6 +61,15 @@ class GoalSteps(
         }
     }
 
+    @Then("at move {int} the planner was told the step now includes {string}")
+    fun toldNowIncludesAt(move: Int, words: String) {
+        val current = shown[move - 1].current
+        assertTrue(words in current, current)
+    }
+
+    @Then("ARTIE's reasoner was last asked to {string}")
+    fun reasonerLastAsked(intent: String) = assertEquals(intent, checkNotNull(reasoner).intents.last())
+
     @Then("the planner was asked {int} times")
     fun plannerAsked(times: Int) = assertEquals(times, shown.size)
 

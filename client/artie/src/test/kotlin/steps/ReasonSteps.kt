@@ -29,7 +29,11 @@ class ScriptedReasoner(private vararg val answers: Selection) : Reasoner {
     val shown = mutableListOf<List<Offer>>()
     val shownLinks = mutableListOf<List<LinkOffer>>()
 
+    /** What it was asked to do, each time, in the words it was given. */
+    val intents = mutableListOf<String>()
+
     override fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection {
+        intents += intent
         shown += offers
         shownLinks += links
         return answers[minOf(shown.size, answers.size) - 1]

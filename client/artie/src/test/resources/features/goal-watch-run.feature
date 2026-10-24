@@ -230,9 +230,11 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | <new>  | <new on 2>  |
     And the planner was asked 13 times
     And ARTIE's reasoner was asked 6 times
+    And at move 9 the planner was told the step now includes "the wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do"
+    And ARTIE's reasoner was last asked to "say why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do."
 
     Examples:
-      | case                         | said on 2                                                              | new | new on 2                                                             |
+      | case                         | said on 2                                                             | new | new on 2                                                             |
       | said on neither, both told   | Looks fine.                                                            | ada | Not merged: A draft can't be merged; mark it ready for review first. |
       | said on 2 already, 1 told    | Not merged: A draft can't be merged; mark it ready for review first. |     |                                                                      |
 
