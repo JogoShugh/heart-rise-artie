@@ -33,6 +33,30 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
         }
     }
 
+    @Given("issue {long} of {string} is closed on the small GitHub once issue {long} has a new comment")
+    fun closedWithComment(issue: Long, repository: String, commented: Long) {
+        gateway.github.afterComment += { comment ->
+            if (comment.issue == commented && "${comment.owner}/${comment.repo}" == repository) {
+                gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == issue }
+                    .state = "closed"
+            }
+        }
+    }
+
+    @Given(
+        "issue {long} of {string} is closed on the small GitHub, whatever happens, once its pull requests are listed " +
+            "{int} times",
+    )
+    fun closedAfterLists(issue: Long, repository: String, times: Int) {
+        var listed = 0
+        gateway.github.beforeAnswer += { request ->
+            if (request.method.name == "GET" && request.uri.path == "/repos/$repository/pulls" && ++listed >= times) {
+                gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == issue }
+                    .state = "closed"
+            }
+        }
+    }
+
     @Then("pull request {long} of {string} is closed and not merged on the small GitHub")
     fun closedNotMerged(number: Long, repository: String) {
         val pull = gateway.github.pulls.first { "${it.owner}/${it.repo}" == repository && it.number == number }

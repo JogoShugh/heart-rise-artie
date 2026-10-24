@@ -32,7 +32,7 @@ internal class StepWatch(
     private val matches = mutableMapOf<Step.Whenever, Map<String, Any?>>()
     private val waits = mutableMapOf<Step.Intent, String>()
     private val ifs = mutableMapOf<Step.Intent, Map<String, Any?>>()
-    private val acts = mutableMapOf<Pair<Step.Intent, String>, Chosen?>()
+    private val acts = mutableMapOf<Pair<Step.Intent, String>, Chain>()
     private var ends: Map<String, Any?>? = null
 
     /**
@@ -56,7 +56,7 @@ internal class StepWatch(
                         moves += "back to the start, at ${scope.held.address}"
                     }
                     move is Move.Act -> decided = acted(scope, move, null)
-                    move is Move.Stop -> stop(move.why)
+                    move is Move.Stop -> run.goalStop(move.why)
                     else -> moves += "${StepText.kind(move)}: refused, here only ${LIST.joinToString(", ")}"
                 }
             }
@@ -64,7 +64,7 @@ internal class StepWatch(
         }
         val until = goal.steps.filterIsInstance<Step.Until>().firstOrNull()
         scope.watch(until = { until != null && over(until, this) }) {
-            replay(list, this, null) {
+            replay(list, sources(this, null)) {
                 whenever {
                     // Whether the member matches: the check the planner made at the first member, decided once.
                     val match = matches.getOrPut(step) {
@@ -88,8 +88,11 @@ internal class StepWatch(
      * Once waits, then acts; any other step acts. Whether the member's other steps are done after it.
      */
     private fun child(step: Step, here: Here): Boolean {
-        val intent = step as? Step.Intent ?: stop("line ${step.line}: only steps that act go under a Whenever yet")
-        if (intent.children.isNotEmpty()) stop("line ${step.line}: a step under a Whenever has no steps under it yet")
+        val intent = step as? Step.Intent
+            ?: run.goalStop("line ${step.line}: only steps that act go under a Whenever yet")
+        if (intent.children.isNotEmpty()) {
+            run.goalStop("line ${step.line}: a step under a Whenever has no steps under it yet")
+        }
         val condition = intent.condition
         val once = intent.once
         when {
@@ -133,45 +136,104 @@ internal class StepWatch(
     }
 
     /**
-     * The act [part] of [step] at [here]: decided now, live, the first time (the planner's act, the reasoner's
-     * choice, then the planner's done); replayed after.
+     * The act [part] of [step] at [here], a chain of acts: replayed as far as it is decided, then decided further,
+     * live, until the planner says done.
      */
     private fun perform(step: Step.Intent, part: String, here: Here, why: String?) {
-        val key = step to part
-        if (key in acts) {
-            acts[key]?.let { replay(it, here, why, NOTHING) }
-            return
-        }
-        val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
-        var chosen: Chosen? = null
-        decide(step, here, ACTS, "$part: ${host.fill(words)}") { move ->
-            when {
-                move is Move.Act && chosen == null -> null.also { chosen = acted(here, move, why) }
-                move is Move.Done -> true
-                else -> null
-            }
-        }
-        acts[key] = chosen
+        val chain = acts.getOrPut(step to part) { Chain() }
+        Walk(step, part, chain, why).from(0, here, here.held)
     }
 
+    /** Where values come from at [here], with the server's reason a wait gave up, [why]. */
+    private fun sources(here: Here, why: String?) = Bound.sources(here.held, named, run, why)
+
     /**
-     * [move], an act, made at [here] by the reasoner, and its choice kept, each value bound to its source. Refused,
-     * the planner is told, and nothing is kept: it decides again.
+     * [move], an act, made at [here] by the reasoner, and its choice kept, each value bound to its source; [then] on
+     * what it reached, with the choice. Refused, the planner is told, and nothing is kept: it decides again.
      */
-    private fun acted(here: Here, move: Move.Act, why: String?): Chosen? {
+    private fun acted(here: Here, move: Move.Act, why: String?, then: Here.(Chosen?) -> Unit = {}): Chosen? {
         val words = host.fill(move.words)
-        val sources = Bound.sources(here.held, named, run, why)
+        val sources = sources(here, why)
         val traced = run.trace.size
+        var chosen: Chosen? = null
+        var entered = false
         val refused = try {
-            here.act(intent = words, block = NOTHING)
+            here.act(intent = words) {
+                entered = true
+                chosen = run.trace.getOrNull(traced)?.let { Chosen.of(it, sources) }
+                moves += "$words: decided ${chosen?.relation}, at ${here.held.address}"
+                then(chosen)
+            }
             null
         } catch (stopped: ScriptStopped) {
-            stopped.refused ?: throw stopped
+            // A refusal of an act inside this one's block is that act's, already told; this one was made.
+            stopped.refused?.takeUnless { entered } ?: throw stopped
         }
-        val chosen = if (refused == null) run.trace.getOrNull(traced)?.let { Chosen.of(it, sources) } else null
-        moves += refused?.let { "$words: refused, ${it.kind.words}: ${it.detail}" }
-            ?: "$words: decided ${chosen?.relation}, at ${here.held.address}"
+        refused?.let { moves += "$words: refused, ${it.kind.words}: ${it.detail}" }
         return chosen
+    }
+
+    /** A chain of [step]'s [part], walked at a resource, with the server's reason a wait gave up, [why]. */
+    private inner class Walk(val step: Step.Intent, val part: String, val chain: Chain, val why: String?) {
+        /** The parts from [index] on, at [here]; [reached] is what the last act reached, where a check is made. */
+        fun from(index: Int, here: Here, reached: Representation) {
+            var last = reached
+            for (at in index until chain.parts.size) {
+                when (val part = chain.parts[at]) {
+                    is Chain.Check -> if (part.passes(sources(here, why), last)) return
+                    is Chain.Act -> if (part.opens) {
+                        here.replay(part.chosen, sources(here, why)) { from(at + 1, this, held) }
+                        return
+                    } else {
+                        here.replay(part.chosen, sources(here, why)) { last = held }
+                    }
+                }
+            }
+            if (!chain.complete) further(here, last)
+        }
+
+        /** The chain decided further at [here], each of the planner's moves kept in order, until it says done. */
+        private fun further(here: Here, reached: Representation) {
+            val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
+            val told = "$part: ${host.fill(words)}: one act or more, in order, then done; the acts after an act " +
+                "that opens are done on what it reached; a check after an act leaves the acts after it undone " +
+                "wherever it holds on what that act reached"
+            var last = reached
+            var over = false
+            while (!over) {
+                when (val move = host.ask(step, here, ACTS, told)) {
+                    is Move.Stop -> run.goalStop(move.why)
+                    is Move.Done -> over = true.also { chain.complete = true }
+                    is Move.Check -> over = checked(move, here, last)
+                    is Move.Act -> over = act(move, here) { last = it }
+                    else -> moves += "${StepText.kind(move)}: refused, here only ${ACTS.joinToString(", ")}"
+                }
+            }
+        }
+
+        /** A check kept; whether it holds on [reached], which leaves the rest undone here. */
+        private fun checked(move: Move.Check, here: Here, reached: Representation): Boolean {
+            chain.parts += Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, sources(here, why)) })
+            val holds = holds(move.facts, reached)
+            moves += "check: kept; " + if (holds) "it holds here, so the acts after it are left undone" else "it fails"
+            return holds
+        }
+
+        /** An act made and kept; one that opens is followed by the chain decided inside it, which ends the chain. */
+        private fun act(move: Move.Act, here: Here, reached: (Representation) -> Unit): Boolean {
+            var inside = false
+            acted(here, move, why) { chosen ->
+                if (chosen == null) return@acted
+                chain.parts += Chain.Act(chosen, move.opens)
+                if (move.opens) {
+                    inside = true
+                    further(this, held)
+                } else {
+                    reached(held)
+                }
+            }
+            return inside
+        }
     }
 
     /** Whether the goal's [until] holds, read at the resource it names, else at [scope]. */
@@ -195,7 +257,7 @@ internal class StepWatch(
     private fun <T : Any> decide(step: Step, here: Here, allowed: Set<String>, current: String, pick: (Move) -> T?): T {
         while (true) {
             val move = host.ask(step, here, allowed, current)
-            if (move is Move.Stop) stop(move.why)
+            if (move is Move.Stop) run.goalStop(move.why)
             val made = pick(move)
             if (made != null) return made
             val kind = StepText.kind(move)
@@ -203,28 +265,16 @@ internal class StepWatch(
         }
     }
 
-    /** [chosen], made again at [here], each value read again from where it came from; [block] where it led. */
-    private fun replay(chosen: Chosen, here: Here, why: String?, block: Here.() -> Unit) {
-        val sources = Bound.sources(here.held, named, run, why)
-        if (chosen.kind == "link") {
-            here.follow(chosen.relation, chosen.title, block = block)
-        } else {
-            here.act(chosen.relation, fields = {
-                chosen.values.forEach { (field, bound) -> field to bound.filled(sources) }
-            }, block = block)
-        }
-    }
-
-    private fun stop(why: String): Nothing = throw GoalStopped(run.step, "\"goal\"", "\"$why\"")
-
     private companion object {
         const val ACT = "act"
         const val OTHERWISE = "otherwise"
-        val ACTS = setOf("act", "done", "stop")
+        val ACTS = setOf("act", "check", "done", "stop")
         val LIST = setOf("act", "back", "stop")
         val WAIT = setOf("wait", "stop")
         val CHECK = setOf("check", "stop")
         val BRACE = Regex("""\{(\w+)""")
-        val NOTHING: Here.() -> Unit = {}
     }
 }
+
+/** The goal run stopped here, saying [why]. */
+private fun Run.goalStop(why: String): Nothing = throw GoalStopped(step, "\"goal\"", "\"$why\"")

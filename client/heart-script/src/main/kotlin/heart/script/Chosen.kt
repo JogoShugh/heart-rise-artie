@@ -11,14 +11,54 @@ import kotlinx.serialization.json.JsonPrimitive
 /**
  * Whether [held] passes every one of [facts]. A fact may name a relation [held] embeds: its value is then the names
  * of what is embedded there (each one's `name`, else its title). A list as a fact's value holds when every item is
- * among the member's values; any other value, when it equals the member's.
+ * among the member's values; any other value, when it equals the member's. A fact may name a relation [held] links
+ * to, neither a member nor embedded: it holds when, for each of its values, a link's title says it (a comment that
+ * says the reason, among the comments listed).
  */
 internal fun holds(facts: Map<String, Any?>, held: Representation): Boolean = facts.all { (member, wanted) ->
+    val titles = held.links[member]?.takeIf { member !in held.state && member !in held.embedded }
     val have: List<Any?>? = held.embedded[member]?.map { it.read["name"] ?: it.title }
         ?: (State(held.state)[member] as? JsonArray)?.map(Values::plainOf)
     when {
+        titles != null -> (wanted as? List<*> ?: listOf(wanted)).all { item ->
+            titles.any { it != null && item.toString() in it }
+        }
         wanted is List<*> -> have != null && wanted.all { item -> have.any { Values.same(it, item) } }
         else -> Values.same(State(held.state)[member], wanted)
+    }
+}
+
+/**
+ * A step's acts, decided as a chain (spec/PLAN-LISTENERS.md, slice 0): "say why, unless it is said already" is a read,
+ * a check and a write. Each [parts] in order; an act that opens leads to the parts after it; a check leaves the parts
+ * after it undone where it holds. [complete] once the planner said done; until then, the chain is decided further at
+ * the next resource that gets past its end.
+ */
+internal class Chain {
+    val parts = mutableListOf<Part>()
+    var complete = false
+
+    sealed interface Part
+
+    /** An act, made again as [chosen]; when it [opens], the parts after it are done on what it reached. */
+    class Act(val chosen: Chosen, val opens: Boolean) : Part
+
+    /** A check on what the act before it reached, each value bound to where it came from. */
+    class Check(val facts: Map<String, Bound>) : Part {
+        /** Whether it holds on [reached], each value read again from [sources]. */
+        fun passes(sources: Map<String, Any?>, reached: Representation): Boolean =
+            holds(facts.mapValues { (_, bound) -> bound.filled(sources) }, reached)
+    }
+}
+
+/** [chosen], made again here, each value read again from [sources]; [block] where it led. */
+internal fun Here.replay(chosen: Chosen, sources: Map<String, Any?>, block: Here.() -> Unit) {
+    if (chosen.kind == "link") {
+        follow(chosen.relation, chosen.title, block = block)
+    } else {
+        act(chosen.relation, fields = {
+            chosen.values.forEach { (field, bound) -> field to bound.filled(sources) }
+        }, block = block)
     }
 }
 

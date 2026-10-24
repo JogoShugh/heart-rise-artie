@@ -109,6 +109,12 @@ class GitHubUpstream {
     /** What happens just after a pull request is changed by a write: someone else, moving on what they saw. */
     val afterPullChange = mutableListOf<(Pull) -> Unit>()
 
+    /** What happens just after a comment is made: someone else, moving on what it said. */
+    val afterComment = mutableListOf<(Comment) -> Unit>()
+
+    /** What happens as each request comes in, before it is answered: someone else, on their own time. */
+    val beforeAnswer = mutableListOf<(Request) -> Unit>()
+
     /** Paths whose nth read, counted from 1, GitHub answers with a 500, once. */
     val failRead = mutableMapOf<String, Int>()
     private val reads = mutableMapOf<String, Int>()
@@ -147,6 +153,7 @@ class GitHubUpstream {
 
     val handler: HttpHandler = { request: Request ->
         requests += request
+        beforeAnswer.forEach { it(request) }
         // As GitHub answers every call: with the headers it lets a browser read, one long value.
         answer(request).header("Access-Control-Expose-Headers", EXPOSED).also { statuses += it.status.code }
     }
@@ -320,6 +327,7 @@ class GitHubUpstream {
                 val body = mapper.readTree(request.bodyString()).path("body").asText()
                 val comment = Comment(issue.owner, issue.repo, issue.number, id, caller(request) ?: "octocat", body)
                 comments += comment
+                afterComment.forEach { it(comment) }
                 json(Response(Status.CREATED), commentBody(comment))
             } ?: Response(Status.NOT_FOUND)
         },

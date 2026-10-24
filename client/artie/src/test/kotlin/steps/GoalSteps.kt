@@ -62,7 +62,9 @@ class GoalSteps(
     @Given("ARTIE's reasoner will choose, in order")
     fun reasonerChooses(table: DataTable) {
         choices = table.asMaps().map { row ->
-            Selection.Act(row.getValue("form"), Json.parseToJsonElement(row.getValue("fields")) as JsonObject)
+            // A row with a link to follow, in place of a form.
+            row["follow"]?.takeIf { it.isNotBlank() }?.let { Selection.Follow(it, null) }
+                ?: Selection.Act(row.getValue("form"), Json.parseToJsonElement(row.getValue("fields")) as JsonObject)
         }
     }
 

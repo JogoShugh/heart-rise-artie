@@ -149,6 +149,87 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | [in] Whenever a pull request labelled {label} changes (as pr)    |
       | [now] If it's labelled hold, leave it, and say so once.          |
 
+  Scenario Outline: Otherwise is decided as a chain of acts, a check in it leaving the rest undone where it holds: <case>
+    "Say why, unless it is said already" is a read, a check and a write
+    (spec/PLAN-LISTENERS.md, slice 0). Pull requests 2 and 1 are drafts, so
+    both waits give up at the second look, pull request 2 first. There the
+    planner reads its comments, checks for the server's reason among them,
+    opens its issue, and comments with the reason. Where the check holds,
+    the rest is left undone, for that pull request; a chain cut short there
+    is decided further at the next pull request that needs it. Every act is
+    kept, and the whole chain is replayed, the reason read again each time.
+    Given pull request 2 is a draft on the small GitHub
+    And "acme/rockets" has these issues on the small GitHub
+      | number | title                  | state | author |
+      | 1      | Bump left-pad to 1.0.1 | open  | ada    |
+      | 2      | Bump left-pad to 1.0.2 | open  | ada    |
+    And issue 2 of "acme/rockets" has these comments on the small GitHub
+      | id | author | body        |
+      | 1  | ada    | <said on 2> |
+    And issue 10 of "acme/rockets" is closed on the small GitHub once issue 1 has a new comment
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its pull requests are listed 30 times
+    And the file "say.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label: dependabot
+      ---
+
+      Merge the pull requests labelled {label}, or say why not.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever a pull request labelled {label} changes `as pr`
+        - Once it can be merged, merge it by squashing.
+          Or give up after 15 seconds.
+          Otherwise, say on it why it wasn't merged, unless that is said there already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                       | opens | relation     | facts                                                                |
+      | act   | open issue 10 of acme/rockets               | yes   |              |                                                                      |
+      | done  |                                             |       |              |                                                                      |
+      | act   | list the open pull requests of acme/rockets | yes   |              |                                                                      |
+      | check |                                             |       |              | {"github:labels": ["dependabot"]}                                    |
+      | wait  |                                             |       | github:merge |                                                                      |
+      | act   | merge it by squashing                       |       |              |                                                                      |
+      | done  |                                             |       |              |                                                                      |
+      | check |                                             |       |              | {"state": "closed"}                                                  |
+      | act   | read its comments                           |       |              |                                                                      |
+      | check |                                             |       |              | {"item": "A draft can't be merged; mark it ready for review first."} |
+      | act   | open its issue                              | yes   |              |                                                                      |
+      | act   | say why it wasn't merged                    |       |              |                                                                      |
+      | done  |                                             |       |              |                                                                      |
+    And ARTIE's reasoner will choose, in order
+      | form              | follow                      | fields                                                                        |
+      | github:issues-get |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                      |
+      | github:pulls-list |                             | {"owner": "acme", "repo": "rockets", "state": "open"}                         |
+      | github:merge      |                             | {"merge_method": "squash"}                                                    |
+      |                   | github:issues-list-comments | {}                                                                            |
+      |                   | github:issues-get           | {}                                                                            |
+      | github:comment    |                             | {"body": "Not merged: A draft can't be merged; mark it ready for review first."} |
+    When the goal "say.goal.md" runs with ARTIE, captured in "say.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 3      |
+    And issue 1 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                                                                   |
+      | ada    | Not merged: A draft can't be merged; mark it ready for review first. |
+    And issue 2 of "acme/rockets" now has these comments on the small GitHub
+      | author | body        |
+      | ada    | <said on 2> |
+      | <new>  | <new on 2>  |
+    And the planner was asked 13 times
+    And ARTIE's reasoner was asked 6 times
+
+    Examples:
+      | case                         | said on 2                                                              | new | new on 2                                                             |
+      | said on neither, both told   | Looks fine.                                                            | ada | Not merged: A draft can't be merged; mark it ready for review first. |
+      | said on 2 already, 1 told    | Not merged: A draft can't be merged; mark it ready for review first. |     |                                                                      |
+
   Scenario: A planner that stops while a watch decides ends the run, saying why, rather than looking again
     A failed look is tried again at the next; a decision the planner won't
     make would only be asked again, and again.

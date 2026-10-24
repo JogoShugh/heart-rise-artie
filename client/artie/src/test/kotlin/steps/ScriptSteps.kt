@@ -177,7 +177,9 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     fun comments(number: Long, repository: String, table: DataTable) {
         val (owner, repo) = repository.split("/")
         val held = gateway.github.comments.filter { it.owner == owner && it.repo == repo && it.issue == number }
-        val expected = table.asMaps().map { it.getValue("author") to it.getValue("body") }
+        // A blank row is a comment not expected, in an example where there is none.
+        val expected = table.asMaps().filter { !it["author"].isNullOrBlank() || !it["body"].isNullOrBlank() }
+            .map { it.getValue("author") to it.getValue("body") }
         assertEquals(expected, held.map { it.author to it.body })
     }
 }
