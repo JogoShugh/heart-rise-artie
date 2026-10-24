@@ -37,6 +37,18 @@ class PlannerSteps(private val ctx: ClientContext) {
         held = Representation(address, Json.parseToJsonElement(state) as JsonObject, forms, emptyMap())
     }
 
+    @Given("the held resource embeds under {string} resources named")
+    fun embeds(rel: String, table: DataTable) {
+        val embedded = table.asMaps().map { row ->
+            val name = row.getValue("name")
+            heart.script.Embedded(null, Json.parseToJsonElement("{\"name\": \"$name\"}") as JsonObject, "/labels/$name")
+        }
+        held = Representation(held.address, held.state, held.offered, held.links, mapOf(rel to embedded))
+        view = view?.let {
+            PlanView(it.goal, it.sentences, it.done, it.moves, it.path, held, it.answers, it.inputs)
+        }
+    }
+
     @Given("the goal is {string} with the input number = {int}, the first sentence done")
     fun goal(text: String, number: Int) {
         val filled = text.replace("\$number", "$number").replace("\$owner/\$repo", "acme/rockets")

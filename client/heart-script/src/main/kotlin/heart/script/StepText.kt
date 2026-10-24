@@ -96,7 +96,8 @@ internal object StepText {
         else -> "this step is a Verify:, which takes a check"
     }
 
-    private fun kind(move: Move): String = when (move) {
+    /** [move]'s kind, as the planner's moves are named: act, back, wait, check, done, finish, stop, clarify. */
+    fun kind(move: Move): String = when (move) {
         is Move.Act -> "act"
         is Move.Back -> "back"
         is Move.Wait -> "wait"

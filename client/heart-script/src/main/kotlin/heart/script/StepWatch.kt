@@ -57,7 +57,7 @@ internal class StepWatch(
                     }
                     move is Move.Act -> decided = acted(scope, move, null)
                     move is Move.Stop -> stop(move.why)
-                    else -> moves += StepText.refused(move, step)
+                    else -> moves += "${StepText.kind(move)}: refused, here only ${LIST.joinToString(", ")}"
                 }
             }
             decided
@@ -195,7 +195,8 @@ internal class StepWatch(
             if (move is Move.Stop) stop(move.why)
             val made = pick(move)
             if (made != null) return made
-            if (move !is Move.Act) moves += StepText.refused(move, step)
+            val kind = StepText.kind(move)
+            if (kind !in allowed) moves += "$kind: refused, here only ${allowed.joinToString(", ")}"
         }
     }
 

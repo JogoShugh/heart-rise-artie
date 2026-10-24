@@ -167,6 +167,35 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     Then the goal run stopped, saying "I can't tell which pull requests match"
     And the planner was asked 4 times
 
+  Scenario: A move the part being decided doesn't take is refused, and the planner told which it takes
+    While the match is decided, the planner tries an act; it is told only a
+    check or a stop is taken there, and makes the check.
+    Given the planner will move
+      | move  | words                                        | opens | relation     | facts                             |
+      | act   | open issue 10 of acme/rockets                | yes   |              |                                   |
+      | done  |                                              |       |              |                                   |
+      | act   | list the open pull requests of acme/rockets  | yes   |              |                                   |
+      | act   | see its labels                               |       |              |                                   |
+      | check |                                              |       |              | {"github:labels": ["dependabot"]} |
+      | wait  |                                              |       | github:merge |                                   |
+      | act   | merge it by squashing                        |       |              |                                   |
+      | done  |                                              |       |              |                                   |
+      | check |                                              |       |              | {"state": "closed"}               |
+      | act   | close it                                     |       |              |                                   |
+      | done  |                                              |       |              |                                   |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+      | github:merge      | {"merge_method": "squash"}                               |
+      | github:close      | {}                                                       |
+    When the goal "merge.goal.md" runs with ARTIE, captured in "merge.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And the planner was told "act: refused, here only check, stop"
+    And ARTIE's reasoner was asked 4 times
+
   Scenario: An act refused while a step is decided is told to the planner, which decides again
     The reasoner first chooses a form the entry doesn't offer, so the
     client refuses it before anything is sent; the planner is told, and its

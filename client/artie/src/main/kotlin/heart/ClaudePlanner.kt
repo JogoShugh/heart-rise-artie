@@ -100,11 +100,15 @@ class ClaudePlanner(
             titles.joinToString("\n") { title -> "$rel" + (title?.let { " \"$it\"" } ?: "") }
         }
         val state = held.state.toString().let { if (it.length > STATE_LIMIT) it.take(STATE_LIMIT) + "…" else it }
+        // What it embeds, by relation, each resource by its name, else its title: a pull request's labels.
+        val embedded = held.embedded.entries.joinToString("\n") { (rel, resources) ->
+            "$rel: " + resources.joinToString(", ") { (it.read["name"] ?: it.title).toString() }
+        }
         val answers = view.answers.joinToString("\n") { (q, a) -> "Q: $q\nA: $a" }
         return "$goal<inputs>\n$inputs\n</inputs>\n" +
             "<moves>\n${view.moves.joinToString("\n")}\n</moves>\n<path>\n${view.path.joinToString("\n")}\n</path>\n" +
-            "<held>\n${held.address}\n<state>\n$state\n</state>\n<forms>\n${forms(view)}" +
-            "\n</forms>\n<links>\n$links\n</links>\n</held>\n<answers>\n$answers\n</answers>"
+            "<held>\n${held.address}\n<state>\n$state\n</state>\n<embedded>\n$embedded\n</embedded>\n" +
+            "<forms>\n${forms(view)}\n</forms>\n<links>\n$links\n</links>\n</held>\n<answers>\n$answers\n</answers>"
     }
 
     /** Each form held offers, a line each: its name, and what it is for where its profile says. */
@@ -155,7 +159,8 @@ class ClaudePlanner(
             The user message has parts: <goal> is the task, numbered by sentence, each marked [done] or [ ];
             <inputs> are values the user gave, by name; <moves> are the moves made so far; <path> is the
             resources the run is in, the start first and the one held last; <held> is the resource held now:
-            its address, <state>, the <forms> it offers by name, and its <links>; <answers> are the user's
+            its address, <state>, <embedded>, what it embeds by relation, each resource by name (a pull
+            request's labels), the <forms> it offers by name, and its <links>; <answers> are the user's
             answers to your questions.
             Call the move tool exactly once, with one of these moves:
             - "act": words for one act at the resource held, as a person would ask it, with every value the
@@ -166,8 +171,9 @@ class ClaudePlanner(
             - "back": to a resource on the <path>, by its address, closing what was opened since.
             - "wait": until the resource held offers a form, before acting on it. Give the form's exact name,
               as in <forms> or as it will be named there, in relation (for example "github:merge").
-            - "check": facts the goal asks to make sure of, each a member of <state> and the value it must
-              have.
+            - "check": facts the goal asks to make sure of, each a member of <state>, or a relation in
+              <embedded>, whose value is the names listed there, and the value it must have; a list as the
+              value holds when every name in it is there.
             - "done": a sentence is fully done, by its number. Mark each sentence done once it is.
             - "finish": every sentence is done.
             - "stop": the goal can't be done here, saying why.

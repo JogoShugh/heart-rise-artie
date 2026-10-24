@@ -52,6 +52,24 @@ Feature: Claude plans a goal run, one move at a time
       | "state":"open"                                                    |
     And the planner's request caches its system prompt and tool
 
+  Scenario: The model is shown what the held resource embeds, by name, and that a check may name it
+    A pull request's labels are resources it embeds, not members of its
+    state: a model shown only the state can't tell what it is labelled, and
+    makes a check on something else.
+    Given the held resource embeds under "github:labels" resources named
+      | name       |
+      | dependabot |
+      | hold       |
+    And the Claude API will answer with the move {"move": "finish"}
+    When the planner is asked its next move
+    Then the planner's request says
+      | part                                   |
+      | <embedded>                             |
+      | github:labels: dependabot, hold        |
+    And the planner's system prompt says
+      | part                                                               |
+      | or a relation in <embedded>, whose value is the names listed there |
+
   Scenario: Each call's tokens are counted as the Claude API says them, the reasoner's and the planner's together
     A run's cost is its model calls and their tokens. The planner the
     reasoner makes shares its count, so one count says what the run took.
