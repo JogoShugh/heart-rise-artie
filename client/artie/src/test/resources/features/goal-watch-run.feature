@@ -537,6 +537,56 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | ada    | Seen by the watch. |
     And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act"
 
+  Scenario: Issues are matched by their labels, and an If that acts closes the one it holds for
+    spec/PLAN-SEED-BENCH.md: a tray is an issue labelled tray, and its stage
+    a label. The match is decided on the labels an issue embeds, as on a
+    pull request's. The If's check holds on tray 14, transplanted, which is
+    closed; tray 15, still sown, is left open.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                       | state | author |
+      | 11     | Tray 14: Red Sails lettuce  | open  | ada    |
+      | 12     | Tray 15: Bright Lights chard | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "tray" on the small GitHub
+    And issue 11 of "acme/rockets" is labelled "transplanted" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "tray" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "sown" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 6 times
+    And the file "trays.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Close each tray once it is transplanted.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled tray changes `as tray`
+        - If it's labelled transplanted, close it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                              | opens | relation | facts                               |
+      | act   | open issue 10 of acme/rockets                      | yes   |          |                                     |
+      | done  |                                                    |       |          |                                     |
+      | act   | list the open issues of acme/rockets labelled tray | yes   |          |                                     |
+      | check |                                                    |       |          | {"github:labels": ["tray"]}         |
+      | check |                                                    |       |          | {"github:labels": ["transplanted"]} |
+      | act   | close it                                           |       |          |                                     |
+      | done  |                                                    |       |          |                                     |
+      | check |                                                    |       |          | {"state": "closed"}                 |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                  |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "tray"} |
+      | github:close                | {}                                                                      |
+    When the goal "trays.goal.md" runs with ARTIE, captured in "trays.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" is now "closed" on the small GitHub
+    And issue 12 of "acme/rockets" is now "open" on the small GitHub
+    And the planner was asked 8 times
+    And ARTIE's reasoner was asked 3 times
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

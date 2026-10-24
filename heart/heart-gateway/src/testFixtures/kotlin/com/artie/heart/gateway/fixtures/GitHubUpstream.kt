@@ -589,7 +589,13 @@ class GitHubUpstream {
         put("url", url)
         put("repository_url", "https://api.github.com/repos/${issue.owner}/${issue.repo}")
         (path("user") as ObjectNode).put("login", issue.author)
-        putArray("labels").apply { issue.labels.forEach { addObject().put("name", it) } }
+        // Each label with its own address, as GitHub writes it, so the gateway embeds it as a pull request's are.
+        putArray("labels").apply {
+            issue.labels.forEach { name ->
+                addObject().put("name", name)
+                    .put("url", "https://api.github.com/repos/${issue.owner}/${issue.repo}/labels/$name")
+            }
+        }
         putArray("assignees").apply { issue.assignees.forEach { addObject().put("login", it) } }
         issue.milestone?.let { putObject("milestone").put("number", it) } ?: putNull("milestone")
         remove("pull_request")

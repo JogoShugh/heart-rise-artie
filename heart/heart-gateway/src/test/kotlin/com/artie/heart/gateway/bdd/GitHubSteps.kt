@@ -436,8 +436,12 @@ class GitHubSteps {
     }
 
     @Then("the issue's labels are now")
-    fun labelsNow(table: DataTable) =
-        assertEquals(table.asMaps().map { it.getValue("label") }, json.path("labels").map { it.path("name").asText() })
+    fun labelsNow(table: DataTable) {
+        // A label with its own address is embedded, as GitHub's are; one without stays in the state.
+        val embedded = json.path("_embedded").path("github:labels")
+        val labels = if (embedded.isArray) embedded else json.path("labels")
+        assertEquals(table.asMaps().map { it.getValue("label") }, labels.map { it.path("name").asText() })
+    }
 
     @Then("issue {long} of {string} offers each caller")
     fun offersEachCaller(number: Long, repository: String, table: DataTable) {
