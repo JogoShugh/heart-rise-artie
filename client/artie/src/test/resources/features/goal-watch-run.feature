@@ -1278,6 +1278,54 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     Then the run finished
     And the capture "who.trace.yaml" keeps a watch script with a line with "act(\"github:assign\", \"assignees\" to listOf(grower)) {}"
 
+  Scenario: The checks a watch decides read inputs again, so its script checks what it is given
+    Found by the script made from the live seed bench run b15: its If kept
+    the hold label as the text it was, so the script, given another label,
+    would check the old one. Every check a watch decides, its match, its
+    Ifs and its Until, binds each value to the input that holds it, as a
+    chain's checks do, the inputs the step's words name first.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "hold.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label:
+        hold:
+      ---
+
+      Answer each alert, unless someone objects.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled {label} changes `as alert`
+        - If it's labelled {hold}, leave it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                           |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                 |
+      | done  |                                                     |       |          |                                 |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                 |
+      | check |                                                     |       |          | {"github:labels": ["alert"]}    |
+      | check |                                                     |       |          | {"github:labels": ["on-hold"]}  |
+      | check |                                                     |       |          | {"state": "closed"}             |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow | fields                                                                   |
+      | github:issues-get           |        | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |        | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+    When the goal "hold.goal.md" runs with ARTIE, captured in "hold.trace.yaml", given
+      | name  | value   |
+      | label | alert   |
+      | hold  | on-hold |
+    Then the run finished
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "act(\"github:issues-list-for-repo\", \"owner\" to \"acme\", \"repo\" to \"rockets\", \"state\" to \"open\", \"labels\" to label)"
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "if (holds(mapOf(\"github:labels\" to listOf(label))))"
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "if (holds(mapOf(\"github:labels\" to listOf(hold)))) note("
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

@@ -11,13 +11,13 @@ import java.util.concurrent.ConcurrentHashMap
 internal class Decisions {
     val lists = ConcurrentHashMap<Step.Whenever, Chosen>()
     val scopes = ConcurrentHashMap<Step.Whenever, String>()
-    val matches = ConcurrentHashMap<Step.Whenever, Map<String, Any?>>()
+    val matches = ConcurrentHashMap<Step.Whenever, Chain.Check>()
     val waits = ConcurrentHashMap<Step.Intent, String>()
-    val ifs = ConcurrentHashMap<Step.Intent, Map<String, Any?>>()
+    val ifs = ConcurrentHashMap<Step.Intent, Chain.Check>()
     val acts = ConcurrentHashMap<Pair<Step.Intent, String>, Chain>()
 
     @Volatile
-    var ends: Map<String, Any?>? = null
+    var ends: Chain.Check? = null
 }
 
 /** Lines of Kotlin, written one at a time, each [INDENT] in for its depth. */
@@ -82,8 +82,8 @@ internal class WatchScript(
 
     /** The Until's check, read again where it names, else where the watch stands; none, the watch runs its time. */
     private fun until(): String {
-        val facts = decided.ends ?: return "{ false }"
-        val check = "holds(${facts(facts)})"
+        val ends = decided.ends ?: return "{ false }"
+        val check = "holds(${bound(ends.facts)})"
         return if (named == null) "{ $check }" else "{ var over = false; at($named) { over = $check }; over }"
     }
 
@@ -96,7 +96,7 @@ internal class WatchScript(
                 if (match == null) {
                     out.said(member, "${fill(step.match)}: no member matched in this run")
                 } else {
-                    out.open(member, "if (holds(${facts(match)}))") { children(step.children, it) }
+                    out.open(member, "if (holds(${bound(match.facts)}))") { children(step.children, it) }
                 }
             }
         }
@@ -115,15 +115,17 @@ internal class WatchScript(
                     left(intent, check, steps.drop(at + 1), depth)
                     return
                 }
-                else -> out.open(depth, "if (holds(${facts(check)}))") { chains.chain(intent, ACT, it) }
+                else -> out.open(depth, "if (holds(${bound(check.facts)}))") { chains.chain(intent, ACT, it) }
             }
         }
     }
 
     /** An If that leaves the member where its [check] holds, saying so; else the [rest] of the member's steps. */
-    private fun left(intent: Step.Intent, check: Map<String, Any?>, rest: List<Step>, depth: Int) {
+    private fun left(intent: Step.Intent, check: Chain.Check, rest: List<Step>, depth: Int) {
         val note = kotlinString("Left \${held.address}: ${fill(intent.words)}", slots = true)
-        out.line(depth, "if (holds(${facts(check)})) note($note) else {")
+        val leaves = "if (holds(${bound(check.facts)})) note($note)"
+        if (rest.isEmpty()) return out.line(depth, leaves)
+        out.line(depth, "$leaves else {")
         children(rest, depth + 1)
         out.line(depth, "}")
     }

@@ -115,9 +115,9 @@ internal class StepWatch(
                 // Whether the member matches: the check the planner made at the first member, decided once.
                 val match = decided.matches.getOrPut(step) {
                     val told = "whenever: ${host.fill(step.match)}: the check a member that matches passes"
-                    decide(step, this, CHECK, told) { (it as? Move.Check)?.facts }
+                    bound(decide(step, this, CHECK, told) { (it as? Move.Check)?.facts }, this, step.match)
                 }
-                if (holds(match, held)) {
+                if (match.passes(sources(this, null), held)) {
                     step.name?.let { named[it] = held }
                     // An If that leaves the member leaves its other steps undone, this look.
                     step.children.all { child(it, this) }
@@ -151,11 +151,9 @@ internal class StepWatch(
         val facts = decided.ifs.getOrPut(intent) {
             val told = "if: ${host.fill(condition)}: the check that holds exactly when that is true of the member, " +
                 "and fails on a member it isn't true of; made on this member, then on every member after"
-            decide(intent, here, CHECK, told) {
-                (it as? Move.Check)?.facts
-            }
+            bound(decide(intent, here, CHECK, told) { (it as? Move.Check)?.facts }, here, condition)
         }
-        val holds = holds(facts, here.held)
+        val holds = facts.passes(sources(here, null), here.held)
         if (holds && intent.leaves) {
             // Said once for each member it leaves.
             val first = here.run.watching.left.add(here.held.address)
@@ -368,10 +366,20 @@ internal class StepWatch(
         } ?: scope
         val told = "until: ${host.fill(until.condition)}: the check that holds once the watch is to end, not " +
             "what holds now; it is made after every look, and the watch ends when it holds"
-        val facts = decided.ends ?: decide(until, at, CHECK, told) {
-            (it as? Move.Check)?.facts
-        }.also { decided.ends = it }
-        return holds(facts, at.held)
+        val ends = decided.ends
+            ?: bound(decide(until, at, CHECK, told) { (it as? Move.Check)?.facts }, at, until.condition)
+                .also { decided.ends = it }
+        return ends.passes(sources(at, null), at.held)
+    }
+
+    /**
+     * [facts] a check was decided as, at [here], kept with each value bound to the run's input that holds it, those
+     * the step's words [meant] name first, or as the planner said it: so the script made from the run checks what
+     * it is given (spec/PLAN-LISTENERS.md, slice 8).
+     */
+    private fun bound(facts: Map<String, Any?>, here: Here, meant: String): Chain.Check {
+        val inputs = sources(here, null, meant).filterKeys { it.startsWith("input:") }
+        return Chain.Check(facts.mapValues { (_, value) -> Bound.of(value, inputs) })
     }
 
     /**

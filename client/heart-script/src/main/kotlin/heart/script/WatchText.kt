@@ -21,12 +21,6 @@ internal fun reach(chosen: Chosen): String {
     return "act($relation$fields)"
 }
 
-/** Facts the planner gave, as a map of values kept as they are. */
-internal fun facts(facts: Map<String, Any?>): String =
-    "mapOf(" + facts.entries.joinToString(", ") { (member, value) ->
-        "${kotlinString(member, slots = false)} to ${literal(value)}"
-    } + ")"
-
 /** Facts kept with each value bound to where it came from, as a map of the expressions that read them. */
 internal fun bound(facts: Map<String, Bound>): String =
     "mapOf(" + facts.entries.joinToString(", ") { (member, value) ->
