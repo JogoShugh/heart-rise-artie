@@ -92,6 +92,28 @@ itself. Each step is decided once by Claude, and replayed after that.
   gateway's issue search doesn't say that it leaves pull requests out. GitHub can't list pull requests by label, so
   the right decision is the pull request list, with the label as the match check.
 
+Each of the next live runs found something, and each was fixed with a test first:
+
+- **g4.** Claude chose the open pull requests as the list, using the new label search. It stopped at the
+  `If … hold` step, which was a plain step, and it was shown no steps inside the Whenever. **Fixed:** If became a
+  word, with a check decided once, where "leave it" leaves the pull request. The step tree now looks inside a
+  Whenever. A planner that stops while a watch decides now ends the run, where before the watch looked again
+  forever.
+- **g5.** The match and the If check held for every pull request. Claude couldn't see the labels, which are
+  embedded resources rather than members of the state. **Fixed:** the planner is shown `<embedded>`, and a check
+  may name an embedded relation.
+- **g6.** The match was right, but the planner's tool turned the list `["dependabot"]` into text. The Until was
+  decided as what held then ("open"), and Done when couldn't be checked. **Fixed:** lists stay lists, the Until is
+  told it is the check that ends the watch, and a Done when fact may be left unchecked, with a note.
+- **g7.** It merged #700, and left #696 and #689 (held) alone with a note each. It stopped at the watch's closing,
+  when Done when checked `merged: true` on the start. **Fixed:** the planner is told what a Done when fact is.
+- **g8 (`runs/goal-1023-g8.out`)** is the goal file run end to end, with exit 0:
+  - It merged #708 once its check passed, and left #696 and #689 (held) alone with a note each.
+  - It stopped at the next look after its issue was closed.
+  - It noted both Done when facts as unchecked, saying why: no resource at the start holds them.
+  - It made 19 model calls in all over 6 looks and about 30 open pull requests. They were all decisions; no event
+    called the model.
+
 ## What it showed
 
 - **The five words come down to small, plain code.** Whenever is a loop over open pull requests, most recently
