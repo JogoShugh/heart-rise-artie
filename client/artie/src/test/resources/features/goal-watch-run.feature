@@ -587,6 +587,65 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 8 times
     And ARTIE's reasoner was asked 3 times
 
+  Scenario: A list a step sent is sent again as a list, and a look that fails still keeps what the watch did
+    Found by the live seed bench run b1: an alert's chain commented, then
+    assigned the grower on duty, an input, as the list ["ada"]. Replayed on the
+    next alert, the list was sent as the text of one, and refused; that look
+    failed before the watch kept the alert as its comment left it, so each
+    look after commented again. A list is replayed as a list of what each item
+    came from, and what a member is once its steps are done is kept even when
+    they fail.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 12 times
+    And the file "alerts.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        grower: ada
+      ---
+
+      Answer each alert once, and hand it to the grower on duty.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it "Seen by the bench watch.", and assign it to {grower}.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts               |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                     |
+      | done  |                                                     |       |          |                     |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                     |
+      | check |                                                     |       |          | {"state": "open"}   |
+      | act   | say on it "Seen by the bench watch."                |       |          |                     |
+      | act   | assign it to ada                                    |       |          |                     |
+      | done  |                                                     |       |          |                     |
+      | check |                                                     |       |          | {"state": "closed"} |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                   |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              | {"body": "Seen by the bench watch."}                                     |
+      | github:assign               | {"assignees": ["ada"]}                                                   |
+    When the goal "alerts.goal.md" runs with ARTIE, captured in "alerts.trace.yaml", given
+      | name   | value |
+      | grower | ada   |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 11 of "acme/rockets" is assigned to "ada" on the small GitHub
+    And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

@@ -132,6 +132,12 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
         assertEquals(true, heldUntilMerged, "the held answer waited for pull request $pull's merge")
     }
 
+    @Then("issue {long} of {string} is assigned to {string} on the small GitHub")
+    fun assigned(number: Long, repository: String, login: String) {
+        val issue = gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == number }
+        assertEquals(listOf(login), issue.assignees)
+    }
+
     @Given("issue {long} of {string} is labelled {string} on the small GitHub")
     fun issueLabelled(number: Long, repository: String, label: String) {
         gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == number }.labels += label

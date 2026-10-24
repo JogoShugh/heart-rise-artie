@@ -81,9 +81,17 @@ internal class Chosen(val kind: String, val relation: String, val title: String?
  * A value bound to where it came from: a [whole] source, read again as it is; text with sources in it, [template],
  * each `{n}` the nth of [keys]; or, from nowhere, the value [kept] as it was.
  */
-internal class Bound(val whole: String?, val template: String?, val keys: List<String>, val kept: Any?) {
+internal class Bound(
+    val whole: String?,
+    val template: String?,
+    val keys: List<String>,
+    val kept: Any?,
+    /** A list's items, each bound on its own: the list is sent again as a list. */
+    val items: List<Bound>? = null,
+) {
     /** The value now, from [sources] as they are now. */
     fun filled(sources: Map<String, Any?>): Any? = when {
+        items != null -> items.map { it.filled(sources) }
         whole != null -> sources[whole]
         template != null -> keys.foldIndexed(template) { i, text, key -> text.replace("{$i}", sources[key].toString()) }
         else -> kept
@@ -92,6 +100,8 @@ internal class Bound(val whole: String?, val template: String?, val keys: List<S
     companion object {
         /** [value] bound to the first of [sources] it equals; else to those it contains, longest first. */
         fun of(value: Any?, sources: Map<String, Any?>): Bound {
+            // A list the reasoner chose comes as a list, or as the JSON text of one: each item bound on its own.
+            listed(value)?.let { items -> return Bound(null, null, emptyList(), value, items.map { of(it, sources) }) }
             val text = (value as? JsonPrimitive)?.content ?: value as? String ?: (value as? Number)?.toString()
             val whole = text?.let { t -> sources.entries.firstOrNull { it.value?.toString() == t }?.key }
             return when {
@@ -99,6 +109,16 @@ internal class Bound(val whole: String?, val template: String?, val keys: List<S
                 whole != null -> Bound(whole, null, emptyList(), value)
                 else -> parts(text, value, sources)
             }
+        }
+
+        /** [value]'s items when it is a list, or the JSON text of one; else null. */
+        private fun listed(value: Any?): List<Any?>? = when (value) {
+            is List<*> -> value
+            is JsonArray -> value
+            is String -> value.trim().takeIf { it.startsWith("[") }?.let { text ->
+                runCatching { kotlinx.serialization.json.Json.parseToJsonElement(text) as? JsonArray }.getOrNull()
+            }
+            else -> null
         }
 
         private fun parts(text: String, value: Any?, sources: Map<String, Any?>): Bound {
