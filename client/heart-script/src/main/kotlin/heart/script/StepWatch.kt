@@ -198,8 +198,11 @@ internal class StepWatch(
         then: Here.(Chosen?) -> Unit = {},
     ): Chosen? = synchronized(host) {
         // One decision at a time, as the planner is asked: the reasoner is the run's, whichever thread acts.
-        // An act of an Otherwise is told the wait gave up, and why, in the server's words.
-        val words = host.fill(move.words) + gaveUp(why)?.let { ". ${it.replaceFirstChar(Char::uppercase)}." }.orEmpty()
+        // An act of an Otherwise is told the wait gave up, and why, in the server's words, unless its words say why
+        // already: told twice, the reasoner says it twice.
+        val said = host.fill(move.words)
+        val told = gaveUp(why)?.takeUnless { why != null && why.trim().trimEnd('.') in said }
+        val words = said + told?.let { ". ${it.replaceFirstChar(Char::uppercase)}." }.orEmpty()
         val sources = sources(here, why)
         val traced = here.run.trace.size
         var chosen: Chosen? = null

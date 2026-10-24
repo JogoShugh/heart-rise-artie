@@ -164,6 +164,9 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     the rest is left undone, for that pull request; a chain cut short there
     is decided further at the next pull request that needs it. Every act is
     kept, and the whole chain is replayed, the reason read again each time.
+    The reasoner is told the server's reason, unless the planner's words
+    already say it: found by the live seed bench run b14, where a comment
+    said the reason twice.
     Given pull request 2 is a draft on the small GitHub
     And "acme/rockets" has these issues on the small GitHub
       | number | title                  | state | author |
@@ -204,7 +207,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | act   | read its comments                           |       |              |                                                                      |
       | check |                                             |       |              | {"item": "A draft can't be merged; mark it ready for review first."} |
       | act   | open its issue                              | yes   |              |                                                                      |
-      | act   | say why it wasn't merged                    |       |              |                                                                      |
+      | act   | <says>                                      |       |              |                                                                      |
       | done  |                                             |       |              |                                                                      |
     And ARTIE's reasoner will choose, in order
       | form              | follow                      | fields                                                                        |
@@ -231,12 +234,13 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 13 times
     And ARTIE's reasoner was asked 6 times
     And at move 9 the planner was told the step now includes "the wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do"
-    And ARTIE's reasoner was last asked to "say why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do."
+    And ARTIE's reasoner was last asked to "<asked>"
 
     Examples:
-      | case                         | said on 2                                                             | new | new on 2                                                             |
-      | said on neither, both told   | Looks fine.                                                            | ada | Not merged: A draft can't be merged; mark it ready for review first. |
-      | said on 2 already, 1 told    | Not merged: A draft can't be merged; mark it ready for review first. |     |                                                                      |
+      | case                                   | said on 2                                                             | new | new on 2                                                             | says                                                                                     | asked                                                                                                                                                                                                  |
+      | said on neither, both told             | Looks fine.                                                            | ada | Not merged: A draft can't be merged; mark it ready for review first. | say why it wasn't merged                                                                 | say why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do. |
+      | said on 2 already, 1 told              | Not merged: A draft can't be merged; mark it ready for review first. |     |                                                                      | say why it wasn't merged                                                                 | say why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do. |
+      | the planner's words hold the reason    | Looks fine.                                                            | ada | Not merged: A draft can't be merged; mark it ready for review first. | say on it: Not merged: A draft can't be merged; mark it ready for review first.         | say on it: Not merged: A draft can't be merged; mark it ready for review first.                                                                                                                       |
 
   Scenario: A planner that stops while a watch decides ends the run, saying why, rather than looking again
     A failed look is tried again at the next; a decision the planner won't
