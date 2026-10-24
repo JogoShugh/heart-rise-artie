@@ -42,6 +42,17 @@ fun Here.decide(tries: Int = 3, block: Here.() -> Unit) {
 }
 
 /**
+ * Read again the resource at [address], one the server handed over earlier (a link's target, a Location), and run
+ * [block] there; then back where it was, read again. A watch's Until reads the resource it names this way.
+ */
+fun Here.at(address: String, block: Here.() -> Unit) {
+    val step = ++run.step
+    val from = held.address
+    Here(navigator, run, arrived(step, "\"at\"", navigator.recall(address))).block()
+    held = arrived(step, "\"at\"", navigator.recall(from))
+}
+
+/**
  * Visit each member the held list links under [rel], page after page by
  * `next`, coming back to its page after each; then back where it began.
  */

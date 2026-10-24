@@ -162,6 +162,40 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       | it is marked ready, and merged | a draft on the small GitHub until it is next read |                                                                      | 1      |
       | it stays a draft, and gives up | a draft on the small GitHub                      | not merged: A draft can't be merged; mark it ready for review first. |        |
 
+  Scenario: at reads again a resource the server handed over earlier, there runs its block, and comes back
+    spec/PLAN-LISTENERS.md, slice 8: the watch's Until reads the issue the
+    watch opened, by the address the server gave it. The watch ends when the
+    issue is closed, at its third look, and notes nothing.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title          | state | author |
+      | 10     | The bench week | open  | ada    |
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its pull requests are listed 3 times
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var watched = ""
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) { watched = held.address }
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 10.seconds, until = {
+                  var closed = false
+                  at(watched) { closed = holds(mapOf("state" to "closed")) }
+                  closed
+              }) {
+                  whenever {
+                      once("github:merge") {
+                          act("github:merge", "merge_method" to "squash") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted
+      | note |
+
   Scenario: holds says whether facts hold where the script stands, as a watch's checks do, and stops nothing
     spec/PLAN-LISTENERS.md, slice 8: the script a decided watch amounts to
     checks as the watch did. A fact names a member of the state, or a
