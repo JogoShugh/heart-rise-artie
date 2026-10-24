@@ -483,6 +483,51 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | 2      |
     And the planner was asked 14 times
 
+  Scenario: What a step does to a member is the watch's own change, not one it answers again
+    Found by the live run g13: a comment changes the issue it is on, and the
+    next look took the issue as changed and commented again, look after
+    look. What the member is once the steps under the Whenever are done is
+    what the watch remembers it as; only a change someone else makes is
+    answered.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                | state | author |
+      | 11     | Veracode scan failed | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "scan" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 8 times
+    And the file "seen.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer the failed scans.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled scan changes `as scan`
+        - Say on it "Seen by the watch."
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                              | opens | relation | facts               |
+      | act   | open issue 10 of acme/rockets                      | yes   |          |                     |
+      | done  |                                                    |       |          |                     |
+      | act   | list the open issues of acme/rockets labelled scan | yes   |          |                     |
+      | check |                                                    |       |          | {"state": "open"}   |
+      | act   | say on it "Seen by the watch."                     |       |          |                     |
+      | done  |                                                    |       |          |                     |
+      | check |                                                    |       |          | {"state": "closed"} |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                  |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "scan"} |
+      | github:comment              | {"body": "Seen by the watch."}                                          |
+    When the goal "seen.goal.md" runs with ARTIE, captured in "seen.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body               |
+      | ada    | Seen by the watch. |
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

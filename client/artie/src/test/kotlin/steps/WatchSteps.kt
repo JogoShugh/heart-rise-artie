@@ -57,6 +57,20 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
         }
     }
 
+    @Given(
+        "issue {long} of {string} is closed on the small GitHub, whatever happens, once its issues are listed " +
+            "{int} times",
+    )
+    fun closedAfterIssueLists(issue: Long, repository: String, times: Int) {
+        var listed = 0
+        gateway.github.beforeAnswer += { request ->
+            if (request.method.name == "GET" && request.uri.path == "/repos/$repository/issues" && ++listed >= times) {
+                gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == issue }
+                    .state = "closed"
+            }
+        }
+    }
+
     /** Released when the pull request the held answer waits on is merged; whether it was, before the wait ran out. */
     private val merged = java.util.concurrent.CountDownLatch(1)
     private var heldUntilMerged: Boolean? = null

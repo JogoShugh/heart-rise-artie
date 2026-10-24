@@ -123,7 +123,13 @@ fun Here.whenever(rel: String = "item", block: Here.() -> Unit) {
         val address = held.address
         val now = held.state.toString()
         val changed = watching.seen.put(address, now) != now
-        if (!watching.active || changed || watching.waitsOn(address)) block()
+        if (!watching.active || changed || watching.waitsOn(address)) {
+            block()
+            // What the block did to the member is the watch's own change, not one to answer at the next look.
+            if (watching.active) {
+                watching.seen[address] = arrived(run.step, "\"watch\"", navigator.recall(address)).state.toString()
+            }
+        }
     }
 }
 

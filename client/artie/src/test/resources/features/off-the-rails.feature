@@ -22,15 +22,17 @@ Feature: Off the rails: a run that reads only what it must, checks only what the
 
   Scenario Outline: <guard>: the issue is read <reads> times
     Lenient reads the issue to act on it, again for sync(), and again when
-    the comment's block is left; off the rails, only the first.
+    the comment's block is left; off the rails, only the first. The close
+    comes first: a comment changes the issue, as GitHub counts its comments,
+    and a close sent off the rails after it would carry a stale validator.
     Given ARTIE runs with the guard "<guard>"
     When this script runs with ARTIE
       """kotlin
       heart("https://github.gateway.test/") {
           act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
               sync()
-              act("github:comment", "body" to "Thanks.") {}
               act("github:close")
+              act("github:comment", "body" to "Thanks.") {}
           }
       }
       """

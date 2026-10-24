@@ -578,6 +578,8 @@ class GitHubUpstream {
         put("title", issue.title)
         put("body", issue.body)
         put("state", issue.state)
+        // As GitHub counts them: a new comment changes the issue.
+        put("comments", comments.count { it.on(issue) })
         issue.stateReason?.let { put("state_reason", it) } ?: putNull("state_reason")
         put("locked", issue.locked)
         if (issue.locked) put("active_lock_reason", "too heated") else putNull("active_lock_reason")
