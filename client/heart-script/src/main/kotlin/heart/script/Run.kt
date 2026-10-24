@@ -105,6 +105,13 @@ class Run(
     /** What the run's model calls took, as its client counted them (Navigator.usage), for its capture. */
     var usage: Map<String, Long> = emptyMap()
 
+    /**
+     * A goal run's watch, as the script its decisions amount to, written when the capture is (spec/PLAN-LISTENERS.md,
+     * slice 8), and the step it began at: the steps from there on are its looks.
+     */
+    var watchScript: (() -> String)? = null
+    var watchFrom: Int? = null
+
     /** Each input the run read: its value, and how it was given ("given", "default" or "asked"). */
     val inputsUsed = linkedMapOf<String, Pair<String, String>>()
 
@@ -193,6 +200,9 @@ class Run(
                 if (marks.isNotEmpty()) put("marks", element(marks.mapKeys { "${it.key}" }))
                 if (planned.isNotEmpty()) put("moves", element(planned))
                 if (usage.isNotEmpty()) put("usage", element(usage))
+                watchScript?.let { script ->
+                    put("watch", element(mapOf("from" to watchFrom, "script" to script())))
+                }
             })
         }
         return Yaml.stream(listOf(run) + (trace.getValue("steps") as kotlinx.serialization.json.JsonArray))

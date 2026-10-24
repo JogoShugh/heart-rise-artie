@@ -29,12 +29,7 @@ internal class StepWatch(
 
 
     // Whenevers side by side look on threads of their own; each decides only its own steps' parts.
-    private val lists = java.util.concurrent.ConcurrentHashMap<Step.Whenever, Chosen>()
-    private val matches = java.util.concurrent.ConcurrentHashMap<Step.Whenever, Map<String, Any?>>()
-    private val waits = java.util.concurrent.ConcurrentHashMap<Step.Intent, String>()
-    private val ifs = java.util.concurrent.ConcurrentHashMap<Step.Intent, Map<String, Any?>>()
-    private val acts = java.util.concurrent.ConcurrentHashMap<Pair<Step.Intent, String>, Chain>()
-    private var ends: Map<String, Any?>? = null
+    private val decided = Decisions()
 
     /**
      * [steps], Whenevers side by side, at [where]: each one's list reached as decided, each look, until the goal's
@@ -44,6 +39,12 @@ internal class StepWatch(
      */
     fun whenever(steps: List<Step.Whenever>, where: Here) {
         val until = goal.steps.filterIsInstance<Step.Until>().firstOrNull()
+        // The watch as the script its decisions amount to, written when the capture is (spec/PLAN-LISTENERS.md,
+        // slice 8), from the step it began at; its Until reads the resource it names by a variable named for it.
+        val entry = where.held.address
+        val name = until?.let { u -> BRACE.findAll(u.condition).map { it.groupValues[1] }.firstOrNull { it in named } }
+        run.watchFrom = run.trace.size + 1
+        run.watchScript = { WatchScript(decided, entry, name?.let { "${it}At" }, host::fill).text(steps) }
         val done: Here.() -> Boolean = { until != null && over(until, this) }
         val single = steps.singleOrNull()
         if (single != null) {
@@ -78,7 +79,12 @@ internal class StepWatch(
     private inner class Watched(val step: Step.Whenever, where: Here) {
         var scope = where
             private set
-        private val list: Chosen = lists.getOrPut(step) { reach() }
+        private val list: Chosen = decided.lists.getOrPut(step) { reach() }
+
+        init {
+            // Where the list is reached from, as decided: where the step stands, or the start.
+            decided.scopes.putIfAbsent(step, scope.held.address)
+        }
 
         private fun reach(): Chosen {
             val told = "whenever: ${host.fill(step.match)}: from here, reach the list to watch, by a form or a " +
@@ -107,7 +113,7 @@ internal class StepWatch(
         fun look(here: Here) = here.replay(list, sources(here, null)) {
             whenever {
                 // Whether the member matches: the check the planner made at the first member, decided once.
-                val match = matches.getOrPut(step) {
+                val match = decided.matches.getOrPut(step) {
                     val told = "whenever: ${host.fill(step.match)}: the check a member that matches passes"
                     decide(step, this, CHECK, told) { (it as? Move.Check)?.facts }
                 }
@@ -142,7 +148,7 @@ internal class StepWatch(
 
     /** An If at the member [here]: its check, decided once; when it holds, its words, or leaving the member. */
     private fun given(intent: Step.Intent, condition: String, here: Here): Boolean {
-        val facts = ifs.getOrPut(intent) {
+        val facts = decided.ifs.getOrPut(intent) {
             val told = "if: ${host.fill(condition)}: the check that holds exactly when that is true of the member, " +
                 "and fails on a member it isn't true of; made on this member, then on every member after"
             decide(intent, here, CHECK, told) {
@@ -162,7 +168,7 @@ internal class StepWatch(
 
     /** A Once at the member [here]: the act its wait is for, decided once; then the wait, its act or otherwise. */
     private fun waited(intent: Step.Intent, once: Once, here: Here) {
-        val relation = waits.getOrPut(intent) {
+        val relation = decided.waits.getOrPut(intent) {
             decide(intent, here, WAIT, "once: ${host.fill(once.condition)}") { move ->
                 (move as? Move.Wait)?.relation?.takeIf { it.isNotBlank() }?.also { moves += "once: waits for $it" }
             }
@@ -179,7 +185,7 @@ internal class StepWatch(
      * live, until the planner says done.
      */
     private fun perform(step: Step.Intent, part: String, here: Here, why: String?) {
-        val chain = acts.getOrPut(step to part) { Chain() }
+        val chain = decided.acts.getOrPut(step to part) { Chain() }
         Walk(step, part, chain, why).from(0, here, here.held)
     }
 
@@ -353,9 +359,9 @@ internal class StepWatch(
         } ?: scope
         val told = "until: ${host.fill(until.condition)}: the check that holds once the watch is to end, not " +
             "what holds now; it is made after every look, and the watch ends when it holds"
-        val facts = ends ?: decide(until, at, CHECK, told) {
+        val facts = decided.ends ?: decide(until, at, CHECK, told) {
             (it as? Move.Check)?.facts
-        }.also { ends = it }
+        }.also { decided.ends = it }
         return holds(facts, at.held)
     }
 

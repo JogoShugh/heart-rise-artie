@@ -779,6 +779,10 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     sometimes lag. Done is refused while a step that says unless has no
     check; the check the planner then makes, after the comment, is kept
     before it. The planner is told an act the server answered is done.
+    The capture keeps the watch as the script its decisions amount to, with
+    no model in it, and the step it began at (spec/PLAN-LISTENERS.md, slice
+    8): its Until reads again the issue the watch opened, by the address the
+    run will keep as watchAt.
     Given "acme/rockets" has these issues on the small GitHub
       | number | title                          | state | author |
       | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
@@ -831,6 +835,20 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was told "done: refused, the step says unless"
     And at move 6 the planner was told the step now includes "an act the server answered is done, even where a read just after it doesn't show it yet"
     And the planner was asked 10 times
+    And the capture "unless.trace.yaml" keeps the watch as this script, from step 4
+      """
+      watch(until = { var over = false; at(watchAt) { over = holds(mapOf("state" to "closed")) }; over }) {
+          act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
+              whenever {
+                  if (holds(mapOf("state" to "open"))) {
+                      var undone1 = false
+                      follow("github:issues-list-comments") { undone1 = holds(mapOf("item" to "Seen by the bench watch.")) }
+                      if (!undone1) act("github:comment", "body" to "Seen by the bench watch.") {}
+                  }
+              }
+          }
+      }
+      """
 
   Scenario: A check's values are the planner's own, and an act asked again just after it is made is refused
     Found by the live seed bench run b5: the first alert already had the
