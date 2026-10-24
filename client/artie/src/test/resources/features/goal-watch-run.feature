@@ -708,6 +708,65 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | move                                                                                                                                                                   |
       | check: kept {"item":"Seen by the bench watch."}, at https://github.gateway.test/repos/acme/rockets/issues/11/comments; it holds here, so the acts after it are left undone |
 
+  Scenario: A check after two acts that write is kept before the first of them
+    Found by the live seed bench run b4: the planner commented, read the
+    comments, assigned, and only then checked. Kept before the assign alone,
+    the check still left the comment first, and the replay said it again.
+    The check, and the reads it is made on, are kept before the first act
+    that writes since the last check: a replay reads, checks, and does none
+    of those acts where the check holds.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And "bob" comments "Checked: the heater is back on." on issue 11 of "acme/rockets" on the small GitHub once its issues are listed 5 times
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "both.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once, and hand it to ada.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, and assign it to ada, unless it's said already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                                |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                      |
+      | done  |                                                     |       |          |                                      |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                      |
+      | check |                                                     |       |          | {"state": "open"}                    |
+      | act   | say on it that the watch has seen it                |       |          |                                      |
+      | act   | read its comments                                   |       |          |                                      |
+      | act   | assign it to ada                                    |       |          |                                      |
+      | check |                                                     |       |          | {"item": "Seen by the bench watch."} |
+      | done  |                                                     |       |          |                                      |
+      | check |                                                     |       |          | {"state": "closed"}                  |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+      |                             | github:issues-list-comments | {}                                                                       |
+      | github:assign               |                             | {"assignees": ["ada"]}                                                   |
+    When the goal "both.goal.md" runs with ARTIE, captured in "both.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                            |
+      | ada    | Seen by the bench watch.        |
+      | bob    | Checked: the heater is back on. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
+
   Scenario: A step that says unless is done only once its check is made, and an act the server answered is done
     Found by the live seed bench run b2: told "say it, unless it's said
     already", the planner commented and said done, with no check, so nothing

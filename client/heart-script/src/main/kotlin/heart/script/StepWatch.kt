@@ -270,14 +270,17 @@ internal class StepWatch(
         /** A check kept; whether it holds on [reached], which leaves the rest undone here. */
         private fun checked(move: Move.Check, here: Here, reached: Representation): Boolean {
             val check = Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, sources(here, why)) })
-            // A check after an act that writes, made on what reads after it reached, can keep nothing from being
-            // done: it is kept before that act, with those reads, so a replay reads, checks, and only then writes.
-            val write = chain.parts.indexOfLast { it is Chain.Act && it.chosen.kind != LINK }
-            val reads = chain.parts.drop(write + 1).all { it is Chain.Act && it.chosen.kind == LINK && !it.opens }
-            if (write >= 0 && reads) {
-                chain.parts += check
-                chain.parts += chain.parts.removeAt(write)
-                moves += "check: kept before the act that writes, with the reads it is made on"
+            // A check after acts that write, made on what reads among them reached, can keep none of them from being
+            // done: it is kept before the first act that writes since the last check, with those reads, so a replay
+            // reads, checks, and only then writes.
+            val since = chain.parts.indexOfLast { it is Chain.Check } + 1
+            val segment = chain.parts.subList(since, chain.parts.size).toList()
+            val (reads, writes) = segment.partition { it is Chain.Act && it.chosen.kind == LINK }
+            val plain = segment.none { it is Chain.Act && it.opens }
+            if (writes.isNotEmpty() && plain) {
+                chain.parts.subList(since, chain.parts.size).clear()
+                chain.parts += reads + check + writes
+                moves += "check: kept before the acts that write, with the reads it is made on"
             } else {
                 chain.parts += check
             }
