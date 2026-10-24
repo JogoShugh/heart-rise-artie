@@ -143,7 +143,8 @@ class Run(
             "steps" to kotlinx.serialization.json.JsonArray(withKeeps(trace.map { it.json() })),
         ),
     ).toString()
-    private val values = mutableMapOf<String, String>()
+    /** Each input's value, once read. */
+    internal val values = mutableMapOf<String, String>()
 
     /** The number of the script's last step: each act, follow, sync, check or flow is one. */
     var step = 0

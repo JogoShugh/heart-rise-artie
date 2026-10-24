@@ -96,7 +96,7 @@ fun Here.watch(
  * Read [start] again and run [block] there; a stop in it, a resource that could not be read (a server's error) or a
  * network that failed, is noted as [failed], and the watch goes on.
  */
-private fun Here.attempt(start: String, failed: String, block: Here.() -> Unit) {
+internal fun Here.attempt(start: String, failed: String, block: Here.() -> Unit) {
     val said = try {
         held = arrived(++run.step, "\"watch\"", navigator.recall(start))
         block()

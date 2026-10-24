@@ -37,8 +37,19 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         runs(script, ArtieNavigator(ctx.client, reasoner, exchangeLog = ctx.exchangeLog, guard = guard()))
 
     @When("this script runs with ARTIE")
-    fun runs(script: String) =
-        runs(script, ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog, guard = guard(), guarding = ctx.guard))
+    fun runs(script: String) {
+        // Each listener of a watch with listeners asks the run for a client of its own.
+        val made = { ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog, guard = guard(), guarding = ctx.guard) }
+        navigators = { heart.WiredNavigator(made(), ctx.bare) }
+        try {
+            runs(script, made())
+        } finally {
+            navigators = null
+        }
+    }
+
+    /** Where the run gets each client after its first, when a script asks for more than one; else the one. */
+    private var navigators: (() -> Navigator)? = null
 
     /** The scenario's lock file and how it is held to (script-guard.feature); null when the run is not guarded. */
     private fun guard(): heart.ScriptGuard? = ctx.pins?.let { pins ->
@@ -80,13 +91,17 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     var now: java.time.Instant = java.time.Instant.parse("2026-10-23T12:00:00Z")
 
     /** A run with [navigator], given [inputs]; when [clocked], its pauses are instant and move its clock. */
-    private fun fresh(inputs: Map<String, String>, navigator: Navigator): Run =
-        if (clocked) {
-            Run(inputs, navigator = { navigator }, pause = { now = now.plusMillis(it.inWholeMilliseconds) })
+    private fun fresh(inputs: Map<String, String>, navigator: Navigator): Run {
+        var first = true
+        val more = navigators
+        val navigators = { if (first || more == null) navigator.also { first = false } else more() }
+        return if (clocked) {
+            Run(inputs, navigator = navigators, pause = { now = now.plusMillis(it.inWholeMilliseconds) })
                 .also { it.clock = { now } }
         } else {
-            Run(inputs, navigator = { navigator })
+            Run(inputs, navigator = navigators)
         }.also { it.remember = remember }
+    }
 
     /** Where the scenario's runs remember what their watches did; null when they don't. */
     private var remember: java.nio.file.Path? = null
