@@ -277,6 +277,13 @@ class GitHubSteps {
     fun offers(table: DataTable) =
         assertEquals(table.column("act"), json.path("_forms").fieldNames().asSequence().toSet(), "$json")
 
+    @Then("the profile's {string} says {string}")
+    fun profileSays(id: String, words: String) {
+        val doc = json.path("alps").path("descriptor").first { it.path("id").asText() == id }.path("doc")
+        val text = doc.path("value").asText(doc.asText())
+        assertTrue(words in text, "\"$id\": $text")
+    }
+
     @Then("the profile describes these relations, among others")
     fun profile(table: DataTable) {
         val descriptors = json.path("alps").path("descriptor").map { it.path("id").asText() }.toSet()

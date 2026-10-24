@@ -34,6 +34,13 @@ Feature: GitHub issues through the gateway: reading them, and closing, reopening
       | /repos/acme/rockets/issues/11  | Rewrite it in Rust    |
       | /repos/acme/rockets/issues/12  | Crash on start        |
 
+  Scenario: The profile says the issue search leaves pull requests out, and where they are listed
+    A client told only GitHub's words, "List issues in a repository", asks
+    the issue search for pull requests by label, and finds none: the
+    connector's own words say what the gateway leaves out.
+    When "ada" gets "/profiles/github" through the GitHub gateway
+    Then the profile's "issues-list-for-repo" says "Pull requests are left out: list them with github:pulls-list, which filters by labels too."
+
   Scenario: The bookmark offers the issue search with GitHub's own filters
     When "ada" gets "/" through the GitHub gateway
     Then the index form "github:issues-list-for-repo" targets "/repos/{owner}/{repo}/issues{?state,labels,assignee,creator,mentioned,milestone,sort,direction,since}"

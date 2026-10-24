@@ -11,6 +11,8 @@ title: /title
 # GitHub lists pull requests as issues too; those are the pull request resource's.
 skip:
   /pull_request: { present: true }
+# What the profile says of this search beside GitHub's words, which count pull requests among issues.
+search-note: "Pull requests are left out: list them with github:pulls-list, which filters by labels too."
 # Lists under an issue, each linked from it: its sub-issues, which are issues, so served here,
 # and its comments, which the comment resource searches by.
 lists: [issues/list-sub-issues]

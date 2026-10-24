@@ -51,6 +51,11 @@ class ResourceDeclaration(
     val volatile: List<JsonPointer> = emptyList(),
     /** Filters the search's own operation lacks, each served by another list operation: GitHub's pulls by label. */
     val searchedBy: List<SearchedBy> = emptyList(),
+    /**
+     * The connector's own words on its search, after the upstream's: what the gateway's search does that the
+     * upstream's description doesn't say. GitHub's issue list has pull requests in it; the gateway's leaves them out.
+     */
+    val searchNote: String? = null,
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
@@ -97,6 +102,7 @@ class ResourceDeclaration(
                     variable to pointer(label, at.asText()).toString()
                 },
                 volatile = node.path("volatile").map { pointer(label, it.asText()) },
+                searchNote = node.path("search-note").asText(null),
                 searchedBy = node.path("searched-by").properties().map { (filter, by) ->
                     fun needs(key: String) =
                         checkNotNull(by.path(key).asText(null)) { "$label: searched-by $filter has no $key" }

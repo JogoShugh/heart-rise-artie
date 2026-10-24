@@ -158,8 +158,10 @@ class Gateway(
             if (connector?.include != null) {
                 val acts = connector.resources.flatMap { it.acts }
                 val modelled = spec.routes.values.filter { it.operation.name !in connector.passthrough }
+                val notes = connector.resources.mapNotNull { r -> r.search?.let { s -> r.searchNote?.let { s to it } } }
+                    .toMap()
                 modelled.filter { route -> acts.none { it.operation == route.operation.name } }.map { route ->
-                    relation(route.operation, alpsType(route.method))
+                    relation(route.operation, alpsType(route.method), notes[route.operation.name])
                 } + acts.distinctBy { it.name }.map { act -> // close, reopen, edit: one relation, any resource
                     // An operation the description lacks is refused later, naming the connector's file.
                     val type = alpsType(spec.routes[act.operation]?.method ?: Act.POST)
@@ -172,8 +174,11 @@ class Gateway(
                 }.distinctBy { it.id }
             }
 
-        fun relation(operation: SpecOperation, type: AlpsType) =
-            Relation(id = operation.relation, type, operation.title, operation.doc, operation.doc)
+        fun relation(operation: SpecOperation, type: AlpsType, note: String? = null): Relation {
+            // The connector's own words on a search, after the upstream's.
+            val doc = note?.let { "${operation.doc} $it" } ?: operation.doc
+            return Relation(id = operation.relation, type, operation.title, doc, doc)
+        }
 
         /** What a request by [method] is (RFC 9110 §9.2): a GET safe, a PUT or a DELETE idempotent, else unsafe. */
         fun alpsType(method: String): AlpsType = when (method) {
