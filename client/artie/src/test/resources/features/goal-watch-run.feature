@@ -828,15 +828,16 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And at move 6 the planner was told the step now includes "an act the server answered is done, even where a read just after it doesn't show it yet"
     And the planner was asked 10 times
 
-  Scenario: A check's values are the planner's own, and an act decided twice in a row is kept once
+  Scenario: A check's values are the planner's own, and an act asked again just after it is made is refused
     Found by the live seed bench run b5: the first alert already had the
     watch's comment, and the planner checked that its comments numbered 1.
     The alert's own comment count was 1 too, so the check was kept as "as many
     as the alert says it has", which holds on every alert: a new alert was
     never told. A check's values come from the run's inputs, or are kept as
     the planner said them, never read again from the member. The planner
-    also assigned the alert four times; an act made again just as the one
-    before it is kept once. A count is a poor check of what was said, as
+    also assigned the alert four times, and in run b13 three times; an act
+    asked again in the words of the one just made is refused, not made
+    again. A count is a poor check of what was said, as
     an alert with other comments shows: the planner is told to check the
     words said.
     Given "acme/rockets" has these issues on the small GitHub
@@ -883,7 +884,6 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
       |                             | github:issues-list-comments | {}                                                                       |
       | github:assign               |                             | {"assignees": ["ada"]}                                                   |
-      | github:assign               |                             | {"assignees": ["ada"]}                                                   |
       | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
     When the goal "count.goal.md" runs with ARTIE, captured in "count.trace.yaml", given
       | name | value |
@@ -894,8 +894,9 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 12 of "acme/rockets" now has these comments on the small GitHub
       | author | body                     |
       | ada    | Seen by the bench watch. |
+    And issue 11 of "acme/rockets" is assigned to "ada" on the small GitHub
     And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
-    And the planner was told "assign it to ada: made again just as the act before it, kept once"
+    And the planner was told "assign it to ada: refused, it was just made, and the server answered it"
     And at move 5 the planner was told the step now includes "whether something was said is checked on the words said, among the titles of what is listed, not on how many there are; a fact names a member of the state, or a relation it links to, its value words a link's title says"
 
   Scenario: A link followed in a chain is a read, though the planner says it opens: the acts after it are done on the member

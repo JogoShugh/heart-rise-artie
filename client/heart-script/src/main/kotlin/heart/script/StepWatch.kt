@@ -225,6 +225,9 @@ internal class StepWatch(
         /** What the last link followed, a read, reached, as this chain is decided. */
         private var read: Representation? = null
 
+        /** The words of the act made last, as this chain is decided, until a check is made after it. */
+        private var made: String? = null
+
         /** The parts from [index] on, at [here]; [reached] is what the last act reached, where a check is made. */
         fun from(index: Int, here: Here, reached: Representation) {
             var last = reached
@@ -267,6 +270,7 @@ internal class StepWatch(
 
         /** A check kept; whether it holds on [reached], which leaves the rest undone here. */
         private fun checked(move: Move.Check, here: Here, reached: Representation): Boolean {
+            made = null
             // Its values from the run's inputs, or as the planner said them: one read again from the member, as the
             // member's own count that happened to equal the planner's, would hold on every member after.
             val inputs = sources(here, why).filterKeys { it.startsWith("input:") }
@@ -301,6 +305,14 @@ internal class StepWatch(
 
         /** An act made and kept; one that opens is followed by the chain decided inside it, which ends the chain. */
         private fun act(move: Move.Act, here: Here, reached: (Representation) -> Unit): Boolean {
+            // Asked again in the words of the act just made, it is not made again: the server answered it.
+            val said = host.fill(move.words)
+            if (said == made) {
+                moves += "$said: refused, it was just made, and the server answered it: what it did is done, though " +
+                    "a read may not show it yet; make the next act, or say done"
+                return false
+            }
+            made = said
             var inside = false
             acted(here, move, why) { chosen ->
                 if (chosen == null) return@acted
