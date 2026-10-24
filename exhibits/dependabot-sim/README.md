@@ -77,6 +77,21 @@ is the same goal written with them, with no loop, maps or clock of its own.
   finished in 165 steps.
 - **A look reads every open pull request, about 30 here, one at a time,** so it takes 30 to 40 seconds.
 
+## The goal file itself, run by ARTIE (`runs/goal-1023-g1.out` to `g3.out`)
+
+Since slice 4a of spec/PLAN-WATCH-GOALS.md, `artie run dependabot-sim.goal.md --reasoner claude` runs the goal
+itself. Each step is decided once by Claude, and replayed after that.
+
+- **g1** stopped while deciding the Whenever's list. The planner sent an act with no words, and the refusal stopped
+  the run. Fixed: a refusal while deciding is told to the planner, which decides again.
+- **g2** stopped because the repository links no list of pull requests (the list is a search form at the start),
+  and going back was refused. Fixed: while the list is decided, the planner may go back to the start, and the watch
+  stands there.
+- **g3** watched, but the list was the wrong one. The reasoner chose the issue search with `labels=dependabot`,
+  which the gateway serves with pull requests left out, so every look found nothing. It was stopped by hand. The
+  gateway's issue search doesn't say that it leaves pull requests out. GitHub can't list pull requests by label, so
+  the right decision is the pull request list, with the label as the match check.
+
 ## What it showed
 
 - **The five words come down to small, plain code.** Whenever is a loop over open pull requests, most recently
