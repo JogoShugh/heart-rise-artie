@@ -262,7 +262,18 @@ internal class StepWatch(
 
         /** A check kept; whether it holds on [reached], which leaves the rest undone here. */
         private fun checked(move: Move.Check, here: Here, reached: Representation): Boolean {
-            chain.parts += Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, sources(here, why)) })
+            val check = Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, sources(here, why)) })
+            // A check after an act that writes, made on what reads after it reached, can keep nothing from being
+            // done: it is kept before that act, with those reads, so a replay reads, checks, and only then writes.
+            val write = chain.parts.indexOfLast { it is Chain.Act && it.chosen.kind != LINK }
+            val reads = chain.parts.drop(write + 1).all { it is Chain.Act && it.chosen.kind == LINK && !it.opens }
+            if (write >= 0 && reads) {
+                chain.parts += check
+                chain.parts += chain.parts.removeAt(write)
+                moves += "check: kept before the act that writes, with the reads it is made on"
+            } else {
+                chain.parts += check
+            }
             val holds = holds(move.facts, reached)
             moves += "check: kept; " + if (holds) "it holds here, so the acts after it are left undone" else "it fails"
             return holds
@@ -321,6 +332,9 @@ internal class StepWatch(
 
     private companion object {
         const val ACT = "act"
+
+        /** A choice that follows a link: a read, never a write. */
+        const val LINK = "link"
         const val OTHERWISE = "otherwise"
         val ACTS = setOf("act", "check", "done", "stop")
         val LIST = setOf("act", "back", "stop")

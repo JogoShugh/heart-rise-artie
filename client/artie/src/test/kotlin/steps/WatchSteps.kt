@@ -132,6 +132,23 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
         assertEquals(true, heldUntilMerged, "the held answer waited for pull request $pull's merge")
     }
 
+    @Given(
+        "{string} comments {string} on issue {long} of {string} on the small GitHub once its issues are listed " +
+            "{int} times",
+    )
+    fun commentsLater(author: String, body: String, issue: Long, repository: String, times: Int) {
+        val (owner, repo) = repository.split("/")
+        var listed = 0
+        gateway.github.beforeAnswer += { request ->
+            val listing = request.method.name == "GET" && request.uri.path == "/repos/$repository/issues"
+            if (listing && ++listed == times) {
+                val id = (gateway.github.comments.maxOfOrNull { it.id } ?: 0) + 1
+                gateway.github.comments +=
+                    com.artie.heart.gateway.fixtures.Comment(owner, repo, issue, id, author, body)
+            }
+        }
+    }
+
     @Then("issue {long} of {string} is assigned to {string} on the small GitHub")
     fun assigned(number: Long, repository: String, login: String) {
         val issue = gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == number }

@@ -646,6 +646,64 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 11 of "acme/rockets" is assigned to "ada" on the small GitHub
     And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
 
+  Scenario: A check the planner makes after an act that writes is kept before it, so a replay says nothing twice
+    Found by the live runs g13, g14 and b1: told "say it, unless it's said
+    already", the planner commented first, then read the comments and
+    checked them. A check after an act that writes can keep nothing from
+    being done, so the runner keeps the check, with the reads it is made on,
+    before that act: the replay reads, checks, and writes only where the
+    check fails. A person's comment on the first alert, after the watch's,
+    changes it; the replay finds the watch's words there, and says nothing.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And "bob" comments "Checked: the heater is back on." on issue 11 of "acme/rockets" on the small GitHub once its issues are listed 5 times
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "said.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, unless it's said already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                                |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                      |
+      | done  |                                                     |       |          |                                      |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                      |
+      | check |                                                     |       |          | {"state": "open"}                    |
+      | act   | say on it that the watch has seen it                |       |          |                                      |
+      | act   | read its comments                                   |       |          |                                      |
+      | check |                                                     |       |          | {"item": "Seen by the bench watch."} |
+      | done  |                                                     |       |          |                                      |
+      | check |                                                     |       |          | {"state": "closed"}                  |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+      |                             | github:issues-list-comments | {}                                                                       |
+    When the goal "said.goal.md" runs with ARTIE, captured in "said.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                            |
+      | ada    | Seen by the bench watch.        |
+      | bob    | Checked: the heater is back on. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And the planner was asked 9 times
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.
