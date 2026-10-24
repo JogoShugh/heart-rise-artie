@@ -1162,7 +1162,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
     When the goal "named.goal.md" runs with ARTIE, captured in "named.trace.yaml", given
       | name | value |
-    Then the planner was told "check: refused, github:comments is neither a member of https://github.gateway.test/repos/acme/rockets/issues/11/comments nor a relation it embeds or links to: it holds {\"count\":1}, and links item: Seen by the bench watch."
+    Then the planner was told "check: refused, github:comments is neither a member of https://github.gateway.test/repos/acme/rockets/issues/11/comments nor a relation it embeds or links to: it holds {\"count\":1}, and links item: Seen by the bench watch.; a fact names one of those, as {\"item\": \"Seen by the bench watch.\"} does"
     And issue 11 of "acme/rockets" now has these comments on the small GitHub
       | author | body                     |
       | ada    | Seen by the bench watch. |

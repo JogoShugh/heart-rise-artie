@@ -1,5 +1,6 @@
 package heart.script
 
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.time.Duration.Companion.minutes
 
 /**
@@ -467,12 +468,25 @@ private fun refusal(facts: Map<String, Any?>, on: Representation, failsAfter: Bo
     }
     return when {
         unheld.isNotEmpty() -> "check: refused, ${unheld.joinToString(", ")} is neither a member of ${on.address} " +
-            "nor a relation it embeds or links to: it holds ${readable(on)}"
+            "nor a relation it embeds or links to: it holds ${readable(on)}" +
+            example(on)?.let { "; a fact names one of those, as $it does" }.orEmpty()
         failsAfter -> "check: refused, it fails here, right after the acts it is to keep from being done again, so " +
             "a replay would do them again: it is made on ${on.address}, which holds ${readable(on)}; a fact names a " +
             "member of that state, or a relation it links to, its value words a link's title says"
         else -> null
     }
+}
+
+/**
+ * A fact that holds on [held], made from what it holds, to show the planner the form a fact takes: its first
+ * relation linked to with a title, that title its value; else its first member, with its value. Null for nothing.
+ */
+private fun example(held: Representation): String? {
+    val linked = held.links.entries
+        .firstOrNull { (relation, titles) -> relation != "self" && titles.any { it != null } }
+    val fact = linked?.let { (relation, titles) -> relation to JsonPrimitive(titles.first { it != null }) }
+        ?: held.state.entries.firstOrNull { it.value is JsonPrimitive }?.toPair()
+    return fact?.let { (name, value) -> "{${JsonPrimitive(name)}: $value}" }
 }
 
 /** What a read reached, in words for the planner: its state, then each relation's link titles, but its own. */
