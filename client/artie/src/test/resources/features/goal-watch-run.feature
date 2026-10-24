@@ -123,6 +123,42 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 11 times
     And ARTIE's reasoner was asked 5 times
 
+  Scenario: A Whenever whose list isn't reached from where it stands goes back to the start, and watches from there
+    The Whenever is under the issue, which leads to no list of pull
+    requests; the planner goes back to the start, where the list's form is.
+    Given line 10 of "merge.goal.md" reads '  - Whenever a pull request labelled {label} changes `as pr`', indented 0
+    And line 11 of "merge.goal.md" reads '    - Once it can be merged, merge it by squashing.', indented 0
+    And line 12 of "merge.goal.md" reads '      Or give up after 15 seconds.', indented 0
+    And line 13 of "merge.goal.md" reads '      Otherwise, close it.', indented 0
+    And the planner will move
+      | move  | words                                        | opens | relation     | facts                             | to        |
+      | act   | open issue 10 of acme/rockets                | yes   |              |                                   |           |
+      | done  |                                              |       |              |                                   |           |
+      | back  |                                              |       |              |                                   | the start |
+      | act   | list the open pull requests of acme/rockets  | yes   |              |                                   |           |
+      | check |                                              |       |              | {"github:labels": ["dependabot"]} |           |
+      | wait  |                                              |       | github:merge |                                   |           |
+      | act   | merge it by squashing                        |       |              |                                   |           |
+      | done  |                                              |       |              |                                   |           |
+      | check |                                              |       |              | {"state": "closed"}               |           |
+      | act   | close it                                     |       |              |                                   |           |
+      | done  |                                              |       |              |                                   |           |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+      | github:merge      | {"merge_method": "squash"}                               |
+      | github:close      | {}                                                       |
+    When the goal "merge.goal.md" runs with ARTIE, captured in "merge.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 3      |
+      | 2      |
+    And the planner was asked 11 times
+
   Scenario Outline: A goal in sections tells the planner its manners, and ends with the checks Done when names: <case>
     Given the file "close.goal.md" is
       """

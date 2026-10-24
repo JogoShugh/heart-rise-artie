@@ -13,23 +13,52 @@ internal class StepWatch(
     private val run: Run,
     private val named: MutableMap<String, Representation>,
     private val moves: MutableList<String>,
-    private val fill: (String) -> String,
-    private val ask: (Step, Here, Set<String>, String) -> Move,
+    private val host: Host,
 ) {
+    /** What the goal run gives a watch: the planner, where the run began, and words with names put in. */
+    interface Host {
+        /** The planner's move for [step] at [here]: the moves it may make, [allowed], and the step as told. */
+        fun ask(step: Step, here: Here, allowed: Set<String>, current: String): Move
+
+        /** Where the run began, read again. */
+        fun start(): Here
+
+        /** [text] with the inputs and names put in. */
+        fun fill(text: String): String
+    }
+
+
     private val lists = mutableMapOf<Step.Whenever, Chosen>()
     private val matches = mutableMapOf<Step.Whenever, Map<String, Any?>>()
     private val waits = mutableMapOf<Step.Intent, String>()
     private val acts = mutableMapOf<Pair<Step.Intent, String>, Chosen?>()
     private var ends: Map<String, Any?>? = null
 
-    /** [step], at [scope]: its list reached as decided, each look, until the goal's Until holds. */
-    fun whenever(step: Step.Whenever, scope: Here) {
+    /**
+     * [step], at [where]: its list reached as decided, each look, until the goal's Until holds. When the list isn't
+     * reached from where the step stands, the planner may go back to the start, and the watch stands there.
+     */
+    fun whenever(step: Step.Whenever, where: Here) {
+        var scope = where
+        val told = "whenever: ${host.fill(step.match)}: from here, reach the list to watch, by a form or a link, " +
+            "or go back to the start if it isn't reached from here; it is read again at every look"
+        var back = false
         val list = lists.getOrPut(step) {
-            val told = "whenever: ${fill(step.match)}: from here, reach the list to watch, by a form or a link; " +
-                "it is read again at every look"
-            decide(step, scope, LIST, told) { move ->
-                (move as? Move.Act)?.let { acted(scope, it, null) }
+            var decided: Chosen? = null
+            while (decided == null) {
+                val move = host.ask(step, scope, LIST, told)
+                when {
+                    move is Move.Back && !back -> {
+                        scope = host.start()
+                        back = true
+                        moves += "back to the start, at ${scope.held.address}"
+                    }
+                    move is Move.Act -> decided = acted(scope, move, null)
+                    move is Move.Stop -> stop(move.why)
+                    else -> moves += StepText.refused(move, step)
+                }
             }
+            decided
         }
         val until = goal.steps.filterIsInstance<Step.Until>().firstOrNull()
         scope.watch(until = { until != null && over(until, this) }) {
@@ -42,8 +71,8 @@ internal class StepWatch(
                 }
             }
         }
-        val ended = until?.let { fill(it.condition) } ?: "its time ran out"
-        moves += "watched: ${fill(StepText.said(step))}, until $ended"
+        val ended = until?.let { host.fill(it.condition) } ?: "its time ran out"
+        moves += "watched: ${host.fill(StepText.said(step))}, until $ended"
     }
 
     /** One step under a Whenever, at the member [here]: a Once waits, then acts; any other step acts. */
@@ -52,7 +81,7 @@ internal class StepWatch(
         if (intent.children.isNotEmpty()) stop("line ${step.line}: a step under a Whenever has no steps under it yet")
         val once = intent.once ?: return perform(intent, ACT, here, null)
         val relation = waits.getOrPut(intent) {
-            decide(intent, here, WAIT, "once: ${fill(once.condition)}") { move ->
+            decide(intent, here, WAIT, "once: ${host.fill(once.condition)}") { move ->
                 (move as? Move.Wait)?.relation?.takeIf { it.isNotBlank() }?.also { moves += "once: waits for $it" }
             }
         }
@@ -75,7 +104,7 @@ internal class StepWatch(
         }
         val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
         var chosen: Chosen? = null
-        decide(step, here, ACTS, "$part: ${fill(words)}") { move ->
+        decide(step, here, ACTS, "$part: ${host.fill(words)}") { move ->
             when {
                 move is Move.Act && chosen == null -> null.also { chosen = acted(here, move, why) }
                 move is Move.Done -> true
@@ -90,7 +119,7 @@ internal class StepWatch(
      * the planner is told, and nothing is kept: it decides again.
      */
     private fun acted(here: Here, move: Move.Act, why: String?): Chosen? {
-        val words = fill(move.words)
+        val words = host.fill(move.words)
         val sources = Bound.sources(here.held, named, run, why)
         val traced = run.trace.size
         val refused = try {
@@ -108,7 +137,7 @@ internal class StepWatch(
     /** Whether the member [here] matches [step]: the check the planner made at the first member, decided once. */
     private fun matches(step: Step.Whenever, here: Here): Boolean {
         val facts = matches.getOrPut(step) {
-            decide(step, here, CHECK, "whenever: ${fill(step.match)}: the check a member that matches passes") {
+            decide(step, here, CHECK, "whenever: ${host.fill(step.match)}: the check a member that matches passes") {
                 (it as? Move.Check)?.facts
             }
         }
@@ -121,7 +150,7 @@ internal class StepWatch(
         val at = name?.let { named.getValue(it).address }?.let {
             Here(scope.navigator, run, arrived(++run.step, "\"until\"", scope.navigator.recall(it)))
         } ?: scope
-        val facts = ends ?: decide(until, at, CHECK, "until: ${fill(until.condition)}") {
+        val facts = ends ?: decide(until, at, CHECK, "until: ${host.fill(until.condition)}") {
             (it as? Move.Check)?.facts
         }.also { ends = it }
         return holds(facts, at.held)
@@ -133,7 +162,7 @@ internal class StepWatch(
      */
     private fun <T : Any> decide(step: Step, here: Here, allowed: Set<String>, current: String, pick: (Move) -> T?): T {
         while (true) {
-            val move = ask(step, here, allowed, current)
+            val move = host.ask(step, here, allowed, current)
             if (move is Move.Stop) stop(move.why)
             val made = pick(move)
             if (made != null) return made
@@ -159,7 +188,7 @@ internal class StepWatch(
         const val ACT = "act"
         const val OTHERWISE = "otherwise"
         val ACTS = setOf("act", "done", "stop")
-        val LIST = setOf("act", "stop")
+        val LIST = setOf("act", "back", "stop")
         val WAIT = setOf("wait", "stop")
         val CHECK = setOf("check", "stop")
         val BRACE = Regex("""\{(\w+)""")

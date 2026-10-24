@@ -19,13 +19,24 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     private var count = 0
     private var stepCount = 0
 
+    /** Where the run began: a Whenever's list may be reached from there. */
+    private var start: Here? = null
+
     /** A Whenever and what is under it, decided once and replayed (spec/PLAN-WATCH-GOALS.md). */
     private val watch by lazy {
-        StepWatch(goal, run, named, moves, ::fill) { step, here, allowed, current ->
-            if (now !== step) stepCount = 0
-            now = step
-            next(here, allowed, current)
-        }
+        StepWatch(goal, run, named, moves, object : StepWatch.Host {
+            override fun ask(step: Step, here: Here, allowed: Set<String>, current: String): Move {
+                if (now !== step) stepCount = 0
+                now = step
+                return next(here, allowed, current)
+            }
+
+            override fun start(): Here = checkNotNull(start).let { begun ->
+                Here(begun.navigator, run, arrived(++run.step, "\"back\"", begun.navigator.recall(begun.held.address)))
+            }
+
+            override fun fill(text: String) = this@StepRun.fill(text)
+        })
     }
 
     fun start() {
@@ -37,6 +48,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
             // The person's words: a value the run sent that they hold is theirs.
             run.goal = (listOf(goal.context) + StepText.all(goal.steps)).joinToString("\n")
             path += held.address
+            start = this
             goal.steps.forEach { step(it, this, null) }
             // Done when: each fact checked at the resource it names, else at the start.
             goal.done.forEach { fact ->
