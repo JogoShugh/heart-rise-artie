@@ -93,7 +93,7 @@ class GitHubThroughGateway {
             "repo" to "/hr:address/repo",
             "pull_number" to "/hr:address/pull_number",
         )
-        override val searchTarget = "/repos/{owner}/{repo}/pulls{?state,sort,direction}"
+        override val searchTarget = "/repos/{owner}/{repo}/pulls{?state,sort,direction,labels}"
         override val searchValues = mapOf("owner" to "octocat", "repo" to "Hello-World", "state" to "open")
         override val lookupTarget = "/repos/{owner}/{repo}/pulls/{pull_number}"
 

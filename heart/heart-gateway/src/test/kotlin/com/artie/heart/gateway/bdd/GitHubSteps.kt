@@ -171,6 +171,17 @@ class GitHubSteps {
         github.pulls += Pull(owner, repo, number, state, title)
     }
 
+    @Given("pull request {long} of {string} is labelled {string} upstream")
+    fun pullLabelled(number: Long, repository: String, label: String) {
+        github.pulls.first { "${it.owner}/${it.repo}" == repository && it.number == number }.labels += label
+    }
+
+    @Given("issue {long} of {string} is labelled {string} upstream, titled {string}")
+    fun issueLabelled(number: Long, repository: String, label: String, title: String) {
+        val (owner, repo) = repository.split("/")
+        github.issues += Issue(owner, repo, number, title, "open", null, false, "ada", labels = mutableListOf(label))
+    }
+
     @When("the GitHub gateway starts")
     fun starts() {
         started = start()

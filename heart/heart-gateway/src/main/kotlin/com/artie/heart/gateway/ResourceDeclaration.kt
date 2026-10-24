@@ -49,10 +49,12 @@ class ResourceDeclaration(
      * state is compared just before an act; the act must instead still be offered.
      */
     val volatile: List<JsonPointer> = emptyList(),
+    /** Filters the search's own operation lacks, each served by another list operation: GitHub's pulls by label. */
+    val searchedBy: List<SearchedBy> = emptyList(),
 ) {
     /** The operations the file names, checked against the description at start. */
     val named: Set<OperationId> = setOfNotNull(read, search) + acts.map { it.operation } +
-        facts.values.map { it.operation } + lists + links
+        facts.values.map { it.operation } + lists + links + searchedBy.map { it.operation }
 
     /** [state] without its [volatile] members, the members the upstream changes by itself. */
     fun steady(state: JsonNode): JsonNode = state.deepCopy<JsonNode>().also { copy ->
@@ -95,6 +97,12 @@ class ResourceDeclaration(
                     variable to pointer(label, at.asText()).toString()
                 },
                 volatile = node.path("volatile").map { pointer(label, it.asText()) },
+                searchedBy = node.path("searched-by").properties().map { (filter, by) ->
+                    fun needs(key: String) =
+                        checkNotNull(by.path(key).asText(null)) { "$label: searched-by $filter has no $key" }
+                    val keep = Condition.all(by.path("keep"))
+                    SearchedBy(filter, needs("operation"), keep, pointer(label, needs("address")))
+                },
             )
         }
 
@@ -102,6 +110,13 @@ class ResourceDeclaration(
             runCatching { JsonPointer.compile(text) }.getOrElse { error("$label: $text is not a JSON Pointer") }
     }
 }
+
+/**
+ * A search [filter] the search's own operation lacks, served by another list [operation]: of what it lists, only the
+ * items for which every one of [keep] holds are these resources, each at its own URL, found at [address]. GitHub's
+ * pull request list has no label filter; its issue list has, and lists pull requests as issues too.
+ */
+class SearchedBy(val filter: String, val operation: OperationId, val keep: List<Condition>, val address: JsonPointer)
 
 /**
  * Another answer a resource's rules read: the [operation] that gives it, its

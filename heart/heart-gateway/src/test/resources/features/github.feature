@@ -60,7 +60,7 @@ Feature: The gateway in front of GitHub, known by its own description, sliced to
 
   Scenario: The bookmark offers the search and lookup the resource file declares
     When a client gets "/" through the GitHub gateway
-    Then the index form "github:pulls-list" targets "/repos/{owner}/{repo}/pulls{?state,sort,direction}"
+    Then the index form "github:pulls-list" targets "/repos/{owner}/{repo}/pulls{?state,sort,direction,labels}"
     And the index form "github:pulls-get" targets "/repos/{owner}/{repo}/pulls/{pull_number}"
 
   Scenario: The forms' fields keep the description's words and schemas
@@ -84,6 +84,18 @@ Feature: The gateway in front of GitHub, known by its own description, sliced to
     Then the GitHub gateway answers 200
     And the answer lists "/repos/acme/rockets/pulls/7" titled "Bump the engines"
     And GitHub was last asked for "/repos/acme/rockets/pulls?state=closed"
+
+  Scenario: A search for pull requests by label is served by GitHub's issue list, keeping only its pull requests
+    GitHub lists pull requests by label only in its issue list, where every
+    pull request is an issue too; its pull request list has no label filter.
+    The gateway asks the issue list, keeps the pull requests, each at its
+    own address as a pull request, and leaves the issues out.
+    Given pull request 482 of "acme/rockets" is labelled "dependabot" upstream
+    And issue 10 of "acme/rockets" is labelled "dependabot" upstream, titled "Track the bumps"
+    When a client gets "/repos/acme/rockets/pulls?state=open&labels=dependabot" through the GitHub gateway
+    Then the GitHub gateway answers 200
+    And the answer lists "/repos/acme/rockets/pulls/482" titled "Fix the login bug"
+    And GitHub was last asked for "/repos/acme/rockets/issues?state=open&labels=dependabot"
 
   Scenario: A connector that includes an operation the description lacks stops the gateway
     Given the GitHub gateway reads GitHub's description with the connector "github-unknown-operation"

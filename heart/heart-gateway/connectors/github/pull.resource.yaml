@@ -8,6 +8,13 @@ search: pulls/list
 address: /url
 # The list's query parameters a search form offers; GitHub pages with Link, so page and per_page are not.
 filters: [state, sort, direction]
+# GitHub's pull request list has no label filter; its issue list has, and lists every pull request as an issue too.
+# A search by labels is made there: the pull requests kept, each at its own address, the issues left out.
+searched-by:
+  labels:
+    operation: issues/list-for-repo
+    keep: { /pull_request: { present: true } }
+    address: /pull_request/url
 title: /title
 # Acts, each a projection of one of GitHub's operations.
 acts:

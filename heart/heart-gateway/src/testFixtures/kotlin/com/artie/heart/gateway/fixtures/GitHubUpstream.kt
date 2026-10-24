@@ -360,9 +360,13 @@ class GitHubUpstream {
             val inRepo = { owner: String, repo: String ->
                 owner == request.path("owner") && repo == request.path("repo")
             }
+            // labels: each one named, comma-separated, must be on it.
+            val wanted = request.query("labels")?.split(",")?.map { it.trim() }.orEmpty()
             val listed = issues.filter { inRepo(it.owner, it.repo) && (state == "all" || it.state == state) }
+                .filter { issue -> issue.labels.containsAll(wanted) }
                 .map { issueBody(it) } +
                 pulls.filter { inRepo(it.owner, it.repo) && (state == "all" || it.state == state) }
+                    .filter { pull -> pull.labels.containsAll(wanted) }
                     .map { pullAsIssue(it) }
             json(Response(Status.OK), listed)
         },
