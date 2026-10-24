@@ -47,6 +47,9 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    // A watch that runs to its time limit keeps every look in its trace: room for it to end and fail its assertions,
+    // rather than run out of memory first.
+    maxHeapSize = "2g"
     finalizedBy(logBddRun)
 }
 

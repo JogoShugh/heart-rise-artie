@@ -243,7 +243,8 @@ internal class StepWatch(
         private fun further(here: Here, reached: Representation) {
             val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
             val told = "$part: ${host.fill(words)}: ${gaveUp(why)?.let { "$it; " }.orEmpty()}" +
-                "one act or more, in order, then done; the acts after an act " +
+                "one act or more, in order, then done; an act the server answered is done, even where a read just " +
+                "after it doesn't show it yet; the acts after an act " +
                 "that opens are done on what it reached; a check is made on what the act before it reached, and " +
                 "where it holds, the acts after it are left undone: so a check that is to keep an act from being " +
                 "done, such as whether it was said already, comes before that act"
@@ -252,7 +253,13 @@ internal class StepWatch(
             while (!over) {
                 when (val move = host.ask(step, here, ACTS, told)) {
                     is Move.Stop -> run.goalStop(move.why)
-                    is Move.Done -> over = true.also { chain.complete = true }
+                    // A step that says unless isn't done until the check that keeps its act from being done is made.
+                    is Move.Done -> if (UNLESS.containsMatchIn(words) && chain.parts.none { it is Chain.Check }) {
+                        moves += "done: refused, the step says unless, and no check keeps its act from being done " +
+                            "yet: read what it is to be checked on, then check it"
+                    } else {
+                        over = true.also { chain.complete = true }
+                    }
                     is Move.Check -> over = checked(move, here, last)
                     is Move.Act -> over = act(move, here) { last = it }
                     else -> moves += "${StepText.kind(move)}: refused, here only ${ACTS.joinToString(", ")}"
@@ -335,6 +342,9 @@ internal class StepWatch(
 
         /** A choice that follows a link: a read, never a write. */
         const val LINK = "link"
+
+        /** A step's words that keep its act from being done somewhere: "…, unless it's said already". */
+        val UNLESS = Regex("""\bunless\b""", RegexOption.IGNORE_CASE)
         const val OTHERWISE = "otherwise"
         val ACTS = setOf("act", "check", "done", "stop")
         val LIST = setOf("act", "back", "stop")

@@ -67,6 +67,12 @@ class GoalSteps(
         assertTrue(words in current, current)
     }
 
+    @Then("at move {int} the planner was shown the resource's {string} as {string}")
+    fun shownMember(move: Int, member: String, value: String) {
+        val now = shown[move - 1].held.state[member]
+        assertEquals(value, (now as? kotlinx.serialization.json.JsonPrimitive)?.content ?: now.toString())
+    }
+
     @Then("ARTIE's reasoner was last asked to {string}")
     fun reasonerLastAsked(intent: String) = assertEquals(intent, checkNotNull(reasoner).intents.last())
 

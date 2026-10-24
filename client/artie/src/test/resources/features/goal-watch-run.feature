@@ -535,7 +535,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 11 of "acme/rockets" now has these comments on the small GitHub
       | author | body               |
       | ada    | Seen by the watch. |
-    And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act"
+    And at move 6 the planner was shown the resource's "comments" as "1"
+    And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; an act the server answered is done, even where a read just after it doesn't show it yet; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act"
 
   Scenario: Issues are matched by their labels, and an If that acts closes the one it holds for
     spec/PLAN-SEED-BENCH.md: a tray is an issue labelled tray, and its stage
@@ -703,6 +704,67 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body                     |
       | ada    | Seen by the bench watch. |
     And the planner was asked 9 times
+
+  Scenario: A step that says unless is done only once its check is made, and an act the server answered is done
+    Found by the live seed bench run b2: told "say it, unless it's said
+    already", the planner commented and said done, with no check, so nothing
+    would keep a replay from saying it again; and it assigned an alert three
+    times, a read just after each not showing it yet, as GitHub's copies
+    sometimes lag. Done is refused while a step that says unless has no
+    check; the check the planner then makes, after the comment, is kept
+    before it. The planner is told an act the server answered is done.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And "bob" comments "Checked: the heater is back on." on issue 11 of "acme/rockets" on the small GitHub once its issues are listed 5 times
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "unless.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, unless it's said already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                                |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                      |
+      | done  |                                                     |       |          |                                      |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                      |
+      | check |                                                     |       |          | {"state": "open"}                    |
+      | act   | say on it that the watch has seen it                |       |          |                                      |
+      | done  |                                                     |       |          |                                      |
+      | act   | read its comments                                   |       |          |                                      |
+      | check |                                                     |       |          | {"item": "Seen by the bench watch."} |
+      | done  |                                                     |       |          |                                      |
+      | check |                                                     |       |          | {"state": "closed"}                  |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+      |                             | github:issues-list-comments | {}                                                                       |
+    When the goal "unless.goal.md" runs with ARTIE, captured in "unless.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                            |
+      | ada    | Seen by the bench watch.        |
+      | bob    | Checked: the heater is back on. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And the planner was told "done: refused, the step says unless"
+    And at move 6 the planner was told the step now includes "an act the server answered is done, even where a read just after it doesn't show it yet"
+    And the planner was asked 10 times
 
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
