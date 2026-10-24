@@ -282,7 +282,9 @@ internal class StepWatch(
                 chain.parts += check
             }
             val holds = holds(move.facts, reached)
-            moves += "check: kept; " + if (holds) "it holds here, so the acts after it are left undone" else "it fails"
+            // Its facts and where it was made, so a wrong check can be read back from the capture.
+            moves += "check: kept ${element(move.facts)}, at ${reached.address}; " +
+                if (holds) "it holds here, so the acts after it are left undone" else "it fails"
             return holds
         }
 

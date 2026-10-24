@@ -704,6 +704,9 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body                     |
       | ada    | Seen by the bench watch. |
     And the planner was asked 9 times
+    And the run's capture keeps each check as decided, with where it was decided
+      | move                                                                                                                                                                   |
+      | check: kept {"item":"Seen by the bench watch."}, at https://github.gateway.test/repos/acme/rockets/issues/11/comments; it holds here, so the acts after it are left undone |
 
   Scenario: A step that says unless is done only once its check is made, and an act the server answered is done
     Found by the live seed bench run b2: told "say it, unless it's said
