@@ -222,6 +222,9 @@ internal class StepWatch(
 
     /** A chain of [step]'s [part], walked at a resource, with the server's reason a wait gave up, [why]. */
     private inner class Walk(val step: Step.Intent, val part: String, val chain: Chain, val why: String?) {
+        /** What the last link followed, a read, reached, as this chain is decided. */
+        private var read: Representation? = null
+
         /** The parts from [index] on, at [here]; [reached] is what the last act reached, where a check is made. */
         fun from(index: Int, here: Here, reached: Representation) {
             var last = reached
@@ -281,16 +284,26 @@ internal class StepWatch(
             val segment = chain.parts.subList(since, chain.parts.size).toList()
             val (reads, writes) = segment.partition { it is Chain.Act && it.chosen.kind == LINK }
             val plain = segment.none { it is Chain.Act && it.opens }
-            if (writes.isNotEmpty() && plain) {
+            val moved = writes.isNotEmpty() && plain
+            // Kept after the reads, it is made on what the last of them reached, as a replay makes it.
+            val on = if (moved) read ?: reached else reached
+            val holds = holds(move.facts, on)
+            // Made right after the acts it is to keep from being done again, it must hold here: one that fails
+            // here would let a replay do them again.
+            if (moved && !holds) {
+                moves += "check: refused, it fails here, right after the acts it is to keep from being done " +
+                    "again, so a replay would do them again: check what they made, as it is here"
+                return false
+            }
+            if (moved) {
                 chain.parts.subList(since, chain.parts.size).clear()
                 chain.parts += reads + check + writes
                 moves += "check: kept before the acts that write, with the reads it is made on"
             } else {
                 chain.parts += check
             }
-            val holds = holds(move.facts, reached)
             // Its facts and where it was made, so a wrong check can be read back from the capture.
-            moves += "check: kept ${element(move.facts)}, at ${reached.address}; " +
+            moves += "check: kept ${element(move.facts)}, at ${on.address}; " +
                 if (holds) "it holds here, so the acts after it are left undone" else "it fails"
             return holds
         }
@@ -314,6 +327,7 @@ internal class StepWatch(
                     inside = true
                     further(this, held)
                 } else {
+                    if (chosen.kind == LINK) read = held
                     reached(held)
                 }
             }

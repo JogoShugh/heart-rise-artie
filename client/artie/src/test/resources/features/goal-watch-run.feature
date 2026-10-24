@@ -955,6 +955,64 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body                     |
       | ada    | Seen by the bench watch. |
 
+  Scenario: A check after the acts it is to keep from being done again is refused where it fails right after them
+    Found by the live seed bench runs b6 and b8: after it commented, the
+    planner checked that the comments list's "comments" was 1. The list has
+    no such member, so the check failed even there, after the comment, and
+    every replay commented again. A check kept before the acts that write
+    must hold where it is made, right after them: one that fails there is
+    refused, and the planner told why.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And "bob" comments "Checked: the heater is back on." on issue 11 of "acme/rockets" on the small GitHub once its issues are listed 5 times
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "fails.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, unless it's said already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                                |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                      |
+      | done  |                                                     |       |          |                                      |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                      |
+      | check |                                                     |       |          | {"state": "open"}                    |
+      | act   | say on it that the watch has seen it                |       |          |                                      |
+      | act   | read its comments                                   |       |          |                                      |
+      | check |                                                     |       |          | {"comments": 1}                      |
+      | check |                                                     |       |          | {"item": "Seen by the bench watch."} |
+      | done  |                                                     |       |          |                                      |
+      | check |                                                     |       |          | {"state": "closed"}                  |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+      |                             | github:issues-list-comments | {}                                                                       |
+    When the goal "fails.goal.md" runs with ARTIE, captured in "fails.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                            |
+      | ada    | Seen by the bench watch.        |
+      | bob    | Checked: the heater is back on. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And the planner was told "check: refused, it fails here, right after the acts it is to keep from being done again"
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.
