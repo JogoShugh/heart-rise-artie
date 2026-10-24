@@ -536,7 +536,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body               |
       | ada    | Seen by the watch. |
     And at move 6 the planner was shown the resource's "comments" as "1"
-    And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; an act the server answered is done, even where a read just after it doesn't show it yet; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act; whether something was said is checked on the words said, among the titles of what is listed, not on how many there are"
+    And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; an act the server answered is done, even where a read just after it doesn't show it yet; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act; whether something was said is checked on the words said, among the titles of what is listed, not on how many there are; a fact names a member of the state, or a relation it links to, its value words a link's title says"
 
   Scenario: Issues are matched by their labels, and an If that acts closes the one it holds for
     spec/PLAN-SEED-BENCH.md: a tray is an issue labelled tray, and its stage
@@ -896,7 +896,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | ada    | Seen by the bench watch. |
     And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
     And the planner was told "assign it to ada: made again just as the act before it, kept once"
-    And at move 5 the planner was told the step now includes "whether something was said is checked on the words said, among the titles of what is listed, not on how many there are"
+    And at move 5 the planner was told the step now includes "whether something was said is checked on the words said, among the titles of what is listed, not on how many there are; a fact names a member of the state, or a relation it links to, its value words a link's title says"
 
   Scenario: A link followed in a chain is a read, though the planner says it opens: the acts after it are done on the member
     Found by the live seed bench run b7: the planner read the first alert's
@@ -959,7 +959,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     Found by the live seed bench runs b6 and b8: after it commented, the
     planner checked that the comments list's "comments" was 1. The list has
     no such member, so the check failed even there, after the comment, and
-    every replay commented again. A check kept before the acts that write
+    every replay commented again. Here the planner checks a count the list
+    doesn't have, under a name it does hold. A check kept before the acts that write
     must hold where it is made, right after them: one that fails there is
     refused, and the planner told why, where the check is made, what is
     there, and how a fact says a link's title (run b11). Found by run b9: a read, kept on the
@@ -994,7 +995,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | check |                                                     |       |          | {"state": "open"}                    |
       | act   | say on it that the watch has seen it                |       |          |                                      |
       | act   | read its comments                                   |       |          |                                      |
-      | check |                                                     |       |          | {"comments": 1}                      |
+      | check |                                                     |       |          | {"count": 2}                         |
       | check |                                                     |       |          | {"item": "Seen by the bench watch."} |
       | done  |                                                     |       |          |                                      |
       | check |                                                     |       |          | {"state": "closed"}                  |
@@ -1053,7 +1054,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                                      |
       | check |                                                     |       |          | {"state": "open"}                                    |
       | act   | read its comments                                   |       |          |                                                      |
-      | check |                                                     |       |          | {"github:comments": ["Seen by the bench watch."]}    |
+      | check |                                                     |       |          | {"count": 2}                                         |
       | done  |                                                     |       |          |                                                      |
       | check |                                                     |       |          | {"item": "Seen by the bench watch."}                 |
       | act   | say on it that the watch has seen it                |       |          |                                                      |
@@ -1068,6 +1069,63 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     When the goal "undone.goal.md" runs with ARTIE, captured in "undone.trace.yaml", given
       | name | value |
     Then the planner was told "done: refused, the last check fails here, and nothing was done after it"
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+
+  Scenario: A check naming what the resource it is made on doesn't hold is refused, and the planner told what it holds
+    Found by the live seed bench runs b10 and b12: the planner read the
+    comments, saw the words there, and checked "github:comments", which the
+    comments list neither holds nor links to. The check could never hold,
+    so the planner said the words again. A fact names a member of the state,
+    or a relation it embeds or links to; one naming none of them is refused.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 11 of "acme/rockets" has these comments on the small GitHub
+      | id | author | body                     |
+      | 1  | ada    | Seen by the bench watch. |
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "named.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, unless it's said already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                                             |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                                   |
+      | done  |                                                     |       |          |                                                   |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                                   |
+      | check |                                                     |       |          | {"state": "open"}                                 |
+      | act   | read its comments                                   |       |          |                                                   |
+      | check |                                                     |       |          | {"github:comments": ["Seen by the bench watch."]} |
+      | check |                                                     |       |          | {"item": "Seen by the bench watch."}              |
+      | act   | say on it that the watch has seen it                |       |          |                                                   |
+      | done  |                                                     |       |          |                                                   |
+      | check |                                                     |       |          | {"state": "closed"}                               |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      |                             | github:issues-list-comments | {}                                                                       |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+    When the goal "named.goal.md" runs with ARTIE, captured in "named.trace.yaml", given
+      | name | value |
+    Then the planner was told "check: refused, github:comments is neither a member of https://github.gateway.test/repos/acme/rockets/issues/11/comments nor a relation it embeds or links to: it holds {\"count\":1}, and links item: Seen by the bench watch."
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
     And issue 12 of "acme/rockets" now has these comments on the small GitHub
       | author | body                     |
       | ada    | Seen by the bench watch. |

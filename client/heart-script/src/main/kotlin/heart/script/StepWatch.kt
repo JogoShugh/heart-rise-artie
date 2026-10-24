@@ -282,13 +282,8 @@ internal class StepWatch(
             // Kept after the reads, it is made on what the last of them reached, as a replay makes it.
             val on = if (moved) read ?: reached else reached
             val holds = holds(move.facts, on)
-            // Made right after the acts it is to keep from being done again, it must hold here: one that fails
-            // here would let a replay do them again.
-            if (moved && !holds) {
-                moves += "check: refused, it fails here, right after the acts it is to keep from being done " +
-                    "again, so a replay would do them again: it is made on ${on.address}, which holds " +
-                    "${readable(on)}; a fact names a member of that state, or a relation it links to, its value " +
-                    "words a link's title says"
+            refusal(move.facts, on, moved && !holds)?.let { refused ->
+                moves += refused
                 return false
             }
             if (moved) {
@@ -401,7 +396,8 @@ private fun toldActs(part: String, words: String, why: String?): String =
         "that opens are done on what it reached; a check is made on what the act before it reached, and " +
         "where it holds, the acts after it are left undone: so a check that is to keep an act from being " +
         "done, such as whether it was said already, comes before that act; whether something was said is " +
-        "checked on the words said, among the titles of what is listed, not on how many there are"
+        "checked on the words said, among the titles of what is listed, not on how many there are; a fact names a " +
+        "member of the state, or a relation it links to, its value words a link's title says"
 
 /**
  * Why a chain of a step's [words] isn't done yet, as the planner is told; null when it is. A step that says unless
@@ -419,6 +415,26 @@ private fun unfinished(words: String, chain: Chain, failing: Boolean): String? =
 
 /** A step's words that keep its act from being done somewhere: "…, unless it's said already". */
 private val UNLESS = Regex("""\bunless\b""", RegexOption.IGNORE_CASE)
+
+/**
+ * Why a check of [facts], made [on] a resource, is refused, as the planner is told; null when it is kept. A fact names
+ * a member, or a relation embedded or linked to: one naming none of them never holds. A check made right after the
+ * acts it is to keep from being done again must hold there ([failsAfter] when it doesn't): else a replay does them
+ * again.
+ */
+private fun refusal(facts: Map<String, Any?>, on: Representation, failsAfter: Boolean): String? {
+    val unheld = facts.keys.filter { name ->
+        !State(on.state).find(name).first && name !in on.embedded && name !in on.links
+    }
+    return when {
+        unheld.isNotEmpty() -> "check: refused, ${unheld.joinToString(", ")} is neither a member of ${on.address} " +
+            "nor a relation it embeds or links to: it holds ${readable(on)}"
+        failsAfter -> "check: refused, it fails here, right after the acts it is to keep from being done again, so " +
+            "a replay would do them again: it is made on ${on.address}, which holds ${readable(on)}; a fact names a " +
+            "member of that state, or a relation it links to, its value words a link's title says"
+        else -> null
+    }
+}
 
 /** What a read reached, in words for the planner: its state, then each relation's link titles, but its own. */
 private fun readable(held: Representation): String {
