@@ -75,6 +75,7 @@ class ArtieCli(
         val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { client })
         run.reasoning = asked.reasoner != null
         run.entry = asked.entry
+        run.remember = folder.named(asked.remember)
         if (output == "words") {
             run.onStep = { out.println(line(run.trace.size, it)) }
             run.onNote = { out.println("note: $it") }
@@ -250,6 +251,9 @@ private fun build(builder: Path, trace: Path, page: Path, title: String, lede: S
 /** The stop a script engine's failure carries, if a stop is what failed it. */
 private fun stopIn(failure: Throwable): ScriptStopped? =
     generateSequence(failure.cause) { it.cause }.filterIsInstance<ScriptStopped>().firstOrNull()
+
+/** The file [name] in this folder; null for no name. */
+private fun Path.named(name: String?): Path? = name?.let(::resolve)
 
 /** One step, as a line: its number, what was asked with its values, and the outcome. */
 internal fun line(number: Int, step: TraceStep): String {

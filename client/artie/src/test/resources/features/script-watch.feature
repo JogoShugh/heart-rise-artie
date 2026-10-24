@@ -103,6 +103,38 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       | 2      |
       | 1      |
 
+  Scenario: A watch that remembers doesn't do again, run again, what it did before
+    The first run gives up on the draft and says so; the second, keeping
+    the same memory, knows that wait is over and says nothing again.
+    Given pull request 1 is a draft on the small GitHub
+    And the run remembers in "watch.yaml"
+    And the script is
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 10.seconds, until = { ++looks == 3 }) {
+                  whenever {
+                      once("github:merge", giveUp = 15.seconds, otherwise = { why -> note("#${state["number"]}: $why") }) {
+                          act("github:merge", "merge_method" to "squash") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    When the script runs with ARTIE
+    Then the run noted
+      | note                                                         |
+      | #1: A draft can't be merged; mark it ready for review first. |
+    When the script runs with ARTIE again
+    Then the script finished
+    And the run noted
+      | note |
+      |      |
+
   Scenario Outline: Outside a watch, once reads the resource again until the wait is over: <case>
     Given pull request 1 is <draft>
     When this script runs with ARTIE

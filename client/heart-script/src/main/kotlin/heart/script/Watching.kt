@@ -1,5 +1,8 @@
 package heart.script
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -27,8 +30,35 @@ internal class Watching {
     /** Each wait that is over, by its resource's address and act: its act done, or its otherwise. */
     val finished = mutableSetOf<String>()
 
+    /** Each resource a goal's If left alone, by its address: said so once. */
+    val left = mutableSetOf<String>()
+
     /** Whether a `once` waits on the resource at [address]. */
     fun waitsOn(address: String): Boolean = waiting.keys.any { it.startsWith("$address ") }
+
+    /** What a watch run before with [file] kept: its finished waits and the resources it left. */
+    fun load(file: java.nio.file.Path) {
+        if (!java.nio.file.Files.exists(file)) return
+        var into: MutableSet<String>? = null
+        java.nio.file.Files.readAllLines(file).forEach { line ->
+            when {
+                line.startsWith("finished:") -> into = finished
+                line.startsWith("left:") -> into = left
+                line.startsWith("- ") ->
+                    into?.add(Json.parseToJsonElement(line.removePrefix("- ")).jsonPrimitive.content)
+            }
+        }
+    }
+
+    /** What this watch did, kept in [file] for a run after it: YAML, a list each, each item a quoted string. */
+    fun save(file: java.nio.file.Path) {
+        fun listed(name: String, items: Set<String>) = if (items.isEmpty()) {
+            "$name: []\n"
+        } else {
+            "$name:\n" + items.joinToString("") { "- ${JsonPrimitive(it)}\n" }
+        }
+        java.nio.file.Files.writeString(file, listed("finished", finished) + listed("left", left))
+    }
 }
 
 /**
@@ -44,6 +74,7 @@ fun Here.watch(
 ) {
     val start = held.address
     val ends = run.clock().plus(atMost.toJavaDuration())
+    run.remember?.let { run.watching.load(it) }
     run.watching.active = true
     try {
         var over = false
@@ -51,6 +82,7 @@ fun Here.watch(
         while (!over && run.clock().isBefore(ends)) {
             looks++
             attempt(start, "A look failed") { look() }
+            run.remember?.let { run.watching.save(it) }
             attempt(start, "Reading whether the watch is over failed") { over = until() }
             if (!over) run.pause(every)
         }

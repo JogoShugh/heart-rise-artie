@@ -48,6 +48,12 @@ class Run(
     /** How the run waits between tries of `until`; a test can make it instant. */
     val pause: (kotlin.time.Duration) -> Unit = { Thread.sleep(it.inWholeMilliseconds) },
 ) {
+    /**
+     * Where a watch keeps what it did, between runs: each wait that is over, each resource left. A watch run again
+     * with the same file doesn't do again what it did, nor say again what it said. Null: it remembers nothing.
+     */
+    var remember: java.nio.file.Path? = null
+
     /** The time now, as `watch` and `once` read it; a test can move it with [pause] alone. Set before the run. */
     var clock: () -> java.time.Instant = java.time.Instant::now
 

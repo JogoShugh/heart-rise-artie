@@ -15,6 +15,9 @@ class Arguments(val script: String) {
     var interactive = false
     var entry: String? = null
     var trace: String? = null
+
+    /** `--remember FILE`: where a watch keeps what it did, so run again it doesn't do it again. */
+    var remember: String? = null
     var report: String? = null
     var rung: String? = null
     var reasoner: String? = null
@@ -76,6 +79,7 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--inputs" to { a, v -> a.inputsFile = v },
     "--entry" to { a, v -> a.entry = v },
     "--trace" to { a, v -> a.trace = v },
+    "--remember" to { a, v -> a.remember = v },
     "--report" to { a, v -> a.report = v },
     "--rung" to { a, v -> a.rung = v.takeIf { it in RUNGS } ?: throw BadArguments("--rung is L0, L1 or L2") },
     "--reasoner" to { a, v -> a.reasoner = v.takeIf { it in REASONERS } ?: throw BadArguments("--reasoner is claude") },

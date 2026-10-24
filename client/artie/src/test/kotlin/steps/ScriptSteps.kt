@@ -86,7 +86,27 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
                 .also { it.clock = { now } }
         } else {
             Run(inputs, navigator = { navigator })
-        }
+        }.also { it.remember = remember }
+
+    /** Where the scenario's runs remember what their watches did; null when they don't. */
+    private var remember: java.nio.file.Path? = null
+    private var script: String? = null
+
+    @io.cucumber.java.en.Given("the run remembers in {string}")
+    fun remembers(name: String) {
+        remember = java.nio.file.Files.createTempDirectory("watch").resolve(name)
+    }
+
+    @io.cucumber.java.en.Given("the script is")
+    fun scriptIs(text: String) {
+        script = text
+    }
+
+    @When("the script runs with ARTIE")
+    fun scriptRuns() = runs(checkNotNull(script))
+
+    @When("the script runs with ARTIE again")
+    fun scriptRunsAgain() = runs(checkNotNull(script))
 
     @io.cucumber.java.en.Given("the run's clock moves only when the run pauses")
     fun clockMovesWithPauses() {

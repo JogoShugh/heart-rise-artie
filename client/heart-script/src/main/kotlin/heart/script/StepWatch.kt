@@ -32,7 +32,6 @@ internal class StepWatch(
     private val matches = mutableMapOf<Step.Whenever, Map<String, Any?>>()
     private val waits = mutableMapOf<Step.Intent, String>()
     private val ifs = mutableMapOf<Step.Intent, Map<String, Any?>>()
-    private val left = mutableSetOf<String>()
     private val acts = mutableMapOf<Pair<Step.Intent, String>, Chosen?>()
     private var ends: Map<String, Any?>? = null
 
@@ -111,7 +110,8 @@ internal class StepWatch(
         val holds = holds(facts, here.held)
         if (holds && intent.leaves) {
             // Said once for each member it leaves.
-            if (left.add(here.held.address)) here.note("Left ${here.held.address}: ${host.fill(intent.words)}")
+            val first = run.watching.left.add(here.held.address)
+            if (first) here.note("Left ${here.held.address}: ${host.fill(intent.words)}")
         } else if (holds) {
             perform(intent, ACT, here, null)
         }
