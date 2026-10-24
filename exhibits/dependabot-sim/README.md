@@ -114,6 +114,17 @@ Each of the next live runs found something, and each was fixed with a test first
   - It made 19 model calls in all over 6 looks and about 30 open pull requests. They were all decisions; no event
     called the model.
 
+- **g9** was told to narrow its list by a filter, and chose the issue search with `labels`, the old trap. It was
+  stopped by hand. **Fixed:** the issue search's description in the profile now says that pull requests are left
+  out, and that `github:pulls-list` lists them, by labels too.
+- **g10 (`runs/goal-1023-g10.out`)** ran with exit 0:
+  - It watched `github:pulls-list` with `labels=dependabot`.
+  - It merged #710, and left #696 and #689 alone.
+  - It finished in **54 steps, where g8 took 474**.
+  - It made 19 model calls.
+  - With `--remember`, it kept what it did in `runs/watch.memory.yaml`, so a watch run again doesn't merge, leave
+    or say any of it again.
+
 ## What it showed
 
 - **The five words come down to small, plain code.** Whenever is a loop over open pull requests, most recently
