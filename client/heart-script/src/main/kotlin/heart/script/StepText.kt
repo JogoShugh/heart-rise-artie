@@ -35,9 +35,13 @@ internal object StepText {
         }
     }
 
-    /** [step] as said: an intent's words; `Wait: …`; `Verify: …`, its facts one after the other. */
+    /**
+     * [step] as said: an intent's words, after its If or Once condition when it has one; `Wait: …`; `Verify: …`,
+     * its facts one after the other; a Whenever's match; an Until's condition.
+     */
     fun said(step: Step): String = when (step) {
-        is Step.Intent -> step.words
+        is Step.Intent -> step.condition?.let { "If $it, ${step.words}" }
+            ?: step.once?.let { "Once ${it.condition}, ${step.words}" } ?: step.words
         is Step.Wait -> "Wait: ${step.condition}"
         is Step.Verify -> "Verify: ${step.facts.joinToString("; ")}"
         is Step.Whenever -> "Whenever ${step.match}"
@@ -51,7 +55,7 @@ internal object StepText {
      */
     fun tree(steps: List<Step>, done: Set<Step>, now: Step, depth: Int = 0): List<String> = steps.flatMap { step ->
         val pad = "  ".repeat(depth)
-        val children = (step as? Step.Intent)?.children.orEmpty()
+        val children = step.subSteps
         when {
             step === now -> listOf("$pad[now] ${line(step)}") + listOfNotNull(
                 children.size.takeIf { it > 0 }?.let {
@@ -67,13 +71,12 @@ internal object StepText {
 
     /** Every step, a line each, indented as nested: the person's words. */
     fun all(steps: List<Step>, depth: Int = 0): List<String> = steps.flatMap { step ->
-        listOf("  ".repeat(depth) + line(step)) + all((step as? Step.Intent)?.children.orEmpty(), depth + 1)
+        listOf("  ".repeat(depth) + line(step)) + all(step.subSteps, depth + 1)
     }
 
-    private fun line(step: Step) = said(step) + (step as? Step.Intent)?.name?.let { " (as $it)" }.orEmpty()
+    private fun line(step: Step) = said(step) + step.gives?.let { " (as $it)" }.orEmpty()
 
-    private fun inside(step: Step, now: Step): Boolean =
-        (step as? Step.Intent)?.children.orEmpty().any { it === now || inside(it, now) }
+    private fun inside(step: Step, now: Step): Boolean = step.subSteps.any { it === now || inside(it, now) }
 
     /** The moves [step] allows, by kind. */
     fun allowed(step: Step): Set<String> = when (step) {

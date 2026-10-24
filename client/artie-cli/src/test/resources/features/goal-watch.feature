@@ -104,6 +104,43 @@ Feature: A goal that keeps watching: Whenever, Until, Once, Or give up and Other
       | line 7: until: {pr} is closed                |
       | a goal in steps: 4 steps, nothing sent       |
 
+  Scenario: If checks a condition, and after the comma says what to do when it holds
+    Given the file "hold.goal.md" is
+      """
+      ---
+      start: scripted://service/
+      ---
+
+      - Whenever a pull request changes `as pr`
+        - If it's labelled hold, leave it, and say so once.
+        - Once it can be merged, merge it.
+      - Until {pr} is closed
+      """
+    When artie is run with
+      | argument     |
+      | run          |
+      | hold.goal.md |
+      | --plan-only  |
+    Then artie exits 0
+    And artie prints
+      | line                                                      |
+      | start scripted://service/                                 |
+      | line 5: whenever: a pull request changes (as pr)          |
+      | line 6:   if: it's labelled hold, then: leave it, and say so once. |
+      | line 7:   once: it can be merged, then: merge it.         |
+      | line 8: until: {pr} is closed                             |
+      | a goal in steps: 4 steps, nothing sent                    |
+
+  Scenario: An If with no comma stops before its first request
+    Given line 15 of "watch.goal.md" reads '- If it is labelled hold leave it', indented 4
+    When artie is run with
+      | argument      |
+      | run           |
+      | watch.goal.md |
+      | --plan-only   |
+    Then artie exits 2
+    And artie's last line is: stopped before the first request: watch.goal.md:15: If says what to check, a comma, then what to do
+
   Scenario: A watch runs as any goal does, so a run with no reasoner stops before its first request
     When artie is run with
       | argument      |

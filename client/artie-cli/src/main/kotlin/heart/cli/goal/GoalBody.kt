@@ -150,13 +150,15 @@ internal class StepReader(val file: String, val inputs: List<String>, val line: 
     private fun intent(item: ListItem, read: ItemWords, sub: BulletList?, tailOf: (Boolean) -> Tail): Step {
         val once = once(read.text)
         if (once != null && once.second.isEmpty()) fail(item, "Once says what to wait for, a comma, then what to do")
-        val given = Marks.of(read.marks) { fail(item, it) }
-        if (given.reasoned && sub != null) fail(item, "reasoned marks a step with no sub-items")
-        given.name?.let { name(it, item) }
+        val given = given(read.text)
+        if (given != null && given.second.isEmpty()) fail(item, "If says what to check, a comma, then what to do")
+        val marks = Marks.of(read.marks) { fail(item, it) }
+        if (marks.reasoned && sub != null) fail(item, "reasoned marks a step with no sub-items")
+        marks.name?.let { name(it, item) }
         val tail = tailOf(once != null)
         return Step.Intent(
-            once?.second ?: read.text, line(item), given.name, given.moves, given.reasoned,
-            sub?.let(::items).orEmpty(), once?.let { Once(it.first, tail.giveUp) }, tail.otherwise,
+            once?.second ?: given?.second ?: read.text, line(item), marks.name, marks.moves, marks.reasoned,
+            sub?.let(::items).orEmpty(), once?.let { Once(it.first, tail.giveUp) }, tail.otherwise, given?.first,
         )
     }
 

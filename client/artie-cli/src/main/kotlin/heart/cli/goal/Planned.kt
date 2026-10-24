@@ -29,7 +29,8 @@ fun planned(goal: Goal): List<String> {
 private fun lines(step: Step, depth: Int): List<String> {
     val pad = "  ".repeat(depth)
     val said = when (step) {
-        is Step.Intent -> (step.once?.let { "once: ${it.condition}, then: " }.orEmpty()) + step.words + marks(step)
+        is Step.Intent -> (step.once?.let { "once: ${it.condition}, then: " }.orEmpty()) +
+            (step.condition?.let { "if: $it, then: " }.orEmpty()) + step.words + marks(step)
         is Step.Wait -> "wait: ${step.condition}"
         is Step.Verify -> "verify: ${step.facts.joinToString("; ")}"
         is Step.Whenever -> "whenever: ${step.match}" + step.name?.let { " (as $it)" }.orEmpty()

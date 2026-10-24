@@ -55,6 +55,9 @@ internal fun tail(lines: List<ItemLine>, first: Int, waits: Boolean, refuse: (In
 /** `Once CONDITION, WORDS`: the condition and the words, split at the first comma outside quotes; null for none. */
 internal fun once(text: String): Pair<String, String>? = opened(ONCE, text)?.let { comma(it) ?: ("" to "") }
 
+/** `If CONDITION, WORDS`: the condition and the words, as Once splits them; null when If doesn't open [text]. */
+internal fun given(text: String): Pair<String, String>? = opened(IF, text)?.let { comma(it) ?: ("" to "") }
+
 /** [words] split at their first comma outside quotes, each side trimmed; null when they have none. */
 internal fun comma(words: String): Pair<String, String>? {
     var quoted = false
@@ -92,6 +95,7 @@ private fun after(text: String): Duration? = GIVE_UP_AFTER.matchEntire(text)?.de
 internal val WHENEVER = Regex("""^(?i)whenever\b""")
 internal val UNTIL = Regex("""^(?i)until\b""")
 private val ONCE = Regex("""^(?i)once\b""")
+private val IF = Regex("""^(?i)if\b""")
 private val GIVE_UP = Regex("""^(?i)or give up\b""")
 private val OTHERWISE = Regex("""^(?i)otherwise\b,?""")
 private val GIVE_UP_AFTER = Regex("""(?i)or give up after (\d+) (seconds?|minutes?|hours?)\.?""")

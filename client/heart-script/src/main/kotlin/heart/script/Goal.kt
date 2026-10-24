@@ -45,6 +45,14 @@ class Goal(
     }
 }
 
+/** The steps under this one: an intent's, or a Whenever's. */
+val Step.subSteps: List<Step>
+    get() = (this as? Step.Intent)?.children ?: (this as? Step.Whenever)?.children.orEmpty()
+
+/** The name this step gives what it leads to, an intent's or a Whenever's; null when it gives none. */
+val Step.gives: String?
+    get() = (this as? Step.Intent)?.name ?: (this as? Step.Whenever)?.name
+
 /** A goal's manners in words, its section's paragraphs then each manner, the section's heading at [line]. */
 class Alongside(val words: List<String>, val line: Int)
 
@@ -82,7 +90,16 @@ sealed interface Step {
         val once: Once? = null,
         /** `Otherwise, …`: what to do instead when the step's words can't be done. */
         val otherwise: Otherwise? = null,
-    ) : Step
+        /** `If …,`: the condition the step's words are for; null when they are for every time. */
+        val condition: String? = null,
+    ) : Step {
+        /** Whether the words, when the condition holds, are to leave the resource: its other steps are not done. */
+        val leaves: Boolean get() = condition != null && LEAVE.containsMatchIn(words)
+
+        private companion object {
+            val LEAVE = Regex("""^(?i)leave it\b""")
+        }
+    }
 
     /**
      * `Whenever …`: the steps under it, its [children], done again on each change that matches [match], the

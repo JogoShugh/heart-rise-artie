@@ -15,6 +15,12 @@ open class ScriptStopped(
 )
 
 /**
+ * A goal run that stops for good: its planner stopped it, or it went past its limits. A watch notes a failed look
+ * and looks again; this it never swallows, or a decision the planner won't make would be asked again forever.
+ */
+class GoalStopped(step: Int, what: String, reason: String) : ScriptStopped(step, what, reason)
+
+/**
  * One input a script declares: [default] when not given; [question] asked of a person, if the run allows. A
  * default made fresh each run, the time now, keeps its [now] pattern, so a script made from the run makes it too.
  */

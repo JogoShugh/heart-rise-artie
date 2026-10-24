@@ -216,7 +216,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
 
     private fun fill(text: String) = StepText.fill(text, named, inputs, run::value)
 
-    private fun stop(why: String): Nothing = throw ScriptStopped(run.step, "\"goal\"", "\"$why\"")
+    private fun stop(why: String): Nothing = throw GoalStopped(run.step, "\"goal\"", "\"$why\"")
 
     private companion object {
         /** A step and its sub-steps, done: every block it opened is left. */

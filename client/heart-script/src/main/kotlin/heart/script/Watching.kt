@@ -69,6 +69,8 @@ private fun Here.attempt(start: String, failed: String, block: Here.() -> Unit) 
         held = arrived(++run.step, "\"watch\"", navigator.recall(start))
         block()
         null
+    } catch (ended: GoalStopped) {
+        throw ended
     } catch (stopped: ScriptStopped) {
         stopped.reason
     } catch (unread: IllegalStateException) {

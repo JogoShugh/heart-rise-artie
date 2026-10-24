@@ -31,6 +31,8 @@ internal class StepWatch(
     private val lists = mutableMapOf<Step.Whenever, Chosen>()
     private val matches = mutableMapOf<Step.Whenever, Map<String, Any?>>()
     private val waits = mutableMapOf<Step.Intent, String>()
+    private val ifs = mutableMapOf<Step.Intent, Map<String, Any?>>()
+    private val left = mutableSetOf<String>()
     private val acts = mutableMapOf<Pair<Step.Intent, String>, Chosen?>()
     private var ends: Map<String, Any?>? = null
 
@@ -64,9 +66,15 @@ internal class StepWatch(
         scope.watch(until = { until != null && over(until, this) }) {
             replay(list, this, null) {
                 whenever {
-                    if (matches(step, this)) {
+                    // Whether the member matches: the check the planner made at the first member, decided once.
+                    val match = matches.getOrPut(step) {
+                        val told = "whenever: ${host.fill(step.match)}: the check a member that matches passes"
+                        decide(step, this, CHECK, told) { (it as? Move.Check)?.facts }
+                    }
+                    if (holds(match, held)) {
                         step.name?.let { named[it] = held }
-                        step.children.forEach { child(it, this) }
+                        // An If that leaves the member leaves its other steps undone, this look.
+                        step.children.all { child(it, this) }
                     }
                 }
             }
@@ -75,11 +83,42 @@ internal class StepWatch(
         moves += "watched: ${host.fill(StepText.said(step))}, until $ended"
     }
 
-    /** One step under a Whenever, at the member [here]: a Once waits, then acts; any other step acts. */
-    private fun child(step: Step, here: Here) {
+    /**
+     * One step under a Whenever, at the member [here]: an If acts, or leaves the member, when its check holds; a
+     * Once waits, then acts; any other step acts. Whether the member's other steps are done after it.
+     */
+    private fun child(step: Step, here: Here): Boolean {
         val intent = step as? Step.Intent ?: stop("line ${step.line}: only steps that act go under a Whenever yet")
         if (intent.children.isNotEmpty()) stop("line ${step.line}: a step under a Whenever has no steps under it yet")
-        val once = intent.once ?: return perform(intent, ACT, here, null)
+        val condition = intent.condition
+        val once = intent.once
+        when {
+            condition != null -> return given(intent, condition, here)
+            once != null -> waited(intent, once, here)
+            else -> perform(intent, ACT, here, null)
+        }
+        return true
+    }
+
+    /** An If at the member [here]: its check, decided once; when it holds, its words, or leaving the member. */
+    private fun given(intent: Step.Intent, condition: String, here: Here): Boolean {
+        val facts = ifs.getOrPut(intent) {
+            decide(intent, here, CHECK, "if: ${host.fill(condition)}: the check that tells") {
+                (it as? Move.Check)?.facts
+            }
+        }
+        val holds = holds(facts, here.held)
+        if (holds && intent.leaves) {
+            // Said once for each member it leaves.
+            if (left.add(here.held.address)) here.note("Left ${here.held.address}: ${host.fill(intent.words)}")
+        } else if (holds) {
+            perform(intent, ACT, here, null)
+        }
+        return !(holds && intent.leaves)
+    }
+
+    /** A Once at the member [here]: the act its wait is for, decided once; then the wait, its act or otherwise. */
+    private fun waited(intent: Step.Intent, once: Once, here: Here) {
         val relation = waits.getOrPut(intent) {
             decide(intent, here, WAIT, "once: ${host.fill(once.condition)}") { move ->
                 (move as? Move.Wait)?.relation?.takeIf { it.isNotBlank() }?.also { moves += "once: waits for $it" }
@@ -134,16 +173,6 @@ internal class StepWatch(
         return chosen
     }
 
-    /** Whether the member [here] matches [step]: the check the planner made at the first member, decided once. */
-    private fun matches(step: Step.Whenever, here: Here): Boolean {
-        val facts = matches.getOrPut(step) {
-            decide(step, here, CHECK, "whenever: ${host.fill(step.match)}: the check a member that matches passes") {
-                (it as? Move.Check)?.facts
-            }
-        }
-        return holds(facts, here.held)
-    }
-
     /** Whether the goal's [until] holds, read at the resource it names, else at [scope]. */
     private fun over(until: Step.Until, scope: Here): Boolean {
         val name = BRACE.findAll(until.condition).map { it.groupValues[1] }.firstOrNull { it in named }
@@ -182,7 +211,7 @@ internal class StepWatch(
         }
     }
 
-    private fun stop(why: String): Nothing = throw ScriptStopped(run.step, "\"goal\"", "\"$why\"")
+    private fun stop(why: String): Nothing = throw GoalStopped(run.step, "\"goal\"", "\"$why\"")
 
     private companion object {
         const val ACT = "act"

@@ -88,6 +88,85 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 10 times
     And ARTIE's reasoner was asked 4 times
 
+  Scenario: If is checked as decided once; a pull request it holds for is left alone, and said so once
+    Pull request 2 is labelled hold too. The If's check is decided at the
+    first member that matches, pull request 3, where it doesn't hold; at
+    pull request 2 it holds, so its other steps are left, and a note says
+    so. The planner is shown where it is among the steps, inside the
+    Whenever.
+    Given pull request 2 is labelled "hold" on the small GitHub
+    And the file "hold.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label: dependabot
+      ---
+
+      Merge the pull requests labelled {label}, unless someone holds them.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever a pull request labelled {label} changes `as pr`
+        - If it's labelled hold, leave it, and say so once.
+        - Once it can be merged, merge it by squashing.
+          Or give up after 15 seconds.
+          Otherwise, close it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                        | opens | relation     | facts                             |
+      | act   | open issue 10 of acme/rockets                | yes   |              |                                   |
+      | done  |                                              |       |              |                                   |
+      | act   | list the open pull requests of acme/rockets  | yes   |              |                                   |
+      | check |                                              |       |              | {"github:labels": ["dependabot"]} |
+      | check |                                              |       |              | {"github:labels": ["hold"]}       |
+      | wait  |                                              |       | github:merge |                                   |
+      | act   | merge it by squashing                        |       |              |                                   |
+      | done  |                                              |       |              |                                   |
+      | check |                                              |       |              | {"state": "closed"}               |
+      | act   | close it                                     |       |              |                                   |
+      | done  |                                              |       |              |                                   |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+      | github:merge      | {"merge_method": "squash"}                               |
+      | github:close      | {}                                                       |
+    When the goal "hold.goal.md" runs with ARTIE, captured in "hold.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 3      |
+    And pull request 2 of "acme/rockets" is open on the small GitHub
+    And the run noted one note beginning "Left https://github.gateway.test/repos/acme/rockets/pulls/2:"
+    And the planner was asked 11 times
+    And at move 5 the planner was shown the steps
+      | line                                                             |
+      | [done] Open issue 10 of acme/rockets (as watch)                  |
+      | [in] Whenever a pull request labelled {label} changes (as pr)    |
+      | [now] If it's labelled hold, leave it, and say so once.          |
+
+  Scenario: A planner that stops while a watch decides ends the run, saying why, rather than looking again
+    A failed look is tried again at the next; a decision the planner won't
+    make would only be asked again, and again.
+    Given the planner will move
+      | move  | words                                        | opens | relation | facts |
+      | act   | open issue 10 of acme/rockets                | yes   |          |       |
+      | done  |                                              |       |          |       |
+      | act   | list the open pull requests of acme/rockets  | yes   |          |       |
+      | stop  | I can't tell which pull requests match       |       |          |       |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+    When the goal "merge.goal.md" runs with ARTIE, captured in "merge.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the goal run stopped, saying "I can't tell which pull requests match"
+    And the planner was asked 4 times
+
   Scenario: An act refused while a step is decided is told to the planner, which decides again
     The reasoner first chooses a form the entry doesn't offer, so the
     client refuses it before anything is sent; the planner is told, and its
