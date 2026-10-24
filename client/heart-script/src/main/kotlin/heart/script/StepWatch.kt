@@ -143,7 +143,9 @@ internal class StepWatch(
     /** An If at the member [here]: its check, decided once; when it holds, its words, or leaving the member. */
     private fun given(intent: Step.Intent, condition: String, here: Here): Boolean {
         val facts = ifs.getOrPut(intent) {
-            decide(intent, here, CHECK, "if: ${host.fill(condition)}: the check that tells") {
+            val told = "if: ${host.fill(condition)}: the check that holds exactly when that is true of the member, " +
+                "and fails on a member it isn't true of; made on this member, then on every member after"
+            decide(intent, here, CHECK, told) {
                 (it as? Move.Check)?.facts
             }
         }

@@ -148,6 +148,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | whenever: a pull request labelled dependabot changes: decided the check {"github:labels":["dependabot"]}, at https://github.gateway.test/repos/acme/rockets/pulls/4 |
       | if: it's labelled hold: decided the check {"github:labels":["hold"]}, at https://github.gateway.test/repos/acme/rockets/pulls/3                                   |
       | until: https://github.gateway.test/repos/acme/rockets/issues/10 is closed: decided the check {"state":"closed"}, at https://github.gateway.test/repos/acme/rockets/issues/10 |
+    And at move 5 the planner was told the step now is "if: it's labelled hold: the check that holds exactly when that is true of the member, and fails on a member it isn't true of; made on this member, then on every member after"
     And at move 5 the planner was shown the steps
       | line                                                             |
       | [done] Open issue 10 of acme/rockets (as watch)                  |
