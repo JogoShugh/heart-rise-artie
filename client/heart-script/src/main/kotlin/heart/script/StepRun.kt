@@ -60,7 +60,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 now = fact
                 stepCount = 0
                 // A fact no resource's members say may be left unchecked: done, saying why.
-                single(fact, at, null, setOf("check", "done", "stop"))
+                val told = "done when: ${fill(fact.facts.joinToString("; "))}: check it only when members of the " +
+                    "resource held say it; otherwise done, saying why"
+                single(fact, at, null, setOf("check", "done", "stop"), told)
             }
         }
     }
@@ -164,10 +166,10 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     }
 
     /** A `Wait:` step, which takes one wait; a `Verify:` step, which takes one check. */
-    private fun single(step: Step, here: Here, opener: Int?, allowed: Set<String>? = null) {
+    private fun single(step: Step, here: Here, opener: Int?, allowed: Set<String>? = null, current: String? = null) {
         var over = false
         while (!over) {
-            val move = next(here, allowed)
+            val move = next(here, allowed, current)
             over = when {
                 move is Move.Wait && step is Step.Wait -> script.waited(here, move, opener, moves)
                 move is Move.Check && step is Step.Verify -> {

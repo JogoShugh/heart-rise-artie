@@ -302,6 +302,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | name | value |
     Then the run finished
     And the run noted one note beginning "Not checked: Every pull request was merged, or says why not"
+    And the planner was last told the step now is "done when: Every pull request was merged, or says why not: check it only when members of the resource held say it; otherwise done, saying why"
 
   Scenario Outline: A goal in sections tells the planner its manners, and ends with the checks Done when names: <case>
     Given the file "close.goal.md" is
