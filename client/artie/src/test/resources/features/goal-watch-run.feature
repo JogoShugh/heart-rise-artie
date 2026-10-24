@@ -143,6 +143,11 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And pull request 2 of "acme/rockets" is open on the small GitHub
     And the run noted one note beginning "Left https://github.gateway.test/repos/acme/rockets/pulls/2:"
     And the planner was asked 11 times
+    And the run's capture keeps each check as decided, with where it was decided
+      | move                                                                                                                                         |
+      | whenever: a pull request labelled dependabot changes: decided the check {"github:labels":["dependabot"]}, at https://github.gateway.test/repos/acme/rockets/pulls/4 |
+      | if: it's labelled hold: decided the check {"github:labels":["hold"]}, at https://github.gateway.test/repos/acme/rockets/pulls/3                                   |
+      | until: https://github.gateway.test/repos/acme/rockets/issues/10 is closed: decided the check {"state":"closed"}, at https://github.gateway.test/repos/acme/rockets/issues/10 |
     And at move 5 the planner was shown the steps
       | line                                                             |
       | [done] Open issue 10 of acme/rockets (as watch)                  |

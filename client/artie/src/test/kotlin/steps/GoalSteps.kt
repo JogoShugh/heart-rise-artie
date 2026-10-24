@@ -53,6 +53,14 @@ class GoalSteps(
     @Then("the planner was last told the step now is {string}")
     fun toldNow(current: String) = assertEquals(current, shown.last().current)
 
+    @Then("the run's capture keeps each check as decided, with where it was decided")
+    fun checksKept(table: DataTable) {
+        val planned = checkNotNull(scripts.lastRun).planned
+        table.asMaps().map { it.getValue("move") }.forEach { move ->
+            assertTrue(move in planned, "no \"$move\" in:\n${planned.joinToString("\n")}")
+        }
+    }
+
     @Then("the planner was asked {int} times")
     fun plannerAsked(times: Int) = assertEquals(times, shown.size)
 

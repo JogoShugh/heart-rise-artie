@@ -304,6 +304,11 @@ internal class StepWatch(
             val move = host.ask(step, here, allowed, current)
             if (move is Move.Stop) run.goalStop(move.why)
             val made = pick(move)
+            // A check is kept in the capture as decided, so a wrong one can be read back, and written as a script.
+            if (made != null && move is Move.Check) {
+                moves += "${current.substringBefore(": the check")}: decided the check ${element(move.facts)}, " +
+                    "at ${here.held.address}"
+            }
             if (made != null) return made
             val kind = StepText.kind(move)
             if (kind !in allowed) moves += "$kind: refused, here only ${allowed.joinToString(", ")}"
