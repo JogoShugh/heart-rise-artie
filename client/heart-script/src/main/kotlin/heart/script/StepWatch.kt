@@ -247,7 +247,8 @@ internal class StepWatch(
                 "after it doesn't show it yet; the acts after an act " +
                 "that opens are done on what it reached; a check is made on what the act before it reached, and " +
                 "where it holds, the acts after it are left undone: so a check that is to keep an act from being " +
-                "done, such as whether it was said already, comes before that act"
+                "done, such as whether it was said already, comes before that act; whether something was said is " +
+                "checked on the words said, among the titles of what is listed, not on how many there are"
             var last = reached
             var over = false
             while (!over) {

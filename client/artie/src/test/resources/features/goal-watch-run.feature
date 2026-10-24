@@ -536,7 +536,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body               |
       | ada    | Seen by the watch. |
     And at move 6 the planner was shown the resource's "comments" as "1"
-    And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; an act the server answered is done, even where a read just after it doesn't show it yet; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act"
+    And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; an act the server answered is done, even where a read just after it doesn't show it yet; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act; whether something was said is checked on the words said, among the titles of what is listed, not on how many there are"
 
   Scenario: Issues are matched by their labels, and an If that acts closes the one it holds for
     spec/PLAN-SEED-BENCH.md: a tray is an issue labelled tray, and its stage
@@ -836,7 +836,9 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     never told. A check's values come from the run's inputs, or are kept as
     the planner said them, never read again from the member. The planner
     also assigned the alert four times; an act made again just as the one
-    before it is kept once.
+    before it is kept once. A count is a poor check of what was said, as
+    an alert with other comments shows: the planner is told to check the
+    words said.
     Given "acme/rockets" has these issues on the small GitHub
       | number | title                          | state | author |
       | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
@@ -894,6 +896,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | ada    | Seen by the bench watch. |
     And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
     And the planner was told "assign it to ada: made again just as the act before it, kept once"
+    And at move 5 the planner was told the step now includes "whether something was said is checked on the words said, among the titles of what is listed, not on how many there are"
 
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
