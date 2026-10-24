@@ -25,7 +25,9 @@ internal class StepWatch(
     /** [step], at [scope]: its list reached as decided, each look, until the goal's Until holds. */
     fun whenever(step: Step.Whenever, scope: Here) {
         val list = lists.getOrPut(step) {
-            decide(step, scope, LIST, "whenever: ${fill(step.match)}: reach the list to watch") { move ->
+            val told = "whenever: ${fill(step.match)}: from here, reach the list to watch, by a form or a link; " +
+                "it is read again at every look"
+            decide(step, scope, LIST, told) { move ->
                 (move as? Move.Act)?.let { acted(scope, it, null) }
             }
         }
@@ -83,13 +85,23 @@ internal class StepWatch(
         acts[key] = chosen
     }
 
-    /** [move], an act, made at [here] by the reasoner, and its choice kept, each value bound to its source. */
+    /**
+     * [move], an act, made at [here] by the reasoner, and its choice kept, each value bound to its source. Refused,
+     * the planner is told, and nothing is kept: it decides again.
+     */
     private fun acted(here: Here, move: Move.Act, why: String?): Chosen? {
+        val words = fill(move.words)
         val sources = Bound.sources(here.held, named, run, why)
         val traced = run.trace.size
-        here.act(intent = fill(move.words), block = NOTHING)
-        val chosen = run.trace.getOrNull(traced)?.let { Chosen.of(it, sources) }
-        moves += "${fill(move.words)}: decided ${chosen?.relation}, at ${here.held.address}"
+        val refused = try {
+            here.act(intent = words, block = NOTHING)
+            null
+        } catch (stopped: ScriptStopped) {
+            stopped.refused ?: throw stopped
+        }
+        val chosen = if (refused == null) run.trace.getOrNull(traced)?.let { Chosen.of(it, sources) } else null
+        moves += refused?.let { "$words: refused, ${it.kind.words}: ${it.detail}" }
+            ?: "$words: decided ${chosen?.relation}, at ${here.held.address}"
         return chosen
     }
 
