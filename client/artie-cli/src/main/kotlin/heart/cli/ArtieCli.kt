@@ -72,7 +72,9 @@ class ArtieCli(
         val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, guarding)
         val made = lazy { navigator(settings) }
         val client by made
-        val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = { client })
+        val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = clients(made) {
+            navigator(settings)
+        })
         run.reasoning = asked.reasoner != null
         run.entry = asked.entry
         run.remember = folder.named(asked.remember)
@@ -254,6 +256,10 @@ private fun stopIn(failure: Throwable): ScriptStopped? =
 
 /** The file [name] in this folder; null for no name. */
 private fun Path.named(name: String?): Path? = name?.let(::resolve)
+
+/** The script's client, [first], made once; each listener of a watch with listeners gets one of its own, [more]. */
+private fun clients(first: Lazy<Navigator>, more: () -> Navigator): () -> Navigator =
+    { if (first.isInitialized()) more() else first.value }
 
 /** One step, as a line: its number, what was asked with its values, and the outcome. */
 internal fun line(number: Int, step: TraceStep): String {

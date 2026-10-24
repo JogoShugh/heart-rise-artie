@@ -453,6 +453,29 @@ Feature: artie run: a script, run from the command line
       | 3 we're done with this one: done    |
       | finished, 3 steps                   |
 
+  Scenario Outline: A watch with listeners gives each listener a client of its own
+    spec/PLAN-LISTENERS.md, slice 1: each listener looks on a thread of its
+    own, so it asks the run for a client of its own, never the script's.
+    Given the script "listen.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          listeners(until = { true }) {
+              <listen>
+          }
+      }
+      """
+    When artie is run with
+      | argument   |
+      | run        |
+      | listen.kts |
+    Then artie exits 0
+    And the client was made <made> times
+
+    Examples:
+      | listen                                     | made |
+      | listen("scan") {}                          | 2    |
+      | listen("scan") {}; listen("merge") {}      | 3    |
+
   Scenario: A reasoner artie doesn't know stops the run before its first request
     Given the script "issue.kts" is
       """kotlin

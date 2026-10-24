@@ -119,6 +119,7 @@ class CliSteps(private val script: ScriptSteps) {
             askedPins = settings.pins
             askedGuard = settings.guarding.guard
             askedValidators = settings.guarding.validators
+            made++
             script.service
         }
         val cli = ArtieCli(folder, PrintStream(bytes, true), { typed.removeFirstOrNull() }, client, BUILDER)
@@ -134,6 +135,12 @@ class CliSteps(private val script: ScriptSteps) {
 
     @Then("artie prints, exactly")
     fun printsExactly(lines: String) = assertEquals(lines, printed.joinToString("\n"))
+
+    /** How many clients the run asked for: one for the script, one more for each listener. */
+    private var made = 0
+
+    @Then("the client was made {int} times")
+    fun madeTimes(times: Int) = assertEquals(times, made)
 
     @Then("the client was made to ask at rung {string}")
     fun rung(rung: String) = assertEquals(rung, askedRung.orEmpty())
