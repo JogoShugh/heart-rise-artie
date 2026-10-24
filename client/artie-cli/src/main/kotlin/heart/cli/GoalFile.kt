@@ -1,7 +1,6 @@
 package heart.cli
 
 import heart.script.Goal
-import heart.script.Step
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -26,32 +25,6 @@ internal fun readGoal(file: Path): Goal = try {
     goalFile(file.fileName.toString(), Files.readString(file))
 } catch (e: BadArguments) {
     throw BadArguments("$STOPPED: ${e.message}", e)
-}
-
-/**
- * A goal that keeps watching, waits with `Once`, or is written in sections with the manners in words or Done when,
- * isn't run yet (spec/ideas/goals-that-work-alongside-others.md): the first such part of [goal], read from [file],
- * stops the run before its first request, saying so.
- */
-internal fun unwatched(goal: Goal, file: Path) {
-    fun first(steps: List<Step>): Pair<Int, String>? = steps.firstNotNullOfOrNull { step ->
-        when {
-            step is Step.Whenever -> step.line to "Whenever"
-            step is Step.Until -> step.line to "Until"
-            step is Step.Intent && step.once != null -> step.line to "Once"
-            step is Step.Intent && step.otherwise != null -> step.line to "Otherwise"
-            else -> null
-        } ?: first(heart.cli.goal.under(step))
-    }
-    val parts = listOfNotNull(
-        goal.alongside?.let { it.line to "Working alongside others" },
-        first(goal.steps),
-        goal.done.firstOrNull()?.let { it.line to "Done when" },
-    )
-    parts.minByOrNull { it.first }?.let { (line, word) ->
-        val how = "--plan-only shows how the goal reads"
-        throw BadArguments("$STOPPED: ${file.fileName}:$line: $word isn't run yet; $how")
-    }
 }
 
 /** `--plan-only`: what goal [file] holds, as lines to print; nothing is sent. */

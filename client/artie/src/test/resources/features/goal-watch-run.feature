@@ -87,3 +87,49 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And pull request 4 of "acme/rockets" is open on the small GitHub
     And the planner was asked 10 times
     And ARTIE's reasoner was asked 4 times
+
+  Scenario Outline: A goal in sections tells the planner its manners, and ends with the checks Done when names: <case>
+    Given the file "close.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Close the watch issue.
+
+      ## Working alongside others
+
+      Leave what others changed.
+
+      - Do not reopen what someone closed.
+
+      ## The work
+
+      - Open issue 10 of acme/rockets `as watch`
+        - Close it
+
+      ## Done when
+
+      - {watch} is closed
+      """
+    And the planner will move
+      | move  | words                         | opens | relation | facts   |
+      | act   | open issue 10 of acme/rockets | yes   |          |         |
+      | done  |                               |       |          |         |
+      | act   | close it                      |       |          |         |
+      | done  |                               |       |          |         |
+      | check |                               |       |          | <facts> |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:close      | {}                                                       |
+    When the goal "close.goal.md" runs with ARTIE, captured in "close.trace.yaml", given
+      | name | value |
+    Then <ended>
+    And the planner was shown the goal with "Do not reopen what someone closed."
+    And the planner was last shown "watch" named, at an address ending "/issues/10"
+
+    Examples:
+      | case                         | facts               | ended                                                          |
+      | the check holds              | {"state": "closed"} | the run finished                                               |
+      | the check fails, and says so | {"state": "open"}   | the goal run stopped, saying "state: expected open, was closed" |

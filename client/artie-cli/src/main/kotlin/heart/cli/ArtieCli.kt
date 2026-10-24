@@ -133,7 +133,6 @@ class ArtieCli(
      */
     private fun pursued(asked: Arguments, file: Path, run: Run, client: () -> Navigator): Ended {
         val goal = readGoal(file)
-        unwatched(goal, file)
         if (asked.reasoner == null) throw BadArguments("$STOPPED: a goal needs --reasoner")
         // Without a planner, the client says why: for ARTIE, where the model key goes.
         val planning = client().planner() ?: throw BadArguments("$STOPPED: ${client().noPlanner}")

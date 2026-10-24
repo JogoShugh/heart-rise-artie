@@ -38,8 +38,25 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
             run.goal = (listOf(goal.context) + StepText.all(goal.steps)).joinToString("\n")
             path += held.address
             goal.steps.forEach { step(it, this, null) }
+            // Done when: each fact checked at the resource it names, else at the start.
+            goal.done.forEach { fact ->
+                val name = BRACE.findAll(fact.facts.joinToString(" ")).map { it.groupValues[1] }
+                    .firstOrNull { it in named }
+                val at = name?.let { named.getValue(it).address }?.let {
+                    Here(navigator, run, arrived(++run.step, "\"done when\"", navigator.recall(it)))
+                } ?: this
+                now = fact
+                stepCount = 0
+                single(fact, at, null)
+            }
         }
     }
+
+    /** What the planner is told the goal is: its brief, then its manners in words, when it has them. */
+    private val told = listOfNotNull(
+        goal.context.takeIf { it.isNotBlank() },
+        goal.alongside?.let { "Working alongside others:\n" + it.words.joinToString("\n") },
+    ).joinToString("\n\n")
 
     /** [step], done at [here], in the block the act on line [opener] opened (null at the top). */
     private fun step(step: Step, here: Here, opener: Int?) {
@@ -174,7 +191,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         if (++stepCount > limit) stop("line ${step.line}: more than $limit moves for one step")
         return planner.next(
             PlanView(
-                goal.context, emptyList(), emptySet(), moves.toList(), path.toList(), here.held, answers.toList(),
+                told, emptyList(), emptySet(), moves.toList(), path.toList(), here.held, answers.toList(),
                 inputs.associateWith { run.value(it) },
                 here.held.offered.sorted().associateWith { here.describe(it) },
                 current = current ?: fill(StepText.said(step)),
@@ -192,6 +209,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     private companion object {
         /** A step and its sub-steps, done: every block it opened is left. */
         const val DONE = Int.MAX_VALUE
+
+        /** A name in braces, as a fact names the resource it is about. */
+        val BRACE = Regex("""\{(\w+)""")
     }
 }
 

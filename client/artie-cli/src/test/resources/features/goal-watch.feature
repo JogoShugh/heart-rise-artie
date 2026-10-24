@@ -5,8 +5,9 @@ Feature: A goal that keeps watching: Whenever, Until, Once, Or give up and Other
   step that begins Once waits for its condition, then does the rest of its
   words; on the lines under it, Or give up after a time ends the wait, and
   Otherwise says what to do instead. The front matter may name the run's
-  manners. --plan-only reads it all and prints it; a run doesn't run a watch
-  yet, and says so before its first request.
+  manners. --plan-only reads it all and prints it; a run runs the watch,
+  each step decided once and replayed (spec/PLAN-WATCH-GOALS.md), and, as
+  any goal, needs a reasoner.
 
   Background:
     Given the file "watch.goal.md" is
@@ -103,13 +104,13 @@ Feature: A goal that keeps watching: Whenever, Until, Once, Or give up and Other
       | line 7: until: {pr} is closed                |
       | a goal in steps: 4 steps, nothing sent       |
 
-  Scenario: A run doesn't run a watch yet, and says so before its first request
+  Scenario: A watch runs as any goal does, so a run with no reasoner stops before its first request
     When artie is run with
       | argument      |
       | run           |
       | watch.goal.md |
     Then artie exits 2
-    And artie's last line is: stopped before the first request: watch.goal.md:14: Whenever isn't run yet; --plan-only shows how the goal reads
+    And artie's last line is: stopped before the first request: a goal needs --reasoner
 
   Scenario Outline: A watch that breaks a rule stops before its first request: <case>
     Given line <line> of "watch.goal.md" reads '<reads>', indented <indent>

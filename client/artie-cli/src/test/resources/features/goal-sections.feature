@@ -3,8 +3,9 @@ Feature: A goal file in sections: the brief, Working alongside others, The work 
   be written in sections, each a ## heading: Working alongside others, the
   manners in words, a paragraph then a list; The work, the one list of steps;
   Done when, the outcomes, a list of facts. A goal with no heading is read as
-  before. --plan-only prints every section; a run doesn't use the manners in
-  words or check Done when yet, and says so before its first request.
+  before. --plan-only prints every section; a run tells the planner the
+  manners in words, ends with the checks Done when names, and, as any goal,
+  needs a reasoner.
 
   Background:
     Given the file "task.goal.md" is
@@ -61,13 +62,13 @@ Feature: A goal file in sections: the brief, Working alongside others, The work 
       | line 27: done when: Nothing anyone else decided was undone |
       | a goal in steps: 3 steps, nothing sent           |
 
-  Scenario: A run doesn't use the sections yet, and says so before its first request
+  Scenario: A goal in sections runs as any goal does, so a run with no reasoner stops before its first request
     When artie is run with
       | argument     |
       | run          |
       | task.goal.md |
     Then artie exits 2
-    And artie's last line is: stopped before the first request: task.goal.md:11: Working alongside others isn't run yet; --plan-only shows how the goal reads
+    And artie's last line is: stopped before the first request: a goal needs --reasoner
 
   Scenario Outline: A goal in sections that breaks a rule stops before its first request: <case>
     Given line <line> of "task.goal.md" reads '<reads>', indented <indent>
