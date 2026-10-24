@@ -69,12 +69,17 @@ val goalText = File(yaml.text("goalFile")).readText()
 val became = yaml["became"].list().joinToString("\n") { b ->
     """<li><b>${esc(b.text("part"))}</b><div class="outcome">${esc(b.text("as"))}</div></li>"""
 }
-val goalRuns = yaml["goalRuns"].list().joinToString("\n") { r ->
+/** Each live run of a goal file, as a row: what it found, and what was fixed. */
+fun runs(key: String) = yaml[key].list().joinToString("\n") { r ->
     val tone = r.text("tone")
     val fixed = r.text("fixed").takeIf { it != "-" }?.let { """<div class="sub">Fixed: ${esc(it)}</div>""" }.orEmpty()
     """<li class="pull $tone"><div class="head"><b class="mono">${esc(r.text("run"))}</b> ${tag(tone, runWords[tone] ?: tone)}</div>""" +
         """<div>${esc(r.text("found"))}</div>$fixed</li>"""
 }
+val goalRuns = runs("goalRuns")
+val goalRunCount = yaml["goalRuns"].list().size
+val scanText = File(yaml.text("scanGoalFile")).readText()
+val scanRuns = runs("scanRuns")
 
 val gaps = yaml["gaps"].list().joinToString("\n") { g ->
     """<li>${tag("quiet", g.text("where"))} ${esc(g.text("what"))}</li>"""
@@ -128,8 +133,19 @@ $roundSections
     <details class="box" open><summary>dependabot-sim.goal.md</summary><div class="scroll"><pre class="src">${esc(goalText)}</pre></div></details>
     <h3>What each part became, in the last run</h3>
     <ol class="words">$became</ol>
-    <h3>Ten live runs, each finding something, each fixed with a test first</h3>
+    <h3>$goalRunCount live runs, each finding something, each fixed with a test first</h3>
     <ol class="pulls">$goalRuns</ol>
+  </section>
+  <section>
+    <h2>Two Whenevers at once: Dependabot, and a security scan</h2>
+    <p>The same watch, with a second Whenever beside it: each issue a security scan opens, labelled
+    <span class="mono">scan</span>, is answered once. Whenevers side by side are one watch, each a listener on a
+    thread of its own, with a client of its own, so a slow read under one holds up only that one. Each one's
+    first look is made in turn, as the goal lists them, so Claude decides in the goal's order; after that, every
+    look replays.</p>
+    <details class="box"><summary>dependabot-scan.goal.md</summary><div class="scroll"><pre class="src">${esc(scanText)}</pre></div></details>
+    <h3>Seven live runs, to every give-up saying why in the gateway's own words</h3>
+    <ol class="pulls">$scanRuns</ol>
   </section>
   <section>
     <h2>The goal words, as the code they came down to</h2>

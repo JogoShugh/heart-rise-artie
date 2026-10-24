@@ -125,6 +125,39 @@ Each of the next live runs found something, and each was fixed with a test first
   - With `--remember`, it kept what it did in `runs/watch.memory.yaml`, so a watch run again doesn't merge, leave
     or say any of it again.
 
+- **g11 (`runs/goal-1024-g11.out`)** merged #714, then stopped at the first give-up (#697). The planner's Otherwise
+  was a read, a check and a comment, but only its first act was kept, so the planner was asked again and again until
+  the step's limit. **Fixed:** a step under a Whenever is decided as a chain of acts, kept in order until the
+  planner says done. A check in the chain leaves the rest undone where it holds.
+
+## Two Whenevers at once: Dependabot, and a security scan (`runs/goal-1024-g12.out` to `g18.out`)
+
+`dependabot-scan.goal.md` puts a second Whenever beside the Dependabot one: each issue a security scan opens,
+labelled `scan`, is answered once. `finding.kts` opens such an issue, as a veracode-bot would. Whenevers side by side
+are one watch, each a listener on a thread of its own with a client of its own (spec/PLAN-LISTENERS.md, slice 1).
+Each one's first look is made in turn, in the goal's order, and every look after replays.
+
+- **g12** stopped before its first look. The planner reached each list from the start, and Whenevers side by side
+  were refused that. **Fixed:** each listener looks from where its own list is reached.
+- **g13** commented on scan issue #718 at every look. Its own comment changed the issue, and the next look took that
+  as a change. It was stopped by hand after two. **Fixed:** once a Whenever's steps are done at a member, the member
+  is read again and remembered as it is, so only someone else's change is answered.
+- **g14** merged #723, answered each scan issue once, and left the held pull requests alone. It stopped at the first
+  give-up, because a pull request offered no comment through the gateway. **Fixed:** a pull request offers
+  `github:comment`, open or closed, posted on the issue it also is.
+- **g15** decided the If "labelled hold" as a check that held on every pull request, and left them all. The capture
+  didn't say which check it was. **Fixed:** each check a watch decides is kept in the capture with where it was
+  decided, and the planner is told an If's check holds exactly when its condition is true.
+- **g16** decided the If right and merged #726. The Otherwise found no comment, because the restarted gateway
+  couldn't bind its port and the old one kept answering.
+- **g17** commented once on each of eight stuck pull requests, and no more after. But the reason was made up from
+  `mergeable_state`, and each comment said it would be merged once it could be. **Fixed:** an Otherwise is told its
+  wait gave up, and the server's own reason, to say that reason in the server's words and promise nothing the watch
+  won't do.
+- **g18 (`runs/goal-1024-g18.out`)** commented once on each of nine pull requests, each in the gateway's own words:
+  a draft (#728, #715, #695, #682), conflicts with its base (#685, #683), or branch protection (#716, #697, #688).
+  The Otherwise was decided once, at the first, and replayed for the rest with no model.
+
 ## What it showed
 
 - **The five words come down to small, plain code.** Whenever is a loop over open pull requests, most recently

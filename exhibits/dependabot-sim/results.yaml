@@ -1,9 +1,9 @@
-# What the Dependabot simulation did, 2026-10-23, on JogoShugh/heart-github-test. report.kts lays this out.
+# What the Dependabot simulation did, 2026-10-23 and 24, on JogoShugh/heart-github-test. report.kts lays this out.
 # Outcomes are from the runs' outputs (runs/*.out); times are GitHub's own, read back from each pull request's
 # timeline and check runs after the runs (UTC).
 # tone: good (did the right thing), safe (stopped, and said why), bad (did harm), quiet (nothing to do).
 
-asOf: "2026-10-23"
+asOf: "2026-10-24"
 
 rounds:
   - name: Round 1, no required check
@@ -133,6 +133,12 @@ gaps:
     what: "Done when over many resources (\"every pull request was merged, or says why\") is noted, not checked: the run would have to answer from its own record."
   - where: ARTIE
     what: artie generate doesn't yet write a decided watch run as a script with no model in it (spec/PLAN-WATCH-GOALS.md, slice 4c).
+  - where: ARTIE
+    what: "\"Say it, unless it's said already\" is decided as a chain; the planner put the comment before the check in g13 and g14, and after it in g15. A watch doesn't answer its own comment, but someone else's comment replays the chain."
+  - where: ARTIE
+    what: --remember isn't kept per listener, so a watch with listeners run again does what it did again.
+  - where: ARTIE
+    what: An Otherwise's step, in the trace and the output, carries the whole of what its reasoner was told, not only the planner's words.
 
 # The goal file run by ARTIE itself (spec/PLAN-WATCH-GOALS.md): artie run dependabot-sim.goal.md --reasoner claude.
 goalFile: ../goal-syntax/goals/dependabot-sim.goal.md
@@ -199,4 +205,42 @@ goalRuns:
   - run: g10
     tone: good
     found: "Exit 0: watched github:pulls-list with labels=dependabot, merged #710, left the held ones alone. 54 steps, 19 model calls, every one a decision; --remember kept what it did."
+    fixed: "-"
+  - run: g11
+    tone: bad
+    found: "Merged #714, then stopped at the first give-up (#697): the planner's Otherwise was a read, a check and a comment, and only its first act was kept, so it asked again and again until the step's limit."
+    fixed: A step under a Whenever is decided as a chain of acts, kept in order until the planner says done; a check in it leaves the rest undone where it holds.
+
+# The same Dependabot watch, with a second Whenever beside it: each issue a security scan opens is answered once.
+# The two Whenevers are one watch, each a listener on a thread of its own (spec/PLAN-LISTENERS.md, slice 1).
+scanGoalFile: ../goal-syntax/goals/dependabot-scan.goal.md
+
+scanRuns:
+  - run: g12
+    tone: bad
+    found: Stopped before its first look. The planner reached each list from the start, and Whenevers side by side were refused that.
+    fixed: Each listener looks from where its own list is reached, the start or where the watch stands.
+  - run: g13
+    tone: bad
+    found: "Commented on scan issue #718 at every look: its own comment changed the issue, and the next look took that as a change. Stopped by hand after two."
+    fixed: Once a Whenever's steps are done at a member, the member is read again and remembered as it is; only someone else's change is answered.
+  - run: g14
+    tone: safe
+    found: "Merged #723, answered each scan issue once, left the held pull requests alone; stopped at the first give-up: a pull request offered no comment through the gateway."
+    fixed: "A pull request offers github:comment, open or closed, posted on the issue it also is: issues/create-comment with the pull request's number."
+  - run: g15
+    tone: bad
+    found: "The If \"labelled hold\" was decided as a check that held on every pull request, so it left them all; the capture didn't say which check it was."
+    fixed: Each check a watch decides is kept in the capture, with where it was decided; the planner is told an If's check holds exactly when its condition is true.
+  - run: g16
+    tone: safe
+    found: "The If was right, and #726 was merged. The Otherwise found no comment: the restarted gateway couldn't bind its port, and the old one kept answering."
+    fixed: "The gateway restarted for real (an operations slip, not a code change)."
+  - run: g17
+    tone: bad
+    found: "Each of eight stuck pull requests got one comment, and no more after; but the reason was made up from mergeable_state, and each said it would be merged once it could be."
+    fixed: An Otherwise is told its wait gave up, and the server's own reason, to say that reason in the server's words and promise nothing the watch won't do.
+  - run: g18
+    tone: good
+    found: "Nine pull requests each got one comment, in the gateway's own words: a draft (#728, #715, #695, #682), conflicts (#685, #683), or branch protection (#716, #697, #688). Decided once, at the first; replayed for the rest with no model."
     fixed: "-"
