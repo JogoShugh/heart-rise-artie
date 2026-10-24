@@ -101,7 +101,7 @@ internal class StepWatch(
                         back = true
                         moves += "back to the start, at ${scope.held.address}"
                     }
-                    move is Move.Act -> decided = acted(scope, move, null)
+                    move is Move.Act -> decided = acted(scope, move, null, step.match)
                     move is Move.Stop -> run.goalStop(move.why)
                     else -> moves += "${StepText.kind(move)}: refused, here only ${LIST.joinToString(", ")}"
                 }
@@ -189,9 +189,14 @@ internal class StepWatch(
         Walk(step, part, chain, why).from(0, here, here.held)
     }
 
-    /** Where values come from at [here], with the server's reason a wait gave up, [why]. */
-    private fun sources(here: Here, why: String?) =
-        Bound.sources(here.held, synchronized(named) { named.toMap() }, here.run, why)
+    /**
+     * Where values come from at [here], with the server's reason a wait gave up, [why]; the inputs the step's words
+     * [meant] name first, as a value more than one input holds is the one the words say.
+     */
+    private fun sources(here: Here, why: String?, meant: String = "") = Bound.sources(
+        here.held, synchronized(named) { named.toMap() }, here.run, why,
+        BRACE.findAll(meant).map { it.groupValues[1] }.toSet(),
+    )
 
     /**
      * [move], an act, made at [here] by the reasoner, and its choice kept, each value bound to its source; [then] on
@@ -201,6 +206,7 @@ internal class StepWatch(
         here: Here,
         move: Move.Act,
         why: String?,
+        meant: String,
         then: Here.(Chosen?) -> Unit = {},
     ): Chosen? = synchronized(host) {
         // One decision at a time, as the planner is asked: the reasoner is the run's, whichever thread acts.
@@ -209,7 +215,7 @@ internal class StepWatch(
         val said = host.fill(move.words)
         val told = gaveUp(why)?.takeUnless { why != null && why.trim().trimEnd('.') in said }
         val words = said + told?.let { ". ${it.replaceFirstChar(Char::uppercase)}." }.orEmpty()
-        val sources = sources(here, why)
+        val sources = sources(here, why, meant)
         val traced = here.run.trace.size
         var chosen: Chosen? = null
         var entered = false
@@ -255,8 +261,11 @@ internal class StepWatch(
         }
 
         /** The chain decided further at [here], each of the planner's moves kept in order, until it says done. */
+        /** The words of the part being decided: the step's, or its Otherwise's. */
+        private fun said() = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
+
         private fun further(here: Here, reached: Representation) {
-            val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
+            val words = said()
             val told = toldActs(part, host.fill(words), why)
             var last = reached
             var over = false
@@ -282,7 +291,7 @@ internal class StepWatch(
             made = null
             // Its values from the run's inputs, or as the planner said them: one read again from the member, as the
             // member's own count that happened to equal the planner's, would hold on every member after.
-            val inputs = sources(here, why).filterKeys { it.startsWith("input:") }
+            val inputs = sources(here, why, said()).filterKeys { it.startsWith("input:") }
             val check = Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, inputs) })
             // A check after acts that write, made on what reads among them reached, can keep none of them from being
             // done: it is kept before the first act that writes since the last check, with those reads, so a replay
@@ -323,7 +332,7 @@ internal class StepWatch(
             }
             made = said
             var inside = false
-            acted(here, move, why) { chosen ->
+            acted(here, move, why, said()) { chosen ->
                 if (chosen == null) return@acted
                 // A link followed is a read, though the planner says it opens: the check after it is made on what
                 // it reached, and the acts after that on the member, where the step's forms are.

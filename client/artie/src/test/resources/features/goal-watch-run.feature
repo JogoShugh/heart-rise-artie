@@ -1230,6 +1230,54 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body                     |
       | ada    | Seen by the bench watch. |
 
+  Scenario: A value two inputs hold is read again from the input the step's words name
+    Found by the live seed bench run b15: the owner and the grower were the
+    same person, so the grower's name in a comment, and the assignee, were
+    kept as the owner's, the first input that held it. A value more than one
+    source holds is bound to an input the step's own words name, before any
+    other: the words say which one the person meant.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "who.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        lead:
+        grower:
+      ---
+
+      Hand each alert to the grower.
+
+      - Open issue 10 of acme/rockets for {lead} `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Assign it to {grower}.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts               |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                     |
+      | done  |                                                     |       |          |                     |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                     |
+      | check |                                                     |       |          | {"state": "open"}   |
+      | act   | assign it to ada                                    |       |          |                     |
+      | done  |                                                     |       |          |                     |
+      | check |                                                     |       |          | {"state": "closed"} |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow | fields                                                                   |
+      | github:issues-get           |        | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |        | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:assign               |        | {"assignees": ["ada"]}                                                   |
+    When the goal "who.goal.md" runs with ARTIE, captured in "who.trace.yaml", given
+      | name   | value |
+      | lead   | ada   |
+      | grower | ada   |
+    Then the run finished
+    And the capture "who.trace.yaml" keeps a watch script with a line with "act(\"github:assign\", \"assignees\" to listOf(grower)) {}"
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

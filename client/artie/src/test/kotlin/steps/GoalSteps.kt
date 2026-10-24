@@ -201,6 +201,13 @@ class GoalSteps(
         assertEquals(from, watch?.get("from"))
     }
 
+    @Then("the capture {string} keeps a watch script with a line with {string}")
+    fun watchLine(capture: String, text: String) {
+        val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>
+        val script = ((head["run"] as Map<*, *>)["watch"] as? Map<*, *>)?.get("script")?.toString().orEmpty()
+        assertTrue(script.lines().any { text in it }, script)
+    }
+
     @Then("the planner was shown these steps, move by move")
     fun stepsShown(table: DataTable) {
         val rows = table.asMaps()

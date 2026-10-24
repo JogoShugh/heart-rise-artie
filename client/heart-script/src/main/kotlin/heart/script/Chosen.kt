@@ -141,7 +141,8 @@ internal class Bound(
         }
 
         /**
-         * Where a value can come from, in the order it is looked for: the run's inputs, the [member]'s state, each
+         * Where a value can come from, in the order it is looked for: the run's inputs, those the step's words name
+         * ([meant]) first, as a value more than one holds is the one the words say; the [member]'s state, each
          * resource a step [named], and the server's reason a wait gave up ([why]).
          */
         fun sources(
@@ -149,8 +150,10 @@ internal class Bound(
             named: Map<String, Representation>,
             run: Run,
             why: String?,
+            meant: Set<String> = emptySet(),
         ): Map<String, Any?> = buildMap {
-            run.inputsUsed.forEach { (name, used) -> put("input:$name", used.first) }
+            run.inputsUsed.entries.sortedBy { it.key !in meant }
+                .forEach { (name, used) -> put("input:$name", used.first) }
             scalars(member).forEach { (pointer, value) -> put("member:$pointer", value) }
             named.forEach { (name, held) -> scalars(held).forEach { (pointer, v) -> put("named:$name:$pointer", v) } }
             why?.let { put("why", it) }
