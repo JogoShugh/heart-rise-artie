@@ -240,8 +240,9 @@ internal class StepWatch(
         private fun further(here: Here, reached: Representation) {
             val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
             val told = "$part: ${host.fill(words)}: one act or more, in order, then done; the acts after an act " +
-                "that opens are done on what it reached; a check after an act leaves the acts after it undone " +
-                "wherever it holds on what that act reached"
+                "that opens are done on what it reached; a check is made on what the act before it reached, and " +
+                "where it holds, the acts after it are left undone: so a check that is to keep an act from being " +
+                "done, such as whether it was said already, comes before that act"
             var last = reached
             var over = false
             while (!over) {

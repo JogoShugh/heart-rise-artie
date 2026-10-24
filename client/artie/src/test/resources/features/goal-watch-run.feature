@@ -504,7 +504,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
 
       - Open issue 10 of acme/rockets `as watch`
       - Whenever an issue labelled scan changes `as scan`
-        - Say on it "Seen by the watch."
+        - Say on it that the watch has seen it.
       - Until {watch} is closed
       """
     And the planner will move
@@ -513,7 +513,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | done  |                                                    |       |          |                     |
       | act   | list the open issues of acme/rockets labelled scan | yes   |          |                     |
       | check |                                                    |       |          | {"state": "open"}   |
-      | act   | say on it "Seen by the watch."                     |       |          |                     |
+      | act   | say on it that the watch has seen it               |       |          |                     |
       | done  |                                                    |       |          |                     |
       | check |                                                    |       |          | {"state": "closed"} |
     And ARTIE's reasoner will choose, in order
@@ -527,6 +527,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 11 of "acme/rockets" now has these comments on the small GitHub
       | author | body               |
       | ada    | Seen by the watch. |
+    And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act"
 
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
