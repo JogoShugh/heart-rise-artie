@@ -286,7 +286,9 @@ internal class StepWatch(
             // here would let a replay do them again.
             if (moved && !holds) {
                 moves += "check: refused, it fails here, right after the acts it is to keep from being done " +
-                    "again, so a replay would do them again: check what they made, as it is here"
+                    "again, so a replay would do them again: it is made on ${on.address}, which holds " +
+                    "${readable(on)}; a fact names a member of that state, or a relation it links to, its value " +
+                    "words a link's title says"
                 return false
             }
             if (moved) {

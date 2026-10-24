@@ -961,7 +961,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     no such member, so the check failed even there, after the comment, and
     every replay commented again. A check kept before the acts that write
     must hold where it is made, right after them: one that fails there is
-    refused, and the planner told why. Found by run b9: a read, kept on the
+    refused, and the planner told why, where the check is made, what is
+    there, and how a fact says a link's title (run b11). Found by run b9: a read, kept on the
     member, showed the planner nothing, and it read again and again; the
     planner is told what a read reached.
     Given "acme/rockets" has these issues on the small GitHub
@@ -1013,7 +1014,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 12 of "acme/rockets" now has these comments on the small GitHub
       | author | body                     |
       | ada    | Seen by the bench watch. |
-    And the planner was told "check: refused, it fails here, right after the acts it is to keep from being done again"
+    And the planner was told "check: refused, it fails here, right after the acts it is to keep from being done again, so a replay would do them again: it is made on https://github.gateway.test/repos/acme/rockets/issues/11/comments, which holds {\"count\":1}, and links item: Seen by the bench watch.; a fact names a member of that state, or a relation it links to, its value words a link's title says"
     And the planner was told "read its comments: read https://github.gateway.test/repos/acme/rockets/issues/11/comments, which holds"
 
   Scenario: A step is not done where its last check fails and nothing was done after it
