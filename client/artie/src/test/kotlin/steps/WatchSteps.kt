@@ -61,18 +61,49 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
     private val merged = java.util.concurrent.CountDownLatch(1)
     private var heldUntilMerged: Boolean? = null
 
+    /** Done once the held answer is given, whether it waited long enough or not. */
+    private val onceGiven = mutableListOf<() -> Unit>()
+
     @Given(
         "the small GitHub holds its first answer to {string} until pull request {long} is merged, " +
             "at most {int} seconds",
     )
-    fun holdsAnswer(path: String, pull: Long, seconds: Int) {
-        var first = true
+    fun holdsAnswer(path: String, pull: Long, seconds: Int) = holds(path, pull, seconds) { true }
+
+    @Given(
+        "the small GitHub holds its first answer to {string} after pull request {long} is merged, until pull " +
+            "request {long} is merged, at most {int} seconds",
+    )
+    fun holdsAnswerAfter(path: String, after: Long, pull: Long, seconds: Int) {
+        val before = java.util.concurrent.CountDownLatch(1)
+        gateway.github.beforeAnswer += { request ->
+            if (request.method.name == "PUT" && request.uri.path.endsWith("/pulls/$after/merge")) before.countDown()
+        }
+        holds(path, pull, seconds) { before.count == 0L }
+    }
+
+    @Given("issue {long} of {string} is closed on the small GitHub once that held answer is given")
+    fun closedOnceGiven(issue: Long, repository: String) {
+        onceGiven += {
+            gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == issue }
+                .state = "closed"
+        }
+    }
+
+    /**
+     * The first answer to [path] once [ready] says so, held until pull request [pull] is merged, or [seconds] have
+     * passed; then whatever waits on its being given.
+     */
+    private fun holds(path: String, pull: Long, seconds: Int, ready: () -> Boolean) {
+        var held = false
         gateway.github.beforeAnswer += { request ->
             val name = request.method.name
             if (name == "PUT" && request.uri.path.endsWith("/pulls/$pull/merge")) merged.countDown()
-            if (name == "GET" && request.uri.path == path && first) {
-                first = false
+            val heldNow = name == "GET" && request.uri.path == path
+            if (heldNow && !held && ready()) {
+                held = true
                 heldUntilMerged = merged.await(seconds.toLong(), java.util.concurrent.TimeUnit.SECONDS)
+                onceGiven.forEach { it() }
             }
         }
     }
@@ -80,6 +111,16 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
     @Then("the small GitHub answered {string} the first time only after pull request {long} was merged")
     fun answeredAfterMerge(path: String, pull: Long) {
         assertEquals(true, heldUntilMerged, "the first answer to $path waited for pull request $pull's merge")
+    }
+
+    @Then("the small GitHub gave that held answer only after pull request {long} was merged")
+    fun heldAnswerAfterMerge(pull: Long) {
+        assertEquals(true, heldUntilMerged, "the held answer waited for pull request $pull's merge")
+    }
+
+    @Given("issue {long} of {string} is labelled {string} on the small GitHub")
+    fun issueLabelled(number: Long, repository: String, label: String) {
+        gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == number }.labels += label
     }
 
     @Then("pull request {long} of {string} is closed and not merged on the small GitHub")

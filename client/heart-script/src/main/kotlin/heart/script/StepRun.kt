@@ -9,10 +9,14 @@ package heart.script
 internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val maxMoves: Int) {
     private val script = MoveLines(run)
     private val marks = StepMarks(run)
-    private val moves = mutableListOf<String>()
+    // Whenevers side by side look on threads of their own: what they tell the planner, and name, is shared.
+    private val moves = java.util.concurrent.CopyOnWriteArrayList<String>()
     private val path = mutableListOf<String>()
     private val answers = mutableListOf<Pair<String, String>>()
-    private val named = linkedMapOf<String, Representation>()
+    private val named = java.util.Collections.synchronizedMap(linkedMapOf<String, Representation>())
+
+    /** What the steps named so far, read at once. */
+    private val names: Map<String, Representation> get() = synchronized(named) { named.toMap() }
     private val done = mutableSetOf<Step>()
     private val inputs = goal.inputs.map { it.name }.toSet()
     private var now: Step? = null
@@ -25,10 +29,11 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     /** A Whenever and what is under it, decided once and replayed (spec/PLAN-WATCH-GOALS.md). */
     private val watch by lazy {
         StepWatch(goal, run, named, moves, object : StepWatch.Host {
-            override fun ask(step: Step, here: Here, allowed: Set<String>, current: String): Move {
+            // One decision at a time, whichever Whenever's thread asks.
+            override fun ask(step: Step, here: Here, allowed: Set<String>, current: String): Move = synchronized(this) {
                 if (now !== step) stepCount = 0
                 now = step
-                return next(here, allowed, current)
+                next(here, allowed, current)
             }
 
             override fun start(): Here = checkNotNull(start).let { begun ->
@@ -81,7 +86,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         when (step) {
             is Step.Intent -> intent(step, here, opener)
             is Step.Wait, is Step.Verify -> single(step, here, opener)
-            is Step.Whenever -> watch.whenever(step, here)
+            // Whenevers side by side are one watch, run at the first of them.
+            is Step.Whenever -> goal.beside(step).takeIf { it.first() === step }?.let { watch.whenever(it, here) }
             // The watch a Whenever ran ended when its Until held: nothing is left to do.
             is Step.Until -> Unit
         }
@@ -219,12 +225,12 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 current = current ?: fill(StepText.said(step)),
                 steps = StepText.tree(goal.steps, done, step),
                 allowed = allowed ?: StepText.allowed(step),
-                named = named.mapValues { it.value.address },
+                named = names.mapValues { it.value.address },
             ),
         ).also { move -> move.reason?.let { moves += "why: $it" } }
     }
 
-    private fun fill(text: String) = StepText.fill(text, named, inputs, run::value)
+    private fun fill(text: String) = StepText.fill(text, names, inputs, run::value)
 
     private fun stop(why: String): Nothing = throw GoalStopped(run.step, "\"goal\"", "\"$why\"")
 

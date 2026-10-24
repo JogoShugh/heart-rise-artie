@@ -81,7 +81,10 @@ class GoalSteps(
         }
         reasoner = ScriptedReasoner(*choices.toTypedArray())
         val navigator = ArtieNavigator(ctx.client, reasoner)
-        val run = scripts.runGoal(goal, planner(), navigator, given)
+        // Each listener of a watch with listeners (Whenevers side by side) asks for a client of its own.
+        val run = scripts.runGoal(goal, planner(), navigator, given) {
+            ArtieNavigator(ctx.newClient(ctx.dialect, ctx.rung), reasoner)
+        }
         Files.writeString(replay.folder.resolve(capture), run.traceYaml())
     }
 

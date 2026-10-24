@@ -106,6 +106,11 @@ internal fun Run.fork(): Run = Run(inputs, navigator = navigator, pause = pause)
     fork.declared += declared
     fork.values += values
     fork.inputsUsed += inputsUsed
+    // What the watch saw and did before its listeners began, so none of them does it again.
+    fork.watching.seen += watching.seen
+    fork.watching.waiting += watching.waiting
+    fork.watching.finished += watching.finished
+    fork.watching.left += watching.left
 }
 
 /** What [fork] did and noted, after this run's own. */

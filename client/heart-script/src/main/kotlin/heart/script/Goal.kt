@@ -49,6 +49,21 @@ class Goal(
 val Step.subSteps: List<Step>
     get() = (this as? Step.Intent)?.children ?: (this as? Step.Whenever)?.children.orEmpty()
 
+/**
+ * The Whenevers side by side with [whenever], it among them, in the order the goal lists them: those next to it in
+ * the same list of steps, with no other step between (spec/PLAN-LISTENERS.md, slice 1).
+ */
+internal fun Goal.beside(whenever: Step.Whenever): List<Step.Whenever> {
+    val lists = generateSequence(listOf(steps)) { level -> 
+        level.flatten().map { it.subSteps }.filter { it.isNotEmpty() }.ifEmpty { null }
+    }
+    val list = lists.flatten().first { siblings -> siblings.any { it === whenever } }
+    val at = list.indexOfFirst { it === whenever }
+    val before = list.take(at).reversed().takeWhile { it is Step.Whenever }.reversed()
+    val after = list.drop(at).takeWhile { it is Step.Whenever }
+    return (before + after).filterIsInstance<Step.Whenever>()
+}
+
 /** The name this step gives what it leads to, an intent's or a Whenever's; null when it gives none. */
 val Step.gives: String?
     get() = (this as? Step.Intent)?.name ?: (this as? Step.Whenever)?.name

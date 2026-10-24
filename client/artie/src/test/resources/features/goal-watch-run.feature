@@ -349,6 +349,78 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | 2      |
     And the planner was asked 11 times
 
+  Scenario: Two Whenevers side by side watch at once, each a listener of its own: a slow read under one holds up only it
+    spec/PLAN-LISTENERS.md, slice 1. Whenevers side by side in a goal's
+    steps are one watch, each Whenever a listener on a thread of its own,
+    with a client of its own. Each Whenever's first look is made in turn,
+    as the goal lists them, so its parts are decided in the goal's order;
+    after it, each looks on its own, replaying what was decided. The first
+    look closes issue 11, merges 3 and 2, and leaves 1, a draft, waiting.
+    The first list of issues read after pull request 3 is merged, the issue
+    Whenever's first on its own, is held until pull request 1 is merged: in
+    one loop, the issues first, the merge would come only after the read
+    gave up waiting. Once it is answered, the watch's issue is closed.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                | state | author |
+      | 11     | Veracode scan failed | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "scan" on the small GitHub
+    And pull request 1 is a draft on the small GitHub until it is next read
+    And the small GitHub holds its first answer to "/repos/acme/rockets/issues" after pull request 3 is merged, until pull request 1 is merged, at most 5 seconds
+    And issue 10 of "acme/rockets" is closed on the small GitHub once that held answer is given
+    And the file "both.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label: dependabot
+      ---
+
+      Close the failed scans, and merge the pull requests labelled {label}.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled scan changes `as scan`
+        - Close it.
+      - Whenever a pull request labelled {label} changes `as pr`
+        - Once it can be merged, merge it by squashing.
+          Or give up after 1 hour.
+          Otherwise, close it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                                | opens | relation     | facts                             |
+      | act   | open issue 10 of acme/rockets                        | yes   |              |                                   |
+      | done  |                                                      |       |              |                                   |
+      | act   | list the open issues of acme/rockets labelled scan   | yes   |              |                                   |
+      | check |                                                      |       |              | {"state": "open"}                 |
+      | act   | close it                                             |       |              |                                   |
+      | done  |                                                      |       |              |                                   |
+      | act   | list the open pull requests of acme/rockets          | yes   |              |                                   |
+      | check |                                                      |       |              | {"github:labels": ["dependabot"]} |
+      | wait  |                                                      |       | github:merge |                                   |
+      | act   | merge it by squashing                                |       |              |                                   |
+      | done  |                                                      |       |              |                                   |
+      | check |                                                      |       |              | {"state": "closed"}               |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                     |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                   |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "scan"}    |
+      | github:close                | {}                                                                         |
+      | github:pulls-list           | {"owner": "acme", "repo": "rockets", "state": "open"}                      |
+      | github:merge                | {"merge_method": "squash"}                                                 |
+    When the goal "both.goal.md" runs with ARTIE, captured in "both.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And issue 11 of "acme/rockets" is now "closed" on the small GitHub
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 3      |
+      | 2      |
+      | 1      |
+    And the small GitHub gave that held answer only after pull request 1 was merged
+    And the planner was asked 12 times
+    And ARTIE's reasoner was asked 5 times
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.

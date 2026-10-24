@@ -38,11 +38,13 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
 
     @When("this script runs with ARTIE")
     fun runs(script: String) {
-        // Each listener of a watch with listeners asks the run for a client of its own.
-        val made = { ArtieNavigator(ctx.client, exchangeLog = ctx.exchangeLog, guard = guard(), guarding = ctx.guard) }
-        navigators = { heart.WiredNavigator(made(), ctx.bare) }
+        // Each listener of a watch with listeners asks for a client of its own: a new one, as production makes it.
+        val made = { client: heart.HeartRiseClient ->
+            ArtieNavigator(client, exchangeLog = ctx.exchangeLog, guard = guard(), guarding = ctx.guard)
+        }
+        navigators = { heart.WiredNavigator(made(ctx.newClient(ctx.dialect, ctx.rung)), ctx.bare) }
         try {
-            runs(script, made())
+            runs(script, made(ctx.client))
         } finally {
             navigators = null
         }
@@ -68,8 +70,10 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         planner: heart.script.Planner,
         navigator: ArtieNavigator,
         inputs: Map<String, String>,
+        more: (() -> Navigator)? = null,
     ): Run {
         stopped = null
+        navigators = more
         val run = fresh(inputs, navigator)
         lastRun = run
         Run.current = run
@@ -77,6 +81,8 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
             heart.script.runGoal(goal, planner)
         } catch (e: ScriptStopped) {
             stopped = e
+        } finally {
+            navigators = null
         }
         return run
     }

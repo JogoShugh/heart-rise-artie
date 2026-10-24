@@ -28,24 +28,64 @@ internal class StepWatch(
     }
 
 
-    private val lists = mutableMapOf<Step.Whenever, Chosen>()
-    private val matches = mutableMapOf<Step.Whenever, Map<String, Any?>>()
-    private val waits = mutableMapOf<Step.Intent, String>()
-    private val ifs = mutableMapOf<Step.Intent, Map<String, Any?>>()
-    private val acts = mutableMapOf<Pair<Step.Intent, String>, Chain>()
+    // Whenevers side by side look on threads of their own; each decides only its own steps' parts.
+    private val lists = java.util.concurrent.ConcurrentHashMap<Step.Whenever, Chosen>()
+    private val matches = java.util.concurrent.ConcurrentHashMap<Step.Whenever, Map<String, Any?>>()
+    private val waits = java.util.concurrent.ConcurrentHashMap<Step.Intent, String>()
+    private val ifs = java.util.concurrent.ConcurrentHashMap<Step.Intent, Map<String, Any?>>()
+    private val acts = java.util.concurrent.ConcurrentHashMap<Pair<Step.Intent, String>, Chain>()
     private var ends: Map<String, Any?>? = null
 
     /**
-     * [step], at [where]: its list reached as decided, each look, until the goal's Until holds. When the list isn't
-     * reached from where the step stands, the planner may go back to the start, and the watch stands there.
+     * [steps], Whenevers side by side, at [where]: each one's list reached as decided, each look, until the goal's
+     * Until holds. One Whenever is one watch. Several are a watch with listeners (spec/PLAN-LISTENERS.md, slice 1):
+     * each one's first look is made in turn, as the goal lists them, so its parts are decided in the goal's order;
+     * after it, each looks on a thread of its own, replaying what was decided.
      */
-    fun whenever(step: Step.Whenever, where: Here) {
+    fun whenever(steps: List<Step.Whenever>, where: Here) {
+        val until = goal.steps.filterIsInstance<Step.Until>().firstOrNull()
+        val done: Here.() -> Boolean = { until != null && over(until, this) }
+        val single = steps.singleOrNull()
+        if (single != null) {
+            val watched = Watched(single, where)
+            watched.scope.watch(until = done) { watched.look(this) }
+        } else {
+            run.watching.active = true
+            val watched = try {
+                steps.map { step ->
+                    Watched(step, where).also { first ->
+                        if (first.scope !== where) {
+                            run.goalStop("line ${step.line}: Whenevers side by side watch from where they stand")
+                        }
+                        where.attempt(where.held.address, "A look failed") { first.look(this) }
+                    }
+                }
+            } finally {
+                run.watching.active = false
+            }
+            where.listeners(until = done) {
+                watched.forEach { listen(host.fill(it.step.match)) { it.look(this) } }
+            }
+        }
+        val ended = until?.let { host.fill(it.condition) } ?: "its time ran out"
+        steps.forEach { moves += "watched: ${host.fill(StepText.said(it))}, until $ended" }
+    }
+
+    /**
+     * Whenever [step]'s list, reached from [where] as decided once. When the list isn't reached from where the
+     * step stands, the planner may go back to the start, and the watch stands there, its [scope].
+     */
+    private inner class Watched(val step: Step.Whenever, where: Here) {
         var scope = where
-        val told = "whenever: ${host.fill(step.match)}: from here, reach the list to watch, by a form or a link, " +
-            "or go back to the start if it isn't reached from here; when a form can narrow the list to what the " +
-            "Whenever says (a filter), narrow it, so each look reads only those; it is read again at every look"
-        var back = false
-        val list = lists.getOrPut(step) {
+            private set
+        private val list: Chosen = lists.getOrPut(step) { reach() }
+
+        private fun reach(): Chosen {
+            val told = "whenever: ${host.fill(step.match)}: from here, reach the list to watch, by a form or a " +
+                "link, or go back to the start if it isn't reached from here; when a form can narrow the list to " +
+                "what the Whenever says (a filter), narrow it, so each look reads only those; it is read again at " +
+                "every look"
+            var back = false
             var decided: Chosen? = null
             while (decided == null) {
                 val move = host.ask(step, scope, LIST, told)
@@ -60,27 +100,24 @@ internal class StepWatch(
                     else -> moves += "${StepText.kind(move)}: refused, here only ${LIST.joinToString(", ")}"
                 }
             }
-            decided
+            return decided
         }
-        val until = goal.steps.filterIsInstance<Step.Until>().firstOrNull()
-        scope.watch(until = { until != null && over(until, this) }) {
-            replay(list, sources(this, null)) {
-                whenever {
-                    // Whether the member matches: the check the planner made at the first member, decided once.
-                    val match = matches.getOrPut(step) {
-                        val told = "whenever: ${host.fill(step.match)}: the check a member that matches passes"
-                        decide(step, this, CHECK, told) { (it as? Move.Check)?.facts }
-                    }
-                    if (holds(match, held)) {
-                        step.name?.let { named[it] = held }
-                        // An If that leaves the member leaves its other steps undone, this look.
-                        step.children.all { child(it, this) }
-                    }
+
+        /** One look, at [here]: the list reached again, and each member new or changed that matches visited. */
+        fun look(here: Here) = here.replay(list, sources(here, null)) {
+            whenever {
+                // Whether the member matches: the check the planner made at the first member, decided once.
+                val match = matches.getOrPut(step) {
+                    val told = "whenever: ${host.fill(step.match)}: the check a member that matches passes"
+                    decide(step, this, CHECK, told) { (it as? Move.Check)?.facts }
+                }
+                if (holds(match, held)) {
+                    step.name?.let { named[it] = held }
+                    // An If that leaves the member leaves its other steps undone, this look.
+                    step.children.all { child(it, this) }
                 }
             }
         }
-        val ended = until?.let { host.fill(it.condition) } ?: "its time ran out"
-        moves += "watched: ${host.fill(StepText.said(step))}, until $ended"
     }
 
     /**
@@ -113,7 +150,7 @@ internal class StepWatch(
         val holds = holds(facts, here.held)
         if (holds && intent.leaves) {
             // Said once for each member it leaves.
-            val first = run.watching.left.add(here.held.address)
+            val first = here.run.watching.left.add(here.held.address)
             if (first) here.note("Left ${here.held.address}: ${host.fill(intent.words)}")
         } else if (holds) {
             perform(intent, ACT, here, null)
@@ -145,22 +182,29 @@ internal class StepWatch(
     }
 
     /** Where values come from at [here], with the server's reason a wait gave up, [why]. */
-    private fun sources(here: Here, why: String?) = Bound.sources(here.held, named, run, why)
+    private fun sources(here: Here, why: String?) =
+        Bound.sources(here.held, synchronized(named) { named.toMap() }, here.run, why)
 
     /**
      * [move], an act, made at [here] by the reasoner, and its choice kept, each value bound to its source; [then] on
      * what it reached, with the choice. Refused, the planner is told, and nothing is kept: it decides again.
      */
-    private fun acted(here: Here, move: Move.Act, why: String?, then: Here.(Chosen?) -> Unit = {}): Chosen? {
+    private fun acted(
+        here: Here,
+        move: Move.Act,
+        why: String?,
+        then: Here.(Chosen?) -> Unit = {},
+    ): Chosen? = synchronized(host) {
+        // One decision at a time, as the planner is asked: the reasoner is the run's, whichever thread acts.
         val words = host.fill(move.words)
         val sources = sources(here, why)
-        val traced = run.trace.size
+        val traced = here.run.trace.size
         var chosen: Chosen? = null
         var entered = false
         val refused = try {
             here.act(intent = words) {
                 entered = true
-                chosen = run.trace.getOrNull(traced)?.let { Chosen.of(it, sources) }
+                chosen = here.run.trace.getOrNull(traced)?.let { Chosen.of(it, sources) }
                 moves += "$words: decided ${chosen?.relation}, at ${here.held.address}"
                 then(chosen)
             }
@@ -170,7 +214,7 @@ internal class StepWatch(
             stopped.refused?.takeUnless { entered } ?: throw stopped
         }
         refused?.let { moves += "$words: refused, ${it.kind.words}: ${it.detail}" }
-        return chosen
+        chosen
     }
 
     /** A chain of [step]'s [part], walked at a resource, with the server's reason a wait gave up, [why]. */
