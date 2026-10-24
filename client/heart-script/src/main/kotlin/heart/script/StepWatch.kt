@@ -328,10 +328,11 @@ internal class StepWatch(
                     "a read may not show it yet; make the next act, or say done"
                 return false
             }
-            made = said
             var inside = false
             acted(here, move, why, said()) { chosen ->
                 if (chosen == null) return@acted
+                // Only an act the server answered is one just made: one refused before it was sent may be asked again.
+                made = said
                 // A link followed is a read, though the planner says it opens: the check after it is made on what
                 // it reached, and the acts after that on the member, where the step's forms are.
                 val opens = move.opens && chosen.kind != LINK
