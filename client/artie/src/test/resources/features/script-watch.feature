@@ -161,3 +161,45 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       | case                           | draft                                            | note                                                                 | merged |
       | it is marked ready, and merged | a draft on the small GitHub until it is next read |                                                                      | 1      |
       | it stays a draft, and gives up | a draft on the small GitHub                      | not merged: A draft can't be merged; mark it ready for review first. |        |
+
+  Scenario: holds says whether facts hold where the script stands, as a watch's checks do, and stops nothing
+    spec/PLAN-LISTENERS.md, slice 8: the script a decided watch amounts to
+    checks as the watch did. A fact names a member of the state, or a
+    relation embedded, its value among the names of what is embedded, or a
+    relation linked to, its value words a link's title says. Unlike check,
+    a fact that fails stops nothing: holds says false, and the script goes on.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 11 of "acme/rockets" has these comments on the small GitHub
+      | id | author | body                     |
+      | 1  | ada    | Seen by the bench watch. |
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
+              watch(every = 10.seconds, until = { ++looks == 2 }) {
+                  whenever {
+                      if (holds(mapOf("github:labels" to listOf("alert"), "state" to "open"))) {
+                          var said = false
+                          follow("github:issues-list-comments") { said = holds(mapOf("item" to "Seen by the bench watch.")) }
+                          if (!said) act("github:comment", "body" to "Seen by the bench watch.") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |

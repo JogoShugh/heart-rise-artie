@@ -12,6 +12,13 @@ import java.math.BigDecimal
  */
 fun Here.check(vararg facts: Any) = checkFacts(facts.map(::fact))
 
+/**
+ * Whether every one of [facts] holds on the held resource, as a watch's checks hold (spec/PLAN-LISTENERS.md, slice
+ * 8): a fact names a member, or a relation embedded, its value among the names of what is embedded, or a relation
+ * linked to, its value words a link's title says. Unlike [check], it stops nothing.
+ */
+fun Here.holds(facts: Map<String, Any?>): Boolean = holds(facts, held)
+
 /** Facts as a map, from data the script already has: each value a value (equality) or a [Matcher]. */
 fun Here.check(facts: Map<String, Any?>) = checkFacts(facts.map { (member, value) -> fact(member to value) })
 
