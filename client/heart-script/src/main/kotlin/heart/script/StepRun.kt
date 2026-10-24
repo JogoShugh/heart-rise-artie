@@ -19,6 +19,15 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     private var count = 0
     private var stepCount = 0
 
+    /** A Whenever and what is under it, decided once and replayed (spec/PLAN-WATCH-GOALS.md). */
+    private val watch by lazy {
+        StepWatch(goal, run, named, moves, ::fill) { step, here, allowed, current ->
+            if (now !== step) stepCount = 0
+            now = step
+            next(here, allowed, current)
+        }
+    }
+
     fun start() {
         run.reasoning = true
         run.source = ""
@@ -40,8 +49,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         when (step) {
             is Step.Intent -> intent(step, here, opener)
             is Step.Wait, is Step.Verify -> single(step, here, opener)
-            is Step.Whenever, is Step.Until ->
-                throw ScriptStopped(run.step, "\"${StepText.said(step)}\"", "\"a watch isn't run yet\"")
+            is Step.Whenever -> watch.whenever(step, here)
+            // The watch a Whenever ran ended when its Until held: nothing is left to do.
+            is Step.Until -> Unit
         }
         done += step
     }
@@ -153,8 +163,11 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
         }
     }
 
-    /** The planner's next move at [here], within the run's limit and the step's. */
-    private fun next(here: Here): Move {
+    /**
+     * The planner's next move at [here], within the run's limit and the step's: the moves it may make, [allowed],
+     * and the step as it is told, [current], are the step's own unless a watch decides a part of it.
+     */
+    private fun next(here: Here, allowed: Set<String>? = null, current: String? = null): Move {
         val step = checkNotNull(now)
         val limit = (step as? Step.Intent)?.moves ?: goal.limits.step
         if (++count > maxMoves) stop("more than $maxMoves moves")
@@ -164,9 +177,9 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 goal.context, emptyList(), emptySet(), moves.toList(), path.toList(), here.held, answers.toList(),
                 inputs.associateWith { run.value(it) },
                 here.held.offered.sorted().associateWith { here.describe(it) },
-                current = fill(StepText.said(step)),
+                current = current ?: fill(StepText.said(step)),
                 steps = StepText.tree(goal.steps, done, step),
-                allowed = StepText.allowed(step),
+                allowed = allowed ?: StepText.allowed(step),
                 named = named.mapValues { it.value.address },
             ),
         ).also { move -> move.reason?.let { moves += "why: $it" } }

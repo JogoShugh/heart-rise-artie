@@ -38,6 +38,15 @@ class GoalSteps(
         moves = table.asMaps().map(::move)
     }
 
+    /** The reasoner of the last goal run, to count what it was asked. */
+    private var reasoner: ScriptedReasoner? = null
+
+    @Then("the planner was asked {int} times")
+    fun plannerAsked(times: Int) = assertEquals(times, shown.size)
+
+    @Then("ARTIE's reasoner was asked {int} times")
+    fun reasonerAsked(times: Int) = assertEquals(times, checkNotNull(reasoner).shown.size)
+
     @Given("ARTIE's reasoner will choose, in order")
     fun reasonerChooses(table: DataTable) {
         choices = table.asMaps().map { row ->
@@ -56,7 +65,8 @@ class GoalSteps(
             refused = e.message
             return
         }
-        val navigator = ArtieNavigator(ctx.client, ScriptedReasoner(*choices.toTypedArray()))
+        reasoner = ScriptedReasoner(*choices.toTypedArray())
+        val navigator = ArtieNavigator(ctx.client, reasoner)
         val run = scripts.runGoal(goal, planner(), navigator, given)
         Files.writeString(replay.folder.resolve(capture), run.traceYaml())
     }
@@ -210,6 +220,8 @@ class GoalSteps(
 
     private fun facts(json: String): Map<String, Any?> = (Json.parseToJsonElement(json) as JsonObject)
         .mapValues { (_, value) ->
+            // A list of values: in a match, every item must be among the member's.
+            if (value is kotlinx.serialization.json.JsonArray) return@mapValues value.map { it.jsonPrimitive.content }
             val primitive = value.jsonPrimitive
             if (primitive.isString) primitive.content else primitive.booleanOrNull ?: primitive.longOrNull
                 ?: primitive.doubleOrNull

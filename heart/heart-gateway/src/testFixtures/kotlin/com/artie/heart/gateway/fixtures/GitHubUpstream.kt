@@ -30,6 +30,8 @@ data class Pull(
     /** Whether the base has commits the branch doesn't: only then can GitHub update the branch. */
     var behind: Boolean = false,
     val requestedReviewers: MutableList<String> = mutableListOf(),
+    /** The names of its labels. */
+    val labels: MutableList<String> = mutableListOf(),
 )
 
 /** A branch as the small GitHub keeps it: its repository, name, head commit, and whether it is protected. */
@@ -103,6 +105,9 @@ class GitHubUpstream {
 
     /** The status GitHub answered each request with, in order. */
     val statuses = mutableListOf<Int>()
+
+    /** What happens just after a pull request is changed by a write: someone else, moving on what they saw. */
+    val afterPullChange = mutableListOf<(Pull) -> Unit>()
 
     /** Paths whose nth read, counted from 1, GitHub answers with a 500, once. */
     val failRead = mutableMapOf<String, Int>()
@@ -194,6 +199,7 @@ class GitHubUpstream {
                 change.path("state").asText(null)?.let { pull.state = it }
                 change.path("title").asText(null)?.let { pull.title = it }
                 change.path("body").asText(null)?.let { pull.body = it }
+                afterPullChange.forEach { it(pull) }
                 json(Response(Status.OK), body(pull))
             } ?: Response(Status.NOT_FOUND)
         },
@@ -603,6 +609,12 @@ class GitHubUpstream {
         put("title", pull.title)
         put("body", pull.body)
         putArray("requested_reviewers").apply { pull.requestedReviewers.forEach { addObject().put("login", it) } }
+        putArray("labels").apply {
+            pull.labels.forEach { name ->
+                addObject().put("name", name)
+                    .put("url", "https://api.github.com/repos/${pull.owner}/${pull.repo}/labels/$name")
+            }
+        }
         put("merged", pull.merged)
         put("draft", pull.draft)
         // As GitHub does: a closed pull request's mergeability is never worked out, merged or not.

@@ -18,6 +18,33 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
         gateway.github.afterNextRead[number] = { it.draft = false }
     }
 
+    @Given("pull request {long} is labelled {string} on the small GitHub")
+    fun labelled(number: Long, label: String) {
+        gateway.github.pulls.first { it.number == number }.labels += label
+    }
+
+    @Given("issue {long} of {string} is closed on the small GitHub once pull request {long} is closed")
+    fun closedWith(issue: Long, repository: String, pull: Long) {
+        gateway.github.afterPullChange += { changed ->
+            if (changed.number == pull && changed.state == "closed") {
+                gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == issue }
+                    .state = "closed"
+            }
+        }
+    }
+
+    @Then("pull request {long} of {string} is closed and not merged on the small GitHub")
+    fun closedNotMerged(number: Long, repository: String) {
+        val pull = gateway.github.pulls.first { "${it.owner}/${it.repo}" == repository && it.number == number }
+        assertEquals("closed false", "${pull.state} ${pull.merged}")
+    }
+
+    @Then("pull request {long} of {string} is open on the small GitHub")
+    fun open(number: Long, repository: String) {
+        val pull = gateway.github.pulls.first { "${it.owner}/${it.repo}" == repository && it.number == number }
+        assertEquals("open", pull.state)
+    }
+
     @Given("the small GitHub answers the {int}nd read of {string} with 500")
     fun failsRead(n: Int, path: String) {
         gateway.github.failRead[path] = n
