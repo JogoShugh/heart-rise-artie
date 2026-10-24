@@ -245,27 +245,21 @@ internal class StepWatch(
         /** The chain decided further at [here], each of the planner's moves kept in order, until it says done. */
         private fun further(here: Here, reached: Representation) {
             val words = if (part == OTHERWISE) checkNotNull(step.otherwise).words else step.words
-            val told = "$part: ${host.fill(words)}: ${gaveUp(why)?.let { "$it; " }.orEmpty()}" +
-                "one act or more, in order, then done; an act the server answered is done, even where a read just " +
-                "after it doesn't show it yet; the acts after an act " +
-                "that opens are done on what it reached; a check is made on what the act before it reached, and " +
-                "where it holds, the acts after it are left undone: so a check that is to keep an act from being " +
-                "done, such as whether it was said already, comes before that act; whether something was said is " +
-                "checked on the words said, among the titles of what is listed, not on how many there are"
+            val told = toldActs(part, host.fill(words), why)
             var last = reached
             var over = false
+            // Whether the last check kept fails here with nothing done after it: what it keeps undone is to be done.
+            var failing = false
             while (!over) {
                 when (val move = host.ask(step, here, ACTS, told)) {
                     is Move.Stop -> run.goalStop(move.why)
-                    // A step that says unless isn't done until the check that keeps its act from being done is made.
-                    is Move.Done -> if (UNLESS.containsMatchIn(words) && chain.parts.none { it is Chain.Check }) {
-                        moves += "done: refused, the step says unless, and no check keeps its act from being done " +
-                            "yet: read what it is to be checked on, then check it"
-                    } else {
-                        over = true.also { chain.complete = true }
+                    is Move.Done -> unfinished(words, chain, failing)?.let { moves += it }
+                        ?: run { over = true.also { chain.complete = true } }
+                    is Move.Check -> {
+                        over = checked(move, here, last)
+                        failing = !over && chain.parts.lastOrNull() is Chain.Check
                     }
-                    is Move.Check -> over = checked(move, here, last)
-                    is Move.Act -> over = act(move, here) { last = it }
+                    is Move.Act -> over = act(move, here) { last = it }.also { failing = false }
                     else -> moves += "${StepText.kind(move)}: refused, here only ${ACTS.joinToString(", ")}"
                 }
             }
@@ -379,8 +373,6 @@ internal class StepWatch(
         /** A choice that follows a link: a read, never a write. */
         const val LINK = "link"
 
-        /** A step's words that keep its act from being done somewhere: "…, unless it's said already". */
-        val UNLESS = Regex("""\bunless\b""", RegexOption.IGNORE_CASE)
         const val OTHERWISE = "otherwise"
         val ACTS = setOf("act", "check", "done", "stop")
         val LIST = setOf("act", "back", "stop")
@@ -398,6 +390,33 @@ private fun gaveUp(why: String?): String? = why?.let {
     "the wait gave up, and the server says why: $it Say that reason in the server's words, and claim nothing the " +
         "watch won't do"
 }
+
+/** What the planner is told as it decides [part] of a step, its [words] filled, with the reason a wait gave up. */
+private fun toldActs(part: String, words: String, why: String?): String =
+    "$part: $words: ${gaveUp(why)?.let { "$it; " }.orEmpty()}" +
+        "one act or more, in order, then done; an act the server answered is done, even where a read just " +
+        "after it doesn't show it yet; the acts after an act " +
+        "that opens are done on what it reached; a check is made on what the act before it reached, and " +
+        "where it holds, the acts after it are left undone: so a check that is to keep an act from being " +
+        "done, such as whether it was said already, comes before that act; whether something was said is " +
+        "checked on the words said, among the titles of what is listed, not on how many there are"
+
+/**
+ * Why a chain of a step's [words] isn't done yet, as the planner is told; null when it is. A step that says unless
+ * isn't done until the check that keeps its act from being done is made; nor where its last check fails here, with
+ * nothing done after it ([failing]): what that check keeps undone is to be done.
+ */
+private fun unfinished(words: String, chain: Chain, failing: Boolean): String? = when {
+    UNLESS.containsMatchIn(words) && chain.parts.none { it is Chain.Check } ->
+        "done: refused, the step says unless, and no check keeps its act from being done yet: read what it is to be " +
+            "checked on, then check it"
+    failing -> "done: refused, the last check fails here, and nothing was done after it: do what it keeps from " +
+        "being done, or make the check that holds where it is done already"
+    else -> null
+}
+
+/** A step's words that keep its act from being done somewhere: "…, unless it's said already". */
+private val UNLESS = Regex("""\bunless\b""", RegexOption.IGNORE_CASE)
 
 /** What a read reached, in words for the planner: its state, then each relation's link titles, but its own. */
 private fun readable(held: Representation): String {

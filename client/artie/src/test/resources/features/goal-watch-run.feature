@@ -1016,6 +1016,61 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was told "check: refused, it fails here, right after the acts it is to keep from being done again"
     And the planner was told "read its comments: read https://github.gateway.test/repos/acme/rockets/issues/11/comments, which holds"
 
+  Scenario: A step is not done where its last check fails and nothing was done after it
+    Found by the live seed bench run b10: the planner read the first alert's
+    comments, saw the words there, checked a relation the comments don't
+    have, and said done. The check failed, so nothing kept the step from
+    acting, yet it had decided no act: a new alert was never told. Done is
+    refused where the last check fails here and no act was made after it.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 11 of "acme/rockets" has these comments on the small GitHub
+      | id | author | body                     |
+      | 1  | ada    | Seen by the bench watch. |
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "undone.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert once.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it, unless it's said already.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                                                |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                                                      |
+      | done  |                                                     |       |          |                                                      |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                                                      |
+      | check |                                                     |       |          | {"state": "open"}                                    |
+      | act   | read its comments                                   |       |          |                                                      |
+      | check |                                                     |       |          | {"github:comments": ["Seen by the bench watch."]}    |
+      | done  |                                                     |       |          |                                                      |
+      | check |                                                     |       |          | {"item": "Seen by the bench watch."}                 |
+      | act   | say on it that the watch has seen it                |       |          |                                                      |
+      | done  |                                                     |       |          |                                                      |
+      | check |                                                     |       |          | {"state": "closed"}                                  |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      |                             | github:issues-list-comments | {}                                                                       |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+    When the goal "undone.goal.md" runs with ARTIE, captured in "undone.trace.yaml", given
+      | name | value |
+    Then the planner was told "done: refused, the last check fails here, and nothing was done after it"
+    And issue 12 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
     resource: the planner says so with done, and the run notes it.
