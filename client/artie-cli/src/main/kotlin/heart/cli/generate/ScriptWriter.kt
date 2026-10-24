@@ -22,6 +22,7 @@ class ScriptWriter(
     val derivations = Derivations(source)
     private val why = Why(derivations)
     private val bindings = Bindings(capture, source, options.asInputs.keys, derivations)
+    private val watch = WatchLines(capture)
 
     /** How many values the script marks for a person to review. */
     var reviews = 0
@@ -46,6 +47,7 @@ class ScriptWriter(
         return derivations.strip(
             buildString {
                 header().forEach { appendLine(it) }
+                watch.imports().forEach { appendLine(it) }
                 inputs().forEach { appendLine(it) }
                 appendLine()
                 appendLine(derivations.anchor("${entry.number}", entry.line, heart))
@@ -54,8 +56,11 @@ class ScriptWriter(
                     val line = why.mark(why.answer(it, null), "var ${it.name} = ${it.kind.initial}", listOf(declared))
                     appendLine("$INDENT$line // step ${it.step}'s ${it.pointer}")
                 }
-                if (bindings.variables.isNotEmpty()) appendLine()
+                watch.declared().forEach { appendLine("$INDENT$it") }
+                if (bindings.variables.isNotEmpty() || watch.declared().isNotEmpty()) appendLine()
                 body.forEach { appendLine(it) }
+                // A goal run's watch, as its decisions amount to, after the steps before it.
+                watch.lines(1).forEach { appendLine(it) }
                 appendLine("}")
             },
         )
@@ -97,7 +102,7 @@ class ScriptWriter(
 
     /** The statements of [node]'s block, at [depth]: what it reads, then the steps nested in it. */
     private fun block(node: Node, depth: Int): List<String> =
-        reads(node.step.number, depth) + node.children.flatMap { statement(it, depth) }
+        reads(node.step.number, depth) + watch.kept(node.step, depth) + node.children.flatMap { statement(it, depth) }
 
     private fun reads(step: Int, depth: Int): List<String> = bindings.variables.values.filter { it.step == step }.map {
         val set = derivations.lines(Regex("^\\s*${it.name}\\s*=[^=]"))

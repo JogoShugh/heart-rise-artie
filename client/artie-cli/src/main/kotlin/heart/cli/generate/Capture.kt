@@ -26,6 +26,17 @@ class Capture(val name: String, text: String) {
     private val marks: Map<Int, Map<*, *>> = (documents.firstOrNull()?.get("run") as? Map<*, *>)?.get("marks").map()
         .entries.mapNotNull { (line, mark) -> line.toString().toIntOrNull()?.let { it to mark.map() } }.toMap()
 
+    private val watch = (documents.firstOrNull()?.get("run") as? Map<*, *>)?.get("watch").map()
+
+    /** A goal run's watch, as the script its decisions amount to (spec/PLAN-LISTENERS.md, slice 8); else null. */
+    val watchScript: String? = watch["script"]?.toString()
+
+    /** The step a goal run's watch began at: the steps from there on are its looks, which its script makes again. */
+    val watchFrom: Int? = (watch["from"] as? Number)?.toInt()
+
+    /** The steps before a watch, if the run had one: the steps the script made from it makes one by one. */
+    val stepped: List<Step> get() = watchFrom?.let { from -> steps.filter { it.number < from } } ?: steps
+
     /** The marks on [step]'s line of a goal run's script, if it has any. */
     fun marks(step: Step): Map<*, *> = step.line?.takeIf { source != null }?.let { marks[it] }.orEmpty()
 
@@ -37,9 +48,9 @@ class Capture(val name: String, text: String) {
         get() = steps.firstOrNull()?.takeIf { it.say.startsWith("enter") }?.params?.get("entry")?.toString()
             ?: throw BadArguments("can't generate from $name: it doesn't begin by entering a service")
 
-    /** Rule 8: only a run that finished is generated from. */
+    /** Rule 8: only a run that finished is generated from; a watch's refusals, while it decided, are its own. */
     fun finished() {
-        steps.firstOrNull { it.outcome in UNFINISHED }?.let {
+        stepped.firstOrNull { it.outcome in UNFINISHED }?.let {
             throw BadArguments("can't generate from $name: step ${it.number} was ${it.outcome}")
         }
     }
@@ -106,7 +117,7 @@ class Node(val step: Step) {
         fun of(capture: Capture): Node {
             val root = Node(capture.steps.first())
             val open = ArrayDeque(listOf(root))
-            capture.steps.drop(1).filterNot { it.say.startsWith("return to") }.forEach { step ->
+            capture.stepped.drop(1).filterNot { it.say.startsWith("return to") }.forEach { step ->
                 while (open.size > 1 && open.last().step.line != step.within) open.removeLast()
                 val node = Node(step)
                 open.last().children += node

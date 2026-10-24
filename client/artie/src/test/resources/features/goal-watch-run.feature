@@ -782,7 +782,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     The capture keeps the watch as the script its decisions amount to, with
     no model in it, and the step it began at (spec/PLAN-LISTENERS.md, slice
     8): its Until reads again the issue the watch opened, by the address the
-    run will keep as watchAt.
+    run will keep as watchAt. artie generate writes it into the script made
+    from the run, which then answers a new alert with no model at all.
     Given "acme/rockets" has these issues on the small GitHub
       | number | title                          | state | author |
       | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
@@ -849,6 +850,22 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
           }
       }
       """
+    When artie generated "unless-gen.kts" from "unless.trace.yaml" and "unless.goal.md"
+    And "acme/rockets" has these issues on the small GitHub
+      | number | title                         | state | author |
+      | 13     | Thrips on the bench 1 peppers | open  | ada    |
+    And issue 13 of "acme/rockets" is labelled "alert" on the small GitHub
+    And "unless-gen.kts" runs with ARTIE, captured in "unless-gen.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And the script "unless-gen.kts" has no line with "act(intent"
+    And issue 13 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                            |
+      | ada    | Seen by the bench watch.        |
+      | bob    | Checked: the heater is back on. |
 
   Scenario: A check's values are the planner's own, and an act asked again just after it is made is refused
     Found by the live seed bench run b5: the first alert already had the
