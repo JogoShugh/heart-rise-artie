@@ -38,6 +38,15 @@ acts:
     # GitHub's 409: the head moved, so the client's view is stale. Its 405: it can't merge now.
     stale: 409
     refused: 405
+  comment:
+    operation: issues/create-comment
+    title: Comment
+    description: Add a comment to the pull request's conversation.
+    fields: [body]
+    # GitHub keeps a pull request's conversation on the issue it also is, numbered as it is.
+    bind: { issue_number: /number }
+    # GitHub answers with the new comment; the gateway answers 201, with the comment's address in Location.
+    creates: comment
   edit:
     operation: pulls/update
     title: Edit

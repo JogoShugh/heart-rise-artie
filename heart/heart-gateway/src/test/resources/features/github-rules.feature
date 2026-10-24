@@ -26,6 +26,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:edit           |
       | github:request-review |
       | github:update-branch  |
+      | github:comment        |
     And the GitHub gateway says these acts are absent, and why
       | act          | reason                                                   |
       | github:merge | A draft can't be merged; mark it ready for review first. |
@@ -34,8 +35,9 @@ Feature: What a GitHub pull request allows now, and why not the rest
     Given pull request 482 was merged
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway offers
-      | act         |
-      | github:edit |
+      | act            |
+      | github:edit    |
+      | github:comment |
     And the GitHub gateway says these acts are absent, and why
       | act           | reason                                   |
       | github:reopen | A merged pull request can't be reopened. |
@@ -49,6 +51,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:edit           |
       | github:request-review |
       | github:update-branch  |
+      | github:comment        |
     And the GitHub gateway says these acts are absent, and why
       | act          | reason                                                                    |
       | github:merge | GitHub is still checking whether it can be merged; read it again shortly. |
@@ -61,6 +64,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:edit           |
       | github:request-review |
       | github:update-branch  |
+      | github:comment        |
 
   Scenario Outline: A pull request GitHub says is <mergeable state> can't be merged now
     Given GitHub says pull request 482 is "<mergeable state>"
@@ -74,13 +78,16 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | blocked         | Branch protection blocks the merge: a required check or review is missing. |
 
   Scenario: A caller who can't push to the repository is offered nothing, from the repository's own answer
+    GitHub's example pull request is locked, so a caller without push access
+    may not comment on it either.
     Given the caller can't push to "acme/rockets"
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway offers nothing
     And the GitHub gateway says these acts are absent, and why
-      | act                   | reason                             |
-      | github:close          | You can't push to this repository. |
-      | github:merge          | You can't push to this repository. |
-      | github:edit           | You can't push to this repository. |
-      | github:request-review | You can't push to this repository. |
-      | github:update-branch  | You can't push to this repository. |
+      | act                   | reason                                                     |
+      | github:close          | You can't push to this repository.                         |
+      | github:merge          | You can't push to this repository.                         |
+      | github:edit           | You can't push to this repository.                         |
+      | github:request-review | You can't push to this repository.                         |
+      | github:update-branch  | You can't push to this repository.                         |
+      | github:comment        | The conversation is locked; only collaborators can comment. |

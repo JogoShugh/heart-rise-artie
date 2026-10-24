@@ -136,11 +136,16 @@ internal class DeclaredResource(
         // A path variable the state doesn't fill is the client's field of that name: remove-label's {name}.
         val inPath = ActSchema(act, route, declared.file).pathFields(pointers.keys).toSet()
         // The form's names are the client's; the operation takes its own (a connector's rename).
+        // A bound value goes where the operation names it: its path (a pull request's issue_number), else its body.
+        val (boundInPath, boundInBody) = act.bound.entries.partition { it.key in ItemPath.variablesOf(route.path) }
         val variables = pointers.mapValues { (_, pointer) -> checked.json.at(pointer).asText() } +
-            fields.filterKeys { it in inPath }.entries.associate { (field, value) -> act.upstream(field) to "$value" }
+            fields.filterKeys { it in inPath }.entries.associate { (field, value) -> act.upstream(field) to "$value" } +
+            boundInPath.associate { (name, pointer) -> name to checked.json.at(pointer).asText() }
         val body = act.filled(inputs) +
             fields.filterKeys { it !in inPath }.mapKeys { (field, _) -> act.upstream(field) } +
-            act.bound.mapValues { (_, pointer) -> mapper.convertValue(checked.json.at(pointer), Any::class.java) }
+            boundInBody.associate { (name, pointer) ->
+                name to mapper.convertValue(checked.json.at(pointer), Any::class.java)
+            }
         val statuses = RefusalStatuses(act.stale, act.refused)
         val path = ItemPath.fill(route.path, variables)
         val answer = calls.act(route.method, path, mapper.writeValueAsString(body), statuses)

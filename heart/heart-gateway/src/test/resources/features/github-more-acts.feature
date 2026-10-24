@@ -26,6 +26,7 @@ Feature: Editing a pull request, requesting reviews, and updating its branch
       | github:edit           |
       | github:request-review |
       | github:update-branch  |
+      | github:comment        |
 
   Scenario: Edit's form asks for the title and body, nothing else
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
@@ -74,13 +75,14 @@ Feature: Editing a pull request, requesting reviews, and updating its branch
     Then the GitHub gateway answers 409
     And the problem's detail is "There are no new commits on the base branch."
 
-  Scenario: A closed pull request can be edited and reopened, and says why not the rest
+  Scenario: A closed pull request can be edited, reopened and commented on, and says why not the rest
     Given pull request 482 is closed upstream
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway offers
-      | act           |
-      | github:reopen |
-      | github:edit   |
+      | act            |
+      | github:reopen  |
+      | github:edit    |
+      | github:comment |
     And the GitHub gateway says these acts are absent, and why
       | act                   | reason                                                               |
       | github:request-review | A closed pull request can't have reviews requested; reopen it first. |

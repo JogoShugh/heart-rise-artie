@@ -14,7 +14,7 @@ Feature: Acts on GitHub pull requests, derived from GitHub's operations
     And pull request 482 of "acme/rockets" is "open" upstream, titled "Fix the login bug"
     And pull request 7 of "acme/rockets" is "closed" upstream, titled "Bump the engines"
 
-  Scenario: An open pull request offers what can be done to it; a closed one, reopen and edit
+  Scenario: An open pull request offers what can be done to it; a closed one, reopen, edit and comment
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway offers
       | act                   |
@@ -23,11 +23,13 @@ Feature: Acts on GitHub pull requests, derived from GitHub's operations
       | github:edit           |
       | github:request-review |
       | github:update-branch  |
+      | github:comment        |
     When a client gets "/repos/acme/rockets/pulls/7" through the GitHub gateway
     Then the GitHub gateway offers
-      | act           |
-      | github:reopen |
-      | github:edit   |
+      | act            |
+      | github:reopen  |
+      | github:edit    |
+      | github:comment |
 
   Scenario: Close is pulls/update with the state closed
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
@@ -35,9 +37,23 @@ Feature: Acts on GitHub pull requests, derived from GitHub's operations
     Then the GitHub gateway answers 200
     And GitHub was asked to PATCH "/repos/acme/rockets/pulls/482" with {"state":"closed"}
     And the GitHub gateway offers
-      | act           |
-      | github:reopen |
-      | github:edit   |
+      | act            |
+      | github:reopen  |
+      | github:edit    |
+      | github:comment |
+
+  Scenario: Commenting on a pull request is issues/create-comment, at its issue's number, never the client's
+    GitHub keeps a pull request's conversation on the issue every pull
+    request also is. The pull request offers the comment where it stands:
+    its form asks only for the body, and the gateway fills the issue's
+    number from the pull request's own, as merge's sha is filled.
+    When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    Then the "github:comment" form asks for these fields
+      | field | required | description                  |
+      | body  | yes      | The contents of the comment. |
+    When the client sends "github:comment" with {"body":"Not merged: it conflicts with its base."} and the ETag it holds
+    Then the GitHub gateway answers 201
+    And GitHub was asked to POST "/repos/acme/rockets/issues/482/comments" with {"body":"Not merged: it conflicts with its base."}
 
   Scenario: Merge's form asks for the merge method and the commit's words, never the sha
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway

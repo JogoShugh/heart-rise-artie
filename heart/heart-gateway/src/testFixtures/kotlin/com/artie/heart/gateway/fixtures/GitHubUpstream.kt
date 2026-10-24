@@ -321,11 +321,14 @@ class GitHubUpstream {
             } ?: Response(Status.NOT_FOUND)
         },
         // As GitHub does: the new comment's author is the caller, and its id the next of the repository's.
+        // A pull request is an issue too: its comments are its issue's, at the same path.
         "/repos/{owner}/{repo}/issues/{number}/comments" bind Method.POST to { request ->
-            issue(request)?.let { issue ->
+            val number = issue(request)?.number ?: pull(request)?.number
+            number?.let { on ->
                 val id = (comments.maxOfOrNull { it.id } ?: 0) + 1
                 val body = mapper.readTree(request.bodyString()).path("body").asText()
-                val comment = Comment(issue.owner, issue.repo, issue.number, id, caller(request) ?: "octocat", body)
+                val owner = request.path("owner").orEmpty()
+                val comment = Comment(owner, request.path("repo").orEmpty(), on, id, caller(request) ?: "octocat", body)
                 comments += comment
                 afterComment.forEach { it(comment) }
                 json(Response(Status.CREATED), commentBody(comment))
