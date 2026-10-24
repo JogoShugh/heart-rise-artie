@@ -43,7 +43,8 @@ internal class StepWatch(
     fun whenever(step: Step.Whenever, where: Here) {
         var scope = where
         val told = "whenever: ${host.fill(step.match)}: from here, reach the list to watch, by a form or a link, " +
-            "or go back to the start if it isn't reached from here; it is read again at every look"
+            "or go back to the start if it isn't reached from here; when a form can narrow the list to what the " +
+            "Whenever says (a filter), narrow it, so each look reads only those; it is read again at every look"
         var back = false
         val list = lists.getOrPut(step) {
             var decided: Chosen? = null

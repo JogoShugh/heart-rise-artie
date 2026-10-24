@@ -47,6 +47,9 @@ class GoalSteps(
         assertTrue(words in goal, goal)
     }
 
+    @Then("at move {int} the planner was told the step now is {string}")
+    fun toldNowAt(move: Int, current: String) = assertEquals(current, shown[move - 1].current)
+
     @Then("the planner was last told the step now is {string}")
     fun toldNow(current: String) = assertEquals(current, shown.last().current)
 

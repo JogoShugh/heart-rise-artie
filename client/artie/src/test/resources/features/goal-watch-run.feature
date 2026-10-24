@@ -87,6 +87,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And pull request 4 of "acme/rockets" is open on the small GitHub
     And the planner was asked 10 times
     And ARTIE's reasoner was asked 4 times
+    And at move 3 the planner was told the step now is "whenever: a pull request labelled dependabot changes: from here, reach the list to watch, by a form or a link, or go back to the start if it isn't reached from here; when a form can narrow the list to what the Whenever says (a filter), narrow it, so each look reads only those; it is read again at every look"
 
   Scenario: If is checked as decided once; a pull request it holds for is left alone, and said so once
     Pull request 2 is labelled hold too. The If's check is decided at the
