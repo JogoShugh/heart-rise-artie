@@ -327,7 +327,11 @@ internal class StepWatch(
                     inside = true
                     further(this, held)
                 } else {
-                    if (chosen.kind == LINK) read = held
+                    // A read leaves the planner on the member: it is told what the read reached, to check it.
+                    if (chosen.kind == LINK) {
+                        read = held
+                        moves += "${host.fill(move.words)}: read ${held.address}, which holds ${readable(held)}"
+                    }
                     reached(held)
                 }
             }
@@ -394,6 +398,18 @@ private fun gaveUp(why: String?): String? = why?.let {
     "the wait gave up, and the server says why: $it Say that reason in the server's words, and claim nothing the " +
         "watch won't do"
 }
+
+/** What a read reached, in words for the planner: its state, then each relation's link titles, but its own. */
+private fun readable(held: Representation): String {
+    val state = held.state.toString().let { if (it.length > READ_SHOWN) it.take(READ_SHOWN) + "…" else it }
+    val links = held.links.filterKeys { it != "self" }.entries.joinToString("; ") { (relation, titles) ->
+        "$relation: " + titles.joinToString(" | ") { it ?: "(untitled)" }
+    }
+    return state + if (links.isEmpty()) "" else ", and links $links"
+}
+
+/** How much of a read's state the planner is told, in characters. */
+private const val READ_SHOWN = 1500
 
 /** The goal run stopped here, saying [why]. */
 private fun Run.goalStop(why: String): Nothing = throw GoalStopped(step, "\"goal\"", "\"$why\"")

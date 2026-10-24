@@ -961,7 +961,9 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     no such member, so the check failed even there, after the comment, and
     every replay commented again. A check kept before the acts that write
     must hold where it is made, right after them: one that fails there is
-    refused, and the planner told why.
+    refused, and the planner told why. Found by run b9: a read, kept on the
+    member, showed the planner nothing, and it read again and again; the
+    planner is told what a read reached.
     Given "acme/rockets" has these issues on the small GitHub
       | number | title                          | state | author |
       | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
@@ -1012,6 +1014,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body                     |
       | ada    | Seen by the bench watch. |
     And the planner was told "check: refused, it fails here, right after the acts it is to keep from being done again"
+    And the planner was told "read its comments: read https://github.gateway.test/repos/acme/rockets/issues/11/comments, which holds"
 
   Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
     "Every pull request was merged or says why" is no member of one
