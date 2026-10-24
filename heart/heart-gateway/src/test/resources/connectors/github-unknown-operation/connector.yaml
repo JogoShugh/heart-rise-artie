@@ -1,0 +1,11 @@
+# A GitHub connector that includes an operation GitHub does not have.
+profile: github
+# Only these operations of GitHub's description are read; the rest is left out before parsing.
+include: [pulls/list, pulls/get, pulls/explode]
+# Every call to GitHub names the API version it was written against.
+headers:
+  X-GitHub-Api-Version: "2022-11-28"
+resources:
+  - pull.resource.yaml
+readers:
+  - pull.reader.yaml

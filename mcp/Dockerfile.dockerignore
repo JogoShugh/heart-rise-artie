@@ -1,0 +1,7 @@
+# The build needs only client/ and mcp/, without anything built or cached.
+*
+!client
+!mcp
+**/build
+**/.gradle
+**/.kotlin

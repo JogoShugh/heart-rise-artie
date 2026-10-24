@@ -43,3 +43,20 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+.claude/tdd-events.log
+.claude/settings.local.json
+
+# Buster is a standalone repo with its own history and gates.
+buster/
+
+### Development credentials (scripts/dev-credentials.sh) ###
+server-spring/.env
+domains/*/.env
+# Any .env, anywhere: they hold or fetch credentials.
+.env
+
+# Python bytecode (the live scripts)
+__pycache__/
+
+### heart-script runs: traces written by artie run ###
+client/scripts/runs/

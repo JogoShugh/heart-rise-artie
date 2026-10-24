@@ -1,0 +1,2439 @@
+---
+run:
+  arm: native
+  model: claude-sonnet-5-5
+  stamp: "1022-062745"
+  owner: JogoShugh
+  repo: heart-github-test
+  label: bug
+  ended: done
+  requests: 22
+  refused_by_harness: 0
+  seconds: 70.3
+  usage:
+    calls: 14
+    input: 30
+    output: 5062
+    cache_read: 279947
+    cache_write: 48608
+  said_last: |-
+    DONE: Everything in the task is done except one part: the duplicate issue is not linked to the crash issue as its original.
+    
+    - **Issues:** I opened the crash issue #186 (labelled bug, assigned to JogoShugh), the test issue #187, and the duplicate issue #188.
+    - **Branch and pull request:** I created `fix-blank-names-1022-062745` from main and committed the two files with the messages you gave. I opened pull request #189 into main and changed its description to "Fixes #186 and is tested by #187." It was mergeable and clean. I squash-merged it with the title "Refuse a bed with no name (#189)", and the merge check confirmed it merged.
+    - **Crash issue #186:** I added #187 as a sub-issue by its id, 5977566896, and commented "Fixed in #189, tested in #187." It had already closed as completed when the pull request merged, because the description said "Fixes #186". I then locked it as resolved. A final read shows it closed, reason completed, locked.
+    - **Test issue #187:** I commented "The test went in with #189." and closed it as completed.
+    - **Duplicate issue #188:** I commented "Same crash as #186." and closed it with reason duplicate. I sent the crash issue's id (5977566896) as `duplicate_of_issue_id`, but the response and #188's timeline show no link to #186. The REST API seems to ignore that field, so #188 is closed as a duplicate without a recorded original.
+---
+n: 1
+at: "2026-10-22T10:27:49+00:00"
+ms: 327
+said: ""
+request:
+  method: GET
+  path: /repos/JogoShugh/heart-github-test
+response:
+  status: 200
+  headers:
+    ETag: "\"55783867f5f0b00e11e12af5a6d8a03f40c1b253b5f044db49cba9beb892f2d7\""
+    X-RateLimit-Remaining: "4967"
+  body:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    owner:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    html_url: "https://github.com/JogoShugh/heart-github-test"
+    description: null
+    fork: false
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    forks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/forks"
+    keys_url: "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}"
+    collaborators_url: "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}"
+    teams_url: "https://api.github.com/repos/JogoShugh/heart-github-test/teams"
+    hooks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/hooks"
+    issue_events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/events"
+    assignees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}"
+    branches_url: "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}"
+    tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/tags"
+    blobs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}"
+    git_tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}"
+    git_refs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}"
+    trees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}"
+    statuses_url: "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}"
+    languages_url: "https://api.github.com/repos/JogoShugh/heart-github-test/languages"
+    stargazers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers"
+    contributors_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contributors"
+    subscribers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers"
+    subscription_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscription"
+    commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}"
+    git_commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}"
+    issue_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}"
+    contents_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}"
+    compare_url: "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}"
+    merges_url: "https://api.github.com/repos/JogoShugh/heart-github-test/merges"
+    archive_url: "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}"
+    downloads_url: "https://api.github.com/repos/JogoShugh/heart-github-test/downloads"
+    issues_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}"
+    pulls_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}"
+    milestones_url: "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}"
+    notifications_url: "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}"
+    releases_url: "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}"
+    deployments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/deployments"
+    created_at: "2026-10-17T01:37:34Z"
+    updated_at: "2026-10-22T02:31:39Z"
+    pushed_at: "2026-10-22T02:31:35Z"
+    git_url: "git://github.com/JogoShugh/heart-github-test.git"
+    ssh_url: "git@github.com:JogoShugh/heart-github-test.git"
+    clone_url: "https://github.com/JogoShugh/heart-github-test.git"
+    svn_url: "https://github.com/JogoShugh/heart-github-test"
+    homepage: null
+    size: 69
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 15
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 15
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+---
+n: 2
+at: "2026-10-22T10:27:49+00:00"
+ms: 285
+said: ""
+request:
+  method: GET
+  path: /repos/JogoShugh/heart-github-test/git/ref/heads/main
+response:
+  status: 200
+  headers:
+    ETag: "\"abdf13abb9f64ea4aca76f616969255d6bb89168dbeef87b9eff6397b56c090a\""
+    X-RateLimit-Remaining: "4966"
+  body:
+    ref: refs/heads/main
+    node_id: REF_kwDOVM7WJa9yZWZzL2hlYWRzL21haW4
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs/heads/main"
+    object:
+      sha: cc53c1b728cfa06b9f6d60b76940391d01308338
+      type: commit
+      url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/git/commits/cc53c1b728cfa06b9f6d60b76940391d01308338
+---
+n: 3
+at: "2026-10-22T10:27:49+00:00"
+ms: 294
+said: ""
+request:
+  method: GET
+  path: /repos/JogoShugh/heart-github-test/labels
+response:
+  status: 200
+  headers:
+    ETag: "\"c1cadaeebe9db0e40322577d5ff0e01c7dd05cab75acf720647af9ca5950a6af\""
+    X-RateLimit-Remaining: "4965"
+  body:
+    -
+      id: 12724094933
+      node_id: LA_kwDOVM7WJc8AAAAC9mpH1Q
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/accessibility"
+      name: accessibility
+      color: f143ab
+      default: true
+      description: Barrier affecting people with disabilities
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724094924
+      node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/bug"
+      name: bug
+      color: d73a4a
+      default: true
+      description: "Something isn't working"
+      archived_at: null
+      archived_by: null
+    -
+      id: 12729618556
+      node_id: LA_kwDOVM7WJc8AAAAC9r6QfA
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/chore"
+      name: chore
+      color: ededed
+      default: false
+      description: null
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724094947
+      node_id: LA_kwDOVM7WJc8AAAAC9mpH4w
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/documentation"
+      name: documentation
+      color: 0075ca
+      default: true
+      description: Improvements or additions to documentation
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724094960
+      node_id: LA_kwDOVM7WJc8AAAAC9mpH8A
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/duplicate"
+      name: duplicate
+      color: cfd3d7
+      default: true
+      description: This issue or pull request already exists
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724094975
+      node_id: LA_kwDOVM7WJc8AAAAC9mpH_w
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/enhancement"
+      name: enhancement
+      color: a2eeef
+      default: true
+      description: New feature or request
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724094997
+      node_id: LA_kwDOVM7WJc8AAAAC9mpIFQ
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/good%20first%20issue"
+      name: good first issue
+      color: 7057ff
+      default: true
+      description: Good for newcomers
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724094985
+      node_id: LA_kwDOVM7WJc8AAAAC9mpICQ
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/help%20wanted"
+      name: help wanted
+      color: "008672"
+      default: true
+      description: Extra attention is needed
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724095007
+      node_id: LA_kwDOVM7WJc8AAAAC9mpIHw
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/invalid"
+      name: invalid
+      color: "e4e669"
+      default: true
+      description: "This doesn't seem right"
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724095018
+      node_id: LA_kwDOVM7WJc8AAAAC9mpIKg
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/question"
+      name: question
+      color: d876e3
+      default: true
+      description: Further information is requested
+      archived_at: null
+      archived_by: null
+    -
+      id: 12724095027
+      node_id: LA_kwDOVM7WJc8AAAAC9mpIMw
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/wontfix"
+      name: wontfix
+      color: ffffff
+      default: true
+      description: This will not be worked on
+      archived_at: null
+      archived_by: null
+---
+n: 4
+at: "2026-10-22T10:27:53+00:00"
+ms: 1190
+said: ""
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/issues
+  body:
+    title: Crash when a bed has no name (1022-062745)
+    body: A bed with a blank name crashes the garden.
+    labels:
+      - bug
+    assignees:
+      - JogoShugh
+response:
+  status: 201
+  headers:
+    ETag: "\"fe3cd6d7ddf8c2bc9cf965052520603be0f3fe4e48c62789f47b765567345a08\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186"
+    Link: |-
+      <https://docs.github.com/en/rest/about-the-rest-api/api-versions>; rel="deprecation"; type="text/html"
+    X-RateLimit-Remaining: "4997"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186"
+    repository_url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/labels{/name}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/comments"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/events"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/186"
+    id: 5977566896
+    node_id: I_kwDOVM7WJc8AAAABZEpusA
+    number: 186
+    title: Crash when a bed has no name (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    labels:
+      -
+        id: 12724094924
+        node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/bug"
+        name: bug
+        color: d73a4a
+        default: true
+        description: "Something isn't working"
+        archived_at: null
+        archived_by: null
+    state: open
+    locked: false
+    assignees:
+      -
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+    milestone: null
+    comments: 0
+    created_at: "2026-10-22T10:27:52Z"
+    updated_at: "2026-10-22T10:27:52Z"
+    closed_at: null
+    assignee:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: A bed with a blank name crashes the garden.
+    closed_by: null
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    timeline_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/timeline"
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+---
+n: 5
+at: "2026-10-22T10:27:55+00:00"
+ms: 733
+said: "Crash issue is #186 (id 5977566896)."
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/issues
+  body:
+    title: Test blank bed names (1022-062745)
+    body: "This is part of #186."
+response:
+  status: 201
+  headers:
+    ETag: "\"acafaa67060969148b342ff6e275c69ea00b1dffb0a45aa3a8ff22349edb4671\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187"
+    Link: |-
+      <https://docs.github.com/en/rest/about-the-rest-api/api-versions>; rel="deprecation"; type="text/html"
+    X-RateLimit-Remaining: "4996"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187"
+    repository_url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/labels{/name}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/comments"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/events"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/187"
+    id: 5977567592
+    node_id: I_kwDOVM7WJc8AAAABZEpxaA
+    number: 187
+    title: Test blank bed names (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: "2026-10-22T10:27:55Z"
+    updated_at: "2026-10-22T10:27:55Z"
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: "This is part of #186."
+    closed_by: null
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    timeline_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/timeline"
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+---
+n: 6
+at: "2026-10-22T10:27:59+00:00"
+ms: 902
+said: "Test issue #187 (id 5977567592)."
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/issues
+  body:
+    title: Garden crashes on an empty bed name (1022-062745)
+    body: Seen on the demo garden.
+response:
+  status: 201
+  headers:
+    ETag: "\"e1c21aeb82e937b6bdd466979c18c2b06058647528d7332564ebe3971f34d021\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188"
+    Link: |-
+      <https://docs.github.com/en/rest/about-the-rest-api/api-versions>; rel="deprecation"; type="text/html"
+    X-RateLimit-Remaining: "4995"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188"
+    repository_url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/labels{/name}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/comments"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/events"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/188"
+    id: 5977568436
+    node_id: I_kwDOVM7WJc8AAAABZEp0tA
+    number: 188
+    title: Garden crashes on an empty bed name (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: "2026-10-22T10:27:59Z"
+    updated_at: "2026-10-22T10:27:59Z"
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Seen on the demo garden.
+    closed_by: null
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    timeline_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/timeline"
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+---
+n: 7
+at: "2026-10-22T10:28:00+00:00"
+ms: 682
+said: ""
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/git/refs
+  body:
+    ref: refs/heads/fix-blank-names-1022-062745
+    sha: cc53c1b728cfa06b9f6d60b76940391d01308338
+response:
+  status: 201
+  headers:
+    ETag: "\"f80245d523c2c8f8c103464692ab729657b28b3129b045137c7260b541485ae0\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs/heads/fix-blank-names-1022-062745"
+    X-RateLimit-Remaining: "4994"
+  body:
+    ref: refs/heads/fix-blank-names-1022-062745
+    node_id: REF_kwDOVM7WJdoAJnJlZnMvaGVhZHMvZml4LWJsYW5rLW5hbWVzLTEwMjItMDYyNzQ1
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs/heads/fix-blank-names-1022-062745"
+    object:
+      sha: cc53c1b728cfa06b9f6d60b76940391d01308338
+      type: commit
+      url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/git/commits/cc53c1b728cfa06b9f6d60b76940391d01308338
+---
+n: 8
+at: "2026-10-22T10:28:12+00:00"
+ms: 1255
+said: ""
+request:
+  method: PUT
+  path: /repos/JogoShugh/heart-github-test/contents/fix-1022-062745.md
+  body:
+    message: Refuse a bed with no name
+    content: QmVkIG5hbWVzIG1heSBub3QgYmUgYmxhbmsu
+    branch: fix-blank-names-1022-062745
+response:
+  status: 201
+  headers:
+    ETag: "\"f546c375e5b2da2a1734f2d8425195c32ae60c8f916e488197bc13128bda15a7\""
+    X-RateLimit-Remaining: "4993"
+  body:
+    content:
+      name: fix-1022-062745.md
+      path: fix-1022-062745.md
+      sha: 3f04bc317273f8a6748f082a9552e7d5d8cbf5b6
+      size: 27
+      url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/contents/fix-1022-062745.md?ref=fix-blank-names-1022-062745
+      html_url: "https://github.com/JogoShugh/heart-github-test/blob/fix-blank-names-1022-062745/fix-1022-062745.md"
+      git_url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs/3f04bc317273f8a6748f082a9552e7d5d8cbf5b6
+      download_url: |-
+        https://raw.githubusercontent.com/JogoShugh/heart-github-test/fix-blank-names-1022-062745/fix-1022-062745.md
+      type: file
+      _links:
+        self: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/contents/fix-1022-062745.md?ref=fix-blank-names-1022-062745
+        git: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs/3f04bc317273f8a6748f082a9552e7d5d8cbf5b6
+        html: "https://github.com/JogoShugh/heart-github-test/blob/fix-blank-names-1022-062745/fix-1022-062745.md"
+    commit:
+      sha: 924d58561be22a2db5b675e067c93ffe3396ec62
+      node_id: C_kwDOVM7WJdoAKDkyNGQ1ODU2MWJlMjJhMmRiNWI2NzVlMDY3YzkzZmZlMzM5NmVjNjI
+      url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/git/commits/924d58561be22a2db5b675e067c93ffe3396ec62
+      html_url: "https://github.com/JogoShugh/heart-github-test/commit/924d58561be22a2db5b675e067c93ffe3396ec62"
+      author:
+        name: Josh Gough
+        email: "jsgough@gmail.com"
+        date: "2026-10-22T10:28:11Z"
+      committer:
+        name: Josh Gough
+        email: "jsgough@gmail.com"
+        date: "2026-10-22T10:28:11Z"
+      tree:
+        sha: 5bcf7147ac227a8f2e5c5a61301e1a74ae159fdf
+        url: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/git/trees/5bcf7147ac227a8f2e5c5a61301e1a74ae159fdf
+      message: Refuse a bed with no name
+      parents:
+        -
+          sha: cc53c1b728cfa06b9f6d60b76940391d01308338
+          url: |-
+            https://api.github.com/repos/JogoShugh/heart-github-test/git/commits/cc53c1b728cfa06b9f6d60b76940391d01308338
+          html_url: "https://github.com/JogoShugh/heart-github-test/commit/cc53c1b728cfa06b9f6d60b76940391d01308338"
+      verification:
+        verified: false
+        reason: unsigned
+        signature: null
+        payload: null
+        verified_at: null
+---
+n: 9
+at: "2026-10-22T10:28:16+00:00"
+ms: 1302
+said: Size 27 matches.
+request:
+  method: PUT
+  path: /repos/JogoShugh/heart-github-test/contents/test-1022-062745.md
+  body:
+    message: Test that a blank bed name is refused
+    content: QSBiZWQgd2l0aCBhIGJsYW5rIG5hbWUgaXMgcmVmdXNlZC4=
+    branch: fix-blank-names-1022-062745
+response:
+  status: 201
+  headers:
+    ETag: "\"7bd0dde073759d08981c6049a9562886469b30a7929bf0e4ed0ce08091d14140\""
+    X-RateLimit-Remaining: "4992"
+  body:
+    content:
+      name: test-1022-062745.md
+      path: test-1022-062745.md
+      sha: d6ff7492d40f418e1396f4880c4afde510886f32
+      size: 35
+      url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/contents/test-1022-062745.md?ref=fix-blank-names-1022-062745
+      html_url: "https://github.com/JogoShugh/heart-github-test/blob/fix-blank-names-1022-062745/test-1022-062745.md"
+      git_url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs/d6ff7492d40f418e1396f4880c4afde510886f32
+      download_url: |-
+        https://raw.githubusercontent.com/JogoShugh/heart-github-test/fix-blank-names-1022-062745/test-1022-062745.md
+      type: file
+      _links:
+        self: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/contents/test-1022-062745.md?ref=fix-blank-names-1022-062745
+        git: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs/d6ff7492d40f418e1396f4880c4afde510886f32
+        html: "https://github.com/JogoShugh/heart-github-test/blob/fix-blank-names-1022-062745/test-1022-062745.md"
+    commit:
+      sha: 049d508cf4efd9b56b03de644b942dce630ae737
+      node_id: C_kwDOVM7WJdoAKDA0OWQ1MDhjZjRlZmQ5YjU2YjAzZGU2NDRiOTQyZGNlNjMwYWU3Mzc
+      url: |-
+        https://api.github.com/repos/JogoShugh/heart-github-test/git/commits/049d508cf4efd9b56b03de644b942dce630ae737
+      html_url: "https://github.com/JogoShugh/heart-github-test/commit/049d508cf4efd9b56b03de644b942dce630ae737"
+      author:
+        name: Josh Gough
+        email: "jsgough@gmail.com"
+        date: "2026-10-22T10:28:15Z"
+      committer:
+        name: Josh Gough
+        email: "jsgough@gmail.com"
+        date: "2026-10-22T10:28:15Z"
+      tree:
+        sha: daff45ac2c7c878c92b98a7f3f688677e9da7a37
+        url: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/git/trees/daff45ac2c7c878c92b98a7f3f688677e9da7a37
+      message: Test that a blank bed name is refused
+      parents:
+        -
+          sha: 924d58561be22a2db5b675e067c93ffe3396ec62
+          url: |-
+            https://api.github.com/repos/JogoShugh/heart-github-test/git/commits/924d58561be22a2db5b675e067c93ffe3396ec62
+          html_url: "https://github.com/JogoShugh/heart-github-test/commit/924d58561be22a2db5b675e067c93ffe3396ec62"
+      verification:
+        verified: false
+        reason: unsigned
+        signature: null
+        payload: null
+        verified_at: null
+---
+n: 10
+at: "2026-10-22T10:28:19+00:00"
+ms: 1498
+said: ""
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/pulls
+  body:
+    title: Refuse a bed with no name (1022-062745)
+    head: fix-blank-names-1022-062745
+    base: main
+    body: "Fixes #186."
+response:
+  status: 201
+  headers:
+    ETag: "\"a6e19e2bec0c5031ab04e92bf8eeed1b11eefedaf9dd9219f0715d206f749388\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189"
+    X-RateLimit-Remaining: "4991"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189"
+    id: 4965889021
+    node_id: PR_kwDOVM7WJc8AAAABJ_1z_Q
+    html_url: "https://github.com/JogoShugh/heart-github-test/pull/189"
+    diff_url: "https://github.com/JogoShugh/heart-github-test/pull/189.diff"
+    patch_url: "https://github.com/JogoShugh/heart-github-test/pull/189.patch"
+    issue_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189"
+    number: 189
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    body: "Fixes #186."
+    created_at: "2026-10-22T10:28:19Z"
+    updated_at: "2026-10-22T10:28:19Z"
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/commits"
+    review_comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/comments"
+    review_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189/comments"
+    statuses_url: |-
+      https://api.github.com/repos/JogoShugh/heart-github-test/statuses/049d508cf4efd9b56b03de644b942dce630ae737
+    head:
+      label: "JogoShugh:fix-blank-names-1022-062745"
+      ref: fix-blank-names-1022-062745
+      sha: 049d508cf4efd9b56b03de644b942dce630ae737
+      user:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+      repo:
+        id: 1422841381
+        node_id: R_kgDOVM7WJQ
+        name: heart-github-test
+        full_name: JogoShugh/heart-github-test
+        private: false
+        owner:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+          gravatar_id: ""
+          url: "https://api.github.com/users/JogoShugh"
+          html_url: "https://github.com/JogoShugh"
+          followers_url: "https://api.github.com/users/JogoShugh/followers"
+          following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+          gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+          starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+          subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+          organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+          repos_url: "https://api.github.com/users/JogoShugh/repos"
+          events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+          received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+          type: User
+          user_view_type: public
+          site_admin: false
+        html_url: "https://github.com/JogoShugh/heart-github-test"
+        description: null
+        fork: false
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+        forks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/forks"
+        keys_url: "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}"
+        collaborators_url: "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}"
+        teams_url: "https://api.github.com/repos/JogoShugh/heart-github-test/teams"
+        hooks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/hooks"
+        issue_events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}"
+        events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/events"
+        assignees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}"
+        branches_url: "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}"
+        tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/tags"
+        blobs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}"
+        git_tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}"
+        git_refs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}"
+        trees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}"
+        statuses_url: "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}"
+        languages_url: "https://api.github.com/repos/JogoShugh/heart-github-test/languages"
+        stargazers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers"
+        contributors_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contributors"
+        subscribers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers"
+        subscription_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscription"
+        commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}"
+        git_commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}"
+        comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}"
+        issue_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}"
+        contents_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}"
+        compare_url: "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}"
+        merges_url: "https://api.github.com/repos/JogoShugh/heart-github-test/merges"
+        archive_url: "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}"
+        downloads_url: "https://api.github.com/repos/JogoShugh/heart-github-test/downloads"
+        issues_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}"
+        pulls_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}"
+        milestones_url: "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}"
+        notifications_url: "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}"
+        labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}"
+        releases_url: "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}"
+        deployments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/deployments"
+        created_at: "2026-10-17T01:37:34Z"
+        updated_at: "2026-10-22T02:31:39Z"
+        pushed_at: "2026-10-22T10:28:15Z"
+        git_url: "git://github.com/JogoShugh/heart-github-test.git"
+        ssh_url: "git@github.com:JogoShugh/heart-github-test.git"
+        clone_url: "https://github.com/JogoShugh/heart-github-test.git"
+        svn_url: "https://github.com/JogoShugh/heart-github-test"
+        homepage: null
+        size: 69
+        stargazers_count: 0
+        watchers_count: 0
+        language: null
+        has_issues: true
+        has_projects: true
+        has_downloads: false
+        has_wiki: true
+        has_pages: false
+        has_discussions: false
+        forks_count: 0
+        mirror_url: null
+        archived: false
+        disabled: false
+        open_issues_count: 19
+        license: null
+        allow_forking: true
+        is_template: false
+        web_commit_signoff_required: false
+        has_pull_requests: true
+        pull_request_creation_policy: all
+        topics: []
+        visibility: public
+        forks: 0
+        open_issues: 19
+        watchers: 0
+        default_branch: main
+    base:
+      label: "JogoShugh:main"
+      ref: main
+      sha: cc53c1b728cfa06b9f6d60b76940391d01308338
+      user:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+      repo:
+        id: 1422841381
+        node_id: R_kgDOVM7WJQ
+        name: heart-github-test
+        full_name: JogoShugh/heart-github-test
+        private: false
+        owner:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+          gravatar_id: ""
+          url: "https://api.github.com/users/JogoShugh"
+          html_url: "https://github.com/JogoShugh"
+          followers_url: "https://api.github.com/users/JogoShugh/followers"
+          following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+          gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+          starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+          subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+          organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+          repos_url: "https://api.github.com/users/JogoShugh/repos"
+          events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+          received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+          type: User
+          user_view_type: public
+          site_admin: false
+        html_url: "https://github.com/JogoShugh/heart-github-test"
+        description: null
+        fork: false
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+        forks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/forks"
+        keys_url: "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}"
+        collaborators_url: "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}"
+        teams_url: "https://api.github.com/repos/JogoShugh/heart-github-test/teams"
+        hooks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/hooks"
+        issue_events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}"
+        events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/events"
+        assignees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}"
+        branches_url: "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}"
+        tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/tags"
+        blobs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}"
+        git_tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}"
+        git_refs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}"
+        trees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}"
+        statuses_url: "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}"
+        languages_url: "https://api.github.com/repos/JogoShugh/heart-github-test/languages"
+        stargazers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers"
+        contributors_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contributors"
+        subscribers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers"
+        subscription_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscription"
+        commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}"
+        git_commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}"
+        comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}"
+        issue_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}"
+        contents_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}"
+        compare_url: "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}"
+        merges_url: "https://api.github.com/repos/JogoShugh/heart-github-test/merges"
+        archive_url: "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}"
+        downloads_url: "https://api.github.com/repos/JogoShugh/heart-github-test/downloads"
+        issues_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}"
+        pulls_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}"
+        milestones_url: "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}"
+        notifications_url: "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}"
+        labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}"
+        releases_url: "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}"
+        deployments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/deployments"
+        created_at: "2026-10-17T01:37:34Z"
+        updated_at: "2026-10-22T02:31:39Z"
+        pushed_at: "2026-10-22T10:28:15Z"
+        git_url: "git://github.com/JogoShugh/heart-github-test.git"
+        ssh_url: "git@github.com:JogoShugh/heart-github-test.git"
+        clone_url: "https://github.com/JogoShugh/heart-github-test.git"
+        svn_url: "https://github.com/JogoShugh/heart-github-test"
+        homepage: null
+        size: 69
+        stargazers_count: 0
+        watchers_count: 0
+        language: null
+        has_issues: true
+        has_projects: true
+        has_downloads: false
+        has_wiki: true
+        has_pages: false
+        has_discussions: false
+        forks_count: 0
+        mirror_url: null
+        archived: false
+        disabled: false
+        open_issues_count: 19
+        license: null
+        allow_forking: true
+        is_template: false
+        web_commit_signoff_required: false
+        has_pull_requests: true
+        pull_request_creation_policy: all
+        topics: []
+        visibility: public
+        forks: 0
+        open_issues: 19
+        watchers: 0
+        default_branch: main
+    _links:
+      self:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189"
+      html:
+        href: "https://github.com/JogoShugh/heart-github-test/pull/189"
+      issue:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189"
+      comments:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189/comments"
+      review_comments:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/comments"
+      review_comment:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}"
+      commits:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/commits"
+      statuses:
+        href: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/statuses/049d508cf4efd9b56b03de644b942dce630ae737
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+---
+n: 11
+at: "2026-10-22T10:28:23+00:00"
+ms: 1122
+said: "PR #189."
+request:
+  method: PATCH
+  path: /repos/JogoShugh/heart-github-test/pulls/189
+  body:
+    body: "Fixes #186 and is tested by #187."
+response:
+  status: 200
+  headers:
+    ETag: "\"05e9a8eed7710fe672e6db0def6f4b8efdfd2855546d61ad37485ca83fce3dab\""
+    X-RateLimit-Remaining: "4990"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189"
+    id: 4965889021
+    node_id: PR_kwDOVM7WJc8AAAABJ_1z_Q
+    html_url: "https://github.com/JogoShugh/heart-github-test/pull/189"
+    diff_url: "https://github.com/JogoShugh/heart-github-test/pull/189.diff"
+    patch_url: "https://github.com/JogoShugh/heart-github-test/pull/189.patch"
+    issue_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189"
+    number: 189
+    state: open
+    locked: false
+    title: Refuse a bed with no name (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    body: "Fixes #186 and is tested by #187."
+    created_at: "2026-10-22T10:28:19Z"
+    updated_at: "2026-10-22T10:28:23Z"
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 62af7ce40ddc72e52a55a5f79a2694eaddd41b80
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/commits"
+    review_comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/comments"
+    review_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189/comments"
+    statuses_url: |-
+      https://api.github.com/repos/JogoShugh/heart-github-test/statuses/049d508cf4efd9b56b03de644b942dce630ae737
+    head:
+      label: "JogoShugh:fix-blank-names-1022-062745"
+      ref: fix-blank-names-1022-062745
+      sha: 049d508cf4efd9b56b03de644b942dce630ae737
+      user:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+      repo:
+        id: 1422841381
+        node_id: R_kgDOVM7WJQ
+        name: heart-github-test
+        full_name: JogoShugh/heart-github-test
+        private: false
+        owner:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+          gravatar_id: ""
+          url: "https://api.github.com/users/JogoShugh"
+          html_url: "https://github.com/JogoShugh"
+          followers_url: "https://api.github.com/users/JogoShugh/followers"
+          following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+          gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+          starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+          subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+          organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+          repos_url: "https://api.github.com/users/JogoShugh/repos"
+          events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+          received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+          type: User
+          user_view_type: public
+          site_admin: false
+        html_url: "https://github.com/JogoShugh/heart-github-test"
+        description: null
+        fork: false
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+        forks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/forks"
+        keys_url: "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}"
+        collaborators_url: "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}"
+        teams_url: "https://api.github.com/repos/JogoShugh/heart-github-test/teams"
+        hooks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/hooks"
+        issue_events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}"
+        events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/events"
+        assignees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}"
+        branches_url: "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}"
+        tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/tags"
+        blobs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}"
+        git_tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}"
+        git_refs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}"
+        trees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}"
+        statuses_url: "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}"
+        languages_url: "https://api.github.com/repos/JogoShugh/heart-github-test/languages"
+        stargazers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers"
+        contributors_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contributors"
+        subscribers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers"
+        subscription_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscription"
+        commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}"
+        git_commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}"
+        comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}"
+        issue_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}"
+        contents_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}"
+        compare_url: "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}"
+        merges_url: "https://api.github.com/repos/JogoShugh/heart-github-test/merges"
+        archive_url: "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}"
+        downloads_url: "https://api.github.com/repos/JogoShugh/heart-github-test/downloads"
+        issues_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}"
+        pulls_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}"
+        milestones_url: "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}"
+        notifications_url: "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}"
+        labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}"
+        releases_url: "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}"
+        deployments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/deployments"
+        created_at: "2026-10-17T01:37:34Z"
+        updated_at: "2026-10-22T02:31:39Z"
+        pushed_at: "2026-10-22T10:28:15Z"
+        git_url: "git://github.com/JogoShugh/heart-github-test.git"
+        ssh_url: "git@github.com:JogoShugh/heart-github-test.git"
+        clone_url: "https://github.com/JogoShugh/heart-github-test.git"
+        svn_url: "https://github.com/JogoShugh/heart-github-test"
+        homepage: null
+        size: 69
+        stargazers_count: 0
+        watchers_count: 0
+        language: null
+        has_issues: true
+        has_projects: true
+        has_downloads: false
+        has_wiki: true
+        has_pages: false
+        has_discussions: false
+        forks_count: 0
+        mirror_url: null
+        archived: false
+        disabled: false
+        open_issues_count: 19
+        license: null
+        allow_forking: true
+        is_template: false
+        web_commit_signoff_required: false
+        has_pull_requests: true
+        pull_request_creation_policy: all
+        topics: []
+        visibility: public
+        forks: 0
+        open_issues: 19
+        watchers: 0
+        default_branch: main
+    base:
+      label: "JogoShugh:main"
+      ref: main
+      sha: cc53c1b728cfa06b9f6d60b76940391d01308338
+      user:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+      repo:
+        id: 1422841381
+        node_id: R_kgDOVM7WJQ
+        name: heart-github-test
+        full_name: JogoShugh/heart-github-test
+        private: false
+        owner:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+          gravatar_id: ""
+          url: "https://api.github.com/users/JogoShugh"
+          html_url: "https://github.com/JogoShugh"
+          followers_url: "https://api.github.com/users/JogoShugh/followers"
+          following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+          gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+          starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+          subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+          organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+          repos_url: "https://api.github.com/users/JogoShugh/repos"
+          events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+          received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+          type: User
+          user_view_type: public
+          site_admin: false
+        html_url: "https://github.com/JogoShugh/heart-github-test"
+        description: null
+        fork: false
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+        forks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/forks"
+        keys_url: "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}"
+        collaborators_url: "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}"
+        teams_url: "https://api.github.com/repos/JogoShugh/heart-github-test/teams"
+        hooks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/hooks"
+        issue_events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}"
+        events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/events"
+        assignees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}"
+        branches_url: "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}"
+        tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/tags"
+        blobs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}"
+        git_tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}"
+        git_refs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}"
+        trees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}"
+        statuses_url: "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}"
+        languages_url: "https://api.github.com/repos/JogoShugh/heart-github-test/languages"
+        stargazers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers"
+        contributors_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contributors"
+        subscribers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers"
+        subscription_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscription"
+        commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}"
+        git_commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}"
+        comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}"
+        issue_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}"
+        contents_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}"
+        compare_url: "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}"
+        merges_url: "https://api.github.com/repos/JogoShugh/heart-github-test/merges"
+        archive_url: "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}"
+        downloads_url: "https://api.github.com/repos/JogoShugh/heart-github-test/downloads"
+        issues_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}"
+        pulls_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}"
+        milestones_url: "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}"
+        notifications_url: "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}"
+        labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}"
+        releases_url: "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}"
+        deployments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/deployments"
+        created_at: "2026-10-17T01:37:34Z"
+        updated_at: "2026-10-22T02:31:39Z"
+        pushed_at: "2026-10-22T10:28:15Z"
+        git_url: "git://github.com/JogoShugh/heart-github-test.git"
+        ssh_url: "git@github.com:JogoShugh/heart-github-test.git"
+        clone_url: "https://github.com/JogoShugh/heart-github-test.git"
+        svn_url: "https://github.com/JogoShugh/heart-github-test"
+        homepage: null
+        size: 69
+        stargazers_count: 0
+        watchers_count: 0
+        language: null
+        has_issues: true
+        has_projects: true
+        has_downloads: false
+        has_wiki: true
+        has_pages: false
+        has_discussions: false
+        forks_count: 0
+        mirror_url: null
+        archived: false
+        disabled: false
+        open_issues_count: 19
+        license: null
+        allow_forking: true
+        is_template: false
+        web_commit_signoff_required: false
+        has_pull_requests: true
+        pull_request_creation_policy: all
+        topics: []
+        visibility: public
+        forks: 0
+        open_issues: 19
+        watchers: 0
+        default_branch: main
+    _links:
+      self:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189"
+      html:
+        href: "https://github.com/JogoShugh/heart-github-test/pull/189"
+      issue:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189"
+      comments:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/189/comments"
+      review_comments:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/comments"
+      review_comment:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/comments{/number}"
+      commits:
+        href: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/189/commits"
+      statuses:
+        href: |-
+          https://api.github.com/repos/JogoShugh/heart-github-test/statuses/049d508cf4efd9b56b03de644b942dce630ae737
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 2
+    additions: 2
+    deletions: 0
+    changed_files: 2
+---
+n: 12
+at: "2026-10-22T10:28:28+00:00"
+ms: 2886
+said: Mergeable and clean. Merge now.
+request:
+  method: PUT
+  path: /repos/JogoShugh/heart-github-test/pulls/189/merge
+  body:
+    merge_method: squash
+    commit_title: "Refuse a bed with no name (#189)"
+response:
+  status: 200
+  headers:
+    ETag: "\"a41986a23640e49944cf492e4125c2d5e0014b5069ef2b7d6e4234d54404c654\""
+    X-RateLimit-Remaining: "4989"
+  body:
+    sha: 4919704ecc2948bdfaeba7fa07988b27dfda7921
+    merged: true
+    message: Pull Request successfully merged
+---
+n: 13
+at: "2026-10-22T10:28:32+00:00"
+ms: 247
+said: ""
+request:
+  method: GET
+  path: /repos/JogoShugh/heart-github-test/pulls/189/merge
+response:
+  status: 204
+  headers:
+    X-RateLimit-Remaining: "4988"
+  body: null
+---
+n: 14
+at: "2026-10-22T10:28:33+00:00"
+ms: 913
+said: ""
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/issues/186/sub_issues
+  body:
+    sub_issue_id: 5977567592
+response:
+  status: 201
+  headers:
+    ETag: "\"bf07b4b7f126ce0dcf941fdf35799b5b1a586f403c67c4cd3bdfb3a8c8573063\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186"
+    X-RateLimit-Remaining: "4987"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186"
+    repository_url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/labels{/name}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/comments"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/events"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/186"
+    id: 5977566896
+    node_id: I_kwDOVM7WJc8AAAABZEpusA
+    number: 186
+    title: Crash when a bed has no name (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    labels:
+      -
+        id: 12724094924
+        node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/bug"
+        name: bug
+        color: d73a4a
+        default: true
+        description: "Something isn't working"
+        archived_at: null
+        archived_by: null
+    state: closed
+    locked: false
+    assignees:
+      -
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+    milestone: null
+    comments: 0
+    created_at: "2026-10-22T10:27:52Z"
+    updated_at: "2026-10-22T10:28:29Z"
+    closed_at: "2026-10-22T10:28:29Z"
+    assignee:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 1
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    repository:
+      id: 1422841381
+      node_id: R_kgDOVM7WJQ
+      name: heart-github-test
+      full_name: JogoShugh/heart-github-test
+      private: false
+      owner:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+      html_url: "https://github.com/JogoShugh/heart-github-test"
+      description: null
+      fork: false
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+      forks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/forks"
+      keys_url: "https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}"
+      collaborators_url: "https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}"
+      teams_url: "https://api.github.com/repos/JogoShugh/heart-github-test/teams"
+      hooks_url: "https://api.github.com/repos/JogoShugh/heart-github-test/hooks"
+      issue_events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}"
+      events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/events"
+      assignees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}"
+      branches_url: "https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}"
+      tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/tags"
+      blobs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}"
+      git_tags_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}"
+      git_refs_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}"
+      trees_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}"
+      statuses_url: "https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}"
+      languages_url: "https://api.github.com/repos/JogoShugh/heart-github-test/languages"
+      stargazers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/stargazers"
+      contributors_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contributors"
+      subscribers_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscribers"
+      subscription_url: "https://api.github.com/repos/JogoShugh/heart-github-test/subscription"
+      commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}"
+      git_commits_url: "https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}"
+      comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}"
+      issue_comment_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}"
+      contents_url: "https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}"
+      compare_url: "https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}"
+      merges_url: "https://api.github.com/repos/JogoShugh/heart-github-test/merges"
+      archive_url: "https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}"
+      downloads_url: "https://api.github.com/repos/JogoShugh/heart-github-test/downloads"
+      issues_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}"
+      pulls_url: "https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}"
+      milestones_url: "https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}"
+      notifications_url: "https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}"
+      labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}"
+      releases_url: "https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}"
+      deployments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/deployments"
+      created_at: "2026-10-17T01:37:34Z"
+      updated_at: "2026-10-22T10:28:32Z"
+      pushed_at: "2026-10-22T10:28:27Z"
+      git_url: "git://github.com/JogoShugh/heart-github-test.git"
+      ssh_url: "git@github.com:JogoShugh/heart-github-test.git"
+      clone_url: "https://github.com/JogoShugh/heart-github-test.git"
+      svn_url: "https://github.com/JogoShugh/heart-github-test"
+      homepage: null
+      size: 69
+      stargazers_count: 0
+      watchers_count: 0
+      language: null
+      has_issues: true
+      has_projects: true
+      has_downloads: false
+      has_wiki: true
+      has_pages: false
+      has_discussions: false
+      forks_count: 0
+      mirror_url: null
+      archived: false
+      disabled: false
+      open_issues_count: 17
+      license: null
+      allow_forking: true
+      is_template: false
+      web_commit_signoff_required: false
+      has_pull_requests: true
+      pull_request_creation_policy: all
+      topics: []
+      visibility: public
+      forks: 0
+      open_issues: 17
+      watchers: 0
+      default_branch: main
+      permissions:
+        admin: true
+        maintain: true
+        push: true
+        triage: true
+        pull: true
+    body: A bed with a blank name crashes the garden.
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    timeline_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/timeline"
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+---
+n: 15
+at: "2026-10-22T10:28:37+00:00"
+ms: 947
+said: ""
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/issues/186/comments
+  body:
+    body: "Fixed in #189, tested in #187."
+response:
+  status: 201
+  headers:
+    ETag: "\"d15649fe790bcc24f487249e1c6278aac7b70b8ec4a5e7212120a3e8e401c07c\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549403"
+    X-RateLimit-Remaining: "4986"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549403"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/186#issuecomment-6338549403"
+    issue_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186"
+    id: 6338549403
+    node_id: IC_kwDOVM7WJc8AAAABec6Wmw
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?u=feed1c1ddc406abefdd39537976a8e767640a59e&v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    created_at: "2026-10-22T10:28:37Z"
+    updated_at: "2026-10-22T10:28:37Z"
+    author_association: OWNER
+    body: "Fixed in #189, tested in #187."
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549403/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    minimized: null
+    pin: null
+---
+n: 16
+at: "2026-10-22T10:28:38+00:00"
+ms: 1018
+said: ""
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/issues/187/comments
+  body:
+    body: "The test went in with #189."
+response:
+  status: 201
+  headers:
+    ETag: "\"adb97a38b71e5eba86f87d128c29c922572fcf2487f20f57c4ca366f2dcdcc71\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549668"
+    X-RateLimit-Remaining: "4985"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549668"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/187#issuecomment-6338549668"
+    issue_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187"
+    id: 6338549668
+    node_id: IC_kwDOVM7WJc8AAAABec6XpA
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?u=feed1c1ddc406abefdd39537976a8e767640a59e&v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    created_at: "2026-10-22T10:28:38Z"
+    updated_at: "2026-10-22T10:28:38Z"
+    author_association: OWNER
+    body: "The test went in with #189."
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549668/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    minimized: null
+    pin: null
+---
+n: 17
+at: "2026-10-22T10:28:39+00:00"
+ms: 916
+said: ""
+request:
+  method: POST
+  path: /repos/JogoShugh/heart-github-test/issues/188/comments
+  body:
+    body: "Same crash as #186."
+response:
+  status: 201
+  headers:
+    ETag: "\"a08ea7a198569822ddd0d335cf3db0b6a278b37c3918cc87100bb8d348c5bfae\""
+    Location: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549970"
+    X-RateLimit-Remaining: "4984"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549970"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/188#issuecomment-6338549970"
+    issue_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188"
+    id: 6338549970
+    node_id: IC_kwDOVM7WJc8AAAABec6Y0g
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?u=feed1c1ddc406abefdd39537976a8e767640a59e&v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    created_at: "2026-10-22T10:28:39Z"
+    updated_at: "2026-10-22T10:28:39Z"
+    author_association: OWNER
+    body: "Same crash as #186."
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549970/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    minimized: null
+    pin: null
+---
+n: 18
+at: "2026-10-22T10:28:44+00:00"
+ms: 1103
+said: ""
+request:
+  method: PATCH
+  path: /repos/JogoShugh/heart-github-test/issues/187
+  body:
+    state: closed
+    state_reason: completed
+response:
+  status: 200
+  headers:
+    ETag: "\"bb67f678d8bff9b755dd03abec3fa63dabfb80203608d92d9ee55e21a7036105\""
+    Link: |-
+      <https://docs.github.com/en/rest/about-the-rest-api/api-versions>; rel="deprecation"; type="text/html"
+    X-RateLimit-Remaining: "4983"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187"
+    repository_url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/labels{/name}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/comments"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/events"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/187"
+    id: 5977567592
+    node_id: I_kwDOVM7WJc8AAAABZEpxaA
+    number: 187
+    title: Test blank bed names (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: "2026-10-22T10:27:55Z"
+    updated_at: "2026-10-22T10:28:44Z"
+    closed_at: "2026-10-22T10:28:44Z"
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    parent_issue_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186"
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: "This is part of #186."
+    closed_by:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    timeline_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/187/timeline"
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+---
+n: 19
+at: "2026-10-22T10:28:45+00:00"
+ms: 1068
+said: ""
+request:
+  method: PATCH
+  path: /repos/JogoShugh/heart-github-test/issues/188
+  body:
+    state: closed
+    state_reason: duplicate
+    duplicate_of_issue_id: 5977566896
+response:
+  status: 200
+  headers:
+    ETag: "\"5aedbdf419fff2b97b911c92d8394792b58bfc730d36067a1798637908033609\""
+    Link: |-
+      <https://docs.github.com/en/rest/about-the-rest-api/api-versions>; rel="deprecation"; type="text/html"
+    X-RateLimit-Remaining: "4982"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188"
+    repository_url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/labels{/name}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/comments"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/events"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/188"
+    id: 5977568436
+    node_id: I_kwDOVM7WJc8AAAABZEp0tA
+    number: 188
+    title: Garden crashes on an empty bed name (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: "2026-10-22T10:27:59Z"
+    updated_at: "2026-10-22T10:28:45Z"
+    closed_at: "2026-10-22T10:28:45Z"
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Seen on the demo garden.
+    closed_by:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    timeline_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188/timeline"
+    performed_via_github_app: null
+    state_reason: duplicate
+    pinned_comment: null
+---
+n: 20
+at: "2026-10-22T10:28:46+00:00"
+ms: 800
+said: ""
+request:
+  method: PUT
+  path: /repos/JogoShugh/heart-github-test/issues/186/lock
+  body:
+    lock_reason: resolved
+response:
+  status: 204
+  headers:
+    X-RateLimit-Remaining: "4981"
+  body: null
+---
+n: 21
+at: "2026-10-22T10:28:50+00:00"
+ms: 379
+said: ""
+request:
+  method: GET
+  path: /repos/JogoShugh/heart-github-test/issues/188/timeline
+response:
+  status: 200
+  headers:
+    ETag: "\"cde70f40b33ab301b364579236e7f1a90035cd04c54c8331ea4150f1139cf785\""
+    X-RateLimit-Remaining: "4964"
+  body:
+    -
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549970"
+      html_url: "https://github.com/JogoShugh/heart-github-test/issues/188#issuecomment-6338549970"
+      issue_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/188"
+      id: 6338549970
+      node_id: IC_kwDOVM7WJc8AAAABec6Y0g
+      user:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+      created_at: "2026-10-22T10:28:39Z"
+      updated_at: "2026-10-22T10:28:39Z"
+      body: "Same crash as #186."
+      author_association: OWNER
+      pin: null
+      reactions:
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6338549970/reactions"
+        total_count: 0
+        "+1": 0
+        "-1": 0
+        laugh: 0
+        hooray: 0
+        confused: 0
+        heart: 0
+        rocket: 0
+        eyes: 0
+      performed_via_github_app: null
+      minimized: null
+      event: commented
+      actor:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+    -
+      id: 33939243393
+      node_id: CE_lADOVM7WJc8AAAABZEp0tM8AAAAH5u_BgQ
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/events/33939243393"
+      actor:
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+      event: closed
+      commit_id: null
+      commit_url: null
+      created_at: "2026-10-22T10:28:45Z"
+      state_reason: duplicate
+      intent: null
+      performed_via_github_app: null
+---
+n: 22
+at: "2026-10-22T10:28:50+00:00"
+ms: 370
+said: ""
+request:
+  method: GET
+  path: /repos/JogoShugh/heart-github-test/issues/186
+response:
+  status: 200
+  headers:
+    ETag: "\"d5df739fb3860cb22bfbfa87044cf4c5cf77ec8e394e2c81eb3c5f4ebb94192c\""
+    X-RateLimit-Remaining: "4963"
+  body:
+    url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186"
+    repository_url: "https://api.github.com/repos/JogoShugh/heart-github-test"
+    labels_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/labels{/name}"
+    comments_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/comments"
+    events_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/events"
+    html_url: "https://github.com/JogoShugh/heart-github-test/issues/186"
+    id: 5977566896
+    node_id: I_kwDOVM7WJc8AAAABZEpusA
+    number: 186
+    title: Crash when a bed has no name (1022-062745)
+    user:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    labels:
+      -
+        id: 12724094924
+        node_id: LA_kwDOVM7WJc8AAAAC9mpHzA
+        url: "https://api.github.com/repos/JogoShugh/heart-github-test/labels/bug"
+        name: bug
+        color: d73a4a
+        default: true
+        description: "Something isn't working"
+        archived_at: null
+        archived_by: null
+    state: closed
+    locked: true
+    assignees:
+      -
+        login: JogoShugh
+        id: 1863005
+        node_id: MDQ6VXNlcjE4NjMwMDU=
+        avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+        gravatar_id: ""
+        url: "https://api.github.com/users/JogoShugh"
+        html_url: "https://github.com/JogoShugh"
+        followers_url: "https://api.github.com/users/JogoShugh/followers"
+        following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+        gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+        starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+        subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+        organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+        repos_url: "https://api.github.com/users/JogoShugh/repos"
+        events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+        received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+        type: User
+        user_view_type: public
+        site_admin: false
+    milestone: null
+    comments: 1
+    created_at: "2026-10-22T10:27:52Z"
+    updated_at: "2026-10-22T10:28:46Z"
+    closed_at: "2026-10-22T10:28:29Z"
+    assignee:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    author_association: OWNER
+    active_lock_reason: resolved
+    sub_issues_summary:
+      total: 1
+      completed: 1
+      percent_completed: 100
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: A bed with a blank name crashes the garden.
+    closed_by:
+      login: JogoShugh
+      id: 1863005
+      node_id: MDQ6VXNlcjE4NjMwMDU=
+      avatar_url: "https://avatars.githubusercontent.com/u/1863005?v=4"
+      gravatar_id: ""
+      url: "https://api.github.com/users/JogoShugh"
+      html_url: "https://github.com/JogoShugh"
+      followers_url: "https://api.github.com/users/JogoShugh/followers"
+      following_url: "https://api.github.com/users/JogoShugh/following{/other_user}"
+      gists_url: "https://api.github.com/users/JogoShugh/gists{/gist_id}"
+      starred_url: "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}"
+      subscriptions_url: "https://api.github.com/users/JogoShugh/subscriptions"
+      organizations_url: "https://api.github.com/users/JogoShugh/orgs"
+      repos_url: "https://api.github.com/users/JogoShugh/repos"
+      events_url: "https://api.github.com/users/JogoShugh/events{/privacy}"
+      received_events_url: "https://api.github.com/users/JogoShugh/received_events"
+      type: User
+      user_view_type: public
+      site_admin: false
+    reactions:
+      url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/reactions"
+      total_count: 0
+      "+1": 0
+      "-1": 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    timeline_url: "https://api.github.com/repos/JogoShugh/heart-github-test/issues/186/timeline"
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null

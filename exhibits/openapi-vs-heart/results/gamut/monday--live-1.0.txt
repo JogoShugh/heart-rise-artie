@@ -1,0 +1,84 @@
+Failures:
+
+1) Scenario: A planted bed can be watered # features/garden-care.feature:14
+   ✔ Before # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:16
+   ✔ Given the garden is at its seed state # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:25
+   ✔ When the operator opens bed 2 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:37
+   ✖ Then bed 2 shows exactly the buttons "Water the bed" # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:51
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+       + actual - expected
+
+         [
+       +   'Harvest the crop',
+       +   'Sow a seed',
+           'Water the bed'
+         ]
+           + expected - actual
+
+            [
+           -  "Harvest the crop"
+           -  "Sow a seed"
+              "Water the bed"
+            ]
+
+           at World.<anonymous> (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:53:12)
+           at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+   - When the operator presses "Water the bed" on bed 2 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:41
+   - Then bed 2's moisture is 65 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:56
+   - And the dashboard sent nothing the garden refused # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:65
+
+2) Scenario: An empty bed can be sown, and not watered # features/garden-care.feature:21
+   ✔ Before # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:16
+   ✔ Given the garden is at its seed state # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:25
+   ✔ When the operator opens bed 1 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:37
+   ✖ Then bed 1 shows exactly the buttons "Sow a seed" # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:51
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+       + actual - expected
+
+         [
+       +   'Harvest the crop',
+       +   'Sow a seed',
+       +   'Water the bed'
+       -   'Sow a seed'
+         ]
+           + expected - actual
+
+            [
+           -  "Harvest the crop"
+              "Sow a seed"
+           -  "Water the bed"
+            ]
+
+           at World.<anonymous> (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:53:12)
+           at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+
+3) Scenario: A ready bed can be harvested # features/garden-care.feature:25
+   ✔ Before # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:16
+   ✔ Given the garden is at its seed state # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:25
+   ✔ When the operator opens bed 3 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:37
+   ✖ Then bed 3 shows exactly the buttons "Harvest the crop" # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:51
+       AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+       + actual - expected
+
+         [
+           'Harvest the crop',
+       +   'Sow a seed',
+       +   'Water the bed'
+         ]
+           + expected - actual
+
+            [
+              "Harvest the crop"
+           -  "Sow a seed"
+           -  "Water the bed"
+            ]
+
+           at World.<anonymous> (file:///Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:53:12)
+           at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+   - When the operator presses "Harvest the crop" on bed 3 # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:41
+   - Then bed 3 shows exactly the buttons "Sow a seed" # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:51
+   - And the dashboard sent nothing the garden refused # file:/Users/josh/repos/artie/exhibits/openapi-vs-heart/suite/features/support/steps.mjs:65
+
+3 scenarios (3 failed)
+15 steps (3 failed, 6 skipped, 6 passed)
+0m00.476s (executing steps: 0m00.464s)

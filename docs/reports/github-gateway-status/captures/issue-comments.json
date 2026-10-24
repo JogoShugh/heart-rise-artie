@@ -1,0 +1,108 @@
+{
+ "name": "comments",
+ "path": "/repos/JogoShugh/heart-github-test/issues/14/comments",
+ "github": {
+  "request": {
+   "method": "GET",
+   "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/comments",
+   "headers": {
+    "Authorization": "Bearer <token>",
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "private, max-age=60, s-maxage=60",
+    "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With",
+    "ETag": "\"8cdefe47ef7e85f5666a6e131c1af2121d5de80f16d6c2f880f9d11e13b1c794\"",
+    "x-github-api-version-selected": "2022-11-28"
+   },
+   "body": [
+    {
+     "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6234871470",
+     "html_url": "https://github.com/JogoShugh/heart-github-test/issues/14#issuecomment-6234871470",
+     "issue_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14",
+     "id": 6234871470,
+     "node_id": "IC_kwDOVM7WJc8AAAABc6CWrg",
+     "user": {
+      "login": "JogoShugh",
+      "id": 1863005,
+      "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/JogoShugh",
+      "html_url": "https://github.com/JogoShugh",
+      "followers_url": "https://api.github.com/users/JogoShugh/followers",
+      "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+      "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+      "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+      "repos_url": "https://api.github.com/users/JogoShugh/repos",
+      "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+     },
+     "created_at": "2026-10-17T14:07:36Z",
+     "updated_at": "2026-10-17T14:07:42Z",
+     "body": "Commented, then edited, through the HEART gateway's forms.",
+     "author_association": "OWNER",
+     "pin": null,
+     "reactions": {
+      "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6234871470/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+     },
+     "performed_via_github_app": null,
+     "minimized": null
+    }
+   ]
+  }
+ },
+ "heart": {
+  "request": {
+   "method": "GET",
+   "url": "http://localhost:8392/repos/JogoShugh/heart-github-test/issues/14/comments",
+   "headers": {
+    "Authorization": "Bearer <token>",
+    "Accept": "application/hal+json"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "Content-Type": "application/hal+json",
+    "Cache-Control": "no-cache",
+    "Link": "<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+    "Vary": "Accept, Accept-Profile"
+   },
+   "body": {
+    "count": 1,
+    "_links": {
+     "self": {
+      "href": "/repos/JogoShugh/heart-github-test/issues/14/comments"
+     },
+     "item": [
+      {
+       "href": "/repos/JogoShugh/heart-github-test/issues/comments/6234871470",
+       "title": "Commented, then edited, through the HEART gateway's forms."
+      }
+     ]
+    }
+   }
+  }
+ },
+ "explanation": null
+}

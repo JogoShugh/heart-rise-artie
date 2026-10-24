@@ -1,0 +1,958 @@
+- timestamp: "2026-07-09T15:38:40Z"
+  friendly: "July 9, 2026 at 11:38 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000",
+      "headers": {
+        "Accept-Profile": "<https://github.com/jogoshugh/heart-rise>",
+        "param:behaviour": "interactive"
+      },
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          },
+          "homeTeam": {
+            "href": "/teams/home"
+          },
+          "awayTeam": {
+            "href": "/teams/away"
+          }
+        },
+        "scoreboard": {
+          "period": 1,
+          "clock": "12:00",
+          "67 Eagles": 0,
+          "Marietta Marauders": 0
+        },
+        "possession": "67 Eagles",
+        "status": "LIVE",
+        "lastEvent": "Game started.",
+        "_forms": {
+          "pauseGame": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/status"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "PAUSE",
+                    "RESUME"
+                  ]
+                }
+              }
+            }
+          },
+          "recordScore": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/score"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "points",
+                "playerNumber"
+              ],
+              "properties": {
+                "points": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                "playerNumber": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "turnover": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/possession"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "STEAL",
+                    "OUT_OF_BOUNDS",
+                    "TRAVELING"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:40:01Z"
+  friendly: "July 9, 2026 at 11:40 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/game/score",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "points": 3,
+        "playerNumber": 55
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          }
+        },
+        "message": "Play recorded."
+      }
+    }
+- timestamp: "2026-07-09T15:40:16Z"
+  friendly: "July 9, 2026 at 11:40 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/game",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          },
+          "homeTeam": {
+            "href": "/teams/home"
+          },
+          "awayTeam": {
+            "href": "/teams/away"
+          }
+        },
+        "scoreboard": {
+          "period": 1,
+          "clock": "12:00",
+          "67 Eagles": 3,
+          "Marietta Marauders": 0
+        },
+        "possession": "Marietta Marauders",
+        "status": "LIVE",
+        "lastEvent": "67 Eagles player #55 scores 3 points!",
+        "_forms": {
+          "pauseGame": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/status"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "PAUSE",
+                    "RESUME"
+                  ]
+                }
+              }
+            }
+          },
+          "recordScore": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/score"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "points",
+                "playerNumber"
+              ],
+              "properties": {
+                "points": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                "playerNumber": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "turnover": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/possession"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "STEAL",
+                    "OUT_OF_BOUNDS",
+                    "TRAVELING"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:41:02Z"
+  friendly: "July 9, 2026 at 11:41 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/game/possession",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "reason": "STEAL"
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          }
+        },
+        "message": "Play recorded."
+      }
+    }
+- timestamp: "2026-07-09T15:41:36Z"
+  friendly: "July 9, 2026 at 11:41 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/game",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          },
+          "homeTeam": {
+            "href": "/teams/home"
+          },
+          "awayTeam": {
+            "href": "/teams/away"
+          }
+        },
+        "scoreboard": {
+          "period": 1,
+          "clock": "12:00",
+          "67 Eagles": 3,
+          "Marietta Marauders": 0
+        },
+        "possession": "67 Eagles",
+        "status": "LIVE",
+        "lastEvent": "Turnover! STEAL. Possession: 67 Eagles",
+        "_forms": {
+          "pauseGame": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/status"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "PAUSE",
+                    "RESUME"
+                  ]
+                }
+              }
+            }
+          },
+          "recordScore": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/score"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "points",
+                "playerNumber"
+              ],
+              "properties": {
+                "points": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                "playerNumber": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "turnover": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/possession"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "STEAL",
+                    "OUT_OF_BOUNDS",
+                    "TRAVELING"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:42:29Z"
+  friendly: "July 9, 2026 at 11:42 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/game/status",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "action": "PAUSE"
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          }
+        },
+        "message": "Play recorded."
+      }
+    }
+- timestamp: "2026-07-09T15:42:48Z"
+  friendly: "July 9, 2026 at 11:42 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/game",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          },
+          "homeTeam": {
+            "href": "/teams/home"
+          },
+          "awayTeam": {
+            "href": "/teams/away"
+          }
+        },
+        "scoreboard": {
+          "period": 1,
+          "clock": "12:00",
+          "67 Eagles": 3,
+          "Marietta Marauders": 0
+        },
+        "possession": "67 Eagles",
+        "status": "PAUSED",
+        "lastEvent": "Game paused",
+        "_forms": {
+          "resumeGame": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/status"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "PAUSE",
+                    "RESUME"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:43:42Z"
+  friendly: "July 9, 2026 at 11:43 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/game/status",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "action": "RESUME"
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          }
+        },
+        "message": "Play recorded."
+      }
+    }
+- timestamp: "2026-07-09T15:43:59Z"
+  friendly: "July 9, 2026 at 11:43 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/game",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          },
+          "homeTeam": {
+            "href": "/teams/home"
+          },
+          "awayTeam": {
+            "href": "/teams/away"
+          }
+        },
+        "scoreboard": {
+          "period": 1,
+          "clock": "12:00",
+          "67 Eagles": 3,
+          "Marietta Marauders": 0
+        },
+        "possession": "67 Eagles",
+        "status": "LIVE",
+        "lastEvent": "Game live",
+        "_forms": {
+          "pauseGame": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/status"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "PAUSE",
+                    "RESUME"
+                  ]
+                }
+              }
+            }
+          },
+          "recordScore": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/score"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "points",
+                "playerNumber"
+              ],
+              "properties": {
+                "points": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                "playerNumber": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "turnover": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/possession"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "STEAL",
+                    "OUT_OF_BOUNDS",
+                    "TRAVELING"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:44:16Z"
+  friendly: "July 9, 2026 at 11:44 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/game/score",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "points": 2,
+        "playerNumber": 55
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          }
+        },
+        "message": "Play recorded."
+      }
+    }
+- timestamp: "2026-07-09T15:44:34Z"
+  friendly: "July 9, 2026 at 11:44 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/game",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          },
+          "homeTeam": {
+            "href": "/teams/home"
+          },
+          "awayTeam": {
+            "href": "/teams/away"
+          }
+        },
+        "scoreboard": {
+          "period": 1,
+          "clock": "12:00",
+          "67 Eagles": 5,
+          "Marietta Marauders": 0
+        },
+        "possession": "Marietta Marauders",
+        "status": "LIVE",
+        "lastEvent": "67 Eagles player #55 scores 2 points!",
+        "_forms": {
+          "pauseGame": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/status"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "PAUSE",
+                    "RESUME"
+                  ]
+                }
+              }
+            }
+          },
+          "recordScore": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/score"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "points",
+                "playerNumber"
+              ],
+              "properties": {
+                "points": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                "playerNumber": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "turnover": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/possession"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "STEAL",
+                    "OUT_OF_BOUNDS",
+                    "TRAVELING"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+- timestamp: "2026-07-09T15:45:11Z"
+  friendly: "July 9, 2026 at 11:45 AM"
+  req: |
+    {
+      "method": "POST",
+      "url": "http://localhost:3000/game/score",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": {
+        "points": 3,
+        "playerNumber": 33
+      }
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          }
+        },
+        "message": "Play recorded."
+      }
+    }
+- timestamp: "2026-07-09T15:45:26Z"
+  friendly: "July 9, 2026 at 11:45 AM"
+  req: |
+    {
+      "method": "GET",
+      "url": "http://localhost:3000/game",
+      "headers": {},
+      "body": null
+    }
+  response: |
+    {
+      "status": 200,
+      "headers": {
+        "content-type": "application/hal+json",
+        "access-control-allow-origin": "*",
+        "connection": "keep-alive",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked"
+      },
+      "body": {
+        "_links": {
+          "self": {
+            "href": "/game"
+          },
+          "homeTeam": {
+            "href": "/teams/home"
+          },
+          "awayTeam": {
+            "href": "/teams/away"
+          }
+        },
+        "scoreboard": {
+          "period": 1,
+          "clock": "12:00",
+          "67 Eagles": 5,
+          "Marietta Marauders": 3
+        },
+        "possession": "67 Eagles",
+        "status": "LIVE",
+        "lastEvent": "Marietta Marauders player #33 scores 3 points!",
+        "_forms": {
+          "pauseGame": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/status"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "properties": {
+                "action": {
+                  "type": "string",
+                  "enum": [
+                    "PAUSE",
+                    "RESUME"
+                  ]
+                }
+              }
+            }
+          },
+          "recordScore": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/score"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "points",
+                "playerNumber"
+              ],
+              "properties": {
+                "points": {
+                  "type": "integer",
+                  "enum": [
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                "playerNumber": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "turnover": {
+            "method": "POST",
+            "_links": {
+              "target": {
+                "href": "/game/possession"
+              }
+            },
+            "schema": {
+              "type": "object",
+              "required": [
+                "reason"
+              ],
+              "properties": {
+                "reason": {
+                  "type": "string",
+                  "enum": [
+                    "STEAL",
+                    "OUT_OF_BOUNDS",
+                    "TRAVELING"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }

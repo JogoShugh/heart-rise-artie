@@ -1,0 +1,3783 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>github-task-from-reasoned</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="github-task-from-reasoned.kts, run with artie run from http://localhost:8392/.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<script>try { document.documentElement.dataset.theme = localStorage.getItem("sr-theme") || "light"; } catch (e) { document.documentElement.dataset.theme = "light"; }</script>
+<style>
+/* The line-by-line report (script-report.js): the script first, then what each line did. Light by default. */
+:root { --bg:#f6f7f5; --surface:#fff; --fg:#1b2420; --muted:#5b6862; --rule:#d9e0dc; --link:#2f5f8f; --code-bg:#f0f3f1;
+  --leaf:#2f8f4f; --gate:#b4403a; --claude:#6b4fa0; --form:#1f5a8a; --link-c:#2f7a5a; --write:#b0641c; --hl:#fff6d6;
+  --mark:#e6f0e9; --mark-fg:#1b3a26;
+  --kt-kw:#8a3f8f; --kt-str:#2f6f3f; --kt-tpl:#b0641c; --kt-cm:#7b847e; --kt-fn:#1f5a8a; --kt-num:#a0522d;
+  --display:"Literata",Georgia,serif; --body:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#121816; --surface:#1a211e; --fg:#e3eae6; --muted:#9aa9a2; --rule:#2c3833; --link:#8ab8e6; --code-bg:#1f2723;
+  --leaf:#7fcf98; --gate:#e58a84; --claude:#b9a2e6; --form:#8cc0ea; --link-c:#8fd4b4; --write:#e6a35c; --hl:#33301d; --mark:#24402e; --mark-fg:#bfe8cc;
+  --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#121816; --surface:#1a211e; --fg:#e3eae6; --muted:#9aa9a2; --rule:#2c3833; --link:#8ab8e6; --code-bg:#1f2723;
+  --leaf:#7fcf98; --gate:#e58a84; --claude:#b9a2e6; --form:#8cc0ea; --link-c:#8fd4b4; --write:#e6a35c; --hl:#33301d; --mark:#24402e; --mark-fg:#bfe8cc;
+  --kt-kw:#d79ad9; --kt-str:#9fd6ac; --kt-tpl:#e6a35c; --kt-cm:#7f8b84; --kt-fn:#8cc0ea; --kt-num:#e0a080; color-scheme:dark; }
+[hidden] { display:none !important; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.55 var(--body);
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width:66rem; margin:0 auto; padding-block:2rem 4rem; display:grid; grid-template-columns:minmax(0,1fr); gap:1.1rem; }
+main > * { min-width:0; }
+header { display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:flex-start; }
+h1 { font:650 2rem/1.15 var(--display); margin:0; text-wrap:balance; } h2 { font:650 1.3rem/1.25 var(--display); margin:.6rem 0 0; }
+p { margin:0; max-width:46rem; } .lede, .muted { color:var(--muted); } a { color:var(--link); }
+.theme { display:flex; gap:.3rem; } .theme button { font:500 .8rem var(--body); background:var(--surface); color:var(--fg); border:1px solid var(--rule); border-radius:6px; padding:.25rem .6rem; cursor:pointer; }
+.theme button[aria-pressed="true"] { background:var(--fg); color:var(--bg); }
+.facts { display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; font-size:.9rem; color:var(--muted); } .facts b { color:var(--fg); }
+.code { background:var(--surface); border:1px solid var(--rule); border-radius:10px; overflow-x:auto; padding:.6rem 0; font:.8rem/1.6 var(--mono); }
+.code .ln { display:grid; grid-template-columns:2.6rem 4rem 1fr; white-space:pre; }
+.code .ln.ran { background:var(--hl); }
+.code .no { color:var(--muted); text-align:right; padding-right:.6rem; user-select:none; }
+.code .marks { font:500 .68rem/1.6rem var(--mono); color:var(--claude); white-space:normal; } .code .marks a { text-decoration:none; color:inherit; margin-right:.2rem; }
+.toggles { position:sticky; top:env(safe-area-inset-top, 0px); z-index:2; background:var(--bg); display:flex; flex-wrap:wrap; gap:.3rem 1rem; padding:.5rem 0; font-size:.88rem; border-bottom:1px solid var(--rule); }
+.steps { display:grid; gap:.4rem; }
+.st { background:var(--surface); border:1px solid var(--rule); border-radius:10px; padding:.55rem .9rem; display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:.2rem .8rem; scroll-margin-top:3rem; }
+.st > .num { font:500 .8rem var(--mono); color:var(--muted); text-align:right; padding-top:.1rem; }
+.st > .num b { display:block; color:var(--fg); font-size:.95rem; }
+.st .body { display:grid; gap:.35rem; min-width:0; }
+.st.quiet { padding:.35rem .9rem; } .st.quiet .stmt { color:var(--muted); }
+.top { display:flex; gap:.8rem; align-items:baseline; justify-content:space-between; min-width:0; }
+.stmt { flex:1; min-width:0; font:.84rem var(--mono); white-space:pre-wrap; overflow-wrap:anywhere; }
+.out { font:.85rem var(--body); white-space:nowrap; } .out b { font:600 .8rem var(--mono); }
+.out.ok b { color:var(--leaf); } .out.w b { color:var(--write); } .out.bad b { color:var(--gate); }
+.sel { border-left:3px solid var(--form); padding:.05rem 0 .05rem .6rem; display:flex; flex-wrap:wrap; gap:.2rem .55rem; align-items:baseline; min-width:0; }
+.sel.link { border-color:var(--link-c); } .sel.facts, .sel.waited { border-color:var(--leaf); }
+.kind { font:600 .68rem var(--mono); text-transform:uppercase; letter-spacing:.04em; padding:.05rem .35rem; border-radius:4px; color:var(--surface); background:var(--form); }
+.sel.link .kind { background:var(--link-c); } .sel.facts .kind, .sel.waited .kind { background:var(--leaf); }
+.sel.warn { border-color:var(--write); } .sel.warn .kind { background:var(--write); } .sel.warn .pv { overflow-wrap:anywhere; }
+.kind.claude { background:var(--claude); }
+.rel { font:600 .9rem var(--mono); }
+.pv { font:.82rem var(--mono); overflow-wrap:anywhere; min-width:0; } .pv .k { color:var(--muted); }
+.tally { justify-self:start; font:.78rem var(--mono); color:var(--muted); background:none; border:0; padding:0; cursor:pointer; text-align:left; }
+.tally:hover { color:var(--fg); }
+.deep { display:grid; gap:.45rem; border-top:1px dashed var(--rule); padding-top:.5rem; min-width:0; }
+.said { font-size:.95rem; } .said .who { font:600 .7rem var(--mono); text-transform:uppercase; letter-spacing:.04em; color:var(--claude); margin-right:.4rem; }
+.kv { display:grid; grid-template-columns:max-content minmax(0,1fr); gap:.1rem .8rem; font:.8rem var(--mono); }
+.kv dt { color:var(--muted); } .kv dd { margin:0; overflow-wrap:anywhere; }
+.left { font-size:.8rem; color:var(--muted); }
+details.d { border:1px solid var(--rule); border-radius:8px; padding:.3rem .6rem; min-width:0; }
+details.d > summary { cursor:pointer; font-size:.84rem; color:var(--muted); }
+details.d[open] > summary { margin-bottom:.4rem; color:var(--fg); }
+.ex { font:.78rem var(--mono); display:grid; gap:.3rem; margin-bottom:.5rem; min-width:0; }
+.ex .line { overflow-wrap:anywhere; } .ex .line.w { color:var(--write); font-weight:600; }
+.hdrs { white-space:pre; overflow-x:auto; background:var(--code-bg); border-radius:6px; padding:.4rem .5rem; }
+.up { margin-left:1rem; border-left:2px solid var(--rule); padding-left:.6rem; display:grid; gap:.3rem; }
+.offer { font:.8rem var(--mono); display:flex; flex-wrap:wrap; gap:.25rem .6rem; } .offer .chosen { font-weight:600; color:var(--form); text-decoration:underline; }
+.stack { display:grid; gap:.5rem; min-width:0; }
+@media (max-width:560px) {
+  .st { grid-template-columns:1fr; } .st > .num { text-align:left; display:flex; gap:.5rem; align-items:baseline; } .st > .num b { display:inline; }
+  .top { flex-direction:column; gap:.1rem; } .code .ln { grid-template-columns:2.2rem 3rem 1fr; }
+}
+/* The JSON viewer (json-view.js): collapsed boxes, line diffs, unchanged runs folded behind buttons. */
+/* A column of boxes. */
+.stack { display: grid; gap: 0.5rem; min-width: 0; }
+details.jv { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 0.45rem 0.75rem; min-width: 0; }
+details.jv > summary { cursor: pointer; font-size: 0.9rem; }
+details.jv[open] > summary { margin-bottom: 0.5rem; }
+.jv-body { display: grid; gap: 0.35rem; min-width: 0; }
+.jv-label { margin: 0; font: 500 0.75rem var(--mono); color: var(--muted); white-space: pre; }
+.jv-doc { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 6px; padding: 0.5rem 0.6rem;
+  font: 0.78rem/1.45 var(--mono); }
+.jv-doc .ln { display: block; white-space: pre; }
+.jv-doc .ln.add { background: color-mix(in srgb, var(--leaf) 16%, transparent); }
+.jv-doc .ln.del { background: color-mix(in srgb, var(--gate) 16%, transparent); }
+.jv-doc .ln.note { color: var(--muted); }
+.jv-gap, .jv-full { font: 500 0.75rem var(--mono); color: var(--muted); background: none; border: 1px dashed var(--rule);
+  border-radius: 4px; padding: 0.1rem 0.5rem; margin: 0.15rem 0; cursor: pointer; }
+.jv-gap { display: block; }
+.jv-gap:hover, .jv-full:hover { color: var(--fg); border-style: solid; }
+.jv-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+.jv-full[disabled] { opacity: 0.5; cursor: default; }
+.jv-req { margin: 0 0 0.35rem; font-size: 0.82rem; overflow-x: auto; white-space: nowrap; }
+.jv-req .who { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.4rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div><h1>github-task-from-reasoned</h1><p class="lede">github-task-from-reasoned.kts, run with artie run from http://localhost:8392/.</p></div>
+    <div class="theme" role="group" aria-label="Theme"><button data-th="light">Light</button><button data-th="dark">Dark</button></div>
+  </header>
+  <div class="facts" id="facts"></div>
+  <h2>The script</h2>
+  <div class="code" id="code"></div>
+  <h2>What each line did</h2>
+  <div class="toggles"><span class="muted">Show</span>
+    <label><input type="checkbox" data-show="detail"> details</label>
+    <label><input type="checkbox" data-show="heart"> HEART exchanges</label>
+    <label><input type="checkbox" data-show="upstream"> upstream calls</label>
+    <label><input type="checkbox" data-show="model"> model calls</label>
+    <label><input type="checkbox" data-show="plumbing"> block ends and re-reads</label>
+  </div>
+  <div class="steps" id="steps"></div>
+  <p class="muted" id="also"></p>
+</main>
+<pre hidden id="script-text">// Generated by artie generate from github-reasoned.trace.yaml, the run of github-task-reasoned.kts.
+// Every selection as that run made it, nested as it nested, with no model.
+// What it was offered is pinned in github-task-from-reasoned.pins.yaml, held to before every act.
+//   artie run github-task-from-reasoned.kts owner=JogoShugh repo=heart-github-test
+val owner by input()
+val repo by input()
+val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd-HHmmss")))
+
+heart("http://localhost:8392/") {
+    var issue = 0L // step 3's /number
+    var pull = 0L // step 9's /number
+
+    act("github:repos-get", "owner" to owner, "repo" to repo, intent = "open the repository $owner/$repo") {
+        act("github:open-issue", intent = "open an issue titled \"Crash when a bed has no name (reasoned)\", saying it was opened by a HEART script", fields = {
+            "title" to "Crash when a bed has no name (reasoned)"
+            "body" to "Opened by a HEART script."
+        }) {
+            issue = state.long("number")
+        }
+    }
+    act("github:repos-get-branch", intent = "open the branch main of $owner/$repo", fields = {
+        "owner" to owner
+        "repo" to repo
+        "branch" to "main"
+    }) {
+        act("github:branch-from-here", intent = "start a new branch from here, named fix-blank-names-reasoned-$stamp", fields = {
+            "name" to "fix-blank-names-reasoned-$stamp"
+        }) {
+            act("github:commit-file", intent = "commit a file named fix-reasoned-$stamp.md, saying \"Bed names may not be blank.\", with the message \"Refuse a bed with no name\"", fields = {
+                "path" to "fix-reasoned-$stamp.md"
+                "message" to "Refuse a bed with no name"
+                "content" to "Bed names may not be blank."
+            })
+            act("github:open-pull-request", intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\", saying it relates to #$issue", fields = {
+                "base" to "main"
+                "title" to "Refuse a bed with no name (reasoned)"
+                "body" to "Relates to #$issue"
+            }) {
+                pull = state.long("number")
+                until(tries = 20) { offers("github:merge") }
+                act("github:merge", "merge_method" to "squash", intent = "merge it, squashing its commits")
+                check("merged" eq true)
+            }
+        }
+    }
+    act("github:issues-get", intent = "open issue $issue in $owner/$repo", fields = {
+        "owner" to owner
+        "repo" to repo
+        "issue_number" to issue
+    }) {
+        act("github:comment", "body" to "Fixed in 1.2 by #$pull.", intent = "comment on it: Fixed in 1.2 by #$pull.") {
+            check("body" eq "Fixed in 1.2 by #$pull.")
+        }
+        act("github:close", intent = "close it, since the fix is done")
+        check("state" eq "closed", "state_reason" eq "completed")
+    }
+}
+</pre>
+<pre hidden id="run-trace">---
+run:
+  inputs:
+    owner:
+      value: JogoShugh
+      given: given
+    repo:
+      value: heart-github-test
+      given: given
+    stamp:
+      value: 1019-225941
+      given: default
+      default: 1019-225941
+---
+at: '2026-10-20T02:59:41.265614Z'
+ms: 53
+mode: script
+say: enter {entry}
+line: 9
+params:
+  entry: http://localhost:8392/
+opens: true
+outcome: done
+address: http://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-20T02:59:41.323848Z'
+ms: 577
+mode: script
+say: act {relation}, owner {owner}, repo {repo}
+intent: open the repository JogoShugh/heart-github-test
+line: 13
+within: 9
+params:
+  relation: github:repos-get
+  owner: JogoShugh
+  repo: heart-github-test
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+opens: true
+chose:
+  kind: form
+  relation: github:repos-get
+  title: Get a repository
+  method: GET
+  target: /repos/{owner}/{repo}
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-19T22:14:35Z'
+    pushed_at: '2026-10-19T22:14:30Z'
+    homepage: null
+    size: 53
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 15
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 15
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 6
+    - 17
+  /_embedded/github:owner/0/login:
+    - 6
+    - 17
+  /name:
+    - 6
+    - 17
+  /hr:address/repo:
+    - 6
+    - 17
+  /default_branch:
+    - 6
+    - 9
+---
+at: '2026-10-20T02:59:41.902204Z'
+ms: 1845
+mode: script
+say: act {relation}, title {title}, body {body}
+intent: open an issue titled "Crash when a bed has no name (reasoned)", saying it was opened by a HEART script
+line: 14
+within: 13
+params:
+  relation: github:open-issue
+  title: Crash when a bed has no name (reasoned)
+  body: Opened by a HEART script.
+values:
+  title:
+    value: Crash when a bed has no name (reasoned)
+    from:
+      - constant
+  body:
+    value: Opened by a HEART script.
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: github:open-issue
+  title: Open an issue
+  method: POST
+  target: /repos/{owner}/{repo}/actions/open-issue
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+  picked: relation
+  not sent:
+    - assignees
+    - labels
+    - milestone
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/b7cdf9d9bd2f16e8
+    integrity: sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  form: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+  schema:
+    href: http://localhost:8392/schemas/f7a8db931b33fcf1
+    integrity: sha256-96jbkxsz/PG3PVDvXBkQMk/mpIId+DfmGRMwWHa2zQE=
+  if-match: '"seq-0.hsf.L2.ed3a0444a5e906b6"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:open-issue
+  links:
+    - alternate
+    - github:archive
+    - github:assignees
+    - github:blobs
+    - github:branches
+    - github:clone
+    - github:collaborators
+    - github:comments
+    - github:commits
+    - github:compare
+    - github:contents
+    - github:contributors
+    - github:deployments
+    - github:downloads
+    - github:events
+    - github:forks
+    - github:git
+    - github:git-commits
+    - github:git-refs
+    - github:git-tags
+    - github:hooks
+    - github:issue-comment
+    - github:issue-events
+    - github:issues
+    - github:keys
+    - github:labels
+    - github:languages
+    - github:merges
+    - github:milestones
+    - github:notifications
+    - github:pulls
+    - github:releases
+    - github:repos-list-branches
+    - github:ssh
+    - github:stargazers
+    - github:statuses
+    - github:subscribers
+    - github:subscription
+    - github:svn
+    - github:tags
+    - github:teams
+    - github:trees
+    - hr:forms
+    - self
+outcome: new resource
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127
+now:
+  state:
+    id: 5935137818
+    node_id: I_kwDOVM7WJc8AAAABYcMEGg
+    number: 127
+    title: Crash when a bed has no name (reasoned)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-20T02:59:42Z'
+    updated_at: '2026-10-20T02:59:42Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Opened by a HEART script.
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '127'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+keeps:
+  /hr:address/owner:
+    - 6
+    - 17
+  /_embedded/github:user/0/login:
+    - 6
+    - 17
+  /hr:address/repo:
+    - 6
+    - 17
+  /number:
+    - 9
+    - 17
+  /hr:address/issue_number:
+    - 17
+---
+at: '2026-10-20T02:59:43.751013Z'
+ms: 221
+mode: script
+say: return to {address}
+line: 14
+within: 13
+params:
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test
+now:
+  state:
+    id: 1422841381
+    node_id: R_kgDOVM7WJQ
+    name: heart-github-test
+    full_name: JogoShugh/heart-github-test
+    private: false
+    description: null
+    fork: false
+    created_at: '2026-10-17T01:37:34Z'
+    updated_at: '2026-10-19T22:14:35Z'
+    pushed_at: '2026-10-19T22:14:30Z'
+    homepage: null
+    size: 53
+    stargazers_count: 0
+    watchers_count: 0
+    language: null
+    has_issues: true
+    has_projects: true
+    has_downloads: false
+    has_wiki: true
+    has_pages: false
+    has_discussions: false
+    forks_count: 0
+    mirror_url: null
+    archived: false
+    disabled: false
+    open_issues_count: 16
+    license: null
+    allow_forking: true
+    is_template: false
+    web_commit_signoff_required: false
+    has_pull_requests: true
+    pull_request_creation_policy: all
+    topics: []
+    visibility: public
+    forks: 0
+    open_issues: 16
+    watchers: 0
+    default_branch: main
+    permissions:
+      admin: true
+      maintain: true
+      push: true
+      triage: true
+      pull: true
+    allow_squash_merge: true
+    allow_merge_commit: true
+    allow_rebase_merge: true
+    allow_auto_merge: false
+    delete_branch_on_merge: false
+    allow_update_branch: false
+    use_squash_pr_title_as_default: false
+    squash_merge_commit_message: COMMIT_MESSAGES
+    squash_merge_commit_title: COMMIT_OR_PR_TITLE
+    merge_commit_message: PR_TITLE
+    merge_commit_title: MERGE_MESSAGE
+    security_and_analysis:
+      secret_scanning:
+        status: enabled
+      secret_scanning_push_protection:
+        status: enabled
+      dependabot_security_updates:
+        status: disabled
+      secret_scanning_non_provider_patterns:
+        status: disabled
+      secret_scanning_validity_checks:
+        status: disabled
+    network_count: 0
+    subscribers_count: 0
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+  forms:
+    - github:open-issue
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:repos-list-branches:
+      - null
+    alternate:
+      - null
+    github:forks:
+      - null
+    github:keys:
+      - null
+    github:collaborators:
+      - null
+    github:teams:
+      - null
+    github:hooks:
+      - null
+    github:issue-events:
+      - null
+    github:events:
+      - null
+    github:assignees:
+      - null
+    github:branches:
+      - null
+    github:tags:
+      - null
+    github:blobs:
+      - null
+    github:git-tags:
+      - null
+    github:git-refs:
+      - null
+    github:trees:
+      - null
+    github:statuses:
+      - null
+    github:languages:
+      - null
+    github:stargazers:
+      - null
+    github:contributors:
+      - null
+    github:subscribers:
+      - null
+    github:subscription:
+      - null
+    github:commits:
+      - null
+    github:git-commits:
+      - null
+    github:comments:
+      - null
+    github:issue-comment:
+      - null
+    github:contents:
+      - null
+    github:compare:
+      - null
+    github:merges:
+      - null
+    github:archive:
+      - null
+    github:downloads:
+      - null
+    github:issues:
+      - null
+    github:pulls:
+      - null
+    github:milestones:
+      - null
+    github:notifications:
+      - null
+    github:labels:
+      - null
+    github:releases:
+      - null
+    github:deployments:
+      - null
+    github:git:
+      - null
+    github:ssh:
+      - null
+    github:clone:
+      - null
+    github:svn:
+      - null
+  embedded:
+    github:owner:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-20T02:59:43.972590Z'
+ms: 3
+mode: script
+say: return to {address}
+line: 13
+within: 9
+params:
+  address: http://localhost:8392/
+outcome: done
+address: http://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-20T02:59:43.976190Z'
+ms: 206
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, branch {branch}
+intent: open the branch main of JogoShugh/heart-github-test
+line: 21
+within: 9
+params:
+  relation: github:repos-get-branch
+  owner: JogoShugh
+  repo: heart-github-test
+  branch: main
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 3
+        pointer: /_embedded/github:user/0/login
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+  branch:
+    value: main
+    type: string
+    from:
+      - step: 2
+        pointer: /default_branch
+opens: true
+chose:
+  kind: form
+  relation: github:repos-get-branch
+  title: Get a branch
+  method: GET
+  target: /repos/{owner}/{repo}/branches/{branch}
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main
+now:
+  state:
+    name: main
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: main
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+          node_id: C_kwDOVM7WJdoAKGZiOGZlNGUyZTU1ZWViZmU5ZDE4YzdlYTQ0M2Y5OTA3ODFkOWJlZWU
+          parents:
+            - sha: f56b37d12d451b9c1f925aac394cab646d8da359
+keeps:
+  /name:
+    - 9
+  /hr:address/branch:
+    - 9
+  /hr:address/owner:
+    - 17
+  /hr:address/repo:
+    - 17
+---
+at: '2026-10-20T02:59:44.185586Z'
+ms: 1230
+mode: script
+say: act {relation}, name {name}
+intent: start a new branch from here, named fix-blank-names-reasoned-1019-225941
+line: 26
+within: 21
+params:
+  relation: github:branch-from-here
+  name: fix-blank-names-reasoned-1019-225941
+values:
+  name:
+    value: fix-blank-names-reasoned-1019-225941
+    type: string
+    from:
+      - parts:
+          '1019-225941':
+            input: stamp
+opens: true
+chose:
+  kind: form
+  relation: github:branch-from-here
+  title: Branch from here
+  method: POST
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/branch-from-here
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main/actions/branch-from-here
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/4d2642fc0a6bfba1
+    integrity: sha256-TSZC/Apr+6H5aTYEEe6uk80IO1TJtjCZKuNINXOnC1g=
+  form: sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+  schema:
+    href: http://localhost:8392/schemas/222e354902f56b39
+    integrity: sha256-Ii41SQL1azknua6MirSv0GWeOOGMJhEv0gNcLxGWRfA=
+  if-match: '"seq-0.hsf.L2.a69b02dac2f8279c"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    - alternate
+    - github:protection
+    - hr:forms
+    - self
+outcome: new resource
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-225941
+now:
+  state:
+    name: fix-blank-names-reasoned-1019-225941
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-reasoned-1019-225941
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+          node_id: C_kwDOVM7WJdoAKGZiOGZlNGUyZTU1ZWViZmU5ZDE4YzdlYTQ0M2Y5OTA3ODFkOWJlZWU
+          parents:
+            - sha: f56b37d12d451b9c1f925aac394cab646d8da359
+keeps:
+  /hr:address/owner:
+    - 17
+  /hr:address/repo:
+    - 17
+---
+at: '2026-10-20T02:59:45.418055Z'
+ms: 1648
+mode: script
+say: act {relation}, path {path}, message {message}, content {content}
+intent: commit a file named fix-reasoned-1019-225941.md, saying "Bed names may not be blank.", with the message "Refuse a bed with no name"
+line: 29
+within: 26
+params:
+  relation: github:commit-file
+  path: fix-reasoned-1019-225941.md
+  message: Refuse a bed with no name
+  content: Bed names may not be blank.
+values:
+  path:
+    value: fix-reasoned-1019-225941.md
+    type: string
+    from:
+      - parts:
+          '1019-225941':
+            input: stamp
+  message:
+    value: Refuse a bed with no name
+    type: string
+    from:
+      - constant
+  content:
+    value: Bed names may not be blank.
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: github:commit-file
+  title: Commit a file
+  method: POST
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/commit-file
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-225941/actions/commit-file
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/4d2642fc0a6bfba1
+    integrity: sha256-TSZC/Apr+6H5aTYEEe6uk80IO1TJtjCZKuNINXOnC1g=
+  form: sha256-h7FKmN5m1aBLCTNu06T7Crdpy5AEPcc2jK7l8IOwo+g=
+  schema:
+    href: http://localhost:8392/schemas/b2f56ca079a95386
+    integrity: sha256-svVsoHmpU4YbdX2cRd0MWqU1hqDTwVtlLUibmkyUd7g=
+  if-match: '"seq-0.hsf.L2.06f72f36626996e5"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    - alternate
+    - github:protection
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-225941
+now:
+  state:
+    name: fix-blank-names-reasoned-1019-225941
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-reasoned-1019-225941
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: 40c2a656da659d63f28784b1456a78db6fed02f5
+          node_id: C_kwDOVM7WJdoAKDQwYzJhNjU2ZGE2NTlkNjNmMjg3ODRiMTQ1NmE3OGRiNmZlZDAyZjU
+          parents:
+            - sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+keeps:
+  /hr:address/owner:
+    - 17
+  /hr:address/repo:
+    - 17
+---
+at: '2026-10-20T02:59:47.071239Z'
+ms: 2415
+mode: script
+say: act {relation}, base {base}, title {title}, body {body}
+intent: 'open a pull request into main titled "Refuse a bed with no name (reasoned)", saying it relates to #127'
+line: 34
+within: 26
+params:
+  relation: github:open-pull-request
+  base: main
+  title: Refuse a bed with no name (reasoned)
+  body: 'Relates to #127'
+values:
+  base:
+    value: main
+    type: string
+    from:
+      - step: 2
+        pointer: /default_branch
+      - step: 6
+        pointer: /name
+      - step: 6
+        pointer: /hr:address/branch
+  title:
+    value: Refuse a bed with no name (reasoned)
+    type: string
+    from:
+      - constant
+  body:
+    value: 'Relates to #127'
+    type: string
+    from:
+      - parts:
+          '127':
+            step: 3
+            pointer: /number
+opens: true
+chose:
+  kind: form
+  relation: github:open-pull-request
+  title: Open a pull request
+  method: POST
+  target: /repos/{owner}/{repo}/branches/{branch}/actions/open-pull-request
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-225941/actions/open-pull-request
+  picked: relation
+  not sent:
+    - draft
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/4d2642fc0a6bfba1
+    integrity: sha256-TSZC/Apr+6H5aTYEEe6uk80IO1TJtjCZKuNINXOnC1g=
+  form: sha256-PE4HJf8D9pKBuS8GjywYA5kUlxGDtzJU9LtqfoDdBMI=
+  schema:
+    href: http://localhost:8392/schemas/991c0e30445a0adc
+    integrity: sha256-mRwOMERaCtzoWpSH8i+m5OfeNAQuH9W/rfaoInELWjs=
+  if-match: '"seq-0.hsf.L2.3dd62d46c00c2bc4"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    - alternate
+    - github:protection
+    - hr:forms
+    - self
+outcome: new resource
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/128
+now:
+  state:
+    id: 4930364350
+    node_id: PR_kwDOVM7WJc8AAAABJd9jvg
+    number: 128
+    state: open
+    locked: false
+    title: Refuse a bed with no name (reasoned)
+    body: 'Relates to #127'
+    created_at: '2026-10-20T02:59:48Z'
+    updated_at: '2026-10-20T02:59:48Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: null
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-reasoned-1019-225941
+      ref: fix-blank-names-reasoned-1019-225941
+      sha: 40c2a656da659d63f28784b1456a78db6fed02f5
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '128'
+  forms:
+    - github:close
+    - github:edit
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 17
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 17
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 17
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 17
+          watchers: 0
+          default_branch: main
+keeps:
+  /hr:address/owner:
+    - 17
+  /_embedded/github:user/0/login:
+    - 17
+  /_embedded/github:head-user/0/login:
+    - 17
+  /_embedded/github:base-user/0/login:
+    - 17
+  /hr:address/repo:
+    - 17
+  /_embedded/github:head-repo/0/name:
+    - 17
+  /_embedded/github:base-repo/0/name:
+    - 17
+  /number:
+    - 18
+  /commits:
+    - 18
+---
+at: '2026-10-20T02:59:50.490904Z'
+ms: 507
+mode: script
+say: return to {address}
+line: 40
+within: 34
+params:
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/128
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/128
+now:
+  state:
+    id: 4930364350
+    node_id: PR_kwDOVM7WJc8AAAABJd9jvg
+    number: 128
+    state: open
+    locked: false
+    title: Refuse a bed with no name (reasoned)
+    body: 'Relates to #127'
+    created_at: '2026-10-20T02:59:48Z'
+    updated_at: '2026-10-20T02:59:48Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 4a1546cc8e4001e3e98d9c36175b9951fde9c4e2
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-reasoned-1019-225941
+      ref: fix-blank-names-reasoned-1019-225941
+      sha: 40c2a656da659d63f28784b1456a78db6fed02f5
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '128'
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 17
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 17
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 17
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 17
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-20T02:59:50.998853Z'
+ms: 0
+mode: script
+say: until
+line: 40
+within: 34
+params: {}
+waited:
+  for: offers("github:merge")
+  reads: 1
+outcome: held
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/128
+now:
+  state:
+    id: 4930364350
+    node_id: PR_kwDOVM7WJc8AAAABJd9jvg
+    number: 128
+    state: open
+    locked: false
+    title: Refuse a bed with no name (reasoned)
+    body: 'Relates to #127'
+    created_at: '2026-10-20T02:59:48Z'
+    updated_at: '2026-10-20T02:59:48Z'
+    closed_at: null
+    merged_at: null
+    merge_commit_sha: 4a1546cc8e4001e3e98d9c36175b9951fde9c4e2
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-reasoned-1019-225941
+      ref: fix-blank-names-reasoned-1019-225941
+      sha: 40c2a656da659d63f28784b1456a78db6fed02f5
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: false
+    mergeable: true
+    rebaseable: true
+    mergeable_state: clean
+    merged_by: null
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '128'
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 17
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 17
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 17
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 17
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-20T02:59:50.999610Z'
+ms: 3849
+mode: script
+say: act {relation}, merge_method {merge_method}
+intent: merge it, squashing its commits
+line: 41
+within: 34
+params:
+  relation: github:merge
+  merge_method: squash
+values:
+  merge_method:
+    value: squash
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: github:merge
+  title: Merge
+  method: POST
+  target: /repos/{owner}/{repo}/pulls/{pull_number}/actions/merge
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/128/actions/merge
+  picked: relation
+  not sent:
+    - commit_message
+    - commit_title
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/37cdf2b1ba217596
+    integrity: sha256-N83ysbohdZYZmLEPGv6vDi700n5VsXCXuObdk3OtTTo=
+  form: sha256-9uvk6g8UGLrpgoWdCsjzgyGS4M6/2yVpVwhHffj2Kf4=
+  schema:
+    href: http://localhost:8392/schemas/0f68e71ca6a8837d
+    integrity: sha256-D2jnHKaog30eN9l15vAwZrWapDF8CrLyMG7Tzd7mK7c=
+  if-match: '"seq-0.hsf.L2.aef340c477a82124"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - github:close
+    - github:edit
+    - github:merge
+    - github:request-review
+    - github:update-branch
+  links:
+    - alternate
+    - github:commits
+    - github:diff
+    - github:issues-get
+    - github:issues-list-comments
+    - github:patch
+    - github:review-comment
+    - github:review-comments
+    - github:statuses
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/128
+now:
+  state:
+    id: 4930364350
+    node_id: PR_kwDOVM7WJc8AAAABJd9jvg
+    number: 128
+    state: closed
+    locked: false
+    title: Refuse a bed with no name (reasoned)
+    body: 'Relates to #127'
+    created_at: '2026-10-20T02:59:48Z'
+    updated_at: '2026-10-20T02:59:53Z'
+    closed_at: '2026-10-20T02:59:53Z'
+    merged_at: '2026-10-20T02:59:53Z'
+    merge_commit_sha: 6fa3023f66818db38294430259b9decf098a497a
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-reasoned-1019-225941
+      ref: fix-blank-names-reasoned-1019-225941
+      sha: 40c2a656da659d63f28784b1456a78db6fed02f5
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '128'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 16
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 16
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 16
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 16
+          watchers: 0
+          default_branch: main
+keeps:
+  /hr:address/owner:
+    - 17
+  /_embedded/github:user/0/login:
+    - 17
+  /_embedded/github:merged-by/0/login:
+    - 17
+  /_embedded/github:head-user/0/login:
+    - 17
+  /_embedded/github:base-user/0/login:
+    - 17
+  /hr:address/repo:
+    - 17
+  /_embedded/github:head-repo/0/name:
+    - 17
+  /_embedded/github:base-repo/0/name:
+    - 17
+---
+at: '2026-10-20T02:59:54.851881Z'
+ms: 0
+mode: script
+say: check
+line: 42
+within: 34
+params:
+  facts:
+    - member: merged
+      test: eq true
+      held: 'true'
+      holds: true
+outcome: held
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/pulls/128
+now:
+  state:
+    id: 4930364350
+    node_id: PR_kwDOVM7WJc8AAAABJd9jvg
+    number: 128
+    state: closed
+    locked: false
+    title: Refuse a bed with no name (reasoned)
+    body: 'Relates to #127'
+    created_at: '2026-10-20T02:59:48Z'
+    updated_at: '2026-10-20T02:59:53Z'
+    closed_at: '2026-10-20T02:59:53Z'
+    merged_at: '2026-10-20T02:59:53Z'
+    merge_commit_sha: 6fa3023f66818db38294430259b9decf098a497a
+    assignees: []
+    requested_reviewers: []
+    requested_teams: []
+    labels: []
+    milestone: null
+    draft: false
+    head:
+      label: JogoShugh:fix-blank-names-reasoned-1019-225941
+      ref: fix-blank-names-reasoned-1019-225941
+      sha: 40c2a656da659d63f28784b1456a78db6fed02f5
+    base:
+      label: JogoShugh:main
+      ref: main
+      sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+    author_association: OWNER
+    auto_merge: null
+    assignee: null
+    active_lock_reason: null
+    merged: true
+    mergeable: null
+    rebaseable: null
+    mergeable_state: unknown
+    comments: 0
+    review_comments: 0
+    maintainer_can_modify: false
+    commits: 1
+    additions: 1
+    deletions: 0
+    changed_files: 1
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      pull_number: '128'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:issues-list-comments:
+      - null
+    github:review-comments:
+      - null
+    github:review-comment:
+      - null
+    github:commits:
+      - null
+    github:statuses:
+      - null
+    github:diff:
+      - null
+    github:patch:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:merged-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:head-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 16
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 16
+          watchers: 0
+          default_branch: main
+    github:base-user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:base-repo:
+      - title: null
+        state:
+          id: 1422841381
+          node_id: R_kgDOVM7WJQ
+          name: heart-github-test
+          full_name: JogoShugh/heart-github-test
+          private: false
+          description: null
+          fork: false
+          created_at: '2026-10-17T01:37:34Z'
+          updated_at: '2026-10-19T22:14:35Z'
+          pushed_at: '2026-10-20T02:59:46Z'
+          homepage: null
+          size: 53
+          stargazers_count: 0
+          watchers_count: 0
+          language: null
+          has_issues: true
+          has_projects: true
+          has_downloads: false
+          has_wiki: true
+          has_pages: false
+          has_discussions: false
+          forks_count: 0
+          mirror_url: null
+          archived: false
+          disabled: false
+          open_issues_count: 16
+          license: null
+          allow_forking: true
+          is_template: false
+          web_commit_signoff_required: false
+          has_pull_requests: true
+          pull_request_creation_policy: all
+          topics: []
+          visibility: public
+          forks: 0
+          open_issues: 16
+          watchers: 0
+          default_branch: main
+---
+at: '2026-10-20T02:59:54.852131Z'
+ms: 203
+mode: script
+say: return to {address}
+line: 34
+within: 26
+params:
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-225941
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1019-225941
+now:
+  state:
+    name: fix-blank-names-reasoned-1019-225941
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: fix-blank-names-reasoned-1019-225941
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: 40c2a656da659d63f28784b1456a78db6fed02f5
+          node_id: C_kwDOVM7WJdoAKDQwYzJhNjU2ZGE2NTlkNjNmMjg3ODRiMTQ1NmE3OGRiNmZlZDAyZjU
+          parents:
+            - sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+---
+at: '2026-10-20T02:59:55.055608Z'
+ms: 200
+mode: script
+say: return to {address}
+line: 26
+within: 21
+params:
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/branches/main
+now:
+  state:
+    name: main
+    protected: false
+    protection:
+      enabled: false
+      required_status_checks:
+        enforcement_level: 'off'
+        contexts: []
+        checks: []
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      branch: main
+  forms:
+    - github:branch-from-here
+    - github:commit-file
+    - github:open-pull-request
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:protection:
+      - null
+  embedded:
+    github:commit:
+      - title: null
+        state:
+          sha: 6fa3023f66818db38294430259b9decf098a497a
+          node_id: C_kwDOVM7WJdoAKDZmYTMwMjNmNjY4MThkYjM4Mjk0NDMwMjU5YjlkZWNmMDk4YTQ5N2E
+          parents:
+            - sha: fb8fe4e2e55eebfe9d18c7ea443f990781d9beee
+---
+at: '2026-10-20T02:59:55.256227Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 21
+within: 9
+params:
+  address: http://localhost:8392/
+outcome: done
+address: http://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-20T02:59:55.259896Z'
+ms: 475
+mode: script
+say: act {relation}, owner {owner}, repo {repo}, issue_number {issue_number}
+intent: open issue 127 in JogoShugh/heart-github-test
+line: 46
+within: 9
+params:
+  relation: github:issues-get
+  owner: JogoShugh
+  repo: heart-github-test
+  issue_number: 127
+values:
+  owner:
+    value: JogoShugh
+    type: string
+    from:
+      - input: owner
+      - step: 2
+        pointer: /hr:address/owner
+      - step: 2
+        pointer: /_embedded/github:owner/0/login
+      - step: 3
+        pointer: /hr:address/owner
+      - step: 3
+        pointer: /_embedded/github:user/0/login
+      - step: 6
+        pointer: /hr:address/owner
+      - step: 7
+        pointer: /hr:address/owner
+      - step: 8
+        pointer: /hr:address/owner
+      - step: 9
+        pointer: /hr:address/owner
+      - step: 9
+        pointer: /_embedded/github:user/0/login
+      - step: 9
+        pointer: /_embedded/github:head-user/0/login
+      - step: 9
+        pointer: /_embedded/github:base-user/0/login
+      - step: 12
+        pointer: /hr:address/owner
+      - step: 12
+        pointer: /_embedded/github:user/0/login
+      - step: 12
+        pointer: /_embedded/github:merged-by/0/login
+      - step: 12
+        pointer: /_embedded/github:head-user/0/login
+      - step: 12
+        pointer: /_embedded/github:base-user/0/login
+  repo:
+    value: heart-github-test
+    type: string
+    from:
+      - input: repo
+      - step: 2
+        pointer: /name
+      - step: 2
+        pointer: /hr:address/repo
+      - step: 3
+        pointer: /hr:address/repo
+      - step: 6
+        pointer: /hr:address/repo
+      - step: 7
+        pointer: /hr:address/repo
+      - step: 8
+        pointer: /hr:address/repo
+      - step: 9
+        pointer: /hr:address/repo
+      - step: 9
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 9
+        pointer: /_embedded/github:base-repo/0/name
+      - step: 12
+        pointer: /hr:address/repo
+      - step: 12
+        pointer: /_embedded/github:head-repo/0/name
+      - step: 12
+        pointer: /_embedded/github:base-repo/0/name
+  issue_number:
+    value: 127
+    type: integer
+    from:
+      - step: 3
+        pointer: /number
+      - step: 3
+        pointer: /hr:address/issue_number
+opens: true
+chose:
+  kind: form
+  relation: github:issues-get
+  title: Get an issue
+  method: GET
+  target: /repos/{owner}/{repo}/issues/{issue_number}
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - github:issues-get
+    - github:issues-get-comment
+    - github:issues-list-comments
+    - github:issues-list-for-repo
+    - github:pulls-get
+    - github:pulls-list
+    - github:repos-get
+    - github:repos-get-branch
+    - github:repos-list-branches
+    - github:repos-list-for-user
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127
+now:
+  state:
+    id: 5935137818
+    node_id: I_kwDOVM7WJc8AAAABYcMEGg
+    number: 127
+    title: Crash when a bed has no name (reasoned)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 0
+    created_at: '2026-10-20T02:59:42Z'
+    updated_at: '2026-10-20T02:59:42Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Opened by a HEART script.
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '127'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-20T02:59:55.744890Z'
+ms: 2553
+mode: script
+say: act {relation}, body {body}
+intent: 'comment on it: Fixed in 1.2 by #128.'
+line: 51
+within: 46
+params:
+  relation: github:comment
+  body: 'Fixed in 1.2 by #128.'
+values:
+  body:
+    value: 'Fixed in 1.2 by #128.'
+    type: string
+    from:
+      - parts:
+          '128':
+            step: 9
+            pointer: /number
+          '1':
+            step: 9
+            pointer: /commits
+opens: true
+chose:
+  kind: form
+  relation: github:comment
+  title: Comment
+  method: POST
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/comment
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127/actions/comment
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/6be47444ffaa98cb
+    integrity: sha256-a+R0RP+qmMt/gD/74l+kNgK6sMcmv+naoY1EEUoiE3k=
+  form: sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
+  schema:
+    href: http://localhost:8392/schemas/ed35e5c584ac8de1
+    integrity: sha256-7TXlxYSsjeGU+EYIxodHAFtCYel24Fb0XIH1qDwdV0k=
+  if-match: '"seq-0.hsf.L2.96ddc0ede025bd91"'
+  checked: lenient
+  warning: 'the set holding github:comment changed: pinned sha256-otL95WfaAqBvpizW5luVdqgfX3ezHO4V7zxlF3sz/vw=, offered sha256-a+R0RP+qmMt/gD/74l+kNgK6sMcmv+naoY1EEUoiE3k='
+  held: form
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: new resource
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6282303892
+now:
+  state:
+    id: 6282303892
+    node_id: IC_kwDOVM7WJc8AAAABdnRZlA
+    created_at: '2026-10-20T02:59:57Z'
+    updated_at: '2026-10-20T02:59:57Z'
+    author_association: OWNER
+    body: 'Fixed in 1.2 by #128.'
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    minimized: null
+    pin: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      comment_id: '6282303892'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-20T02:59:58.300349Z'
+ms: 0
+mode: script
+say: check
+line: 52
+within: 51
+params:
+  facts:
+    - member: body
+      test: 'eq Fixed in 1.2 by #128.'
+      held: 'Fixed in 1.2 by #128.'
+      holds: true
+outcome: held
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6282303892
+now:
+  state:
+    id: 6282303892
+    node_id: IC_kwDOVM7WJc8AAAABdnRZlA
+    created_at: '2026-10-20T02:59:57Z'
+    updated_at: '2026-10-20T02:59:57Z'
+    author_association: OWNER
+    body: 'Fixed in 1.2 by #128.'
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    minimized: null
+    pin: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      comment_id: '6282303892'
+  forms:
+    - github:edit
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    alternate:
+      - null
+    github:issues-get:
+      - null
+    github:reactions:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-20T02:59:58.300466Z'
+ms: 433
+mode: script
+say: return to {address}
+line: 51
+within: 46
+params:
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127
+now:
+  state:
+    id: 5935137818
+    node_id: I_kwDOVM7WJc8AAAABYcMEGg
+    number: 127
+    title: Crash when a bed has no name (reasoned)
+    labels: []
+    state: open
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-20T02:59:42Z'
+    updated_at: '2026-10-20T02:59:57Z'
+    closed_at: null
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Opened by a HEART script.
+    closed_by: null
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: null
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '127'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-20T02:59:58.734449Z'
+ms: 2238
+mode: script
+say: act {relation}
+intent: close it, since the fix is done
+line: 54
+within: 46
+params:
+  relation: github:close
+chose:
+  kind: form
+  relation: github:close
+  title: Close
+  method: POST
+  target: /repos/{owner}/{repo}/issues/{issue_number}/actions/close
+  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127/actions/close
+  picked: relation
+  not sent:
+    - milestone
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8392/affordance-sets/6be47444ffaa98cb
+    integrity: sha256-a+R0RP+qmMt/gD/74l+kNgK6sMcmv+naoY1EEUoiE3k=
+  form: sha256-dh58qlv7+sFtgerVi97uxDZvM3UPD5ospGsa2DgUMv8=
+  schema:
+    href: http://localhost:8392/schemas/834fb6089e888bf3
+    integrity: sha256-g0+2CJ6Ii/MZTh0M+uCFlDeGUMi++eyFyqfmNWOx7R4=
+  if-match: '"seq-0.hsf.L2.5891ad58e3e6f5b5"'
+  checked: lenient
+  held: values
+offered:
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:close
+    - github:close-duplicate
+    - github:close-not-planned
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    - alternate
+    - github:events
+    - github:issues-list-comments
+    - github:issues-list-sub-issues
+    - github:labels
+    - github:reactions
+    - github:repos-get
+    - github:timeline
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127
+now:
+  state:
+    id: 5935137818
+    node_id: I_kwDOVM7WJc8AAAABYcMEGg
+    number: 127
+    title: Crash when a bed has no name (reasoned)
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-20T02:59:42Z'
+    updated_at: '2026-10-20T03:00:00Z'
+    closed_at: '2026-10-20T03:00:00Z'
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Opened by a HEART script.
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '127'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-20T03:00:00.972753Z'
+ms: 0
+mode: script
+say: check
+line: 55
+within: 46
+params:
+  facts:
+    - member: state
+      test: eq closed
+      held: closed
+      holds: true
+    - member: state_reason
+      test: eq completed
+      held: completed
+      holds: true
+outcome: held
+address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/127
+now:
+  state:
+    id: 5935137818
+    node_id: I_kwDOVM7WJc8AAAABYcMEGg
+    number: 127
+    title: Crash when a bed has no name (reasoned)
+    labels: []
+    state: closed
+    locked: false
+    assignees: []
+    milestone: null
+    comments: 1
+    created_at: '2026-10-20T02:59:42Z'
+    updated_at: '2026-10-20T03:00:00Z'
+    closed_at: '2026-10-20T03:00:00Z'
+    assignee: null
+    author_association: OWNER
+    active_lock_reason: null
+    sub_issues_summary:
+      total: 0
+      completed: 0
+      percent_completed: 0
+    issue_dependencies_summary:
+      blocked_by: 0
+      total_blocked_by: 0
+      blocking: 0
+      total_blocking: 0
+    body: Opened by a HEART script.
+    reactions:
+      total_count: 0
+      '+1': 0
+      '-1': 0
+      laugh: 0
+      hooray: 0
+      confused: 0
+      heart: 0
+      rocket: 0
+      eyes: 0
+    performed_via_github_app: null
+    state_reason: completed
+    pinned_comment: null
+    hr:address:
+      owner: JogoShugh
+      repo: heart-github-test
+      issue_number: '127'
+  forms:
+    - github:add-sub-issue
+    - github:assign
+    - github:comment
+    - github:edit
+    - github:label
+    - github:lock
+    - github:remove-sub-issue
+    - github:reopen
+    - github:set-milestone
+    - github:unassign
+    - github:unlabel
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    github:issues-list-sub-issues:
+      - null
+    github:issues-list-comments:
+      - null
+    github:repos-get:
+      - null
+    github:labels:
+      - null
+    github:events:
+      - null
+    alternate:
+      - null
+    github:reactions:
+      - null
+    github:timeline:
+      - null
+  embedded:
+    github:user:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+    github:closed-by:
+      - title: null
+        state:
+          login: JogoShugh
+          id: 1863005
+          node_id: MDQ6VXNlcjE4NjMwMDU=
+          gravatar_id: ''
+          type: User
+          user_view_type: public
+          site_admin: false
+---
+at: '2026-10-20T03:00:00.972829Z'
+ms: 1
+mode: script
+say: return to {address}
+line: 46
+within: 9
+params:
+  address: http://localhost:8392/
+outcome: done
+address: http://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+</pre>
+<pre hidden id="upstream-record"></pre>
+<script>
+/*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */
+!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).jsyaml={})}(this,(function(e){"use strict";function t(e){return null==e}var n={isNothing:t,isObject:function(e){return"object"==typeof e&&null!==e},toArray:function(e){return Array.isArray(e)?e:t(e)?[]:[e]},repeat:function(e,t){var n,i="";for(n=0;n<t;n+=1)i+=e;return i},isNegativeZero:function(e){return 0===e&&Number.NEGATIVE_INFINITY===1/e},extend:function(e,t){var n,i,r,o;if(t)for(n=0,i=(o=Object.keys(t)).length;n<i;n+=1)e[r=o[n]]=t[r];return e}};function i(e,t){var n="",i=e.reason||"(unknown reason)";return e.mark?(e.mark.name&&(n+='in "'+e.mark.name+'" '),n+="("+(e.mark.line+1)+":"+(e.mark.column+1)+")",!t&&e.mark.snippet&&(n+="\n\n"+e.mark.snippet),i+" "+n):i}function r(e,t){Error.call(this),this.name="YAMLException",this.reason=e,this.mark=t,this.message=i(this,!1),Error.captureStackTrace?Error.captureStackTrace(this,this.constructor):this.stack=(new Error).stack||""}r.prototype=Object.create(Error.prototype),r.prototype.constructor=r,r.prototype.toString=function(e){return this.name+": "+i(this,e)};var o=r;function a(e,t,n,i,r){var o="",a="",l=Math.floor(r/2)-1;return i-t>l&&(t=i-l+(o=" ... ").length),n-i>l&&(n=i+l-(a=" ...").length),{str:o+e.slice(t,n).replace(/\t/g,"→")+a,pos:i-t+o.length}}function l(e,t){return n.repeat(" ",t-e.length)+e}var c=function(e,t){if(t=Object.create(t||null),!e.buffer)return null;t.maxLength||(t.maxLength=79),"number"!=typeof t.indent&&(t.indent=1),"number"!=typeof t.linesBefore&&(t.linesBefore=3),"number"!=typeof t.linesAfter&&(t.linesAfter=2);for(var i,r=/\r?\n|\r|\0/g,o=[0],c=[],s=-1;i=r.exec(e.buffer);)c.push(i.index),o.push(i.index+i[0].length),e.position<=i.index&&s<0&&(s=o.length-2);s<0&&(s=o.length-1);var u,p,f="",d=Math.min(e.line+t.linesAfter,c.length).toString().length,h=t.maxLength-(t.indent+d+3);for(u=1;u<=t.linesBefore&&!(s-u<0);u++)p=a(e.buffer,o[s-u],c[s-u],e.position-(o[s]-o[s-u]),h),f=n.repeat(" ",t.indent)+l((e.line-u+1).toString(),d)+" | "+p.str+"\n"+f;for(p=a(e.buffer,o[s],c[s],e.position,h),f+=n.repeat(" ",t.indent)+l((e.line+1).toString(),d)+" | "+p.str+"\n",f+=n.repeat("-",t.indent+d+3+p.pos)+"^\n",u=1;u<=t.linesAfter&&!(s+u>=c.length);u++)p=a(e.buffer,o[s+u],c[s+u],e.position-(o[s]-o[s+u]),h),f+=n.repeat(" ",t.indent)+l((e.line+u+1).toString(),d)+" | "+p.str+"\n";return f.replace(/\n$/,"")},s=["kind","multi","resolve","construct","instanceOf","predicate","represent","representName","defaultStyle","styleAliases"],u=["scalar","sequence","mapping"];var p=function(e,t){if(t=t||{},Object.keys(t).forEach((function(t){if(-1===s.indexOf(t))throw new o('Unknown option "'+t+'" is met in definition of "'+e+'" YAML type.')})),this.options=t,this.tag=e,this.kind=t.kind||null,this.resolve=t.resolve||function(){return!0},this.construct=t.construct||function(e){return e},this.instanceOf=t.instanceOf||null,this.predicate=t.predicate||null,this.represent=t.represent||null,this.representName=t.representName||null,this.defaultStyle=t.defaultStyle||null,this.multi=t.multi||!1,this.styleAliases=function(e){var t={};return null!==e&&Object.keys(e).forEach((function(n){e[n].forEach((function(e){t[String(e)]=n}))})),t}(t.styleAliases||null),-1===u.indexOf(this.kind))throw new o('Unknown kind "'+this.kind+'" is specified for "'+e+'" YAML type.')};function f(e,t){var n=[];return e[t].forEach((function(e){var t=n.length;n.forEach((function(n,i){n.tag===e.tag&&n.kind===e.kind&&n.multi===e.multi&&(t=i)})),n[t]=e})),n}function d(e){return this.extend(e)}d.prototype.extend=function(e){var t=[],n=[];if(e instanceof p)n.push(e);else if(Array.isArray(e))n=n.concat(e);else{if(!e||!Array.isArray(e.implicit)&&!Array.isArray(e.explicit))throw new o("Schema.extend argument should be a Type, [ Type ], or a schema definition ({ implicit: [...], explicit: [...] })");e.implicit&&(t=t.concat(e.implicit)),e.explicit&&(n=n.concat(e.explicit))}t.forEach((function(e){if(!(e instanceof p))throw new o("Specified list of YAML types (or a single Type object) contains a non-Type object.");if(e.loadKind&&"scalar"!==e.loadKind)throw new o("There is a non-scalar type in the implicit list of a schema. Implicit resolving of such types is not supported.");if(e.multi)throw new o("There is a multi type in the implicit list of a schema. Multi tags can only be listed as explicit.")})),n.forEach((function(e){if(!(e instanceof p))throw new o("Specified list of YAML types (or a single Type object) contains a non-Type object.")}));var i=Object.create(d.prototype);return i.implicit=(this.implicit||[]).concat(t),i.explicit=(this.explicit||[]).concat(n),i.compiledImplicit=f(i,"implicit"),i.compiledExplicit=f(i,"explicit"),i.compiledTypeMap=function(){var e,t,n={scalar:{},sequence:{},mapping:{},fallback:{},multi:{scalar:[],sequence:[],mapping:[],fallback:[]}};function i(e){e.multi?(n.multi[e.kind].push(e),n.multi.fallback.push(e)):n[e.kind][e.tag]=n.fallback[e.tag]=e}for(e=0,t=arguments.length;e<t;e+=1)arguments[e].forEach(i);return n}(i.compiledImplicit,i.compiledExplicit),i};var h=d,g=new p("tag:yaml.org,2002:str",{kind:"scalar",construct:function(e){return null!==e?e:""}}),m=new p("tag:yaml.org,2002:seq",{kind:"sequence",construct:function(e){return null!==e?e:[]}}),y=new p("tag:yaml.org,2002:map",{kind:"mapping",construct:function(e){return null!==e?e:{}}}),b=new h({explicit:[g,m,y]});var A=new p("tag:yaml.org,2002:null",{kind:"scalar",resolve:function(e){if(null===e)return!0;var t=e.length;return 1===t&&"~"===e||4===t&&("null"===e||"Null"===e||"NULL"===e)},construct:function(){return null},predicate:function(e){return null===e},represent:{canonical:function(){return"~"},lowercase:function(){return"null"},uppercase:function(){return"NULL"},camelcase:function(){return"Null"},empty:function(){return""}},defaultStyle:"lowercase"});var v=new p("tag:yaml.org,2002:bool",{kind:"scalar",resolve:function(e){if(null===e)return!1;var t=e.length;return 4===t&&("true"===e||"True"===e||"TRUE"===e)||5===t&&("false"===e||"False"===e||"FALSE"===e)},construct:function(e){return"true"===e||"True"===e||"TRUE"===e},predicate:function(e){return"[object Boolean]"===Object.prototype.toString.call(e)},represent:{lowercase:function(e){return e?"true":"false"},uppercase:function(e){return e?"TRUE":"FALSE"},camelcase:function(e){return e?"True":"False"}},defaultStyle:"lowercase"});function w(e){return 48<=e&&e<=55}function k(e){return 48<=e&&e<=57}var C=new p("tag:yaml.org,2002:int",{kind:"scalar",resolve:function(e){if(null===e)return!1;var t,n,i=e.length,r=0,o=!1;if(!i)return!1;if("-"!==(t=e[r])&&"+"!==t||(t=e[++r]),"0"===t){if(r+1===i)return!0;if("b"===(t=e[++r])){for(r++;r<i;r++)if("_"!==(t=e[r])){if("0"!==t&&"1"!==t)return!1;o=!0}return o&&"_"!==t}if("x"===t){for(r++;r<i;r++)if("_"!==(t=e[r])){if(!(48<=(n=e.charCodeAt(r))&&n<=57||65<=n&&n<=70||97<=n&&n<=102))return!1;o=!0}return o&&"_"!==t}if("o"===t){for(r++;r<i;r++)if("_"!==(t=e[r])){if(!w(e.charCodeAt(r)))return!1;o=!0}return o&&"_"!==t}}if("_"===t)return!1;for(;r<i;r++)if("_"!==(t=e[r])){if(!k(e.charCodeAt(r)))return!1;o=!0}return!(!o||"_"===t)},construct:function(e){var t,n=e,i=1;if(-1!==n.indexOf("_")&&(n=n.replace(/_/g,"")),"-"!==(t=n[0])&&"+"!==t||("-"===t&&(i=-1),t=(n=n.slice(1))[0]),"0"===n)return 0;if("0"===t){if("b"===n[1])return i*parseInt(n.slice(2),2);if("x"===n[1])return i*parseInt(n.slice(2),16);if("o"===n[1])return i*parseInt(n.slice(2),8)}return i*parseInt(n,10)},predicate:function(e){return"[object Number]"===Object.prototype.toString.call(e)&&e%1==0&&!n.isNegativeZero(e)},represent:{binary:function(e){return e>=0?"0b"+e.toString(2):"-0b"+e.toString(2).slice(1)},octal:function(e){return e>=0?"0o"+e.toString(8):"-0o"+e.toString(8).slice(1)},decimal:function(e){return e.toString(10)},hexadecimal:function(e){return e>=0?"0x"+e.toString(16).toUpperCase():"-0x"+e.toString(16).toUpperCase().slice(1)}},defaultStyle:"decimal",styleAliases:{binary:[2,"bin"],octal:[8,"oct"],decimal:[10,"dec"],hexadecimal:[16,"hex"]}}),x=new RegExp("^(?:[-+]?(?:[0-9][0-9_]*)(?:\\.[0-9_]*)?(?:[eE][-+]?[0-9]+)?|\\.[0-9_]+(?:[eE][-+]?[0-9]+)?|[-+]?\\.(?:inf|Inf|INF)|\\.(?:nan|NaN|NAN))$");var I=/^[-+]?[0-9]+e/;var S=new p("tag:yaml.org,2002:float",{kind:"scalar",resolve:function(e){return null!==e&&!(!x.test(e)||"_"===e[e.length-1])},construct:function(e){var t,n;return n="-"===(t=e.replace(/_/g,"").toLowerCase())[0]?-1:1,"+-".indexOf(t[0])>=0&&(t=t.slice(1)),".inf"===t?1===n?Number.POSITIVE_INFINITY:Number.NEGATIVE_INFINITY:".nan"===t?NaN:n*parseFloat(t,10)},predicate:function(e){return"[object Number]"===Object.prototype.toString.call(e)&&(e%1!=0||n.isNegativeZero(e))},represent:function(e,t){var i;if(isNaN(e))switch(t){case"lowercase":return".nan";case"uppercase":return".NAN";case"camelcase":return".NaN"}else if(Number.POSITIVE_INFINITY===e)switch(t){case"lowercase":return".inf";case"uppercase":return".INF";case"camelcase":return".Inf"}else if(Number.NEGATIVE_INFINITY===e)switch(t){case"lowercase":return"-.inf";case"uppercase":return"-.INF";case"camelcase":return"-.Inf"}else if(n.isNegativeZero(e))return"-0.0";return i=e.toString(10),I.test(i)?i.replace("e",".e"):i},defaultStyle:"lowercase"}),O=b.extend({implicit:[A,v,C,S]}),j=O,T=new RegExp("^([0-9][0-9][0-9][0-9])-([0-9][0-9])-([0-9][0-9])$"),N=new RegExp("^([0-9][0-9][0-9][0-9])-([0-9][0-9]?)-([0-9][0-9]?)(?:[Tt]|[ \\t]+)([0-9][0-9]?):([0-9][0-9]):([0-9][0-9])(?:\\.([0-9]*))?(?:[ \\t]*(Z|([-+])([0-9][0-9]?)(?::([0-9][0-9]))?))?$");var F=new p("tag:yaml.org,2002:timestamp",{kind:"scalar",resolve:function(e){return null!==e&&(null!==T.exec(e)||null!==N.exec(e))},construct:function(e){var t,n,i,r,o,a,l,c,s=0,u=null;if(null===(t=T.exec(e))&&(t=N.exec(e)),null===t)throw new Error("Date resolve error");if(n=+t[1],i=+t[2]-1,r=+t[3],!t[4])return new Date(Date.UTC(n,i,r));if(o=+t[4],a=+t[5],l=+t[6],t[7]){for(s=t[7].slice(0,3);s.length<3;)s+="0";s=+s}return t[9]&&(u=6e4*(60*+t[10]+ +(t[11]||0)),"-"===t[9]&&(u=-u)),c=new Date(Date.UTC(n,i,r,o,a,l,s)),u&&c.setTime(c.getTime()-u),c},instanceOf:Date,represent:function(e){return e.toISOString()}});var E=new p("tag:yaml.org,2002:merge",{kind:"scalar",resolve:function(e){return"<<"===e||null===e}}),M="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=\n\r";var L=new p("tag:yaml.org,2002:binary",{kind:"scalar",resolve:function(e){if(null===e)return!1;var t,n,i=0,r=e.length,o=M;for(n=0;n<r;n++)if(!((t=o.indexOf(e.charAt(n)))>64)){if(t<0)return!1;i+=6}return i%8==0},construct:function(e){var t,n,i=e.replace(/[\r\n=]/g,""),r=i.length,o=M,a=0,l=[];for(t=0;t<r;t++)t%4==0&&t&&(l.push(a>>16&255),l.push(a>>8&255),l.push(255&a)),a=a<<6|o.indexOf(i.charAt(t));return 0===(n=r%4*6)?(l.push(a>>16&255),l.push(a>>8&255),l.push(255&a)):18===n?(l.push(a>>10&255),l.push(a>>2&255)):12===n&&l.push(a>>4&255),new Uint8Array(l)},predicate:function(e){return"[object Uint8Array]"===Object.prototype.toString.call(e)},represent:function(e){var t,n,i="",r=0,o=e.length,a=M;for(t=0;t<o;t++)t%3==0&&t&&(i+=a[r>>18&63],i+=a[r>>12&63],i+=a[r>>6&63],i+=a[63&r]),r=(r<<8)+e[t];return 0===(n=o%3)?(i+=a[r>>18&63],i+=a[r>>12&63],i+=a[r>>6&63],i+=a[63&r]):2===n?(i+=a[r>>10&63],i+=a[r>>4&63],i+=a[r<<2&63],i+=a[64]):1===n&&(i+=a[r>>2&63],i+=a[r<<4&63],i+=a[64],i+=a[64]),i}}),_=Object.prototype.hasOwnProperty,D=Object.prototype.toString;var U=new p("tag:yaml.org,2002:omap",{kind:"sequence",resolve:function(e){if(null===e)return!0;var t,n,i,r,o,a=[],l=e;for(t=0,n=l.length;t<n;t+=1){if(i=l[t],o=!1,"[object Object]"!==D.call(i))return!1;for(r in i)if(_.call(i,r)){if(o)return!1;o=!0}if(!o)return!1;if(-1!==a.indexOf(r))return!1;a.push(r)}return!0},construct:function(e){return null!==e?e:[]}}),q=Object.prototype.toString;var Y=new p("tag:yaml.org,2002:pairs",{kind:"sequence",resolve:function(e){if(null===e)return!0;var t,n,i,r,o,a=e;for(o=new Array(a.length),t=0,n=a.length;t<n;t+=1){if(i=a[t],"[object Object]"!==q.call(i))return!1;if(1!==(r=Object.keys(i)).length)return!1;o[t]=[r[0],i[r[0]]]}return!0},construct:function(e){if(null===e)return[];var t,n,i,r,o,a=e;for(o=new Array(a.length),t=0,n=a.length;t<n;t+=1)i=a[t],r=Object.keys(i),o[t]=[r[0],i[r[0]]];return o}}),R=Object.prototype.hasOwnProperty;var B=new p("tag:yaml.org,2002:set",{kind:"mapping",resolve:function(e){if(null===e)return!0;var t,n=e;for(t in n)if(R.call(n,t)&&null!==n[t])return!1;return!0},construct:function(e){return null!==e?e:{}}}),K=j.extend({implicit:[F,E],explicit:[L,U,Y,B]}),P=Object.prototype.hasOwnProperty,W=/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x84\x86-\x9F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/,H=/[\x85\u2028\u2029]/,$=/[,\[\]\{\}]/,G=/^(?:!|!!|![a-z\-]+!)$/i,V=/^(?:!|[^,\[\]\{\}])(?:%[0-9a-f]{2}|[0-9a-z\-#;\/\?:@&=\+\$,_\.!~\*'\(\)\[\]])*$/i;function Z(e){return Object.prototype.toString.call(e)}function J(e){return 10===e||13===e}function Q(e){return 9===e||32===e}function z(e){return 9===e||32===e||10===e||13===e}function X(e){return 44===e||91===e||93===e||123===e||125===e}function ee(e){var t;return 48<=e&&e<=57?e-48:97<=(t=32|e)&&t<=102?t-97+10:-1}function te(e){return 48===e?"\0":97===e?"":98===e?"\b":116===e||9===e?"\t":110===e?"\n":118===e?"\v":102===e?"\f":114===e?"\r":101===e?"":32===e?" ":34===e?'"':47===e?"/":92===e?"\\":78===e?"":95===e?" ":76===e?"\u2028":80===e?"\u2029":""}function ne(e){return e<=65535?String.fromCharCode(e):String.fromCharCode(55296+(e-65536>>10),56320+(e-65536&1023))}for(var ie=new Array(256),re=new Array(256),oe=0;oe<256;oe++)ie[oe]=te(oe)?1:0,re[oe]=te(oe);function ae(e,t){this.input=e,this.filename=t.filename||null,this.schema=t.schema||K,this.onWarning=t.onWarning||null,this.legacy=t.legacy||!1,this.json=t.json||!1,this.listener=t.listener||null,this.implicitTypes=this.schema.compiledImplicit,this.typeMap=this.schema.compiledTypeMap,this.length=e.length,this.position=0,this.line=0,this.lineStart=0,this.lineIndent=0,this.firstTabInLine=-1,this.documents=[]}function le(e,t){var n={name:e.filename,buffer:e.input.slice(0,-1),position:e.position,line:e.line,column:e.position-e.lineStart};return n.snippet=c(n),new o(t,n)}function ce(e,t){throw le(e,t)}function se(e,t){e.onWarning&&e.onWarning.call(null,le(e,t))}var ue={YAML:function(e,t,n){var i,r,o;null!==e.version&&ce(e,"duplication of %YAML directive"),1!==n.length&&ce(e,"YAML directive accepts exactly one argument"),null===(i=/^([0-9]+)\.([0-9]+)$/.exec(n[0]))&&ce(e,"ill-formed argument of the YAML directive"),r=parseInt(i[1],10),o=parseInt(i[2],10),1!==r&&ce(e,"unacceptable YAML version of the document"),e.version=n[0],e.checkLineBreaks=o<2,1!==o&&2!==o&&se(e,"unsupported YAML version of the document")},TAG:function(e,t,n){var i,r;2!==n.length&&ce(e,"TAG directive accepts exactly two arguments"),i=n[0],r=n[1],G.test(i)||ce(e,"ill-formed tag handle (first argument) of the TAG directive"),P.call(e.tagMap,i)&&ce(e,'there is a previously declared suffix for "'+i+'" tag handle'),V.test(r)||ce(e,"ill-formed tag prefix (second argument) of the TAG directive");try{r=decodeURIComponent(r)}catch(t){ce(e,"tag prefix is malformed: "+r)}e.tagMap[i]=r}};function pe(e,t,n,i){var r,o,a,l;if(t<n){if(l=e.input.slice(t,n),i)for(r=0,o=l.length;r<o;r+=1)9===(a=l.charCodeAt(r))||32<=a&&a<=1114111||ce(e,"expected valid JSON character");else W.test(l)&&ce(e,"the stream contains non-printable characters");e.result+=l}}function fe(e,t,i,r){var o,a,l,c;for(n.isObject(i)||ce(e,"cannot merge mappings; the provided source object is unacceptable"),l=0,c=(o=Object.keys(i)).length;l<c;l+=1)a=o[l],P.call(t,a)||(t[a]=i[a],r[a]=!0)}function de(e,t,n,i,r,o,a,l,c){var s,u;if(Array.isArray(r))for(s=0,u=(r=Array.prototype.slice.call(r)).length;s<u;s+=1)Array.isArray(r[s])&&ce(e,"nested arrays are not supported inside keys"),"object"==typeof r&&"[object Object]"===Z(r[s])&&(r[s]="[object Object]");if("object"==typeof r&&"[object Object]"===Z(r)&&(r="[object Object]"),r=String(r),null===t&&(t={}),"tag:yaml.org,2002:merge"===i)if(Array.isArray(o))for(s=0,u=o.length;s<u;s+=1)fe(e,t,o[s],n);else fe(e,t,o,n);else e.json||P.call(n,r)||!P.call(t,r)||(e.line=a||e.line,e.lineStart=l||e.lineStart,e.position=c||e.position,ce(e,"duplicated mapping key")),"__proto__"===r?Object.defineProperty(t,r,{configurable:!0,enumerable:!0,writable:!0,value:o}):t[r]=o,delete n[r];return t}function he(e){var t;10===(t=e.input.charCodeAt(e.position))?e.position++:13===t?(e.position++,10===e.input.charCodeAt(e.position)&&e.position++):ce(e,"a line break is expected"),e.line+=1,e.lineStart=e.position,e.firstTabInLine=-1}function ge(e,t,n){for(var i=0,r=e.input.charCodeAt(e.position);0!==r;){for(;Q(r);)9===r&&-1===e.firstTabInLine&&(e.firstTabInLine=e.position),r=e.input.charCodeAt(++e.position);if(t&&35===r)do{r=e.input.charCodeAt(++e.position)}while(10!==r&&13!==r&&0!==r);if(!J(r))break;for(he(e),r=e.input.charCodeAt(e.position),i++,e.lineIndent=0;32===r;)e.lineIndent++,r=e.input.charCodeAt(++e.position)}return-1!==n&&0!==i&&e.lineIndent<n&&se(e,"deficient indentation"),i}function me(e){var t,n=e.position;return!(45!==(t=e.input.charCodeAt(n))&&46!==t||t!==e.input.charCodeAt(n+1)||t!==e.input.charCodeAt(n+2)||(n+=3,0!==(t=e.input.charCodeAt(n))&&!z(t)))}function ye(e,t){1===t?e.result+=" ":t>1&&(e.result+=n.repeat("\n",t-1))}function be(e,t){var n,i,r=e.tag,o=e.anchor,a=[],l=!1;if(-1!==e.firstTabInLine)return!1;for(null!==e.anchor&&(e.anchorMap[e.anchor]=a),i=e.input.charCodeAt(e.position);0!==i&&(-1!==e.firstTabInLine&&(e.position=e.firstTabInLine,ce(e,"tab characters must not be used in indentation")),45===i)&&z(e.input.charCodeAt(e.position+1));)if(l=!0,e.position++,ge(e,!0,-1)&&e.lineIndent<=t)a.push(null),i=e.input.charCodeAt(e.position);else if(n=e.line,we(e,t,3,!1,!0),a.push(e.result),ge(e,!0,-1),i=e.input.charCodeAt(e.position),(e.line===n||e.lineIndent>t)&&0!==i)ce(e,"bad indentation of a sequence entry");else if(e.lineIndent<t)break;return!!l&&(e.tag=r,e.anchor=o,e.kind="sequence",e.result=a,!0)}function Ae(e){var t,n,i,r,o=!1,a=!1;if(33!==(r=e.input.charCodeAt(e.position)))return!1;if(null!==e.tag&&ce(e,"duplication of a tag property"),60===(r=e.input.charCodeAt(++e.position))?(o=!0,r=e.input.charCodeAt(++e.position)):33===r?(a=!0,n="!!",r=e.input.charCodeAt(++e.position)):n="!",t=e.position,o){do{r=e.input.charCodeAt(++e.position)}while(0!==r&&62!==r);e.position<e.length?(i=e.input.slice(t,e.position),r=e.input.charCodeAt(++e.position)):ce(e,"unexpected end of the stream within a verbatim tag")}else{for(;0!==r&&!z(r);)33===r&&(a?ce(e,"tag suffix cannot contain exclamation marks"):(n=e.input.slice(t-1,e.position+1),G.test(n)||ce(e,"named tag handle cannot contain such characters"),a=!0,t=e.position+1)),r=e.input.charCodeAt(++e.position);i=e.input.slice(t,e.position),$.test(i)&&ce(e,"tag suffix cannot contain flow indicator characters")}i&&!V.test(i)&&ce(e,"tag name cannot contain such characters: "+i);try{i=decodeURIComponent(i)}catch(t){ce(e,"tag name is malformed: "+i)}return o?e.tag=i:P.call(e.tagMap,n)?e.tag=e.tagMap[n]+i:"!"===n?e.tag="!"+i:"!!"===n?e.tag="tag:yaml.org,2002:"+i:ce(e,'undeclared tag handle "'+n+'"'),!0}function ve(e){var t,n;if(38!==(n=e.input.charCodeAt(e.position)))return!1;for(null!==e.anchor&&ce(e,"duplication of an anchor property"),n=e.input.charCodeAt(++e.position),t=e.position;0!==n&&!z(n)&&!X(n);)n=e.input.charCodeAt(++e.position);return e.position===t&&ce(e,"name of an anchor node must contain at least one character"),e.anchor=e.input.slice(t,e.position),!0}function we(e,t,i,r,o){var a,l,c,s,u,p,f,d,h,g=1,m=!1,y=!1;if(null!==e.listener&&e.listener("open",e),e.tag=null,e.anchor=null,e.kind=null,e.result=null,a=l=c=4===i||3===i,r&&ge(e,!0,-1)&&(m=!0,e.lineIndent>t?g=1:e.lineIndent===t?g=0:e.lineIndent<t&&(g=-1)),1===g)for(;Ae(e)||ve(e);)ge(e,!0,-1)?(m=!0,c=a,e.lineIndent>t?g=1:e.lineIndent===t?g=0:e.lineIndent<t&&(g=-1)):c=!1;if(c&&(c=m||o),1!==g&&4!==i||(d=1===i||2===i?t:t+1,h=e.position-e.lineStart,1===g?c&&(be(e,h)||function(e,t,n){var i,r,o,a,l,c,s,u=e.tag,p=e.anchor,f={},d=Object.create(null),h=null,g=null,m=null,y=!1,b=!1;if(-1!==e.firstTabInLine)return!1;for(null!==e.anchor&&(e.anchorMap[e.anchor]=f),s=e.input.charCodeAt(e.position);0!==s;){if(y||-1===e.firstTabInLine||(e.position=e.firstTabInLine,ce(e,"tab characters must not be used in indentation")),i=e.input.charCodeAt(e.position+1),o=e.line,63!==s&&58!==s||!z(i)){if(a=e.line,l=e.lineStart,c=e.position,!we(e,n,2,!1,!0))break;if(e.line===o){for(s=e.input.charCodeAt(e.position);Q(s);)s=e.input.charCodeAt(++e.position);if(58===s)z(s=e.input.charCodeAt(++e.position))||ce(e,"a whitespace character is expected after the key-value separator within a block mapping"),y&&(de(e,f,d,h,g,null,a,l,c),h=g=m=null),b=!0,y=!1,r=!1,h=e.tag,g=e.result;else{if(!b)return e.tag=u,e.anchor=p,!0;ce(e,"can not read an implicit mapping pair; a colon is missed")}}else{if(!b)return e.tag=u,e.anchor=p,!0;ce(e,"can not read a block mapping entry; a multiline key may not be an implicit key")}}else 63===s?(y&&(de(e,f,d,h,g,null,a,l,c),h=g=m=null),b=!0,y=!0,r=!0):y?(y=!1,r=!0):ce(e,"incomplete explicit mapping pair; a key node is missed; or followed by a non-tabulated empty line"),e.position+=1,s=i;if((e.line===o||e.lineIndent>t)&&(y&&(a=e.line,l=e.lineStart,c=e.position),we(e,t,4,!0,r)&&(y?g=e.result:m=e.result),y||(de(e,f,d,h,g,m,a,l,c),h=g=m=null),ge(e,!0,-1),s=e.input.charCodeAt(e.position)),(e.line===o||e.lineIndent>t)&&0!==s)ce(e,"bad indentation of a mapping entry");else if(e.lineIndent<t)break}return y&&de(e,f,d,h,g,null,a,l,c),b&&(e.tag=u,e.anchor=p,e.kind="mapping",e.result=f),b}(e,h,d))||function(e,t){var n,i,r,o,a,l,c,s,u,p,f,d,h=!0,g=e.tag,m=e.anchor,y=Object.create(null);if(91===(d=e.input.charCodeAt(e.position)))a=93,s=!1,o=[];else{if(123!==d)return!1;a=125,s=!0,o={}}for(null!==e.anchor&&(e.anchorMap[e.anchor]=o),d=e.input.charCodeAt(++e.position);0!==d;){if(ge(e,!0,t),(d=e.input.charCodeAt(e.position))===a)return e.position++,e.tag=g,e.anchor=m,e.kind=s?"mapping":"sequence",e.result=o,!0;h?44===d&&ce(e,"expected the node content, but found ','"):ce(e,"missed comma between flow collection entries"),f=null,l=c=!1,63===d&&z(e.input.charCodeAt(e.position+1))&&(l=c=!0,e.position++,ge(e,!0,t)),n=e.line,i=e.lineStart,r=e.position,we(e,t,1,!1,!0),p=e.tag,u=e.result,ge(e,!0,t),d=e.input.charCodeAt(e.position),!c&&e.line!==n||58!==d||(l=!0,d=e.input.charCodeAt(++e.position),ge(e,!0,t),we(e,t,1,!1,!0),f=e.result),s?de(e,o,y,p,u,f,n,i,r):l?o.push(de(e,null,y,p,u,f,n,i,r)):o.push(u),ge(e,!0,t),44===(d=e.input.charCodeAt(e.position))?(h=!0,d=e.input.charCodeAt(++e.position)):h=!1}ce(e,"unexpected end of the stream within a flow collection")}(e,d)?y=!0:(l&&function(e,t){var i,r,o,a,l,c=1,s=!1,u=!1,p=t,f=0,d=!1;if(124===(a=e.input.charCodeAt(e.position)))r=!1;else{if(62!==a)return!1;r=!0}for(e.kind="scalar",e.result="";0!==a;)if(43===(a=e.input.charCodeAt(++e.position))||45===a)1===c?c=43===a?3:2:ce(e,"repeat of a chomping mode identifier");else{if(!((o=48<=(l=a)&&l<=57?l-48:-1)>=0))break;0===o?ce(e,"bad explicit indentation width of a block scalar; it cannot be less than one"):u?ce(e,"repeat of an indentation width identifier"):(p=t+o-1,u=!0)}if(Q(a)){do{a=e.input.charCodeAt(++e.position)}while(Q(a));if(35===a)do{a=e.input.charCodeAt(++e.position)}while(!J(a)&&0!==a)}for(;0!==a;){for(he(e),e.lineIndent=0,a=e.input.charCodeAt(e.position);(!u||e.lineIndent<p)&&32===a;)e.lineIndent++,a=e.input.charCodeAt(++e.position);if(!u&&e.lineIndent>p&&(p=e.lineIndent),J(a))f++;else{if(e.lineIndent<p){3===c?e.result+=n.repeat("\n",s?1+f:f):1===c&&s&&(e.result+="\n");break}for(r?Q(a)?(d=!0,e.result+=n.repeat("\n",s?1+f:f)):d?(d=!1,e.result+=n.repeat("\n",f+1)):0===f?s&&(e.result+=" "):e.result+=n.repeat("\n",f):e.result+=n.repeat("\n",s?1+f:f),s=!0,u=!0,f=0,i=e.position;!J(a)&&0!==a;)a=e.input.charCodeAt(++e.position);pe(e,i,e.position,!1)}}return!0}(e,d)||function(e,t){var n,i,r;if(39!==(n=e.input.charCodeAt(e.position)))return!1;for(e.kind="scalar",e.result="",e.position++,i=r=e.position;0!==(n=e.input.charCodeAt(e.position));)if(39===n){if(pe(e,i,e.position,!0),39!==(n=e.input.charCodeAt(++e.position)))return!0;i=e.position,e.position++,r=e.position}else J(n)?(pe(e,i,r,!0),ye(e,ge(e,!1,t)),i=r=e.position):e.position===e.lineStart&&me(e)?ce(e,"unexpected end of the document within a single quoted scalar"):(e.position++,r=e.position);ce(e,"unexpected end of the stream within a single quoted scalar")}(e,d)||function(e,t){var n,i,r,o,a,l,c;if(34!==(l=e.input.charCodeAt(e.position)))return!1;for(e.kind="scalar",e.result="",e.position++,n=i=e.position;0!==(l=e.input.charCodeAt(e.position));){if(34===l)return pe(e,n,e.position,!0),e.position++,!0;if(92===l){if(pe(e,n,e.position,!0),J(l=e.input.charCodeAt(++e.position)))ge(e,!1,t);else if(l<256&&ie[l])e.result+=re[l],e.position++;else if((a=120===(c=l)?2:117===c?4:85===c?8:0)>0){for(r=a,o=0;r>0;r--)(a=ee(l=e.input.charCodeAt(++e.position)))>=0?o=(o<<4)+a:ce(e,"expected hexadecimal character");e.result+=ne(o),e.position++}else ce(e,"unknown escape sequence");n=i=e.position}else J(l)?(pe(e,n,i,!0),ye(e,ge(e,!1,t)),n=i=e.position):e.position===e.lineStart&&me(e)?ce(e,"unexpected end of the document within a double quoted scalar"):(e.position++,i=e.position)}ce(e,"unexpected end of the stream within a double quoted scalar")}(e,d)?y=!0:!function(e){var t,n,i;if(42!==(i=e.input.charCodeAt(e.position)))return!1;for(i=e.input.charCodeAt(++e.position),t=e.position;0!==i&&!z(i)&&!X(i);)i=e.input.charCodeAt(++e.position);return e.position===t&&ce(e,"name of an alias node must contain at least one character"),n=e.input.slice(t,e.position),P.call(e.anchorMap,n)||ce(e,'unidentified alias "'+n+'"'),e.result=e.anchorMap[n],ge(e,!0,-1),!0}(e)?function(e,t,n){var i,r,o,a,l,c,s,u,p=e.kind,f=e.result;if(z(u=e.input.charCodeAt(e.position))||X(u)||35===u||38===u||42===u||33===u||124===u||62===u||39===u||34===u||37===u||64===u||96===u)return!1;if((63===u||45===u)&&(z(i=e.input.charCodeAt(e.position+1))||n&&X(i)))return!1;for(e.kind="scalar",e.result="",r=o=e.position,a=!1;0!==u;){if(58===u){if(z(i=e.input.charCodeAt(e.position+1))||n&&X(i))break}else if(35===u){if(z(e.input.charCodeAt(e.position-1)))break}else{if(e.position===e.lineStart&&me(e)||n&&X(u))break;if(J(u)){if(l=e.line,c=e.lineStart,s=e.lineIndent,ge(e,!1,-1),e.lineIndent>=t){a=!0,u=e.input.charCodeAt(e.position);continue}e.position=o,e.line=l,e.lineStart=c,e.lineIndent=s;break}}a&&(pe(e,r,o,!1),ye(e,e.line-l),r=o=e.position,a=!1),Q(u)||(o=e.position+1),u=e.input.charCodeAt(++e.position)}return pe(e,r,o,!1),!!e.result||(e.kind=p,e.result=f,!1)}(e,d,1===i)&&(y=!0,null===e.tag&&(e.tag="?")):(y=!0,null===e.tag&&null===e.anchor||ce(e,"alias node should not have any properties")),null!==e.anchor&&(e.anchorMap[e.anchor]=e.result)):0===g&&(y=c&&be(e,h))),null===e.tag)null!==e.anchor&&(e.anchorMap[e.anchor]=e.result);else if("?"===e.tag){for(null!==e.result&&"scalar"!==e.kind&&ce(e,'unacceptable node kind for !<?> tag; it should be "scalar", not "'+e.kind+'"'),s=0,u=e.implicitTypes.length;s<u;s+=1)if((f=e.implicitTypes[s]).resolve(e.result)){e.result=f.construct(e.result),e.tag=f.tag,null!==e.anchor&&(e.anchorMap[e.anchor]=e.result);break}}else if("!"!==e.tag){if(P.call(e.typeMap[e.kind||"fallback"],e.tag))f=e.typeMap[e.kind||"fallback"][e.tag];else for(f=null,s=0,u=(p=e.typeMap.multi[e.kind||"fallback"]).length;s<u;s+=1)if(e.tag.slice(0,p[s].tag.length)===p[s].tag){f=p[s];break}f||ce(e,"unknown tag !<"+e.tag+">"),null!==e.result&&f.kind!==e.kind&&ce(e,"unacceptable node kind for !<"+e.tag+'> tag; it should be "'+f.kind+'", not "'+e.kind+'"'),f.resolve(e.result,e.tag)?(e.result=f.construct(e.result,e.tag),null!==e.anchor&&(e.anchorMap[e.anchor]=e.result)):ce(e,"cannot resolve a node with !<"+e.tag+"> explicit tag")}return null!==e.listener&&e.listener("close",e),null!==e.tag||null!==e.anchor||y}function ke(e){var t,n,i,r,o=e.position,a=!1;for(e.version=null,e.checkLineBreaks=e.legacy,e.tagMap=Object.create(null),e.anchorMap=Object.create(null);0!==(r=e.input.charCodeAt(e.position))&&(ge(e,!0,-1),r=e.input.charCodeAt(e.position),!(e.lineIndent>0||37!==r));){for(a=!0,r=e.input.charCodeAt(++e.position),t=e.position;0!==r&&!z(r);)r=e.input.charCodeAt(++e.position);for(i=[],(n=e.input.slice(t,e.position)).length<1&&ce(e,"directive name must not be less than one character in length");0!==r;){for(;Q(r);)r=e.input.charCodeAt(++e.position);if(35===r){do{r=e.input.charCodeAt(++e.position)}while(0!==r&&!J(r));break}if(J(r))break;for(t=e.position;0!==r&&!z(r);)r=e.input.charCodeAt(++e.position);i.push(e.input.slice(t,e.position))}0!==r&&he(e),P.call(ue,n)?ue[n](e,n,i):se(e,'unknown document directive "'+n+'"')}ge(e,!0,-1),0===e.lineIndent&&45===e.input.charCodeAt(e.position)&&45===e.input.charCodeAt(e.position+1)&&45===e.input.charCodeAt(e.position+2)?(e.position+=3,ge(e,!0,-1)):a&&ce(e,"directives end mark is expected"),we(e,e.lineIndent-1,4,!1,!0),ge(e,!0,-1),e.checkLineBreaks&&H.test(e.input.slice(o,e.position))&&se(e,"non-ASCII line breaks are interpreted as content"),e.documents.push(e.result),e.position===e.lineStart&&me(e)?46===e.input.charCodeAt(e.position)&&(e.position+=3,ge(e,!0,-1)):e.position<e.length-1&&ce(e,"end of the stream or a document separator is expected")}function Ce(e,t){t=t||{},0!==(e=String(e)).length&&(10!==e.charCodeAt(e.length-1)&&13!==e.charCodeAt(e.length-1)&&(e+="\n"),65279===e.charCodeAt(0)&&(e=e.slice(1)));var n=new ae(e,t),i=e.indexOf("\0");for(-1!==i&&(n.position=i,ce(n,"null byte is not allowed in input")),n.input+="\0";32===n.input.charCodeAt(n.position);)n.lineIndent+=1,n.position+=1;for(;n.position<n.length-1;)ke(n);return n.documents}var xe={loadAll:function(e,t,n){null!==t&&"object"==typeof t&&void 0===n&&(n=t,t=null);var i=Ce(e,n);if("function"!=typeof t)return i;for(var r=0,o=i.length;r<o;r+=1)t(i[r])},load:function(e,t){var n=Ce(e,t);if(0!==n.length){if(1===n.length)return n[0];throw new o("expected a single document in the stream, but found more")}}},Ie=Object.prototype.toString,Se=Object.prototype.hasOwnProperty,Oe=65279,je={0:"\\0",7:"\\a",8:"\\b",9:"\\t",10:"\\n",11:"\\v",12:"\\f",13:"\\r",27:"\\e",34:'\\"',92:"\\\\",133:"\\N",160:"\\_",8232:"\\L",8233:"\\P"},Te=["y","Y","yes","Yes","YES","on","On","ON","n","N","no","No","NO","off","Off","OFF"],Ne=/^[-+]?[0-9_]+(?::[0-9_]+)+(?:\.[0-9_]*)?$/;function Fe(e){var t,i,r;if(t=e.toString(16).toUpperCase(),e<=255)i="x",r=2;else if(e<=65535)i="u",r=4;else{if(!(e<=4294967295))throw new o("code point within a string may not be greater than 0xFFFFFFFF");i="U",r=8}return"\\"+i+n.repeat("0",r-t.length)+t}function Ee(e){this.schema=e.schema||K,this.indent=Math.max(1,e.indent||2),this.noArrayIndent=e.noArrayIndent||!1,this.skipInvalid=e.skipInvalid||!1,this.flowLevel=n.isNothing(e.flowLevel)?-1:e.flowLevel,this.styleMap=function(e,t){var n,i,r,o,a,l,c;if(null===t)return{};for(n={},r=0,o=(i=Object.keys(t)).length;r<o;r+=1)a=i[r],l=String(t[a]),"!!"===a.slice(0,2)&&(a="tag:yaml.org,2002:"+a.slice(2)),(c=e.compiledTypeMap.fallback[a])&&Se.call(c.styleAliases,l)&&(l=c.styleAliases[l]),n[a]=l;return n}(this.schema,e.styles||null),this.sortKeys=e.sortKeys||!1,this.lineWidth=e.lineWidth||80,this.noRefs=e.noRefs||!1,this.noCompatMode=e.noCompatMode||!1,this.condenseFlow=e.condenseFlow||!1,this.quotingType='"'===e.quotingType?2:1,this.forceQuotes=e.forceQuotes||!1,this.replacer="function"==typeof e.replacer?e.replacer:null,this.implicitTypes=this.schema.compiledImplicit,this.explicitTypes=this.schema.compiledExplicit,this.tag=null,this.result="",this.duplicates=[],this.usedDuplicates=null}function Me(e,t){for(var i,r=n.repeat(" ",t),o=0,a=-1,l="",c=e.length;o<c;)-1===(a=e.indexOf("\n",o))?(i=e.slice(o),o=c):(i=e.slice(o,a+1),o=a+1),i.length&&"\n"!==i&&(l+=r),l+=i;return l}function Le(e,t){return"\n"+n.repeat(" ",e.indent*t)}function _e(e){return 32===e||9===e}function De(e){return 32<=e&&e<=126||161<=e&&e<=55295&&8232!==e&&8233!==e||57344<=e&&e<=65533&&e!==Oe||65536<=e&&e<=1114111}function Ue(e){return De(e)&&e!==Oe&&13!==e&&10!==e}function qe(e,t,n){var i=Ue(e),r=i&&!_e(e);return(n?i:i&&44!==e&&91!==e&&93!==e&&123!==e&&125!==e)&&35!==e&&!(58===t&&!r)||Ue(t)&&!_e(t)&&35===e||58===t&&r}function Ye(e,t){var n,i=e.charCodeAt(t);return i>=55296&&i<=56319&&t+1<e.length&&(n=e.charCodeAt(t+1))>=56320&&n<=57343?1024*(i-55296)+n-56320+65536:i}function Re(e){return/^\n* /.test(e)}function Be(e,t,n,i,r,o,a,l){var c,s,u=0,p=null,f=!1,d=!1,h=-1!==i,g=-1,m=De(s=Ye(e,0))&&s!==Oe&&!_e(s)&&45!==s&&63!==s&&58!==s&&44!==s&&91!==s&&93!==s&&123!==s&&125!==s&&35!==s&&38!==s&&42!==s&&33!==s&&124!==s&&61!==s&&62!==s&&39!==s&&34!==s&&37!==s&&64!==s&&96!==s&&function(e){return!_e(e)&&58!==e}(Ye(e,e.length-1));if(t||a)for(c=0;c<e.length;u>=65536?c+=2:c++){if(!De(u=Ye(e,c)))return 5;m=m&&qe(u,p,l),p=u}else{for(c=0;c<e.length;u>=65536?c+=2:c++){if(10===(u=Ye(e,c)))f=!0,h&&(d=d||c-g-1>i&&" "!==e[g+1],g=c);else if(!De(u))return 5;m=m&&qe(u,p,l),p=u}d=d||h&&c-g-1>i&&" "!==e[g+1]}return f||d?n>9&&Re(e)?5:a?2===o?5:2:d?4:3:!m||a||r(e)?2===o?5:2:1}function Ke(e,t,n,i,r){e.dump=function(){if(0===t.length)return 2===e.quotingType?'""':"''";if(!e.noCompatMode&&(-1!==Te.indexOf(t)||Ne.test(t)))return 2===e.quotingType?'"'+t+'"':"'"+t+"'";var a=e.indent*Math.max(1,n),l=-1===e.lineWidth?-1:Math.max(Math.min(e.lineWidth,40),e.lineWidth-a),c=i||e.flowLevel>-1&&n>=e.flowLevel;switch(Be(t,c,e.indent,l,(function(t){return function(e,t){var n,i;for(n=0,i=e.implicitTypes.length;n<i;n+=1)if(e.implicitTypes[n].resolve(t))return!0;return!1}(e,t)}),e.quotingType,e.forceQuotes&&!i,r)){case 1:return t;case 2:return"'"+t.replace(/'/g,"''")+"'";case 3:return"|"+Pe(t,e.indent)+We(Me(t,a));case 4:return">"+Pe(t,e.indent)+We(Me(function(e,t){var n,i,r=/(\n+)([^\n]*)/g,o=(l=e.indexOf("\n"),l=-1!==l?l:e.length,r.lastIndex=l,He(e.slice(0,l),t)),a="\n"===e[0]||" "===e[0];var l;for(;i=r.exec(e);){var c=i[1],s=i[2];n=" "===s[0],o+=c+(a||n||""===s?"":"\n")+He(s,t),a=n}return o}(t,l),a));case 5:return'"'+function(e){for(var t,n="",i=0,r=0;r<e.length;i>=65536?r+=2:r++)i=Ye(e,r),!(t=je[i])&&De(i)?(n+=e[r],i>=65536&&(n+=e[r+1])):n+=t||Fe(i);return n}(t)+'"';default:throw new o("impossible error: invalid scalar style")}}()}function Pe(e,t){var n=Re(e)?String(t):"",i="\n"===e[e.length-1];return n+(i&&("\n"===e[e.length-2]||"\n"===e)?"+":i?"":"-")+"\n"}function We(e){return"\n"===e[e.length-1]?e.slice(0,-1):e}function He(e,t){if(""===e||" "===e[0])return e;for(var n,i,r=/ [^ ]/g,o=0,a=0,l=0,c="";n=r.exec(e);)(l=n.index)-o>t&&(i=a>o?a:l,c+="\n"+e.slice(o,i),o=i+1),a=l;return c+="\n",e.length-o>t&&a>o?c+=e.slice(o,a)+"\n"+e.slice(a+1):c+=e.slice(o),c.slice(1)}function $e(e,t,n,i){var r,o,a,l="",c=e.tag;for(r=0,o=n.length;r<o;r+=1)a=n[r],e.replacer&&(a=e.replacer.call(n,String(r),a)),(Ve(e,t+1,a,!0,!0,!1,!0)||void 0===a&&Ve(e,t+1,null,!0,!0,!1,!0))&&(i&&""===l||(l+=Le(e,t)),e.dump&&10===e.dump.charCodeAt(0)?l+="-":l+="- ",l+=e.dump);e.tag=c,e.dump=l||"[]"}function Ge(e,t,n){var i,r,a,l,c,s;for(a=0,l=(r=n?e.explicitTypes:e.implicitTypes).length;a<l;a+=1)if(((c=r[a]).instanceOf||c.predicate)&&(!c.instanceOf||"object"==typeof t&&t instanceof c.instanceOf)&&(!c.predicate||c.predicate(t))){if(n?c.multi&&c.representName?e.tag=c.representName(t):e.tag=c.tag:e.tag="?",c.represent){if(s=e.styleMap[c.tag]||c.defaultStyle,"[object Function]"===Ie.call(c.represent))i=c.represent(t,s);else{if(!Se.call(c.represent,s))throw new o("!<"+c.tag+'> tag resolver accepts not "'+s+'" style');i=c.represent[s](t,s)}e.dump=i}return!0}return!1}function Ve(e,t,n,i,r,a,l){e.tag=null,e.dump=n,Ge(e,n,!1)||Ge(e,n,!0);var c,s=Ie.call(e.dump),u=i;i&&(i=e.flowLevel<0||e.flowLevel>t);var p,f,d="[object Object]"===s||"[object Array]"===s;if(d&&(f=-1!==(p=e.duplicates.indexOf(n))),(null!==e.tag&&"?"!==e.tag||f||2!==e.indent&&t>0)&&(r=!1),f&&e.usedDuplicates[p])e.dump="*ref_"+p;else{if(d&&f&&!e.usedDuplicates[p]&&(e.usedDuplicates[p]=!0),"[object Object]"===s)i&&0!==Object.keys(e.dump).length?(!function(e,t,n,i){var r,a,l,c,s,u,p="",f=e.tag,d=Object.keys(n);if(!0===e.sortKeys)d.sort();else if("function"==typeof e.sortKeys)d.sort(e.sortKeys);else if(e.sortKeys)throw new o("sortKeys must be a boolean or a function");for(r=0,a=d.length;r<a;r+=1)u="",i&&""===p||(u+=Le(e,t)),c=n[l=d[r]],e.replacer&&(c=e.replacer.call(n,l,c)),Ve(e,t+1,l,!0,!0,!0)&&((s=null!==e.tag&&"?"!==e.tag||e.dump&&e.dump.length>1024)&&(e.dump&&10===e.dump.charCodeAt(0)?u+="?":u+="? "),u+=e.dump,s&&(u+=Le(e,t)),Ve(e,t+1,c,!0,s)&&(e.dump&&10===e.dump.charCodeAt(0)?u+=":":u+=": ",p+=u+=e.dump));e.tag=f,e.dump=p||"{}"}(e,t,e.dump,r),f&&(e.dump="&ref_"+p+e.dump)):(!function(e,t,n){var i,r,o,a,l,c="",s=e.tag,u=Object.keys(n);for(i=0,r=u.length;i<r;i+=1)l="",""!==c&&(l+=", "),e.condenseFlow&&(l+='"'),a=n[o=u[i]],e.replacer&&(a=e.replacer.call(n,o,a)),Ve(e,t,o,!1,!1)&&(e.dump.length>1024&&(l+="? "),l+=e.dump+(e.condenseFlow?'"':"")+":"+(e.condenseFlow?"":" "),Ve(e,t,a,!1,!1)&&(c+=l+=e.dump));e.tag=s,e.dump="{"+c+"}"}(e,t,e.dump),f&&(e.dump="&ref_"+p+" "+e.dump));else if("[object Array]"===s)i&&0!==e.dump.length?(e.noArrayIndent&&!l&&t>0?$e(e,t-1,e.dump,r):$e(e,t,e.dump,r),f&&(e.dump="&ref_"+p+e.dump)):(!function(e,t,n){var i,r,o,a="",l=e.tag;for(i=0,r=n.length;i<r;i+=1)o=n[i],e.replacer&&(o=e.replacer.call(n,String(i),o)),(Ve(e,t,o,!1,!1)||void 0===o&&Ve(e,t,null,!1,!1))&&(""!==a&&(a+=","+(e.condenseFlow?"":" ")),a+=e.dump);e.tag=l,e.dump="["+a+"]"}(e,t,e.dump),f&&(e.dump="&ref_"+p+" "+e.dump));else{if("[object String]"!==s){if("[object Undefined]"===s)return!1;if(e.skipInvalid)return!1;throw new o("unacceptable kind of an object to dump "+s)}"?"!==e.tag&&Ke(e,e.dump,t,a,u)}null!==e.tag&&"?"!==e.tag&&(c=encodeURI("!"===e.tag[0]?e.tag.slice(1):e.tag).replace(/!/g,"%21"),c="!"===e.tag[0]?"!"+c:"tag:yaml.org,2002:"===c.slice(0,18)?"!!"+c.slice(18):"!<"+c+">",e.dump=c+" "+e.dump)}return!0}function Ze(e,t){var n,i,r=[],o=[];for(Je(e,r,o),n=0,i=o.length;n<i;n+=1)t.duplicates.push(r[o[n]]);t.usedDuplicates=new Array(i)}function Je(e,t,n){var i,r,o;if(null!==e&&"object"==typeof e)if(-1!==(r=t.indexOf(e)))-1===n.indexOf(r)&&n.push(r);else if(t.push(e),Array.isArray(e))for(r=0,o=e.length;r<o;r+=1)Je(e[r],t,n);else for(r=0,o=(i=Object.keys(e)).length;r<o;r+=1)Je(e[i[r]],t,n)}function Qe(e,t){return function(){throw new Error("Function yaml."+e+" is removed in js-yaml 4. Use yaml."+t+" instead, which is now safe by default.")}}var ze=p,Xe=h,et=b,tt=O,nt=j,it=K,rt=xe.load,ot=xe.loadAll,at={dump:function(e,t){var n=new Ee(t=t||{});n.noRefs||Ze(e,n);var i=e;return n.replacer&&(i=n.replacer.call({"":i},"",i)),Ve(n,0,i,!0,!0)?n.dump+"\n":""}}.dump,lt=o,ct={binary:L,float:S,map:y,null:A,pairs:Y,set:B,timestamp:F,bool:v,int:C,merge:E,omap:U,seq:m,str:g},st=Qe("safeLoad","load"),ut=Qe("safeLoadAll","loadAll"),pt=Qe("safeDump","dump"),ft={Type:ze,Schema:Xe,FAILSAFE_SCHEMA:et,JSON_SCHEMA:tt,CORE_SCHEMA:nt,DEFAULT_SCHEMA:it,load:rt,loadAll:ot,dump:at,YAMLException:lt,types:ct,safeLoad:st,safeLoadAll:ut,safeDump:pt};e.CORE_SCHEMA=nt,e.DEFAULT_SCHEMA=it,e.FAILSAFE_SCHEMA=et,e.JSON_SCHEMA=tt,e.Schema=Xe,e.Type=ze,e.YAMLException=lt,e.default=ft,e.dump=at,e.load=rt,e.loadAll=ot,e.safeDump=pt,e.safeLoad=st,e.safeLoadAll=ut,e.types=ct,Object.defineProperty(e,"__esModule",{value:!0})}));
+</script>
+<script>
+// One viewer for every JSON example in the reports. A <details class="jv"> names its documents by the ids of
+// <script type="application/json"> blocks: data-a alone shows one document; data-a and data-b show what b
+// changes of a, as a line diff with a few lines of context. Nothing renders until the reader opens it; the
+// unchanged lines and the whole documents appear only on a click.
+(() => {
+  const CONTEXT = 3;   // unchanged lines kept around each change
+  const PREVIEW = 14;  // lines of a lone document shown before "show all"
+  const CHANGE = 24;   // a run of changed lines longer than this shows its first FIRST lines, the rest on a click
+  const FIRST = 16;
+  const cache = new Map();
+
+  const linesOf = (value) => (typeof value === "string" ? value : JSON.stringify(value, null, 2)).split("\n");
+  const doc = (id) => {
+    if (!cache.has(id)) cache.set(id, linesOf(JSON.parse(document.getElementById(id).textContent)));
+    return cache.get(id);
+  };
+
+  const el = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  // Lines of a and b, each marked " " (both), "-" (a only) or "+" (b only): a longest common subsequence
+  // after trimming the common head and tail, which is most of a JSON answer.
+  const diff = (a, b) => {
+    let head = 0;
+    while (head < a.length && head < b.length && a[head] === b[head]) head++;
+    let tail = 0;
+    while (tail < a.length - head && tail < b.length - head && a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++;
+    const x = a.slice(head, a.length - tail), y = b.slice(head, b.length - tail);
+    const n = x.length, m = y.length, w = m + 1;
+    const table = new Uint32Array((n + 1) * w);
+    for (let i = n - 1; i >= 0; i--)
+      for (let j = m - 1; j >= 0; j--)
+        table[i * w + j] = x[i] === y[j] ? table[(i + 1) * w + j + 1] + 1 : Math.max(table[(i + 1) * w + j], table[i * w + j + 1]);
+    const out = a.slice(0, head).map((line) => [" ", line]);
+    let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (x[i] === y[j]) { out.push([" ", x[i]]); i++; j++; }
+      else if (table[(i + 1) * w + j] >= table[i * w + j + 1]) out.push(["-", x[i++]]);
+      else out.push(["+", y[j++]]);
+    }
+    while (i < n) out.push(["-", x[i++]]);
+    while (j < m) out.push(["+", y[j++]]);
+    return out.concat(a.slice(a.length - tail).map((line) => [" ", line]));
+  };
+
+  const row = ([mark, line]) => el("span", { " ": "ln", "-": "ln del", "+": "ln add" }[mark], `${mark} ${line}`);
+
+  // The diff with each long run of unchanged lines folded into a button that unfolds it.
+  const diffView = (a, b) => {
+    const lines = diff(a, b), pre = el("pre", "jv-doc");
+    if (!lines.some(([mark]) => mark !== " ")) pre.append(el("span", "ln note", "  (no difference)"));
+    let k = 0;
+    while (k < lines.length) {
+      if (lines[k][0] !== " ") {
+        let end = k;
+        while (end < lines.length && lines[end][0] !== " ") end++;
+        const run = lines.slice(k, end);
+        if (run.length <= CHANGE) run.forEach((l) => pre.append(row(l)));
+        else {
+          run.slice(0, FIRST).forEach((l) => pre.append(row(l)));
+          const rest = run.slice(FIRST);
+          const more = el("button", "jv-gap", `⋯ ${rest.length} more changed lines`);
+          more.type = "button";
+          more.addEventListener("click", () => more.replaceWith(...rest.map(row)));
+          pre.append(more);
+        }
+        k = end;
+        continue;
+      }
+      let end = k;
+      while (end < lines.length && lines[end][0] === " ") end++;
+      const first = k === 0, last = end === lines.length;
+      const keepHead = first ? 0 : CONTEXT, keepTail = last ? 0 : CONTEXT;
+      if (end - k <= keepHead + keepTail + 1) { lines.slice(k, end).forEach((l) => pre.append(row(l))); }
+      else {
+        lines.slice(k, k + keepHead).forEach((l) => pre.append(row(l)));
+        const hidden = lines.slice(k + keepHead, end - keepTail);
+        const gap = el("button", "jv-gap", `⋯ ${hidden.length} unchanged lines`);
+        gap.type = "button";
+        gap.addEventListener("click", () => gap.replaceWith(...hidden.map(row)));
+        pre.append(gap);
+        lines.slice(end - keepTail, end).forEach((l) => pre.append(row(l)));
+      }
+      k = end;
+    }
+    return pre;
+  };
+
+  // A lone document: its first lines, the rest on a click.
+  const docView = (lines) => {
+    const pre = el("pre", "jv-doc");
+    lines.slice(0, PREVIEW).forEach((line) => pre.append(el("span", "ln", line)));
+    if (lines.length > PREVIEW) {
+      const more = el("button", "jv-gap", `⋯ ${lines.length - PREVIEW} more lines`);
+      more.type = "button";
+      more.addEventListener("click", () => more.replaceWith(...lines.slice(PREVIEW).map((l) => el("span", "ln", l))));
+      pre.append(more);
+    }
+    return pre;
+  };
+
+  // "Show all": a whole document, on demand.
+  const fullButton = (label, lines, host) => {
+    const button = el("button", "jv-full", `${label} in full (${lines.length} lines)`);
+    button.type = "button";
+    button.addEventListener("click", () => {
+      const pre = el("pre", "jv-doc");
+      lines.forEach((line) => pre.append(el("span", "ln", line)));
+      button.disabled = true;
+      host.append(el("p", "jv-label", `${label}, in full`), pre);
+    });
+    return button;
+  };
+
+  const render = (box) => {
+    const body = el("div", "jv-body"), tools = el("div", "jv-tools");
+    const a = doc(box.dataset.a), labelA = box.dataset.labelA || "document";
+    if (box.dataset.b) {
+      const b = doc(box.dataset.b), labelB = box.dataset.labelB || "after";
+      body.append(el("p", "jv-label", `− ${labelA}   + ${labelB}`), diffView(a, b));
+      tools.append(fullButton(labelA, a, body), fullButton(labelB, b, body));
+    } else {
+      body.append(el("p", "jv-label", labelA), docView(a));
+    }
+    // Before the box's tail (a nested box, such as why the rest are absent), if it has one.
+    const tail = box.querySelector(":scope > .jv-tail");
+    box.insertBefore(body, tail);
+    if (tools.childElementCount) box.insertBefore(tools, tail);
+  };
+
+  // For other scripts (run-report.js): a box for documents already in hand, rendered when opened like any other.
+  let made = 0;
+  window.JsonView = {
+    box({ a, b, labelA, labelB, summary, lead }) {
+      const box = el("details", "jv");
+      const id = (value) => { const key = `jvm${made++}`; cache.set(key, linesOf(value)); return key; };
+      box.dataset.a = id(a);
+      if (b !== undefined) box.dataset.b = id(b);
+      if (labelA) box.dataset.labelA = labelA;
+      if (labelB) box.dataset.labelB = labelB;
+      const head = el("summary");
+      head.innerHTML = summary;
+      box.append(head);
+      if (lead) box.append(lead);
+      return box;
+    },
+  };
+
+  // toggle doesn't bubble, but a capturing listener on the document sees every one.
+  document.addEventListener("toggle", (event) => {
+    const box = event.target;
+    if (box.classList && box.classList.contains("jv") && box.open && !box.dataset.rendered) {
+      box.dataset.rendered = "1";
+      render(box);
+    }
+  }, true);
+})();
+</script>
+<script>
+// The line-by-line report (spec/PLAN-LINE-BY-LINE-REPORT.md): the script first, coloured, each line that ran marked
+// with its steps; then one row per step, in the order the run took them: the statement, how it ended, the
+// affordance chosen and the values passed, and one terse line of what it took. Everything else is one click
+// deeper, or a toggle on top: the words the model was asked, the request and its guard, what was offered, where
+// each value came from, the model's calls, every HEART exchange and, under each, the upstream calls the gateway
+// made for it (tied by traceparent). Reads, all as YAML text in the page: the script, the run's capture (one
+// document for the run, one per step; a one-document JSON trace reads too), and the gateway's record.
+(() => {
+  const text = (id) => (document.getElementById(id) || {}).textContent || "";
+  const all = (id) => { const t = text(id).trim(); return t ? window.jsyaml.loadAll(t).filter((d) => d != null) : []; };
+  const documents = all("run-trace");
+  const steps = documents.length === 1 && documents[0].steps ? documents[0].steps : documents.slice(1);
+  const run = (documents[0] && documents[0].run) || {};
+  const script = text("script-text").replace(/\n$/, "").split("\n");
+  const upstream = all("upstream-record");
+  const byTrace = {};
+  upstream.forEach((call) => { if (call.traceparent) (byTrace[call.traceparent] = byTrace[call.traceparent] || []).push(call); });
+
+  const el = (tag, cls, content) => { const n = document.createElement(tag); if (cls) n.className = cls; if (content !== undefined) n.textContent = content; return n; };
+  const kotlin = (t) => el("code", "kotlin", t);
+  const fmt = (v) => (typeof v === "string" ? v : JSON.stringify(v));
+  const short = (u) => String(u || "").replace(/^[a-z]+:\/\/[^/]+/, "") || "/";
+  const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
+  const header = (headers, name) => { const k = Object.keys(headers || {}).find((h) => h.toLowerCase() === name); return k ? headers[k] : undefined; };
+  const sentOf = (step) => (step.exchanges || []);
+  const upOf = (exchange) => byTrace[header(exchange.request.headers, "traceparent")] || [];
+  const upAll = (step) => sentOf(step).flatMap(upOf);
+  const writes = (calls) => calls.filter((c) => c.request.method !== "GET").length;
+  const lineOf = (n) => (n ? (script[n - 1] || "").trim() : "");
+
+  // Theme: light unless the reader chose dark.
+  const setTheme = (t) => { document.documentElement.dataset.theme = t; try { localStorage.setItem("sr-theme", t); } catch (e) { /* none kept */ }
+    document.querySelectorAll(".theme button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.th === t))); };
+  document.querySelectorAll(".theme button").forEach((b) => b.addEventListener("click", () => setTheme(b.dataset.th)));
+  setTheme(document.documentElement.dataset.theme || "light");
+
+  // What a step is, by what it said and the line it came from.
+  const kindOf = (s) => {
+    if (s.say.startsWith("return to")) return lineOf(s.line).startsWith("until(") ? "reread" : "end";
+    if (s.say === "until") return "until";
+    if (s.say === "check") return "check";
+    if (s.say.startsWith("enter")) return "enter";
+    return s.mode === "intent" ? "reason" : "select";
+  };
+
+  // The facts strip.
+  const last = steps[steps.length - 1] || {};
+  const secs = steps.length ? (new Date(last.at) - new Date(steps[0].at) + (last.ms || 0)) / 1000 : 0;
+  const heartCalls = steps.reduce((n, s) => n + sentOf(s).length, 0);
+  const upCalls = steps.flatMap(upAll);
+  const facts = [
+    `<span><b>${steps.length}</b> steps</span>`,
+    `<span><b>${steps.filter((s) => s.mode === "intent").length}</b> reason steps</span>`,
+    heartCalls ? `<span><b>${heartCalls}</b> HEART calls</span>` : "",
+    upCalls.length ? `<span><b>${upCalls.length}</b> upstream calls, <b>${writes(upCalls)}</b> writes</span>` : "",
+    `<span><b>${secs.toFixed(1)} s</b></span>`,
+    `<span>${steps.some((s) => s.outcome === "refused" || s.outcome === "failed") ? "stopped" : "finished"}</span>`,
+  ];
+  const inputs = Object.entries(run.inputs || {}).map(([k, v]) => `${k} = ${v && v.value}`).join(", ");
+  if (inputs) facts.push(`<span>inputs: ${inputs.replace(/</g, "&lt;")}</span>`);
+  document.getElementById("facts").innerHTML = facts.filter(Boolean).join("");
+
+  // The script, each line that ran marked with its steps.
+  const byLine = {};
+  steps.forEach((s, i) => { if (s.line) (byLine[s.line] = byLine[s.line] || []).push(i + 1); });
+  const code = document.getElementById("code");
+  script.forEach((t, i) => {
+    const row = el("div", "ln" + (byLine[i + 1] ? " ran" : ""));
+    row.append(el("span", "no", String(i + 1)));
+    const marks = el("span", "marks");
+    (byLine[i + 1] || []).forEach((n) => { const a = el("a", "", `#${n}`); a.href = `#s${n}`; marks.append(a); });
+    row.append(marks, kotlin(t || " "));
+    code.append(row);
+  });
+
+  // One exchange as lines, its bodies in the shared viewer; a HEART exchange with its upstream calls under it.
+  const keep = /^(if-match|if-none-match|accept|accept-profile|prefer|content-type|location|etag|content-location|authorization|traceparent)$/i;
+  const lines = (h) => Object.entries(h || {}).filter(([k]) => keep.test(k)).map(([k, v]) => `${k}: ${v}`).join("\n");
+  const exchangeBox = (x, withUpstream) => {
+    const box = el("div", "ex");
+    box.dataset.kind = "heart";
+    const w = x.request.method !== "GET";
+    box.append(el("div", "line" + (w ? " w" : ""), `${x.request.method} ${short(x.request.url)}  →  ${x.response.status}  ·  ${x.ms} ms`));
+    const h = [lines(x.request.headers), lines(x.response.headers) && `— answer —\n${lines(x.response.headers)}`].filter(Boolean).join("\n");
+    if (h) box.append(el("div", "hdrs", h));
+    if (x.request.body != null) box.append(window.JsonView.box({ a: x.request.body, labelA: "request body", summary: "Request body" }));
+    if (x.response.body != null && x.response.body !== "") box.append(window.JsonView.box({ a: x.response.body, labelA: "answer body", summary: "Answer body" }));
+    const ups = withUpstream ? upOf(x) : [];
+    if (ups.length) {
+      const d = drawer(`upstream calls for it (${ups.length}${writes(ups) ? `, ${writes(ups)} write` : ""})`, (into) => {
+        const list = el("div", "up");
+        ups.forEach((u) => list.append(exchangeBox(u, false)));
+        into.append(list);
+      }, "upstream");
+      box.append(d);
+    }
+    return box;
+  };
+  // Whether a toggle on top is on; a drawer filled late opens what inside it a toggle asks for.
+  const shown = (k) => { const box = document.querySelector(`[data-show="${k}"]`); return !!(box && box.checked); };
+  const drawer = (title, fill, kind) => {
+    const d = el("details", "d"); d.dataset.kind = kind || "";
+    d.append(el("summary", "", title));
+    d.addEventListener("toggle", () => {
+      if (!d.open || d.dataset.f) return;
+      d.dataset.f = 1;
+      fill(d);
+      d.querySelectorAll("details.d").forEach((inner) => { inner.open = shown(inner.dataset.kind); });
+    });
+    return d;
+  };
+  const sources = (from) => (from || []).map((f) => {
+    if (typeof f === "string") return f;
+    if (f.input) return `input ${f.input}`;
+    if (f.step) return `step ${f.step} ${f.pointer}`;
+    if (f.parts) return "parts: " + Object.entries(f.parts).map(([p, s]) => `${p} from ${sources([s])}`).join("; ");
+    return JSON.stringify(f);
+  }).join(", ");
+
+  const root = document.getElementById("steps");
+  steps.forEach((s, i) => {
+    const n = i + 1, kind = kindOf(s), c = s.chose;
+    const plumbing = kind === "end" || kind === "reread";
+    const card = el("section", "st" + (plumbing || kind === "enter" ? " quiet" : "")); card.id = `s${n}`;
+    card.dataset.kind = plumbing ? "plumbing" : "step";
+    const num = el("div", "num"); num.append(el("b", "", `#${n}`), document.createTextNode(s.line ? `L${s.line}` : ""));
+    const body = el("div", "body"); card.append(num, body);
+
+    // Line 1: the statement, and how it ended.
+    const top = el("div", "top");
+    const stmt = el("div", "stmt");
+    if (kind === "end") stmt.append(document.createTextNode(`end of the block at line ${s.line}: back to ${short(s.address)}`));
+    else if (kind === "reread") stmt.append(document.createTextNode(`until: read ${short(s.address)} again`));
+    else stmt.append(kotlin(lineOf(s.line) || s.say));
+    const status = sentOf(s).length ? sentOf(s)[sentOf(s).length - 1].response.status : "";
+    const changed = c && c.method !== "GET";
+    const [mark, word, cls] = s.outcome === "new resource" ? [status || "", "Created", "w"]
+      : s.outcome === "held" ? ["✓", "held", "ok"]
+      : s.outcome === "failed" || s.outcome === "refused" ? ["✗", s.outcome, "bad"]
+      : [status || "", changed ? "Done" : "Read", changed ? "w" : "ok"];
+    const out = el("div", "out " + cls); out.append(el("b", "", String(mark)), document.createTextNode(` ${word}`));
+    top.append(stmt, out); body.append(top);
+
+    // Line 2: what was chosen and passed; a check's facts; what an until waited for.
+    if (c) {
+      const sel = el("div", "sel " + c.kind);
+      if (s.mode === "intent") sel.append(el("span", "kind claude", "Claude chose"));
+      sel.append(el("span", "kind", c.kind === "form" ? (c.method === "GET" ? "lookup" : "form") : "link"), el("span", "rel", c.relation));
+      const sent = Object.entries(s.params || {}).filter(([k]) => k !== "relation");
+      if (sent.length) {
+        const v = el("span", "pv");
+        sent.forEach(([k, x], j) => { v.append(el("span", "k", k), document.createTextNode(` = ${fmt(x)}`)); if (j < sent.length - 1) v.append(document.createTextNode("  ·  ")); });
+        sel.append(v);
+      }
+      body.append(sel);
+    } else if (kind === "check" && s.params && s.params.facts) {
+      const f = el("div", "sel facts"); f.append(el("span", "kind", "facts"),
+        el("span", "pv", s.params.facts.map((x) => `${x.member} ${x.test}: ${x.held} ${x.holds ? "✓" : "✗"}`).join("  ·  ")));
+      body.append(f);
+    } else if (kind === "until" && s.waited) {
+      const f = el("div", "sel waited"); f.append(el("span", "kind", "waited"),
+        el("span", "pv", `${s.waited.for || "the condition"} · ${plural(s.waited.reads, "read")}`));
+      body.append(f);
+    }
+
+    // What a lenient guard went past, on the row itself: a changed set, or a relation the lock file doesn't pin.
+    if (s.guard && (s.guard.warning || s.guard.unpinned)) {
+      const w = el("div", "sel warn"); w.append(el("span", "kind", "guard"),
+        el("span", "pv", s.guard.warning || `${s.chose ? s.chose.relation : "this"} is not in the lock file`));
+      body.append(w);
+    }
+
+    // Line 3: what it took.
+    const ups = upAll(s);
+    const tally = [sentOf(s).length ? plural(sentOf(s).length, "HEART call") : (kind === "check" || kind === "until" ? "no request" : ""),
+      ups.length ? plural(ups.length, "upstream call") + (writes(ups) ? ` (${writes(ups)} write)` : "") : "",
+      s.model && s.model.length ? plural(s.model.length, "model call") : "",
+      `${((s.ms || 0) / 1000).toFixed(1)} s`].filter(Boolean).join("  ·  ");
+    const t = el("button", "tally", tally + "  ▸"); t.type = "button"; body.append(t);
+
+    // Everything else, one click deeper.
+    const deep = el("div", "deep"); deep.hidden = true; body.append(deep);
+    let filled = false;
+    const fill = () => {
+      if (filled) return; filled = true;
+      if (s.mode === "intent") { const p = el("div", "said"); p.append(el("span", "who", "Claude was asked"), document.createTextNode(`“${s.say}”`)); deep.append(p); }
+      const kv = el("dl", "kv");
+      const row = (k, v) => { if (v !== undefined && v !== null && v !== "") kv.append(el("dt", "", k), el("dd", "", fmt(v))); };
+      if (c) {
+        row("request", `${c.method} ${c.address}`);
+        if (c.target !== c.address) row("as offered", c.target);
+        row("picked by", c.picked);
+        if (c["not sent"]) row("not sent", c["not sent"].join(", "));
+      }
+      if (s.guard) {
+        row("rung", s.guard.rung);
+        if (s.guard.set) row("set", `${s.guard.set.href}  ${s.guard.set.integrity || ""}`);
+        row("form integrity", s.guard.form);
+        if (s.guard.schema) row("schema", `${s.guard.schema.href}  ${s.guard.schema.integrity || ""}`);
+        row("If-Match", s.guard["if-match"]);
+        // What held the act to the lock file, when it passed: the set recorded for it, or the form's own integrity.
+        const HELD = { set: "its set, recorded for it in the lock file", form: "its form's own integrity alone (its set new, or none)", values: "the values it sent: its form changed, but kept its method, and what was sent fits it (on-change: values)" };
+        if (s.guard.held) row("held by", `${HELD[s.guard.held] || s.guard.held}${s.guard.checked ? `, ${s.guard.checked}` : ""}`);
+      }
+      Object.entries(s.values || {}).forEach(([k, v]) => row(`${k} from`, sources(v.from)));
+      if (s.reason) {
+        row("template", s.reason.template);
+        Object.entries(s.reason.slots || {}).forEach(([k, v]) => row(`slot ${k}`, `${v.value} — ${sources(v.from)}`));
+      }
+      if (s.mode === "intent") row("judgement", s.judgement ? "yes: a value its words didn't give" : "no");
+      Object.entries(s.keeps || {}).forEach(([p, by]) => row(`${p} read by`, by.map((x) => `#${x}`).join(", ")));
+      if (s.refused) row("refused", `${s.refused.kind}, by ${s.refused.by}: ${s.refused.detail}`);
+      if (kv.childElementCount) deep.append(kv);
+      const more = el("div", "stack");
+      if (s.offered) more.append(drawer(`offered here: ${plural(s.offered.forms.length, "form")}, ${plural(s.offered.links.length, "link")}`, (d) => {
+        const o = el("div", "offer"); [...s.offered.forms, ...s.offered.links].forEach((r) => o.append(el("span", c && r === c.relation ? "chosen" : "", r))); d.append(o); }, "detail"));
+      if (s.model && s.model.length) more.append(drawer(`model calls (${s.model.length})`, (d) => s.model.forEach((m) => {
+        d.append(el("div", "left", m.model || ""), window.JsonView.box({ a: m.asked, labelA: "asked", summary: "What it was asked" }));
+        let answered = m.answered; try { answered = JSON.parse(m.answered); } catch (e) { /* text */ }
+        d.append(window.JsonView.box({ a: answered, labelA: "answered", summary: "What it answered" }));
+      }), "model"));
+      if (sentOf(s).length) more.append(drawer(`HEART exchanges (${sentOf(s).length})`, (d) => sentOf(s).forEach((x) => d.append(exchangeBox(x, true))), "heart"));
+      const lastBody = sentOf(s).length ? sentOf(s)[sentOf(s).length - 1].response.body : null;
+      const alt = lastBody && lastBody._links && lastBody._links.alternate;
+      const altHref = alt && (Array.isArray(alt) ? alt[0] : alt).href;
+      if (altHref) { const p = el("div", "left"); const a = el("a", "", altHref); a.href = altHref; p.append(document.createTextNode("on the upstream: "), a); more.append(p); }
+      if (more.childElementCount) deep.append(more);
+    };
+    card.open = (on) => { if (on) fill(); deep.hidden = !on; t.textContent = tally + (on ? "  ▾" : "  ▸"); };
+    t.addEventListener("click", () => card.open(deep.hidden));
+    root.append(card);
+  });
+
+  // The toggles: open every step's details, or one kind of drawer everywhere; show block ends and re-reads.
+  const on = shown;
+  const apply = () => document.querySelectorAll(".st").forEach((c) => {
+    c.hidden = c.dataset.kind === "plumbing" && !on("plumbing");
+    const any = on("detail") || on("heart") || on("upstream") || on("model");
+    c.open(any);
+    c.querySelectorAll("details.d").forEach((d) => {
+      d.open = on(d.dataset.kind) || (d.dataset.kind === "heart" && on("upstream"));
+      if (d.open) d.querySelectorAll("details.d").forEach((inner) => { inner.open = on(inner.dataset.kind); });
+    });
+  });
+  document.querySelectorAll("[data-show]").forEach((i) => i.addEventListener("change", apply));
+  apply();
+})();
+</script>
+<script>
+// Kotlin syntax colouring for heart-scripts shown in reports: comments, strings (with their $templates),
+// keywords, numbers, and calls, the DSL's verbs among them. Every <code class="kotlin"> on the page is
+// coloured in place, from its text, so the page needs no library. The rules come with it, so no page can
+// leave them out; their colours are the page's own tokens (--kt-kw, --kt-str, --kt-tpl, --kt-cm, --kt-fn,
+// --kt-num, light and dark), with light values to fall back on when a page has none.
+// window.KotlinView.classes(text) gives each character's class ("" for plain), for a page that colours
+// text it also marks (the derivation report).
+(() => {
+  const KEYWORDS = new Set(["val", "var", "fun", "if", "else", "when", "return", "by", "to", "in", "is", "as",
+    "null", "true", "false", "class", "object", "for", "while", "import", "package", "this", "it"]);
+  const TOKEN = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*")|\b(\d+(?:\.\d+)?L?)\b|\b([A-Za-z_]\w*)\b/g;
+  // Each token of the text: its class ("" for plain) and its text, in order, covering every character.
+  const tokens = (text) => {
+    const out = [];
+    let last = 0;
+    for (const m of text.matchAll(TOKEN)) {
+      out.push(["", text.slice(last, m.index)]);
+      const [all, comment, str, num, word] = m;
+      // A call: a name with ( or { after it. Tested on what follows, as a lookahead alone can't be captured.
+      const call = word && /^\s*[({]/.test(text.slice(m.index + all.length));
+      if (comment) out.push(["kt-cm", comment]);
+      else if (str) {
+        // A string, its ${…} and $name templates marked inside it.
+        let at = 0;
+        str.replace(/\$\{[^}]*\}|\$[A-Za-z_]\w*/g, (t, i) => {
+          out.push(["kt-str", str.slice(at, i)], ["kt-str kt-tpl", t]);
+          at = i + t.length;
+          return t;
+        });
+        out.push(["kt-str", str.slice(at)]);
+      } else if (num) out.push(["kt-num", num]);
+      else if (KEYWORDS.has(word)) out.push(["kt-kw", word]);
+      else if (call) out.push(["kt-fn", word]);
+      else out.push(["", all]);
+      last = m.index + all.length;
+    }
+    out.push(["", text.slice(last)]);
+    return out.filter(([, t]) => t.length > 0);
+  };
+  const classes = (text) => tokens(text).flatMap(([cls, t]) => Array.from({ length: t.length }, () => cls));
+  const colour = (code) => {
+    const out = document.createDocumentFragment();
+    for (const [cls, text] of tokens(code.textContent)) {
+      if (!cls) { out.append(document.createTextNode(text)); continue; }
+      const s = document.createElement("span");
+      s.className = cls;
+      s.textContent = text;
+      out.append(s);
+    }
+    code.replaceChildren(out);
+  };
+  const rules = document.createElement("style");
+  rules.textContent = [
+    ".kt-kw { color: var(--kt-kw, #8a3f8f); font-weight: 500; }", ".kt-str { color: var(--kt-str, #2f6f3f); }",
+    ".kt-str.kt-tpl, .kt-tpl { color: var(--kt-tpl, #b0641c); }",
+    ".kt-cm { color: var(--kt-cm, #7b847e); font-style: italic; }",
+    ".kt-fn { color: var(--kt-fn, #1f5a8a); }", ".kt-num { color: var(--kt-num, #a0522d); }",
+  ].join("\n");
+  document.head.append(rules);
+  window.KotlinView = { classes };
+  document.querySelectorAll("code.kotlin").forEach(colour);
+})();
+</script>
+</body>
+</html>

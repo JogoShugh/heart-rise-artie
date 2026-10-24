@@ -5,4 +5,4 @@ Put state at the H.E.A.R.T. of your Agentic worklows by embracing Hypermedia As 
 
 Introducing Hypermedia Enforced Agentic Reliable Transactions
 
-See [SPEC.md](SPEC.md) for details in progress...
+See [spec/SPEC.md](spec/SPEC.md) for the protocol (v0.5 draft) and [spec/CONFORMANCE-GAPS.md](spec/CONFORMANCE-GAPS.md) for what is built so far.

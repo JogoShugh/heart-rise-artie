@@ -1,0 +1,182 @@
+<title>Bare ARTIE Against Python</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; a timing strip drawn to one scale; the three scripts behind tabs, full width. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea;
+  --py: #b8650b; --bare: #0f7d76; --careful: #4b4fc4; --ok: #1f7a3a;
+  --code-bg: #f0f2f6;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442;
+  --py: #e4953b; --bare: #3cc1b6; --careful: #8f93f2; --ok: #5cc27a; --code-bg: #161b23; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442;
+  --py: #e4953b; --bare: #3cc1b6; --careful: #8f93f2; --ok: #5cc27a; --code-bg: #161b23; color-scheme: dark }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 28px; }
+h1, h2 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; }
+h2 { font-size: 20px; }
+.lede { color: var(--muted); max-width: 68ch; margin: 6px 0 0; }
+.kicker { font: 500 12px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+section { display: grid; gap: 12px; min-width: 0; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px;
+  display: grid; gap: 4px; border-top: 3px solid var(--c); }
+.tile .name { font: 500 13px var(--mono); color: var(--c); }
+.tile .big { font: 600 30px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.tile .sub { color: var(--muted); font-size: 13px; }
+.py { --c: var(--py); } .bare { --c: var(--bare); } .careful { --c: var(--careful); }
+.strip { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px; display: grid; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: 180px 1fr 56px; gap: 10px; align-items: center; font-size: 13px; }
+.bar-row .who { font-family: var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { height: 14px; background: var(--code-bg); border-radius: 3px; position: relative; }
+.bar { position: absolute; inset: 0 auto 0 0; background: var(--c); border-radius: 3px; }
+.bar-row .s { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; }
+.axis { display: grid; grid-template-columns: 180px 1fr 56px; gap: 10px; font: 12px var(--mono); color: var(--muted); }
+.axis .ticks { display: flex; justify-content: space-between; }
+.tablebox { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 500 12px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--c); margin-right: 6px; }
+.pass { color: var(--ok); font-family: var(--mono); }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button { font: 500 14px var(--body); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 8px 14px; cursor: pointer; border-bottom: 3px solid transparent; }
+.tabs button[aria-selected="true"] { border-bottom-color: var(--c); color: var(--c); }
+.tabs button:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+.pane { display: grid; gap: 10px; min-width: 0; }
+.about { color: var(--muted); margin: 0; max-width: 78ch; }
+.about code, td code, p code { font-family: var(--mono); font-size: 13px; }
+pre { margin: 0; background: var(--code-bg); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 0;
+  overflow-x: auto; font: 12.5px/1.55 var(--mono); counter-reset: line; }
+pre code { display: block; }
+pre .l { display: block; padding: 0 16px 0 0; white-space: pre; }
+pre .l::before { counter-increment: line; content: counter(line); display: inline-block; width: 3.2em; padding-right: 1em;
+  text-align: right; color: var(--muted); opacity: .6; user-select: none; }
+.note { color: var(--muted); font-size: 13px; max-width: 78ch; }
+@media (max-width: 560px) { .bar-row, .axis { grid-template-columns: 96px 1fr 44px; } h1 { font-size: 25px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="kicker">Native vs HEART trial · triage task · 2026-10-22</div>
+    <h1>Bare ARTIE against Python, with the careful run beside them</h1>
+    <p class="lede">The same triage task on the scratch repository, three runs each. The bare script is a careful ARTIE run cut down by <code>artie generate --bare</code> to the GitHub calls it made, then sent by ARTIE with every guardrail off.</p>
+  </header>
+
+  <section>
+    <div class="tiles">
+      <div class="tile bare"><span class="name">artie-bare</span><span class="big">21.0 s</span><span class="sub">median of 3 · 19 GitHub calls · 3/3 checked 23/23</span></div>
+      <div class="tile py"><span class="name">py-direct</span><span class="big">21.9 s</span><span class="sub">median of 3 · 23 GitHub calls · 3/3 checked 23/23</span></div>
+      <div class="tile careful"><span class="name">careful-heart</span><span class="big">76.1 s</span><span class="sub">median of 3 · 98 ARTIE requests, 237 GitHub calls · 3/3 checked 23/23</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Each run, to one scale</h2>
+    <div class="strip" role="img" aria-label="Seconds per run: artie-bare 23.6, 21.0, 19.0; py-direct 21.9, 23.5, 21.7; careful-heart 76.1, 67.9, 81.1">
+      <div class="bar-row bare"><span class="who">artie-bare 211312</span><span class="bar-track"><span class="bar" style="width:26.2%"></span></span><span class="s">23.6</span></div>
+      <div class="bar-row bare"><span class="who">artie-bare 211443</span><span class="bar-track"><span class="bar" style="width:23.3%"></span></span><span class="s">21.0</span></div>
+      <div class="bar-row bare"><span class="who">artie-bare 211615</span><span class="bar-track"><span class="bar" style="width:21.1%"></span></span><span class="s">19.0</span></div>
+      <div class="bar-row py"><span class="who">py-direct 211359</span><span class="bar-track"><span class="bar" style="width:24.3%"></span></span><span class="s">21.9</span></div>
+      <div class="bar-row py"><span class="who">py-direct 211530</span><span class="bar-track"><span class="bar" style="width:26.1%"></span></span><span class="s">23.5</span></div>
+      <div class="bar-row py"><span class="who">py-direct 211658</span><span class="bar-track"><span class="bar" style="width:24.1%"></span></span><span class="s">21.7</span></div>
+      <div class="bar-row careful"><span class="who">careful-heart 135623</span><span class="bar-track"><span class="bar" style="width:84.6%"></span></span><span class="s">76.1</span></div>
+      <div class="bar-row careful"><span class="who">careful-heart 135802</span><span class="bar-track"><span class="bar" style="width:75.4%"></span></span><span class="s">67.9</span></div>
+      <div class="bar-row careful"><span class="who">careful-heart 135937</span><span class="bar-track"><span class="bar" style="width:90.1%"></span></span><span class="s">81.1</span></div>
+      <div class="axis"><span></span><span class="ticks"><span>0</span><span>30</span><span>60</span><span>90 s</span></span><span></span></div>
+    </div>
+    <p class="note">Seconds from start to exit, <code>artie run</code>'s script compile included (about 2 s). The bare and Python runs were interleaved; the careful runs are the earlier fresh-lock, catch-up ladder of the same day.</p>
+  </section>
+
+  <section>
+    <h2>The runs</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th>Arm</th><th>Stamp</th><th>Exit</th><th>Seconds</th><th>Checked</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot bare"></span>artie-bare</td><td class="n">1022-211312</td><td class="n">0</td><td class="n">23.6</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot py"></span>py-direct</td><td class="n">1022-211359</td><td class="n">0</td><td class="n">21.9</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot bare"></span>artie-bare</td><td class="n">1022-211443</td><td class="n">0</td><td class="n">21.0</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot py"></span>py-direct</td><td class="n">1022-211530</td><td class="n">0</td><td class="n">23.5</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot bare"></span>artie-bare</td><td class="n">1022-211615</td><td class="n">0</td><td class="n">19.0</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot py"></span>py-direct</td><td class="n">1022-211658</td><td class="n">0</td><td class="n">21.7</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot careful"></span>careful-heart</td><td class="n">1022-135623</td><td class="n">0</td><td class="n">76.1</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot careful"></span>careful-heart</td><td class="n">1022-135802</td><td class="n">0</td><td class="n">67.9</td><td class="pass">23/23</td></tr>
+        <tr><td><span class="dot careful"></span>careful-heart</td><td class="n">1022-135937</td><td class="n">0</td><td class="n">81.1</td><td class="pass">23/23</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Checked: <code>checker.py check</code>, reading GitHub after each run: 23 things the task asks for. Every run did all 23.</p>
+  </section>
+
+  <section>
+    <h2>What each one does on the way</h2>
+    <div class="tablebox"><table>
+      <thead><tr><th></th><th><span class="dot py"></span>py-direct</th><th><span class="dot bare"></span>artie-bare</th><th><span class="dot careful"></span>careful-heart</th></tr></thead>
+      <tbody>
+        <tr><td>Written by</td><td>Claude, from its own run's transcript</td><td><code>artie generate --bare</code>, from a careful run's capture and the gateway's record</td><td><code>artie generate</code>, from a recorded run</td></tr>
+        <tr><td>Talks to</td><td>GitHub</td><td>GitHub</td><td>The HEART gateway, which talks to GitHub</td></tr>
+        <tr><td>Finds where to act</td><td>Addresses it knows</td><td>Addresses recorded</td><td>From the entry, by the forms and links offered</td></tr>
+        <tr><td>Checks an act is allowed now</td><td>No</td><td>No</td><td>The act must be offered; its form held to the lock file</td></tr>
+        <tr><td>Sends validators</td><td>No</td><td>No</td><td><code>If-Match</code> on every act; a 412 is decided again</td></tr>
+        <tr><td>Reads before acting</td><td>Only for a number it needs</td><td>Only the one read a later call needs (the main branch's sha)</td><td>Reads, rereads after blocks, <code>sync()</code></td></tr>
+        <tr><td>Waits for the merge</td><td>Polls the pull request, 2 s apart</td><td>Sends the merge; on "not yet", again 1 s later</td><td><code>until { offers("github:merge") }</code></td></tr>
+        <tr><td>On any other refusal</td><td>Stops</td><td>Stops, with GitHub's words</td><td>Stops, or decides again on stale</td></tr>
+        <tr><td>Checks at the end</td><td>Reads the three issues back</td><td>None</td><td><code>check(...)</code> after acts</td></tr>
+        <tr><td>Calls per run</td><td class="n">23</td><td class="n">19</td><td class="n">98 to the gateway, 237 to GitHub</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Careful-heart's request counts are from 1022-205149, the run recorded with its exchanges that the bare script was made from (58.4 s, 23/23); the three timed careful runs above weren't recorded with exchanges.</p>
+  </section>
+
+  <section>
+    <h2>The scripts</h2>
+    <div class="tabs" role="tablist" aria-label="Scripts">
+      <button role="tab" id="tab-bare" class="bare" aria-selected="true" aria-controls="pane-bare">Bare ARTIE · 29 lines</button>
+      <button role="tab" id="tab-py" class="py" aria-selected="false" aria-controls="pane-py">Python · 162 lines</button>
+      <button role="tab" id="tab-careful" class="careful" aria-selected="false" aria-controls="pane-careful">Careful ARTIE · 119 lines</button>
+    </div>
+    <div class="pane" id="pane-bare" role="tabpanel" aria-labelledby="tab-bare">
+      <p class="about"><code>exhibits/native-vs-heart/runs/heart-script.bare.kts</code>. Made by <code>artie generate careful-heart-1022-205149.yaml --bare upstream.record.yaml</code>: of the careful run's 237 GitHub calls, its 18 writes and the one read a write needed. Every number and id is read from an earlier answer by pointer; only the merge, which the run waited before, is tried again.</p>
+      <pre><code>@@BARE@@</code></pre>
+    </div>
+    <div class="pane" id="pane-py" role="tabpanel" aria-labelledby="tab-py" hidden>
+      <p class="about"><code>exhibits/native-vs-heart/runs/native-script.py</code>. Written by Claude in one call, given its own successful run's transcript and the task, and asked for a script that does the task again with no model.</p>
+      <pre><code>@@PY@@</code></pre>
+    </div>
+    <div class="pane" id="pane-careful" role="tabpanel" aria-labelledby="tab-careful" hidden>
+      <p class="about"><code>exhibits/native-vs-heart/runs/heart-script.kts</code>, run with <code>--guard strict --validators last</code> and its lock file, through the gateway taking every kind of care. It names no address but the entry: every act is chosen from what the resource offers.</p>
+      <pre><code>@@CAREFUL@@</code></pre>
+    </div>
+  </section>
+
+  <p class="note">Commits 9479893, 00e3e01, 9ae84bc, 56eaac1 on <code>claude/auth-branch-4bnmhc</code>. The plan and what's next: <code>spec/ideas/bare-runs.md</code>.</p>
+</div>
+
+<script>
+(function () {
+  var names = ['bare', 'py', 'careful'];
+  function show(name) {
+    names.forEach(function (n) {
+      document.getElementById('pane-' + n).hidden = n !== name;
+      document.getElementById('tab-' + n).setAttribute('aria-selected', String(n === name));
+    });
+  }
+  names.forEach(function (n) {
+    document.getElementById('tab-' + n).addEventListener('click', function () { show(n); });
+  });
+  var asked = location.hash.slice(1);
+  if (names.indexOf(asked) >= 0) show(asked);
+})();
+</script>

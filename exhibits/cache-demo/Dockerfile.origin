@@ -1,0 +1,36 @@
+# Dockerfile.origin
+#
+# Containerizes the existing fixture server (server.py) unchanged.
+# Fixtures are generated at container BUILD time, not at request time --
+# deliberate, since content-addressed data should be produced once and
+# then just served, not regenerated per-container-start (which would
+# produce different random `moisture` values and different resource
+# bytes on every restart, defeating the point of a stable demo).
+#
+# Fixture generation moved from generate_fixtures.sh to the Kotlin
+# `generateFixtures` Gradle task (kotlin-client/src/main/kotlin/
+# GenerateFixtures.kt), so this is now a multi-stage build: a Gradle/JDK
+# stage runs it, and only its output (fixtures/) is copied into the actual
+# runtime image, which stays the same lean python:3.12-slim as before.
+
+FROM gradle:8.14-jdk17 AS fixtures
+
+WORKDIR /build
+COPY kotlin-client/build.gradle.kts kotlin-client/settings.gradle.kts kotlin-client/
+COPY kotlin-client/src kotlin-client/src
+
+WORKDIR /build/kotlin-client
+# generateFixtures pins its own working directory to the repo root
+# (rootDir.parentFile, i.e. /build), so output lands at /build/fixtures
+# regardless of the WORKDIR this RUN executes from.
+RUN gradle generateFixtures --no-daemon
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY server.py ./
+COPY --from=fixtures /build/fixtures ./fixtures
+
+EXPOSE 8080
+CMD ["python3", "server.py", "8080"]
