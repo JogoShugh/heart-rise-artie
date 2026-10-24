@@ -325,9 +325,9 @@ Other people work in this Jenkins while you do. What they decide stands.
     <h2>Every element, decided</h2>
     <ol class="elements">
 <li class="element safe"><div class="head"><b>Header</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example">--- start: … inputs: … ---</p><p>The entry address and the run's values, each with a question or a default.</p></li>
-<li class="element good"><div class="head"><b>Manners setting</b><span class="tag quiet">parsed</span><span class="tag good">add</span></div><p class="example">manners: alongside-others</p><p>Names the run-wide policy exactly, beside the sentences that say it to a person.</p></li>
+<li class="element good"><div class="head"><b>Manners setting</b><span class="tag quiet">today</span><span class="tag good">add</span></div><p class="example">manners: alongside-others</p><p>Names the run-wide policy exactly, beside the sentences that say it to a person.</p></li>
 <li class="element safe"><div class="head"><b>Brief</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example">The first paragraph</p><p>The task in words. The reasoner reads it; no rule is taken from it.</p></li>
-<li class="element good"><div class="head"><b>Sections</b><span class="tag quiet">parsed</span><span class="tag good">add</span></div><p class="example">## Working alongside others · ## The work · ## Done when</p><p>Below the brief, each part of the goal under its own heading, each at most once. A goal with no heading reads as before.</p></li>
+<li class="element good"><div class="head"><b>Sections</b><span class="tag quiet">today</span><span class="tag good">add</span></div><p class="example">## Working alongside others · ## The work · ## Done when</p><p>Below the brief, each part of the goal under its own heading, each at most once. A goal with no heading reads as before.</p></li>
 <li class="element safe"><div class="head"><b>Manners: don't overwrite</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">Don't undo or write over anything someone else changed since you looked.</p><p>On a 412, read again and decide again; never send again over a member someone else changed.</p><p class="sub">Recognised as a fixed phrase, not interpreted.</p></li>
 <li class="element safe"><div class="head"><b>Manners: leave and say why</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">When a step no longer makes sense because of what someone did, leave it, and say why.</p><p>Skip an act that isn't offered, and note the server's reason from hr:unavailable.</p><p class="sub">Recognised as a fixed phrase.</p></li>
 <li class="element safe"><div class="head"><b>Manners: no false claims</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">Nothing you write may claim something that isn't so.</p><p>Text that depends on an outcome is sent only once that outcome happened.</p><p class="sub">Recognised as a fixed phrase.</p></li>
@@ -338,16 +338,16 @@ Other people work in this Jenkins while you do. What they decide stands.
 <li class="element safe"><div class="head"><b>Value</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example"><span class="val">{owner}</span> · <span class="val">{issue.number}</span></p><p>An input, or a member of what an earlier step made.</p></li>
 <li class="element safe"><div class="head"><b>Name</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example"><span class="as">as issue</span></p><p>Names what a step made, so later steps can say {issue}.</p><p class="sub">Step numbers stay dropped.</p></li>
 <li class="element safe"><div class="head"><b>Quoted text</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example">&quot;Refuse a bed with no name&quot;</p><p>Sent exactly as written.</p></li>
-<li class="element safe"><div class="head"><b>Once</b><span class="tag quiet">parsed</span><span class="tag safe">keep</span></div><p class="example"><span class="kw">Once</span> it can be merged, merge it by squashing.</p><p>Wait for one offer, then act, one time.</p><p class="sub">The phrase must map to exactly one offer, and every wait must be able to end (Give up).</p></li>
+<li class="element safe"><div class="head"><b>Once</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example"><span class="kw">Once</span> it can be merged, merge it by squashing.</p><p>Wait for one offer, then act, one time.</p><p class="sub">The phrase must map to exactly one offer, and every wait must be able to end (Give up).</p></li>
 <li class="element safe"><div class="head"><b>Add to</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">Add to its description that it is tested by</p><p>Append; never replace.</p><p class="sub">GitHub refuses If-Match on writes, so append is the only safe edit of shared text.</p></li>
 <li class="element bad"><div class="head"><b>&quot;; or, …&quot;</b><span class="tag quiet">proposed</span><span class="tag bad">drop</span></div><p class="example">…; or, while that's still unmerged, that it waits on</p><p>A second outcome, carried by a semicolon and a comma.</p><p class="sub">Too fragile to parse. Replaced by Otherwise.</p></li>
 <li class="element bad"><div class="head"><b>&quot;Held back as …&quot;</b><span class="tag quiet">proposed</span><span class="tag bad">drop</span></div><p class="example">Held back as a draft, it stays unmerged.</p><p>A second outcome, stated as a fact.</p><p class="sub">Reads as a fact, so a parser can't tell an expectation from a step. Replaced by Otherwise.</p></li>
-<li class="element good"><div class="head"><b>Otherwise</b><span class="tag quiet">parsed</span><span class="tag good">add</span></div><p class="example">Say it's fixed in #<span class="val">{pr.number}</span>. Otherwise, say it waits on #<span class="val">{pr.number}</span>.</p><p>The step's other outcome, as a sentence of its own under the step.</p></li>
-<li class="element good"><div class="head"><b>Give up</b><span class="tag quiet">parsed</span><span class="tag good">add</span></div><p class="example"><span class="kw">Or give up</span> after 10 minutes.</p><p>Ends a wait. A wait also ends early, with the server's reason, when hr:unavailable says the offer won't come.</p><p class="sub">The M4 lesson: artie-bare sent the merge 30 times against a draft.</p></li>
-<li class="element good"><div class="head"><b>Whenever</b><span class="tag quiet">parsed</span><span class="tag good">add</span></div><p class="example"><span class="kw">Whenever</span> a pull request from dependabot opens <span class="as">as pr</span></p><p>Repeat the bullets under it on each matching change, once per match.</p><p class="sub">Fan-out at the top level; behaviour per resource when nested. On one line too: Whenever someone requests changes, leave it.</p></li>
-<li class="element warn"><div class="head"><b>If</b><span class="tag quiet">new</span><span class="tag warn">open</span></div><p class="example"><span class="kw">If</span> it's labelled <span class="val">{hold}</span>, leave it, and say so once.</p><p>A condition on what the step holds now, read again each time the step runs.</p><p class="sub">Not one of the five words. Either a sixth word, or the manners' &quot;leave it&quot; said for one case; to decide.</p></li>
-<li class="element good"><div class="head"><b>Until</b><span class="tag quiet">parsed</span><span class="tag good">add</span></div><p class="example"><span class="kw">Until</span> <span class="val">{owner}</span> closes the issue &quot;Auto-merge watch&quot;</p><p>When a watch ends.</p></li>
-<li class="element safe"><div class="head"><b>Done when</b><span class="tag quiet">parsed</span><span class="tag safe">keep</span></div><p class="example">The crash issue is closed and the pull request is merged</p><p>The final checks, written as outcomes.</p></li>
+<li class="element good"><div class="head"><b>Otherwise</b><span class="tag quiet">today</span><span class="tag good">add</span></div><p class="example">Say it's fixed in #<span class="val">{pr.number}</span>. Otherwise, say it waits on #<span class="val">{pr.number}</span>.</p><p>The step's other outcome, as a sentence of its own under the step.</p></li>
+<li class="element good"><div class="head"><b>Give up</b><span class="tag quiet">today</span><span class="tag good">add</span></div><p class="example"><span class="kw">Or give up</span> after 10 minutes.</p><p>Ends a wait. A wait also ends early, with the server's reason, when hr:unavailable says the offer won't come.</p><p class="sub">The M4 lesson: artie-bare sent the merge 30 times against a draft.</p></li>
+<li class="element good"><div class="head"><b>Whenever</b><span class="tag quiet">today</span><span class="tag good">add</span></div><p class="example"><span class="kw">Whenever</span> a pull request from dependabot opens <span class="as">as pr</span></p><p>Repeat the bullets under it on each matching change, once per match.</p><p class="sub">Fan-out at the top level; behaviour per resource when nested. On one line too: Whenever someone requests changes, leave it.</p></li>
+<li class="element good"><div class="head"><b>If</b><span class="tag quiet">today</span><span class="tag good">add</span></div><p class="example"><span class="kw">If</span> it's labelled <span class="val">{hold}</span>, leave it, and say so once.</p><p>A condition on what the step holds now, read again each time the step runs.</p><p class="sub">Decided 2026-10-23: a word. Its check is decided once; &quot;leave it&quot; leaves the resource, its other steps not done this look.</p></li>
+<li class="element good"><div class="head"><b>Until</b><span class="tag quiet">today</span><span class="tag good">add</span></div><p class="example"><span class="kw">Until</span> <span class="val">{owner}</span> closes the issue &quot;Auto-merge watch&quot;</p><p>When a watch ends.</p></li>
+<li class="element safe"><div class="head"><b>Done when</b><span class="tag quiet">today</span><span class="tag safe">keep</span></div><p class="example">The crash issue is closed and the pull request is merged</p><p>The final checks, written as outcomes.</p></li>
 <li class="element safe"><div class="head"><b>Done when: others kept</b><span class="tag quiet">proposed</span><span class="tag safe">keep</span></div><p class="example">Nothing anyone else decided was undone</p><p>What others decided, compared with what the run left.</p><p class="sub">Needs the resource's history to check (GitHub's timeline; generically a history link relation).</p></li>
     </ol>
   </section>
@@ -358,7 +358,7 @@ Other people work in this Jenkins while you do. What they decide stands.
   <section>
     <h2>How this page is made</h2>
     <details class="box"><summary>syntax.yaml: the decisions</summary><div class="scroll"><pre class="src"># Every element of the goal syntax, decided (spec/ideas/goals-that-work-alongside-others.md, &quot;Review, 2026-10-23&quot;).
-# status: today (run now), parsed (read by artie run --plan-only, not run yet), proposed (in the first draft), new (added in the review).
+# status: today (run by artie run now), proposed (in the first draft), new (added in the review).
 # verdict: keep, add, drop, or open (still to decide). goals.kts lays this out, one element after another.
 
 asOf: &quot;2026-10-23&quot;
@@ -382,7 +382,7 @@ elements:
     means: The entry address and the run's values, each with a question or a default.
     verdict: keep
   - name: Manners setting
-    status: parsed
+    status: today
     example: &quot;manners: alongside-others&quot;
     means: Names the run-wide policy exactly, beside the sentences that say it to a person.
     verdict: add
@@ -392,7 +392,7 @@ elements:
     means: The task in words. The reasoner reads it; no rule is taken from it.
     verdict: keep
   - name: Sections
-    status: parsed
+    status: today
     example: &quot;## Working alongside others · ## The work · ## Done when&quot;
     means: Below the brief, each part of the goal under its own heading, each at most once. A goal with no heading reads as before.
     verdict: add
@@ -453,7 +453,7 @@ elements:
     means: Sent exactly as written.
     verdict: keep
   - name: Once
-    status: parsed
+    status: today
     example: Once it can be merged, merge it by squashing.
     means: Wait for one offer, then act, one time.
     verdict: keep
@@ -477,35 +477,35 @@ elements:
     verdict: drop
     note: Reads as a fact, so a parser can't tell an expectation from a step. Replaced by Otherwise.
   - name: Otherwise
-    status: parsed
+    status: today
     example: &quot;Say it's fixed in #{pr.number}. Otherwise, say it waits on #{pr.number}.&quot;
     means: The step's other outcome, as a sentence of its own under the step.
     verdict: add
   - name: Give up
-    status: parsed
+    status: today
     example: Or give up after 10 minutes.
     means: Ends a wait. A wait also ends early, with the server's reason, when hr:unavailable says the offer won't come.
     verdict: add
     note: &quot;The M4 lesson: artie-bare sent the merge 30 times against a draft.&quot;
   - name: Whenever
-    status: parsed
+    status: today
     example: Whenever a pull request from dependabot opens `as pr`
     means: Repeat the bullets under it on each matching change, once per match.
     verdict: add
     note: &quot;Fan-out at the top level; behaviour per resource when nested. On one line too: Whenever someone requests changes, leave it.&quot;
   - name: If
-    status: new
+    status: today
     example: If it's labelled {hold}, leave it, and say so once.
     means: A condition on what the step holds now, read again each time the step runs.
-    verdict: open
-    note: Not one of the five words. Either a sixth word, or the manners' &quot;leave it&quot; said for one case; to decide.
+    verdict: add
+    note: &quot;Decided 2026-10-23: a word. Its check is decided once; \&quot;leave it\&quot; leaves the resource, its other steps not done this look.&quot;
   - name: Until
-    status: parsed
+    status: today
     example: Until {owner} closes the issue &quot;Auto-merge watch&quot;
     means: When a watch ends.
     verdict: add
   - name: Done when
-    status: parsed
+    status: today
     example: The crash issue is closed and the pull request is merged
     means: The final checks, written as outcomes.
     verdict: keep

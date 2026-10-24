@@ -1,5 +1,5 @@
 # Every element of the goal syntax, decided (spec/ideas/goals-that-work-alongside-others.md, "Review, 2026-10-23").
-# status: today (run now), parsed (read by artie run --plan-only, not run yet), proposed (in the first draft), new (added in the review).
+# status: today (run by artie run now), proposed (in the first draft), new (added in the review).
 # verdict: keep, add, drop, or open (still to decide). goals.kts lays this out, one element after another.
 
 asOf: "2026-10-23"
@@ -23,7 +23,7 @@ elements:
     means: The entry address and the run's values, each with a question or a default.
     verdict: keep
   - name: Manners setting
-    status: parsed
+    status: today
     example: "manners: alongside-others"
     means: Names the run-wide policy exactly, beside the sentences that say it to a person.
     verdict: add
@@ -33,7 +33,7 @@ elements:
     means: The task in words. The reasoner reads it; no rule is taken from it.
     verdict: keep
   - name: Sections
-    status: parsed
+    status: today
     example: "## Working alongside others · ## The work · ## Done when"
     means: Below the brief, each part of the goal under its own heading, each at most once. A goal with no heading reads as before.
     verdict: add
@@ -94,7 +94,7 @@ elements:
     means: Sent exactly as written.
     verdict: keep
   - name: Once
-    status: parsed
+    status: today
     example: Once it can be merged, merge it by squashing.
     means: Wait for one offer, then act, one time.
     verdict: keep
@@ -118,35 +118,35 @@ elements:
     verdict: drop
     note: Reads as a fact, so a parser can't tell an expectation from a step. Replaced by Otherwise.
   - name: Otherwise
-    status: parsed
+    status: today
     example: "Say it's fixed in #{pr.number}. Otherwise, say it waits on #{pr.number}."
     means: The step's other outcome, as a sentence of its own under the step.
     verdict: add
   - name: Give up
-    status: parsed
+    status: today
     example: Or give up after 10 minutes.
     means: Ends a wait. A wait also ends early, with the server's reason, when hr:unavailable says the offer won't come.
     verdict: add
     note: "The M4 lesson: artie-bare sent the merge 30 times against a draft."
   - name: Whenever
-    status: parsed
+    status: today
     example: Whenever a pull request from dependabot opens `as pr`
     means: Repeat the bullets under it on each matching change, once per match.
     verdict: add
     note: "Fan-out at the top level; behaviour per resource when nested. On one line too: Whenever someone requests changes, leave it."
   - name: If
-    status: new
+    status: today
     example: If it's labelled {hold}, leave it, and say so once.
     means: A condition on what the step holds now, read again each time the step runs.
-    verdict: open
-    note: Not one of the five words. Either a sixth word, or the manners' "leave it" said for one case; to decide.
+    verdict: add
+    note: "Decided 2026-10-23: a word. Its check is decided once; \"leave it\" leaves the resource, its other steps not done this look."
   - name: Until
-    status: parsed
+    status: today
     example: Until {owner} closes the issue "Auto-merge watch"
     means: When a watch ends.
     verdict: add
   - name: Done when
-    status: parsed
+    status: today
     example: The crash issue is closed and the pull request is merged
     means: The final checks, written as outcomes.
     verdict: keep

@@ -26,6 +26,7 @@ val pulls = rounds.flatMap { it["pulls"].list() }
 fun pr(number: Any?) = """<a class="mono" href="$repo/pull/$number" rel="noopener" target="_blank">#$number</a>"""
 fun tag(tone: String, words: String) = """<span class="tag $tone">${esc(words)}</span>"""
 val outcomeWords = mapOf("good" to "right", "safe" to "stopped, said why", "bad" to "harm", "quiet" to "nothing")
+val runWords = mapOf("good" to "finished", "safe" to "did the work, then failed a check", "bad" to "stopped")
 
 fun count(by: String, tone: String) = pulls.count { it.text("by") == by && it.text("tone") == tone }
 val tiles = listOf(
@@ -64,6 +65,17 @@ val fixed = yaml["fixed"].list().joinToString("\n") { f ->
     """<li><div>${esc(f.text("what"))}</div><div class="outcome">${esc(f.text("fix"))}</div>""" +
         """<div class="sub mono">${esc(f.text("out"))}</div></li>"""
 }
+val goalText = File(yaml.text("goalFile")).readText()
+val became = yaml["became"].list().joinToString("\n") { b ->
+    """<li><b>${esc(b.text("part"))}</b><div class="outcome">${esc(b.text("as"))}</div></li>"""
+}
+val goalRuns = yaml["goalRuns"].list().joinToString("\n") { r ->
+    val tone = r.text("tone")
+    val fixed = r.text("fixed").takeIf { it != "-" }?.let { """<div class="sub">Fixed: ${esc(it)}</div>""" }.orEmpty()
+    """<li class="pull $tone"><div class="head"><b class="mono">${esc(r.text("run"))}</b> ${tag(tone, runWords[tone] ?: tone)}</div>""" +
+        """<div>${esc(r.text("found"))}</div>$fixed</li>"""
+}
+
 val gaps = yaml["gaps"].list().joinToString("\n") { g ->
     """<li>${tag("quiet", g.text("where"))} ${esc(g.text("what"))}</li>"""
 }
@@ -109,9 +121,21 @@ val body = """
   </section>
 $roundSections
   <section>
+    <h2>The goal file, run by ARTIE itself</h2>
+    <p>Then ARTIE learned the words: <span class="mono">artie run dependabot-sim.goal.md --reasoner claude</span>
+    runs the goal file below as written. Claude decides each part once, the first time the run needs it, on a real
+    pull request; every later pull request and every later look replays the decision, with no model.</p>
+    <details class="box" open><summary>dependabot-sim.goal.md</summary><div class="scroll"><pre class="src">${esc(goalText)}</pre></div></details>
+    <h3>What each part became, in the last run</h3>
+    <ol class="words">$became</ol>
+    <h3>Ten live runs, each finding something, each fixed with a test first</h3>
+    <ol class="pulls">$goalRuns</ol>
+  </section>
+  <section>
     <h2>The goal words, as the code they came down to</h2>
-    <p>The goal grammar doesn't know these words yet, so <span class="mono">watch.kts</span> writes each by hand in
-    heart-script, through the HEART gateway.</p>
+    <p>Before ARTIE read the words, <span class="mono">watch.kts</span> wrote each by hand in heart-script,
+    through the HEART gateway; heart-script's <span class="mono">watch</span>, <span class="mono">whenever</span>
+    and <span class="mono">once</span> now keep them, and a goal run decides them.</p>
     <ol class="words">$words</ol>
   </section>
   <section>
@@ -135,7 +159,8 @@ val page = File(assets, "report-shell.html").readText()
     .replace("@@TITLE@@", "Dependabot, Simulated")
     .replace("@@HEADING@@", "Dependabot, simulated: a watch that can be told no")
     .replace("@@LEDE@@", "Dependabot-style pull requests opened with our own account on a scratch repository, merged " +
-        "by a heart-script watch through the HEART gateway, beside GitHub's own auto-merge. Run ${yaml.text("asOf")}.")
+        "by a watch through the HEART gateway, beside GitHub's own auto-merge; then by the goal file itself, run by " +
+        "ARTIE, each step decided once by Claude. Run ${yaml.text("asOf")}.")
     .replace("@@BASE@@", File(assets, "report-base.css").readText())
     .replace("@@THEME@@", File(assets, "theme-switch.js").readText())
     .replace("@@STYLE@@", style).replace("@@SCRIPT@@", "").replace("@@BODY@@", body)

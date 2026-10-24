@@ -126,10 +126,77 @@ gaps:
   - where: gateway
     what: No reviews resource, so a person objects with a label rather than "changes requested".
   - where: gateway
-    what: Pull requests can't be listed by label, and list pages carry no ETag; the watch reads each changed pull request to see its labels.
+    what: List pages carry no ETag, so each look reads the list in full from the gateway (GitHub answers it 304).
   - where: heart-script
-    what: note() is kept but never written to the trace or shown; watch.kts works around it with tell().
-  - where: heart-script
-    what: The trace keeps every representation in full, 3.6 MB for six minutes; a long watch's journal must keep only what changed, and resume from it.
-  - where: goal grammar
-    what: Whenever, Until, Once, Otherwise and Give up are written by hand here; Goal.kt doesn't know them yet.
+    what: The trace keeps every representation in full; a long watch's journal should keep only what changed. --remember keeps what a watch did, not the whole journal.
+  - where: ARTIE
+    what: "Done when over many resources (\"every pull request was merged, or says why\") is noted, not checked: the run would have to answer from its own record."
+  - where: ARTIE
+    what: artie generate doesn't yet write a decided watch run as a script with no model in it (spec/PLAN-WATCH-GOALS.md, slice 4c).
+
+# The goal file run by ARTIE itself (spec/PLAN-WATCH-GOALS.md): artie run dependabot-sim.goal.md --reasoner claude.
+goalFile: ../goal-syntax/goals/dependabot-sim.goal.md
+
+# What each part of the goal became in the last run, g10, decided once by Claude and replayed.
+became:
+  - part: "In {owner}/{repo}"
+    as: A read of the repository
+  - part: "Open an issue … `as watch`"
+    as: "Issue #712, the watch's own"
+  - part: "Whenever a pull request labelled {label} changes"
+    as: "The list github:pulls-list, state=open, labels=dependabot, reached from the start; the match: labels include dependabot"
+  - part: "If it's labelled {hold}, leave it, and say so once"
+    as: "The check: labels include hold. #696 and #689 left alone, a note each"
+  - part: "Once it can be merged, merge it by squashing"
+    as: "Wait until github:merge is offered, then merge, merge_method squash. #710 merged"
+  - part: "Or give up after 10 minutes / Otherwise, say why"
+    as: Not reached; the watch ended before any wait ran out
+  - part: "Until someone closes {watch}"
+    as: "The check: #712's state is closed. It ended the watch at the next look after the issue was closed"
+  - part: "## Working alongside others"
+    as: "Told to Claude as words; with --remember, \"don't say again\" is kept by the watch's memory too"
+  - part: "## Done when"
+    as: Both facts noted unchecked, with Claude's reason; nothing at the start holds them
+
+# Each live run of the goal file, what it found, and what was fixed (a test first each time).
+goalRuns:
+  - run: g1
+    tone: bad
+    found: Stopped deciding the Whenever's list; the planner's act had no words, and a refusal ended the run.
+    fixed: A refusal while deciding is told to the planner, which decides again.
+  - run: g2
+    tone: bad
+    found: The repository links no list of pull requests, and going back to the start was refused.
+    fixed: While a list is decided, the planner may go back to the start; the watch stands there.
+  - run: g3
+    tone: bad
+    found: Watched the issue search with labels=dependabot, which leaves pull requests out; every look found nothing.
+    fixed: The gateway's pull request search filters by labels, served by GitHub's issue list.
+  - run: g4
+    tone: bad
+    found: Stopped at the If step, a plain step then; the planner was shown no steps inside the Whenever.
+    fixed: If became a word, its check decided once; the step tree looks inside a Whenever; a planner's stop ends a watch.
+  - run: g5
+    tone: bad
+    found: The match and the If check held for every pull request; the labels are embedded, and the planner never saw them.
+    fixed: The planner is shown what a resource embeds, and a check may name an embedded relation.
+  - run: g6
+    tone: bad
+    found: A check's list became text; the Until was decided as what held then; Done when couldn't be checked.
+    fixed: Lists stay lists; the Until is told it ends the watch; a Done when fact may be left unchecked, noted.
+  - run: g7
+    tone: safe
+    found: "Merged #700 and left #696 and #689 alone, then checked Done when as merged: true on the start, and failed."
+    fixed: The planner is told what a Done when fact is.
+  - run: g8
+    tone: good
+    found: "Exit 0: merged #708, left the held ones alone, stopped when its issue was closed, Done when noted. 474 steps: every open pull request read each look."
+    fixed: The planner deciding the list is told to narrow it by a filter.
+  - run: g9
+    tone: bad
+    found: Told to narrow the list, chose the issue search with labels again, the trap.
+    fixed: The issue search's description says pull requests are left out, and where they are listed.
+  - run: g10
+    tone: good
+    found: "Exit 0: watched github:pulls-list with labels=dependabot, merged #710, left the held ones alone. 54 steps, 19 model calls, every one a decision; --remember kept what it did."
+    fixed: "-"
