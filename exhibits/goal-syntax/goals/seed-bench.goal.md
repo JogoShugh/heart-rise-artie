@@ -34,7 +34,7 @@ Growers move trays, relabel them and write on them by hand. What they decide sta
     - If it's labelled {hold}, leave it, and say so once.
     - Once it can be merged, merge it by squashing.
       Or give up after 5 minutes.
-      Otherwise, say on {plan} why it wasn't merged.
+      Otherwise, say on {plan} why it wasn't merged, unless it's said already.
   - Whenever an issue labelled tray changes `as tray`
     - If it's labelled transplanted, close it.
 - Until someone closes {watch}
