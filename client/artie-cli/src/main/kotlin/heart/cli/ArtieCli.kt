@@ -83,23 +83,33 @@ class ArtieCli(
             run.onNote = { out.println("note: $it") }
         }
         val text = Files.readString(file)
-        val ended = if (isGoal(file)) {
-            pursued(asked, file, run) { client }
-        } else {
-            // A script that reasons, an act with an intent and no relation, is known before it runs, by its text:
-            // without --reasoner, nothing is sent.
-            if (!asked.inputsOf && asked.reasoner == null && REASONS.containsMatchIn(text)) {
-                throw BadArguments("stopped before the first request: act(intent = …) needs --reasoner")
-            }
-            execute(run, text).also { if (asked.inputsOf) return listed(run, text) }
-        }
         val name = file.fileName.toString().substringBefore('.')
         // The run's capture, as a person reads it: YAML (spec/PLAN-LINE-BY-LINE-REPORT.md).
         val trace = folder.resolve(asked.trace ?: "runs/$name-${Instant.now().epochSecond}.trace.yaml")
-        Files.createDirectories(trace.toAbsolutePath().parent)
+        val kept = {
+            Files.createDirectories(trace.toAbsolutePath().parent)
+            Files.writeString(trace, run.traceYaml())
+        }
+        // A process told to stop, as a guard stops a watch, writes the trace as the run left it.
+        val stopped = Thread { kept() }
+        Runtime.getRuntime().addShutdownHook(stopped)
+        val ended = try {
+            if (isGoal(file)) {
+                pursued(asked, file, run) { client }
+            } else {
+                // A script that reasons, an act with an intent and no relation, is known before it runs, by its
+                // text: without --reasoner, nothing is sent.
+                if (!asked.inputsOf && asked.reasoner == null && REASONS.containsMatchIn(text)) {
+                    throw BadArguments("stopped before the first request: act(intent = …) needs --reasoner")
+                }
+                execute(run, text).also { if (asked.inputsOf) return listed(run, text) }
+            }
+        } finally {
+            runCatching { Runtime.getRuntime().removeShutdownHook(stopped) }
+        }
         // What the run's model calls took, as its client counted them: a client never made took nothing.
         if (made.isInitialized()) run.usage = client.usage
-        Files.writeString(trace, run.traceYaml())
+        kept()
         val repinned = repin(asked, folder, file, config, run.traceYaml())
         if (output == "words") repinned.forEach(out::println)
         asked.report?.let { report(folder.resolve(it), trace, file, run) }

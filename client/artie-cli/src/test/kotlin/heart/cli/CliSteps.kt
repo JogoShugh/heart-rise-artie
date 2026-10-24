@@ -127,6 +127,32 @@ class CliSteps(private val script: ScriptSteps) {
         printed = bytes.toString().lines().filter { it.isNotBlank() }
     }
 
+    /**
+     * The process told to stop, as a guard's kill tells it: the run's own handling never sees it, as a signal ends
+     * the process around it. The shutdown hooks a JVM would run are run here, then the run is broken off.
+     */
+    @Given("the process is told to stop when the client acts {string}, its trace {string} kept as {string}")
+    fun toldToStop(relation: String, trace: String, kept: String) {
+        script.service.onAct[relation] = {
+            ShutdownHooks.runAll()
+            // What a stopped process leaves: the trace as it was then, whatever this one, going on, writes after.
+            folder.resolve(trace).takeIf { Files.exists(it) }?.let { Files.copy(it, folder.resolve(kept)) }
+            throw ToldToStop()
+        }
+    }
+
+    /** What a signal is to the run: nothing it catches. */
+    private class ToldToStop : Error("told to stop")
+
+    /** The JVM's shutdown hooks, run as a signal runs them, though the process goes on (needs java.lang opened). */
+    private object ShutdownHooks {
+        fun runAll() {
+            val hooks = Class.forName("java.lang.ApplicationShutdownHooks").getDeclaredField("hooks")
+            hooks.isAccessible = true
+            (hooks.get(null) as Map<*, *>).keys.toList().forEach { (it as Thread).run() }
+        }
+    }
+
     @Then("artie exits {int}")
     fun exits(code: Int) = assertEquals(code, exit, printed.joinToString("\n"))
 

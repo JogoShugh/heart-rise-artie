@@ -514,6 +514,29 @@ Feature: artie run: a script, run from the command line
       | act {relation}, number {number} | done    |
       | act {relation}                  | refused |
 
+  Scenario: The trace is kept when the process is told to stop, with the steps the run made
+    Found by the live seed bench run b6: a guard stopped the run from
+    outside, and no trace was written, so what the planner decided was lost.
+    The process, told to stop, writes the trace as the run left it.
+    Given the process is told to stop when the client acts "close", its trace "run.yaml" kept as "stopped.yaml"
+    And the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          act("close")
+      }
+      """
+    When artie is run with
+      | argument   |
+      | run        |
+      | issue.kts  |
+      | --trace    |
+      | run.yaml   |
+    Then the trace "stopped.yaml" has these steps
+      | say                             | outcome |
+      | enter {entry}                   | done    |
+      | act {relation}, number {number} | done    |
+
   Scenario: The run report, written where the run is told, with the script in it
     Given the script "issue.kts" is
       """kotlin

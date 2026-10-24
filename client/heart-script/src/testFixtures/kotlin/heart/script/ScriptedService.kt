@@ -55,7 +55,11 @@ class ScriptedService : Navigator, Wire {
         return at("/")
     }
 
+    /** What happens to the process as the client acts, by relation, before it sends: a stop, where a feature says. */
+    val onAct = mutableMapOf<String, () -> Unit>()
+
     override fun act(rel: String, fields: Map<String, Any?>): Answer {
+        onAct[rel]?.invoke()
         asked += "act" to (if (fields.isEmpty()) rel else "$rel ${json(fields)}")
         val key = "$rel at $held"
         refusals[key]?.takeIf { (refusedTimes[key] ?: 1) > 0 }?.let { refusal ->

@@ -72,6 +72,8 @@ tasks.named<CreateStartScripts>("startScripts") {
 
 tasks.test {
     useJUnitPlatform()
+    // run.feature runs the shutdown hooks a signal would, to see the trace kept when the process is told to stop.
+    jvmArgs("--add-opens", "java.base/java.lang=ALL-UNNAMED")
 }
 
 detekt {
