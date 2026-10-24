@@ -1,0 +1,41 @@
+# What generated/seed-bench.kts was recorded against, from runs/bench-1024-b15.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.
+rung: L2
+forms:
+  github:repos-get:
+    integrity: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+    method: GET
+    sets: []
+  github:open-issue:
+    integrity: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+    method: POST
+    sets:
+      - sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  github:issues-list-for-repo:
+    integrity: sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+    method: GET
+    sets: []
+  github:assign:
+    integrity: sha256-VscVtuEo5Tk2ZKoux1zt3PeDF2khsJ/DkO2uKd3V7GQ=
+    method: POST
+    sets:
+      - sha256-TjBX+DBbz5JvbKZCt+6J14V1pEI0VTVb/cou8olWou8=
+  github:pulls-list:
+    integrity: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+    method: GET
+    sets: []
+  github:comment:
+    integrity: sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
+    method: POST
+    sets:
+      - sha256-TjBX+DBbz5JvbKZCt+6J14V1pEI0VTVb/cou8olWou8=
+      - sha256-g/oJ+K2Rc0UDQ7pZcmwO3OL5YUlzC14oLlUByVmjVaY=
+  github:merge:
+    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+    method: PUT
+    sets:
+      - sha256-tB6evjRCMG+5AEO3aa+kdDiMRyv3wmGN9LfZkHAT888=
+links:
+  item: ''
+  github:issues-list-comments: ''
