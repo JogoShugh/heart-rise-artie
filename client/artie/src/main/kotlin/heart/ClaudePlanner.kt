@@ -138,10 +138,12 @@ class ClaudePlanner(
         }
     }
 
-    private fun plain(value: kotlinx.serialization.json.JsonElement): Any? {
-        val primitive = value as? JsonPrimitive ?: return value.toString()
-        return if (primitive.isString) primitive.content else
-            primitive.booleanOrNull ?: primitive.longOrNull ?: primitive.doubleOrNull
+    /** A fact's value as a check reads it: a scalar as itself, a list as a list of them, anything else as text. */
+    private fun plain(value: kotlinx.serialization.json.JsonElement): Any? = when {
+        value is JsonArray -> value.map(::plain)
+        value !is JsonPrimitive -> value.toString()
+        value.isString -> value.content
+        else -> value.booleanOrNull ?: value.longOrNull ?: value.doubleOrNull
     }
 
     companion object {

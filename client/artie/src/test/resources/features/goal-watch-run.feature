@@ -267,6 +267,42 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | 2      |
     And the planner was asked 11 times
 
+  Scenario: A fact of Done when the planner can't check as facts is left unchecked, and noted
+    "Every pull request was merged or says why" is no member of one
+    resource: the planner says so with done, and the run notes it.
+    Given the file "close.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Close the watch issue.
+
+      ## The work
+
+      - Open issue 10 of acme/rockets `as watch`
+        - Close it
+
+      ## Done when
+
+      - Every pull request was merged, or says why not
+      """
+    And the planner will move
+      | move  | words                         | opens |
+      | act   | open issue 10 of acme/rockets | yes   |
+      | done  |                               |       |
+      | act   | close it                      |       |
+      | done  |                               |       |
+      | done  |                               |       |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:close      | {}                                                       |
+    When the goal "close.goal.md" runs with ARTIE, captured in "close.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And the run noted one note beginning "Not checked: Every pull request was merged, or says why not"
+
   Scenario Outline: A goal in sections tells the planner its manners, and ends with the checks Done when names: <case>
     Given the file "close.goal.md" is
       """

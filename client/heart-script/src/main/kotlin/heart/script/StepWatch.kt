@@ -179,7 +179,9 @@ internal class StepWatch(
         val at = name?.let { named.getValue(it).address }?.let {
             Here(scope.navigator, run, arrived(++run.step, "\"until\"", scope.navigator.recall(it)))
         } ?: scope
-        val facts = ends ?: decide(until, at, CHECK, "until: ${host.fill(until.condition)}") {
+        val told = "until: ${host.fill(until.condition)}: the check that holds once the watch is to end, not " +
+            "what holds now; it is made after every look, and the watch ends when it holds"
+        val facts = ends ?: decide(until, at, CHECK, told) {
             (it as? Move.Check)?.facts
         }.also { ends = it }
         return holds(facts, at.held)

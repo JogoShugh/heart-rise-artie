@@ -59,7 +59,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
                 } ?: this
                 now = fact
                 stepCount = 0
-                single(fact, at, null)
+                // A fact no resource's members say may be left unchecked: done, saying why.
+                single(fact, at, null, setOf("check", "done", "stop"))
             }
         }
     }
@@ -163,18 +164,25 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
     }
 
     /** A `Wait:` step, which takes one wait; a `Verify:` step, which takes one check. */
-    private fun single(step: Step, here: Here, opener: Int?) {
-        while (true) {
-            val move = next(here)
-            when {
-                move is Move.Wait && step is Step.Wait -> if (script.waited(here, move, opener, moves)) return
+    private fun single(step: Step, here: Here, opener: Int?, allowed: Set<String>? = null) {
+        var over = false
+        while (!over) {
+            val move = next(here, allowed)
+            over = when {
+                move is Move.Wait && step is Step.Wait -> script.waited(here, move, opener, moves)
                 move is Move.Check && step is Step.Verify -> {
                     script.written(GoalText.check(move.facts), opener)
                     here.check(move.facts)
                     moves += "checked ${move.facts}"
-                    return
+                    true
                 }
-                else -> other(move, step)
+                // A fact of Done when no member of one resource says, the planner leaves unchecked, and says so.
+                move is Move.Done && step is Step.Verify && step in goal.done -> {
+                    here.note("Not checked: ${fill(step.facts.joinToString("; "))}" +
+                        (move.reason?.let { ": $it" } ?: ""))
+                    true
+                }
+                else -> false.also { other(move, step) }
             }
         }
     }

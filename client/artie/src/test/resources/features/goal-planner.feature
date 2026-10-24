@@ -28,6 +28,7 @@ Feature: Claude plans a goal run, one move at a time
       | {"move": "back", "to": "the issue"}                                      | back to "the issue"                   |
       | {"move": "wait", "relation": "github:close"}                             | wait until "github:close" is offered  |
       | {"move": "check", "facts": {"state": "closed"}}                          | check {state=closed}                  |
+      | {"move": "check", "facts": {"github:labels": ["dependabot", "hold"]}}    | check {github:labels=[dependabot, hold]} |
       | {"move": "done", "sentence": 2}                                          | sentence 2 done                       |
       | {"move": "finish"}                                                       | finished                              |
       | {"move": "stop", "why": "the issue is locked"}                           | stopped: the issue is locked          |
