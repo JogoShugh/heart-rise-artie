@@ -97,3 +97,42 @@ Feature: Listeners, each on its own: a slow one never holds up another
       | first: 2 open   |
       | second: 1 open  |
       | second: 2 open  |
+
+  Scenario: A wait gives up at its time, however seldom its listener looks
+    spec/PLAN-LISTENERS.md, slice 3. A `once` that waits sets a timeout for
+    its give-up; the listener looks again when it runs out, whether or not
+    anything it read changed. Its Otherwise runs on the timeout, at the
+    time it gives up, never at the next look. Pull request 1 is a draft and
+    stays one; the listener looks only every hour, yet gives up on it at
+    ten minutes past. On virtual time, the half hour takes no real time.
+    Given the run's clock moves only when the run pauses
+    And pull request 1 is a draft on the small GitHub
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.hours
+      import kotlin.time.Duration.Companion.minutes
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          listeners(every = 1.minutes, until = { ++looks > 30 }) {
+              listen("merge", every = 1.hours) {
+                  act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+                      whenever {
+                          once("github:merge", giveUp = 10.minutes, otherwise = {
+                              note("gave up on #${state["number"]} at ${Run.current.clock()}")
+                          }) {
+                              act("github:merge", "merge_method" to "squash") {}
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 2      |
+    And the run noted
+      | note                                |
+      | gave up on #1 at 2026-10-23T12:10:00Z |

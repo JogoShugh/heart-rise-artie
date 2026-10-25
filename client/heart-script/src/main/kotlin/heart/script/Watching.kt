@@ -27,6 +27,9 @@ internal class Watching {
     /** Each wait not over yet, by its resource's address and act: since when it waits. */
     val waiting = mutableMapOf<String, java.time.Instant>()
 
+    /** Each wait not over yet, by its resource's address and act: when it gives up (spec/PLAN-LISTENERS.md, 3). */
+    val ends = java.util.concurrent.ConcurrentHashMap<String, java.time.Instant>()
+
     /** Each wait that is over, by its resource's address and act: its act done, or its otherwise. */
     val finished = mutableSetOf<String>()
 
@@ -153,12 +156,14 @@ fun Here.once(
     val key = "${held.address} $rel"
     if (key in watching.finished) return
     val since = watching.waiting.getOrPut(key) { run.clock() }
+    watching.ends[key] = since.plus(giveUp.toJavaDuration())
     var waiting = true
     while (waiting) {
         val waited = java.time.Duration.between(since, run.clock()).toKotlinDuration()
         val over = offers(rel) || waited >= giveUp
         if (over) {
             watching.waiting.remove(key)
+            watching.ends.remove(key)
             watching.finished += key
             if (offers(rel)) block() else otherwise(why(rel))
         }

@@ -8,6 +8,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
+import kotlin.time.toKotlinDuration
 
 /*
  * A watch with listeners (spec/PLAN-LISTENERS.md, slice 1): each listener looks again and again on a thread of its
@@ -52,7 +53,8 @@ fun Here.listeners(
             threads.submit(run.time.thread { fork.listening(listener, watch, polls) })
         }
         try {
-            looking(watch, every, until) { running.any { it.isDone } }
+            // The watch's own thread is one of its threads too: time doesn't move while it reads.
+            run.time.thread { looking(watch, every, until) { running.any { it.isDone } } }()
         } finally {
             watch.over.set(true)
             run.time.poke()
@@ -80,7 +82,7 @@ private fun Here.looking(watch: Watch, every: Duration, until: Here.() -> Boolea
 
 /**
  * One listener's loop, on its own thread, with a client of its own: [listener]'s look, then again each time a
- * resource it read is hinted changed (Hints.kt). While a `once` in it waits, it also looks at its own pace.
+ * resource it read is hinted changed (Hints.kt), and when a `once` in it gives up: a timeout, not a look's chance.
  */
 private fun Run.listening(listener: Listener, watch: Watch, polls: Polls) {
     val start = listener.from ?: watch.start
@@ -95,7 +97,10 @@ private fun Run.listening(listener: Listener, watch: Watch, polls: Polls) {
             here.attempt(start, "${listener.name}: a look failed") { listener.look(this) }
             polls.want(inbox, listener.every, read(from))
         }
-        look = inbox.take(listener.every).isNotEmpty() || watching.waiting.isNotEmpty()
+        val due = watching.ends.values.minOrNull()
+        val left = due?.let { java.time.Duration.between(clock(), it).toKotlinDuration() }
+        look = inbox.take(left?.coerceIn(Duration.ZERO, listener.every) ?: listener.every).isNotEmpty() ||
+            (due != null && !clock().isBefore(due))
     }
 }
 
@@ -129,6 +134,7 @@ internal fun Run.fork(): Run = Run(inputs, navigator = navigator, pause = pause)
     // What the watch saw and did before its listeners began, so none of them does it again.
     fork.watching.seen += watching.seen
     fork.watching.waiting += watching.waiting
+    fork.watching.ends += watching.ends
     fork.watching.finished += watching.finished
     fork.watching.left += watching.left
 }
