@@ -30,7 +30,7 @@ internal class StepWatch(
 
 
     // Whenevers side by side look on threads of their own; each decides only its own steps' parts.
-    private val decided = Decisions()
+    val decided = Decisions()
 
     /**
      * [steps], Whenevers side by side, at [where]: each one's list reached as decided, each look, until the goal's
@@ -120,6 +120,7 @@ internal class StepWatch(
                 }
                 if (match.passes(sources(this, null), held)) {
                     step.name?.let { named[it] = held }
+                    decided.answered(step, held.address)
                     // An If that leaves the member leaves its other steps undone, this look.
                     step.children.all { child(it, this) }
                 }

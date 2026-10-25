@@ -1413,6 +1413,67 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the run noted one note beginning "Not checked: Every pull request was merged, or says why not"
     And the planner was last told the step now is "done when: Every pull request was merged, or says why not: check it only when members of the resource held say it; otherwise done, saying why"
 
+  Scenario Outline: A fact of Done when about what a Whenever answers is checked on every one it answered: <case>
+    Found by the live seed bench runs: "Every alert … is assigned" was
+    checked at the start, which holds no alert, so it was always left
+    unchecked. A fact that names what a Whenever names (`as alert`) is
+    decided once, on the first member that watch answered, and checked on
+    every one of them; it holds on all, or the run stops saying on which not.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+      | 12     | Damping-off on tray 14         | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 11 of "acme/rockets" is labelled "urgent" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "<on 12>" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 14 times
+    And the file "every.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert.
+
+      ## The work
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it.
+      - Until {watch} is closed
+
+      ## Done when
+
+      - Every alert is labelled urgent
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                         |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                               |
+      | done  |                                                     |       |          |                               |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                               |
+      | check |                                                     |       |          | {"state": "open"}             |
+      | act   | say on it that the watch has seen it                |       |          |                               |
+      | done  |                                                     |       |          |                               |
+      | check |                                                     |       |          | {"state": "closed"}           |
+      | check |                                                     |       |          | {"github:labels": ["urgent"]} |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                   |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              | {"body": "Seen by the bench watch."}                                     |
+    When the goal "every.goal.md" runs with ARTIE, captured in "every.trace.yaml", given
+      | name | value |
+    Then <ended>
+    And the run's capture keeps each check as decided, with where it was decided
+      | move                                                                                                                     |
+      | done when: Every alert is labelled urgent: checked {"github:labels":["urgent"]} on every alert the watch answered: holds on <held> |
+
+    Examples:
+      | case                            | on 12  | held   | ended                                                                                                  |
+      | it holds on every alert         | urgent | 2 of 2 | the run finished                                                                                       |
+      | it fails on one, and says which | later  | 1 of 2 | the goal run stopped, saying "Every alert is labelled urgent: holds on 1 of 2; not on https://github.gateway.test/repos/acme/rockets/issues/12" |
+
   Scenario Outline: A goal in sections tells the planner its manners, and ends with the checks Done when names: <case>
     Given the file "close.goal.md" is
       """

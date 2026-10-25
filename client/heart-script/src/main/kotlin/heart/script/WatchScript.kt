@@ -16,8 +16,16 @@ internal class Decisions {
     val ifs = ConcurrentHashMap<Step.Intent, Chain.Check>()
     val acts = ConcurrentHashMap<Pair<Step.Intent, String>, Chain>()
 
+    /** The members each Whenever answered, by address, in the order it first answered them. */
+    val members = ConcurrentHashMap<Step.Whenever, MutableSet<String>>()
+
     @Volatile
     var ends: Chain.Check? = null
+
+    /** A member [step] answered, at [address]. */
+    fun answered(step: Step.Whenever, address: String) {
+        members.getOrPut(step) { java.util.Collections.synchronizedSet(LinkedHashSet()) } += address
+    }
 }
 
 /** Lines of Kotlin, written one at a time, each [INDENT] in for its depth. */

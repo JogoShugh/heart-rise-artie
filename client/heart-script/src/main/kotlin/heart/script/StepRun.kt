@@ -55,15 +55,17 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
             path += held.address
             start = this
             goal.steps.forEach { step(it, this, null) }
-            // Done when: each fact checked at the resource it names, else at the start.
+            // Done when: a fact about what a Whenever answered checked on each of them; any other at the resource
+            // it names, else at the start, read again, as a watch may have left the client elsewhere.
+            val every = DoneWhen(watch.decided.members, { at, allowed, told -> next(at, allowed, told) }, ::fill, moves)
             goal.done.forEach { fact ->
-                val name = BRACE.findAll(fact.facts.joinToString(" ")).map { it.groupValues[1] }
-                    .firstOrNull { it in named }
-                val at = name?.let { named.getValue(it).address }?.let {
-                    Here(navigator, run, arrived(++run.step, "\"done when\"", navigator.recall(it)))
-                } ?: this
                 now = fact
                 stepCount = 0
+                if (every.every(fact, this)) return@forEach
+                val name = BRACE.findAll(fact.facts.joinToString(" ")).map { it.groupValues[1] }
+                    .firstOrNull { it in named }
+                val at = Here(navigator, run, arrived(++run.step, "\"done when\"",
+                    navigator.recall(name?.let { named.getValue(it).address } ?: held.address)))
                 // A fact no resource's members say may be left unchecked: done, saying why.
                 val told = "done when: ${fill(fact.facts.joinToString("; "))}: check it only when members of the " +
                     "resource held say it; otherwise done, saying why"
