@@ -1,0 +1,121 @@
+# Choices from state, live, 2026-10-25. Each row is read from a run in runs/: what was asked, how, who answered,
+# and what they said. The page (report.kts) only lays these out.
+asOf: "2026-10-25"
+attempts:
+  - service: basketball
+    kind: outside
+    run: foul-out-1
+    asked: A personal foul on Rowan (8), who has just fouled out
+    how: script
+    answer: refused by ARTIE, nothing sent
+    said: 'playerNumber: 8 is not one of the choices'
+  - service: basketball
+    kind: outside
+    run: foul-out-1
+    asked: '"record a personal foul on Rowan of the Hornets"'
+    how: words, to Claude
+    answer: refused by Claude, nothing sent
+    said: Rowan (#8) has already fouled out with 5 fouls, so a foul can't be recorded on him. Did you mean a
+      different Hornets player, Kai (5), Ellis (12), Harper (24) or Finley (33)?
+  - service: basketball
+    kind: inside
+    run: foul-out-1
+    asked: '"record a personal foul on Kai of the Hornets"'
+    how: words, to Claude
+    answer: done
+    said: Kai's foul recorded
+  - service: basketball
+    kind: outside
+    run: server-refuses
+    asked: The foul on Rowan, sent past ARTIE with the game's current ETag
+    how: bare HTTP
+    answer: 422 invalid-input, at /playerNumber
+    said: 8 is not one of the choices now
+  - service: tickets
+    kind: outside
+    run: assign-2
+    asked: Assign ticket 1 (high) to Lena, who is off duty
+    how: script
+    answer: refused by ARTIE, nothing sent
+    said: 'agent: "lena" is not one of the choices'
+  - service: tickets
+    kind: outside
+    run: assign-2
+    asked: '"assign this ticket to Lena"'
+    how: words, to Claude
+    answer: refused by Claude, nothing sent
+    said: Lena isn't an available agent. Would you like to assign this ticket to priya or marco instead?
+  - service: tickets
+    kind: inside
+    run: assign-2
+    asked: '"assign this ticket to Marco"'
+    how: words, to Claude
+    answer: done
+    said: assigned to marco
+  - service: tickets
+    kind: outside
+    run: assign-2
+    asked: '"give this ticket to Tom", once it is urgent'
+    how: words, to Claude
+    answer: refused by Claude, nothing sent
+    said: Tom isn't available as an agent for this ticket. The only agent I can assign it to is priya.
+  - service: tickets
+    kind: inside
+    run: assign-2
+    asked: '"reassign this urgent ticket to Priya"'
+    how: words, to Claude
+    answer: done
+    said: assigned to priya
+  - service: tickets
+    kind: ambiguous
+    run: assign-1
+    asked: '"assign this ticket to someone who can take it now"'
+    how: words, to Claude
+    answer: refused by Claude, nothing sent
+    said: 'Which agent should take this ticket: priya or marco? I can''t see who is available right now.'
+dialects:
+  - dialect: HAL Schema Forms
+    says: 'hr:options: pointer /{team}/players, value number, prompt name, where fouledOut is false'
+    values: none in the form; the client resolves them from the game, for the team it chose
+    shared: the same bytes for every live game, so one shared, cached form per phase
+  - dialect: HAL-FORMS
+    says: options.inline, resolved by the server for this game
+    values: Kai, Ellis, Harper, Finley, Logan, Parker, Reese, Skyler, Emerson (both teams, without Rowan)
+    shared: different bytes for every game and every foul; cannot depend on the team field
+clients:
+  - client: ARTIE (Kotlin)
+    resolves: pointer and link; link revalidated by ETag
+    shows: an enum, with prompts, to its reasoner
+    refuses: a value outside them, before sending
+    since: 05aef9f
+  - client: heart-mcp
+    resolves: through ARTIE
+    shows: an enum, with prompts, to the host's model; no hr:options
+    refuses: a value outside them, before sending
+    since: 19ab1d8
+  - client: heart-ts (TypeScript)
+    resolves: pointer and link; link revalidated by ETag
+    shows: choices(name, fields)
+    refuses: a value outside them, or a required property with none, before sending
+    since: bdfc419
+  - client: Any client, at the server
+    resolves: from the state If-Match matched
+    shows: 422 invalid-input at the property
+    refuses: whatever is sent outside them
+    since: 95aa186
+findings:
+  - Asked in words for someone who can't be chosen now, Claude refused each time and named who can. It was
+    shown only the values the server will take, so it had nothing else to pick.
+  - By script, ARTIE refused the same values before anything was sent. Sent past ARTIE, the server refused it
+    with 422 at /playerNumber.
+  - The tickets choices follow state in another resource. Once the ticket went urgent, Marco and Tom dropped out
+    and Priya was the only agent left.
+  - '"Someone who can take it now" with two agents to choose from is ambiguous. ARTIE''s reasoner asks rather than
+    guess, as it is told to. Saying "now" in the choices'' description did not change that, and was not kept.'
+  - HAL-FORMS can say these choices only as values for one game. It cannot make them depend on the team field, so
+    it offers both teams' players. HAL Schema Forms keeps the form the same for every game and leaves the values in
+    state.
+gaps:
+  - One run of each, over a phone's hotspot, with the services on the laptop.
+  - The artie dashboard still draws an enum as a select and knows nothing of hr:options. The garden it shows has
+    none.

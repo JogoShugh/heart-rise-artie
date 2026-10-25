@@ -1,0 +1,137 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>Choices, Live</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --accent: #4b4fc4;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* This page's own. */
+
+section, .tiles { margin-top: 28px; }
+.tile { cursor: default; }
+td { min-width: 90px; }
+ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; max-width: 80ch; }
+
+</style>
+<div class="wrap">
+  <div class="top"><div>
+    <h1>Choices from state, live: only what can be chosen now</h1>
+    <p class="lede">HAL Schema Forms' hr:options on two live services, basketball and a support desk: asked by script, in words to Claude, and past the client, to the server. One run each, 2026-10-25.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+
+  <div class="tiles">
+  <div class="tile safe"><b>6 / 6</b><span class="sub">asks for someone who can't be chosen now, refused</span></div>
+  <div class="tile good"><b>3 / 3</b><span class="sub">asks for someone who can, done</span></div>
+  <div class="tile good"><b>0</b><span class="sub">values outside the choices that got through</span></div>
+  <div class="tile quiet"><b>1</b><span class="sub">ask that fit two choices, answered with a question</span></div></div>
+<section><h2>Basketball: a player from the chosen team, still in the game</h2><p>record-foul's player is one of the chosen team's players who have not fouled out. Rowan fouled out with four more fouls; then a fifth was asked for, three ways, and one on Kai.</p><div class="scroll"><table><thead><tr><th>Answer</th><th>Asked</th><th>How</th><th>Said</th><th>Run</th></tr></thead><tbody><tr><td><span class="tag safe">refused by ARTIE, nothing sent</span></td><td>A personal foul on Rowan (8), who has just fouled out</td><td>script</td><td>playerNumber: 8 is not one of the choices</td><td>foul-out-1</td></tr><tr><td><span class="tag safe">refused by Claude, nothing sent</span></td><td>"record a personal foul on Rowan of the Hornets"</td><td>words, to Claude</td><td>Rowan (#8) has already fouled out with 5 fouls, so a foul can't be recorded on him. Did you mean a different Hornets player, Kai (5), Ellis (12), Harper (24) or Finley (33)?</td><td>foul-out-1</td></tr><tr><td><span class="tag good">done</span></td><td>"record a personal foul on Kai of the Hornets"</td><td>words, to Claude</td><td>Kai's foul recorded</td><td>foul-out-1</td></tr><tr><td><span class="tag bad">422 invalid-input, at /playerNumber</span></td><td>The foul on Rowan, sent past ARTIE with the game's current ETag</td><td>bare HTTP</td><td>8 is not one of the choices now</td><td>server-refuses</td></tr></tbody></table></div></section><section><h2>Tickets: an agent from another resource, on duty, for the ticket's priority</h2><p>assign's agent is one of the desk's agents at /agents?priority=…, filled from the ticket, who are on duty. Ticket 1 is high: Priya and Marco. Then it goes urgent: only Priya.</p><div class="scroll"><table><thead><tr><th>Answer</th><th>Asked</th><th>How</th><th>Said</th><th>Run</th></tr></thead><tbody><tr><td><span class="tag safe">refused by ARTIE, nothing sent</span></td><td>Assign ticket 1 (high) to Lena, who is off duty</td><td>script</td><td>agent: "lena" is not one of the choices</td><td>assign-2</td></tr><tr><td><span class="tag safe">refused by Claude, nothing sent</span></td><td>"assign this ticket to Lena"</td><td>words, to Claude</td><td>Lena isn't an available agent. Would you like to assign this ticket to priya or marco instead?</td><td>assign-2</td></tr><tr><td><span class="tag good">done</span></td><td>"assign this ticket to Marco"</td><td>words, to Claude</td><td>assigned to marco</td><td>assign-2</td></tr><tr><td><span class="tag safe">refused by Claude, nothing sent</span></td><td>"give this ticket to Tom", once it is urgent</td><td>words, to Claude</td><td>Tom isn't available as an agent for this ticket. The only agent I can assign it to is priya.</td><td>assign-2</td></tr><tr><td><span class="tag good">done</span></td><td>"reassign this urgent ticket to Priya"</td><td>words, to Claude</td><td>assigned to priya</td><td>assign-2</td></tr><tr><td><span class="tag safe">refused by Claude, nothing sent</span></td><td>"assign this ticket to someone who can take it now"</td><td>words, to Claude</td><td>Which agent should take this ticket: priya or marco? I can't see who is available right now.</td><td>assign-1</td></tr></tbody></table></div></section><section><h2>The same choices in the two dialects</h2><p>record-foul's player on the live game, after Rowan fouled out, as each dialect renders it.</p><div class="scroll"><table><thead><tr><th>Dialect</th><th>Says</th><th>Values</th><th>Shared</th></tr></thead><tbody><tr><td>HAL Schema Forms</td><td>hr:options: pointer /{team}/players, value number, prompt name, where fouledOut is false</td><td>none in the form; the client resolves them from the game, for the team it chose</td><td>the same bytes for every live game, so one shared, cached form per phase</td></tr><tr><td>HAL-FORMS</td><td>options.inline, resolved by the server for this game</td><td>Kai, Ellis, Harper, Finley, Logan, Parker, Reese, Skyler, Emerson (both teams, without Rowan)</td><td>different bytes for every game and every foul; cannot depend on the team field</td></tr></tbody></table></div></section><section><h2>Where the choices are kept</h2><p>Every client that offers the choices also refuses anything outside them, and the server refuses it again.</p><div class="scroll"><table><thead><tr><th>Client</th><th>Resolves</th><th>Shows</th><th>Refuses</th><th>Since</th></tr></thead><tbody><tr><td>ARTIE (Kotlin)</td><td>pointer and link; link revalidated by ETag</td><td>an enum, with prompts, to its reasoner</td><td>a value outside them, before sending</td><td>05aef9f</td></tr><tr><td>heart-mcp</td><td>through ARTIE</td><td>an enum, with prompts, to the host's model; no hr:options</td><td>a value outside them, before sending</td><td>19ab1d8</td></tr><tr><td>heart-ts (TypeScript)</td><td>pointer and link; link revalidated by ETag</td><td>choices(name, fields)</td><td>a value outside them, or a required property with none, before sending</td><td>bdfc419</td></tr><tr><td>Any client, at the server</td><td>from the state If-Match matched</td><td>422 invalid-input at the property</td><td>whatever is sent outside them</td><td>95aa186</td></tr></tbody></table></div></section>
+  <section>
+    <h2>What it shows</h2>
+    <ul class="gaps"><li>Asked in words for someone who can't be chosen now, Claude refused each time and named who can. It was shown only the values the server will take, so it had nothing else to pick.</li><li>By script, ARTIE refused the same values before anything was sent. Sent past ARTIE, the server refused it with 422 at /playerNumber.</li><li>The tickets choices follow state in another resource. Once the ticket went urgent, Marco and Tom dropped out and Priya was the only agent left.</li><li>"Someone who can take it now" with two agents to choose from is ambiguous. ARTIE's reasoner asks rather than guess, as it is told to. Saying "now" in the choices' description did not change that, and was not kept.</li><li>HAL-FORMS can say these choices only as values for one game. It cannot make them depend on the team field, so it offers both teams' players. HAL Schema Forms keeps the form the same for every game and leaves the values in state.</li></ul>
+  </section>
+  <section>
+    <h2>Not shown here</h2>
+    <ul class="gaps"><li>One run of each, over a phone's hotspot, with the services on the laptop.</li><li>The artie dashboard still draws an enum as a select and knows nothing of hr:options. The garden it shows has none.</li></ul>
+  </section>
+
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+
+
+</script>
+</body></html>
