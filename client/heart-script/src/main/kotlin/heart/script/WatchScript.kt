@@ -98,15 +98,14 @@ internal class WatchScript(
     /** One look of [step]: its list reached as decided, and each member that matches answered. */
     private fun look(step: Step.Whenever, depth: Int) {
         val list = decided.lists[step] ?: return out.said(depth, "${fill(step.match)}: no list decided in this run")
+        // Which members it answers is the whenever's own: by whom, saying what, holding what the match decided.
+        val match = decided.matches[step].takeUnless { step.saidByWords }
         out.open(depth, reach(list)) { inside ->
-            out.open(inside, whenever(step)) { member ->
-                val match = decided.matches[step]
-                if (step.saidByWords) {
+            out.open(inside, whenever(step, match)) { member ->
+                if (step.saidByWords || match != null) {
                     children(step.children, member)
-                } else if (match == null) {
-                    out.said(member, "${fill(step.match)}: no member matched in this run")
                 } else {
-                    out.open(member, "if (holds(${bound(match.facts)}))") { children(step.children, it) }
+                    out.said(member, "${fill(step.match)}: no member matched in this run")
                 }
             }
         }
@@ -125,19 +124,17 @@ internal class WatchScript(
                     left(intent, check, steps.drop(at + 1), depth)
                     return
                 }
-                else -> out.open(depth, "if (holds(${bound(check.facts)}))") { chains.chain(intent, ACT, it) }
+                else -> out.open(depth, "onlyWhere(${bound(check.facts)})") { chains.chain(intent, ACT, it) }
             }
         }
     }
 
     /** An If that leaves the member where its [check] holds, saying so; else the [rest] of the member's steps. */
     private fun left(intent: Step.Intent, check: Chain.Check, rest: List<Step>, depth: Int) {
-        val note = kotlinString("Left \${held.address}: ${fill(intent.words)}", slots = true)
-        val leaves = "if (holds(${bound(check.facts)})) note($note)"
-        if (rest.isEmpty()) return out.line(depth, leaves)
-        out.line(depth, "$leaves else {")
-        children(rest, depth + 1)
-        out.line(depth, "}")
+        val leaving = kotlinString(fill(intent.words), slots = true)
+        val leaves = "unless(${bound(check.facts)}, leaving = $leaving)"
+        if (rest.isEmpty()) return out.line(depth, "$leaves {}")
+        out.open(depth, leaves) { children(rest, it) }
     }
 
     /** A step with no If: a Once, or a chain of acts. */
@@ -172,10 +169,17 @@ internal class WatchScript(
 /** Words that are one input alone, `{name}`. */
 private val INPUT = Regex("""\{(\w+)}""")
 
-/** A Whenever's `whenever`, with who made its members and what they say, each an input where its words name one. */
-private fun whenever(step: Step.Whenever): String {
+/**
+ * A Whenever's `whenever`: who made its members and what they say, each an input where its words name one, and what
+ * they hold.
+ */
+private fun whenever(step: Step.Whenever, match: Chain.Check?): String {
     fun said(words: String) = INPUT.matchEntire(words)?.groupValues?.get(1) ?: kotlinString(words, slots = false)
-    val named = listOfNotNull(step.by?.let { "by = ${said(it)}" }, step.says?.let { "says = ${said(it)}" })
+    val named = listOfNotNull(
+        step.by?.let { "by = ${said(it)}" },
+        step.says?.let { "says = ${said(it)}" },
+        match?.let { "has = ${bound(it.facts)}" },
+    )
     return if (named.isEmpty()) "whenever" else "whenever(${named.joinToString(", ")})"
 }
 

@@ -133,15 +133,24 @@ internal fun Here.attempt(start: String, failed: String, block: Here.() -> Unit)
 /**
  * Visit each member the held list links under [rel], as `members` does; in a watch, only those new or changed since
  * the last look, and those a `once` still waits on. With [by], only those it made; with [says], only those whose words
- * hold it, in any case (spec/PLAN-LISTENERS.md, slice 4).
+ * hold it, in any case (spec/PLAN-LISTENERS.md, slice 4); with [has], only those where every fact holds, as data
+ * rather than an if in the block.
  */
-fun Here.whenever(rel: String = "item", by: String? = null, says: String? = null, block: Here.() -> Unit) {
+fun Here.whenever(
+    rel: String = "item",
+    by: String? = null,
+    says: String? = null,
+    has: Map<String, Any?>? = null,
+    block: Here.() -> Unit,
+) {
     val watching = run.watching
     members(rel) {
         val address = held.address
         val now = held.state.toString()
         val due = !watching.active || watching.differs(address, now) || watching.waitsOn(address)
-        if (due && held.kept(by, says)) {
+        // A member the watch answers: made by whom it names, saying what it says, holding what [has] says.
+        val answered = held.kept(by, says) && (has == null || holds(has))
+        if (due && answered) {
             try {
                 block()
             } finally {

@@ -91,6 +91,29 @@ Feature: A HEART script: the Reason step written in advance
       | return | /issues/10                       |
       | act    | comment {"body":"Fixed in 1.3."} |
 
+  Scenario: A step made only where facts hold, and one made unless they do
+    A condition, as data rather than Kotlin's if. onlyWhere runs its block
+    where every fact holds on the resource held. unless runs it where they
+    don't; where they do, it leaves the resource and says so.
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10) {
+              onlyWhere(mapOf("state" to "open")) { act("close") }
+              onlyWhere(mapOf("state" to "closed")) { act("comment", "body" to "Closed.") }
+              unless(mapOf("state" to "open"), leaving = "an open issue is left alone.") { act("comment", "body" to "Not open.") }
+          }
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                     |
+      | enter  | scripted://service/      |
+      | act    | issues-get {"number":10} |
+      | act    | close                    |
+      | return | /                        |
+    And the script noted "Left /issues/10: an open issue is left alone."
+
   Scenario: A long act's values in a block, one a line, which may be left out; the block after still visits
     When this script runs
       """kotlin

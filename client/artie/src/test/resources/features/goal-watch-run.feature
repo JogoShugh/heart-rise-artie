@@ -593,6 +593,9 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 12 of "acme/rockets" is now "open" on the small GitHub
     And the planner was asked 8 times
     And ARTIE's reasoner was asked 3 times
+    And the capture "trays.trace.yaml" keeps a watch script with a line with "whenever(has = mapOf(\"github:labels\" to listOf(\"tray\")))"
+    And the capture "trays.trace.yaml" keeps a watch script with a line with "onlyWhere(mapOf(\"github:labels\" to listOf(\"transplanted\")))"
+    And the capture "trays.trace.yaml" keeps a watch script with no line with "if ("
 
   Scenario: A list a step sent is sent again as a list, and a look that fails still keeps what the watch did
     Found by the live seed bench run b1: an alert's chain commented, then
@@ -842,10 +845,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       """
       watch(until = { var over = false; at(watchAt) { over = holds(mapOf("state" to "closed")) }; over }) {
           act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
-              whenever {
-                  if (holds(mapOf("state" to "open"))) {
-                      actOnce("github:comment", "body" to "Seen by the bench watch.", listedIn = "github:issues-list-comments") {}
-                  }
+              whenever(has = mapOf("state" to "open")) {
+                  actOnce("github:comment", "body" to "Seen by the bench watch.", listedIn = "github:issues-list-comments") {}
               }
           }
       }
@@ -1323,8 +1324,9 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | hold  | on-hold |
     Then the run finished
     And the capture "hold.trace.yaml" keeps a watch script with a line with "act(\"github:issues-list-for-repo\", \"owner\" to \"acme\", \"repo\" to \"rockets\", \"state\" to \"open\", \"labels\" to label)"
-    And the capture "hold.trace.yaml" keeps a watch script with a line with "if (holds(mapOf(\"github:labels\" to listOf(label))))"
-    And the capture "hold.trace.yaml" keeps a watch script with a line with "if (holds(mapOf(\"github:labels\" to listOf(hold)))) note("
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "whenever(has = mapOf(\"github:labels\" to listOf(label)))"
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "unless(mapOf(\"github:labels\" to listOf(hold)), leaving = \"leave it.\")"
+    And the capture "hold.trace.yaml" keeps a watch script with no line with "if ("
 
   Scenario: An act refused before it was sent may be asked again in the same words
     Found by the live seed bench run b17: the reasoner's first choice for
