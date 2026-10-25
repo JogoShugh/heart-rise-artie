@@ -84,7 +84,7 @@ val body = """
   </section>
   <section>
     <h2>The script made from the run</h2>
-    <p>What artie generate wrote from run b19. It reads values again where they came from: the grower and the hold
+    <p>What artie generate wrote from run b20. It reads values again where they came from: the grower and the hold
     label are inputs, and the reason a merge gave up is the server's, read at the time.</p>
     ${shown("generated/seed-bench.kts", yaml.text("generated"))}
   </section>

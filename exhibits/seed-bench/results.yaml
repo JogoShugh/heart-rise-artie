@@ -8,24 +8,25 @@ generated: generated/seed-bench.kts
 
 # The proof, end to end: Claude decides once, the decisions become a script, the script runs with no model.
 proof:
-  - step: Run b19, with Claude
+  - step: Run b20, with Claude
     what: >-
       Claude decided every part of the watch, the first time each was needed: how to answer an alert, how to
-      merge a plan that fits, and what to say on a plan that can't be merged.
+      merge a plan that fits, what to say on a plan that can't be merged, and how to close a tray once it is
+      transplanted.
     showed: >-
-      Merged the plan that fits (#774). Told the new alert #778 it was seen, once, and assigned it. Gave up on
-      the plan with 60 trays (#779) after 5 minutes and said why, once, in GitHub's own words.
+      Closed the transplanted tray #783. Merged the plan that fits. Told the new alert it was seen, once, and
+      assigned it. Gave up on the plan with 60 trays after 5 minutes and said why, once, in GitHub's own words.
   - step: artie generate
     what: >-
       Wrote the run's decisions as a script, generated/seed-bench.kts: plain heart-script, no intent, no model.
       The repository's owner, the grower and the hold label are inputs; the forms it uses are pinned in a lock
       file beside it.
     showed: The script opens the watch issue, then listens for alerts, sowing plans and trays, as the run did.
-  - step: Run g3, the script alone
+  - step: Run g4, the script alone
     what: The generated script run with artie run and no --reasoner.
     showed: >-
-      Merged the new plan that fits (#780). Told the new alert #781 it was seen, once, and assigned it. 168
-      steps, none of them reasoned, no model called.
+      Closed the transplanted tray #788. Merged the new plan that fits (#790). Told the new alert #789 it was
+      seen, once, and assigned it. 229 steps, none of them reasoned, no model called.
 
 runs:
   - run: b1
@@ -120,16 +121,28 @@ runs:
   - run: g3
     tone: good
     found: The script made from b19, alone. Merged #780, told and assigned #781; 168 steps, none reasoned.
+    fixed: >-
+      Then, with no run to find them: the goal's closing checks are made on every member a watch answered, not
+      at the start; an Until that can never hold is refused; the trace keeps Claude's words alone; a read no
+      check is made on is left out.
+  - run: b20
+    tone: safe
+    found: >-
+      Every part decided, the tray included: #783 closed once transplanted. The closing check "every alert is
+      assigned to the grower" was made on all 17 alerts, and held on none, though each was assigned: an embedded
+      user has no title and no name, only a login.
+    fixed: A value names an embedded resource when it is its title, or one of its own values.
+  - run: g4
+    tone: good
+    found: The script made from b20, alone, with every listener. Closed tray #788, merged #790, told and assigned #789; 229 steps, none reasoned.
     fixed: "-"
 
 gaps:
   - where: Done when
-    what: The goal's closing checks are made at the start page, which holds nothing to check, so all three are skipped.
-  - where: Until
-    what: An Until decided wrong lets a watch run to its time limit.
-  - where: The trace
-    what: The Otherwise step in the trace carries the whole of what Claude was told.
+    what: >-
+      "Says it was seen, once" needs the comments read on each alert; a closing check is made on the member
+      alone.
   - where: The script
-    what: A few lines left from Claude's wandering, such as a second read of the comments after commenting.
-  - where: Trays
-    what: No tray changed in the runs that made the script, so its tray listener is empty.
+    what: A check can keep text copied from an earlier run's comment, word for word.
+  - where: Old runs
+    what: The alerts told twice by the runs that went wrong still carry the extra comments.

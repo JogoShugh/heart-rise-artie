@@ -1,4 +1,4 @@
-# What generated/seed-bench.kts was recorded against, from runs/bench-1024-b19.yaml. artie run holds the script to it before every act:
+# What generated/seed-bench.kts was recorded against, from runs/bench-1024-b20.yaml. artie run holds the script to it before every act:
 # --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
 # also refuses one offered in a set not recorded for it.
 rung: L2
@@ -25,17 +25,22 @@ forms:
     integrity: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
     method: GET
     sets: []
-  github:merge:
-    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
-    method: PUT
+  github:close:
+    integrity: sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+    method: PATCH
     sets:
-      - sha256-tB6evjRCMG+5AEO3aa+kdDiMRyv3wmGN9LfZkHAT888=
+      - sha256-TjBX+DBbz5JvbKZCt+6J14V1pEI0VTVb/cou8olWou8=
   github:comment:
     integrity: sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
     method: POST
     sets:
       - sha256-TjBX+DBbz5JvbKZCt+6J14V1pEI0VTVb/cou8olWou8=
       - sha256-g/oJ+K2Rc0UDQ7pZcmwO3OL5YUlzC14oLlUByVmjVaY=
+  github:merge:
+    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+    method: PUT
+    sets:
+      - sha256-tB6evjRCMG+5AEO3aa+kdDiMRyv3wmGN9LfZkHAT888=
 links:
   item: ''
   github:issues-list-comments: ''

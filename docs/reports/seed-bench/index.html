@@ -104,13 +104,13 @@ ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
     <p class="lede">A greenhouse bench watched through the HEART gateway on a scratch GitHub repository: Claude decides each part once, artie generate writes those decisions as a script, and the script does the work alone. Run 2026-10-24.</p>
   </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
 
-  <div class="tiles"><div class="tile quiet"><b>19</b><span class="sub">live runs with Claude deciding</span></div><div class="tile good"><b>3</b><span class="sub">live runs of the script alone, no model</span></div><div class="tile safe"><b>16</b><span class="sub">things found and fixed, each with a test first</span></div><div class="tile good"><b>0</b><span class="sub">model calls in the runs of the script</span></div></div>
+  <div class="tiles"><div class="tile quiet"><b>20</b><span class="sub">live runs with Claude deciding</span></div><div class="tile good"><b>4</b><span class="sub">live runs of the script alone, no model</span></div><div class="tile safe"><b>18</b><span class="sub">things found and fixed, each with a test first</span></div><div class="tile good"><b>0</b><span class="sub">model calls in the runs of the script</span></div></div>
   <section>
     <h2>The idea, in three steps</h2>
     <p>A goal file says, in plain words, what a watch over a greenhouse bench should do. Claude decides how to do
     each part once, the first time it comes up. Those decisions are written down as a script. From then on the
     script does the work by itself, with no model, and costs no tokens.</p>
-    <div class="flow"><div class="node"><b>Run b19, with Claude</b><div>Claude decided every part of the watch, the first time each was needed: how to answer an alert, how to merge a plan that fits, and what to say on a plan that can't be merged.</div><div class="outcome">Merged the plan that fits (#774). Told the new alert #778 it was seen, once, and assigned it. Gave up on the plan with 60 trays (#779) after 5 minutes and said why, once, in GitHub's own words.</div></div><div class="arrow" aria-hidden="true">↓</div><div class="node"><b>artie generate</b><div>Wrote the run's decisions as a script, generated/seed-bench.kts: plain heart-script, no intent, no model. The repository's owner, the grower and the hold label are inputs; the forms it uses are pinned in a lock file beside it.</div><div class="outcome">The script opens the watch issue, then listens for alerts, sowing plans and trays, as the run did.</div></div><div class="arrow" aria-hidden="true">↓</div><div class="node"><b>Run g3, the script alone</b><div>The generated script run with artie run and no --reasoner.</div><div class="outcome">Merged the new plan that fits (#780). Told the new alert #781 it was seen, once, and assigned it. 168 steps, none of them reasoned, no model called.</div></div></div>
+    <div class="flow"><div class="node"><b>Run b20, with Claude</b><div>Claude decided every part of the watch, the first time each was needed: how to answer an alert, how to merge a plan that fits, what to say on a plan that can't be merged, and how to close a tray once it is transplanted.</div><div class="outcome">Closed the transplanted tray #783. Merged the plan that fits. Told the new alert it was seen, once, and assigned it. Gave up on the plan with 60 trays after 5 minutes and said why, once, in GitHub's own words.</div></div><div class="arrow" aria-hidden="true">↓</div><div class="node"><b>artie generate</b><div>Wrote the run's decisions as a script, generated/seed-bench.kts: plain heart-script, no intent, no model. The repository's owner, the grower and the hold label are inputs; the forms it uses are pinned in a lock file beside it.</div><div class="outcome">The script opens the watch issue, then listens for alerts, sowing plans and trays, as the run did.</div></div><div class="arrow" aria-hidden="true">↓</div><div class="node"><b>Run g4, the script alone</b><div>The generated script run with artie run and no --reasoner.</div><div class="outcome">Closed the transplanted tray #788. Merged the new plan that fits (#790). Told the new alert #789 it was seen, once, and assigned it. 229 steps, none of them reasoned, no model called.</div></div></div>
   </section>
   <section>
     <h2>What the goal says</h2>
@@ -167,9 +167,9 @@ Growers move trays, relabel them and write on them by hand. What they decide sta
   </section>
   <section>
     <h2>The script made from the run</h2>
-    <p>What artie generate wrote from run b19. It reads values again where they came from: the grower and the hold
+    <p>What artie generate wrote from run b20. It reads values again where they came from: the grower and the hold
     label are inputs, and the reason a merge gave up is the server's, read at the time.</p>
-    <details class="box"><summary>generated/seed-bench.kts</summary><div class="scroll"><pre class="src">// Generated by artie generate from runs/bench-1024-b19.yaml, the run of ../goal-syntax/goals/seed-bench.goal.md.
+    <details class="box"><summary>generated/seed-bench.kts</summary><div class="scroll"><pre class="src">// Generated by artie generate from runs/bench-1024-b20.yaml, the run of ../goal-syntax/goals/seed-bench.goal.md.
 // Every selection as that run made it, nested as it nested, with no model.
 // What it was offered is pinned in generated/seed-bench.pins.yaml, held to before every act.
 //   artie run generated/seed-bench.kts owner=JogoShugh grower=JogoShugh
@@ -183,8 +183,8 @@ val hold by input(default = &quot;hold&quot;, question = &quot;Which label means
 heart(&quot;https://localhost:8392/&quot;) {
     var watchAt = &quot;&quot;
 
-    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, intent = &quot;get the repository $owner/$repo&quot;) {
-        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;open an issue titled &quot;Bench watch, week $week&quot; with body &quot;Close this issue to stop the watch.&quot;&quot;&quot;&quot;, fields = {
+    act(&quot;github:repos-get&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, intent = &quot;get repository $owner/$repo&quot;) {
+        act(&quot;github:open-issue&quot;, intent = &quot;&quot;&quot;Open an issue titled &quot;Bench watch, week $week&quot; with the body &quot;Close this issue to stop the watch.&quot;&quot;&quot;&quot;, fields = {
             &quot;title&quot; to &quot;Bench watch, week $week&quot;
             &quot;body&quot; to &quot;Close this issue to stop the watch.&quot;
         }) {
@@ -226,7 +226,11 @@ heart(&quot;https://localhost:8392/&quot;) {
         listen(&quot;an issue labelled tray changes&quot;, from = &quot;https://localhost:8392/&quot;) {
             act(&quot;github:issues-list-for-repo&quot;, &quot;owner&quot; to owner, &quot;repo&quot; to repo, &quot;labels&quot; to &quot;tray&quot;) {
                 whenever {
-                    // an issue labelled tray changes: no member matched in this run
+                    if (holds(mapOf(&quot;github:labels&quot; to listOf(&quot;tray&quot;)))) {
+                        if (holds(mapOf(&quot;github:labels&quot; to listOf(&quot;transplanted&quot;)))) {
+                            act(&quot;github:close&quot;) {}
+                        }
+                    }
                 }
             }
         }
@@ -259,15 +263,15 @@ heart(&quot;https://localhost:8392/&quot;) {
 <li class="pull safe"><div class="head"><b class="mono">b17</b> <span class="tag safe">stopped, nothing harmed</span></div><div>A read Claude chose wrongly was refused; asked again in the same words, it was refused as an act just made, though nothing was made.</div><div class="sub">Fixed: Only an act the server answered counts as just made.</div></li>
 <li class="pull safe"><div class="head"><b class="mono">b18</b> <span class="tag safe">stopped, nothing harmed</span></div><div>Told the new alert</div><div class="sub">Fixed: A refused check shows one fact that holds there, made from the resource itself.</div></li>
 <li class="pull good"><div class="head"><b class="mono">b19</b> <span class="tag good">did it right</span></div><div>Every part decided at the first try. Merged</div></li>
-<li class="pull good"><div class="head"><b class="mono">g3</b> <span class="tag good">did it right</span></div><div>The script made from b19, alone. Merged</div></li></ol>
+<li class="pull good"><div class="head"><b class="mono">g3</b> <span class="tag good">did it right</span></div><div>The script made from b19, alone. Merged</div><div class="sub">Fixed: Then, with no run to find them: the goal's closing checks are made on every member a watch answered, not at the start; an Until that can never hold is refused; the trace keeps Claude's words alone; a read no check is made on is left out.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">b20</b> <span class="tag safe">stopped, nothing harmed</span></div><div>Every part decided, the tray included: #783 closed once transplanted. The closing check &quot;every alert is assigned to the grower&quot; was made on all 17 alerts, and held on none, though each was assigned: an embedded user has no title and no name, only a login.</div><div class="sub">Fixed: A value names an embedded resource when it is its title, or one of its own values.</div></li>
+<li class="pull good"><div class="head"><b class="mono">g4</b> <span class="tag good">did it right</span></div><div>The script made from b20, alone, with every listener. Closed tray</div></li></ol>
   </section>
   <section>
     <h2>Still missing</h2>
-    <ul class="gaps"><li><span class="tag quiet">Done when</span> The goal's closing checks are made at the start page, which holds nothing to check, so all three are skipped.</li>
-<li><span class="tag quiet">Until</span> An Until decided wrong lets a watch run to its time limit.</li>
-<li><span class="tag quiet">The trace</span> The Otherwise step in the trace carries the whole of what Claude was told.</li>
-<li><span class="tag quiet">The script</span> A few lines left from Claude's wandering, such as a second read of the comments after commenting.</li>
-<li><span class="tag quiet">Trays</span> No tray changed in the runs that made the script, so its tray listener is empty.</li></ul>
+    <ul class="gaps"><li><span class="tag quiet">Done when</span> &quot;Says it was seen, once&quot; needs the comments read on each alert; a closing check is made on the member alone.</li>
+<li><span class="tag quiet">The script</span> A check can keep text copied from an earlier run's comment, word for word.</li>
+<li><span class="tag quiet">Old runs</span> The alerts told twice by the runs that went wrong still carry the extra comments.</li></ul>
   </section>
   <section>
     <h2>How this page is made</h2>
@@ -281,24 +285,25 @@ generated: generated/seed-bench.kts
 
 # The proof, end to end: Claude decides once, the decisions become a script, the script runs with no model.
 proof:
-  - step: Run b19, with Claude
+  - step: Run b20, with Claude
     what: &gt;-
       Claude decided every part of the watch, the first time each was needed: how to answer an alert, how to
-      merge a plan that fits, and what to say on a plan that can't be merged.
+      merge a plan that fits, what to say on a plan that can't be merged, and how to close a tray once it is
+      transplanted.
     showed: &gt;-
-      Merged the plan that fits (#774). Told the new alert #778 it was seen, once, and assigned it. Gave up on
-      the plan with 60 trays (#779) after 5 minutes and said why, once, in GitHub's own words.
+      Closed the transplanted tray #783. Merged the plan that fits. Told the new alert it was seen, once, and
+      assigned it. Gave up on the plan with 60 trays after 5 minutes and said why, once, in GitHub's own words.
   - step: artie generate
     what: &gt;-
       Wrote the run's decisions as a script, generated/seed-bench.kts: plain heart-script, no intent, no model.
       The repository's owner, the grower and the hold label are inputs; the forms it uses are pinned in a lock
       file beside it.
     showed: The script opens the watch issue, then listens for alerts, sowing plans and trays, as the run did.
-  - step: Run g3, the script alone
+  - step: Run g4, the script alone
     what: The generated script run with artie run and no --reasoner.
     showed: &gt;-
-      Merged the new plan that fits (#780). Told the new alert #781 it was seen, once, and assigned it. 168
-      steps, none of them reasoned, no model called.
+      Closed the transplanted tray #788. Merged the new plan that fits (#790). Told the new alert #789 it was
+      seen, once, and assigned it. 229 steps, none of them reasoned, no model called.
 
 runs:
   - run: b1
@@ -393,19 +398,31 @@ runs:
   - run: g3
     tone: good
     found: The script made from b19, alone. Merged #780, told and assigned #781; 168 steps, none reasoned.
+    fixed: &gt;-
+      Then, with no run to find them: the goal's closing checks are made on every member a watch answered, not
+      at the start; an Until that can never hold is refused; the trace keeps Claude's words alone; a read no
+      check is made on is left out.
+  - run: b20
+    tone: safe
+    found: &gt;-
+      Every part decided, the tray included: #783 closed once transplanted. The closing check &quot;every alert is
+      assigned to the grower&quot; was made on all 17 alerts, and held on none, though each was assigned: an embedded
+      user has no title and no name, only a login.
+    fixed: A value names an embedded resource when it is its title, or one of its own values.
+  - run: g4
+    tone: good
+    found: The script made from b20, alone, with every listener. Closed tray #788, merged #790, told and assigned #789; 229 steps, none reasoned.
     fixed: &quot;-&quot;
 
 gaps:
   - where: Done when
-    what: The goal's closing checks are made at the start page, which holds nothing to check, so all three are skipped.
-  - where: Until
-    what: An Until decided wrong lets a watch run to its time limit.
-  - where: The trace
-    what: The Otherwise step in the trace carries the whole of what Claude was told.
+    what: &gt;-
+      &quot;Says it was seen, once&quot; needs the comments read on each alert; a closing check is made on the member
+      alone.
   - where: The script
-    what: A few lines left from Claude's wandering, such as a second read of the comments after commenting.
-  - where: Trays
-    what: No tray changed in the runs that made the script, so its tray listener is empty.
+    what: A check can keep text copied from an earlier run's comment, word for word.
+  - where: Old runs
+    what: The alerts told twice by the runs that went wrong still carry the extra comments.
 </pre></div></details>
     <details class="box"><summary>report.kts: the script that lays it out</summary><div class="scroll"><pre class="src">// The seed bench as a page: a goal file run by ARTIE with Claude, the script made from that run, and the script run
 // with no model. The facts live in results.yaml; this script only lays them out. The look comes from the reports'
@@ -493,7 +510,7 @@ val body = &quot;&quot;&quot;
   &lt;/section&gt;
   &lt;section&gt;
     &lt;h2&gt;The script made from the run&lt;/h2&gt;
-    &lt;p&gt;What artie generate wrote from run b19. It reads values again where they came from: the grower and the hold
+    &lt;p&gt;What artie generate wrote from run b20. It reads values again where they came from: the grower and the hold
     label are inputs, and the reason a merge gave up is the server's, read at the time.&lt;/p&gt;
     ${shown(&quot;generated/seed-bench.kts&quot;, yaml.text(&quot;generated&quot;))}
   &lt;/section&gt;

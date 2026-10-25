@@ -1,9 +1,9 @@
-# How generated/seed-bench.kts was derived from runs/bench-1024-b19.yaml, the run of ../goal-syntax/goals/seed-bench.goal.md: each derivation, numbered
+# How generated/seed-bench.kts was derived from runs/bench-1024-b20.yaml, the run of ../goal-syntax/goals/seed-bench.goal.md: each derivation, numbered
 # in the order generated/seed-bench.kts first shows it, with the rule of spec/PLAN-SCRIPT-GENERATOR.md that bound it, and where it
 # stands in both scripts (line and column, from 1); rows: where each step of the run begins in both.
 script: 'generated/seed-bench.kts'
 source: '../goal-syntax/goals/seed-bench.goal.md'
-capture: 'runs/bench-1024-b19.yaml'
+capture: 'runs/bench-1024-b20.yaml'
 rows:
   - {at: 'inputs', source: null, generated: 6}
   - {at: '1', source: null, generated: 12}
@@ -16,7 +16,7 @@ derivations:
     title: 'owner, an input'
     why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
     source:
-      - {line: 1, column: 34, text: '$owner'}
+      - {line: 1, column: 30, text: '$owner'}
     generated:
       - {line: 6, column: 1, text: 'val owner by input(question = "Whose repository?")'}
       - {line: 15, column: 40, text: 'owner'}
@@ -26,7 +26,7 @@ derivations:
     title: 'repo, an input'
     why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
     source:
-      - {line: 1, column: 41, text: '$repo'}
+      - {line: 1, column: 37, text: '$repo'}
     generated:
       - {line: 7, column: 1, text: 'val repo by input(default = "heart-github-test", question = "Which repository?")'}
       - {line: 15, column: 57, text: 'repo'}
@@ -80,6 +80,6 @@ derivations:
     title: '"Close this issue to stop the watch.", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 2, column: 75, text: 'Close this issue to stop the watch.'}
+      - {line: 2, column: 79, text: 'Close this issue to stop the watch.'}
     generated:
       - {line: 18, column: 23, text: '"Close this issue to stop the watch."'}

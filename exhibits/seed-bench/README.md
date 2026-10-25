@@ -20,7 +20,7 @@ decisions as a script, `generated/seed-bench.kts`, and the script then does the 
 - `plan.kts`: a sowing plan, as a person would open one. `over=true` makes one too big for the bench.
 - `sensor.kts`: an alert, as a bench sensor would open one.
 - `runs/`: each run's output. `b` runs had Claude deciding; `g` runs are the generated script alone.
-- `generated/`: the script made from run b19, its lock file, and how each value in it was derived.
+- `generated/`: the script made from run b20, its lock file, and how each value in it was derived.
 - `results.yaml` and `report.kts`: what happened, and the page made from it
   (`docs/reports/seed-bench/index.html`).
 
