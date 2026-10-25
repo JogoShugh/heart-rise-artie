@@ -1,10 +1,12 @@
 package heart.script
 
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
 import kotlin.time.Duration
+import kotlin.time.toKotlinDuration
 
 /*
  * Hints (spec/PLAN-LISTENERS.md, slice 2). A listener looks again only when something its last look read may have
@@ -36,8 +38,21 @@ internal class Inbox(private val time: Time, private val over: () -> Boolean) {
     }
 }
 
-/** The watch's polls: one for each resource a listener's last look read, shared by every listener that read it. */
-internal class Polls(private val run: Run, private val watch: Watch, private val threads: ExecutorService) {
+/**
+ * The watch's polls: one for each resource a listener's last look read, shared by every listener that read it. Each
+ * asks the server to hold its read while nothing changed, up to its pace (spec/PLAN-LISTENERS.md, slice 6), so a
+ * server that holds reads, the gateway as hub, answers it as soon as something did; a server that doesn't answers at
+ * once, and the poll waits out its pace itself. Polls run on threads of their own, [stop]ped, held reads and all,
+ * when the watch ends.
+ */
+internal class Polls(private val run: Run, private val watch: Watch) : AutoCloseable {
+    private val threads: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
+
+    /** Every poll stopped, a held read too: the watch is over. */
+    override fun close() {
+        threads.shutdownNow()
+    }
+
     /** One resource polled: what each listener last saw there, and how often it is read. */
     private class Poll(val address: String, @Volatile var every: Duration) {
         val seen = ConcurrentHashMap<Inbox, String>()
@@ -73,21 +88,30 @@ internal class Polls(private val run: Run, private val watch: Watch, private val
     /** One resource read again and again, on a thread and with a client of its own, while the watch is on. */
     private fun polling(poll: Poll) {
         val navigator = run.navigator()
+        // A first read, held by no server, gives the poll's client the validator its held reads are conditional on.
+        read(navigator, poll, held = false)?.let { hint(poll, it) }
         while (watch.on(run)) {
-            run.time.await(poll.every) { !watch.on(run) }
-            if (watch.on(run) && poll.seen.isNotEmpty()) read(navigator, poll.address)?.let { hint(poll, it) }
+            val began = run.clock()
+            val hinted = poll.seen.isNotEmpty() && read(navigator, poll, run.time.held)?.let { hint(poll, it) } == true
+            val spent = java.time.Duration.between(began, run.clock()).toKotlinDuration()
+            if (!hinted && spent < poll.every) run.time.await(poll.every - spent) { !watch.on(run) }
         }
     }
 
-    /** Each listener whose last read of [poll]'s resource doesn't show what it [shows] now is hinted, once. */
-    private fun hint(poll: Poll, shows: String) = poll.seen.forEach { (inbox, seen) ->
-        if (seen != shows) {
-            poll.seen[inbox] = shows
-            inbox.put(poll.address)
-        }
-    }
+    /**
+     * Each listener whose last read of [poll]'s resource doesn't show what it [shows] now is hinted, once; whether
+     * any was.
+     */
+    private fun hint(poll: Poll, shows: String): Boolean = poll.seen.filter { it.value != shows }.keys.onEach { inbox ->
+        poll.seen[inbox] = shows
+        inbox.put(poll.address)
+    }.isNotEmpty()
 
-    /** What [address] shows now; null when it could not be read this time (a refusal, an error): polled again. */
-    private fun read(navigator: Navigator, address: String): String? =
-        runCatching { (navigator.visit(address) as? Answer.Done)?.now?.shows() }.getOrNull()
+    /**
+     * What [poll]'s resource shows now, the server asked to hold the read up to its pace while nothing changed, on
+     * the real clock; null when it could not be read this time (a refusal, an error, the watch over): polled again.
+     */
+    private fun read(navigator: Navigator, poll: Poll, held: Boolean): String? = runCatching {
+        (navigator.awaiting(poll.address, if (held) poll.every else Duration.ZERO) as? Answer.Done)?.now?.shows()
+    }.getOrNull()
 }

@@ -1,6 +1,6 @@
 # Plan: listeners, not one loop
 
-Status: chosen 2026-10-24. Slices 0 to 5 and 8 done; see "As built" at the end.
+Status: chosen 2026-10-24. Slices 0 to 6 and 8 done; see "As built" at the end.
 
 ## The problem
 
@@ -150,3 +150,11 @@ Each slice starts with its feature, seen red at test level, then made green.
   id and the act's idempotency key in one: a state answered once is never answered again, however often it is
   hinted. A member is kept as seen only once it is answered, so a run stopped while answering it answers it again;
   a wait is kept as over before its act, so its act is done at most once. No key is sent to servers yet.
+- **The gateway as hub (slice 6, `heart-gateway/.../Hub.kt`).** Not an event stream: a conditional read that
+  prefers to wait (RFC 7240, `Prefer: wait=N`). While its answer would be 304 the gateway holds it, up to N seconds
+  (60 at most), and reads it again when a GitHub webhook names its resource, a list holding it, or a list under it,
+  and every 15 seconds meanwhile, since a webhook can be lost. Webhooks are taken at `/hooks/github` only when their
+  body's HMAC-SHA256 is the secret's (`GATEWAY_WEBHOOK_SECRET`). This keeps HEART's one representation and its
+  validators: an event is a read that comes back early, and still only a hint. A client needs no stream: each poll
+  (`Hints.kt`) first reads once for a validator, then asks to be held up to its listener's pace; on a server that
+  doesn't hold reads it waits out the pace itself. Polls run on their own threads, stopped when the watch ends.

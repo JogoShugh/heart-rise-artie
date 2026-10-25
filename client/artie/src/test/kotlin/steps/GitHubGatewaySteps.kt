@@ -53,6 +53,21 @@ class GitHubGatewaySteps(private val ctx: ClientContext) {
         check(origin.startsWith("http")) { "an http origin, as GitHub serves" }
     }
 
+    /** The gateway as it serves now, for a webhook sent to it (script-listeners.feature). */
+    var handler: org.http4k.core.HttpHandler? = null
+        private set
+
+    /** The secret GitHub signs its webhooks with, when the gateway takes them. */
+    var webhookSecret: String? = null
+        private set
+
+    @Given("the GitHub gateway takes GitHub's webhooks, signed with the secret {string}")
+    fun takesWebhooks(secret: String) {
+        webhookSecret = secret
+        handler = GitHubGateway.handler(github, CONNECTOR, webhookSecret = secret)
+        ctx.inProcess = InProcessTransport(checkNotNull(handler))
+    }
+
     @Given("the GitHub gateway's switch for acts with no validator is {word}")
     fun noValidatorSwitch(switch: String) {
         ctx.inProcess = InProcessTransport(GitHubGateway.handler(github, CONNECTOR, validatorRequired = switch != "on"))

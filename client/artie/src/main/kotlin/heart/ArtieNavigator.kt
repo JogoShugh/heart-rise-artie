@@ -105,6 +105,10 @@ class ArtieNavigator(
 
     override fun visit(address: String): Answer = answer(address) { client.enter(address) }
 
+    override val awaiting: (String, kotlin.time.Duration) -> Answer = { address, atMost ->
+        answer(address) { client.awaiting(address, atMost.inWholeSeconds) }
+    }
+
     /** Off the rails, the resource as last held, nothing read; else read again. */
     override fun recall(address: String): Answer =
         if (offRails) answer(address) { client.recall(address) } else visit(address)

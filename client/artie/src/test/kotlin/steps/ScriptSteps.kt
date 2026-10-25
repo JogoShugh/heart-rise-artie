@@ -43,12 +43,21 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
             ArtieNavigator(client, exchangeLog = ctx.exchangeLog, guard = guard(), guarding = ctx.guard)
         }
         navigators = { heart.WiredNavigator(made(ctx.newClient(ctx.dialect, ctx.rung)), ctx.bare) }
+        val began = System.nanoTime()
         try {
             runs(script, made(ctx.client))
         } finally {
             navigators = null
+            took = java.time.Duration.ofNanos(System.nanoTime() - began)
         }
     }
+
+    /** How long the last script run took, on the real clock. */
+    private var took: java.time.Duration = java.time.Duration.ZERO
+
+    @Then("the run took less than {int} seconds")
+    fun tookLessThan(seconds: Long) =
+        kotlin.test.assertTrue(took < java.time.Duration.ofSeconds(seconds), "the run took $took")
 
     /** Where the run gets each client after its first, when a script asks for more than one; else the one. */
     private var navigators: (() -> Navigator)? = null

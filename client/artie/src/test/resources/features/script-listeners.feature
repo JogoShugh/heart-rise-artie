@@ -131,6 +131,39 @@ Feature: Listeners, each on its own: a slow one never holds up another
       | note                                    |
       | answered: Veracode scan FAILED: 2 high. |
 
+  Scenario: A listener's polls are held by the gateway, and answered as soon as a webhook says what changed
+    spec/PLAN-LISTENERS.md, slice 6. A poll asks the gateway to hold its
+    read while nothing changed, up to its listener's pace (Prefer: wait).
+    The listener here polls only every 30 seconds, yet answers the bot's
+    comment well within the two seconds the watch lasts: GitHub's webhook
+    for it wakes the held read of the thread, and the read's answer is the
+    listener's hint. The watch ends at once though reads are still held.
+    Given the GitHub gateway takes GitHub's webhooks, signed with the secret "hub-secret"
+    And "veracode-bot" comments "Veracode scan failed." on issue 10 of "acme/rockets" on the small GitHub 300 milliseconds after its comments are first listed, and GitHub sends its webhook
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.milliseconds
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          listeners(every = 200.milliseconds, until = { ++looks >= 10 }) {
+              listen("veracode", every = 30.seconds) {
+                  act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
+                      follow("github:issues-list-comments") {
+                          whenever(by = "veracode-bot", says = "failed") { note("answered: ${state["body"]}") }
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted
+      | note                             |
+      | answered: Veracode scan failed. |
+    And the run took less than 5 seconds
+
   Scenario: A wait gives up at its time, however seldom its listener looks
     spec/PLAN-LISTENERS.md, slice 3. A `once` that waits sets a timeout for
     its give-up; the listener looks again when it runs out, whether or not

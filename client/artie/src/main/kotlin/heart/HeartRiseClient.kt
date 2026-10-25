@@ -21,6 +21,12 @@ interface HeartRiseClient {
     fun discover(url: String)
 
     fun enter(url: String): HeartRepresentation
+
+    /**
+     * [enter], the server asked to hold the read up to [seconds] while the resource is unchanged since this client
+     * last held it (spec/PLAN-LISTENERS.md, slice 6): a watch's poll, answered as soon as something changed.
+     */
+    val awaiting: (url: String, seconds: Long) -> HeartRepresentation get() = { url, _ -> enter(url) }
     fun act(rel: String, payload: JsonObject): HeartRepresentation
 
     /** Follows the [rel] link in the current representation whose title is [title]. */

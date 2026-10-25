@@ -61,6 +61,10 @@ class ArtieClient(
 
     override fun enter(url: String): HeartRepresentation = sync(url)
 
+    override val awaiting: (String, Long) -> HeartRepresentation = { url, seconds ->
+        sync(url, this.bindings.forUri(url).read(url, asking, seconds).received(url))
+    }
+
     /**
      * A GET form is safe (RFC 9110 §9.2.1): its target, filled from the form's
      * fields, is synced like any resource, with no body and no validator.

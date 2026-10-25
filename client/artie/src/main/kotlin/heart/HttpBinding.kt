@@ -12,6 +12,13 @@ class HttpBinding(private val transport: Transport) : Binding {
         // on the path (RFC 9111 §5.2.1.4), whatever the stored response said.
         outcome(transport.send(HeartRequest("GET", url, negotiation(rendering) + LAYER1_NO_CACHE)))
 
+    /** RFC 7240's wait, beside the rung's own preferences: a server that holds reads holds this one. */
+    override fun read(url: String, rendering: Rendering, seconds: Long): Outcome {
+        val negotiated = negotiation(rendering)
+        val prefer = listOfNotNull(negotiated["Prefer"], "wait=$seconds").joinToString(", ")
+        return outcome(transport.send(HeartRequest("GET", url, negotiated + LAYER1_NO_CACHE + ("Prefer" to prefer))))
+    }
+
     override fun fetch(url: String, accept: List<String>, integrity: String?): Outcome {
         val headers = mapOf("Accept" to accept.joinToString(", "))
         return outcome(transport.send(HeartRequest("GET", url, headers, integrity = integrity)))

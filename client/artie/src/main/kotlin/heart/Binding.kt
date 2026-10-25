@@ -90,6 +90,12 @@ interface Binding {
     fun read(url: String, rendering: Rendering): Outcome
 
     /**
+     * [read], asking the server to hold the read up to [seconds] while the resource is unchanged since the client
+     * last held it (spec/PLAN-LISTENERS.md, slice 6). A binding that can't ask it reads at once.
+     */
+    fun read(url: String, rendering: Rendering, seconds: Long): Outcome = read(url, rendering)
+
+    /**
      * Reads any other resource in one of [accept]'s media types. [integrity] is
      * the value the link carried, for a binding that checks it below its cache.
      */

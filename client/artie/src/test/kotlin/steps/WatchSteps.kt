@@ -167,6 +167,39 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
     }
 
     @Given(
+        "{string} comments {string} on issue {long} of {string} on the small GitHub {int} milliseconds after its " +
+            "comments are first listed, and GitHub sends its webhook",
+    )
+    fun commentsLaterWithWebhook(author: String, body: String, issue: Long, repository: String, after: Long) {
+        val (owner, repo) = repository.split("/")
+        val listed = java.util.concurrent.atomic.AtomicBoolean()
+        gateway.github.beforeAnswer += { request ->
+            val path = "/repos/$repository/issues/$issue/comments"
+            if (request.method.name == "GET" && request.uri.path == path && listed.compareAndSet(false, true)) {
+                Thread.ofVirtual().start {
+                    Thread.sleep(after)
+                    val id = (gateway.github.comments.maxOfOrNull { it.id } ?: 0) + 1
+                    gateway.github.comments +=
+                        com.artie.heart.gateway.fixtures.Comment(owner, repo, issue, id, author, body)
+                    checkNotNull(gateway.handler)(webhook(repository, issue, id, checkNotNull(gateway.webhookSecret)))
+                }
+            }
+        }
+    }
+
+    /** GitHub's webhook for a comment, [id], made on [issue], its body signed with [secret]. */
+    private fun webhook(repository: String, issue: Long, id: Long, secret: String): org.http4k.core.Request {
+        val api = "https://api.github.com/repos/$repository"
+        val body = """{"action":"created","issue":{"url":"$api/issues/$issue"},""" +
+            """"comment":{"url":"$api/issues/comments/$id"},"repository":{"url":"$api"}}"""
+        val mac = javax.crypto.Mac.getInstance("HmacSHA256")
+            .apply { init(javax.crypto.spec.SecretKeySpec(secret.toByteArray(), "HmacSHA256")) }
+        val signature = mac.doFinal(body.toByteArray()).joinToString("") { "%02x".format(it) }
+        return org.http4k.core.Request(org.http4k.core.Method.POST, "/hooks/github")
+            .header("X-Hub-Signature-256", "sha256=$signature").body(body)
+    }
+
+    @Given(
         "issue {long} of {string}, titled {string}, opens on the small GitHub once its issues are listed {int} times",
     )
     fun opensLater(number: Long, repository: String, title: String, times: Int) {

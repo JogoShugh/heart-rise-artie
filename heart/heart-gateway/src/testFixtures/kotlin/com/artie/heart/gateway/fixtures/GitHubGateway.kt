@@ -18,8 +18,16 @@ import java.nio.file.Path
  * forwarded to [github]. For clients' tests, in process, with no network.
  */
 object GitHubGateway {
-    /** With [validatorRequired] false, the gateway's development switch for acts with no validator is on. */
-    fun handler(github: GitHubUpstream, connector: Path, validatorRequired: Boolean = true): HttpHandler {
+    /**
+     * With [validatorRequired] false, the gateway's development switch for acts with no validator is on; with a
+     * [webhookSecret], it takes GitHub's webhooks signed with it, and holds reads that prefer to wait (Hub).
+     */
+    fun handler(
+        github: GitHubUpstream,
+        connector: Path,
+        validatorRequired: Boolean = true,
+        webhookSecret: String? = null,
+    ): HttpHandler {
         val mapper = ObjectMapper()
         val loaded = Connector.load(connector, mapper)
         val description = checkNotNull(GitHubUpstream::class.java.getResource("/github/openapi.json")).readText()
@@ -30,6 +38,7 @@ object GitHubGateway {
             upstreamUrl = "https://api.github.com",
         )
         val settings = HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired))
-        return gateway.handler(Credentials.forwarded(), settings)
+        val hub = webhookSecret?.let { com.artie.heart.gateway.Hub(it, "https://api.github.com", mapper) }
+        return gateway.handler(Credentials.forwarded(), settings, hub = hub)
     }
 }

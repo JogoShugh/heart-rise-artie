@@ -166,6 +166,12 @@ interface Navigator {
      */
     fun recall(address: String): Answer = visit(address)
 
+    /**
+     * The resource at [address] again, the server asked to hold the read up to [atMost] while nothing changed since
+     * this client last read it (spec/PLAN-LISTENERS.md, slice 6): a watch's poll. A client that can't ask reads it.
+     */
+    val awaiting: (address: String, atMost: kotlin.time.Duration) -> Answer get() = { address, _ -> visit(address) }
+
     /** Why the act [rel] is not offered, as the server says (SPEC §6.12); null when it says nothing. */
     fun why(rel: String): String?
 

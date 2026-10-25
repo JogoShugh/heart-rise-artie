@@ -18,6 +18,9 @@ interface Time {
     /** What a waiter waits on may hold now: each waiter looks again. */
     fun poke()
 
+    /** Whether a server may hold a read on this time: only on the real clock, as a server's wait takes real time. */
+    val held: Boolean get() = true
+
     /**
      * [block] as one of the watch's own threads runs it, counted as busy from now, before the thread starts, until
      * it ends, but while it waits.
@@ -57,6 +60,8 @@ class VirtualTime(start: java.time.Instant, private val grace: Duration = 1.seco
     private val waiting = mutableMapOf<Thread, java.time.Instant>()
 
     fun now(): java.time.Instant = lock.withLock { now }
+
+    override val held: Boolean get() = false
 
     /** Wait for [d] to pass: a run's pause. */
     fun pause(d: Duration) {

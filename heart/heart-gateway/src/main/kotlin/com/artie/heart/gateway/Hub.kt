@@ -70,7 +70,9 @@ class Hub(
             }
             answer = next(request)
         }
-        return answer.header("Preference-Applied", "wait=$wait")
+        // Beside what else the answer applied, the rung's forms and schema: one header, as RFC 7240 lists them.
+        val applied = listOfNotNull(answer.header(APPLIED), "wait=$wait").joinToString(", ")
+        return answer.replaceHeader(APPLIED, applied)
     }
 
     /** A webhook, taken only when signed with the secret: each address it names wakes the reads held of it. */
@@ -107,6 +109,7 @@ class Hub(
         /** Where GitHub's webhooks are taken. */
         const val PATH = "/hooks/github"
         private const val SIGNATURE = "X-Hub-Signature-256"
+        private const val APPLIED = "Preference-Applied"
         private const val HMAC = "HmacSHA256"
 
         /** The longest a read is held, in seconds, whatever it prefers. */

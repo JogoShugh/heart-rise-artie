@@ -48,8 +48,8 @@ fun Here.listeners(
     val watch = Watch(start, run.clock().plus(atMost.toJavaDuration()), AtomicBoolean(false))
     run.remember?.let { run.watching.keep(it) }
     val forks = listeners.map { run.fork() }
+    val polls = Polls(run, watch)
     val running = Executors.newVirtualThreadPerTaskExecutor().use { threads ->
-        val polls = Polls(run, watch, threads)
         val running = listeners.zip(forks).map { (listener, fork) ->
             threads.submit(run.time.thread { fork.listening(listener, watch, polls) })
         }
@@ -59,6 +59,7 @@ fun Here.listeners(
         } finally {
             watch.over.set(true)
             run.time.poke()
+            polls.close()
         }
         running
     }
