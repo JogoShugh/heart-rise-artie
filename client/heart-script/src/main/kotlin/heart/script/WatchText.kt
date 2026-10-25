@@ -26,9 +26,10 @@ internal const val ONCE_PARTS = 3
 
 /**
  * The parts of [parts] from [at] as one `actOnce`, when they are "say it, unless it's said already": a read that
- * opens nothing, a check that what it reached shows a text, and an act that opens nothing and sends that same text.
- * The act then checks with its own value, read again as the act sends it, so the two can't drift apart. Null when
- * they are anything else.
+ * opens nothing, a check that what it reached shows a text, and an act that opens nothing and sends that text, alone
+ * or within its words. The act then checks with its own whole value, read again as the act sends it, so the two
+ * can't drift apart: a check kept with the text one run saw (a wait's reason) would miss what the act says on
+ * another run, and say it again. Null when they are anything else.
  */
 internal fun saidOnce(parts: List<Chain.Part>, at: Int): String? {
     val read = parts.getOrNull(at) as? Chain.Act
@@ -37,9 +38,10 @@ internal fun saidOnce(parts: List<Chain.Part>, at: Int): String? {
     // The text a check looks for, written alone or as a list of one.
     val kept = check?.facts?.values?.singleOrNull()?.kept
     val said = kept as? String ?: (kept as? List<*>)?.singleOrNull() as? String
-    val sends = act?.chosen?.values?.values.orEmpty().map { it.kept }
+    // What the act sends holds the text, alone or within its words ("Not merged: <the reason>").
+    val sends = act?.chosen?.values?.values.orEmpty().mapNotNull { it.kept as? String }
     val fits = read != null && read.chosen.kind == "link" && !read.opens && act != null && !act.opens &&
-        act.chosen.kind != "link" && said != null && said in sends
+        act.chosen.kind != "link" && said != null && sends.any { said in it }
     return if (fits) {
         reach(act!!.chosen).replaceFirst("act(", "actOnce(").dropLast(1) +
             ", listedIn = ${kotlinString(read!!.chosen.relation, slots = false)}) {}"
