@@ -17,12 +17,14 @@ import kotlinx.serialization.json.JsonPrimitive
  */
 internal fun holds(facts: Map<String, Any?>, held: Representation): Boolean = facts.all { (member, wanted) ->
     val titles = held.links[member]?.takeIf { member !in held.state && member !in held.embedded }
-    val have: List<Any?>? = held.embedded[member]?.map { it.read["name"] ?: it.title }
-        ?: (State(held.state)[member] as? JsonArray)?.map(Values::plainOf)
+    // An embedded resource is named by its title, or by any of its own values: a user by its login, a label by its
+    // name; a value it holds names it.
+    val embedded = held.embedded[member]?.map { listOf(it.title) + it.state.values.map(Values::plainOf) }
+    val have: List<Any?>? = (State(held.state)[member] as? JsonArray)?.map(Values::plainOf)
+    val items = wanted as? List<*> ?: listOf(wanted)
     when {
-        titles != null -> (wanted as? List<*> ?: listOf(wanted)).all { item ->
-            titles.any { it != null && item.toString() in it }
-        }
+        titles != null -> items.all { item -> titles.any { it != null && item.toString() in it } }
+        embedded != null -> items.all { item -> embedded.any { names -> names.any { Values.same(it, item) } } }
         wanted is List<*> -> have != null && wanted.all { item -> have.any { Values.same(it, item) } }
         else -> Values.same(State(held.state)[member], wanted)
     }
