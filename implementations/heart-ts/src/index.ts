@@ -67,7 +67,12 @@ export class InvalidInput extends Refused {}
 export class RuleRefused extends Refused {}
 export class PreconditionRequired extends Refused {}
 export class NotAuthenticated extends Refused {}
+/** Not sent: a value is not among its property's choices, or a required one has none now. */
+export class NotAChoice extends Refused {}
 export class IntegrityFailure extends Error {}
+
+/** One choice for a property (HAL-SCHEMA-FORMS-HR Rule 8): the value sent, and the prompt shown. */
+export interface Choice { value: Json; prompt: string }
 
 export interface Options {
     rung?: Rung;
@@ -113,6 +118,8 @@ export class HeartClient {
         const held = this.held();
         const form = held.forms.get(name);
         if (!form) throw new Error(`${name} is not offered now; nothing was sent`);
+        const misfits = await this.misfits(form, held, fields);
+        if (misfits.length) throw new NotAChoice("not-a-choice", `${misfits.join("; ")}; nothing was sent`, 0, misfits);
         const target = new URL(this.expand(form, held, fields), held.url);
         if (form.method === "GET") {
             for (const [key, value] of Object.entries(fields)) {
@@ -136,6 +143,90 @@ export class HeartClient {
             return this.complete(url, response, Buffer.from(await response.arrayBuffer()));
         }
         throw await this.refusal(name, response);
+    }
+
+    // ---- Choices from state (HAL-SCHEMA-FORMS-HR Rule 8) ----
+
+    /**
+     * The choices of each property of the offered form [name] that carries
+     * `hr:options`, with [fields] filled so far: from the held resource, at a
+     * pointer that may name other fields, or from the resource a link names,
+     * read like any Layer 1 resource. Only items equal to every member of
+     * `where` are choices.
+     */
+    async choices(name: string, fields: JsonObject = {}): Promise<Record<string, Choice[]>> {
+        const held = this.held();
+        const form = held.forms.get(name);
+        if (!form) throw new Error(`${name} is not offered now`);
+        const result: Record<string, Choice[]> = {};
+        for (const [property, options] of declared(form.schema)) {
+            result[property] = await this.resolveChoices(options, held, fields);
+        }
+        return result;
+    }
+
+    /** One sentence per sent value that is not among its choices, or required property that has none now. */
+    private async misfits(form: Form, held: Representation, fields: JsonObject): Promise<string[]> {
+        const required = new Set((form.schema.required ?? []) as string[]);
+        const misfits: string[] = [];
+        for (const [property, options] of declared(form.schema)) {
+            const choices = await this.resolveChoices(options, held, fields);
+            const sent = fields[property];
+            if (sent === undefined) {
+                if (required.has(property) && !choices.length) misfits.push(`${property} has no choices now`);
+                continue;
+            }
+            const allowed = new Set(choices.map((c) => JSON.stringify(c.value)));
+            const outside = (Array.isArray(sent) ? sent : [sent]).find((v) => !allowed.has(JSON.stringify(v)));
+            if (outside !== undefined) misfits.push(`${property}: ${String(outside)} is not one of the choices`);
+        }
+        return misfits;
+    }
+
+    private async resolveChoices(options: JsonObject, held: Representation, fields: JsonObject): Promise<Choice[]> {
+        let items: Json | undefined;
+        if (typeof options.pointer === "string") {
+            // The pointer's {name}s are other fields of the form, escaped as RFC 6901 asks.
+            const pointer = options.pointer.replace(/\{([^}]+)\}/g, (_, field: string) =>
+                String(fields[field] ?? "").replace(/~/g, "~0").replace(/\//g, "~1"));
+            items = resolve(held.state, pointer);
+        } else if (options.link && typeof options.link === "object") {
+            const link = options.link as JsonObject;
+            const pointers = (options.templatePointers ?? {}) as Record<string, string>;
+            const href = link.templated === true ? fill(String(link.href), pointers, held.state, fields) : String(link.href);
+            const answer = await this.plain(new URL(href, held.url).toString());
+            items = typeof options.items === "string" && answer !== undefined ? resolve(answer, options.items) : answer;
+        }
+        const where = (options.where ?? {}) as JsonObject;
+        const value = typeof options.valueField === "string" ? options.valueField : "value";
+        const prompt = typeof options.promptField === "string" ? options.promptField : "prompt";
+        if (!Array.isArray(items)) return [];
+        return items.flatMap((item): Choice[] => {
+            if (item !== null && typeof item === "object" && !Array.isArray(item)) {
+                const matches = Object.entries(where).every(([k, v]) => JSON.stringify(item[k]) === JSON.stringify(v));
+                if (!matches || item[value] === undefined) return [];
+                return [{ value: item[value], prompt: String(item[prompt] ?? item[value]) }];
+            }
+            const scalar = Object.keys(where).length === 0 && item !== null && typeof item !== "object";
+            return scalar ? [{ value: item, prompt: String(item) }] : [];
+        });
+    }
+
+    /** What the client last read of each plain JSON resource, to revalidate it with its ETag. */
+    private readonly plainReads = new Map<string, { etag: string; body: Json }>();
+
+    /** A plain JSON resource, read as Layer 1 is (SPEC §6.1): no-cache, revalidated by its ETag. */
+    private async plain(url: string): Promise<Json | undefined> {
+        const kept = this.plainReads.get(url);
+        const headers: Record<string, string> = { Accept: "application/json", "Cache-Control": "no-cache" };
+        if (kept) headers["If-None-Match"] = kept.etag;
+        const response = await this.send(url, { headers });
+        if (response.status === 304 && kept) return kept.body;
+        if (!response.ok) return undefined;
+        const body = (await response.json()) as Json;
+        const etag = response.headers.get("ETag");
+        if (etag) this.plainReads.set(url, { etag, body });
+        return body;
     }
 
     // ---- Sync: Layer 1, then, above L0, the affordance set and its schemas ----
@@ -216,25 +307,7 @@ export class HeartClient {
     // ---- Templates: pointer, then field, then the owning resource's member ----
 
     private expand(form: Form, held: Representation, fields: JsonObject): string {
-        if (!form.templated) return form.target;
-        return form.target.replace(/\{([^}]+)\}/g, (_, name: string) => {
-            // A query expression ({?tag,count}): each field given, by name; none given, nothing.
-            if (name.startsWith("?")) {
-                const pairs = name.slice(1).split(",").filter((key) => fields[key] !== undefined && fields[key] !== null)
-                    .flatMap((key) => {
-                        const value = fields[key];
-                        const values = Array.isArray(value) ? value : [value];
-                        return values.map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(String(v))}`);
-                    });
-                return pairs.length ? `?${pairs.join("&")}` : "";
-            }
-            const pointer = form.templatePointers[name];
-            const value = pointer !== undefined ? resolve(held.state, pointer) : fields[name] ?? held.state[name];
-            if (typeof value !== "string" && typeof value !== "number") {
-                throw new Error(`the template variable ${name} has no string or number value; nothing was sent`);
-            }
-            return encodeURIComponent(String(value));
-        });
+        return form.templated ? fill(form.target, form.templatePointers, held.state, fields) : form.target;
     }
 
     // ---- The wire ----
@@ -295,6 +368,39 @@ export class HeartClient {
         if (!this.current) throw new Error("enter a service first");
         return this.current;
     }
+}
+
+/**
+ * A template filled as Rule 1 fills a target: each variable from its template
+ * pointer into [state], else from [fields], else from the state's member.
+ */
+function fill(template: string, pointers: Record<string, string>, state: JsonObject, fields: JsonObject): string {
+    return template.replace(/\{([^}]+)\}/g, (_, name: string) => {
+        // A query expression ({?tag,count}): each value found, by name; none found, nothing.
+        if (name.startsWith("?")) {
+            const pairs = name.slice(1).split(",").flatMap((key) => {
+                const value = pointers[key] !== undefined ? resolve(state, pointers[key]) : fields[key];
+                if (value === undefined || value === null) return [];
+                return (Array.isArray(value) ? value : [value])
+                    .map((v) => `${encodeURIComponent(key)}=${encodeURIComponent(String(v))}`);
+            });
+            return pairs.length ? `?${pairs.join("&")}` : "";
+        }
+        const pointer = pointers[name];
+        const value = pointer !== undefined ? resolve(state, pointer) : fields[name] ?? state[name];
+        if (typeof value !== "string" && typeof value !== "number") {
+            throw new Error(`the template variable ${name} has no string or number value; nothing was sent`);
+        }
+        return encodeURIComponent(String(value));
+    });
+}
+
+/** The properties of [schema] that carry `hr:options`, with it. */
+function declared(schema: JsonObject): [string, JsonObject][] {
+    return Object.entries((schema.properties ?? {}) as JsonObject).flatMap(([name, property]) => {
+        const options = (property as JsonObject | null)?.["hr:options"];
+        return options && typeof options === "object" && !Array.isArray(options) ? [[name, options as JsonObject]] : [];
+    });
 }
 
 /** A JSON Pointer (RFC 6901) into a JSON value. */

@@ -118,7 +118,9 @@ Then("the water act was sent once", function () {
 Then("it was refused before sending, because {string}", function (text) {
     assert.ok(this.error, "expected a refusal");
     assert.ok(this.error.message.includes(text), this.error.message);
-    assert.equal(this.me.log.length, this.sentBefore, "something was sent");
+    // Reading may happen, as reading a form's choices does; nothing that acts may go.
+    const sent = this.me.log.slice(this.sentBefore).filter((r) => r.method !== "GET");
+    assert.deepEqual(sent, [], "something was sent");
 });
 
 // ---- A service that sends an affordance set whose bytes do not match its link ----
@@ -183,4 +185,112 @@ Then("the state has exactly these members", function (table) {
 
 Then("it refused the affordance set for its integrity", function () {
     assert.ok(this.error instanceof heart.IntegrityFailure, `expected an integrity failure, got ${this.error}`);
+});
+
+// ---- Choices from state (HAL-SCHEMA-FORMS-HR Rule 8) ----
+
+Given("a service whose game takes its players and its agents from state", async function () {
+    const profile = `<${heart.PROFILE}>; rel="profile"`;
+    const player = (number, name, fouledOut = false) => ({ number, name, fouledOut });
+    const game = {
+        sport: "basketball",
+        home: { players: [player(4, "Ana"), player(7, "Bea", true), player(9, "Cy")] },
+        away: { players: [player(3, "Dee")] },
+        _links: { self: { href: "/" } },
+        _forms: {
+            "record-foul": {
+                _links: { target: { href: "/actions/record-foul" } }, method: "POST",
+                schema: {
+                    type: "object", required: ["team", "playerNumber"],
+                    properties: {
+                        team: { type: "string", enum: ["home", "away"] },
+                        playerNumber: {
+                            type: "integer",
+                            "hr:options": {
+                                pointer: "/{team}/players", valueField: "number", promptField: "name",
+                                where: { fouledOut: false }, maxItems: 1,
+                            },
+                        },
+                    },
+                },
+            },
+            "call-agent": {
+                _links: { target: { href: "/actions/call-agent" } }, method: "POST",
+                schema: {
+                    type: "object", required: ["agent"],
+                    properties: {
+                        agent: {
+                            type: "string",
+                            "hr:options": {
+                                link: { href: "/agents{?skill}", templated: true },
+                                templatePointers: { skill: "/sport" }, items: "/agents",
+                                valueField: "login", promptField: "name", where: { onDuty: true },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    };
+    const agent = (login, name, skill, onDuty) => ({ login, name, skill, onDuty });
+    const agents = [
+        agent("priya", "Priya", "basketball", true), agent("marco", "Marco", "basketball", false),
+        agent("lena", "Lena", "basketball", true), agent("tom", "Tom", "football", true),
+    ];
+    this.fakeLog = [];
+    this.fake = http.createServer((req, res) => {
+        const url = new URL(req.url, "http://fake");
+        const seen = { method: req.method, url: req.url, ifNoneMatch: req.headers["if-none-match"] };
+        this.fakeLog.push(seen);
+        if (url.pathname === "/agents") {
+            const skill = url.searchParams.get("skill");
+            const etag = `"agents-${skill}"`;
+            seen.status = req.headers["if-none-match"] === etag ? 304 : 200;
+            res.writeHead(seen.status, { "Content-Type": "application/json", ETag: etag, "Cache-Control": "no-cache" });
+            return res.end(seen.status === 304 ? undefined : JSON.stringify({ agents: agents.filter((a) => a.skill === skill) }));
+        }
+        seen.status = 200;
+        res.writeHead(200, { "Content-Type": "application/hal+json", Link: profile, ETag: '"1"' });
+        res.end(JSON.stringify(game));
+    });
+    await new Promise((ok) => this.fake.listen(0, "127.0.0.1", ok));
+    this.fakeUrl = `http://127.0.0.1:${this.fake.address().port}/`;
+});
+
+/** The choices as a table shows them: each value as written, and its prompt. */
+const rows = (choices) => choices.map((c) => ({ value: String(c.value), prompt: c.prompt }));
+
+Then("the choices for {string} of {string}, by {string}, are", async function (property, form, field, table) {
+    const expected = table.hashes();
+    for (const value of [...new Set(expected.map((r) => r[field]))]) {
+        const choices = await this.me.heart.choices(form, { [field]: value });
+        const want = expected.filter((r) => r[field] === value).map(({ value, prompt }) => ({ value, prompt }));
+        assert.deepEqual(rows(choices[property] ?? []), want, `${field} ${value}`);
+    }
+});
+
+Then("the choices for {string} of {string} are", async function (property, form, table) {
+    const choices = await this.me.heart.choices(form, {});
+    assert.deepEqual(rows(choices[property] ?? []), table.hashes());
+});
+
+Then("the agents were read at {string}", function (path) {
+    assert.deepEqual(this.fakeLog.filter((r) => r.url.startsWith("/agents")).map((r) => r.url), [path]);
+});
+
+When("it resolves the choices for {string} of {string} twice", async function (property, form) {
+    await this.me.heart.choices(form, {});
+    await this.me.heart.choices(form, {});
+});
+
+Then("the second read of the agents carried the ETag of the first, and was answered 304", function () {
+    const reads = this.fakeLog.filter((r) => r.url.startsWith("/agents"));
+    assert.equal(reads.length, 2, JSON.stringify(reads));
+    assert.equal(reads[0].status, 200);
+    assert.equal(reads[1].ifNoneMatch, '"agents-basketball"');
+    assert.equal(reads[1].status, 304);
+});
+
+Then("the act {string} was sent once", function (form) {
+    assert.equal(this.fakeLog.filter((r) => r.method === "POST" && r.url === `/actions/${form}`).length, 1);
 });

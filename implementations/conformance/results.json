@@ -1,5 +1,703 @@
 [
   {
+    "description": "  HAL-SCHEMA-FORMS-HR Rule 8: a property of a form may take its choices from\n  state, with hr:options. They come from the resource that offers the form,\n  at a JSON Pointer that may name another field of the same form, or from\n  another resource, read like any Layer 1 resource. Only items whose members\n  equal every one of \"where\" are choices. A client offers only those, and\n  sends no value outside them.\n\n  The service here is a small one the steps serve. It has one game. The\n  game's sport is basketball. Its home players are 4 Ana and 9 Cy, and 7 Bea,\n  who has fouled out; its away player is 3 Dee. Its agents are Priya and Lena,\n  on duty, and Marco, off duty, all for basketball, and Tom for football.\n  The game offers record-foul, whose playerNumber is one of the chosen team's\n  players who have not fouled out, and call-agent, whose agent is one of the\n  agents for the game's sport who are on duty.",
+    "elements": [
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-choice-that-depends-on-another-field:-the-chosen-team's-players-who-have-not-fouled-out",
+        "keyword": "Scenario",
+        "line": 22,
+        "name": "A choice that depends on another field: the chosen team's players who have not fouled out",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 360874
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1668749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 73958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 14186125
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "team",
+                      "value",
+                      "prompt"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "home",
+                      "4",
+                      "Ana"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "home",
+                      "9",
+                      "Cy"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "away",
+                      "3",
+                      "Dee"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 23,
+            "name": "the choices for \"playerNumber\" of \"record-foul\", by \"team\", are",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:263"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 556375
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 155792
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;choices-from-another-resource,-its-address-filled-from-the-game's-state",
+        "keyword": "Scenario",
+        "line": 29,
+        "name": "Choices from another resource, its address filled from the game's state",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 14708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 270749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 26959
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2108249
+            }
+          },
+          {
+            "arguments": [
+              {
+                "rows": [
+                  {
+                    "cells": [
+                      "value",
+                      "prompt"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "priya",
+                      "Priya"
+                    ]
+                  },
+                  {
+                    "cells": [
+                      "lena",
+                      "Lena"
+                    ]
+                  }
+                ]
+              }
+            ],
+            "keyword": "Then ",
+            "line": 30,
+            "name": "the choices for \"agent\" of \"call-agent\" are",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:272"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1363166
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 34,
+            "name": "the agents were read at \"/agents?skill=basketball\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:277"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 46915
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 45249
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;the-other-resource-is-revalidated,-not-read-again-in-full",
+        "keyword": "Scenario",
+        "line": 36,
+        "name": "The other resource is revalidated, not read again in full",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 11499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 147334
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 40917
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1212416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 37,
+            "name": "it resolves the choices for \"agent\" of \"call-agent\" twice",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:281"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1507374
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 38,
+            "name": "the second read of the agents carried the ETag of the first, and was answered 304",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:286"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 33458
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36207
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-outside-the-choices-is-refused-before-anything-is-sent:-a-player-who-fouled-out",
+        "keyword": "Scenario Outline",
+        "line": 46,
+        "name": "A value outside the choices is refused before anything is sent: a player who fouled out",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 18875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 169708
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 33915
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1256208
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 41,
+            "name": "it tries to submit \"record-foul\" with {\"team\": \"home\", \"playerNumber\": 7}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 269499
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 42,
+            "name": "it was refused before sending, because \"playerNumber: 7 is not one of the choices\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:118"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 34207
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 30917
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-outside-the-choices-is-refused-before-anything-is-sent:-a-player-of-the-other-team",
+        "keyword": "Scenario Outline",
+        "line": 47,
+        "name": "A value outside the choices is refused before anything is sent: a player of the other team",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6541
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 95083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 12875
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1015625
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 41,
+            "name": "it tries to submit \"record-foul\" with {\"team\": \"away\", \"playerNumber\": 4}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 61333
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 42,
+            "name": "it was refused before sending, because \"playerNumber: 4 is not one of the choices\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:118"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 20999
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36500
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-outside-the-choices-is-refused-before-anything-is-sent:-an-agent-off-duty",
+        "keyword": "Scenario Outline",
+        "line": 48,
+        "name": "A value outside the choices is refused before anything is sent: an agent off duty",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6334
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 85457
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 12666
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1128958
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 41,
+            "name": "it tries to submit \"call-agent\" with {\"agent\": \"marco\"}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:58"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 1280874
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 42,
+            "name": "it was refused before sending, because \"agent: marco is not one of the choices\"",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:118"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 28500
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 36750
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      },
+      {
+        "description": "",
+        "id": "a-form's-choices-from-state;a-value-among-the-choices-is-sent",
+        "keyword": "Scenario",
+        "line": 50,
+        "name": "A value among the choices is sent",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 6416
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 18,
+            "name": "a service whose game takes its players and its agents from state",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:192"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 88707
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "And ",
+            "line": 19,
+            "name": "a client at rung L0 with no credential",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:41"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 54083
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 20,
+            "name": "it enters that service",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 985749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "When ",
+            "line": 51,
+            "name": "it submits \"record-foul\" with {\"team\": \"home\", \"playerNumber\": 9}",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:53"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 2535749
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Then ",
+            "line": 52,
+            "name": "the act \"record-foul\" was sent once",
+            "match": {
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:294"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 30958
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 31958
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "a-form's-choices-from-state",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "A form's choices from state",
+    "tags": [],
+    "uri": "features/choices.feature"
+  },
+  {
     "description": "  The client side of HEART conformance, written from the specification and\n  the Internet-Draft. Any client can be held to it; heart-ts is the first\n  run against it. The service is the reference garden: bed 1 is empty, bed 2\n  is planted with tomato at moisture 40, and every request needs the garden's\n  credential. Nothing here names a URI the client should build: it enters at\n  the bookmark and goes on from what each representation offers.",
     "elements": [
       {
@@ -14,7 +712,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 471041
+              "duration": 12957
             }
           },
           {
@@ -27,7 +725,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 141396750
+              "duration": 118511500
             }
           },
           {
@@ -40,7 +738,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 167417
+              "duration": 85332
             }
           },
           {
@@ -53,7 +751,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 63004542
+              "duration": 35740667
             }
           },
           {
@@ -66,7 +764,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 227351708
+              "duration": 180757832
             }
           },
           {
@@ -79,7 +777,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 106791
+              "duration": 66707
             }
           },
           {
@@ -92,7 +790,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 33832
+              "duration": 17249
             }
           },
           {
@@ -105,7 +803,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 368124
+              "duration": 37000
             }
           },
           {
@@ -118,7 +816,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 196166
+              "duration": 82333
             }
           },
           {
@@ -126,7 +824,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 71250
+              "duration": 3417
             }
           }
         ],
@@ -145,7 +843,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 88166
+              "duration": 21666
             }
           },
           {
@@ -158,7 +856,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 116433792
+              "duration": 106940749
             }
           },
           {
@@ -171,7 +869,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 153999
+              "duration": 64042
             }
           },
           {
@@ -184,7 +882,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 3019290
+              "duration": 2328499
             }
           },
           {
@@ -197,7 +895,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 24956667
+              "duration": 19073125
             }
           },
           {
@@ -210,7 +908,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 60707
+              "duration": 37166
             }
           },
           {
@@ -223,7 +921,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 23624
+              "duration": 10292
             }
           },
           {
@@ -236,7 +934,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 30375
+              "duration": 20791
             }
           },
           {
@@ -249,7 +947,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 52333
+              "duration": 23790
             }
           },
           {
@@ -257,7 +955,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 16250
+              "duration": 3209
             }
           }
         ],
@@ -276,7 +974,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 11708
+              "duration": 3958
             }
           },
           {
@@ -289,7 +987,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 110915750
+              "duration": 90663957
             }
           },
           {
@@ -302,7 +1000,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 62332
+              "duration": 70249
             }
           },
           {
@@ -315,7 +1013,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 2683124
+              "duration": 2143875
             }
           },
           {
@@ -328,7 +1026,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 13480584
+              "duration": 10160291
             }
           },
           {
@@ -341,7 +1039,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 81598375
+              "duration": 68546458
             }
           },
           {
@@ -354,7 +1052,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 114416
+              "duration": 69624
             }
           },
           {
@@ -367,7 +1065,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 52790
+              "duration": 35833
             }
           },
           {
@@ -380,7 +1078,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 27625
+              "duration": 21833
             }
           },
           {
@@ -388,7 +1086,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 6792
+              "duration": 3832
             }
           }
         ],
@@ -407,7 +1105,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 7625
+              "duration": 3249
             }
           },
           {
@@ -420,7 +1118,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 108335457
+              "duration": 100500874
             }
           },
           {
@@ -433,7 +1131,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 67208
+              "duration": 82541
             }
           },
           {
@@ -446,7 +1144,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 61249
+              "duration": 65708
             }
           },
           {
@@ -459,7 +1157,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 2275458
+              "duration": 2083249
             }
           },
           {
@@ -472,7 +1170,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 10394000
+              "duration": 9953875
             }
           },
           {
@@ -485,7 +1183,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 30150292
+              "duration": 29571374
             }
           },
           {
@@ -498,7 +1196,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 33819334
+              "duration": 29513250
             }
           },
           {
@@ -511,7 +1209,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 59792
+              "duration": 65499
             }
           },
           {
@@ -524,7 +1222,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 39040
+              "duration": 31082
             }
           },
           {
@@ -537,7 +1235,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 16834
+              "duration": 13500
             }
           },
           {
@@ -545,7 +1243,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 9040
+              "duration": 6540
             }
           }
         ],
@@ -564,7 +1262,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 5000
+              "duration": 3041
             }
           },
           {
@@ -577,7 +1275,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 232121709
+              "duration": 93769082
             }
           },
           {
@@ -590,7 +1288,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 73834
+              "duration": 57624
             }
           },
           {
@@ -603,7 +1301,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 2673790
+              "duration": 1866999
             }
           },
           {
@@ -616,7 +1314,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 13412417
+              "duration": 8749249
             }
           },
           {
@@ -629,7 +1327,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 22263584
+              "duration": 14178167
             }
           },
           {
@@ -642,7 +1340,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 41207
+              "duration": 35249
             }
           },
           {
@@ -655,7 +1353,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 40666
+              "duration": 40124
             }
           },
           {
@@ -663,7 +1361,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 7500
+              "duration": 7458
             }
           }
         ],
@@ -682,7 +1380,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 4541
+              "duration": 3500
             }
           },
           {
@@ -695,7 +1393,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 109698916
+              "duration": 98225333
             }
           },
           {
@@ -708,7 +1406,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 66500
+              "duration": 45916
             }
           },
           {
@@ -721,7 +1419,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 2215416
+              "duration": 1849082
             }
           },
           {
@@ -734,7 +1432,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 10954207
+              "duration": 8804999
             }
           },
           {
@@ -747,7 +1445,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 16270041
+              "duration": 9315749
             }
           },
           {
@@ -760,7 +1458,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 50999
+              "duration": 30416
             }
           },
           {
@@ -773,7 +1471,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 26416
+              "duration": 18791
             }
           },
           {
@@ -781,7 +1479,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 8833
+              "duration": 3166
             }
           }
         ],
@@ -800,7 +1498,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 7833
+              "duration": 3332
             }
           },
           {
@@ -813,7 +1511,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 116260958
+              "duration": 106515333
             }
           },
           {
@@ -826,7 +1524,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 62250
+              "duration": 62750
             }
           },
           {
@@ -839,7 +1537,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 1772458
+              "duration": 2053750
             }
           },
           {
@@ -852,7 +1550,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 8380875
+              "duration": 9635582
             }
           },
           {
@@ -865,7 +1563,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 65417
+              "duration": 91083
             }
           },
           {
@@ -878,7 +1576,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 55374
+              "duration": 29915
             }
           },
           {
@@ -886,7 +1584,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 10874
+              "duration": 4250
             }
           }
         ],
@@ -905,7 +1603,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 4666
+              "duration": 3791
             }
           },
           {
@@ -918,7 +1616,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 113031416
+              "duration": 93312375
             }
           },
           {
@@ -931,7 +1629,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 62667
+              "duration": 51875
             }
           },
           {
@@ -944,7 +1642,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 1752250
+              "duration": 1688791
             }
           },
           {
@@ -957,7 +1655,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 52310582
+              "duration": 45506957
             }
           },
           {
@@ -970,7 +1668,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 9121334
+              "duration": 8363916
             }
           },
           {
@@ -983,7 +1681,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 44916
+              "duration": 53040
             }
           },
           {
@@ -991,7 +1689,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 4374
+              "duration": 6832
             }
           }
         ],
@@ -1010,7 +1708,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 5040
+              "duration": 3332
             }
           },
           {
@@ -1023,7 +1721,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 101458040
+              "duration": 98154457
             }
           },
           {
@@ -1036,7 +1734,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 89042
+              "duration": 46374
             }
           },
           {
@@ -1049,7 +1747,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 1277707
+              "duration": 1348250
             }
           },
           {
@@ -1062,7 +1760,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 28416
+              "duration": 26624
             }
           },
           {
@@ -1070,7 +1768,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 4791
+              "duration": 5959
             }
           }
         ],
@@ -1089,7 +1787,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 5499
+              "duration": 3500
             }
           },
           {
@@ -1102,7 +1800,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 104069374
+              "duration": 101116209
             }
           },
           {
@@ -1111,11 +1809,11 @@
             "line": 79,
             "name": "a service whose affordance set does not match the integrity of its link",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:126"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:128"
             },
             "result": {
               "status": "passed",
-              "duration": 1994041
+              "duration": 346334
             }
           },
           {
@@ -1128,7 +1826,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 39333
+              "duration": 23875
             }
           },
           {
@@ -1137,11 +1835,11 @@
             "line": 81,
             "name": "it tries to enter that service",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:140"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:142"
             },
             "result": {
               "status": "passed",
-              "duration": 6027916
+              "duration": 2051832
             }
           },
           {
@@ -1150,11 +1848,11 @@
             "line": 82,
             "name": "it refused the affordance set for its integrity",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:184"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:186"
             },
             "result": {
               "status": "passed",
-              "duration": 42540
+              "duration": 27334
             }
           },
           {
@@ -1162,7 +1860,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 178292
+              "duration": 90875
             }
           }
         ],
@@ -1181,7 +1879,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 4667
+              "duration": 3750
             }
           },
           {
@@ -1194,7 +1892,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 122747499
+              "duration": 102370625
             }
           },
           {
@@ -1207,7 +1905,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 85708
+              "duration": 55375
             }
           },
           {
@@ -1220,7 +1918,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 1996042
+              "duration": 1828500
             }
           },
           {
@@ -1233,7 +1931,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 9165082
+              "duration": 8512500
             }
           },
           {
@@ -1261,11 +1959,11 @@
             "line": 88,
             "name": "it holds these embedded resources",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:146"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:148"
             },
             "result": {
               "status": "passed",
-              "duration": 165707
+              "duration": 125792
             }
           },
           {
@@ -1274,11 +1972,11 @@
             "line": 91,
             "name": "it read no bed on its own",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:151"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:153"
             },
             "result": {
               "status": "passed",
-              "duration": 93041
+              "duration": 93542
             }
           },
           {
@@ -1286,7 +1984,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 7082
+              "duration": 4333
             }
           }
         ],
@@ -1305,7 +2003,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 3833
+              "duration": 3834
             }
           },
           {
@@ -1318,7 +2016,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 108949500
+              "duration": 107353791
             }
           },
           {
@@ -1327,11 +2025,11 @@
             "line": 94,
             "name": "a service whose resource embeds its author, and keeps a member named \"_note\"",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:156"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:158"
             },
             "result": {
               "status": "passed",
-              "duration": 393042
+              "duration": 316832
             }
           },
           {
@@ -1344,7 +2042,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 18832
+              "duration": 17624
             }
           },
           {
@@ -1353,11 +2051,11 @@
             "line": 96,
             "name": "it enters that service",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:176"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:178"
             },
             "result": {
               "status": "passed",
-              "duration": 1555417
+              "duration": 1037291
             }
           },
           {
@@ -1386,11 +2084,11 @@
             "line": 97,
             "name": "the state has exactly these members",
             "match": {
-              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:180"
+              "location": "file:/Users/josh/repos/artie/implementations/conformance/features/support/steps.mjs:182"
             },
             "result": {
               "status": "passed",
-              "duration": 62875
+              "duration": 43125
             }
           },
           {
@@ -1403,7 +2101,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 1190415
+              "duration": 679542
             }
           },
           {
@@ -1416,7 +2114,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 30791
+              "duration": 20416
             }
           },
           {
@@ -1429,7 +2127,7 @@
             },
             "result": {
               "status": "passed",
-              "duration": 21083
+              "duration": 18917
             }
           },
           {
@@ -1437,7 +2135,7 @@
             "hidden": true,
             "result": {
               "status": "passed",
-              "duration": 46374
+              "duration": 41832
             }
           }
         ],
