@@ -1,6 +1,6 @@
 # Plan: listeners, not one loop
 
-Status: chosen 2026-10-24. Slices 0, 1, 2, 3 and 8 done; see "As built" at the end.
+Status: chosen 2026-10-24. Slices 0 to 4 and 8 done; see "As built" at the end.
 
 ## The problem
 
@@ -136,3 +136,10 @@ Each slice starts with its feature, seen red at test level, then made green.
   no thread finds more time passed than the others let pass.
 - **Give up as a timeout (slice 3).** A `once` that waits keeps when it gives up (`Watching.ends`); its listener
   wakes then, whether or not anything it read changed, and its Otherwise runs at that time, not at a later look.
+- **By and says (slice 4, `ByAndSays.kt`).** `whenever(by = …, says = …)` keeps the members someone made, a person
+  or bot the member embeds under its author, user or creator relation (by its title or one of its own values), whose
+  words hold the text, in any case. In a goal, `by <who>` and `says "<text>"` in a Whenever's words become those
+  filters; a match they say all of ("an issue by {bot} says "failed"") needs no check decided, and the script made
+  from the run writes them as they are. A comment thread is listened to like any list: its page is polled, and a
+  new comment is a hint. What a look saw of a resource is what it first read there (or what its own write
+  answered), so a change that lands while the look reads again at a block's end still makes a hint.

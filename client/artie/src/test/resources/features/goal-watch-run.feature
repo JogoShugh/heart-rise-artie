@@ -1505,6 +1505,56 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the run noted
       | note |
 
+  Scenario: A Whenever's words by and says keep only what someone made saying so, and need no check decided
+    spec/PLAN-LISTENERS.md, slice 4. "by {bot}" keeps the members the bot
+    made, and "says" those whose words hold the text, in any case, as the
+    watch reads each member: the planner decides no check for them, and the
+    script made from the run says them as they are. Only the bot's failure
+    is closed: not its pass, nor ada's issue that says failed.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                        | state | author       |
+      | 11     | Veracode scan FAILED: 2 high | open  | veracode-bot |
+      | 12     | Veracode scan passed         | open  | veracode-bot |
+      | 13     | Why has the scan failed?     | open  | ada          |
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 3 times
+    And the file "bot.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        bot: veracode-bot
+      ---
+
+      Close each failed scan the bot reports.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue by {bot} says "failed" `as scan`
+        - Close it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                | opens | relation | facts               |
+      | act   | open issue 10 of acme/rockets        | yes   |          |                     |
+      | done  |                                      |       |          |                     |
+      | act   | list the open issues of acme/rockets | yes   |          |                     |
+      | act   | close it                             |       |          |                     |
+      | done  |                                      |       |          |                     |
+      | check |                                      |       |          | {"state": "closed"} |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                   |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+      | github:close                | {}                                                       |
+    When the goal "bot.goal.md" runs with ARTIE, captured in "bot.trace.yaml", given
+      | name | value        |
+      | bot  | veracode-bot |
+    Then the run finished
+    And issue 11 of "acme/rockets" is now "closed" on the small GitHub
+    And issue 12 of "acme/rockets" is now "open" on the small GitHub
+    And issue 13 of "acme/rockets" is now "open" on the small GitHub
+    And the planner was asked 6 times
+    And the capture "bot.trace.yaml" keeps a watch script with a line with "whenever(by = bot, says = \"failed\") {"
+
   Scenario: An embedded resource is named by any of its own values, as its login names an assignee
     Found by the live seed bench run b20: "Every alert is assigned to the
     grower" was checked as the assignees embedding the grower, and held on

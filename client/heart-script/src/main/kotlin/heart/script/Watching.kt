@@ -118,15 +118,17 @@ internal fun Here.attempt(start: String, failed: String, block: Here.() -> Unit)
 
 /**
  * Visit each member the held list links under [rel], as `members` does; in a watch, only those new or changed since
- * the last look, and those a `once` still waits on.
+ * the last look, and those a `once` still waits on. With [by], only those it made; with [says], only those whose words
+ * hold it, in any case (spec/PLAN-LISTENERS.md, slice 4).
  */
-fun Here.whenever(rel: String = "item", block: Here.() -> Unit) {
+fun Here.whenever(rel: String = "item", by: String? = null, says: String? = null, block: Here.() -> Unit) {
     val watching = run.watching
     members(rel) {
         val address = held.address
         val now = held.state.toString()
         val changed = watching.seen.put(address, now) != now
-        if (!watching.active || changed || watching.waitsOn(address)) {
+        val due = !watching.active || changed || watching.waitsOn(address)
+        if (due && held.kept(by, says)) {
             try {
                 block()
             } finally {

@@ -98,6 +98,39 @@ Feature: Listeners, each on its own: a slow one never holds up another
       | second: 1 open  |
       | second: 2 open  |
 
+  Scenario: A listener on a comment thread answers only what a bot says: whenever, by whom, saying what
+    spec/PLAN-LISTENERS.md, slice 4. `by` keeps the members someone made:
+    a person or a bot the member embeds as its author, by its title or one
+    of its own values. `says` keeps those whose words hold the text, in any
+    case. Ada's question and the bot's pass are left; the failure the bot
+    reports once the thread has been read twice is answered, once.
+    Given issue 10 of "acme/rockets" has these comments on the small GitHub
+      | id | author       | body                    |
+      | 1  | ada          | Did the scan fail?      |
+      | 2  | veracode-bot | Veracode scan passed.   |
+    And "veracode-bot" comments "Veracode scan FAILED: 2 high." on issue 10 of "acme/rockets" on the small GitHub once its comments are listed 2 times
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.milliseconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          listeners(every = 100.milliseconds, until = { ++looks >= 8 }) {
+              listen("veracode", every = 50.milliseconds) {
+                  act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
+                      follow("github:issues-list-comments") {
+                          whenever(by = "veracode-bot", says = "failed") { note("answered: ${state["body"]}") }
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted
+      | note                                    |
+      | answered: Veracode scan FAILED: 2 high. |
+
   Scenario: A wait gives up at its time, however seldom its listener looks
     spec/PLAN-LISTENERS.md, slice 3. A `once` that waits sets a timeout for
     its give-up; the listener looks again when it runs out, whether or not

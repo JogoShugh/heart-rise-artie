@@ -125,7 +125,26 @@ sealed interface Step {
         override val line: Int,
         val name: String? = null,
         val children: List<Step> = emptyList(),
-    ) : Step
+    ) : Step {
+        /** Who made the members it answers, as its words say `by <who>` (spec/PLAN-LISTENERS.md, slice 4). */
+        val by: String? = BY.find(match)?.groupValues?.get(1)
+
+        /** What the members it answers say, as its words say `says "<text>"`. */
+        val says: String? = SAYS.find(match)?.groupValues?.get(1)
+
+        /**
+         * Whether [by] and [says] say all its match does: what is left is a kind of resource and how it changes, so
+         * no check is decided for it.
+         */
+        val saidByWords: Boolean = (by != null || says != null) &&
+            KIND.matches(match.replace(BY, "").replace(SAYS, "").trim())
+
+        private companion object {
+            val BY = Regex("""\bby\s+(\{\w+}|[\w.\-\[\]]+)""")
+            val SAYS = Regex("""\bsays\s+"([^"]*)"""")
+            val KIND = Regex("""(?:an?|any|each)\s+[\w-]+(?:\s+(?:changes|comes|appears|is added))?""")
+        }
+    }
 
     /** `Until …`: when the watch ends: once [condition] holds. */
     class Until(val condition: String, override val line: Int) : Step

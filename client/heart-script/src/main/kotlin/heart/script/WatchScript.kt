@@ -99,9 +99,11 @@ internal class WatchScript(
     private fun look(step: Step.Whenever, depth: Int) {
         val list = decided.lists[step] ?: return out.said(depth, "${fill(step.match)}: no list decided in this run")
         out.open(depth, reach(list)) { inside ->
-            out.open(inside, "whenever") { member ->
+            out.open(inside, whenever(step)) { member ->
                 val match = decided.matches[step]
-                if (match == null) {
+                if (step.saidByWords) {
+                    children(step.children, member)
+                } else if (match == null) {
                     out.said(member, "${fill(step.match)}: no member matched in this run")
                 } else {
                     out.open(member, "if (holds(${bound(match.facts)}))") { children(step.children, it) }
@@ -165,6 +167,16 @@ internal class WatchScript(
         const val ACT = "act"
         const val OTHERWISE = "otherwise"
     }
+}
+
+/** Words that are one input alone, `{name}`. */
+private val INPUT = Regex("""\{(\w+)}""")
+
+/** A Whenever's `whenever`, with who made its members and what they say, each an input where its words name one. */
+private fun whenever(step: Step.Whenever): String {
+    fun said(words: String) = INPUT.matchEntire(words)?.groupValues?.get(1) ?: kotlinString(words, slots = false)
+    val named = listOfNotNull(step.by?.let { "by = ${said(it)}" }, step.says?.let { "says = ${said(it)}" })
+    return if (named.isEmpty()) "whenever" else "whenever(${named.joinToString(", ")})"
 }
 
 /**

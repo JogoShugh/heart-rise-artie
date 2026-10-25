@@ -112,19 +112,24 @@ internal class StepWatch(
 
         /** One look, at [here]: the list reached again, and each member new or changed that matches visited. */
         fun look(here: Here) = here.replay(list, sources(here, null)) {
-            whenever {
-                // Whether the member matches: the check the planner made at the first member, decided once.
-                val match = decided.matches.getOrPut(step) {
-                    val told = "whenever: ${host.fill(step.match)}: the check a member that matches passes"
-                    bound(decide(step, this, CHECK, told) { (it as? Move.Check)?.facts }, this, step.match)
-                }
-                if (match.passes(sources(this, null), held)) {
+            // Who made a member and what it says are read as they are; a match they say all of needs no check.
+            whenever(by = step.by?.let(host::fill), says = step.says?.let(host::fill)) {
+                if (step.saidByWords || matches(this)) {
                     step.name?.let { named[it] = held }
                     decided.answered(step, held.address)
                     // An If that leaves the member leaves its other steps undone, this look.
                     step.children.all { child(it, this) }
                 }
             }
+        }
+
+        /** Whether the member [here] matches: the check the planner made at the first member, decided once. */
+        private fun matches(here: Here): Boolean {
+            val match = decided.matches.getOrPut(step) {
+                val told = "whenever: ${host.fill(step.match)}: the check a member that matches passes"
+                bound(decide(step, here, CHECK, told) { (it as? Move.Check)?.facts }, here, step.match)
+            }
+            return match.passes(sources(here, null), here.held)
         }
     }
 

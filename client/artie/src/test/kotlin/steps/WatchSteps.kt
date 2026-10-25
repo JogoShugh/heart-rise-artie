@@ -150,6 +150,23 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
     }
 
     @Given(
+        "{string} comments {string} on issue {long} of {string} on the small GitHub once its comments are listed " +
+            "{int} times",
+    )
+    fun commentsAfterThread(author: String, body: String, issue: Long, repository: String, times: Int) {
+        val (owner, repo) = repository.split("/")
+        val listed = java.util.concurrent.atomic.AtomicInteger()
+        gateway.github.beforeAnswer += { request ->
+            val path = "/repos/$repository/issues/$issue/comments"
+            if (request.method.name == "GET" && request.uri.path == path && listed.incrementAndGet() == times) {
+                val id = (gateway.github.comments.maxOfOrNull { it.id } ?: 0) + 1
+                gateway.github.comments +=
+                    com.artie.heart.gateway.fixtures.Comment(owner, repo, issue, id, author, body)
+            }
+        }
+    }
+
+    @Given(
         "issue {long} of {string}, titled {string}, opens on the small GitHub once its issues are listed {int} times",
     )
     fun opensLater(number: Long, repository: String, title: String, times: Int) {

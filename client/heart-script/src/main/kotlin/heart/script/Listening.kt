@@ -104,9 +104,20 @@ private fun Run.listening(listener: Listener, watch: Watch, polls: Polls) {
     }
 }
 
-/** What each resource this run's steps from [from] on held last showed, by address. */
-private fun Run.read(from: Int): Map<String, String> =
-    trace.drop(from).mapNotNull { step -> step.now?.let { it.address to it.shows() } }.toMap()
+/**
+ * What the look that made this run's steps from [from] on saw of each resource, by address: what it first read
+ * there, which is what it answered, or what its own last write there answered. A read again later in the look, at a
+ * block's end, may already show a change it never answered, and must not hide it from the next hint.
+ */
+private fun Run.read(from: Int): Map<String, String> {
+    val seen = mutableMapOf<String, String>()
+    trace.drop(from).forEach { step ->
+        val now = step.now ?: return@forEach
+        val wrote = step.used?.method?.let { !it.equals("GET", ignoreCase = true) } == true
+        if (wrote || now.address !in seen) seen[now.address] = now.shows()
+    }
+    return seen
+}
 
 /** What stopped a listener's thread, if anything did. */
 private fun Future<*>.stopped(): Throwable? = try {
