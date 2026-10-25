@@ -1,6 +1,6 @@
 # Plan: listeners, not one loop
 
-Status: chosen 2026-10-24. Slices 0 to 8 done; see "As built" at the end.
+Status: chosen 2026-10-24. All slices done; the live run is exhibits/listeners-live; see "As built" at the end.
 
 ## The problem
 
@@ -164,3 +164,7 @@ Each slice starts with its feature, seen red at test level, then made green.
   description and a two-file connector serves its mailbox with a `send` act, as it serves GitHub. Not yet: a goal's
   planner reaching a second server (its front matter names one start), and string ids in the generic gateway (a
   resource's id is a number there, `UpstreamState.id`).
+- **Live (slice 9, `exhibits/listeners-live`).** One watch on the scratch repository, run as three listeners and as
+  one loop against the same timeline (a stand-in veracode-bot's failed and passed scans, alerts, slow triage). By
+  GitHub's own times the listeners answered in 16, 9 and 22 seconds, the loop in 27, 42 and 26: a slow handler held
+  up only itself. Both said each thing once. One run each, over a phone's hotspot, with the hub off.

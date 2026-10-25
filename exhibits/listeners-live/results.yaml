@@ -1,0 +1,37 @@
+# Listeners, live: the same watch and timeline, as listeners and as one loop, 2026-10-25, on
+# JogoShugh/heart-github-test through the HEART gateway at localhost:8392, over a phone's hotspot.
+# Reaction times are GitHub's own: from the event's created_at to the watch's answer's created_at.
+# One run each: a first look, not a benchmark. reactions.kts reads them; report.kts lays this out.
+
+asOf: "2026-10-25"
+pace: 10 seconds
+slowTriage: 15 seconds
+
+runs:
+  - run: l1
+    mode: three listeners
+    steps: 335
+    saidTwice: 0
+    reactions:
+      - { event: "scan failed (20 s)", seconds: 16 }
+      - { event: "alert (50 s)", seconds: 9 }
+      - { event: "alert (110 s)", seconds: 22 }
+    ignored: ["scan passed (80 s)", "scan failed again (140 s): already held, said once"]
+  - run: g1
+    mode: one loop
+    steps: 204
+    saidTwice: 0
+    reactions:
+      - { event: "scan failed (20 s)", seconds: 27 }
+      - { event: "alert (50 s)", seconds: 42 }
+      - { event: "alert (110 s)", seconds: 26 }
+    ignored: ["scan passed (80 s)", "scan failed again (140 s): already held, said once"]
+
+findings:
+  - Listeners answered in 16, 9 and 22 seconds; the loop in 27, 42 and 26. On average 16 against 32.
+  - In the loop, each slow triage (15 seconds) held up the scan and the alerts behind it; as a listener it held up
+    only itself.
+  - Both said each thing once, and left the passed scan alone.
+  - >-
+    The hub was off, since GitHub can't reach a laptop: every poll was a read answered at once, 304 while
+    unchanged. With webhooks, a held read comes back as soon as GitHub says what changed.
