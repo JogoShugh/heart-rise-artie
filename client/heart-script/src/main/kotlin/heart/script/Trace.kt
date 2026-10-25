@@ -161,10 +161,24 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
         traced({ followAsked(rel, title) }) { inner.follow(rel, title) }
 
     override fun visit(address: String): Answer =
-        traced({ TraceStep.Asked("return to {address}", mapOf("address" to address)) }) { inner.visit(address) }
+        traced({ TraceStep.Asked("return to {address}", mapOf("address" to address)) }) {
+            unhanded(address) ?: inner.visit(address)
+        }
 
     override fun recall(address: String): Answer =
-        traced({ TraceStep.Asked("return to {address}", mapOf("address" to address)) }) { inner.recall(address) }
+        traced({ TraceStep.Asked("return to {address}", mapOf("address" to address)) }) {
+            unhanded(address) ?: inner.recall(address)
+        }
+
+    /**
+     * The addresses the server handed over in this run (Fielding's Rule 4): each resource it answered with, the
+     * entry's, a new one's Location, and each it embedded. A resource is read again only at one of them.
+     */
+    private val handed: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
+
+    /** A refusal of [address] when the server never handed it over; null when it did. */
+    private fun unhanded(address: String): Answer.Refused? = if (address in handed) null else
+        Answer.Refused(Refusal.NotOffered, Side.CLIENT, "$address is no address the server handed over in this run")
 
     override fun why(rel: String): String? = inner.why(rel)
 
@@ -195,6 +209,7 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
         }
         val from = held
         now?.let { at = it.address; held = it }
+        now?.let { handed += it.address; handed += it.embedded.values.flatten().map { embedded -> embedded.address } }
         val ms = (System.nanoTime() - started) / NANOS_PER_MILLI
         val step = TraceStep(TraceStep.Began(began, ms), asked(), outcomeOf(answer), at, now, answer as? Answer.Refused)
         step.used = answer.used

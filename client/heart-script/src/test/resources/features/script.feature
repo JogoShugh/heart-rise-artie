@@ -130,6 +130,24 @@ Feature: A HEART script: the Reason step written in advance
       """
     Then the script failed: "nothing is kept as \"isue\"; keepAs(\"isue\") where it is reached"
 
+  Scenario: A resource is read again only at an address the server handed over in this run
+    Fielding's Rule 4 (spec/FIELDING-REVIEW.md): a client follows the
+    addresses the server gives it, and makes none up. at(address) reads a
+    resource again; ARTIE refuses an address the run never held, so a
+    script can't reach /c/501 by writing it down, though it is there.
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10) {}
+          at("/issues/10") { note("read again") }
+          at("/c/501") { note("never read") }
+      }
+      """
+    Then the script stopped at step 3, "at": not offered, refused by the client: "/c/501 is no address the server handed over in this run"
+    And the script noted, in order
+      | note       |
+      | read again |
+
   Scenario: A part done already is left, where its facts say so, with no variable to set
     doing runs its block, which says in words what it does. doneWhere ends
     the block where its facts hold, read on the resource held there: the
