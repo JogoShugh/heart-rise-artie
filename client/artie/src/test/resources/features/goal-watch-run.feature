@@ -1413,6 +1413,50 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the run noted one note beginning "Not checked: Every pull request was merged, or says why not"
     And the planner was last told the step now is "done when: Every pull request was merged, or says why not: check it only when members of the resource held say it; otherwise done, saying why"
 
+  Scenario: An Until naming what its resource doesn't hold is refused, so the watch doesn't run to its time limit
+    An Until that names a member its resource doesn't have can never hold:
+    the watch would look until its time ran out. It is refused when it is
+    decided, and the planner told what the resource holds.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 4 times
+    And the file "ends.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts                |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                      |
+      | done  |                                                     |       |          |                      |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                      |
+      | check |                                                     |       |          | {"state": "open"}    |
+      | act   | say on it that the watch has seen it                |       |          |                      |
+      | done  |                                                     |       |          |                      |
+      | check |                                                     |       |          | {"status": "closed"} |
+      | check |                                                     |       |          | {"state": "closed"}  |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                   |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              | {"body": "Seen by the bench watch."}                                     |
+    When the goal "ends.goal.md" runs with ARTIE, captured in "ends.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And the planner was told "check: refused, status is neither a member of https://github.gateway.test/repos/acme/rockets/issues/10"
+    And the run noted
+      | note |
+
   Scenario Outline: A fact of Done when about what a Whenever answers is checked on every one it answered: <case>
     Found by the live seed bench runs: "Every alert … is assigned" was
     checked at the start, which holds no alert, so it was always left

@@ -369,9 +369,14 @@ internal class StepWatch(
         } ?: scope
         val told = "until: ${host.fill(until.condition)}: the check that holds once the watch is to end, not " +
             "what holds now; it is made after every look, and the watch ends when it holds"
+        // One naming what the resource doesn't hold can never hold, and the watch would look until its time ran out.
+        val possible: (Move) -> Map<String, Any?>? = { move ->
+            (move as? Move.Check)?.facts?.takeIf { facts ->
+                refusal(facts, at.held, failsAfter = false)?.also { moves += it } == null
+            }
+        }
         val ends = decided.ends
-            ?: bound(decide(until, at, CHECK, told) { (it as? Move.Check)?.facts }, at, until.condition)
-                .also { decided.ends = it }
+            ?: bound(decide(until, at, CHECK, told, possible), at, until.condition).also { decided.ends = it }
         return ends.passes(sources(at, null), at.held)
     }
 
