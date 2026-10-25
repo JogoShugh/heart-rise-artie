@@ -21,9 +21,13 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /** What heart-mcp shows of a resource that embeds others (SPEC §6.1), checked on its view directly. */
-class EmbeddedViewSteps {
-    private lateinit var held: HeartRepresentation
-    private lateinit var view: JsonObject
+class EmbeddedViewSteps(private val shown: HeldView) {
+    private var held: HeartRepresentation
+        get() = shown.held
+        set(value) { shown.held = value }
+    private var view: JsonObject
+        get() = shown.view
+        set(value) { shown.view = value }
 
     @Given("heart-mcp holds a resource that embeds these resources")
     fun holds(table: DataTable) {
@@ -56,7 +60,7 @@ class EmbeddedViewSteps {
 
     @When("heart-mcp shows what it holds")
     fun shows() {
-        view = Views.of(held)
+        view = Views.of(held, read = { shown.readable[it] })
     }
 
     @Then("the view embeds these resources")

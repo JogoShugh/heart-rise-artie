@@ -1,5 +1,6 @@
 package heart.mcp
 
+import heart.FormChoices
 import heart.HeartRepresentation
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -18,7 +19,16 @@ import kotlinx.serialization.json.addJsonObject
  */
 internal object Views {
 
-    fun of(held: HeartRepresentation, extra: Map<String, JsonElement> = emptyMap()): JsonObject = buildJsonObject {
+    /**
+     * The view of [held], with [extra] members. Each act's schema shows its
+     * choices from state (HAL-SCHEMA-FORMS-HR Rule 8) as an `enum`, resolved
+     * by ARTIE, reading with [read] those that come from another resource.
+     */
+    fun of(
+        held: HeartRepresentation,
+        extra: Map<String, JsonElement> = emptyMap(),
+        read: (String) -> JsonElement? = { null },
+    ): JsonObject = buildJsonObject {
         putJsonObject("resource") { put("state", held.state) }
         putJsonArray("acts") {
             held.affordances.forEach { (name, form) ->
@@ -26,7 +36,7 @@ internal object Views {
                     put("name", name)
                     form.title?.let { put("title", it) }
                     form.description?.let { put("description", it) }
-                    put("schema", withoutIds(form.schema))
+                    put("schema", withoutIds(FormChoices(form, held, read).shownSchema()))
                 }
             }
         }

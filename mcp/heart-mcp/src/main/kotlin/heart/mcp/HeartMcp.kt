@@ -59,6 +59,9 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
     /** One host session drives one client; its calls take turns. */
     private val turn = Mutex()
 
+    /** How ARTIE reads another resource a form's choices come from (HAL-SCHEMA-FORMS-HR Rule 8). */
+    private val read: (String) -> JsonElement? get() = client.listReader
+
     /** Adds the six verbs to [server]. */
     fun register(server: Server) = Tools.all(bookmarks.keys).forEach { verb ->
         server.addTool(name = verb.name, description = verb.description, inputSchema = verb.input) { request ->
@@ -88,23 +91,31 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
     }
 
     private fun look(service: String?): JsonObject {
-        if (service == null) return Views.of(client.enter(held().url))
+        if (service == null) return Views.of(client.enter(held().url), read = read)
         val bookmark = bookmarks[service]
             ?: error("No service named '$service'. The services are: ${bookmarks.keys.joinToString(", ")}.")
         before.clear()
         client.discover(bookmark)
-        return Views.of(client.enter(bookmark))
+        return Views.of(client.enter(bookmark), read = read)
     }
 
-    /** Checks the choice against the held resource first; nothing is sent for a choice it does not offer. */
+    /**
+     * Checks the choice against the held resource first, its schema and its
+     * choices from state; nothing is sent for a choice it does not offer.
+     */
     private fun act(name: String, fields: JsonObject): JsonObject {
         val held = held()
         val form = held.affordance(name)
-        val violations = form?.let { SchemaCheck.violations(fields, it.schema) }.orEmpty()
+        val violations = form?.let { SchemaCheck.violations(fields, it.schema) }.orEmpty() +
+            client.choices(name)?.violations(fields).orEmpty()
         return when {
-            form == null ->
-                rejected(held, "$name is not offered now. Offered: ${held.affordances.keys.joinToString(", ")}.")
-            violations.isNotEmpty() -> rejected(held, "The fields do not satisfy $name's schema.", violations)
+            form == null -> Views.of(
+                held,
+                rejection("$name is not offered now. Offered: ${held.affordances.keys.joinToString(", ")}."),
+                read,
+            )
+            violations.isNotEmpty() ->
+                Views.of(held, rejection("The fields do not satisfy $name's schema or choices.", violations), read)
             else -> {
                 // A GET form moves to another resource; any other act changes this one.
                 if (form.method == "GET") before.addLast(held.url)
@@ -114,42 +125,42 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
     }
 
     private fun send(held: HeartRepresentation, name: String, fields: JsonObject): JsonObject = try {
-        Views.of(client.act(name, fields), outcome("acted", "$name was done."))
+        Views.of(client.act(name, fields), outcome("acted", "$name was done."), read)
     } catch (refusal: ActRefused) {
-        Views.of(client.current ?: held, refused(refusal))
+        Views.of(client.current ?: held, refused(refusal), read)
     } catch (refusal: AccessRefused) {
         val kind = when (refusal) {
             is NotAuthenticated -> "not-authenticated"
             is Forbidden -> "forbidden"
         }
-        Views.of(held, outcome(kind, refusal.message.orEmpty()))
+        Views.of(held, outcome(kind, refusal.message.orEmpty()), read)
     }
 
     private fun follow(rel: String, title: String?): JsonObject {
         val held = held()
         if ((rel to title) !in Views.followable(held)) {
-            return rejected(held, "There is no $rel link titled '$title' here.")
+            return Views.of(held, rejection("There is no $rel link titled '$title' here."), read)
         }
         before.addLast(held.url)
-        return Views.of(client.follow(rel, title))
+        return Views.of(client.follow(rel, title), read = read)
     }
 
     private fun describe(name: String): JsonObject {
         val held = held()
-        if (held.affordance(name) == null) return rejected(held, "$name is not offered now.")
+        if (held.affordance(name) == null) return Views.of(held, rejection("$name is not offered now."), read)
         val text = client.describe(name) ?: "The service gives no further description of $name."
-        return Views.of(held, mapOf("description" to JsonPrimitive(text)))
+        return Views.of(held, mapOf("description" to JsonPrimitive(text)), read)
     }
 
     private fun explain(name: String): JsonObject {
         val held = held()
         val reason = client.explain(name) ?: "The service gives no reason why $name is not offered."
-        return Views.of(held, mapOf("explanation" to JsonPrimitive(reason)))
+        return Views.of(held, mapOf("explanation" to JsonPrimitive(reason)), read)
     }
 
     private fun back(): JsonObject {
         val previous = before.removeLastOrNull() ?: error("There is no resource before this one.")
-        return Views.of(client.enter(previous))
+        return Views.of(client.enter(previous), read = read)
     }
 
     private fun held(): HeartRepresentation =
@@ -187,8 +198,8 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
         private fun success(content: JsonObject) =
             CallToolResult(listOf(TextContent(content.toString())), false, content, null)
 
-        private fun rejected(held: HeartRepresentation, message: String, violations: List<String> = emptyList()) =
-            Views.of(held, outcome("rejected-before-sending", "$message Nothing was sent.", violations))
+        private fun rejection(message: String, violations: List<String> = emptyList()) =
+            outcome("rejected-before-sending", "$message Nothing was sent.", violations)
 
         private fun refused(refusal: ActRefused): Map<String, JsonElement> = when (refusal) {
             is StaleAct -> outcome("stale", "${refusal.message}. The resource below is the fresh one.")
