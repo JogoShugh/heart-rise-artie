@@ -593,9 +593,10 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 12 of "acme/rockets" is now "open" on the small GitHub
     And the planner was asked 8 times
     And ARTIE's reasoner was asked 3 times
-    And the capture "trays.trace.yaml" keeps a watch script with a line with "whenever(has = mapOf(\"github:labels\" to listOf(\"tray\")))"
-    And the capture "trays.trace.yaml" keeps a watch script with a line with "onlyWhere(mapOf(\"github:labels\" to listOf(\"transplanted\")))"
+    And the capture "trays.trace.yaml" keeps a watch script with a line with "has { \"github:labels\" has \"tray\" }"
+    And the capture "trays.trace.yaml" keeps a watch script with a line with "given { \"github:labels\" has \"transplanted\" } then {"
     And the capture "trays.trace.yaml" keeps a watch script with no line with "if ("
+    And the capture "trays.trace.yaml" keeps a watch script with no line with "mapOf("
 
   Scenario: A list a step sent is sent again as a list, and a look that fails still keeps what the watch did
     Found by the live seed bench run b1: an alert's chain commented, then
@@ -843,9 +844,10 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 10 times
     And the capture "unless.trace.yaml" keeps the watch as this script, from step 4
       """
-      watch(until = holdsAt("watch", mapOf("state" to "closed"))) {
+      watch(until = { at("watch") { "state" eq "closed" } }) {
           act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
-              whenever(has = mapOf("state" to "open")) {
+              whenever {
+                  has { "state" eq "open" }
                   actOnce("github:comment", "body" to "Seen by the bench watch.", listedIn = "github:issues-list-comments") {}
               }
           }
@@ -1326,8 +1328,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | hold  | on-hold |
     Then the run finished
     And the capture "hold.trace.yaml" keeps a watch script with a line with "act(\"github:issues-list-for-repo\", \"owner\" to \"acme\", \"repo\" to \"rockets\", \"state\" to \"open\", \"labels\" to label)"
-    And the capture "hold.trace.yaml" keeps a watch script with a line with "whenever(has = mapOf(\"github:labels\" to listOf(label)))"
-    And the capture "hold.trace.yaml" keeps a watch script with a line with "unless(mapOf(\"github:labels\" to listOf(hold)), leaving = \"leave it.\")"
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "has { \"github:labels\" has label }"
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "leaveWhere(\"leave it.\") { \"github:labels\" has hold }"
     And the capture "hold.trace.yaml" keeps a watch script with no line with "if ("
 
   Scenario: An act refused before it was sent may be asked again in the same words
@@ -1555,7 +1557,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 12 of "acme/rockets" is now "open" on the small GitHub
     And issue 13 of "acme/rockets" is now "open" on the small GitHub
     And the planner was asked 6 times
-    And the capture "bot.trace.yaml" keeps a watch script with a line with "whenever(by = bot, says = \"failed\") {"
+    And the capture "bot.trace.yaml" keeps a watch script with a line with "madeBy(bot)"
+    And the capture "bot.trace.yaml" keeps a watch script with a line with "saying(\"failed\")"
 
   Scenario: An embedded resource is named by any of its own values, as its login names an assignee
     Found by the live seed bench run b20: "Every alert is assigned to the

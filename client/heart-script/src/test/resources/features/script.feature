@@ -91,17 +91,18 @@ Feature: A HEART script: the Reason step written in advance
       | return | /issues/10                       |
       | act    | comment {"body":"Fixed in 1.3."} |
 
-  Scenario: A step made only where facts hold, and one made unless they do
-    A condition, as data rather than Kotlin's if. onlyWhere runs its block
-    where every fact holds on the resource held. unless runs it where they
-    don't; where they do, it leaves the resource and says so.
+  Scenario: A branch on facts, as a block, rather than Kotlin's if
+    spec/ideas/dsl-conditions-as-facts.md. A facts block says what must hold
+    on the resource held: "state" eq "open". It is ordinary Kotlin, and that
+    takes any condition the script works out itself. given runs its then
+    block where the facts hold, and its otherwise block where they don't.
     When this script runs
       """kotlin
       heart("scripted://service/") {
           act("issues-get", "number" to 10) {
-              onlyWhere(mapOf("state" to "open")) { act("close") }
-              onlyWhere(mapOf("state" to "closed")) { act("comment", "body" to "Closed.") }
-              unless(mapOf("state" to "open"), leaving = "an open issue is left alone.") { act("comment", "body" to "Not open.") }
+              given { "state" eq "open" } then { act("close") }
+              given { "state" eq "closed" } then { act("comment", "body" to "Closed.") } otherwise { note("not closed") }
+              given { that(1 + 1 == 2) } then { note("worked out by the script") }
           }
       }
       """
@@ -112,7 +113,22 @@ Feature: A HEART script: the Reason step written in advance
       | act    | issues-get {"number":10} |
       | act    | close                    |
       | return | /                        |
-    And the script noted "Left /issues/10: an open issue is left alone."
+    And the script noted, in order
+      | note                     |
+      | not closed               |
+      | worked out by the script |
+
+  Scenario: A fact about a resource never kept stops the script, saying so
+    A name kept nowhere is a mistake in the script, not a fact that doesn't
+    hold: a watch's Until that read it so would never end.
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10) { keepAs("issue") }
+          given { at("isue") { "state" eq "open" } } then { act("close") }
+      }
+      """
+    Then the script failed: "nothing is kept as \"isue\"; keepAs(\"isue\") where it is reached"
 
   Scenario: A long act's values in a block, one a line, which may be left out; the block after still visits
     When this script runs

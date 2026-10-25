@@ -8,7 +8,7 @@ package heart.cli.generate
 class WatchLines(private val capture: Capture) {
     private val script = capture.watchScript
 
-    /** The names the watch reads again, as `holdsAt("<name>", …)` says them. */
+    /** The names the watch reads again, as its facts say them: `at("<name>") { … }`. */
     private val names: List<String> = script?.let { text ->
         NAMED.findAll(text).map { it.groupValues[1] }.distinct().toList()
     }.orEmpty()
@@ -25,7 +25,7 @@ class WatchLines(private val capture: Capture) {
     fun lines(depth: Int): List<String> = script?.lines()?.map { INDENT.repeat(depth) + it }.orEmpty()
 
     private companion object {
-        val NAMED = Regex("""\bholdsAt\("(\w+)"""")
+        val NAMED = Regex("""\bat\("(\w+)"\) \{""")
         val UNITS = listOf("minutes", "seconds")
         const val INDENT = "    "
     }

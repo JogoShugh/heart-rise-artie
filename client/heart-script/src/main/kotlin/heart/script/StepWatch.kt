@@ -46,7 +46,7 @@ internal class StepWatch(
         val name = until?.let { u -> BRACE.findAll(u.condition).map { it.groupValues[1] }.firstOrNull { it in named } }
         run.watchFrom = run.trace.size + 1
         run.watchScript = { WatchScript(decided, entry, name, host::fill).text(steps) }
-        val done: Here.() -> Boolean = { until != null && over(until, this) }
+        val done: Facts.() -> Unit = { that(until != null && over(until, here)) }
         val single = steps.singleOrNull()
         if (single != null) {
             val watched = Watched(single, where)
@@ -113,7 +113,9 @@ internal class StepWatch(
         /** One look, at [here]: the list reached again, and each member new or changed that matches visited. */
         fun look(here: Here) = here.replay(list, sources(here, null)) {
             // Who made a member and what it says are read as they are; a match they say all of needs no check.
-            whenever(by = step.by?.let(host::fill), says = step.says?.let(host::fill)) {
+            whenever {
+                step.by?.let { madeBy(host.fill(it)) }
+                step.says?.let { saying(host.fill(it)) }
                 if (step.saidByWords || matches(this)) {
                     step.name?.let { named[it] = held }
                     decided.answered(step, held.address)

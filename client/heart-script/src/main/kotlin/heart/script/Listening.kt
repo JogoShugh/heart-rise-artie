@@ -40,7 +40,7 @@ internal class Listener(val name: String, val every: Duration, val from: String?
 fun Here.listeners(
     every: Duration = 15.seconds,
     atMost: Duration = 2.hours,
-    until: Here.() -> Boolean,
+    until: Facts.() -> Unit,
     block: Listeners.() -> Unit,
 ) {
     val listeners = Listeners().apply(block).named
@@ -73,10 +73,10 @@ internal class Watch(val start: String, val ends: java.time.Instant, val over: A
 }
 
 /** The watch's own loop: [until] read every [every], until it holds, or a listener [ended] early, or time is up. */
-private fun Here.looking(watch: Watch, every: Duration, until: Here.() -> Boolean, ended: () -> Boolean) {
+private fun Here.looking(watch: Watch, every: Duration, until: Facts.() -> Unit, ended: () -> Boolean) {
     var done = false
     while (!done && watch.on(run)) {
-        attempt(watch.start, "Reading whether the watch is over failed") { done = until() }
+        attempt(watch.start, "Reading whether the watch is over failed") { done = holds(until) }
         done = done || ended()
         if (!done) run.pause(every)
     }

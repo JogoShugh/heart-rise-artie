@@ -21,9 +21,6 @@ val repository = arrayOf("owner" to owner, "repo" to repo)
 /** How each comment the watch leaves begins, so a later watch knows what was said. */
 val WATCH = "Not merged by the auto-merge watch"
 
-/** The names of the labels the held pull request carries. */
-fun Here.labelled(): Set<String> = embedded("github:labels").mapNotNull { it.read["name"] as? String }.toSet()
-
 heart(gateway) {
     var watch = 0L
     act("github:repos-get", *repository) {
@@ -31,34 +28,28 @@ heart(gateway) {
             "title" to "Auto-merge watch ($stamp)"
             "body" to "Pull requests labelled `$label` are merged once they can be; `$hold` keeps one back. " +
                 "Close this issue to stop the watch."
-        }) { watch = state.long("number") }
+        }) {
+            watch = state.long("number")
+            keepAs("watch")
+        }
     }
     // The watch stands at the entry, where both the list and the watch's issue are reached from.
     // Until someone closes the watch's issue.
-    watch(every = every.toInt().seconds, until = {
-        var closed = false
-        act("github:issues-get", *repository, "issue_number" to watch) { closed = state["state"] != "open" }
-        closed
-    }) {
+    watch(every = every.toInt().seconds, until = { at("watch") { "state" eq "closed" } }) {
         act("github:pulls-list", *repository, "state" to "open") {
             // Whenever a pull request labelled `label` changes, unless a person holds it back.
             whenever {
-                val labels = labelled()
-                if (label in labels && hold !in labels) {
-                    val number = state.long("number")
-                    once("github:merge", giveUp = giveUp.toInt().minutes, otherwise = { why ->
-                        // Otherwise, say why, unless a watch said it already.
-                        val said = "$WATCH (#$watch) after $giveUp minutes: ${why ?: "the merge was never offered"}"
-                        follow("github:issues-get") {
-                            var already = false
-                            follow("github:issues-list-comments") {
-                                already = links("item").filterNotNull().any { it.startsWith(WATCH) && it.endsWith(why.orEmpty()) }
-                            }
-                            if (!already) act("github:comment", "body" to said) {}
-                        }
-                    }) {
-                        act("github:merge", "merge_method" to "squash", "commit_title" to "${state.text("title")} (#$number)") {}
+                has { "github:labels" has label }
+                leaveWhere("a person holds it back") { "github:labels" has hold }
+                val number = state.long("number")
+                once("github:merge", giveUp = giveUp.toInt().minutes, otherwise = { why ->
+                    // Otherwise, say why, unless a watch said it already.
+                    val said = "$WATCH (#$watch) after $giveUp minutes: ${why ?: "the merge was never offered"}"
+                    follow("github:issues-get") {
+                        actOnce("github:comment", "body" to said, listedIn = "github:issues-list-comments")
                     }
+                }) {
+                    act("github:merge", "merge_method" to "squash", "commit_title" to "${state.text("title")} (#$number)") {}
                 }
             }
         }

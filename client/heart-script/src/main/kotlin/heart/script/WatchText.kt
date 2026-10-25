@@ -48,11 +48,19 @@ internal fun saidOnce(parts: List<Chain.Part>, at: Int): String? {
     }
 }
 
-/** Facts kept with each value bound to where it came from, as a map of the expressions that read them. */
-internal fun bound(facts: Map<String, Bound>): String =
-    "mapOf(" + facts.entries.joinToString(", ") { (member, value) ->
-        "${kotlinString(member, slots = false)} to ${expression(value)}"
-    } + ")"
+/**
+ * Facts kept with each value bound to where it came from, as the body of a facts block: a list's items each a `has`,
+ * any other value an `eq`, each read again where it came from.
+ */
+internal fun facts(facts: Map<String, Bound>): String = facts.entries.flatMap { (member, value) ->
+    val name = kotlinString(member, slots = false)
+    val listed = value.kept as? List<*>
+    when {
+        value.items != null -> value.items.map { "$name has ${expression(it)}" }
+        listed != null -> listed.map { "$name has ${literal(it)}" }
+        else -> listOf("$name eq ${expression(value)}")
+    }
+}.joinToString("; ")
 
 /** [value], read again where it came from: an input by its name, the member's state, the reason a wait gave up. */
 internal fun expression(value: Bound): String {

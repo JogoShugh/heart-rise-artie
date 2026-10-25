@@ -87,7 +87,7 @@ internal class Watching {
 fun Here.watch(
     every: Duration = 15.seconds,
     atMost: Duration = 2.hours,
-    until: Here.() -> Boolean,
+    until: Facts.() -> Unit,
     look: Here.() -> Unit,
 ) {
     val start = held.address
@@ -100,7 +100,7 @@ fun Here.watch(
         while (!over && run.clock().isBefore(ends)) {
             looks++
             attempt(start, "A look failed") { look() }
-            attempt(start, "Reading whether the watch is over failed") { over = until() }
+            attempt(start, "Reading whether the watch is over failed") { over = holds(until) }
             if (!over) run.pause(every)
         }
         if (!over) note("The watch stopped after $atMost, $looks looks, its condition not met.")
@@ -132,40 +132,39 @@ internal fun Here.attempt(start: String, failed: String, block: Here.() -> Unit)
 
 /**
  * Visit each member the held list links under [rel], as `members` does; in a watch, only those new or changed since
- * the last look, and those a `once` still waits on. With [by], only those it made; with [says], only those whose words
- * hold it, in any case (spec/PLAN-LISTENERS.md, slice 4); with [has], only those where every fact holds, as data
- * rather than an if in the block.
+ * the last look, and those a `once` still waits on. Which members are answered is said in [block] itself, by its
+ * guards (`has`, `leaveWhere`, `madeBy`, `saying`): one that fails ends that member's turn
+ * (spec/ideas/dsl-conditions-as-facts.md).
  */
-fun Here.whenever(
-    rel: String = "item",
-    by: String? = null,
-    says: String? = null,
-    has: Map<String, Any?>? = null,
-    block: Here.() -> Unit,
-) {
+fun Here.whenever(rel: String = "item", block: Here.() -> Unit) {
     val watching = run.watching
     members(rel) {
         val address = held.address
         val now = held.state.toString()
         val due = !watching.active || watching.differs(address, now) || watching.waitsOn(address)
-        // A member the watch answers: made by whom it names, saying what it says, holding what [has] says.
-        val answered = held.kept(by, says) && (has == null || holds(has))
-        if (due && answered) {
+        if (due) {
+            val began = run.step
+            var changed = true
             try {
                 block()
+            } catch (_: MemberLeft) {
+                // A guard ended the turn; where nothing was read or done before it, the member is as it was.
+                changed = run.step != began
             } finally {
                 // What the block did to the member is the watch's own change, not one to answer at the next look,
                 // whether its steps all went through or one failed after another had acted. It is seen once it is
                 // answered, so a run stopped while answering it answers it again.
-                if (watching.active) {
-                    watching.saw(address, arrived(run.step, "\"watch\"", navigator.recall(address)).state.toString())
-                }
+                if (watching.active) watching.saw(address, if (changed) reread(address) else now)
             }
         } else if (watching.active) {
             watching.saw(address, now)
         }
     }
 }
+
+/** The member at [address], read again after its turn, as the watch will compare it next time. */
+private fun Here.reread(address: String): String =
+    arrived(run.step, "\"watch\"", navigator.recall(address)).state.toString()
 
 /**
  * Once the held resource offers [rel], run [block], one time for this resource. Until then, wait: in a watch, the

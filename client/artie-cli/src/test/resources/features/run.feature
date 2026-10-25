@@ -66,7 +66,7 @@ Feature: artie run: a script, run from the command line
       """kotlin
       heart("scripted://service/") {
           act("issues-get", "number" to 10) {
-              watch(until = { true }) {
+              watch(until = { that(true) }) {
                   once("close") { act("close") }
               }
           }
@@ -457,7 +457,7 @@ Feature: artie run: a script, run from the command line
     Given the script "listen.kts" is
       """kotlin
       heart("scripted://service/") {
-          listeners(until = { true }) {
+          listeners(until = { that(true) }) {
               <listen>
           }
       }

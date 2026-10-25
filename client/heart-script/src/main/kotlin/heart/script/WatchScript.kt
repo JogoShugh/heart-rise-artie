@@ -90,19 +90,18 @@ internal class WatchScript(
 
     /** The Until's check, read again where it names, else where the watch stands; none, the watch runs its time. */
     private fun until(): String {
-        val ends = decided.ends ?: return "{ false }"
-        val check = "holds(${bound(ends.facts)})"
-        return if (named == null) "{ $check }" else "holdsAt(${quoted(named)}, ${bound(ends.facts)})"
+        val ends = decided.ends ?: return "{ that(false) }"
+        return if (named == null) "{ ${facts(ends.facts)} }" else "{ at(${quoted(named)}) { ${facts(ends.facts)} } }"
     }
 
-    /** One look of [step]: its list reached as decided, and each member that matches answered. */
+    /** One look of [step]: its list reached as decided, and each member answered past the guards that match it. */
     private fun look(step: Step.Whenever, depth: Int) {
         val list = decided.lists[step] ?: return out.said(depth, "${fill(step.match)}: no list decided in this run")
-        // Which members it answers is the whenever's own: by whom, saying what, holding what the match decided.
         val match = decided.matches[step].takeUnless { step.saidByWords }
         out.open(depth, reach(list)) { inside ->
-            out.open(inside, whenever(step, match)) { member ->
+            out.open(inside, "whenever") { member ->
                 if (step.saidByWords || match != null) {
+                    guards(step, match).forEach { out.line(member, it) }
                     children(step.children, member)
                 } else {
                     out.said(member, "${fill(step.match)}: no member matched in this run")
@@ -111,7 +110,7 @@ internal class WatchScript(
         }
     }
 
-    /** The steps under a Whenever, at a member: an If that leaves it holds the steps after it in its else. */
+    /** The steps under a Whenever, at a member: an If that leaves it is a guard before the steps after it. */
     private fun children(steps: List<Step>, depth: Int) {
         for ((at, step) in steps.withIndex()) {
             val intent = step as? Step.Intent ?: continue
@@ -124,17 +123,16 @@ internal class WatchScript(
                     left(intent, check, steps.drop(at + 1), depth)
                     return
                 }
-                else -> out.open(depth, "onlyWhere(${bound(check.facts)})") { chains.chain(intent, ACT, it) }
+                else -> out.open(depth, "given { ${facts(check.facts)} } then") { chains.chain(intent, ACT, it) }
             }
         }
     }
 
-    /** An If that leaves the member where its [check] holds, saying so; else the [rest] of the member's steps. */
+    /** An If that leaves the member where its [check] holds, saying so: a guard, then the [rest] of the steps. */
     private fun left(intent: Step.Intent, check: Chain.Check, rest: List<Step>, depth: Int) {
         val leaving = kotlinString(fill(intent.words), slots = true)
-        val leaves = "unless(${bound(check.facts)}, leaving = $leaving)"
-        if (rest.isEmpty()) return out.line(depth, "$leaves {}")
-        out.open(depth, leaves) { children(rest, it) }
+        out.line(depth, "leaveWhere($leaving) { ${facts(check.facts)} }")
+        children(rest, depth)
     }
 
     /** A step with no If: a Once, or a chain of acts. */
@@ -170,17 +168,16 @@ internal class WatchScript(
 private val INPUT = Regex("""\{(\w+)}""")
 
 /**
- * A Whenever's `whenever`: who made its members and what they say, each an input where its words name one, and what
- * they hold.
+ * A Whenever's guards, the first lines of its member's turn: who made it and what it says, each an input where its
+ * words name one, and what it holds, as the match decided.
  */
-private fun whenever(step: Step.Whenever, match: Chain.Check?): String {
+private fun guards(step: Step.Whenever, match: Chain.Check?): List<String> {
     fun said(words: String) = INPUT.matchEntire(words)?.groupValues?.get(1) ?: kotlinString(words, slots = false)
-    val named = listOfNotNull(
-        step.by?.let { "by = ${said(it)}" },
-        step.says?.let { "says = ${said(it)}" },
-        match?.let { "has = ${bound(it.facts)}" },
+    return listOfNotNull(
+        step.by?.let { "madeBy(${said(it)})" },
+        step.says?.let { "saying(${said(it)})" },
+        match?.let { "has { ${facts(it.facts)} }" },
     )
-    return if (named.isEmpty()) "whenever" else "whenever(${named.joinToString(", ")})"
 }
 
 /**
@@ -226,8 +223,8 @@ internal class ChainScript(
                 return
             }
             out.line(depth, guard + when {
-                part is Chain.Check -> "$undone = holds(${bound(part.facts)})"
-                next != null -> "${reach((part as Chain.Act).chosen)} { $undone = holds(${bound(next.facts)}) }"
+                part is Chain.Check -> "$undone = holds { ${facts(part.facts)} }"
+                next != null -> "${reach((part as Chain.Act).chosen)} { $undone = holds { ${facts(next.facts)} } }"
                 else -> "${reach((part as Chain.Act).chosen)} {}"
             })
             if (part is Chain.Check || next != null) guard = "if (!$undone) "

@@ -4,7 +4,8 @@
 //   once;
 // - alerts: answer each issue labelled live-alert once;
 // - triage: handle each new comment on the triage issue slowly, as a model call is slow ([slow] seconds).
-// It ends when the watch's issue is closed.
+// It ends when the watch's issue is closed. Conditions are facts blocks and guards
+// (spec/ideas/dsl-conditions-as-facts.md); the script has no if of its own.
 //   artie run watch.kts owner=JogoShugh watch=801 scan=802 triage=803 mode=listeners --rung L2
 import kotlin.time.Duration.Companion.seconds
 
@@ -24,9 +25,10 @@ val pace = every.toInt().seconds
 fun Here.scans() = act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to scan.toInt()) {
     val issue = held.address
     follow("github:issues-list-comments") {
-        whenever(says = "Veracode scan FAILED") {
+        whenever {
+            saying("Veracode scan FAILED")
             at(issue) {
-                if (!holds(mapOf("github:labels" to listOf("security-hold")))) {
+                given { "github:labels" has "security-hold" } otherwise {
                     act("github:label", "labels" to listOf("security-hold")) {}
                     act("github:comment", "body" to "Held for security until the scan passes.") {}
                     note("held #$scan at ${java.time.Instant.now()}")
@@ -41,10 +43,7 @@ fun Here.alerts() = act(
     "github:issues-list-for-repo", "owner" to owner, "repo" to repo, "state" to "open", "labels" to "live-alert",
 ) {
     whenever {
-        var said = false
-        follow("github:issues-list-comments") { said = holds(mapOf("item" to "Seen by the watch.")) }
-        if (!said) {
-            act("github:comment", "body" to "Seen by the watch.") {}
+        actOnce("github:comment", "body" to "Seen by the watch.", listedIn = "github:issues-list-comments") {
             note("answered an alert at ${java.time.Instant.now()}")
         }
     }
@@ -61,21 +60,15 @@ fun Here.triaged() = act("github:issues-get", "owner" to owner, "repo" to repo, 
 }
 
 heart(gateway) {
-    var over = false
-    val closed: Here.() -> Boolean = {
-        act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to watch.toInt()) {
-            over = state["state"].toString().contains("closed")
-        }
-        over
-    }
-    if (mode == "loop") {
-        watch(every = pace, until = closed) {
+    act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to watch.toInt()) { keepAs("watch") }
+    given { that(mode == "loop") } then {
+        watch(every = pace, until = { at("watch") { "state" eq "closed" } }) {
             scans()
             alerts()
             triaged()
         }
-    } else {
-        listeners(every = pace, until = closed) {
+    } otherwise {
+        listeners(every = pace, until = { at("watch") { "state" eq "closed" } }) {
             listen("veracode", every = pace) { scans() }
             listen("alerts", every = pace) { alerts() }
             listen("triage", every = pace) { triaged() }

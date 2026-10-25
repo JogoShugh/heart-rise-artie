@@ -34,7 +34,7 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       heart("https://github.gateway.test/") {
           var looks = 0
           act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
-              watch(every = 10.seconds, until = { ++looks == 3 }) {
+              watch(every = 10.seconds, until = { that(++looks == 3) }) {
                   whenever {
                       once("github:merge") {
                           act("github:merge", "merge_method" to "squash") {}
@@ -59,7 +59,7 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       heart("https://github.gateway.test/") {
           var looks = 0
           act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
-              watch(every = 10.seconds, until = { ++looks == 4 }) {
+              watch(every = 10.seconds, until = { that(++looks == 4) }) {
                   whenever {
                       once("github:merge", giveUp = 15.seconds, otherwise = { why -> note("#${state["number"]}: $why") }) {
                           act("github:merge", "merge_method" to "squash") {}
@@ -86,7 +86,7 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       heart("https://github.gateway.test/") {
           var looks = 0
           act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
-              watch(every = 10.seconds, until = { ++looks == 2 }) {
+              watch(every = 10.seconds, until = { that(++looks == 2) }) {
                   whenever {
                       once("github:merge") {
                           act("github:merge", "merge_method" to "squash") {}
@@ -115,7 +115,7 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       heart("https://github.gateway.test/") {
           var looks = 0
           act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
-              watch(every = 10.seconds, until = { ++looks == 3 }) {
+              watch(every = 10.seconds, until = { that(++looks == 3) }) {
                   whenever {
                       once("github:merge", giveUp = 15.seconds, otherwise = { why -> note("#${state["number"]}: $why") }) {
                           act("github:merge", "merge_method" to "squash") {}
@@ -151,7 +151,7 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       heart("https://github.gateway.test/") {
           var looks = 0
           act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
-              watch(every = 1.minutes, until = { ++looks == 8 }) {
+              watch(every = 1.minutes, until = { that(++looks == 8) }) {
                   whenever {
                       if (state["draft"].toString() == "false") note("ready: #${state["number"]}")
                       once("github:merge", giveUp = 10.minutes, otherwise = {
@@ -214,14 +214,9 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       import kotlin.time.Duration.Companion.seconds
 
       heart("https://github.gateway.test/") {
-          var watched = ""
-          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) { watched = held.address }
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) { keepAs("watched") }
           act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
-              watch(every = 10.seconds, until = {
-                  var closed = false
-                  at(watched) { closed = holds(mapOf("state" to "closed")) }
-                  closed
-              }) {
+              watch(every = 10.seconds, until = { at("watched") { "state" eq "closed" } }) {
                   whenever {
                       once("github:merge") {
                           act("github:merge", "merge_method" to "squash") {}
@@ -257,7 +252,7 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       heart("https://github.gateway.test/") {
           var looks = 0
           act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
-              watch(every = 10.seconds, until = { ++looks == 2 }) {
+              watch(every = 10.seconds, until = { that(++looks == 2) }) {
                   whenever {
                       if (holds(mapOf("github:labels" to listOf("alert"), "state" to "open"))) {
                           var said = false

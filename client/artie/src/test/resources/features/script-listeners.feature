@@ -33,7 +33,7 @@ Feature: Listeners, each on its own: a slow one never holds up another
 
       heart("https://github.gateway.test/") {
           var looks = 0
-          listeners(every = 200.milliseconds, until = { ++looks >= 4 }) {
+          listeners(every = 200.milliseconds, until = { that(++looks >= 4) }) {
               var said = false
               listen("scan", every = 100.milliseconds) {
                   act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
@@ -76,7 +76,7 @@ Feature: Listeners, each on its own: a slow one never holds up another
 
       heart("https://github.gateway.test/") {
           var looks = 0
-          listeners(every = 200.milliseconds, until = { ++looks >= 6 }) {
+          listeners(every = 200.milliseconds, until = { that(++looks >= 6) }) {
               listen("first", every = 50.milliseconds) {
                   act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open") {
                       note("first: ${state["count"]} open")
@@ -115,11 +115,11 @@ Feature: Listeners, each on its own: a slow one never holds up another
 
       heart("https://github.gateway.test/") {
           var looks = 0
-          listeners(every = 100.milliseconds, until = { ++looks >= 8 }) {
+          listeners(every = 100.milliseconds, until = { that(++looks >= 8) }) {
               listen("veracode", every = 50.milliseconds) {
                   act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
                       follow("github:issues-list-comments") {
-                          whenever(by = "veracode-bot", says = "failed") { note("answered: ${state["body"]}") }
+                          whenever { madeBy("veracode-bot"); saying("failed"); note("answered: ${state["body"]}") }
                       }
                   }
               }
@@ -147,11 +147,11 @@ Feature: Listeners, each on its own: a slow one never holds up another
 
       heart("https://github.gateway.test/") {
           var looks = 0
-          listeners(every = 200.milliseconds, until = { ++looks >= 10 }) {
+          listeners(every = 200.milliseconds, until = { that(++looks >= 10) }) {
               listen("veracode", every = 30.seconds) {
                   act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
                       follow("github:issues-list-comments") {
-                          whenever(by = "veracode-bot", says = "failed") { note("answered: ${state["body"]}") }
+                          whenever { madeBy("veracode-bot"); saying("failed"); note("answered: ${state["body"]}") }
                       }
                   }
               }
@@ -179,11 +179,13 @@ Feature: Listeners, each on its own: a slow one never holds up another
 
       heart("https://github.gateway.test/") {
           var looks = 0
-          listeners(every = 100.milliseconds, until = { ++looks >= 8 }) {
+          listeners(every = 100.milliseconds, until = { that(++looks >= 8) }) {
               listen("veracode", every = 50.milliseconds) {
                   act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
                       follow("github:issues-list-comments") {
-                          whenever(by = "veracode-bot", says = "failed") {
+                          whenever {
+                              madeBy("veracode-bot")
+                              saying("failed")
                               val said = state["body"].toString()
                               enter("https://mail.gateway.test/mailboxes/1") {
                                   act("mail:send", "to" to "ada@rockets.test", "subject" to "Veracode failed on #10", "body" to said) {}
@@ -216,7 +218,7 @@ Feature: Listeners, each on its own: a slow one never holds up another
 
       heart("https://github.gateway.test/") {
           var looks = 0
-          listeners(every = 1.minutes, until = { ++looks > 30 }) {
+          listeners(every = 1.minutes, until = { that(++looks > 30) }) {
               listen("merge", every = 1.hours) {
                   act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
                       whenever {
