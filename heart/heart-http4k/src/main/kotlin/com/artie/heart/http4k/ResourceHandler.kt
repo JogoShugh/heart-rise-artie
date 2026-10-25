@@ -3,6 +3,7 @@ package com.artie.heart.http4k
 import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.ActRequests
+import com.artie.heart.ActTargets
 import com.artie.heart.Acted
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
@@ -15,6 +16,7 @@ import com.artie.heart.ServingLimits
 import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.runBlocking
+import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import org.http4k.core.Status
@@ -41,6 +43,7 @@ class ResourceHandler<S, K>(
 ) {
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper, limits.validatorRequired)
+    private val targets = ActTargets(resource.layers)
 
     /** The current state, or as of `?asOf=` for a type that keeps its past; any other query is not a route. */
     fun read(request: Request): Response {
@@ -82,17 +85,37 @@ class ResourceHandler<S, K>(
 
     fun act(request: Request): Response {
         val act = type.acts.firstOrNull { it.answersAt(checkNotNull(request.path("path"))) }
+        val plainJson = Negotiation.wantsPlainJson(request.header(ACCEPT))
         return when {
             act == null -> Response(Status.NOT_FOUND)
+            // SPEC §6.3: the act's target is a resource; GET reads it, under its owner's ETag.
+            request.method in READS && !plainJson -> target(act, request)
             !ActRequests.allowed(act, request.method.name) ->
                 Response(Status.METHOD_NOT_ALLOWED).header(ALLOW, act.method)
-            Negotiation.wantsPlainJson(request.header(ACCEPT)) -> actPlain(act, request)
+            plainJson -> actPlain(act, request)
             else -> actHeart(act, request)
         }
     }
 
-    /** The act's input: the body, or a DELETE's query (SPEC §6.2). */
-    private fun input(act: Act, request: Request): String? = ActRequests.input(act, body(request), request.uri.query)
+    /**
+     * [act]'s target, read: 200 with its representation, under the ETag of the owner's representation this
+     * request selects; 304 while that is unchanged; 409, with why, when the owner doesn't offer it now.
+     */
+    private fun target(act: Act, request: Request): Response {
+        val dialect = dialect(request)
+        val state = runBlocking { pipeline.checkOffered(act.name) { resource.locate(variables(request)) } }
+        val owner = Rendered(state, dialect, limits.rung(dialect, request))
+        val body = when (dialect) {
+            Dialect.JSONSCHEMA -> targets.of(state, act, limits.rung(dialect, request), owner.etag)
+            Dialect.HALFORMS -> targets.halForms(state, act, owner.etag)
+        }
+        val ifNoneMatch = request.header(IF_NONE_MATCH)
+        if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, owner.etag)) {
+            return owner.headers(Response(Status.NOT_MODIFIED))
+        }
+        val answered = owner.headers(Response(Status.OK).header(CONTENT_TYPE, dialect.mediaType))
+        return if (request.method == Method.HEAD) answered else answered.body(mapper.writeValueAsString(body))
+    }
 
     /** An act in HEART: its validator checked first, as SPEC §6.2 says. */
     private fun actHeart(act: Act, request: Request): Response {
@@ -193,6 +216,9 @@ class ResourceHandler<S, K>(
         type.itemPath.variables.mapNotNull { name -> request.path(name)?.let { name to it } }.toMap()
 
     private companion object {
+        /** The methods that read an act's target rather than perform the act. */
+        val READS = setOf(Method.GET, Method.HEAD)
+
         /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. No rung above the cap is served. */
         fun ServingLimits.rung(dialect: Dialect, request: Request): Rung =
             if (dialect == Dialect.JSONSCHEMA) cap(Rung.fromPrefer(request.header(PREFER))) else Rung.L0
@@ -211,6 +237,9 @@ class ResourceHandler<S, K>(
         }
 
         fun body(request: Request): String? = request.bodyString().ifEmpty { null }
+
+        /** The act's input: the body, or a DELETE's query (SPEC §6.2). */
+        fun input(act: Act, request: Request): String? = ActRequests.input(act, body(request), request.uri.query)
 
         fun dialect(request: Request): Dialect =
             Negotiation.dialect(request.header(ACCEPT), request.header(Negotiation.ACCEPT_PROFILE))

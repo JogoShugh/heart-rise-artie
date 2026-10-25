@@ -128,6 +128,13 @@ class CoapSteps(private val door: CoapFrontDoor, private val store: LampStore) {
         held = last.options.eTags.firstOrNull()
     }
 
+    /** Reads [path] as the last read asked, keeping the lamp's validator the client holds. */
+    @When("the CoAP client gets {string} as it got the lamp")
+    fun getAsBefore(path: String) = send(read(path))
+
+    @Then("the CoAP ETag is the lamp's")
+    fun lampsETag() = assertArrayEquals(checkNotNull(held), last.options.eTags.singleOrNull())
+
     @When("the CoAP client gets {string} again with the ETag it holds")
     fun revalidate(path: String) = send(read(path).apply { options.addETag(checkNotNull(held)) })
 

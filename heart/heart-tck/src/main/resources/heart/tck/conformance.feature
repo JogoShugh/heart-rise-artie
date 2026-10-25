@@ -78,6 +78,42 @@ Feature: HEART conformance over HTTP, for any declared resource type
     Then the act is refused as stale
     And the resource holds only the other client's act
 
+  Scenario Outline: An act's target is a resource, under its owner's ETag, at L<n>
+    SPEC §6.3: If-Match on an act is compared with the representation of the
+    act's own target. That target is a resource: GET it, and it names its
+    owner and its form, and carries the owner's ETag in the same negotiation.
+    Its body is small: the form stays in the owner's shared affordance set,
+    linked by a JSON Pointer fragment, with the set's and the form's own
+    integrity. A client that holds the owner's ETag already holds the act's,
+    so it never needs this GET to act.
+    When a client gets the resource as hal-schema-forms with Prefer "<prefer>"
+    And the client gets the offered act's target as it got the resource
+    Then the response status is 200
+    And the response has Cache-Control "no-cache"
+    And the response's ETag is the resource's
+    And the response links "up" to the resource
+    And the response links the offered act's form in the resource's affordance set, with the form's own integrity
+    When the client sends the offered act with its valid body and the ETag it holds
+    Then the response status is 200
+
+    Examples:
+      | n | prefer                  |
+      | 1 | forms=link              |
+      | 2 | forms=link, schema=link |
+
+  Scenario: An act's target is revalidated with 304 while its owner is unchanged
+    When a client gets the resource as hal-schema-forms
+    And the client gets the offered act's target as it got the resource
+    And the client gets the offered act's target again with the ETag it was given
+    Then the response status is 304
+
+  Scenario: An act not offered now answers at its target with why, as a problem
+    When a client gets the resource as hal-schema-forms
+    And the client gets the absent act's target as it got the resource
+    Then the response status is 409
+    And the response is a problem of type "not-offered"
+    And the problem's detail gives the absent act's reason
+
   Scenario: HAL-FORMS offers the same acts, by the same targets
     Then a hal-schema-forms client and a hal-forms client see the same act targets on the resource
     And the response status is 200

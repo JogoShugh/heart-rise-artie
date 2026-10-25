@@ -48,6 +48,15 @@
       ]
     },
     {
+      "path": "rels/form",
+      "kind": "Link relation",
+      "title": "form",
+      "definition": "From an act's target to its form, where the form already lives: in the owning resource's shared affordance set, by a JSON Pointer fragment, with the set's integrity and the form's own. Served on the act's target when it is read, so the target has a representation of its own while the form stays shared. Written as the CURIE hr:form.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#62-compliant-server-behaviour"
+      ]
+    },
+    {
       "path": "problems/stale",
       "kind": "Problem type",
       "title": "The act is stale: the state has changed",

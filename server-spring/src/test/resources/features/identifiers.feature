@@ -16,6 +16,7 @@ Feature: Every HEART identifier the garden sends leads to a page
       | https://w3id.org/heart-rise/hal-forms                   |
       | https://w3id.org/heart-rise/rels/forms                  |
       | https://w3id.org/heart-rise/rels/unavailable            |
+      | https://w3id.org/heart-rise/rels/form                   |
       | https://w3id.org/heart-rise/problems/stale              |
       | https://w3id.org/heart-rise/problems/not-offered        |
       | https://w3id.org/heart-rise/problems/invalid-input      |

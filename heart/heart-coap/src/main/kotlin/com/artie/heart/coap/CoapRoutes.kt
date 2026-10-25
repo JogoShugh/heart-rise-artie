@@ -3,6 +3,7 @@ package com.artie.heart.coap
 import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.ActRequests
+import com.artie.heart.ActTargets
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
@@ -54,6 +55,9 @@ internal class CoapRoutes(
             request.code != Code.GET -> replies.error(ResponseCode.METHOD_NOT_ALLOWED, "${request.code} $path")
             typed != null && segments.size == 1 -> search(typed, request)
             typed != null && segments.size == 2 -> typed.read(request, id(segments[1]))
+            // SPEC §6.3: an act's target is a resource, read under its owner's validator.
+            typed != null && segments.size == ACT_SEGMENTS && segments[2] == ACTIONS ->
+                typed.target(request, id(segments[1]), segments[ACT_SEGMENTS - 1])
             else -> read(request, segments) ?: replies.error(ResponseCode.NOT_FOUND, path)
         }
     }
@@ -114,6 +118,7 @@ internal class CoapRoutes(
     private inner class Typed(val resource: HeartResource<Any?, Any?>, mapper: ObjectMapper) {
         val collection = resource.layers.type.collection
         private val pipeline = ActPipeline(resource.layers.type, mapper)
+        private val targets = ActTargets(resource.layers)
 
         suspend fun read(request: Request, id: Long): Response {
             val state = resource.load(id)
@@ -122,6 +127,22 @@ internal class CoapRoutes(
             if (request.options.eTags.any { it.contentEquals(validator) }) return replies.valid(validator)
             val body = resource.layers.layer1(state, rung)
             return replies.layer1(ResponseCode.CONTENT, body, validator, rung.preferenceApplied)
+        }
+
+        /** An act's target, read: its representation under its owner's validator; 4.09, with why, if not offered. */
+        suspend fun target(request: Request, id: Long, path: String): Response {
+            val act = resource.layers.type.acts.firstOrNull { it.answersAt(path) }
+                ?: return replies.error(ResponseCode.NOT_FOUND, path)
+            val state = pipeline.checkOffered(act.name) { resource.load(id) }
+            val rung = rung(request)
+            val etag = etagOf(state, rung)
+            val validator = CoapOptions.validator(etag)
+            return if (request.options.eTags.any { it.contentEquals(validator) }) {
+                replies.valid(validator)
+            } else {
+                val body = targets.of(state, act, rung, etag)
+                replies.layer1(ResponseCode.CONTENT, body, validator, rung.preferenceApplied)
+            }
         }
 
         /** SPEC §6.2 over CoAP: the same checks, in the same order, with the 8-byte validator. */
@@ -175,11 +196,12 @@ internal class CoapRoutes(
                 .apply { options.setLocationPath("$collection/$id") }
         }
 
-        private fun validatorOf(state: Any?, rung: Rung): ByteArray = CoapOptions.validator(
-            StateETag.of(
-                resource.layers.type.state.versionOf(state), Dialect.JSONSCHEMA.etagTag, rung,
-                resource.layers.layer1(state, rung),
-            ),
+        private fun validatorOf(state: Any?, rung: Rung): ByteArray = CoapOptions.validator(etagOf(state, rung))
+
+        /** The HTTP ETag of [state]'s representation at [rung], which the CoAP validator is taken from. */
+        private fun etagOf(state: Any?, rung: Rung): String = StateETag.of(
+            resource.layers.type.state.versionOf(state), Dialect.JSONSCHEMA.etagTag, rung,
+            resource.layers.layer1(state, rung),
         )
     }
 

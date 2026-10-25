@@ -54,6 +54,22 @@ Feature: A declared resource over CoAP, served by heart-coap
       | posts   | dim        | {"brightness": 20} |
       | deletes | switch-off | {}                 |
 
+  Scenario: An act's target is a resource over CoAP too, under its lamp's validator
+    SPEC §6.3, as over HTTP: GET on an act's target answers with its small
+    representation and the validator of the lamp's own representation.
+    Given a CoAP client got "/lamps/7" with Prefer "forms=link, schema=link"
+    When the CoAP client gets "/lamps/7/actions/dim" as it got the lamp
+    Then the CoAP response is 2.05
+    And the CoAP ETag is the lamp's
+    And the CoAP body links self to "/lamps/7/actions/dim"
+    And the CoAP body links up to "/lamps/7"
+
+  Scenario: An act not offered now answers at its target with 4.09, and why
+    Given a CoAP client got "/lamps/7" with Prefer ""
+    When the CoAP client gets "/lamps/7/actions/switch-on" as it got the lamp
+    Then the CoAP response is 4.09
+    And the CoAP problem type is "not-offered"
+
   Scenario: A successful act answers with the lamp's new representation
     Given a CoAP client got "/lamps/7" with Prefer ""
     When the CoAP client puts {"brightness": 20} to "/lamps/7/actions/dim" with the ETag it holds

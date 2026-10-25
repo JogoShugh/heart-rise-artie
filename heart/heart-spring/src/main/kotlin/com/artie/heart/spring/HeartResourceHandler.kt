@@ -3,6 +3,7 @@ package com.artie.heart.spring
 import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.ActRequests
+import com.artie.heart.ActTargets
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
@@ -12,6 +13,7 @@ import com.artie.heart.ServingLimits
 import com.artie.heart.StateETag
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -41,6 +43,7 @@ class HeartResourceHandler<S, K>(
 ) {
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper)
+    private val targets = ActTargets(resource.layers)
 
     suspend fun read(request: ServerRequest): ServerResponse = represent(resource.locate(variables(request)), request)
 
@@ -83,7 +86,7 @@ class HeartResourceHandler<S, K>(
             )
         }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
-        val rendered = Rendered(state, dialect, rung(dialect, request))
+        val rendered = Rendered(state, dialect, limits.rung(dialect, request))
         val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
         return if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, rendered.etag)) {
             ServerResponse.status(HttpStatus.NOT_MODIFIED).headers { rendered.headers(it) }.buildAndAwait()
@@ -94,21 +97,46 @@ class HeartResourceHandler<S, K>(
 
     suspend fun act(request: ServerRequest): ServerResponse {
         val act = type.acts.firstOrNull { it.answersAt(request.pathVariable("path")) }
+        val plainJson = HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())
         return when {
             act == null -> ServerResponse.notFound().buildAndAwait()
+            // SPEC §6.3: the act's target is a resource; GET reads it, under its owner's ETag.
+            request.method() in READS && !plainJson -> target(act, request)
             !ActRequests.allowed(act, request.method().name()) ->
                 ServerResponse.status(HttpStatus.METHOD_NOT_ALLOWED).header(HttpHeaders.ALLOW, act.method)
                     .buildAndAwait()
-            HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders()) -> actPlain(act, request)
+            plainJson -> actPlain(act, request)
             else -> actHeart(act, request)
         }
+    }
+
+    /**
+     * [act]'s target, read: 200 with its representation, under the ETag of the owner's representation this
+     * request selects; 304 while that is unchanged; 409, with why, when the owner doesn't offer it now.
+     */
+    private suspend fun target(act: Act, request: ServerRequest): ServerResponse {
+        val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
+        val rung = limits.rung(dialect, request)
+        val state = pipeline.checkOffered(act.name) { resource.locate(variables(request)) }
+        val owner = Rendered(state, dialect, rung)
+        val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
+        if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, owner.etag)) {
+            return ServerResponse.status(HttpStatus.NOT_MODIFIED).headers { owner.headers(it) }.buildAndAwait()
+        }
+        val body = when (dialect) {
+            Dialect.JSONSCHEMA -> targets.of(state, act, rung, owner.etag)
+            Dialect.HALFORMS -> targets.halForms(state, act, owner.etag)
+        }
+        val answer = ServerResponse.ok().contentType(MediaType.parseMediaType(dialect.mediaType))
+            .headers { owner.headers(it) }
+        return if (request.method() == HttpMethod.HEAD) answer.buildAndAwait() else answer.bodyValueAndAwait(body)
     }
 
     /** An act in HEART: its validator checked first, as SPEC §6.2 says. */
     private suspend fun actHeart(act: Act, request: ServerRequest): ServerResponse {
         // Negotiate before acting, so a 406 never follows a write.
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
-        val rung = rung(dialect, request)
+        val rung = limits.rung(dialect, request)
         val variables = variables(request)
         val ifMatch = request.headers().firstHeader(HttpHeaders.IF_MATCH)
         val checked = pipeline.check(act.name, ifMatch, { resource.locate(variables) }) { current, held ->
@@ -145,7 +173,7 @@ class HeartResourceHandler<S, K>(
             )
         }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
-        val rung = rung(dialect, request)
+        val rung = limits.rung(dialect, request)
         pipeline.checkAtBookmark(name, request.headers().firstHeader(HttpHeaders.IF_MATCH)) { held ->
             StateETag.matches(held, index.validator(dialect))
         }
@@ -205,20 +233,23 @@ class HeartResourceHandler<S, K>(
                 .bodyValueAndAwait(body)
     }
 
-    /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. No rung above the cap is served. */
-    private fun rung(dialect: Dialect, request: ServerRequest): Rung =
-        if (dialect == Dialect.JSONSCHEMA) {
-            limits.cap(Rung.fromPrefer(request.headers().firstHeader(HttpNegotiation.PREFER)))
-        } else {
-            Rung.L0
-        }
-
     /** The item path's variables, as the request's path filled them. */
     private fun variables(request: ServerRequest): Map<String, String> =
         request.pathVariables().filterKeys { it in type.itemPath.variables }
 
     private companion object {
         const val PREFERENCE_APPLIED = "Preference-Applied"
+
+        /** The methods that read an act's target rather than perform the act. */
+        val READS = setOf(HttpMethod.GET, HttpMethod.HEAD)
+
+        /** HAL-FORMS is the L0 on-ramp: it ignores layering preferences. No rung above the cap is served. */
+        fun ServingLimits.rung(dialect: Dialect, request: ServerRequest): Rung =
+            if (dialect == Dialect.JSONSCHEMA) {
+                cap(Rung.fromPrefer(request.headers().firstHeader(HttpNegotiation.PREFER)))
+            } else {
+                Rung.L0
+            }
 
         /** Layer 1 only: Layers 2 and 3 never vary (SPEC §6.1). HAL-FORMS is always L0, so Prefer cannot change it. */
         fun vary(dialect: Dialect): String = when (dialect) {

@@ -9,7 +9,7 @@
 **Proposed in 0.5** (editor's proposals; none is accepted until the author removes its `[0.5]` marker):
 
 1. **Status line corrected (front matter).** Decided 2026-10-09: the status line now says what is implemented and tested live.
-2. **Precondition scope and strong validators (§6.1, §6.2, §6.3).** Decided 2026-10-08; see below.
+2. **Precondition scope and strong validators (§6.1, §6.2, §6.3).** Decided 2026-10-08; an act's target made a resource of its own, read under its owner's ETag, 2026-10-25. See below.
 3. **Evaluation order (§6.2).** Decided 2026-10-09; see below.
 4. **Layer 3 scope (§6.5).** Decided 2026-10-09; see below.
 5. **Template variable resolution (§6.9.1).** Superseded: decided below as declared template pointers.
@@ -436,6 +436,15 @@ A server MAY add other members RFC 9457 allows, such as `detail` and `instance`.
 The critical distinction, and the one §6.10.5 exists to demonstrate: **412 means the world moved under a valid intent; 409 means the intent was never valid here.** A client that retries on 412 corrupts state. A client that treats 409 as transient loops forever.
 
 **Precondition scope (decided 2026-10-08).** An act is sent to an affordance target (for example `/beds/2/actions/water-cell`), not to the Layer 1 URI that issued the `ETag`. RFC 9110 evaluates `If-Match` against the *selected representation* of the target resource, and the origin server decides what that is (RFC 9110 §3.2). H.E.A.R.T. decides it this way: every affordance target belongs to exactly one *owning resource*, the Layer 1 resource whose affordance set listed it, and an act's selected representation is the owning resource's representation chosen by **the act's own** `Accept`, `Accept-Profile` and `Prefer`.
+
+**An act's target is a resource (decided 2026-10-25).** So that the selected representation is something a client, a cache or a proxy can observe, and not only something the server asserts, a server SHALL answer `GET` and `HEAD` on an act's target, in either dialect:
+
+- **Offered now:** `200`, with the `ETag` of the owning resource's representation that the request's own `Accept`, `Accept-Profile` and `Prefer` select, and `Cache-Control: no-cache`, as Layer 1. The body is small. In HAL Schema Forms it holds `ownerETag`, that same value, and links: `self`; `up` (RFC 8288's registered relation) to the owning resource; and `hr:form` to the act's form where it already lives, in the affordance set the owner links at that rung (the set with schemas embedded, at L0), by a JSON Pointer fragment (RFC 6901 §6), with the set's `integrity` and the form's own `hr:integrity` (HAL-SCHEMA-FORMS-HR Rules 2 and 10). In HAL-FORMS it holds `ownerETag`, `self`, `up`, and the act's one template as the owner renders it. It carries no copy of the shared form and none of the owner's state. Its bytes change exactly when the owner's representation does, so the owner's `ETag` is a strong validator for it (RFC 9110 §8.8.1).
+- **While unchanged:** a request whose `If-None-Match` names that `ETag` is answered `304`.
+- **Not offered now:** `409` with the `not-offered` problem type and the reason, as an act would be refused.
+- A request for plain JSON (the OpenAPI twin) is not served at an act's target; the act alone is, as before.
+
+The `ETag` an act's `If-Match` is compared with is therefore the target's own, exactly as RFC 9110 §13.1.1 reads, and it is the value a client already holds from its sync: no client sends anything new, and none needs this `GET` before acting. It is there to be read, revalidated, linked and logged. Not yet served: `GET` on an act the bookmark offers, at `/actions/{path}`. Richer readings of an act's target, all opt-in and discovered from the representation, are parked in `spec/ideas/act-resource.md`.
 
 HTTP is stateless, so a client SHALL send on each act the same negotiation headers it sent on the sync whose `ETag` it holds. The server SHALL select the owning resource's representation from those headers and compare `If-Match` with that representation's current `ETag` by **strong comparison**, the whole value, character for character; `*` matches any current representation. This is RFC 9110 §13.1.1 as written. Nothing is narrowed: no part of an `ETag` is ignored, and an `ETag` for another representation than the act's headers select does not match, even if the state is unchanged.
 

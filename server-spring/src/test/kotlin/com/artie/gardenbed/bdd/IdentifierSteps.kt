@@ -37,6 +37,10 @@ class IdentifierSteps(
                 val headers = mapOf("Accept" to HAL_SCHEMA_FORMS_ACCEPT) + listOfNotNull(prefer?.let { "Prefer" to it })
                 val bed = http.get("/beds/2", headers).also(::collect)
                 shared(bed.json).forEach { collect(http.get(it)) }
+                // Each act's target is a resource too (SPEC §6.3), read in the same negotiation.
+                bed.json.path("_forms").forEach { form ->
+                    collect(http.get(form.path("_links").path("target").path("href").asText(), headers))
+                }
             }
         }
         refusals()
