@@ -816,7 +816,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | act   | say on it that the watch has seen it                |       |          |                                      |
       | done  |                                                     |       |          |                                      |
       | act   | read its comments                                   |       |          |                                      |
-      | check |                                                     |       |          | {"item": "Seen by the bench watch."} |
+      | check |                                                     |       |          | {"item": ["Seen by the bench watch."]} |
       | done  |                                                     |       |          |                                      |
       | check |                                                     |       |          | {"state": "closed"}                  |
     And ARTIE's reasoner will choose, in order
@@ -844,9 +844,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
           act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
               whenever {
                   if (holds(mapOf("state" to "open"))) {
-                      var undone1 = false
-                      follow("github:issues-list-comments") { undone1 = holds(mapOf("item" to "Seen by the bench watch.")) }
-                      if (!undone1) act("github:comment", "body" to "Seen by the bench watch.") {}
+                      actOnce("github:comment", "body" to "Seen by the bench watch.", listedIn = "github:issues-list-comments") {}
                   }
               }
           }

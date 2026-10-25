@@ -54,6 +54,43 @@ Feature: A HEART script: the Reason step written in advance
       | return | /issues/10                                |
       | act    | close                                     |
 
+  Scenario: An act the list it names already shows is not made
+    A watch says a thing once. With actOnce, before the act ARTIE
+    follows that relation from where it is and looks for an item that
+    already says what the act would send. Where one does, nothing is sent.
+    The look is made with the act's own values, so it cannot drift from them.
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          actOnce("comment", "body" to "Fixed in 1.2.", listedIn = "comments")
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                     |
+      | enter  | scripted://service/      |
+      | act    | issues-get {"number":10} |
+      | follow | comments                 |
+      | return | /issues/10               |
+
+  Scenario: An act the list it names doesn't show yet is made
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          actOnce("comment", "body" to "Fixed in 1.3.", listedIn = "comments")
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                             |
+      | enter  | scripted://service/              |
+      | act    | issues-get {"number":10}         |
+      | follow | comments                         |
+      | return | /issues/10                       |
+      | act    | comment {"body":"Fixed in 1.3."} |
+
   Scenario: A long act's values in a block, one a line, which may be left out; the block after still visits
     When this script runs
       """kotlin

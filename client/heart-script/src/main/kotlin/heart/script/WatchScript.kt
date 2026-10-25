@@ -194,7 +194,11 @@ internal class ChainScript(
     fun chain(intent: Step.Intent, part: String, depth: Int) {
         val chain = decided.acts[intent to part]
             ?: return out.said(depth, "${fill(intent.words)}: not decided in this run")
-        val undone = if (chain.parts.any { it is Chain.Check }) "undone${++chains}" else null
+        // A check written as an actOnce needs no variable; any other does.
+        val guarded = chain.parts.indices.any { at ->
+            chain.parts[at] is Chain.Check && saidOnce(chain.parts, at - 1) == null
+        }
+        val undone = if (guarded) "undone${++chains}" else null
         undone?.let { out.line(depth, "var $it = false") }
         parts(chain.parts, undone, depth)
         if (!chain.complete) out.said(depth, "${fill(intent.words)}: decided no further in this run")
@@ -207,6 +211,12 @@ internal class ChainScript(
         while (at < parts.size) {
             val part = parts[at]
             val next = parts.getOrNull(at + 1) as? Chain.Check
+            val once = saidOnce(parts, at)
+            if (once != null) {
+                out.line(depth, guard + once)
+                at += ONCE_PARTS
+                continue
+            }
             if (part is Chain.Act && part.opens) {
                 out.open(depth, "$guard${reach(part.chosen)}") { parts(parts.drop(at + 1), undone, it) }
                 return

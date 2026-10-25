@@ -21,6 +21,33 @@ internal fun reach(chosen: Chosen): String {
     return "act($relation$fields)"
 }
 
+/** How many parts of a chain an `actOnce` is written for: a read, a check on it, and the act it guards. */
+internal const val ONCE_PARTS = 3
+
+/**
+ * The parts of [parts] from [at] as one `actOnce`, when they are "say it, unless it's said already": a read that
+ * opens nothing, a check that what it reached shows a text, and an act that opens nothing and sends that same text.
+ * The act then checks with its own value, read again as the act sends it, so the two can't drift apart. Null when
+ * they are anything else.
+ */
+internal fun saidOnce(parts: List<Chain.Part>, at: Int): String? {
+    val read = parts.getOrNull(at) as? Chain.Act
+    val check = parts.getOrNull(at + 1) as? Chain.Check
+    val act = parts.getOrNull(at + 2) as? Chain.Act
+    // The text a check looks for, written alone or as a list of one.
+    val kept = check?.facts?.values?.singleOrNull()?.kept
+    val said = kept as? String ?: (kept as? List<*>)?.singleOrNull() as? String
+    val sends = act?.chosen?.values?.values.orEmpty().map { it.kept }
+    val fits = read != null && read.chosen.kind == "link" && !read.opens && act != null && !act.opens &&
+        act.chosen.kind != "link" && said != null && said in sends
+    return if (fits) {
+        reach(act!!.chosen).replaceFirst("act(", "actOnce(").dropLast(1) +
+            ", listedIn = ${kotlinString(read!!.chosen.relation, slots = false)}) {}"
+    } else {
+        null
+    }
+}
+
 /** Facts kept with each value bound to where it came from, as a map of the expressions that read them. */
 internal fun bound(facts: Map<String, Bound>): String =
     "mapOf(" + facts.entries.joinToString(", ") { (member, value) ->
