@@ -66,8 +66,11 @@ class Run(
     /** What a `watch` remembers from look to look: what each resource was, what waits, what is done. */
     internal val watching = Watching()
 
-    /** The addresses the script kept by name (`keepAs`), to read them again by name (`holdsAt`). */
-    internal val kept = mutableMapOf<String, String>()
+    /** The resources the script kept by name (`keepAs`), to read them again by name (`at`, `kept`). */
+    internal val kept = java.util.concurrent.ConcurrentHashMap<String, Kept>()
+
+    /** A resource kept by name: the address the server gave it, and its state when it was kept. */
+    internal class Kept(val address: String, val state: State)
 
     /** Another entry than the script's: an environment, another binding. Set before the run. */
     var entry: String? = null

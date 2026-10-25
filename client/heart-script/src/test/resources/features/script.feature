@@ -130,6 +130,46 @@ Feature: A HEART script: the Reason step written in advance
       """
     Then the script failed: "nothing is kept as \"isue\"; keepAs(\"isue\") where it is reached"
 
+  Scenario: A value read from a resource kept by name, with no variable to fill
+    A script declares once what it reads from a resource it keeps, as it
+    declares an input, and reads it after the act that reached it: no var,
+    and no assignment in the act's block. The value is the resource's as it
+    was when it was kept.
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          val title by kept("issue") { text("title") }
+          act("issues-get", "number" to 10) { keepAs("issue") }
+          note("kept: $title")
+          act("issues-get", "number" to 10) {
+              act("comment", "body" to "About: $title")
+          }
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                                         |
+      | enter  | scripted://service/                          |
+      | act    | issues-get {"number":10}                     |
+      | return | /                                            |
+      | act    | issues-get {"number":10}                     |
+      | act    | comment {"body":"About: Login fails on Safari"} |
+      | return | /                                            |
+    And the script noted, in order
+      | note                         |
+      | kept: Login fails on Safari  |
+
+  Scenario: A value read from a resource not kept yet stops the script, saying so
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          val title by kept("issue") { text("title") }
+          note(title)
+          act("issues-get", "number" to 10) { keepAs("issue") }
+      }
+      """
+    Then the script failed: "nothing is kept as \"issue\" yet; keepAs(\"issue\") before reading it"
+
   Scenario: A long act's values in a block, one a line, which may be left out; the block after still visits
     When this script runs
       """kotlin

@@ -22,16 +22,13 @@ val repository = arrayOf("owner" to owner, "repo" to repo)
 val WATCH = "Not merged by the auto-merge watch"
 
 heart(gateway) {
-    var watch = 0L
+    val watch by kept("watch") { long("number") }
     act("github:repos-get", *repository) {
         act("github:open-issue", fields = {
             "title" to "Auto-merge watch ($stamp)"
             "body" to "Pull requests labelled `$label` are merged once they can be; `$hold` keeps one back. " +
                 "Close this issue to stop the watch."
-        }) {
-            watch = state.long("number")
-            keepAs("watch")
-        }
+        }) { keepAs("watch") }
     }
     // The watch stands at the entry, where both the list and the watch's issue are reached from.
     // Until someone closes the watch's issue.
