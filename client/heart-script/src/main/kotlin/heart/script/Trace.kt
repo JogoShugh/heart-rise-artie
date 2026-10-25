@@ -173,8 +173,11 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
     /** One intent step: the words, and the choice the reasoner made, known only once it has made it. */
     override fun reason(intent: String): Reasoned {
         var reasoned: Reasoned? = null
+        // What the run tells the reasoner besides the words (a wait gave up, and why) is the reasoner's, not the
+        // person's: the trace keeps the words alone.
+        val told = run.besides?.let { "$intent. $it" } ?: intent
         val answer = traced({ reasonAsked(intent, reasoned?.chosen) }) {
-            inner.reason(intent).also { reasoned = it }.answer
+            inner.reason(told).also { reasoned = it }.answer
         }
         reasoned?.model?.takeIf { it.isNotEmpty() }?.let { run.trace.last().model = it }
         return Reasoned(reasoned?.chosen, answer, reasoned?.model.orEmpty())

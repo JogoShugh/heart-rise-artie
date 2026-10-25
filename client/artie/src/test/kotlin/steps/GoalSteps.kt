@@ -208,6 +208,13 @@ class GoalSteps(
         assertTrue(script.lines().any { text in it }, script)
     }
 
+    @Then("the capture {string} has no step whose words hold {string}")
+    fun noStepSays(capture: String, words: String) {
+        val said = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).drop(1)
+            .map { (it as Map<*, *>)["say"].toString() }
+        assertTrue(said.none { words in it }, said.filter { words in it }.joinToString("\n"))
+    }
+
     @Then("the planner was shown these steps, move by move")
     fun stepsShown(table: DataTable) {
         val rows = table.asMaps()

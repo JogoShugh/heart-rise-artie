@@ -214,13 +214,16 @@ internal class StepWatch(
         // already: told twice, the reasoner says it twice.
         val said = host.fill(move.words)
         val told = gaveUp(why)?.takeUnless { why != null && why.trim().trimEnd('.') in said }
-        val words = said + told?.let { ". ${it.replaceFirstChar(Char::uppercase)}." }.orEmpty()
+        val words = said
         val sources = sources(here, why, meant)
         val traced = here.run.trace.size
         var chosen: Chosen? = null
         var entered = false
+        // The reasoner is told why the wait gave up besides the words; the trace keeps the words alone.
+        here.run.besides = told?.let { "${it.replaceFirstChar(Char::uppercase)}." }
         val refused = try {
             here.act(intent = words) {
+                here.run.besides = null
                 entered = true
                 chosen = here.run.trace.getOrNull(traced)?.let { Chosen.of(it, sources) }
                 moves += "$words: decided ${chosen?.relation}, at ${here.held.address}"
@@ -230,6 +233,8 @@ internal class StepWatch(
         } catch (stopped: ScriptStopped) {
             // A refusal of an act inside this one's block is that act's, already told; this one was made.
             stopped.refused?.takeUnless { entered } ?: throw stopped
+        } finally {
+            here.run.besides = null
         }
         refused?.let { moves += "$words: refused, ${it.kind.words}: ${it.detail}" }
         chosen

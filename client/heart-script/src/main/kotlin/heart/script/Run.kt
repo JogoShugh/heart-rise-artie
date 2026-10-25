@@ -112,6 +112,10 @@ class Run(
     var watchScript: (() -> String)? = null
     var watchFrom: Int? = null
 
+    /** What the reasoner is told besides an act's words, for the act a watch is deciding; null otherwise. */
+    @Volatile
+    internal var besides: String? = null
+
     /** Each input the run read: its value, and how it was given ("given", "default" or "asked"). */
     val inputsUsed = linkedMapOf<String, Pair<String, String>>()
 

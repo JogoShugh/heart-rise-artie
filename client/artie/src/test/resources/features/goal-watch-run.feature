@@ -166,7 +166,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     kept, and the whole chain is replayed, the reason read again each time.
     The reasoner is told the server's reason, unless the planner's words
     already say it: found by the live seed bench run b14, where a comment
-    said the reason twice.
+    said the reason twice. The capture keeps the planner's words for the
+    step; what the reasoner was told besides is not the person's.
     Given pull request 2 is a draft on the small GitHub
     And "acme/rockets" has these issues on the small GitHub
       | number | title                  | state | author |
@@ -235,6 +236,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And ARTIE's reasoner was asked 6 times
     And at move 9 the planner was told the step now includes "the wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do"
     And ARTIE's reasoner was last asked to "<asked>"
+    And the capture "say.trace.yaml" has no step whose words hold "The wait gave up"
 
     Examples:
       | case                                   | said on 2                                                             | new | new on 2                                                             | says                                                                                     | asked                                                                                                                                                                                                  |
