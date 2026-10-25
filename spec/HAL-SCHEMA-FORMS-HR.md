@@ -1,6 +1,6 @@
 # HAL Schema Forms, H.E.A.R.T. profile
 
-**Status:** draft, 2026-10-08; Rules 6 and 7 added 2026-10-10; Rule 8 added 2026-10-15. Differences only.
+**Status:** draft, 2026-10-08; Rules 6 and 7 added 2026-10-10; Rule 8 added 2026-10-15; Rule 11 added 2026-10-25. Differences only.
 
 **Profile:** `https://w3id.org/heart-rise/hal-schema-forms`
 
@@ -346,6 +346,30 @@ itself is unchanged (`spec/ideas/replay-guards-lenient-strict.md`). Both
 still check every fetched body against its link's integrity (Rule 2).
 
 (Decided 2026-10-18; SPEC §6.9.)
+
+## Rule 11: fragments are JSON Pointers
+
+Within a representation served under this profile, a URI's fragment
+identifier is a JSON Pointer (RFC 6901), in the URI fragment form of its
+§6, evaluated against the representation's JSON body. `#/_forms/garden:water-cell`
+names the form keyed `garden:water-cell`; `#` alone names the whole body; a
+pointer that resolves to nothing names nothing.
+
+The media type does not say this on its own. RFC 6839 §3.1 gives `+json`
+types the fragment semantics of `application/json`, and `application/json`
+defines none (RFC 8259). A profile is a set of processing rules for its
+media type, which is where Fielding's Rule 3 says such rules belong, so this
+profile says it, for every representation that names it in
+`Link: rel="profile"`. The fragment is never sent: a client fetches the
+resource, checks its bytes against the integrity of the link that led to it
+(Rule 2), and only then evaluates the pointer.
+
+An act's target links its form this way, as `hr:form`: into the owning
+resource's shared affordance set, with the set's integrity and the form's own
+(Rule 10), so the target has a representation of its own while the form
+stays shared (SPEC §6.2, "An act's target is a resource").
+
+(Decided 2026-10-25.)
 
 ## Not covered here
 
