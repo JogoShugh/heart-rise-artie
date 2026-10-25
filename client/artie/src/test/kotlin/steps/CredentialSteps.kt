@@ -35,9 +35,13 @@ class RenewingSource(private val origin: Origin, private val first: Credential, 
 /** Steps for the credentials ARTIE sends, and where they must never appear. */
 class CredentialSteps(private val ctx: ClientContext) {
 
+    /** Each origin's credential the scenario gave ARTIE, so far: a step for another origin adds one. */
+    private val held = linkedMapOf<String, Credential>()
+
     @Given("ARTIE holds the {word} credential {string} for {string}")
     fun holds(scheme: String, value: String, origin: String) {
-        ctx.credentials = CredentialSources.of(mapOf(origin to credential(scheme, value)))
+        held[origin] = credential(scheme, value)
+        ctx.credentials = CredentialSources.of(held.toMap())
     }
 
     @Given("ARTIE holds no credentials")

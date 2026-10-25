@@ -53,6 +53,18 @@ fun Here.at(address: String, block: Here.() -> Unit) {
 }
 
 /**
+ * Enter another server at [entry], a bookmark of its own, with the same client, and run [block] there; then back
+ * where it was, read again (spec/PLAN-LISTENERS.md, slice 7). A handler acts on any resource it can reach: a HEART
+ * server, a plain one through the gateway made from its OpenAPI description, a mail service through its gateway.
+ */
+fun Here.enter(entry: String, block: Here.() -> Unit) {
+    val step = ++run.step
+    val from = held.address
+    Here(navigator, run, arrived(step, "\"enter\"", navigator.enter(entry))).block()
+    held = arrived(step, "\"enter\"", navigator.recall(from))
+}
+
+/**
  * Visit each member the held list links under [rel], page after page by
  * `next`, coming back to its page after each; then back where it began.
  */

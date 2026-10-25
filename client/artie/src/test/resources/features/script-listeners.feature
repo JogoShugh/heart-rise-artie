@@ -164,6 +164,42 @@ Feature: Listeners, each on its own: a slow one never holds up another
       | answered: Veracode scan failed. |
     And the run took less than 5 seconds
 
+  Scenario: A listener acts on another server: a scan the bot reports failed is mailed, through the mail gateway
+    spec/PLAN-LISTENERS.md, slice 7. A handler acts on any resource it can
+    reach: here a plain mail service, which publishes only OpenAPI, through
+    the HEART gateway made from its description, as GitHub is. The script
+    enters the mailbox by its address, a bookmark of its own, with the same
+    client, sends from it what its form asks for, and comes back.
+    Given ARTIE also talks to the mail gateway at "https://mail.gateway.test", in front of a small mail service with the mailbox "1"
+    And ARTIE holds the Bearer credential "ada-token" for "https://mail.gateway.test"
+    And "veracode-bot" comments "Veracode scan failed: 2 high." on issue 10 of "acme/rockets" on the small GitHub once its comments are listed 2 times
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.milliseconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          listeners(every = 100.milliseconds, until = { ++looks >= 8 }) {
+              listen("veracode", every = 50.milliseconds) {
+                  act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) {
+                      follow("github:issues-list-comments") {
+                          whenever(by = "veracode-bot", says = "failed") {
+                              val said = state["body"].toString()
+                              enter("https://mail.gateway.test/mailboxes/1") {
+                                  act("mail:send", "to" to "ada@rockets.test", "subject" to "Veracode failed on #10", "body" to said) {}
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the small mail service sent these messages
+      | mailbox | to               | subject                |
+      | 1       | ada@rockets.test | Veracode failed on #10 |
+
   Scenario: A wait gives up at its time, however seldom its listener looks
     spec/PLAN-LISTENERS.md, slice 3. A `once` that waits sets a timeout for
     its give-up; the listener looks again when it runs out, whether or not

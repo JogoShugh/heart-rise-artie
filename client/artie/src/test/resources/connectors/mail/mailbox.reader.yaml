@@ -1,0 +1,8 @@
+# The default reader: an open mailbox sends; a closed one says why it doesn't.
+allowed:
+  table: /status
+  rows:
+    OPEN: { allow: [send] }
+    CLOSED:
+      allow: []
+      absent: { send: "The mailbox is closed." }

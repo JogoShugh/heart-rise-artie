@@ -1,6 +1,6 @@
 # Plan: listeners, not one loop
 
-Status: chosen 2026-10-24. Slices 0 to 6 and 8 done; see "As built" at the end.
+Status: chosen 2026-10-24. Slices 0 to 8 done; see "As built" at the end.
 
 ## The problem
 
@@ -158,3 +158,9 @@ Each slice starts with its feature, seen red at test level, then made green.
   validators: an event is a read that comes back early, and still only a hint. A client needs no stream: each poll
   (`Hints.kt`) first reads once for a validator, then asks to be held up to its listener's pace; on a server that
   doesn't hold reads it waits out the pace itself. Polls run on their own threads, stopped when the watch ends.
+- **Acts on other servers (slice 7).** `enter(entry) { … }` (`Flow.kt`) enters another server at a bookmark of its
+  own, with the same client and its credentials for that origin, runs the block there, and comes back, read again.
+  The feature's mail service is a plain server that publishes only OpenAPI; the HEART gateway made from its
+  description and a two-file connector serves its mailbox with a `send` act, as it serves GitHub. Not yet: a goal's
+  planner reaching a second server (its front matter names one start), and string ids in the generic gateway (a
+  resource's id is a number there, `UpstreamState.id`).
