@@ -85,10 +85,10 @@ Feature: artie generate: a run's capture, made a script with no model in it
       val title by input()
 
       heart("scripted://service/") {
-          var issue = 0L // step 2's /number
+          val issue by kept("issue") { long("number") } // step 2's /number
 
           act("open-issue", "title" to title, intent = "open an issue titled $title") {
-              issue = state.long("number")
+              keepAs("issue")
           }
           act("issues-get", "number" to issue, intent = "open issue $issue") {
               act("comment", "body" to "Seen in #$issue.", intent = "comment on it: Seen in #$issue.") {}
@@ -156,10 +156,10 @@ Feature: artie generate: a run's capture, made a script with no model in it
       val title by input()
 
       heart("scripted://service/") {
-          var issue = 0L // step 2's /number
+          val issue by kept("issue") { long("number") } // step 2's /number
 
           act("open-issue", "title" to title) {
-              issue = state.long("number")
+              keepAs("issue")
           }
           act("issues-get", "number" to issue) {
               act("comment", "body" to "Seen in #$issue.") {}
@@ -375,10 +375,10 @@ Feature: artie generate: a run's capture, made a script with no model in it
       val stamp by input(default = "1018-2200")
 
       heart("http://localhost:8392/") {
-          var headSha = "" // step 2's /head_sha
+          val headSha by kept("headSha") { text("head_sha") } // step 2's /head_sha
 
           act("repos-get", "owner" to owner, intent = "open the repository $owner") {
-              headSha = state.text("head_sha")
+              keepAs("headSha")
               follow("branches", intent = "follow its branches")
               act("start-branch", "name" to "fix-$stamp", intent = "start a branch named fix-$stamp") {
                   sync()

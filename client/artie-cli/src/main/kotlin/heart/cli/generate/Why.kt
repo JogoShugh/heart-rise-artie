@@ -25,8 +25,9 @@ internal class Why(private val derivations: Derivations) {
 
     fun answer(variable: Variable, tie: String?): Derivation = derivations.of(
         "answer:${variable.name}", "answer", "2.3", "${variable.name}, read from step ${variable.step}'s answer",
-        "Step ${variable.step} brought ${variable.pointer} into the run: declared once, read with " +
-            "state.${variable.kind.read} in that step's block, and sent from it wherever the run sent its value." +
+        "Step ${variable.step} brought ${variable.pointer} into the run: the resource it led to is kept as " +
+            "\"${variable.keptAs}\" in that step's block, the value declared once and read from it with " +
+            "${variable.kind.read}, and sent from it wherever the run sent its value." +
             (tie?.let { " Marked for review: $it (rule 5)." } ?: ""),
     )
 

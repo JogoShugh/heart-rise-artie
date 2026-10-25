@@ -147,7 +147,8 @@ Feature: A goal in plain words, planned move by move, becomes a script with no m
     Then the run finished
     And issue 12 of "acme/rockets" is now "closed" on the small GitHub
     When artie generated "open-gen.kts" from "open.trace.yaml" and "open.goal.md"
-    Then the script "open-gen.kts" has a line with "state.long(\"number\")"
+    Then the script "open-gen.kts" has a line with "{ long(\"number\") }"
+    And the script "open-gen.kts" has no line with "var "
     And the script "open-gen.kts" has no line with "to 12"
     And the script "open-gen.kts" has no line with "#12"
     And the script "open-gen.kts" has a line with "\"Fixed in 2.12 for #$number in $stamp.\""

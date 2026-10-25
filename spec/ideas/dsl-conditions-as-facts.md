@@ -40,6 +40,12 @@ this member, which counts as answered:
 
 **An Until is a facts block**: `listeners(until = { at("watch") { "state" eq "closed" } }) { … }`.
 
+**A value read from a kept resource is declared, not filled.** `val number by kept("issue") { long("number") }`
+is declared once, as an input is, and read after the act whose block says `keepAs("issue")`. It is the value the
+resource had when it was kept; `at("issue") { … }` reads the resource again. Read before anything is kept by that
+name, it stops the script and says so. The generator writes this for every value an answer brought into the run,
+keeping each resource once, by its goal step's `as` name, else by its first value's name.
+
 ## What the watch writer makes of a goal
 
 ```kotlin
@@ -51,5 +57,5 @@ whenever {
 }
 ```
 
-No `if`, no `else`, no `mapOf`. What remains native: the variable a chain's check sets where it is not a said-once
-act, and the variables of kept values (`var issueNumber`), the next step (E).
+No `if`, no `else`, no `mapOf`, and since E no `var` for kept values. What remains native: the variable a chain's
+check sets where it is not a said-once act.

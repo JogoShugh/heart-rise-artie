@@ -52,8 +52,8 @@ class ScriptWriter(
                 appendLine()
                 appendLine(derivations.anchor("${entry.number}", entry.line, heart))
                 bindings.variables.values.forEach {
-                    val declared = derivations.lines(Regex("^\\s*var\\s+${it.name}\\b"))
-                    val line = why.mark(why.answer(it, null), "var ${it.name} = ${it.kind.initial}", listOf(declared))
+                    val declared = derivations.lines(Regex("^\\s*va[rl]\\s+${it.name}\\b"))
+                    val line = why.mark(why.answer(it, null), it.declared, listOf(declared))
                     appendLine("$INDENT$line // step ${it.step}'s ${it.pointer}")
                 }
                 if (bindings.variables.isNotEmpty()) appendLine()
@@ -100,13 +100,19 @@ class ScriptWriter(
     }
 
     /** The statements of [node]'s block, at [depth]: what it reads, then the steps nested in it. */
-    private fun block(node: Node, depth: Int): List<String> =
-        reads(node.step.number, depth) + watch.kept(node.step, depth) + node.children.flatMap { statement(it, depth) }
-
-    private fun reads(step: Int, depth: Int): List<String> = bindings.variables.values.filter { it.step == step }.map {
-        val set = derivations.lines(Regex("^\\s*${it.name}\\s*=[^=]"))
-        INDENT.repeat(depth) + why.mark(why.answer(it, null), "${it.name} = ${it.read}", listOf(set))
+    private fun block(node: Node, depth: Int): List<String> {
+        val reads = reads(node.step.number, depth)
+        // A resource the watch reads again and a value read from it are kept once, by the one name.
+        val watched = watch.kept(node.step, depth).takeIf { reads.isEmpty() }.orEmpty()
+        return reads + watched + node.children.flatMap { statement(it, depth) }
     }
+
+    /** The resource [step] led to, kept by the name its values are read by, once however many it has. */
+    private fun reads(step: Int, depth: Int): List<String> =
+        bindings.variables.values.filter { it.step == step }.distinctBy { it.keptAs }.map {
+            val set = derivations.lines(Regex("^\\s*(?:${it.name}\\s*=[^=]|keepAs\\(\"${it.keptAs}\"\\))"))
+            INDENT.repeat(depth) + why.mark(why.answer(it, null), "keepAs(\"${it.keptAs}\")", listOf(set))
+        }
 
     /** The lines of [node]'s step, the first of which begins its row. */
     private fun statement(node: Node, depth: Int): List<String> {

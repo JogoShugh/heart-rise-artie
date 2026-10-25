@@ -132,8 +132,9 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
       | github:issues-get | 1     |
       | github:comment    | 2     |
       | github:issues-get | 1     |
-    And the script "fix-gen.kts" has a line with "var issueTitle = \"\""
-    And the script "fix-gen.kts" has a line with "issueTitle = state.text(\"title\")"
+    And the script "fix-gen.kts" has a line with "val issueTitle by kept(\"issue\") { text(\"title\") }"
+    And the script "fix-gen.kts" has a line with "keepAs(\"issue\")"
+    And the script "fix-gen.kts" has no line with "var "
     And the script "fix-gen.kts" has a line with "Fixed: $issueTitle."
     And the script "fix-gen.kts" has a line with "act(intent = \"Close it\")"
     And the script "fix-gen.kts" has no line with "as completed"

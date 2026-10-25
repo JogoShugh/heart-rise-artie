@@ -82,7 +82,7 @@ Feature: artie generate says how it derived each value, and shows it beside the 
     And the derivation "gen.derivation.yaml" has these derivations
       | n | kind     | rule   | title                                       | source                                                                                | generated                                                                                 |
       | 1 | input    | 1, 2.1 | title, an input                             | 1:1 val title by input(); 5:40 $title                                                 | 6:1 val title by input(); 11:34 title                                                     |
-      | 2 | answer   | 2.3    | issue, read from step 2's answer            | 4:5 var issue = 0L; 6:9 issue = state.long("number"); 8:30 $issue                | 9:5 var issue = 0L; 12:9 issue = state.long("number"); 14:35 issue                        |
+      | 2 | answer   | 2.3    | issue, read from step 2's answer            | 4:5 var issue = 0L; 6:9 issue = state.long("number"); 8:30 $issue                | 9:5 val issue by kept("issue") { long("number") }; 12:9 keepAs("issue"); 14:35 issue      |
       | 3 | relation | 9      | The relation each reason step chose, named  | 5:5 act; 8:5 act; 9:9 act; 10:9 act                                                  | 11:9 "open-issue"; 14:9 "issues-get"; 15:13 "comment"; 16:13 "close"                      |
       | 4 | template | 3      | A string, its values put back as their names | 9:47 $issue                                                                          | 15:34 "Seen in #$issue."                                                                  |
       | 5 | model    | 4      | "completed", the reasoner's own choice      |                                                                                       | 17:25 "completed"                                                                    |
@@ -139,7 +139,7 @@ Feature: artie generate says how it derived each value, and shows it beside the 
     And the derivation "gen.derivation.yaml" has these derivations
       | n | kind     | rule   | title                                        | source                                                             | generated                                                          |
       | 1 | input    | 1, 2.1 | title, an input                              | 1:1 val title by input(); 5:34 title                               | 5:1 val title by input(); 10:34 title                              |
-      | 2 | answer   | 2.3    | issue, read from step 2's answer             | 4:5 var issue = 0L; 6:9 issue = state.long("number"); 10:21 issue  | 8:5 var issue = 0L; 11:9 issue = state.long("number"); 13:35 issue |
+      | 2 | answer   | 2.3    | issue, read from step 2's answer             | 4:5 var issue = 0L; 6:9 issue = state.long("number"); 10:21 issue  | 8:5 val issue by kept("issue") { long("number") }; 11:9 keepAs("issue"); 13:35 issue |
       | 3 | template | 3      | A string, its values put back as their names | 12:34 "Seen in #$issue."                                           | 14:34 "Seen in #$issue."                                           |
       | 4 | words    | 2.2    | "completed", as the script wrote it          | 13:34 "completed"                                                  | 15:34 "completed"                                                  |
 

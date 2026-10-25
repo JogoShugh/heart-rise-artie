@@ -2,18 +2,25 @@ package heart.cli.generate
 
 import heart.cli.BadArguments
 
-/** A variable a generated script reads in the block of the step that brought its value into the run. */
-class Variable(val name: String, val step: Int, val pointer: String, val kind: Kind) {
-    /** How a script reads it: `state.long("number")`, by member name, or by pointer for nested state. */
+/**
+ * A value a generated script reads from the resource the step that brought it into the run led to, kept by name
+ * ([keptAs]) in that step's block: `val number by kept("issue") { long("number") }`, with no var to fill.
+ */
+class Variable(val name: String, val step: Int, val pointer: String, val kind: Kind, val keptAs: String) {
+    /** How a script reads it from the kept state: `long("number")`, by member name, or by pointer for nested state. */
     val read: String
         get() {
             val member = pointer.removePrefix("/").takeIf { '/' !in it }
                 ?.replace("~1", "/")?.replace("~0", "~") ?: pointer
-            return "state.${kind.read}(${KotlinText.quoted(member)})"
+            return "${kind.read}(${KotlinText.quoted(member)})"
         }
 
-    enum class Kind(val read: String, val initial: String) {
-        WHOLE("long", "0L"), DECIMAL("double", "0.0"), TEXT("text", "\"\""), BOOL("bool", "false");
+    /** Its declaration: read by [read] from the resource kept as [keptAs]. */
+    val declared: String
+        get() = "val $name by kept(${KotlinText.quoted(keptAs)}) { $read }"
+
+    enum class Kind(val read: String) {
+        WHOLE("long"), DECIMAL("double"), TEXT("text"), BOOL("bool");
 
         companion object {
             fun of(value: Any?): Kind = when (value) {
@@ -121,11 +128,13 @@ class Bindings(
         val last = camel(pointer.substringAfterLast('/'))
         val named = last.takeIf { IDENTIFIER.matches(it) } ?: camel(pointer.removePrefix("/").replace('/', '_'))
         // A goal step's name names what is read from where it led: issue's number is issueNumber.
-        val given = capture.step(step)?.let { capture.marks(it)["as"] }
-            ?.let { "$it${named.replaceFirstChar(Char::uppercase)}" }
+        val mark = capture.step(step)?.let { capture.marks(it)["as"] }?.toString()
+        val given = mark?.let { "$it${named.replaceFirstChar(Char::uppercase)}" }
         val base = slotted[step to pointer] ?: given ?: named
         val name = if (base in taken) "$base$step" else base
-        Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)))
+        // The resource is kept once, by the name its goal step gave it, else by its first value's name.
+        val keptAs = mark ?: variables.values.firstOrNull { it.step == step }?.keptAs ?: name
+        Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)), keptAs)
     }
 
     /** Rule 2.2: text the script wrote literally, outside any slot of its reason template, or in its own line. */
