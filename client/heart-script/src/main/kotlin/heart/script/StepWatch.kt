@@ -45,7 +45,7 @@ internal class StepWatch(
         val entry = where.held.address
         val name = until?.let { u -> BRACE.findAll(u.condition).map { it.groupValues[1] }.firstOrNull { it in named } }
         run.watchFrom = run.trace.size + 1
-        run.watchScript = { WatchScript(decided, entry, name?.let { "${it}At" }, host::fill).text(steps) }
+        run.watchScript = { WatchScript(decided, entry, name, host::fill).text(steps) }
         val done: Here.() -> Boolean = { until != null && over(until, this) }
         val single = steps.singleOrNull()
         if (single != null) {

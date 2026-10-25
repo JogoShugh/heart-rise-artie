@@ -786,8 +786,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     before it. The planner is told an act the server answered is done.
     The capture keeps the watch as the script its decisions amount to, with
     no model in it, and the step it began at (spec/PLAN-LISTENERS.md, slice
-    8): its Until reads again the issue the watch opened, by the address the
-    run will keep as watchAt. artie generate writes it into the script made
+    8): its Until reads again the issue the watch opened, kept by the name
+    the goal gave it, watch. artie generate writes it into the script made
     from the run, which then answers a new alert with no model at all.
     Given "acme/rockets" has these issues on the small GitHub
       | number | title                          | state | author |
@@ -843,7 +843,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 10 times
     And the capture "unless.trace.yaml" keeps the watch as this script, from step 4
       """
-      watch(until = { var over = false; at(watchAt) { over = holds(mapOf("state" to "closed")) }; over }) {
+      watch(until = holdsAt("watch", mapOf("state" to "closed"))) {
           act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
               whenever(has = mapOf("state" to "open")) {
                   actOnce("github:comment", "body" to "Seen by the bench watch.", listedIn = "github:issues-list-comments") {}
@@ -860,6 +860,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | name | value |
     Then the run finished
     And the script "unless-gen.kts" has no line with "act(intent"
+    And the script "unless-gen.kts" has a line with "keepAs(\"watch\")"
+    And the script "unless-gen.kts" has no line with "var "
     And issue 13 of "acme/rockets" now has these comments on the small GitHub
       | author | body                     |
       | ada    | Seen by the bench watch. |

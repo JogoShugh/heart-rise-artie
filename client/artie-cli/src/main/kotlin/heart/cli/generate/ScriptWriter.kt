@@ -56,8 +56,7 @@ class ScriptWriter(
                     val line = why.mark(why.answer(it, null), "var ${it.name} = ${it.kind.initial}", listOf(declared))
                     appendLine("$INDENT$line // step ${it.step}'s ${it.pointer}")
                 }
-                watch.declared().forEach { appendLine("$INDENT$it") }
-                if (bindings.variables.isNotEmpty() || watch.declared().isNotEmpty()) appendLine()
+                if (bindings.variables.isNotEmpty()) appendLine()
                 body.forEach { appendLine(it) }
                 // A goal run's watch, as its decisions amount to, after the steps before it.
                 watch.lines(1).forEach { appendLine(it) }

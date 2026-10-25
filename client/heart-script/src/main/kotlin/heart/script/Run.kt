@@ -66,6 +66,9 @@ class Run(
     /** What a `watch` remembers from look to look: what each resource was, what waits, what is done. */
     internal val watching = Watching()
 
+    /** The addresses the script kept by name (`keepAs`), to read them again by name (`holdsAt`). */
+    internal val kept = mutableMapOf<String, String>()
+
     /** Another entry than the script's: an environment, another binding. Set before the run. */
     var entry: String? = null
 

@@ -92,7 +92,7 @@ internal class WatchScript(
     private fun until(): String {
         val ends = decided.ends ?: return "{ false }"
         val check = "holds(${bound(ends.facts)})"
-        return if (named == null) "{ $check }" else "{ var over = false; at($named) { over = $check }; over }"
+        return if (named == null) "{ $check }" else "holdsAt(${quoted(named)}, ${bound(ends.facts)})"
     }
 
     /** One look of [step]: its list reached as decided, and each member that matches answered. */
