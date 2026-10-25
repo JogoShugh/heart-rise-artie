@@ -102,8 +102,12 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         val more = navigators
         val navigators = { if (first || more == null) navigator.also { first = false } else more() }
         return if (clocked) {
-            Run(inputs, navigator = navigators, pause = { now = now.plusMillis(it.inWholeMilliseconds) })
-                .also { it.clock = { now } }
+            // Virtual time: it moves only once every thread of a watch waits (Time.kt).
+            val time = heart.script.VirtualTime(now)
+            Run(inputs, navigator = navigators, pause = time::pause).also {
+                it.clock = time::now
+                it.time = time
+            }
         } else {
             Run(inputs, navigator = navigators)
         }.also { it.remember = remember }

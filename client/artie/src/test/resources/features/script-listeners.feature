@@ -60,3 +60,40 @@ Feature: Listeners, each on its own: a slow one never holds up another
       | 2      |
       | 1      |
     And the run noted one note beginning "scan: issue 10 is open"
+
+  Scenario: A listener looks again only when what its last look read has changed
+    spec/PLAN-LISTENERS.md, slice 2. The watch polls what each listener's
+    last look read, one poll for each resource however many listeners read
+    it, and tells a listener only when something it read changed: a hint,
+    never the truth, so the listener reads it again itself. A list that
+    stays the same is not looked at again, however often it is polled. Here
+    a new issue opens once the issues have been listed three times: each
+    listener looks once at the start, and once more for the new issue.
+    Given issue 11 of "acme/rockets", titled "Second scan", opens on the small GitHub once its issues are listed 3 times
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.milliseconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          listeners(every = 200.milliseconds, until = { ++looks >= 6 }) {
+              listen("first", every = 50.milliseconds) {
+                  act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+                      note("first: ${state["count"]} open")
+                  }
+              }
+              listen("second", every = 50.milliseconds) {
+                  act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+                      note("second: ${state["count"]} open")
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted
+      | note            |
+      | first: 1 open   |
+      | first: 2 open   |
+      | second: 1 open  |
+      | second: 2 open  |

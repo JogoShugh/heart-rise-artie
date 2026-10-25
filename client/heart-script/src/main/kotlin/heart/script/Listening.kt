@@ -47,13 +47,15 @@ fun Here.listeners(
     val watch = Watch(start, run.clock().plus(atMost.toJavaDuration()), AtomicBoolean(false))
     val forks = listeners.map { run.fork() }
     val running = Executors.newVirtualThreadPerTaskExecutor().use { threads ->
+        val polls = Polls(run, watch, threads)
         val running = listeners.zip(forks).map { (listener, fork) ->
-            threads.submit { fork.listening(listener, watch) }
+            threads.submit(run.time.thread { fork.listening(listener, watch, polls) })
         }
         try {
             looking(watch, every, until) { running.any { it.isDone } }
         } finally {
             watch.over.set(true)
+            run.time.poke()
         }
         running
     }
@@ -76,17 +78,30 @@ private fun Here.looking(watch: Watch, every: Duration, until: Here.() -> Boolea
     }
 }
 
-/** One listener's loop, on its own thread, with a client of its own: [listener]'s look, a pause apart. */
-private fun Run.listening(listener: Listener, watch: Watch) {
+/**
+ * One listener's loop, on its own thread, with a client of its own: [listener]'s look, then again each time a
+ * resource it read is hinted changed (Hints.kt). While a `once` in it waits, it also looks at its own pace.
+ */
+private fun Run.listening(listener: Listener, watch: Watch, polls: Polls) {
     val start = listener.from ?: watch.start
     val navigator = TracingNavigator(navigator(), this)
     val here = Here(navigator, this, arrived(0, start, navigator.enter(start)))
+    val inbox = Inbox(time) { !watch.on(this) }
     watching.active = true
+    var look = true
     while (watch.on(this)) {
-        here.attempt(start, "${listener.name}: a look failed") { listener.look(this) }
-        if (watch.on(this)) pause(listener.every)
+        if (look) {
+            val from = trace.size
+            here.attempt(start, "${listener.name}: a look failed") { listener.look(this) }
+            polls.want(inbox, listener.every, read(from))
+        }
+        look = inbox.take(listener.every).isNotEmpty() || watching.waiting.isNotEmpty()
     }
 }
+
+/** What each resource this run's steps from [from] on held last showed, by address. */
+private fun Run.read(from: Int): Map<String, String> =
+    trace.drop(from).mapNotNull { step -> step.now?.let { it.address to it.shows() } }.toMap()
 
 /** What stopped a listener's thread, if anything did. */
 private fun Future<*>.stopped(): Throwable? = try {
@@ -102,6 +117,7 @@ private fun Future<*>.stopped(): Throwable? = try {
  */
 internal fun Run.fork(): Run = Run(inputs, navigator = navigator, pause = pause).also { fork ->
     fork.clock = clock
+    fork.time = time
     fork.entry = entry
     fork.reasoning = reasoning
     fork.onStep = onStep

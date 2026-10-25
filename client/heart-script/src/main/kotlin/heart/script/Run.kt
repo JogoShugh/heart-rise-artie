@@ -57,6 +57,12 @@ class Run(
     /** The time now, as `watch` and `once` read it; a test can move it with [pause] alone. Set before the run. */
     var clock: () -> java.time.Instant = java.time.Instant::now
 
+    /**
+     * How a watch's own threads wait, its listeners and its polls: on the real clock, or on a test's virtual time,
+     * which [clock] and [pause] then read and move too. Set before the run.
+     */
+    var time: Time = RealTime()
+
     /** What a `watch` remembers from look to look: what each resource was, what waits, what is done. */
     internal val watching = Watching()
 

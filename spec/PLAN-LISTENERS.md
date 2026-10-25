@@ -1,6 +1,6 @@
 # Plan: listeners, not one loop
 
-Status: chosen 2026-10-24. Slice 0 (the Otherwise chain) first, then slice 1.
+Status: chosen 2026-10-24. Slices 0, 1, 2 and 8 done; see "As built" at the end.
 
 ## The problem
 
@@ -121,3 +121,16 @@ Each slice starts with its feature, seen red at test level, then made green.
 - **Order.** Hints may come out of order. A handler reads the resource as it is now, so order doesn't matter.
 - **Rate limits.** Listeners share sources; none polls on its own.
 - **Deciding at once.** Two listeners deciding the same step: one lock per step.
+
+## As built
+
+- **Threads, not coroutines (slice 1).** Each listener and each poll is a Java 21 virtual thread
+  (`Listening.kt`). Today's blocking navigator runs unchanged; that was most of the gain the coroutine plan promised.
+- **Hints from what a look read (slice 2, `Hints.kt`).** A listener names no source. The watch polls each resource
+  its last look read (the list, each member, the start), one poll per address however many listeners read it, at the
+  quickest pace any of them asks. A listener is hinted only when a resource it read now shows something else than it
+  last saw there, and looks again then: a list that stays the same is never looked at again, however often it is
+  polled. Pages of search results carry an ETag in every binding, so each poll of an unchanged list is a 304.
+- **Time (`Time.kt`).** The watch's threads wait on the run's `time`: the real clock, or, in the features, a
+  virtual time that moves only once every thread of the watch waits, so a one-hour give-up takes no real time and
+  no thread finds more time passed than the others let pass.

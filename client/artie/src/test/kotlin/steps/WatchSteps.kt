@@ -149,6 +149,22 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
         }
     }
 
+    @Given(
+        "issue {long} of {string}, titled {string}, opens on the small GitHub once its issues are listed {int} times",
+    )
+    fun opensLater(number: Long, repository: String, title: String, times: Int) {
+        val (owner, repo) = repository.split("/")
+        val listed = java.util.concurrent.atomic.AtomicInteger()
+        gateway.github.beforeAnswer += { request ->
+            val listing = request.method.name == "GET" && request.uri.path == "/repos/$repository/issues"
+            if (listing && listed.incrementAndGet() == times) {
+                gateway.github.issues += com.artie.heart.gateway.fixtures.Issue(
+                    owner, repo, number, title, "open", stateReason = null, locked = false, author = "ada",
+                )
+            }
+        }
+    }
+
     @Then("issue {long} of {string} is assigned to {string} on the small GitHub")
     fun assigned(number: Long, repository: String, login: String) {
         val issue = gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == number }
