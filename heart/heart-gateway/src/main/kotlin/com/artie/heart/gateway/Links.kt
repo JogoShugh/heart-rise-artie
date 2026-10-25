@@ -102,7 +102,7 @@ class LinkWriter(
     /** Adds the link to [href], named after [name] or the [member] it was, to [links]. */
     fun add(links: MutableMap<String, Any?>, name: String, member: String, href: String) {
         val relation = servedBy(href)?.relation ?: rules.relations[member] ?: name.trimEnd('-')
-        val key = if (':' in relation || relation in IANA) relation else "$curie:$relation"
+        val key = written(relation, curie)
         val link = link(href)
         links[key] = when (val held = links[key]) {
             null -> link
@@ -146,11 +146,15 @@ class LinkWriter(
     private companion object {
         const val HAL_JSON = "application/hal+json"
         val TEMPLATE = Regex("\\{[^}]*}")
-
-        /** Relations IANA registers, written bare: no CURIE. */
-        val IANA = setOf("alternate", "icon", "self", "item", "collection", "related", "license")
     }
 }
+
+/** Relations IANA registers that a connector may name, written bare: no CURIE. */
+private val IANA = setOf("alternate", "icon", "self", "item", "collection", "related", "license", "author")
+
+/** [relation] as written in a link or an embed: bare when IANA registers it or it names its own CURIE. */
+private fun written(relation: String, curie: String): String =
+    if (':' in relation || relation in IANA) relation else "$curie:$relation"
 
 /** A state with its link members lifted out: what is left, and the links and embedded resources they became. */
 class Lifted(val state: JsonNode, val hypermedia: Hypermedia)
@@ -174,7 +178,11 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
         val obj = node as? ObjectNode ?: return Triple(node, emptyMap(), emptyMap())
         val links = LinkedHashMap<String, Any?>()
         val embedded = LinkedHashMap<String, Any?>()
-        rules.embed.forEach { path -> embed(obj, path)?.let { embedded["$curie:${embeddedName(path)}"] = it } }
+        rules.embed.forEach { path ->
+            // Named as the connector's relations name it (GitHub's user is IANA's author), else after its path.
+            val relation = written(rules.relations[path] ?: embeddedName(path), curie)
+            embed(obj, path)?.let { embedded[relation] = it }
+        }
         rules.upstreamLinks?.let { member -> upstream(obj.remove(member), links) }
         rules.drop.forEach { obj.remove(it) }
         members(obj, "", links)
@@ -304,8 +312,11 @@ class LinkRelations(private val rules: LinkRules, private val writer: LinkWriter
             at?.get(name)?.let { properties(map(it)) }
         }
         val schema = parent?.get(names.last())?.let(::map) ?: return
-        val id = LinkLifter.embeddedName(path)
-        add(id, schema, "The ${path.replace('/', ' ').replace('_', ' ')} it holds, a resource of its own, embedded.")
+        // A relation the connector names (IANA's author) is described where it is registered, not here.
+        if (path !in rules.relations) {
+            val words = path.replace('/', ' ').replace('_', ' ')
+            add(LinkLifter.embeddedName(path), schema, "The $words it holds, a resource of its own, embedded.")
+        }
         resource(item(schema))
     }
 

@@ -42,8 +42,9 @@ in the data are addresses.
    `application/hal+json;profile=…`.)
 6. **Templates** (`{/name}`, `{+path}`, `{?since,...}`) become `templated: true`.
 7. **Nested objects become `_embedded`** (`user`, `head.repo`, `base.repo`, `owner`), each with its
-   own `self` and its own lifted links, under a relation named after its path (`github:user`,
-   `github:head-repo`).
+   own `self` and its own lifted links, under a relation named after its path (`github:head-repo`),
+   unless the connector's `relations` name it: since 25 October 2026 GitHub's `user` and `creator` are
+   embedded under IANA's `author`, so a client knows who made a resource without knowing GitHub's names.
 8. **No binding, no link.** `git://` stays data until HEART has a binding for it; `ssh_url`
    (`git@github.com:...`) is not a URI, so it stays data.
 9. **Nothing is dropped by default.** `drop` is an option, empty by default.

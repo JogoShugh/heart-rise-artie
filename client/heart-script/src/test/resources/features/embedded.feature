@@ -44,6 +44,34 @@ Feature: A script reads embedded resources in place, and follows them to act
       | act    | pulls-get {"number":482} |
       | return | /                        |
 
+  Scenario Outline: Who made a resource is read under the registered author relation alone: <relation>
+    Fielding review, Rule 6, a thing to watch since 25 October: madeBy
+    looked for its maker under author, user or creator, in any profile,
+    so it assumed a structure no media type defines. author is registered
+    with IANA (RFC 8288); a server that knows a resource's maker embeds it
+    there, as the GitHub gateway does for GitHub's user and creator.
+    Given these links
+      | at | relation | title                  | to         |
+      | /  | item     | Refuse blank bed names | /pulls/482 |
+    And these embedded resources
+      | at         | relation   | resource   |
+      | /pulls/482 | <relation> | /users/lin |
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          whenever { madeBy("Lin"); note("made by Lin") }
+          note("looked")
+      }
+      """
+    Then the script's notes, joined, are "<notes>"
+
+    Examples:
+      | relation    | notes               |
+      | author      | made by Lin; looked |
+      | github:user | looked              |
+      | user        | looked              |
+      | creator     | looked              |
+
   Scenario: An embedded relation is followed like a link
     When this script runs
       """kotlin

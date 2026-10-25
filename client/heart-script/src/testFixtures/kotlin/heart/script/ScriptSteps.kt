@@ -127,6 +127,9 @@ class ScriptSteps {
     @Then("the script noted {string}")
     fun noted(note: String) = assertTrue(note in run.notes, "notes: ${run.notes}")
 
+    @Then("the script's notes, joined, are {string}")
+    fun notesJoined(notes: String) = assertEquals(notes, run.notes.joinToString("; "))
+
     @Then("the script noted, in order")
     fun notedInOrder(table: DataTable) = assertEquals(table.asMaps().map { it.getValue("note") }, run.notes)
 

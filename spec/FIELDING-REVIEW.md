@@ -147,7 +147,7 @@ Every act goes to a target the server sent. ARTIE's `act()` takes an action name
 
 - **Tests:** `layers.feature` (heart-core: the pointer `id` at `/id`), client `conditional-acts.feature` (pointers, fields, refusals), `sync-l2.feature` (a hash-shaped URL is ignored; mismatched integrity is refused)
 - **Spec:** `spec/HAL-SCHEMA-FORMS-HR.md` Rules 1 and 2; §6.5 "Naming is the server's", §6.9.1
-- **To watch (25 Oct 2026):** heart-script's `at(address)` reads again a resource by its address, and its documentation says the address must be one the server handed over: a link's target, a `Location`, the held resource's own. Every script today passes one so (`held.address`), but nothing checks it, so a hand-written script could pass an address it made up. ARTIE could refuse an address not seen in the run.
+- **To watch (25 Oct 2026):** heart-script's `at(address)` reads again a resource by its address, and its documentation says the address must be one the server handed over: a link's target, a `Location`, the held resource's own. Every script today passes one so (`held.address`), but nothing checks it, so a hand-written script could pass an address it made up. ARTIE could refuse an address not seen in the run. **Closed the same day (`a26dd40`):** the client every script runs through keeps the addresses the server handed over in the run, and refuses to read again at any other (`script.feature`). A link not yet followed doesn't count, since the client keeps a link's relation and title, not its address.
 
 <a id="r5">
 
@@ -308,7 +308,7 @@ It keeps no script of request sequences. Each act is decided from the current ma
 A response must name the hal-schema-forms (or hal-forms) profile in `Link: rel="profile"`, or ARTIE refuses it. Only then does it read `_forms` or `_templates`. One difference from his wording: the profile is declared in a header rather than in the body, following the W3C profile-negotiation draft. Buster tests this side of the rule from the server’s end, by changing what the content says. ARTIE was attacked 46 times in this way (curies removed, the `Preference-Applied` header removed, link `integrity` stripped, one byte flipped), and every time it declined to use what the content no longer vouched for. 44 of those 46 verdicts are also confirmed by ARTIE’s own decision log, matched by trace id.
 
 - **Tests:** `sync-l0.feature` (three ways a missing or wrong profile is refused)
-- **To watch (25 Oct 2026):** heart-script's `whenever(by = …)` finds who made a resource under an embedded relation named `author`, `user` or `creator`. `author` is registered with IANA; `user` and `creator` are not, so that part assumes a structure no media type or profile defines, which is what this reply warns about. Keeping only `author`, or letting a profile say which of its relations means "made by", would close it.
+- **To watch (25 Oct 2026):** heart-script's `whenever(by = …)` finds who made a resource under an embedded relation named `author`, `user` or `creator`. `author` is registered with IANA; `user` and `creator` are not, so that part assumes a structure no media type or profile defines, which is what this reply warns about. Keeping only `author`, or letting a profile say which of its relations means "made by", would close it. **Closed the same day:** `madeBy` reads `author` alone, and the GitHub gateway's connector embeds GitHub's `user` and `creator` under it (`embedded.feature`, `github-links.feature`).
 
 <a id="app-state">
 

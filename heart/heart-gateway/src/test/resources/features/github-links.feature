@@ -52,16 +52,19 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | title  |
       | state  |
 
-  Scenario: An issue's author is embedded, with its own typed links
+  Scenario: An issue's author is embedded under IANA's author relation, with its own typed links
+    GitHub names who opened an issue `user`. The connector names that
+    member's relation author, registered with IANA (RFC 8288), so a client
+    knows who made a resource without knowing GitHub's names.
     When "ada" gets "/repos/acme/rockets/issues/10" through the GitHub gateway
-    Then the answer embeds "github:user" with its self at "/users/ada" and these links
+    Then the answer embeds "author" with its self at "/users/ada" and these links
       | relation         | href                                          | type                        |
       | alternate        | https://github.com/ada                        | text/html                   |
       | icon             | https://github.com/images/error/ada_happy.gif | image/gif                   |
       | github:followers | /users/ada/followers                          | application/hal+json        |
       | github:repos-list-for-user | /users/ada/repos                    | application/hal+json        |
       | github:subscriptions | https://api.github.com/users/ada/subscriptions | application/vnd.github+json |
-    And the embedded "github:user" still has the member "login" as "ada"
+    And the embedded "author" still has the member "login" as "ada"
     And the answer's state has none of these members
       | member |
       | user   |
