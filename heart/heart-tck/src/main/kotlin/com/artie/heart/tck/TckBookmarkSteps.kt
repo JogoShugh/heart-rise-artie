@@ -27,6 +27,13 @@ class TckBookmarkSteps(private val fixture: TckFixture, private val world: TckWo
         world.get(expand(target, fixture.searchValues))
     }
 
+    @When("the client asks for the results again with the ETag they were given")
+    fun searchAgain() {
+        val etag = checkNotNull(world.last.responseHeaders.eTag) { "the results carry no ETag" }
+        val accept = checkNotNull(world.last.requestHeaders.getFirst(HttpHeaders.ACCEPT))
+        world.get(world.last.url.toString(), mapOf(HttpHeaders.ACCEPT to accept, HttpHeaders.IF_NONE_MATCH to etag))
+    }
+
     @Then("the index offers the type's search and lookup forms")
     fun indexForms() {
         val targets = world.targets()

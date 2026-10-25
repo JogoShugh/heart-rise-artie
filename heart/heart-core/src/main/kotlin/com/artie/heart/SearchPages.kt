@@ -54,6 +54,13 @@ object SearchPages {
         }
     }
 
+    /**
+     * A page's Layer 1 validator: the dialect, then the digest of the page itself, so a client that watches a
+     * list revalidates it and is answered 304 while nothing in it changed (spec/PLAN-LISTENERS.md, slice 2).
+     */
+    fun validator(page: Map<String, Any>, dialect: Dialect): String =
+        "\"page.${dialect.etagTag}.${ContentAddress.address(ContentAddress.canonical(page))}\""
+
     /** Page [page] in plain JSON, the OpenAPI twin: each match by id and title, and no links. */
     fun plainPage(found: List<Found>, page: Int, size: Int): Map<String, Any> = mapOf(
         "count" to found.size,

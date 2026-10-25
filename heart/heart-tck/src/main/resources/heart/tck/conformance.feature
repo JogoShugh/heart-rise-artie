@@ -91,6 +91,15 @@ Feature: HEART conformance over HTTP, for any declared resource type
     Then the response status is 200
     And the home document names the resource's collection
 
+  Scenario: A page of results is revalidated with 304 while nothing in it changed
+    A client that watches a list reads it again and again (spec/PLAN-LISTENERS.md, slice 2). A page is a Layer 1
+    resource like any other: no-cache, with an ETag, so asking again costs no body while nothing changed.
+    When a client gets "/" as hal-schema-forms
+    And a client follows the search form with the fixture's search term
+    Then the response has Cache-Control "no-cache"
+    When the client asks for the results again with the ETag they were given
+    Then the response status is 304
+
   Scenario: The profile describes every relation the resource's forms use
     When a client gets the resource as hal-schema-forms
     Then the response offers the offered act, with its full schema and a concrete target

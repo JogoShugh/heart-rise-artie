@@ -57,9 +57,8 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
             return PlainJson.respond(ServerResponse.ok(), SearchPages.plainPage(found, page, limits.pageSize))
         }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
-        return ServerResponse.ok().contentType(MediaType.parseMediaType(dialect.mediaType))
-            .headers { layer1(it, dialect) }
-            .bodyValueAndAwait(SearchPages.page(search, found, page, limits.pageSize))
+        val body = SearchPages.page(search, found, page, limits.pageSize)
+        return answer(request, SearchPages.validator(body, dialect), dialect.mediaType, body) { layer1(it, dialect) }
     }
 
     /** A 304 when If-None-Match already names [etag]; otherwise the body, with the same headers. */
@@ -67,7 +66,7 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
         request: ServerRequest,
         etag: String,
         type: String,
-        body: String,
+        body: Any,
         headers: (HttpHeaders) -> Unit,
     ): ServerResponse {
         val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)

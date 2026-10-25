@@ -64,8 +64,11 @@ class IndexHandler(
                 .body(mapper.writeValueAsString(SearchPages.plainPage(found, page, limits.pageSize)))
         }
         val dialect = dialect(request)
-        return layer1(Response(Status.OK).header(CONTENT_TYPE, dialect.mediaType), dialect)
-            .body(mapper.writeValueAsString(SearchPages.page(search, found, page, limits.pageSize)))
+        val body = SearchPages.page(search, found, page, limits.pageSize)
+        val answer = Published.revalidated(request, SearchPages.validator(body, dialect), dialect.mediaType) {
+            mapper.writeValueAsString(body)
+        }
+        return layer1(answer, dialect)
     }
 
     private fun layer1(response: Response, dialect: Dialect): Response =

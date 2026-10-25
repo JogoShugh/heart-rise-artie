@@ -44,6 +44,12 @@ Feature: A long search comes in pages, linked by next, prev, first and last
     And the response links "first" to "/lamps"
     And the response has no link under "next"
 
+  Scenario: A page is revalidated, as any Layer 1 resource: asked again with its ETag, unchanged, it is a 304
+    When a client gets "/lamps?page=2" as hal-schema-forms
+    Then the response has an ETag
+    When a client gets "/lamps?page=2" again with the ETag it was given
+    Then the response status is 304
+
   Scenario: HAL-FORMS pages the same way
     When a client gets "/lamps" as hal-forms
     Then the response links "next" to "/lamps?page=2"
