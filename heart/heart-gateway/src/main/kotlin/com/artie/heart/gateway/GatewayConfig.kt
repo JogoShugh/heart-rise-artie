@@ -41,6 +41,11 @@ class GatewayConfig private constructor(
     val serving: Serving,
     /** Where to keep the record of upstream calls (GATEWAY_RECORD); none keeps no record. */
     val record: Path? = null,
+    /**
+     * The secret the upstream signs its webhooks with (GATEWAY_WEBHOOK_SECRET): with it, the gateway takes them, and
+     * holds reads that prefer to wait (Hub); without, neither. Never written back.
+     */
+    val webhookSecret: String? = null,
 ) {
     companion object {
         const val DEFAULT_PORT = 8090
@@ -55,7 +60,8 @@ class GatewayConfig private constructor(
             }
             val upstream = UpstreamSettings(url, value("UPSTREAM_SPEC") ?: "$url/openapi.json", auth(::value))
             val record = value("GATEWAY_RECORD")?.let { Path.of(it) }
-            return GatewayConfig(upstream, profile, connector, serving(::value, upstream.auth), record)
+            val secret = value("GATEWAY_WEBHOOK_SECRET")
+            return GatewayConfig(upstream, profile, connector, serving(::value, upstream.auth), record, secret)
         }
 
         /** How the gateway serves its callers, from [value]s, calling the upstream as [auth] says. */

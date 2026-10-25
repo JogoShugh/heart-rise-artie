@@ -130,9 +130,24 @@ class GitHubSteps {
 
     internal val lastResponse: Response get() = responses.last()
 
+    /** The path of the last read, for a read again (github-hub.feature). */
+    internal var lastPath: String? = null
+        private set
+
+    /** The secret GitHub signs its webhooks with, when the gateway takes them (github-hub.feature). */
+    internal var hubSecret: String? = null
+        set(secret) {
+            field = secret
+            started = null
+        }
+
+    /** [request] sent to the gateway, its answer not kept as the last: a webhook sent while a read is held. */
+    internal fun call(request: Request): Response = gateway(request)
+
     /** A read as [caller], carrying the W3C [traceparent] a client sends, when given. */
     internal fun getAs(caller: String, path: String, traceparent: String?) {
         authorization = "Bearer $caller-token"
+        lastPath = path
         val request = Request(Method.GET, path).header("Authorization", "Bearer $caller-token")
             .header("Accept", "application/hal+json")
         responses += gateway(traceparent?.let { request.header("traceparent", it) } ?: request)
@@ -615,6 +630,7 @@ class GitHubSteps {
             credentials,
             HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired)),
             standingCare,
+            hubSecret?.let { com.artie.heart.gateway.Hub(it, upstreamUrl) },
         )
     }
 

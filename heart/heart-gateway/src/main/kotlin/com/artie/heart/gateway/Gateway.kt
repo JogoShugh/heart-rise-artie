@@ -137,10 +137,13 @@ class Gateway(
         credentials: Credentials,
         settings: HeartSettings = HeartSettings(mapper = mapper),
         care: GatewayCare = GatewayCare.EVERY,
+        hub: Hub? = null,
     ): HttpHandler {
         val heart = HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
         val served = PassThroughMode(recorded, auth, credentials).then(CareAsked(care)).then(heart)
-        return record?.servingFilter?.then(served) ?: served
+        val recording = record?.servingFilter?.then(served) ?: served
+        // Outside the callers' credentials: GitHub signs its webhooks, and a held read is read again as it came.
+        return hub?.filter()?.then(recording) ?: recording
     }
 
     private companion object {
