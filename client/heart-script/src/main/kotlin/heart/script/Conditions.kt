@@ -24,8 +24,38 @@ class Given internal constructor(private val here: Here, private val holding: Bo
     }
 }
 
+/** A guard ended a block: each block it passes through on its way out goes back where it was, read again. */
+internal open class Ended : RuntimeException(null, null, false, false)
+
 /** A whenever's member is left: the guard that ended its turn, for whenever to catch. */
-internal class MemberLeft : RuntimeException(null, null, false, false)
+internal class MemberLeft : Ended()
+
+/** A part of the script is done already: the guard that ended it, for doing to catch. */
+internal class PartDone : Ended()
+
+/** How deep in doing blocks this thread is, so a doneWhere in none stops the script. */
+private val doings = ThreadLocal.withInitial { 0 }
+
+/**
+ * A part of the script, which [words] say, run as [block]: a doneWhere in it ends it where the part is done
+ * already, and the script goes on after it.
+ */
+fun Here.doing(words: String, block: Here.() -> Unit) {
+    doings.set(doings.get() + 1)
+    try {
+        block()
+    } catch (_: PartDone) {
+        note("Done already: $words")
+    } finally {
+        doings.set(doings.get() - 1)
+    }
+}
+
+/** Guard: where [facts] hold, the doing block this is in is done already, and ends. */
+fun Here.doneWhere(facts: Facts.() -> Unit) {
+    kotlin.check(doings.get() > 0) { "doneWhere ends a doing block, and is in none" }
+    if (holds(facts)) throw PartDone()
+}
 
 /** Guard: the rest of this member's turn runs only where [facts] hold. */
 fun Here.has(facts: Facts.() -> Unit) {

@@ -237,6 +237,10 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And at move 9 the planner was told the step now includes "the wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do"
     And ARTIE's reasoner was last asked to "<asked>"
     And the capture "say.trace.yaml" has no step whose words hold "The wait gave up"
+    And the capture "say.trace.yaml" keeps a watch script with a line with "doing(\"say on it why it wasn't merged, unless that is said there already.\") {"
+    And the capture "say.trace.yaml" keeps a watch script with a line with "follow(\"github:issues-list-comments\") { doneWhere {"
+    And the capture "say.trace.yaml" keeps a watch script with no line with "var "
+    And the capture "say.trace.yaml" keeps a watch script with no line with "if ("
 
     Examples:
       | case                                   | said on 2                                                             | new | new on 2                                                             | says                                                                                     | asked                                                                                                                                                                                                  |

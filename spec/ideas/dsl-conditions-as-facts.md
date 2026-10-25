@@ -57,5 +57,18 @@ whenever {
 }
 ```
 
-No `if`, no `else`, no `mapOf`, and since E no `var` for kept values. What remains native: the variable a chain's
-check sets where it is not a said-once act.
+No `if`, no `else`, no `mapOf`, and no `var`.
+
+**A part done already is left.** A chain of acts with a check that is not a said-once act is a `doing` block, in
+the step's words, each check a `doneWhere { facts }` on what the act before it reached:
+
+```kotlin
+doing("say on it why it wasn't merged, unless that is said there already.") {
+    follow("github:issues-list-comments") { doneWhere { "item" eq "…" } }
+    act("github:comment", "body" to "Not merged: $why") {}
+}
+```
+
+Where the facts hold, the block ends, the run notes "Done already: <words>", and the script goes on after it. Every
+block a guard ends on its way out goes back where it was, read again, as it does at its end. A `doneWhere` outside
+any `doing` stops the script.

@@ -7,18 +7,18 @@ val repo by input()
 val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd-HHmmss")))
 
 heart("http://localhost:8392/") {
-    var issue = 0L
-    var pull = 0L
+    val issue by kept("issue") { long("number") }
+    val pull by kept("pull") { long("number") }
     act(intent = "open the repository $owner/$repo") {
         act(intent = "open an issue titled \"Crash when a bed has no name (reasoned)\", saying it was opened by a HEART script") {
-            issue = state.long("number")
+            keepAs("issue")
         }
     }
     act(intent = "open the branch main of $owner/$repo") {
         act(intent = "start a new branch from here, named fix-blank-names-reasoned-$stamp") {
             act(intent = "commit a file named fix-reasoned-$stamp.md, saying \"Bed names may not be blank.\", with the message \"Refuse a bed with no name\"")
             act(intent = "open a pull request into main titled \"Refuse a bed with no name (reasoned)\", saying it relates to #$issue") {
-                pull = state.long("number")
+                keepAs("pull")
                 // GitHub works out whether it can merge a new pull request a moment after it opens.
                 until(tries = 20) { offers("github:merge") }
                 act(intent = "merge it, squashing its commits")

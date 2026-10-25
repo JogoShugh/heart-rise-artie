@@ -7,11 +7,11 @@ val repo by input()
 val stamp by input(default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd-HHmmss")))
 
 heart("http://localhost:8392/") {
-    var issue = 0L
-    var pull = 0L
+    val issue by kept("issue") { long("number") }
+    val pull by kept("pull") { long("number") }
     act("github:repos-get", "owner" to owner, "repo" to repo) {
         act("github:open-issue", "title" to "Crash when a bed has no name (hybrid)", "body" to "Opened by a HEART script.") {
-            issue = state.long("number")
+            keepAs("issue")
         }
     }
     // The branch is named, as a person would: a list of branches is paged, and main may not be on its first page.
@@ -29,7 +29,7 @@ heart("http://localhost:8392/") {
                 "base" to "main",
                 "body" to "Relates to #$issue.",
             ) {
-                pull = state.long("number")
+                keepAs("pull")
                 // GitHub works out whether it can merge a new pull request a moment after it opens.
                 until(tries = 20) { offers("github:merge") }
                 act("github:merge", "merge_method" to "squash")

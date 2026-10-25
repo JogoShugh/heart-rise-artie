@@ -130,6 +130,48 @@ Feature: A HEART script: the Reason step written in advance
       """
     Then the script failed: "nothing is kept as \"isue\"; keepAs(\"isue\") where it is reached"
 
+  Scenario: A part done already is left, where its facts say so, with no variable to set
+    doing runs its block, which says in words what it does. doneWhere ends
+    the block where its facts hold, read on the resource held there: the
+    part is done already. The script goes on after the block, back where it
+    was, read again.
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          doing("say it's fixed in 1.2, unless that is said already") {
+              follow("comments") { doneWhere { "item" has "Fixed in 1.2." } }
+              act("comment", "body" to "Fixed in 1.2.") {}
+          }
+          doing("say it's fixed in 1.3, unless that is said already") {
+              follow("comments") { doneWhere { "item" has "Fixed in 1.3." } }
+              act("comment", "body" to "Fixed in 1.3.") {}
+          }
+          act("close")
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                             |
+      | enter  | scripted://service/              |
+      | act    | issues-get {"number":10}         |
+      | follow | comments                         |
+      | return | /issues/10                       |
+      | follow | comments                         |
+      | return | /issues/10                       |
+      | act    | comment {"body":"Fixed in 1.3."} |
+      | return | /issues/10                       |
+      | act    | close                            |
+
+  Scenario: doneWhere outside a doing block stops the script, saying so
+    When this script runs
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10) { doneWhere { "state" eq "open" } }
+      }
+      """
+    Then the script failed: "doneWhere ends a doing block, and is in none"
+
   Scenario: A value read from a resource kept by name, with no variable to fill
     A script declares once what it reads from a resource it keeps, as it
     declares an input, and reads it after the act that reached it: no var,

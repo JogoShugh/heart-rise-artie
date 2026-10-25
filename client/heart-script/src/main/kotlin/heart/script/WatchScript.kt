@@ -157,12 +157,11 @@ internal class WatchScript(
     }
 
     private fun quoted(text: String) = kotlinString(text, slots = false)
-
-    private companion object {
-        const val ACT = "act"
-        const val OTHERWISE = "otherwise"
-    }
 }
+
+/** The parts of a step a chain is decided for: its words, and its Otherwise. */
+private const val ACT = "act"
+private const val OTHERWISE = "otherwise"
 
 /** Words that are one input alone, `{name}`. */
 private val INPUT = Regex("""\{(\w+)}""")
@@ -189,45 +188,47 @@ internal class ChainScript(
     private val out: ScriptLines,
     private val fill: (String) -> String,
 ) {
-    private var chains = 0
-
-    /** [intent]'s chain for [part], at [depth]; a chain with a check has a variable of its own for it. */
+    /**
+     * [intent]'s chain for [part], at [depth]. A chain with a check is a `doing` block in the intent's words, each
+     * check a `doneWhere` that ends it where the rest is done already.
+     */
     fun chain(intent: Step.Intent, part: String, depth: Int) {
         val chain = decided.acts[intent to part]
             ?: return out.said(depth, "${fill(intent.words)}: not decided in this run")
-        // A check written as an actOnce needs no variable; any other does.
+        // A check written as an actOnce needs no block; any other does.
         val guarded = chain.parts.indices.any { at ->
             chain.parts[at] is Chain.Check && saidOnce(chain.parts, at - 1) == null
         }
-        val undone = if (guarded) "undone${++chains}" else null
-        undone?.let { out.line(depth, "var $it = false") }
-        parts(chain.parts, undone, depth)
+        if (guarded) {
+            val words = if (part == OTHERWISE) intent.otherwise?.words ?: intent.words else intent.words
+            out.open(depth, "doing(${kotlinString(fill(words), slots = false)})") { parts(chain.parts, it) }
+        } else {
+            parts(chain.parts, depth)
+        }
         if (!chain.complete) out.said(depth, "${fill(intent.words)}: decided no further in this run")
     }
 
-    /** [parts] at [depth]: once a check is made, each part after it is done only where [undone] is false. */
-    private fun parts(parts: List<Chain.Part>, undone: String?, depth: Int) {
-        var guard = ""
+    /** [parts] at [depth]: each check a doneWhere on what the act before it reached, or on what is held. */
+    private fun parts(parts: List<Chain.Part>, depth: Int) {
         var at = 0
         while (at < parts.size) {
             val part = parts[at]
             val next = parts.getOrNull(at + 1) as? Chain.Check
             val once = saidOnce(parts, at)
             if (once != null) {
-                out.line(depth, guard + once)
+                out.line(depth, once)
                 at += ONCE_PARTS
                 continue
             }
             if (part is Chain.Act && part.opens) {
-                out.open(depth, "$guard${reach(part.chosen)}") { parts(parts.drop(at + 1), undone, it) }
+                out.open(depth, reach(part.chosen)) { parts(parts.drop(at + 1), it) }
                 return
             }
-            out.line(depth, guard + when {
-                part is Chain.Check -> "$undone = holds { ${facts(part.facts)} }"
-                next != null -> "${reach((part as Chain.Act).chosen)} { $undone = holds { ${facts(next.facts)} } }"
+            out.line(depth, when {
+                part is Chain.Check -> "doneWhere { ${facts(part.facts)} }"
+                next != null -> "${reach((part as Chain.Act).chosen)} { doneWhere { ${facts(next.facts)} } }"
                 else -> "${reach((part as Chain.Act).chosen)} {}"
             })
-            if (part is Chain.Check || next != null) guard = "if (!$undone) "
             at += if (part is Chain.Act && next != null) 2 else 1
         }
     }

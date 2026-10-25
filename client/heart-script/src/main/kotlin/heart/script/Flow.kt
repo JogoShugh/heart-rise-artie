@@ -48,8 +48,9 @@ fun Here.decide(tries: Int = 3, block: Here.() -> Unit) {
 fun Here.at(address: String, block: Here.() -> Unit) {
     val step = ++run.step
     val from = held.address
-    Here(navigator, run, arrived(step, "\"at\"", navigator.recall(address))).block()
-    held = arrived(step, "\"at\"", navigator.recall(from))
+    Here(navigator, run, arrived(step, "\"at\"", navigator.recall(address))).inside(block) {
+        held = arrived(step, "\"at\"", navigator.recall(from))
+    }
 }
 
 /**
@@ -60,8 +61,9 @@ fun Here.at(address: String, block: Here.() -> Unit) {
 fun Here.enter(entry: String, block: Here.() -> Unit) {
     val step = ++run.step
     val from = held.address
-    Here(navigator, run, arrived(step, "\"enter\"", navigator.enter(entry))).block()
-    held = arrived(step, "\"enter\"", navigator.recall(from))
+    Here(navigator, run, arrived(step, "\"enter\"", navigator.enter(entry))).inside(block) {
+        held = arrived(step, "\"enter\"", navigator.recall(from))
+    }
 }
 
 /**

@@ -140,9 +140,19 @@ class Here internal constructor(
         val from = held.address
         // The step just traced is this selection's: it opens the block.
         run.trace.lastOrNull()?.opens = true
-        Here(navigator, run, now).block()
-        held = arrived(step, what, navigator.recall(from))
+        Here(navigator, run, now).inside(block) { held = arrived(step, what, navigator.recall(from)) }
     }
+}
+
+/** Run [block] here, then [back], whether it ran to its end or a guard ended it on its way out. */
+internal fun Here.inside(block: Here.() -> Unit, back: () -> Unit) {
+    try {
+        block()
+    } catch (ended: Ended) {
+        back()
+        throw ended
+    }
+    back()
 }
 
 /** What the client holds after [answer]; a refusal stops the script at [step]. */
