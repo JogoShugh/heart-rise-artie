@@ -96,14 +96,19 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     /** The run's clock, when [clocked]: the time its pauses add up to. */
     var now: java.time.Instant = java.time.Instant.parse("2026-10-23T12:00:00Z")
 
+    /** The last run's virtual time, when [clocked]. */
+    private var lastTime: heart.script.VirtualTime? = null
+
     /** A run with [navigator], given [inputs]; when [clocked], its pauses are instant and move its clock. */
     private fun fresh(inputs: Map<String, String>, navigator: Navigator): Run {
         var first = true
         val more = navigators
         val navigators = { if (first || more == null) navigator.also { first = false } else more() }
         return if (clocked) {
-            // Virtual time: it moves only once every thread of a watch waits (Time.kt).
-            val time = heart.script.VirtualTime(now)
+            // Virtual time: it moves only once every thread of a watch waits (Time.kt). A run after another
+            // begins where the one before ended.
+            now = lastTime?.now() ?: now
+            val time = heart.script.VirtualTime(now).also { lastTime = it }
             Run(inputs, navigator = navigators, pause = time::pause).also {
                 it.clock = time::now
                 it.time = time

@@ -135,6 +135,45 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       | note |
       |      |
 
+  Scenario: Run again with its journal, a watch answers only what changed since, and a wait gives up on time
+    spec/PLAN-LISTENERS.md, slice 5. The journal keeps, as the watch goes,
+    what each member it answered showed, each wait with when it began, and
+    each wait over. Run again with it, the watch skips the members that
+    haven't changed, answers the one that has, and a wait resumes with the
+    time it had left: pull request 1 has waited since noon, so it gives up
+    at ten past, though the second run began at seven past.
+    Given pull request 1 is a draft on the small GitHub
+    And the run remembers in "watch.yaml"
+    And the script is
+      """kotlin
+      import kotlin.time.Duration.Companion.minutes
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 1.minutes, until = { ++looks == 8 }) {
+                  whenever {
+                      if (state["draft"].toString() == "false") note("ready: #${state["number"]}")
+                      once("github:merge", giveUp = 10.minutes, otherwise = {
+                          note("gave up on #${state["number"]} at ${Run.current.clock()}")
+                      }) {}
+                  }
+              }
+          }
+      }
+      """
+    When the script runs with ARTIE
+    Then the run noted
+      | note      |
+      | ready: #2 |
+    Given "acme/rockets" has pull request 3 on the small GitHub, open, titled "Bump left-pad to 1.0.3"
+    When the script runs with ARTIE again
+    Then the script finished
+    And the run noted
+      | note                                  |
+      | ready: #3                             |
+      | gave up on #1 at 2026-10-23T12:10:00Z |
+
   Scenario Outline: Outside a watch, once reads the resource again until the wait is over: <case>
     Given pull request 1 is <draft>
     When this script runs with ARTIE

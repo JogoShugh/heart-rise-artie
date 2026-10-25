@@ -61,7 +61,7 @@ Feature: artie run: a script, run from the command line
       | note: left the issue open: someone is still on it   |
       | finished, 2 steps                                   |
 
-  Scenario: --remember keeps what a watch did, in a file, so a watch run again doesn't do it again
+  Scenario: --remember keeps a journal of what a watch did, so a watch run again doesn't do it again
     Given the script "watch.kts" is
       """kotlin
       heart("scripted://service/") {
@@ -80,10 +80,8 @@ Feature: artie run: a script, run from the command line
       | watch.yaml |
     Then artie exits 0
     And the file "watch.yaml" has these lines, in order
-      | line                 |
-      | finished:            |
-      | - "/issues/10 close" |
-      | left: []             |
+      | line                                       |
+      | - {"kind":"over","key":"/issues/10 close"} |
 
   Scenario Outline: The exit says how the run ended
     Given the script "issue.kts" is

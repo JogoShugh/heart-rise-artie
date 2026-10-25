@@ -46,6 +46,7 @@ fun Here.listeners(
     val listeners = Listeners().apply(block).named
     val start = held.address
     val watch = Watch(start, run.clock().plus(atMost.toJavaDuration()), AtomicBoolean(false))
+    run.remember?.let { run.watching.keep(it) }
     val forks = listeners.map { run.fork() }
     val running = Executors.newVirtualThreadPerTaskExecutor().use { threads ->
         val polls = Polls(run, watch, threads)
@@ -148,6 +149,8 @@ internal fun Run.fork(): Run = Run(inputs, navigator = navigator, pause = pause)
     fork.watching.ends += watching.ends
     fork.watching.finished += watching.finished
     fork.watching.left += watching.left
+    // One journal for the whole watch: every listener adds to it.
+    fork.watching.journal = watching.journal
 }
 
 /** What [fork] did and noted, after this run's own. */

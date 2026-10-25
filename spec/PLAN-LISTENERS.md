@@ -1,6 +1,6 @@
 # Plan: listeners, not one loop
 
-Status: chosen 2026-10-24. Slices 0 to 4 and 8 done; see "As built" at the end.
+Status: chosen 2026-10-24. Slices 0 to 5 and 8 done; see "As built" at the end.
 
 ## The problem
 
@@ -143,3 +143,10 @@ Each slice starts with its feature, seen red at test level, then made green.
   from the run writes them as they are. A comment thread is listened to like any list: its page is polled, and a
   new comment is a hint. What a look saw of a resource is what it first read there (or what its own write
   answered), so a change that lands while the look reads again at a block's end still makes a hint.
+- **The journal (slice 5, `Journal.kt`).** `--remember FILE` now names an append-only YAML journal, one flow mapping
+  a line, written as the watch goes, by every listener: a member seen as answered (a digest of its state), a wait
+  begun (with when), a wait over, a resource left. Run again with it, a watch answers no member it answered
+  unchanged, and each wait resumes with the time it had left. The digest of the state a member showed is the hint's
+  id and the act's idempotency key in one: a state answered once is never answered again, however often it is
+  hinted. A member is kept as seen only once it is answered, so a run stopped while answering it answers it again;
+  a wait is kept as over before its act, so its act is done at most once. No key is sent to servers yet.
