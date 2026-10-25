@@ -90,16 +90,17 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
 <body>
 <main class="wrap">
   <header style="display:grid;gap:0.9rem">
-    <span class="eyebrow">Assessment · 14 October 2026 · revised the same day</span>
+    <span class="eyebrow">Assessment · 14 October 2026 · revised the same day and on 25 October</span>
     <h1>OpenAPI and HEART, by Fielding's rules</h1>
     <p class="lede">Roy Fielding defined REST in 2000. In 2008 he listed six rules an API must follow to call itself REST. This page scores OpenAPI and HEART against them, using what the garden exhibit actually showed, and says what is still open to question about HEART.</p>
   </header>
 
-  <p class="thesis">OpenAPI describes HTTP APIs well and was never trying to be REST. HEART follows all six rules for the clients it's meant for: generic ones that know its media type. What's left to question is evidence, cost, and meaning the representation doesn't carry.</p>
+  <p class="thesis">OpenAPI describes HTTP APIs well and was never trying to be REST. HEART follows five of the six rules for the clients it's meant for, generic ones that know its media type, and the sixth with one stretch it has a fix for. What's left to question is evidence, cost, and meaning the representation doesn't carry.</p>
 
   <section>
     <h2>This page changed its mind</h2>
     <p>The first version of this page, published earlier on 14 October, listed five gaps in HEART. The project's author pushed back on three of them. I checked them against the exact text of Fielding's post, and the author was right. Those three are withdrawn. They're kept below, under <a href="#withdrawn">"What I got wrong first"</a>, with the reason for each, so the change is visible rather than quietly erased. The scorecard moved with them: rules 2, 3 and 5 went from "Mostly" or "Partly" to "Yes".</p>
+    <p>It changed again on 25 October, to agree with the fuller <a href="../fielding-review/">Fielding's Rules, Checked</a>, which had looked more closely at two rules. Rule 1 goes to "Yes": the spec's core is protocol-neutral, with HTTP and CoAP as two bindings of it (SPEC §6.0). Rule 2 goes back to "Partly": an act's <code>If-Match</code> carries the ETag of the resource that offered the form, not of the act's own target, which stretches RFC 9110 §13.1.1; that review says how far, and recommends giving each act's target a representation of its own. Question 3 below now has a first answer.</p>
   </section>
 
   <section>
@@ -117,8 +118,8 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <table>
         <thead><tr><th scope="col">Rule, paraphrased</th><th scope="col">OpenAPI</th><th scope="col">HEART</th><th scope="col">Evidence from the exhibit</th></tr></thead>
         <tbody>
-          <tr><th scope="row">1. Not tied to one protocol</th><td class="fail">No</td><td class="part">Partly</td><td>HEART serves the same declaration over HTTP and CoAP (with coaps). OpenAPI is built from HTTP paths and methods.</td></tr>
-          <tr><th scope="row">2. Don't change the protocol; only fill in its gaps</th><td class="pass">Yes</td><td class="pass">Yes <span class="quiet">(was "Mostly")</span></td><td>HEART's requirements, such as <code>If-Match</code> on every act, are processing rules of its media type, built from standard HTTP pieces. HTTP itself is unchanged.</td></tr>
+          <tr><th scope="row">1. Not tied to one protocol</th><td class="fail">No</td><td class="pass">Yes <span class="quiet">(was "Partly")</span></td><td>HEART serves the same declaration over HTTP and CoAP (with coaps), from a protocol-neutral core. OpenAPI is built from HTTP paths and methods.</td></tr>
+          <tr><th scope="row">2. Don't change the protocol; only fill in its gaps</th><td class="pass">Yes</td><td class="part">Partly <span class="quiet">(was "Yes")</span></td><td>HEART's requirements, such as <code>If-Match</code> on every act, are processing rules of its media type, built from standard HTTP pieces. One stretches RFC 9110: an act's <code>If-Match</code> names another resource's ETag.</td></tr>
           <tr><th scope="row">3. Put the descriptive effort into media types and link relations</th><td class="fail">No</td><td class="pass">Yes <span class="quiet">(was "Mostly")</span></td><td>HEART defines a media type profile and its processing rules. Domains add extended relation names, such as <code>garden:water-cell</code>, which this rule explicitly allows.</td></tr>
           <tr><th scope="row">4. No fixed URIs; the server tells the client how to make them</th><td class="fail">No</td><td class="pass">Yes</td><td><code>move-url</code>: the bespoke dashboard got 404, while every HEART client followed the form's new target.</td></tr>
           <tr><th scope="row">5. No resource types the client depends on</th><td class="fail">No</td><td class="pass">Yes <span class="quiet">(was "Partly")</span></td><td><code>rename-field</code>: the bespoke dashboard showed <code>undefined</code>, while the ARTIE dashboard and Claude carried on with the new name.</td></tr>
@@ -136,7 +137,7 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p class="plain">The API's meaning should live in its representations, not in the quirks of HTTP. If the same resources and acts can travel over another protocol, the design is about the information, not the plumbing.</p>
       <div class="verdicts">
         <div class="o"><b>OpenAPI</b><span>Its whole structure is HTTP paths, methods and status codes. There's no other binding.</span></div>
-        <div class="h"><b>HEART</b><span>One declaration serves HTTP and CoAP, with the same forms and validators. "Partly", because the spec is still written mainly as an HTTP binding.</span></div>
+        <div class="h"><b>HEART</b><span>One declaration serves HTTP and CoAP, with the same forms and validators. The spec states its core without a protocol and maps it to each binding (SPEC §6.0), so this is a "Yes".</span></div>
       </div>
     </div>
 
@@ -145,7 +146,7 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p class="plain">An API should use HTTP as HTTP is defined. It may fill in things HTTP leaves open, but it shouldn't invent new rules that every client and intermediary has to learn. Caches, proxies and generic tools only understand standard HTTP.</p>
       <div class="verdicts">
         <div class="o"><b>OpenAPI</b><span>Describes HTTP as it is. No new protocol rules.</span></div>
-        <div class="h"><b>HEART</b><span>Leaves HTTP as it is. Its requirements, such as <code>If-Match</code> on every act and <code>Prefer</code> tokens for the layout, are rules of its media type, which is where rule 3 says they belong. A generic client learns them once, for every resource.</span></div>
+        <div class="h"><b>HEART</b><span>Leaves HTTP as it is. Its requirements, such as <code>If-Match</code> on every act and <code>Prefer</code> tokens for the layout, are rules of its media type, which is where rule 3 says they belong. A generic client learns them once, for every resource. One sits less easily: an act is sent to its own target, but its <code>If-Match</code> carries the ETag of the resource whose form offered it, which RFC 9110 doesn't quite say. Hence "Partly".</span></div>
       </div>
     </div>
 
@@ -216,6 +217,8 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
       <p>Resilience to drift is bought with that cost. Whether it's worth it depends on how often the server changes and what a broken client costs. That trade has to be measured, not assumed.</p>
       <span class="label">What could close it</span>
       <p>Measure it: tokens and latency per decision, against the rework a change forces on early-bound clients. The exhibit already counts the rework; it doesn't yet count the model's cost.</p>
+      <span class="label">A first answer (25 October)</span>
+      <p>Don't pay it on every run. A model decides once; <code>artie generate</code> writes those decisions as a script with a lock file that pins each form it used. The script then runs with no model, and before each act ARTIE checks the form against its pin, refusing to send if the server changed it. On the seed bench the script alone did a goal's work on new issues, 229 steps, with no model called (<a href="../seed-bench/">Seed Bench</a>). Not yet built: handing a refused step back to a model. Not yet measured: how many runs one decision serves.</p>
     </div>
 
     <div class="gap">
@@ -291,7 +294,7 @@ footer { color: var(--muted); font-size: 0.9rem; border-top: 1px solid var(--rul
 
   <section>
     <h2>The verdict, in one paragraph</h2>
-    <p>By Fielding's rules, OpenAPI isn't REST, and it doesn't claim to be. It's a precise contract for HTTP-based remote calls, and it's good at that. HEART follows all six rules for the clients it's built for: generic clients that know its media type. The server owns its URLs, every step is a choice the server offered in the current state, and HTTP caching is used the way REST intends. In the exhibit, no generic client broke under any change. What's still open is how often a model chooses well, what reading by meaning costs, what to do when the meaning isn't in the representation, and how this holds up at scale.</p>
+    <p>By Fielding's rules, OpenAPI isn't REST, and it doesn't claim to be. It's a precise contract for HTTP-based remote calls, and it's good at that. HEART follows the six rules for the clients it's built for, generic clients that know its media type, with one stretch of RFC 9110 under rule 2 that has a recommended fix. The server owns its URLs, every step is a choice the server offered in the current state, and HTTP caching is used the way REST intends. In the exhibit, no generic client broke under any change. What's still open is how often a model chooses well, what reading by meaning costs, what to do when the meaning isn't in the representation, and how this holds up at scale.</p>
     <p class="note">The first version of this verdict named three weak spots: relations not shared beyond one API, requirements that risk reading as a protocol, and clients that couple themselves. All three are withdrawn; see <a href="#withdrawn">"What I got wrong first"</a>.</p>
   </section>
 

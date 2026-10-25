@@ -20,30 +20,33 @@ Key: ✅ Supports the work does this · 🟡 Partly mostly, with a stated gap ·
 
 ## At a glance
 
+> Re-checked 25 October 2026 at commit `e5c16e8`, on the work since 15 October: resources embedded the HAL way (`_embedded`, SPEC §6.1); search and list results revalidated by their own `ETag`; an OpenAPI-to-HEART gateway that serves GitHub as HEART; heart-script, its scripts, goals in plain words, and `artie generate`, which writes a run's decisions as a script with a lock file; listeners that look again only when what they read has changed, with the gateway holding a read until a webhook says it has; and choices from state in two more clients, heart-ts and heart-mcp, and live on two domains (`docs/reports/choices-live/`). No verdict changed. One row is added, [Inference per run](#inference), because the project's goal is Fielding's rules with as little model inference per run as possible, and nothing here measured that half. It asks the question this review had left alone: a script that runs with no model names its relations, as the early-bound client of the OpenAPI review does, so how is it still a REST client? Rule 2 also gains one thing to watch: the gateway's held read.
+
 Each row jumps to its full account below. Columns are the commits this review has been checked against, all re-assessed with Fielding’s full wording.
 
-| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run | `a70ecc2` 11 Oct · re-checked live | `a7831ce` 12 Oct · trace over CoAP, bed from the bookmark | 15 Oct · coaps, ETag digest, choices from state |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 |
-| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ |
-| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 | 🟡 | 🟡 | 🟡 |
+| Axis | `c16e61b` 4 Oct · first review | `c5db0e4` 8 Oct · integrity, template pointers | `91fb71a` 8 Oct · service index | `e2a773f` 9 Oct · strong If-Match | `9a39cfc` 9 Oct · discovery, no fixed paths | `360865f` 10 Oct · typed relations, Buster | `d10c048` 10 Oct · any protocol | `4c52390` 10 Oct · CoAP binding | `b7f4d00` 10 Oct · first real-model run | `a70ecc2` 11 Oct · re-checked live | `a7831ce` 12 Oct · trace over CoAP, bed from the bookmark | 15 Oct · coaps, ETag digest, choices from state | `e5c16e8` 25 Oct · scripts, gateway, listeners |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| [Any protocol](#r1) Rule 1 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🔴 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No protocol changes](#r2) Rule 2 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | 🟡 | 🟡 |
+| [Media types first](#r3) Rule 3 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Server-taught URIs](#r4) Rule 4 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No typed resources](#r5) Rule 5 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Bookmark only](#r6) Rule 6 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Hypertext = affordance](#hypertext) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Typed relations](#typed-relations) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Interface in the form](#interface) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Client decides](#client-decides) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Cool URIs](#cool-uris) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [What POST means](#post-meaning) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Concentrated prior knowledge](#prior-knowledge) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [No batch calls](#no-batch) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Follow your nose](#follow-nose) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Key off the content](#key-off-content) Reply | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [App vs resource state](#app-state) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [Public identifiers](#public-ids) Reply | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [AI-driven clients](#ai-driven) Reply | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 | ✅ | ✅ | ✅ | ✅ | ✅ |
+| [How well a model chooses](#model-quality) Project, §10 | – | – | – | – | – | – | – | – | 🟡 | 🟡 | 🟡 | 🟡 | 🟡 |
+| [Inference per run](#inference) Project goal | – | – | – | – | – | – | – | – | – | – | – | – | 🟡 |
 
 ## The six rules in the post
 
@@ -78,6 +81,7 @@ Every mechanism is an existing standard: `Prefer` tokens (RFC 7240, which allows
 - **Spec:** §6.1 "Why not a media-type parameter", §6.3 "Precondition scope"
 - **Tests:** `negotiation.feature` (heart-core), `conditional-requests.feature` (heart-spring), `index.feature` (heart-core: the home document), client `layer1-freshness.feature`
 - **Open:** the act's precondition scope ([below](#precondition-scope))
+- **To watch (25 Oct 2026):** the gateway's held read. A listener's conditional GET may carry `Prefer: wait=N`, and the gateway then holds it while the answer would be 304, until a signed webhook says the resource changed or the time runs out. RFC 7240 §4.3 defines `wait` as how long the client expects the server to take to process the request; using it to wait for a change is a long poll under that name, not what the RFC describes. It is a gateway feature, not in SPEC, and a client that ignores it is answered at once. If SPEC takes it up, it should be named for what it does, as RFC 7240 lets anyone define a preference, rather than borrow `wait`.
 
 <a id="precondition-scope">
 
@@ -349,11 +353,43 @@ Questions the project asks of itself that Fielding’s rules do not. They are sc
 
 **🟡 Partly:** Shown working on real cases; not yet measured.
 
-Two cases pass with a real Claude model. One is against the real server: “water bed 2 with 250 ml” led to the right act and the right value, and the server recorded it. That proves nothing about rates. The evaluation in `spec/EVAL-L6.md` would answer that. It needs five small domains, 60–75 reviewed requests with answer keys, renamed copies of each domain, and several runs per case. It would measure selection accuracy, precondition sensitivity (asking instead of doing a different legal act), clarification, structural hallucination, and cost. A scorer proven first on scripted reasoners would grade it, against a pass bar agreed before the first run.
+Two cases pass with a real Claude model. One is against the real server: “water bed 2 with 250 ml” led to the right act and the right value, and the server recorded it. Since then there have been many more live runs with a real model: the seven server changes of the OpenAPI-vs-HEART exhibit, the seed bench's goal runs, GitHub through the gateway, and on 25 October seven asks in words on basketball and a support desk: Claude did the three that named someone who could be chosen, refused the three that named someone who couldn't and said who could, and asked which on the one that fit two. That is still a record of runs, not a rate. The evaluation in `spec/EVAL-L6.md` would answer that. It needs five small domains, 60–75 reviewed requests with answer keys, renamed copies of each domain, and several runs per case. It would measure selection accuracy, precondition sensitivity (asking instead of doing a different legal act), clarification, structural hallucination, and cost. A scorer proven first on scripted reasoners would grade it, against a pass bar agreed before the first run.
 
-- **Tests:** two `@llm` scenarios (`llmTest`)
+- **Tests:** two `@llm` scenarios (`llmTest`); live runs in `exhibits/openapi-vs-heart`, `exhibits/seed-bench`, `exhibits/choices-live`
 - **Open:** the eval harness, the domains and cases, the pass bar, local and hosted models
 
-**Gaps to carry forward:** the act's precondition scope, which stretches RFC 9110 until an action resource has a representation of its own ([Precondition scope, examined](#precondition-scope), Rule 2); CoAP's experimental option numbers, unregistered (now including 65020 for trace context), and Buster attacks only the HTTP binding (`spec/ideas/buster-over-coap.md`) (Rule 1); the draft `Accept-Profile` (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); and how well a model chooses, shown on real cases but not yet measured (its own row). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the `If-Match` narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Resolved 12 October 2026: no trace context over CoAP (Rule 1). Resolved 14 October 2026: no `coaps` (Rule 1), now DTLS 1.2 with a pre-shared key per client. Added 15 October 2026: choices from state (the "interface in the form" reply). Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.
+<a id="inference">
 
-Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to `~/repos/artie` as of commit `a7831ce`, 12 October 2026. The Buster campaign, run at that commit: 22 rounds, 125 planned mutations, all made, 74 pass, 51 pass (attested), 0 FAIL, no holes.
+### How little does a run need a model, and is a run without one still a REST client?
+
+*The project's goal: Fielding's rules, with minimal inference per run*
+
+**🟡 Partly:** A model decides once; afterwards a script does the same work with none, and a changed server is caught before anything is sent. When a guard refuses, the run stops; it does not yet hand the step back to a model.
+
+**The question.** Rule 6 asks that every transition be "driven by client selection of server-provided choices". A model reading each representation does that, at the cost of a model call per step. A script does it for free, but it names its relations in advance: `act("garden:water-cell", …)`. That is the early-bound client the OpenAPI review set aside as "failing rule 6 by its own design". So the cheap path and Fielding's path seem to pull apart, and a project that wants both has to say how they meet.
+
+**How HEART meets them: a script is a cached decision, and its lock file is its validator.** REST already has an answer for doing work once and reusing it safely: the cache constraint. A response is reused while its validator matches and checked again when it doesn't. `artie generate` applies the same rule to decisions. A run where a model chose each step becomes a script, plus a lock file that pins, for every relation the script uses, the integrity of the form it was chosen from (HAL-SCHEMA-FORMS-HR Rule 10). Before the script sends an act, ARTIE checks the form the server offers now against the pin (`ScriptGuard`). If it matches, the cached decision still applies and is sent with no model. If it doesn't, the guard refuses and nothing is sent. Lenient mode with `on-change: values` lets a changed form through only when it kept its method and what the script sends fits its new schema. So the script is early-bound in its names but never acts on a server that has changed beneath it. Everything else a generic client does, it still does: it enters at the bookmark, acts only on forms offered in the current representation, sends `If-Match`, follows the server's targets, and reads choices from state deterministically. What it skips is only the model.
+
+**What is deterministic now, with no model at any point:**
+- choosing a form's values from state (`hr:options`), resolved from the resource or a linked one;
+- a stale act decided again from fresh state (`decide { }`), its values recomputed by the script;
+- noticing that something changed: listeners poll what they last read, answered 304 while unchanged, one shared poll per resource;
+- waiting for a server catching up, before a strict guard refuses.
+
+**Evidence.**
+- The seed bench (`docs/reports/seed-bench/`): run b20 with Claude deciding each part of a goal once; `artie generate` wrote it as a script; run g4, the script alone, did the same work on new issues, 229 steps, none reasoned, no model called.
+- `script-guard.feature`: lenient and strict pins, a changed form refused before sending; `script-replay.feature`, `script-catch-up.feature`; `decide-again.feature`.
+- The listeners run (`docs/reports/listeners-live/`): three handlers watching GitHub for minutes with no model, each answering once.
+- The care dial (`docs/reports/care-dial/`): what each guard costs, from careful to `--guard off-the-rails`.
+
+**What remains.**
+- **The way back to a model.** When a guard refuses because the server changed, the run stops and says why. Handing that one step back to a model, then pinning its new decision, would close the loop: inference only where the world changed. It is designed, not built (`spec/ideas/replay-guards-lenient-strict.md`, "repaired on the fly"; `spec/ideas/self-repair-without-repeating-acts.md`).
+- **Not measured.** How many runs a decision serves before it must be made again, and what the first run costs, across domains. One live proof per exhibit, no rates.
+- **The first run still needs a model,** or a person writing the script. That is by design: meaning that isn't in the representation has to come from someone.
+
+- **Code:** client `ScriptGuard.kt`, `artie-cli` `generate`, heart-script `Flow.kt` (`decide`), `Listening.kt`, `Choices.kt`
+- **Open:** the step back to a model on a guard's refusal; rates
+
+**Gaps to carry forward:** the act's precondition scope, which stretches RFC 9110 until an action resource has a representation of its own ([Precondition scope, examined](#precondition-scope), Rule 2); CoAP's experimental option numbers, unregistered (now including 65020 for trace context), and Buster attacks only the HTTP binding (`spec/ideas/buster-over-coap.md`) (Rule 1); the draft `Accept-Profile` (Rule 2); a published but unstandardized media type and profile (Rule 6); action relations that are typed but belong to one service, with no shared vocabulary yet (the "typed relations" reply); how well a model chooses, shown on real cases but not yet measured (its own row); the step back to a model when a script's guard refuses, and how many runs one decision serves ([Inference per run](#inference)); and, to watch, the gateway's held read borrowing `Prefer: wait` (Rule 2). Resolved 8–9 October 2026: content addresses recognised by URL shape (Rule 4); no entry point (Rule 6); the `If-Match` narrowing (Rule 2). Resolved 10 October 2026: an AI-driven client working against the real server (the AI-driven reply); a protocol-neutral core with HTTP and CoAP bindings chosen by URI scheme, proven live over UDP (Rule 1); actions named by typed relations with an ALPS description (the "typed relations" reply). Resolved 12 October 2026: no trace context over CoAP (Rule 1). Resolved 14 October 2026: no `coaps` (Rule 1), now DTLS 1.2 with a pre-shared key per client. Added 15 October 2026: choices from state (the "interface in the form" reply). Withdrawn: "template filling at L1 and L2" (Rule 6), which rested on a truncated quote.
+
+Source: Roy T. Fielding, "REST APIs must be hypertext-driven", Untangled, 20 October 2008, and his comments on it. Quotes are verbatim. Evidence refers to `~/repos/artie` as of commit `e5c16e8`, 25 October 2026; rows not touched since are as checked at `a7831ce`, 12 October. The Buster campaign, run at that commit: 22 rounds, 125 planned mutations, all made, 74 pass, 51 pass (attested), 0 FAIL, no holes.
