@@ -208,6 +208,13 @@ class GoalSteps(
         assertTrue(script.lines().any { text in it }, script)
     }
 
+    @Then("the capture {string} keeps a watch script with no line with {string}")
+    fun noWatchLine(capture: String, text: String) {
+        val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>
+        val script = ((head["run"] as Map<*, *>)["watch"] as? Map<*, *>)?.get("script")?.toString().orEmpty()
+        assertTrue(script.isNotEmpty() && script.lines().none { text in it }, script)
+    }
+
     @Then("the capture {string} has no step whose words hold {string}")
     fun noStepSays(capture: String, words: String) {
         val said = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).drop(1)

@@ -280,7 +280,7 @@ internal class StepWatch(
                 when (val move = host.ask(step, here, ACTS, told)) {
                     is Move.Stop -> run.goalStop(move.why)
                     is Move.Done -> unfinished(words, chain, failing)?.let { moves += it }
-                        ?: run { over = true.also { chain.complete = true } }
+                        ?: run { over = true.also { chain.done() } }
                     is Move.Check -> {
                         over = checked(move, here, last)
                         failing = !over && chain.parts.lastOrNull() is Chain.Check

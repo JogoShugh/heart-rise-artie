@@ -38,6 +38,15 @@ internal class Chain {
     val parts = mutableListOf<Part>()
     var complete = false
 
+    /** Done, as the planner said: each read no check is made on, which changes nothing, left out. */
+    fun done() {
+        complete = true
+        val idle = parts.filterIndexed { at, part ->
+            part is Act && part.chosen.kind == "link" && !part.opens && parts.getOrNull(at + 1) !is Check
+        }
+        parts.removeAll(idle)
+    }
+
     sealed interface Part
 
     /** An act, made again as [chosen]; when it [opens], the parts after it are done on what it reached. */

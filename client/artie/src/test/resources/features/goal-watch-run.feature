@@ -1415,6 +1415,52 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the run noted one note beginning "Not checked: Every pull request was merged, or says why not"
     And the planner was last told the step now is "done when: Every pull request was merged, or says why not: check it only when members of the resource held say it; otherwise done, saying why"
 
+  Scenario: A read no check is made on is left out of a chain once it is done, so it is neither replayed nor written
+    Found by the script made from the live seed bench run b16: the planner
+    read the comments again after it commented, and checked nothing on
+    them; the read was replayed on every alert, and written in the script.
+    A read with no check after it changes nothing: once the chain is done,
+    it is left out.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                          | state | author |
+      | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 4 times
+    And the file "idle.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Answer each alert.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled alert changes `as alert`
+        - Say on it that the watch has seen it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                               | opens | relation | facts               |
+      | act   | open issue 10 of acme/rockets                       | yes   |          |                     |
+      | done  |                                                     |       |          |                     |
+      | act   | list the open issues of acme/rockets labelled alert | yes   |          |                     |
+      | check |                                                     |       |          | {"state": "open"}   |
+      | act   | say on it that the watch has seen it                |       |          |                     |
+      | act   | read its comments                                   |       |          |                     |
+      | done  |                                                     |       |          |                     |
+      | check |                                                     |       |          | {"state": "closed"} |
+    And ARTIE's reasoner will choose, in order
+      | form                        | follow                      | fields                                                                   |
+      | github:issues-get           |                             | {"owner": "acme", "repo": "rockets", "issue_number": 10}                 |
+      | github:issues-list-for-repo |                             | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "alert"} |
+      | github:comment              |                             | {"body": "Seen by the bench watch."}                                     |
+      |                             | github:issues-list-comments | {}                                                                       |
+    When the goal "idle.goal.md" runs with ARTIE, captured in "idle.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And the capture "idle.trace.yaml" keeps a watch script with a line with "act(\"github:comment\", \"body\" to \"Seen by the bench watch.\") {}"
+    And the capture "idle.trace.yaml" keeps a watch script with no line with "follow(\"github:issues-list-comments\")"
+
   Scenario: An Until naming what its resource doesn't hold is refused, so the watch doesn't run to its time limit
     An Until that names a member its resource doesn't have can never hold:
     the watch would look until its time ran out. It is refused when it is
