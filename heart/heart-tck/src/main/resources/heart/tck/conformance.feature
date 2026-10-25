@@ -97,7 +97,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
     When a client gets "/" as hal-schema-forms
     And a client follows the search form with the fixture's search term
     Then the response has Cache-Control "no-cache"
-    When the client asks for the results again with the ETag they were given
+    When the client asks for the results again as it asked before, with the ETag they were given
     Then the response status is 304
 
   Scenario: The profile describes every relation the resource's forms use
