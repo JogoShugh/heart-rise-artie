@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-labelledby="coupling-title coupling-desc">
+<title id="coupling-title">Generic clients, coupled to media types, not to sites</title>
+<desc id="coupling-desc">The browser is tightly coupled to HTML, images, CSS and, optionally, JavaScript, and to no site: a bank, a wiki and a shop each send their own controls. ARTIE is coupled the same way to HAL, the HEART profile, JSON Schema and problem details, and to no API; a person, an agent or a script can use it.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="coupling-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="240" y="30" text-anchor="middle">The browser</text>
+<text class="h" x="720" y="30" text-anchor="middle">A generic API client</text>
+<path class="dash" d="M480 20 L480 500"/>
+<rect class="hl" x="160" y="210" width="160" height="64" rx="10"/>
+<text class="h" x="240" y="237" text-anchor="middle">Browser</text>
+<text class="s" x="240" y="257" text-anchor="middle">knows formats</text>
+<rect class="box" x="20" y="60" width="130" height="40" rx="10"/>
+<text class="h" x="85" y="85" text-anchor="middle">HTML</text>
+<path class="line" d="M150 80 L200 210"/>
+<rect class="box" x="20" y="112" width="130" height="40" rx="10"/>
+<text class="h" x="85" y="137" text-anchor="middle">PNG, JPEG</text>
+<path class="line" d="M150 132 L200 210"/>
+<rect class="box" x="20" y="164" width="130" height="40" rx="10"/>
+<text class="h" x="85" y="189" text-anchor="middle">CSS</text>
+<path class="line" d="M150 184 L200 210"/>
+<rect class="ghost" x="20" y="216" width="130" height="40" rx="10"/>
+<text class="h" x="85" y="241" text-anchor="middle">JavaScript</text>
+<path class="dash" d="M150 236 L200 210"/>
+<text class="s" x="85" y="280" text-anchor="middle">optional (dashed)</text>
+<rect class="box" x="40" y="400" width="120" height="44" rx="10"/>
+<text class="h" x="100" y="427" text-anchor="middle">a bank</text>
+<path class="dash" d="M100 400 L240 276"/>
+<rect class="box" x="180" y="400" width="120" height="44" rx="10"/>
+<text class="h" x="240" y="427" text-anchor="middle">a wiki</text>
+<path class="dash" d="M240 400 L240 276"/>
+<rect class="box" x="320" y="400" width="120" height="44" rx="10"/>
+<text class="h" x="380" y="427" text-anchor="middle">a shop</text>
+<path class="dash" d="M380 400 L240 276"/>
+<text class="s" x="240" y="480" text-anchor="middle">knows no site: each sends its own controls</text>
+<rect class="hl" x="640" y="210" width="160" height="64" rx="10"/>
+<text class="h" x="720" y="237" text-anchor="middle">ARTIE</text>
+<text class="s" x="720" y="257" text-anchor="middle">knows formats</text>
+<rect class="box" x="500" y="60" width="130" height="40" rx="10"/>
+<text class="h" x="565" y="85" text-anchor="middle">HAL</text>
+<path class="line" d="M630 80 L680 210"/>
+<rect class="box" x="500" y="112" width="130" height="40" rx="10"/>
+<text class="h" x="565" y="137" text-anchor="middle">HEART profile</text>
+<path class="line" d="M630 132 L680 210"/>
+<rect class="box" x="500" y="164" width="130" height="40" rx="10"/>
+<text class="h" x="565" y="189" text-anchor="middle">JSON Schema</text>
+<path class="line" d="M630 184 L680 210"/>
+<rect class="box" x="500" y="216" width="130" height="40" rx="10"/>
+<text class="h" x="565" y="241" text-anchor="middle">RFC 9457</text>
+<path class="line" d="M630 236 L680 210"/>
+<rect class="box" x="520" y="400" width="120" height="44" rx="10"/>
+<text class="h" x="580" y="427" text-anchor="middle">GitHub</text>
+<path class="dash" d="M580 400 L720 276"/>
+<rect class="box" x="660" y="400" width="120" height="44" rx="10"/>
+<text class="h" x="720" y="427" text-anchor="middle">a garden</text>
+<path class="dash" d="M720 400 L720 276"/>
+<rect class="box" x="800" y="400" width="120" height="44" rx="10"/>
+<text class="h" x="860" y="427" text-anchor="middle">tickets</text>
+<path class="dash" d="M860 400 L720 276"/>
+<text class="t" x="830" y="180" text-anchor="start">a person</text>
+<path class="line" d="M826 175 L802 242" marker-end="url(#coupling-head)"/>
+<text class="t" x="830" y="230" text-anchor="start">an agent</text>
+<path class="line" d="M826 225 L802 242" marker-end="url(#coupling-head)"/>
+<text class="t" x="830" y="280" text-anchor="start">a script</text>
+<path class="line" d="M826 275 L802 242" marker-end="url(#coupling-head)"/>
+<text class="s" x="720" y="480" text-anchor="middle">knows no API: each sends its own controls</text>
+</svg>
