@@ -156,29 +156,39 @@ fun constraints() = Svg("constraints", 960, 270).apply {
         "generic client needs.",
 )
 
-fun drift() = Svg("drift", 960, 400).apply {
-    line(60, 70, 920, 70, "accline")
-    text(70, 56, "In the answer itself", cls = "s", anchor = "start")
-    data class Era(val x: Int, val y: Int, val era: String, val where: String)
-    val eras = listOf(
-        Era(120, 70, "The Web", "in the page"),
-        Era(300, 150, "RPC, SOAP", "in an interface file"),
-        Era(480, 210, "JSON over HTTP", "in documentation"),
-        Era(660, 260, "OpenAPI", "in a description of all"),
-        Era(840, 310, "LLM agents", "in training data"),
-    )
-    path(eras.joinToString(" ") { (if (it == eras.first()) "M" else "L") + "${it.x} ${it.y}" }, "dash", head = false)
-    eras.forEach { e ->
-        dot(e.x, e.y)
-        text(e.x, e.y + 30, e.era, e.where, cls = "s", first = "t")
+fun drift() = Svg("drift", 960, 500).apply {
+    // The server's rules, carried out along one line per era to where a client finds them; the further out, the staler.
+    val places = listOf("The answer", "An interface file", "The docs", "A generated client", "The model")
+    val xs = listOf(380, 500, 620, 740, 860)
+    box(250, 86, 56, 380, "hl", rx = 8)
+    add("""<text class="h" x="0" y="0" text-anchor="middle" transform="translate(284 276) rotate(-90)">The server, where the rules are true</text>""")
+    places.forEachIndexed { i, p ->
+        val words = p.split(" ")
+        val split = if (words.size > 2) words.size - 1 else words.size
+        text(xs[i], 44, words.take(split).joinToString(" "), words.drop(split).joinToString(" "), cls = "t", step = 18)
+        line(xs[i], 82, xs[i], 466)
     }
-    add("""<text class="s" x="0" y="0" text-anchor="middle" transform="translate(30 200) rotate(-90)">further from the answer</text>""")
-    path("M30 290 L30 350")
+    data class Era(val name: String, val sub: String, val at: Int, val fresh: String, val back: Boolean = false)
+    listOf(
+        Era("The Web", "a form in the page", 0, "true now"),
+        Era("RPC, SOAP", "WSDL, compiled in", 1, "as of the release"),
+        Era("JSON APIs", "pages a developer reads", 2, "as of the reading"),
+        Era("OpenAPI", "SDKs generated from it", 3, "as of the last build"),
+        Era("LLM agents", "what training saw", 4, "as of training"),
+        Era("HEART", "back in the answer", 0, "true now", back = true),
+    ).forEachIndexed { i, e ->
+        val y = 112 + i * 62
+        text(40, y, e.name, e.sub, cls = "s", first = if (e.back) "h" else "t", anchor = "start", step = 19)
+        path("M306 ${y - 5} L${xs[e.at] - 9} ${y - 5}", if (e.back) "accline" else "line")
+        dot(xs[e.at], y - 5, if (e.back) 9 else 7)
+        text(xs[e.at], y + 19, e.fresh, cls = "s")
+    }
 }.render(
-    "Where the rules live, era by era",
-    "On the Web the rules arrive in the page. With RPC they moved to interface files, with JSON APIs to documentation, " +
-        "with OpenAPI to a description of every operation, and for LLM agents to training data: each step further from " +
-        "the answer a client holds.",
+    "The rules move away from the server, and go stale",
+    "Each row is an era, and the line runs from the server to where a client finds the rules. On the Web they are in " +
+        "the answer, true now. With RPC they are in an interface file, as of the release; with JSON APIs in " +
+        "documentation, as of the reading; with OpenAPI in a generated client, as of the last build; for LLM agents in " +
+        "the model, as of training. HEART puts them back in the answer, true now.",
 )
 
 fun blank() = Svg("blank", 960, 330).apply {

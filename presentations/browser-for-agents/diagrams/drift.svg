@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="drift-title drift-desc">
-<title id="drift-title">Where the rules live, era by era</title>
-<desc id="drift-desc">On the Web the rules arrive in the page. With RPC they moved to interface files, with JSON APIs to documentation, with OpenAPI to a description of every operation, and for LLM agents to training data: each step further from the answer a client holds.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" role="img" aria-labelledby="drift-title drift-desc">
+<title id="drift-title">The rules move away from the server, and go stale</title>
+<desc id="drift-desc">Each row is an era, and the line runs from the server to where a client finds the rules. On the Web they are in the answer, true now. With RPC they are in an interface file, as of the release; with JSON APIs in documentation, as of the reading; with OpenAPI in a generated client, as of the last build; for LLM agents in the model, as of training. HEART puts them back in the answer, true now.</desc>
 <style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
 .hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
 .ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
@@ -14,24 +14,51 @@
 .accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
 .head{fill:var(--d-muted,#5A6370)}</style>
 <defs><marker id="drift-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
-<path class="accline" d="M60 70 L920 70"/>
-<text class="s" x="70" y="56" text-anchor="start">In the answer itself</text>
-<path class="dash" d="M120 70 L300 150 L480 210 L660 260 L840 310"/>
-<circle class="a" cx="120" cy="70" r="7"/>
-<text class="t" x="120" y="100" text-anchor="middle">The Web</text>
-<text class="s" x="120" y="120" text-anchor="middle">in the page</text>
-<circle class="a" cx="300" cy="150" r="7"/>
-<text class="t" x="300" y="180" text-anchor="middle">RPC, SOAP</text>
-<text class="s" x="300" y="200" text-anchor="middle">in an interface file</text>
-<circle class="a" cx="480" cy="210" r="7"/>
-<text class="t" x="480" y="240" text-anchor="middle">JSON over HTTP</text>
-<text class="s" x="480" y="260" text-anchor="middle">in documentation</text>
-<circle class="a" cx="660" cy="260" r="7"/>
-<text class="t" x="660" y="290" text-anchor="middle">OpenAPI</text>
-<text class="s" x="660" y="310" text-anchor="middle">in a description of all</text>
-<circle class="a" cx="840" cy="310" r="7"/>
-<text class="t" x="840" y="340" text-anchor="middle">LLM agents</text>
-<text class="s" x="840" y="360" text-anchor="middle">in training data</text>
-<text class="s" x="0" y="0" text-anchor="middle" transform="translate(30 200) rotate(-90)">further from the answer</text>
-<path class="line" d="M30 290 L30 350" marker-end="url(#drift-head)"/>
+<rect class="hl" x="250" y="86" width="56" height="380" rx="8"/>
+<text class="h" x="0" y="0" text-anchor="middle" transform="translate(284 276) rotate(-90)">The server, where the rules are true</text>
+<text class="t" x="380" y="44" text-anchor="middle">The answer</text>
+<text class="t" x="380" y="62" text-anchor="middle"></text>
+<path class="dash" d="M380 82 L380 466"/>
+<text class="t" x="500" y="44" text-anchor="middle">An interface</text>
+<text class="t" x="500" y="62" text-anchor="middle">file</text>
+<path class="dash" d="M500 82 L500 466"/>
+<text class="t" x="620" y="44" text-anchor="middle">The docs</text>
+<text class="t" x="620" y="62" text-anchor="middle"></text>
+<path class="dash" d="M620 82 L620 466"/>
+<text class="t" x="740" y="44" text-anchor="middle">A generated</text>
+<text class="t" x="740" y="62" text-anchor="middle">client</text>
+<path class="dash" d="M740 82 L740 466"/>
+<text class="t" x="860" y="44" text-anchor="middle">The model</text>
+<text class="t" x="860" y="62" text-anchor="middle"></text>
+<path class="dash" d="M860 82 L860 466"/>
+<text class="t" x="40" y="112" text-anchor="start">The Web</text>
+<text class="s" x="40" y="131" text-anchor="start">a form in the page</text>
+<path class="line" d="M306 107 L371 107" marker-end="url(#drift-head)"/>
+<circle class="a" cx="380" cy="107" r="7"/>
+<text class="s" x="380" y="131" text-anchor="middle">true now</text>
+<text class="t" x="40" y="174" text-anchor="start">RPC, SOAP</text>
+<text class="s" x="40" y="193" text-anchor="start">WSDL, compiled in</text>
+<path class="line" d="M306 169 L491 169" marker-end="url(#drift-head)"/>
+<circle class="a" cx="500" cy="169" r="7"/>
+<text class="s" x="500" y="193" text-anchor="middle">as of the release</text>
+<text class="t" x="40" y="236" text-anchor="start">JSON APIs</text>
+<text class="s" x="40" y="255" text-anchor="start">pages a developer reads</text>
+<path class="line" d="M306 231 L611 231" marker-end="url(#drift-head)"/>
+<circle class="a" cx="620" cy="231" r="7"/>
+<text class="s" x="620" y="255" text-anchor="middle">as of the reading</text>
+<text class="t" x="40" y="298" text-anchor="start">OpenAPI</text>
+<text class="s" x="40" y="317" text-anchor="start">SDKs generated from it</text>
+<path class="line" d="M306 293 L731 293" marker-end="url(#drift-head)"/>
+<circle class="a" cx="740" cy="293" r="7"/>
+<text class="s" x="740" y="317" text-anchor="middle">as of the last build</text>
+<text class="t" x="40" y="360" text-anchor="start">LLM agents</text>
+<text class="s" x="40" y="379" text-anchor="start">what training saw</text>
+<path class="line" d="M306 355 L851 355" marker-end="url(#drift-head)"/>
+<circle class="a" cx="860" cy="355" r="7"/>
+<text class="s" x="860" y="379" text-anchor="middle">as of training</text>
+<text class="h" x="40" y="422" text-anchor="start">HEART</text>
+<text class="s" x="40" y="441" text-anchor="start">back in the answer</text>
+<path class="accline" d="M306 417 L371 417" marker-end="url(#drift-head)"/>
+<circle class="a" cx="380" cy="417" r="9"/>
+<text class="s" x="380" y="441" text-anchor="middle">true now</text>
 </svg>
