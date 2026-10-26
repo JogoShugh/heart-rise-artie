@@ -77,6 +77,39 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       | number |
       | 2      |
 
+  Scenario: leaveWhere says it left a member once, though the member changes and is visited again
+    Pull request 1 is held, and a draft at the first look, marked ready just
+    after: the second look visits it again, as changed, and leaves it again,
+    saying nothing more. A long watch said it at every look the member
+    changed, the same words many times over.
+    Given pull request 1 is labelled "hold" on the small GitHub
+    And pull request 1 is a draft on the small GitHub until it is next read
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 10.seconds, until = { that(++looks == 3) }) {
+                  whenever {
+                      leaveWhere("held.") { "github:labels" has "hold" }
+                      once("github:merge") {
+                          act("github:merge", "merge_method" to "squash") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted
+      | note                                                             |
+      | Left https://github.gateway.test/repos/acme/rockets/pulls/1: held. |
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 2      |
+
   Scenario: A look that fails is noted, and the next look tries again
     Given the small GitHub answers the 2nd read of "/repos/acme/rockets/pulls" with 500
     When this script runs with ARTIE

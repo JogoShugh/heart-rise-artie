@@ -62,10 +62,13 @@ fun Here.has(facts: Facts.() -> Unit) {
     if (!holds(facts)) throw MemberLeft()
 }
 
-/** Guard: where [facts] hold, the member is left, and the run notes "Left <address>: [words]". */
+/**
+ * Guard: where [facts] hold, the member is left, and the run notes "Left <address>: [words]" the first time it
+ * leaves that member, as a goal's If says so once; a member changed and visited again is left saying nothing.
+ */
 fun Here.leaveWhere(words: String, facts: Facts.() -> Unit) {
     if (holds(facts)) {
-        note("Left ${held.address}: $words")
+        if (run.watching.leave(held.address)) note("Left ${held.address}: $words")
         throw MemberLeft()
     }
 }
