@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Browser for Agents</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --paper: #F7F3EA; --ink: #1D2128; --muted: #5B6370; --rule: #DDD5C6; --panel: #FFFDF8;
+  --accent: #A45F12; --accent-soft: #F6E3C2; --code: #EFE9DC;
+  --d-ink: var(--ink); --d-muted: var(--muted); --d-line: #C9C2B4; --d-panel: var(--panel);
+  --d-accent: #B86E12; --d-accent-soft: var(--accent-soft);
+  --d-font: 'IBM Plex Sans', system-ui, sans-serif; --d-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A;
+  --d-line: #3A434F; --d-accent: #E7A64A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A;
+  --d-line: #3A434F; --d-accent: #E7A64A; color-scheme: dark }
+body { background: var(--paper); color: var(--ink); margin: 0;
+  font: 400 1.125rem/1.7 'Source Serif 4', Georgia, serif; }
+main { max-width: 44rem; margin: 0 auto; padding-block: 4rem 6rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.masthead { border-bottom: 1px solid var(--rule); padding-bottom: 2rem; margin-bottom: 1rem; }
+.kicker { font: 600 0.8rem/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 1rem; }
+h1 { font: 600 clamp(2.4rem, 6vw, 3.6rem)/1.05 'IBM Plex Sans', system-ui, sans-serif; margin: 0 0 1rem;
+  text-wrap: balance; letter-spacing: -0.01em; }
+.dek { font-size: 1.3rem; line-height: 1.5; color: var(--muted); margin: 0; }
+h2 { font: 600 1.6rem/1.25 'IBM Plex Sans', system-ui, sans-serif; margin: 3.5rem 0 1rem; text-wrap: balance; }
+.num { display: inline-block; min-width: 2rem; color: var(--accent); }
+p { margin: 0 0 1.1rem; }
+em { font-style: italic; }
+blockquote { margin: 1.8rem 0; padding: 0.4rem 0 0.4rem 1.4rem; border-left: 3px solid var(--accent);
+  font-size: 1.3rem; line-height: 1.55; }
+code { font: 0.88em 'JetBrains Mono', ui-monospace, monospace; background: var(--code); padding: 0.1em 0.3em;
+  border-radius: 4px; }
+pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0; }
+pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.55; }
+figure { margin: 2.2rem 0; }
+figure .art { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px;
+  padding: 1rem; }
+figure svg { display: block; width: 100%; min-width: 560px; height: auto; }
+figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 0.6rem; }
+@media (min-width: 1100px) { figure { margin-left: -6rem; margin-right: -6rem; } }
+.sources { margin-top: 4rem; border-top: 1px solid var(--rule); padding-top: 1rem;
+  font: 400 0.92rem/1.6 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
+.sources h2 { font-size: 1rem; margin: 1rem 0 0.5rem; }
+.sources ul { padding-left: 1.2rem; }
+</style>
+</head><body><main>
+<header class="masthead">
+<p class="kicker">HEART and ARTIE</p>
+<h1>The Browser for Agents</h1>
+<p class="dek">How the Web made one client work with every site, and how a media type and a generic agent can do the same for APIs.</p>
+</header>
+
+<section id="question">
+<h2><span class="num">1</span>The question</h2>
+<p>You have never installed a client for your bank’s website. Or for a newspaper, a shop or your council’s planning forms. One program, a browser, handles all of them, including sites that didn’t exist when it was written. That is so ordinary we forget how strange it is.</p>
+<p>The browser can do it because of what it is coupled to. It doesn’t know any site. It knows a few <em>formats</em>, chiefly HTML, and a few rules for using them: follow a link, fill in a form and send it. Every site speaks those formats, so every site works.</p>
+<p>Software agents today have the opposite arrangement. An agent that works with GitHub is built for GitHub: its tools, its endpoints, its rules. An agent for Stripe is built again for Stripe. An agent for your own billing system starts from nothing, until someone writes the documentation, the tools or the prompts for it. The coupling runs from each agent to each API, by hand.</p>
+<figure id="fig-fanout"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="fanout-title fanout-desc">
+<title id="fanout-title">One browser for every site, one agent per API</title>
+<desc id="fanout-desc">On the left a single browser reaches a shop, a bank, a newspaper and a billion more sites, because it knows only HTML. On the right each agent is wired to one API: a GitHub agent to GitHub, a Stripe agent to Stripe.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="fanout-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="240" y="28" text-anchor="middle">The Web: one client, any site</text>
+<text class="h" x="720" y="28" text-anchor="middle">APIs: one client per API</text>
+<rect class="hl" x="40" y="180" width="170" height="64" rx="10"/>
+<text class="h" x="125" y="207" text-anchor="middle">Browser</text>
+<text class="s" x="125" y="227" text-anchor="middle">knows HTML</text>
+<rect class="box" x="290" y="56" width="160" height="44" rx="10"/>
+<text class="h" x="370" y="83" text-anchor="middle">a shop</text>
+<path class="line" d="M210 212 L288 78" marker-end="url(#fanout-head)"/>
+<rect class="box" x="290" y="120" width="160" height="44" rx="10"/>
+<text class="h" x="370" y="147" text-anchor="middle">a bank</text>
+<path class="line" d="M210 212 L288 142" marker-end="url(#fanout-head)"/>
+<rect class="box" x="290" y="184" width="160" height="44" rx="10"/>
+<text class="h" x="370" y="211" text-anchor="middle">a newspaper</text>
+<path class="line" d="M210 212 L288 206" marker-end="url(#fanout-head)"/>
+<rect class="box" x="290" y="248" width="160" height="44" rx="10"/>
+<text class="h" x="370" y="275" text-anchor="middle">a council's forms</text>
+<path class="line" d="M210 212 L288 270" marker-end="url(#fanout-head)"/>
+<rect class="ghost" x="290" y="312" width="160" height="44" rx="10"/>
+<text class="h" x="370" y="339" text-anchor="middle">a billion more</text>
+<path class="line" d="M210 212 L288 334" marker-end="url(#fanout-head)"/>
+<path class="dash" d="M480 50 L480 380"/>
+<rect class="box" x="510" y="72" width="170" height="48" rx="10"/>
+<text class="h" x="595" y="101" text-anchor="middle">GitHub agent</text>
+<rect class="box" x="770" y="72" width="160" height="48" rx="10"/>
+<text class="h" x="850" y="101" text-anchor="middle">GitHub API</text>
+<path class="line" d="M680 96 L768 96" marker-end="url(#fanout-head)"/>
+<rect class="box" x="510" y="144" width="170" height="48" rx="10"/>
+<text class="h" x="595" y="173" text-anchor="middle">Stripe agent</text>
+<rect class="box" x="770" y="144" width="160" height="48" rx="10"/>
+<text class="h" x="850" y="173" text-anchor="middle">Stripe API</text>
+<path class="line" d="M680 168 L768 168" marker-end="url(#fanout-head)"/>
+<rect class="box" x="510" y="216" width="170" height="48" rx="10"/>
+<text class="h" x="595" y="245" text-anchor="middle">Jira agent</text>
+<rect class="box" x="770" y="216" width="160" height="48" rx="10"/>
+<text class="h" x="850" y="245" text-anchor="middle">Jira API</text>
+<path class="line" d="M680 240 L768 240" marker-end="url(#fanout-head)"/>
+<rect class="box" x="510" y="288" width="170" height="48" rx="10"/>
+<text class="h" x="595" y="317" text-anchor="middle">your billing agent</text>
+<rect class="box" x="770" y="288" width="160" height="48" rx="10"/>
+<text class="h" x="850" y="317" text-anchor="middle">your billing API</text>
+<path class="line" d="M680 312 L768 312" marker-end="url(#fanout-head)"/>
+<text class="s" x="240" y="404" text-anchor="middle">coupled to a media type</text>
+<text class="s" x="720" y="404" text-anchor="middle">coupled to each API, by hand</text>
+</svg></div><figcaption>One browser for every site, one agent per API</figcaption></figure>
+<p>This essay is about closing that gap. The claim is simple: what made the browser generic can make an agent generic. HEART is a media type that does for agents what HTML does for browsers. ARTIE is the generic agent that reads it. The rest is how we got here, and why the idea is older than it looks.</p>
+</section>
+
+<section id="islands">
+<h2><span class="num">2</span>Before the Web: links, but no generic client</h2>
+<p>Linked information is an old dream. In 1945 Vannevar Bush described the Memex, a desk that would store a researcher’s documents and the trails between them. It was never built. In 1965 Ted Nelson coined the word <em>hypertext</em>. In 1968 Douglas Engelbart demonstrated NLS: live, linked, editable information on a screen, with a mouse. In 1987 Apple shipped HyperCard, and millions of people built linked stacks of cards.</p>
+<p>Each was remarkable, and each was an island. NLS ran on NLS terminals. A HyperCard stack ran in HyperCard. The content and the program that read it came as a pair, so knowledge could link only within one system.</p>
+<figure id="fig-islands"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="islands-title islands-desc">
+<title id="islands-title">Hypertext before and after the Web</title>
+<desc id="islands-desc">A timeline: Memex in 1945, Nelson's hypertext in 1965, NLS in 1968, HyperCard in 1987, each with a client of its own; then the Web in 1991, where any browser reads any site.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="islands-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<path class="line" d="M40 210 L920 210"/>
+<path class="line" d="M110 170 L110 210"/>
+<circle class="a" cx="110" cy="210" r="6"/>
+<text class="s" x="110" y="238" text-anchor="middle">1945</text>
+<rect class="box" x="38" y="92" width="144" height="78" rx="10"/>
+<text class="h" x="110" y="126" text-anchor="middle">Memex</text>
+<text class="s" x="110" y="146" text-anchor="middle">a desk, never built</text>
+<path class="line" d="M280 170 L280 210"/>
+<circle class="a" cx="280" cy="210" r="6"/>
+<text class="s" x="280" y="238" text-anchor="middle">1965</text>
+<rect class="box" x="208" y="92" width="144" height="78" rx="10"/>
+<text class="h" x="280" y="126" text-anchor="middle">Hypertext</text>
+<text class="s" x="280" y="146" text-anchor="middle">Nelson's word</text>
+<path class="line" d="M450 170 L450 210"/>
+<circle class="a" cx="450" cy="210" r="6"/>
+<text class="s" x="450" y="238" text-anchor="middle">1968</text>
+<rect class="box" x="378" y="92" width="144" height="78" rx="10"/>
+<text class="h" x="450" y="126" text-anchor="middle">NLS</text>
+<text class="s" x="450" y="146" text-anchor="middle">its own terminal</text>
+<path class="line" d="M620 170 L620 210"/>
+<circle class="a" cx="620" cy="210" r="6"/>
+<text class="s" x="620" y="238" text-anchor="middle">1987</text>
+<rect class="box" x="548" y="92" width="144" height="78" rx="10"/>
+<text class="h" x="620" y="126" text-anchor="middle">HyperCard</text>
+<text class="s" x="620" y="146" text-anchor="middle">its own app</text>
+<path class="line" d="M820 170 L820 210"/>
+<circle class="a" cx="820" cy="210" r="9"/>
+<text class="s" x="820" y="238" text-anchor="middle">1991</text>
+<rect class="hl" x="725" y="72" width="190" height="98" rx="10"/>
+<text class="h" x="820" y="116" text-anchor="middle">The Web</text>
+<text class="s" x="820" y="136" text-anchor="middle">any browser, any site</text>
+<text class="s" x="480" y="286" text-anchor="middle">Each early system came with its own client.</text>
+<text class="s" x="480" y="306" text-anchor="middle">The Web split the client from the content, and agreed only on formats.</text>
+</svg></div><figcaption>Hypertext before and after the Web</figcaption></figure>
+<p>The Web did not invent links. Its real invention was the split: the client on one side, the content on the other, and nothing between them but agreed formats and a protocol.</p>
+</section>
+
+<section id="browser">
+<h2><span class="num">3</span>The Web’s real invention: a generic client</h2>
+<p>Tim Berners-Lee’s proposal of 1989 and the public Web of 1991 rest on three agreements. URIs name things. HTTP moves representations of them. HTML describes a page. Anyone who implements the three can read anything published with them.</p>
+<p>The decisive step came a few years later, between 1993 and 1995, when HTML gained forms. Until then a page could tell you where to go next. With forms, it could tell you what you could <em>do</em>: search, order, sign up, pay. The page arrived with its own controls. The browser didn’t need to know that this shop takes a quantity and a postcode. The form said so, and the browser drew it.</p>
+<p>So the browser’s knowledge is general, and stops at a clear line. It knows the protocol, how to name and reach things, the media type, and what a link and a form mean. Everything about a particular site arrives in the site’s own pages, at the moment it is needed.</p>
+<figure id="fig-knows"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" role="img" aria-labelledby="knows-title knows-desc">
+<title id="knows-title">What a browser knows, and what it doesn't</title>
+<desc id="knows-desc">The browser knows HTTP, URIs, the HTML media type and what links and forms mean. It knows nothing about any particular site: not Amazon, not your bank, not their addresses or rules.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="knows-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="40" y="30" width="560" height="320" rx="10"/>
+<text class="h" x="320" y="66" text-anchor="middle">What a browser knows</text>
+<rect class="hl" x="70" y="90" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="111" text-anchor="middle">What a link and a form mean</text>
+<text class="s" x="320" y="131" text-anchor="middle">follow it; fill it in and send it</text>
+<rect class="hl" x="70" y="152" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="173" text-anchor="middle">HTML: the media type</text>
+<text class="s" x="320" y="193" text-anchor="middle">how a page carries its information and its controls</text>
+<rect class="box" x="70" y="214" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="235" text-anchor="middle">URIs</text>
+<text class="s" x="320" y="255" text-anchor="middle">how to name and reach anything</text>
+<rect class="box" x="70" y="276" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="297" text-anchor="middle">HTTP</text>
+<text class="s" x="320" y="317" text-anchor="middle">methods, status codes, caching</text>
+<rect class="ghost" x="640" y="30" width="280" height="320" rx="10"/>
+<text class="h" x="780" y="66" text-anchor="middle">What it doesn't know</text>
+<text class="s" x="780" y="130" text-anchor="middle">Amazon</text>
+<text class="s" x="780" y="164" text-anchor="middle">your bank</text>
+<text class="s" x="780" y="198" text-anchor="middle">any site's addresses</text>
+<text class="s" x="780" y="232" text-anchor="middle">any site's rules</text>
+<text class="s" x="780" y="266" text-anchor="middle">anything about you</text>
+</svg></div><figcaption>What a browser knows, and what it doesn't</figcaption></figure>
+<p>This is why a site can change without breaking its visitors. Rename a page, move a button, add a step to checkout: the next page you receive describes the new arrangement. Nobody updates your browser.</p>
+</section>
+
+<section id="fielding">
+<h2><span class="num">4</span>Fielding names it</h2>
+<p>In 2000 Roy Fielding described the architecture behind the Web in his dissertation and called it REST. He named four constraints on the interface between client and server. Resources are identified. They are manipulated through representations. Messages describe themselves. And <em>hypermedia is the engine of application state</em>: the client moves from one state to the next by choosing among the links and forms the current representation offers.</p>
+<figure id="fig-constraints"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 270" role="img" aria-labelledby="constraints-title constraints-desc">
+<title id="constraints-title">REST's four interface constraints</title>
+<desc id="constraints-desc">Identification of resources, manipulation through representations and self-descriptive messages are kept by most HTTP APIs. The fourth, hypermedia as the engine of application state, is mostly dropped, and it is the one a generic client needs.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="constraints-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="480" y="28" text-anchor="middle">REST's four interface constraints (Fielding, 2000, §5.1.5)</text>
+<rect class="box" x="40" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="142" y="110" text-anchor="middle">Identification</text>
+<text class="s" x="142" y="130" text-anchor="middle">of resources</text>
+<rect class="box" x="265" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="367" y="110" text-anchor="middle">Manipulation</text>
+<text class="s" x="367" y="130" text-anchor="middle">through representations</text>
+<rect class="box" x="490" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="592" y="110" text-anchor="middle">Self-descriptive</text>
+<text class="s" x="592" y="130" text-anchor="middle">messages</text>
+<rect class="hl" x="715" y="60" width="205" height="110" rx="10"/>
+<text class="h" x="817" y="100" text-anchor="middle">Hypermedia</text>
+<text class="s" x="817" y="120" text-anchor="middle">as the engine of</text>
+<text class="s" x="817" y="140" text-anchor="middle">application state</text>
+<path class="line" d="M40 190 L40 200 L695 200 L695 190"/>
+<text class="s" x="367" y="228" text-anchor="middle">kept by most HTTP APIs</text>
+<path class="accline" d="M715 190 L715 200 L920 200 L920 190"/>
+<text class="t" x="817" y="228" text-anchor="middle">mostly dropped</text>
+<text class="s" x="817" y="250" text-anchor="middle">and the one a generic client needs</text>
+</svg></div><figcaption>REST's four interface constraints</figcaption></figure>
+<p>The fourth constraint is what makes a generic client possible. It is also the one the industry quietly dropped. By 2008 so many HTTP interfaces called themselves REST that Fielding wrote a short, irritated post: “if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period.”</p>
+<p>In the comments he defined what he meant, and the definition is the theme of this essay:</p>
+<blockquote>When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.</blockquote>
+<p>Note the words in brackets: <em>or automaton</em>. Fielding was not only describing people with browsers. In the same thread he wrote that “machines can follow links when they understand the data format and relationship types,” and that a REST API should be entered “with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types.” A bookmark and a media type. Nothing else.</p>
+</section>
+
+<section id="lost">
+<h2><span class="num">5</span>How APIs lost it</h2>
+<p>When web APIs spread in the 2000s, they kept HTTP and URLs and swapped HTML for JSON. JSON is a fine format for data. But a JSON object has no link and no form. A list of pull requests arrives as data, and nothing in it says what you may do with any of them.</p>
+<p>The knowledge didn’t disappear. It moved, and each move took it further from the answer a client holds. With RPC and SOAP, the rules lived in an interface file compiled into the client. With JSON APIs, they lived in human documentation. With OpenAPI, they live in a description of every operation the API will ever accept: GitHub’s lists more than twelve hundred. With today’s language-model agents, they live partly in training data.</p>
+<figure id="fig-drift"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="drift-title drift-desc">
+<title id="drift-title">Where the rules live, era by era</title>
+<desc id="drift-desc">On the Web the rules arrive in the page. With RPC they moved to interface files, with JSON APIs to documentation, with OpenAPI to a description of every operation, and for LLM agents to training data: each step further from the answer a client holds.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="drift-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<path class="accline" d="M60 70 L920 70"/>
+<text class="s" x="70" y="56" text-anchor="start">In the answer itself</text>
+<path class="dash" d="M120 70 L300 150 L480 210 L660 260 L840 310"/>
+<circle class="a" cx="120" cy="70" r="7"/>
+<text class="t" x="120" y="100" text-anchor="middle">The Web</text>
+<text class="s" x="120" y="120" text-anchor="middle">in the page</text>
+<circle class="a" cx="300" cy="150" r="7"/>
+<text class="t" x="300" y="180" text-anchor="middle">RPC, SOAP</text>
+<text class="s" x="300" y="200" text-anchor="middle">in an interface file</text>
+<circle class="a" cx="480" cy="210" r="7"/>
+<text class="t" x="480" y="240" text-anchor="middle">JSON over HTTP</text>
+<text class="s" x="480" y="260" text-anchor="middle">in documentation</text>
+<circle class="a" cx="660" cy="260" r="7"/>
+<text class="t" x="660" y="290" text-anchor="middle">OpenAPI</text>
+<text class="s" x="660" y="310" text-anchor="middle">in a description of all</text>
+<circle class="a" cx="840" cy="310" r="7"/>
+<text class="t" x="840" y="340" text-anchor="middle">LLM agents</text>
+<text class="s" x="840" y="360" text-anchor="middle">in training data</text>
+<text class="s" x="0" y="0" text-anchor="middle" transform="translate(30 200) rotate(-90)">further from the answer</text>
+<path class="line" d="M30 290 L30 350" marker-end="url(#drift-head)"/>
+</svg></div><figcaption>Where the rules live, era by era</figcaption></figure>
+<p>Each of these is useful, and each brings back the islands. A client generated from an API’s description is a client for that API. When the API changes, the client is wrong until someone regenerates it. And a description of everything that is ever possible cannot say what is possible <em>now</em>. GitHub’s description of the merge operation is honest about this. It lists a response: “405 Method Not Allowed if merge cannot be performed.” To find out, you try.</p>
+</section>
+
+<section id="agents">
+<h2><span class="num">6</span>Agents inherit the problem</h2>
+<p>A language-model agent is the most adaptable client ever built. It reads, it reasons, it recovers from surprises. Put it in front of a browser and it does what a person does: reads the page, sees the buttons, chooses.</p>
+<p>Put it in front of a JSON API and there are no buttons. It gets data and has to work out the rest. Which endpoint merges? Is merging allowed now? What does the request need? It answers from training, from documentation someone fed it, or from trying and reading the error. For a famous public API that mostly works. For a private API it starts with nothing. For an API that changed last week, it is confidently out of date.</p>
+<figure id="fig-blank"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" role="img" aria-labelledby="blank-title blank-desc">
+<title id="blank-title">An agent facing data with no controls</title>
+<desc id="blank-desc">A pull request as JSON: its number, state, title and URLs. Nothing in it says whether it can be merged now, how, or with what. The agent is left asking.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="blank-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="40" y="40" width="460" height="250" rx="10"/>
+<text class="m" x="60" y="76" text-anchor="start">{ &quot;number&quot;: 20,</text>
+<text class="m" x="60" y="106" text-anchor="start">  &quot;state&quot;: &quot;open&quot;,</text>
+<text class="m" x="60" y="136" text-anchor="start">  &quot;title&quot;: &quot;Bump left-pad&quot;,</text>
+<text class="m" x="60" y="166" text-anchor="start">  &quot;mergeable_state&quot;: &quot;unknown&quot;,</text>
+<text class="m" x="60" y="196" text-anchor="start">  &quot;url&quot;: &quot;https://api.github.com/…&quot;,</text>
+<text class="m" x="60" y="226" text-anchor="start">  … }</text>
+<rect class="hl" x="700" y="130" width="220" height="80" rx="10"/>
+<text class="h" x="810" y="165" text-anchor="middle">An agent</text>
+<text class="s" x="810" y="185" text-anchor="middle">what can I do now?</text>
+<rect class="ghost" x="540" y="50" width="120" height="36" rx="18"/>
+<text class="s" x="600" y="73" text-anchor="middle">merge it?</text>
+<path class="dash" d="M698 170 L662 68" marker-end="url(#blank-head)"/>
+<rect class="ghost" x="540" y="140" width="120" height="36" rx="18"/>
+<text class="s" x="600" y="163" text-anchor="middle">with what?</text>
+<path class="dash" d="M698 170 L662 158" marker-end="url(#blank-head)"/>
+<rect class="ghost" x="540" y="230" width="120" height="36" rx="18"/>
+<text class="s" x="600" y="253" text-anchor="middle">allowed now?</text>
+<path class="dash" d="M698 170 L662 248" marker-end="url(#blank-head)"/>
+</svg></div><figcaption>An agent facing data with no controls</figcaption></figure>
+<p>The usual remedy is to wrap each API in hand-written tools. That works, and it is the islands again: one set of tools per API, each to be written, kept current and trusted. The agent is generic. Its connection to the world is not.</p>
+</section>
+
+<section id="heart">
+<h2><span class="num">7</span>HEART: a media type for agents</h2>
+<p>The browser’s answer was never to know more about sites. It was a media type that carries the controls. HEART takes the same route for agents. A HEART representation is JSON, so an agent reads it easily, and it brings back what JSON APIs dropped, element for element.</p>
+<figure id="fig-mapping"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 410" role="img" aria-labelledby="mapping-title mapping-desc">
+<title id="mapping-title">HTML and HEART, element for element</title>
+<desc id="mapping-desc">An HTML link with a rel is a HEART link by relation; an HTML form is a HEART form with method and target; an input's constraints are a JSON Schema; and where HTML shows no button, HEART offers no form and says why.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="mapping-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="385" y="34" text-anchor="middle">HTML · for a browser</text>
+<text class="h" x="765" y="34" text-anchor="middle">HEART · for an agent</text>
+<text class="t" x="40" y="90" text-anchor="start">A link</text>
+<text class="s" x="40" y="110" text-anchor="start">by relation</text>
+<rect class="box" x="210" y="60" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="87" text-anchor="start">&lt;a rel=&quot;author&quot;</text>
+<text class="m" x="226" y="107" text-anchor="start">   href=&quot;/users/ana&quot;&gt;</text>
+<path class="line" d="M564 92 L586 92" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="60" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="87" text-anchor="start">&quot;_links&quot;: { &quot;author&quot;:</text>
+<text class="m" x="606" y="107" text-anchor="start">  { &quot;href&quot;: &quot;/users/ana&quot; } }</text>
+<text class="t" x="40" y="174" text-anchor="start">An action</text>
+<text class="s" x="40" y="194" text-anchor="start">method and target</text>
+<rect class="box" x="210" y="144" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="171" text-anchor="start">&lt;form method=&quot;post&quot;</text>
+<text class="m" x="226" y="191" text-anchor="start">  action=&quot;/pulls/20/merge&quot;&gt;</text>
+<path class="line" d="M564 176 L586 176" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="144" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="171" text-anchor="start">&quot;_forms&quot;: { &quot;github:merge&quot;: {</text>
+<text class="m" x="606" y="191" text-anchor="start">  &quot;method&quot;: &quot;PUT&quot;, … } }</text>
+<text class="t" x="40" y="258" text-anchor="start">Its inputs</text>
+<text class="s" x="40" y="278" text-anchor="start">what to send</text>
+<rect class="box" x="210" y="228" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="255" text-anchor="start">&lt;input name=&quot;title&quot; required</text>
+<text class="m" x="226" y="275" text-anchor="start">  maxlength=&quot;256&quot;&gt;</text>
+<path class="line" d="M564 260 L586 260" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="228" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="255" text-anchor="start">&quot;title&quot;: { &quot;type&quot;: &quot;string&quot;,</text>
+<text class="m" x="606" y="275" text-anchor="start">  &quot;maxLength&quot;: 256 }</text>
+<text class="t" x="40" y="342" text-anchor="start">Not possible now</text>
+<text class="s" x="40" y="362" text-anchor="start">and why</text>
+<rect class="box" x="210" y="312" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="339" text-anchor="start">(the button isn't there)</text>
+<path class="line" d="M564 344 L586 344" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="312" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="339" text-anchor="start">(no form; hr:unavailable</text>
+<text class="m" x="606" y="359" text-anchor="start"> says why)</text>
+</svg></div><figcaption>HTML and HEART, element for element</figcaption></figure>
+<p><strong>Links, by relation.</strong> Links sit in <code>_links</code>, named by what they mean: <code>author</code>, <code>next</code>, or a service’s own relation such as <code>github:issues-list-comments</code>. This is HAL, a format already used by Spring and others. A client follows a relation. It never builds an address.</p>
+<p><strong>Forms.</strong> Actions sit in <code>_forms</code>, each with a method, a target and its inputs described in JSON Schema, the same schema language that tool-using models and OpenAPI already use. A form is HTML’s <code>&lt;form&gt;</code>, for JSON.</p>
+<pre><code>"_forms": {
+  "github:merge": {
+    "title": "Merge this pull request",
+    "method": "PUT",
+    "_links": { "target": { "href": "…/pulls/20/merge" } },
+    "schema": { "properties": {
+      "merge_method": { "enum": ["merge", "squash", "rebase"] } } } } }</code></pre>
+<p><strong>Forms that follow the state.</strong> A representation offers only the forms its current state allows. A pull request that can’t be merged has no merge form. Once it can be, the form appears. An open issue offers close; a closed one offers reopen instead. This is exactly what a web page does with its buttons, and exactly what a description of everything ever possible cannot do.</p>
+<p><strong>Why an act is absent.</strong> When a form is missing, the representation can link to a short explanation: “Branch protection blocks the merge: a required check or review is missing.” An agent can tell a person why, without guessing.</p>
+<p><strong>Refusal of anything not offered.</strong> A HEART service refuses an act it didn’t offer in that state, a write to a state that has changed since it was read, and inputs outside the schema. The rules the forms show are the rules the service enforces.</p>
+<p>The name spells this out: Hypermedia, Enforced, for Agentic, Reliable Transactions.</p>
+</section>
+
+<section id="artie">
+<h2><span class="num">8</span>ARTIE: the generic agent</h2>
+<p>If HEART is the HTML of this story, ARTIE is the browser. It knows HEART: how to read a representation, follow a relation, fill in a form, send it with the right preconditions, and understand a refusal. It doesn’t know GitHub, a ticket desk or a basketball game. Those arrive in their own representations, as sites do.</p>
+<figure id="fig-stacks"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="stacks-title stacks-desc">
+<title id="stacks-title">The browser stack and the agent stack</title>
+<desc id="stacks-desc">A person, a browser, HTML and any website, next to a model, ARTIE, HEART and any HEART service. The browser and ARTIE are generic; each is coupled only to its media type.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="stacks-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="250" y="30" text-anchor="middle">On the Web</text>
+<text class="h" x="710" y="30" text-anchor="middle">With HEART</text>
+<rect class="box" x="100" y="50" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="78" text-anchor="middle">A person</text>
+<text class="s" x="250" y="98" text-anchor="middle">chooses what to do</text>
+<path class="line" d="M250 116 L250 138" marker-end="url(#stacks-head)"/>
+<rect class="box" x="100" y="140" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="168" text-anchor="middle">A browser</text>
+<text class="s" x="250" y="188" text-anchor="middle">generic: knows HTML</text>
+<path class="line" d="M250 206 L250 228" marker-end="url(#stacks-head)"/>
+<rect class="hl" x="100" y="230" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="258" text-anchor="middle">HTML</text>
+<text class="s" x="250" y="278" text-anchor="middle">the media type</text>
+<path class="line" d="M250 296 L250 318" marker-end="url(#stacks-head)"/>
+<rect class="box" x="100" y="320" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="348" text-anchor="middle">Any website</text>
+<text class="s" x="250" y="368" text-anchor="middle">its own resources and rules</text>
+<rect class="box" x="560" y="50" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="78" text-anchor="middle">A model</text>
+<text class="s" x="710" y="98" text-anchor="middle">chooses among what's offered</text>
+<path class="line" d="M710 116 L710 138" marker-end="url(#stacks-head)"/>
+<rect class="box" x="560" y="140" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="168" text-anchor="middle">ARTIE</text>
+<text class="s" x="710" y="188" text-anchor="middle">generic: knows HEART</text>
+<path class="line" d="M710 206 L710 228" marker-end="url(#stacks-head)"/>
+<rect class="hl" x="560" y="230" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="258" text-anchor="middle">HEART</text>
+<text class="s" x="710" y="278" text-anchor="middle">the media type</text>
+<path class="line" d="M710 296 L710 318" marker-end="url(#stacks-head)"/>
+<rect class="box" x="560" y="320" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="348" text-anchor="middle">Any HEART service</text>
+<text class="s" x="710" y="368" text-anchor="middle">its own resources and rules</text>
+<text class="h" x="480" y="89" text-anchor="middle">≈</text>
+<text class="h" x="480" y="179" text-anchor="middle">≈</text>
+<text class="h" x="480" y="269" text-anchor="middle">≈</text>
+<text class="h" x="480" y="359" text-anchor="middle">≈</text>
+<text class="s" x="480" y="424" text-anchor="middle">Each client is coupled to the media type, never to a site.</text>
+</svg></div><figcaption>The browser stack and the agent stack</figcaption></figure>
+<p>The two stacks line up. On the Web a person chooses what to do, and the browser carries it out in terms of HTML. With HEART a model chooses among what is offered, and ARTIE carries it out in terms of HEART. The model is in the person’s seat, not the browser’s. It never types an address and never invents an action. It picks from the controls on screen, as a person picks a button.</p>
+<p>That division is the point. The judgement stays with the model. The mechanics, and the guarantee that only offered acts are attempted, sit with a generic client that works for any HEART service. A new service needs a starting address, its bookmark, and nothing else.</p>
+</section>
+
+<section id="routine">
+<h2><span class="num">9</span>From browsing to a routine</h2>
+<p>People don’t only browse. When they do the same thing every week, they automate it: a bookmark, a macro, a recorded browser test. The browser makes this possible because each step is an act on a control the page offered.</p>
+<p>ARTIE does the same, with one improvement. A person writes a goal in plain words: <em>whenever a sowing plan can be merged, merge it; if it can’t be within five minutes, say why on it, unless that has been said already</em>. ARTIE browses the goal once, with a model choosing at each step among what the service offers. Those choices become a script: the relations to follow, the forms to fill, the checks to make. The forms the script used are pinned with their fingerprints.</p>
+<figure id="fig-routine"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-labelledby="routine-title routine-desc">
+<title id="routine-title">From browsing to a routine</title>
+<desc id="routine-desc">A goal in plain words is browsed once, with a model choosing among the offers. Its choices become a script with the forms pinned, and every later run needs no model and stops if a form changes.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="routine-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="40" y="60" width="190" height="100" rx="10"/>
+<text class="h" x="135" y="95" text-anchor="middle">A goal</text>
+<text class="s" x="135" y="115" text-anchor="middle">plain words,</text>
+<text class="s" x="135" y="135" text-anchor="middle">written once</text>
+<path class="line" d="M232 110 L268 110" marker-end="url(#routine-head)"/>
+<rect class="box" x="270" y="60" width="190" height="100" rx="10"/>
+<text class="h" x="365" y="95" text-anchor="middle">A first run</text>
+<text class="s" x="365" y="115" text-anchor="middle">a model chooses</text>
+<text class="s" x="365" y="135" text-anchor="middle">among offers</text>
+<path class="line" d="M462 110 L498 110" marker-end="url(#routine-head)"/>
+<rect class="box" x="500" y="60" width="190" height="100" rx="10"/>
+<text class="h" x="595" y="95" text-anchor="middle">A script</text>
+<text class="s" x="595" y="115" text-anchor="middle">its choices, with</text>
+<text class="s" x="595" y="135" text-anchor="middle">the forms pinned</text>
+<path class="line" d="M692 110 L728 110" marker-end="url(#routine-head)"/>
+<rect class="hl" x="730" y="60" width="190" height="100" rx="10"/>
+<text class="h" x="825" y="95" text-anchor="middle">Every later run</text>
+<text class="s" x="825" y="115" text-anchor="middle">no model; stops if</text>
+<text class="s" x="825" y="135" text-anchor="middle">a form changes</text>
+<path class="accline" d="M820 60 C820 20 900 20 900 58" marker-end="url(#routine-head)"/>
+<path class="line" d="M40 186 L40 196 L460 196 L460 186"/>
+<text class="t" x="250" y="222" text-anchor="middle">browsing</text>
+<path class="accline" d="M500 186 L500 196 L920 196 L920 186"/>
+<text class="t" x="710" y="222" text-anchor="middle">a routine</text>
+<text class="s" x="480" y="262" text-anchor="middle">Like a recorded macro, except every step is held to the controls it was offered.</text>
+</svg></div><figcaption>From browsing to a routine</figcaption></figure>
+<p>From then on the script runs alone, with no model. It is held to what it was offered: if the service stops offering a form, or changes one, the script stops and says so before it sends anything. A recorded macro would click on whatever is there. In our own trials, a goal like this one, watching a seed bench’s alerts, sowing plans and trays on GitHub, ran once with a model and then repeatedly with none.</p>
+</section>
+
+<section id="gateway">
+<h2><span class="num">10</span>Old systems, new clients: the gateway</h2>
+<p>Most services won’t speak HEART soon, and they don’t have to. The Web met the same problem in the 1990s. Banks and airlines didn’t rewrite their mainframes. They put web front ends in front of them, programs that rendered the old system’s data as HTML so any browser could use it.</p>
+<figure id="fig-gateway"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="gateway-title gateway-desc">
+<title id="gateway-title">A front for an old system, then and now</title>
+<desc id="gateway-desc">In the 1990s a web front end put HTML in front of a mainframe application so any browser could use it. Now a HEART gateway puts HEART in front of GitHub's REST API so ARTIE can use it.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="gateway-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="t" x="40" y="88" text-anchor="start">The 1990s</text>
+<rect class="box" x="170" y="50" width="210" height="76" rx="10"/>
+<text class="h" x="275" y="93" text-anchor="middle">A browser</text>
+<path class="line" d="M382 88 L428 88" marker-end="url(#gateway-head)"/>
+<rect class="hl" x="430" y="50" width="230" height="76" rx="10"/>
+<text class="h" x="545" y="83" text-anchor="middle">A web front end</text>
+<text class="s" x="545" y="103" text-anchor="middle">renders HTML from it</text>
+<path class="line" d="M662 88 L708 88" marker-end="url(#gateway-head)"/>
+<rect class="box" x="710" y="50" width="210" height="76" rx="10"/>
+<text class="h" x="815" y="93" text-anchor="middle">A mainframe app</text>
+<text class="t" x="40" y="208" text-anchor="start">Now</text>
+<rect class="box" x="170" y="170" width="210" height="76" rx="10"/>
+<text class="h" x="275" y="213" text-anchor="middle">ARTIE</text>
+<path class="line" d="M382 208 L428 208" marker-end="url(#gateway-head)"/>
+<rect class="hl" x="430" y="170" width="230" height="76" rx="10"/>
+<text class="h" x="545" y="203" text-anchor="middle">A HEART gateway</text>
+<text class="s" x="545" y="223" text-anchor="middle">renders HEART from it</text>
+<path class="line" d="M662 208 L708 208" marker-end="url(#gateway-head)"/>
+<rect class="box" x="710" y="170" width="210" height="76" rx="10"/>
+<text class="h" x="815" y="213" text-anchor="middle">GitHub's REST API</text>
+<text class="s" x="480" y="286" text-anchor="middle">The old system stays as it is. A new front speaks the generic client's media type.</text>
+</svg></div><figcaption>A front for an old system, then and now</figcaption></figure>
+<p>A HEART gateway is that front end for agents. Given GitHub’s published API description and a short connector, it renders GitHub’s answers as HEART: the state, the links lifted out of the data, and only the forms the state allows. On the way in, it checks every act against what it offered before GitHub hears it. GitHub doesn’t change. Anyone can run their own gateway, on a laptop, for the APIs they depend on.</p>
+</section>
+
+<section id="costs">
+<h2><span class="num">11</span>What it costs, and what it isn’t</h2>
+<p>A generic client is bought with a shared format, and that has a price. A service must speak HEART, or someone must put a gateway in front of it, and writing a good connector is real work. A HEART agent does only what the service offers. An agent with a shell and a dozen hand-written tools can do more things, in more places, with fewer promises about any of them.</p>
+<p>That trade is the same one the Web made. A browser can’t do everything a native program can. It does a narrower thing for every site there is, safely, without being rebuilt for each. HEART and ARTIE make the same bargain for agents: the model chooses only among options the service vouches for, and only where judgement earns its place.</p>
+</section>
+
+<section id="close">
+<h2><span class="num">12</span>Close</h2>
+<p>The Web never made people guess. Every page arrives with what you can do next and nothing you can’t, and one client reads them all. In 2008 Fielding said machines deserved the same, “or automaton”, years before anyone had an automaton that could use it.</p>
+<p>Now we do. What it needs is not more knowledge of each API. It needs what the browser always had: the information and the controls, together.</p>
+</section>
+
+<footer class="sources">
+<h2>Sources</h2>
+<ul>
+<li>Vannevar Bush, “As We May Think”, <i>The Atlantic</i>, July 1945.</li>
+<li>Roy T. Fielding, <i>Architectural Styles and the Design of Network-based Software Architectures</i>, UC Irvine, 2000, §5.1.5.</li>
+<li>Roy T. Fielding, “REST APIs must be hypertext-driven”, Untangled, 20 October 2008, and his comments there.</li>
+<li>Mike Kelly, JSON Hypertext Application Language, draft-kelly-json-hal, IETF, 2012–2023.</li>
+<li>GitHub REST API description, github/rest-api-description, OpenAPI 3.0.3.</li>
+<li>HEART: spec/SPEC.md and spec/HAL-SCHEMA-FORMS-HR.md in this repository; profiles under w3id.org/heart-rise.</li>
+</ul>
+</footer>
+
+</main></body></html>
