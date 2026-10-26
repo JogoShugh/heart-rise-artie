@@ -41,8 +41,9 @@ internal class StepWatch(
     fun whenever(steps: List<Step.Whenever>, where: Here) {
         val until = goal.steps.filterIsInstance<Step.Until>().firstOrNull()
         // The watch as the script its decisions amount to, written when the capture is (spec/PLAN-LISTENERS.md,
-        // slice 8), from the step it began at; its Until reads the resource it names by a variable named for it.
-        val entry = where.held.address
+        // slice 8); its Until reads the resource it names by a variable named for it. The script made from the
+        // run stands at the start when its watch begins, its steps' blocks closed: the watch goes on from there.
+        val entry = goal.start
         val name = until?.let { u -> BRACE.findAll(u.condition).map { it.groupValues[1] }.firstOrNull { it in named } }
         run.watchFrom = run.trace.size + 1
         run.watchScript = { WatchScript(decided, entry, name, host::fill).text(steps) }

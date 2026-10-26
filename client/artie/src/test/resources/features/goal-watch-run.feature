@@ -401,6 +401,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
   Scenario: A Whenever whose list isn't reached from where it stands goes back to the start, and watches from there
     The Whenever is under the issue, which leads to no list of pull
     requests; the planner goes back to the start, where the list's form is.
+    The script made from the run stands at the start when its watch begins,
+    so its watch script doesn't go back there again.
     Given line 10 of "merge.goal.md" reads '  - Whenever a pull request labelled {label} changes `as pr`', indented 0
     And line 11 of "merge.goal.md" reads '    - Once it can be merged, merge it by squashing.', indented 0
     And line 12 of "merge.goal.md" reads '      Or give up after 15 seconds.', indented 0
@@ -433,6 +435,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | 3      |
       | 2      |
     And the planner was asked 11 times
+    And the capture "merge.trace.yaml" keeps a watch script with no line with "at(\"https://github.gateway.test/\")"
 
   Scenario: Two Whenevers side by side watch at once, each a listener of its own: a slow read under one holds up only it
     spec/PLAN-LISTENERS.md, slice 1. Whenevers side by side in a goal's
