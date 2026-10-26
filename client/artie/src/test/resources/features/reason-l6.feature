@@ -79,6 +79,18 @@ Feature: L6: the Reason step picks; deterministic code acts
     And the Claude request contains no URI from the manifest
     And the Claude reasoner selected "waterCell" with {"milliliters": 300}
 
+  Scenario: The Claude reasoner is told to write words as the intent describes them, to the letter
+    A merge watch asked for one friendly sentence, and the model wrote two
+    or three in two of five comments. Words a field takes are written as
+    the intent says: its length, its tone, what it says.
+    Given the Claude API will answer with a tool call selecting "waterCell" with {"milliliters": 300}
+    When the Claude reasoner reasons about "water bed 2 with 300ml" over the manifest of "http://garden.test/beds/2"
+    Then the Claude request's system prompt says
+      | part                                                                                    |
+      | When a field takes words the intent describes, write them exactly as it describes them |
+      | "one sentence" is one sentence                                                          |
+      | nothing added that the intent doesn't ask for                                           |
+
   Scenario: The model may answer in words instead of the tool, and that is a question
     Current Claude models refuse a forced tool call ("tool_choice: type tool
     and any are not supported for this model"), so the request lets the model

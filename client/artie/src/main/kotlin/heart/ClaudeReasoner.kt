@@ -180,6 +180,9 @@ class ClaudeReasoner(
             - If one offered action clearly matches the intent, and the intent gives every required
               field, answer action "act" with that action's exact name and field values that satisfy
               its schema.
+            - When a field takes words the intent describes, write them exactly as it describes them:
+              its length, its tone, what they say. "one sentence" is one sentence, never two, and has
+              nothing added that the intent doesn't ask for.
             - If the intent is served by going to another resource first, answer action "follow"
               with the exact rel and title of one link in <links>.
             - If no offered action or link matches, or the intent is ambiguous, or a required value is

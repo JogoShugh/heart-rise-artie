@@ -241,6 +241,13 @@ class ReasonSteps(private val ctx: ClientContext) {
         assertTrue(tools.single().jsonObject.containsKey("cache_control"), "tool: ${tools.single()}")
     }
 
+    @Then("the Claude request's system prompt says")
+    fun claudeSystemSays(table: DataTable) {
+        val system = claudeRequestBody().getValue("system").jsonArray.last().jsonObject.getValue("text")
+            .jsonPrimitive.content.replace(Regex("\\s+"), " ")
+        table.asMaps().map { it.getValue("part") }.forEach { assertTrue(it in system, "no \"$it\" in:\n$system") }
+    }
+
     @Then("the Claude request's last message carries the state, the offers and the intent, in that order")
     fun claudeOrder() {
         val text = claudeRequestBody().getValue("messages").jsonArray.last().jsonObject
