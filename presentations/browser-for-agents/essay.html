@@ -6,63 +6,96 @@
 
 <section id="question">
 <h2><span class="num">1</span>The question</h2>
-<p>You have never installed a client for your bank’s website. Or for a newspaper, a shop or your council’s planning forms. One program, a browser, handles all of them, including sites that didn’t exist when it was written. That is so ordinary we forget how strange it is.</p>
-<p>The browser can do it because of what it is coupled to. It doesn’t know any site. It knows a few <em>formats</em>, chiefly HTML, and a few rules for using them: follow a link, fill in a form and send it. Every site speaks those formats, so every site works.</p>
-<p>Software agents today have the opposite arrangement. An agent that works with GitHub is built for GitHub: its tools, its endpoints, its rules. An agent for Stripe is built again for Stripe. An agent for your own billing system starts from nothing, until someone writes the documentation, the tools or the prompts for it. The coupling runs from each agent to each API, by hand.</p>
+<p>One program, a browser, works with every site, including sites that didn’t exist when it was written. Agents don’t work that way.</p>
 <!--diagram:fanout-->
-<p>This essay is about closing that gap. The claim is simple: what made the browser generic can make an agent generic. HEART is a media type that does for agents what HTML does for browsers. ARTIE is the generic agent that reads it. The rest is how we got here, and why the idea is older than it looks.</p>
+<ul class="obs">
+<li>The browser knows no site. It knows a few formats, chiefly HTML, and what a link and a form mean.</li>
+<li>Every site speaks those formats, so every site works.</li>
+<li>An agent is built per API: a GitHub agent, a Stripe agent, a billing agent, each with its own tools and prompts.</li>
+<li>A private API starts with nothing until someone writes the docs or tools for it.</li>
+<li>The claim of this essay: what made the browser generic can make an agent generic. HEART plays HTML’s part; ARTIE plays the browser’s.</li>
+</ul>
 </section>
 
 <section id="islands">
 <h2><span class="num">2</span>Before the Web: links, but no generic client</h2>
-<p>Linked information is an old dream. In 1945 Vannevar Bush described the Memex, a desk that would store a researcher’s documents and the trails between them. It was never built. In 1965 Ted Nelson coined the word <em>hypertext</em>. In 1968 Douglas Engelbart demonstrated NLS: live, linked, editable information on a screen, with a mouse. In 1987 Apple shipped HyperCard, and millions of people built linked stacks of cards.</p>
-<p>Each was remarkable, and each was an island. NLS ran on NLS terminals. A HyperCard stack ran in HyperCard. The content and the program that read it came as a pair, so knowledge could link only within one system.</p>
+<p>Linked information is an old idea. For decades each system came with its own client.</p>
 <!--diagram:islands-->
-<p>The Web did not invent links. Its real invention was the split: the client on one side, the content on the other, and nothing between them but agreed formats and a protocol.</p>
+<ul class="obs">
+<li><b>1945</b> Bush’s Memex: a desk of documents and the trails between them. Never built.</li>
+<li><b>1965</b> Nelson coins “hypertext”.</li>
+<li><b>1968</b> Engelbart’s NLS: live, linked, editable information, on NLS terminals only.</li>
+<li><b>1987</b> HyperCard: millions of linked stacks, readable only in HyperCard.</li>
+<li>Content and reader came as a pair, so links stayed inside one system.</li>
+<li>The Web didn’t invent links. It split the client from the content, with only agreed formats between them.</li>
+</ul>
 </section>
 
 <section id="browser">
-<h2><span class="num">3</span>The Web’s real invention: a generic client</h2>
-<p>Tim Berners-Lee’s proposal of 1989 and the public Web of 1991 rest on three agreements. URIs name things. HTTP moves representations of them. HTML describes a page. Anyone who implements the three can read anything published with them.</p>
-<p>The decisive step came a few years later, between 1993 and 1995, when HTML gained forms. Until then a page could tell you where to go next. With forms, it could tell you what you could <em>do</em>: search, order, sign up, pay. The page arrived with its own controls. The browser didn’t need to know that this shop takes a quantity and a postcode. The form said so, and the browser drew it.</p>
-<p>So the browser’s knowledge is general, and stops at a clear line. It knows the protocol, how to name and reach things, the media type, and what a link and a form mean. Everything about a particular site arrives in the site’s own pages, at the moment it is needed.</p>
+<h2><span class="num">3</span>The Web’s invention: a generic client</h2>
+<p>Three agreements made the split work: URIs name things, HTTP moves them, HTML describes them. Forms, from about 1993, completed it.</p>
 <!--diagram:knows-->
-<p>This is why a site can change without breaking its visitors. Rename a page, move a button, add a step to checkout: the next page you receive describes the new arrangement. Nobody updates your browser.</p>
+<ul class="obs">
+<li>Links tell the browser where it can go next. Forms tell it what it can <em>do</em>: search, order, pay.</li>
+<li>The page arrives with its own controls. The browser doesn’t know this shop takes a postcode; the form says so.</li>
+<li>The browser’s knowledge stops at a clear line: protocol, names, media type, links and forms.</li>
+<li>Everything about a site arrives in the site’s own pages, when it is needed.</li>
+<li>So a site can change without breaking its visitors. Nobody updates the browser.</li>
+</ul>
 </section>
 
 <section id="fielding">
 <h2><span class="num">4</span>Fielding names it</h2>
-<p>In 2000 Roy Fielding described the architecture behind the Web in his dissertation and called it REST. He named four constraints on the interface between client and server. Resources are identified. They are manipulated through representations. Messages describe themselves. And <em>hypermedia is the engine of application state</em>: the client moves from one state to the next by choosing among the links and forms the current representation offers.</p>
+<p>In 2000 Roy Fielding described the Web’s architecture and called it REST. One of its four interface constraints is what makes a generic client possible.</p>
 <!--diagram:constraints-->
-<p>The fourth constraint is what makes a generic client possible. It is also the one the industry quietly dropped. By 2008 so many HTTP interfaces called themselves REST that Fielding wrote a short, irritated post: “if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period.”</p>
-<p>In the comments he defined what he meant, and the definition is the theme of this essay:</p>
-<blockquote>When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.</blockquote>
-<p>Note the words in brackets: <em>or automaton</em>. Fielding was not only describing people with browsers. In the same thread he wrote that “machines can follow links when they understand the data format and relationship types,” and that a REST API should be entered “with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types.” A bookmark and a media type. Nothing else.</p>
+<blockquote>When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.<cite>Roy T. Fielding, 2008</cite></blockquote>
+<ul class="obs">
+<li><b>Hypermedia as the engine of application state:</b> the client moves on by choosing among the links and forms the current answer offers.</li>
+<li>It is the constraint most HTTP APIs dropped. In 2008 Fielding wrote that an API not driven by hypertext “cannot be a REST API. Period.”</li>
+<li><b>Information and controls, together:</b> the theme of this essay.</li>
+<li><b>“Or automaton”:</b> he meant machines too. “Machines can follow links when they understand the data format and relationship types.”</li>
+<li>A REST API should be entered “with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types.” A bookmark and a media type. Nothing else.</li>
+</ul>
 </section>
 
 <section id="lost">
-<h2><span class="num">5</span>How APIs lost it</h2>
-<p>When web APIs spread in the 2000s, they kept HTTP and URLs and swapped HTML for JSON. JSON is a fine format for data. But a JSON object has no link and no form. A list of pull requests arrives as data, and nothing in it says what you may do with any of them.</p>
-<p>The knowledge didn’t disappear. It moved, and each move took it further from the answer a client holds. With RPC and SOAP, the rules lived in an interface file compiled into the client. With JSON APIs, they lived in human documentation. With OpenAPI, they live in a description of every operation the API will ever accept: GitHub’s lists more than twelve hundred. With today’s language-model agents, they live partly in training data.</p>
+<h2><span class="num">5</span>How APIs lost it: the rules moved away</h2>
+<p>Web APIs kept HTTP and URLs and swapped HTML for JSON. JSON carries data, but no links and no forms, so the rules had to live somewhere else.</p>
 <!--diagram:drift-->
-<p>Distance has a cost of its own: the rules go stale. Rules in the answer are true now, because the server writes them as it answers. Every step out freezes them at an earlier moment: the release, the day a developer read the page, the last build, the training run. The server goes on changing, and the copy further out doesn’t know. HEART’s move, in section 7, is to bring the rules back to where they are true.</p>
-<p>Each of these is useful, and each brings back the islands. A client generated from an API’s description is a client for that API. When the API changes, the client is wrong until someone regenerates it. And a description of everything that is ever possible cannot say what is possible <em>now</em>. GitHub’s description of the merge operation is honest about this. It lists a response: “405 Method Not Allowed if merge cannot be performed.” To find out, you try.</p>
+<ul class="obs">
+<li><b>The Web:</b> the rules are in the page, written by the server as it answers. True now.</li>
+<li><b>RPC and SOAP:</b> in an interface file compiled into the client. True as of the release.</li>
+<li><b>JSON APIs:</b> in documentation a developer reads. True as of the reading.</li>
+<li><b>OpenAPI:</b> in a description of every operation, generated into SDKs. GitHub’s lists more than twelve hundred. True as of the last build.</li>
+<li><b>LLM agents:</b> partly in training data. True as of training.</li>
+<li>Each step puts the rules further from the server and freezes them earlier. The server goes on changing; the copy doesn’t know.</li>
+<li>Each step also brings back the islands: a client generated for one API is a client for that API alone.</li>
+</ul>
+<p>A description of everything possible can’t say what is possible <em>now</em>. GitHub’s description of merge says so itself:</p>
+<pre><code>PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
+  405: Method Not Allowed if merge cannot be performed</code></pre>
+<ul class="obs">
+<li>To find out whether merge is allowed, you try it.</li>
+</ul>
 </section>
 
 <section id="agents">
 <h2><span class="num">6</span>Agents inherit the problem</h2>
-<p>A language-model agent is the most adaptable client ever built. It reads, it reasons, it recovers from surprises. Put it in front of a browser and it does what a person does: reads the page, sees the buttons, chooses.</p>
-<p>Put it in front of a JSON API and there are no buttons. It gets data and has to work out the rest. Which endpoint merges? Is merging allowed now? What does the request need? It answers from training, from documentation someone fed it, or from trying and reading the error. For a famous public API that mostly works. For a private API it starts with nothing. For an API that changed last week, it is confidently out of date.</p>
+<p>A language-model agent is the most adaptable client ever built. In front of a browser it does what a person does. In front of JSON there is nothing to see.</p>
 <!--diagram:blank-->
-<p>The usual remedy is to wrap each API in hand-written tools. That works, and it is the islands again: one set of tools per API, each to be written, kept current and trusted. The agent is generic. Its connection to the world is not.</p>
+<ul class="obs">
+<li>The data says what the pull request is, not what can be done with it.</li>
+<li>The agent answers from training, from docs it was given, or by trying and reading the error.</li>
+<li>A famous public API mostly works. A private API starts with nothing. A changed API is confidently out of date.</li>
+<li>The usual remedy, hand-written tools per API, is the islands again. The agent is generic; its connection to the world isn’t.</li>
+</ul>
 </section>
 
 <section id="heart">
 <h2><span class="num">7</span>HEART: a media type for agents</h2>
-<p>The browser’s answer was never to know more about sites. It was a media type that carries the controls. HEART takes the same route for agents. A HEART representation is JSON, so an agent reads it easily, and it brings back what JSON APIs dropped, element for element.</p>
+<p>The browser’s answer was never to know more about sites. It was a media type that carries the controls. HEART does that for agents, in JSON.</p>
 <!--diagram:mapping-->
-<p><strong>Links, by relation.</strong> Links sit in <code>_links</code>, named by what they mean: <code>author</code>, <code>next</code>, or a service’s own relation such as <code>github:issues-list-comments</code>. This is HAL, a format already used by Spring and others. A client follows a relation. It never builds an address.</p>
-<p><strong>Forms.</strong> Actions sit in <code>_forms</code>, each with a method, a target and its inputs described in JSON Schema, the same schema language that tool-using models and OpenAPI already use. A form is HTML’s <code>&lt;form&gt;</code>, for JSON.</p>
+<p>A form, as an agent receives it:</p>
 <pre><code>"_forms": {
   "github:merge": {
     "title": "Merge this pull request",
@@ -70,45 +103,80 @@
     "_links": { "target": { "href": "…/pulls/20/merge" } },
     "schema": { "properties": {
       "merge_method": { "enum": ["merge", "squash", "rebase"] } } } } }</code></pre>
-<p><strong>Forms that follow the state.</strong> A representation offers only the forms its current state allows. A pull request that can’t be merged has no merge form. Once it can be, the form appears. An open issue offers close; a closed one offers reopen instead. This is exactly what a web page does with its buttons, and exactly what a description of everything ever possible cannot do.</p>
-<p><strong>Why an act is absent.</strong> When a form is missing, the representation can link to a short explanation: “Branch protection blocks the merge: a required check or review is missing.” An agent can tell a person why, without guessing.</p>
-<p><strong>Refusal of anything not offered.</strong> A HEART service refuses an act it didn’t offer in that state, a write to a state that has changed since it was read, and inputs outside the schema. The rules the forms show are the rules the service enforces.</p>
-<p>The name spells this out: Hypermedia, Enforced, for Agentic, Reliable Transactions.</p>
+<ul class="obs">
+<li><b>Links by relation</b> in <code>_links</code>: <code>author</code>, <code>next</code>, or a service’s own. A client follows a relation; it never builds an address. This is HAL, already used by Spring and others.</li>
+<li><b>Forms</b> in <code>_forms</code>: method, target, and inputs in JSON Schema, the schema language models already use for tools.</li>
+<li><b>Forms follow the state.</b> No merge form until the pull request can be merged. An open issue offers close; a closed one offers reopen.</li>
+<li><b>Why an act is absent.</b> A missing form can link to its reason: “Branch protection blocks the merge: a required check or review is missing.”</li>
+<li><b>Refusal of anything not offered.</b> The service refuses unoffered acts, writes over a changed state, and inputs outside the schema.</li>
+<li>The rules are back in the answer, true now. The name says it: Hypermedia, Enforced, for Agentic, Reliable Transactions.</li>
+</ul>
 </section>
 
 <section id="artie">
 <h2><span class="num">8</span>ARTIE: the generic agent</h2>
-<p>If HEART is the HTML of this story, ARTIE is the browser. It knows HEART: how to read a representation, follow a relation, fill in a form, send it with the right preconditions, and understand a refusal. It doesn’t know GitHub, a ticket desk or a basketball game. Those arrive in their own representations, as sites do.</p>
+<p>If HEART is the HTML of this story, ARTIE is the browser. It knows HEART, and no service.</p>
 <!--diagram:stacks-->
-<p>The two stacks line up. On the Web a person chooses what to do, and the browser carries it out in terms of HTML. With HEART a model chooses among what is offered, and ARTIE carries it out in terms of HEART. The model is in the person’s seat, not the browser’s. It never types an address and never invents an action. It picks from the controls on screen, as a person picks a button.</p>
-<p>That division is the point. The judgement stays with the model. The mechanics, and the guarantee that only offered acts are attempted, sit with a generic client that works for any HEART service. A new service needs a starting address, its bookmark, and nothing else.</p>
+<ul class="obs">
+<li>ARTIE reads representations, follows relations, fills in forms, sends them with the right preconditions and understands refusals.</li>
+<li>It doesn’t know GitHub, a ticket desk or a basketball game. They arrive in their own representations, as sites do.</li>
+<li>The model sits in the person’s seat, not the browser’s. It chooses among what is offered, as a person picks a button.</li>
+<li>It never types an address and never invents an action.</li>
+<li>A new service needs one thing: its bookmark.</li>
+</ul>
 </section>
 
 <section id="routine">
 <h2><span class="num">9</span>From browsing to a routine</h2>
-<p>People don’t only browse. When they do the same thing every week, they automate it: a bookmark, a macro, a recorded browser test. The browser makes this possible because each step is an act on a control the page offered.</p>
-<p>ARTIE does the same, with one improvement. A person writes a goal in plain words: <em>whenever a sowing plan can be merged, merge it; if it can’t be within five minutes, say why on it, unless that has been said already</em>. ARTIE browses the goal once, with a model choosing at each step among what the service offers. Those choices become a script: the relations to follow, the forms to fill, the checks to make. The forms the script used are pinned with their fingerprints.</p>
+<p>People automate what they do every week in a browser: bookmarks, macros, recorded tests. ARTIE does the same, with one improvement.</p>
 <!--diagram:routine-->
-<p>From then on the script runs alone, with no model. It is held to what it was offered: if the service stops offering a form, or changes one, the script stops and says so before it sends anything. A recorded macro would click on whatever is there. In our own trials, a goal like this one, watching a seed bench’s alerts, sowing plans and trays on GitHub, ran once with a model and then repeatedly with none.</p>
+<p>A goal, as a person writes it:</p>
+<pre><code>- Whenever a pull request labelled sowing changes
+  - If it's labelled hold, leave it, and say so once.
+  - Once it can be merged, merge it by squashing.
+    Or give up after 5 minutes.
+    Otherwise, say why it wasn't merged, unless it's said already.</code></pre>
+<ul class="obs">
+<li>The goal names no endpoint, no field and no URL.</li>
+<li>ARTIE browses it once, with a model choosing among what the service offers.</li>
+<li>Those choices become a script: relations to follow, forms to fill, checks to make. The forms it used are pinned.</li>
+<li>From then on the script runs alone, with no model.</li>
+<li>If the service stops offering a form, or changes one, the script stops before it sends anything. A recorded macro would click whatever is there.</li>
+<li>In our trials, a seed-bench goal like this one ran on GitHub once with a model, then with none.</li>
+</ul>
 </section>
 
 <section id="gateway">
 <h2><span class="num">10</span>Old systems, new clients: the gateway</h2>
-<p>Most services won’t speak HEART soon, and they don’t have to. The Web met the same problem in the 1990s. Banks and airlines didn’t rewrite their mainframes. They put web front ends in front of them, programs that rendered the old system’s data as HTML so any browser could use it.</p>
+<p>Most services won’t speak HEART soon. The Web met the same problem in the 1990s and solved it with a front end.</p>
 <!--diagram:gateway-->
-<p>A HEART gateway is that front end for agents. Given GitHub’s published API description and a short connector, it renders GitHub’s answers as HEART: the state, the links lifted out of the data, and only the forms the state allows. On the way in, it checks every act against what it offered before GitHub hears it. GitHub doesn’t change. Anyone can run their own gateway, on a laptop, for the APIs they depend on.</p>
+<ul class="obs">
+<li>Banks and airlines didn’t rewrite their mainframes. Web front ends rendered them as HTML.</li>
+<li>A HEART gateway renders an existing API as HEART, from its published description and a short connector.</li>
+<li>Out: the state, links lifted out of the data, and only the forms the state allows.</li>
+<li>In: every act checked against what was offered, before the API hears it.</li>
+<li>GitHub doesn’t change. Anyone can run a gateway, on a laptop, for the APIs they depend on.</li>
+</ul>
 </section>
 
 <section id="costs">
 <h2><span class="num">11</span>What it costs, and what it isn’t</h2>
-<p>A generic client is bought with a shared format, and that has a price. A service must speak HEART, or someone must put a gateway in front of it, and writing a good connector is real work. A HEART agent does only what the service offers. An agent with a shell and a dozen hand-written tools can do more things, in more places, with fewer promises about any of them.</p>
-<p>That trade is the same one the Web made. A browser can’t do everything a native program can. It does a narrower thing for every site there is, safely, without being rebuilt for each. HEART and ARTIE make the same bargain for agents: the model chooses only among options the service vouches for, and only where judgement earns its place.</p>
+<p>A generic client is bought with a shared format. That has a price.</p>
+<ul class="obs">
+<li>A service must speak HEART, or someone must put a gateway in front of it. A good connector is real work.</li>
+<li>A HEART agent does only what the service offers. An agent with a shell and hand-written tools can do more things, with fewer promises about any of them.</li>
+<li>The Web made the same trade. A browser can’t do everything a native program can; it does a narrower thing for every site, safely.</li>
+<li>HEART and ARTIE make that bargain for agents: the model chooses only among options the service vouches for.</li>
+</ul>
 </section>
 
 <section id="close">
 <h2><span class="num">12</span>Close</h2>
-<p>The Web never made people guess. Every page arrives with what you can do next and nothing you can’t, and one client reads them all. In 2008 Fielding said machines deserved the same, “or automaton”, years before anyone had an automaton that could use it.</p>
-<p>Now we do. What it needs is not more knowledge of each API. It needs what the browser always had: the information and the controls, together.</p>
+<ul class="obs">
+<li>The Web never made people guess. Every page arrives with what you can do next, and one client reads them all.</li>
+<li>In 2008 Fielding said machines deserved the same, “or automaton”, years before an automaton could use it.</li>
+<li>Now one can. It doesn’t need more knowledge of each API. It needs what the browser always had: the information and the controls, together.</li>
+</ul>
 </section>
 
 <footer class="sources">

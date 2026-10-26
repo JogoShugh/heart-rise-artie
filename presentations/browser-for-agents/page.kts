@@ -47,6 +47,13 @@ code { font: 0.88em 'JetBrains Mono', ui-monospace, monospace; background: var(-
   border-radius: 4px; }
 pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0; }
 pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.55; }
+ul.obs { margin: 1.2rem 0 1.6rem; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
+ul.obs li { position: relative; padding-left: 1.4rem; line-height: 1.55; }
+ul.obs li::before { content: ""; position: absolute; left: 0.2rem; top: 0.68em; width: 0.45rem; height: 0.45rem;
+  border-radius: 50%; background: var(--accent); }
+ul.obs b { font-weight: 600; }
+blockquote cite { display: block; margin-top: 0.6rem; font: 400 0.9rem 'IBM Plex Sans', system-ui, sans-serif;
+  font-style: normal; color: var(--muted); }
 figure { margin: 2.2rem 0; }
 figure .art { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px;
   padding: 1rem; }
