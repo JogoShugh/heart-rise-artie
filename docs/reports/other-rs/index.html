@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Other R’s</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=JetBrains+Mono:wght@400&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+:root {
+  --paper: #F7F3EA; --ink: #1D2128; --muted: #5B6370; --rule: #DDD5C6; --panel: #FFFDF8;
+  --accent: #A45F12; --accent-soft: #F6E3C2; --code: #EFE9DC;
+  --d-ink: var(--ink); --d-muted: var(--muted); --d-line: #C9C2B4; --d-panel: var(--panel);
+  --d-accent: #B86E12; --d-accent-soft: var(--accent-soft);
+  --d-font: 'IBM Plex Sans', system-ui, sans-serif; --d-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --c-key: #8A3B12; --c-str: #2F6B3A; --c-num: #1F5A99; --c-lit: #7A3E9D; --c-tag: #1F5A99; --c-attr: #8A3B12;
+  --c-add-bg: #DFF0DC; --c-del-bg: #F6DEDA; --c-add: #2F6B3A; --c-del: #A3352B; --c-mark: #7A3E9D;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A;
+  --c-key: #F0A875; --c-str: #9FD49A; --c-num: #8DBCF0; --c-lit: #D3A6F0; --c-tag: #8DBCF0; --c-attr: #F0A875;
+  --c-add-bg: #1E3322; --c-del-bg: #3A2020; --c-add: #9FD49A; --c-del: #F09A90; --c-mark: #D3A6F0;
+  --d-line: #3A434F; --d-accent: #E7A64A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #14181E; --ink: #ECE6DA; --muted: #A3ABB6; --rule: #2C333D; --panel: #1C222A;
+  --accent: #E7A64A; --accent-soft: #3A2C17; --code: #1C222A;
+  --c-key: #F0A875; --c-str: #9FD49A; --c-num: #8DBCF0; --c-lit: #D3A6F0; --c-tag: #8DBCF0; --c-attr: #F0A875;
+  --c-add-bg: #1E3322; --c-del-bg: #3A2020; --c-add: #9FD49A; --c-del: #F09A90; --c-mark: #D3A6F0;
+  --d-line: #3A434F; --d-accent: #E7A64A; color-scheme: dark }
+body { background: var(--paper); color: var(--ink); margin: 0;
+  font: 400 1.125rem/1.7 'Source Serif 4', Georgia, serif; }
+main { max-width: 44rem; margin: 0 auto; padding-block: 4rem 6rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.masthead { border-bottom: 1px solid var(--rule); padding-bottom: 2rem; margin-bottom: 1rem; }
+.kicker { font: 600 0.8rem/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 1rem; }
+h1 { font: 600 clamp(2.4rem, 6vw, 3.6rem)/1.05 'IBM Plex Sans', system-ui, sans-serif; margin: 0 0 1rem;
+  text-wrap: balance; letter-spacing: -0.01em; }
+.dek { font-size: 1.3rem; line-height: 1.5; color: var(--muted); margin: 0; }
+h2 { font: 600 1.6rem/1.25 'IBM Plex Sans', system-ui, sans-serif; margin: 3.5rem 0 1rem; text-wrap: balance; }
+.num { display: inline-block; min-width: 2rem; color: var(--accent); }
+p { margin: 0 0 1.1rem; }
+em { font-style: italic; }
+blockquote { margin: 1.8rem 0; padding: 0.4rem 0 0.4rem 1.4rem; border-left: 3px solid var(--accent);
+  font-size: 1.3rem; line-height: 1.55; }
+code { font: 0.88em 'JetBrains Mono', ui-monospace, monospace; background: var(--code); padding: 0.1em 0.3em;
+  border-radius: 4px; }
+pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0;
+  font-size: 0.85rem; line-height: 1.55; }
+pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.55; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  border-bottom: 1px solid var(--rule); }
+.bar-in { max-width: 44rem; margin: 0 auto; display: flex; gap: 0.6rem; justify-content: flex-end; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar button { font: 500 0.85rem 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; }
+.bar button:hover { border-color: var(--accent); }
+.howto { font: 400 0.92rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 1.2rem; }
+details.deep { margin: 1.2rem 0 1.6rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); }
+details.deep > summary { cursor: pointer; padding: 0.8rem 1.1rem; list-style: none;
+  font: 600 0.95rem/1.4 'IBM Plex Sans', system-ui, sans-serif; color: var(--accent); }
+details.deep > summary::-webkit-details-marker { display: none; }
+details.deep > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-weight: 600; }
+details.deep[open] > summary::before { content: "−"; }
+details.deep > :not(summary) { margin-left: 1.1rem; margin-right: 1.1rem; }
+details.deep > :last-child { margin-bottom: 1.1rem; }
+details.deep p, details.deep li { font-size: 1rem; }
+details.deep pre { background: var(--code); }
+.table { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; width: 100%; font: 400 0.9rem/1.45 'IBM Plex Sans', system-ui, sans-serif; }
+th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--muted); }
+ul.obs { margin: 1.2rem 0 1.6rem; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
+ul.obs li { position: relative; padding-left: 1.4rem; line-height: 1.55; }
+ul.obs li::before { content: ""; position: absolute; left: 0.2rem; top: 0.68em; width: 0.45rem; height: 0.45rem;
+  border-radius: 50%; background: var(--accent); }
+ul.obs b { font-weight: 600; }
+blockquote cite { display: block; margin-top: 0.6rem; font: 400 0.9rem 'IBM Plex Sans', system-ui, sans-serif;
+  font-style: normal; color: var(--muted); }
+figure { margin: 2.2rem 0; }
+figure .art { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 12px;
+  padding: 1rem; }
+figure svg { display: block; width: 100%; min-width: 560px; height: auto; }
+figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 0.6rem; }
+@media (min-width: 1100px) { figure { margin-left: -6rem; margin-right: -6rem; } }
+.sources { margin-top: 4rem; border-top: 1px solid var(--rule); padding-top: 1rem;
+  font: 400 0.92rem/1.6 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
+h3.step { font: 600 1.05rem/1.4 'IBM Plex Sans', system-ui, sans-serif; margin: 2.2rem 0 0.4rem; color: var(--accent); }
+.sources h2 { font-size: 1rem; margin: 1rem 0 0.5rem; }
+.sources ul { padding-left: 1.2rem; }
+.cj-k { color: var(--c-key); } .cj-s { color: var(--c-str); } .cj-n { color: var(--c-num); } .cj-l { color: var(--c-lit); font-weight: 600; }
+.cj-t { color: var(--c-tag); } .cj-a { color: var(--c-attr); } .cj-m { color: var(--c-mark); font-weight: 600; }
+pre code .ln { display: block; margin: 0 -1.3rem; padding: 0 1.3rem; }
+pre code .ln.add { background: var(--c-add-bg); } pre code .ln.del { background: var(--c-del-bg); }
+pre code .ln.add .sg { color: var(--c-add); font-weight: 600; } pre code .ln.del .sg { color: var(--c-del); font-weight: 600; }
+ol.rules { padding-left: 1.4rem; } ol.rules > li { margin: 0 0 1.6rem; } ol.rules blockquote { font-size: 1.05rem; margin: 0.4rem 0 0.6rem; }
+ol.rules > li::marker { font: 600 1.1rem "IBM Plex Sans", system-ui, sans-serif; color: var(--accent); }
+.handoff { margin-top: 2rem; padding: 1rem 1.2rem; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); }
+</style>
+</head><body>
+<nav class="bar" aria-label="Page controls"><div class="bar-in">
+<button type="button" id="all">Show all detail</button>
+<button type="button" id="theme">Theme: auto</button>
+</div></nav>
+<main>
+<header class="masthead">
+<p class="kicker">HEART and ARTIE · after the merge watch</p>
+<h1>The Other R’s</h1>
+<p class="dek">Everyone talks about reasoning. Business systems run on repeatability, reliability, resilience and right behavior. The merge watch keeps reasoning to the one place it earns its keep, and lets the other R’s carry the load.</p>
+<p class="howto">Each R gets a short section: what it means, what the merge watch did, and the evidence. The evidence sits under <b>Technical detail</b>; <b>Show all detail</b> above opens every one.</p>
+</header>
+
+<section id="complaint">
+<h2><span class="num">1</span>The complaint</h2>
+<p>People building with AI keep meeting the same surprise: the same input, sent twice, gets two different answers. When they ask why, they are told it’s probabilistic.</p>
+<figure id="fig-twice"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="twice-title twice-desc">
+<title id="twice-title">Ask every time, or decide once and replay</title>
+<desc id="twice-desc">Asked again for the same pull request, a model may answer differently each call. Decided once and kept, the same decision is replayed for every later pull request and look, and the server checks it each time.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="twice-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="240" y="30" text-anchor="middle">Ask the model every time</text>
+<text class="h" x="720" y="30" text-anchor="middle">Decide once, replay</text>
+<path class="dash" d="M480 20 L480 380"/>
+<rect class="box" x="30" y="150" width="140" height="64" rx="10"/>
+<text class="h" x="100" y="177" text-anchor="middle">Same input</text>
+<text class="s" x="100" y="197" text-anchor="middle">same pull request</text>
+<rect class="box" x="290" y="60" width="160" height="56" rx="10"/>
+<text class="h" x="370" y="83" text-anchor="middle">Call 1</text>
+<text class="s" x="370" y="103" text-anchor="middle">merge, squash</text>
+<path class="line" d="M170 182 L288 88" marker-end="url(#twice-head)"/>
+<rect class="hl" x="290" y="160" width="160" height="56" rx="10"/>
+<text class="h" x="370" y="183" text-anchor="middle">Call 2</text>
+<text class="s" x="370" y="203" text-anchor="middle">comment first</text>
+<path class="line" d="M170 182 L288 188" marker-end="url(#twice-head)"/>
+<rect class="box" x="290" y="260" width="160" height="56" rx="10"/>
+<text class="h" x="370" y="283" text-anchor="middle">Call 3</text>
+<text class="s" x="370" y="303" text-anchor="middle">merge, rebase</text>
+<path class="line" d="M170 182 L288 288" marker-end="url(#twice-head)"/>
+<text class="s" x="240" y="370" text-anchor="middle">Each call may answer differently (an illustration)</text>
+<rect class="hl" x="500" y="60" width="180" height="60" rx="10"/>
+<text class="h" x="590" y="85" text-anchor="middle">First time</text>
+<text class="s" x="590" y="105" text-anchor="middle">the model decides</text>
+<path class="line" d="M680 90 L728 90" marker-end="url(#twice-head)"/>
+<rect class="box" x="730" y="60" width="200" height="60" rx="10"/>
+<text class="h" x="830" y="85" text-anchor="middle">Kept</text>
+<text class="s" x="830" y="105" text-anchor="middle">github:merge, squash</text>
+<rect class="box" x="730" y="170" width="200" height="50" rx="10"/>
+<text class="h" x="830" y="190" text-anchor="middle">Pull request 2</text>
+<text class="s" x="830" y="210" text-anchor="middle">same decision</text>
+<path class="line" d="M830 154 L830 170" marker-end="url(#twice-head)"/>
+<rect class="box" x="730" y="236" width="200" height="50" rx="10"/>
+<text class="h" x="830" y="256" text-anchor="middle">Pull request 3</text>
+<text class="s" x="830" y="276" text-anchor="middle">same decision</text>
+<path class="line" d="M830 220 L830 236" marker-end="url(#twice-head)"/>
+<rect class="box" x="730" y="302" width="200" height="50" rx="10"/>
+<text class="h" x="830" y="322" text-anchor="middle">Look 151</text>
+<text class="s" x="830" y="342" text-anchor="middle">same decision</text>
+<path class="line" d="M830 286 L830 302" marker-end="url(#twice-head)"/>
+<text class="s" x="720" y="390" text-anchor="middle">The server re-checks each replay against what it offers now</text>
+</svg></div><figcaption>Ask every time, or decide once and replay</figcaption></figure>
+<ul class="obs">
+<li>Everyone knows a model is probabilistic. That is a description, not an answer.</li>
+<li>Business systems have been held to other standards for decades: transactions that commit or don’t, requests that are safe to retry, audit logs, changes reviewed before they ship.</li>
+<li>Those expectations didn’t lapse because a model is in the loop. The AI revolution promised more capability, not less dependability.</li>
+<li>The fix isn’t a better prompt. It is architecture: decide with the model where judgment is needed, and let everything else be deterministic, checked and kept.</li>
+<li>People who have worked in this field for years should be offering exactly that, or something close. The rest of us, building systems that must be reliable and right, can reasonably ask for it.</li>
+</ul>
+</section>
+
+<section id="keep">
+<h2><span class="num">2</span>Where reasoning earns its keep</h2>
+<p>In the merge watch, the model does two jobs. It decides each step once, the first time the step is needed. And it writes one sentence to an author whenever a merge gives up. Everything else runs without it.</p>
+<figure id="fig-share"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="share-title share-desc">
+<title id="share-title">How many steps asked the model</title>
+<desc id="share-desc">Goal run 1: 444 steps, 13 model calls. Goal run 2: 538 steps, 12. The generated script over an hour: 2,740 steps, 5 model calls, all at the line marked reasoned.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="share-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="t" x="20" y="76" text-anchor="start">Goal run 1, 13 minutes</text>
+<rect class="box" x="250" y="50" width="76" height="40" rx="6"/>
+<rect class="a" x="250" y="50" width="3" height="40" rx="3"/>
+<text class="s" x="336" y="76" text-anchor="start">444 steps · 13 model calls</text>
+<text class="t" x="20" y="156" text-anchor="start">Goal run 2, 10 minutes</text>
+<rect class="box" x="250" y="130" width="92" height="40" rx="6"/>
+<rect class="a" x="250" y="130" width="3" height="40" rx="3"/>
+<text class="s" x="352" y="156" text-anchor="start">538 steps · 12 model calls</text>
+<text class="t" x="20" y="236" text-anchor="start">Script, one hour</text>
+<rect class="box" x="250" y="210" width="470" height="40" rx="6"/>
+<rect class="a" x="250" y="210" width="3" height="40" rx="3"/>
+<text class="s" x="730" y="236" text-anchor="start">2740 steps · 5 model calls</text>
+<text class="s" x="480" y="290" text-anchor="middle">Orange: steps that asked the model. The rest ran on kept decisions and the server's controls.</text>
+</svg></div><figcaption>How many steps asked the model</figcaption></figure>
+<ul class="obs">
+<li><b>Deciding</b> is reasoning used once: reading the goal’s words against what the server offers, and choosing a relation, a check or a field. Kept, it never needs asking again.</li>
+<li><b>Writing to a person</b> is reasoning used every time, because every case is different. The goal marks that one line <code>reasoned</code>.</li>
+<li>Over an hour: 2,740 steps, 5 model calls. That isn’t a model doing less than it could. It is a model doing only what nothing else can.</li>
+</ul>
+<pre><code data-lang="goal">    - Once it can be merged, merge it by squashing.
+      Or give up after 3 minutes.
+      Otherwise, tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`</code></pre>
+</section>
+
+<section id="carriers">
+<h2><span class="num">3</span>Who carries the other R’s</h2>
+<p>If the model carries only reasoning, the rest has to come from somewhere. In the merge watch, three parties carry it: the server, the script, and the people.</p>
+<figure id="fig-carriers"><div class="art"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-labelledby="carriers-title carriers-desc">
+<title id="carriers-title">Who carries which R</title>
+<desc id="carriers-desc">The server carries right behavior, refusal, recency and resilience; the script carries repeatability, reliability, reproducibility, recoverability, restraint, respect and rate; people carry readability, reviewability, responsibility and revocability. The model carries reasoning, and only where judgment is needed.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="carriers-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="20" y="30" width="215" height="70" rx="10"/>
+<text class="h" x="127" y="60" text-anchor="middle">The server</text>
+<text class="s" x="127" y="80" text-anchor="middle">controls in the answer</text>
+<rect class="box" x="35" y="120" width="185" height="40" rx="10"/>
+<text class="t" x="127" y="146" text-anchor="middle">Right behavior</text>
+<rect class="box" x="35" y="172" width="185" height="40" rx="10"/>
+<text class="t" x="127" y="198" text-anchor="middle">Refusal</text>
+<rect class="box" x="35" y="224" width="185" height="40" rx="10"/>
+<text class="t" x="127" y="250" text-anchor="middle">Recency</text>
+<rect class="box" x="35" y="276" width="185" height="40" rx="10"/>
+<text class="t" x="127" y="302" text-anchor="middle">Resilience</text>
+<rect class="box" x="255" y="30" width="215" height="70" rx="10"/>
+<text class="h" x="362" y="60" text-anchor="middle">The script</text>
+<text class="s" x="362" y="80" text-anchor="middle">kept decisions</text>
+<rect class="box" x="270" y="120" width="185" height="40" rx="10"/>
+<text class="t" x="362" y="146" text-anchor="middle">Repeatability</text>
+<rect class="box" x="270" y="172" width="185" height="40" rx="10"/>
+<text class="t" x="362" y="198" text-anchor="middle">Reliability</text>
+<rect class="box" x="270" y="224" width="185" height="40" rx="10"/>
+<text class="t" x="362" y="250" text-anchor="middle">Reproducibility</text>
+<rect class="box" x="270" y="276" width="185" height="40" rx="10"/>
+<text class="t" x="362" y="302" text-anchor="middle">Recoverability</text>
+<rect class="box" x="270" y="328" width="185" height="40" rx="10"/>
+<text class="t" x="362" y="354" text-anchor="middle">Restraint</text>
+<rect class="box" x="270" y="380" width="185" height="40" rx="10"/>
+<text class="t" x="362" y="406" text-anchor="middle">Respect</text>
+<rect class="box" x="270" y="432" width="185" height="40" rx="10"/>
+<text class="t" x="362" y="458" text-anchor="middle">Rate</text>
+<rect class="box" x="490" y="30" width="215" height="70" rx="10"/>
+<text class="h" x="597" y="60" text-anchor="middle">The people</text>
+<text class="s" x="597" y="80" text-anchor="middle">goal and review</text>
+<rect class="box" x="505" y="120" width="185" height="40" rx="10"/>
+<text class="t" x="597" y="146" text-anchor="middle">Readability</text>
+<rect class="box" x="505" y="172" width="185" height="40" rx="10"/>
+<text class="t" x="597" y="198" text-anchor="middle">Reviewability</text>
+<rect class="box" x="505" y="224" width="185" height="40" rx="10"/>
+<text class="t" x="597" y="250" text-anchor="middle">Responsibility</text>
+<rect class="box" x="505" y="276" width="185" height="40" rx="10"/>
+<text class="t" x="597" y="302" text-anchor="middle">Revocability</text>
+<rect class="hl" x="725" y="30" width="215" height="70" rx="10"/>
+<text class="h" x="832" y="60" text-anchor="middle">The model</text>
+<text class="s" x="832" y="80" text-anchor="middle">where judgment lives</text>
+<rect class="hl" x="740" y="120" width="185" height="40" rx="10"/>
+<text class="t" x="832" y="146" text-anchor="middle">Reasoning</text>
+<text class="s" x="480" y="505" text-anchor="middle">Reasoning is one R of many, and the only one that costs a model call</text>
+</svg></div><figcaption>Who carries which R</figcaption></figure>
+<ul class="obs">
+<li><b>The server</b> carries what must be true now: which acts are allowed, why not, and whether the state is still the one you read.</li>
+<li><b>The script</b> carries what must be the same every time: kept decisions, replayed; a memory of what it saw; good manners.</li>
+<li><b>The people</b> carry what must be accountable: a goal they can read, a script they can review, a record of every act, and a way to stop it.</li>
+</ul>
+</section>
+
+<section id="same">
+<h2><span class="num">4</span>Same every time</h2>
+
+<h3 class="step">Repeatability · same goal, same state, same result</h3>
+<p>The second pull request is merged the way the first was, not reconsidered. The decision was made once, on a real pull request, and kept.</p>
+<details class="deep"><summary>Technical detail: the kept decisions, and the script line each became</summary>
+<pre><code data-lang="goal">merge it by squashing: decided github:merge, at …/pulls/820
+if: it's labelled hold: decided the check {"github:labels":["hold"]}, at …/pulls/820</code></pre>
+<pre><code data-lang="http">leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+act("github:merge", "merge_method" to "squash") {}</code></pre>
+<p>Every later pull request, every later look, runs those lines. No model is asked.</p>
+</details>
+
+<h3 class="step">Reliability · it works every time, unattended</h3>
+<p>An hour, a stream of bumps, no one watching. Six merged, two left alone, five authors told why, and the watch stopped when its issue was closed.</p>
+<details class="deep"><summary>Technical detail: the hour, in numbers</summary>
+<div class="table"><table>
+<tr><th>Steps</th><th>Model calls</th><th>Merged</th><th>Left</th><th>Told why</th><th>Errors</th></tr>
+<tr><td>2,740</td><td>5</td><td>6</td><td>2</td><td>5</td><td>0</td></tr>
+</table></div>
+<p>Fewer dice rolls, fewer losses: each step that runs on a kept decision is a step that can’t come out differently.</p>
+</details>
+
+<h3 class="step">Reproducibility · show afterwards exactly what happened, and why</h3>
+<p>Every run keeps a capture: each step, its request and answer, and the model’s stated reason for each decision. From it, the script is generated, line by line, and each line points back to the goal line it came from.</p>
+<details class="deep"><summary>Technical detail: a decision with its reason, and a derivation</summary>
+<pre><code data-lang="goal">why: The PR is clean and mergeable and offers github:merge, so squash-merge it.
+merge it by squashing: decided github:merge, at …/pulls/820</code></pre>
+<pre><code data-lang="json">- n: 5
+  kind: relation
+  title: 'The relation each reason step chose, named'
+  source:    [ { line: 1, column: 1, text: 'act' } ]
+  generated: [ { line: 12, column: 9, text: '"github:repos-get"' } ]</code></pre>
+</details>
+</section>
+
+<section id="wrong">
+<h2><span class="num">5</span>When things go wrong</h2>
+
+<h3 class="step">Resilience · keep going, and never make it worse</h3>
+<p>A look that fails is tried again at the next. A wait that never ends gives up on time. A merge chosen from a view that has since changed is refused, not applied.</p>
+<details class="deep"><summary>Technical detail: a failed look, and a stale merge</summary>
+<pre><code data-lang="http">note: A look failed: …; looking again next time.
+
+PUT …/pulls/825/actions/merge
+If-Match: "seq-0.hsf.L0.ca86bad8d04b304a"
+→ 412 Precondition Failed      the pull request changed since it was read</code></pre>
+<p>Resilience comes mostly from the server saying no clearly, and the client treating no as normal.</p>
+</details>
+
+<h3 class="step">Recoverability · stop, and pick up where it left off</h3>
+<p>Run with a memory, the watch remembers what each pull request looked like and how long each wait has run. Restarted, it answers only what changed, and a wait gives up when it would have.</p>
+<details class="deep"><summary>Technical detail: a wait that resumes</summary>
+<pre><code data-lang="http">artie run merge.kts owner=JogoShugh --remember watch.yaml</code></pre>
+<p>From the feature that pins it down: “pull request 1 has waited since noon, so it gives up at ten past, though the second run began at seven past.”</p>
+</details>
+
+<h3 class="step">Refusal · the server may say no, and says why</h3>
+<p>When merging isn’t possible, the server doesn’t just withhold the form. It gives the reason, in its own words, which the model can pass on and the author can act on.</p>
+<details class="deep"><summary>Technical detail: why not</summary>
+<pre><code data-lang="json">{ "rel": "/profiles/github#merge", "title": "Merge",
+  "reason": "A draft can't be merged; mark it ready for review first." }</code></pre>
+</details>
+</section>
+
+<section id="right">
+<h2><span class="num">6</span>Doing the right thing</h2>
+
+<h3 class="step">Right behavior · only what is allowed, now</h3>
+<p>The script can’t merge a draft, because merge isn’t offered on a draft. The wrong move isn’t forbidden by a prompt; it is simply not there.</p>
+<details class="deep"><summary>Technical detail: the forms on a draft</summary>
+<pre><code data-lang="json">"_forms": { "github:comment": { … }, "github:close": { … }, "github:edit": { … } }</code></pre>
+<pre><code data-lang="http">once("github:merge", giveUp = 3.minutes, …) { act("github:merge", "merge_method" to "squash") {} }</code></pre>
+<p><code>once</code> waits for the merge form to appear. Until it does, nothing is sent.</p>
+</details>
+
+<h3 class="step">Restraint · the model only where judgment lives</h3>
+<p>One line of the goal is marked <code>reasoned</code>. That mark is restraint written into the language: a person decides, in advance, where the model may act on its own each time.</p>
+
+<h3 class="step">Recency · the rules come from the server, at the moment of acting</h3>
+<p>The script holds no rule about drafts, conflicts or permissions. It reads them, every look, from the answers. When GitHub changes a rule, the gateway’s answer changes, and the script is current without a release.</p>
+
+<h3 class="step">Respect · work alongside people</h3>
+<p>Held pull requests are left alone and noted once, however often they change. A wait gives up once for each pull request, so each author is told once. Good manners are part of correct behavior when software works next to people.</p>
+<details class="deep"><summary>Technical detail: noted once, for the whole run</summary>
+<pre><code data-lang="http">note: Left …/pulls/810: leave it, and say so once.
+note: Left …/pulls/805: leave it, and say so once.
+note: Left …/pulls/822: leave it, and say so once.</code></pre>
+<p>An early run noted the same held pull request about twenty times in an hour; the note is now kept once per pull request.</p>
+</details>
+</section>
+
+<section id="people">
+<h2><span class="num">7</span>People in charge</h2>
+
+<h3 class="step">Readability · a person can read what it will do</h3>
+<p>The goal is fifteen lines of plain words. The generated script is thirty-five lines a developer can read in a minute.</p>
+
+<h3 class="step">Reviewability · someone else can check it before it runs</h3>
+<p>The script has no model in it except the one marked line, so it can be reviewed like any code: in a pull request, by a colleague, before it touches anything.</p>
+<details class="deep"><summary>Technical detail: the script, and what it is held to</summary>
+<pre><code data-lang="http">watch(until = { at("watch") { "state" eq "closed" } }) {
+    act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label) {
+        whenever {
+            has { "github:labels" has label }
+            leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+            once("github:merge", giveUp = 3.minutes, otherwise = { why -> … }) {
+                act("github:merge", "merge_method" to "squash") {}
+            }
+        }
+    }
+}</code></pre>
+<pre><code data-lang="json">forms:
+  github:merge:
+    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+    method: PUT</code></pre>
+<p>The pins say exactly which forms the script was reviewed against. If the server changes one, the script refuses to act.</p>
+</details>
+
+<h3 class="step">Responsibility · every act traced</h3>
+<p>Each act in the record names the goal line it came from, the decision behind it, and the server’s answer. When software acts in someone’s name, that is what accountability looks like.</p>
+
+<h3 class="step">Revocability · stop it cleanly</h3>
+<p>Close the watch’s issue and the watch ends at its next look. Change a form on the server and a pinned script stops rather than guess.</p>
+</section>
+
+<section id="rate">
+<h2><span class="num">8</span>Rate · what it costs to run</h2>
+<p>Five model calls an hour: 12,979 tokens in, 971 out. A watch that asked the model at every look would have made thousands of calls, with thousands of chances to answer differently.</p>
+<ul class="obs">
+<li>Cost and energy are part of whether a system is fit to run all day, every day.</li>
+<li>The cheapest model call is the one a kept decision makes unnecessary.</li>
+</ul>
+</section>
+
+<section id="ask">
+<h2><span class="num">9</span>What to ask for</h2>
+<p>For anyone building business systems with AI, or buying them, these are fair questions. A good answer needn’t be this design, but it should be close.</p>
+<ul class="obs">
+<li><b>Where exactly does the model run?</b> Which steps, and why those? Can you point to them?</li>
+<li><b>Can a decision be kept and replayed?</b> If I run it again on the same state, do I get the same result?</li>
+<li><b>Who enforces what is allowed?</b> The prompt, or the system the agent acts on?</li>
+<li><b>What happens when the system says no?</b> Does the agent stop, retry blindly, or pass the reason on?</li>
+<li><b>Can I read, and review, what it will do</b> before it does it?</li>
+<li><b>Is every act recorded,</b> with the reason it was taken?</li>
+<li><b>How do I stop it,</b> and what happens to work in progress?</li>
+<li><b>What does an hour of it cost,</b> in calls and tokens?</li>
+</ul>
+<blockquote>Reason once, then let the other R’s carry the load.</blockquote>
+</section>
+
+<footer class="sources">
+<h2>Sources</h2>
+<ul>
+<li>The merge watch: <code>exhibits/merge-watch/</code> in this repository: the goal, the generated script and its pins and derivations, live run 2’s output and capture, and the hour run’s output.</li>
+<li>The companion pages: <i>Information and Controls</i> (the media type and the controls) and <i>One Goal, Decided Once</i> (the run).</li>
+<li>Recoverability: <code>client/artie/src/test/resources/features/script-watch.feature</code>, “Run again with its journal, a watch answers only what changed since, and a wait gives up on time”.</li>
+</ul>
+</footer>
+
+</main>
+<script>
+(function () {
+  var root = document.documentElement, all = document.getElementById('all'), theme = document.getElementById('theme');
+  var order = ['auto', 'light', 'dark'];
+  function setTheme(t) {
+    if (t === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+    theme.textContent = 'Theme: ' + t;
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem('theme') || 'auto'; } catch (e) {}
+  setTheme(order.indexOf(saved) < 0 ? 'auto' : saved);
+  theme.addEventListener('click', function () {
+    var now = root.getAttribute('data-theme') || 'auto';
+    setTheme(order[(order.indexOf(now) + 1) % order.length]);
+  });
+  function details() { return Array.prototype.slice.call(document.querySelectorAll('details.deep')); }
+  function sync() { all.textContent = details().every(function (d) { return d.open; }) ? 'Hide all detail' : 'Show all detail'; }
+  all.addEventListener('click', function () {
+    var open = !details().every(function (d) { return d.open; });
+    details().forEach(function (d) { d.open = open; });
+    sync();
+  });
+  details().forEach(function (d) { d.addEventListener('toggle', sync); });
+
+  // Code: JSON, HTML, HTTP and goal text coloured by token; a diff's lines marked added or removed.
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function span(c, s) { return '<span class="cj-' + c + '">' + esc(s) + '</span>'; }
+  function tokens(text, re, paint) {
+    var out = '', at = 0, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(text)) !== null) {
+      out += esc(text.slice(at, m.index)) + paint(m);
+      at = m.index + m[0].length;
+      if (m[0].length === 0) re.lastIndex++;
+    }
+    return out + esc(text.slice(at));
+  }
+  var JSON_RE = /("(?:[^"\\]|\\.)*")(\s*:)?|\b(true|false|null)\b|(-?\b\d+(?:\.\d+)?\b)/g;
+  function json(t) {
+    return tokens(t, JSON_RE, function (m) {
+      if (m[1]) return m[2] ? span('k', m[1]) + esc(m[2]) : span('s', m[1]);
+      if (m[3]) return span('l', m[3]);
+      return span('n', m[4]);
+    });
+  }
+  var HTML_RE = /(<\/?)([a-zA-Z][a-zA-Z0-9]*)|([a-zA-Z-]+)(=)("[^"]*")|(\/?>)/g;
+  function html(t) {
+    return tokens(t, HTML_RE, function (m) {
+      if (m[2]) return esc(m[1]) + span('t', m[2]);
+      if (m[3]) return span('a', m[3]) + esc(m[4]) + span('s', m[5]);
+      return esc(m[6]);
+    });
+  }
+  function http(t) {
+    var head = /^(GET|PUT|POST|PATCH|DELETE|HTTP\/1\.1|→)(\s+)(.*)/.exec(t);
+    if (head) return span('l', head[1]) + head[2] + esc(head[3]);
+    var hdr = /^([A-Za-z-]+)(:)(\s.*)/.exec(t);
+    if (hdr) return span('k', hdr[1]) + esc(hdr[2]) + json(hdr[3]);
+    var code = /^(\d{3})(\s.*)/.exec(t);
+    if (code) return span('n', code[1]) + esc(code[2]);
+    return json(t);
+  }
+  var GOAL_RE = /(`[^`]*`)|(\{[a-z]+\})|\b(Whenever|If|Once|Or give up|Otherwise|Until|In)\b/g;
+  function goal(t) {
+    return tokens(t, GOAL_RE, function (m) {
+      if (m[1]) return span('m', m[1]);
+      if (m[2]) return span('n', m[2]);
+      return span('k', m[3]);
+    });
+  }
+  var PAINT = { json: json, html: html, http: http, goal: goal };
+  Array.prototype.forEach.call(document.querySelectorAll('pre code[data-lang]'), function (el) {
+    var paint = PAINT[el.getAttribute('data-lang')] || esc;
+    var lines = el.textContent.split('\n');
+    if (el.classList.contains('diff')) {
+      el.innerHTML = lines.map(function (line) {
+        var sign = line.charAt(0), rest = line.slice(2);
+        var kind = sign === '+' ? 'add' : sign === '-' ? 'del' : 'same';
+        var mark = kind === 'same' ? '  ' : '<span class="sg">' + sign + '</span> ';
+        return '<span class="ln ' + kind + '">' + mark + paint(rest) + '</span>';
+      }).join('');
+    } else {
+      el.innerHTML = lines.map(paint).join('\n');
+    }
+  });
+})();
+</script>
+</body></html>
