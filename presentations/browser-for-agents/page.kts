@@ -45,8 +45,32 @@ blockquote { margin: 1.8rem 0; padding: 0.4rem 0 0.4rem 1.4rem; border-left: 3px
   font-size: 1.3rem; line-height: 1.55; }
 code { font: 0.88em 'JetBrains Mono', ui-monospace, monospace; background: var(--code); padding: 0.1em 0.3em;
   border-radius: 4px; }
-pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0; }
+pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0;
+  font-size: 0.85rem; line-height: 1.55; }
 pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.55; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  border-bottom: 1px solid var(--rule); }
+.bar-in { max-width: 44rem; margin: 0 auto; display: flex; gap: 0.6rem; justify-content: flex-end; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar button { font: 500 0.85rem 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; }
+.bar button:hover { border-color: var(--accent); }
+.howto { font: 400 0.92rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 1.2rem; }
+details.deep { margin: 1.2rem 0 1.6rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); }
+details.deep > summary { cursor: pointer; padding: 0.8rem 1.1rem; list-style: none;
+  font: 600 0.95rem/1.4 'IBM Plex Sans', system-ui, sans-serif; color: var(--accent); }
+details.deep > summary::-webkit-details-marker { display: none; }
+details.deep > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-weight: 600; }
+details.deep[open] > summary::before { content: "−"; }
+details.deep > :not(summary) { margin-left: 1.1rem; margin-right: 1.1rem; }
+details.deep > :last-child { margin-bottom: 1.1rem; }
+details.deep p, details.deep li { font-size: 1rem; }
+details.deep pre { background: var(--code); }
+.table { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; width: 100%; font: 400 0.9rem/1.45 'IBM Plex Sans', system-ui, sans-serif; }
+th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--muted); }
 ul.obs { margin: 1.2rem 0 1.6rem; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
 ul.obs li { position: relative; padding-left: 1.4rem; line-height: 1.55; }
 ul.obs li::before { content: ""; position: absolute; left: 0.2rem; top: 0.68em; width: 0.45rem; height: 0.45rem;
@@ -77,6 +101,39 @@ fun figure(name: String): String {
 
 val body = Regex("<!--diagram:([a-z-]+)-->").replace(File(essay).readText()) { figure(it.groupValues[1]) }
 
+/** The bar above the page: open or close every technical detail, and the theme: as the system has it, light or dark. */
+val BAR = """<nav class="bar" aria-label="Page controls"><div class="bar-in">
+<button type="button" id="all">Show all detail</button>
+<button type="button" id="theme">Theme: auto</button>
+</div></nav>"""
+
+val SCRIPT = """<script>
+(function () {
+  var root = document.documentElement, all = document.getElementById('all'), theme = document.getElementById('theme');
+  var order = ['auto', 'light', 'dark'];
+  function setTheme(t) {
+    if (t === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+    theme.textContent = 'Theme: ' + t;
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem('theme') || 'auto'; } catch (e) {}
+  setTheme(order.indexOf(saved) < 0 ? 'auto' : saved);
+  theme.addEventListener('click', function () {
+    var now = root.getAttribute('data-theme') || 'auto';
+    setTheme(order[(order.indexOf(now) + 1) % order.length]);
+  });
+  function details() { return Array.prototype.slice.call(document.querySelectorAll('details.deep')); }
+  function sync() { all.textContent = details().every(function (d) { return d.open; }) ? 'Hide all detail' : 'Show all detail'; }
+  all.addEventListener('click', function () {
+    var open = !details().every(function (d) { return d.open; });
+    details().forEach(function (d) { d.open = open; });
+    sync();
+  });
+  details().forEach(function (d) { d.addEventListener('toggle', sync); });
+})();
+</script>"""
+
 val head = """<title>$TITLE</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -89,13 +146,17 @@ File(out).writeText(
     """<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 $head
-</head><body><main>
+</head><body>
+$BAR
+<main>
 $body
-</main></body></html>
+</main>
+$SCRIPT
+</body></html>
 """,
 )
 println("wrote $out")
 if (artifact.isNotBlank()) {
-    File(artifact).writeText("$head\n<main>\n$body\n</main>\n")
+    File(artifact).writeText("$head\n$BAR\n<main>\n$body\n</main>\n$SCRIPT\n")
     println("wrote $artifact")
 }

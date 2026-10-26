@@ -38,8 +38,32 @@ blockquote { margin: 1.8rem 0; padding: 0.4rem 0 0.4rem 1.4rem; border-left: 3px
   font-size: 1.3rem; line-height: 1.55; }
 code { font: 0.88em 'JetBrains Mono', ui-monospace, monospace; background: var(--code); padding: 0.1em 0.3em;
   border-radius: 4px; }
-pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0; }
+pre { background: var(--code); border-radius: 10px; padding: 1.1rem 1.3rem; overflow-x: auto; margin: 1.4rem 0;
+  font-size: 0.85rem; line-height: 1.55; }
 pre code { background: none; padding: 0; font-size: 0.85rem; line-height: 1.55; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  border-bottom: 1px solid var(--rule); }
+.bar-in { max-width: 44rem; margin: 0 auto; display: flex; gap: 0.6rem; justify-content: flex-end; flex-wrap: wrap;
+  padding-block: 0.6rem; padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.bar button { font: 500 0.85rem 'IBM Plex Sans', system-ui, sans-serif; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--rule); border-radius: 999px; padding: 0.4rem 0.9rem; cursor: pointer; }
+.bar button:hover { border-color: var(--accent); }
+.howto { font: 400 0.92rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 1.2rem; }
+details.deep { margin: 1.2rem 0 1.6rem; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); }
+details.deep > summary { cursor: pointer; padding: 0.8rem 1.1rem; list-style: none;
+  font: 600 0.95rem/1.4 'IBM Plex Sans', system-ui, sans-serif; color: var(--accent); }
+details.deep > summary::-webkit-details-marker { display: none; }
+details.deep > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-weight: 600; }
+details.deep[open] > summary::before { content: "−"; }
+details.deep > :not(summary) { margin-left: 1.1rem; margin-right: 1.1rem; }
+details.deep > :last-child { margin-bottom: 1.1rem; }
+details.deep p, details.deep li { font-size: 1rem; }
+details.deep pre { background: var(--code); }
+.table { overflow-x: auto; margin: 1rem 0; }
+table { border-collapse: collapse; width: 100%; font: 400 0.9rem/1.45 'IBM Plex Sans', system-ui, sans-serif; }
+th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule); }
+th { font-weight: 600; color: var(--muted); }
 ul.obs { margin: 1.2rem 0 1.6rem; padding: 0; list-style: none; display: grid; gap: 0.55rem; }
 ul.obs li { position: relative; padding-left: 1.4rem; line-height: 1.55; }
 ul.obs li::before { content: ""; position: absolute; left: 0.2rem; top: 0.68em; width: 0.45rem; height: 0.45rem;
@@ -58,11 +82,17 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 .sources h2 { font-size: 1rem; margin: 1rem 0 0.5rem; }
 .sources ul { padding-left: 1.2rem; }
 </style>
-</head><body><main>
+</head><body>
+<nav class="bar" aria-label="Page controls"><div class="bar-in">
+<button type="button" id="all">Show all detail</button>
+<button type="button" id="theme">Theme: auto</button>
+</div></nav>
+<main>
 <header class="masthead">
 <p class="kicker">HEART and ARTIE</p>
 <h1>The Browser for Agents</h1>
 <p class="dek">How the Web made one client work with every site, and how a media type and a generic agent can do the same for APIs.</p>
+<p class="howto">Each section is short. The technical detail sits under <b>Technical detail</b> at its end; <b>Show all detail</b> above opens every one.</p>
 </header>
 
 <section id="question">
@@ -135,6 +165,30 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>A private API starts with nothing until someone writes the docs or tools for it.</li>
 <li>The claim of this essay: what made the browser generic can make an agent generic. HEART plays HTML’s part; ARTIE plays the browser’s.</li>
 </ul>
+<details class="deep"><summary>Technical detail: what “coupled to a media type” means on the wire</summary>
+<p>A browser says which formats it reads in <code>Accept</code>; the site answers in one of them and names it in <code>Content-Type</code>. Nothing in the exchange names the site’s own vocabulary.</p>
+<pre><code>GET /orders/42 HTTP/1.1
+Accept: text/html
+
+HTTP/1.1 200 OK
+Content-Type: text/html</code></pre>
+<p>A HEART client does the same, and asks for the HEART profile beside the media type:</p>
+<pre><code>GET /repos/acme/claims/pulls/20 HTTP/1.1
+Accept: application/hal+json
+Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile"
+ETag: "seq-5.hsf.L2.e8e98768123683fa"
+Cache-Control: no-cache</code></pre>
+<ul class="obs">
+<li>The base media type is HAL, <code>application/hal+json</code>. HEART is a profile over it, negotiated with W3C Content Negotiation by Profile (<code>Accept-Profile</code>, <code>Link: rel="profile"</code>), not a media-type parameter.</li>
+<li>Two dialects: <b>HAL Schema Forms</b> (<code>_forms</code>, full JSON Schema per field) is the reference; <b>HAL-FORMS</b> (<code>_templates</code>, the format Spring HATEOAS ships) is an on-ramp, served collapsed only.</li>
+<li>Both are generated from one source of truth for which acts are legal now, so they can’t disagree.</li>
+<li>A server that varies an answer by <code>Accept</code>, <code>Prefer</code> or <code>Accept-Profile</code> sends <code>Vary</code> with them.</li>
+</ul>
+</details>
 </section>
 
 <section id="islands">
@@ -248,6 +302,19 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>Everything about a site arrives in the site’s own pages, when it is needed.</li>
 <li>So a site can change without breaking its visitors. Nobody updates the browser.</li>
 </ul>
+<details class="deep"><summary>Technical detail: a form builds the request, not the client</summary>
+<pre><code>&lt;form method="get" action="/search"&gt;
+  &lt;input name="q"&gt;
+&lt;/form&gt;
+
+GET /search?q=tomatoes HTTP/1.1      ← built from the form's action and fields</code></pre>
+<ul class="obs">
+<li>The browser builds the address from the form, by a fixed algorithm (HTML’s “mutate action URL”), never from knowledge of the site.</li>
+<li>A <code>post</code> form sends a body; the site usually answers <code>303 See Other</code> with the next page’s address.</li>
+<li>HEART keeps the same split. A lookup or search is a <b>GET form</b> whose target is an RFC 6570 template filled from the form’s own fields: <code>searchBeds</code> targets <code>/beds{?name}</code>, <code>getBed</code> targets <code>/beds/{id}</code>.</li>
+<li>A GET form is safe: no body, no <code>If-Match</code>. Acts use <code>POST</code>, <code>PUT</code>, <code>PATCH</code> or <code>DELETE</code>, never <code>GET</code>, each with HTTP’s own meaning (<code>PUT</code> and <code>DELETE</code> idempotent).</li>
+</ul>
+</details>
 </section>
 
 <section id="fielding">
@@ -297,6 +364,19 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li><b>“Or automaton”:</b> he meant machines too. “Machines can follow links when they understand the data format and relationship types.”</li>
 <li>A REST API should be entered “with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types.” A bookmark and a media type. Nothing else.</li>
 </ul>
+<details class="deep"><summary>Technical detail: the four constraints, as HEART meets them</summary>
+<div class="table"><table>
+<tr><th>Constraint</th><th>In HEART</th></tr>
+<tr><td>Identification of resources</td><td>Every resource has a stable URL. Shared affordance sets and schemas have content-addressed URLs, one per distinct body.</td></tr>
+<tr><td>Manipulation through representations</td><td>An act sends a JSON body that the form’s JSON Schema describes, to the form’s target.</td></tr>
+<tr><td>Self-descriptive messages</td><td>The media type, the profile in <code>Link: rel="profile"</code>, strong <code>ETag</code>s, and refusals as RFC 9457 problems with a <code>type</code> URI.</td></tr>
+<tr><td>Hypermedia as the engine of application state</td><td>One service index is the bookmark. Every other resource is reached by links and forms; a client never builds a URI.</td></tr>
+</table></div>
+<ul class="obs">
+<li>Collections list members under IANA’s <code>item</code> relation, each titled; paging uses <code>next</code>, <code>prev</code>, <code>first</code>, <code>last</code>.</li>
+<li>ARTIE enforces the bookmark rule on itself: reading an address again is allowed only if the server handed that address over in this run.</li>
+</ul>
+</details>
 </section>
 
 <section id="lost">
@@ -370,17 +450,39 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li><b>The Web:</b> the rules are in the page, written by the server as it answers. True now.</li>
 <li><b>RPC and SOAP:</b> in an interface file compiled into the client. True as of the release.</li>
 <li><b>JSON APIs:</b> in documentation a developer reads. True as of the reading.</li>
-<li><b>OpenAPI:</b> in a description of every operation, generated into SDKs. GitHub’s lists more than twelve hundred. True as of the last build.</li>
+<li><b>OpenAPI:</b> in a description of every operation, generated into SDKs. True as of the last build.</li>
 <li><b>LLM agents:</b> partly in training data. True as of training.</li>
 <li>Each step puts the rules further from the server and freezes them earlier. The server goes on changing; the copy doesn’t know.</li>
 <li>Each step also brings back the islands: a client generated for one API is a client for that API alone.</li>
 </ul>
-<p>A description of everything possible can’t say what is possible <em>now</em>. GitHub’s description of merge says so itself:</p>
-<pre><code>PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
-  405: Method Not Allowed if merge cannot be performed</code></pre>
+<details class="deep"><summary>Technical detail: GitHub’s answer, and GitHub’s description</summary>
+<p>A pull request, as GitHub’s REST API returns it (abridged):</p>
+<pre><code>{ "number": 20, "state": "open", "draft": false,
+  "mergeable": true, "mergeable_state": "blocked",
+  "url":                 "https://api.github.com/repos/…/pulls/20",
+  "html_url":            "https://github.com/…/pull/20",
+  "diff_url":            "https://github.com/…/pull/20.diff",
+  "issue_url":           "https://api.github.com/repos/…/issues/20",
+  "commits_url":         "https://api.github.com/repos/…/pulls/20/commits",
+  "comments_url":        "https://api.github.com/repos/…/issues/20/comments",
+  "statuses_url":        "https://api.github.com/repos/…/statuses/{sha}",
+  … }</code></pre>
 <ul class="obs">
-<li>To find out whether merge is allowed, you try it.</li>
+<li>Pull request #20 on our scratch repository had <b>157</b> members whose value is a URL. They are data: no method, no fields, no word on whether an act is allowed now.</li>
+<li>Whether merge is allowed must be worked out from <code>state</code>, <code>draft</code>, <code>mergeable</code>, <code>mergeable_state</code>, the caller’s permissions and branch protection: rules the client has to know.</li>
 </ul>
+<p>The same operation in GitHub’s OpenAPI description:</p>
+<pre><code>PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge
+  operationId: pulls/merge
+  responses:
+    200: if merge was successful
+    405: Method Not Allowed if merge cannot be performed
+    409: Conflict if sha was provided and pull request head did not match</code></pre>
+<ul class="obs">
+<li>The description had <b>823</b> paths and <b>1,242</b> operations (commit of 18 October 2026), <b>30</b> of them for pull requests.</li>
+<li>Every one is a template with placeholders. It lists what is possible ever; it can’t say what is possible now.</li>
+</ul>
+</details>
 </section>
 
 <section id="agents">
@@ -428,6 +530,21 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>A famous public API mostly works. A private API starts with nothing. A changed API is confidently out of date.</li>
 <li>The usual remedy, hand-written tools per API, is the islands again. The agent is generic; its connection to the world isn’t.</li>
 </ul>
+<details class="deep"><summary>Technical detail: why a tool list isn’t a form</summary>
+<p>A hand-written tool for an agent (illustrative):</p>
+<pre><code>{ "name": "merge_pull_request",
+  "description": "Merge a pull request. Fails if it can't be merged.",
+  "inputSchema": { "type": "object",
+    "properties": { "owner": {…}, "repo": {…}, "pull_number": {…},
+                    "merge_method": { "enum": ["merge","squash","rebase"] } } } }</code></pre>
+<ul class="obs">
+<li>It uses JSON Schema, like a HEART form. The difference is when it is true.</li>
+<li>A tool is offered whether or not merge is possible for <em>this</em> pull request now. The agent learns by calling it.</li>
+<li>Its inputs include the address parts (<code>owner</code>, <code>repo</code>, <code>pull_number</code>): the agent builds the target.</li>
+<li>The Model Context Protocol lets a server’s tool list vary with the caller’s authorization, not with the state of what the tools act on.</li>
+<li>A HEART form exists only while the act is legal, targets one resource, and asks only for what the act needs.</li>
+</ul>
+</details>
 </section>
 
 <section id="heart">
@@ -487,22 +604,101 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <text class="m" x="606" y="339" text-anchor="start">(no form; hr:unavailable</text>
 <text class="m" x="606" y="359" text-anchor="start"> says why)</text>
 </svg></div><figcaption>HTML and HEART, element for element</figcaption></figure>
-<p>A form, as an agent receives it:</p>
-<pre><code>"_forms": {
-  "github:merge": {
-    "title": "Merge this pull request",
-    "method": "PUT",
-    "_links": { "target": { "href": "…/pulls/20/merge" } },
-    "schema": { "properties": {
-      "merge_method": { "enum": ["merge", "squash", "rebase"] } } } } }</code></pre>
 <ul class="obs">
-<li><b>Links by relation</b> in <code>_links</code>: <code>author</code>, <code>next</code>, or a service’s own. A client follows a relation; it never builds an address. This is HAL, already used by Spring and others.</li>
+<li><b>Links by relation</b> in <code>_links</code>: <code>author</code>, <code>next</code>, or a service’s own. A client follows a relation; it never builds an address.</li>
 <li><b>Forms</b> in <code>_forms</code>: method, target, and inputs in JSON Schema, the schema language models already use for tools.</li>
 <li><b>Forms follow the state.</b> No merge form until the pull request can be merged. An open issue offers close; a closed one offers reopen.</li>
-<li><b>Why an act is absent.</b> A missing form can link to its reason: “Branch protection blocks the merge: a required check or review is missing.”</li>
-<li><b>Refusal of anything not offered.</b> The service refuses unoffered acts, writes over a changed state, and inputs outside the schema.</li>
+<li><b>Why an act is absent.</b> A missing form can link to its reason.</li>
+<li><b>Refusal of anything not offered.</b> The rules the forms show are the rules the service enforces.</li>
 <li>The rules are back in the answer, true now. The name says it: Hypermedia, Enforced, for Agentic, Reliable Transactions.</li>
 </ul>
+<details class="deep"><summary>Technical detail: a representation, collapsed (L0)</summary>
+<p>A pull request through the HEART gateway, abridged:</p>
+<pre><code>{ "number": 20, "state": "open", "title": "Bump left-pad to 1.0.3",
+  "_links": {
+    "self":   { "href": "https://localhost:8392/repos/acme/claims/pulls/20" },
+    "curies": [ { "name": "github", "href": "…{rel}", "templated": true } ],
+    "alternate": { "href": "https://github.com/acme/claims/pull/20", "type": "text/html" },
+    "github:commits": { "href": "…/pulls/20/commits", "type": "application/hal+json" },
+    "hr:unavailable": { "href": "…/unavailable/sha256-…", "integrity": "sha256-…" } },
+  "_embedded": {
+    "author": { "login": "ana", "_links": { "self": { "href": "…/users/ana" } } } },
+  "_forms": {
+    "github:merge": {
+      "title": "Merge", "method": "PUT",
+      "_links": { "target": { "href": "…/pulls/20/merge" } },
+      "schema": { "type": "object", "properties": {
+        "merge_method":   { "enum": ["merge", "squash", "rebase"] },
+        "commit_title":   { "type": "string" },
+        "commit_message": { "type": "string" } } } },
+    "github:comment": { … }, "github:close": { … }, "github:edit": { … } } }</code></pre>
+<ul class="obs">
+<li>GitHub’s <code>*_url</code> members are lifted out of the state into <code>_links</code>, each with a <code>type</code>. API links are rewritten to the gateway; web pages keep their own address.</li>
+<li>GitHub’s <code>user</code> is embedded under IANA’s <code>author</code>, so a client knows who made it without knowing GitHub’s names.</li>
+<li>The merge form has no <code>sha</code> field: the gateway binds it from the state the client read, so a merge lands only on the head it was offered for.</li>
+</ul>
+</details>
+<details class="deep"><summary>Technical detail: an act, and how it is refused</summary>
+<pre><code>PUT …/pulls/20/merge HTTP/1.1
+Content-Type: application/json
+If-Match: "seq-5.hsf.L2.e8e98768123683fa"
+
+{ "merge_method": "squash" }</code></pre>
+<div class="table"><table>
+<tr><th>Status</th><th>Problem <code>type</code></th><th>Meaning</th><th>Client</th></tr>
+<tr><td>428</td><td>precondition-required</td><td>No <code>If-Match</code></td><td>Send again, conditionally</td></tr>
+<tr><td>412</td><td>stale</td><td>The state changed since it was read</td><td>Read again; drop the act, decide again</td></tr>
+<tr><td>409</td><td>not-offered</td><td>The act isn’t offered in this state</td><td>Read again; it may be gone for good</td></tr>
+<tr><td>422</td><td>invalid-input</td><td>A field breaks the schema</td><td>Fix the input; <code>violations</code> point at the fields</td></tr>
+</table></div>
+<pre><code>HTTP/1.1 412 Precondition Failed
+Content-Type: application/problem+json
+
+{ "type": "https://w3id.org/heart-rise/problems/stale",
+  "title": "The resource changed since it was read", "status": 412 }</code></pre>
+<ul class="obs">
+<li>The checks run in that order: 428, 412, 409, 422.</li>
+<li>A client tells refusals apart by status and <code>type</code>, never by reading the prose.</li>
+<li><code>ETag</code>s are strong and change whenever the bytes do, even if only the rendering changed.</li>
+</ul>
+</details>
+<details class="deep"><summary>Technical detail: shared, cached controls (L1, L2)</summary>
+<p>A client says how it wants the controls with <code>Prefer</code>. At L2 the forms and schemas are separate resources, named by a digest of their bytes:</p>
+<pre><code>GET …/pulls/20                     Prefer: forms=link, schema=link
+→ 200  state + _links.forms → /affordance-sets/sha256-…   (no-cache, ETag)
+GET /affordance-sets/sha256-…
+→ 200  _forms with schema.$ref and integrity              (max-age=31536000, immutable)
+GET /schemas/sha256-…
+→ 200  the schema                                         (immutable)</code></pre>
+<div class="table"><table>
+<tr><th>Rung</th><th><code>Prefer</code></th><th>What arrives</th></tr>
+<tr><td>L0</td><td>none</td><td>State, forms and schemas in one answer</td></tr>
+<tr><td>L1</td><td><code>forms=link</code></td><td>State, and a link to the affordance set</td></tr>
+<tr><td>L2</td><td><code>forms=link, schema=link</code></td><td>State; the set; each schema on its own</td></tr>
+</table></div>
+<ul class="obs">
+<li>Every pull request in the same situation shares one affordance set, at one address, cached once.</li>
+<li>In steady state, a sync of an unchanged resource is one conditional GET answered <code>304</code>, and nothing more.</li>
+<li>The explanation of absent acts is shared the same way: a function of state alone, fetched only when someone asks why.</li>
+</ul>
+<pre><code>{ "unavailable": [
+    { "rel": "github:merge",
+      "reason": "Branch protection blocks the merge: a required check or review is missing." } ] }</code></pre>
+</details>
+<details class="deep"><summary>Technical detail: choices that come from the state</summary>
+<pre><code>"playerNumber": {
+  "type": "integer",
+  "hr:options": {
+    "pointer": "/{team}/players",
+    "valueField": "number", "promptField": "name",
+    "where": { "fouledOut": false } } }</code></pre>
+<ul class="obs">
+<li>Not “any integer”: one of this team’s players who haven’t fouled out, read from the resource itself.</li>
+<li>Or from another resource: a ticket’s <code>agent</code> takes its choices from <code>/agents{?priority}</code>, filtered to those on duty.</li>
+<li>The client offers only those values. The server refuses any other with <code>422</code> at that field.</li>
+<li>JSON Schema validators ignore the unknown keyword, so plain clients still work.</li>
+</ul>
+</details>
 </section>
 
 <section id="artie">
@@ -569,6 +765,32 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>It never types an address and never invents an action.</li>
 <li>A new service needs one thing: its bookmark.</li>
 </ul>
+<details class="deep"><summary>Technical detail: the sync, reason, act cycle</summary>
+<pre><code>sync    GET   resource      Cache-Control: no-cache, If-None-Match: "…"   → 200 or 304
+reason        choose one of the forms in hand, fill its schema               (a model, or a script)
+act     PUT   form target   If-Match: "…"                                  → 2xx, or a refusal</code></pre>
+<ul class="obs">
+<li><b>Sync:</b> every resource is revalidated on every read; an unchanged one costs a <code>304</code>.</li>
+<li><b>Reason:</b> only over forms present now. A model is handed the state, the offers and the links, and answers by naming one offer and its fields; it has no way to answer with a URL.</li>
+<li><b>Act:</b> always conditional. On <code>409</code> it reads again and decides again; on <code>412</code> it discards the act, so it never writes over someone else’s change.</li>
+<li>Credentials are added below the cache, just above the wire, scoped to one origin. The model never sees them.</li>
+</ul>
+</details>
+<details class="deep"><summary>Technical detail: heart-script, ARTIE’s script language</summary>
+<pre><code>heart("https://localhost:8392/") {                       // the bookmark
+    act("github:repos-get", "owner" to owner, "repo" to repo) {
+        act("github:open-issue", fields = {
+            "title" to "Bench watch, week $week"
+            "body"  to "Close this issue to stop the watch."
+        }) { keepAs("watch") }                           // remember the new issue by name
+    }
+}</code></pre>
+<ul class="obs">
+<li>A script is Kotlin. Every step names a relation, never a URL. Each nested block runs on the resource the act answered with.</li>
+<li>An act whose form isn’t offered where the script stands is refused before anything is sent.</li>
+<li><code>artie run script.kts owner=…</code> runs it, with no model.</li>
+</ul>
+</details>
 </section>
 
 <section id="routine">
@@ -628,8 +850,51 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>Those choices become a script: relations to follow, forms to fill, checks to make. The forms it used are pinned.</li>
 <li>From then on the script runs alone, with no model.</li>
 <li>If the service stops offering a form, or changes one, the script stops before it sends anything. A recorded macro would click whatever is there.</li>
-<li>In our trials, a seed-bench goal like this one ran on GitHub once with a model, then with none.</li>
 </ul>
+<details class="deep"><summary>Technical detail: the goal’s words, and what they become</summary>
+<div class="table"><table>
+<tr><th>In the goal</th><th>Means</th><th>In the script</th></tr>
+<tr><td>Whenever …</td><td>Every member of a list, now and as it changes</td><td><code>whenever { has { … } }</code></td></tr>
+<tr><td>If …</td><td>A check, decided once, on the member</td><td><code>has</code>, <code>leaveWhere</code></td></tr>
+<tr><td>unless it’s said already</td><td>Act only if the words aren’t there</td><td><code>actOnce(…, listedIn = …)</code></td></tr>
+<tr><td>Once … Or give up after</td><td>Wait for an act to be offered, up to a time</td><td><code>once("github:merge", giveUp = …)</code></td></tr>
+<tr><td>Otherwise</td><td>What to do on giving up, told the server’s reason</td><td><code>otherwise = { why -&gt; … }</code></td></tr>
+<tr><td>Until …</td><td>When the whole watch ends</td><td><code>watch(until = …)</code></td></tr>
+</table></div>
+<pre><code>whenever {
+    has { "github:labels" has label }
+    leaveWhere("a person holds it back") { "github:labels" has hold }
+    once("github:merge", giveUp = 5.minutes, otherwise = { why ->
+        follow("github:issues-get") {
+            actOnce("github:comment", "body" to "Not merged: $why",
+                listedIn = "github:issues-list-comments")
+        }
+    }) { act("github:merge", "merge_method" to "squash") }
+}</code></pre>
+<ul class="obs">
+<li>The words are parsed by ARTIE. The model decides only how this service does what each line asks: which list, which check, which act.</li>
+<li>Conditions are data (facts blocks), not <code>if</code>, so a script can be read back, checked and compared with its goal.</li>
+<li>Each <code>Whenever</code> runs as a listener on its own thread; a slow one holds up only itself.</li>
+</ul>
+</details>
+<details class="deep"><summary>Technical detail: run, generate, run again</summary>
+<pre><code>artie run seed-bench.goal.md owner=acme --reasoner claude --trace runs/first.yaml
+artie generate runs/first.yaml --out seed-bench.kts --script seed-bench.goal.md
+artie run seed-bench.kts owner=acme</code></pre>
+<p><code>artie generate</code> writes three files beside the script:</p>
+<pre><code># seed-bench.pins.yaml: what the run was offered, held to before every act
+forms:
+  github:merge:
+    integrity: sha256-…
+    method: PUT
+    sets: [ sha256-… ]</code></pre>
+<ul class="obs">
+<li><b>The script:</b> inputs, relations, checks. No prompt, no model.</li>
+<li><b>Pins:</b> each form by its digest. <b>Lenient</b> (the default) refuses a form no longer offered or changed; <b>strict</b> also refuses one offered in a set not recorded for it.</li>
+<li><b>Derivation:</b> for every value in the script, the rule that bound it and where it came from: an input, an earlier answer, or the goal’s words.</li>
+<li>A step the goal marks as a judgement stays a question for the model, in the person’s own words; everything else is pinned.</li>
+</ul>
+</details>
 </section>
 
 <section id="gateway">
@@ -680,6 +945,61 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>In: every act checked against what was offered, before the API hears it.</li>
 <li>GitHub doesn’t change. Anyone can run a gateway, on a laptop, for the APIs they depend on.</li>
 </ul>
+<details class="deep"><summary>Technical detail: a connector, in three parts</summary>
+<p><b>Which operations:</b> only these are read from GitHub’s description; the rest are left out before parsing.</p>
+<pre><code># connector.yaml
+profile: github
+include: [ pulls/get, pulls/list, pulls/merge, pulls/update, issues/create-comment, … ]
+headers: { X-GitHub-Api-Version: "2022-11-28" }</code></pre>
+<p><b>Which acts:</b> each a projection of one GitHub operation.</p>
+<pre><code># pull.resource.yaml
+acts:
+  merge:
+    operation: pulls/merge
+    title: Merge
+    fields: [merge_method, commit_title, commit_message]
+    bind: { sha: /head/sha }      # merge only the head the client read
+    stale: 409                    # GitHub's 409 here means the client's view is stale
+    refused: 405                  # GitHub's 405 means it can't merge now</code></pre>
+<p><b>When each act is allowed, and why not:</b></p>
+<pre><code># pull.reader.yaml
+allowed:
+  table: /state
+  rows:
+    open:   { allow: [close, merge, edit, request-review, update-branch, comment] }
+    closed: { allow: [reopen, edit, comment] }
+rules:
+  - when: { /draft: true }
+    absent: { merge: "A draft can't be merged; mark it ready for review first." }
+  - when: { /mergeable_state: blocked }
+    absent: { merge: "Branch protection blocks the merge: a required check or review is missing." }</code></pre>
+<ul class="obs">
+<li>The rules GitHub leaves to every client are written once, here, and served to all of them as forms and reasons.</li>
+<li>The gateway calls GitHub as each caller, with their own token (<code>UPSTREAM_AUTH=caller</code>).</li>
+<li>Members GitHub works out in the background (<code>mergeable</code>, <code>mergeable_state</code>) are marked volatile: they change the offers, not the validator an act is checked against.</li>
+<li>A read can be held until a signed GitHub webhook says what changed, instead of polling.</li>
+</ul>
+</details>
+<details class="deep"><summary>Technical detail: or speak HEART natively</summary>
+<p>A service built on the HEART library declares its acts once, and which states offer them:</p>
+<pre><code>offers = Offers(
+    keys = Status.entries,
+    offered = { status ->
+        when (status) {
+            Status.NEW      -> listOf("assign", "comment", "changePriority")
+            Status.ASSIGNED -> listOf("assign", "comment", "askCustomer", "resolve", "changePriority")
+            Status.RESOLVED -> listOf("reopen", "close", "changePriority")
+            Status.CLOSED   -> emptyList()
+            …
+        }
+    },
+    whyAbsent = SupportProfile::whyAbsent,
+)</code></pre>
+<ul class="obs">
+<li>From the ticket desk domain. The library renders the forms, schemas, links, <code>ETag</code>s and refusals; the domain records what each act does.</li>
+<li>By the time an act reaches domain code, the library has checked it is offered, current and valid.</li>
+</ul>
+</details>
 </section>
 
 <section id="costs">
@@ -691,6 +1011,22 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>The Web made the same trade. A browser can’t do everything a native program can; it does a narrower thing for every site, safely.</li>
 <li>HEART and ARTIE make that bargain for agents: the model chooses only among options the service vouches for.</li>
 </ul>
+<details class="deep"><summary>Technical detail: the conformance ladder</summary>
+<div class="table"><table>
+<tr><th>Rung</th><th>What it proves</th></tr>
+<tr><td>L0</td><td>State and its legal acts together. Correct, not economical; not enough to claim compliance.</td></tr>
+<tr><td>L1</td><td>Affordance sets fetched by link, shared and cached.</td></tr>
+<tr><td>L2</td><td>Schemas fetched separately. The reference rung, and the minimum for compliance.</td></tr>
+<tr><td>L3</td><td>The caching proof: unchanged state costs a <code>304</code>.</td></tr>
+<tr><td>L4</td><td>Concurrency and errors: <code>If-Match</code>, 412, 409, 428, problem types.</td></tr>
+<tr><td>L5</td><td>Both dialects from one source of truth.</td></tr>
+<tr><td>L6</td><td>Reasoning. Optional: a HEART client need not contain a model at all.</td></tr>
+</table></div>
+<ul class="obs">
+<li>A test kit (the TCK) checks a server rung by rung.</li>
+<li>The negotiation by profile it relies on is a W3C Working Draft, not yet a Recommendation.</li>
+</ul>
+</details>
 </section>
 
 <section id="close">
@@ -709,9 +1045,37 @@ figcaption { font: 400 0.9rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color:
 <li>Roy T. Fielding, <i>Architectural Styles and the Design of Network-based Software Architectures</i>, UC Irvine, 2000, §5.1.5.</li>
 <li>Roy T. Fielding, “REST APIs must be hypertext-driven”, Untangled, 20 October 2008, and his comments there.</li>
 <li>Mike Kelly, JSON Hypertext Application Language, draft-kelly-json-hal, IETF, 2012–2023.</li>
-<li>GitHub REST API description, github/rest-api-description, OpenAPI 3.0.3.</li>
-<li>HEART: spec/SPEC.md and spec/HAL-SCHEMA-FORMS-HR.md in this repository; profiles under w3id.org/heart-rise.</li>
+<li>W3C, Content Negotiation by Profile (Working Draft). RFC 9110 (HTTP semantics), RFC 9457 (problem details), RFC 6570 (URI templates), RFC 8288 (web linking).</li>
+<li>GitHub REST API description, github/rest-api-description, OpenAPI 3.0.3, commit of 18 October 2026.</li>
+<li>HEART: spec/SPEC.md and spec/HAL-SCHEMA-FORMS-HR.md in this repository; the GitHub connector in heart/heart-gateway/connectors/github; profiles under w3id.org/heart-rise.</li>
 </ul>
 </footer>
 
-</main></body></html>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, all = document.getElementById('all'), theme = document.getElementById('theme');
+  var order = ['auto', 'light', 'dark'];
+  function setTheme(t) {
+    if (t === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', t);
+    theme.textContent = 'Theme: ' + t;
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  }
+  var saved = 'auto';
+  try { saved = localStorage.getItem('theme') || 'auto'; } catch (e) {}
+  setTheme(order.indexOf(saved) < 0 ? 'auto' : saved);
+  theme.addEventListener('click', function () {
+    var now = root.getAttribute('data-theme') || 'auto';
+    setTheme(order[(order.indexOf(now) + 1) % order.length]);
+  });
+  function details() { return Array.prototype.slice.call(document.querySelectorAll('details.deep')); }
+  function sync() { all.textContent = details().every(function (d) { return d.open; }) ? 'Hide all detail' : 'Show all detail'; }
+  all.addEventListener('click', function () {
+    var open = !details().every(function (d) { return d.open; });
+    details().forEach(function (d) { d.open = open; });
+    sync();
+  });
+  details().forEach(function (d) { d.addEventListener('toggle', sync); });
+})();
+</script>
+</body></html>
