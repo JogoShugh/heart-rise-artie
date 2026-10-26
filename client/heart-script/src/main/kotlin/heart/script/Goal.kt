@@ -77,8 +77,11 @@ class Once(val condition: String, val giveUp: GiveUp? = null)
 /** `Or give up after …`, on its own [line] under a `Once` step: the wait ends [after] that long. */
 class GiveUp(val after: kotlin.time.Duration, val line: Int)
 
-/** `Otherwise, …`, on its own [line] under a step: what to do, in [words], when the step's words can't be done. */
-class Otherwise(val words: String, val line: Int)
+/**
+ * `Otherwise, …`, on its own [line] under a step: what to do, in [words], when the step's words can't be done.
+ * [reasoned], that the model decides it every time it is done, told the server's reason, and nothing is replayed.
+ */
+class Otherwise(val words: String, val line: Int, val reasoned: Boolean = false)
 
 /** How far a goal run may go: [moves] in all, and [step] for one step of a goal in steps. */
 class Limits(val moves: Int = 50, val step: Int = 10)

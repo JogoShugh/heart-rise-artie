@@ -37,8 +37,8 @@ internal fun tail(lines: List<ItemLine>, first: Int, waits: Boolean, refuse: (In
     lines.forEachIndexed { i, line ->
         val at = first + i
         val text = line.text.trim()
-        if (line.marks.isNotEmpty()) refuse(at, "Or give up and Otherwise take no backticks")
         if (GIVE_UP.containsMatchIn(text)) {
+            if (line.marks.isNotEmpty()) refuse(at, "Or give up takes no backticks")
             if (!waits) refuse(at, "Or give up ends a wait: it goes under a Once")
             if (giveUp != null) refuse(at, "Or give up is given twice")
             giveUp = GiveUp(after(text) ?: refuse(at, "Or give up after N seconds, minutes or hours"), at)
@@ -46,7 +46,11 @@ internal fun tail(lines: List<ItemLine>, first: Int, waits: Boolean, refuse: (In
             if (otherwise != null) refuse(at, "Otherwise is given twice")
             val words = OTHERWISE.find(text)?.let { text.substring(it.range.last + 1).trim() }
                 ?: refuse(at, "under a step's words come only Or give up and Otherwise")
-            otherwise = Otherwise(words.ifEmpty { refuse(at, "Otherwise, says what to do instead") }, at)
+            // An Otherwise may be marked reasoned: the model decides it every time, so nothing of it is replayed.
+            val marks = Marks.of(line.marks) { refuse(at, it) }
+            if (marks.name != null || marks.moves != null) refuse(at, "Otherwise takes only reasoned")
+            val instead = words.ifEmpty { refuse(at, "Otherwise, says what to do instead") }
+            otherwise = Otherwise(instead, at, marks.reasoned)
         }
     }
     return Tail(giveUp, otherwise)

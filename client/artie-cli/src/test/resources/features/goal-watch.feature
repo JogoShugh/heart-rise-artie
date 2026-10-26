@@ -173,5 +173,6 @@ Feature: A goal that keeps watching: Whenever, Until, Once, Or give up and Other
       | a give-up with no time            | 16   | 6      | Or give up soon.                                 | 16 | Or give up after N seconds, minutes or hours                  |
       | a give-up given twice             | 17   | 6      | Or give up after 5 minutes.                      | 17 | Or give up is given twice                                     |
       | an Otherwise with nothing after   | 17   | 6      | Otherwise,                                       | 17 | Otherwise, says what to do instead                            |
-      | backticks on a give-up            | 16   | 6      | Or give up after 10 minutes. `as late`           | 16 | Or give up and Otherwise take no backticks                    |
+      | backticks on a give-up            | 16   | 6      | Or give up after 10 minutes. `as late`           | 16 | Or give up takes no backticks                                 |
+      | an Otherwise marked but reasoned  | 17   | 6      | Otherwise, say why. `as said`                    | 17 | Otherwise takes only reasoned                                 |
       | an Otherwise as a bullet          | 17   | 6      | - Otherwise, say why.                            | 17 | Otherwise goes on the line under its step, not as a bullet    |

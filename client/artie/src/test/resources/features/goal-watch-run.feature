@@ -248,6 +248,73 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | said on 2 already, 1 told              | Not merged: A draft can't be merged; mark it ready for review first. |     |                                                                      | say why it wasn't merged                                                                 | say why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first. Say that reason in the server's words, and claim nothing the watch won't do. |
       | the planner's words hold the reason    | Looks fine.                                                            | ada | Not merged: A draft can't be merged; mark it ready for review first. | say on it: Not merged: A draft can't be merged; mark it ready for review first.         | say on it: Not merged: A draft can't be merged; mark it ready for review first.                                                                                                                       |
 
+  Scenario: An Otherwise marked reasoned is the model's at every give-up, asked again each time and never replayed
+    An Otherwise line takes one mark, reasoned, at its end. Pull requests 2 and 1 are drafts, so both waits give up, pull request 2
+    first. A reasoned Otherwise is no chain the planner decides: at each
+    give-up the reasoner is asked, in the step's words with the server's
+    reason, and chooses afresh. Everything else is decided once and replayed.
+    The watch script made from the run asks the reasoner there too, so it
+    needs a reasoner when it runs, and only for that step.
+    Given pull request 2 is a draft on the small GitHub
+    And "acme/rockets" has these issues on the small GitHub
+      | number | title                  | state | author |
+      | 1      | Bump left-pad to 1.0.1 | open  | ada    |
+      | 2      | Bump left-pad to 1.0.2 | open  | ada    |
+    And issue 10 of "acme/rockets" is closed on the small GitHub once issue 1 has a new comment
+    And the file "tell.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label: dependabot
+      ---
+
+      Merge the pull requests labelled {label}, or tell their authors why not.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever a pull request labelled {label} changes `as pr`
+        - Once it can be merged, merge it by squashing.
+          Or give up after 15 seconds.
+          Otherwise, tell its author why it wasn't merged. `reasoned`
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                       | opens | relation     | facts                             |
+      | act   | open issue 10 of acme/rockets               | yes   |              |                                   |
+      | done  |                                             |       |              |                                   |
+      | act   | list the open pull requests of acme/rockets | yes   |              |                                   |
+      | check |                                             |       |              | {"github:labels": ["dependabot"]} |
+      | wait  |                                             |       | github:merge |                                   |
+      | act   | merge it by squashing                       |       |              |                                   |
+      | done  |                                             |       |              |                                   |
+      | check |                                             |       |              | {"state": "closed"}               |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                                    |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10}                  |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}                     |
+      | github:merge      | {"merge_method": "squash"}                                                |
+      | github:comment    | {"body": "Ada, 1.0.2 is still a draft: mark it ready and it will merge."} |
+      | github:comment    | {"body": "Ada, 1.0.1 is still a draft: mark it ready and it will merge."} |
+    When the goal "tell.goal.md" runs with ARTIE, captured in "tell.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And the small GitHub was asked to merge these pull requests, in order
+      | number |
+      | 3      |
+    And issue 2 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                                                          |
+      | ada    | Ada, 1.0.2 is still a draft: mark it ready and it will merge. |
+    And issue 1 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                                                          |
+      | ada    | Ada, 1.0.1 is still a draft: mark it ready and it will merge. |
+    And the planner was asked 8 times
+    And ARTIE's reasoner was asked 5 times
+    And ARTIE's reasoner was last asked to "tell its author why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first."
+    And the capture "tell.trace.yaml" keeps a watch script with a line with "once(\"github:merge\", giveUp = 15.seconds, otherwise = { why ->"
+    And the capture "tell.trace.yaml" keeps a watch script with a line with "act(intent = \"tell its author why it wasn't merged. The wait gave up, and the server says why: ${why ?: \"no reason given\"}\")"
+    And the capture "tell.trace.yaml" keeps a watch script with no line with "Ada, 1.0"
+
   Scenario: A planner that stops while a watch decides ends the run, saying why, rather than looking again
     A failed look is tried again at the next; a decision the planner won't
     make would only be asked again, and again.

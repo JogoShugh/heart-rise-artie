@@ -183,7 +183,11 @@ internal class StepWatch(
         here.once(
             relation,
             giveUp = once.giveUp?.after ?: 10.minutes,
-            otherwise = { why -> intent.otherwise?.let { perform(intent, OTHERWISE, this, why) } },
+            otherwise = { why ->
+                intent.otherwise?.let {
+                    if (it.reasoned) judged(it, this, why, host, moves) else perform(intent, OTHERWISE, this, why)
+                }
+            },
         ) { perform(intent, ACT, this, null) }
     }
 
@@ -445,6 +449,30 @@ private fun gaveUp(why: String?): String? = why?.let {
     "the wait gave up, and the server says why: $it Say that reason in the server's words, and claim nothing the " +
         "watch won't do"
 }
+
+/**
+ * What the reasoner is asked at a reasoned Otherwise: its [words], then why the wait gave up, in the server's words
+ * [why]. The script made from the run writes the same, with its own `why` ([WHY_SLOT]).
+ */
+internal fun gaveUpIntent(words: String, why: String?): String =
+    "${words.trimEnd('.')}. The wait gave up, and the server says why: ${why ?: NO_REASON}"
+
+/**
+ * A reasoned Otherwise at [here]: the reasoner asked, in its words with the server's reason [why], every time;
+ * nothing kept to replay. One decision at a time, as the planner is asked, by the run's [host]; [moves] is told.
+ */
+private fun judged(otherwise: Otherwise, here: Here, why: String?, host: StepWatch.Host, moves: MutableList<String>) =
+    synchronized(host) {
+        val words = gaveUpIntent(host.fill(otherwise.words), why)
+        moves += "otherwise: asked the reasoner, as the step is marked reasoned: $words"
+        here.act(intent = words)
+    }
+
+/** What a reasoned Otherwise is told when the server gave no reason. */
+internal const val NO_REASON = "no reason given"
+
+/** The server's reason, as a script's Otherwise names it, with what it is told when there is none. */
+internal const val WHY_SLOT = "\${why ?: \"$NO_REASON\"}"
 
 /** What the planner is told as it decides [part] of a step, its [words] filled, with the reason a wait gave up. */
 private fun toldActs(part: String, words: String, why: String?): String =

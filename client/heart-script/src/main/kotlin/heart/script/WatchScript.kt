@@ -145,7 +145,16 @@ internal class WatchScript(
     private fun waited(intent: Step.Intent, once: Once, depth: Int) {
         val relation = decided.waits[intent] ?: return out.said(depth, "once ${fill(once.condition)}: not decided")
         val giveUp = once.giveUp?.after?.let { ", giveUp = ${duration(it)}" }.orEmpty()
-        if (decided.acts[intent to OTHERWISE] == null) {
+        val otherwise = intent.otherwise
+        if (otherwise != null && otherwise.reasoned) {
+            // The model's every time: asked in the step's words, with the server's reason.
+            val asked = kotlinString(gaveUpIntent(fill(otherwise.words), WHY_MARK), slots = true)
+            out.line(depth, "once(${quoted(relation)}$giveUp, otherwise = { why ->")
+            out.line(depth + 1, "act(intent = ${asked.replace(WHY_MARK, WHY_SLOT)})")
+            out.line(depth, "}) {")
+            chains.chain(intent, ACT, depth + 1)
+            out.line(depth, "}")
+        } else if (decided.acts[intent to OTHERWISE] == null) {
             out.open(depth, "once(${quoted(relation)}$giveUp)") { chains.chain(intent, ACT, it) }
         } else {
             out.line(depth, "once(${quoted(relation)}$giveUp, otherwise = { why ->")
@@ -162,6 +171,9 @@ internal class WatchScript(
 /** The parts of a step a chain is decided for: its words, and its Otherwise. */
 private const val ACT = "act"
 private const val OTHERWISE = "otherwise"
+
+/** Where the server's reason goes in a reasoned Otherwise's words, until the script's `why` is put there. */
+private const val WHY_MARK = "\u0000why\u0000"
 
 /** Words that are one input alone, `{name}`. */
 private val INPUT = Regex("""\{(\w+)}""")
