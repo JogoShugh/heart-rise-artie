@@ -46,6 +46,11 @@ class LinkRules(
     val drop: List<String>,
     /** The upstream's own links object, as GitHub's pull request carries `_links`: read as links too. */
     val upstreamLinks: String?,
+    /**
+     * By embed path, the only data members an embedded resource keeps, besides its links and what it embeds: the
+     * rest changes with everything that happens to it (a repository's counts and times), and is at its self.
+     */
+    val summaries: Map<String, List<String>> = emptyMap(),
 ) {
     private val patterns = members.map { glob ->
         Regex("^" + glob.split("*").joinToString(".*") { Regex.escape(it) } + "$")
@@ -55,7 +60,11 @@ class LinkRules(
 
     /** These rules, with a resource file's own embeds when it gives any. */
     fun embedding(own: List<String>?): LinkRules =
-        if (own == null) this else LinkRules(members, self, relations, types, apiType, own, drop, upstreamLinks)
+        if (own == null) {
+            this
+        } else {
+            LinkRules(members, self, relations, types, apiType, own, drop, upstreamLinks, summaries)
+        }
 
     companion object {
         fun of(node: JsonNode): LinkRules? {
@@ -71,6 +80,8 @@ class LinkRules(
                 embed = node.path("embed").map { it.asText() },
                 drop = node.path("drop").map { it.asText() },
                 upstreamLinks = node.path("upstream").asText(null),
+                summaries = node.path("summary").properties()
+                    .associate { (path, kept) -> path to kept.map { it.asText() } },
             )
         }
     }
@@ -194,9 +205,10 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
         val names = path.split("/")
         val parent = names.dropLast(1).fold(obj as JsonNode?) { at, name -> at?.get(name) } as? ObjectNode
         val value = parent?.get(names.last())
+        val kept = rules.summaries[path]
         val resources = when (value) {
-            is ObjectNode -> listOfNotNull(embedded(value))
-            is ArrayNode -> value.mapNotNull { (it as? ObjectNode)?.let(::embedded) }
+            is ObjectNode -> listOfNotNull(embedded(summary(value, kept)))
+            is ArrayNode -> value.mapNotNull { (it as? ObjectNode)?.let { one -> embedded(summary(one, kept)) } }
             else -> emptyList()
         }
         if (resources.isNotEmpty()) parent?.remove(names.last())
@@ -205,6 +217,20 @@ class LinkLifter(private val rules: LinkRules, private val writer: LinkWriter, p
             value is ArrayNode -> resources
             else -> resources.single()
         }
+    }
+
+    /**
+     * [value] with only the data members [kept] names, its links and what it embeds staying; [value] itself when
+     * [kept] is null, as for every embed the connector gives no summary.
+     */
+    private fun summary(value: ObjectNode, kept: List<String>?): ObjectNode {
+        if (kept == null) return value
+        val nested = rules.embed.map { it.substringBefore('/') }.toSet()
+        val gone = value.fieldNames().asSequence().filterNot { name ->
+            name in kept || name in nested || name == rules.self || name == rules.upstreamLinks || rules.isLink(name)
+        }.toList()
+        value.remove(gone)
+        return value
     }
 
     /** An embedded resource object: its own state, links and embedded ones, and its self link. None without self. */

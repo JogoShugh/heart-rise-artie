@@ -80,6 +80,13 @@ links:
           requested_reviewers, head/user, head/repo, base/user, base/repo, author, committer,
           parent, source, template_repository, repository, organization, pull_request,
           performed_via_github_app, auto_merge/enabled_by, license, code_of_conduct, commit]
+  # What a repository embedded in another resource keeps, besides its links and its owner: what names it. Its
+  # counts and times (open_issues, pushed_at) change with everything that happens in it, and would change every
+  # pull request with them; they are at its self, one link away.
+  summary:
+    base/repo: &repository [id, node_id, name, full_name, private, fork, default_branch]
+    head/repo: *repository
+    repository: *repository
 # GitHub reads the gateway passes through without modelling them (spec/PLAN-GATEWAY-URL-LINKS.md): served at
 # GitHub's own path, as the caller, links lifted, no forms; a list as a HEART collection, each member titled
 # by its pointer. Links to them are named after the member they were (github:followers). No other GitHub

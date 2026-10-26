@@ -88,6 +88,14 @@ class LinkSteps(private val github: GitHubSteps) {
         }
     }
 
+    @Then("the embedded {string} keeps only these members")
+    fun embeddedKeeps(relation: String, table: DataTable) {
+        val embedded = answer.path("_embedded").path(relation)
+        assertTrue(embedded.isObject, "no $relation in ${answer.path("_embedded")}")
+        val kept = table.asMaps().map { it.getValue("member") }.toSet()
+        assertEquals(kept, embedded.fieldNames().asSequence().filterNot { it.startsWith("_") }.toSet(), "$embedded")
+    }
+
     @Then("the embedded {string} keeps only these members of each of its {string}")
     fun embeddedItemsKeep(relation: String, list: String, table: DataTable) {
         val items = answer.path("_embedded").path(relation).path(list)

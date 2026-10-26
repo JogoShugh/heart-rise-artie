@@ -91,6 +91,30 @@ Feature: GitHub's link members become HEART links: through the gateway where it 
       | head   |
       | base   |
 
+  Scenario: A repository embedded in a pull request keeps what names it; its counts and times are at its own address
+    GitHub puts the whole repository in each pull request, counts and times
+    included: open_issues changes whenever any issue or pull request opens,
+    pushed_at whenever any branch is pushed. Embedded whole, every pull
+    request would change with everything that happens in its repository,
+    and a client watching for changes would see each one change again and
+    again. The connector names what an embedded repository keeps; the rest
+    is one link away, at its self.
+    When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    Then the GitHub gateway answers 200
+    And the embedded "github:base-repo" keeps only these members
+      | member         |
+      | id             |
+      | node_id        |
+      | name           |
+      | full_name      |
+      | private        |
+      | fork           |
+      | default_branch |
+    And the answer embeds "github:base-repo" with its self at "/repos/acme/rockets" and these links
+      | relation     | href                                  | type      |
+      | alternate    | https://github.com/acme/rockets       | text/html |
+      | github:clone | https://github.com/acme/rockets.git   |           |
+
   Scenario: GitHub's own _links on a pull request become links too, and a template is never taken for a served path
     GitHub's review_comment template, .../pulls/comments{/number}, would look
     like the pull request read's path once its expression is set aside; a
