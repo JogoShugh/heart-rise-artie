@@ -38,6 +38,10 @@ metrics; each stop gets one short proof from a live run, never a trace dump or a
 5. **The gateway: from a bag of endpoints to controls in the answer.** The hinge of the piece, given room of its own,
    with one diagram: OpenAPI operations on the left, the connector's YAML in the middle, a pull request's HEART
    representation on the right, its offered forms changing with its state.
+   - **Scope, said once, then kept.** GitHub's description has 1,242 operations; the connector reads 32 of them
+     (pull requests, issues, comments, repositories, branches). The detail covers only what the merge watch
+     touches: the repository, the watch issue, the pull request list and one pull request, and its two acts, merge
+     and comment. Five forms in the lock file, one link. Everything below is shown on that slice.
    - **What it starts from.** GitHub's own OpenAPI description: a catalogue of operations, each a method, a path and
      a request schema, true in every state. It says what can be called, never what may be done now. Only the
      operations the connector names are read (`connector.yaml`, `include`).
