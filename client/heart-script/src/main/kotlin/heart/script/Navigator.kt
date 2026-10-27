@@ -67,6 +67,11 @@ class Pins(
     val rung: String? = null,
     val forms: Map<String, FormPin> = emptyMap(),
     val links: Map<String, String> = emptyMap(),
+    /**
+     * The digest of every form the server declared when the lock file was written, from its index's manifest
+     * (spec/ideas/off-the-rails.md): what look-then-leap compares when it looks at everything. Null when not kept.
+     */
+    val digest: String? = null,
 )
 
 /**
@@ -285,4 +290,9 @@ class Guarding(
      * given for the resource, or "none", a blind write, which only a server's development switch takes.
      */
     val validators: String? = null,
+    /**
+     * What look-then-leap's one look compares (spec/ideas/off-the-rails.md): "used" (the default), each form the
+     * lock file pins, or "everything", the digest of every form the server declares.
+     */
+    val look: String? = null,
 )

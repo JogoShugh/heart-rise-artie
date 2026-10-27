@@ -35,7 +35,12 @@ class ArtieNavigatorProvider : NavigatorProvider {
             val rung = settings.rung?.let(Rung::valueOf) ?: Rung.L0
             val guarding = settings.guarding
             val guard = settings.pins?.let {
-                ScriptGuard(it, strict = guarding.guard == "strict", values = guarding.onChange == "values")
+                ScriptGuard(
+                    it,
+                    strict = guarding.guard == "strict",
+                    values = guarding.onChange == "values",
+                    everything = guarding.look == "everything",
+                )
             }
             val credentials = CredentialSources.standard(env, userHome)
             val log = if (settings.exchanges) ExchangeLog(HttpTransport()) else null

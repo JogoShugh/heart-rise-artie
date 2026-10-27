@@ -65,7 +65,11 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     /** The scenario's lock file and how it is held to (script-guard.feature); null when the run is not guarded. */
     private fun guard(): heart.ScriptGuard? = ctx.pins?.let { pins ->
         val forms = pins.mapValues { (_, pin) -> heart.script.FormPin(pin.first, listOfNotNull(pin.second)) }
-        heart.ScriptGuard(heart.script.Pins(forms = forms, links = ctx.linkPins), strict = ctx.guard == "strict")
+        heart.ScriptGuard(
+            heart.script.Pins(forms = forms, links = ctx.linkPins, digest = ctx.digest),
+            strict = ctx.guard == "strict",
+            everything = ctx.lookEverything,
+        )
     }
 
     private fun runs(script: String, navigator: ArtieNavigator) {

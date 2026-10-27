@@ -15,17 +15,20 @@ import kotlinx.serialization.json.JsonObject
  * script sends fits its new schema. [strict]: the set must also be one recorded for it, and an unpinned relation
  * is refused. Bytes are checked against their links' integrity as always (Rule 2), whatever the mode.
  */
-class ScriptGuard(private val pins: Pins, val strict: Boolean, val values: Boolean = false) {
+class ScriptGuard(
+    private val pins: Pins,
+    val strict: Boolean,
+    val values: Boolean = false,
+    /** Whether look-then-leap's one look compares every form the server declares, not only those pinned. */
+    private val everything: Boolean = false,
+) {
     val mode: String get() = if (strict) "strict" else "lenient"
 
     /**
-     * Whether every form [held] offers that the lock file pins has its pinned integrity: look-then-leap's one look
-     * (spec/ideas/off-the-rails.md), at the entry.
+     * Look-then-leap's one look (spec/ideas/off-the-rails.md), at the [entry]'s manifest of the server's forms:
+     * whether the run leaves the rails, and what it says of it.
      */
-    fun unchanged(held: HeartRepresentation?): Boolean = held != null && held.affordances.keys.all { rel ->
-        val pinned = pins.forms[rel]?.integrity
-        pinned == null || pinned == held.affordance(rel)?.integrity
-    }
+    fun look(entry: HeartRepresentation?): Pair<Boolean, String> = LookThenLeap(pins, everything).look(entry)
 
     /** Why the form [rel] of [held] may not be used to send [sent], by the lock file; null when it may. */
     fun refusal(held: HeartRepresentation?, rel: String, sent: JsonObject = NOTHING): Answer.Refused? {

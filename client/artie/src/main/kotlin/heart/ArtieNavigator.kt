@@ -59,8 +59,10 @@ class ArtieNavigator(
     /** The entry; for look-then-leap, its one look: the entry's forms as pinned, the run leaves the rails. */
     override fun enter(entry: String): Answer = answer("entry") { client.enter(entry) }.also {
         if (guarding == LOOK_THEN_LEAP) {
-            offRails = guard?.unchanged(client.current) == true
-            entered = if (offRails) LEAPT else STAYED
+            guard?.look(client.current)?.let { (leaps, said) ->
+                offRails = leaps
+                entered = said
+            }
         }
     }
 
@@ -165,12 +167,6 @@ class ArtieNavigator(
 /** The guards a run may name (spec/ideas/off-the-rails.md), beyond lenient and strict. */
 const val OFF_THE_RAILS = "off-the-rails"
 const val LOOK_THEN_LEAP = "look-then-leap"
-
-/** What look-then-leap's one look says, either way. */
-private const val LEAPT =
-    "Look then leap: the entry's forms are as the lock file pins them, so the run leaves the rails."
-private const val STAYED =
-    "Look then leap: the entry's forms changed since the lock file, so the run stays lenient."
 
 /** What [client]'s [select] came to, as the DSL's answer: what it holds, or why it was refused. */
 private fun answered(client: HeartRiseClient, what: String, select: () -> HeartRepresentation): Answer = try {

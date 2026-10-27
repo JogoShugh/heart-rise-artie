@@ -26,6 +26,16 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
         ctx.pins = bookmark() + (relation to (pinnedForm to if (set == "changed") CHANGED else setNow))
     }
 
+    @Given("ARTIE looks at everything, the lock file recording the server's digest {}")
+    fun looksAtEverything(digest: String) {
+        ctx.lookEverything = true
+        ctx.digest = when (digest) {
+            "as served" -> read("/").getValue("hr:manifest").jsonObject.getValue("digest").jsonPrimitive.content
+            "changed" -> CHANGED
+            else -> null
+        }
+    }
+
     @Given("ARTIE runs with the guard {string}")
     fun runsWith(guard: String) {
         ctx.guard = guard

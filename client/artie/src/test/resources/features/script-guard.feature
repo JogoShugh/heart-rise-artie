@@ -40,11 +40,13 @@ Feature: A script's lock file guards each act before ARTIE sends it
       | strict  | as offered | as offered | finished                      | closed |
       | off-the-rails | changed | as offered | finished                 | closed |
 
-  Scenario: Look then leap: the entry's forms as pinned, the run leaves the rails; a changed form further on isn't looked at
-    spec/ideas/off-the-rails.md. One look, at the entry: when its forms are
-    as the lock file pins them, the run leaves the rails, and says so, so a
-    reader knows which way it went.
-    Given ARTIE guards the run "look-then-leap", pinning "github:close" to its form "changed" in a set "as offered"
+  Scenario Outline: Look then leap: one look, at every form the script uses, here the close form <close>
+    spec/ideas/off-the-rails.md. One look, at the entry's manifest of every
+    form the server declares: when each form the lock file pins is there with
+    its pinned integrity, the run leaves the rails. A form changed further on,
+    past the entry, is seen too, and the run stays lenient. Either way it says
+    so, so a reader knows which way it went.
+    Given ARTIE guards the run "look-then-leap", pinning "github:close" to its form "<close>" in a set "as offered"
     When this script runs with ARTIE
       """kotlin
       heart("https://github.gateway.test/") {
@@ -52,11 +54,16 @@ Feature: A script's lock file guards each act before ARTIE sends it
           act("github:close")
       }
       """
-    Then the run finished
-    And issue 10 of "acme/rockets" is now "closed" on the small GitHub
+    Then the run <ends>
+    And issue 10 of "acme/rockets" is now "<state>" on the small GitHub
     And the run noted
-      | note                                                                                             |
-      | Look then leap: the entry's forms are as the lock file pins them, so the run leaves the rails.  |
+      | note   |
+      | <note> |
+
+    Examples:
+      | close      | ends                               | state  | note                                                                                                   |
+      | as offered | finished                           | closed | Look then leap: every form the script uses is as the lock file pins it, so the run leaves the rails.  |
+      | changed    | was stopped at step 2 by its guard | open   | Look then leap: github:close changed since the lock file, so the run stays lenient.                    |
 
   Scenario: Look then leap: a form at the entry changed, the run stays lenient, and its guard refuses that form
     Given ARTIE guards the run "look-then-leap", the entry's "github:issues-get" pinned as it was before a change
@@ -70,8 +77,33 @@ Feature: A script's lock file guards each act before ARTIE sends it
     Then the run was stopped at step 1 by its guard
     And issue 10 of "acme/rockets" is now "open" on the small GitHub
     And the run noted
-      | note                                                                                |
-      | Look then leap: the entry's forms changed since the lock file, so the run stays lenient. |
+      | note                                                                                     |
+      | Look then leap: github:issues-get changed since the lock file, so the run stays lenient. |
+
+  Scenario Outline: Look then leap at everything: the server's digest <digest>
+    --look everything: the one look compares the digest of every form the
+    server declares with the one the lock file recorded. Any change, to any
+    form, even one the script never uses, keeps the run lenient.
+    Given ARTIE guards the run "look-then-leap", pinning "github:close" to its form "as offered" in a set "as offered"
+    And ARTIE looks at everything, the lock file recording the server's digest <digest>
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run finished
+    And issue 10 of "acme/rockets" is now "closed" on the small GitHub
+    And the run noted
+      | note   |
+      | <note> |
+
+    Examples:
+      | digest    | note                                                                                                               |
+      | as served | Look then leap: every form the server declares is as when the lock file was written, so the run leaves the rails. |
+      | changed   | Look then leap: the server's forms changed since the lock file was written, so the run stays lenient.             |
+      | not kept  | Look then leap: the lock file records no digest of the server's forms, so the run stays lenient.                  |
 
   Scenario: Lenient, past an unchanged form in a changed set: the capture warns, naming both sets
     spec/ideas/replay-guards-lenient-strict.md, the open item, decided: a
