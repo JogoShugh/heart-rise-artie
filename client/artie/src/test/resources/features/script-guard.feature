@@ -42,7 +42,8 @@ Feature: A script's lock file guards each act before ARTIE sends it
 
   Scenario: Look then leap: the entry's forms as pinned, the run leaves the rails; a changed form further on isn't looked at
     spec/ideas/off-the-rails.md. One look, at the entry: when its forms are
-    as the lock file pins them, the run leaves the rails.
+    as the lock file pins them, the run leaves the rails, and says so, so a
+    reader knows which way it went.
     Given ARTIE guards the run "look-then-leap", pinning "github:close" to its form "changed" in a set "as offered"
     When this script runs with ARTIE
       """kotlin
@@ -53,6 +54,9 @@ Feature: A script's lock file guards each act before ARTIE sends it
       """
     Then the run finished
     And issue 10 of "acme/rockets" is now "closed" on the small GitHub
+    And the run noted
+      | note                                                                                             |
+      | Look then leap: the entry's forms are as the lock file pins them, so the run leaves the rails.  |
 
   Scenario: Look then leap: a form at the entry changed, the run stays lenient, and its guard refuses that form
     Given ARTIE guards the run "look-then-leap", the entry's "github:issues-get" pinned as it was before a change
@@ -65,6 +69,9 @@ Feature: A script's lock file guards each act before ARTIE sends it
       """
     Then the run was stopped at step 1 by its guard
     And issue 10 of "acme/rockets" is now "open" on the small GitHub
+    And the run noted
+      | note                                                                                |
+      | Look then leap: the entry's forms changed since the lock file, so the run stays lenient. |
 
   Scenario: Lenient, past an unchanged form in a changed set: the capture warns, naming both sets
     spec/ideas/replay-guards-lenient-strict.md, the open item, decided: a

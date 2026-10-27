@@ -154,6 +154,8 @@ internal class TracingNavigator(private val inner: Navigator, private val run: R
     override fun enter(entry: String): Answer =
         traced({ TraceStep.Asked("enter {entry}", mapOf("entry" to entry)) }) { inner.enter(entry) }
 
+    override val entered: String? get() = inner.entered
+
     override fun act(rel: String, fields: Map<String, Any?>): Answer =
         traced({ actAsked(rel, fields) }) { inner.act(rel, fields) }
 

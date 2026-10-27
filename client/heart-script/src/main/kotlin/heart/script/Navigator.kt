@@ -150,6 +150,12 @@ interface Navigator {
     /** The entry's representation: the only address a script knows. */
     fun enter(entry: String): Answer
 
+    /**
+     * What the client says of the entry once entered, for the run's notes: look-then-leap's one look, and which
+     * way it went (spec/ideas/off-the-rails.md). Null when it says nothing.
+     */
+    val entered: String? get() = null
+
     /** Select the form [rel], with [fields]: the client knows whether it reads or acts. */
     fun act(rel: String, fields: Map<String, Any?>): Answer
 

@@ -25,7 +25,7 @@ fun heart(entry: String, block: Here.() -> Unit) {
     val at = run.entry ?: entry
     val entered = arrived(0, at, navigator.enter(at))
     run.trace.lastOrNull()?.opens = true
-    Here(navigator, run, entered).block()
+    Here(navigator, run, entered).apply { navigator.entered?.let(::note) }.block()
 }
 
 /**
