@@ -35,9 +35,37 @@ metrics; each stop gets one short proof from a live run, never a trace dump or a
    - The point: bare is safe exactly where the service enforces its own rules, and only there. A rule the service
      lacks (here, "up to date before merge", which this repository doesn't require) is nobody's.
    - The table: when bare makes sense, when it is inherently risky.
-5. **Your own gateway: the rule GitHub doesn't have.** The gateway reads GitHub's compare and holds merge back while
-   the branch is behind, with a reason. One rule, in one place, for every client. ("Little control of GitHub? Your
-   own gateway.")
+5. **The gateway: from a bag of endpoints to controls in the answer.** The hinge of the piece, given room of its own,
+   with one diagram: OpenAPI operations on the left, the connector's YAML in the middle, a pull request's HEART
+   representation on the right, its offered forms changing with its state.
+   - **What it starts from.** GitHub's own OpenAPI description: a catalogue of operations, each a method, a path and
+     a request schema, true in every state. It says what can be called, never what may be done now. Only the
+     operations the connector names are read (`connector.yaml`, `include`).
+   - **Resources, not operations** (`pull.resource.yaml`). Which operation reads one pull request, which lists them,
+     which address it lives at. Each act is a projection of one operation, given a name: `merge` is `pulls/merge`
+     with three of its fields; `comment` is `issues/create-comment`. Each form's schema is cut from the operation's
+     request body, so it is GitHub's own, and content-addressed, so a client can pin it.
+   - **Values bound from state.** A field the client shouldn't have to know is filled from what it holds: `merge`
+     binds `sha` to `/head/sha`, so GitHub's own check that the head hasn't moved becomes part of the act; the
+     client never sends it.
+   - **What may be done now** (`pull.reader.yaml`). GitHub's answer says nothing about what is allowed, so the reader
+     says it: by state first (open, closed), then by ordered rules over several members, each making an act absent
+     with a reason: a draft, GitHub still checking, conflicts, blocked by protection, no push permission. A rule may
+     read a fact from another of GitHub's answers: whether the caller can push is on the repository, not the pull
+     request.
+   - **Links, not URLs.** GitHub's `*_url` members and `_links` become HEART links and leave the state; nested users,
+     labels and repositories are embedded resources of their own. Links into the API the gateway serves point back
+     at the gateway.
+   - **HTTP's own safety, added.** Every representation has an ETag; every act needs `If-Match`; a change since it
+     was read is a 412, not a lost write. GitHub's refusals are mapped to HEART's: its 405 "can't merge now" is the
+     act not offered (409, with the reason), its 409 "head moved" is stale (412). Members GitHub works out by itself
+     (`mergeable`) don't make a client's view stale. Reads upstream are revalidated with `If-None-Match`.
+   - **Configuration only.** No code per API: the same gateway, with another connector folder, fronts another
+     service. A client written for HEART, ARTIE or another, works with every one.
+   - **Then, the rule GitHub doesn't have.** The proof of the stop: the reader adds one fact, GitHub's compare of the
+     base with the head, and one rule: while the branch is behind, merge is absent, "The branch is behind its base;
+     update it first." One rule, in one place, for every client. ("Little control of GitHub? Automate it from your
+     laptop with your own gateway.")
 6. **Off the rails: controls arrive.** The same words, through the gateway, the client trusting. The behind pull
    request is held back, and its author is told why, in the gateway's words. The server guards even a trusting
    client. A wait is the task's, so even off the rails the watch sees someone close it.
@@ -64,7 +92,9 @@ metrics; each stop gets one short proof from a live run, never a trace dump or a
 
 - Bare comes first, not last: the climb goes up from it, adding hypermedia stop by stop.
 - The safety scene is "behind its base": real, live, and the gap between GitHub's rules and the gateway's.
-- A stop of its own for the gateway's own rule, the pitch for running one's own gateway.
+- A stop of its own for the gateway: how it turns an OpenAPI description into state-based controls (resources,
+  acts as projections of operations, values bound from state, rules with reasons, facts, links, ETags and mapped
+  refusals), ending on its own rule, the pitch for running one's own gateway.
 - Look then leap now looks at every form the server declares, used or everything, not only the entry's.
 - Model calls stay out of the stops: one sentence in the table and the closing, as the explainer memory asks.
 - The opening gains the "scale of decades" quote and the five R's.
