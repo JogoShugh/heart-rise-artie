@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
  * The index ignores `Prefer`: its forms are inline at every rung.
  */
 class ServiceIndex(
-    types: List<ResourceType<*, *>>,
+    private val types: List<ResourceType<*, *>>,
     title: String? = null,
     /**
      * Where the binding serves the OpenAPI description, if it does: linked
@@ -53,11 +53,9 @@ class ServiceIndex(
 
     fun homeValidator(maxRung: Rung): String = "\"index-home-${ContentAddress.address(home(maxRung))}\""
 
-    private fun schemaFormsIndex(): Map<String, Any> = mapOf(
-        "title" to title,
-        "_links" to links() + ("curies" to found.flatMap { it.profile.curies }.distinct()),
+    private fun schemaFormsIndex(): Map<String, Any> {
         // HAL-SCHEMA-FORMS-HR Rules 6 and 7: keyed by relation, and self-describing.
-        "_forms" to found.flatMap { type ->
+        val forms = found.flatMap { type ->
             val finding = checkNotNull(type.finding)
             val forms = FindingForms(type)
             listOf(
@@ -66,8 +64,14 @@ class ServiceIndex(
                 type.profile.key(finding.lookup.relation) to
                     schemaForm(type, forms.lookupTarget, finding.lookup.relation, forms.lookupSchema),
             ) + type.bookmarkActs.map { type.profile.key(it.relation) to actForm(type, it) }
-        }.toMap(),
-    )
+        }.toMap()
+        return mapOf(
+            "title" to title,
+            "_links" to links() + ("curies" to found.flatMap { it.profile.curies }.distinct()),
+            "_forms" to forms,
+            MANIFEST to manifest(forms, types),
+        )
+    }
 
     /** The type that declares the index's act at [path], if any, and the act. */
     fun actAt(path: String): Pair<ResourceType<*, *>, Act>? =
@@ -168,6 +172,23 @@ private fun actForm(type: ResourceType<*, *>, act: Act): Map<String, Any> {
 
 /** HAL-SCHEMA-FORMS-HR Rule 10: a form's own integrity. */
 private const val FORM_INTEGRITY = "hr:integrity"
+
+/** Every form the server declares, by relation, with a digest of them all (spec/ideas/off-the-rails.md). */
+private const val MANIFEST = "hr:manifest"
+
+/**
+ * The index's manifest: by relation, the integrity of each form the server can offer, the index's own [forms] and
+ * every one of [types]' acts, sorted; and the integrity of that list in canonical form, which changes when any
+ * form does. All of it is known from the declarations, with nothing read.
+ */
+private fun manifest(forms: Map<String, Map<String, Any>>, types: List<ResourceType<*, *>>): Map<String, Any> {
+    val listed = (forms.map { (rel, form) -> rel to form.getValue(FORM_INTEGRITY) as String } +
+        types.flatMap { Layers(it).formIntegrities.toList() })
+        .groupBy({ it.first }, { it.second })
+        .mapValues { (_, integrities) -> integrities.distinct().sorted() }
+        .toSortedMap()
+    return mapOf("forms" to listed, "digest" to ContentAddress.integrity(ContentAddress.canonical(listed)))
+}
 
 /** SPEC §6.11.1: the index as a JSON Home document, for the types that can be found. */
 internal class HomeDocument(

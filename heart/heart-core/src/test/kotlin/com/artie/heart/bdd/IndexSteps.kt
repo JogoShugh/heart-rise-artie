@@ -73,6 +73,29 @@ class IndexSteps(private val world: LampWorld) {
         }
     }
 
+    @Then("its manifest lists, for each relation, the integrity of the form served for it")
+    fun manifestLists(table: DataTable) {
+        val forms = json.path("hr:manifest").path("forms")
+        val sets = world.layers.affordanceSets.values.map { mapper.readTree(it).path("_forms") }
+        table.asMaps().forEach { row ->
+            val rel = row.getValue("relation")
+            val served = if (row.getValue("served by") == "the index") {
+                json.path("_forms").path(rel).path("hr:integrity").asText(null)
+            } else {
+                sets.firstNotNullOfOrNull { it.path(rel).path("hr:integrity").asText(null) }
+            }
+            assertEquals(listOf(served), forms.path(rel).map { it.asText() }, rel)
+        }
+        assertEquals(table.asMaps().size, forms.size(), "manifest: $forms")
+    }
+
+    @Then("the manifest's digest is the integrity of its forms, in canonical form")
+    fun manifestDigest() {
+        val manifest = json.path("hr:manifest")
+        val forms = JsonTrees.plain(manifest.path("forms").toString())
+        assertEquals(ContentAddress.integrity(ContentAddress.canonical(forms)), manifest.path("digest").asText(null))
+    }
+
     private fun getForm(key: String, target: String, field: String) {
         val form = json.path("_forms").path(key)
         assertEquals("GET", form.path("method").asText())

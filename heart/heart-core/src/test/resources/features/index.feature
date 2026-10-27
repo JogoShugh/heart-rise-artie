@@ -29,6 +29,25 @@ Feature: The service index, the home document and search pages, from the declara
       | home:search-lamps |
       | home:get-lamp     |
 
+  Scenario: The index lists every form the server declares, with its integrity, and a digest of them all
+    spec/ideas/off-the-rails.md, look then leap. A client's one look at the
+    entry should see whether any form it will use has changed, not only the
+    entry's own. Forms are declared, not made from a resource's state: each
+    one's integrity is known when the server starts, with nothing read. The
+    index lists, by relation, the integrity of every form the server can
+    offer, the index's own and every type's acts, and a digest over that
+    list: one value that changes when any form does.
+    When the service index is rendered in HAL Schema Forms
+    Then its manifest lists, for each relation, the integrity of the form served for it
+      | relation          | served by                    |
+      | home:search-lamps | the index                    |
+      | home:get-lamp     | the index                    |
+      | home:install-lamp | the index                    |
+      | home:switch-on    | a lamp's set of forms        |
+      | home:switch-off   | a lamp's set of forms        |
+      | home:dim          | a lamp's set of forms        |
+    And the manifest's digest is the integrity of its forms, in canonical form
+
   Scenario: In HAL-FORMS, the same two forms are GET templates whose fields go in the query
     When the service index is rendered in HAL-FORMS
     Then it offers these GET templates

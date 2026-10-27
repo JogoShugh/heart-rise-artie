@@ -35,6 +35,16 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
     /** Address -> canonical affordance set, for `/affordance-sets/{address}`. It grows as open keys are met. */
     val affordanceSets: Map<String, String> get() = content.affordanceSets
 
+    /**
+     * Each of the type's acts' forms' integrity, by relation, as every set serves it: known from the declaration,
+     * with no resource read, for the index's manifest (spec/ideas/off-the-rails.md, look then leap).
+     */
+    val formIntegrities: Map<String, String> by lazy {
+        type.acts.associate { act ->
+            type.profile.key(act.relation) to form(act, false).getValue(FORM_INTEGRITY) as String
+        }
+    }
+
     /** The acts [key] offers, by name, in order. */
     fun offered(key: K): List<String> = type.offers.offered(content.known(key))
 
