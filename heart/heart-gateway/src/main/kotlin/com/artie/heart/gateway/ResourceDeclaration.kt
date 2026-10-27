@@ -89,8 +89,12 @@ class ResourceDeclaration(
                 facts = node.path("facts").fields().asSequence().associate { (name, fact) ->
                     name to FactDeclaration(
                         checkNotNull(fact.path("operation").asText(null)) { "$label: fact $name has no operation" },
-                        fact.path("pointers").fields().asSequence()
-                            .associate { (variable, at) -> variable to pointer(label, at.asText()).toString() },
+                        fact.path("pointers").fields().asSequence().associate { (variable, at) ->
+                            val text = at.asText()
+                            // A value of several members, as GitHub's compare takes BASE...HEAD, is a template.
+                            FactDeclaration.MEMBER.findAll(text).forEach { pointer(label, it.groupValues[1]) }
+                            variable to if ('{' in text) text else pointer(label, text).toString()
+                        },
                     )
                 },
                 skip = Condition.all(node.path("skip")),
@@ -127,6 +131,18 @@ class SearchedBy(val filter: String, val operation: OperationId, val keep: List<
 /**
  * Another answer a resource's rules read: the [operation] that gives it, its
  * path filled from the resource's state by [pointers]. GitHub says whether
- * the caller may push not on a pull request but on its repository.
+ * the caller may push not on a pull request but on its repository. A pointer
+ * may be a template of several, each in braces: `{/base/ref}...{/head/sha}`.
  */
-class FactDeclaration(val operation: OperationId, val pointers: Map<String, StatePointer>)
+class FactDeclaration(val operation: OperationId, val pointers: Map<String, StatePointer>) {
+
+    /** Each of the path's variables, as [state] fills it. */
+    fun values(state: JsonNode): Map<String, String> = pointers.mapValues { (_, at) ->
+        if ('{' in at) MEMBER.replace(at) { state.at(it.groupValues[1]).asText() } else state.at(at).asText()
+    }
+
+    companion object {
+        /** A member of the state, named by its pointer in braces, in a template. */
+        val MEMBER = Regex("""\{(/[^}]*)\}""")
+    }
+}

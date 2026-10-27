@@ -39,6 +39,9 @@ allowed:
     # check; with none required, a branch behind its base is clean (seen live, 2026-10-16).
     - when: { /mergeable_state: behind }
       absent: { merge: "The branch is behind its base; update it first." }
+    # Without that protection, the gateway's own rule: GitHub's compare says the base has commits the branch lacks.
+    - when: { /state: open, "compare:/behind_by": { not: 0 } }
+      absent: { merge: "The branch is behind its base; update it first." }
     - when: { /mergeable_state: dirty }
       absent:
         merge: "The branch has conflicts with its base; resolve them first."

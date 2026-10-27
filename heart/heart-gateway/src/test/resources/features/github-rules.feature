@@ -77,6 +77,35 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | dirty           | The branch has conflicts with its base; resolve them first.                |
       | blocked         | Branch protection blocks the merge: a required check or review is missing. |
 
+  Scenario: A branch behind its base can't be merged, though GitHub says it is clean, until it is updated
+    GitHub says behind only when the base's branch protection asks for
+    up-to-date branches; without that, a branch behind its base is clean,
+    and GitHub merges it. The gateway asks GitHub's compare whether the base
+    has commits the branch lacks, and holds merge back until the branch is
+    updated: a rule of its own that GitHub doesn't have.
+    Given pull request 482's branch is behind its base
+    When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    Then the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
+      | github:comment        |
+    And the GitHub gateway says these acts are absent, and why
+      | act          | reason                                          |
+      | github:merge | The branch is behind its base; update it first. |
+    When the client sends "github:update-branch" with {} and the ETag it holds
+    And a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    Then the GitHub gateway offers
+      | act                   |
+      | github:close          |
+      | github:merge          |
+      | github:edit           |
+      | github:request-review |
+      | github:update-branch  |
+      | github:comment        |
+
   Scenario: A caller who can't push to the repository is offered nothing, from the repository's own answer
     GitHub's example pull request is locked, so a caller without push access
     may not comment on it either.

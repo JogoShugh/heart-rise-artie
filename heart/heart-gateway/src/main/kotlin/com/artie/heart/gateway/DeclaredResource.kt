@@ -175,7 +175,7 @@ internal class DeclaredResource(
     /** The answers the file's facts name, each read at its operation's path, filled from [state]. */
     private fun facts(state: JsonNode): Map<String, UpstreamBody> = declared.facts.mapValues { (_, fact) ->
         val route = spec.route(fact.operation)
-        calls.get(ItemPath.fill(route.path, fact.pointers.mapValues { (_, at) -> state.at(at).asText() })).body
+        calls.get(ItemPath.fill(route.path, fact.values(state))).body
     }
 
     /** An act's schema: the operation body's properties the client fills, and nothing else. */

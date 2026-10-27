@@ -210,6 +210,12 @@ class GitHubUpstream {
                 json(Response(Status.OK), body(pull))
             } ?: Response(Status.NOT_FOUND)
         },
+        // As GitHub's compare does, for BASE...HEAD where HEAD is a pull request's head: how far each is ahead.
+        "/repos/{owner}/{repo}/compare/{basehead}" bind Method.GET to { request ->
+            val head = request.path("basehead")?.substringAfter("...")
+            pulls.firstOrNull { it.owner == request.path("owner") && it.repo == request.path("repo") && it.head == head }
+                ?.let { json(Response(Status.OK), comparison(it)) } ?: Response(Status.NOT_FOUND)
+        },
         "/repos/{owner}/{repo}/pulls/{number}/requested_reviewers" bind Method.POST to { request ->
             pull(request)?.let { requestReviews(it, request) } ?: Response(Status.NOT_FOUND)
         },
@@ -615,6 +621,17 @@ class GitHubUpstream {
     private fun pull(request: Request): Pull? = pulls.firstOrNull {
         it.owner == request.path("owner") && it.repo == request.path("repo") &&
             it.number.toString() == request.path("number")
+    }
+
+    /** GitHub's comparison of [pull]'s base with its head: behind by one when the base has a commit the branch lacks. */
+    private fun comparison(pull: Pull): Map<String, Any> {
+        val behindBy = if (pull.behind) 1 else 0
+        return mapOf(
+            "status" to if (pull.behind) "diverged" else "ahead",
+            "ahead_by" to 1,
+            "behind_by" to behindBy,
+            "total_commits" to 1,
+        )
     }
 
     private fun message(status: Status, message: String): Response = json(Response(status), mapOf("message" to message))

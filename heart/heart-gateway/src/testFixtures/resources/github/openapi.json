@@ -12199,6 +12199,69 @@
      "subcategory": "repos"
     }
    }
+  },
+  "/repos/{owner}/{repo}/compare/{basehead}": {
+   "get": {
+    "description": "Compares two commits against one another.",
+    "operationId": "repos/compare-commits",
+    "parameters": [
+     {
+      "$ref": "#/components/parameters/owner"
+     },
+     {
+      "$ref": "#/components/parameters/repo"
+     },
+     {
+      "name": "basehead",
+      "description": "The base branch and head branch to compare. This parameter expects the format `BASE...HEAD`. Both must be branch names in `repo`. To compare with a branch that exists in a different repository in the same network as `repo`, the `basehead` parameter expects the format `USERNAME:BASE...USERNAME:HEAD`.",
+      "in": "path",
+      "required": true,
+      "x-multi-segment": true,
+      "schema": {
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "object",
+         "properties": {
+          "status": {
+           "type": "string",
+           "enum": [
+            "diverged",
+            "ahead",
+            "behind",
+            "identical"
+           ]
+          },
+          "ahead_by": {
+           "type": "integer"
+          },
+          "behind_by": {
+           "type": "integer"
+          },
+          "total_commits": {
+           "type": "integer"
+          }
+         }
+        }
+       }
+      }
+     },
+     "404": {
+      "$ref": "#/components/responses/not_found"
+     }
+    },
+    "summary": "Compare two commits",
+    "tags": [
+     "repos"
+    ]
+   }
   }
  },
  "servers": [

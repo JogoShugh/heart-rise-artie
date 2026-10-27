@@ -72,6 +72,13 @@ facts:
     pointers:
       owner: /base/repo/owner/login
       repo: /base/repo/name
+  # GitHub's compare of the base branch with the head: behind_by counts the base's commits the branch lacks.
+  compare:
+    operation: repos/compare-commits
+    pointers:
+      owner: /base/repo/owner/login
+      repo: /base/repo/name
+      basehead: "{/base/ref}...{/head/sha}"
 # Members GitHub works out by itself, in the background, with no write: a new pull request reads
 # "mergeable": null, then true a second later. They don't make the state an act was checked against stale;
 # the act must instead still be offered.
