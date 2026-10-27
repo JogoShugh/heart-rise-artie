@@ -26,9 +26,8 @@ As of 2026-10-27. In order of what to pick up next; reorder as we go.
 
 9. **Look-then-leap that sees past the entry: built 2026-10-27** (72818d6, d6c2caf, 3e7e5f2, 8038761). The index's
    `hr:manifest` lists every declared form's integrity by relation, with a digest; `--look used` (default) or
-   `--look everything`. Live on the changed-form scene: used leapt, everything stayed lenient. Left: regenerate
-   `exhibits/merge-watch/merge.pins.yaml` from a fresh goal run so it keeps the digest (the live everything run used
-   a demo copy, `runs/demo-digest.pins.yaml`).
+   `--look everything`. Live on the changed-form scene: used leapt, everything stayed lenient. `merge.kts` made again
+   from goal run 3, its lock file keeping the digest; looking at everything, it leaps (8e62a7a).
 
 10. **A new system deployed mid-run (idea, spec/ideas/new-system-mid-run.md).** A closing demo for Wayfinding to
     Rails: a build service appears during the merge watch, the gateway links each pull request to its build, and ARTIE
