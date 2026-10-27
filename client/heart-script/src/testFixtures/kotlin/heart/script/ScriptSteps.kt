@@ -156,6 +156,21 @@ class ScriptSteps {
         )
     }
 
+    @Given("the reasoner writes")
+    fun reasonerWrites(table: DataTable) = table.asMaps().forEach {
+        service.writes[it.getValue("intent")] = it.getValue("words")
+    }
+
+    @When("this script runs, allowed a reasoner, each pause moving the clock {int} seconds")
+    fun runsOnAClock(seconds: Int, text: String) {
+        script = text
+        var now = java.time.Instant.parse("2026-01-01T00:00:00Z")
+        val run = Run(navigator = { service }, pause = { now = now.plusSeconds(seconds.toLong()) })
+        run.clock = { now }
+        run.reasoning = true
+        execute(run)
+    }
+
     @When("this script runs, allowed a reasoner")
     fun runsReasoning(text: String) {
         script = text

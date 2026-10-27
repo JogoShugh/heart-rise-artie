@@ -19,7 +19,7 @@ data class Link(val at: String, val relation: String, val title: String?, val to
  * by address, their forms and links. Every call is recorded, as the client
  * would have been asked it, so a feature can say what a script did.
  */
-class ScriptedService : Navigator, Wire {
+class ScriptedService : Navigator, Wire, Writes {
     val resources = mutableMapOf<String, Map<String, String>>()
     val forms = mutableListOf<Form>()
     val links = mutableListOf<Link>()
@@ -130,6 +130,14 @@ class ScriptedService : Navigator, Wire {
 
     /** What the reasoner chooses, by the words it is given. */
     val reasons = mutableMapOf<String, Choice>()
+
+    /** What the reasoner writes, by the words it is asked. */
+    val writes = mutableMapOf<String, String>()
+
+    override fun write(intent: String): String? {
+        asked += "write" to intent
+        return writes[intent]
+    }
 
     /** A goal run's moves, in order; once they run out, finished. */
     val moves = ArrayDeque<Move>()

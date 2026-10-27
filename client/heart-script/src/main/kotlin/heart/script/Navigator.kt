@@ -201,6 +201,14 @@ interface Navigator {
         Reasoned(null, Answer.Refused(Refusal.NoReasoner, Side.CLIENT, "this client has no reasoner"))
 }
 
+/**
+ * A client whose reasoner also writes: a bare script's one reasoned line, where there is no form to choose from,
+ * only text to send. [write] gives the words [intent] asks for; null when it wrote nothing.
+ */
+fun interface Writes {
+    fun write(intent: String): String?
+}
+
 /** What a reasoner chose: an act on the form [relation] with [fields], or a link [relation] titled [title]. */
 class Choice(
     val relation: String,

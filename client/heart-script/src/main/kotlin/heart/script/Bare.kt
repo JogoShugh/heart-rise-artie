@@ -35,26 +35,38 @@ fun interface Wire {
 
 /** Where a bare script is: nowhere. It holds no representation; it only sends, and reads what came back. */
 @HeartDsl
-class Bare internal constructor(private val wire: Wire, private val navigator: Navigator, private val run: Run) {
+class Bare internal constructor(private val wire: Wire, internal val navigator: Navigator, internal val run: Run) {
+    /** The member of a `whenever` whose turn it is, by its key; null outside one. */
+    internal var member: String? = null
+
     /**
      * Send [method] to [url] with [body] as JSON, and answer with what came back, or null for an empty answer.
      * Any answer but a 2xx stops the script; with [retry] above 1, the call is tried again, a second apart, that
      * many times in all, first: for a call the recorded run waited before.
      */
     fun call(method: String, url: String, body: Any? = null, retry: Int = 1): JsonElement? {
-        val step = ++run.step
-        val sent = Sent(method, url, CONTENT, body?.let { element(it).toString() })
+        val step = run.step + 1
         var answer: Received? = null
         for (attempt in 1..retry) {
             if (attempt > 1) run.pause(1.seconds)
-            val began = Instant.now()
-            answer = wire.send(sent)
-            trace(sent, answer, began)
-            if (answer.status in OK) return answer.body?.takeIf { it.isNotBlank() }?.let(Json::parseToJsonElement)
+            answer = sent(method, url, body)
+            if (answer.status in OK) return parsed(answer)
         }
         val last = checkNotNull(answer)
         throw ScriptStopped(step, "\"$method $url\"", "the server answered ${last.status}: ${last.body.orEmpty()}")
     }
+
+    /** Send [method] to [url] with [body] once, as a step of its own; answer with what came back, whatever it is. */
+    internal fun sent(method: String, url: String, body: Any?): Received {
+        ++run.step
+        val sent = Sent(method, url, CONTENT, body?.let { element(it).toString() })
+        val began = Instant.now()
+        return wire.send(sent).also { trace(sent, it, began) }
+    }
+
+    /** What [answer] holds, as JSON; null for an empty one. */
+    internal fun parsed(answer: Received): JsonElement? =
+        answer.body?.takeIf { it.isNotBlank() }?.let(Json::parseToJsonElement)
 
     private fun trace(sent: Sent, answer: Received, began: Instant) {
         val asked = TraceStep.Asked("send {method} {url}", mapOf("method" to sent.method, "url" to sent.url))
@@ -65,7 +77,7 @@ class Bare internal constructor(private val wire: Wire, private val navigator: N
         run.traced(step)
     }
 
-    private companion object {
+    internal companion object {
         val OK = 200..299
         val CONTENT = mapOf("Content-Type" to "application/json", "Accept" to "application/json")
     }
