@@ -387,6 +387,41 @@ Feature: artie run: a script, run from the command line
       | none       | 0    | the client was made to send validators "none"                     |
       | some       | 2    | artie's last line is: --validators is last or none                |
 
+  Scenario Outline: What look-then-leap's one look compares: <look>
+    spec/ideas/off-the-rails.md. --look used, the default, compares each form
+    the lock file pins with the server's manifest; --look everything
+    compares the digest of every form the server declares with the one the
+    lock file kept.
+    Given the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+      }
+      """
+    And the file "issue.pins.yaml" is
+      """
+      rung: L0
+      digest: sha256-every-form
+      forms: {}
+      links: {}
+      """
+    When artie is run with
+      | argument       |
+      | run            |
+      | issue.kts      |
+      | --guard        |
+      | look-then-leap |
+      | --look         |
+      | <look>         |
+    Then artie exits <exit>
+    And <made>
+
+    Examples:
+      | look       | exit | made                                                                     |
+      | used       | 0    | the client was made to look at "used", the lock file's digest "sha256-every-form"       |
+      | everything | 0    | the client was made to look at "everything", the lock file's digest "sha256-every-form" |
+      | some       | 2    | artie's last line is: --look is used or everything                       |
+
   Scenario Outline: The rung the client asks at, pinned by the run
     Given the script "issue.kts" is
       """kotlin

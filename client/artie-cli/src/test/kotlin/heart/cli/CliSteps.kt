@@ -30,6 +30,7 @@ class CliSteps(private val script: ScriptSteps) {
     private var askedPins: heart.script.Pins? = null
     private var askedGuard: String? = null
     private var askedValidators: String? = null
+    private var askedLook: String? = null
 
     @Given("the client cannot reach the server for {string} at {string}: {string}")
     fun unreachable(rel: String, at: String, detail: String) {
@@ -119,6 +120,7 @@ class CliSteps(private val script: ScriptSteps) {
             askedPins = settings.pins
             askedGuard = settings.guarding.guard
             askedValidators = settings.guarding.validators
+            askedLook = settings.guarding.look
             made++
             script.service
         }
@@ -259,6 +261,12 @@ class CliSteps(private val script: ScriptSteps) {
     fun holdsNoLockOffRails() {
         assertEquals(null, askedPins)
         assertEquals("off-the-rails", askedGuard)
+    }
+
+    @Then("the client was made to look at {string}, the lock file's digest {string}")
+    fun look(look: String, digest: String) {
+        assertEquals(look, askedLook)
+        assertEquals(digest, askedPins?.digest)
     }
 
     @Then("the client was made to send validators {string}")

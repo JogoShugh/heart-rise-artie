@@ -68,7 +68,7 @@ class ArtieCli(
         val given = asked.inputsFile?.let { inputsFile(folder.resolve(it)) }.orEmpty() + asked.inputs
         val config = config(asked, folder, file)
         val lock = lockFile(asked, folder, file, config)
-        val guarding = Guarding(lock.guard, config.onChange, asked.validators ?: config.validators)
+        val guarding = guarding(asked, config, lock)
         val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, guarding)
         val made = lazy { navigator(settings) }
         val client by made
@@ -266,6 +266,10 @@ private fun stopIn(failure: Throwable): ScriptStopped? =
 
 /** The file [name] in this folder; null for no name. */
 private fun Path.named(name: String?): Path? = name?.let(::resolve)
+
+/** How careful the run is: the guard the lock file is held to, then each setting as the flag, else the config, says. */
+private fun guarding(asked: Arguments, config: Config, lock: LockFile) =
+    Guarding(lock.guard, config.onChange, asked.validators ?: config.validators, asked.look ?: config.look)
 
 /** The script's client, [first], made once; each listener of a watch with listeners gets one of its own, [more]. */
 private fun clients(first: Lazy<Navigator>, more: () -> Navigator): () -> Navigator =

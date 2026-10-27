@@ -31,6 +31,9 @@ class Arguments(val script: String) {
     /** The validator each act carries: last, the default, or none (spec/ideas/off-the-rails.md). */
     var validators: String? = null
 
+    /** What look-then-leap's one look compares: used, the default, or everything (spec/ideas/off-the-rails.md). */
+    var look: String? = null
+
     /** The config, when it isn't NAME.config.yaml beside the script: for a trial run that leaves the default alone. */
     var config: String? = null
 
@@ -64,6 +67,9 @@ internal val GUARDS = setOf("strict", "lenient", "look-then-leap", "off-the-rail
 /** The validators a run's acts may carry. */
 internal val VALIDATORS = setOf("last", "none")
 
+/** What look-then-leap's one look compares: the forms the script uses, or every form the server declares. */
+internal val LOOKS = setOf("used", "everything")
+
 /** The options that stand alone. */
 private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
     "--inputs-of" to { it.inputsOf = true },
@@ -89,6 +95,7 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--validators" to { a, v ->
         a.validators = v.takeIf { it in VALIDATORS } ?: throw BadArguments("--validators is ${said(VALIDATORS)}")
     },
+    "--look" to { a, v -> a.look = v.takeIf { it in LOOKS } ?: throw BadArguments("--look is ${said(LOOKS)}") },
     "--output" to { a, v -> a.output = v.takeIf { it == "json" } ?: throw BadArguments("--output json only") },
 )
 

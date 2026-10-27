@@ -47,5 +47,5 @@ internal fun pins(text: String): Pins {
     }
     val links = (doc["links"] as? Map<*, *>).orEmpty().entries
         .associate { (rel, target) -> rel.toString() to target.toString() }
-    return Pins(doc["rung"]?.toString(), forms, links)
+    return Pins(doc["rung"]?.toString(), forms, links, doc["digest"]?.toString())
 }

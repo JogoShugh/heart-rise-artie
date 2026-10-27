@@ -20,6 +20,8 @@ class Config(
     val onChange: String? = null,
     /** The validator each act carries: last, the default, or none, a blind write (spec/ideas/off-the-rails.md). */
     val validators: String? = null,
+    /** What look-then-leap's one look compares: used, the default, or everything (spec/ideas/off-the-rails.md). */
+    val look: String? = null,
 )
 
 /** The settings a config may hold, and the values each may take. */
@@ -28,6 +30,7 @@ private val SETTINGS: Map<String, Set<String>> = mapOf(
     "repin" to setOf("auto", "propose", "never"),
     "on-change" to setOf("refuse", "values"),
     "validators" to VALIDATORS,
+    "look" to LOOKS,
 )
 
 /** The config for [asked], whose script is [script], found in [folder]. */
@@ -45,6 +48,7 @@ fun config(asked: Arguments, folder: Path, script: Path): Config {
         repin = doc["repin"]?.toString(),
         onChange = doc["on-change"]?.toString(),
         validators = doc["validators"]?.toString(),
+        look = doc["look"]?.toString(),
     )
 }
 
