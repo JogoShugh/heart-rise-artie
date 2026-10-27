@@ -30,6 +30,10 @@ As of 2026-10-27. In order of what to pick up next; reorder as we go.
    `exhibits/merge-watch/merge.pins.yaml` from a fresh goal run so it keeps the digest (the live everything run used
    a demo copy, `runs/demo-digest.pins.yaml`).
 
+10. **A new system deployed mid-run (idea, spec/ideas/new-system-mid-run.md).** A closing demo for Wayfinding to
+    Rails: a build service appears during the merge watch, the gateway links each pull request to its build, and ARTIE
+    follows the link with no change to ARTIE, the script or the goal. Plan only.
+
 ## Open questions, not blocking
 
 - Why the gateway answers 422 when reading pulls/813, which GitHub serves directly.
