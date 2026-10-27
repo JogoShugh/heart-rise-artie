@@ -11,6 +11,15 @@ internal object BareText {
     fun escaped(s: String) =
         s.replace("\\", "\\\\").replace("\"", "\\\"").replace("$", "\\$").replace("\n", "\\n")
 
+    /** The script's declaration of the input [name], with the default and question the run read it with. */
+    fun declaration(name: String, input: Map<*, *>): String {
+        val said = listOfNotNull(
+            input["default"]?.let { "default = ${plain(it.toString())}" },
+            input["question"]?.let { "question = ${plain(it.toString())}" },
+        )
+        return "val $name by input(${said.joinToString(", ")})"
+    }
+
     /** The text [s] encodes, when it is base64 of printable text, as GitHub takes a file's content. */
     fun encoded(s: String): String? = s.takeIf { BASE64.matches(it) && it.length % QUANTUM == 0 }
         ?.let { runCatching { String(Base64.getDecoder().decode(it)) }.getOrNull() }

@@ -81,6 +81,7 @@ private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare"
  * upstream record, sent straight to the service: a script with no lock file, since it pins nothing.
  */
 private fun bare(capture: Capture, upstream: String, folder: Path, script: String, out: PrintStream) {
+    if (capture.watchScript != null) return rails(capture, upstream, folder, script, out)
     val run = BareRun(capture, Files.readString(existing(folder, upstream, "upstream record")))
     val writer = BareWriter(run, upstream)
     Files.writeString(folder.resolve(script), writer.write())
@@ -90,6 +91,18 @@ private fun bare(capture: Capture, upstream: String, folder: Path, script: Strin
             "${count(run.writes.size, "write")} and ${count(writer.reads, "read")}",
     )
 }
+
+/**
+ * `--bare UPSTREAM.yaml` for a goal run that watched (spec/ideas/bare-runs.md, "Rails"): its kept script's watch,
+ * its words kept, each act brought down to the call it made to the service, at a fixed address.
+ */
+private fun rails(capture: Capture, upstream: String, folder: Path, script: String, out: PrintStream) {
+    val run = RailsRun(capture, Files.readString(existing(folder, upstream, "upstream record")))
+    val writer = RailsWriter(run, capture.name to upstream)
+    Files.writeString(folder.resolve(script), writer.write())
+    out.println("wrote $script: the watch's words over ${writer.calls} calls to the service, at fixed addresses")
+}
+
 private val FLAGS = setOf("--keep-reason")
 
 private fun options(args: List<String>): Map<String, String> {

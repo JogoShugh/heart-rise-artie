@@ -1,5 +1,6 @@
 package heart.cli.generate
 
+import heart.cli.generate.BareText.declaration
 import heart.cli.generate.BareText.encoded
 import heart.cli.generate.BareText.escaped
 import heart.cli.generate.BareText.plain
@@ -71,14 +72,6 @@ internal class BareWriter(private val run: BareRun, private val upstreamName: St
             }
         }
         return "\"" + out + escaped(s.substring(last)) + "\""
-    }
-
-    private fun declaration(name: String, input: Map<*, *>): String {
-        val said = listOfNotNull(
-            input["default"]?.let { "default = ${plain(it.toString())}" },
-            input["question"]?.let { "question = ${plain(it.toString())}" },
-        )
-        return "val $name by input(${said.joinToString(", ")})"
     }
 
     private companion object {
