@@ -131,6 +131,9 @@ Known limits:
 
 ## Next (ideas, not started)
 
+- **A native Python merge watch** (spec/ideas/python-merge-watch.md). The Python we have does the triage task,
+  not a watch, so the bare watch has nothing yet to be compared with.
+
 - **The meddler on `artie-bare`.** `MEDDLE=M1,M2,M3,M5` and `MEDDLE=M4`, 3 rounds each, beside `py-direct` and
   `artie-goal`. Expected: `artie-bare` goes off the rails like `py-direct` (overwrites the teammate's close, its
   duplicate reason, its comment), and `artie-goal` keeps everything. That shows it is the safeguards that save
