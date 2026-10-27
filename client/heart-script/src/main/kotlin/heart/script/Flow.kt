@@ -43,12 +43,13 @@ fun Here.decide(tries: Int = 3, block: Here.() -> Unit) {
 
 /**
  * Read again the resource at [address], one the server handed over earlier (a link's target, a Location), and run
- * [block] there; then back where it was, read again. A watch's Until reads the resource it names this way.
+ * [block] there; then back where it was, read again. A watch's Until reads the resource it names this way. The
+ * task asks for this read, so it is made even off the rails (spec/ideas/off-the-rails.md): only the way back is care.
  */
 fun Here.at(address: String, block: Here.() -> Unit) {
     val step = ++run.step
     val from = held.address
-    Here(navigator, run, arrived(step, "\"at\"", navigator.recall(address))).inside(block) {
+    Here(navigator, run, arrived(step, "\"at\"", navigator.visit(address))).inside(block) {
         held = arrived(step, "\"at\"", navigator.recall(from))
     }
 }

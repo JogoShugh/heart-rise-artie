@@ -85,3 +85,33 @@ Feature: Off the rails: a run that reads only what it must, checks only what the
       | last       | off    | with If-Match  | the run finished                                                 |
       | none       | on     | with no If-Match | the run finished                                               |
       | none       | off    | with no If-Match | the script stopped at step 2, "github:comment": precondition required, refused by the server: "the act was sent with no validator" |
+
+  Scenario Outline: <guard>: a watch's Until reads the resource it names again, and sees someone else close it
+    A wait is the task's, not ARTIE's care: off the rails, too, the Until
+    reads the resource kept by name again at every look, and the watch ends
+    once someone else has closed it. Found live: off the rails, the merge
+    watch's Until read the watch issue as it was when opened, so it never
+    saw it closed, and the watch looked on until its time ran out.
+    Given ARTIE runs with the guard "<guard>"
+    And the run's clock moves only when the run pauses
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its pull requests are listed 2 times
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.minutes
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10) { keepAs("watched") }
+          watch(every = 10.seconds, atMost = 1.minutes, until = { at("watched") { "state" eq "closed" } }) {
+              act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {}
+          }
+      }
+      """
+    Then the run finished
+    And the run noted
+      | note |
+
+    Examples:
+      | guard         |
+      | lenient       |
+      | off-the-rails |
