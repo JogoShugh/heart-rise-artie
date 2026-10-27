@@ -87,6 +87,48 @@ Translating a run is mechanical:
    ARTIE with every guardrail off is as fast as the Python, compiling the script included (about 2 s a run). The
    guardrails are what the careful runs' 58 to 81 s pay for.
 
+## Rails: a watch brought down (2026-10-27)
+
+A straight-line replay of one run can't watch. For a goal run that watched, `artie generate --bare` now translates
+the kept script's watch word by word into plain calls at fixed addresses, the way a hand-written script polls:
+
+| Kept script | Bare |
+|---|---|
+| `act("github:open-issue", …)` and `keepAs("watch")` | `val watch = call("POST", ".../issues", …)` |
+| `watch(until = { at("watch") { "state" eq "closed" } })` | `watch(until = { call("GET", ".../issues/${watch["number"].text}")["state"].text == "closed" })` |
+| `act("github:pulls-list", …)` and `whenever` | `whenever(call("GET", ".../issues?labels=${label}")) { item ->` and a read of `.../pulls/${item["number"].text}` |
+| `has { "github:labels" has label }` | `has(member["labels"] has label)` |
+| `leaveWhere(…) { "github:labels" has hold }` | `leaveWhere(…, member["labels"] has hold)` |
+| `once("github:merge", giveUp = 3.minutes, otherwise = …)` | `once("PUT", ".../pulls/${member["number"].text}/merge", …, giveUp = 3.minutes, otherwise = …)` |
+| reasoned `act(intent = "tell its author …")` | `call("POST", ".../issues/…/comments", mapOf("body" to write("tell its author …")))` |
+
+- Each act's call, method and body come from the gateway's upstream record, under the spans of the steps that
+  made it. Each value is an input, the list's item, the member read, or the resource kept by name.
+- The gateway's rules (draft, still checking, behind) are dropped: a bare `once` tries the call at each look, and
+  GitHub's refusal is the gate. Its `message` is the reason the Otherwise is told.
+- The one reasoned line stays: `write(…)` asks ARTIE's reasoner for the words, offered as the one field of a form
+  of its own.
+
+Built: `bare-watch.feature` (heart-script), `bare-script.feature` (artie), `generate-bare-watch.feature`
+(artie-cli). The exhibit: `exhibits/merge-watch/merge.bare.kts`, generated from `runs/rails-1.yaml` (a goal run
+recorded with `--exchanges`) and `runs/rails-1.upstream.yaml`.
+
+Live, 2026-10-27, on the scratch repository (`runs/bare-1.*`):
+- one look covered all ten labelled pull requests;
+- #829 was refused at first (GitHub still working out mergeability) and merged at the next look;
+- three held pull requests were left, each said once;
+- six drafts and conflicted ones were commented on after three minutes, in the model's words from GitHub's
+  reasons ("Pull Request is still a draft", "Merge conflict").
+
+In the same repository, the gateway-backed goal run (`runs/rails-1.out`) stopped every look at #813, because the
+gateway answered 422 reading it. The bare watch read #813 directly. The gateway's 422 is still unexplained.
+
+Known limits:
+- A list item that is a plain issue, not a pull request, would fail its member read.
+- One member's failed read ends that look for the members after it, as in the kept script.
+- Only the words the merge watch uses are translated (watch, whenever, has, leaveWhere, once, a reasoned or
+  plain Otherwise). Any other word stops the generator, saying which.
+
 ## Next (ideas, not started)
 
 - **The meddler on `artie-bare`.** `MEDDLE=M1,M2,M3,M5` and `MEDDLE=M4`, 3 rounds each, beside `py-direct` and
