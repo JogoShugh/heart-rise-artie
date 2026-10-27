@@ -20,6 +20,16 @@ As of 2026-10-27. In order of what to pick up next; reorder as we go.
    separate Claude run, as a subject of the experiment, is allowed under the no-new-Python rule. The author may run
    this experiment in another session first.
 
+8. **Wayfinding to Rails, appendix: a larger, interleaved run.** Every rung (bare, off-the-rails, look-then-leap,
+   lenient, strict) on one fixed scene, several rounds, interleaved, for firmer per-pass numbers than the single
+   runs of 2026-10-27. Agreed to do later.
+
+9. **Look-then-leap that sees past the entry: built 2026-10-27** (72818d6, d6c2caf, 3e7e5f2, 8038761). The index's
+   `hr:manifest` lists every declared form's integrity by relation, with a digest; `--look used` (default) or
+   `--look everything`. Live on the changed-form scene: used leapt, everything stayed lenient. Left: regenerate
+   `exhibits/merge-watch/merge.pins.yaml` from a fresh goal run so it keeps the digest (the live everything run used
+   a demo copy, `runs/demo-digest.pins.yaml`).
+
 ## Open questions, not blocking
 
 - Why the gateway answers 422 when reading pulls/813, which GitHub serves directly.
