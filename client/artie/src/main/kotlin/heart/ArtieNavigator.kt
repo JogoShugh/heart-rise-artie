@@ -36,7 +36,7 @@ class ArtieNavigator(
      * `look-then-leap` does once the entry's forms are as the lock file pins them; any other keeps it.
      */
     private val guarding: String? = null,
-) : Navigator {
+) : Navigator, heart.script.Writes by ReasonerWriter(reasoner) {
     /** Whether this run is off the rails: no lock file, no schema check, no reading again, a 412 stops it. */
     private var offRails = guarding == OFF_THE_RAILS
 

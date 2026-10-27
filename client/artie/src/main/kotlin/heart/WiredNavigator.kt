@@ -4,6 +4,7 @@ import heart.script.Navigator
 import heart.script.Received
 import heart.script.Sent
 import heart.script.Wire
+import heart.script.Writes
 
 /**
  * ARTIE as a script's client, sending a bare script's calls too (spec/ideas/bare-runs.md): [navigator] does every
@@ -11,7 +12,10 @@ import heart.script.Wire
  * credentials, its name and trace, and its exchange log, with no cache and no integrity check above them, and no
  * validator, since nothing but the script sets a header.
  */
-class WiredNavigator(val navigator: Navigator, private val wire: Transport) : Navigator by navigator, Wire {
+class WiredNavigator(val navigator: Navigator, private val wire: Transport) : Navigator by navigator, Wire, Writes {
+    /** The words [navigator]'s reasoner writes, when it writes. */
+    override fun write(intent: String): String? = (navigator as? Writes)?.write(intent)
+
     override fun send(sent: Sent): Received {
         val answer = wire.send(HeartRequest(sent.method, sent.url, sent.headers, sent.body))
         val headers = answer.headers.mapValues { (_, values) -> values.joinToString(", ") }

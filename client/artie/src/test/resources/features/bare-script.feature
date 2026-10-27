@@ -36,6 +36,20 @@ Feature: ARTIE sends a bare script's calls as written, with its own credential a
     And every exchange the run kept sends its credential as "<token>" and a traceparent
     And no exchange the run kept sends "If-Match" or "If-None-Match"
 
+  Scenario: A bare script's one reasoned line is written by ARTIE's reasoner, as the one field of a form of its own
+    Given ARTIE's reasoner will choose to act on "write" with {"text": "Fixed in 1.2; thanks for the report."}
+    When this script runs with ARTIE, allowed its reasoner
+      """kotlin
+      bare {
+          call("POST", "https://api.github.test/repos/acme/rockets/issues/10/comments",
+              mapOf("body" to write("Tell its author, in one friendly sentence, that it was fixed in 1.2")))
+      }
+      """
+    Then the script finished
+    And issue 10 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                                  |
+      | ada    | Fixed in 1.2; thanks for the report.  |
+
   Scenario: An answer GitHub refuses stops the script, with GitHub's own words
     When this script runs with ARTIE
       """kotlin
