@@ -11,6 +11,9 @@ class LockWriter(capture: Capture) {
     private val methods = mutableMapOf<String, String>()
     private val links = linkedMapOf<String, String>()
 
+    // The digest of every form the server declared, from the entry's manifest, for look-then-leap's look at everything.
+    private val digest = capture.steps.firstNotNullOfOrNull { it.state["hr:manifest"].map()["digest"]?.toString() }
+
     init {
         capture.steps.filter { it.relation != null }.forEach { step ->
             val relation = step.relation.orEmpty()
@@ -43,6 +46,7 @@ class LockWriter(capture: Capture) {
         )
         appendLine("# also refuses one offered in a set not recorded for it.")
         rung?.let { appendLine("rung: ${scalar(it)}") }
+        digest?.let { appendLine("digest: ${scalar(it)}") }
         appendLine(if (forms.isEmpty()) "forms: {}" else "forms:")
         forms.forEach { (relation, pin) ->
             appendLine("  ${scalar(relation)}:")

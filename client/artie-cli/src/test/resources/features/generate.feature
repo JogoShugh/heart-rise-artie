@@ -170,7 +170,9 @@ Feature: artie generate: a run's capture, made a script with no model in it
 
   Scenario: Without the script, inputs, waits and checks come from the capture; the lock file pins what was offered
     A value two answers hold is read from the earlier one, the step that
-    brought it into the run, whatever order the capture lists them in.
+    brought it into the run, whatever order the capture lists them in. The
+    lock file keeps the digest of every form the server declared, from the
+    entry's manifest, for look-then-leap's look at everything.
     Given the file "run.trace.yaml" is
       """
       ---
@@ -191,6 +193,14 @@ Feature: artie generate: a run's capture, made a script with no model in it
         entry: http://localhost:8392/
       opens: true
       outcome: done
+      now:
+        state:
+          title: Rockets
+          hr:manifest:
+            forms:
+              repos-get:
+                - sha256-repos
+            digest: sha256-every-form
       ---
       mode: intent
       say: open the repository acme
@@ -398,6 +408,7 @@ Feature: artie generate: a run's capture, made a script with no model in it
       # --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
       # also refuses one offered in a set not recorded for it.
       rung: L2
+      digest: sha256-every-form
       forms:
         repos-get:
           integrity: sha256-repos
