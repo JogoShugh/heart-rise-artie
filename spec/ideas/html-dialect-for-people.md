@@ -118,6 +118,53 @@ The HTML writer turns each form's JSON Schema into inputs:
 
 The browser's own checks are a convenience; the server's 422 is still the rule.
 
+## Disabled, not only hidden
+
+Added 2026-10-26, from the author: UIs commonly show unavailable actions greyed out or disabled, and that is good
+design. Stable layout, discoverability ("you could do this once…"), and no "where did the button go?". Hiding every
+act that isn't legal is the purist reading of HATEOAS and a blind spot of it. `hr:unavailable` (SPEC §6.12) is the
+answer HEART already has; the HTML dialect should use it fully.
+
+### Three cases per act
+
+For every act a resource type can offer, in a given state:
+
+| Case | Server says | HTML shows |
+|---|---|---|
+| Legal now | a form in `_forms` | an enabled button with its inputs |
+| Not legal, reason given | an entry in `hr:unavailable` | a disabled button with the reason shown |
+| Not legal, nothing said | nothing | hidden |
+
+The third row keeps the honesty: SPEC §6.12 says a client shall not infer a reason from absence alone, so the UI
+never greys out a button from a catalogue of everything the type could do. It shows only what the server explained.
+A disabled button cannot act, which matches the rule that a client never acts on a relation it finds in
+`hr:unavailable`.
+
+### What is needed beyond today
+
+- **Stable positions.** The view hints list the acts in order, so an absent act keeps its slot. Per act, a hint says
+  whether to show it disabled or hide it when absent (`whenAbsent = disabled | hidden`); the default is disabled when a
+  reason is given.
+- **Reasons always fetched for HTML.** Agents fetch `hr:unavailable` only when asked. The HTML writer, on the server,
+  always includes it. It is shared and cached, so it costs almost nothing.
+- **Accessibility.** The reason is visible text, or reachable by keyboard: `aria-disabled="true"` with the reason in the
+  accessible description. Never only a hover tooltip, which touch and keyboard users never see. A disabled button stays
+  focusable so its reason can be read.
+- **Kinds of absence (a gap in the profile today).** Three different stories, which a UI wants to treat differently:
+  - **not yet:** "The crop is not ready." It will become possible: show it disabled, perhaps with what it waits on;
+  - **not for you:** a permission. It won't become possible for this caller: usually hide it, and explain no more than
+    needed;
+  - **never again:** the game is final. Hide it, or show a quiet "game over".
+
+  An optional `kind` on each `hr:unavailable` entry (`not-yet`, `not-permitted`, `final`), and perhaps a short
+  "becomes available when…" phrase, would let the UI choose. Agents gain too: "not yet" means wait or watch, "not for
+  you" means stop, "final" means give up. This belongs in the profile itself, not only in the HTML dialect, and would
+  need its own feature-first change to SPEC §6.12 and `spec/HAL-SCHEMA-FORMS-HR.md`.
+- **Excluded choices, inside a form.** The same applies to fields. A fouled-out player could appear in the `<select>`,
+  greyed out, labelled "fouled out". `hr:options` (profile Rule 8) keeps only the allowed values today. An extension
+  could list the excluded ones with a reason each, served the same way: the server still refuses them with 422. Open,
+  and smaller than the rest.
+
 ## Two flavours, both possible
 
 - **Server-rendered HTML with htmx** (this idea's core). For people. No client program.
