@@ -33,6 +33,13 @@ As of 2026-10-27. In order of what to pick up next; reorder as we go.
     Rails: a build service appears during the merge watch, the gateway links each pull request to its build, and ARTIE
     follows the link with no change to ARTIE, the script or the goal. Plan only.
 
+11. **A fat-prompt ARTIE (idea, spec/ideas/fat-prompt-artie.md).** ARTIE's behaviour written as a skill, Claude
+    doing the merge watch with only `curl` and inference, beside ARTIE's wayfinding and its kept script: the same
+    scene, measured for correctness, tokens, time and repeatability. Idea only.
+12. **Script levels in the README (in progress).** `intent` for a person's words, `inferred` for a model's
+    (heart-script and the recorded watch done); next, the generator's `inferred` and `--intents`, then a fresh goal
+    run and a README section from plain text to bare.
+
 ## Open questions, not blocking
 
 - Why the gateway answers 422 when reading pulls/813, which GitHub serves directly.
