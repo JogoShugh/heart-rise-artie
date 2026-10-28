@@ -187,8 +187,10 @@ fun Here.once(
         val waited = java.time.Duration.between(since, run.clock()).toKotlinDuration()
         val over = offers(rel) || waited >= giveUp
         if (over) {
-            watching.over(key)
+            // Over only once its act or otherwise went through: one that fails, as the member changed while it
+            // waited, is done again at the next look, on the member read again.
             if (offers(rel)) block() else otherwise(why(rel))
+            watching.over(key)
         } else {
             // A wait begins only when it isn't over at once: kept, with when it gives up.
             watching.waits(key, since)

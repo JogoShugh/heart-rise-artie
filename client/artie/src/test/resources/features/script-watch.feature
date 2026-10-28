@@ -77,6 +77,38 @@ Feature: A script that keeps watching: watch, whenever and once, the goal words 
       | number |
       | 2      |
 
+  Scenario: An otherwise that fails is tried again at the next look, and is over only once it goes through
+    A wait gives up after long enough for the member to change: an act its
+    otherwise makes may be refused as stale, or fail as any look may. The
+    wait is over only once its otherwise went through; until then, the next
+    look reads the member again and does otherwise again. Here the first
+    try acts where nothing is offered, and fails.
+    Given pull request 1 is a draft on the small GitHub
+    When this script runs with ARTIE
+      """kotlin
+      import kotlin.time.Duration.Companion.seconds
+
+      heart("https://github.gateway.test/") {
+          var looks = 0
+          var tries = 0
+          act("github:pulls-list", "owner" to "acme", "repo" to "rockets", "state" to "open") {
+              watch(every = 10.seconds, until = { that(++looks == 5) }) {
+                  whenever {
+                      once("github:merge", giveUp = 15.seconds, otherwise = { why ->
+                          if (++tries == 1) act("github:reopen") {}
+                          note("#${state["number"]}: $why")
+                      }) {
+                          act("github:merge", "merge_method" to "squash") {}
+                      }
+                  }
+              }
+          }
+      }
+      """
+    Then the script finished
+    And the run noted one note beginning "A look failed:"
+    And the run noted one note beginning "#1: A draft can't be merged"
+
   Scenario: leaveWhere says it left a member once, though the member changes and is visited again
     Pull request 1 is held, and a draft at the first look, marked ready just
     after: the second look visits it again, as changed, and leaves it again,
