@@ -21,11 +21,23 @@ class WatchLines(private val capture: Capture) {
     fun kept(step: Step, depth: Int): List<String> = capture.marks(step)["as"]?.toString()?.takeIf { it in names }
         ?.let { listOf(INDENT.repeat(depth) + "keepAs(\"$it\")") }.orEmpty()
 
-    /** The watch's lines, at [depth]. */
-    fun lines(depth: Int): List<String> = script?.lines()?.map { INDENT.repeat(depth) + it }.orEmpty()
+    /**
+     * The watch's lines, at [depth]; with [intents] (`--intents`), each act that keeps its words written as them
+     * alone, for the reasoner to choose, the rest of the watch as it was.
+     */
+    fun lines(depth: Int, intents: Boolean = false): List<String> = script?.lines()?.map { line ->
+        val said = if (intents) WORDED.replace(line) { "${it.groupValues[1]}act(${it.groupValues[2]})" } else line
+        INDENT.repeat(depth) + said
+    }.orEmpty()
 
     private companion object {
         val NAMED = Regex("""\bat\("(\w+)"\) \{""")
+
+        /** An act with a relation and its words, the last of its arguments: `act("rel", …, intent = "…")`. */
+        val WORDED = Regex(
+            """^(\s*)act\("[^"]*"(?:, .*?)?, ((?:intent|inferred) = (?:"(?:[^"\\]|\\.)*"|""" + "\"\"\".*?\"\"\"" +
+                """))\)""",
+        )
         val UNITS = listOf("minutes", "seconds")
         const val INDENT = "    "
     }

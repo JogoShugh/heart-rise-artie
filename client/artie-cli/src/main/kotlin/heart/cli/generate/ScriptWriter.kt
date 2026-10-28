@@ -66,7 +66,7 @@ class ScriptWriter(
                 if (bindings.variables.isNotEmpty()) appendLine()
                 body.forEach { appendLine(it) }
                 // A goal run's watch, as its decisions amount to, after the steps before it.
-                watch.lines(1).forEach { appendLine(it) }
+                watch.lines(1, options.intents).forEach { appendLine(it) }
                 appendLine("}")
             },
         )
