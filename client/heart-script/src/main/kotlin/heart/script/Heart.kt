@@ -91,7 +91,8 @@ class Here internal constructor(
      * Select the form [rel] with [fields]. An act the manifest does not offer is refused here, by the
      * client, before anything is sent. With a [block], the script visits what the act led to, then
      * returns to where it was, read again. [intent] says, in a person's words, what the act is for; [inferred]
-     * says it in words a model inferred; the trace keeps either. With no [rel], the words are handed to the
+     * says it in words a model inferred, and [fromIntent] which of a person's they serve; the trace keeps
+     * them. With no [rel], the words are handed to the
      * client's reasoner, which chooses one selection from what is offered here (a form with its fields, or a
      * link); a run must allow it (`--reasoner`). A long act gives its values in [fields], a block, one a line:
      * `fields = { "title" to title }`, after any in [values].
@@ -103,11 +104,12 @@ class Here internal constructor(
         vararg values: Pair<String, Any?>,
         intent: String? = null,
         inferred: String? = null,
+        fromIntent: String? = null,
         fields: (Fields.() -> Unit)? = null,
         block: (Here.() -> Unit)? = null,
     ) {
         val step = ++run.step
-        val said = Said(intent, inferred)
+        val said = Said(intent, inferred, fromIntent)
         when {
             rel != null -> acted(step, rel, values.toMap() + Fields().also { fields?.invoke(it) }.values, said, block)
             said.words != null -> reasoned(step, said, block)
@@ -119,17 +121,20 @@ class Here internal constructor(
     /**
      * Select the link [rel] titled [title], or the resource embedded under [rel] with that title, which
      * fetches it; with a [block], visit it and return. [intent] says, in a person's words, what the follow is
-     * for, and [inferred] in a model's; the trace keeps either.
+     * for, and [inferred] in a model's, with [fromIntent] the person's they serve; the trace keeps them.
      */
+    // The DSL's one follow: each argument is a part of the follow a script may write, by name.
+    @Suppress("LongParameterList")
     fun follow(
         rel: String,
         title: String? = null,
         intent: String? = null,
         inferred: String? = null,
+        fromIntent: String? = null,
         block: (Here.() -> Unit)? = null,
     ) {
         val step = ++run.step
-        val said = Said(intent, inferred)
+        val said = Said(intent, inferred, fromIntent)
         // A list with a next page may hold the link further on: the client follows its next links to find it.
         if (title !in links(rel) && title !in embedded(rel).map { it.title } && links("next").isEmpty()) {
             val detail = "no \"$rel\" link" + (title?.let { " titled \"$it\"" } ?: "")

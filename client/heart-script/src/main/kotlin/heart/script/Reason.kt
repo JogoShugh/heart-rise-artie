@@ -20,9 +20,10 @@ internal fun Here.acted(step: Int, rel: String, fields: Map<String, Any?>, said:
 
 /**
  * What a step is for, in words: a person's, as a goal or a script wrote them ([intent]), or a model's, inferred while
- * it ran ([inferred]). Either may be reasoned on; the trace keeps them apart.
+ * it ran ([inferred]), with the person's words they serve, if any ([fromIntent]). Either an intent or inferred words
+ * may be reasoned on; the trace keeps all three apart.
  */
-class Said(val intent: String? = null, val inferred: String? = null) {
+class Said(val intent: String? = null, val inferred: String? = null, val fromIntent: String? = null) {
     /** The words to reason on: a person's, else a model's. */
     val words: String? get() = intent ?: inferred
 }

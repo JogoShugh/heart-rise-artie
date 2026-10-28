@@ -90,10 +90,12 @@ Feature: A script's reason step: a model chooses one selection from what is offe
     worth keeping beside the act, for a reader and for the reasoner, but not
     the person's. A script says which by its argument; the trace keeps them
     apart. With no relation, inferred words are reasoned on, as an intent is.
+    A model's words may say which of a person's they serve: fromIntent, kept
+    beside them as where they came from, never reasoned on alone.
     When this script runs, allowed a reasoner
       """kotlin
       heart("scripted://service/") {
-          act("issues-get", "number" to 10, inferred = "get issue 10") {
+          act("issues-get", "number" to 10, inferred = "get issue 10", fromIntent = "On issue 10") {
               act("close", intent = "we're done with this one")
           }
           act(inferred = "we're done with this one")
@@ -109,9 +111,9 @@ Feature: A script's reason step: a model chooses one selection from what is offe
       | reason | we're done with this one |
       | act    | close                    |
     And the trace's steps keep these words
-      | step | intent                   | inferred     |
-      | 2    |                          | get issue 10 |
-      | 3    | we're done with this one |              |
+      | step | intent                   | inferred     | fromIntent  |
+      | 2    |                          | get issue 10 | On issue 10 |
+      | 3    | we're done with this one |              |             |
 
   Scenario: A run not allowed a reasoner stops at the reason step
     When this script runs

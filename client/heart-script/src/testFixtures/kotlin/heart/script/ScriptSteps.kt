@@ -210,6 +210,7 @@ class ScriptSteps {
             val document = documents[row.getValue("step").toInt()]
             assertEquals(row["intent"].orEmpty(), member(document, "intent"), says)
             assertEquals(row["inferred"].orEmpty(), member(document, "inferred"), says)
+            row["fromIntent"]?.let { assertEquals(it, member(document, "fromIntent"), says) }
         }
     }
 

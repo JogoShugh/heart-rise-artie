@@ -32,10 +32,14 @@ class TraceStep(
     /** What an act was for, in words a model inferred (`act(rel, …, inferred = …)`); null when there are none. */
     var inferred: String? = null
 
-    /** Keeps [said]: a person's words as the intent, a model's as inferred. */
+    /** The person's words a model's inferred ones serve (`fromIntent = …`); null when there are none. */
+    var fromIntent: String? = null
+
+    /** Keeps [said]: a person's words as the intent, a model's as inferred, and the person's they serve. */
     fun said(said: Said) {
         intent = said.intent
         inferred = said.inferred
+        fromIntent = said.fromIntent
     }
 
     /** The script line this step came from, as its author numbers it; null when run outside a script. */
@@ -84,6 +88,7 @@ class TraceStep(
         put("say", asked.say)
         intent?.let { put("intent", it) }
         inferred?.let { put("inferred", it) }
+        fromIntent?.let { put("fromIntent", it) }
         line?.let { put("line", it) }
         within?.let { put("within", it) }
         put("params", JsonObject(asked.params.mapValues { (_, v) -> element(v) }))
