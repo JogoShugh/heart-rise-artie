@@ -8,7 +8,7 @@ package heart.script
  */
 internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val maxMoves: Int) {
     private val script = MoveLines(run)
-    private val marks = StepMarks(run)
+    private val marks = StepMarks(run) { GoalText.spoken(it, inputs) }
     // Whenevers side by side look on threads of their own: what they tell the planner, and name, is shared.
     private val moves = java.util.concurrent.CopyOnWriteArrayList<String>()
     private val path = mutableListOf<String>()
@@ -42,7 +42,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
 
             override fun fill(text: String) = this@StepRun.fill(text)
 
-            override fun spoken(text: String) = StepText.fill(text, names, inputs) { "\${$it}" }
+            override fun spoken(text: String) = GoalText.spoken(text, inputs)
         })
     }
 
@@ -251,7 +251,7 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
  * A goal in steps' marks on the lines of the script its moves amount to ([Run.marks]), for the script made from
  * the run: a step's name on the act that led to what it named, and each act of a reasoned step.
  */
-internal class StepMarks(private val run: Run) {
+internal class StepMarks(private val run: Run, private val spoken: (String) -> String) {
     /** The lines of each step's acts that were done. */
     private val acts = mutableMapOf<Step, MutableList<Int>>()
 
@@ -266,6 +266,8 @@ internal class StepMarks(private val run: Run) {
         step.name?.let { name -> (at?.takeIf { it in lines } ?: lines.lastOrNull())?.let { mark(it)["as"] = name } }
         // A reasoned step is kept in the person's words: the planner's say how this run decided it.
         if (step.reasoned) lines.forEach { mark(it)["reasoned"] = step.words }
+        // Any other step's words are the intent of the act that did its job, its last: a person's, not the planner's.
+        else lines.lastOrNull()?.let { mark(it)["intent"] = spoken(step.words) }
     }
 
     private fun mark(line: Int) = run.marks.getOrPut(line) { mutableMapOf() }

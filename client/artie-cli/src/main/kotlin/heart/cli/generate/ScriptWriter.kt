@@ -161,8 +161,8 @@ class ScriptWriter(
 
     private fun follow(step: Step): String {
         val title = step.params["title"]?.let { ", ${KotlinText.quoted(it.toString())}" }.orEmpty()
-        val intent = intent(step, names)?.let { ", intent = ${kotlinString(it)}" }.orEmpty()
-        return "follow(${why.relation(step, source)}$title$intent)"
+        val said = said(capture, step, names, emptyList())?.let { ", $it" }.orEmpty()
+        return "follow(${why.relation(step, source)}$title$said)"
     }
 
     /** The names the script knows, which a step's intent may keep: its inputs and its variables. */
@@ -176,8 +176,7 @@ class ScriptWriter(
     private fun act(step: Step, pad: String): List<String> {
         val relation = why.relation(step, source)
         val arguments = bindings.arguments(step)
-        val goal = capture.source != null
-        val intent = intent(step, names)?.let { "intent = " + kotlinString(spoken(it, arguments, goal)) }
+        val intent = said(capture, step, names, arguments)
         reviews += arguments.count { it.review != null }
         val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
             listOfNotNull(intent)).joinToString(", ") + ")"
@@ -203,6 +202,28 @@ private fun spoken(words: String, arguments: List<Argument>, goal: Boolean): Str
     if (!goal) return words
     return arguments.flatMap { it.named.entries }.filter { it.key.isNotEmpty() }.fold(words) { said, (text, name) ->
         Regex("(?<![\\w$])(?<!\\d\\.)${Regex.escape(text)}(?![\\w])(?!\\.\\d)").replace(said) { "\${$name}" }
+    }
+}
+
+/**
+ * What [step] of [capture] was for, as its act or follow says it: `intent = "…"`, a person's words, those of the goal
+ * step whose job it did, or the script's; else `inferred = "…"`, the words a model chose it by, each value an
+ * earlier answer gave put as the variable of [names] the script reads it from ([arguments]). Null when there are none.
+ */
+private fun said(capture: Capture, step: Step, names: Set<String>, arguments: List<Argument>): String? {
+    val goal = capture.source != null
+    // A goal run's acts are the planner's, each in its words, but the act that did a step's job has the step's;
+    // a script's are its author's, but where it said they were a model's.
+    val person = if (goal) {
+        capture.marks(step)["intent"]?.toString()
+    } else {
+        intent(step, names).takeIf { step.inferred == null }
+    }
+    val inferred = if (goal) intent(step, names) else step.inferred
+    return when {
+        person != null -> "intent = " + kotlinString(person)
+        inferred != null -> "inferred = " + kotlinString(spoken(inferred, arguments, goal))
+        else -> null
     }
 }
 

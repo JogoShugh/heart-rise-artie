@@ -102,6 +102,9 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
     every run of the script, which says so at its top; every other step is
     fixed. The step kept is the person's words, not the planner's: those say
     how this run closed it, which is what the model is to decide each time.
+    Every other act keeps its step's words too, a person's intent, each
+    input the variable the script reads; the planner's own words for an act
+    are kept only where no step's words are, as inferred.
     Given line 10 of "fix.goal.md" reads '- Comment "Fixed: {issue.title}."', indented 2
     And line 12 of "fix.goal.md" reads '- Close it `reasoned`', indented 2
     And the planner will move
@@ -138,6 +141,9 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
     And the script "fix-gen.kts" has a line with "Fixed: $issueTitle."
     And the script "fix-gen.kts" has a line with "act(intent = \"Close it\")"
     And the script "fix-gen.kts" has no line with "as completed"
+    And the script "fix-gen.kts" has a line with "intent = \"Open issue ${number} of acme/rockets\""
+    And the script "fix-gen.kts" has a line with "intent = \"\"\"Comment \"Fixed: {issue.title}.\"\"\"\""
+    And the script "fix-gen.kts" has no line with "intent = \"open issue"
     And the script "fix-gen.kts" has a line with "until(tries = 3) { offers(\"github:reopen\") }"
     And the script "fix-gen.kts" has a line with "// 1 step calls the model on every run: artie run needs --reasoner."
 

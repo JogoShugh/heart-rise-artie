@@ -173,6 +173,9 @@ internal object GoalText {
     fun check(facts: Map<String, Any?>) = "check(" +
         facts.entries.joinToString { (member, value) -> "${kotlinString(member, false)} to ${literal(value)}" } + ")"
 
+    /** A goal's [text] as a script says it, a person's intent: each of [inputs] the variable it reads. */
+    fun spoken(text: String, inputs: Set<String>): String = fill(text, inputs) { "\${$it}" }
+
     /**
      * [text] with each `{name}`, `$name` or `${name}` of one of [inputs] put as its [value]; `{{` and `}}`, a goal
      * file's braces, put as one.

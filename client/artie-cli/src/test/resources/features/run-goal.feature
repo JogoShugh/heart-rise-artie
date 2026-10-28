@@ -67,8 +67,8 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | line                                                    |
       | val number by input()                                   |
       | heart("scripted://service/") {                          |
-      | act("issues-get", "number" to number, intent = "open issue $number") { |
-      | act("close", intent = "close it")                       |
+      | act("issues-get", "number" to number, inferred = "open issue $number") { |
+      | act("close", inferred = "close it")                       |
 
   Scenario: The capture keeps the client's count of model calls and tokens
     Given the planner will move
