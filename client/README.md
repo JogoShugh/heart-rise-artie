@@ -52,6 +52,45 @@ Without it, a run against `https://localhost:8392` stops with "PKIX path buildin
 **The model**, for `--reasoner claude`, reads `ANTHROPIC_API_KEY`, or else the bearer entry for
 `https://api.anthropic.com` in the credentials, as for any origin.
 
+## From plain text to rails
+
+One job can be run at five levels, each made from the one before by `artie generate`, from a single recorded run.
+Going down, the model does less and the script says more; what stays the same is the person's words.
+
+| Level | File | Who decides each step | Model on every run |
+|---|---|---|---|
+| 1. The goal, in plain text | `merge.goal.md` | The model, reading each line | Every step |
+| 2. The run in words | `merge.intent.kts` | The model, picking from what is offered; the shape is code | Every act |
+| 3. Relations, with their words | `merge.kts` | The script; held to its lock file | Only a `reasoned` line |
+| 4. The same script, at a level of care | `merge.kts --guard …` | The script, trusting more or less | Only a `reasoned` line |
+| 5. Bare | `merge.bare.kts` | The script, at fixed addresses, no checks | Only a `reasoned` line |
+
+The same act at each level:
+
+```kotlin
+// 1. merge.goal.md
+//    - Once it can be merged, merge it by squashing.
+
+// 2. merge.intent.kts
+act(intent = "merge it by squashing.") {}
+
+// 3. merge.kts
+act("github:merge", "merge_method" to "squash", intent = "merge it by squashing.") {}
+
+// 5. merge.bare.kts
+once("PUT", "https://api.github.com/repos/${owner}/${repo}/pulls/${member["number"].text}/merge",
+    mapOf("merge_method" to "squash", "sha" to member["head"]["sha"].text), giveUp = 3.minutes, ...)
+```
+
+**Whose words.** An act's words say what it is for, and whose they are:
+
+- `intent = "…"`: a person's words, from a line of the goal or written in a script. In a script made from a goal run,
+  the act that did a goal step's job carries that step's words, each input as the variable the script reads.
+- `inferred = "…"`: words a model wrote while it ran, for an act no goal line names: a step it added on its way, or
+  every act of a goal written in plain prose.
+
+An act carries one or the other. Either is handed to the reasoner when the act has no relation.
+
 ## The merge watch, start to finish
 
 The merge watch is one job, run every way ARTIE can run it. A HEART gateway in front of GitHub
@@ -112,17 +151,41 @@ The model reads each line and picks, from the links and forms the gateway offers
 does what the line says.
 
 ```sh
-artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2 --exchanges --trace runs/live-3.yaml
+artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2 --exchanges --trace runs/live-4.yaml
 ```
 
 The watch runs until someone closes its issue. `--trace` keeps every step; `--exchanges` keeps each request and
 answer in it, which `artie generate --bare` needs later.
 
-### 3. Keep the script it amounts to
+### 3. Keep the run in words, then the script it amounts to
 
 ```sh
-artie generate runs/live-3.yaml --script merge.goal.md --out merge.kts
+artie generate runs/live-4.yaml --script merge.goal.md --intents --out merge.intent.kts
+artie generate runs/live-4.yaml --script merge.goal.md --out merge.kts
 ```
+
+The first keeps the run's shape as code, each act as its words alone, for the reasoner to choose on every run:
+
+```kotlin
+act(intent = "In ${owner}/${repo}") {
+    act(intent = """Open an issue titled "Merge watch", saying "Close this issue to stop the watch."""") {
+        keepAs("watch")
+    }
+}
+watch(until = { at("watch") { "state" eq "closed" } }) {
+    act(intent = "a pull request labelled ${label} changes") {
+        whenever {
+            has { "github:labels" has label }
+            leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+            once("github:merge", giveUp = 3.minutes, otherwise = { why -> act(intent = "tell its author ...") }) {
+                act(intent = "merge it by squashing.") {}
+            }
+        }
+    }
+}
+```
+
+The second fixes each choice the run made.
 
 This writes three files:
 
@@ -134,20 +197,30 @@ This writes three files:
 The heart of `merge.kts`:
 
 ```kotlin
+act("github:repos-get", "owner" to owner, "repo" to repo, intent = "In ${owner}/${repo}") {
+    act("github:open-issue", intent = """Open an issue titled "Merge watch", saying "Close this issue to stop the watch."""", fields = {
+        "title" to "Merge watch"
+        "body" to "Close this issue to stop the watch."
+    }) {
+        keepAs("watch")
+    }
+}
 watch(until = { at("watch") { "state" eq "closed" } }) {
-    act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label) {
+    act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label, intent = "a pull request labelled ${label} changes") {
         whenever {
             has { "github:labels" has label }
             leaveWhere("leave it, and say so once.") { "github:labels" has hold }
             once("github:merge", giveUp = 3.minutes, otherwise = { why ->
                 act(intent = "tell its author in one friendly sentence why it wasn't merged ... ${why ?: "no reason given"}")
             }) {
-                act("github:merge", "merge_method" to "squash") {}
+                act("github:merge", "merge_method" to "squash", intent = "merge it by squashing.") {}
             }
         }
     }
 }
 ```
+
+Every act carries the goal's own words beside its relation.
 
 List a script's inputs without running it:
 
@@ -183,7 +256,7 @@ from a goal run kept with `--exchanges`, and the gateway's record of the calls i
 (`GATEWAY_RECORD`):
 
 ```sh
-artie generate runs/rails-1.yaml --bare runs/rails-1.upstream.yaml --out merge.bare.kts
+artie generate runs/live-4.yaml --bare runs/live-4.upstream.yaml --out merge.bare.kts
 artie run merge.bare.kts owner=JogoShugh --reasoner claude
 ```
 
@@ -275,7 +348,7 @@ By default, `artie run` prints one line per step and a last line saying how the 
 ## `artie generate`
 
 ```
-artie generate <capture.yaml> --out <script.kts> [--script <source>] [--keep-reason] [--inputs a,b] [--report <dir>]
+artie generate <capture.yaml> --out <script.kts> [--script <source>] [--keep-reason] [--intents] [--inputs a,b] [--report <dir>]
 artie generate <capture.yaml> --bare <upstream.yaml> --out <script.bare.kts>
 ```
 
@@ -286,6 +359,7 @@ artie generate <capture.yaml> --bare <upstream.yaml> --out <script.bare.kts>
 | `--out FILE` | The script to write. Beside it, `NAME.pins.yaml` and `NAME.derivation.yaml`. |
 | `--script FILE` | The goal or script the run ran. With a goal, the generated script follows its lines and keeps its words as each act's `intent`. |
 | `--keep-reason` | Keeps each reasoned step as a reasoned step, instead of writing down the choice the model made. |
+| `--intents` | Writes the run in words only: its shape as code, each act and follow as `act(intent = "…")` or `act(inferred = "…")`, for the reasoner to choose on every run. A watch's acts too; what `once` waits for stays named. |
 | `--inputs a,b` | Makes the values the run sent under these fields into inputs, defaulting to what was sent. |
 | `--report DIR` | Builds a derivation report in DIR: the source and the generated script side by side, each derivation numbered on both (needs `--script`). |
 | `--bare FILE` | Writes a bare script instead, from the gateway's upstream record FILE: each act the call it came down to, at a fixed address. A run that watched becomes a bare watch with the same words. Needs a capture kept with `--exchanges`. |

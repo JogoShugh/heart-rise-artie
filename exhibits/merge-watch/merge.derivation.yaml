@@ -1,9 +1,9 @@
-# How merge.kts was derived from runs/live-3.yaml, the run of merge.goal.md: each derivation, numbered
+# How merge.kts was derived from runs/live-4.yaml, the run of merge.goal.md: each derivation, numbered
 # in the order merge.kts first shows it, with the rule of spec/PLAN-SCRIPT-GENERATOR.md that bound it, and where it
 # stands in both scripts (line and column, from 1); rows: where each step of the run begins in both.
 script: 'merge.kts'
 source: 'merge.goal.md'
-capture: 'runs/live-3.yaml'
+capture: 'runs/live-4.yaml'
 rows:
   - {at: 'inputs', source: null, generated: 6}
   - {at: '1', source: null, generated: 11}
@@ -72,6 +72,6 @@ derivations:
     title: '"Close this issue to stop the watch.", as the words wrote it'
     why: 'Written in the words, outside any slot: a constant, never read from an answer.'
     source:
-      - {line: 2, column: 63, text: 'Close this issue to stop the watch.'}
+      - {line: 2, column: 67, text: 'Close this issue to stop the watch.'}
     generated:
       - {line: 15, column: 23, text: '"Close this issue to stop the watch."'}

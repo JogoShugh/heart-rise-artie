@@ -1,4 +1,4 @@
-// Made by artie generate --bare from runs/rails-1.yaml and runs/rails-1.upstream.yaml (spec/ideas/bare-runs.md, "Rails"):
+// Made by artie generate --bare from runs/live-4.yaml and runs/live-4.upstream.yaml (spec/ideas/bare-runs.md, "Rails"):
 // the kept script's watch, its words kept, each act brought down to the call it made to the service, at a
 // fixed address. No entry, no forms, no validators, no reasons for absence: where the kept script waits for a
 // form, this tries the call, and the service's refusal is the only gate.
