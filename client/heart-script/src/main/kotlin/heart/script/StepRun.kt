@@ -265,13 +265,24 @@ internal class StepMarks(private val run: Run, private val spoken: (String) -> S
         // What the step named is what the act whose block it was done in led to.
         step.name?.let { name -> (at?.takeIf { it in lines } ?: lines.lastOrNull())?.let { mark(it)["as"] = name } }
         // A reasoned step is kept in the person's words: the planner's say how this run decided it.
-        if (step.reasoned) lines.forEach { mark(it)["reasoned"] = step.words }
+        if (step.reasoned) return lines.forEach { mark(it)["reasoned"] = step.words }
+        val words = spoken(step.words)
         // Any other step's words are the intent of the act that did its job, its last: a person's, not the planner's.
-        else lines.lastOrNull()?.let { mark(it)["intent"] = spoken(step.words) }
+        // A step that only says where its sub-steps happen names no act: the act that got there, and any act on
+        // the way to a step's job, keeps the planner's words, from the step's.
+        lines.forEachIndexed { at, line ->
+            val job = at == lines.lastIndex && !step.scopes
+            mark(line)[if (job) "intent" else "fromIntent"] = words
+        }
     }
 
     private fun mark(line: Int) = run.marks.getOrPut(line) { mutableMapOf() }
 }
+
+/** Whether this step only says where its sub-steps happen, `In {owner}/{repo}`, `On {issue}`: it names no act. */
+private val Step.Intent.scopes: Boolean get() = children.isNotEmpty() && SCOPE.matches(words.trim())
+
+private val SCOPE = Regex("""(?i)(in|on)\s+\S+""")
 
 /** The lines of the script a goal run's moves amount to, written as they are made; the next step stands for each. */
 internal class MoveLines(private val run: Run) {

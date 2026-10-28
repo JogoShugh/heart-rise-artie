@@ -231,9 +231,12 @@ private fun said(capture: Capture, step: Step, names: Set<String>, arguments: Li
         intent(step, names).takeIf { step.inferred == null }
     }
     val inferred = if (goal) intent(step, names) else step.inferred
+    // The person's words a model's serve: a step that names no act, or an act on the way to a step's job.
+    val from = (if (goal) capture.marks(step)["fromIntent"]?.toString() else step.fromIntent)
+        ?.let { ", fromIntent = " + kotlinString(it) }.orEmpty()
     return when {
         person != null -> "intent = " + kotlinString(person)
-        inferred != null -> "inferred = " + kotlinString(spoken(inferred, arguments, goal))
+        inferred != null -> "inferred = " + kotlinString(spoken(inferred, arguments, goal)) + from
         else -> null
     }
 }

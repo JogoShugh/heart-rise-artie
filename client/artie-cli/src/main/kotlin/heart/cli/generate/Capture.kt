@@ -79,6 +79,9 @@ class Step(val number: Int, private val doc: Map<*, *>) {
 
     /** What an act or follow was for, in words a model inferred (`inferred = …`), as its script said. */
     val inferred: String? = doc["inferred"]?.toString()
+
+    /** The person's words a model's inferred ones serve (`fromIntent = …`), as its script said. */
+    val fromIntent: String? = doc["fromIntent"]?.toString()
     val slots: Map<*, *> = doc["reason"].map()["slots"].map()
     val waitedFor: String? = doc["waited"].map()["for"]?.toString()
     val state: Map<*, *> = doc["now"].map()["state"].map()

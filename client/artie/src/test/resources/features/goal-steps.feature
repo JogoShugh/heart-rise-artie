@@ -104,7 +104,10 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
     how this run closed it, which is what the model is to decide each time.
     Every other act keeps its step's words too, a person's intent, each
     input the variable the script reads; the planner's own words for an act
-    are kept only where no step's words are, as inferred.
+    are kept only where no step's words are, as inferred. A step that only
+    says where its sub-steps happen, On {issue}, names no act: the act that
+    gets there keeps the planner's words, inferred, from the step's,
+    fromIntent.
     Given line 10 of "fix.goal.md" reads '- Comment "Fixed: {issue.title}."', indented 2
     And line 12 of "fix.goal.md" reads '- Close it `reasoned`', indented 2
     And the planner will move
@@ -144,6 +147,8 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
     And the script "fix-gen.kts" has a line with "intent = \"Open issue ${number} of acme/rockets\""
     And the script "fix-gen.kts" has a line with "intent = \"\"\"Comment \"Fixed: {issue.title}.\"\"\"\""
     And the script "fix-gen.kts" has no line with "intent = \"open issue"
+    And the script "fix-gen.kts" has a line with "fromIntent = \"On {issue}\""
+    And the script "fix-gen.kts" has no line with "intent = \"On {issue}\""
     And the script "fix-gen.kts" has a line with "until(tries = 3) { offers(\"github:reopen\") }"
     And the script "fix-gen.kts" has a line with "// 1 step calls the model on every run: artie run needs --reasoner."
 
