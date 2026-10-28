@@ -34,9 +34,11 @@ class WatchLines(private val capture: Capture) {
         val NAMED = Regex("""\bat\("(\w+)"\) \{""")
 
         /** An act with a relation and its words, the last of its arguments: `act("rel", …, intent = "…")`. */
+        private const val TEXT = """(?:"(?:[^"\\]|\\.)*"|""" + "\"\"\".*?\"\"\")"
+
+        /** `intent = "…"`, or `inferred = "…"` with the person's words it serves, `fromIntent = "…"`. */
         val WORDED = Regex(
-            """^(\s*)act\("[^"]*"(?:, .*?)?, ((?:intent|inferred) = (?:"(?:[^"\\]|\\.)*"|""" + "\"\"\".*?\"\"\"" +
-                """))\)""",
+            """^(\s*)act\("[^"]*"(?:, .*?)?, ((?:intent = $TEXT|inferred = $TEXT(?:, fromIntent = $TEXT)?))\)""",
         )
         val UNITS = listOf("minutes", "seconds")
         const val INDENT = "    "

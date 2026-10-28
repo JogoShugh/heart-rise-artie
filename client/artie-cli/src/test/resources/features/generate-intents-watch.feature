@@ -31,7 +31,7 @@ Feature: artie generate --intents writes a goal run's watch in words too
           from: 3
           script: |-
             watch(until = { at("watch") { "state" eq "closed" } }) {
-                act("github:pulls-list", "owner" to owner, "labels" to label, intent = "a pull request labelled ${label} changes") {
+                act("github:pulls-list", "owner" to owner, "labels" to label, inferred = "list pull requests of ${owner} labelled ${label}", fromIntent = "a pull request labelled ${label} changes") {
                     whenever {
                         has { "github:labels" has label }
                         once("github:merge", giveUp = 3.minutes) {
@@ -67,7 +67,7 @@ Feature: artie generate --intents writes a goal run's watch in words too
       | line                                                                  |
       | act(intent = """Open an issue titled "Merge watch"""") {              |
       | watch(until = { at("watch") { "state" eq "closed" } }) {               |
-      | act(intent = "a pull request labelled ${label} changes") {            |
+      | act(inferred = "list pull requests of ${owner} labelled ${label}", fromIntent = "a pull request labelled ${label} changes") { |
       | has { "github:labels" has label }                                     |
       | once("github:merge", giveUp = 3.minutes) {                            |
       | act(intent = "merge it by squashing.") {}                             |
