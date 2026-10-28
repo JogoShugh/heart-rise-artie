@@ -77,22 +77,26 @@ class ScriptWriter(
         if (options.intents) {
             "// The run in words: its shape as it nested, each act said in words for the reasoner to choose on " +
                 "every run."
-        } else if (kept == 0) {
+        } else if (kept == 0 && asked == 0) {
             "// Every selection as that run made it, nested as it nested, with no model."
+        } else if (kept == 0) {
+            "// Every selection as that run made it, nested as it nested; an act it left to the model stays in words."
         } else {
             "// Every selection as that run made it, nested as it nested; " +
                 "where the reasoner chose a value, its reason step is kept."
         },
         "// What it was offered is pinned in $pins, held to before every act.",
         // How often the script calls the model, said where a person sees it first.
-        (if (kept == 1) "// 1 step calls" else "// $kept steps call")
-            .let { "$it the model on every run: artie run needs --reasoner." }.takeIf { kept > 0 },
+        calls(kept, asked)?.let { "// $it: artie run needs --reasoner." },
         ("// A line marked \"review:\" holds a value the reasoner chose: check it before keeping the script.")
             .takeIf { reviews > 0 },
         "//   artie run $out" + capture.inputs.filter { it.value["given"] == "given" }
             .entries.joinToString("") { (name, input) -> " $name=${shell(input["value"].toString())}" } +
-            (if (kept > 0) " --reasoner claude" else ""),
+            (if (kept > 0 || asked > 0) " --reasoner claude" else ""),
     )
+
+    /** The watch's acts written as words alone, each asked of the model whenever the watch reaches it. */
+    private val asked: Int get() = watch.asked(options.intents)
 
     /** The inputs, each as the run's script declared it, else as the capture kept it; the first begins a row. */
     private fun inputs(): List<String> {
@@ -247,6 +251,21 @@ private fun said(capture: Capture, step: Step, names: Set<String>, arguments: Li
  */
 private fun keeps(capture: Capture, step: Step, keepReason: Boolean): Boolean = step.mode == "intent" &&
     (keepReason && step.judged || capture.marks(step)["reasoned"] != null)
+
+/**
+ * Which parts of a script call the model, and how often: [kept] steps on every run, [asked] acts in the watch each
+ * time one is reached. Null when none do.
+ */
+private fun calls(kept: Int, asked: Int): String? {
+    val steps = (if (kept == 1) "1 step calls" else "$kept steps call") + " the model on every run"
+    val acts = if (asked == 1) "1 act in the watch" else "$asked acts in the watch"
+    return when {
+        kept > 0 && asked > 0 -> "$steps, and $acts each time one is reached"
+        kept > 0 -> steps
+        asked > 0 -> "$acts ${if (asked == 1) "calls" else "call"} the model each time one is reached"
+        else -> null
+    }
+}
 
 /** Whether [step] acts: a form, not a link, and not a read. */
 private fun acts(step: Step): Boolean = !step.follows && (step.relation != null || step.mode == "intent") &&

@@ -30,7 +30,11 @@ class WatchLines(private val capture: Capture) {
         INDENT.repeat(depth) + said
     }.orEmpty()
 
+    /** How many of the watch's acts are written as words alone, for the reasoner to choose each time one is reached. */
+    fun asked(intents: Boolean): Int = lines(0, intents).count { ASKED.containsMatchIn(it) }
+
     private companion object {
+        val ASKED = Regex("""^\s*act\((?:intent|inferred) = """)
         val NAMED = Regex("""\bat\("(\w+)"\) \{""")
 
         /** An act with a relation and its words, the last of its arguments: `act("rel", …, intent = "…")`. */

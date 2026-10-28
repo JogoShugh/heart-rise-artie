@@ -65,6 +65,7 @@ Feature: artie generate --intents writes a goal run's watch in words too
     Then artie exits 0
     And the file "watch.kts" has these lines
       | line                                                                  |
+      | // 1 step calls the model on every run, and 2 acts in the watch each time one is reached: artie run needs --reasoner. |
       | act(intent = """Open an issue titled "Merge watch"""") {              |
       | watch(until = { at("watch") { "state" eq "closed" } }) {               |
       | act(inferred = "list pull requests of ${owner} labelled ${label}", fromIntent = "a pull request labelled ${label} changes") { |

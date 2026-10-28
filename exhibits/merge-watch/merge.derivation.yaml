@@ -5,10 +5,10 @@ script: 'merge.kts'
 source: 'merge.goal.md'
 capture: 'runs/live-6.yaml'
 rows:
-  - {at: 'inputs', source: null, generated: 6}
-  - {at: '1', source: null, generated: 11}
-  - {at: '2', source: 1, generated: 12}
-  - {at: '3', source: 2, generated: 16}
+  - {at: 'inputs', source: null, generated: 7}
+  - {at: '1', source: null, generated: 12}
+  - {at: '2', source: 1, generated: 13}
+  - {at: '3', source: 2, generated: 17}
 derivations:
   - n: 1
     kind: input
@@ -18,8 +18,8 @@ derivations:
     source:
       - {line: 1, column: 34, text: '$owner'}
     generated:
-      - {line: 6, column: 1, text: 'val owner by input(question = "Whose repository?")'}
-      - {line: 13, column: 20, text: 'owner'}
+      - {line: 7, column: 1, text: 'val owner by input(question = "Whose repository?")'}
+      - {line: 14, column: 20, text: 'owner'}
   - n: 2
     kind: input
     rule: '1, 2.1'
@@ -28,8 +28,8 @@ derivations:
     source:
       - {line: 1, column: 41, text: '$repo'}
     generated:
-      - {line: 7, column: 1, text: 'val repo by input(default = "heart-github-test", question = "Which repository?")'}
-      - {line: 14, column: 19, text: 'repo'}
+      - {line: 8, column: 1, text: 'val repo by input(default = "heart-github-test", question = "Which repository?")'}
+      - {line: 15, column: 19, text: 'repo'}
   - n: 3
     kind: input
     rule: '1, 2.1'
@@ -37,7 +37,7 @@ derivations:
     why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
     source: []
     generated:
-      - {line: 8, column: 1, text: 'val label by input(default = "dependencies", question = "Which label marks a dependency bump?")'}
+      - {line: 9, column: 1, text: 'val label by input(default = "dependencies", question = "Which label marks a dependency bump?")'}
   - n: 4
     kind: input
     rule: '1, 2.1'
@@ -45,7 +45,7 @@ derivations:
     why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
     source: []
     generated:
-      - {line: 9, column: 1, text: 'val hold by input(default = "hold", question = "Which label means a person objects?")'}
+      - {line: 10, column: 1, text: 'val hold by input(default = "hold", question = "Which label means a person objects?")'}
   - n: 5
     kind: relation
     rule: '9'
@@ -55,8 +55,8 @@ derivations:
       - {line: 1, column: 1, text: 'act'}
       - {line: 2, column: 1, text: 'act'}
     generated:
-      - {line: 12, column: 9, text: '"github:repos-get"'}
-      - {line: 16, column: 13, text: '"github:open-issue"'}
+      - {line: 13, column: 9, text: '"github:repos-get"'}
+      - {line: 17, column: 13, text: '"github:open-issue"'}
   - n: 6
     kind: words
     rule: '2.2'
@@ -65,7 +65,7 @@ derivations:
     source:
       - {line: 2, column: 39, text: 'Merge watch'}
     generated:
-      - {line: 17, column: 24, text: '"Merge watch"'}
+      - {line: 18, column: 24, text: '"Merge watch"'}
   - n: 7
     kind: words
     rule: '2.2'
@@ -74,4 +74,4 @@ derivations:
     source:
       - {line: 2, column: 63, text: 'Close this issue to stop the watch.'}
     generated:
-      - {line: 18, column: 23, text: '"Close this issue to stop the watch."'}
+      - {line: 19, column: 23, text: '"Close this issue to stop the watch."'}
