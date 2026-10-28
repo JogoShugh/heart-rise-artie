@@ -862,8 +862,10 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     The capture keeps the watch as the script its decisions amount to, with
     no model in it, and the step it began at (spec/PLAN-LISTENERS.md, slice
     8): its Until reads again the issue the watch opened, kept by the name
-    the goal gave it, watch. Each act it reaches by keeps the goal's own words
-    beside it, a person's intent: the list, its Whenever's. artie generate
+    the goal gave it, watch. Each act keeps words beside it. A Whenever says
+    what to watch for, not what to do: the list it reads keeps the planner's
+    words, inferred, each input put back as its variable, from the Whenever's,
+    fromIntent. artie generate
     writes it into the script made from the run, which then answers a new
     alert with no model at all.
     Given "acme/rockets" has these issues on the small GitHub
@@ -921,7 +923,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the capture "unless.trace.yaml" keeps the watch as this script, from step 4
       """
       watch(until = { at("watch") { "state" eq "closed" } }) {
-          act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert", intent = "an issue labelled alert changes") {
+          act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert", inferred = "list the open issues of acme/rockets labelled alert", fromIntent = "an issue labelled alert changes") {
               whenever {
                   has { "state" eq "open" }
                   actOnce("github:comment", "body" to "Seen by the bench watch.", listedIn = "github:issues-list-comments") {}
@@ -1403,7 +1405,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | label | alert   |
       | hold  | on-hold |
     Then the run finished
-    And the capture "hold.trace.yaml" keeps a watch script with a line with "act(\"github:issues-list-for-repo\", \"owner\" to \"acme\", \"repo\" to \"rockets\", \"state\" to \"open\", \"labels\" to label, intent = \"an issue labelled ${label} changes\")"
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "act(\"github:issues-list-for-repo\", \"owner\" to \"acme\", \"repo\" to \"rockets\", \"state\" to \"open\", \"labels\" to label, inferred = \"list the open issues of acme/rockets labelled ${label}\", fromIntent = \"an issue labelled ${label} changes\")"
     And the capture "hold.trace.yaml" keeps a watch script with a line with "has { \"github:labels\" has label }"
     And the capture "hold.trace.yaml" keeps a watch script with a line with "leaveWhere(\"leave it.\") { \"github:labels\" has hold }"
     And the capture "hold.trace.yaml" keeps a watch script with no line with "if ("

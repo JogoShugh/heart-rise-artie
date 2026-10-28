@@ -74,7 +74,14 @@ internal fun Here.replay(chosen: Chosen, sources: Map<String, Any?>, block: Here
 }
 
 /** A reasoner's choice, kept to be made again: the link or form, and each value bound to where it came from. */
-internal class Chosen(val kind: String, val relation: String, val title: String?, val values: Map<String, Bound>) {
+internal class Chosen(
+    val kind: String,
+    val relation: String,
+    val title: String?,
+    val values: Map<String, Bound>,
+    /** The words the planner chose it by, as it said them; null when it was not reasoned. */
+    val said: String? = null,
+) {
     /** Whether [other] is this choice made again: the same link or form, with the same values. */
     fun same(other: Chosen): Boolean = kind == other.kind && relation == other.relation && title == other.title &&
         values.mapValues { it.value.kept.toString() } == other.values.mapValues { it.value.kept.toString() }
@@ -86,7 +93,8 @@ internal class Chosen(val kind: String, val relation: String, val title: String?
             return (params["relation"] as? String)?.let { relation ->
                 val values = params.filterKeys { it != "relation" && it != "title" }
                     .mapValues { (_, value) -> Bound.of(value, sources) }
-                Chosen(taken.used?.kind ?: "form", relation, params["title"] as? String, values)
+                val said = taken.asked.say.takeIf { taken.asked.mode == "intent" }
+                Chosen(taken.used?.kind ?: "form", relation, params["title"] as? String, values, said)
             }
         }
     }

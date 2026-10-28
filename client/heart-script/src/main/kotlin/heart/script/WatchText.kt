@@ -10,8 +10,9 @@ import kotlin.time.Duration
  */
 
 /**
- * [chosen], made again: a follow of its link, or an act of its form with each value read again. An act made for a
- * goal's step keeps the step's words, a person's, as its intent ([said]); a follow is a way there, and keeps none.
+ * [chosen], made again: a follow of its link, or an act of its form with each value read again. An act keeps its
+ * words, as the script says them ([said]: `intent = "…"`, or `inferred = "…", fromIntent = "…"`); a follow is a way
+ * there, and keeps none.
  */
 internal fun reach(chosen: Chosen, said: String? = null): String {
     val relation = kotlinString(chosen.relation, slots = false)
@@ -21,8 +22,7 @@ internal fun reach(chosen: Chosen, said: String? = null): String {
     val fields = chosen.values.entries.joinToString("") { (field, value) ->
         ", ${kotlinString(field, slots = false)} to ${expression(value)}"
     }
-    val intent = said?.let { ", intent = ${kotlinString(it, slots = true)}" }.orEmpty()
-    return "act($relation$fields$intent)"
+    return "act($relation$fields${said?.let { ", $it" }.orEmpty()})"
 }
 
 /** How many parts of a chain an `actOnce` is written for: a read, a check on it, and the act it guards. */

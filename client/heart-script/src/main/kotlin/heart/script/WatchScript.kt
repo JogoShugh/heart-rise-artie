@@ -57,18 +57,18 @@ internal class ScriptLines {
  * The script a watch's [decided] parts amount to, with no model in it (spec/PLAN-LISTENERS.md, slice 8): one
  * Whenever a `watch`, several a watch with `listeners`, each look its list reached as decided and each member that
  * matches answered as decided. Its Until reads again, by `at`, the address the variable [named] holds; [entry] is
- * where the script stands as it begins; [fill] puts the inputs and names into words.
+ * where the script stands as it begins; [words] puts the inputs and names into words, and says a goal's and a
+ * model's words as the script does.
  */
 internal class WatchScript(
     private val decided: Decisions,
     private val entry: String,
     private val named: String?,
-    private val fill: (String) -> String,
-    /** A goal's words as the script says them, each input the variable it reads: a person's intent. */
-    private val spoken: (String) -> String = fill,
+    private val words: StepWatch.Host,
 ) {
+    private val fill: (String) -> String = words::fill
     private val out = ScriptLines()
-    private val chains = ChainScript(decided, out, fill, spoken)
+    private val chains = ChainScript(decided, out, fill, words::spoken)
 
     /** The script of [steps], Whenevers side by side. */
     fun text(steps: List<Step.Whenever>): String {
@@ -100,8 +100,11 @@ internal class WatchScript(
     private fun look(step: Step.Whenever, depth: Int) {
         val list = decided.lists[step] ?: return out.said(depth, "${fill(step.match)}: no list decided in this run")
         val match = decided.matches[step].takeUnless { step.saidByWords }
-        // The list is reached for the Whenever: its words, the goal's, are the act's intent.
-        out.open(depth, reach(list, spoken(step.match))) { inside ->
+        // A Whenever says what to watch for, not what to do: the list keeps the planner's words, from the Whenever's.
+        val watched = kotlinString(words.spoken(step.match), slots = true)
+        val listed = list.said?.let { kotlinString(words.unfilled(it), slots = true) }
+        val said = listed?.let { "inferred = $it, fromIntent = $watched" } ?: "intent = $watched"
+        out.open(depth, reach(list, said)) { inside ->
             out.open(inside, "whenever") { member ->
                 if (step.saidByWords || match != null) {
                     guards(step, match).forEach { out.line(member, it) }
@@ -217,7 +220,7 @@ internal class ChainScript(
         }
         val words = if (part == OTHERWISE) intent.otherwise?.words ?: intent.words else intent.words
         // The step's words, the goal's, are the intent of each act the chain makes; a link it follows is a way there.
-        val said = spoken(words)
+        val said = "intent = " + kotlinString(spoken(words), slots = true)
         if (guarded) {
             out.open(depth, "doing(${kotlinString(fill(words), slots = false)})") { parts(chain.parts, it, said) }
         } else {

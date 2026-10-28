@@ -176,6 +176,13 @@ internal object GoalText {
     /** A goal's [text] as a script says it, a person's intent: each of [inputs] the variable it reads. */
     fun spoken(text: String, inputs: Set<String>): String = fill(text, inputs) { "\${$it}" }
 
+    /** [text] with each of [values]' values, as a whole word, put back as its input's variable, longest first. */
+    fun unfilled(text: String, values: Map<String, String>): String = values.entries
+        .filter { it.value.isNotBlank() }.sortedByDescending { it.value.length }
+        .fold(text) { said, (name, value) ->
+            Regex("""(?<![\w-])${Regex.escape(value)}(?![\w-])""").replace(said) { "\${$name}" }
+        }
+
     /**
      * [text] with each `{name}`, `$name` or `${name}` of one of [inputs] put as its [value]; `{{` and `}}`, a goal
      * file's braces, put as one.

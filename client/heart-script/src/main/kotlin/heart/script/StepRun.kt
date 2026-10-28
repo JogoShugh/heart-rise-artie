@@ -43,6 +43,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
             override fun fill(text: String) = this@StepRun.fill(text)
 
             override fun spoken(text: String) = GoalText.spoken(text, inputs)
+
+            override fun unfilled(text: String) = GoalText.unfilled(text, inputs.associateWith(run::value))
         })
     }
 
