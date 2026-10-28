@@ -1,14 +1,14 @@
-# How merge.kts was derived from runs/live-6.yaml, the run of merge.goal.md: each derivation, numbered
+# How merge.kts was derived from runs/live-8.yaml, the run of merge.goal.md: each derivation, numbered
 # in the order merge.kts first shows it, with the rule of spec/PLAN-SCRIPT-GENERATOR.md that bound it, and where it
 # stands in both scripts (line and column, from 1); rows: where each step of the run begins in both.
 script: 'merge.kts'
 source: 'merge.goal.md'
-capture: 'runs/live-6.yaml'
+capture: 'runs/live-8.yaml'
 rows:
   - {at: 'inputs', source: null, generated: 7}
-  - {at: '1', source: null, generated: 12}
-  - {at: '2', source: 1, generated: 13}
-  - {at: '3', source: 2, generated: 17}
+  - {at: '1', source: null, generated: 13}
+  - {at: '2', source: 1, generated: 14}
+  - {at: '3', source: 2, generated: 18}
 derivations:
   - n: 1
     kind: input
@@ -19,7 +19,7 @@ derivations:
       - {line: 1, column: 34, text: '$owner'}
     generated:
       - {line: 7, column: 1, text: 'val owner by input(question = "Whose repository?")'}
-      - {line: 14, column: 20, text: 'owner'}
+      - {line: 15, column: 20, text: 'owner'}
   - n: 2
     kind: input
     rule: '1, 2.1'
@@ -29,7 +29,7 @@ derivations:
       - {line: 1, column: 41, text: '$repo'}
     generated:
       - {line: 8, column: 1, text: 'val repo by input(default = "heart-github-test", question = "Which repository?")'}
-      - {line: 15, column: 19, text: 'repo'}
+      - {line: 16, column: 19, text: 'repo'}
   - n: 3
     kind: input
     rule: '1, 2.1'
@@ -47,6 +47,14 @@ derivations:
     generated:
       - {line: 10, column: 1, text: 'val hold by input(default = "hold", question = "Which label means a person objects?")'}
   - n: 5
+    kind: input
+    rule: '1, 2.1'
+    title: 'told, an input'
+    why: 'Declared as the run''s script declared it (rule 1); each value the run took from it is sent from it (rule 2.1).'
+    source: []
+    generated:
+      - {line: 11, column: 1, text: 'val told by input(default = "watch-told", question = "Which label marks a pull request the watch has told why?")'}
+  - n: 6
     kind: relation
     rule: '9'
     title: 'The relation each reason step chose, named'
@@ -55,9 +63,9 @@ derivations:
       - {line: 1, column: 1, text: 'act'}
       - {line: 2, column: 1, text: 'act'}
     generated:
-      - {line: 13, column: 9, text: '"github:repos-get"'}
-      - {line: 17, column: 13, text: '"github:open-issue"'}
-  - n: 6
+      - {line: 14, column: 9, text: '"github:repos-get"'}
+      - {line: 18, column: 13, text: '"github:open-issue"'}
+  - n: 7
     kind: words
     rule: '2.2'
     title: '"Merge watch", as the words wrote it'
@@ -65,8 +73,8 @@ derivations:
     source:
       - {line: 2, column: 39, text: 'Merge watch'}
     generated:
-      - {line: 18, column: 24, text: '"Merge watch"'}
-  - n: 7
+      - {line: 19, column: 24, text: '"Merge watch"'}
+  - n: 8
     kind: words
     rule: '2.2'
     title: '"Close this issue to stop the watch.", as the words wrote it'
@@ -74,4 +82,4 @@ derivations:
     source:
       - {line: 2, column: 63, text: 'Close this issue to stop the watch.'}
     generated:
-      - {line: 19, column: 23, text: '"Close this issue to stop the watch."'}
+      - {line: 20, column: 23, text: '"Close this issue to stop the watch."'}

@@ -115,6 +115,7 @@ inputs:
   repo:  { default: heart-github-test, question: "Which repository?" }
   label: { default: dependencies, question: "Which label marks a dependency bump?" }
   hold:  { default: hold, question: "Which label means a person objects?" }
+  told:  { default: watch-told, question: "Which label marks a pull request the watch has told why?" }
 ---
 
 Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
@@ -123,15 +124,20 @@ Merge dependency bumps once they can be merged. Keep watching until the watch's 
   - Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
   - Whenever a pull request labelled {label} changes `as pr`
     - If it's labelled {hold}, leave it, and say so once.
+    - If it's labelled {told}, leave it.
     - Once it can be merged, merge it by squashing.
       Or give up after 3 minutes.
-      Otherwise, tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`
+      Otherwise, label it {told}, then tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`
 - Until someone closes {watch}
 ```
 
 The header names the entry point and the inputs. Each `{name}` is an input. The marks in backquotes are ARTIE's:
 `as watch` names what a line made, so a later line can refer to it, and `reasoned` marks a line whose words the
 model writes every time.
+
+The watch tells each pull request why once, across runs. The label `{told}` is the mark: a fact on the pull
+request that any later run reads, so the next watch leaves it. A reasoned Otherwise asks the model one act at a
+time, one for each part after ", then".
 
 Check how ARTIE reads it, with nothing sent:
 
@@ -140,15 +146,18 @@ artie run merge.goal.md --plan-only
 ```
 ```
 start https://localhost:8392/
-inputs owner, repo, label, hold
-line 13:   Open an issue titled "Merge watch", saying "Close this issue to stop the watch." (as watch)
-line 14:   whenever: a pull request labelled {label} changes (as pr)
-line 15:     if: it's labelled {hold}, then: leave it, and say so once.
-line 16:     once: it can be merged, then: merge it by squashing.
-line 17:       give up after 3 minutes
-line 18:       otherwise: tell its author in one friendly sentence why it wasn't merged and what to do next.
-line 19: until: someone closes {watch}
-a goal in steps: 6 steps, nothing sent
+inputs owner, repo, label, hold, told
+context: Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+line 13: In {owner}/{repo}
+line 14:   Open an issue titled "Merge watch", saying "Close this issue to stop the watch." (as watch)
+line 15:   whenever: a pull request labelled {label} changes (as pr)
+line 16:     if: it's labelled {hold}, then: leave it, and say so once.
+line 17:     if: it's labelled {told}, then: leave it.
+line 18:     once: it can be merged, then: merge it by squashing.
+line 19:       give up after 3 minutes
+line 20:       otherwise: label it {told}, then tell its author in one friendly sentence why it wasn't merged and what to do next.
+line 21: until: someone closes {watch}
+a goal in steps: 7 steps, nothing sent
 ```
 
 ### 2. Run the goal: wayfinding
@@ -157,7 +166,7 @@ The model reads each line and picks, from the links and forms the gateway offers
 does what the line says.
 
 ```sh
-artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2 --exchanges --trace runs/live-6.yaml
+artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2 --exchanges --trace runs/live-8.yaml
 ```
 
 The watch runs until someone closes its issue. `--trace` keeps every step; `--exchanges` keeps each request and
@@ -166,8 +175,8 @@ answer in it, which `artie generate --bare` needs later.
 ### 3. Keep the run in words, then the script it amounts to
 
 ```sh
-artie generate runs/live-6.yaml --script merge.goal.md --intents --out merge.intent.kts
-artie generate runs/live-6.yaml --script merge.goal.md --out merge.kts
+artie generate runs/live-8.yaml --script merge.goal.md --intents --out merge.intent.kts
+artie generate runs/live-8.yaml --script merge.goal.md --out merge.kts
 ```
 
 The first keeps the run's shape as code, each act as its words alone, for the reasoner to choose on every run:
@@ -183,7 +192,11 @@ watch(until = { at("watch") { "state" eq "closed" } }) {
         whenever {
             has { "github:labels" has label }
             leaveWhere("leave it, and say so once.") { "github:labels" has hold }
-            once("github:merge", giveUp = 3.minutes, otherwise = { why -> act(intent = "tell its author ...") }) {
+            leaveWhere("leave it.") { "github:labels" has told }
+            once("github:merge", giveUp = 3.minutes, otherwise = { why ->
+                act(intent = "label it ${told}")
+                act(intent = "tell its author ...")
+            }) {
                 act(intent = "merge it by squashing.") {}
             }
         }
@@ -216,7 +229,9 @@ watch(until = { at("watch") { "state" eq "closed" } }) {
         whenever {
             has { "github:labels" has label }
             leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+            leaveWhere("leave it.") { "github:labels" has told }
             once("github:merge", giveUp = 3.minutes, otherwise = { why ->
+                act(intent = "label it ${told}")
                 act(intent = "tell its author in one friendly sentence why it wasn't merged ... ${why ?: "no reason given"}")
             }) {
                 act("github:merge", "merge_method" to "squash", intent = "merge it by squashing.") {}
@@ -238,6 +253,7 @@ owner: a question, "Whose repository?"
 repo: optional, default "heart-github-test"
 label: optional, default "dependencies"
 hold: optional, default "hold"
+told: optional, default "watch-told"
 ```
 
 ### 4. Run the kept script, at the level of care you choose
@@ -265,6 +281,9 @@ from a goal run kept with `--exchanges`, and the gateway's record of the calls i
 artie generate runs/live-6.yaml --bare runs/live-6.upstream.yaml --out merge.bare.kts
 artie run merge.bare.kts owner=JogoShugh --reasoner claude
 ```
+
+The bare script is still made from run 6, before the watch labelled what it told: `--bare` can't yet bring an
+Otherwise in parts down to calls.
 
 Bare is fast, and only as safe as the service's own rules. On the scratch repository, bare merged a pull request
 one commit behind its base, which GitHub calls clean. Every guard level through the gateway held it back: the
