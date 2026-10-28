@@ -64,9 +64,11 @@ internal class WatchScript(
     private val entry: String,
     private val named: String?,
     private val fill: (String) -> String,
+    /** A goal's words as the script says them, each input the variable it reads: a person's intent. */
+    private val spoken: (String) -> String = fill,
 ) {
     private val out = ScriptLines()
-    private val chains = ChainScript(decided, out, fill)
+    private val chains = ChainScript(decided, out, fill, spoken)
 
     /** The script of [steps], Whenevers side by side. */
     fun text(steps: List<Step.Whenever>): String {
@@ -98,7 +100,8 @@ internal class WatchScript(
     private fun look(step: Step.Whenever, depth: Int) {
         val list = decided.lists[step] ?: return out.said(depth, "${fill(step.match)}: no list decided in this run")
         val match = decided.matches[step].takeUnless { step.saidByWords }
-        out.open(depth, reach(list)) { inside ->
+        // The list is reached for the Whenever: its words, the goal's, are the act's intent.
+        out.open(depth, reach(list, spoken(step.match))) { inside ->
             out.open(inside, "whenever") { member ->
                 if (step.saidByWords || match != null) {
                     guards(step, match).forEach { out.line(member, it) }
@@ -199,6 +202,7 @@ internal class ChainScript(
     private val decided: Decisions,
     private val out: ScriptLines,
     private val fill: (String) -> String,
+    private val spoken: (String) -> String = fill,
 ) {
     /**
      * [intent]'s chain for [part], at [depth]. A chain with a check is a `doing` block in the intent's words, each
@@ -211,17 +215,22 @@ internal class ChainScript(
         val guarded = chain.parts.indices.any { at ->
             chain.parts[at] is Chain.Check && saidOnce(chain.parts, at - 1) == null
         }
+        val words = if (part == OTHERWISE) intent.otherwise?.words ?: intent.words else intent.words
+        // The step's words, the goal's, are the intent of each act the chain makes; a link it follows is a way there.
+        val said = spoken(words)
         if (guarded) {
-            val words = if (part == OTHERWISE) intent.otherwise?.words ?: intent.words else intent.words
-            out.open(depth, "doing(${kotlinString(fill(words), slots = false)})") { parts(chain.parts, it) }
+            out.open(depth, "doing(${kotlinString(fill(words), slots = false)})") { parts(chain.parts, it, said) }
         } else {
-            parts(chain.parts, depth)
+            parts(chain.parts, depth, said)
         }
         if (!chain.complete) out.said(depth, "${fill(intent.words)}: decided no further in this run")
     }
 
-    /** [parts] at [depth]: each check a doneWhere on what the act before it reached, or on what is held. */
-    private fun parts(parts: List<Chain.Part>, depth: Int) {
+    /**
+     * [parts] at [depth]: each check a doneWhere on what the act before it reached, or on what is held; each act
+     * with the step's words, [said], as its intent.
+     */
+    private fun parts(parts: List<Chain.Part>, depth: Int, said: String) {
         var at = 0
         while (at < parts.size) {
             val part = parts[at]
@@ -233,13 +242,13 @@ internal class ChainScript(
                 continue
             }
             if (part is Chain.Act && part.opens) {
-                out.open(depth, reach(part.chosen)) { parts(parts.drop(at + 1), it) }
+                out.open(depth, reach(part.chosen, said)) { parts(parts.drop(at + 1), it, said) }
                 return
             }
             out.line(depth, when {
                 part is Chain.Check -> "doneWhere { ${facts(part.facts)} }"
-                next != null -> "${reach((part as Chain.Act).chosen)} { doneWhere { ${facts(next.facts)} } }"
-                else -> "${reach((part as Chain.Act).chosen)} {}"
+                next != null -> "${reach((part as Chain.Act).chosen, said)} { doneWhere { ${facts(next.facts)} } }"
+                else -> "${reach((part as Chain.Act).chosen, said)} {}"
             })
             at += if (part is Chain.Act && next != null) 2 else 1
         }

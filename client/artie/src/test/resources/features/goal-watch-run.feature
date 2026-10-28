@@ -862,8 +862,10 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     The capture keeps the watch as the script its decisions amount to, with
     no model in it, and the step it began at (spec/PLAN-LISTENERS.md, slice
     8): its Until reads again the issue the watch opened, kept by the name
-    the goal gave it, watch. artie generate writes it into the script made
-    from the run, which then answers a new alert with no model at all.
+    the goal gave it, watch. Each act it reaches by keeps the goal's own words
+    beside it, a person's intent: the list, its Whenever's. artie generate
+    writes it into the script made from the run, which then answers a new
+    alert with no model at all.
     Given "acme/rockets" has these issues on the small GitHub
       | number | title                          | state | author |
       | 11     | Bench 2 fell to 4 °C overnight | open  | ada    |
@@ -919,7 +921,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the capture "unless.trace.yaml" keeps the watch as this script, from step 4
       """
       watch(until = { at("watch") { "state" eq "closed" } }) {
-          act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert") {
+          act("github:issues-list-for-repo", "owner" to "acme", "repo" to "rockets", "state" to "open", "labels" to "alert", intent = "an issue labelled alert changes") {
               whenever {
                   has { "state" eq "open" }
                   actOnce("github:comment", "body" to "Seen by the bench watch.", listedIn = "github:issues-list-comments") {}
@@ -1355,7 +1357,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | lead   | ada   |
       | grower | ada   |
     Then the run finished
-    And the capture "who.trace.yaml" keeps a watch script with a line with "act(\"github:assign\", \"assignees\" to listOf(grower)) {}"
+    And the capture "who.trace.yaml" keeps a watch script with a line with "act(\"github:assign\", \"assignees\" to listOf(grower), intent = \"Assign it to ${grower}.\") {}"
 
   Scenario: The checks a watch decides read inputs again, so its script checks what it is given
     Found by the script made from the live seed bench run b15: its If kept
@@ -1401,7 +1403,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | label | alert   |
       | hold  | on-hold |
     Then the run finished
-    And the capture "hold.trace.yaml" keeps a watch script with a line with "act(\"github:issues-list-for-repo\", \"owner\" to \"acme\", \"repo\" to \"rockets\", \"state\" to \"open\", \"labels\" to label)"
+    And the capture "hold.trace.yaml" keeps a watch script with a line with "act(\"github:issues-list-for-repo\", \"owner\" to \"acme\", \"repo\" to \"rockets\", \"state\" to \"open\", \"labels\" to label, intent = \"an issue labelled ${label} changes\")"
     And the capture "hold.trace.yaml" keeps a watch script with a line with "has { \"github:labels\" has label }"
     And the capture "hold.trace.yaml" keeps a watch script with a line with "leaveWhere(\"leave it.\") { \"github:labels\" has hold }"
     And the capture "hold.trace.yaml" keeps a watch script with no line with "if ("
@@ -1536,7 +1538,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     When the goal "idle.goal.md" runs with ARTIE, captured in "idle.trace.yaml", given
       | name | value |
     Then the run finished
-    And the capture "idle.trace.yaml" keeps a watch script with a line with "act(\"github:comment\", \"body\" to \"Seen by the bench watch.\") {}"
+    And the capture "idle.trace.yaml" keeps a watch script with a line with "act(\"github:comment\", \"body\" to \"Seen by the bench watch.\", intent = \"Say on it that the watch has seen it.\") {}"
     And the capture "idle.trace.yaml" keeps a watch script with no line with "follow(\"github:issues-list-comments\")"
 
   Scenario: An Until naming what its resource doesn't hold is refused, so the watch doesn't run to its time limit

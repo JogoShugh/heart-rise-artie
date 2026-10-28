@@ -26,6 +26,9 @@ internal class StepWatch(
 
         /** [text] with the inputs and names put in. */
         fun fill(text: String): String
+
+        /** [text] as a script says it: each input a variable it reads (`${'$'}{label}`), each name put in. */
+        fun spoken(text: String): String
     }
 
 
@@ -46,7 +49,7 @@ internal class StepWatch(
         val entry = goal.start
         val name = until?.let { u -> BRACE.findAll(u.condition).map { it.groupValues[1] }.firstOrNull { it in named } }
         run.watchFrom = run.trace.size + 1
-        run.watchScript = { WatchScript(decided, entry, name, host::fill).text(steps) }
+        run.watchScript = { WatchScript(decided, entry, name, host::fill, host::spoken).text(steps) }
         val done: Facts.() -> Unit = { that(until != null && over(until, here)) }
         val single = steps.singleOrNull()
         if (single != null) {

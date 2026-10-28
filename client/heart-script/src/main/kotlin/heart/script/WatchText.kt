@@ -9,8 +9,11 @@ import kotlin.time.Duration
  * that makes it again, facts as a map, and each value bound to where it came from as the expression that reads it.
  */
 
-/** [chosen], made again: a follow of its link, or an act of its form with each value read again. */
-internal fun reach(chosen: Chosen): String {
+/**
+ * [chosen], made again: a follow of its link, or an act of its form with each value read again. An act made for a
+ * goal's step keeps the step's words, a person's, as its intent ([said]); a follow is a way there, and keeps none.
+ */
+internal fun reach(chosen: Chosen, said: String? = null): String {
     val relation = kotlinString(chosen.relation, slots = false)
     if (chosen.kind == "link") {
         return "follow($relation${chosen.title?.let { ", ${kotlinString(it, slots = false)}" }.orEmpty()})"
@@ -18,7 +21,8 @@ internal fun reach(chosen: Chosen): String {
     val fields = chosen.values.entries.joinToString("") { (field, value) ->
         ", ${kotlinString(field, slots = false)} to ${expression(value)}"
     }
-    return "act($relation$fields)"
+    val intent = said?.let { ", intent = ${kotlinString(it, slots = true)}" }.orEmpty()
+    return "act($relation$fields$intent)"
 }
 
 /** How many parts of a chain an `actOnce` is written for: a read, a check on it, and the act it guards. */

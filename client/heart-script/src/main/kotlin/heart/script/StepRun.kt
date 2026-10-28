@@ -41,6 +41,8 @@ internal class StepRun(val goal: Goal, val planner: Planner, val run: Run, val m
             }
 
             override fun fill(text: String) = this@StepRun.fill(text)
+
+            override fun spoken(text: String) = StepText.fill(text, names, inputs) { "\${$it}" }
         })
     }
 
