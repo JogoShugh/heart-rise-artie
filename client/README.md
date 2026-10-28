@@ -84,12 +84,18 @@ once("PUT", "https://api.github.com/repos/${owner}/${repo}/pulls/${member["numbe
 
 **Whose words.** An act's words say what it is for, and whose they are:
 
-- `intent = "…"`: a person's words, from a line of the goal or written in a script. In a script made from a goal run,
-  the act that did a goal step's job carries that step's words, each input as the variable the script reads.
-- `inferred = "…"`: words a model wrote while it ran, for an act no goal line names: a step it added on its way, or
-  every act of a goal written in plain prose.
+| An act | Carries |
+|---|---|
+| does one of a goal's steps | `intent = "merge it by squashing."`, the person's words |
+| serves a goal line that names no act: `In {owner}/{repo}`, a Whenever, or an act on the way to a step's job | `inferred = "get the repository $owner/$repo", fromIntent = "In ${owner}/${repo}"` |
+| has no goal line at all: a goal in plain prose | `inferred = "close it"` |
 
-An act carries one or the other. Either is handed to the reasoner when the act has no relation.
+- `intent`: a person's words, from a line of the goal or written in a script, each input as the variable the script
+  reads.
+- `inferred`: words a model wrote while it ran, each input's value put back as its variable.
+- `fromIntent`: the person's words that inferred words serve. It is kept for the reader, and never reasoned on alone.
+
+With no relation, the reasoner is handed the intent, or else the inferred words.
 
 ## The merge watch, start to finish
 
@@ -151,7 +157,7 @@ The model reads each line and picks, from the links and forms the gateway offers
 does what the line says.
 
 ```sh
-artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2 --exchanges --trace runs/live-4.yaml
+artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2 --exchanges --trace runs/live-6.yaml
 ```
 
 The watch runs until someone closes its issue. `--trace` keeps every step; `--exchanges` keeps each request and
@@ -160,20 +166,20 @@ answer in it, which `artie generate --bare` needs later.
 ### 3. Keep the run in words, then the script it amounts to
 
 ```sh
-artie generate runs/live-4.yaml --script merge.goal.md --intents --out merge.intent.kts
-artie generate runs/live-4.yaml --script merge.goal.md --out merge.kts
+artie generate runs/live-6.yaml --script merge.goal.md --intents --out merge.intent.kts
+artie generate runs/live-6.yaml --script merge.goal.md --out merge.kts
 ```
 
 The first keeps the run's shape as code, each act as its words alone, for the reasoner to choose on every run:
 
 ```kotlin
-act(intent = "In ${owner}/${repo}") {
+act(inferred = "get the repository $owner/$repo", fromIntent = "In ${owner}/${repo}") {
     act(intent = """Open an issue titled "Merge watch", saying "Close this issue to stop the watch."""") {
         keepAs("watch")
     }
 }
 watch(until = { at("watch") { "state" eq "closed" } }) {
-    act(intent = "a pull request labelled ${label} changes") {
+    act(inferred = "list pull requests of ${owner}/${repo} filtered by label ${label}", fromIntent = "a pull request labelled ${label} changes") {
         whenever {
             has { "github:labels" has label }
             leaveWhere("leave it, and say so once.") { "github:labels" has hold }
@@ -197,7 +203,7 @@ This writes three files:
 The heart of `merge.kts`:
 
 ```kotlin
-act("github:repos-get", "owner" to owner, "repo" to repo, intent = "In ${owner}/${repo}") {
+act("github:repos-get", "owner" to owner, "repo" to repo, inferred = "get the repository $owner/$repo", fromIntent = "In ${owner}/${repo}") {
     act("github:open-issue", intent = """Open an issue titled "Merge watch", saying "Close this issue to stop the watch."""", fields = {
         "title" to "Merge watch"
         "body" to "Close this issue to stop the watch."
@@ -206,7 +212,7 @@ act("github:repos-get", "owner" to owner, "repo" to repo, intent = "In ${owner}/
     }
 }
 watch(until = { at("watch") { "state" eq "closed" } }) {
-    act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label, intent = "a pull request labelled ${label} changes") {
+    act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label, inferred = "list pull requests of ${owner}/${repo} filtered by label ${label}", fromIntent = "a pull request labelled ${label} changes") {
         whenever {
             has { "github:labels" has label }
             leaveWhere("leave it, and say so once.") { "github:labels" has hold }
@@ -220,7 +226,7 @@ watch(until = { at("watch") { "state" eq "closed" } }) {
 }
 ```
 
-Every act carries the goal's own words beside its relation.
+Every act carries words beside its relation: the goal's own, or the model's with the goal line they serve.
 
 List a script's inputs without running it:
 
@@ -256,7 +262,7 @@ from a goal run kept with `--exchanges`, and the gateway's record of the calls i
 (`GATEWAY_RECORD`):
 
 ```sh
-artie generate runs/live-4.yaml --bare runs/live-4.upstream.yaml --out merge.bare.kts
+artie generate runs/live-6.yaml --bare runs/live-6.upstream.yaml --out merge.bare.kts
 artie run merge.bare.kts owner=JogoShugh --reasoner claude
 ```
 
