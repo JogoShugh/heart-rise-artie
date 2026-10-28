@@ -465,14 +465,26 @@ internal fun gaveUpIntent(words: String, why: String?): String =
     "${words.trimEnd('.')}. The wait gave up, and the server says why: ${why ?: NO_REASON}"
 
 /**
+ * A reasoned Otherwise's [words] in parts, each after ", then", one act of the reasoner's each, in order: the
+ * reasoner chooses one act at a time. The server's reason [why] goes with the last part, the one it is for.
+ */
+internal fun gaveUpIntents(words: String, why: String?): List<String> {
+    val parts = words.split(THEN).map { it.trim() }
+    return parts.dropLast(1) + gaveUpIntent(parts.last(), why)
+}
+
+private const val THEN = ", then "
+
+/**
  * A reasoned Otherwise at [here]: the reasoner asked, in its words with the server's reason [why], every time;
  * nothing kept to replay. One decision at a time, as the planner is asked, by the run's [host]; [moves] is told.
  */
 private fun judged(otherwise: Otherwise, here: Here, why: String?, host: StepWatch.Host, moves: MutableList<String>) =
     synchronized(host) {
-        val words = gaveUpIntent(host.fill(otherwise.words), why)
-        moves += "otherwise: asked the reasoner, as the step is marked reasoned: $words"
-        here.act(intent = words)
+        gaveUpIntents(host.fill(otherwise.words), why).forEach { words ->
+            moves += "otherwise: asked the reasoner, as the step is marked reasoned: $words"
+            here.act(intent = words)
+        }
     }
 
 /** What a reasoned Otherwise is told when the server gave no reason. */

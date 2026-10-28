@@ -4,6 +4,7 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /** script-watch.feature: a script that keeps watching the small GitHub, in process. */
 class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: ScriptSteps) {
@@ -224,6 +225,15 @@ class WatchSteps(private val gateway: GitHubGatewaySteps, private val scripts: S
     @Given("issue {long} of {string} is labelled {string} on the small GitHub")
     fun issueLabelled(number: Long, repository: String, label: String) {
         gateway.github.issues.first { "${it.owner}/${it.repo}" == repository && it.number == number }.labels += label
+    }
+
+    /** A pull request is an issue too, numbered as it is: its label is on either, as the small GitHub keeps them. */
+    @Then("pull request {long} of {string} is labelled {string} on the small GitHub")
+    fun pullLabelledNow(number: Long, repository: String, label: String) {
+        fun mine(owner: String, repo: String, at: Long) = "$owner/$repo" == repository && at == number
+        val labels = gateway.github.pulls.filter { mine(it.owner, it.repo, it.number) }.flatMap { it.labels } +
+            gateway.github.issues.filter { mine(it.owner, it.repo, it.number) }.flatMap { it.labels }
+        assertTrue(label in labels, "$labels")
     }
 
     @Then("pull request {long} of {string} is closed and not merged on the small GitHub")

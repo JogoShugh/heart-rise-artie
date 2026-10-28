@@ -315,6 +315,70 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the capture "tell.trace.yaml" keeps a watch script with a line with "act(intent = \"tell its author why it wasn't merged. The wait gave up, and the server says why: ${why ?: \"no reason given\"}\")"
     And the capture "tell.trace.yaml" keeps a watch script with no line with "Ada, 1.0"
 
+  Scenario: A reasoned Otherwise in parts, each after ", then", is one act of the model's each, in order
+    The reasoner chooses one act at a time. An Otherwise that says two
+    things, "label it, then tell its author why", is two parts, each asked
+    of the reasoner in turn; the server's reason goes with the last, the
+    part it is for. The script made from the run asks the same, part by
+    part. A label a run leaves is a fact any later reader sees.
+    Given pull request 2 is a draft on the small GitHub
+    And "acme/rockets" has these issues on the small GitHub
+      | number | title                  | state | author |
+      | 1      | Bump left-pad to 1.0.1 | open  | ada    |
+      | 2      | Bump left-pad to 1.0.2 | open  | ada    |
+    And issue 10 of "acme/rockets" is closed on the small GitHub once issue 1 has a new comment
+    And the file "told.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label: dependabot
+        told: watch-told
+      ---
+
+      Merge the pull requests labelled {label}, or tell their authors why not, once.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever a pull request labelled {label} changes `as pr`
+        - Once it can be merged, merge it by squashing.
+          Or give up after 15 seconds.
+          Otherwise, label it {told}, then tell its author why it wasn't merged. `reasoned`
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                       | opens | relation     | facts                             |
+      | act   | open issue 10 of acme/rockets               | yes   |              |                                   |
+      | done  |                                             |       |              |                                   |
+      | act   | list the open pull requests of acme/rockets | yes   |              |                                   |
+      | check |                                             |       |              | {"github:labels": ["dependabot"]} |
+      | wait  |                                             |       | github:merge |                                   |
+      | act   | merge it by squashing                       |       |              |                                   |
+      | done  |                                             |       |              |                                   |
+      | check |                                             |       |              | {"state": "closed"}               |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                                    |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10}                  |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}                     |
+      | github:merge      | {"merge_method": "squash"}                                                |
+      | github:label      | {"labels": ["watch-told"]}                                                |
+      | github:comment    | {"body": "Ada, 1.0.2 is still a draft: mark it ready and it will merge."} |
+      | github:label      | {"labels": ["watch-told"]}                                                |
+      | github:comment    | {"body": "Ada, 1.0.1 is still a draft: mark it ready and it will merge."} |
+    When the goal "told.goal.md" runs with ARTIE, captured in "told.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+      | told  | watch-told |
+    Then the run finished
+    And pull request 2 of "acme/rockets" is labelled "watch-told" on the small GitHub
+    And pull request 1 of "acme/rockets" is labelled "watch-told" on the small GitHub
+    And issue 1 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                                                          |
+      | ada    | Ada, 1.0.1 is still a draft: mark it ready and it will merge. |
+    And ARTIE's reasoner was asked 7 times
+    And ARTIE's reasoner was last asked to "tell its author why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first."
+    And the capture "told.trace.yaml" keeps a watch script with a line with "act(intent = \"label it ${told}\")"
+    And the capture "told.trace.yaml" keeps a watch script with a line with "act(intent = \"tell its author why it wasn't merged. The wait gave up, and the server says why: ${why ?: \"no reason given\"}\")"
+
   Scenario: A planner that stops while a watch decides ends the run, saying why, rather than looking again
     A failed look is tried again at the next; a decision the planner won't
     make would only be asked again, and again.

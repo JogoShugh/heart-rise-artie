@@ -153,10 +153,10 @@ internal class WatchScript(
         val giveUp = once.giveUp?.after?.let { ", giveUp = ${duration(it)}" }.orEmpty()
         val otherwise = intent.otherwise
         if (otherwise != null && otherwise.reasoned) {
-            // The model's every time: asked in the step's words, with the server's reason.
-            val asked = kotlinString(gaveUpIntent(fill(otherwise.words), WHY_MARK), slots = true)
+            // The model's every time: asked in the step's words, part by part, with the server's reason.
+            val asked = gaveUpIntents(words.spoken(otherwise.words), WHY_MARK).map { kotlinString(it, slots = true) }
             out.line(depth, "once(${quoted(relation)}$giveUp, otherwise = { why ->")
-            out.line(depth + 1, "act(intent = ${asked.replace(WHY_MARK, WHY_SLOT)})")
+            asked.forEach { out.line(depth + 1, "act(intent = ${it.replace(WHY_MARK, WHY_SLOT)})") }
             out.line(depth, "}) {")
             chains.chain(intent, ACT, depth + 1)
             out.line(depth, "}")
