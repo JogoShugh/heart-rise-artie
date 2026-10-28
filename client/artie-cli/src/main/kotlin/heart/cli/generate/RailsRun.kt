@@ -80,8 +80,13 @@ internal class Templates(inputs: Map<String, Map<*, *>>) {
             "\"$k\" to ${value(x, sources, words)}"
         }
         is List<*> -> "listOf(" + v.joinToString(", ") { value(it, sources, words) } + ")"
-        // In a reasoned call, words are the reasoner's to write, whatever values they happened to hold in the run.
-        is String -> if (words != null && !SHA.matches(v)) "write($words)" else text(v, sources)
+        // In a reasoned call, words are the reasoner's to write, whatever values they happened to hold in the run;
+        // a value that is an input's, as a label the goal names, is the input's.
+        is String -> if (words != null && !SHA.matches(v) && given.none { it.first == v }) {
+            "write($words)"
+        } else {
+            text(v, sources)
+        }
         is Number -> read(v.toString(), sources) ?: v.toString()
         else -> v.toString()
     }

@@ -155,8 +155,11 @@ internal class RailsWriter(private val evidence: RailsRun, private val names: Pa
     }
 }
 
-/** A reasoned step's words up to where the reason it was told goes, as the step said them. */
-private fun opening(literal: String): String = literal.removeSurrounding("\"").substringBefore("\${why")
+/**
+ * A reasoned step's words up to the first value the script puts in (an input, or the reason it was told), as the
+ * step said them: the run said them with that value already in.
+ */
+private fun opening(literal: String): String = literal.removeSurrounding("\"").substringBefore("\${")
     .replace("\\\"", "\"").replace("\\$", "$").replace("\\\\", "\\")
 
 /**

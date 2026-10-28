@@ -39,6 +39,11 @@ Feature: A watch run's capture made a bare watch: the kept script's words, over 
             given: default
             default: hold
             question: Which label means someone objects?
+          told:
+            value: watch-told
+            given: default
+            default: watch-told
+            question: Which label marks one told why?
         source: |-
           act(intent = "get repository $owner/$repo")
           act(intent = "Open an issue titled \"Merge watch\"")
@@ -53,7 +58,9 @@ Feature: A watch run's capture made a bare watch: the kept script's words, over 
                     whenever {
                         has { "github:labels" has label }
                         leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+                        leaveWhere("leave it.") { "github:labels" has told }
                         once("github:merge", giveUp = 3.minutes, otherwise = { why ->
+                            act(intent = "label it ${told}")
                             act(intent = "tell its author why it wasn't merged. The server says why: ${why ?: "no reason given"}")
                         }) {
                             act("github:merge", "merge_method" to "squash") {}
@@ -144,6 +151,20 @@ Feature: A watch run's capture made a bare watch: the kept script's words, over 
             url: https://localhost:8392/repos/acme/rockets/pulls/8
             headers:
               traceparent: 00-0189d6a9b7a605907ec3a4d57bc079e5-0000000000000006-01
+          response:
+            status: 200
+      ---
+      mode: intent
+      say: label it watch-told
+      params:
+        relation: github:label
+      outcome: done
+      exchanges:
+        - request:
+            method: POST
+            url: https://localhost:8392/repos/acme/rockets/pulls/8/actions/label
+            headers:
+              traceparent: 00-0189d6a9b7a605907ec3a4d57bc079e5-0000000000000008-01
           response:
             status: 200
       ---
@@ -246,6 +267,19 @@ Feature: A watch run's capture made a bare watch: the kept script's words, over 
           head:
             sha: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
       ---
+      traceparent: 00-0189d6a9b7a605907ec3a4d57bc079e5-0000000000000008-01
+      request:
+        method: POST
+        url: https://api.github.com/repos/acme/rockets/issues/8/labels
+        body:
+          labels:
+            - watch-told
+      response:
+        status: 200
+        body:
+          - name: deps
+          - name: watch-told
+      ---
       traceparent: 00-0189d6a9b7a605907ec3a4d57bc079e5-0000000000000007-01
       request:
         method: POST
@@ -270,7 +304,7 @@ Feature: A watch run's capture made a bare watch: the kept script's words, over 
     Then artie exits 0
     And artie prints
       | line                                                                         |
-      | wrote watch.bare.kts: the watch's words over 6 calls to the service, at fixed addresses |
+      | wrote watch.bare.kts: the watch's words over 7 calls to the service, at fixed addresses |
     And the file "watch.bare.kts" reads
       """
       // Made by artie generate --bare from watch.trace.yaml and upstream.yaml (spec/ideas/bare-runs.md, "Rails"):
@@ -283,6 +317,7 @@ Feature: A watch run's capture made a bare watch: the kept script's words, over 
       val repo by input(default = "rockets", question = "Which repository?")
       val label by input(default = "deps", question = "Which label marks a bump?")
       val hold by input(default = "hold", question = "Which label means someone objects?")
+      val told by input(default = "watch-told", question = "Which label marks one told why?")
 
       bare {
           val watch = call("POST", "https://api.github.com/repos/${owner}/${repo}/issues", mapOf("title" to "Merge watch", "body" to "Close this issue to stop the watch."))
@@ -291,7 +326,9 @@ Feature: A watch run's capture made a bare watch: the kept script's words, over 
                   val member = call("GET", "https://api.github.com/repos/${owner}/${repo}/pulls/${item["number"].text}")
                   has(member["labels"] has label)
                   leaveWhere("leave it, and say so once.", member["labels"] has hold)
+                  leaveWhere("leave it.", member["labels"] has told)
                   once("PUT", "https://api.github.com/repos/${owner}/${repo}/pulls/${member["number"].text}/merge", mapOf("merge_method" to "squash", "sha" to member["head"]["sha"].text), giveUp = 3.minutes, otherwise = { why ->
+                      call("POST", "https://api.github.com/repos/${owner}/${repo}/issues/${member["number"].text}/labels", mapOf("labels" to listOf("${told}")))
                       call("POST", "https://api.github.com/repos/${owner}/${repo}/issues/${member["number"].text}/comments", mapOf("body" to write("tell its author why it wasn't merged. The server says why: ${why ?: "no reason given"}")))
                   })
               }

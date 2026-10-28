@@ -278,12 +278,9 @@ from a goal run kept with `--exchanges`, and the gateway's record of the calls i
 (`GATEWAY_RECORD`):
 
 ```sh
-artie generate runs/live-6.yaml --bare runs/live-6.upstream.yaml --out merge.bare.kts
+artie generate runs/live-8.yaml --bare runs/live-8.upstream.yaml --out merge.bare.kts
 artie run merge.bare.kts owner=JogoShugh --reasoner claude
 ```
-
-The bare script is still made from run 6, before the watch labelled what it told: `--bare` can't yet bring an
-Otherwise in parts down to calls.
 
 Bare is fast, and only as safe as the service's own rules. On the scratch repository, bare merged a pull request
 one commit behind its base, which GitHub calls clean. Every guard level through the gateway held it back: the
