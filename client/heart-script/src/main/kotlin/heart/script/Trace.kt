@@ -26,8 +26,17 @@ class TraceStep(
     /** What a test script expected this step to answer, in words (heart-script-test); null when nothing. */
     var expect: String? = null
 
-    /** What an act was for, in words, as its script said (`act(rel, …, intent = …)`); null when it didn't. */
+    /** What an act was for, in a person's words, as its script said (`act(rel, …, intent = …)`); null if none. */
     var intent: String? = null
+
+    /** What an act was for, in words a model inferred (`act(rel, …, inferred = …)`); null when there are none. */
+    var inferred: String? = null
+
+    /** Keeps [said]: a person's words as the intent, a model's as inferred. */
+    fun said(said: Said) {
+        intent = said.intent
+        inferred = said.inferred
+    }
 
     /** The script line this step came from, as its author numbers it; null when run outside a script. */
     var line: Int? = null
@@ -74,6 +83,7 @@ class TraceStep(
         put("mode", asked.mode)
         put("say", asked.say)
         intent?.let { put("intent", it) }
+        inferred?.let { put("inferred", it) }
         line?.let { put("line", it) }
         within?.let { put("within", it) }
         put("params", JsonObject(asked.params.mapValues { (_, v) -> element(v) }))

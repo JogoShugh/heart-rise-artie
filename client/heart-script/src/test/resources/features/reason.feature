@@ -84,6 +84,35 @@ Feature: A script's reason step: a model chooses one selection from what is offe
     And trace step 3 keeps the intent "read what they said"
     And trace step 5 keeps the intent "we're done with this one"
 
+  Scenario: Words a model inferred are kept apart from a person's intent, and reasoned on alike
+    An intent is a person's words, written in a goal or a script. Words a
+    model wrote while it ran, its reading of a goal's line, are inferred:
+    worth keeping beside the act, for a reader and for the reasoner, but not
+    the person's. A script says which by its argument; the trace keeps them
+    apart. With no relation, inferred words are reasoned on, as an intent is.
+    When this script runs, allowed a reasoner
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10, inferred = "get issue 10") {
+              act("close", intent = "we're done with this one")
+          }
+          act(inferred = "we're done with this one")
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                     |
+      | enter  | scripted://service/      |
+      | act    | issues-get {"number":10} |
+      | act    | close                    |
+      | return | /                        |
+      | reason | we're done with this one |
+      | act    | close                    |
+    And the trace's steps keep these words
+      | step | intent                   | inferred     |
+      | 2    |                          | get issue 10 |
+      | 3    | we're done with this one |              |
+
   Scenario: A run not allowed a reasoner stops at the reason step
     When this script runs
       """kotlin

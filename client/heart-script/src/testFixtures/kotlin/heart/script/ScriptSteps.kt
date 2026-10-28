@@ -200,6 +200,19 @@ class ScriptSteps {
         assertEquals(words, intent?.removeSurrounding("'")?.removeSurrounding("\""), documents[step])
     }
 
+    @Then("the trace's steps keep these words")
+    fun traceWords(table: DataTable) {
+        val documents = run.traceYaml().split(Regex("(?m)^---$")).filter { it.isNotBlank() }
+        fun member(document: String, name: String) = Regex("(?m)^$name: (.*)$").find(document)?.groupValues?.get(1)
+            ?.removeSurrounding("'")?.removeSurrounding("\"").orEmpty()
+        val says = documents.drop(1).mapIndexed { i, d -> "${i + 1}: ${member(d, "say")}" }.joinToString("; ")
+        table.asMaps().forEach { row ->
+            val document = documents[row.getValue("step").toInt()]
+            assertEquals(row["intent"].orEmpty(), member(document, "intent"), says)
+            assertEquals(row["inferred"].orEmpty(), member(document, "inferred"), says)
+        }
+    }
+
     @Then("trace step {int}'s values are")
     fun traceValues(step: Int, table: DataTable) = assertEquals(
         table.asMaps().associate { it.getValue("name") to it.getValue("value") },
