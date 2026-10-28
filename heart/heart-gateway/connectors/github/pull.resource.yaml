@@ -47,6 +47,13 @@ acts:
     bind: { issue_number: /number }
     # GitHub answers with the new comment; the gateway answers 201, with the comment's address in Location.
     creates: comment
+  label:
+    operation: issues/add-labels
+    title: Label
+    description: Add labels to the pull request.
+    fields: [labels]
+    # GitHub keeps a pull request's labels on the issue it also is, numbered as it is.
+    bind: { issue_number: /number }
   edit:
     operation: pulls/update
     title: Edit

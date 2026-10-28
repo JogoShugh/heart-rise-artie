@@ -24,12 +24,14 @@ Feature: Acts on GitHub pull requests, derived from GitHub's operations
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
     When a client gets "/repos/acme/rockets/pulls/7" through the GitHub gateway
     Then the GitHub gateway offers
       | act            |
       | github:reopen  |
       | github:edit    |
       | github:comment |
+      | github:label   |
 
   Scenario: Close is pulls/update with the state closed
     When a client gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
@@ -41,6 +43,7 @@ Feature: Acts on GitHub pull requests, derived from GitHub's operations
       | github:reopen  |
       | github:edit    |
       | github:comment |
+      | github:label   |
 
   Scenario: Commenting on a pull request is issues/create-comment, at its issue's number, never the client's
     GitHub keeps a pull request's conversation on the issue every pull

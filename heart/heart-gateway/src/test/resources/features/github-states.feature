@@ -16,15 +16,15 @@ Feature: The GitHub connector, as shipped, on GitHub's own answers in every stat
 
   Scenario: What GitHub's example pull request offers in each state
     Then GitHub's own example pull request, number 1347 of "octocat/Hello-World", offers in each state
-      | state               | close | reopen | merge | edit | request-review | update-branch | comment |
-      | open and clean      | yes   | no     | yes   | yes  | yes            | yes           | yes     |
-      | a draft             | yes   | no     | no    | yes  | yes            | yes           | yes     |
-      | behind its base     | yes   | no     | no    | yes  | yes            | yes           | yes     |
-      | blocked             | yes   | no     | no    | yes  | yes            | yes           | yes     |
-      | still being checked | yes   | no     | no    | yes  | yes            | yes           | yes     |
-      | in conflict         | yes   | no     | no    | yes  | yes            | no            | yes     |
-      | merged              | no    | no     | no    | yes  | no             | no            | yes     |
-      | closed              | no    | yes    | no    | yes  | no             | no            | yes     |
+      | state               | close | reopen | merge | edit | request-review | update-branch | comment | label |
+      | open and clean      | yes   | no     | yes   | yes  | yes            | yes           | yes     | yes   |
+      | a draft             | yes   | no     | no    | yes  | yes            | yes           | yes     | yes   |
+      | behind its base     | yes   | no     | no    | yes  | yes            | yes           | yes     | yes   |
+      | blocked             | yes   | no     | no    | yes  | yes            | yes           | yes     | yes   |
+      | still being checked | yes   | no     | no    | yes  | yes            | yes           | yes     | yes   |
+      | in conflict         | yes   | no     | no    | yes  | yes            | no            | yes     | yes   |
+      | merged              | no    | no     | no    | yes  | no             | no            | yes     | yes   |
+      | closed              | no    | yes    | no    | yes  | no             | no            | yes     | yes   |
 
   Scenario: Why GitHub's example pull request leaves an act out, in each state
     Then GitHub's own example pull request, number 1347 of "octocat/Hello-World", says why an act is absent

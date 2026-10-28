@@ -5,7 +5,10 @@ Feature: Editing a pull request, requesting reviews, and updating its branch
   - request-review: pulls/request-reviewers, its form asking for reviewers
     or teams, at least one, as GitHub's own schema says;
   - update-branch: pulls/update-branch, its expected_head_sha bound to the
-    head the client's view had, as merge's sha is.
+    head the client's view had, as merge's sha is;
+  - label: issues/add-labels, at the issue the pull request also is, as
+    comment is: a label is a fact anyone reading it sees, and a client may
+    mark what it has done with one.
   GitHub's own refusals stay the final word, in GitHub's own words.
 
   Background:
@@ -27,6 +30,7 @@ Feature: Editing a pull request, requesting reviews, and updating its branch
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
 
   Scenario: Edit's form asks for the title and body, nothing else
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
@@ -69,6 +73,16 @@ Feature: Editing a pull request, requesting reviews, and updating its branch
     Then the GitHub gateway answers 200
     And GitHub was asked to PUT "/repos/acme/rockets/pulls/482/update-branch" with {"expected_head_sha":"a1b2c3"}
 
+  Scenario: Labelling a pull request is issues/add-labels, at its issue's number, and the label is then read
+    When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    And the client sends "github:label" with {"labels":["watch-told"]} and the ETag it holds
+    Then the GitHub gateway answers 200
+    And GitHub was asked to POST "/repos/acme/rockets/issues/482/labels" with {"labels":["watch-told"]}
+    When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    Then the issue's labels are now
+      | label      |
+      | watch-told |
+
   Scenario: Updating a branch that is up to date is refused in GitHub's own words
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     And the client sends "github:update-branch" with {} and the ETag it holds
@@ -83,6 +97,7 @@ Feature: Editing a pull request, requesting reviews, and updating its branch
       | github:reopen  |
       | github:edit    |
       | github:comment |
+      | github:label   |
     And the GitHub gateway says these acts are absent, and why
       | act                   | reason                                                               |
       | github:request-review | A closed pull request can't have reviews requested; reopen it first. |

@@ -288,10 +288,12 @@ class GitHubUpstream {
                 json(Response(Status.OK), issueBody(issue))
             } ?: Response(Status.NOT_FOUND)
         },
+        // A pull request is an issue too, numbered as it is: its labels are added at the issue's address.
         "/repos/{owner}/{repo}/issues/{number}/labels" bind Method.POST to { request ->
-            issue(request)?.let { issue ->
-                issue.labels += mapper.readTree(request.bodyString()).path("labels").map { it.asText() }
-                json(Response(Status.OK), issue.labels.map { mapOf("name" to it) })
+            val labels = issue(request)?.labels ?: pull(request)?.labels
+            labels?.let {
+                it += mapper.readTree(request.bodyString()).path("labels").map { label -> label.asText() }
+                json(Response(Status.OK), it.map { name -> mapOf("name" to name) })
             } ?: Response(Status.NOT_FOUND)
         },
         "/repos/{owner}/{repo}/issues/{number}/labels/{name}" bind Method.DELETE to { request ->

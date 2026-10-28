@@ -27,6 +27,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
     And the GitHub gateway says these acts are absent, and why
       | act          | reason                                                   |
       | github:merge | A draft can't be merged; mark it ready for review first. |
@@ -38,6 +39,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | act            |
       | github:edit    |
       | github:comment |
+      | github:label   |
     And the GitHub gateway says these acts are absent, and why
       | act           | reason                                   |
       | github:reopen | A merged pull request can't be reopened. |
@@ -52,6 +54,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
     And the GitHub gateway says these acts are absent, and why
       | act          | reason                                                                    |
       | github:merge | GitHub is still checking whether it can be merged; read it again shortly. |
@@ -65,6 +68,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
 
   Scenario Outline: A pull request GitHub says is <mergeable state> can't be merged now
     Given GitHub says pull request 482 is "<mergeable state>"
@@ -92,6 +96,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
     And the GitHub gateway says these acts are absent, and why
       | act          | reason                                          |
       | github:merge | The branch is behind its base; update it first. |
@@ -105,6 +110,7 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
 
   Scenario: A caller who can't push to the repository is offered nothing, from the repository's own answer
     GitHub's example pull request is locked, so a caller without push access
@@ -120,3 +126,4 @@ Feature: What a GitHub pull request allows now, and why not the rest
       | github:request-review | You can't push to this repository.                         |
       | github:update-branch  | You can't push to this repository.                         |
       | github:comment        | The conversation is locked; only collaborators can comment. |
+      | github:label          | You need triage access to this repository.                 |

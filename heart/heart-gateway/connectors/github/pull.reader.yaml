@@ -6,10 +6,10 @@ allowed:
   table: /state
   rows:
     open:
-      allow: [close, merge, edit, request-review, update-branch, comment]
+      allow: [close, merge, edit, request-review, update-branch, comment, label]
       absent: { reopen: The pull request is already open. }
     closed:
-      allow: [reopen, edit, comment]
+      allow: [reopen, edit, comment, label]
       absent:
         close: The pull request is already closed.
         merge: "A closed pull request can't be merged; reopen it first."
@@ -25,6 +25,9 @@ allowed:
         edit: You can't push to this repository.
         request-review: You can't push to this repository.
         update-branch: You can't push to this repository.
+    # Labels are triage's, as on an issue.
+    - when: { "repository:/permissions/triage": false }
+      absent: { label: You need triage access to this repository. }
     # A locked conversation takes comments only from collaborators with push access, as an issue's does.
     - when: { /locked: true, "repository:/permissions/push": false }
       absent: { comment: The conversation is locked; only collaborators can comment. }

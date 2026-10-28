@@ -33,6 +33,7 @@ Feature: The gateway calls GitHub as each caller, and revalidates what it read
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
     When "bob" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the GitHub gateway offers nothing
 
@@ -58,6 +59,7 @@ Feature: The gateway calls GitHub as each caller, and revalidates what it read
       | github:request-review |
       | github:update-branch  |
       | github:comment        |
+      | github:label          |
 
   Scenario: One caller's copy never answers another
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
