@@ -28,7 +28,7 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     }
     val asInputs = options["--inputs"]?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()
         .associateWith { sentOnce(capture, it) }
-    val chosen = ScriptWriter.Options(keepReason = "--keep-reason" in options, asInputs = asInputs)
+    val chosen = ScriptWriter.Options("--keep-reason" in options, asInputs, intents = "--intents" in options)
     val writer = ScriptWriter(capture, source, sourceName, script, pins, chosen)
     val text = writer.write()
     val lock = LockWriter(capture)
@@ -71,7 +71,8 @@ private fun derivationReport(builder: Path?, folder: Path, page: String, files: 
 }
 
 const val GENERATE_USAGE =
-    "usage: artie generate <capture.yaml> --out <script.kts> [--script <source.kts>] [--keep-reason] [--inputs a,b]" +
+    "usage: artie generate <capture.yaml> --out <script.kts> [--script <source.kts>] [--keep-reason] [--intents]" +
+        " [--inputs a,b]" +
         " [--report <dir>]"
 
 private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare")
@@ -103,7 +104,7 @@ private fun rails(capture: Capture, upstream: String, folder: Path, script: Stri
     out.println("wrote $script: the watch's words over ${writer.calls} calls to the service, at fixed addresses")
 }
 
-private val FLAGS = setOf("--keep-reason")
+private val FLAGS = setOf("--keep-reason", "--intents")
 
 private fun options(args: List<String>): Map<String, String> {
     val rest = ArrayDeque(args.drop(2))
