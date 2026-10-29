@@ -219,3 +219,37 @@ That is the plan. The short version: Jenkins already hands out links, so the gat
 the forms, the reasons, and one honest split between a job's settings and its activity.
 Starting a job brings a queue item into being, scripts wait on it with "until", and the
 rollup is one upstream read, summarised by a script.
+
+## The spike, 2026-10-29
+
+A scratch Jenkins now runs in Docker from `exhibits/jenkins-scratch`: the long-term-support
+image on Java 21, version 2.580.2, with the Folders, Pipeline, Job DSL and Configuration as
+Code plugins, one folder called services, and one parameterised pipeline job in it. Its
+real answers are kept in `captures.yaml` there, and they confirm the plan with a few
+corrections.
+
+Starting works as described. Posting to the job's build-with-parameters address with an
+API token as Basic authentication answers 201 Created with an empty body and a Location
+naming a queue item. No crumb is needed with the token; with the password instead, the
+same request is refused with 403, and so is an unauthenticated one. The queue item first
+reads as a waiting item, saying why it waits in Jenkins's own words, "In the quiet period.
+Expires in 4.8 sec". About eight seconds later it reads as a left item and carries the
+build's number and address under the name executable. The parameters the caller sent are
+on the queue item and on the build, so a script can check what it asked for.
+
+The build reads as described: while it runs, building is true and result is null; when it
+has finished, result is SUCCESS or FAILURE, with its duration and start time. The folder
+rollup is one request, and after one passing and one failing build it shows the last
+build, the last completed build, the last successful build and the last failed build, each
+with its number, and the job's colour, red.
+
+Two corrections to the plan. First, Jenkins sends no entity tag, no cache control and no
+last-modified on its JSON, and it ignores If-None-Match, so the gateway makes every
+version itself, as the plan guessed but hadn't checked. Second, Jenkins is documented to
+forget a queue item a few minutes after its build starts, which the spike did not wait to
+see; if so, the queue item resource is short-lived by nature, and a script that holds one
+must follow the build link soon, or go back to the job.
+
+One more finding for the connector: a job's parameters come back as a property with
+parameter definitions, each with its class, name and default. A choice parameter carries
+its choices there too. That is what the start form's fields will be built from.
