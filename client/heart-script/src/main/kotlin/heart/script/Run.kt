@@ -69,6 +69,12 @@ class Run(
     /** The resources the script kept by name (`keepAs`), to read them again by name (`at`, `kept`). */
     internal val kept = java.util.concurrent.ConcurrentHashMap<String, Kept>()
 
+    /**
+     * What the reasoner chose in this run, by the words it was asked, the resource it was asked on, and what that
+     * offered: the same again is the same choice, made with no model.
+     */
+    internal val reasoned = java.util.concurrent.ConcurrentHashMap<Triple<String, String, Set<String>>, Choice>()
+
     /** A resource kept by name: the address the server gave it, and its state when it was kept. */
     internal class Kept(val address: String, val state: State)
 

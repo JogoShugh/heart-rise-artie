@@ -32,19 +32,33 @@ class Said(val intent: String? = null, val inferred: String? = null, val fromInt
  * `act(intent = …)` with no relation, as step [step]: hand [intent] to the client's reasoner, which chooses one
  * selection from what is offered here: a form with its fields, or a link. The client checks the choice and
  * makes it; the script then holds what it led to, as after any act or follow. With a [block], visit it and
- * return. A run must allow it (`--reasoner`).
+ * return. A run must allow it (`--reasoner`). The same words on the same resource, offering the same, are the
+ * choice made before in this run, made again with no model.
  */
 internal fun Here.reasoned(step: Int, said: Said, block: (Here.() -> Unit)?) {
     val intent = checkNotNull(said.words)
     if (!run.reasoning) {
         throw ScriptStopped(step, "\"intent\"", "\"act(intent = …) needs a reasoner, and this run has none\"")
     }
+    // A goal's planner keeps its own decisions, and its capture each move as it was reasoned: only a script's.
+    val key = Triple(intent, held.address, held.offered).takeIf { run.goal == null }
+    key?.let { run.reasoned[it] }?.let { chosen -> return again(step, chosen, said, block) }
     val before = run.trace.size
-    val answer = navigator.reason(intent).answer
+    val reasoned = navigator.reason(intent)
+    if (key != null && reasoned.answer !is Answer.Refused) reasoned.chosen?.let { run.reasoned[key] = it }
+    val answer = reasoned.answer
     // A model's words are kept as inferred on the reason step the client traced, so a script made from the run
     // says whose they were; a client that traces none is left as it is.
     if (said.intent == null && run.trace.size > before) run.trace[before].inferred = intent
     go(step, "\"intent\"", answer, block)
+}
+
+/** [chosen], what the reasoner chose before on these words here, made again as step [step], with no model. */
+private fun Here.again(step: Int, chosen: Choice, said: Said, block: (Here.() -> Unit)?) {
+    if (!chosen.follow) return acted(step, chosen.relation, chosen.fields, said, block)
+    val answer = navigator.follow(chosen.relation, chosen.title)
+    run.trace.lastOrNull()?.said(said)
+    go(step, "\"${chosen.relation}\"", answer, block)
 }
 
 /** What a reason step asked, for its trace: the words as said, and the choice made as its values. */

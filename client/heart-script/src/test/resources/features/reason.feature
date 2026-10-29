@@ -124,3 +124,43 @@ Feature: A script's reason step: a model chooses one selection from what is offe
       }
       """
     Then the script stopped at step 2, "intent": "act(intent = …) needs a reasoner, and this run has none"
+
+  Scenario: The same words, on the same resource offering the same forms, are reasoned on once in a run
+    A watch says its acts again at every look. Asked the same words on the
+    same resource, offered the same forms, a reasoner chooses the same, so the
+    run makes its first choice again, with no model. On another resource, or
+    when what is offered has changed, the words are reasoned on again. Each
+    act made again keeps its words in the trace.
+    Given a service holds these resources
+      | address    | title            | state |
+      | /issues/11 | Crash on startup | open  |
+    And these forms
+      | at         | relation  | leads to   | outcome |
+      | /          | issues-11 | /issues/11 | done    |
+      | /issues/11 | close     | /issues/11 | done    |
+    When this script runs, allowed a reasoner
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10) {
+              repeat(3) { act(intent = "we're done with this one") }
+          }
+          act("issues-11") {
+              act(intent = "we're done with this one")
+          }
+      }
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call   | what                     |
+      | enter  | scripted://service/      |
+      | act    | issues-get {"number":10} |
+      | reason | we're done with this one |
+      | act    | close                    |
+      | act    | close                    |
+      | act    | close                    |
+      | return | /                        |
+      | act    | issues-11                |
+      | reason | we're done with this one |
+      | act    | close                    |
+      | return | /                        |
+    And trace step 4 keeps the intent "we're done with this one"
