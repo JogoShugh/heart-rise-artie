@@ -8,6 +8,106 @@ or a bare script that calls an ordinary API directly, and it writes the scripts 
 This README documents every option of `artie run` and `artie generate`, with one job as the example throughout:
 the merge watch in `exhibits/merge-watch/`.
 
+## Quick start: your own scratch repository, your own run
+
+The merge watch runs against a real GitHub repository, through a HEART gateway on your own machine. Nothing here
+touches a repository you don't name. The script below sets it all up, start to finish, for one person:
+
+1. **A scratch repository of your own**, say `you/heart-github-test`, and a fine-grained token for that
+   repository alone, with Contents, Issues and Pull requests read and write. The token goes in
+   `~/.artie/credentials`; no script ever holds it.
+2. **GitHub's OpenAPI description**, which the gateway reads to learn GitHub's endpoints. It is MIT licensed,
+   from `github/rest-api-description`.
+3. **A certificate for the gateway**, self-signed for `localhost`, and a trust store for `artie` that holds it.
+4. **The gateway**, built and started on port 8392, forwarding each caller's own token to GitHub.
+5. **`artie`**, built and on the PATH.
+6. **The stage**: a base branch `deps-main` holding `deps.txt`, and one pull request that bumps it, labelled
+   `dependencies`, opened the way Dependabot would open one.
+7. **The run**: the goal in plain English, with the model finding the way. It watches until you close its
+   "Merge watch" issue on GitHub, and keeps a trace you can generate the kept script from.
+
+Set `OWNER` to your GitHub account. Every other name is the default the exhibits use.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+OWNER=you                                   # your GitHub account
+REPO=heart-github-test                      # the scratch repository; its default branch is main
+ARTIE=$HOME/repos/artie                     # this repository
+export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal
+
+# 1. The scratch repository and the token.
+#    Make the repository on GitHub with one commit on main (a README is enough), and a fine-grained token
+#    for it alone: Contents, Issues and Pull requests, read and write. Then keep the token here:
+mkdir -p ~/.artie && chmod 700 ~/.artie
+grep -q '^\[https://api.github.com\]' ~/.artie/credentials 2>/dev/null || {
+  read -rsp 'GitHub token: ' TOKEN; echo
+  printf '[https://api.github.com]\nbearer = %s\n' "$TOKEN" >> ~/.artie/credentials
+  chmod 600 ~/.artie/credentials; unset TOKEN
+}
+#    The model key, for --reasoner claude, goes in the same file under [https://api.anthropic.com],
+#    or in ANTHROPIC_API_KEY.
+
+# 2. GitHub's OpenAPI description, for the gateway.
+mkdir -p ~/.cache/artie/ghdesc
+[ -f ~/.cache/artie/ghdesc/api.github.com.json ] || curl -sSL -o ~/.cache/artie/ghdesc/api.github.com.json \
+  https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json
+
+# 3. A certificate for the gateway, and a trust store for artie.
+D=~/.cache/artie/tls; mkdir -p $D; chmod 700 $D
+[ -f $D/password ] || { openssl rand -hex 16 > $D/password; chmod 600 $D/password; }
+P=$(cat $D/password); KT=$JAVA_HOME/bin/keytool
+[ -f $D/gateway.p12 ] || {
+  $KT -genkeypair -alias gateway -keyalg EC -groupname secp256r1 -dname CN=localhost \
+      -ext SAN=dns:localhost,ip:127.0.0.1 -validity 365 -storetype PKCS12 \
+      -keystore $D/gateway.p12 -storepass "$P" -keypass "$P"
+  $KT -exportcert -rfc -alias gateway -keystore $D/gateway.p12 -storepass "$P" -file $D/gateway.pem
+  cp $JAVA_HOME/lib/security/cacerts $D/trust.p12; chmod 600 $D/trust.p12
+  $KT -importcert -noprompt -alias artie-gateway -file $D/gateway.pem -keystore $D/trust.p12 -storepass changeit
+}
+
+# 4. The gateway: built, then started in the background on https://localhost:8392.
+cd $ARTIE/heart && ./gradlew -q :heart-gateway:installDist
+cd $ARTIE/heart/heart-gateway
+UPSTREAM_URL=https://api.github.com \
+UPSTREAM_SPEC=$HOME/.cache/artie/ghdesc/api.github.com.json \
+UPSTREAM_AUTH=caller \
+GATEWAY_CONNECTOR=build/install/heart-gateway/connectors/github \
+GATEWAY_RECORD=$HOME/.cache/artie/runs/upstream.record.yaml \
+GATEWAY_TLS_KEYSTORE=$D/gateway.p12 GATEWAY_TLS_PASSWORD="$P" PORT=8392 \
+  nohup build/install/heart-gateway/bin/heart-gateway > ~/.cache/artie/gateway.log 2>&1 &
+for i in $(seq 1 30); do curl -sk https://localhost:8392/ > /dev/null && break; sleep 1; done
+
+# 5. artie: built and on the PATH, trusting the gateway's certificate.
+cd $ARTIE/client && ./gradlew -q :artie-cli:installDist
+. scripts/.env
+export JAVA_OPTS="-Djavax.net.ssl.trustStore=$D/trust.p12 -Djavax.net.ssl.trustStorePassword=changeit"
+
+# 6. The stage: deps-main with deps.txt, and one bump labelled the way the goal expects.
+cd $ARTIE/exhibits/dependabot-sim
+artie run setup.kts owner=$OWNER repo=$REPO
+artie run bump.kts owner=$OWNER repo=$REPO to=1.0.1 label=dependencies
+
+# 7. The run: the goal, in plain English, with the model finding the way.
+#    It merges the bump once GitHub says it can be, then keeps watching. To stop it, close the
+#    "Merge watch" issue it opened in your repository.
+cd $ARTIE/exhibits/merge-watch
+artie run merge.goal.md owner=$OWNER repo=$REPO --reasoner claude --rung L2 --exchanges --trace runs/first.yaml
+
+# Afterwards: the same run as a kept script, with no model but the reasoned line.
+#   artie generate runs/first.yaml --script merge.goal.md --out merge.kts
+#   artie run merge.kts owner=$OWNER repo=$REPO --reasoner claude
+```
+
+What to expect: the run prints one line per step. It gets the repository, opens the "Merge watch" issue, lists
+the pull requests labelled `dependencies`, and merges the bump at its first look once GitHub has checked it,
+usually within a minute. Then it looks again every few seconds until the issue is closed. Open another bump
+meanwhile (`artie run bump.kts owner=$OWNER repo=$REPO to=1.0.2 label=dependencies`) and watch it merged; open one
+with `draft=true` and watch the run give up after 3 minutes and tell its author why, in the gateway's own
+words.
+
+To stop the gateway: `pkill -f heart-gateway/lib/heart-gateway`.
+
 ## The modules
 
 | Module | What it is |
