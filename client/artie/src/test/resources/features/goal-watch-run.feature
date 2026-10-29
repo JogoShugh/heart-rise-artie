@@ -398,6 +398,41 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     Then the goal run stopped, saying "I can't tell which pull requests match"
     And the planner was asked 4 times
 
+  Scenario Outline: A planner that stops at a Once is told the step waits, once; a second stop ends the run: <case>
+    At a Once the planner names the act the step waits for, which need not
+    be offered yet. A planner that misreads the step may stop there: the
+    first stop is refused, and the planner told the step waits. A second
+    stop ends the run, saying why, as any stop does.
+    Given the planner will move
+      | move   | words                                           | opens | relation        | facts                             |
+      | act    | open issue 10 of acme/rockets                   | yes   |                 |                                   |
+      | done   |                                                 |       |                 |                                   |
+      | act    | list the open pull requests of acme/rockets     | yes   |                 |                                   |
+      | check  |                                                 |       |                 | {"github:labels": ["dependabot"]} |
+      | stop   | its state shows mergeable, so I'm checking that |       |                 |                                   |
+      | <then> | <then words>                                    |       | <then relation> |                                   |
+      | act    | merge it by squashing                           |       |                 |                                   |
+      | done   |                                                 |       |                 |                                   |
+      | check  |                                                 |       |                 | {"state": "closed"}               |
+      | act    | close it                                        |       |                 |                                   |
+      | done   |                                                 |       |                 |                                   |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+      | github:merge      | {"merge_method": "squash"}                               |
+      | github:close      | {}                                                       |
+    When the goal "merge.goal.md" runs with ARTIE, captured in "merge.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the <outcome>
+    And the planner was told "stop: refused once, this step waits: name the form its act needs, even when it isn't offered now; stop again to end the run"
+
+    Examples:
+      | case                           | then | then words                                      | then relation | outcome                                                                     |
+      | it names the act when asked again | wait |                                              | github:merge  | run finished                                                                |
+      | it stops again                 | stop | its state shows mergeable, so I'm checking that |               | goal run stopped, saying "its state shows mergeable, so I'm checking that" |
+
   Scenario: A move the part being decided doesn't take is refused, and the planner told which it takes
     While the match is decided, the planner tries an act; it is told only a
     check or a stop is taken there, and makes the check.

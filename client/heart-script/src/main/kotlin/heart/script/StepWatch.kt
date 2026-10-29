@@ -418,8 +418,15 @@ internal class StepWatch(
      * something of one; a stop stops the run, and any other move is refused and the planner told.
      */
     private fun <T : Any> decide(step: Step, here: Here, allowed: Set<String>, current: String, pick: (Move) -> T?): T {
+        // A Once's wait is the one part a misread step stops at: its first stop is refused, and the planner told why.
+        var questioned = allowed != WAIT
         while (true) {
             val move = host.ask(step, here, allowed, current)
+            if (move is Move.Stop && !questioned) {
+                questioned = true
+                moves += STOP_AT_ONCE
+                continue
+            }
             if (move is Move.Stop) run.goalStop(move.why)
             val made = pick(move)
             // A check is kept in the capture as decided, so a wrong one can be read back, and written as a script.
@@ -443,6 +450,8 @@ internal class StepWatch(
         val ACTS = setOf("act", "check", "done", "stop")
         val LIST = setOf("act", "back", "stop")
         val WAIT = setOf("wait", "stop")
+        const val STOP_AT_ONCE = "stop: refused once, this step waits: name the form its act needs, even when it " +
+            "isn't offered now; stop again to end the run"
         val CHECK = setOf("check", "stop")
         val BRACE = Regex("""\{(\w+)""")
     }
