@@ -271,3 +271,84 @@ generic writer (state as a definition list, nested lists as tables, one htmx for
 `If-Match` and Accept in `hx-headers`, inputs from the schema, `hr:unavailable` as disabled buttons with the reason);
 form-encoded acts converted by schema type; refusals rendered and swapped; `HX-Location` on 201. Shown on the garden,
 with the agreement test there. No view hints, no volleyball, no gateway in this slice.
+
+## Generic interaction defaults, 2026-10-30
+
+From the author's sketch (acts in overlay dialogs, unavailable acts greyed and inert, errors inline in the dialog,
+client-side checks from the schema, entry-point searches as a full-page transition, lists as grids with per-row
+actions), assessed against the protocol. Where this differs from the sketch, the reason is given.
+
+**One rule decides overlay or page: the form's method, not where the form sits.**
+
+- An unsafe act (POST, PUT, PATCH, DELETE) opens an overlay dialog on the resource held, and its answer replaces the
+  resource in place.
+- A safe form (GET: find, search, filter) also takes its fields in a dialog, but submits as a plain HTML GET form: a
+  full-page navigation to the result, which then has its own address, a back button and a bookmark.
+- So an entry point's searches give the full-page transition the sketch asks for, for the result. They do not get a
+  page of their own for their fields: a form has no address in HEART (it lives inside a representation), and making
+  one would add protocol surface and a round trip for nothing the dialog doesn't already do. It also covers the cases
+  "entry point vs resource" would get wrong: a repository offers safe forms ("list pull requests labelled…"), and an
+  entry point may offer an unsafe act.
+
+**Unavailable acts: in their slot, inert, and saying why.**
+
+- The buttons are the union of the acts offered now and the acts `hr:unavailable` lists, in the type's declared order,
+  so each act keeps its place as the state changes. The writer is on the server, so it knows that order with no hints.
+- An act in `hr:unavailable` is a greyed button with `aria-disabled`, still focusable, never sending anything. Its
+  reason shows when it is focused or clicked, as visible text, never only a hover tooltip. A greyed button with no
+  reason is the familiar frustration; the reason is the whole point of `hr:unavailable`.
+- An act neither offered nor listed is not shown (§6.12: no reason is inferred from absence).
+
+**The dialog.**
+
+- A native `<dialog>`: focus moves in, Escape closes, focus returns to the button. Title and description from the
+  form; one input per field the client fills (fields bound from state by template pointers are filled by the server
+  and not shown); the submit button named by the act's title.
+- An act with no fields still opens the dialog, as its confirmation, with its description. One more click, but every
+  act behaves the same and none fires by accident. A view hint may later mark an act as one-click.
+
+**Checks in the browser, two layers, from the form's own JSON Schema.**
+
+1. HTML constraints written from the schema: `required`, `min`, `max`, `step` (from `multipleOf`), `minlength`,
+   `maxlength`, `pattern`, input types from `type` and `format`, a `<select>` from `enum` and `hr:options`. No script,
+   and the browser's own accessible messages.
+2. The schema itself, embedded in the dialog, checked on submit by a JSON Schema validator for what HTML cannot say:
+   `oneOf`, `anyOf`, `if`/`then`, `const`, `dependentRequired`, array rules. Its messages go beside the field its
+   pointer names.
+
+htmx and the validator are served by the HEART server itself, as shared immutable files like an affordance set, so a
+page needs no CDN and works under a strict CSP. The server's checks stay the rule: a rule of the resource (422
+rule-refused) and a race (412) can only be found there.
+
+**Errors, inside the dialog, by kind.**
+
+| Answer | In the dialog |
+|---|---|
+| 422 invalid input | each message at its field, by the problem's pointer; values kept; focus on the first |
+| 422 refused by a rule | the rule's words at the top; values kept |
+| 412 stale | "This changed since you opened it." The resource behind is read again; if the act is still offered, the dialog stays, values kept, with the new ETag; if not, it closes and the button shows its reason |
+| 409 not legal now | as a 412 whose act is no longer offered |
+| 401, 403 | the refusal at the top; sign-in is the page's business |
+| network, 5xx | a plain message and a retry; values kept |
+
+Success: a 200 closes the dialog, replaces the resource in place, and says "Done: <act title>" in a polite live
+region. A 201 moves to the new resource (`HX-Location`), with history.
+
+**Lists: a grid, and actions per row fetched when asked for.**
+
+- Columns: the item's title, as the link to it, first; then up to five scalar members most items share, from the page
+  shown; nested objects and arrays left out; long text cut. On a phone, rows become cards. Paging by the list's own
+  next and previous links. The order is the server's; sorting appears only where the server offers it, as a safe
+  form.
+- The sketch's per-row action forms cannot come from the list: an embedded resource carries no forms (SPEC §6.11,
+  decided 2026-10-18), because every act needs `If-Match` and an embedded copy has no ETag. That is also the right
+  answer for a person: what may be done to each item depends on that item's own state, read fresh.
+- So each row has an "Actions" menu that, when opened, reads the item (`Accept: text/html`) and shows its action bar
+  from that answer: its legal acts and its greyed ones with reasons, at its current ETag. Choosing one opens the same
+  dialog as on the item's own page. After a success the list is read again. One read per opened menu, none for rows
+  never touched.
+- Better than the menu for working through a list: a side panel that shows the chosen item, its state and its action
+  bar, beside the list, so a person keeps their place. Left for later, as an option; the menu and the link to the item
+  are the plain default. No bulk selection: HEART has no act on many resources at once.
+- `spec/ideas/embedded-forms-with-validators.md` would allow row forms without the read; if it is ever decided, the
+  menu can use them.
