@@ -197,3 +197,36 @@ never fired should not generate a watch at all, or the generator should say the 
 Next, in order of cost: the thinking build of the same model at 4096 tokens (which needs a `--max-tokens`
 setting), then `gpt-oss:20b` for the planner only (its reasoner answers in the wrong shape), then a larger
 dense model if one fits. The prompt stays one prompt.
+
+## Phase 2, three more models, 2026-10-30
+
+With `--max-tokens` added, three more goal runs on the same scene, each a fresh bump and a draft, each on
+leftover bumps from the runs before, which no run touched.
+
+The thinking build, `qwen3:30b-a3b` at 4096 tokens: three calls, 7,473 output tokens, most of them thinking,
+190 seconds. Its planner opened with "list pull requests with label dependencies" at the bookmark, without the
+owner and repository, which the reasoner sent back as a question; it tried again with them, listed the pull
+requests, and then answered its third turn in words alone, which is a question for the person, so the run
+stopped: "the planner asks: Could you say more?". The same wrong first step as the instruct build, with more
+thinking spent reaching it.
+
+`gpt-oss:20b` at 1024: three calls, 86 seconds. Its planner was right: "We need to retrieve the repository
+to proceed", words "github:repos-get — owner: JogoShugh, repo: heart-github-test". Its reasoner then named the
+form by its title, "Get a repository", not its name, and the act was refused as not offered; the planner tried
+"list pulls", refused the same way, and asked for more. So the spike's reading holds exactly: the planner's
+prompt carries this model, the reasoner's tool shape does not. One line in `ClaudeReasoner.selection`, reading
+an `action` that is not one of the five words but is an offered form's name or title as an act on that form,
+would likely carry it through. That is a change to artie for one model's habit, not a prompt change; it is
+noted here and not made.
+
+`qwen3:32b`, the dense thinking build at 4096: Ollama loaded it at 29 GB with the default 32,768-token
+context, on a 36 GB machine with the gateway and artie beside it. Claude Code's background-task reaper stopped
+the run for low memory at the first step. A run of it needs the context cut (`OLLAMA_CONTEXT_LENGTH=8192`,
+which the longest prompt here, about 5,000 tokens, fits) and a quiet machine, and should be started on
+purpose, not by a chain.
+
+So far, then: no local model under 20 GB finishes the behind scene as the prompts stand. The instruct build
+answers every single turn well and plans the goal badly; gpt-oss plans it well and answers the tool badly.
+Phase 3's first question has its answer for this size of model. The one honest next step on the prompt side
+is not tuning for a model but asking whether the step-with-sub-steps rule, which both Qwen builds got wrong,
+is clear enough for anyone; Claude may follow it because it knows what a merge watch looks like.
