@@ -170,3 +170,30 @@ Corrections and additions to the plan from the spike:
   4096, so `--max-tokens` is cheap to add beside `--model`; not required.
 - The planner's turns are not in the trace, only the reasoner's. Phase 2's traces should keep both, or the
   planner's calls can't be replayed against another model the way the reasoner's were here.
+
+## Phase 2, first run, 2026-10-30
+
+The goal ran through artie for real on `qwen3:30b-a3b-instruct-2507-q4_K_M` (`--model`, `--model-url`,
+`--rung L2 --exchanges`), the behind scene staged as the quick start stages it: a fresh bump (1790) and a draft
+(1791). It took four model calls, 4,685 input tokens, 3,837 of them cache reads, under a minute, and did the
+wrong thing.
+
+At the first step, "In {owner}/{repo}", a step with sub-steps, the planner listed the repository's issues
+labelled `dependencies` instead of opening the repository, reasoning "To find issues with the 'dependencies'
+label, use the issues-list-for-repo form". It then marked that step done, marked "Open an issue titled Merge
+watch" done without acting, with "No issues with the 'dependencies' label exist, so there is nothing to merge
+or watch", and the run stopped there with that as its reason. Nothing was merged, nothing told; the watch issue
+was never opened. In the spike this model answered the merge step well; the step it fails is the one the
+prompt describes at most length, "for a step with sub-steps, act only to reach the resource its sub-steps
+start from". So the planner's prompt leans on what Claude knows, which is the first of phase 3's questions,
+answered early.
+
+A second finding, not about the model: `artie generate` on that two-step trace wrote a kept script whose body
+is `watch(until = { that(false) }) { }`, a watch with nothing to do and no way to end, and the strict run of it
+looped "return to https://localhost:8392/" until it was killed at step 129. A capture in which a "Whenever"
+never fired should not generate a watch at all, or the generator should say the run never reached it, as
+`--bare` already says for a goal line that never fired.
+
+Next, in order of cost: the thinking build of the same model at 4096 tokens (which needs a `--max-tokens`
+setting), then `gpt-oss:20b` for the planner only (its reasoner answers in the wrong shape), then a larger
+dense model if one fits. The prompt stays one prompt.
