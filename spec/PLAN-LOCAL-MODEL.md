@@ -230,3 +230,43 @@ answers every single turn well and plans the goal badly; gpt-oss plans it well a
 Phase 3's first question has its answer for this size of model. The one honest next step on the prompt side
 is not tuning for a model but asking whether the step-with-sub-steps rule, which both Qwen builds got wrong,
 is clear enough for anyone; Claude may follow it because it knows what a merge watch looks like.
+
+## Phase 2, the dense build, 2026-10-30
+
+`qwen3:32b` at 4096 tokens, with Ollama restarted at `OLLAMA_CONTEXT_LENGTH=8192` (22 GB loaded), on a fresh
+bump (1800) and a draft (1801): 634 seconds, nothing merged, nothing told, and the watch issue never opened.
+Its planner asked nine times, in nine wordings, to "List pull requests in the JogoShugh/heart-github-test
+repository filtered by the dependencies label to find those ready to merge", and its reasoner refused every
+one as "unclear to the reasoner: Could you say more?", answering in words with no tool call. So the dense
+thinking build makes the instruct build's planning mistake and adds a reasoning mistake of its own; a bigger
+model of the same family did not help, and the run was the slowest of the five.
+
+## Phase 2, the scripts, 2026-10-30
+
+The same scene, twice more, on `qwen3:30b-a3b-instruct-2507-q4_K_M` at 1024 tokens, with no planner in the
+loop: the two scripts `artie generate` wrote from Claude's run of the goal (the quick start's `merge.intent.kts`
+and `merge.kts`), each on a fresh bump and a draft. Both did the job.
+
+The intent script, every act in words, every relation and field left to the reasoner: nine calls, 460 output
+tokens, 15,539 input tokens of which 9,478 were cache reads. It opened the watch issue, merged the fresh bump
+(1802) by squash, and after the three-minute give-up labelled the draft (1803) `watch-told` and told its author
+"A draft can't be merged; mark it ready for review first." It also told an older draft left from an earlier run
+(1801). One act on an older, now-conflicting bump (1800), "label it watch-told", was refused as not offered,
+and the watch looked again. Claude's run of the same script in the quick-start bench took six calls and about
+21,000 tokens; here the difference is the walk over the thirty open pull requests the scratch repository had
+accumulated, not the model.
+
+The kept script, every relation and field pinned, `--guard strict`, the reasoner called only for the two acts
+left in words: five calls, 257 output tokens, 4,853 input tokens, 6,658 cache reads. Merged 1805 by squash,
+labelled and told 1806 the same way, and told 1800 too, where the second act was refused as stale, "the
+resource changed since it was read", and looked again next time.
+
+So the split the spike suggested holds on real runs. The local instruct build does the reasoner's job: given
+words and the forms on offer, it picks the form and fills it, nine times of nine and five of five. What it
+cannot do, in any build tried, is the planner's job: hold the goal's steps, know which is next, when one is
+done, when to wait and when to go back. The scripts carry that shape as code, so the model never has to.
+That is the division of labour the plan's "seam" section names, and it says where a local model fits today:
+runs of generated scripts, with the first run of a goal left to Claude. For the goal itself on a local model,
+the next things to try, cheapest first: the planner prompt's rule for a step with sub-steps, which every
+local build read as "list things in the repository" rather than "open it", and then a tool-use-trained build
+of the same size (`qwen3-coder:30b`), since the planner's turn is the agentic one.
