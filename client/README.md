@@ -159,7 +159,7 @@ sequenceDiagram
   G->>H: PUT …/pulls/1781/merge {merge_method, sha}
   H-->>G: 200 merged
   G-->>A: 200, a new ETag
-  Note over A,G: the draft never offers merge; after 3 minutes the wait gives up with the gateway's reason
+  Note over A,G: the draft never offers merge, so after 3 minutes the wait gives up with the gateway's reason
   A->>M: the reasoned line, with that reason
   M-->>A: select: act github:comment {body: "Hi @…, this wasn't merged because it's still a draft…"}
   A->>G: POST …/pulls/1782/actions/comment
@@ -167,7 +167,7 @@ sequenceDiagram
   P->>A: artie generate runs/first.yaml --script merge.goal.md --out merge.kts
   A-->>P: merge.kts, merge.pins.yaml, merge.derivation.yaml
   P->>A: artie run merge.kts owner=… --reasoner claude --guard strict
-  Note over A,G: the same acts with no model but the note; each form checked against its pin before it is sent
+  Note over A,G: the same acts with no model but the note, each form checked against its pin before it is sent
 ```
 
 ### What you will see
