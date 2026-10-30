@@ -270,3 +270,49 @@ runs of generated scripts, with the first run of a goal left to Claude. For the 
 the next things to try, cheapest first: the planner prompt's rule for a step with sub-steps, which every
 local build read as "list things in the repository" rather than "open it", and then a tool-use-trained build
 of the same size (`qwen3-coder:30b`), since the planner's turn is the agentic one.
+
+## Phase 2, ten runs each of the intent script, 2026-10-30
+
+The intent script, ten runs on each 30B-A3B build, each run on a fresh bump and a draft, the run called done
+once the bump was merged and the draft told, then the watch issue closed.
+
+`qwen3:30b-a3b-instruct-2507-q4_K_M` at 1024 tokens: ten of ten bumps the model was offered merged, nine of
+ten drafts told. Six to eleven calls a clean run, 320 to 550 output tokens, 276 to 318 seconds, most of it
+the three-minute give-up and the walk over the scratch repository's open pull requests. The one miss (run 3)
+was the model's: the first "label it watch-told" was refused stale (412, the pull request changed between the
+read and the act), and on every look after it the model answered `explain` on the label form instead of `act`,
+four times, so the tell never ran. Run 10's bump was never offered merge: its `deps-check` run sat
+`in_progress` past the give-up, so the model labelled and told it instead, which is what the script says.
+
+`qwen3:30b-a3b`, the thinking build, at 1024 tokens: nine valid runs, seven clean, no wrong answer from the
+model in any of them. Six to ten calls a run, 2,200 to 4,000 output tokens (its thinking, which 1024 covers
+for the reasoner's turns), 340 to 430 seconds. Its two partial runs were not the model's: run 1's check
+finished after the give-up, as run 10 above; in run 4 the tell after the label was refused stale, and the
+script's own `leaveWhere` for the told label then left it. One more run crashed when artie was reinstalled
+under it, and three were lost to the gateway (below), none counted.
+
+So for the reasoner's job the two builds are alike: about one wrong answer in 160 turns for the instruct
+build, none in 70 for the thinking build, which costs seven times the output tokens and a third more time.
+Three things the runs showed that are artie's, not a model's: after a stale refusal the next act is asked
+with the same prompt, so a model that answered wrongly answers wrongly again; `explain` on a form that is
+offered is reported as "not offered, refused by the server: no reason given", which hides what the model did;
+and a label-then-tell pair with the label as the leave marker loses the tell on one stale refusal between
+them.
+
+The gateway: after two days up, with an 18 GB model loading and unloading beside it, its TLS handshakes took
+15 to 105 seconds while its threads sat idle; artie's connect timeout is 5 seconds, so three runs died
+"HTTP connect timed out". A restart brought the handshake to 0.02 seconds. Not shown to be a leak (its RSS
+was 95 MB when slow); most likely its heap paged out to swap. Ollama's default five-minute unload made it
+worse, since the watch's give-up left the model idle that long; `OLLAMA_KEEP_ALIVE` set long keeps it loaded.
+
+### The planner prompt, tried
+
+The rule for a step with sub-steps now also says the plain case: a step that only names a place, such as
+"In acme/rockets", is one act, opening that resource by its names or numbers, then done, and never a list or
+a search. The instruct build, on the goal, with that rule: the same first move, "To find issues labeled
+'dependencies' in the repository, use the issues-list-for-repo form", then "No issues with the 'dependencies'
+label are found, so there is nothing to merge or watch", done, and a question when the issue could not be
+opened at the list. The rule stays, since it is true and costs nothing, but it did not move this model. Its
+reason shows what it reads first: the context's "Merge dependency bumps", not the step. What is left to try
+for the goal on a local model: a build trained on tool loops (`qwen3-coder:30b`), or the runner opening a
+step that only names a place itself, with no model turn, which would be a change to the goal runner.
