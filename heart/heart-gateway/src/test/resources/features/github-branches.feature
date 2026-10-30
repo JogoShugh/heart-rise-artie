@@ -71,6 +71,30 @@ Feature: Branches, commits and new pull requests, from acts a branch offers
       | /repos/acme/rockets/branches/main | main  |
       | /repos/acme/rockets/branches/fix  | fix   |
 
+  Scenario Outline: A branch whose name holds a slash is linked and read at its name encoded, <way>
+    Live, 2026-10-30: a client followed the link to "deps/left-pad-1.0.1",
+    "/branches/deps%2Fleft-pad-1.0.1", and the gateway answered 400 before
+    any of its own code ran: Jetty refuses an encoded slash in a path by
+    default. GitHub answers both forms. A branch name is one path segment, so
+    its slash is encoded in the link, and the gateway takes it so.
+    Given "acme/rockets" has these branches upstream
+      | name          | sha                                      | protected |
+      | deps/left-pad | 3333333333333333333333333333333333333333 | false     |
+    When "ada" gets "/repos/acme/rockets/branches" through the GitHub gateway
+    Then the answer lists
+      | href                                       | title         |
+      | /repos/acme/rockets/branches/main          | main          |
+      | /repos/acme/rockets/branches/fix           | fix           |
+      | /repos/acme/rockets/branches/deps%2Fleft-pad | deps/left-pad |
+    When "ada" gets "/repos/acme/rockets/branches/deps%2Fleft-pad" through <way>
+    Then the GitHub gateway answers 200
+    And the answer links "self" to "/repos/acme/rockets/branches/deps%2Fleft-pad"
+
+    Examples:
+      | way                                |
+      | the GitHub gateway                 |
+      | the GitHub gateway's own listener  |
+
   Scenario: The forms ask for what a person would say, not GitHub's plumbing
     When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
     Then the forms ask for these fields

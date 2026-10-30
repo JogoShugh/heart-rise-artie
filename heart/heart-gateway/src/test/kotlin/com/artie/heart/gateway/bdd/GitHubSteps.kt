@@ -25,6 +25,7 @@ import org.http4k.core.HttpHandler
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import org.http4k.server.asServer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -151,6 +152,29 @@ class GitHubSteps {
         val request = Request(Method.GET, path).header("Authorization", "Bearer $caller-token")
             .header("Accept", "application/hal+json")
         responses += gateway(traceparent?.let { request.header("traceparent", it) } ?: request)
+    }
+
+    /**
+     * A read as [caller] over the gateway's own listener, the Jetty it serves with, as a client on the network
+     * reaches it: what the listener takes or refuses before the gateway's code runs (github-branches.feature).
+     */
+    @When("{string} gets {string} through the GitHub gateway's own listener")
+    fun getOverListener(caller: String, path: String) {
+        authorization = "Bearer $caller-token"
+        lastPath = path
+        val serving = com.artie.heart.gateway.Serving(0, Credentials.forwarded(), ServingLimits())
+        val server = gateway.asServer(com.artie.heart.gateway.listener(serving)).start()
+        try {
+            val address = java.net.URI.create("http://localhost:${server.port()}$path")
+            val request = java.net.http.HttpRequest.newBuilder(address).GET()
+                .header("Authorization", "Bearer $caller-token").header("Accept", "application/hal+json").build()
+            val answer = java.net.http.HttpClient.newHttpClient()
+                .send(request, java.net.http.HttpResponse.BodyHandlers.ofString())
+            val headers = answer.headers().map().flatMap { (name, values) -> values.map { name to it } }
+            responses += Response(org.http4k.core.Status(answer.statusCode(), "")).headers(headers).body(answer.body())
+        } finally {
+            server.stop()
+        }
     }
 
     /** Where the gateway keeps its record of upstream calls, when a scenario asks for one. */

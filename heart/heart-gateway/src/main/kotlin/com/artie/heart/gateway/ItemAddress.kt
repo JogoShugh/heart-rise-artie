@@ -16,8 +16,18 @@ import java.net.URLDecoder
  */
 internal class ItemAddress(private val url: JsonPointer, private val readPath: PathTemplate, private val file: String) {
     private val variables = ItemPath.variablesOf(readPath)
+    // A variable that ends the path takes the rest of it: GitHub writes a branch named "deps/left-pad" in its own
+    // link as is, slash and all, where the gateway's own address encodes it.
     private val pattern = Regex(
-        "^" + Regex("\\{[^}/]+}").split(readPath).joinToString("([^/]+)") { Regex.escape(it) } + "$",
+        "^" + Regex("\\{[^}/]+}").split(readPath).let { literals ->
+            literals.mapIndexed { i, literal ->
+                Regex.escape(literal) + when {
+                    i == literals.lastIndex -> ""
+                    i == literals.lastIndex - 1 && readPath.endsWith("}") -> "(.+)"
+                    else -> "([^/]+)"
+                }
+            }.joinToString("")
+        } + "$",
     )
 
     /** Each variable of the read's path, where in the state it is. */
