@@ -316,3 +316,22 @@ opened at the list. The rule stays, since it is true and costs nothing, but it d
 reason shows what it reads first: the context's "Merge dependency bumps", not the step. What is left to try
 for the goal on a local model: a build trained on tool loops (`qwen3-coder:30b`), or the runner opening a
 step that only names a place itself, with no model turn, which would be a change to the goal runner.
+
+## Phase 2, a build trained on tool loops, 2026-10-30
+
+`qwen3-coder:30b` (Qwen3-Coder-30B-A3B, 18 GB) at 1024 tokens. Replaying the spike's four turns: the planner's
+merge step right, the reasoner's repository and merge turns right, and the tell turn wrong, `explain` on
+`github:merge` where it should have commented. On the goal it was the first local model past "In
+{owner}/{repo}": it opened the repository with `github:repos-get`. At the next step, "Open an issue titled
+Merge watch", its planner asked to "list the branches in this repository", and the reasoner followed a branch
+whose name holds a slash. The gateway answered 400 and ARTIE threw out of the run, so no trace was written.
+
+Both of those were bugs, now fixed: a read the server answers with an error is a refusal ("not found", or the
+new "unreadable"), so a run stops at its step and keeps its trace; and the gateway's listener takes an encoded
+slash in a path, which Jetty 12 refuses by default, while its reading of GitHub's own links lets a branch name
+keep its slash. The model's own mistake stands: one step further than the others, then the wrong step.
+
+So no local model tried runs the goal: four builds of 20 to 32B, each wrong at the first or second step, each in
+its own way. What they share is that they act on the goal's headline ("merge dependency bumps") rather than the
+step marked now. The division that works today is the one the scripts give: Claude plans a goal's first run,
+`artie generate` keeps it, and a local model does the reasoner's part of every run after.
