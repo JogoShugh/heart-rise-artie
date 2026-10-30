@@ -120,55 +120,87 @@ To stop the gateway: `pkill -f heart-gateway/lib/heart-gateway`.
 
 ```mermaid
 flowchart TB
-  goal["merge.goal.md<br/>the goal, in plain English"]
-  run1["artie run merge.goal.md --reasoner claude --exchanges --trace runs/first.yaml<br/>wayfinding: the model picks each step from what the gateway offers"]
-  trace["runs/first.yaml<br/>the capture: every step, every exchange, the model's reasons"]
-  gen["artie generate runs/first.yaml --script merge.goal.md"]
-  intent["merge.intent.kts<br/>the run in words: the shape as code, each act as its words"]
-  kept["merge.kts, merge.pins.yaml, merge.derivation.yaml<br/>the kept script, its lock file, and where each line came from"]
-  bare["merge.bare.kts<br/>bare: GitHub's own addresses, from the gateway's record of its calls"]
-  run2["artie run merge.kts --guard strict | lenient | look-then-leap | off-the-rails<br/>the rails: no model but the reasoned line"]
-  run3["artie run merge.bare.kts<br/>no gateway, no checks"]
+  goal[merge.goal.md]
+  run1[artie run]
+  trace[runs/first.yaml]
+  gen[artie generate]
+  intent[merge.intent.kts]
+  kept[merge.kts + pins + derivation]
+  bare[merge.bare.kts]
+  run2[artie run, guarded]
+  run3[artie run, bare]
   goal --> run1 --> trace --> gen
-  gen -->|with --intents| intent
+  gen -->|--intents| intent
   gen --> kept
-  gen -->|with --bare runs/first.upstream.yaml| bare
+  gen -->|--bare| bare
   kept --> run2
+  intent --> run2
   bare --> run3
-  intent -->|artie run: the model picks each act again| run2
 ```
+
+- **merge.goal.md**: the goal, in plain English.
+- **artie run**: wayfinding. The model picks each step from what the gateway offers.
+- **runs/first.yaml**: the capture. Every step, every exchange, the model's reasons.
+- **artie generate**: reads the capture and the goal, and writes one of three forms.
+- **merge.intent.kts**: the run in words. The shape as code, each act as its words. Run it, and the model picks each act again.
+- **merge.kts + pins + derivation**: the kept script, its lock file, and where each line came from.
+- **merge.bare.kts**: GitHub's own addresses, from the gateway's record of its calls.
+- **artie run, guarded**: the rails. No model but the reasoned line. `--guard strict`, `lenient`, `look-then-leap` or `off-the-rails`.
+- **artie run, bare**: no gateway, no checks.
 
 ```mermaid
 sequenceDiagram
+  autonumber
   participant P as Person
   participant A as artie
   participant M as Model
-  participant G as HEART gateway (localhost:8392)
-  participant H as GitHub (api.github.com)
-  P->>A: artie run merge.goal.md owner=… --reasoner claude --trace runs/first.yaml
-  A->>G: GET / (the bookmark)
-  G-->>A: the links and forms offered now
-  A->>M: a goal line, the state, the offers, the links
-  M-->>A: select: act github:repos-get {owner, repo}
-  A->>G: GET /repos/{owner}/{repo}
-  G->>H: GET /repos/{owner}/{repo} (the caller's token, If-None-Match)
-  H-->>G: 200, or 304 from the gateway's copy
-  G-->>A: the repository, its forms, an ETag
-  Note over A,M: each step the same way: the model picks from what is offered, the server answers
-  A->>G: PUT …/pulls/1781/actions/merge, If-Match: "…", {merge_method: squash}
-  G->>H: PUT …/pulls/1781/merge {merge_method, sha}
-  H-->>G: 200 merged
-  G-->>A: 200, a new ETag
-  Note over A,G: the draft never offers merge, so after 3 minutes the wait gives up with the gateway's reason
-  A->>M: the reasoned line, with that reason
-  M-->>A: select: act github:comment {body: "Hi @…, this wasn't merged because it's still a draft…"}
-  A->>G: POST …/pulls/1782/actions/comment
-  A->>A: runs/first.yaml: every step, exchange and reason
-  P->>A: artie generate runs/first.yaml --script merge.goal.md --out merge.kts
-  A-->>P: merge.kts, merge.pins.yaml, merge.derivation.yaml
-  P->>A: artie run merge.kts owner=… --reasoner claude --guard strict
-  Note over A,G: the same acts with no model but the note, each form checked against its pin before it is sent
+  participant G as Gateway
+  participant H as GitHub
+  P->>A: run goal
+  A->>G: GET /
+  G-->>A: offers
+  A->>M: goal + offers
+  M-->>A: pick
+  A->>G: GET repo
+  G->>H: GET repo
+  H-->>G: 200 or 304
+  G-->>A: repo + ETag
+  Note over A,H: steps 4 to 9 repeat
+  A->>G: PUT merge
+  G->>H: PUT merge
+  H-->>G: 200
+  G-->>A: 200 + ETag
+  Note over A,G: draft: wait gives up
+  A->>M: reason
+  M-->>A: comment
+  A->>G: POST comment
+  A->>A: write trace
+  P->>A: generate
+  A-->>P: script
+  P->>A: run script
 ```
+
+1. `artie run merge.goal.md owner=… --reasoner claude --exchanges --trace runs/first.yaml`.
+2. artie reads the bookmark, the one address it knows.
+3. The gateway answers with the links and forms offered now.
+4. artie sends the model one goal line, the state, the offers and the links.
+5. The model answers with one act and its inputs: `act github:repos-get {owner, repo}`.
+6. artie sends the act to the gateway.
+7. The gateway asks GitHub, with the caller's token and `If-None-Match`.
+8. GitHub answers 200, or 304 when the gateway's copy is still good.
+9. The gateway answers with the repository, its forms and an ETag.
+10. `PUT …/pulls/1781/actions/merge` with `If-Match` and `{merge_method: squash}`.
+11. The gateway sends GitHub's own merge request, with the sha it checked.
+12. GitHub answers 200, merged.
+13. The gateway answers 200 with a new ETag.
+14. The draft never offers merge, so after 3 minutes the wait gives up with the gateway's reason.
+15. artie sends the model the reasoned line and that reason.
+16. The model answers `act github:comment` with a note that says why.
+17. `POST …/pulls/1782/actions/comment`.
+18. artie writes `runs/first.yaml`: every step, exchange and reason.
+19. `artie generate runs/first.yaml --script merge.goal.md --out merge.kts`.
+20. artie writes `merge.kts`, `merge.pins.yaml` and `merge.derivation.yaml`.
+21. `artie run merge.kts owner=… --reasoner claude --guard strict`: the same acts, no model but the note, each form checked against its pin before it is sent.
 
 ### What you will see
 
