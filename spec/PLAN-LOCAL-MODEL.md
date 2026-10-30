@@ -136,3 +136,37 @@ Three questions, answered by the traces rather than argued:
   `./gradlew installDist`.
 - One live goal run and one live strict run per model, traces kept under `exhibits/merge-watch/runs/`.
 - Commits local, in feature order. Push only on "Push".
+
+## Phase 0, done 2026-10-30
+
+The runtime: Ollama 0.40.13 from the CLI tarball, since the Homebrew formula will not build on macOS 14. It
+serves `/v1/messages` on Metal with 27 GiB for models and a default context of 32,768 tokens. The spike's
+files and every answer are in `exhibits/local-model/`.
+
+Three models were asked the three reasoner turns and one planner turn. What they answered:
+
+| Model | Reasoner | Planner at 1024 | Warm call |
+|---|---|---|---|
+| `qwen3:30b-a3b-instruct-2507-q4_K_M` | 3 of 3 right, exact enum and names | right, with `why`, words "merge it by squashing" | 3 to 4 s |
+| `qwen3:30b-a3b` | 3 of 3 right | no tool call: its thinking spends all 1024 tokens; right at 4096, without `why` | 6 to 8 s, planner 34 s |
+| `gpt-oss:20b` | wrong shape: `action` holds the form's name, `affordance` the title | right, with `why` | 4 to 7 s |
+
+So one model answers both prompts as Claude does, at the first try, with no change to either prompt: the
+instruct build of Qwen3 30B-A3B, which does not think. Phase 1 and 2 use it. The thinking build is the same
+model with a budget it will not stay in: the Messages API's `thinking: {type: disabled}` is not honoured
+(it thinks in plain text instead), and `budget_tokens` is ignored. `gpt-oss:20b` fills the tool's optional
+fields with empty strings and reads `action` as the thing to do rather than one of the five words; a run on it
+would stop at its first act with "no such form", which is a finding, not a bug in artie.
+
+Corrections and additions to the plan from the spike:
+
+- A cold call reads the first prompt at about 150 tokens a second here: 4,800 tokens in 30 s. Warm calls on the
+  same prefix hit Ollama's prompt cache, reported as `cache_read_input_tokens`, and take 3 to 8 s. So
+  `ModelUsage` counts cache reads for a local model too, unchanged.
+- `cache_control` is accepted and ignored; `usage` has no `cache_creation_input_tokens`, which counts 0.
+- The reasoned comment is one sentence from every model. The instruct build's is two, with a "Thanks!";
+  the prompt's "one sentence" rule is kept by Claude and the thinking build, not by it. Worth a row in phase 2.
+- Phase 1 needs no `max_tokens` setting for the chosen model. If the thinking build is ever measured, it needs
+  4096, so `--max-tokens` is cheap to add beside `--model`; not required.
+- The planner's turns are not in the trace, only the reasoner's. Phase 2's traces should keep both, or the
+  planner's calls can't be replayed against another model the way the reasoner's were here.

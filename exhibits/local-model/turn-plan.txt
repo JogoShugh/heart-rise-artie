@@ -1,0 +1,58 @@
+<context>
+Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+</context>
+<steps>
+[in] In {owner}/{repo}
+  [done] Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+  [in] Whenever a pull request labelled {label} changes `as pr`
+    [done] If it's labelled {hold}, leave it, and say so once.
+    [done] If it's labelled {told}, leave it.
+    [now] Once it can be merged, merge it by squashing. (2 sub-steps after)
+</steps>
+<now>
+Once it can be merged, merge it by squashing.
+</now>
+<named>
+watch = https://localhost:8392/repos/JogoShugh/heart-github-test/issues/1783
+pr = https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+</named>
+<inputs>
+$owner = JogoShugh
+$repo = heart-github-test
+$label = dependencies
+$hold = hold
+$told = watch-told
+</inputs>
+<moves>
+
+</moves>
+<path>
+https://localhost:8392/
+https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+</path>
+<held>
+https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/1781
+<state>
+{"id":5078425780,"node_id":"PR_kwDOVM7WJc8AAAABLrKgtA","number":1781,"state":"open","locked":false,"title":"Bump left-pad from 1.0.8 to 1.0.9 (1029-221447)","body":"Bumps left-pad from 1.0.8 to 1.0.9. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","milestone":null,"active_lock_reason":null,"created_at":"2026-10-30T02:14:50Z","updated_at":"2026-10-30T02:14:51Z","closed_at":null,"merged_at":null,"merge_commit_sha":"a186ba848b6cbf99cc3cebb76d9a009c69056495","assignee":null,"assignees":[],"requested_reviewers":[],"requested_teams":[],"head":{"label":"JogoShugh:deps/left-pad-1.0.9-1029-221447","ref":"deps/left-pad-1.0.9-1029-221447","sha":"312a2bc7d98d50344acb1bcd3dc52063f59db577"},"base":{"label":"JogoShugh:deps-main","ref":"deps-main","sha":"74d8c49e8a37b9c68cc1e9ebc7813f28a3520857"},"author_association":"OWNER","auto_merge":null,"draft":false,"merged":false,"mergeable":true,"rebaseable":true,"mergeable_state":"clean","merged_by":null,"comments":0,"review_comments":0,"maintainer_can_modify":false,"commits":1,"additions":1,"deletions":1,"changed_files":1,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","pull_number":"1781"}}
+</state>
+<embedded>
+labels: dependencies
+</embedded>
+<forms>
+github:close
+github:comment
+github:edit
+github:label
+github:merge
+github:request-review
+github:update-branch
+</forms>
+<links>
+self
+alternate "On GitHub"
+github:issue "The pull request as an issue"
+</links>
+</held>
+<answers>
+
+</answers>
