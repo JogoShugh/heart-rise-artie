@@ -192,7 +192,10 @@ class ClaudePlanner(
             needn't be set), the step's sub-steps run where the run is when it is done, and after the step the
             runner comes back to where it began by itself: never "finish" in a goal in steps. For a step with sub-steps, act only to
             reach the resource its sub-steps start from (an act that opens), then "done": never do a sub-step's
-            work early, since each comes next as a step of its own. Each act in <moves> says what was done:
+            work early, since each comes next as a step of its own. A step that only names a place, such as
+            "In acme/rockets" or "On issue 12", means one act: open that resource by its names or numbers (the
+            repository, the issue), then "done"; its sub-steps do the work there, so never list, search or act
+            on anything else for it. Each act in <moves> says what was done:
             "acted" a form, or "followed" a link, and what came of it. A follow moves you and makes nothing:
             from a list, follow on to the item you need (a branch, an issue), then act there. Say "done" only
             once a move did the step's work, never because a follow came back done. "back" goes to a resource on <path> this

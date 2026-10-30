@@ -112,6 +112,22 @@ Feature: Claude plans a goal run, one move at a time
       | move     |
     And the move's reason is "the branch starts from main"
 
+  Scenario: The planner is told a step that only names a place means open it, since its sub-steps do the work there
+    spec/PLAN-LOCAL-MODEL.md, phase 2. At the step "In acme/rockets", which
+    has sub-steps, every local model listed the repository's issues or pull
+    requests instead of opening it; Claude opened it. The rule for a step
+    with sub-steps says "act only to reach the resource its sub-steps start
+    from", which reads as a search to a small model. So the prompt says the
+    plain case plainly: a step that only names a place is one act, opening it.
+    Given the goal is in steps, now at "In acme/rockets", with "issue" named at "https://github.gateway.test/repos/acme/rockets/issues/10"
+    And the Claude API will answer with the move {"move": "act", "words": "open the repository acme/rockets", "opens": true}
+    When the planner is asked its next move
+    Then the planner's system prompt says
+      | part                                                       |
+      | A step that only names a place                             |
+      | means one act: open that resource by its names or numbers  |
+      | its sub-steps do the work there                            |
+
   Scenario: In a goal in steps, the model is shown the steps, the step now and the names, and may make only its moves
     spec/PLAN-GOAL-MARKDOWN.md. The runner keeps the structure: the model
     sees the steps as a tree, the step now marked, the resources the steps
