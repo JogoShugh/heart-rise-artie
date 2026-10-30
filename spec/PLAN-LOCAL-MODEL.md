@@ -1,0 +1,138 @@
+# Plan: a goal run on a local model
+
+Status: plan only, 2026-10-30. No code, no spec text. Follows spec/ideas/goal-once-stop-and-model-settings.md,
+idea 2 (the model's settings as a measured choice), and makes the model's address one of those settings.
+
+## The idea
+
+Every goal run so far reasoned with Claude over the Anthropic API. The same run should be able to reason with a
+model on this laptop, with nothing else changed: the same goal file, the same gateway, the same trace, the same
+`artie generate` after it. Then the question "what does the model buy, against what the structure buys" can be
+asked of a free, slow, small model as well as of a paid, fast, large one, and the answer measured the same way
+the bench measured the four forms.
+
+## What is true now
+
+- `ClaudeReasoner` and `ClaudePlanner` post to `https://api.anthropic.com/v1/messages`, a constant. The model is
+  `claude-sonnet-5-5`, a constant. The key comes from `ModelKey.standard`: `ANTHROPIC_API_KEY`, else the
+  credentials file's entry for `https://api.github.com`'s neighbour, `https://api.anthropic.com`. No key, no
+  reasoner, and the run says where a key goes.
+- `artie run --reasoner` accepts one value, `claude`. A goal needs it; an `act(intent = …)` needs it.
+- Both prompts are one system text, one tool (`select` for the reasoner, `move` for the planner), `tool_choice`
+  auto, `max_tokens` 1024, and `cache_control` on the fixed parts. A text answer with no tool call is read as a
+  question for the person, never as a move or an act. The planner needs `why` and `move`; the reasoner needs
+  `action`.
+- `ModelUsage` counts each answer's `usage`: input, output, cache read, cache write. A missing field counts 0.
+- Each `ModelCall` in the trace records the model's name, what was asked and what was answered.
+
+## The seam
+
+The Messages API is the seam, not Claude. Ollama (since 0.14, January 2026) and llama.cpp's server both serve an
+Anthropic-compatible `/v1/messages`, tools included, on localhost. So the whole change on artie's side is three
+settings: where the model is, what it is called, and whether a key is needed. Nothing about the prompts, the
+tools, the trace or the generator changes. A model that answers that endpoint well is a reasoner; one that
+answers it badly shows up in the trace as questions, refusals and stops, which is the measurement.
+
+An OpenAI chat-completions reasoner (LM Studio, MLX, vLLM) is a second seam. Not now: the Messages seam covers
+the two runtimes that matter on a Mac, and a second request shape is a second thing to keep right.
+
+## The machine
+
+Apple M3 Max, 36 GB unified memory, 642 GB free. That memory fits one model at a time up to about 20 GB of
+weights with room for the KV cache of a 10,000-token prompt. Candidates, as the Ollama library names them, to
+be checked against what the library lists today:
+
+| Model | Size on disk | Why |
+|---|---|---|
+| `qwen3:30b-a3b` | about 19 GB | Mixture of experts: 3B active, so fast; strong tool calling |
+| `gpt-oss:20b` | about 13 GB | Native tool calling and a reasoning-effort setting |
+| `qwen3:14b` | about 9 GB | The small, dense fallback if the two above stumble on the tool |
+
+A dense 32B is too slow for a 13-call run; a 70B does not fit. Install the Homebrew formula, not the Ollama
+application: the formula is a command and a service, the application puts a dialog on the screen.
+
+## What to build
+
+### Phase 0: the runtime, by hand
+
+1. `brew install ollama`; `brew services start ollama`. It listens on `http://localhost:11434`.
+2. `ollama pull qwen3:30b-a3b` and `ollama pull gpt-oss:20b`.
+3. One `curl` to `http://localhost:11434/v1/messages` with the reasoner's exact request: the `select` tool, the
+   system text, one real turn taken from `runs/first.yaml`. The answer must hold a `tool_use` block whose
+   `input.action` is one of the five actions. Repeat with the planner's `move` tool and a real `<goal>` turn.
+   Keep both answers in `exhibits/local-model/captures.yaml`, bodies as YAML.
+4. Note what the answer's `usage` carries, whether `cache_control` is ignored or refused, and whether the model
+   spends its 1024 tokens thinking before it calls the tool. If it does, the spike finds the request field that
+   turns thinking off or down for that runtime, and the plan's phase 1 carries it as a setting.
+
+Nothing in the repository changes until the curl answers well. If no model answers the tool at all, the plan stops
+here and says so.
+
+### Phase 1: the settings
+
+Feature first, red at test level, then `src/main`, then green, module by module.
+
+- `artie-cli`: `artie run` takes `--model NAME` and `--model-url ORIGIN`. Defaults stay as they are. Both go in
+  the run's record beside the usage it keeps. `run.feature` and `run-goal.feature` get the scenarios: the client is
+  made with the model and address asked for; the record names them.
+- `heart-script`: `ClientSettings` carries `model` and `modelUrl`.
+- `artie`: `ClaudeReasoner` and `ClaudePlanner` take an endpoint. `ModelKey.standard` looks the key up by the
+  model's origin, not a constant: for `https://api.anthropic.com` as today, for another origin the credentials
+  file's entry for it, and for an origin with no entry, no key and no refusal. `model-key.feature` gets the
+  scenarios: a local address needs no key; a key for a local address, when the file holds one, is sent as the
+  file says. The header is `x-api-key` either way, which is what both runtimes read.
+- `ModelUsage` already tolerates a `usage` without the cache fields.
+- The names `ClaudeReasoner` and `ClaudePlanner` are wrong once they talk to anything. Renaming is refactor
+  work, done in refactor mode after green, when the author switches it on.
+
+The reasoner is still chosen as `--reasoner claude`: the value names the prompt and tool shape, which is Claude's.
+Whether to rename it (`messages`) is decided with the classes.
+
+### Phase 2: the run
+
+The behind scene on the scratch repository, as the bench ran it, with the gateway on this machine:
+
+```
+artie run exhibits/merge-watch/merge.goal.md owner=JogoShugh repo=heart-github-test \
+  --reasoner claude --model qwen3:30b-a3b --model-url http://localhost:11434 \
+  --exchanges --trace runs/local.yaml
+```
+
+Then `artie generate runs/local.yaml --script exhibits/merge-watch/merge.goal.md --out merge.local.kts` and a
+strict run of what it wrote. The kept script's one reasoned line is where a local model should be enough: a short
+prompt, one sentence back.
+
+Measured as the bench measured: merged or not, told once or not, steps, model calls, time to settle, and the
+model's own time per call, which the bench did not need and this run does. Ten runs per model, the same two
+scenes. The write-up's new row: one laptop, no key, and what that bought and cost.
+
+What to expect: a prompt of 5,000 to 10,000 tokens per call reads at a few hundred tokens a second on this
+machine, so 10 to 30 seconds of model time per call before the first token, against under 5 for Claude. Thirteen
+calls is several minutes of model time on top of the wait the scene itself takes. A smaller model may answer in
+words where Claude answered with the tool, which ends the run with a question; the trace shows exactly where.
+
+### Phase 3: what it teaches
+
+Three questions, answered by the traces rather than argued:
+
+- Does the planner's prompt carry a small model, or does it lean on what a large one knows? A local model that
+  stops, or acts on a form not offered, says the prompt leans.
+- Is the kept form model-independent in practice? Two calls, one sentence: if a local model does that as well,
+  the rails are the point and the model is a detail.
+- What is the floor? The smallest model that finishes the behind scene ten times out of ten is a number the
+  write-up can state.
+
+## Out of scope
+
+- An OpenAI-shaped reasoner.
+- Running the model elsewhere than localhost. The address is a setting, so nothing prevents it, but the plan
+  measures the laptop.
+- Tuning prompts for a given model. The prompt stays one prompt; if a model needs its own, that is a finding.
+
+## Verification
+
+- Phase 0's captures in YAML, token-free (there is none).
+- Each feature red at test level with the right module's `BDD_RUN FAIL` logged, then green; detekt clean;
+  `./gradlew installDist`.
+- One live goal run and one live strict run per model, traces kept under `exhibits/merge-watch/runs/`.
+- Commits local, in feature order. Push only on "Push".
