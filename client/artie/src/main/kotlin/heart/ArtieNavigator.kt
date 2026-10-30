@@ -177,6 +177,9 @@ private fun answered(client: HeartRiseClient, what: String, select: () -> HeartR
     refusal(client, what, refused)
 } catch (refused: AccessRefused) {
     refusal(client, what, refused)
+} catch (refused: ReadRefused) {
+    val kind = if (refused.notFound) Refusal.NotFound else Refusal.Unreadable
+    Answer.Refused(kind, Side.SERVER, refused.message.orEmpty())
 } catch (failed: java.io.IOException) {
     // Java's HTTP client says nothing when nothing listens: a ConnectException with no message.
     Answer.Refused(Refusal.Unreachable, Side.CLIENT, failed.message ?: "could not reach the server")

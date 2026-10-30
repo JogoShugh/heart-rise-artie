@@ -48,6 +48,9 @@ enum class Refusal(val words: String) {
     NotAuthenticated("not authenticated"),
     Forbidden("forbidden"),
     NotFound("not found"),
+
+    /** A read the server answered with an error other than not found: the resource could not be read. */
+    Unreadable("unreadable"),
     NotAChoice("not a choice"),
     NoBinding("no binding"),
     IntegrityMismatch("integrity mismatch"),

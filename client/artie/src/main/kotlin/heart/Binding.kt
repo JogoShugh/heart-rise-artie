@@ -71,7 +71,7 @@ sealed class Outcome(val code: String, val problemType: String?) {
         throw when (this) {
             is Unauthenticated -> refusal(url)
             is Denied -> refusal(url)
-            else -> IllegalStateException("$url could not be read: the binding answered $code")
+            else -> ReadRefused(url, code)
         }
     }
 

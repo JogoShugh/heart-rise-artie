@@ -83,6 +83,32 @@ Feature: Embedded resources: read in place, followed to act
       """
     Then the script finished
 
+  Scenario Outline: A followed resource the server won't give stops the script with a refusal, not a crash: <status>
+    Live, 2026-10-30: a reasoner followed a branch whose name holds a slash,
+    the gateway answered 400, and ARTIE threw, ending the run with a stack
+    trace and no trace written. A read the server refuses is a refusal, said
+    the way an act's is, so the script stops at its step and the run is kept.
+    Given the service answers GET "http://garden.test/users/lin" with:
+      """
+      <status>
+      Content-Type: application/problem+json
+
+      title: no
+      """
+    When this script runs with ARTIE
+      """kotlin
+      heart("http://garden.test/pulls/482") {
+          follow("pulls:reviewers", title = "Lin")
+      }
+      """
+    Then the script stopped at step 1, "pulls:reviewers": <reason>
+
+    Examples:
+      | status                    | reason                                                                                                       |
+      | 404 Not Found             | not found, refused by the server: "http://garden.test/users/lin could not be read: the server answered 404"  |
+      | 400 Bad Request           | unreadable, refused by the server: "http://garden.test/users/lin could not be read: the server answered 400" |
+      | 500 Internal Server Error | unreadable, refused by the server: "http://garden.test/users/lin could not be read: the server answered 500" |
+
   Scenario: The reasoner sees each embedded resource as a link, with its state and no URI
     Given the reasoner will follow the "pulls:author" link titled "Ada"
     When the agent handles "who wrote this?" at "http://garden.test/pulls/482"

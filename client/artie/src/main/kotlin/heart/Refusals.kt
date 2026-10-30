@@ -53,5 +53,19 @@ class Forbidden(val origin: String, val sent: String?) : AccessRefused(
     else "$origin does not allow this with the $sent credential ARTIE sent",
 )
 
+/**
+ * A read the server answered with an error ([code], the binding's own word for it): the resource at [url]
+ * could not be read. A refusal, said as an act's is, so a run stops at its step instead of crashing.
+ */
+class ReadRefused(val url: String, val code: String) :
+    RuntimeException("$url could not be read: the server answered $code") {
+    /** Not found (HTTP 404 or 410, CoAP 4.04), as against any other error. */
+    val notFound: Boolean get() = code in NOT_FOUND
+
+    private companion object {
+        val NOT_FOUND = setOf("404", "410", "4.04")
+    }
+}
+
 /** Any other outcome; [code] is the binding's own word for it (HTTP: the status code). */
 class UnexpectedResponse(rel: String, code: String) : ActRefused("$rel got the unexpected answer $code")
