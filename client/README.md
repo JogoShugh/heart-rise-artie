@@ -845,7 +845,10 @@ export JAVA_OPTS="-Djavax.net.ssl.trustStore=$HOME/.cache/artie/tls/trust.p12 -D
 Without it, a run against `https://localhost:8392` stops with "PKIX path building failed".
 
 **The model**, for `--reasoner claude`, reads `ANTHROPIC_API_KEY`, or else the bearer entry for
-`https://api.anthropic.com` in the credentials, as for any origin.
+`https://api.anthropic.com` in the credentials, as for any origin. A model on this machine takes the same
+prompts: `--model-url http://localhost:11434 --model qwen3:30b-a3b-instruct-2507-q4_K_M` asks Ollama's
+Messages API instead of Anthropic's, with no key unless the credentials hold one for that origin
+(`spec/PLAN-LOCAL-MODEL.md`).
 
 ## From plain text to rails
 
@@ -1106,6 +1109,8 @@ artie run <script> [name=value …] [options]
 | `--entry URL` | Starts at another entry point than the one the script or goal names: the same script against another server. |
 | `--rung L0\|L1\|L2` | Which rung of HEART the client asks for. L0 gets forms and schemas inline; L1 and L2 get them by link, shared and cached. A kept script reads at the rung its lock file records. |
 | `--reasoner claude` | Allows the steps that need a model: every step of a goal, and a script's reasoned lines. |
+| `--model NAME` | The model the reasoner asks, as its runtime names it. Default `claude-sonnet-5-5`. |
+| `--model-url ORIGIN` | Where the model answers the Messages API, such as `http://localhost:11434` for Ollama. Default Anthropic's. The trace names both, beside what the calls took. |
 | `--remember FILE` | For a watch: keeps what it did in FILE, so that run again, it doesn't do it again (a comment already made, a "left" already said). |
 
 ### Guards

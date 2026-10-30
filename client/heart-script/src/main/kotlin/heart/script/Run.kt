@@ -123,6 +123,9 @@ class Run(
     /** What the run's model calls took, as its client counted them (Navigator.usage), for its capture. */
     var usage: Map<String, Long> = emptyMap()
 
+    /** Which model took them, and where it answered (Navigator.model), for its capture. */
+    var model: Map<String, String> = emptyMap()
+
     /**
      * A goal run's watch, as the script its decisions amount to, written when the capture is (spec/PLAN-LISTENERS.md,
      * slice 8), and the step it began at: the steps from there on are its looks.
@@ -221,6 +224,7 @@ class Run(
                 if (place != null) source?.let { put("source", kotlinx.serialization.json.JsonPrimitive(it)) }
                 if (marks.isNotEmpty()) put("marks", element(marks.mapKeys { "${it.key}" }))
                 if (planned.isNotEmpty()) put("moves", element(planned))
+                if (model.isNotEmpty()) put("model", element(model))
                 if (usage.isNotEmpty()) put("usage", element(usage))
                 watchScript?.let { script ->
                     put("watch", element(mapOf("from" to watchFrom, "script" to script())))

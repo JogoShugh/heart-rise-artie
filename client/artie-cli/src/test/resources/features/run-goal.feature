@@ -99,6 +99,35 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | calls | input | output | cache_read | cache_write |
       | 6     | 5000  | 400    | 12000      | 3000        |
 
+  Scenario: The capture names the model the client reasoned with, and where it answered
+    spec/PLAN-LOCAL-MODEL.md, phase 1: beside what the calls took, which model
+    took them, and at which address, so one trace can be set against another's.
+    Given the planner will move
+      | move   | words              | sentence | opens |
+      | act    | open issue $number | 1        | yes   |
+      | done   |                    | 1        |       |
+      | act    | close it           | 2        |       |
+      | done   |                    | 2        |       |
+      | finish |                    |          |       |
+    And the reasoner chooses
+      | intent        | selection | relation   | fields           |
+      | open issue 10 | act       | issues-get | {"number": "10"} |
+      | close it      | act       | close      | {}               |
+    And the client reasons with the model "qwen3:30b-a3b-instruct-2507-q4_K_M" at "http://localhost:11434"
+    When artie is run with
+      | argument        |
+      | run             |
+      | close.goal.md   |
+      | number=10       |
+      | --reasoner      |
+      | claude          |
+      | --trace         |
+      | goal.trace.yaml |
+    Then artie exits 0
+    And the trace "goal.trace.yaml" names the model
+      | name                               | url                    |
+      | qwen3:30b-a3b-instruct-2507-q4_K_M | http://localhost:11434 |
+
   Scenario: A client with no planner says why, and where the model key goes
     Given the client has no planner, because "no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials"
     When artie is run with

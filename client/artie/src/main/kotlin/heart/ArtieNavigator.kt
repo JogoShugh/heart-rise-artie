@@ -50,6 +50,8 @@ class ArtieNavigator(
 
     override val usage: Map<String, Long> get() = (reasoner as? ClaudeReasoner)?.usage?.counts().orEmpty()
 
+    override val model: Map<String, String> get() = (reasoner as? ClaudeReasoner)?.named.orEmpty()
+
     /** A goal run's planner: Claude's, when the reasoner is (spec/PLAN-PLAIN-TEXT-RUN.md). */
     override fun planner(): heart.script.Planner? = (reasoner as? ClaudeReasoner)?.planner()
 

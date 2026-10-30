@@ -486,6 +486,37 @@ Feature: artie run: a script, run from the command line
       | 3 we're done with this one: done    |
       | finished, 3 steps                   |
 
+  Scenario Outline: With --model and --model-url, the client reasons with that model at that address
+    spec/PLAN-LOCAL-MODEL.md, phase 1: the Messages API is the seam, so a run
+    may name the model and where it answers, an origin; left out, the client's
+    own defaults stand. The address must be an origin: a scheme and a host.
+    Given the script "close.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          act(intent = "we're done with this one")
+      }
+      """
+    And the reasoner chooses
+      | intent                   | selection | relation | fields |
+      | we're done with this one | act       | close    | {}     |
+    When artie is run with
+      | argument    |
+      | run         |
+      | close.kts   |
+      | --reasoner  |
+      | claude      |
+      | <option>    |
+      | <value>     |
+    Then artie exits <exit>
+    And the client was made to reason with the model "<model>" at "<url>"
+
+    Examples:
+      | option      | value                              | exit | model                              | url                    |
+      | --model     | qwen3:30b-a3b-instruct-2507-q4_K_M | 0    | qwen3:30b-a3b-instruct-2507-q4_K_M |                        |
+      | --model-url | http://localhost:11434             | 0    |                                    | http://localhost:11434 |
+      | --model-url | localhost:11434                    | 2    |                                    |                        |
+
   Scenario Outline: A watch with listeners gives each listener a client of its own
     spec/PLAN-LISTENERS.md, slice 1: each listener looks on a thread of its
     own, so it asks the run for a client of its own, never the script's.
@@ -631,3 +662,19 @@ Feature: artie run: a script, run from the command line
       | first | second       | last                                   |
       | run   | missing.kts  | no script at missing.kts               |
       | walk  | issue.kts    | usage: artie run <script> [name=value …] [options] |
+
+  Scenario Outline: A model option that can't be run stops the run before its first request: <option> <value>
+    When artie is run with
+      | argument    |
+      | run         |
+      | missing.kts |
+      | <option>    |
+      | <value>     |
+    Then artie exits 2
+    And artie's last line is: <last>
+
+    Examples:
+      | option      | value           | last                                                   |
+      | --model-url | localhost:11434 | --model-url is an origin, such as http://localhost:11434 |
+      | --model-url | ftp://a.b       | --model-url is an origin, such as http://localhost:11434 |
+      | --model     |                 | --model needs a value                                  |

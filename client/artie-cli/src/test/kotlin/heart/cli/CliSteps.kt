@@ -26,6 +26,8 @@ class CliSteps(private val script: ScriptSteps) {
     private var printed = listOf<String>()
     private var askedRung: String? = null
     private var askedReasoner: String? = null
+    private var askedModel: String? = null
+    private var askedModelUrl: String? = null
     private var askedExchanges: Boolean? = null
     private var askedPins: heart.script.Pins? = null
     private var askedGuard: String? = null
@@ -79,6 +81,22 @@ class CliSteps(private val script: ScriptSteps) {
         script.service.counted = table.asMaps().single().mapValues { it.value.toLong() }
     }
 
+    @Given("the client reasons with the model {string} at {string}")
+    fun reasonsWith(name: String, url: String) {
+        script.service.named = mapOf("name" to name, "url" to url)
+    }
+
+    @Then("the trace {string} names the model")
+    fun traceNamesModel(name: String, table: DataTable) {
+        val head = org.yaml.snakeyaml.Yaml().loadAll(Files.readString(folder.resolve(name))).first() as Map<*, *>
+        val model = ((head["run"] as Map<*, *>)["model"] as Map<*, *>)
+        assertEquals(table.asMaps().single(), model.mapKeys { "${it.key}" }.mapValues { "${it.value}" })
+    }
+
+    @Then("the client was made to reason with the model {string} at {string}")
+    fun madeWithModel(name: String, url: String) =
+        assertEquals(name to url, askedModel.orEmpty() to askedModelUrl.orEmpty())
+
     @Then("the trace {string} counts these model tokens")
     fun traceCounts(name: String, table: DataTable) {
         val head = org.yaml.snakeyaml.Yaml().loadAll(Files.readString(folder.resolve(name))).first() as Map<*, *>
@@ -116,6 +134,8 @@ class CliSteps(private val script: ScriptSteps) {
         val client = { settings: heart.script.ClientSettings ->
             askedRung = settings.rung.orEmpty()
             askedReasoner = settings.reasoner.orEmpty()
+            askedModel = settings.model.name
+            askedModelUrl = settings.model.url
             askedExchanges = settings.exchanges
             askedPins = settings.pins
             askedGuard = settings.guarding.guard

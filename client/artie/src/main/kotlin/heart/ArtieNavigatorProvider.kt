@@ -20,10 +20,6 @@ class ArtieNavigatorProvider : NavigatorProvider {
     companion object {
         private const val NO_KEY =
             "no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials"
-
-        /** The Messages API's path at any origin that serves it. */
-        private const val MESSAGES = "/v1/messages"
-
         /**
          * ARTIE with the credentials [env] and [userHome] hold: over HTTP and HTTPS, plain CoAP, and coaps,
          * whose pre-shared keys stay inside its DTLS connector, as [settings] ask. With the reasoner `claude`, its
@@ -63,7 +59,7 @@ class ArtieNavigatorProvider : NavigatorProvider {
                 key == null && origin == ModelKey.ORIGIN -> ArtieNavigator(client, null, NO_KEY, log, guard, named)
                 else -> {
                     val model = settings.model.name ?: ClaudeReasoner.DEFAULT_MODEL
-                    val reasoner = ClaudeReasoner(HttpTransport(), key?.value, model, "$origin$MESSAGES")
+                    val reasoner = ClaudeReasoner(HttpTransport(), key?.value, model, origin + ClaudeReasoner.MESSAGES)
                     ArtieNavigator(client, reasoner, NO_KEY, log, guard, named)
                 }
             }

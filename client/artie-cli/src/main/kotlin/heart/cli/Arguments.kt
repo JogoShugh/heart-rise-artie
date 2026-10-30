@@ -22,6 +22,12 @@ class Arguments(val script: String) {
     var rung: String? = null
     var reasoner: String? = null
 
+    /** `--model NAME`: the model the reasoner asks, as its runtime names it (spec/PLAN-LOCAL-MODEL.md). */
+    var model: String? = null
+
+    /** `--model-url ORIGIN`: where the model answers the Messages API, such as http://localhost:11434. */
+    var modelUrl: String? = null
+
     /** The lock file, when it isn't NAME.pins.yaml beside the script (spec/PLAN-SCRIPT-GENERATOR.md). */
     var pins: String? = null
 
@@ -70,6 +76,10 @@ internal val VALIDATORS = setOf("last", "none")
 /** What look-then-leap's one look compares: the forms the script uses, or every form the server declares. */
 internal val LOOKS = setOf("used", "everything")
 
+/** An origin a model may answer at: a scheme the Messages API is served over, a host, and nothing after it. */
+private val ORIGIN = Regex("^https?://[^/\\s]+$")
+private const val NOT_AN_ORIGIN = "--model-url is an origin, such as http://localhost:11434"
+
 /** The options that stand alone. */
 private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
     "--inputs-of" to { it.inputsOf = true },
@@ -89,6 +99,8 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--report" to { a, v -> a.report = v },
     "--rung" to { a, v -> a.rung = v.takeIf { it in RUNGS } ?: throw BadArguments("--rung is L0, L1 or L2") },
     "--reasoner" to { a, v -> a.reasoner = v.takeIf { it in REASONERS } ?: throw BadArguments("--reasoner is claude") },
+    "--model" to { a, v -> a.model = v },
+    "--model-url" to { a, v -> a.modelUrl = v.takeIf(ORIGIN::matches) ?: throw BadArguments(NOT_AN_ORIGIN) },
     "--pins" to { a, v -> a.pins = v },
     "--config" to { a, v -> a.config = v },
     "--guard" to { a, v -> a.guard = v.takeIf { it in GUARDS } ?: throw BadArguments("--guard is ${said(GUARDS)}") },

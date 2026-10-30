@@ -198,6 +198,9 @@ interface Navigator {
     /** What its model calls took, by count: calls, input, output, cache_read, cache_write; empty with no model. */
     val usage: Map<String, Long> get() = emptyMap()
 
+    /** The model its calls went to: its name, and the url it answers at; empty with no model. */
+    val model: Map<String, String> get() = emptyMap()
+
     /** The client's planner for a goal run (spec/PLAN-PLAIN-TEXT-RUN.md); null when it has none. */
     fun planner(): Planner? = null
 

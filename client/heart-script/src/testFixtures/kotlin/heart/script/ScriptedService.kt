@@ -128,6 +128,11 @@ class ScriptedService : Navigator, Wire, Writes {
 
     override val usage: Map<String, Long> get() = counted
 
+    /** The model a scenario says this client reasons with, by name and url. */
+    var named: Map<String, String> = emptyMap()
+
+    override val model: Map<String, String> get() = named
+
     /** What the reasoner chooses, by the words it is given. */
     val reasons = mutableMapOf<String, Choice>()
 

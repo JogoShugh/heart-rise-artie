@@ -69,7 +69,8 @@ class ArtieCli(
         val config = config(asked, folder, file)
         val lock = lockFile(asked, folder, file, config)
         val guarding = guarding(asked, config, lock)
-        val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, guarding)
+        val model = heart.script.Model(asked.model, asked.modelUrl)
+        val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, guarding, model)
         val made = lazy { navigator(settings) }
         val client by made
         val run = Run(given, asked.interactive, ::ask, listing = asked.inputsOf, navigator = clients(made) {
@@ -107,8 +108,12 @@ class ArtieCli(
         } finally {
             runCatching { Runtime.getRuntime().removeShutdownHook(stopped) }
         }
-        // What the run's model calls took, as its client counted them: a client never made took nothing.
-        if (made.isInitialized()) run.usage = client.usage
+        // What the run's model calls took, as its client counted them, and which model took them: a client never
+        // made took nothing.
+        if (made.isInitialized()) {
+            run.usage = client.usage
+            run.model = client.model
+        }
         kept()
         val repinned = repin(asked, folder, file, config, run.traceYaml())
         if (output == "words") repinned.forEach(out::println)

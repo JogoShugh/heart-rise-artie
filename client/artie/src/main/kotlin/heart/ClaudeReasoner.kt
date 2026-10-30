@@ -49,6 +49,9 @@ class ClaudeReasoner(
     /** What this reasoner's calls, and its planner's, took. */
     val usage = ModelUsage()
 
+    /** The model by name, and the origin it answers at, for a run's capture. */
+    val named: Map<String, String> get() = mapOf("name" to model, "url" to endpoint.substringBefore(MESSAGES))
+
     /** A planner for goal runs on the same model, key and transport, its calls counted with this reasoner's. */
     fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model, usage, endpoint)
 
@@ -149,7 +152,9 @@ class ClaudeReasoner(
     }
 
     companion object {
-        const val ENDPOINT = "https://api.anthropic.com/v1/messages"
+        /** The Messages API's path, at Anthropic's origin or any other that serves it. */
+        const val MESSAGES = "/v1/messages"
+        const val ENDPOINT = "https://api.anthropic.com$MESSAGES"
         const val DEFAULT_MODEL = "claude-sonnet-5-5"
         private const val API_VERSION = "2023-06-01"
 
