@@ -226,3 +226,48 @@ and the HTML dialect, at their best. The main risk is rule creep (liberos, rotat
 4. GitHub through the gateway in a browser.
 5. Volleyball, with a view, as the showcase.
 6. The explorer, if wanted, after all of the above.
+
+## Review, 2026-10-30
+
+Read against the code as it stands. The idea holds; the points below are what the code and htmx's own defaults
+change about it.
+
+**What fits.** Negotiation is one function (`Negotiation.dialect`) and the dialect an enum, so a third value is a
+small, local change, and its tag joins the Layer 1 ETag the way `hf` and `hsf` do. Both bindings (Spring for the
+domains, http4k for the gateway) already ask heart-core for the dialect and the representation, so an HTML writer in
+heart-core serves both. Legality, `hr:unavailable` and `hr:options` are all decided before any writer runs, so the
+HTML cannot offer what the JSON does not.
+
+**What the idea gets wrong or leaves out.**
+
+- **A browser's Accept falls to the default today.** `text/html,…,*/*;q=0.8` has a wildcard, so the server answers
+  HAL-FORMS JSON. `text/html` must be ranked like a dialect media type, and named explicitly: a wildcard alone must
+  never select HTML, or a client that names nothing would get a page.
+- **htmx does not send `Accept: text/html`.** Its requests go out with the browser's default for scripts, `*/*`, and
+  would get JSON back. Each page sets `hx-headers` with the Accept (and the ETag), or the server reads `HX-Request`.
+  The first is plainer and keeps negotiation by Accept alone.
+- **htmx does not swap a 4xx answer by default.** A 412, 409 or 422 rendered as HTML would be dropped. htmx 2's
+  `responseHandling` config must swap them; one line in the page.
+- **Form data is all strings.** htmx's `json-enc` would send `"milliliters": "250"`, which the schema refuses as not an
+  integer. The act pipeline should take `application/x-www-form-urlencoded` and convert each field by its schema type
+  before the check, in heart-core, so both bindings get it and the 422 stays the rule.
+- **A 201 has nowhere to go.** An act that makes a resource answers 201 with a Location; htmx swaps the body in place.
+  The HTML answer to a 201 should send `HX-Location` so the browser moves to the new resource, with history.
+- **Links need no htmx.** A link is a plain `<a href>`: the browser follows it with `Accept: text/html` by itself.
+  htmx is for forms only.
+- **Machine-readable too.** Each form carries `data-rel` with its relation, so the dialect-agreement test reads the
+  HTML's forms without a browser, and an agent could, too.
+
+**The two decisions, with a recommendation each.**
+
+1. **Credentials.** Recommend: first slice on a domain server run locally with its existing Basic credentials, which a
+   browser handles natively (one native sign-in, acceptable for a local demo); a cookie session, with CSRF, only when a
+   shared or gateway deployment needs it.
+2. **Is `text/html` a HEART dialect?** Recommend: not yet. Serve it as the people's on-ramp, outside the profile, held
+   to the one rule that matters (it offers exactly the forms the JSON offers). A profile can follow once it is used.
+
+**First slice, if started.** Feature first, in heart-core and the Spring binding: `text/html` negotiated by name; a
+generic writer (state as a definition list, nested lists as tables, one htmx form per legal act with `data-rel`,
+`If-Match` and Accept in `hx-headers`, inputs from the schema, `hr:unavailable` as disabled buttons with the reason);
+form-encoded acts converted by schema type; refusals rendered and swapped; `HX-Location` on 201. Shown on the garden,
+with the agreement test there. No view hints, no volleyball, no gateway in this slice.
