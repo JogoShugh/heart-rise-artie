@@ -18,6 +18,27 @@ Feature: The model key ARTIE reasons with
       | env-key     |          | env-key  | the environment      |
       |             |          |          | nowhere              |
 
+  Scenario Outline: The key is the model's address's: Anthropic's from the environment or the file, another's from the file alone
+    spec/PLAN-LOCAL-MODEL.md, phase 1: the Messages API is the seam, so a run
+    may name where its model answers. ANTHROPIC_API_KEY is Anthropic's key, so it
+    stands only for Anthropic's address; any other address takes the credentials
+    file's entry for it, and with none, no key, which a local model doesn't need.
+    Given the environment's ANTHROPIC_API_KEY is "<environment>"
+    And the credentials file's key for "<origin>" is "<file>"
+    When ARTIE looks for its model key for "<origin>"
+    Then it finds "<found>", from <where>
+
+    Examples:
+      | origin                    | environment | file     | found    | where                |
+      | https://api.anthropic.com | env-key     | file-key | env-key  | the environment      |
+      | http://localhost:11434    | env-key     | file-key | file-key | the credentials file |
+      | http://localhost:11434    | env-key     |          |          | nowhere              |
+
+  Scenario: A model at another address needs no key: allowed the claude reasoner there, ARTIE plans and reasons
+    Given the environment's ANTHROPIC_API_KEY is ""
+    When a script host's ARTIE, allowed the claude reasoner at "http://localhost:11434", is made
+    Then it has a planner
+
   Scenario: What ARTIE says of a key names its source, never its value
     Given the environment's ANTHROPIC_API_KEY is "sk-secret-value"
     When ARTIE looks for its model key

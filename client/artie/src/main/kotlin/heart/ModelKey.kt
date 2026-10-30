@@ -11,16 +11,21 @@ class ModelKey(val value: String, val source: String) {
 
     companion object {
         private const val ENVIRONMENT = "ANTHROPIC_API_KEY"
-        private const val ORIGIN = "https://api.anthropic.com"
+
+        /** Anthropic's address, where the model answers unless a run says otherwise. */
+        const val ORIGIN = "https://api.anthropic.com"
 
         /**
-         * ANTHROPIC_API_KEY in [env] first; else the Bearer entry for https://api.anthropic.com in the
-         * credentials file, ARTIE_HOME's or else `.artie` in [userHome]; null when neither holds one.
+         * The key for the model at [origin] (spec/PLAN-LOCAL-MODEL.md): for Anthropic's address, ANTHROPIC_API_KEY
+         * in [env] first; for any address, the Bearer entry for it in the credentials file, ARTIE_HOME's or else
+         * `.artie` in [userHome]; null when neither holds one, which a local runtime doesn't mind.
          */
-        fun standard(env: Map<String, String>, userHome: Path): ModelKey? {
-            env[ENVIRONMENT]?.takeIf { it.isNotBlank() }?.let { return ModelKey(it, "the environment") }
+        fun standard(env: Map<String, String>, userHome: Path, origin: String = ORIGIN): ModelKey? {
+            if (origin == ORIGIN) {
+                env[ENVIRONMENT]?.takeIf { it.isNotBlank() }?.let { return ModelKey(it, "the environment") }
+            }
             val folder = env["ARTIE_HOME"]?.let { Path.of(it) } ?: userHome.resolve(".artie")
-            val held = FileCredentials(folder.resolve("credentials")).credentialFor(Origin.of(ORIGIN))
+            val held = FileCredentials(folder.resolve("credentials")).credentialFor(Origin.of(origin))
             return (held as? Credential.Bearer)?.header()?.removePrefix("Bearer ")
                 ?.let { ModelKey(it, "the credentials file") }
         }

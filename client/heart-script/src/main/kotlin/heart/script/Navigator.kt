@@ -274,6 +274,16 @@ class ClientSettings(
     val pins: Pins? = null,
     /** How careful the run is: how it holds to the lock file, and what its acts carry. */
     val guarding: Guarding = Guarding(),
+    /** The model the reasoner asks, and where (spec/PLAN-LOCAL-MODEL.md); each null for the client's default. */
+    val model: Model = Model(),
+)
+
+/** A run's model (spec/PLAN-LOCAL-MODEL.md): its [name] as its runtime knows it, and the origin it answers at. */
+class Model(
+    /** `--model`: the name, such as `claude-sonnet-5-5` or `qwen3:30b-a3b-instruct-2507-q4_K_M`. */
+    val name: String? = null,
+    /** `--model-url`: an origin that serves the Messages API, such as `http://localhost:11434`. */
+    val url: String? = null,
 )
 
 /** How careful a run is (spec/ideas/replay-guards-lenient-strict.md, spec/ideas/off-the-rails.md). */

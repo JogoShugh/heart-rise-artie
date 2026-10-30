@@ -21,6 +21,9 @@ class ArtieNavigatorProvider : NavigatorProvider {
         private const val NO_KEY =
             "no model key: set ANTHROPIC_API_KEY, or add one for https://api.anthropic.com to ~/.artie/credentials"
 
+        /** The Messages API's path at any origin that serves it. */
+        private const val MESSAGES = "/v1/messages"
+
         /**
          * ARTIE with the credentials [env] and [userHome] hold: over HTTP and HTTPS, plain CoAP, and coaps,
          * whose pre-shared keys stay inside its DTLS connector, as [settings] ask. With the reasoner `claude`, its
@@ -50,12 +53,19 @@ class ArtieNavigatorProvider : NavigatorProvider {
             val care = Care(validators = guarding.validators != "none")
             val client = ArtieClient(transport, rung, care = care, bindings = coaps)
             val claude = settings.reasoner == "claude"
-            val key = if (claude) ModelKey.standard(env, userHome) else null
+            // The model's address (spec/PLAN-LOCAL-MODEL.md): Anthropic's needs a key; another takes one only
+            // when the credentials file holds one for it.
+            val origin = settings.model.url?.trimEnd('/') ?: ModelKey.ORIGIN
+            val key = if (claude) ModelKey.standard(env, userHome, origin) else null
             val named = guarding.guard
             val navigator = when {
                 !claude -> ArtieNavigator(client, exchangeLog = log, guard = guard, guarding = named)
-                key == null -> ArtieNavigator(client, null, NO_KEY, log, guard, named)
-                else -> ArtieNavigator(client, ClaudeReasoner(HttpTransport(), key.value), NO_KEY, log, guard, named)
+                key == null && origin == ModelKey.ORIGIN -> ArtieNavigator(client, null, NO_KEY, log, guard, named)
+                else -> {
+                    val model = settings.model.name ?: ClaudeReasoner.DEFAULT_MODEL
+                    val reasoner = ClaudeReasoner(HttpTransport(), key?.value, model, "$origin$MESSAGES")
+                    ArtieNavigator(client, reasoner, NO_KEY, log, guard, named)
+                }
             }
             // A bare script's calls go out below ARTIE's cache and integrity check, on the same trace and log.
             return WiredNavigator(navigator, AuthTransport(credentials, wire))

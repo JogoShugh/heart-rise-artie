@@ -29,20 +29,18 @@ import kotlinx.serialization.json.putJsonObject
  */
 class ClaudePlanner(
     private val transport: Transport,
-    private val apiKey: String,
+    /** The key sent as `x-api-key`; null for a runtime that asks none. */
+    private val apiKey: String?,
     private val model: String = ClaudeReasoner.DEFAULT_MODEL,
     /** What its calls took, counted with its reasoner's when it has one. */
     val usage: ModelUsage = ModelUsage(),
+    /** Where the Messages API answers, as the reasoner's. */
+    private val endpoint: String = ClaudeReasoner.ENDPOINT,
 ) : Planner {
 
     override fun next(view: PlanView): Move {
         val response = transport.send(
-            HeartRequest(
-                "POST",
-                ClaudeReasoner.ENDPOINT,
-                mapOf("x-api-key" to apiKey, "anthropic-version" to API_VERSION, "Content-Type" to "application/json"),
-                request(view).toString(),
-            ),
+            HeartRequest("POST", endpoint, ClaudeReasoner.headers(apiKey), request(view).toString()),
         )
         check(response.status in SUCCESS) {
             "Claude API answered ${response.status}: ${response.body.take(ERROR_EXCERPT)}"
@@ -147,7 +145,6 @@ class ClaudePlanner(
     }
 
     companion object {
-        private const val API_VERSION = "2023-06-01"
         private const val MAX_TOKENS = 1024
         private const val ERROR_EXCERPT = 300
         private const val STATE_LIMIT = 4000

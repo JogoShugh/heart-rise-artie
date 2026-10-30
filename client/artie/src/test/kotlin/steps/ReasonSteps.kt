@@ -201,11 +201,31 @@ class ReasonSteps(private val ctx: ClientContext) {
     // ---- the Claude reasoner, against the scripted transport ----
 
     @Given("the Claude API will answer with a tool call selecting {string} with {}")
-    fun claudeAnswers(affordance: String, fields: String) {
+    fun claudeAnswers(affordance: String, fields: String) = claudeAnswersAt(ClaudeReasoner.ENDPOINT, affordance, fields)
+
+    @Given("the Claude API at {string} will answer with a tool call selecting {string} with {}")
+    fun claudeAnswersAt(url: String, affordance: String, fields: String) {
         val body = """{"id":"msg_1","type":"message","role":"assistant","content":[""" +
             """{"type":"tool_use","id":"t1","name":"select","input":""" +
             """{"action":"act","affordance":"$affordance","fields":$fields}}],"stop_reason":"tool_use"}"""
-        ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(OK, emptyMap(), body))
+        ctx.transport.respond("POST", url, HeartResponse(OK, emptyMap(), body))
+    }
+
+    @When("the Claude reasoner for {string} at {string} reasons about {string} over the manifest of {string}")
+    fun claudeReasonsAt(model: String, origin: String, intent: String, url: String) {
+        val synced = ctx.client.enter(ctx.url(url))
+        val offers = synced.affordances.values.map { Offer(it.rel, it.schema, it.title, it.description) }
+        val links = synced.linksByRel.flatMap { (rel, list) -> list.map { LinkOffer(rel, it.title) } }
+        val reasoner = ClaudeReasoner(ctx.transport, null, model, "$origin/v1/messages")
+        selection = reasoner.reason(intent, synced.state, offers, links)
+    }
+
+    @Then("the request went to {string} naming the model {string}, with no x-api-key header")
+    fun wentTo(url: String, model: String) {
+        val request = ctx.transport.requests.last { it.url == url }
+        val body = Json.parseToJsonElement(request.body.orEmpty()).jsonObject
+        assertEquals(model, body["model"]?.jsonPrimitive?.content)
+        assertFalse(request.headers.containsKey("x-api-key"), "headers: ${request.headers.keys}")
     }
 
     @Given("the Claude API will answer with the text {string}")

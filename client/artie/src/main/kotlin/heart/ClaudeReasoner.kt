@@ -30,8 +30,11 @@ import kotlinx.serialization.json.putJsonObject
  */
 class ClaudeReasoner(
     private val transport: Transport,
-    private val apiKey: String,
+    /** The key sent as `x-api-key`; null for a runtime that asks none, such as a local one. */
+    private val apiKey: String?,
     private val model: String = DEFAULT_MODEL,
+    /** Where the Messages API answers (spec/PLAN-LOCAL-MODEL.md): Anthropic's, or a local runtime's. */
+    private val endpoint: String = ENDPOINT,
 ) : Reasoner, KeepsModelCalls {
 
     private val calls = mutableListOf<heart.script.ModelCall>()
@@ -47,17 +50,12 @@ class ClaudeReasoner(
     val usage = ModelUsage()
 
     /** A planner for goal runs on the same model, key and transport, its calls counted with this reasoner's. */
-    fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model, usage)
+    fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model, usage, endpoint)
 
     override fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection {
         val asked = turn(intent, state, offers, links)
         val response = transport.send(
-            HeartRequest(
-                "POST",
-                ENDPOINT,
-                mapOf("x-api-key" to apiKey, "anthropic-version" to API_VERSION, "Content-Type" to "application/json"),
-                request(intent, state, offers, links).toString(),
-            ),
+            HeartRequest("POST", endpoint, headers(apiKey), request(intent, state, offers, links).toString()),
         )
         check(response.status in SUCCESS) {
             "Claude API answered ${response.status}: ${response.body.take(ERROR_EXCERPT)}"
@@ -154,6 +152,13 @@ class ClaudeReasoner(
         const val ENDPOINT = "https://api.anthropic.com/v1/messages"
         const val DEFAULT_MODEL = "claude-sonnet-5-5"
         private const val API_VERSION = "2023-06-01"
+
+        /** The Messages API's headers: the key when there is one, the version, and JSON. */
+        fun headers(apiKey: String?): Map<String, String> = buildMap {
+            apiKey?.let { put("x-api-key", it) }
+            put("anthropic-version", API_VERSION)
+            put("Content-Type", "application/json")
+        }
         private const val TOOL_NAME = "select"
 
         /** The model's words, when it answered without the tool: a question for the user. */

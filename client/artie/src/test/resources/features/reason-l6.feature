@@ -79,6 +79,15 @@ Feature: L6: the Reason step picks; deterministic code acts
     And the Claude request contains no URI from the manifest
     And the Claude reasoner selected "waterCell" with {"milliliters": 300}
 
+  Scenario: The Claude reasoner at another address names its model there, and sends no key it doesn't have
+    spec/PLAN-LOCAL-MODEL.md, phase 1: a local runtime serving the Messages API
+    (Ollama, llama.cpp) is asked the same request at its own address, naming its
+    own model; the prompt, the tool and the answer's reading are unchanged.
+    Given the Claude API at "http://localhost:11434/v1/messages" will answer with a tool call selecting "waterCell" with {"milliliters": 300}
+    When the Claude reasoner for "qwen3:30b-a3b-instruct-2507-q4_K_M" at "http://localhost:11434" reasons about "water bed 2 with 300ml" over the manifest of "http://garden.test/beds/2"
+    Then the request went to "http://localhost:11434/v1/messages" naming the model "qwen3:30b-a3b-instruct-2507-q4_K_M", with no x-api-key header
+    And the Claude reasoner selected "waterCell" with {"milliliters": 300}
+
   Scenario: The Claude reasoner is told to write words as the intent describes them, to the letter
     A merge watch asked for one friendly sentence, and the model wrote two
     or three in two of five comments. Words a field takes are written as

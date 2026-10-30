@@ -33,6 +33,22 @@ class ModelKeySteps {
         found = ModelKey.standard(env, home)
     }
 
+    @When("ARTIE looks for its model key for {string}")
+    fun looksFor(origin: String) {
+        found = ModelKey.standard(env, home, origin)
+    }
+
+    private var made: heart.script.Navigator? = null
+
+    @When("a script host's ARTIE, allowed the claude reasoner at {string}, is made")
+    fun madeAt(origin: String) {
+        val settings = heart.script.ClientSettings(reasoner = "claude", model = heart.script.Model(url = origin))
+        made = heart.ArtieNavigatorProvider.standard(env, home, settings)
+    }
+
+    @Then("it has a planner")
+    fun hasPlanner() = kotlin.test.assertNotNull(made?.planner(), "no planner")
+
     @Then("it finds {string}, from {}")
     fun finds(key: String, where: String) = assertEquals(
         key.ifEmpty { null } to where,
