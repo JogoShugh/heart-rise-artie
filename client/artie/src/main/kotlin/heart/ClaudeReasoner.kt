@@ -35,6 +35,8 @@ class ClaudeReasoner(
     private val model: String = DEFAULT_MODEL,
     /** Where the Messages API answers (spec/PLAN-LOCAL-MODEL.md): Anthropic's, or a local runtime's. */
     private val endpoint: String = ENDPOINT,
+    /** The most an answer may run to; a model that thinks before its tool call needs more than the default. */
+    private val maxTokens: Int = MAX_TOKENS,
 ) : Reasoner, KeepsModelCalls {
 
     private val calls = mutableListOf<heart.script.ModelCall>()
@@ -53,7 +55,7 @@ class ClaudeReasoner(
     val named: Map<String, String> get() = mapOf("name" to model, "url" to endpoint.substringBefore(MESSAGES))
 
     /** A planner for goal runs on the same model, key and transport, its calls counted with this reasoner's. */
-    fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model, usage, endpoint)
+    fun planner(): ClaudePlanner = ClaudePlanner(transport, apiKey, model, usage, endpoint, maxTokens)
 
     override fun reason(intent: String, state: JsonObject, offers: List<Offer>, links: List<LinkOffer>): Selection {
         val asked = turn(intent, state, offers, links)
@@ -76,7 +78,7 @@ class ClaudeReasoner(
         links: List<LinkOffer>,
     ): JsonObject = buildJsonObject {
         put("model", model)
-        put("max_tokens", MAX_TOKENS)
+        put("max_tokens", maxTokens)
         putJsonArray("tools") { add(TOOL) }
         putJsonObject("tool_choice") { put("type", "auto") }
         putJsonArray("system") {
@@ -170,7 +172,8 @@ class ClaudeReasoner(
         fun words(content: List<JsonObject>): String =
             content.mapNotNull { block -> block["text"]?.jsonPrimitive?.content }.joinToString(" ").trim()
                 .ifEmpty { "Could you say more?" }
-        private const val MAX_TOKENS = 1024
+        /** The most an answer may run to unless a run says otherwise: enough for a tool call and a few words. */
+        const val MAX_TOKENS = 1024
         private const val ERROR_EXCERPT = 300
         private val ACTIONS = listOf("act", "describe", "explain", "follow", "clarify")
         private val SUCCESS = 200..299

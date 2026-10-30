@@ -36,6 +36,8 @@ class ClaudePlanner(
     val usage: ModelUsage = ModelUsage(),
     /** Where the Messages API answers, as the reasoner's. */
     private val endpoint: String = ClaudeReasoner.ENDPOINT,
+    /** The most a move may run to, as the reasoner's. */
+    private val maxTokens: Int = ClaudeReasoner.MAX_TOKENS,
 ) : Planner {
 
     override fun next(view: PlanView): Move {
@@ -52,7 +54,7 @@ class ClaudePlanner(
 
     private fun request(view: PlanView): JsonObject = buildJsonObject {
         put("model", model)
-        put("max_tokens", MAX_TOKENS)
+        put("max_tokens", maxTokens)
         // A goal in steps offers only the moves the step now allows: a cached prefix for each kind of step.
         putJsonArray("tools") { add(tool(view.allowed.toList().ifEmpty { MOVES })) }
         putJsonObject("tool_choice") { put("type", "auto") }
@@ -145,7 +147,6 @@ class ClaudePlanner(
     }
 
     companion object {
-        private const val MAX_TOKENS = 1024
         private const val ERROR_EXCERPT = 300
         private const val STATE_LIMIT = 4000
         private val SUCCESS = 200..299

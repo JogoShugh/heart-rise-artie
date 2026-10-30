@@ -34,6 +34,14 @@ Feature: Claude plans a goal run, one move at a time
       | {"move": "stop", "why": "the issue is locked"}                           | stopped: the issue is locked          |
       | {"move": "clarify", "question": "Which issue?"}                          | a question: Which issue?              |
 
+  Scenario: The planner asks for the answer length a run sets, for a model that thinks before it moves
+    spec/PLAN-LOCAL-MODEL.md, phase 2: the thinking build of a local model spent
+    the default 1024 tokens thinking and never reached its tool call; at 4096 it did.
+    Given the planner is Claude, through the scripted Claude API, allowed 4096 tokens an answer
+    And the Claude API will answer with the move {"move": "finish"}
+    When the planner is asked its next move
+    Then the planner's request asks for at most 4096 tokens
+
   Scenario: An answer in words alone is a question for the person, never a move
     Given the Claude API will answer with the text "Should I close it as completed or as not planned?"
     When the planner is asked its next move

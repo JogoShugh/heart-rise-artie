@@ -69,7 +69,7 @@ class ArtieCli(
         val config = config(asked, folder, file)
         val lock = lockFile(asked, folder, file, config)
         val guarding = guarding(asked, config, lock)
-        val model = heart.script.Model(asked.model, asked.modelUrl)
+        val model = heart.script.Model(asked.model, asked.modelUrl, asked.maxTokens)
         val settings = ClientSettings(lock.rung, asked.reasoner, asked.exchanges, lock.pins, guarding, model)
         val made = lazy { navigator(settings) }
         val client by made

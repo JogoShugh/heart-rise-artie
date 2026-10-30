@@ -28,6 +28,7 @@ class CliSteps(private val script: ScriptSteps) {
     private var askedReasoner: String? = null
     private var askedModel: String? = null
     private var askedModelUrl: String? = null
+    private var askedMaxTokens: Int? = null
     private var askedExchanges: Boolean? = null
     private var askedPins: heart.script.Pins? = null
     private var askedGuard: String? = null
@@ -93,6 +94,9 @@ class CliSteps(private val script: ScriptSteps) {
         assertEquals(table.asMaps().single(), model.mapKeys { "${it.key}" }.mapValues { "${it.value}" })
     }
 
+    @Then("the client was made to let the model answer with {} tokens")
+    fun madeWithTokens(tokens: String) = assertEquals(tokens, askedMaxTokens?.toString().orEmpty())
+
     @Then("the client was made to reason with the model {string} at {string}")
     fun madeWithModel(name: String, url: String) =
         assertEquals(name to url, askedModel.orEmpty() to askedModelUrl.orEmpty())
@@ -136,6 +140,7 @@ class CliSteps(private val script: ScriptSteps) {
             askedReasoner = settings.reasoner.orEmpty()
             askedModel = settings.model.name
             askedModelUrl = settings.model.url
+            askedMaxTokens = settings.model.maxTokens
             askedExchanges = settings.exchanges
             askedPins = settings.pins
             askedGuard = settings.guarding.guard

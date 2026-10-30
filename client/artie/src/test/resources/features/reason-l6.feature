@@ -88,6 +88,13 @@ Feature: L6: the Reason step picks; deterministic code acts
     Then the request went to "http://localhost:11434/v1/messages" naming the model "qwen3:30b-a3b-instruct-2507-q4_K_M", with no x-api-key header
     And the Claude reasoner selected "waterCell" with {"milliliters": 300}
 
+  Scenario: The Claude reasoner asks for the answer length a run sets
+    spec/PLAN-LOCAL-MODEL.md, phase 2: a model that thinks before it calls the
+    tool spends the default 1024 tokens thinking; a run may allow it more.
+    Given the Claude API will answer with a tool call selecting "waterCell" with {"milliliters": 300}
+    When the Claude reasoner, allowed 4096 tokens an answer, reasons about "water bed 2 with 300ml" over the manifest of "http://garden.test/beds/2"
+    Then the Claude request asks for at most 4096 tokens
+
   Scenario: The Claude reasoner is told to write words as the intent describes them, to the letter
     A merge watch asked for one friendly sentence, and the model wrote two
     or three in two of five comments. Words a field takes are written as

@@ -1111,6 +1111,7 @@ artie run <script> [name=value …] [options]
 | `--reasoner claude` | Allows the steps that need a model: every step of a goal, and a script's reasoned lines. |
 | `--model NAME` | The model the reasoner asks, as its runtime names it. Default `claude-sonnet-5-5`. |
 | `--model-url ORIGIN` | Where the model answers the Messages API, such as `http://localhost:11434` for Ollama. Default Anthropic's. The trace names both, beside what the calls took. |
+| `--max-tokens N` | The most an answer may run to. Default 1024, enough for a tool call; a model that thinks before it calls the tool needs 4096. |
 | `--remember FILE` | For a watch: keeps what it did in FILE, so that run again, it doesn't do it again (a comment already made, a "left" already said). |
 
 ### Guards

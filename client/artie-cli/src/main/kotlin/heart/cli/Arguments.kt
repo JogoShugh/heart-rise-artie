@@ -28,6 +28,9 @@ class Arguments(val script: String) {
     /** `--model-url ORIGIN`: where the model answers the Messages API, such as http://localhost:11434. */
     var modelUrl: String? = null
 
+    /** `--max-tokens N`: the most an answer may run to; null for the client's default. */
+    var maxTokens: Int? = null
+
     /** The lock file, when it isn't NAME.pins.yaml beside the script (spec/PLAN-SCRIPT-GENERATOR.md). */
     var pins: String? = null
 
@@ -79,6 +82,7 @@ internal val LOOKS = setOf("used", "everything")
 /** An origin a model may answer at: a scheme the Messages API is served over, a host, and nothing after it. */
 private val ORIGIN = Regex("^https?://[^/\\s]+$")
 private const val NOT_AN_ORIGIN = "--model-url is an origin, such as http://localhost:11434"
+private const val NOT_A_LENGTH = "--max-tokens is a number of tokens, such as 4096"
 
 /** The options that stand alone. */
 private val FLAGS: Map<String, (Arguments) -> Unit> = mapOf(
@@ -101,6 +105,7 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--reasoner" to { a, v -> a.reasoner = v.takeIf { it in REASONERS } ?: throw BadArguments("--reasoner is claude") },
     "--model" to { a, v -> a.model = v },
     "--model-url" to { a, v -> a.modelUrl = v.takeIf(ORIGIN::matches) ?: throw BadArguments(NOT_AN_ORIGIN) },
+    "--max-tokens" to { a, v -> a.maxTokens = v.toIntOrNull()?.takeIf { it > 0 } ?: throw BadArguments(NOT_A_LENGTH) },
     "--pins" to { a, v -> a.pins = v },
     "--config" to { a, v -> a.config = v },
     "--guard" to { a, v -> a.guard = v.takeIf { it in GUARDS } ?: throw BadArguments("--guard is ${said(GUARDS)}") },

@@ -287,6 +287,8 @@ class Model(
     val name: String? = null,
     /** `--model-url`: an origin that serves the Messages API, such as `http://localhost:11434`. */
     val url: String? = null,
+    /** `--max-tokens`: the most an answer may run to; a model that thinks before its tool call needs more. */
+    val maxTokens: Int? = null,
 )
 
 /** How careful a run is (spec/ideas/replay-guards-lenient-strict.md, spec/ideas/off-the-rails.md). */

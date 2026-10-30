@@ -517,6 +517,35 @@ Feature: artie run: a script, run from the command line
       | --model-url | http://localhost:11434             | 0    |                                    | http://localhost:11434 |
       | --model-url | localhost:11434                    | 2    |                                    |                        |
 
+  Scenario Outline: With --max-tokens, the model may answer at that length: <value>
+    spec/PLAN-LOCAL-MODEL.md, phase 2: a model that thinks before its tool call
+    needs more than the default 1024 tokens an answer. Left out, the default stands.
+    Given the script "close.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          act(intent = "we're done with this one")
+      }
+      """
+    And the reasoner chooses
+      | intent                   | selection | relation | fields |
+      | we're done with this one | act       | close    | {}     |
+    When artie is run with
+      | argument     |
+      | run          |
+      | close.kts    |
+      | --reasoner   |
+      | claude       |
+      | --max-tokens |
+      | <value>      |
+    Then artie exits <exit>
+    And the client was made to let the model answer with <tokens> tokens
+
+    Examples:
+      | value | exit | tokens |
+      | 4096  | 0    | 4096   |
+      | many  | 2    |        |
+
   Scenario Outline: A watch with listeners gives each listener a client of its own
     spec/PLAN-LISTENERS.md, slice 1: each listener looks on a thread of its
     own, so it asks the run for a client of its own, never the script's.
@@ -678,3 +707,5 @@ Feature: artie run: a script, run from the command line
       | --model-url | localhost:11434 | --model-url is an origin, such as http://localhost:11434 |
       | --model-url | ftp://a.b       | --model-url is an origin, such as http://localhost:11434 |
       | --model     |                 | --model needs a value                                  |
+      | --max-tokens | many           | --max-tokens is a number of tokens, such as 4096       |
+      | --max-tokens | 0              | --max-tokens is a number of tokens, such as 4096       |

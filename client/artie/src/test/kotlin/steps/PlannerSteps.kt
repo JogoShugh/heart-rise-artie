@@ -14,6 +14,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -30,6 +31,15 @@ class PlannerSteps(private val ctx: ClientContext) {
     fun plannerIsClaude() {
         planner = ClaudePlanner(ctx.transport, "test-key")
     }
+
+    @Given("the planner is Claude, through the scripted Claude API, allowed {int} tokens an answer")
+    fun plannerIsClaudeLong(tokens: Int) {
+        planner = ClaudePlanner(ctx.transport, "test-key", maxTokens = tokens)
+    }
+
+    @Then("the planner's request asks for at most {int} tokens")
+    fun asksForTokens(tokens: Int) =
+        assertEquals(tokens, request().getValue("max_tokens").jsonPrimitive.int)
 
     @Given("the planner holds {string} with the state {}, offering")
     fun holds(address: String, state: String, table: DataTable) {

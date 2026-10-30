@@ -212,13 +212,22 @@ class ReasonSteps(private val ctx: ClientContext) {
     }
 
     @When("the Claude reasoner for {string} at {string} reasons about {string} over the manifest of {string}")
-    fun claudeReasonsAt(model: String, origin: String, intent: String, url: String) {
+    fun claudeReasonsAt(model: String, origin: String, intent: String, url: String) =
+        claudeReasonsWith(ClaudeReasoner(ctx.transport, null, model, "$origin/v1/messages"), intent, url)
+
+    @When("the Claude reasoner, allowed {int} tokens an answer, reasons about {string} over the manifest of {string}")
+    fun claudeReasonsLong(tokens: Int, intent: String, url: String) =
+        claudeReasonsWith(ClaudeReasoner(ctx.transport, "test-key", maxTokens = tokens), intent, url)
+
+    private fun claudeReasonsWith(reasoner: ClaudeReasoner, intent: String, url: String) {
         val synced = ctx.client.enter(ctx.url(url))
         val offers = synced.affordances.values.map { Offer(it.rel, it.schema, it.title, it.description) }
         val links = synced.linksByRel.flatMap { (rel, list) -> list.map { LinkOffer(rel, it.title) } }
-        val reasoner = ClaudeReasoner(ctx.transport, null, model, "$origin/v1/messages")
         selection = reasoner.reason(intent, synced.state, offers, links)
     }
+
+    @Then("the Claude request asks for at most {int} tokens")
+    fun asksForTokens(tokens: Int) = assertEquals(tokens, claudeRequestBody().getValue("max_tokens").jsonPrimitive.int)
 
     @Then("the request went to {string} naming the model {string}, with no x-api-key header")
     fun wentTo(url: String, model: String) {

@@ -59,7 +59,9 @@ class ArtieNavigatorProvider : NavigatorProvider {
                 key == null && origin == ModelKey.ORIGIN -> ArtieNavigator(client, null, NO_KEY, log, guard, named)
                 else -> {
                     val model = settings.model.name ?: ClaudeReasoner.DEFAULT_MODEL
-                    val reasoner = ClaudeReasoner(HttpTransport(), key?.value, model, origin + ClaudeReasoner.MESSAGES)
+                    val length = settings.model.maxTokens ?: ClaudeReasoner.MAX_TOKENS
+                    val at = origin + ClaudeReasoner.MESSAGES
+                    val reasoner = ClaudeReasoner(HttpTransport(), key?.value, model, at, length)
                     ArtieNavigator(client, reasoner, NO_KEY, log, guard, named)
                 }
             }
