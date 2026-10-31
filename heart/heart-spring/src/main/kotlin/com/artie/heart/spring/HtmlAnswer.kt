@@ -65,6 +65,28 @@ internal class HtmlAnswer<S, K>(
         return respond(builder, done.state)
     }
 
+    /**
+     * Act [name], which the bookmark offers, sent by a browser: If-Match compared with the bookmark page's
+     * [validator]; the answer 201, and a move to the resource it made.
+     */
+    suspend fun actAtBookmark(name: String, request: ServerRequest, validator: String): ServerResponse {
+        pipeline.checkAtBookmark(name, request.headers().firstHeader(HttpHeaders.IF_MATCH)) { held ->
+            StateETag.matches(held, validator)
+        }
+        val act = layers.type.bookmarkActs.first { it.name == name }
+        val done = pipeline.run(name, input(act, request)) { given ->
+            checkNotNull(resource.performAtBookmark)(name, given)
+        }
+        val location = resource.location(done.state)
+        val title = layers.type.profile.relation(act.relation).title
+        return respond(
+            ServerResponse.created(URI.create(location)).header(HttpHeaders.CONTENT_LOCATION, location)
+                .header(HX_REDIRECT, location)
+                .header(HX_TRIGGER, mapper.writeValueAsString(mapOf(DONE to "$title: done."))),
+            done.state,
+        )
+    }
+
     /** [builder] answering with [state]'s HTML and its validator. */
     suspend fun respond(builder: ServerResponse.BodyBuilder, state: S): ServerResponse {
         val etag = etag(state)

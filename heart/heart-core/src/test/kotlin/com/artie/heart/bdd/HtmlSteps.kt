@@ -2,6 +2,8 @@ package com.artie.heart.bdd
 
 import com.artie.heart.ActRequests
 import com.artie.heart.HtmlFields
+import com.artie.heart.HtmlList
+import com.artie.heart.ServiceIndex
 import com.artie.heart.HtmlProblem
 import com.artie.heart.HtmlView
 import com.artie.heart.JsonTrees
@@ -122,6 +124,41 @@ class HtmlSteps(private val world: LampWorld) {
     @Then("the HTML problem names the field {string} as {string}")
     fun problemNames(pointer: String, message: String) =
         assertEquals(message, field.selectFirst(".problem li[data-pointer=$pointer]")?.text())
+
+    @When("the service index of lamps is rendered as HTML under the validator {string}")
+    fun indexRendered(etag: String) {
+        page = Jsoup.parse(HtmlView.index(ServiceIndex(listOf(world.type)), etag))
+    }
+
+    @Then("the {string} dialog goes to the address {string}")
+    fun goesTo(key: String, template: String) {
+        val form = form(key)
+        assertEquals("get", form.attr("method"))
+        assertEquals(template, form.attr("data-template"))
+    }
+
+    @When("the page {} is rendered as HTML titled {string}")
+    fun pageRendered(body: String, title: String) {
+        page = Jsoup.parse(HtmlList.page(JsonTrees.plain(body) as Map<*, *>, title))
+    }
+
+    @Then("the grid has these rows")
+    fun gridRows(table: DataTable) {
+        val heads = page.select(".grid thead th").map { it.text() }.dropLast(1)
+        val rows = page.select(".grid tbody tr").map { row ->
+            mapOf("href" to row.attr("data-item")) + heads.zip(row.select("td").map { it.text() })
+        }
+        assertEquals(table.asMaps(), rows)
+    }
+
+    @Then("each row's acts are read from its match when asked")
+    fun rowActs() = page.select(".grid tbody tr").forEach { row ->
+        assertEquals(row.attr("data-item"), row.selectFirst("button[data-acts]")?.attr("data-acts"))
+    }
+
+    @Then("the page links {string} to {string}")
+    fun pageLinks(rel: String, href: String) =
+        assertEquals(href, page.selectFirst("nav.paging a[rel=$rel]")?.attr("href"))
 
     private fun form(key: String): Element = checkNotNull(page.selectFirst("dialog form[data-rel=$key]")) { key }
 

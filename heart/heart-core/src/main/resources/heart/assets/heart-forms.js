@@ -114,6 +114,73 @@
       });
   }
 
+  // A safe act goes to an address: its target's template, filled from the form's fields (RFC 6570, the simple
+  // expressions HEART's targets use: {name} in a path, {?a,b} and {&a} in a query).
+  function expand(template, data) {
+    return template.replace(/\{([?&]?)([^}]+)\}/g, function (_, operator, names) {
+      var parts = names.split(',').map(function (name) {
+        var values = data.getAll(name).filter(function (v) { return v !== ''; });
+        if (!operator) return values.map(encodeURIComponent).join(',');
+        return values.map(function (v) { return encodeURIComponent(name) + '=' + encodeURIComponent(v); }).join('&');
+      }).filter(function (part) { return part !== ''; });
+      if (!operator) return parts.join(',');
+      return parts.length ? operator + parts.join('&') : '';
+    });
+  }
+
+  document.addEventListener('submit', function (event) {
+    var form = event.target;
+    var template = form.getAttribute('data-template');
+    if (!template) return;
+    event.preventDefault();
+    window.location.assign(expand(template, new FormData(form)));
+  });
+
+  // A row's acts are read from its match when a person asks: offered acts go to the match with the act's dialog
+  // open; acts it won't offer say why.
+  document.addEventListener('click', function (event) {
+    var button = event.target.closest('[data-acts]');
+    if (!button) return;
+    var menu = button.parentElement.querySelector('.row-menu');
+    var open = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', String(!open));
+    menu.hidden = open;
+    if (open || menu.dataset.read) return;
+    var href = button.getAttribute('data-acts');
+    menu.textContent = 'Reading…';
+    fetch(href, { headers: { Accept: 'text/html' }, credentials: 'same-origin' })
+      .then(function (response) { return response.text(); })
+      .then(function (html) {
+        var page = new DOMParser().parseFromString(html, 'text/html');
+        menu.replaceChildren();
+        var acts = page.querySelectorAll('.acts button.act');
+        if (!acts.length) { menu.textContent = 'Nothing can be done to this now.'; }
+        acts.forEach(function (act) {
+          var line;
+          if (act.getAttribute('aria-disabled') === 'true') {
+            line = document.createElement('span');
+            line.className = 'greyed';
+            var why = page.getElementById(act.getAttribute('aria-describedby'));
+            line.textContent = act.textContent + ': ' + (why ? why.textContent : 'not now');
+          } else {
+            line = document.createElement('a');
+            line.href = href + '#' + act.getAttribute('data-dialog');
+            line.textContent = act.textContent;
+          }
+          menu.appendChild(line);
+        });
+        menu.dataset.read = 'true';
+      })
+      .catch(function () { menu.textContent = 'This could not be read. Open it instead.'; });
+  });
+
+  // Arriving with an act's dialog named in the address opens it.
+  window.addEventListener('DOMContentLoaded', function () {
+    var named = window.location.hash.slice(1);
+    var dialog = named && document.getElementById(named);
+    if (dialog && dialog.tagName === 'DIALOG') dialog.showModal();
+  });
+
   document.addEventListener('heart:done', function (event) {
     announce(event.detail && event.detail.value ? event.detail.value : 'Done.');
   });

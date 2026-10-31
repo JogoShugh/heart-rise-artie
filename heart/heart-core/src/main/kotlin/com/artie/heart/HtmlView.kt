@@ -34,18 +34,33 @@ object HtmlView {
     fun render(body: Map<*, *>, etag: String, absent: List<Map<*, *>>, order: List<String>): String {
         val acts = entries(body, absent, order)
         val title = HtmlState.title(body)
-        return "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">" +
+        return document(
+            title, etag,
+            HtmlState.links(body) + "<h1>${Html.text(title)}</h1>" + HtmlState.state(body) +
+                HtmlState.embedded(body) + HtmlActs.buttons(acts) + HtmlActs.dialogs(acts, etag),
+        )
+    }
+
+    /** The bookmark's page: its forms as dialogs, a search's sent as an address to go to (SPEC §6.11). */
+    fun index(index: ServiceIndex, etag: String): String =
+        render(JsonTrees.plain(index.body(Dialect.JSONSCHEMA)) as Map<*, *>, etag, emptyList(), emptyList())
+
+    /** The bookmark page's validator: it changes when the index does, or the renderer. */
+    fun indexValidator(index: ServiceIndex): String =
+        "\"index-$ETAG_TAG-${ContentAddress.address(VERSION + index.body(Dialect.JSONSCHEMA))}\""
+
+    /** A whole page around [main], with the server's own stylesheet and scripts. */
+    internal fun document(title: String, etag: String, main: String): String =
+        "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">" +
             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
             "<title>${Html.text(title)}</title>" +
             "<link rel=\"stylesheet\"${Html.attr("href", HtmlAssets.href("heart.css"))}>" +
             "<script defer${Html.attr("src", HtmlAssets.href("htmx-2.0.4.min.js"))}></script>" +
             "<script defer${Html.attr("src", HtmlAssets.href("heart-forms.js"))}></script>" +
             "</head><body hx-headers='{\"Accept\": \"text/html\"}'>" +
-            "<main id=\"resource\"${Html.attr("data-etag", etag)}>" +
-            HtmlState.links(body) + "<h1>${Html.text(title)}</h1>" + HtmlState.state(body) + HtmlState.embedded(body) +
+            "<main id=\"resource\"${Html.attr("data-etag", etag)}>$main" +
             "<div id=\"announce\" class=\"announce\" role=\"status\" aria-live=\"polite\"></div>" +
-            HtmlActs.buttons(acts) + HtmlActs.dialogs(acts, etag) + "</main></body></html>\n"
-    }
+            "</main></body></html>\n"
 
     /** The offered forms and the absent acts, one entry per act, in [order]; any not in it after, as they come. */
     private fun entries(body: Map<*, *>, absent: List<Map<*, *>>, order: List<String>): List<HtmlActs.Entry> {

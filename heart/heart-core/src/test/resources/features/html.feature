@@ -93,6 +93,26 @@ Feature: HTML for people, rendered from the declaration
       | text with a space  | {"type":"object","properties":{"title":{"type":"string"}}}                            | title=Fix+the+%3Cform%3E                | {"title":"Fix the <form>"}    |
       | not a number       | {"type":"object","properties":{"n":{"type":"integer"}}}                               | n=many                                  | {"n":"many"}                  |
 
+  Scenario: The bookmark's forms are dialogs: a search goes to an address, an act is sent by its method
+    A search or a lookup is safe: it is sent as a plain form, so its answer
+    is a page of its own, with an address and a way back. The page fills its
+    target's template from the fields, a path's variable and a query's alike.
+    When the service index of lamps is rendered as HTML under the validator "index-html-abc"
+    Then the "home:search-lamps" dialog goes to the address "/lamps{?name}"
+    And the "home:get-lamp" dialog goes to the address "/lamps/{id}"
+    And the "home:install-lamp" dialog sends POST to "/actions/install-lamp" with If-Match "index-html-abc"
+
+  Scenario: A page of matches is a grid: each a row, titled and linked, with the members their summaries share
+    A match carries no forms (SPEC §6.11), so each row's acts are read from
+    the match itself when a person asks for them.
+    When the page {"count":2,"_links":{"self":{"href":"/pulls"},"next":{"href":"/pulls?page=2"},"item":[{"href":"/pulls/1873","title":"Bump left-pad"},{"href":"/pulls/1872","title":"Fix login"}]},"_embedded":{"item":[{"number":1873,"title":"Bump left-pad","state":"open","draft":true,"_links":{"self":{"href":"/pulls/1873"}}},{"number":1872,"title":"Fix login","state":"open","draft":false,"_links":{"self":{"href":"/pulls/1872"}}}]}} is rendered as HTML titled "Pull requests"
+    Then the grid has these rows
+      | href       | Title         | Number | State | Draft |
+      | /pulls/1873 | Bump left-pad | 1873   | open  | true  |
+      | /pulls/1872 | Fix login     | 1872   | open  | false |
+    And each row's acts are read from its match when asked
+    And the page links "next" to "/pulls?page=2"
+
   Scenario: A refusal, for a browser, is HTML: its title, its detail, and each violation at its field
     When the problem {"type":"https://w3id.org/heart-rise/problems/invalid-input","title":"The body does not match the form's schema","status":422,"detail":"request body does not satisfy the affordance schema","violations":[{"pointer":"/brightness","message":"must be at most 100"}]} is rendered as HTML
     Then the HTML problem reads "The body does not match the form's schema"

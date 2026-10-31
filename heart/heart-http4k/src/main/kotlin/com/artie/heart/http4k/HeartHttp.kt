@@ -3,6 +3,8 @@ package com.artie.heart.http4k
 import com.artie.heart.Caller
 import com.artie.heart.HeartResource
 import com.artie.heart.HtmlAssets
+import com.artie.heart.HtmlView
+import com.artie.heart.Negotiation
 import com.artie.heart.Layers
 import com.artie.heart.Listing
 import com.artie.heart.OpenApiDocument
@@ -120,6 +122,11 @@ class HeartHttp(
         val handler = handlers.firstOrNull { it.resource.layers.type.bookmarkActs.any { act -> act.path == path } }
             ?: return Response(Status.NOT_FOUND)
         val act = handler.resource.layers.type.bookmarkActs.first { it.path == path }
-        return handler.actAtBookmark(act.name, request)
+        // A browser's is checked against the bookmark page's validator (spec/PLAN-HTML-DIALECT.md).
+        return if (Negotiation.wantsHtml(request.header(ACCEPT))) {
+            handler.html.actAtBookmark(act.name, request, HtmlView.indexValidator(index))
+        } else {
+            handler.actAtBookmark(act.name, request)
+        }
     }
 }

@@ -48,9 +48,13 @@ internal object HtmlActs {
     /** How the form sends: htmx by the act's method, If-Match the page's validator; a GET as a plain form. */
     private fun sending(key: String, form: Map<*, *>, etag: String): String {
         val method = form["method"]?.toString()?.uppercase() ?: "POST"
-        val target = ((form["_links"] as? Map<*, *>)?.get("target") as? Map<*, *>)?.get("href")?.toString().orEmpty()
-            .substringBefore("{?")
-        if (method == "GET") return "${Html.attr("data-rel", key)} method=\"get\"${Html.attr("action", target)}"
+        val template = ((form["_links"] as? Map<*, *>)?.get("target") as? Map<*, *>)?.get("href")?.toString().orEmpty()
+        val target = template.substringBefore("{?")
+        // A safe act goes to an address: heart-forms.js fills the template, path and query alike.
+        if (method == "GET") {
+            return Html.attr("data-rel", key) + " method=\"get\"" + Html.attr("action", target) +
+                Html.attr("data-template", template)
+        }
         val headers = MAPPER.writeValueAsString(mapOf("If-Match" to etag, "Accept" to "text/html"))
         return Html.attr("data-rel", key) + Html.attr("hx-${method.lowercase()}", target) +
             Html.attr("hx-headers", headers) +

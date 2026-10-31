@@ -65,6 +65,25 @@ Feature: HTML for people: a resource read in a browser
     And the response is an HTML problem reading "The act is not offered in the resource's current state"
     And lamp 7 is still at version 3
 
+  Scenario: The bookmark is a page too, and its act takes the browser to the lamp it installs
+    When a client gets "/" as html
+    Then the response status is 200
+    And the response has Content-Type "text/html;charset=UTF-8"
+    When a browser sends POST "/actions/install-lamp" with "brightness=30" and the bookmark's ETag
+    Then the response status is 201
+    And the response has Location "/lamps/8"
+    And the response has HX-Redirect "/lamps/8"
+
+  Scenario: A search is a grid of its matches, each a row linking to its lamp
+    Given lamps 1 to 2 are "ON" in the lamp server
+    When a client gets "/lamps?name=lamp" as html
+    Then the response status is 200
+    And the grid lists
+      | href     | Title  |
+      | /lamps/1 | Lamp 1 |
+      | /lamps/2 | Lamp 2 |
+      | /lamps/7 | Lamp 7 |
+
   Scenario: The scripts and stylesheet the HTML names are the server's own, immutable
     When a client gets "/lamps/7" as html
     Then each asset the HTML names is served by the server with Cache-Control "public, max-age=31536000, immutable"
