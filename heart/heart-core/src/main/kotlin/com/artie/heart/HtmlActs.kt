@@ -10,8 +10,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
  * validator as If-Match; a safe act (GET) is a plain form, so its answer is a page of its own.
  */
 internal object HtmlActs {
-    /** One act's button: its form key, title, and its form when offered or its reason when not. */
-    class Entry(val key: String, val title: String, val form: Map<*, *>?, val reason: String?)
+    /**
+     * One act's button: its form key, title, and its form when offered or its reason when not; and the order its
+     * input declares its [fields] in, which its dialog asks in (any the schema has beyond them after, as they come).
+     */
+    class Entry(
+        val key: String,
+        val title: String,
+        val form: Map<*, *>?,
+        val reason: String?,
+        val fields: List<String> = emptyList(),
+    )
 
     fun buttons(entries: List<Entry>): String = if (entries.isEmpty()) "" else
         "<div class=\"acts\" role=\"toolbar\" aria-label=\"Acts\">" + entries.joinToString("") { entry ->
@@ -33,7 +42,9 @@ internal object HtmlActs {
         val id = "act-${Html.token(entry.key)}"
         val schema = form["schema"] as? Map<*, *> ?: emptyMap<String, Any?>()
         val required = (schema["required"] as? List<*>).orEmpty().toSet()
-        val fields = (schema["properties"] as? Map<*, *>).orEmpty().entries.joinToString("") { (name, property) ->
+        val properties = (schema["properties"] as? Map<*, *>).orEmpty().entries
+            .sortedBy { (name, _) -> entry.fields.indexOf(name).let { if (it < 0) entry.fields.size else it } }
+        val fields = properties.joinToString("") { (name, property) ->
             HtmlFields.of(id, name.toString(), property as? Map<*, *> ?: emptyMap<String, Any?>(), name in required)
         }
         val description = form["description"]?.let { "<p class=\"desc\">${Html.text(it)}</p>" }.orEmpty()

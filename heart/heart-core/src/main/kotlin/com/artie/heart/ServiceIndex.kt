@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
  * The index ignores `Prefer`: its forms are inline at every rung.
  */
 class ServiceIndex(
-    private val types: List<ResourceType<*, *>>,
+    internal val types: List<ResourceType<*, *>>,
     title: String? = null,
     /**
      * Where the binding serves the OpenAPI description, if it does: linked

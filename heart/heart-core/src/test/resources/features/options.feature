@@ -87,6 +87,21 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
     And the template "assignOfficial" property "official" has an options link "/officials?level=senior"
     And that HAL-FORMS representation has a validator, as every Layer 1 representation does
 
+  # A JSON object's members have no order, so the canonical schema lists them by name. A person filling a form
+  # does need one: the team before its players, whose choices depend on it. The forms for people follow the
+  # order the input declares.
+  Scenario Outline: <representation> asks for an act's fields in the order its input declares them, the team before its player
+    When the match is rendered <rendered>
+    Then the "foul" act asks for its fields in this order
+      | field        |
+      | team         |
+      | playerNumber |
+
+    Examples:
+      | representation | rendered     |
+      | HAL-FORMS      | in HAL-FORMS |
+      | HTML           | as HTML      |
+
   Scenario: The OpenAPI description carries the choices as an extension, and says them in prose
     When the OpenAPI description of the matches is rendered
     Then its schema "Foul" property "playerNumber" carries x-heart-options with the pointer "/{team}/players"

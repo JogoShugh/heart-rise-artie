@@ -3,6 +3,7 @@ package com.artie.heart
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ArrayNode
 import com.fasterxml.jackson.databind.node.TextNode
 import com.github.victools.jsonschema.generator.Option
 import com.github.victools.jsonschema.generator.OptionPreset
@@ -75,12 +76,29 @@ object InputSchemas {
             forTypesInGeneral().withTypeAttributeOverride { node, _, _ ->
                 if (node.path("type").asText() == "object" && !node.has("properties")) node.putObject("properties")
             }
+            // Properties in the order the input declares them, not by name: the forms for people ask in that
+            // order, the team before its players. The canonical schema still lists them by name.
+            forTypesInGeneral().withPropertySorter { _, _ -> 0 }
         }
         .build()
         .let(::SchemaGenerator)
 
     /** The schema of [type], as JSON text. */
-    fun of(type: Class<*>): String = generator.generateSchema(type).toString()
+    fun of(type: Class<*>): String = generator.generateSchema(type).also(::requiredByName).toString()
+
+    /**
+     * Each `required` list by name, wherever it is. The properties keep their declared order, which canonical
+     * form lists by name anyway; an array is not reordered by it, so this keeps the schema's bytes, and every
+     * address over them, as they were.
+     */
+    private fun requiredByName(node: JsonNode) {
+        (node.get("required") as? ArrayNode)?.let { required ->
+            val names = required.map { it.asText() }.sorted()
+            required.removeAll()
+            names.forEach(required::add)
+        }
+        node.forEach(::requiredByName)
+    }
 
     /** The names of the properties [schema] declares, in its order. */
     fun propertyNames(schema: String): List<String> =

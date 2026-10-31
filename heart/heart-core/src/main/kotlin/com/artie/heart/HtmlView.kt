@@ -24,15 +24,22 @@ object HtmlView {
         val body = layers.layer1(state, Rung.L0)
         val type = layers.type
         val order = type.acts.map { type.profile.reference(it.relation) }
-        return render(body, etag, absent(layers, body), order)
+        return render(body, etag, absent(layers, body), order, fields(listOf(type)))
     }
 
     /**
      * The page of [body], an L0 representation: its state, links and embedded resources; its offered forms and
-     * the [absent] acts (each `rel`, `title` and `reason`), as buttons in [order], by full relation.
+     * the [absent] acts (each `rel`, `title` and `reason`), as buttons in [order], by full relation; each dialog
+     * asking for its fields in the order [fields] gives for its relation.
      */
-    fun render(body: Map<*, *>, etag: String, absent: List<Map<*, *>>, order: List<String>): String {
-        val acts = entries(body, absent, order)
+    fun render(
+        body: Map<*, *>,
+        etag: String,
+        absent: List<Map<*, *>>,
+        order: List<String>,
+        fields: Map<String, List<String>> = emptyMap(),
+    ): String {
+        val acts = entries(body, absent, order, fields)
         val title = HtmlState.title(body)
         // On a wide screen the acts stand in a column beside the information; a small one stacks them below it.
         return document(
@@ -46,7 +53,10 @@ object HtmlView {
 
     /** The bookmark's page: its forms as dialogs, a search's sent as an address to go to (SPEC §6.11). */
     fun index(index: ServiceIndex, etag: String): String =
-        render(JsonTrees.plain(index.body(Dialect.JSONSCHEMA)) as Map<*, *>, etag, emptyList(), emptyList())
+        render(
+            JsonTrees.plain(index.body(Dialect.JSONSCHEMA)) as Map<*, *>, etag, emptyList(), emptyList(),
+            fields(index.types),
+        )
 
     /** The bookmark page's validator: it changes when the index does, or the renderer. */
     fun indexValidator(index: ServiceIndex): String =
@@ -67,12 +77,26 @@ object HtmlView {
             "<div id=\"announce\" class=\"announce\" role=\"status\" aria-live=\"polite\"></div>" +
             "</body></html>\n"
 
+    /**
+     * Each act's fields of [types], by full relation, in the order its input declares them: the canonical schema
+     * the representation carries lists them by name, which is no order to ask a person in.
+     */
+    private fun fields(types: List<ResourceType<*, *>>): Map<String, List<String>> =
+        types.flatMap { type -> type.allActs.map { type.profile.reference(it.relation) to it.schema } }
+            .associate { (relation, schema) -> relation to InputSchemas.propertyNames(schema) }
+
     /** The offered forms and the absent acts, one entry per act, in [order]; any not in it after, as they come. */
-    private fun entries(body: Map<*, *>, absent: List<Map<*, *>>, order: List<String>): List<HtmlActs.Entry> {
+    private fun entries(
+        body: Map<*, *>,
+        absent: List<Map<*, *>>,
+        order: List<String>,
+        fields: Map<String, List<String>>,
+    ): List<HtmlActs.Entry> {
         val curies = Curies((body["_links"] as? Map<*, *>)?.get("curies"))
         val forms = (body["_forms"] as? Map<*, *>).orEmpty().entries.associate { (key, form) ->
             val title = (form as? Map<*, *>)?.get("title")?.toString() ?: key.toString()
-            curies.expand(key.toString()) to HtmlActs.Entry(key.toString(), title, form as? Map<*, *>, null)
+            val relation = curies.expand(key.toString())
+            relation to HtmlActs.Entry(key.toString(), title, form as? Map<*, *>, null, fields[relation].orEmpty())
         }
         val greyed = absent.associate { act ->
             val rel = act["rel"].toString()

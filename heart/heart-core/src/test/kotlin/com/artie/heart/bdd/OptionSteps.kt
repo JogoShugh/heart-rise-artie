@@ -4,6 +4,7 @@ import com.artie.heart.ActPipeline
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
+import com.artie.heart.HtmlView
 import com.artie.heart.Layers
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.Rung
@@ -21,6 +22,8 @@ import io.cucumber.java.en.When
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 
 /** Steps for options.feature: choices from state, rendered and enforced by heart-core. */
 class OptionSteps {
@@ -29,6 +32,7 @@ class OptionSteps {
     private val matches = mutableListOf<Match>()
     private lateinit var read: JsonNode
     private var outcome: Result<Unit>? = null
+    private var page: Document? = null
 
     @Given("a playing match at level {string} with these players")
     @Given("another playing match at level {string} with these players")
@@ -102,6 +106,19 @@ class OptionSteps {
     fun validator() {
         val etag = StateETag.of(1, Dialect.HALFORMS.etagTag, Rung.L0, layers.halForms(matches.first()))
         assertTrue(etag.startsWith("\"seq-1.hf.L0."), etag)
+    }
+
+    @When("the match is rendered as HTML")
+    fun renderedHtml() {
+        page = Jsoup.parse(HtmlView.of(layers, matches.first(), "\"seq-1.html.L0.test\""))
+    }
+
+    /** The fields an act asks for, in order: its HTML dialog's controls, else its HAL-FORMS template's properties. */
+    @Then("the {string} act asks for its fields in this order")
+    fun fieldOrder(act: String, table: DataTable) {
+        val asked = page?.select("form[data-rel$=:$act] .field [name]")?.map { it.attr("name") }
+            ?: read.path("_templates").path(act).path("properties").map { it.path("name").asText() }
+        assertEquals(table.asList().drop(1), asked)
     }
 
     @When("the OpenAPI description of the matches is rendered")

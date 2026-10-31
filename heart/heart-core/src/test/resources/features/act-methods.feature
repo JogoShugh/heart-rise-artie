@@ -4,7 +4,7 @@ Feature: An act says the HTTP method it is served by
   agrees: a PUT or a DELETE is idempotent, a POST or a PATCH is unsafe, and an
   act is never safe. A PATCH takes a JSON Merge Patch (RFC 7396). A DELETE
   takes no body: its fields, if any, are its target's query, as a URI
-  template the client fills (Rule 1). A bookmark's act brings a resource into
+  template the client fills (Rule 1), in the order the input declares them. A bookmark's act brings a resource into
   being, so it is a POST. The method is part of the form's integrity.
 
   Background:
@@ -17,7 +17,7 @@ Feature: An act says the HTTP method it is served by
       | store:restock    | POST   | application/json             | /shelves/{id}/actions/restock               |
       | store:relabel    | PATCH  | application/merge-patch+json | /shelves/{id}/actions/relabel               |
       | store:set-price  | PUT    | application/json             | /shelves/{id}/actions/set-price             |
-      | store:remove-tag | DELETE |                              | /shelves/{id}/actions/remove-tag{?count,tag} |
+      | store:remove-tag | DELETE |                              | /shelves/{id}/actions/remove-tag{?tag,count} |
       | store:retire     | DELETE |                              | /shelves/{id}/actions/retire                |
 
   Scenario: At L0, a DELETE's target is still a template, for its query
@@ -25,7 +25,7 @@ Feature: An act says the HTTP method it is served by
     Then its forms say
       | form             | method | contentType                  | target                                 |
       | store:relabel    | PATCH  | application/merge-patch+json | /shelves/3/actions/relabel             |
-      | store:remove-tag | DELETE |                              | /shelves/3/actions/remove-tag{?count,tag} |
+      | store:remove-tag | DELETE |                              | /shelves/3/actions/remove-tag{?tag,count} |
       | store:retire     | DELETE |                              | /shelves/3/actions/retire              |
     And the "store:remove-tag" form's target is templated
     And the "store:retire" form's target is not templated
@@ -47,7 +47,7 @@ Feature: An act says the HTTP method it is served by
       | POST   | /shelves/{id}/actions/restock      | restock     | application/json             |            |
       | PATCH  | /shelves/{id}/actions/relabel      | relabel     | application/merge-patch+json |            |
       | PUT    | /shelves/{id}/actions/set-price    | setPrice    | application/json             |            |
-      | DELETE | /shelves/{id}/actions/remove-tag   | removeTag   |                              | count, tag |
+      | DELETE | /shelves/{id}/actions/remove-tag   | removeTag   |                              | tag, count |
       | DELETE | /shelves/{id}/actions/retire       | retire      |                              |            |
 
   Scenario: The method and content type are part of the form's integrity
