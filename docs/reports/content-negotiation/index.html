@@ -62,9 +62,14 @@ section { display: grid; gap: 20px; min-width: 0; }
 .col { display: grid; gap: 18px; align-content: start; min-width: 0; }
 .eyebrow { font: 600 0.78rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
 .lede { font-size: 1.14rem; color: var(--muted); }
+/* The light and dark switch, shared with the other reports: the system theme holds until the viewer chooses. */
+.topbar { grid-column: 1 / -1; display: flex; gap: 16px; align-items: center; justify-content: space-between; }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* Wide layouts */
-.hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 40px; align-items: center; }
+.hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 40px; row-gap: 20px; align-items: center; }
 .split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px; align-items: start; }
 .split.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .split.wide-left { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
@@ -164,8 +169,11 @@ footer { color: var(--muted); font-size: 0.85rem; display: grid; gap: 6px; }
 <div class="wrap">
 
 <header class="hero">
-  <div class="col">
+  <div class="topbar">
     <span class="eyebrow">HEART · one address, three representations</span>
+    <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+  </div>
+  <div class="col">
     <h1>One garden bed, served to people, to agents on the on-ramp, and to agents at full speed</h1>
     <p class="lede">The bed lives at one address, <code>/beds/1</code>. What comes back depends on what the client says it can read. A browser gets a page with buttons. An agent that knows HAL-FORMS gets templates. An agent that speaks HEART's own HAL Schema Forms gets JSON Schema, integrity hashes, and affordances it can cache for a year. Every exchange below was captured from the running garden server on October 30, 2026.</p>
   </div>
@@ -767,6 +775,26 @@ footer { color: var(--muted); font-size: 0.85rem; display: grid; gap: 6px; }
 </footer>
 </div>
 
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
 <script>
 (function () {
   var picks = {"html":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> text/html;charset=UTF-8\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.html.L0.5a5247872fd134d6\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Vary:\u003c/span> Accept","band":"people","why":"A browser names text/html first, so it gets the page for people: its own validator, varying by Accept alone, and no HEART profile."},"halforms":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> application/prs.hal-forms+json\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> application/prs.hal-forms+json\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.hf.L0.492dcdff0322b24d\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Link:\u003c/span> &lt;https://w3id.org/heart-rise/hal-forms&gt;; rel=\"profile\", &lt;https://w3id.org/heart-rise&gt;; rel=\"profile\"\n\u003cspan class=\"h\">Vary:\u003c/span> Accept, Accept-Profile","band":"ramp","why":"Names HAL-FORMS, so it gets the on-ramp: one template per offered act, everything inline, profile hal-forms."},"l0":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> application/hal+json\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> application/hal+json\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.hsf.L0.9d906584184b9119\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Link:\u003c/span> &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=\"profile\", &lt;https://w3id.org/heart-rise&gt;; rel=\"profile\"\n\u003cspan class=\"h\">Vary:\u003c/span> Accept, Prefer, Accept-Profile","band":"agent","why":"Names HAL Schema Forms and prefers nothing, so every layer comes inline: L0, one hop."},"l2":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> application/hal+json\n\u003cspan class=\"h\">Prefer:\u003c/span> forms=link, schema=link\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> application/hal+json\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.hsf.L2.af94fd75c423f076\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Link:\u003c/span> &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=\"profile\", &lt;https://w3id.org/heart-rise&gt;; rel=\"profile\"\n\u003cspan class=\"h\">Vary:\u003c/span> Accept, Prefer, Accept-Profile\n\u003cspan class=\"h\">Preference-Applied:\u003c/span> forms=link, schema=link","band":"agent","why":"Prefers forms and schemas by link: Layer 1 alone, linking what it can cache for a year. Preference-Applied confirms it."}};

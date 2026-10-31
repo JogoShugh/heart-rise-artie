@@ -38,13 +38,18 @@ figcaption { font-size: 0.88rem; color: var(--muted); }
 figcaption b { color: var(--ink); }
 .open { display: grid; gap: 8px; padding-left: 20px; margin: 0; }
 footer { color: var(--muted); font-size: 0.85rem; }
+/* The light and dark switch, shared with the other reports: the system theme holds until the viewer chooses. */
+.toprow { display: flex; gap: 16px; align-items: center; justify-content: space-between; }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 </style>
 </head>
 <body>
 
 <div class="wrap">
 <header style="display:grid;gap:10px">
-  <h1>HEART in a browser</h1>
+  <div class="toprow"><h1>HEART in a browser</h1><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
   <p class="lede">Any HEART resource, opened in a plain browser, is a page: its state laid out for a person, a button for each act it offers now, and a greyed button that says why for each act it won't. heart-core renders it, so the garden and the GitHub gateway serve it with no code of their own. Built October 30, 2026, from spec/PLAN-HTML-DIALECT.md; every screenshot is the live servers in headless Chrome.</p>
 </header>
 
@@ -101,5 +106,25 @@ footer { color: var(--muted); font-size: 0.85rem; }
 
 <footer>HEART HTML on-ramp: heart-core HtmlView, HtmlList, HtmlActs; heart-spring and heart-http4k; mockup at docs/reports/html-dialect-mockup/.</footer>
 </div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
 </body>
 </html>

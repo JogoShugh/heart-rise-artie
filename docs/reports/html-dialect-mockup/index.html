@@ -63,6 +63,11 @@ code, pre, .mono { font-family: var(--mono); font-size: 0.86em; }
 a { color: var(--accent); }
 .badge { display: inline-block; font: 600 0.72rem/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 8px; border-radius: 4px; background: var(--warn-soft); color: var(--warn); }
 header.top { display: grid; gap: 12px; }
+/* The light and dark switch, shared with the other reports: the system theme holds until the viewer chooses. */
+.toprow { display: flex; gap: 16px; align-items: center; justify-content: space-between; }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .lede { color: var(--muted); font-size: 1.05rem; }
 .facts { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: 0.9rem; }
 .facts b { color: var(--ink); font-weight: 600; }
@@ -172,7 +177,7 @@ footer { color: var(--muted); font-size: 0.85rem; }
 
 <div class="wrap">
 <header class="top">
-  <span class="badge">Draft mockup · nothing built</span>
+  <div class="toprow"><span class="badge">Draft mockup · nothing built</span><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
   <h1>A HEART resource, opened in a plain browser</h1>
   <p class="lede">What the HEART GitHub gateway would send a browser if it also spoke HTML. The branch, the draft pull request, their acts and their reasons were read from the running gateway on October 30, 2026. The HTML, the dialogs and the simulated answers are the proposal.</p>
   <div class="facts">
@@ -618,6 +623,26 @@ hx-select: .acts        → the menu lists that pull request's acts, greyed ones
   <div class="dlg-foot"><span class="sim"><label for="sim-close">Simulate</label><select id="sim-close"><option value="200">200 closed</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Close</button></span></div>
 </form></dialog>
 
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
 <script>
 (function () {
   // Tabs within each step
