@@ -54,3 +54,31 @@ listened on this machine only. Costs are what the API would charge; the runs use
   command can't be checked before it runs"), and the agent stopped and asked rather than work around it. From `d4`
   on, the token went in a curl config file (`curl -K auth.curlrc`), deleted after each run.
 - Seconds for the agent include Claude Code's start-up; the script's include `tsx`'s.
+
+## Four bumps, and a rule that changes (2026-10-31)
+
+Each run got its own label and four fresh bumps (`runs/mess/harness/stage5.mjs`): one fresh but not labelled
+`approved`, and three labelled `approved`: one behind its base, one draft, one with conflicts. Each run was scored
+from GitHub afterwards (`score.mjs`), not from what the agent said. Same agent and settings as above.
+
+Halfway through, the team's rules changed: the proxy gained "It needs the label approved first."
+(`runs/mess/rule-change.diff`; `proxy.ts` is back as it was). Nothing else changed: not the skills, not the
+scripts. So before the change only the fresh bump should merge, and after it, nothing.
+
+| How | Model | Rules as they were | After the rule change | Seconds | Cost a run |
+|---|---|---|---|---|---|
+| Agent, no rules, straight to GitHub | every run | 0 of 3 right: merged the behind bump | 0 of 3 right: merged fresh and behind | 17–25 | $0.04–0.10 |
+| Agent, rules in the skill, straight to GitHub | every run | 3 of 3 right | 0 of 3 right: merged the unapproved bump | 21–28 | $0.06–0.10 |
+| Agent through the proxy | every run | 3 of 3 right | 3 of 3 right, quoting the new reason | 17–22 | $0.05 |
+| `merge-bumps.ts` through the proxy | none | 3 of 3 right | 3 of 3 right | 5–9 | $0 |
+| Agent does the job once and saves `merge-bumps.sh`, through the proxy | once | 2 of 2 right | | 32–34 | $0.085 once |
+| ...then that saved script, replayed | none | 2 of 2 right | 2 of 2 right | 5–9 | $0 |
+| Agent does the job once and saves `merge-bumps.sh`, rules in the skill | once | 1 of 2: one run wrote the script first, was refused permission to run it, and stopped to ask | | 27–30 | $0.08 once |
+| ...then that saved script, replayed | none | 2 of 2 right | 0 of 2 right: merged the unapproved bump | 6–10 | $0 |
+
+- No form merged the draft or the conflicted bump: GitHub refuses both.
+- The scripts the agent saved through the proxy follow the `allowed-now` link, as the skill does
+  (`runs/mess/*gen-proxy*.merge-bumps.sh`), so they picked up the new rule with no change. The ones saved from the
+  rules-in-the-skill agent wrote the rules into the script, and kept the old ones.
+- Every saved script was read before it was run. Each one used only curl and jq, against the proxy or the scratch
+  repository.
