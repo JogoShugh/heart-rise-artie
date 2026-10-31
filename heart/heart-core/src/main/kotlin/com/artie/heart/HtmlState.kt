@@ -13,8 +13,10 @@ internal object HtmlState {
     /** The relations that are the protocol's own, not a place a person goes. */
     private val PROTOCOL = setOf("self", "curies")
 
+    /** What heads a resource's page: its link's title, else its title, name, login or label, else its address. */
     fun title(body: Map<*, *>): String =
-        (self(body)?.get("title") ?: body["title"] ?: body["name"] ?: self(body)?.get("href") ?: "").toString()
+        (self(body)?.get("title") ?: NAMING.firstNotNullOfOrNull { body[it] } ?: self(body)?.get("href") ?: "")
+            .toString()
 
     fun links(body: Map<*, *>): String {
         val links = (body["_links"] as? Map<*, *>).orEmpty().filterKeys { rel ->
@@ -42,7 +44,7 @@ internal object HtmlState {
         (rel, value) ->
         val items = each(value).joinToString("") { item ->
             val self = self(item)
-            val words = Html.text(self?.get("title") ?: item["title"] ?: item["name"] ?: self?.get("href") ?: rel)
+            val words = Html.text(self?.get("title") ?: named(item) ?: self?.get("href") ?: rel)
             val href = self?.get("href")
             if (href == null) "<li>$words</li>" else "<li><a${Html.attr("href", href)}>$words</a></li>"
         }
@@ -62,6 +64,12 @@ internal object HtmlState {
         value is Map<*, *> || value is List<*> -> "<code>${Html.text(MAPPER.writeValueAsString(value))}</code>"
         else -> Html.text(value)
     }
+
+    /** What names [item] for a person: its title, name, login or label, else its first words. */
+    private fun named(item: Map<*, *>): Any? = NAMING.firstNotNullOfOrNull { item[it] }
+        ?: item.entries.firstOrNull { (key, value) -> value is String && !key.toString().startsWith("_") }?.value
+
+    private val NAMING = listOf("title", "name", "login", "label")
 
     private fun self(body: Map<*, *>): Map<*, *>? = ((body["_links"] as? Map<*, *>)?.get("self") as? Map<*, *>)
 

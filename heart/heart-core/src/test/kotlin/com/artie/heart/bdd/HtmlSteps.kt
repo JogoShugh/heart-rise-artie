@@ -125,6 +125,24 @@ class HtmlSteps(private val world: LampWorld) {
     fun problemNames(pointer: String, message: String) =
         assertEquals(message, field.selectFirst(".problem li[data-pointer=$pointer]")?.text())
 
+    @When("the representation {} is rendered as HTML")
+    fun representationRendered(body: String) {
+        page = Jsoup.parse(HtmlView.render(JsonTrees.plain(body) as Map<*, *>, "e", emptyList(), emptyList()))
+    }
+
+    @Then("the page is headed {string}")
+    fun headed(heading: String) = assertEquals(heading, page.selectFirst("h1")?.text())
+
+    @Then("the HTML lists {string} as {string} linked to {string}")
+    fun embeddedListed(heading: String, words: String, href: String) {
+        val section = checkNotNull(
+            page.select("section.embedded").firstOrNull { it.selectFirst("h2")?.text() == heading },
+        )
+        val link = checkNotNull(section.selectFirst("li a"))
+        assertEquals(words, link.text())
+        assertEquals(href, link.attr("href"))
+    }
+
     @When("the service index of lamps is rendered as HTML under the validator {string}")
     fun indexRendered(etag: String) {
         page = Jsoup.parse(HtmlView.index(ServiceIndex(listOf(world.type)), etag))

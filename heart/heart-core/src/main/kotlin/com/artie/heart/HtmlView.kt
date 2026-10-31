@@ -58,9 +58,10 @@ object HtmlView {
             "<script defer${Html.attr("src", HtmlAssets.href("htmx-2.0.4.min.js"))}></script>" +
             "<script defer${Html.attr("src", HtmlAssets.href("heart-forms.js"))}></script>" +
             "</head><body hx-headers='{\"Accept\": \"text/html\"}'>" +
-            "<main id=\"resource\"${Html.attr("data-etag", etag)}>$main" +
+            "<main id=\"resource\"${Html.attr("data-etag", etag)}>$main</main>" +
+            // Outside what an act's answer swaps, so what the act did is said once the new page is in.
             "<div id=\"announce\" class=\"announce\" role=\"status\" aria-live=\"polite\"></div>" +
-            "</main></body></html>\n"
+            "</body></html>\n"
 
     /** The offered forms and the absent acts, one entry per act, in [order]; any not in it after, as they come. */
     private fun entries(body: Map<*, *>, absent: List<Map<*, *>>, order: List<String>): List<HtmlActs.Entry> {

@@ -113,6 +113,40 @@ Feature: HTML for people, rendered from the declaration
     And each row's acts are read from its match when asked
     And the page links "next" to "/pulls?page=2"
 
+  Scenario Outline: An embedded resource is named for a person, never by its address: <by>
+    Live, 2026-10-30: the GitHub gateway's pull request embeds its author, a
+    user with a login but no title, and the page listed "/users/JogoShugh".
+    When the representation {"_links":{"self":{"href":"/pulls/1873"}},"_embedded":{"author":<item>}} is rendered as HTML
+    Then the HTML lists "Author" as "<words>" linked to "/users/ada"
+
+    Examples:
+      | by              | item                                                                           | words    |
+      | its link title  | {"login":"ada","_links":{"self":{"href":"/users/ada","title":"Ada Lovelace"}}} | Ada Lovelace |
+      | its name        | {"login":"ada","name":"Ada","_links":{"self":{"href":"/users/ada"}}}           | Ada      |
+      | its login       | {"id":7,"login":"ada","_links":{"self":{"href":"/users/ada"}}}                 | ada      |
+      | its first words | {"id":7,"sha":"abc123","_links":{"self":{"href":"/users/ada"}}}                | abc123   |
+
+  Scenario Outline: A resource's heading names it for a person: <by>
+    Live, 2026-10-30: a garden bed's page was headed "/beds/1", where the
+    bed is labelled "bed-1".
+    When the representation <body> is rendered as HTML
+    Then the page is headed "<heading>"
+
+    Examples:
+      | by             | body                                                                         | heading |
+      | its link title | {"label":"bed-1","_links":{"self":{"href":"/beds/1","title":"North bed"}}}   | North bed |
+      | its title      | {"title":"Fix login","label":"x","_links":{"self":{"href":"/pulls/1"}}}      | Fix login |
+      | its label      | {"id":1,"status":"EMPTY","label":"bed-1","_links":{"self":{"href":"/beds/1"}}} | bed-1   |
+      | its address    | {"id":7,"status":"ON","_links":{"self":{"href":"/lamps/7"}}}                 | /lamps/7 |
+
+  Scenario: A grid leaves out a member that only repeats each row's title
+    Live, 2026-10-30: the garden's beds listed each label twice, as the
+    title and again as a column.
+    When the page {"count":1,"_links":{"self":{"href":"/beds"},"item":[{"href":"/beds/1","title":"bed-1"}]},"_embedded":{"item":[{"id":1,"label":"bed-1","status":"EMPTY","_links":{"self":{"href":"/beds/1"}}}]}} is rendered as HTML titled "Beds"
+    Then the grid has these rows
+      | href    | Title | Id | Status |
+      | /beds/1 | bed-1 | 1  | EMPTY  |
+
   Scenario: A refusal, for a browser, is HTML: its title, its detail, and each violation at its field
     When the problem {"type":"https://w3id.org/heart-rise/problems/invalid-input","title":"The body does not match the form's schema","status":422,"detail":"request body does not satisfy the affordance schema","violations":[{"pointer":"/brightness","message":"must be at most 100"}]} is rendered as HTML
     Then the HTML problem reads "The body does not match the form's schema"

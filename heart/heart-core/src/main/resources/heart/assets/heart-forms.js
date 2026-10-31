@@ -80,7 +80,12 @@
   // A refusal is shown in the dialog that asked, never swapped over the resource.
   document.addEventListener('htmx:beforeSwap', function (event) {
     var status = event.detail.xhr.status;
-    if (status < 400) return;
+    if (status < 400) {
+      // What the act did, said once the new page is in: htmx would fire it on the form the swap removes.
+      var said = done(event.detail.xhr.getResponseHeader('HX-Trigger'));
+      if (said) window.setTimeout(function () { announce(said); }, 0);
+      return;
+    }
     event.detail.shouldSwap = false;
     event.detail.isError = false;
     var form = event.detail.requestConfig && event.detail.requestConfig.elt;
@@ -97,8 +102,12 @@
       .then(function () {
         var again = rel && main().querySelector('form[data-rel="' + CSS.escape(rel) + '"]');
         if (!again) {
-          announce('This changed since you opened it, and that act is no longer offered.');
+          // The act is gone: say so, with the server's reason, beside its greyed button.
           var button = main().querySelector('.act[data-rel="' + CSS.escape(rel) + '"]');
+          var why = button && document.getElementById(button.getAttribute('aria-describedby'));
+          announce('This changed since you opened it. ' + (button ? button.textContent : 'That act') +
+            ' is no longer offered' + (why ? ': ' + why.textContent : '.'));
+          if (why) why.hidden = false;
           if (button) button.focus();
           return;
         }
@@ -181,9 +190,9 @@
     if (dialog && dialog.tagName === 'DIALOG') dialog.showModal();
   });
 
-  document.addEventListener('heart:done', function (event) {
-    announce(event.detail && event.detail.value ? event.detail.value : 'Done.');
-  });
+  function done(header) {
+    try { return header ? JSON.parse(header)['heart:done'] : null; } catch (e) { return null; }
+  }
 
   document.addEventListener('htmx:sendError', function (event) {
     var form = event.detail.elt && event.detail.elt.closest('form');

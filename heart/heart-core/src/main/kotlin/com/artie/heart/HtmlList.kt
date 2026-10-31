@@ -18,7 +18,11 @@ object HtmlList {
         val summaries = ((body["_embedded"] as? Map<*, *>)?.get("item") as? List<*>).orEmpty()
             .filterIsInstance<Map<*, *>>()
             .associateBy { ((it["_links"] as? Map<*, *>)?.get("self") as? Map<*, *>)?.get("href") }
-        val columns = columns(summaries.values.toList())
+        val titles = items.associate { it["href"] to it["title"] }
+        val columns = columns(summaries.values.toList()).filterNot { name ->
+            // A member that only repeats each row's title says nothing the first column doesn't.
+            summaries.all { (href, summary) -> summary[name]?.toString() == titles[href]?.toString() }
+        }
         val head = "<tr><th>Title</th>" + columns.joinToString("") { "<th>${Html.text(FieldTitle.of(it))}</th>" } +
             "<th><span class=\"hidden\">Acts</span></th></tr>"
         val rows = items.joinToString("") { item -> row(item, summaries[item["href"]], columns) }
