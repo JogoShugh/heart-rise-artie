@@ -201,8 +201,8 @@ footer { color: var(--muted); font-size: 0.85rem; }
         </nav>
         <div><div class="kind">Branch</div><h1 class="res">deps/left-pad-1.0.43-1030-175546</h1></div>
         <dl class="state">
-          <dt>name</dt><dd>deps/left-pad-1.0.43-1030-175546</dd>
-          <dt>protected</dt><dd>false</dd>
+          <dt title="name">Name</dt><dd>deps/left-pad-1.0.43-1030-175546</dd>
+          <dt title="protected">Protected</dt><dd>false</dd>
         </dl>
         <div class="live" role="status" aria-live="polite" id="branch-live" hidden></div>
         <div class="acts" role="toolbar" aria-label="Acts">
@@ -260,8 +260,8 @@ Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile"</pre>
   &lt;/nav&gt;
   &lt;h1&gt;deps/left-pad-1.0.43-1030-175546&lt;/h1&gt;
   &lt;dl class="state"&gt;
-    &lt;dt&gt;name&lt;/dt&gt;&lt;dd&gt;deps/left-pad-1.0.43-1030-175546&lt;/dd&gt;
-    &lt;dt&gt;protected&lt;/dt&gt;&lt;dd&gt;false&lt;/dd&gt;
+    &lt;dt title="name"&gt;Name&lt;/dt&gt;&lt;dd&gt;deps/left-pad-1.0.43-1030-175546&lt;/dd&gt;
+    &lt;dt title="protected"&gt;Protected&lt;/dt&gt;&lt;dd&gt;false&lt;/dd&gt;
   &lt;/dl&gt;
   &lt;div role="status" aria-live="polite" id="announce"&gt;&lt;/div&gt;
 
@@ -412,23 +412,23 @@ Location: /repos/JogoShugh/heart-github-test/pulls/1874
         </nav>
         <div><div class="kind">Pull request</div><h1 class="res">Bump left-pad from x to 1.0.43 (1030-175546)</h1></div>
         <dl class="state" id="pr-state">
-          <dt>number</dt><dd>1873</dd>
-          <dt>state</dt><dd>open</dd>
-          <dt>draft</dt><dd>true</dd>
-          <dt>body</dt><dd>Bumps left-pad from x to 1.0.43. Opened by a Dependabot stand-in (exhibits/dependabot-sim).</dd>
-          <dt>mergeable_state</dt><dd>clean</dd>
-          <dt>commits</dt><dd>1</dd>
-          <dt>additions</dt><dd>1</dd>
-          <dt>deletions</dt><dd>0</dd>
-          <dt>changed_files</dt><dd>1</dd>
-          <dt>comments</dt><dd>0</dd>
-          <dt>created_at</dt><dd>Oct 30, 2026, 5:55 PM EDT</dd>
-          <dt>updated_at</dt><dd>Oct 30, 2026, 5:55 PM EDT</dd>
+          <dt title="number">Number</dt><dd>1873</dd>
+          <dt title="state">State</dt><dd>open</dd>
+          <dt title="draft">Draft</dt><dd>true</dd>
+          <dt title="body">Body</dt><dd>Bumps left-pad from x to 1.0.43. Opened by a Dependabot stand-in (exhibits/dependabot-sim).</dd>
+          <dt title="mergeable_state">Mergeable state</dt><dd>clean</dd>
+          <dt title="commits">Commits</dt><dd>1</dd>
+          <dt title="additions">Additions</dt><dd>1</dd>
+          <dt title="deletions">Deletions</dt><dd>0</dd>
+          <dt title="changed_files">Changed files</dt><dd>1</dd>
+          <dt title="comments">Comments</dt><dd>0</dd>
+          <dt title="created_at">Created at</dt><dd>Oct 30, 2026, 5:55 PM EDT</dd>
+          <dt title="updated_at">Updated at</dt><dd>Oct 30, 2026, 5:55 PM EDT</dd>
         </dl>
         <button class="more" type="button" id="pr-more">Show 22 more members</button>
         <div class="embedded">
           <h3>Embedded</h3>
-          <div>author <a href="#s4">JogoShugh</a> · labels <span class="chip">dependencies</span></div>
+          <div>Author <a href="#s4">JogoShugh</a> · Labels <span class="chip">dependencies</span></div>
         </div>
         <div class="reason" id="pr-reason" role="status" hidden></div>
         <div class="acts" role="toolbar" aria-label="Acts">
@@ -528,7 +528,7 @@ hx-select: .acts        → the menu lists that pull request's acts, greyed ones
       <p>Showing all is noise; choosing some is a view hint. The mockup shows 12 members, folds the other 22 behind "Show 22 more", and never shows <code>hr:address</code>, which is protocol, not state for a person.</p>
       <p class="ask">Is "first 12 scalars, rest folded" the right generic default until view hints exist?</p></article>
     <article class="finding"><h3>5. Field labels and help came from GitHub's own words. Fixed.</h3>
-      <p>Commit a file's <code>path</code> was described only as "path parameter", <code>base</code> in three sentences, and no field had a title. Now every field has a title: the connector's own words first, then the operation's title, then the name split at underscores, hyphens and capitals (<code>team_reviewers</code> is "Team reviewers"). The dialogs above show the new words, read live from the gateway.</p></article>
+      <p>Commit a file's <code>path</code> was described only as "path parameter", <code>base</code> in three sentences, and no field had a title. Now every field has a title: the connector's own words first, then the operation's title, then the name split at underscores, hyphens and capitals (<code>team_reviewers</code> is "Team reviewers"). The dialogs above show the new words, read live from the gateway. The state's labels follow the same convention (<code>changed_files</code> shows as "Changed files"), with the member's own name kept on hover.</p></article>
     <article class="finding"><h3>6. Base is free text.</h3>
       <p>The person types "deps-main" by hand. A choice of the repository's branches is exactly what the parked <code>hr:options</code> plan would give: choices from another resource.</p>
       <p class="ask">Leave as text for the first slice?</p></article>
@@ -680,13 +680,14 @@ hx-select: .acts        → the menu lists that pull request's acts, greyed ones
     });
   });
 
+  function title(n) { return n.split(/[_\-\s]+|(?<=[a-z0-9])(?=[A-Z])/).filter(Boolean).map(function (w) { return w.length > 1 && w === w.toUpperCase() ? w : w.toLowerCase(); }).join(" ").replace(/^./, function (c) { return c.toUpperCase(); }); }
   // PR members fold
   var more = document.getElementById('pr-more');
   var extra = [["id","5091540857"],["node_id","PR_kwDOVM7WJc8AAAABL3q_eQ"],["locked","false"],["milestone","null"],["active_lock_reason","null"],["closed_at","null"],["merged_at","null"],["merge_commit_sha","a54dbfcf10a410c09c1cd52875379da19929aa3c"],["assignee","null"],["assignees","[]"],["requested_reviewers","[]"],["requested_teams","[]"],["head","{ ref: deps/left-pad-1.0.43-1030-175546, sha, repo, … }"],["base","{ ref: deps-main, sha, repo, … }"],["author_association","OWNER"],["auto_merge","null"],["merged","false"],["mergeable","true"],["rebaseable","true"],["merged_by","null"],["review_comments","0"],["maintainer_can_modify","false"]];
   more.addEventListener('click', function () {
     var dl = document.getElementById('pr-state');
     if (more.dataset.open) { dl.querySelectorAll('.x').forEach(function (n) { n.remove(); }); more.textContent = 'Show 22 more members'; delete more.dataset.open; return; }
-    extra.forEach(function (kv) { var dt = document.createElement('dt'); dt.className = 'x'; dt.textContent = kv[0]; var dd = document.createElement('dd'); dd.className = 'x'; dd.textContent = kv[1]; dl.appendChild(dt); dl.appendChild(dd); });
+    extra.forEach(function (kv) { var dt = document.createElement('dt'); dt.className = 'x'; dt.textContent = title(kv[0]); dt.title = kv[0]; var dd = document.createElement('dd'); dd.className = 'x'; dd.textContent = kv[1]; dl.appendChild(dt); dl.appendChild(dd); });
     more.textContent = 'Show fewer'; more.dataset.open = '1';
   });
 
