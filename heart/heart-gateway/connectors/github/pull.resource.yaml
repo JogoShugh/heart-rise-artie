@@ -64,6 +64,11 @@ acts:
     title: Request a review
     description: Ask people or teams to review the pull request.
     fields: [reviewers, team_reviewers]
+    describe:
+      reviewers:
+        description: The people to ask, by their logins, such as octocat.
+      team_reviewers:
+        description: The teams to ask, by their slugs, such as maintainers.
   update-branch:
     operation: pulls/update-branch
     title: Update the branch

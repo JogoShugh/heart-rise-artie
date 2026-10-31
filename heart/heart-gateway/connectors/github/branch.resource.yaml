@@ -37,11 +37,25 @@ acts:
     # The client writes the file's text; GitHub takes it base64-encoded.
     encode: { content: base64 }
     bind: { branch: /name }
+    # GitHub's own word for path is "path parameter"; a person filling the form needs more.
+    describe:
+      path:
+        title: File path
+        description: Where the file goes, from the repository's root, such as docs/NOTES.md.
   open-pull-request:
     operation: pulls/create
     title: Open a pull request
     description: Propose this branch's changes to another branch, named as base.
     fields: [title, body, base, draft]
     bind: { head: /name }
+    # GitHub's words for base run to three sentences, and draft's hold a link to its help.
+    describe:
+      body:
+        description: What the pull request changes, and why.
+      base:
+        title: Base branch
+        description: The branch to merge into, such as main.
+      draft:
+        description: Open it as a draft, not yet ready to merge.
     # GitHub answers with the new pull request; the gateway answers 201, with its address in Location.
     creates: pull

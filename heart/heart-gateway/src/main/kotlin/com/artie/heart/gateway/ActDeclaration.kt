@@ -44,6 +44,8 @@ class ActDeclaration(
     val at: UriTemplate? = null,
     /** Fields the form names otherwise than the operation does, each with the operation's own name. */
     val rename: Map<String, String> = emptyMap(),
+    /** A field's own title and description, each written by the resource file, over the operation's words. */
+    val describe: Map<String, Map<String, String>> = emptyMap(),
 ) {
     /** The operation's own name for the form's [field]: as written, or as [rename] maps it. */
     fun upstream(field: String): String = rename[field] ?: field
@@ -93,8 +95,20 @@ class ActDeclaration(
                     }
                     field to upstream.asText()
                 },
+                describe = node.path("describe").properties().associate { (field, words) ->
+                    check(field in node.path("fields").map { it.asText() } || node.path("inputs").has(field)) {
+                        "$label: act $name describes $field, which is not one of its fields"
+                    }
+                    field to words.properties().associate { (key, text) ->
+                        check(key in WORDS) { "$label: act $name describes $field's $key; only $WORDS" }
+                        key to text.asText()
+                    }
+                },
             )
         }
+
+        /** What a resource file may write of a field: its title and its description. */
+        private val WORDS = setOf("title", "description")
 
         /** The one encoding a field may ask for. */
         const val BASE64 = "base64"

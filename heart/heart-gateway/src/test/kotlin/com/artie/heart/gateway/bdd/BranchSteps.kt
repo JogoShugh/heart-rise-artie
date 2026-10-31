@@ -24,6 +24,17 @@ class BranchSteps(private val github: GitHubSteps) {
         assertEquals(description, property.path("description").asText(), "$property")
     }
 
+    @Then("the forms title their fields")
+    fun titled(table: DataTable) {
+        table.asMaps().forEach { row ->
+            val act = row.getValue("act")
+            val field = row.getValue("field")
+            val property = github.lastAnswer.path("_forms").path(act).path("schema").path("properties").path(field)
+            assertEquals(row.getValue("title"), property.path("title").asText(), "$act $field: $property")
+            row["description"]?.let { assertEquals(it, property.path("description").asText(), "$act $field") }
+        }
+    }
+
     @Then("GitHub holds the file {string} on {string} of {string}, saying {string}, committed as {string}")
     fun holds(path: String, branch: String, repository: String, text: String, message: String) {
         val (owner, repo) = repository.split("/")

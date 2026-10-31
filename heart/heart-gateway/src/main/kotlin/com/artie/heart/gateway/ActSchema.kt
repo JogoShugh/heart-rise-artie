@@ -31,7 +31,7 @@ internal class ActSchema(private val act: ActDeclaration, private val route: Spe
             "type" to "object",
             "title" to act.title,
             // An input is the resource file's own field, with its own schema; the rest are the operation's.
-            "properties" to act.inputs + act.fields.associateWith { field ->
+            "properties" to (act.inputs + act.fields.associateWith { field ->
                 val property = checkNotNull(property(act.upstream(field))) {
                     "$file: ${act.operation} has no field ${act.upstream(field)}"
                 }
@@ -41,11 +41,18 @@ internal class ActSchema(private val act: ActDeclaration, private val route: Spe
                     (property as Map<*, *>) + ("description" to "Plain text, as is: the gateway encodes it in " +
                         "$encoding before sending it on.")
                 } ?: property
-            },
+            }).mapValues { (field, property) -> worded(field, property as Map<*, *>) },
             "required" to (act.inputs.keys + act.fields).filter { it in required },
             "additionalProperties" to false,
         ) + alternatives()
     }
+
+    /**
+     * [property] as a person reads it in a form: titled, by the resource file's words, else its own title, else
+     * from the field's name; described by the resource file's words, else its own.
+     */
+    private fun worded(field: String, property: Map<*, *>): Map<*, *> =
+        property + ("title" to (property["title"] ?: FieldTitle.of(field))) + act.describe[field].orEmpty()
 
     private fun property(field: String): Any? {
         val branches = listOf("oneOf", "anyOf").flatMap { body[it] as? List<*> ?: emptyList<Any?>() }

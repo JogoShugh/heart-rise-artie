@@ -108,6 +108,18 @@ Feature: Branches, commits and new pull requests, from acts a branch offers
       | github:open-pull-request | base    |
       | github:open-pull-request | draft   |
 
+  Scenario: The connector's own words for a field replace GitHub's
+    From the HTML mockup, 2026-10-30: GitHub describes commit-file's path
+    only as "path parameter", and pulls/create's base in three sentences. A
+    resource file may give a field its own title and description, which a
+    person reads in the form, and which win over GitHub's and the name's.
+    When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
+    Then the forms title their fields
+      | act                      | field | title       | description                                                             |
+      | github:commit-file       | path  | File path   | Where the file goes, from the repository's root, such as docs/NOTES.md. |
+      | github:open-pull-request | base  | Base branch | The branch to merge into, such as main.                                 |
+      | github:open-pull-request | title | Title       | The title of the new pull request. Required unless `issue` is specified. |
+
   Scenario: Branching from here sends GitHub a ref, at this branch's head, and answers 201 naming the new branch
     When "ada" gets "/repos/acme/rockets/branches/fix" through the GitHub gateway
     And the client sends "github:branch-from-here" with {"name":"fix-2"} and the ETag it holds

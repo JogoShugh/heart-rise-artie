@@ -32,6 +32,19 @@ Feature: Editing a pull request, requesting reviews, and updating its branch
       | github:comment        |
       | github:label          |
 
+  Scenario: A field GitHub gives no title is titled from its name
+    Decided 2026-10-30, from the HTML mockup: GitHub titles none of its
+    fields, and their names are written for code, as team_reviewers. A form
+    shows a person a field's title, so the gateway writes one from the name:
+    words split at underscores, hyphens and capitals, the first capitalised.
+    When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
+    Then the forms title their fields
+      | act                   | field          | title          |
+      | github:request-review | reviewers      | Reviewers      |
+      | github:request-review | team_reviewers | Team reviewers |
+      | github:edit           | title          | Title          |
+      | github:edit           | body           | Body           |
+
   Scenario: Edit's form asks for the title and body, nothing else
     When "ada" gets "/repos/acme/rockets/pulls/482" through the GitHub gateway
     Then the form "github:edit" has the fields
