@@ -40,22 +40,42 @@ internal object HtmlState {
         return if (members.isEmpty()) "" else list(shown) + more
     }
 
-    fun embedded(body: Map<*, *>): String = (body["_embedded"] as? Map<*, *>).orEmpty().entries.joinToString("") {
-        (rel, value) ->
-        val items = each(value).joinToString("") { item ->
-            val self = self(item)
-            val words = Html.text(self?.get("title") ?: named(item) ?: self?.get("href") ?: rel)
-            val href = self?.get("href")
-            if (href == null) "<li>$words</li>" else "<li><a${Html.attr("href", href)}>$words</a></li>"
+    /** The embedded resources, a card each relation, laid side by side as the width allows. */
+    fun embedded(body: Map<*, *>): String {
+        val sections = (body["_embedded"] as? Map<*, *>).orEmpty().entries.joinToString("") { (rel, value) ->
+            val items = each(value).joinToString("") { item ->
+                val self = self(item)
+                val words = Html.text(self?.get("title") ?: named(item) ?: self?.get("href") ?: rel)
+                val href = self?.get("href")
+                if (href == null) "<li>$words</li>" else "<li><a${Html.attr("href", href)}>$words</a></li>"
+            }
+            "<section class=\"embedded\"><h2>${Html.text(FieldTitle.of(rel.toString().substringAfter(':')))}</h2>" +
+                "<ul>$items</ul></section>"
         }
-        "<section class=\"embedded\"><h2>${Html.text(FieldTitle.of(rel.toString().substringAfter(':')))}</h2>" +
-            "<ul>$items</ul></section>"
+        return if (sections.isEmpty()) "" else "<div class=\"embedded-all\">$sections</div>"
     }
 
+    /**
+     * Members as tiles that fill the width: a short value sits beside others; a long text or a structure is
+     * marked wide and takes a whole row.
+     */
     private fun list(members: List<Map.Entry<Any?, Any?>>): String = "<dl class=\"state\">" +
         members.joinToString("") { (name, value) ->
-            "<dt${Html.attr("title", name)}>${Html.text(FieldTitle.of(name.toString()))}</dt><dd>${shown(value)}</dd>"
+            "<div class=\"member${if (wide(value)) " wide" else ""}\">" +
+                "<dt${Html.attr("title", name)}>${Html.text(FieldTitle.of(name.toString()))}</dt>" +
+                "<dd>${shown(value)}</dd></div>"
         } + "</dl>"
+
+    /** Whether [value] needs a whole row: a structure, or text longer than a tile holds. */
+    private fun wide(value: Any?): Boolean = when (value) {
+        null -> false
+        is Map<*, *> -> true
+        is List<*> -> value.any { it is Map<*, *> || it is List<*> } || value.joinToString(", ").length > TILE
+        else -> value.toString().length > TILE
+    }
+
+    /** The most characters a tile shows without crowding it; longer text takes a whole row. */
+    private const val TILE = 32
 
     /** A value as text: a scalar as it is, a list of scalars joined, anything else as compact JSON. */
     private fun shown(value: Any?): String = when {

@@ -19,6 +19,18 @@ Feature: HTML for people, rendered from the declaration
       | status     | Status     | ON    |
       | brightness | Brightness | 50    |
 
+  Scenario: Short values sit side by side; a long value takes a whole row; the acts stand beside the state
+    The author, 2026-10-30: one label above another down the page is lame on
+    a large screen. Short members are tiles that fill the width; a long text
+    or a structure takes a whole row; the acts are a column of their own
+    beside the information, which a small screen stacks below it.
+    When the representation {"title":"Bump left-pad","number":1873,"state":"open","draft":true,"body":"Bumps left-pad from x to 1.0.43. Opened by a Dependabot stand-in (exhibits/dependabot-sim).","head":{"ref":"deps/left-pad"},"_links":{"self":{"href":"/pulls/1873"}},"_forms":{"x:close":{"title":"Close","method":"PATCH","_links":{"target":{"href":"/pulls/1873/actions/close"}},"schema":{"type":"object"}}}} is rendered as HTML
+    Then the members laid out a whole row wide are
+      | member |
+      | body   |
+      | head   |
+    And the acts stand in a column beside the state
+
   Scenario: Each act is a button in the type's order, offered or greyed with the server's reason
     An act listed as unavailable keeps its place and stays focusable, so a
     keyboard reaches it and a person learns why. An act neither offered nor

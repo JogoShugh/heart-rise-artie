@@ -34,10 +34,13 @@ object HtmlView {
     fun render(body: Map<*, *>, etag: String, absent: List<Map<*, *>>, order: List<String>): String {
         val acts = entries(body, absent, order)
         val title = HtmlState.title(body)
+        // On a wide screen the acts stand in a column beside the information; a small one stacks them below it.
         return document(
             title, etag,
-            HtmlState.links(body) + "<h1>${Html.text(title)}</h1>" + HtmlState.state(body) +
-                HtmlState.embedded(body) + HtmlActs.buttons(acts) + HtmlActs.dialogs(acts, etag),
+            HtmlState.links(body) + "<h1>${Html.text(title)}</h1>" +
+                "<div class=\"layout\"><div class=\"info\">${HtmlState.state(body)}${HtmlState.embedded(body)}</div>" +
+                "<aside class=\"side\" aria-label=\"Acts\">${HtmlActs.buttons(acts)}</aside></div>" +
+                HtmlActs.dialogs(acts, etag),
         )
     }
 

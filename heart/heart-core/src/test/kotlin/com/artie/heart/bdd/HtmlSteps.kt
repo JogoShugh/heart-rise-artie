@@ -160,6 +160,19 @@ class HtmlSteps(private val world: LampWorld) {
     @Then("what it names includes the published name of each script and stylesheet")
     fun namesAssets() = assertEquals(HtmlAssets.byName.keys.sorted(), source["assets"])
 
+    @Then("the members laid out a whole row wide are")
+    fun wideMembers(table: DataTable) = assertEquals(
+        table.asMaps().map { it.getValue("member") },
+        page.select("dl.state .member.wide dt").map { it.attr("title") },
+    )
+
+    @Then("the acts stand in a column beside the state")
+    fun actsBeside() {
+        val layout = checkNotNull(page.selectFirst(".layout"))
+        assertTrue(layout.selectFirst(".info dl.state") != null)
+        assertTrue(layout.selectFirst("aside.side .acts") != null)
+    }
+
     @Then("the page is headed {string}")
     fun headed(heading: String) = assertEquals(heading, page.selectFirst("h1")?.text())
 
