@@ -527,9 +527,8 @@ hx-select: .acts        → the menu lists that pull request's acts, greyed ones
     <article class="finding"><h3>4. A pull request has 36 state members.</h3>
       <p>Showing all is noise; choosing some is a view hint. The mockup shows 12 members, folds the other 22 behind "Show 22 more", and never shows <code>hr:address</code>, which is protocol, not state for a person.</p>
       <p class="ask">Is "first 12 scalars, rest folded" the right generic default until view hints exist?</p></article>
-    <article class="finding"><h3>5. Field labels and help come from GitHub's own words.</h3>
-      <p>Commit a file's <code>path</code> is described only as "path parameter". Open a pull request's <code>base</code> has three sentences of GitHub prose. <code>draft</code> holds a Markdown link. No field has a title, so labels come from member names.</p>
-      <p class="ask">Give the connector titles and short help per field, as it already does for <code>content</code>?</p></article>
+    <article class="finding"><h3>5. Field labels and help came from GitHub's own words. Fixed.</h3>
+      <p>Commit a file's <code>path</code> was described only as "path parameter", <code>base</code> in three sentences, and no field had a title. Now every field has a title: the connector's own words first, then the operation's title, then the name split at underscores, hyphens and capitals (<code>team_reviewers</code> is "Team reviewers"). The dialogs above show the new words, read live from the gateway.</p></article>
     <article class="finding"><h3>6. Base is free text.</h3>
       <p>The person types "deps-main" by hand. A choice of the repository's branches is exactly what the parked <code>hr:options</code> plan would give: choices from another resource.</p>
       <p class="ask">Leave as text for the first slice?</p></article>
@@ -558,7 +557,7 @@ hx-select: .acts        → the menu lists that pull request's acts, greyed ones
 
 <dialog id="d-commit" aria-labelledby="d-commit-t"><form data-kind="commit">
   <h2 id="d-commit-t">Commit a file</h2><p class="desc">Add a file to this branch, as a new commit.</p>
-  <div class="field"><label for="f-path">Path<span class="req">*</span></label><input type="text" id="f-path" name="path" required value="NOTES.md"><span class="hint">path parameter</span></div>
+  <div class="field"><label for="f-path">File path<span class="req">*</span></label><input type="text" id="f-path" name="path" required value="NOTES.md"><span class="hint">Where the file goes, from the repository's root, such as docs/NOTES.md.</span></div>
   <div class="field"><label for="f-msg">Message<span class="req">*</span></label><input type="text" id="f-msg" name="message" required value="Note the left-pad bump"><span class="hint">The commit message.</span></div>
   <div class="field"><label for="f-content">Content<span class="req">*</span></label><textarea id="f-content" name="content" required>left-pad 1.0.43 is pinned until the tests pass.</textarea><span class="hint">Plain text, as is: the gateway encodes it in base64 before sending it on.</span></div>
   <div class="problem" role="alert" hidden></div>
@@ -568,9 +567,9 @@ hx-select: .acts        → the menu lists that pull request's acts, greyed ones
 <dialog id="d-pull" aria-labelledby="d-pull-t"><form data-kind="pull">
   <h2 id="d-pull-t">Open a pull request</h2><p class="desc">Propose this branch's changes to another branch, named as base.</p>
   <div class="field"><label for="f-title">Title</label><input type="text" id="f-title" name="title" value="Bump left-pad to 1.0.43"><span class="hint">The title of the new pull request. Required unless <code>issue</code> is specified.</span></div>
-  <div class="field"><label for="f-body">Body</label><textarea id="f-body" name="body"></textarea><span class="hint">The contents of the pull request.</span></div>
-  <div class="field"><label for="f-base">Base<span class="req">*</span></label><input type="text" id="f-base" name="base" required value="deps-main"><span class="hint">The name of the branch you want the changes pulled into. This should be an existing branch on the current repository.</span></div>
-  <div class="field"><label class="check"><input type="checkbox" id="f-draft" name="draft" checked> Draft</label><span class="hint">Indicates whether the pull request is a draft. See "Draft Pull Requests" in the GitHub Help documentation to learn more.</span></div>
+  <div class="field"><label for="f-body">Body</label><textarea id="f-body" name="body"></textarea><span class="hint">What the pull request changes, and why.</span></div>
+  <div class="field"><label for="f-base">Base branch<span class="req">*</span></label><input type="text" id="f-base" name="base" required value="deps-main"><span class="hint">The branch to merge into, such as main.</span></div>
+  <div class="field"><label class="check"><input type="checkbox" id="f-draft" name="draft" checked> Draft</label><span class="hint">Open it as a draft, not yet ready to merge.</span></div>
   <div class="problem" role="alert" hidden></div>
   <div class="dlg-foot"><span class="sim"><label for="sim-pull">Simulate</label><select id="sim-pull"><option value="422">422 one already open</option><option value="201">201 Created</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Open a pull request</button></span></div>
 </form></dialog>
@@ -599,8 +598,8 @@ hx-select: .acts        → the menu lists that pull request's acts, greyed ones
 
 <dialog id="d-review" aria-labelledby="d-review-t"><form data-kind="review">
   <h2 id="d-review-t">Request a review</h2><p class="desc">Ask people or teams to review the pull request.</p>
-  <div class="field" data-list="reviewers"><label for="f-r0">Reviewers</label><div class="listbox"><input type="text" id="f-r0" name="reviewers" value="ada"></div><button type="button" class="more" data-add>Add another</button><span class="hint">User logins to ask.</span></div>
-  <div class="field" data-list="team_reviewers"><label for="f-t0">Team reviewers</label><div class="listbox"><input type="text" id="f-t0" name="team_reviewers"></div><button type="button" class="more" data-add>Add another</button><span class="hint">Team slugs to ask.</span></div>
+  <div class="field" data-list="reviewers"><label for="f-r0">Reviewers</label><div class="listbox"><input type="text" id="f-r0" name="reviewers" value="ada"></div><button type="button" class="more" data-add>Add another</button><span class="hint">The people to ask, by their logins, such as octocat.</span></div>
+  <div class="field" data-list="team_reviewers"><label for="f-t0">Team reviewers</label><div class="listbox"><input type="text" id="f-t0" name="team_reviewers"></div><button type="button" class="more" data-add>Add another</button><span class="hint">The teams to ask, by their slugs, such as maintainers.</span></div>
   <div class="problem" role="alert" hidden></div>
   <div class="dlg-foot"><span class="sim"><label for="sim-review">Simulate</label><select id="sim-review"><option value="201">201 requested</option><option value="422">422 not a collaborator</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Request a review</button></span></div>
 </form></dialog>
