@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HEART Content Negotiation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@1,8..60,400;1,8..60,500&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a wide canvas. Each band puts the argument (prose, Fielding, what it can't say) in one column and the
+   evidence (screens, real exchanges) in the other; below 1000px they stack. Three audiences, one colour each,
+   used the same way everywhere: people (HTML), the on-ramp (HAL-FORMS), full speed (HAL Schema Forms). */
+:root {
+  --paper: #f3f4f6;
+  --sheet: #ffffff;
+  --ink: #15191e;
+  --muted: #59626d;
+  --rule: #d8dce2;
+  --code-bg: #f7f8fa;
+  --people: #b4441f;
+  --people-soft: #fbe9e2;
+  --ramp: #8a6100;
+  --ramp-soft: #fbf1d9;
+  --agent: #0f6e6a;
+  --agent-soft: #dcf0ee;
+  --key: #2f4fb3;
+  --str: #2f7d32;
+  --num: #a14a00;
+  --lit: #7a3fb0;
+  --quote: #1c2430;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101318; --sheet: #171b21; --ink: #e6e9ee; --muted: #9aa3ae; --rule: #2a3039; --code-bg: #12161b;
+    --people: #f08a64; --people-soft: #3a2119; --ramp: #e6b545; --ramp-soft: #33290f; --agent: #4fc4bc; --agent-soft: #11302e;
+    --key: #8fa8ff; --str: #8fd48f; --num: #f0a868; --lit: #c9a2f2; --quote: #e6e9ee; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101318; --sheet: #171b21; --ink: #e6e9ee; --muted: #9aa3ae; --rule: #2a3039; --code-bg: #12161b;
+  --people: #f08a64; --people-soft: #3a2119; --ramp: #e6b545; --ramp-soft: #33290f; --agent: #4fc4bc; --agent-soft: #11302e;
+  --key: #8fa8ff; --str: #8fd48f; --num: #f0a868; --lit: #c9a2f2; --quote: #e6e9ee; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.62 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 40px 80px; }
+.wrap { max-width: 1320px; margin: 0 auto; display: grid; gap: 64px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.12; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 3.4vw, 2.9rem); letter-spacing: -0.01em; }
+h2 { font-size: clamp(1.5rem, 2.8vw, 2.1rem); }
+h3 { font-size: 1.12rem; }
+p { margin: 0; max-width: 70ch; }
+a { color: var(--key); }
+code { font: 0.86em var(--mono); background: var(--code-bg); border: 1px solid var(--rule); border-radius: 4px; padding: 0 4px; overflow-wrap: anywhere; }
+section { display: grid; gap: 20px; min-width: 0; }
+.col { display: grid; gap: 18px; align-content: start; min-width: 0; }
+.eyebrow { font: 600 0.78rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.14rem; color: var(--muted); }
+
+/* Wide layouts */
+.hero { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 40px; align-items: center; }
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 32px; align-items: start; }
+.split.even { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.split.wide-left { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+.sticky { position: sticky; top: calc(20px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 1000px) {
+  .hero, .split, .split.even, .split.wide-left { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .sticky { position: static; }
+}
+
+/* Three audiences */
+.band { border-top: 4px solid var(--c); padding-top: 22px; }
+.people { --c: var(--people); --cs: var(--people-soft); }
+.ramp { --c: var(--ramp); --cs: var(--ramp-soft); }
+.agent { --c: var(--agent); --cs: var(--agent-soft); }
+.tag { justify-self: start; display: inline-block; font: 600 0.74rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--c); background: var(--cs); padding: 3px 8px; border-radius: 4px; }
+.band h2 { color: var(--ink); }
+
+/* Fielding */
+blockquote { margin: 0; padding: 18px 22px; background: var(--sheet); border: 1px solid var(--rule); border-left: 3px solid var(--c, var(--ink)); border-radius: 10px; display: grid; gap: 10px; }
+blockquote p { font: italic 400 1.08rem/1.55 var(--serif); color: var(--quote); max-width: none; }
+blockquote.big p { font-size: clamp(1.2rem, 2vw, 1.45rem); line-height: 1.45; }
+blockquote cite { font: 0.85rem var(--body); color: var(--muted); font-style: normal; }
+
+/* Picker */
+.picker { display: grid; gap: 14px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 12px; padding: 18px; min-width: 0; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choices button { font: 600 0.9rem var(--body); border-radius: 999px; padding: 7px 14px; border: 1.5px solid var(--c); background: transparent; color: var(--c); cursor: pointer; }
+.choices button[aria-pressed="true"] { background: var(--c); color: var(--sheet); }
+.choices button:focus-visible, summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.exchange { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+.exchange > div { min-width: 0; display: grid; gap: 6px; align-content: start; }
+.label { font: 600 0.75rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+@media (max-width: 760px) { .exchange { grid-template-columns: minmax(0, 1fr); } }
+
+/* Code */
+pre { margin: 0; font: 0.79rem/1.55 var(--mono); background: var(--code-bg); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; overflow-x: auto; white-space: pre; min-width: 0; }
+pre .k { color: var(--key); } pre .s { color: var(--str); } pre .n { color: var(--num); } pre .l { color: var(--lit); }
+pre .h { color: var(--c, var(--key)); font-weight: 600; }
+pre .t { color: var(--key); } pre .a { color: var(--num); } pre .c { color: var(--muted); font-style: italic; }
+details { background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; min-width: 0; }
+details > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; list-style: none; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; color: var(--c, var(--muted)); transition: transform 0.15s; display: inline-block; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > summary .meta { font: 400 0.8rem var(--mono); color: var(--muted); margin-left: auto; }
+details > .inner { padding: 0 16px 16px; display: grid; gap: 10px; min-width: 0; }
+.stack { display: grid; gap: 10px; min-width: 0; }
+@media (prefers-reduced-motion: reduce) { details > summary::before { transition: none; } }
+
+/* Tables */
+.tablewrap { overflow-x: auto; min-width: 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+th { text-align: left; font: 600 0.74rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); padding: 9px 12px; border-bottom: 1px solid var(--rule); }
+td { padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+.yes { color: var(--agent); font-weight: 600; }
+.grey { color: var(--muted); }
+
+/* Screens */
+figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 10px; display: block; }
+figcaption { font-size: 0.88rem; color: var(--muted); }
+.shot-dark { display: none !important; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .shot-dark { display: block !important; } :root:not([data-theme="light"]) .shot-light { display: none !important; } }
+:root[data-theme="dark"] .shot-dark { display: block !important; }
+:root[data-theme="dark"] .shot-light { display: none !important; }
+
+/* Layers */
+.ladder { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.rung { background: var(--sheet); border: 1px solid var(--rule); border-top: 3px solid var(--agent); border-radius: 10px; padding: 14px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.rung b { font-family: var(--display); font-size: 1.05rem; }
+.rung small { color: var(--muted); font-size: 0.86rem; }
+.rungs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.rungs div { background: var(--agent-soft); border-radius: 8px; padding: 10px 12px; font-size: 0.88rem; }
+.rungs b { display: block; font-family: var(--mono); font-size: 0.82rem; }
+@media (max-width: 760px) { .ladder, .rungs { grid-template-columns: minmax(0, 1fr); } }
+.bars { display: grid; gap: 8px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; }
+.bar { display: grid; grid-template-columns: 12rem minmax(0, 1fr) 4.6rem; gap: 10px; align-items: center; font-size: 0.86rem; }
+.bar .track { height: 14px; background: var(--code-bg); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; display: flex; }
+.bar .fill { height: 100%; }
+.bar .fill.l1 { background: var(--agent); }
+.bar .fill.l2 { background: color-mix(in srgb, var(--agent) 55%, transparent); }
+.bar .fill.l3 { background: color-mix(in srgb, var(--agent) 28%, transparent); }
+.bar .fill.p { background: var(--people); }
+.bar .fill.r { background: var(--ramp); }
+.bar .v { font: 0.8rem var(--mono); text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) { .bar { grid-template-columns: 7rem minmax(0, 1fr) 3.8rem; } }
+.key { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.82rem; color: var(--muted); }
+.key span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; background: var(--sw); vertical-align: -1px; }
+.rules { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+@media (max-width: 1000px) { .rules { grid-template-columns: minmax(0, 1fr); } }
+footer { color: var(--muted); font-size: 0.85rem; display: grid; gap: 6px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="col">
+    <span class="eyebrow">HEART · one address, three representations</span>
+    <h1>One garden bed, served to people, to agents on the on-ramp, and to agents at full speed</h1>
+    <p class="lede">The bed lives at one address, <code>/beds/1</code>. What comes back depends on what the client says it can read. A browser gets a page with buttons. An agent that knows HAL-FORMS gets templates. An agent that speaks HEART's own HAL Schema Forms gets JSON Schema, integrity hashes, and affordances it can cache for a year. Every exchange below was captured from the running garden server on October 30, 2026.</p>
+  </div>
+  <blockquote class="big">
+    <p>“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”</p>
+    <cite>Roy T. Fielding, replying in the comments of <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven" rel="noopener">“REST APIs must be hypertext-driven”</a>, October 20, 2008</cite>
+  </blockquote>
+</header>
+
+<section id="ask">
+  <div class="split wide-left">
+    <div class="col">
+      <span class="eyebrow">Try it</span>
+      <h2>Ask for the same bed four ways</h2>
+      <p>“The user (or automaton)”: one resource has to serve both. Content negotiation is how one server does it without two APIs. Pick what the client sends; the request and the answer's headers are the real ones, with the token hidden.</p>
+      <div class="picker">
+        <div class="choices" role="group" aria-label="Representation">
+          <button type="button" class="people" data-pick="html" aria-pressed="true">A browser</button>
+          <button type="button" class="ramp" data-pick="halforms" aria-pressed="false">HAL-FORMS</button>
+          <button type="button" class="agent" data-pick="l0" aria-pressed="false">HAL Schema Forms, L0</button>
+          <button type="button" class="agent" data-pick="l2" aria-pressed="false">HAL Schema Forms, L2</button>
+        </div>
+        <p id="pick-why"></p>
+        <div class="exchange">
+          <div><span class="label">Request</span><pre id="pick-req"></pre></div>
+          <div><span class="label">Answer</span><pre id="pick-res"></pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="col sticky">
+      <h3>How the server decides</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Accept sent</th><th>Answer</th></tr></thead>
+        <tbody>
+          <tr><td><code>text/html,…,*/*;q=0.8</code><br><span class="grey">What every browser sends: HTML named above both HEART types.</span></td><td><span class="tag people">HTML</span></td></tr>
+          <tr><td><code>application/prs.hal-forms+json</code><br><span class="grey">Named outright.</span></td><td><span class="tag ramp">HAL-FORMS</span></td></tr>
+          <tr><td><code>application/hal+json</code><br><span class="grey">Named outright; <code>Prefer</code> picks the rung.</span></td><td><span class="tag agent">HAL Schema Forms</span></td></tr>
+          <tr><td><code>application/hal+json, text/html;q=0.5</code><br><span class="grey">Highest q wins: this agent prefers HEART.</span></td><td><span class="tag agent">HAL Schema Forms</span></td></tr>
+          <tr><td><code>*/*</code><br><span class="grey">A wildcard never picks HTML, so a client that names nothing still gets controls it can act on: the default dialect. Captured: <code>HTTP/1.1 200 OK</code>, <code>application/prs.hal-forms+json</code>.</span></td><td><span class="tag ramp">HAL-FORMS</span></td></tr>
+          <tr><td><code>image/png</code><br><span class="grey">Nothing the server produces. Captured: <code>HTTP/1.1 406 Not Acceptable</code>.</span></td><td><b>406</b></td></tr>
+        </tbody>
+      </table></div>
+      <p><code>Accept-Profile</code> can name a HEART profile when <code>Accept</code> says only <code>*/*</code>. Every answer lists what it varies by in <code>Vary</code>, so a cache never hands HTML to an agent or JSON to a browser.</p>
+    </div>
+  </div>
+  <blockquote>
+    <p>“The media type identifies a specification that defines how a representation is to be processed.  That is out-of-band information (all communication is dependent on some prior knowledge).  What you are missing is that each representation contains the specific instructions for interfacing with a given service, provided in-band.  The media type is a generic processing model that every agent can learn if there aren’t too many of them (hence the need for standards). The representation is specific to the application being performed by the agent.  Each representation therefore provides the transitions that are available at that point in the application.”</p>
+    <cite>Roy T. Fielding, comment of October 23, 2008, on the same post</cite>
+  </blockquote>
+</section>
+
+<section id="people" class="band people">
+  <span class="tag">For people</span>
+  <div class="split">
+    <div class="col">
+      <h2>HTML: the page a person reads</h2>
+      <p>A browser knows one media type and nothing about gardens. It gets the bed's state as tiles that fill the screen, and one button per act in the type's own order, in a column beside it. Water the bed is offered. Sow a seed and Harvest the crop are greyed, and pressing one shows the server's reason. heart-core renders the page from the same declaration as the JSON, so the two always offer the same acts.</p>
+      <blockquote>
+        <p>“Think of it in terms of the Web.  How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource?  None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links.  A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions.”</p>
+        <cite>Roy T. Fielding, comment of October 20, 2008</cite>
+      </blockquote>
+      <details class="people">
+        <summary>The answer's headers <span class="meta">3567 bytes</span></summary>
+        <div class="inner"><pre><span class="h">HTTP/1.1 200 OK</span>
+<span class="h">Content-Type:</span> text/html;charset=UTF-8
+<span class="h">ETag:</span> "seq-3.html.L0.5a5247872fd134d6"
+<span class="h">Cache-Control:</span> no-cache
+<span class="h">Vary:</span> Accept
+
+<span class="c">Asked again with If-None-Match:</span>
+<span class="h">HTTP/1.1 304 Not Modified</span>
+<span class="h">ETag:</span> "seq-3.html.L0.5a5247872fd134d6"
+<span class="h">Cache-Control:</span> no-cache
+<span class="h">Vary:</span> Accept</pre>
+        <p>The page has its own ETag, tagged <code>html</code>, and is revalidated on every visit like any HEART resource; asked again with it, it answers <code>304 Not Modified</code>. It sends no profile link: HTML is an on-ramp outside the HEART profile, as plain JSON is.</p></div>
+      </details>
+      <details class="people">
+        <summary>The HTML itself <span class="meta">abridged</span></summary>
+        <div class="inner"><pre>&lt;<span <span class="a">class</span>="t">title</span>&gt;bed-1&lt;/<span <span class="a">class</span>="t">title</span>&gt;
+&lt;<span <span class="a">class</span>="t">link</span> <span class="a">rel</span>="stylesheet" <span class="a">href</span>="/heart/assets/heart.f49413dd9009.css"&gt;
+&lt;<span <span class="a">class</span>="t">script</span> defer <span class="a">src</span>="/heart/assets/htmx-2.0.4.min.e209dda5c823.js"&gt;
+&lt;/<span <span class="a">class</span>="t">script</span>&gt;
+&lt;<span <span class="a">class</span>="t">script</span> defer <span class="a">src</span>="/heart/assets/ajv2020-8.17.1.min.d2f97a24636c.js"&gt;
+&lt;/<span <span class="a">class</span>="t">script</span>&gt;
+&lt;<span <span class="a">class</span>="t">script</span> defer <span class="a">src</span>="/heart/assets/heart-forms.e3ecd1103c5a.js"&gt;
+&lt;/<span <span class="a">class</span>="t">script</span>&gt;
+&lt;/<span <span class="a">class</span>="t">head</span>&gt;
+&lt;<span <span class="a">class</span>="t">body</span> <span class="a">hx-headers</span>='{"Accept": "text/html"}'&gt;
+&lt;<span <span class="a">class</span>="t">main</span> <span class="a">id</span>="resource" <span class="a">data-etag</span>="&amp;quot;seq-3.html.L0.5a5247872fd134d6&amp;quot;"&gt;
+&lt;<span <span class="a">class</span>="t">h1</span>&gt;bed-1&lt;/<span <span class="a">class</span>="t">h1</span>&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="layout"&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="info"&gt;
+&lt;<span <span class="a">class</span>="t">dl</span> <span class="a">class</span>="state"&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="member"&gt;
+&lt;<span <span class="a">class</span>="t">dt</span> <span class="a">title</span>="id"&gt;Id&lt;/<span <span class="a">class</span>="t">dt</span>&gt;
+&lt;<span <span class="a">class</span>="t">dd</span>&gt;1&lt;/<span <span class="a">class</span>="t">dd</span>&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="member"&gt;
+&lt;<span <span class="a">class</span>="t">dt</span> <span class="a">title</span>="label"&gt;Label&lt;/<span <span class="a">class</span>="t">dt</span>&gt;
+&lt;<span <span class="a">class</span>="t">dd</span>&gt;bed-1&lt;/<span <span class="a">class</span>="t">dd</span>&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+<span class="c">&lt;!-- … six more members … --&gt;</span>
+&lt;/<span <span class="a">class</span>="t">dl</span>&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+&lt;<span <span class="a">class</span>="t">aside</span> <span class="a">class</span>="side" <span class="a">aria-label</span>="Acts"&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="acts" <span class="a">role</span>="toolbar" <span class="a">aria-label</span>="Acts"&gt;
+&lt;<span <span class="a">class</span>="t">button</span> <span class="a">type</span>="button" <span class="a">class</span>="act" <span class="a">data-rel</span>="garden:sow-seed" <span class="a">aria-disabled</span>="true" <span class="a">aria-describedby</span>="why-garden-sow-seed"&gt;Sow a seed&lt;/<span <span class="a">class</span>="t">button</span>&gt;
+&lt;<span <span class="a">class</span>="t">span</span> <span class="a">class</span>="why" <span class="a">id</span>="why-garden-sow-seed" hidden&gt;The bed is already planted.&lt;/<span <span class="a">class</span>="t">span</span>&gt;
+&lt;<span <span class="a">class</span>="t">button</span> <span class="a">type</span>="button" <span class="a">class</span>="act" <span class="a">data-rel</span>="garden:water-cell" <span class="a">data-dialog</span>="act-garden-water-cell"&gt;Water the bed&lt;/<span <span class="a">class</span>="t">button</span>&gt;
+&lt;<span <span class="a">class</span>="t">button</span> <span class="a">type</span>="button" <span class="a">class</span>="act" <span class="a">data-rel</span>="garden:harvest" <span class="a">aria-disabled</span>="true" <span class="a">aria-describedby</span>="why-garden-harvest"&gt;Harvest the crop&lt;/<span <span class="a">class</span>="t">button</span>&gt;
+&lt;<span <span class="a">class</span>="t">span</span> <span class="a">class</span>="why" <span class="a">id</span>="why-garden-harvest" hidden&gt;The crop is not ready yet; it needs more water to grow.&lt;/<span <span class="a">class</span>="t">span</span>&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+&lt;/<span <span class="a">class</span>="t">aside</span>&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+&lt;<span <span class="a">class</span>="t">dialog</span> <span class="a">id</span>="act-garden-water-cell" <span class="a">aria-labelledby</span>="act-garden-water-cell-title"&gt;
+&lt;<span <span class="a">class</span>="t">form</span> <span class="a">data-rel</span>="garden:water-cell" <span class="a">hx-post</span>="/beds/1/actions/water-cell" <span class="a">hx-headers</span>="{&amp;quot;If-Match&amp;quot;:&amp;quot;\&amp;quot;seq-3.html.L0.5a5247872fd134d6\&amp;quot;&amp;quot;,&amp;quot;Accept&amp;quot;:&amp;quot;text/html&amp;quot;}" <span class="a">hx-target</span>="#resource" <span class="a">hx-select</span>="#resource" <span class="a">hx-swap</span>="outerHTML"&gt;
+&lt;<span <span class="a">class</span>="t">h2</span> <span class="a">id</span>="act-garden-water-cell-title"&gt;Water the bed&lt;/<span <span class="a">class</span>="t">h2</span>&gt;
+&lt;<span <span class="a">class</span>="t">p</span> <span class="a">class</span>="desc"&gt;Pours water into every cell of a planted bed. Enough water makes it ready to harvest.&lt;/<span <span class="a">class</span>="t">p</span>&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="field"&gt;
+&lt;<span <span class="a">class</span>="t">label</span> <span class="a">for</span>="act-garden-water-cell-milliliters"&gt;Water per cell&lt;<span <span class="a">class</span>="t">span</span> <span class="a">class</span>="required" <span class="a">aria-hidden</span>="true"&gt;*&lt;/<span <span class="a">class</span>="t">span</span>&gt;
+&lt;/<span <span class="a">class</span>="t">label</span>&gt;
+&lt;<span <span class="a">class</span>="t">input</span> <span class="a">type</span>="number" <span class="a">id</span>="act-garden-water-cell-milliliters" <span class="a">name</span>="milliliters" required <span class="a">min</span>="1" <span class="a">max</span>="1000" <span class="a">step</span>="1" <span class="a">placeholder</span>="250" <span class="a">aria-describedby</span>="act-garden-water-cell-milliliters-hint"&gt;
+&lt;<span <span class="a">class</span>="t">p</span> <span class="a">class</span>="hint" <span class="a">id</span>="act-garden-water-cell-milliliters-hint"&gt;Millilitres of water poured into each cell&lt;/<span <span class="a">class</span>="t">p</span>&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+&lt;<span <span class="a">class</span>="t">script</span> <span class="a">type</span>="application/schema+json" <span class="a">class</span>="schema"&gt;{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"milliliters":{"description":"Millilitres of water poured into each cell","examples":[250],"maximum":1000,"minimum":1,"title":"Water per cell","type":"integer"}},"required":["milliliters"],"title":"Water Cell","type":"object","$id":"/schemas/7f232c04c52671dd"}&lt;/<span <span class="a">class</span>="t">script</span>&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="problem" <span class="a">role</span>="alert" hidden&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+&lt;<span <span class="a">class</span>="t">div</span> <span class="a">class</span>="buttons"&gt;
+&lt;<span <span class="a">class</span>="t">button</span> <span class="a">type</span>="button" <span class="a">class</span>="quiet" data-close&gt;Cancel&lt;/<span <span class="a">class</span>="t">button</span>&gt;
+&lt;<span <span class="a">class</span>="t">button</span> <span class="a">type</span>="submit"&gt;Water the bed&lt;/<span <span class="a">class</span>="t">button</span>&gt;
+&lt;/<span <span class="a">class</span>="t">div</span>&gt;
+&lt;/<span <span class="a">class</span>="t">form</span>&gt;
+&lt;/<span <span class="a">class</span>="t">dialog</span>&gt;</pre>
+        <p>Each greyed button keeps its slot and stays focusable; its reason is the element it is described by. The dialog's form sends by its act's method to its act's target, with the page's ETag as <code>If-Match</code>. It carries the act's whole JSON Schema, which the browser checks with Ajv before sending anything. htmx, Ajv, the script and the stylesheet are served by the garden itself, under names that hold their content's hash.</p></div>
+      </details>
+    </div>
+    <div class="col">
+      <figure>
+        <img class="shot-light" src="bed-light.png" alt="The bed as a page: its state as tiles, the acts in a column beside it, Harvest's reason shown">
+        <img class="shot-dark" src="bed-dark.png" alt="The bed as a page: its state as tiles, the acts in a column beside it, Harvest's reason shown">
+        <figcaption>Harvest pressed: “The crop is not ready yet; it needs more water to grow.”</figcaption>
+      </figure>
+      <figure>
+        <img class="shot-light" src="dialog-light.png" alt="The Water the bed dialog over the page">
+        <img class="shot-dark" src="dialog-dark.png" alt="The Water the bed dialog over the page">
+        <figcaption>Water opens a dialog built from the act's JSON Schema: label, bounds, hint, and the whole schema checked before sending.</figcaption>
+      </figure>
+      <figure>
+        <img class="shot-light" src="pr-light.png" alt="A GitHub pull request through the HEART gateway, as the same kind of page">
+        <img class="shot-dark" src="pr-dark.png" alt="A GitHub pull request through the HEART gateway, as the same kind of page">
+        <figcaption>The same renderer, no garden or GitHub code: a pull request through the HEART GitHub gateway. Merge and Reopen greyed.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="ramp" class="band ramp">
+  <span class="tag">For agents: the on-ramp</span>
+  <div class="split">
+    <div class="col">
+      <h2>HAL-FORMS: templates any HAL toolchain already reads</h2>
+      <p>HAL-FORMS is an existing media type with existing clients, such as Spring HATEOAS. HEART serves it so a team can start with tools it already has. The bed comes back with one template per offered act: its method, target and properties. An agent can act without reading any documentation.</p>
+      <blockquote>
+        <p>“Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.”</p>
+        <cite>Roy T. Fielding, comment of October 20, 2008</cite>
+      </blockquote>
+      <h3>What the on-ramp leaves out</h3>
+      <div class="tablewrap"><table>
+        <thead><tr><th>HAL-FORMS says</th><th>It cannot say</th></tr></thead>
+        <tbody>
+          <tr><td>Which acts are offered now: only <code>waterCell</code></td><td>Why Sow and Harvest are missing. They simply aren't there, so an agent can't tell “not now” from “never”.</td></tr>
+          <tr><td><code>"type": "number"</code>, <code>min</code>, <code>max</code>, <code>required</code></td><td>That the number is an integer, or any rule over several fields. It has no JSON Schema.</td></tr>
+          <tr><td>Everything inline, in one answer</td><td>Anything to cache. Every read carries every template again; <code>Prefer</code> is ignored.</td></tr>
+          <tr><td>A target per template</td><td>A hash proving a template is the one the server declared.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div class="col">
+      <div class="stack">
+        <pre class="ramp"><span class="h">GET /beds/1 HTTP/1.1</span>
+<span class="h">Host:</span> localhost:8080
+<span class="h">Accept:</span> application/prs.hal-forms+json
+<span class="h">Authorization:</span> Bearer &lt;token&gt;</pre>
+        <pre class="ramp"><span class="h">HTTP/1.1 200 OK</span>
+<span class="h">Content-Type:</span> application/prs.hal-forms+json
+<span class="h">ETag:</span> "seq-3.hf.L0.492dcdff0322b24d"
+<span class="h">Cache-Control:</span> no-cache
+<span class="h">Link:</span> &lt;https://w3id.org/heart-rise/hal-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
+<span class="h">Vary:</span> Accept, Accept-Profile</pre>
+        <pre class="ramp">{
+  <span class="k">"id"</span>: <span class="n">1</span>,
+  <span class="k">"label"</span>: <span class="s">"bed-1"</span>,
+  <span class="k">"widthFt"</span>: <span class="n">4</span>,
+  <span class="k">"lengthFt"</span>: <span class="n">8</span>,
+  <span class="k">"status"</span>: <span class="s">"PLANTED"</span>,
+  <span class="k">"cropName"</span>: <span class="s">"basil"</span>,
+  <span class="k">"growthPoints"</span>: <span class="n">6</span>,
+  <span class="k">"moistureLevel"</span>: <span class="n">3</span>,
+  <span class="k">"_links"</span>: {
+    <span class="k">"self"</span>: {
+      <span class="k">"href"</span>: <span class="s">"/beds/1"</span>
+    }
+  },
+  <span class="k">"_templates"</span>: {
+    <span class="k">"waterCell"</span>: {
+      <span class="k">"title"</span>: <span class="s">"Water the bed"</span>,
+      <span class="k">"method"</span>: <span class="s">"POST"</span>,
+      <span class="k">"contentType"</span>: <span class="s">"application/json"</span>,
+      <span class="k">"target"</span>: <span class="s">"/beds/1/actions/water-cell"</span>,
+      <span class="k">"properties"</span>: [
+        {
+          <span class="k">"name"</span>: <span class="s">"milliliters"</span>,
+          <span class="k">"prompt"</span>: <span class="s">"Water per cell"</span>,
+          <span class="k">"required"</span>: <span class="l">true</span>,
+          <span class="k">"type"</span>: <span class="s">"number"</span>,
+          <span class="k">"min"</span>: <span class="n">1</span>,
+          <span class="k">"max"</span>: <span class="n">1000</span>
+        }
+      ]
+    }
+  }
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="agent" class="band agent">
+  <span class="tag">For agents: full speed</span>
+  <div class="split even">
+    <div class="col">
+      <h2>HAL Schema Forms: the same bed, in layers an agent can cache</h2>
+      <p>HEART's own dialect splits a resource into three layers that change at different speeds. Only Layer 1 changes when the bed does. The forms and schemas are named by their content, so an address never changes meaning; they are served <code>immutable</code> for a year and shared by every resource in the same state.</p>
+    </div>
+    <div class="col">
+      <div class="ladder">
+        <div class="rung"><b>Layer 1 · the bed</b><small>State, links, and a link to its forms. <code>no-cache</code>: revalidated every time; a 304 costs no body.</small></div>
+        <div class="rung"><b>Layer 2 · the affordance set</b><small>The forms its state allows, and why the rest are absent. One per state, shared. <code>immutable</code>.</small></div>
+        <div class="rung"><b>Layer 3 · the schemas</b><small>Each act's JSON Schema 2020-12, named by its hash. <code>immutable</code>.</small></div>
+      </div>
+      <div class="rungs">
+        <div><b>Prefer: (none)</b>L0: all three layers in one answer.</div>
+        <div><b>Prefer: forms=link</b>L1: forms by link, schemas inside them.</div>
+        <div><b>Prefer: forms=link, schema=link</b>L2: forms and schemas by link.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="split even">
+    <div class="col">
+      <h3>L0: one hop, everything inline</h3>
+      <pre class="agent"><span class="h">GET /beds/1 HTTP/1.1</span>
+<span class="h">Host:</span> localhost:8080
+<span class="h">Accept:</span> application/hal+json
+<span class="h">Authorization:</span> Bearer &lt;token&gt;</pre>
+      <pre class="agent"><span class="h">HTTP/1.1 200 OK</span>
+<span class="h">Content-Type:</span> application/hal+json
+<span class="h">ETag:</span> "seq-3.hsf.L0.9d906584184b9119"
+<span class="h">Cache-Control:</span> no-cache
+<span class="h">Link:</span> &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
+<span class="h">Vary:</span> Accept, Prefer, Accept-Profile</pre>
+      <details class="agent">
+        <summary>The bed at L0 <span class="meta">1143 bytes</span></summary>
+        <div class="inner"><pre>{
+  <span class="k">"id"</span>: <span class="n">1</span>,
+  <span class="k">"label"</span>: <span class="s">"bed-1"</span>,
+  <span class="k">"widthFt"</span>: <span class="n">4</span>,
+  <span class="k">"lengthFt"</span>: <span class="n">8</span>,
+  <span class="k">"status"</span>: <span class="s">"PLANTED"</span>,
+  <span class="k">"cropName"</span>: <span class="s">"basil"</span>,
+  <span class="k">"growthPoints"</span>: <span class="n">6</span>,
+  <span class="k">"moistureLevel"</span>: <span class="n">3</span>,
+  <span class="k">"_links"</span>: {
+    <span class="k">"self"</span>: {
+      <span class="k">"href"</span>: <span class="s">"/beds/1"</span>
+    },
+    <span class="k">"curies"</span>: [
+      {
+        <span class="k">"name"</span>: <span class="s">"garden"</span>,
+        <span class="k">"href"</span>: <span class="s">"/profiles/garden#{rel}"</span>,
+        <span class="k">"templated"</span>: <span class="l">true</span>
+      },
+      {
+        <span class="k">"name"</span>: <span class="s">"hr"</span>,
+        <span class="k">"href"</span>: <span class="s">"https://w3id.org/heart-rise/rels/{rel}"</span>,
+        <span class="k">"templated"</span>: <span class="l">true</span>
+      }
+    ],
+    <span class="k">"hr:unavailable"</span>: {
+      <span class="k">"href"</span>: <span class="s">"/unavailable/1648f3dc5307f159"</span>,
+      <span class="k">"type"</span>: <span class="s">"application/json"</span>,
+      <span class="k">"integrity"</span>: <span class="s">"sha256-Fkjz3FMH8VnKolwCT8ID7fvf1jvy2LKP83Ge1Xk4UOA="</span>
+    }
+  },
+  <span class="k">"_forms"</span>: {
+    <span class="k">"garden:water-cell"</span>: {
+      <span class="k">"title"</span>: <span class="s">"Water the bed"</span>,
+      <span class="k">"description"</span>: <span class="s">"Pours water into every cell of a planted bed. Enough water makes it ready to harvest."</span>,
+      <span class="k">"_links"</span>: {
+        <span class="k">"target"</span>: {
+          <span class="k">"href"</span>: <span class="s">"/beds/1/actions/water-cell"</span>
+        }
+      },
+      <span class="k">"method"</span>: <span class="s">"POST"</span>,
+      <span class="k">"contentType"</span>: <span class="s">"application/json"</span>,
+      <span class="k">"schema"</span>: {
+        <span class="k">"$schema"</span>: <span class="s">"https://json-schema.org/draft/2020-12/schema"</span>,
+        <span class="k">"properties"</span>: {
+          <span class="k">"milliliters"</span>: {
+            <span class="k">"description"</span>: <span class="s">"Millilitres of water poured into each cell"</span>,
+            <span class="k">"examples"</span>: [
+              <span class="n">250</span>
+            ],
+            <span class="k">"maximum"</span>: <span class="n">1000</span>,
+            <span class="k">"minimum"</span>: <span class="n">1</span>,
+            <span class="k">"title"</span>: <span class="s">"Water per cell"</span>,
+            <span class="k">"type"</span>: <span class="s">"integer"</span>
+          }
+        },
+        <span class="k">"required"</span>: [
+          <span class="s">"milliliters"</span>
+        ],
+        <span class="k">"title"</span>: <span class="s">"Water Cell"</span>,
+        <span class="k">"type"</span>: <span class="s">"object"</span>,
+        <span class="k">"$id"</span>: <span class="s">"/schemas/7f232c04c52671dd"</span>
+      },
+      <span class="k">"hr:integrity"</span>: <span class="s">"sha256-PNINjwmbImFF1BjHGk9F/t6JIDu+xde09JqZZ5PL4cA="</span>
+    }
+  }
+}</pre></div>
+      </details>
+      <p>The form carries its whole JSON Schema, with <code>"type": "integer"</code>, and its own <code>hr:integrity</code>. The <code>hr:unavailable</code> link names why the other acts are absent, pinned by its hash.</p>
+    </div>
+    <div class="col">
+      <h3>L2: the bed alone, its forms by link</h3>
+      <pre class="agent"><span class="h">GET /beds/1 HTTP/1.1</span>
+<span class="h">Host:</span> localhost:8080
+<span class="h">Accept:</span> application/hal+json
+<span class="h">Prefer:</span> forms=link, schema=link
+<span class="h">Authorization:</span> Bearer &lt;token&gt;</pre>
+      <pre class="agent"><span class="h">HTTP/1.1 200 OK</span>
+<span class="h">Content-Type:</span> application/hal+json
+<span class="h">ETag:</span> "seq-3.hsf.L2.af94fd75c423f076"
+<span class="h">Cache-Control:</span> no-cache
+<span class="h">Link:</span> &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
+<span class="h">Vary:</span> Accept, Prefer, Accept-Profile
+<span class="h">Preference-Applied:</span> forms=link, schema=link</pre>
+      <details class="agent" open>
+        <summary>The bed at L2 <span class="meta">458 bytes</span></summary>
+        <div class="inner"><pre>{
+  <span class="k">"id"</span>: <span class="n">1</span>,
+  <span class="k">"label"</span>: <span class="s">"bed-1"</span>,
+  <span class="k">"widthFt"</span>: <span class="n">4</span>,
+  <span class="k">"lengthFt"</span>: <span class="n">8</span>,
+  <span class="k">"status"</span>: <span class="s">"PLANTED"</span>,
+  <span class="k">"cropName"</span>: <span class="s">"basil"</span>,
+  <span class="k">"growthPoints"</span>: <span class="n">6</span>,
+  <span class="k">"moistureLevel"</span>: <span class="n">3</span>,
+  <span class="k">"_links"</span>: {
+    <span class="k">"self"</span>: {
+      <span class="k">"href"</span>: <span class="s">"/beds/1"</span>
+    },
+    <span class="k">"curies"</span>: [
+      {
+        <span class="k">"name"</span>: <span class="s">"hr"</span>,
+        <span class="k">"href"</span>: <span class="s">"https://w3id.org/heart-rise/rels/{rel}"</span>,
+        <span class="k">"templated"</span>: <span class="l">true</span>
+      }
+    ],
+    <span class="k">"hr:forms"</span>: {
+      <span class="k">"href"</span>: <span class="s">"/affordance-sets/3931614f5ea55db8"</span>,
+      <span class="k">"type"</span>: <span class="s">"application/hal+json"</span>,
+      <span class="k">"profile"</span>: <span class="s">"https://w3id.org/heart-rise/hal-schema-forms"</span>,
+      <span class="k">"integrity"</span>: <span class="s">"sha256-OTFhT16lXbj5ZAU4iAt6FC0+tvo0YdHFlnxVcdtJbec="</span>
+    }
+  }
+}</pre></div>
+      </details>
+      <p><code>Preference-Applied</code> confirms the rung. <code>hr:forms</code> carries the set's address and the hash its bytes must match, so a cached copy can be trusted without asking.</p>
+    </div>
+  </div>
+
+  <div class="split even">
+    <div class="col">
+      <details class="agent" open>
+        <summary>Layer 2: the affordance set <span class="meta">824 bytes · immutable</span></summary>
+        <div class="inner"><pre><span class="h">HTTP/1.1 200 OK</span>
+<span class="h">Content-Type:</span> application/hal+json
+<span class="h">Cache-Control:</span> public, max-age=31536000, immutable
+<span class="h">Repr-Digest:</span> sha-256=:OTFhT16lXbj5ZAU4iAt6FC0+tvo0YdHFlnxVcdtJbec=:</pre><pre>{
+  <span class="k">"_forms"</span>: {
+    <span class="k">"garden:water-cell"</span>: {
+      <span class="k">"_links"</span>: {
+        <span class="k">"target"</span>: {
+          <span class="k">"href"</span>: <span class="s">"/beds/{id}/actions/water-cell"</span>,
+          <span class="k">"templated"</span>: <span class="l">true</span>
+        }
+      },
+      <span class="k">"contentType"</span>: <span class="s">"application/json"</span>,
+      <span class="k">"description"</span>: <span class="s">"Pours water into every cell of a planted bed. Enough water makes it ready to harvest."</span>,
+      <span class="k">"hr:integrity"</span>: <span class="s">"sha256-PNINjwmbImFF1BjHGk9F/t6JIDu+xde09JqZZ5PL4cA="</span>,
+      <span class="k">"hr:templatePointers"</span>: {
+        <span class="k">"id"</span>: <span class="s">"/id"</span>
+      },
+      <span class="k">"method"</span>: <span class="s">"POST"</span>,
+      <span class="k">"schema"</span>: {
+        <span class="k">"$ref"</span>: <span class="s">"/schemas/7f232c04c52671dd"</span>,
+        <span class="k">"hr:integrity"</span>: <span class="s">"sha256-fyMsBMUmcd0HdvI4xkfZO3dvViJqO0HdGynlKasuMdQ="</span>
+      },
+      <span class="k">"title"</span>: <span class="s">"Water the bed"</span>
+    }
+  },
+  <span class="k">"_links"</span>: {
+    <span class="k">"curies"</span>: [
+      {
+        <span class="k">"href"</span>: <span class="s">"/profiles/garden#{rel}"</span>,
+        <span class="k">"name"</span>: <span class="s">"garden"</span>,
+        <span class="k">"templated"</span>: <span class="l">true</span>
+      },
+      {
+        <span class="k">"href"</span>: <span class="s">"https://w3id.org/heart-rise/rels/{rel}"</span>,
+        <span class="k">"name"</span>: <span class="s">"hr"</span>,
+        <span class="k">"templated"</span>: <span class="l">true</span>
+      }
+    ],
+    <span class="k">"hr:unavailable"</span>: {
+      <span class="k">"href"</span>: <span class="s">"/unavailable/1648f3dc5307f159"</span>,
+      <span class="k">"integrity"</span>: <span class="s">"sha256-Fkjz3FMH8VnKolwCT8ID7fvf1jvy2LKP83Ge1Xk4UOA="</span>,
+      <span class="k">"type"</span>: <span class="s">"application/json"</span>
+    }
+  }
+}</pre>
+        <p>The target is a template, <code>/beds/{id}/actions/water-cell</code>, filled from the bed's own state by <code>hr:templatePointers</code>. No bed's address is inside it, so the same bytes serve every planted bed. Bed 4 is planted too, and its L2 answer links the very same set: <code>/affordance-sets/3931614f5ea55db8</code>.</p></div>
+      </details>
+    </div>
+    <div class="col">
+      <details class="agent">
+        <summary>Layer 3: the schema <span class="meta">298 bytes · immutable</span></summary>
+        <div class="inner"><pre><span class="h">HTTP/1.1 200 OK</span>
+<span class="h">Content-Type:</span> application/schema+json
+<span class="h">Cache-Control:</span> public, max-age=31536000, immutable
+<span class="h">Repr-Digest:</span> sha-256=:fyMsBMUmcd0HdvI4xkfZO3dvViJqO0HdGynlKasuMdQ=:</pre><pre>{
+  <span class="k">"$schema"</span>: <span class="s">"https://json-schema.org/draft/2020-12/schema"</span>,
+  <span class="k">"properties"</span>: {
+    <span class="k">"milliliters"</span>: {
+      <span class="k">"description"</span>: <span class="s">"Millilitres of water poured into each cell"</span>,
+      <span class="k">"examples"</span>: [
+        <span class="n">250</span>
+      ],
+      <span class="k">"maximum"</span>: <span class="n">1000</span>,
+      <span class="k">"minimum"</span>: <span class="n">1</span>,
+      <span class="k">"title"</span>: <span class="s">"Water per cell"</span>,
+      <span class="k">"type"</span>: <span class="s">"integer"</span>
+    }
+  },
+  <span class="k">"required"</span>: [
+    <span class="s">"milliliters"</span>
+  ],
+  <span class="k">"title"</span>: <span class="s">"Water Cell"</span>,
+  <span class="k">"type"</span>: <span class="s">"object"</span>
+}</pre></div>
+      </details>
+      <details class="agent">
+        <summary>Why the other acts are absent <span class="meta">242 bytes · immutable</span></summary>
+        <div class="inner"><pre>{
+  <span class="k">"unavailable"</span>: [
+    {
+      <span class="k">"reason"</span>: <span class="s">"The bed is already planted."</span>,
+      <span class="k">"rel"</span>: <span class="s">"/profiles/garden#sow-seed"</span>,
+      <span class="k">"title"</span>: <span class="s">"Sow a seed"</span>
+    },
+    {
+      <span class="k">"reason"</span>: <span class="s">"The crop is not ready yet; it needs more water to grow."</span>,
+      <span class="k">"rel"</span>: <span class="s">"/profiles/garden#harvest"</span>,
+      <span class="k">"title"</span>: <span class="s">"Harvest the crop"</span>
+    }
+  ]
+}</pre>
+        <p>The same reasons the page shows on its greyed buttons, for an agent: what is not allowed now, and what would allow it.</p></div>
+      </details>
+      <details class="agent">
+        <summary>Asked again: 304, and the rest from cache</summary>
+        <div class="inner"><pre><span class="h">GET /beds/1 HTTP/1.1</span>
+<span class="h">Host:</span> localhost:8080
+<span class="h">Accept:</span> application/hal+json
+<span class="h">Prefer:</span> forms=link, schema=link
+<span class="h">If-None-Match:</span> "seq-3.hsf.L2.af94fd75c423f076"
+<span class="h">Authorization:</span> Bearer &lt;token&gt;</pre><pre><span class="h">HTTP/1.1 304 Not Modified</span>
+<span class="h">ETag:</span> "seq-3.hsf.L2.af94fd75c423f076"
+<span class="h">Cache-Control:</span> no-cache
+<span class="h">Link:</span> &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
+<span class="h">Vary:</span> Accept, Prefer, Accept-Profile
+<span class="h">Preference-Applied:</span> forms=link, schema=link</pre>
+        <p>The bed is unchanged, so the answer has no body. The set, the schema and the explanation were cached as immutable, so they are not asked for at all.</p></div>
+      </details>
+    </div>
+  </div>
+
+  <div class="split even">
+    <div class="col">
+      <h3>What crosses the wire</h3>
+      <div class="bars" role="img" aria-label="Bytes per visit for each representation">
+        <div class="bar"><span>HTML page</span><div class="track"><div class="fill p" style="width:100.00%"></div></div><span class="v">3567 B</span></div>
+        <div class="bar"><span>HAL-FORMS, any visit</span><div class="track"><div class="fill r" style="width:11.61%"></div></div><span class="v">414 B</span></div>
+        <div class="bar"><span>HAL Schema Forms L0, any visit</span><div class="track"><div class="fill l1" style="width:32.04%"></div></div><span class="v">1143 B</span></div>
+        <div class="bar"><span>L2, first visit</span><div class="track"><div class="fill l1" style="width:12.84%"></div><div class="fill l2" style="width:23.10%"></div><div class="fill l3" style="width:15.14%"></div></div><span class="v">1822 B</span></div>
+        <div class="bar"><span>L2, bed unchanged</span><div class="track"></div><span class="v">304, 0 B</span></div>
+        <div class="bar"><span>L2, bed 4, same state</span><div class="track"><div class="fill l1" style="width:12.90%"></div></div><span class="v">460 B</span></div>
+        <div class="key"><span style="--sw: var(--people)">HTML page</span><span style="--sw: var(--ramp)">HAL-FORMS</span><span style="--sw: var(--agent)">Layer 1</span><span style="--sw: color-mix(in srgb, var(--agent) 55%, transparent)">Layer 2</span><span style="--sw: color-mix(in srgb, var(--agent) 28%, transparent)">Layer 3 and why absent</span></div>
+      </div>
+      <p>L2's first visit takes four requests and about as many bytes as L0. Every visit after that, and every other bed in the same state, costs Layer 1 alone: an agent walking many beds learns the forms once.</p>
+    </div>
+    <div class="col">
+      <blockquote>
+        <p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand).  [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p>
+        <cite>Roy T. Fielding, “REST APIs must be hypertext-driven”, October 20, 2008</cite>
+      </blockquote>
+      <p>“Appropriate for the intended audience” is the whole argument for three representations. Each audience gets a standard it already understands, and in every one of them the choices are the server's, present in the answer.</p>
+    </div>
+  </div>
+</section>
+
+<section id="same">
+  <div class="split wide-left">
+    <div class="col">
+      <span class="eyebrow">One truth, three forms</span>
+      <h2>Every representation offers the same acts</h2>
+      <div class="tablewrap"><table>
+        <thead><tr><th>Act</th><th style="color:var(--people)">HTML</th><th style="color:var(--ramp)">HAL-FORMS</th><th style="color:var(--agent)">HAL Schema Forms</th></tr></thead>
+        <tbody>
+          <tr><td>Water the bed</td><td class="yes">Button and dialog</td><td class="yes">Template <code>waterCell</code></td><td class="yes">Form <code>garden:water-cell</code></td></tr>
+          <tr><td>Sow a seed</td><td class="grey">Greyed: “The bed is already planted.”</td><td class="grey">Absent, silently</td><td class="grey">Absent; <code>hr:unavailable</code> says why</td></tr>
+          <tr><td>Harvest the crop</td><td class="grey">Greyed: “The crop is not ready yet; it needs more water to grow.”</td><td class="grey">Absent, silently</td><td class="grey">Absent; <code>hr:unavailable</code> says why</td></tr>
+        </tbody>
+      </table></div>
+      <p>All three are rendered by heart-core from one declaration and one decision about what the bed's state allows. A test reads the HTML and the JSON of the same bed and fails if their acts differ.</p>
+    </div>
+    <div class="col">
+      <blockquote>
+        <p>“When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p>
+        <cite>Roy T. Fielding, comment of October 23, 2008</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<section id="rules">
+  <span class="eyebrow">The 2008 rules, checked</span>
+  <h2>Fielding's rules, and where each lives here</h2>
+  <div class="rules">
+    <details>
+      <summary>Descriptive effort goes into media types</summary>
+      <div class="inner">
+        <blockquote><p>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]”</p></blockquote>
+        <p>HEART's effort is HAL Schema Forms, a profile of HAL, plus relation names in an ALPS profile per domain (<code>garden:water-cell</code>). Method and target come with each form; nothing says “POST to /beds/{id}/actions/water-cell” anywhere but the representation.</p>
+      </div>
+    </details>
+    <details>
+      <summary>No fixed resource names: the server says how to build its URIs</summary>
+      <div class="inner">
+        <blockquote><p>“A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace. Instead, allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates, by defining those instructions within media types and link relations. [Failure here implies that clients are assuming a resource structure due to out-of band information, such as a domain-specific standard, which is the data-oriented equivalent to RPC’s functional coupling].”</p></blockquote>
+        <p>The shared affordance set's target is a URI template filled by JSON Pointers into the bed's own state. The page's search and lookup forms fill their templates the same way, in the browser.</p>
+      </div>
+    </details>
+    <details>
+      <summary>No typed resources the client depends on</summary>
+      <div class="inner">
+        <blockquote><p>“A REST API should never have “typed” resources that are significant to the client. Specification authors may use resource types for describing server implementation behind the interface, but those types must be irrelevant and invisible to the client. The only types that are significant to a client are the current representation’s media type and standardized relation names. [ditto]”</p></blockquote>
+        <p>The browser page, ARTIE and a HAL-FORMS client all work on any HEART service. None has garden code. They know the media type and the relation names the answer itself carries.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Not tied to one protocol</summary>
+      <div class="inner">
+        <blockquote><p>“A REST API should not be dependent on any single communication protocol, though its successful mapping to a given protocol may be dependent on the availability of metadata, choice of methods, etc. In general, any protocol element that uses a URI for identification must allow any URI scheme to be used for the sake of that identification. [Failure here implies that identification is not separated from interaction.]”</p></blockquote>
+        <p>The same declaration is served over HTTP by two bindings, heart-spring and heart-http4k, and over CoAP. Negotiation, validators and refusals are decided in heart-core; each binding only carries them.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Prior knowledge, concentrated into standards</summary>
+      <div class="inner">
+        <blockquote><p>“Of course the client has prior knowledge.  Every protocol, every media type definition, every URI scheme, and every link relationship type constitutes prior knowledge that the client must know (or learn) in order to make use of that knowledge. REST doesn’t eliminate the need for a clue.  What REST does is concentrate that need for prior knowledge into readily standardizable forms. That is the essential distinction between data-oriented and control-oriented integration.”</p><cite>Roy T. Fielding, comment of October 22, 2008</cite></blockquote>
+        <p>That is the choice content negotiation offers each client: HTML for any browser, HAL-FORMS for existing HAL tools, HAL Schema Forms for agents that learn one more standard and get caching, integrity and reasons for it.</p>
+      </div>
+    </details>
+    <details>
+      <summary>Agents need the vocabulary in the representation</summary>
+      <div class="inner">
+        <blockquote><p>“Automated agents are dependent on their understanding of the media types, link types, or microformat extensions provided in representations. It is the same basic issue as with human communication: we will always need a common vocabulary to make sense of it. Exposing that vocabulary in the representations makes it easy to learn and be adopted by others. Some of it will be standardized, some of it will be domain-specific, but ultimately the agents will have to be adaptable to new vocabulary.”</p><cite>Roy T. Fielding, comment of October 21, 2008</cite></blockquote>
+        <p>Each form carries its title, description and JSON Schema; each relation is a CURIE that expands to its ALPS descriptor at <code>/profiles/garden</code>. The domain's vocabulary travels with the answer.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<footer>
+  <span>Captured from the HEART garden server (heart-spring) at http://localhost:8080 on October 30, 2026; screenshots from headless Chrome, the pull request through the HEART GitHub gateway. Bearer tokens are shown as &lt;token&gt;.</span>
+  <span>Quotations are verbatim from Roy T. Fielding's post “REST APIs must be hypertext-driven” (Untangled, October 20, 2008) and his own replies in its comments.</span>
+</footer>
+</div>
+
+<script>
+(function () {
+  var picks = {"html":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> text/html;charset=UTF-8\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.html.L0.5a5247872fd134d6\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Vary:\u003c/span> Accept","band":"people","why":"A browser names text/html first, so it gets the page for people: its own validator, varying by Accept alone, and no HEART profile."},"halforms":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> application/prs.hal-forms+json\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> application/prs.hal-forms+json\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.hf.L0.492dcdff0322b24d\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Link:\u003c/span> &lt;https://w3id.org/heart-rise/hal-forms&gt;; rel=\"profile\", &lt;https://w3id.org/heart-rise&gt;; rel=\"profile\"\n\u003cspan class=\"h\">Vary:\u003c/span> Accept, Accept-Profile","band":"ramp","why":"Names HAL-FORMS, so it gets the on-ramp: one template per offered act, everything inline, profile hal-forms."},"l0":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> application/hal+json\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> application/hal+json\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.hsf.L0.9d906584184b9119\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Link:\u003c/span> &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=\"profile\", &lt;https://w3id.org/heart-rise&gt;; rel=\"profile\"\n\u003cspan class=\"h\">Vary:\u003c/span> Accept, Prefer, Accept-Profile","band":"agent","why":"Names HAL Schema Forms and prefers nothing, so every layer comes inline: L0, one hop."},"l2":{"req":"\u003cspan class=\"h\">GET /beds/1 HTTP/1.1\u003c/span>\n\u003cspan class=\"h\">Host:\u003c/span> localhost:8080\n\u003cspan class=\"h\">Accept:\u003c/span> application/hal+json\n\u003cspan class=\"h\">Prefer:\u003c/span> forms=link, schema=link\n\u003cspan class=\"h\">Authorization:\u003c/span> Bearer &lt;token&gt;","res":"\u003cspan class=\"h\">HTTP/1.1 200 OK\u003c/span>\n\u003cspan class=\"h\">Content-Type:\u003c/span> application/hal+json\n\u003cspan class=\"h\">ETag:\u003c/span> \"seq-3.hsf.L2.af94fd75c423f076\"\n\u003cspan class=\"h\">Cache-Control:\u003c/span> no-cache\n\u003cspan class=\"h\">Link:\u003c/span> &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel=\"profile\", &lt;https://w3id.org/heart-rise&gt;; rel=\"profile\"\n\u003cspan class=\"h\">Vary:\u003c/span> Accept, Prefer, Accept-Profile\n\u003cspan class=\"h\">Preference-Applied:\u003c/span> forms=link, schema=link","band":"agent","why":"Prefers forms and schemas by link: Layer 1 alone, linking what it can cache for a year. Preference-Applied confirms it."}};
+  var buttons = document.querySelectorAll('[data-pick]');
+  function show(name) {
+    var p = picks[name];
+    var req = document.getElementById('pick-req');
+    var res = document.getElementById('pick-res');
+    req.innerHTML = p.req; res.innerHTML = p.res;
+    req.className = res.className = p.band;
+    document.getElementById('pick-why').textContent = p.why;
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-pick') === name)); });
+  }
+  buttons.forEach(function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-pick')); }); });
+  show('html');
+})();
+</script>
+</body>
+</html>
