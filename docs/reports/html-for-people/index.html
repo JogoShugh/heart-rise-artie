@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HEART in a Browser</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one reading column; a short table of what is built, then screenshots in pairs, each captioned. */
+:root {
+  --paper: #f5f6f4; --sheet: #ffffff; --ink: #1d2427; --muted: #5d686c; --rule: #d9dedc;
+  --accent: #1f6f5c; --accent-soft: #e2efea; --warn: #8a5300; --warn-soft: #fbf0dc;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --paper: #141a1b; --sheet: #1b2324; --ink: #e3e8e6; --muted: #9aa6a5; --rule: #2f3a3b; --accent: #5fbf9f; --accent-soft: #1f3530; --warn: #e2a64b; --warn-soft: #33291a; color-scheme: dark; }
+}
+:root[data-theme="dark"] { --paper: #141a1b; --sheet: #1b2324; --ink: #e3e8e6; --muted: #9aa6a5; --rule: #2f3a3b; --accent: #5fbf9f; --accent-soft: #1f3530; --warn: #e2a64b; --warn-soft: #33291a; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.6 var(--body); margin: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+.wrap { max-width: 1000px; margin: 0 auto; display: grid; gap: 32px; }
+h1, h2 { margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.3rem; }
+p { margin: 0; max-width: 70ch; }
+.lede { color: var(--muted); font-size: 1.05rem; }
+code { font: 0.86em var(--mono); }
+a { color: var(--accent); }
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th { text-align: left; color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+td { padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+figure { margin: 0; display: grid; gap: 8px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 10px; padding: 10px; min-width: 0; }
+figure img { width: 100%; height: auto; border-radius: 6px; display: block; }
+figcaption { font-size: 0.88rem; color: var(--muted); }
+figcaption b { color: var(--ink); }
+.open { display: grid; gap: 8px; padding-left: 20px; margin: 0; }
+footer { color: var(--muted); font-size: 0.85rem; }
+/* The light and dark switch, shared with the other reports: the system theme holds until the viewer chooses. */
+.toprow { display: flex; gap: 16px; align-items: center; justify-content: space-between; }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header style="display:grid;gap:10px">
+  <div class="toprow"><h1>HEART in a browser</h1><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+  <p class="lede">Any HEART resource, opened in a plain browser, is a page: its state laid out for a person, a button for each act it offers now, and a greyed button that says why for each act it won't. heart-core renders it, so the garden and the GitHub gateway serve it with no code of their own. Built October 30, 2026, from spec/PLAN-HTML-DIALECT.md; every screenshot is the live servers in headless Chrome.</p>
+</header>
+
+<section style="display:grid;gap:12px">
+  <h2>What a browser gets</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Asked for</th><th>Answer</th></tr></thead>
+    <tbody>
+      <tr><td>A resource</td><td>Its state, labelled from member names; links; embedded resources named for a person; one button per act in the type's order</td></tr>
+      <tr><td>An act offered now</td><td>A dialog: fields, controls and checks from the act's schema; sent by htmx under the page's own ETag; the page swapped in place, and a line saying what was done</td></tr>
+      <tr><td>An act not offered</td><td>A greyed button, still focusable, showing the server's reason when pressed</td></tr>
+      <tr><td>A form that breaks its act's schema</td><td>Caught in the browser before anything is sent: the dialog carries the act's whole schema, which Ajv runs, so a rule over several fields ("at least one of") is said too, beside the fields or above them</td></tr>
+      <tr><td>A refusal</td><td>The same problem at the same status, as HTML, in the dialog that asked; each violation at its field</td></tr>
+      <tr><td>A stale page (412)</td><td>The resource read again; the dialog kept with the person's values if the act is still offered, else closed with the reason</td></tr>
+      <tr><td>The bookmark</td><td>Its searches and lookups as dialogs that go to an address; its acts send the browser to what they made</td></tr>
+      <tr><td>A search or a list</td><td>A grid: title, then the members the matches share; each row's Actions read from that match when asked</td></tr>
+    </tbody>
+  </table></div>
+  <p>Chosen only when <code>Accept</code> names <code>text/html</code> above both dialects, so agents are unaffected. htmx, Ajv and the page's own script and stylesheet are served by the server, immutable; no CDN.</p>
+</section>
+
+<section style="display:grid;gap:12px">
+  <h2>The GitHub gateway</h2>
+  <div class="shots">
+    <figure><img src="github-pr-merge-why.png" alt="A draft pull request with Merge greyed and its reason shown" loading="lazy"><figcaption><b>A draft pull request.</b> Merge and Reopen are greyed; pressing Merge shows GitHub's reason, through the connector.</figcaption></figure>
+    <figure><img src="github-pulls-actions.png" alt="Open pull requests as a grid with one row's actions open" loading="lazy"><figcaption><b>Open pull requests.</b> A row's Actions read that pull request: offered acts link to it, the others say why.</figcaption></figure>
+    <figure><img src="github-check-anyof.png" alt="Request a review refused in the browser: fill in at least one of reviewers and team reviewers" loading="lazy"><figcaption><b>Checked before sending.</b> GitHub's schema asks for reviewers or teams; the browser says so and sends nothing.</figcaption></figure>
+    <figure><img src="github-review-dialog.png" alt="Request a review dialog with list fields" loading="lazy"><figcaption><b>Request a review.</b> Arrays of logins and team slugs, each a list a person adds to; titles from the field names.</figcaption></figure>
+    <figure><img src="github-commit-dialog.png" alt="Commit a file dialog" loading="lazy"><figcaption><b>Commit a file, on a branch named with a slash.</b> The connector's own words for "File path"; the text area by convention.</figcaption></figure>
+  </div>
+</section>
+
+<section style="display:grid;gap:12px">
+  <h2>The garden</h2>
+  <div class="shots">
+    <figure><img src="garden-search-dialog.png" alt="The bookmark's search dialog" loading="lazy"><figcaption><b>The bookmark.</b> Finding beds is a dialog whose answer is a page of its own, with an address.</figcaption></figure>
+    <figure><img src="garden-beds.png" alt="The beds as a grid" loading="lazy"><figcaption><b>The beds.</b> A grid of what the summaries share; the label is the title, not repeated.</figcaption></figure>
+    <figure><img src="garden-sow-dialog.png" alt="Sow a seed dialog" loading="lazy"><figcaption><b>Sow a seed.</b> Filled and sent from the browser; the bed came back planted.</figcaption></figure>
+    <figure><img src="garden-bed-why.png" alt="A planted bed with Harvest greyed and its reason" loading="lazy"><figcaption><b>Not yet.</b> Harvest is greyed until the crop is ready, and says so.</figcaption></figure>
+    <figure><img src="garden-stale.png" alt="A stale water dialog kept open" loading="lazy"><figcaption><b>Changed meanwhile.</b> Someone watered the bed after the page was read: the 412 re-read it, kept the dialog and the 20, and asked to check and send again.</figcaption></figure>
+    <figure><img src="garden-done.png" alt="The bed after watering with a done message" loading="lazy"><figcaption><b>Sent again.</b> The bed swapped in place, and the page said what was done.</figcaption></figure>
+  </div>
+</section>
+
+<section style="display:grid;gap:12px">
+  <h2>Still open</h2>
+  <ul class="open">
+    <li>How a browser signs in to the gateway. These screenshots used a local stand-in that adds the caller's token; a GitHub sign-in or a session is still to choose.</li>
+    <li>Field order. A schema's properties come in canonical, alphabetical order, so "Base branch" comes before "Title".</li>
+    <li>Merge's reason points to "ready for review", which nothing offers (GitHub's REST API has no such operation).</li>
+    <li>Lists through the gateway carry titles only, so their grids have one column.</li>
+  </ul>
+</section>
+
+<footer>HEART HTML on-ramp: heart-core HtmlView, HtmlList, HtmlActs; heart-spring and heart-http4k; mockup at docs/reports/html-dialect-mockup/.</footer>
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,916 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>Dependabot, Simulated</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --accent: #4b4fc4;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* This page's own. */
+
+section, .tiles { margin-top: 28px; }
+.tile { cursor: default; }
+.headline { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.timeline { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px;
+  min-width: 0; }
+.timeline h3 { margin: 0 0 10px; }
+.timeline ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.timeline li { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding-left: 10px;
+  border-left: 3px solid var(--c, var(--rule)); }
+.timeline li.quiet { --c: var(--rule); }
+.timeline .at { font: 12.5px var(--mono); color: var(--muted); }
+ol.pulls, ol.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pull, ol.plain > li { background: var(--panel); border: 1px solid var(--rule);
+  border-left: 4px solid var(--c, var(--rule));
+  border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.pull .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.outcome { color: var(--c, var(--ink)); }
+ol.plain > li .outcome { color: var(--good); }
+ol.words { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+ol.words li { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 12px 14px; min-width: 0; }
+ol.words code { font: 12.5px/1.5 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+
+</style>
+<div class="wrap">
+  <div class="top"><div>
+    <h1>Dependabot, simulated: a watch that can be told no</h1>
+    <p class="lede">Dependabot-style pull requests opened with our own account on a scratch repository, merged by a watch through the HEART gateway, beside GitHub's own auto-merge; then by the goal file itself, run by ARTIE, each step decided once by Claude. Run 2026-10-24.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+
+  <div class="tiles"><div class="tile good"><b>5</b><span class="sub">the watch did the right thing: merged, or left a held one alone</span></div><div class="tile safe"><b>4</b><span class="sub">the watch gave up and said why, in the gateway's words</span></div><div class="tile bad"><b>0</b><span class="sub">the watch did harm</span></div><div class="tile bad"><b>1</b><span class="sub">GitHub's auto-merge merged over a person's hold</span></div></div>
+  <section>
+    <h2>A person says no</h2>
+    <p>Two bumps, each labelled <span class="mono">hold</span> by a person after it was taken up, with the required
+    check passing on both. The watch reads the pull request again at each look, and acts only on what it holds now.
+    GitHub's auto-merge decided once, when it was turned on.</p>
+    <div class="headline"><div class="timeline"><h3><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/689" rel="noopener" target="_blank">#689</a> with the watch</h3><ol><li class="quiet"><span class="at">16:51:54</span><span>Opened by the Dependabot stand-in</span></li><li class="quiet"><span class="at">16:51:56</span><span>Labelled dependabot</span></li><li class="warn"><span class="at">16:52:01</span><span>Labelled hold by a person</span></li><li class="quiet"><span class="at">16:52:26</span><span>deps-check passed</span></li><li class="good"><span class="at">-</span><span>Not merged: the watch reads the labels again at each look, and left it alone</span></li></ol></div>
+<div class="timeline"><h3><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/691" rel="noopener" target="_blank">#691</a> with GitHub's auto-merge</h3><ol><li class="quiet"><span class="at">16:52:18</span><span>Opened by the Dependabot stand-in</span></li><li class="quiet"><span class="at">16:52:19</span><span>Labelled dependabot-actions</span></li><li class="quiet"><span class="at">16:52:29</span><span>Auto-merge turned on by github-actions[bot]</span></li><li class="warn"><span class="at">16:52:36</span><span>Labelled hold by a person</span></li><li class="quiet"><span class="at">16:52:49</span><span>deps-check passed</span></li><li class="bad"><span class="at">16:53:02</span><span>Merged by github-actions[bot]</span></li></ol></div></div>
+    <p class="sub">Times are GitHub's own (UTC), from each pull request's timeline and check runs.</p>
+  </section>
+<section><h2>Round 1, no required check</h2><p class="sub">The watch looked every 10 seconds and gave up after 2 minutes. deps-main had no protection, so &quot;can be merged&quot; meant only what GitHub worked out about the branch. Output: <span class="mono">runs/watch-1023-watch2.out</span>.</p><ol class="pulls"><li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/678" rel="noopener" target="_blank">#678</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump, open and labelled before the watch started</div><div class="outcome">Merged on the first look</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/681" rel="noopener" target="_blank">#681</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump opened while the watch ran</div><div class="outcome">Merged at the next look</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/682" rel="noopener" target="_blank">#682</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>A bump opened as a draft</div><div class="outcome">After 2 minutes, commented: A draft can't be merged; mark it ready for review first.</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/683" rel="noopener" target="_blank">#683</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>Opened already labelled hold; a person removed hold later</div><div class="outcome">Left alone while held. Once released, it conflicted, so the watch commented with that reason.</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/684" rel="noopener" target="_blank">#684</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump opened together with #685, from the same base</div><div class="outcome">Merged</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/685" rel="noopener" target="_blank">#685</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>The other of the pair; it conflicted once #684 was in</div><div class="outcome">Commented: The branch has conflicts with its base; resolve them first.</div></li></ol></section>
+<section><h2>Round 2, a required check, and GitHub's auto-merge beside the watch</h2><p class="sub">The watch looked every 10 seconds and gave up after 4 minutes. deps-main required deps-check, for admins too. Pull requests labelled dependabot-actions were left to GitHub's auto-merge. Output: <span class="mono">runs/watch-1023-watch3.out</span>.</p><ol class="pulls"><li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/687" rel="noopener" target="_blank">#687</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump</div><div class="outcome">Merged 36 seconds after the check passed</div></li>
+<li class="pull safe"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/688" rel="noopener" target="_blank">#688</a> <span class="tag safe">stopped, said why</span><span class="sub">the watch</span></div><div>A broken bump; the check failed</div><div class="outcome">After 4 minutes, commented: Branch protection blocks the merge: a required check or review is missing.</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/689" rel="noopener" target="_blank">#689</a> <span class="tag good">right</span><span class="sub">the watch</span></div><div>A bump a person labelled hold 5 seconds after it was labelled dependabot</div><div class="outcome">Left alone, though its check passed; the watch said so once</div></li>
+<li class="pull good"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/690" rel="noopener" target="_blank">#690</a> <span class="tag good">right</span><span class="sub">GitHub's auto-merge</span></div><div>A bump labelled dependabot-actions</div><div class="outcome">Merged by github-actions[bot] once the check passed</div></li>
+<li class="pull bad"><div class="head"><a class="mono" href="https://github.com/JogoShugh/heart-github-test/pull/691" rel="noopener" target="_blank">#691</a> <span class="tag bad">harm</span><span class="sub">GitHub's auto-merge</span></div><div>A bump labelled dependabot-actions, then hold by a person</div><div class="outcome">Merged by github-actions[bot] anyway, 26 seconds after the hold</div></li></ol></section>
+  <section>
+    <h2>The goal file, run by ARTIE itself</h2>
+    <p>Then ARTIE learned the words: <span class="mono">artie run dependabot-sim.goal.md --reasoner claude</span>
+    runs the goal file below as written. Claude decides each part once, the first time the run needs it, on a real
+    pull request; every later pull request and every later look replays the decision, with no model.</p>
+    <details class="box" open><summary>dependabot-sim.goal.md</summary><div class="scroll"><pre class="src">---
+start: https://localhost:8392/
+inputs:
+  owner: { question: &quot;Whose repository?&quot; }
+  repo:  { default: heart-github-test, question: &quot;Which repository?&quot; }
+  label: { default: dependabot, question: &quot;Which label marks a pull request to merge?&quot; }
+  hold:  { default: hold, question: &quot;Which label means a person objects?&quot; }
+manners: alongside-others
+---
+
+Merge the pull requests labelled {label} once they can be merged, unless a person labels them {hold}. Keep
+watching until the watch's own issue is closed.
+
+## Working alongside others
+
+Other people work in this repository while you do. What they decide stands.
+
+- Don't undo or write over anything someone else changed since you looked. Look again, and work from what's there now.
+- When a step no longer makes sense because of what someone did, leave it, and say why.
+- Nothing you write may claim something that isn't so: &quot;merged&quot; only once it is.
+- Don't say again what has already been said.
+
+## The work
+
+- In {owner}/{repo}
+  - Open an issue titled &quot;Auto-merge watch&quot;, saying &quot;Close this issue to stop the watch.&quot; `as watch`
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 10 minutes.
+      Otherwise, say on {pr} why it wasn't merged.
+- Until someone closes {watch}
+
+## Done when
+
+- Every pull request labelled {label} during the watch is merged, or says why not
+- Nothing anyone else decided was undone: no pull request labelled {hold} was merged
+</pre></div></details>
+    <h3>What each part became, in the last run</h3>
+    <ol class="words"><li><b>In {owner}/{repo}</b><div class="outcome">A read of the repository</div></li>
+<li><b>Open an issue … `as watch`</b><div class="outcome">Issue #712, the watch's own</div></li>
+<li><b>Whenever a pull request labelled {label} changes</b><div class="outcome">The list github:pulls-list, state=open, labels=dependabot, reached from the start; the match: labels include dependabot</div></li>
+<li><b>If it's labelled {hold}, leave it, and say so once</b><div class="outcome">The check: labels include hold. #696 and #689 left alone, a note each</div></li>
+<li><b>Once it can be merged, merge it by squashing</b><div class="outcome">Wait until github:merge is offered, then merge, merge_method squash. #710 merged</div></li>
+<li><b>Or give up after 10 minutes / Otherwise, say why</b><div class="outcome">Not reached; the watch ended before any wait ran out</div></li>
+<li><b>Until someone closes {watch}</b><div class="outcome">The check: #712's state is closed. It ended the watch at the next look after the issue was closed</div></li>
+<li><b>## Working alongside others</b><div class="outcome">Told to Claude as words; with --remember, &quot;don't say again&quot; is kept by the watch's memory too</div></li>
+<li><b>## Done when</b><div class="outcome">Both facts noted unchecked, with Claude's reason; nothing at the start holds them</div></li></ol>
+    <h3>11 live runs, each finding something, each fixed with a test first</h3>
+    <ol class="pulls"><li class="pull bad"><div class="head"><b class="mono">g1</b> <span class="tag bad">stopped</span></div><div>Stopped deciding the Whenever's list; the planner's act had no words, and a refusal ended the run.</div><div class="sub">Fixed: A refusal while deciding is told to the planner, which decides again.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g2</b> <span class="tag bad">stopped</span></div><div>The repository links no list of pull requests, and going back to the start was refused.</div><div class="sub">Fixed: While a list is decided, the planner may go back to the start; the watch stands there.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g3</b> <span class="tag bad">stopped</span></div><div>Watched the issue search with labels=dependabot, which leaves pull requests out; every look found nothing.</div><div class="sub">Fixed: The gateway's pull request search filters by labels, served by GitHub's issue list.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g4</b> <span class="tag bad">stopped</span></div><div>Stopped at the If step, a plain step then; the planner was shown no steps inside the Whenever.</div><div class="sub">Fixed: If became a word, its check decided once; the step tree looks inside a Whenever; a planner's stop ends a watch.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g5</b> <span class="tag bad">stopped</span></div><div>The match and the If check held for every pull request; the labels are embedded, and the planner never saw them.</div><div class="sub">Fixed: The planner is shown what a resource embeds, and a check may name an embedded relation.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g6</b> <span class="tag bad">stopped</span></div><div>A check's list became text; the Until was decided as what held then; Done when couldn't be checked.</div><div class="sub">Fixed: Lists stay lists; the Until is told it ends the watch; a Done when fact may be left unchecked, noted.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">g7</b> <span class="tag safe">did the work, then failed a check</span></div><div>Merged #700 and left #696 and #689 alone, then checked Done when as merged: true on the start, and failed.</div><div class="sub">Fixed: The planner is told what a Done when fact is.</div></li>
+<li class="pull good"><div class="head"><b class="mono">g8</b> <span class="tag good">finished</span></div><div>Exit 0: merged #708, left the held ones alone, stopped when its issue was closed, Done when noted. 474 steps: every open pull request read each look.</div><div class="sub">Fixed: The planner deciding the list is told to narrow it by a filter.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g9</b> <span class="tag bad">stopped</span></div><div>Told to narrow the list, chose the issue search with labels again, the trap.</div><div class="sub">Fixed: The issue search's description says pull requests are left out, and where they are listed.</div></li>
+<li class="pull good"><div class="head"><b class="mono">g10</b> <span class="tag good">finished</span></div><div>Exit 0: watched github:pulls-list with labels=dependabot, merged #710, left the held ones alone. 54 steps, 19 model calls, every one a decision; --remember kept what it did.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g11</b> <span class="tag bad">stopped</span></div><div>Merged #714, then stopped at the first give-up (#697): the planner's Otherwise was a read, a check and a comment, and only its first act was kept, so it asked again and again until the step's limit.</div><div class="sub">Fixed: A step under a Whenever is decided as a chain of acts, kept in order until the planner says done; a check in it leaves the rest undone where it holds.</div></li></ol>
+  </section>
+  <section>
+    <h2>Two Whenevers at once: Dependabot, and a security scan</h2>
+    <p>The same watch, with a second Whenever beside it: each issue a security scan opens, labelled
+    <span class="mono">scan</span>, is answered once. Whenevers side by side are one watch, each a listener on a
+    thread of its own, with a client of its own, so a slow read under one holds up only that one. Each one's
+    first look is made in turn, as the goal lists them, so Claude decides in the goal's order; after that, every
+    look replays.</p>
+    <details class="box"><summary>dependabot-scan.goal.md</summary><div class="scroll"><pre class="src">---
+start: https://localhost:8392/
+inputs:
+  owner: { question: &quot;Whose repository?&quot; }
+  repo:  { default: heart-github-test, question: &quot;Which repository?&quot; }
+  label: { default: dependabot, question: &quot;Which label marks a pull request to merge?&quot; }
+  hold:  { default: hold, question: &quot;Which label means a person objects?&quot; }
+  scan:  { default: scan, question: &quot;Which label marks a failed security scan?&quot; }
+manners: alongside-others
+---
+
+Merge the pull requests labelled {label} once they can be merged, unless a person labels them {hold}. At the same
+time, answer each issue a security scan opens, labelled {scan}. Keep watching until the watch's own issue is closed.
+
+## Working alongside others
+
+Other people work in this repository while you do. What they decide stands.
+
+- Don't undo or write over anything someone else changed since you looked. Look again, and work from what's there now.
+- When a step no longer makes sense because of what someone did, leave it, and say why.
+- Nothing you write may claim something that isn't so: &quot;merged&quot; only once it is.
+- Don't say again what has already been said.
+
+## The work
+
+- In {owner}/{repo}
+  - Open an issue titled &quot;Auto-merge and scan watch&quot;, saying &quot;Close this issue to stop the watch.&quot; `as watch`
+  - Whenever an issue labelled {scan} changes `as finding`
+    - Say on {finding} &quot;Seen by the watch: a person will look at this scan.&quot;, unless it's said already.
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 10 minutes.
+      Otherwise, say on {pr} why it wasn't merged.
+- Until someone closes {watch}
+
+## Done when
+
+- Every pull request labelled {label} during the watch is merged, or says why not
+- Nothing anyone else decided was undone: no pull request labelled {hold} was merged
+</pre></div></details>
+    <h3>Seven live runs, to every give-up saying why in the gateway's own words</h3>
+    <ol class="pulls"><li class="pull bad"><div class="head"><b class="mono">g12</b> <span class="tag bad">stopped</span></div><div>Stopped before its first look. The planner reached each list from the start, and Whenevers side by side were refused that.</div><div class="sub">Fixed: Each listener looks from where its own list is reached, the start or where the watch stands.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g13</b> <span class="tag bad">stopped</span></div><div>Commented on scan issue #718 at every look: its own comment changed the issue, and the next look took that as a change. Stopped by hand after two.</div><div class="sub">Fixed: Once a Whenever's steps are done at a member, the member is read again and remembered as it is; only someone else's change is answered.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">g14</b> <span class="tag safe">did the work, then failed a check</span></div><div>Merged #723, answered each scan issue once, left the held pull requests alone; stopped at the first give-up: a pull request offered no comment through the gateway.</div><div class="sub">Fixed: A pull request offers github:comment, open or closed, posted on the issue it also is: issues/create-comment with the pull request's number.</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g15</b> <span class="tag bad">stopped</span></div><div>The If &quot;labelled hold&quot; was decided as a check that held on every pull request, so it left them all; the capture didn't say which check it was.</div><div class="sub">Fixed: Each check a watch decides is kept in the capture, with where it was decided; the planner is told an If's check holds exactly when its condition is true.</div></li>
+<li class="pull safe"><div class="head"><b class="mono">g16</b> <span class="tag safe">did the work, then failed a check</span></div><div>The If was right, and #726 was merged. The Otherwise found no comment: the restarted gateway couldn't bind its port, and the old one kept answering.</div><div class="sub">Fixed: The gateway restarted for real (an operations slip, not a code change).</div></li>
+<li class="pull bad"><div class="head"><b class="mono">g17</b> <span class="tag bad">stopped</span></div><div>Each of eight stuck pull requests got one comment, and no more after; but the reason was made up from mergeable_state, and each said it would be merged once it could be.</div><div class="sub">Fixed: An Otherwise is told its wait gave up, and the server's own reason, to say that reason in the server's words and promise nothing the watch won't do.</div></li>
+<li class="pull good"><div class="head"><b class="mono">g18</b> <span class="tag good">finished</span></div><div>Nine pull requests each got one comment, in the gateway's own words: a draft (#728, #715, #695, #682), conflicts (#685, #683), or branch protection (#716, #697, #688). Decided once, at the first; replayed for the rest with no model.</div></li></ol>
+  </section>
+  <section>
+    <h2>The goal words, as the code they came down to</h2>
+    <p>Before ARTIE read the words, <span class="mono">watch.kts</span> wrote each by hand in heart-script,
+    through the HEART gateway; heart-script's <span class="mono">watch</span>, <span class="mono">whenever</span>
+    and <span class="mono">once</span> now keep them, and a goal run decides them.</p>
+    <ol class="words"><li><b>Whenever</b><code>act(&quot;github:pulls-list&quot;, … &quot;sort&quot; to &quot;updated&quot;, &quot;direction&quot; to &quot;desc&quot;), read down to the first one older than the last look</code></li>
+<li><b>Once</b><code>offers(&quot;github:merge&quot;), then act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)</code></li>
+<li><b>Give up</b><code>the time since it was taken up, against giveUp minutes; never on a reason that says to read again</code></li>
+<li><b>Otherwise</b><code>act(&quot;github:comment&quot;) with why(&quot;github:merge&quot;), the gateway's hr:unavailable reason, unless a watch already said it</code></li>
+<li><b>Until</b><code>the watch opens its own issue, and reads it at the end of every look; closed, it stops</code></li>
+<li><b>Manners</b><code>hold in the labels it holds now leaves the pull request alone; a refused act is read again next look, never sent again blind</code></li></ol>
+  </section>
+  <section>
+    <h2>Found and fixed on the way</h2>
+    <ol class="plain"><li><div>The first watch died on one look the gateway answered with 500 while GitHub was slow.</div><div class="outcome">Each look catches a failure, says so, and the next look tries again.</div><div class="sub mono">runs/watch-1023-watch1.out</div></li>
+<li><div>Restarted, the watch commented on #682, #683 and #685 a second time.</div><div class="outcome">Before it comments, it reads the pull request's comments and says nothing a watch already said. A fourth watch said nothing new.</div><div class="sub mono">runs/watch-1023-watch4.out</div></li>
+<li><div>It once gave up on &quot;GitHub is still checking… read it again shortly&quot;, telling #683 something untrue.</div><div class="outcome">It doesn't give up on a reason that says to read again; it waits one more look.</div><div class="sub mono">runs/watch-1023-watch3.out</div></li></ol>
+  </section>
+  <section>
+    <h2>Still missing</h2>
+    <ul class="gaps"><li><span class="tag quiet">gateway</span> No checks resource. A failed check and a pending one give the same reason, &quot;a required check or review is missing&quot;.</li>
+<li><span class="tag quiet">HEART</span> hr:unavailable has no mark for a reason that passes by itself; the watch reads the words &quot;read it again&quot;.</li>
+<li><span class="tag quiet">gateway</span> No reviews resource, so a person objects with a label rather than &quot;changes requested&quot;.</li>
+<li><span class="tag quiet">gateway</span> List pages carry no ETag, so each look reads the list in full from the gateway (GitHub answers it 304).</li>
+<li><span class="tag quiet">heart-script</span> The trace keeps every representation in full; a long watch's journal should keep only what changed. --remember keeps what a watch did, not the whole journal.</li>
+<li><span class="tag quiet">ARTIE</span> Done when over many resources (&quot;every pull request was merged, or says why&quot;) is noted, not checked: the run would have to answer from its own record.</li>
+<li><span class="tag quiet">ARTIE</span> artie generate doesn't yet write a decided watch run as a script with no model in it (spec/PLAN-WATCH-GOALS.md, slice 4c).</li>
+<li><span class="tag quiet">ARTIE</span> &quot;Say it, unless it's said already&quot; is decided as a chain; the planner put the comment before the check in g13 and g14, and after it in g15. A watch doesn't answer its own comment, but someone else's comment replays the chain.</li>
+<li><span class="tag quiet">ARTIE</span> --remember isn't kept per listener, so a watch with listeners run again does what it did again.</li>
+<li><span class="tag quiet">ARTIE</span> An Otherwise's step, in the trace and the output, carries the whole of what its reasoner was told, not only the planner's words.</li></ul>
+  </section>
+  <section>
+    <h2>How this page is made</h2>
+    <details class="box"><summary>results.yaml: what happened</summary><div class="scroll"><pre class="src"># What the Dependabot simulation did, 2026-10-23 and 24, on JogoShugh/heart-github-test. report.kts lays this out.
+# Outcomes are from the runs' outputs (runs/*.out); times are GitHub's own, read back from each pull request's
+# timeline and check runs after the runs (UTC).
+# tone: good (did the right thing), safe (stopped, and said why), bad (did harm), quiet (nothing to do).
+
+asOf: &quot;2026-10-24&quot;
+
+rounds:
+  - name: Round 1, no required check
+    out: runs/watch-1023-watch2.out
+    setting: The watch looked every 10 seconds and gave up after 2 minutes. deps-main had no protection, so &quot;can be merged&quot; meant only what GitHub worked out about the branch.
+    pulls:
+      - number: 678
+        by: watch
+        what: A bump, open and labelled before the watch started
+        outcome: Merged on the first look
+        tone: good
+      - number: 681
+        by: watch
+        what: A bump opened while the watch ran
+        outcome: Merged at the next look
+        tone: good
+      - number: 682
+        by: watch
+        what: A bump opened as a draft
+        outcome: &quot;After 2 minutes, commented: A draft can't be merged; mark it ready for review first.&quot;
+        tone: safe
+      - number: 683
+        by: watch
+        what: Opened already labelled hold; a person removed hold later
+        outcome: Left alone while held. Once released, it conflicted, so the watch commented with that reason.
+        tone: safe
+      - number: 684
+        by: watch
+        what: &quot;A bump opened together with #685, from the same base&quot;
+        outcome: Merged
+        tone: good
+      - number: 685
+        by: watch
+        what: &quot;The other of the pair; it conflicted once #684 was in&quot;
+        outcome: &quot;Commented: The branch has conflicts with its base; resolve them first.&quot;
+        tone: safe
+  - name: Round 2, a required check, and GitHub's auto-merge beside the watch
+    out: runs/watch-1023-watch3.out
+    setting: The watch looked every 10 seconds and gave up after 4 minutes. deps-main required deps-check, for admins too. Pull requests labelled dependabot-actions were left to GitHub's auto-merge.
+    pulls:
+      - number: 687
+        by: watch
+        what: A bump
+        outcome: Merged 36 seconds after the check passed
+        tone: good
+      - number: 688
+        by: watch
+        what: A broken bump; the check failed
+        outcome: &quot;After 4 minutes, commented: Branch protection blocks the merge: a required check or review is missing.&quot;
+        tone: safe
+      - number: 689
+        by: watch
+        what: A bump a person labelled hold 5 seconds after it was labelled dependabot
+        outcome: Left alone, though its check passed; the watch said so once
+        tone: good
+      - number: 690
+        by: rival
+        what: A bump labelled dependabot-actions
+        outcome: Merged by github-actions[bot] once the check passed
+        tone: good
+      - number: 691
+        by: rival
+        what: A bump labelled dependabot-actions, then hold by a person
+        outcome: Merged by github-actions[bot] anyway, 26 seconds after the hold
+        tone: bad
+
+# The two pull requests a person objected to, side by side in time.
+timelines:
+  - number: 689
+    by: the watch
+    events:
+      - { at: &quot;16:51:54&quot;, what: Opened by the Dependabot stand-in }
+      - { at: &quot;16:51:56&quot;, what: Labelled dependabot }
+      - { at: &quot;16:52:01&quot;, what: Labelled hold by a person, tone: warn }
+      - { at: &quot;16:52:26&quot;, what: deps-check passed }
+      - { at: &quot;-&quot;, what: &quot;Not merged: the watch reads the labels again at each look, and left it alone&quot;, tone: good }
+  - number: 691
+    by: GitHub's auto-merge
+    events:
+      - { at: &quot;16:52:18&quot;, what: Opened by the Dependabot stand-in }
+      - { at: &quot;16:52:19&quot;, what: Labelled dependabot-actions }
+      - { at: &quot;16:52:29&quot;, what: &quot;Auto-merge turned on by github-actions[bot]&quot; }
+      - { at: &quot;16:52:36&quot;, what: Labelled hold by a person, tone: warn }
+      - { at: &quot;16:52:49&quot;, what: deps-check passed }
+      - { at: &quot;16:53:02&quot;, what: &quot;Merged by github-actions[bot]&quot;, tone: bad }
+
+# Each goal word, and what it came down to in watch.kts.
+words:
+  - word: Whenever
+    code: act(&quot;github:pulls-list&quot;, … &quot;sort&quot; to &quot;updated&quot;, &quot;direction&quot; to &quot;desc&quot;), read down to the first one older than the last look
+  - word: Once
+    code: offers(&quot;github:merge&quot;), then act(&quot;github:merge&quot;, &quot;merge_method&quot; to &quot;squash&quot;)
+  - word: Give up
+    code: the time since it was taken up, against giveUp minutes; never on a reason that says to read again
+  - word: Otherwise
+    code: act(&quot;github:comment&quot;) with why(&quot;github:merge&quot;), the gateway's hr:unavailable reason, unless a watch already said it
+  - word: Until
+    code: the watch opens its own issue, and reads it at the end of every look; closed, it stops
+  - word: Manners
+    code: hold in the labels it holds now leaves the pull request alone; a refused act is read again next look, never sent again blind
+
+# Found and fixed on the way.
+fixed:
+  - what: The first watch died on one look the gateway answered with 500 while GitHub was slow.
+    fix: Each look catches a failure, says so, and the next look tries again.
+    out: runs/watch-1023-watch1.out
+  - what: &quot;Restarted, the watch commented on #682, #683 and #685 a second time.&quot;
+    fix: Before it comments, it reads the pull request's comments and says nothing a watch already said. A fourth watch said nothing new.
+    out: runs/watch-1023-watch4.out
+  - what: 'It once gave up on &quot;GitHub is still checking… read it again shortly&quot;, telling #683 something untrue.'
+    fix: It doesn't give up on a reason that says to read again; it waits one more look.
+    out: runs/watch-1023-watch3.out
+
+# Still missing, with whose to build it is.
+gaps:
+  - where: gateway
+    what: No checks resource. A failed check and a pending one give the same reason, &quot;a required check or review is missing&quot;.
+  - where: HEART
+    what: hr:unavailable has no mark for a reason that passes by itself; the watch reads the words &quot;read it again&quot;.
+  - where: gateway
+    what: No reviews resource, so a person objects with a label rather than &quot;changes requested&quot;.
+  - where: gateway
+    what: List pages carry no ETag, so each look reads the list in full from the gateway (GitHub answers it 304).
+  - where: heart-script
+    what: The trace keeps every representation in full; a long watch's journal should keep only what changed. --remember keeps what a watch did, not the whole journal.
+  - where: ARTIE
+    what: &quot;Done when over many resources (\&quot;every pull request was merged, or says why\&quot;) is noted, not checked: the run would have to answer from its own record.&quot;
+  - where: ARTIE
+    what: artie generate doesn't yet write a decided watch run as a script with no model in it (spec/PLAN-WATCH-GOALS.md, slice 4c).
+  - where: ARTIE
+    what: &quot;\&quot;Say it, unless it's said already\&quot; is decided as a chain; the planner put the comment before the check in g13 and g14, and after it in g15. A watch doesn't answer its own comment, but someone else's comment replays the chain.&quot;
+  - where: ARTIE
+    what: --remember isn't kept per listener, so a watch with listeners run again does what it did again.
+  - where: ARTIE
+    what: An Otherwise's step, in the trace and the output, carries the whole of what its reasoner was told, not only the planner's words.
+
+# The goal file run by ARTIE itself (spec/PLAN-WATCH-GOALS.md): artie run dependabot-sim.goal.md --reasoner claude.
+goalFile: ../goal-syntax/goals/dependabot-sim.goal.md
+
+# What each part of the goal became in the last run, g10, decided once by Claude and replayed.
+became:
+  - part: &quot;In {owner}/{repo}&quot;
+    as: A read of the repository
+  - part: &quot;Open an issue … `as watch`&quot;
+    as: &quot;Issue #712, the watch's own&quot;
+  - part: &quot;Whenever a pull request labelled {label} changes&quot;
+    as: &quot;The list github:pulls-list, state=open, labels=dependabot, reached from the start; the match: labels include dependabot&quot;
+  - part: &quot;If it's labelled {hold}, leave it, and say so once&quot;
+    as: &quot;The check: labels include hold. #696 and #689 left alone, a note each&quot;
+  - part: &quot;Once it can be merged, merge it by squashing&quot;
+    as: &quot;Wait until github:merge is offered, then merge, merge_method squash. #710 merged&quot;
+  - part: &quot;Or give up after 10 minutes / Otherwise, say why&quot;
+    as: Not reached; the watch ended before any wait ran out
+  - part: &quot;Until someone closes {watch}&quot;
+    as: &quot;The check: #712's state is closed. It ended the watch at the next look after the issue was closed&quot;
+  - part: &quot;## Working alongside others&quot;
+    as: &quot;Told to Claude as words; with --remember, \&quot;don't say again\&quot; is kept by the watch's memory too&quot;
+  - part: &quot;## Done when&quot;
+    as: Both facts noted unchecked, with Claude's reason; nothing at the start holds them
+
+# Each live run of the goal file, what it found, and what was fixed (a test first each time).
+goalRuns:
+  - run: g1
+    tone: bad
+    found: Stopped deciding the Whenever's list; the planner's act had no words, and a refusal ended the run.
+    fixed: A refusal while deciding is told to the planner, which decides again.
+  - run: g2
+    tone: bad
+    found: The repository links no list of pull requests, and going back to the start was refused.
+    fixed: While a list is decided, the planner may go back to the start; the watch stands there.
+  - run: g3
+    tone: bad
+    found: Watched the issue search with labels=dependabot, which leaves pull requests out; every look found nothing.
+    fixed: The gateway's pull request search filters by labels, served by GitHub's issue list.
+  - run: g4
+    tone: bad
+    found: Stopped at the If step, a plain step then; the planner was shown no steps inside the Whenever.
+    fixed: If became a word, its check decided once; the step tree looks inside a Whenever; a planner's stop ends a watch.
+  - run: g5
+    tone: bad
+    found: The match and the If check held for every pull request; the labels are embedded, and the planner never saw them.
+    fixed: The planner is shown what a resource embeds, and a check may name an embedded relation.
+  - run: g6
+    tone: bad
+    found: A check's list became text; the Until was decided as what held then; Done when couldn't be checked.
+    fixed: Lists stay lists; the Until is told it ends the watch; a Done when fact may be left unchecked, noted.
+  - run: g7
+    tone: safe
+    found: &quot;Merged #700 and left #696 and #689 alone, then checked Done when as merged: true on the start, and failed.&quot;
+    fixed: The planner is told what a Done when fact is.
+  - run: g8
+    tone: good
+    found: &quot;Exit 0: merged #708, left the held ones alone, stopped when its issue was closed, Done when noted. 474 steps: every open pull request read each look.&quot;
+    fixed: The planner deciding the list is told to narrow it by a filter.
+  - run: g9
+    tone: bad
+    found: Told to narrow the list, chose the issue search with labels again, the trap.
+    fixed: The issue search's description says pull requests are left out, and where they are listed.
+  - run: g10
+    tone: good
+    found: &quot;Exit 0: watched github:pulls-list with labels=dependabot, merged #710, left the held ones alone. 54 steps, 19 model calls, every one a decision; --remember kept what it did.&quot;
+    fixed: &quot;-&quot;
+  - run: g11
+    tone: bad
+    found: &quot;Merged #714, then stopped at the first give-up (#697): the planner's Otherwise was a read, a check and a comment, and only its first act was kept, so it asked again and again until the step's limit.&quot;
+    fixed: A step under a Whenever is decided as a chain of acts, kept in order until the planner says done; a check in it leaves the rest undone where it holds.
+
+# The same Dependabot watch, with a second Whenever beside it: each issue a security scan opens is answered once.
+# The two Whenevers are one watch, each a listener on a thread of its own (spec/PLAN-LISTENERS.md, slice 1).
+scanGoalFile: ../goal-syntax/goals/dependabot-scan.goal.md
+
+scanRuns:
+  - run: g12
+    tone: bad
+    found: Stopped before its first look. The planner reached each list from the start, and Whenevers side by side were refused that.
+    fixed: Each listener looks from where its own list is reached, the start or where the watch stands.
+  - run: g13
+    tone: bad
+    found: &quot;Commented on scan issue #718 at every look: its own comment changed the issue, and the next look took that as a change. Stopped by hand after two.&quot;
+    fixed: Once a Whenever's steps are done at a member, the member is read again and remembered as it is; only someone else's change is answered.
+  - run: g14
+    tone: safe
+    found: &quot;Merged #723, answered each scan issue once, left the held pull requests alone; stopped at the first give-up: a pull request offered no comment through the gateway.&quot;
+    fixed: &quot;A pull request offers github:comment, open or closed, posted on the issue it also is: issues/create-comment with the pull request's number.&quot;
+  - run: g15
+    tone: bad
+    found: &quot;The If \&quot;labelled hold\&quot; was decided as a check that held on every pull request, so it left them all; the capture didn't say which check it was.&quot;
+    fixed: Each check a watch decides is kept in the capture, with where it was decided; the planner is told an If's check holds exactly when its condition is true.
+  - run: g16
+    tone: safe
+    found: &quot;The If was right, and #726 was merged. The Otherwise found no comment: the restarted gateway couldn't bind its port, and the old one kept answering.&quot;
+    fixed: &quot;The gateway restarted for real (an operations slip, not a code change).&quot;
+  - run: g17
+    tone: bad
+    found: &quot;Each of eight stuck pull requests got one comment, and no more after; but the reason was made up from mergeable_state, and each said it would be merged once it could be.&quot;
+    fixed: An Otherwise is told its wait gave up, and the server's own reason, to say that reason in the server's words and promise nothing the watch won't do.
+  - run: g18
+    tone: good
+    found: &quot;Nine pull requests each got one comment, in the gateway's own words: a draft (#728, #715, #695, #682), conflicts (#685, #683), or branch protection (#716, #697, #688). Decided once, at the first; replayed for the rest with no model.&quot;
+    fixed: &quot;-&quot;
+</pre></div></details>
+    <details class="box"><summary>watch.kts: the watch</summary><div class="scroll"><pre class="src">// The Dependabot goal (exhibits/goal-syntax/goals/dependabot.goal.md), written by hand in heart-script before the
+// goal words Whenever, Until, Once, Otherwise and Give up exist (spec/ideas/goals-that-work-alongside-others.md,
+// &quot;Review, 2026-10-23&quot;). Each word is the loop or the branch it will come down to:
+//   Until    the watch opens its own issue and stops when someone closes it (or after hours, a safety stop).
+//   Whenever the open pull requests, most recently updated first, are read down to the last one seen unchanged;
+//            each labelled label is taken up. Events are hints: this is the polling kind, and the gateway asks
+//            GitHub with its copy's ETag, so a look at an unchanged pull request costs nothing against the limit.
+//   Once     a pull request taken up is merged by squashing as soon as it offers github:merge.
+//   Manners  one labelled hold is left alone, and the watch says so once; a refused merge is read again and
+//            decided again next time round, never sent again blind.
+//   Give up  after giveUp minutes without the merge offered;
+//   Otherwise the pull request is told why, in the gateway's own words (hr:unavailable).
+//   artie run watch.kts owner=JogoShugh gateway=https://localhost:8392/
+val owner by input(question = &quot;Whose repository?&quot;)
+val repo by input(default = &quot;heart-github-test&quot;, question = &quot;Which repository?&quot;)
+val label by input(default = &quot;dependabot&quot;, question = &quot;Which label marks a pull request to merge?&quot;)
+val hold by input(default = &quot;hold&quot;, question = &quot;Which label means a person objects?&quot;)
+val every by input(default = &quot;15&quot;, question = &quot;How many seconds between looks?&quot;)
+val giveUp by input(default = &quot;10&quot;, question = &quot;Give up on a pull request after how many minutes?&quot;)
+val hours by input(default = &quot;2&quot;, question = &quot;Stop the watch after how many hours at most?&quot;)
+val stamp by input(
+    default = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(&quot;MMdd-HHmmss&quot;)),
+)
+val gateway by input(default = &quot;http://localhost:8392/&quot;, question = &quot;Where is the gateway?&quot;)
+
+val repository = arrayOf(&quot;owner&quot; to owner, &quot;repo&quot; to repo)
+val deadline = java.time.Instant.now().plusSeconds(hours.toLong() * 3600)
+
+/** A remark, kept in the run's record and shown as the run goes (a note alone is not shown). */
+fun Here.tell(text: String) {
+    note(text)
+    println(&quot;  note: $text&quot;)
+}
+
+/** How each comment the watch leaves begins, so a later watch knows what was said. */
+val WATCH = &quot;Not merged by the auto-merge watch&quot;
+
+/** Whether the server's reason for not offering an act says it will pass by itself. */
+fun passing(why: String?): Boolean = why.orEmpty().contains(&quot;read it again&quot;)
+
+/** What the watch says, once, of a pull request a person objected to. */
+fun leftAlone(number: Long) = &quot;#$number is labelled $hold: left alone until the label goes.&quot;
+
+/** The names of the labels the held pull request carries, read from the labels it embeds. */
+fun Here.labelled(): Set&lt;String&gt; = embedded(&quot;github:labels&quot;).mapNotNull { it.read[&quot;name&quot;] as? String }.toSet()
+
+heart(gateway) {
+    var watch = 0L
+    act(&quot;github:repos-get&quot;, *repository, intent = &quot;get the repository $owner/$repo&quot;) {
+        act(&quot;github:open-issue&quot;, intent = &quot;open the issue that keeps the watch going&quot;, fields = {
+            &quot;title&quot; to &quot;Auto-merge watch ($stamp)&quot;
+            &quot;body&quot; to &quot;Pull requests labelled `$label` are merged once they can be; `$hold` keeps one back. &quot; +
+                &quot;Close this issue to stop the watch.&quot;
+        }) {
+            watch = state.long(&quot;number&quot;)
+        }
+    }
+
+    val waiting = mutableMapOf&lt;Long, java.time.Instant&gt;() // taken up, not yet merged: since when
+    val heldBack = mutableSetOf&lt;Long&gt;() // left alone for the hold label, said once
+    val finished = mutableSetOf&lt;Long&gt;() // merged, or given up on
+    var seen: String? = null // the newest updated_at read so far
+    var open = true
+
+    while (open &amp;&amp; java.time.Instant.now() &lt; deadline) {
+        // A look that fails (GitHub answered 5xx, the network dropped) is noted; the next one tries again.
+        try {
+            // Whenever: what changed since the last look, newest first, down to the first one older than that.
+            act(&quot;github:pulls-list&quot;, *repository, &quot;state&quot; to &quot;open&quot;, &quot;sort&quot; to &quot;updated&quot;, &quot;direction&quot; to &quot;desc&quot;) {
+                var newest = seen
+                for (title in links(&quot;item&quot;).filterNotNull()) {
+                    var older = false
+                    follow(&quot;item&quot;, title) {
+                        val updated = state.text(&quot;updated_at&quot;)
+                        val number = state.long(&quot;number&quot;)
+                        older = seen != null &amp;&amp; updated &lt; seen!!
+                        if (!older) {
+                            if (newest == null || updated &gt; newest!!) newest = updated
+                            val labels = labelled()
+                            when {
+                                number in finished || label !in labels -&gt; Unit
+                                hold in labels -&gt; {
+                                    waiting.remove(number)
+                                    if (heldBack.add(number)) tell(leftAlone(number))
+                                }
+                                else -&gt; {
+                                    heldBack.remove(number)
+                                    waiting.putIfAbsent(number, java.time.Instant.now())
+                                }
+                            }
+                        }
+                    }
+                    if (older) break
+                }
+                seen = newest
+            }
+
+            // Once each one waiting can be merged, merge it; or give up after giveUp minutes.
+            for ((number, since) in waiting.toMap()) {
+                try {
+                    act(&quot;github:pulls-get&quot;, *repository, &quot;pull_number&quot; to number) {
+                        val waited = java.time.Duration.between(since, java.time.Instant.now())
+                        when {
+                            state[&quot;state&quot;] != &quot;open&quot; -&gt; {
+                                tell(&quot;#$number was closed or merged by someone else: left as it is.&quot;)
+                                finished += number
+                            }
+                            hold in labelled() -&gt; {
+                                if (heldBack.add(number)) tell(leftAlone(number))
+                                waiting.remove(number)
+                            }
+                            offers(&quot;github:merge&quot;) -&gt; {
+                                act(&quot;github:merge&quot;, intent = &quot;merge #$number by squashing&quot;, fields = {
+                                    &quot;merge_method&quot; to &quot;squash&quot;
+                                    &quot;commit_title&quot; to &quot;${state.text(&quot;title&quot;)} (#$number)&quot;
+                                }) {}
+                                finished += number
+                            }
+                            // A reason that says to read again is a passing one (GitHub working mergeability out):
+                            // giving up on it would tell the pull request something untrue, so wait one more look.
+                            // The words stand in for a mark hr:unavailable doesn't have yet: temporary or not.
+                            waited.toMinutes() &gt;= giveUp.toLong() &amp;&amp; !passing(why(&quot;github:merge&quot;)) -&gt; {
+                                // Otherwise: say why it wasn't merged, in the gateway's words.
+                                val why = why(&quot;github:merge&quot;) ?: &quot;the merge was never offered&quot;
+                                follow(&quot;github:issues-get&quot;) {
+                                    // Said already, by this watch or an earlier one: not said again.
+                                    var said = false
+                                    follow(&quot;github:issues-list-comments&quot;) {
+                                        said = links(&quot;item&quot;).filterNotNull()
+                                            .any { it.startsWith(WATCH) &amp;&amp; it.endsWith(&quot;: $why&quot;) }
+                                    }
+                                    if (said) tell(&quot;#$number: already told why, by an earlier watch.&quot;)
+                                    else act(&quot;github:comment&quot;, intent = &quot;say why #$number wasn't merged&quot;, fields = {
+                                        &quot;body&quot; to &quot;$WATCH (#$watch) after $giveUp minutes: $why&quot;
+                                    }) {}
+                                }
+                                finished += number
+                            }
+                        }
+                    }
+                } catch (stopped: ScriptStopped) {
+                    // Refused (someone moved it since it was read): read again and decide again next time round.
+                    tell(&quot;#$number: ${stopped.reason}; looked at again next time.&quot;)
+                }
+                if (number in finished) waiting.remove(number)
+            }
+
+            // Until someone closes the watch's issue.
+            act(&quot;github:issues-get&quot;, *repository, &quot;issue_number&quot; to watch) {
+                open = state[&quot;state&quot;] == &quot;open&quot;
+            }
+        } catch (failed: Exception) {
+            tell(&quot;A look failed: ${failed.message}; looking again next time.&quot;)
+        }
+        if (open) Thread.sleep(every.toLong() * 1000)
+    }
+}
+</pre></div></details>
+    <details class="box"><summary>report.kts: the script that lays it out</summary><div class="scroll"><pre class="src">// The Dependabot simulation as a page: what the watch and GitHub's auto-merge did with the same kinds of pull
+// request, and what is still missing. The facts live in results.yaml; this script only lays them out. The look comes
+// from the reports' shared assets (report-shell.html, report-base.css, theme-switch.js), inlined.
+//   artie run report.kts out=../../docs/reports/dependabot-sim/index.html artifact=/tmp/dependabot-sim.html
+// out gets a whole document for GitHub Pages; artifact, when given, the same page without the document skeleton.
+import java.io.File
+import org.yaml.snakeyaml.Yaml
+
+val data by input(default = &quot;results.yaml&quot;, question = &quot;Where are the results?&quot;)
+val out by input(question = &quot;Where to write the page?&quot;)
+val artifact by input(default = &quot;&quot;, question = &quot;Where to write the artifact copy, if anywhere?&quot;)
+val source by input(default = &quot;report.kts&quot;, question = &quot;Where is this script, to show it on the page?&quot;)
+val watcher by input(default = &quot;watch.kts&quot;, question = &quot;Where is the watch, to show it on the page?&quot;)
+val assets by input(default = &quot;../../docs/reports/assets&quot;, question = &quot;Where are the reports' shared assets?&quot;)
+val repo by input(default = &quot;https://github.com/JogoShugh/heart-github-test&quot;, question = &quot;Which repository ran it?&quot;)
+
+fun Any?.map(): Map&lt;String, Any?&gt; = (this as? Map&lt;*, *&gt;).orEmpty().entries.associate { it.key.toString() to it.value }
+fun Any?.list(): List&lt;Map&lt;String, Any?&gt;&gt; = (this as? List&lt;*&gt;).orEmpty().map { it.map() }
+fun Map&lt;String, Any?&gt;.text(key: String) = this[key]?.toString().orEmpty()
+fun esc(s: String) = s.replace(&quot;&amp;&quot;, &quot;&amp;amp;&quot;).replace(&quot;&lt;&quot;, &quot;&amp;lt;&quot;).replace(&quot;&gt;&quot;, &quot;&amp;gt;&quot;).replace(&quot;\&quot;&quot;, &quot;&amp;quot;&quot;)
+
+val yaml = Yaml().load&lt;Any?&gt;(File(data).readText()).map()
+val rounds = yaml[&quot;rounds&quot;].list()
+val pulls = rounds.flatMap { it[&quot;pulls&quot;].list() }
+
+fun pr(number: Any?) = &quot;&quot;&quot;&lt;a class=&quot;mono&quot; href=&quot;$repo/pull/$number&quot; rel=&quot;noopener&quot; target=&quot;_blank&quot;&gt;#$number&lt;/a&gt;&quot;&quot;&quot;
+fun tag(tone: String, words: String) = &quot;&quot;&quot;&lt;span class=&quot;tag $tone&quot;&gt;${esc(words)}&lt;/span&gt;&quot;&quot;&quot;
+val outcomeWords = mapOf(&quot;good&quot; to &quot;right&quot;, &quot;safe&quot; to &quot;stopped, said why&quot;, &quot;bad&quot; to &quot;harm&quot;, &quot;quiet&quot; to &quot;nothing&quot;)
+val runWords = mapOf(&quot;good&quot; to &quot;finished&quot;, &quot;safe&quot; to &quot;did the work, then failed a check&quot;, &quot;bad&quot; to &quot;stopped&quot;)
+
+fun count(by: String, tone: String) = pulls.count { it.text(&quot;by&quot;) == by &amp;&amp; it.text(&quot;tone&quot;) == tone }
+val tiles = listOf(
+    Triple(&quot;good&quot;, count(&quot;watch&quot;, &quot;good&quot;), &quot;the watch did the right thing: merged, or left a held one alone&quot;),
+    Triple(&quot;safe&quot;, count(&quot;watch&quot;, &quot;safe&quot;), &quot;the watch gave up and said why, in the gateway's words&quot;),
+    Triple(&quot;bad&quot;, count(&quot;watch&quot;, &quot;bad&quot;), &quot;the watch did harm&quot;),
+    Triple(&quot;bad&quot;, count(&quot;rival&quot;, &quot;bad&quot;), &quot;GitHub's auto-merge merged over a person's hold&quot;),
+).joinToString(&quot;&quot;) { (tone, n, says) -&gt;
+    &quot;&quot;&quot;&lt;div class=&quot;tile $tone&quot;&gt;&lt;b&gt;$n&lt;/b&gt;&lt;span class=&quot;sub&quot;&gt;${esc(says)}&lt;/span&gt;&lt;/div&gt;&quot;&quot;&quot;
+}
+
+val timelines = yaml[&quot;timelines&quot;].list().joinToString(&quot;\n&quot;) { t -&gt;
+    val events = t[&quot;events&quot;].list().joinToString(&quot;&quot;) { e -&gt;
+        val tone = e.text(&quot;tone&quot;).ifEmpty { &quot;quiet&quot; }
+        &quot;&quot;&quot;&lt;li class=&quot;$tone&quot;&gt;&lt;span class=&quot;at&quot;&gt;${esc(e.text(&quot;at&quot;))}&lt;/span&gt;&lt;span&gt;${esc(e.text(&quot;what&quot;))}&lt;/span&gt;&lt;/li&gt;&quot;&quot;&quot;
+    }
+    &quot;&quot;&quot;&lt;div class=&quot;timeline&quot;&gt;&lt;h3&gt;${pr(t[&quot;number&quot;])} with ${esc(t.text(&quot;by&quot;))}&lt;/h3&gt;&lt;ol&gt;$events&lt;/ol&gt;&lt;/div&gt;&quot;&quot;&quot;
+}
+
+val roundSections = rounds.joinToString(&quot;\n&quot;) { r -&gt;
+    val rows = r[&quot;pulls&quot;].list().joinToString(&quot;\n&quot;) { p -&gt;
+        val tone = p.text(&quot;tone&quot;)
+        val who = if (p.text(&quot;by&quot;) == &quot;rival&quot;) &quot;GitHub's auto-merge&quot; else &quot;the watch&quot;
+        &quot;&quot;&quot;&lt;li class=&quot;pull $tone&quot;&gt;&lt;div class=&quot;head&quot;&gt;${pr(p[&quot;number&quot;])} ${tag(tone, outcomeWords[tone] ?: tone)}&quot;&quot;&quot; +
+            &quot;&quot;&quot;&lt;span class=&quot;sub&quot;&gt;${esc(who)}&lt;/span&gt;&lt;/div&gt;&lt;div&gt;${esc(p.text(&quot;what&quot;))}&lt;/div&gt;&quot;&quot;&quot; +
+            &quot;&quot;&quot;&lt;div class=&quot;outcome&quot;&gt;${esc(p.text(&quot;outcome&quot;))}&lt;/div&gt;&lt;/li&gt;&quot;&quot;&quot;
+    }
+    &quot;&quot;&quot;&lt;section&gt;&lt;h2&gt;${esc(r.text(&quot;name&quot;))}&lt;/h2&gt;&lt;p class=&quot;sub&quot;&gt;${esc(r.text(&quot;setting&quot;))} &quot;&quot;&quot; +
+        &quot;&quot;&quot;Output: &lt;span class=&quot;mono&quot;&gt;${esc(r.text(&quot;out&quot;))}&lt;/span&gt;.&lt;/p&gt;&lt;ol class=&quot;pulls&quot;&gt;$rows&lt;/ol&gt;&lt;/section&gt;&quot;&quot;&quot;
+}
+
+val words = yaml[&quot;words&quot;].list().joinToString(&quot;\n&quot;) { w -&gt;
+    &quot;&quot;&quot;&lt;li&gt;&lt;b&gt;${esc(w.text(&quot;word&quot;))}&lt;/b&gt;&lt;code&gt;${esc(w.text(&quot;code&quot;))}&lt;/code&gt;&lt;/li&gt;&quot;&quot;&quot;
+}
+val fixed = yaml[&quot;fixed&quot;].list().joinToString(&quot;\n&quot;) { f -&gt;
+    &quot;&quot;&quot;&lt;li&gt;&lt;div&gt;${esc(f.text(&quot;what&quot;))}&lt;/div&gt;&lt;div class=&quot;outcome&quot;&gt;${esc(f.text(&quot;fix&quot;))}&lt;/div&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;div class=&quot;sub mono&quot;&gt;${esc(f.text(&quot;out&quot;))}&lt;/div&gt;&lt;/li&gt;&quot;&quot;&quot;
+}
+val goalText = File(yaml.text(&quot;goalFile&quot;)).readText()
+val became = yaml[&quot;became&quot;].list().joinToString(&quot;\n&quot;) { b -&gt;
+    &quot;&quot;&quot;&lt;li&gt;&lt;b&gt;${esc(b.text(&quot;part&quot;))}&lt;/b&gt;&lt;div class=&quot;outcome&quot;&gt;${esc(b.text(&quot;as&quot;))}&lt;/div&gt;&lt;/li&gt;&quot;&quot;&quot;
+}
+/** Each live run of a goal file, as a row: what it found, and what was fixed. */
+fun runs(key: String) = yaml[key].list().joinToString(&quot;\n&quot;) { r -&gt;
+    val tone = r.text(&quot;tone&quot;)
+    val fixed = r.text(&quot;fixed&quot;).takeIf { it != &quot;-&quot; }?.let { &quot;&quot;&quot;&lt;div class=&quot;sub&quot;&gt;Fixed: ${esc(it)}&lt;/div&gt;&quot;&quot;&quot; }.orEmpty()
+    &quot;&quot;&quot;&lt;li class=&quot;pull $tone&quot;&gt;&lt;div class=&quot;head&quot;&gt;&lt;b class=&quot;mono&quot;&gt;${esc(r.text(&quot;run&quot;))}&lt;/b&gt; ${tag(tone, runWords[tone] ?: tone)}&lt;/div&gt;&quot;&quot;&quot; +
+        &quot;&quot;&quot;&lt;div&gt;${esc(r.text(&quot;found&quot;))}&lt;/div&gt;$fixed&lt;/li&gt;&quot;&quot;&quot;
+}
+val goalRuns = runs(&quot;goalRuns&quot;)
+val goalRunCount = yaml[&quot;goalRuns&quot;].list().size
+val scanText = File(yaml.text(&quot;scanGoalFile&quot;)).readText()
+val scanRuns = runs(&quot;scanRuns&quot;)
+
+val gaps = yaml[&quot;gaps&quot;].list().joinToString(&quot;\n&quot;) { g -&gt;
+    &quot;&quot;&quot;&lt;li&gt;${tag(&quot;quiet&quot;, g.text(&quot;where&quot;))} ${esc(g.text(&quot;what&quot;))}&lt;/li&gt;&quot;&quot;&quot;
+}
+
+fun shown(name: String, path: String) = &quot;&quot;&quot;&lt;details class=&quot;box&quot;&gt;&lt;summary&gt;$name&lt;/summary&gt;&quot;&quot;&quot; +
+    &quot;&quot;&quot;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(File(path).readText())}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;&quot;&quot;&quot;
+
+val style = &quot;&quot;&quot;
+section, .tiles { margin-top: 28px; }
+.tile { cursor: default; }
+.headline { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.timeline { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px 16px;
+  min-width: 0; }
+.timeline h3 { margin: 0 0 10px; }
+.timeline ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.timeline li { display: grid; grid-template-columns: 70px 1fr; gap: 10px; padding-left: 10px;
+  border-left: 3px solid var(--c, var(--rule)); }
+.timeline li.quiet { --c: var(--rule); }
+.timeline .at { font: 12.5px var(--mono); color: var(--muted); }
+ol.pulls, ol.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.pull, ol.plain &gt; li { background: var(--panel); border: 1px solid var(--rule);
+  border-left: 4px solid var(--c, var(--rule));
+  border-radius: 6px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.pull .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.outcome { color: var(--c, var(--ink)); }
+ol.plain &gt; li .outcome { color: var(--good); }
+ol.words { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+ol.words li { display: grid; gap: 4px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 12px 14px; min-width: 0; }
+ol.words code { font: 12.5px/1.5 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+ul.gaps { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+&quot;&quot;&quot;
+
+val body = &quot;&quot;&quot;
+  &lt;div class=&quot;tiles&quot;&gt;$tiles&lt;/div&gt;
+  &lt;section&gt;
+    &lt;h2&gt;A person says no&lt;/h2&gt;
+    &lt;p&gt;Two bumps, each labelled &lt;span class=&quot;mono&quot;&gt;hold&lt;/span&gt; by a person after it was taken up, with the required
+    check passing on both. The watch reads the pull request again at each look, and acts only on what it holds now.
+    GitHub's auto-merge decided once, when it was turned on.&lt;/p&gt;
+    &lt;div class=&quot;headline&quot;&gt;$timelines&lt;/div&gt;
+    &lt;p class=&quot;sub&quot;&gt;Times are GitHub's own (UTC), from each pull request's timeline and check runs.&lt;/p&gt;
+  &lt;/section&gt;
+$roundSections
+  &lt;section&gt;
+    &lt;h2&gt;The goal file, run by ARTIE itself&lt;/h2&gt;
+    &lt;p&gt;Then ARTIE learned the words: &lt;span class=&quot;mono&quot;&gt;artie run dependabot-sim.goal.md --reasoner claude&lt;/span&gt;
+    runs the goal file below as written. Claude decides each part once, the first time the run needs it, on a real
+    pull request; every later pull request and every later look replays the decision, with no model.&lt;/p&gt;
+    &lt;details class=&quot;box&quot; open&gt;&lt;summary&gt;dependabot-sim.goal.md&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(goalText)}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;
+    &lt;h3&gt;What each part became, in the last run&lt;/h3&gt;
+    &lt;ol class=&quot;words&quot;&gt;$became&lt;/ol&gt;
+    &lt;h3&gt;$goalRunCount live runs, each finding something, each fixed with a test first&lt;/h3&gt;
+    &lt;ol class=&quot;pulls&quot;&gt;$goalRuns&lt;/ol&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Two Whenevers at once: Dependabot, and a security scan&lt;/h2&gt;
+    &lt;p&gt;The same watch, with a second Whenever beside it: each issue a security scan opens, labelled
+    &lt;span class=&quot;mono&quot;&gt;scan&lt;/span&gt;, is answered once. Whenevers side by side are one watch, each a listener on a
+    thread of its own, with a client of its own, so a slow read under one holds up only that one. Each one's
+    first look is made in turn, as the goal lists them, so Claude decides in the goal's order; after that, every
+    look replays.&lt;/p&gt;
+    &lt;details class=&quot;box&quot;&gt;&lt;summary&gt;dependabot-scan.goal.md&lt;/summary&gt;&lt;div class=&quot;scroll&quot;&gt;&lt;pre class=&quot;src&quot;&gt;${esc(scanText)}&lt;/pre&gt;&lt;/div&gt;&lt;/details&gt;
+    &lt;h3&gt;Seven live runs, to every give-up saying why in the gateway's own words&lt;/h3&gt;
+    &lt;ol class=&quot;pulls&quot;&gt;$scanRuns&lt;/ol&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;The goal words, as the code they came down to&lt;/h2&gt;
+    &lt;p&gt;Before ARTIE read the words, &lt;span class=&quot;mono&quot;&gt;watch.kts&lt;/span&gt; wrote each by hand in heart-script,
+    through the HEART gateway; heart-script's &lt;span class=&quot;mono&quot;&gt;watch&lt;/span&gt;, &lt;span class=&quot;mono&quot;&gt;whenever&lt;/span&gt;
+    and &lt;span class=&quot;mono&quot;&gt;once&lt;/span&gt; now keep them, and a goal run decides them.&lt;/p&gt;
+    &lt;ol class=&quot;words&quot;&gt;$words&lt;/ol&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Found and fixed on the way&lt;/h2&gt;
+    &lt;ol class=&quot;plain&quot;&gt;$fixed&lt;/ol&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;Still missing&lt;/h2&gt;
+    &lt;ul class=&quot;gaps&quot;&gt;$gaps&lt;/ul&gt;
+  &lt;/section&gt;
+  &lt;section&gt;
+    &lt;h2&gt;How this page is made&lt;/h2&gt;
+    ${shown(&quot;results.yaml: what happened&quot;, data)}
+    ${shown(&quot;watch.kts: the watch&quot;, watcher)}
+    ${shown(&quot;report.kts: the script that lays it out&quot;, source)}
+  &lt;/section&gt;
+&quot;&quot;&quot;
+
+/** The page: the reports' shared shell, filled with this page's own parts. */
+val page = File(assets, &quot;report-shell.html&quot;).readText()
+    .replace(&quot;@@TITLE@@&quot;, &quot;Dependabot, Simulated&quot;)
+    .replace(&quot;@@HEADING@@&quot;, &quot;Dependabot, simulated: a watch that can be told no&quot;)
+    .replace(&quot;@@LEDE@@&quot;, &quot;Dependabot-style pull requests opened with our own account on a scratch repository, merged &quot; +
+        &quot;by a watch through the HEART gateway, beside GitHub's own auto-merge; then by the goal file itself, run by &quot; +
+        &quot;ARTIE, each step decided once by Claude. Run ${yaml.text(&quot;asOf&quot;)}.&quot;)
+    .replace(&quot;@@BASE@@&quot;, File(assets, &quot;report-base.css&quot;).readText())
+    .replace(&quot;@@THEME@@&quot;, File(assets, &quot;theme-switch.js&quot;).readText())
+    .replace(&quot;@@STYLE@@&quot;, style).replace(&quot;@@SCRIPT@@&quot;, &quot;&quot;).replace(&quot;@@BODY@@&quot;, body)
+
+File(out).apply { parentFile.mkdirs() }.writeText(
+    &quot;&lt;!doctype html&gt;&lt;html lang=\&quot;en\&quot;&gt;&lt;head&gt;&lt;meta charset=\&quot;utf-8\&quot;&gt;&quot; +
+        &quot;&lt;meta name=\&quot;viewport\&quot; content=\&quot;width=device-width,initial-scale=1,viewport-fit=cover\&quot;&gt;&lt;/head&gt;&quot; +
+        &quot;&lt;body style=\&quot;margin:0\&quot;&gt;\n&quot; + page + &quot;&lt;/body&gt;&lt;/html&gt;\n&quot;
+)
+if (artifact.isNotBlank()) File(artifact).writeText(page)
+println(&quot;wrote $out&quot; + if (artifact.isNotBlank()) &quot; and $artifact&quot; else &quot;&quot;)
+</pre></div></details>
+  </section>
+
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+
+
+</script>
+</body></html>

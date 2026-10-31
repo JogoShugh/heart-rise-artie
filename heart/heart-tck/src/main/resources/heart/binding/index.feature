@@ -1,0 +1,71 @@
+Feature: The bookmark and the searches, served over HTTP from the declarations
+  SPEC §6.11 and §6.11.1. The HTTP binding serves the service index at / in
+  either dialect, or as JSON Home when Accept ranks it first, and each
+  findable type's search at /{collection}. All are Layer 1: revalidated on
+  every use.
+
+  Background:
+    Given lamp 1 is "ON" at version 1 in the lamp server
+    And lamp 2 is "OFF" at version 1 in the lamp server
+
+  Scenario Outline: The index answers in the dialect asked for: <dialect>
+    When a client gets "/" as <dialect>
+    Then the response status is 200
+    And the response has Content-Type "<type>"
+    And the response has Cache-Control "no-cache"
+    And the response has Vary "Accept, Accept-Profile"
+    And the response has an ETag
+
+    Examples:
+      | dialect          | type                           |
+      | hal-schema-forms | application/hal+json           |
+      | hal-forms        | application/prs.hal-forms+json |
+
+  Scenario: An unchanged index is revalidated with 304
+    When a client gets "/" as hal-schema-forms
+    And a client gets "/" again with the ETag it was given
+    Then the response status is 304
+
+  Scenario: Ranked first, JSON Home is the answer
+    When a client gets "/" with Accept "application/json-home, application/hal+json"
+    Then the response status is 200
+    And the response has Content-Type "application/json-home"
+    And the response has Vary "Accept"
+
+  Scenario: A search lists the lamps found, titled, in the dialect asked for
+    When a client gets "/lamps?name=lamp" as hal-schema-forms
+    Then the response status is 200
+    And the response has Content-Type "application/hal+json"
+    And the response lists these items
+      | href     | title  |
+      | /lamps/1 | Lamp 1 |
+      | /lamps/2 | Lamp 2 |
+
+  Scenario: A search answers in HAL-FORMS too
+    When a client gets "/lamps?name=lamp" as hal-forms
+    Then the response status is 200
+    And the response has Content-Type "application/prs.hal-forms+json"
+    And the response lists these items
+      | href     | title  |
+      | /lamps/1 | Lamp 1 |
+      | /lamps/2 | Lamp 2 |
+
+  Scenario: A lamp can also be looked up by id in the query, which lists exactly that lamp
+    When a client gets "/lamps?id=2" as hal-schema-forms
+    Then the response lists these items
+      | href     | title  |
+      | /lamps/2 | Lamp 2 |
+
+  Scenario: The lookup form's target, filled from its field, is the lamp
+    When a client gets "/" as hal-schema-forms
+    And the client fills the "home:get-lamp" form with id 2 and follows it
+    Then the response status is 200
+    And the response links "self" to "/lamps/2"
+
+  Scenario: Both dialects' indexes offer the same forms, matched by title, but those HAL-FORMS cannot target
+    When a client gets "/" as hal-schema-forms
+    And a client gets "/" as hal-forms
+    Then the two indexes offer forms with the same titles, but for these
+      | title              |
+      | List pull requests |
+      | Get a pull request |

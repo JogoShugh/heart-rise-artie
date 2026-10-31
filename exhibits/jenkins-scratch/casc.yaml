@@ -1,0 +1,31 @@
+jenkins:
+  systemMessage: "HEART Jenkins spike"
+  numExecutors: 2
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: spike-admin
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+jobs:
+  - script: |
+      folder('services')
+      pipelineJob('services/build-service') {
+        parameters { stringParam('SERVICE', 'api', 'Service to build') }
+        definition {
+          cps {
+            script('''pipeline {
+              agent any
+              stages {
+                stage('build') {
+                  steps { sh "echo building ^${params.SERVICE}; sleep 15; test \\"^${params.SERVICE}\\" != broken" }
+                }
+              }
+            }''')
+            sandbox(true)
+          }
+        }
+      }

@@ -1,0 +1,11 @@
+# A branch says whether it is protected; a protected branch takes no commits through the contents API.
+matches:
+  path: /repos/{owner}/{repo}/branches/{branch}
+allowed:
+  table: /protected
+  rows:
+    "false":
+      allow: [branch-from-here, commit-file, open-pull-request]
+    "true":
+      allow: [branch-from-here, open-pull-request]
+      absent: { commit-file: The branch is protected; commit to another one. }

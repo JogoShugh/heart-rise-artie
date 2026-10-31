@@ -1,0 +1,22 @@
+# Youth basketball scoring. Its own Postgres database, `basketball`, in the shared
+# container (server-spring/docker-compose.yml; reset-db.sh creates it); its own
+# HTTP and CoAP ports.
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:basketball}
+    username: ${DB_USER:artie}
+    password: ${DB_PASSWORD:artie}
+  flyway:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:basketball}
+    user: ${DB_USER:artie}
+    password: ${DB_PASSWORD:artie}
+
+server:
+  port: ${PORT:8181}
+
+heart:
+  title: Youth basketball scoring
+  max-rung: ${HEART_MAX_RUNG:L2}
+  page-size: ${HEART_PAGE_SIZE:20}
+  coap:
+    port: ${COAP_PORT:5684}

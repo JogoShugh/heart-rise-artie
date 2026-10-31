@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="splinter-title splinter-desc">
+<title id="splinter-title">Hypermedia formats splintered; none became the HTML of APIs</title>
+<desc id="splinter-desc">HAL, HAL-FORMS, Siren, Collection+JSON, JSON:API, Hydra and UBER each offered links, and some forms; none was adopted everywhere. OpenAPI won by describing endpoints instead, and clients were built per API.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="splinter-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="hl" x="370" y="140" width="220" height="70" rx="10"/>
+<text class="h" x="480" y="170" text-anchor="middle">A generic API client?</text>
+<text class="s" x="480" y="190" text-anchor="middle">which format to read</text>
+<rect class="box" x="40" y="30" width="220" height="50" rx="10"/>
+<text class="h" x="150" y="60" text-anchor="middle">HAL</text>
+<path class="dash" d="M260 55 L368 175"/>
+<rect class="box" x="40" y="110" width="220" height="50" rx="10"/>
+<text class="h" x="150" y="140" text-anchor="middle">HAL-FORMS</text>
+<path class="dash" d="M260 135 L368 175"/>
+<rect class="box" x="40" y="190" width="220" height="50" rx="10"/>
+<text class="h" x="150" y="220" text-anchor="middle">Siren</text>
+<path class="dash" d="M260 215 L368 175"/>
+<rect class="box" x="40" y="270" width="220" height="50" rx="10"/>
+<text class="h" x="150" y="300" text-anchor="middle">Collection+JSON</text>
+<path class="dash" d="M260 295 L368 175"/>
+<rect class="box" x="700" y="30" width="220" height="50" rx="10"/>
+<text class="h" x="810" y="60" text-anchor="middle">JSON:API</text>
+<path class="dash" d="M700 55 L592 175"/>
+<rect class="box" x="700" y="110" width="220" height="50" rx="10"/>
+<text class="h" x="810" y="140" text-anchor="middle">Hydra</text>
+<path class="dash" d="M700 135 L592 175"/>
+<rect class="box" x="700" y="190" width="220" height="50" rx="10"/>
+<text class="h" x="810" y="220" text-anchor="middle">UBER</text>
+<path class="dash" d="M700 215 L592 175"/>
+<rect class="ghost" x="700" y="270" width="220" height="50" rx="10"/>
+<text class="h" x="810" y="300" text-anchor="middle">OpenAPI (a description)</text>
+<path class="dash" d="M700 295 L592 175"/>
+<text class="s" x="480" y="340" text-anchor="middle">Many good formats, no shared one: so clients were built per API instead</text>
+</svg>

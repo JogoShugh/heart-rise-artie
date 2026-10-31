@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" role="img" aria-labelledby="knows-title knows-desc">
+<title id="knows-title">What a browser knows, and what it doesn't</title>
+<desc id="knows-desc">The browser knows HTTP, URIs, the HTML media type and what links and forms mean. It knows nothing about any particular site: not Amazon, not your bank, not their addresses or rules.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="knows-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="40" y="30" width="560" height="320" rx="10"/>
+<text class="h" x="320" y="66" text-anchor="middle">What a browser knows</text>
+<rect class="hl" x="70" y="90" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="111" text-anchor="middle">What a link and a form mean</text>
+<text class="s" x="320" y="131" text-anchor="middle">follow it; fill it in and send it</text>
+<rect class="hl" x="70" y="152" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="173" text-anchor="middle">HTML: the media type</text>
+<text class="s" x="320" y="193" text-anchor="middle">how a page carries its information and its controls</text>
+<rect class="box" x="70" y="214" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="235" text-anchor="middle">URIs</text>
+<text class="s" x="320" y="255" text-anchor="middle">how to name and reach anything</text>
+<rect class="box" x="70" y="276" width="500" height="52" rx="10"/>
+<text class="h" x="320" y="297" text-anchor="middle">HTTP</text>
+<text class="s" x="320" y="317" text-anchor="middle">methods, status codes, caching</text>
+<rect class="ghost" x="640" y="30" width="280" height="320" rx="10"/>
+<text class="h" x="780" y="66" text-anchor="middle">What it doesn't know</text>
+<text class="s" x="780" y="130" text-anchor="middle">Amazon</text>
+<text class="s" x="780" y="164" text-anchor="middle">your bank</text>
+<text class="s" x="780" y="198" text-anchor="middle">any site's addresses</text>
+<text class="s" x="780" y="232" text-anchor="middle">any site's rules</text>
+<text class="s" x="780" y="266" text-anchor="middle">anything about you</text>
+</svg>

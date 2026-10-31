@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 460" role="img" aria-labelledby="bag-title bag-desc">
+<title id="bag-title">A bag of endpoints, and controls in the answer</title>
+<desc id="bag-desc">A JSON API is a bag of endpoints a client is built against, with the rules in documentation. A hypermedia API starts from one bookmark, and every next step is chosen from the controls the current answer offers.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="bag-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="240" y="30" text-anchor="middle">A bag of endpoints</text>
+<text class="h" x="720" y="30" text-anchor="middle">Controls in the answer</text>
+<path class="dash" d="M480 20 L480 440"/>
+<rect class="box" x="20" y="56" width="290" height="34" rx="10"/>
+<text class="m" x="30" y="78" style="font-size:11.5px">GET /repos/{o}/{r}/issues?labels=</text>
+<path class="dash" d="M310 73 L338 222"/>
+<rect class="box" x="20" y="108" width="290" height="34" rx="10"/>
+<text class="m" x="30" y="130" style="font-size:11.5px">GET /repos/{o}/{r}/pulls/{n}</text>
+<path class="dash" d="M310 125 L338 222"/>
+<rect class="box" x="20" y="160" width="290" height="34" rx="10"/>
+<text class="m" x="30" y="182" style="font-size:11.5px">PUT /repos/{o}/{r}/pulls/{n}/merge</text>
+<path class="dash" d="M310 177 L338 222"/>
+<rect class="box" x="20" y="212" width="290" height="34" rx="10"/>
+<text class="m" x="30" y="234" style="font-size:11.5px">POST /repos/{o}/{r}/issues/{n}/comments</text>
+<path class="dash" d="M310 229 L338 222"/>
+<rect class="box" x="20" y="264" width="290" height="34" rx="10"/>
+<text class="m" x="30" y="286" style="font-size:11.5px">GET /repos/{o}/{r}/issues/{n}</text>
+<path class="dash" d="M310 281 L338 222"/>
+<rect class="ghost" x="20" y="316" width="290" height="34" rx="10"/>
+<text class="m" x="30" y="338" style="font-size:11.5px">… 823 paths in all</text>
+<path class="dash" d="M310 333 L338 222"/>
+<rect class="box" x="340" y="190" width="125" height="64" rx="10"/>
+<text class="h" x="402" y="217" text-anchor="middle">Client</text>
+<text class="s" x="402" y="237" text-anchor="middle">per API</text>
+<rect class="ghost" x="340" y="330" width="125" height="56" rx="10"/>
+<text class="h" x="402" y="353" text-anchor="middle">The docs</text>
+<text class="s" x="402" y="373" text-anchor="middle">rules</text>
+<path class="line" d="M402 330 L402 256" marker-end="url(#bag-head)"/>
+<text class="s" x="240" y="420" text-anchor="middle">The client builds each address and knows each rule</text>
+<rect class="box" x="630" y="60" width="180" height="50" rx="10"/>
+<text class="h" x="720" y="80" text-anchor="middle">The bookmark</text>
+<text class="s" x="720" y="100" text-anchor="middle">one URI</text>
+<path class="line" d="M720 110 L720 148" marker-end="url(#bag-head)"/>
+<rect class="hl" x="600" y="150" width="240" height="64" rx="10"/>
+<text class="h" x="720" y="177" text-anchor="middle">An answer</text>
+<text class="s" x="720" y="197" text-anchor="middle">state + links + forms</text>
+<path class="line" d="M720 214 L720 252" marker-end="url(#bag-head)"/>
+<rect class="hl" x="600" y="254" width="240" height="64" rx="10"/>
+<text class="h" x="720" y="281" text-anchor="middle">The next answer</text>
+<text class="s" x="720" y="301" text-anchor="middle">chosen from those offered</text>
+<path class="line" d="M720 318 L720 356" marker-end="url(#bag-head)"/>
+<rect class="ghost" x="600" y="358" width="240" height="50" rx="10"/>
+<text class="h" x="720" y="388" text-anchor="middle">…as long as needed</text>
+</svg>

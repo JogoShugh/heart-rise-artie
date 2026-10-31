@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Design for people, then for agents: why an OpenAPI catalog is the page with every form on it, and what a HEART form tells a machine.">
+<title>The Dynamic OpenAPI Client, Checked</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a two-act essay, people then agents; screenshots and code pairs break out wider; the form anatomy is annotated JSON with callouts beside it. */
+:root {
+  --bg: #f3f6f5;
+  --surface: #ffffff;
+  --fg: #17211d;
+  --muted: #55645d;
+  --rule: #d3ddd8;
+  --leaf: #2b7a4b;
+  --link: #2f5f8f;
+  --amber: #8a6a1f;
+  --refuse: #a3442e;
+  --code-bg: #e9efec;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+    --leaf: #6cc690; --link: #8ab8e6; --amber: #e0bf6a; --refuse: #e58a72; --code-bg: #1d2723; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732;
+  --leaf: #6cc690; --link: #8ab8e6; --amber: #e0bf6a; --refuse: #e58a72; --code-bg: #1d2723; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font: 16px/1.65 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 44rem; margin: 0 auto; padding-block: 3rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.75rem; }
+.wide { margin-inline: calc((44rem - min(62rem, 100%)) / 2); }
+@media (max-width: 62rem) { .wide { margin-inline: 0; } }
+h1, h2, h3 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 5vw, 2.9rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.05rem; font-family: var(--body); font-weight: 600; }
+p, li { max-width: 65ch; }
+p { margin: 0; }
+section { display: grid; gap: 1rem; min-width: 0; }
+.eyebrow { font: 600 0.74rem/1 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 1.12rem; color: var(--muted); }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.85rem 1rem; font: 0.79rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; }
+.c { color: var(--muted); }
+.k { color: var(--link); }
+.g { color: var(--leaf); }
+.r { color: var(--refuse); }
+a { color: var(--link); }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+ul { margin: 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+.note { color: var(--muted); font-size: 0.92rem; }
+
+.claim { display: grid; gap: 1rem; border-top: 1px solid var(--rule); padding-top: 1.5rem; }
+.claim blockquote { margin: 0; font-family: var(--display); font-weight: 500; font-size: 1.15rem; line-height: 1.45; color: var(--fg); padding-left: 1rem; border-left: 3px solid var(--rule); }
+.verdict { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.pill { font: 600 0.74rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; padding: 0.35rem 0.6rem; border-radius: 999px; border: 1px solid currentColor; }
+.pill.yes { color: var(--leaf); }
+.pill.adjust { color: var(--amber); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1rem; }
+.pair > div { display: grid; gap: 0.45rem; align-content: start; min-width: 0; }
+.label { font: 600 0.74rem/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.label.before { color: var(--refuse); }
+.label.after { color: var(--leaf); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1.25rem; align-items: start; }
+figure { margin: 0; display: grid; gap: 0.5rem; align-content: start; min-width: 0; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
+figcaption { font-size: 0.9rem; color: var(--muted); }
+figcaption b { color: var(--fg); }
+.close { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 1.1rem 1.25rem; display: grid; gap: 0.8rem; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.35rem; }
+.act { display: grid; gap: 1.1rem; }
+.actlabel { font: 600 0.78rem/1 var(--body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--leaf); }
+.map { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); }
+.map table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: 0.93rem; }
+.map th, .map td { text-align: left; vertical-align: top; padding: 0.6rem 0.9rem; border-bottom: 1px solid var(--rule); }
+.map tr:last-child td { border-bottom: 0; }
+.map thead th { font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.anatomy { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 48rem) { .anatomy { grid-template-columns: minmax(0, 1fr); } }
+.callouts { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+.callouts li { display: grid; gap: 0.15rem; padding-left: 0.8rem; border-left: 3px solid var(--rule); }
+.callouts li b { font-size: 0.92rem; }
+.callouts li span { font-size: 0.9rem; color: var(--muted); }
+.aside { background: var(--surface); border: 1px dashed var(--rule); border-radius: 8px; padding: 1.1rem 1.25rem; display: grid; gap: 0.8rem; }
+.figures { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header style="display:grid;gap:0.9rem">
+    <span class="eyebrow">OpenAPI vs HEART · design for people, design for agents</span>
+    <h1>The dynamic OpenAPI client, checked</h1>
+    <p class="lede">Nobody would give a customer a web page that lists every form on the site, blank, with the rules in small red print. An OpenAPI description is that page, handed to every program. This is about why, what it costs, and what HEART does instead.</p>
+  </header>
+
+  <!-- ===================== ACT 1: PEOPLE ===================== -->
+  <section class="act">
+    <span class="actlabel">Part one · designing for people</span>
+    <h2>The page with every form on it</h2>
+    <p>Picture a shop that puts every account action on one page. Two links at the top, then eight forms: cancel an order, change an address, track a shipment, return an item, reorder, review a product, apply a coupon, pay an invoice. Every form is blank. Every one asks for an ID. Under each is a red sentence saying when it would work.</p>
+  </section>
+
+  <section class="wide">
+    <div class="shots">
+      <figure><img src="shop-catalog.png" alt="A page titled Account actions: eight blank forms, each asking for an order, product, cart or invoice ID, each with a red sentence saying when it is allowed" width="820" height="1480"><figcaption><b>Every form, for everyone.</b> Blank ID fields, free-text values, and the rules in red prose. Nothing here knows who you are.</figcaption></figure>
+      <figure><img src="shop-state.png" alt="A page titled Your orders: three orders, each with a status and only the buttons that apply, with drop-down lists filled from that order" width="820" height="730"><figcaption><b>Your orders, as they are now.</b> Each order shows only what it allows. No ID fields. Drop-downs hold only your addresses, or only that order's items.</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <p>The page on the left is accurate. Every form works, if you fill it in right, for an order in the right state. It's still terrible design, and any designer would say why:</p>
+    <ul>
+      <li><b>It makes you supply what it already knows.</b> Your order numbers, your addresses, the items you bought.</li>
+      <li><b>It makes you apply the rules.</b> "Only allowed when the order status is PROCESSING" is your job to check.</li>
+      <li><b>It makes you guess valid values.</b> A reason code typed by hand, a rating typed by hand.</li>
+      <li><b>It teaches by failure.</b> Cancel an order that already shipped, and you learn the rule after you pressed the button.</li>
+      <li><b>It shows you everything.</b> Coupons and invoices sit beside your orders whether you have a cart or an invoice or not.</li>
+    </ul>
+    <p>The page on the right is how the Web is designed. You enter at a home page that offers a few relevant choices. Each choice leads to a page that narrows or expands into more choices, constrained by where you came from and what you picked. IDs are carried by the links, not typed. Choices come as lists of valid values. A button that wouldn't work isn't there.</p>
+    <p>Roy Fielding put that design principle into a definition, in a comment on his 2008 post:</p>
+    <blockquote style="margin:0;font-family:var(--display);font-weight:500;font-size:1.15rem;line-height:1.45;padding-left:1rem;border-left:3px solid var(--leaf)">"When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions."</blockquote>
+    <p class="note">Roy T. Fielding, comment on <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">"REST APIs must be hypertext-driven"</a>, 2008. Note the words "or automaton".</p>
+  </section>
+
+  <!-- ===================== ACT 2: AGENTS ===================== -->
+  <section class="act">
+    <span class="actlabel">Part two · designing for agents</span>
+    <h2>The OpenAPI description is the page with every form on it</h2>
+    <p>Now hand the same shop to a program: a generated client, a dashboard, or an AI agent. The usual way is an OpenAPI description. Read it next to the left-hand page, card by card, and they turn out to be the same thing.</p>
+  </section>
+
+  <section class="wide">
+    <div class="map">
+      <table>
+        <thead><tr><th scope="col">On the page for people</th><th scope="col">In the OpenAPI description</th></tr></thead>
+        <tbody>
+          <tr><td>A form card, "Cancel an order"</td><td>An operation, <code>POST /orders/{orderId}/cancel</code></td></tr>
+          <tr><td>A blank "Order ID" field</td><td>A path parameter, <code>orderId</code>, <code>"required": true</code></td></tr>
+          <tr><td>The red sentence about when it works</td><td>The operation's <code>description</code>: "Only allowed when the order status is PROCESSING."</td></tr>
+          <tr><td>A free-text "Address ID" field</td><td>A request body property, <code>{"type": "string"}</code>, with no idea which addresses are yours</td></tr>
+          <tr><td>Eight forms on one page, for everyone</td><td>Every operation on every resource, in every state, in one document</td></tr>
+          <tr><td>Pressing Cancel on a shipped order</td><td><code>409 Conflict</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pair">
+      <div><span class="label before">The cancel card, as OpenAPI</span>
+<pre><code><span class="k">"/orders/{orderId}/cancel"</span>: { <span class="k">"post"</span>: {
+  <span class="k">"operationId"</span>: "cancelOrder",
+  <span class="k">"parameters"</span>: [ { <span class="k">"name"</span>: "orderId",
+      <span class="k">"in"</span>: "path", <span class="k">"required"</span>: true } ],
+  <span class="k">"description"</span>: "<span class="r">Only allowed when the
+      order status is PROCESSING.</span>"
+} }
+<span class="c">// … and seven more cards,
+// for every order, in every state</span></code></pre>
+      </div>
+      <div><span class="label after">Order 1047, as HEART sends it</span>
+<pre><code>{ <span class="k">"id"</span>: 1047, <span class="k">"status"</span>: "PROCESSING",
+  <span class="k">"_forms"</span>: {
+    <span class="k">"shop:cancel"</span>: { <span class="k">"title"</span>: "Cancel order",
+      <span class="k">"method"</span>: "POST",
+      <span class="k">"_links"</span>: { <span class="k">"target"</span>: {
+        <span class="k">"href"</span>: "/orders/{id}/cancel",
+        <span class="k">"templated"</span>: true } },
+      <span class="k">"hr:templatePointers"</span>: { <span class="k">"id"</span>: "/id" } },
+    <span class="k">"shop:change-address"</span>: { … }
+} }
+<span class="c">// only what order 1047 allows now</span></code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p>A program reading the description has the same five problems the shopper had. It must find the IDs elsewhere. It must apply rules written as prose, or copy them into its code. It must guess valid values. It learns the rules from 409s. And it has to hold the whole catalog to act on one order.</p>
+    <p>For an AI agent this is literal. The catalog goes into its context, every operation, so it can pick one, and the rules it must obey arrive as sentences it has to interpret correctly every time. We measured the garden from this exhibit, a small API with eight operations on one kind of resource:</p>
+<pre class="figures"><code>GET /openapi.json           <span class="r">13,174 bytes</span>  every operation, every state
+GET /beds/2  (HEART, L0)     <span class="g">1,077 bytes</span>  this bed's state and its form
+GET /affordance-sets/…   773–1,065 bytes  one state's forms, shared</code></pre>
+    <p>One complete HEART answer is about a twelfth of the catalog, and the catalog grows with every operation the API adds, while the answer about one bed grows only with what that bed allows. Caching makes the catalog's bytes a once-per-release cost. The cost that stays is structural: every client re-derives "what can I do now" from "everything that could ever happen", on every turn.</p>
+  </section>
+
+  <!-- ===================== THE HEART FORM ===================== -->
+  <section class="act">
+    <span class="actlabel">What a HEART form tells a machine</span>
+    <h2>Everything the request needs, and nothing it doesn't</h2>
+    <p>A HEART form is the right-hand page for programs. It tells an agent, or a person, exactly what the request looks like, which parts are already known, and what may be chosen and within what limits. Here is a real form from the garden, under the release where watering gained an optional method:</p>
+  </section>
+
+  <section class="wide">
+    <div class="anatomy">
+<pre><code>{ <span class="k">"title"</span>: "Water the bed",
+  <span class="k">"description"</span>:
+    "Adds the given millilitres of water to each cell.",
+  <span class="k">"method"</span>: "POST",
+  <span class="k">"_links"</span>: { <span class="k">"target"</span>: {
+    <span class="k">"href"</span>: "/beds/{id}/actions/water-cell",
+    <span class="k">"templated"</span>: true } },
+  <span class="g">"hr:templatePointers"</span>: { <span class="k">"id"</span>: "/id" },
+  <span class="k">"schema"</span>: {
+    <span class="k">"type"</span>: "object",
+    <span class="k">"required"</span>: ["milliliters"],
+    <span class="k">"properties"</span>: {
+      <span class="k">"milliliters"</span>: {
+        <span class="k">"title"</span>: "Water per cell",
+        <span class="k">"type"</span>: "integer",
+        <span class="k">"minimum"</span>: 1, <span class="k">"maximum"</span>: 1000,
+        <span class="k">"examples"</span>: [250] },
+      <span class="k">"method"</span>: {
+        <span class="k">"title"</span>: "Method",
+        <span class="k">"enum"</span>: ["drip", "spray"],
+        <span class="k">"default"</span>: "drip" }
+    } } }</code></pre>
+      <ul class="callouts">
+        <li><b>It's offered at all</b><span>The bed is planted. A frozen bed's answer has no such form, so there's no rule to read and no 409 to risk.</span></li>
+        <li><b>Where it goes, without an ID field</b><span><code>hr:templatePointers</code> says the <code>{id}</code> comes from the bed's own <code>/id</code>. Deterministic code fills it; nobody types it and no model guesses it.</span></li>
+        <li><b>What must be supplied</b><span><code>required</code> names the one field the caller has to provide.</span></li>
+        <li><b>Within what range</b><span><code>minimum</code> and <code>maximum</code> bound it; <code>examples</code> gives a sensible value to start from.</span></li>
+        <li><b>From which fixed choices</b><span><code>enum</code> lists the only valid methods, and <code>default</code> says what happens if you leave it out.</span></li>
+        <li><b>What it means</b><span>A title and description for a person, a relation name for code, the same words an agent reads to decide.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <p>That's the drop-down page, as data. The server, which knows the state, does the work the catalog left to the client. And because each form arrives with the state it applies to, the client never trims anything: it draws, or chooses from, what arrived.</p>
+<pre><code><span class="c">// a HEART client, in effect</span>
+<span class="k">for</span> (form <span class="k">in</span> representation.forms) offer(form)   <span class="c">// no catalog, no rules, no subtraction</span></code></pre>
+  </section>
+
+  <!-- ===================== RESEARCH ASIDE ===================== -->
+  <section class="aside wide">
+    <span class="eyebrow">A research aside</span>
+    <h3 style="font-family:var(--display);font-size:1.2rem">Can template pointers constrain a choice to values from the resource's own state?</h3>
+    <p>The shop's right-hand page has drop-downs of <em>your</em> addresses and <em>this order's</em> items. Can a HEART form say that, with the choices coming from the resource's state rather than a fixed list?</p>
+    <p><b>Not today. The standard pieces to do it exist, though.</b></p>
+    <ul>
+      <li><b>JSON Hyper-Schema's <code>templatePointers</code></b>, which <code>hr:templatePointers</code> comes from, fill URI template variables from the resource's data, and may be relative pointers. They supply values; they don't constrain choices. Its <code>hrefSchema</code> can constrain what a user enters for a variable, including with an <code>enum</code>, but that list is fixed in the schema. Nothing in the spec limits an input to values taken from the resource itself.</li>
+      <li><b>HEART's own rule</b> is stricter still: a pointer must resolve to a string or a number. An array is an error, so a pointer can't hand over a list.</li>
+      <li><b>JSON Schema</b> has no standard way for an <code>enum</code> to come from data. Its <code>enum</code> is a literal list.</li>
+      <li><b>HAL-FORMS does have it.</b> A property's <code>options</code> can be <code>inline</code>, or fetched at run time from a <code>link</code> whose <code>href</code> may be a URI template, with <code>promptField</code>, <code>valueField</code>, <code>selectedValues</code>, <code>minItems</code> and <code>maxItems</code>. That's a multi-value choice constrained by the server, fetched when needed.</li>
+    </ul>
+    <p>Why HEART can't just write the customer's addresses into the form: forms and schemas are content-addressed and shared by every resource in the same state, which is what makes them cacheable. Put one customer's addresses in, and the set stops being shareable. The way through is to keep the form shared and point at the per-resource choices, which combines the two standards above. A possible shape, not built:</p>
+<pre><code><span class="k">"addressId"</span>: {
+  <span class="k">"type"</span>: "string",
+  <span class="g">"hr:options"</span>: { <span class="k">"link"</span>: { <span class="k">"href"</span>: "/customers/{customer}/addresses", <span class="k">"templated"</span>: true },
+                  <span class="k">"promptField"</span>: "label", <span class="k">"valueField"</span>: "id", <span class="k">"maxItems"</span>: 1 } }
+<span class="c">// and on the form, beside the target's pointer:</span>
+<span class="g">"hr:templatePointers"</span>: { <span class="k">"id"</span>: "/id", <span class="k">"customer"</span>: "/customerId" }</code></pre>
+    <p>The form stays identical for every processing order, so it still caches. The template pointer fills the customer from the order's state, and the options link returns that customer's addresses. A pointer straight into an array in the state, say <code>"/addresses"</code>, would work too, for short lists the representation already carries. Either way the server constrains the choice, and the client never offers an address that isn't yours.</p>
+    <p class="note">Sources: JSON Hyper-Schema 2019-09, <code>templatePointers</code> and <code>hrefSchema</code>; the HAL-FORMS specification, the <code>options</code> element; HEART's profile, <code>spec/HAL-SCHEMA-FORMS-HR.md</code> Rule 1. HEART's HAL-FORMS rendering already turns an <code>enum</code> into inline <code>options</code>.</p>
+  </section>
+
+  <!-- ===================== THE OPENAPI CLIENT ===================== -->
+  <section class="act">
+    <span class="actlabel">Back to OpenAPI</span>
+    <h2>How far an OpenAPI client got, and what it took</h2>
+    <p>In the exhibit, an OpenAPI client was improved step by step. Its author summed up the final version in three claims. Each is right, with one adjustment.</p>
+    <ul>
+      <li><b>"It has no typed copies of the server's shapes."</b> Correct. It generates nothing and reads schemas while it runs. The coupling moved to the OpenAPI format itself, and it still starts from three facts: the server's address, where the description lives, and the one operation that looks up a bed.</li>
+      <li><b>"It builds its available operations from the spec at run time."</b> Correct, except for one word. The spec gives the operations that could ever exist, not the ones available now. That's why it still offered Water on a frozen bed.</li>
+      <li><b>"State-based affordances come in as a small extension, HEART-shaped."</b> Right. Each plain answer carries a <code>Link</code> to the affordance set for its state, and the client keeps only the operations a form names. It's bound to a convention, a link relation and a forms format, not to HEART the product.</li>
+    </ul>
+<pre><code><span class="c">// the extension: follow the link, keep what the forms name</span>
+<span class="k">const</span> allowedNow = everyOperation.filter((op) =&gt;
+    forms.some((f) =&gt; f.method === op.method &amp;&amp; shape(f.target) === shape(op.path)));</code></pre>
+    <p>It works: the frost suite went from 0 of 3 and 1 of 7 to 3 of 3 and 7 of 7. But look at what the client does. It downloads the page with every form on it, then uses the link to hide the forms that don't apply. That's a script bolted onto the left-hand page. The right-hand page never needed one, because it was built from the visitor's state to begin with.</p>
+  </section>
+
+  <section class="close wide">
+    <h2>Where this road ends</h2>
+    <p>The forms behind that link already carry a title, a method, a target and a schema. Once the client has them, the OpenAPI description isn't needed to decide anything; it supplies names and documentation. Act on the form's own target instead of matching it to an operation, and the client is a HEART client.</p>
+<pre><code><span class="c">// one step further: act on the form itself</span>
+<span class="k">const</span> form = forms["garden:thaw"];
+<span class="k">await</span> fetch(expand(form._links.target.href, bed), { method: form.method, body: … });</code></pre>
+    <p>So the same principle runs through both halves. For people, nobody ships the page with every form on it; we design pages that present information and the controls that apply to it, together. For agents, the OpenAPI catalog is that page, and every fix for it, the dynamic client, the careful releases, the affordance link, moves it toward the other design. HEART starts there. OpenAPI stays useful as the documentation layer, which is what its maintainers built it to be when they chose to describe "HTTP APIs".</p>
+  </section>
+
+  <footer>
+    <span>From the OpenAPI-vs-HEART exhibit: the spec-reading client is <code>openapi-live/</code>, with the link it's <code>openapi-affordances/</code>, and the shop pages are mock-ups made for this page.</span>
+    <span>Companion page: <a href="../hateoas-anyway/">In the end we wind up with HATEOAS anyway</a>.</span>
+  </footer>
+</main>
+</body>
+</html>

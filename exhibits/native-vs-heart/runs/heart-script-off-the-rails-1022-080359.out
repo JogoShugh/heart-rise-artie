@@ -1,0 +1,12 @@
+1 enter http://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Crash when a bed has no name (1022-080359), body a bed with a blank name crashes the garden: new resource
+4 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/254: done
+5 act github:label, labels [bug]: done
+6 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/254: done
+7 act github:assign, assignees [JogoShugh]: done
+8 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/254: done
+9 check: held
+10 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+11 act github:open-issue, title Test blank bed names (1022-080359), body part of #254: refused
+stopped at step 7, "github:open-issue": stale, refused by the server: "the resource changed since it was read"

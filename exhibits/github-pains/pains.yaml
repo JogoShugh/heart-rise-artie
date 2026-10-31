@@ -1,0 +1,339 @@
+# What people automating GitHub through its API actually struggle with, and whether ARTIE and HEART answer it.
+# Each pain: what people hit, the sources (with how sure they are), our own evidence, how HEART answers it,
+# what we would still have to build, whether our own runs met it (seen), and a fit: strong, medium, none, or against (HEART makes it worse today).
+# Researched 2026-10-23. Confidence per source: documented (GitHub's docs), probed (we tried it against GitHub),
+# reported (a public thread or issue), secondhand (a third party's summary, not checked against GitHub).
+# pains.kts turns this into docs/reports/github-pains/.
+
+asOf: "2026-10-23"
+
+pains:
+  - id: why-not-merge
+    title: "Why can't I merge?"
+    fit: strong
+    seen: true
+    hit: >-
+      The API says a pull request can't be merged, but not why. mergeable_state is a single undocumented word
+      (blocked, behind, unstable, dirty, unknown), and the merge itself answers 405 for a draft, missing reviews,
+      failing required checks or a ruleset alike. Each script works the reason out again from branch protection,
+      reviews and checks, and each gets it slightly wrong.
+    sources:
+      - label: "GitHub REST docs: get a pull request, merge a pull request"
+        url: https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
+        confidence: documented
+        says: >-
+          mergeable_state appears in the schema only as "required, string", with no meanings. The merge
+          endpoint answers "405 Method Not Allowed if merge cannot be performed".
+      - label: "GitHub Community #21886: the reason a pull request isn't mergeable"
+        url: https://github.com/orgs/community/discussions/21886
+        confidence: reported
+        says: >-
+          GitHub staff, 2018: "There isn't an API that summarizes why a PR is mergeable or not, only that it is
+          or isn't." The asker fell back on the undocumented mergeable_state.
+    ours: >-
+      Under the meddler's M4 (the pull request turned into a draft), artie-bare sent the merge 30 times, a second
+      apart, and got 405 "Pull Request is still a draft" each time before giving up after about 62 s.
+    heart: >-
+      Offer the merge only when it would be taken, and say why it isn't in hr:unavailable: "a draft", "needs 1
+      approving review", "check build is failing". One place works the reason out, the gateway, and every client
+      reads it.
+    missing: >-
+      The gateway's GitHub connector doesn't yet derive each blocking reason (draft, reviews, required checks,
+      rulesets) from GitHub's data into hr:unavailable.
+
+  - id: mergeable-later
+    title: "Mergeability arrives later"
+    fit: medium
+    seen: true
+    hit: >-
+      Right after a pull request opens or its base moves, mergeable is null while GitHub works it out. Scripts poll
+      with hand-written loops and backoff, and some read null as "no".
+    sources:
+      - label: "GitHub REST docs: get a pull request"
+        url: https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request
+        confidence: documented
+        says: >-
+          "If the value is null, then GitHub has started a background job to compute the mergeability. After
+          giving the job time to complete, resubmit the request."
+      - label: "Zuul's GitHub driver"
+        url: https://opendev.org/zuul/zuul/commit/83281e33565dfe872c3b82bb4a80733971ff216e
+        confidence: reported
+        says: >-
+          Reading null during the calculation as "not mergeable" gave false negatives; Zuul stopped checking it
+          and relied on branch protection instead.
+    ours: >-
+      Claude's Python polls GET /pulls/N up to 30 times, 2 s apart. The careful ARTIE script says
+      until(tries = 20) { offers("github:merge") }. artie-bare retries the merge itself.
+    heart: >-
+      The wait is said once, in the task's words ("once the merge is offered"), not as a loop of field checks.
+      The polling is still there underneath; HEART makes it one rule in one place, not faster.
+    missing: >-
+      Backoff on the wait, and a wait that ends with the reason when the merge will never be offered (it's a draft),
+      instead of running out of tries.
+
+  - id: lost-updates
+    title: "Two writers, one overwritten"
+    fit: strong
+    seen: true
+    hit: >-
+      A bot and a person, or two bots, change the same issue or pull request. The later write wins and the
+      earlier is lost without a word: labels flipped back, a description edit undone, an issue someone closed as
+      not planned closed again as completed.
+    sources:
+      - label: "Our probe of GitHub, 2026-10-23"
+        url: https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api#use-conditional-requests-if-appropriate
+        confidence: probed
+        says: >-
+          PATCH /issues/677 on the scratch repository with If-Match answered 400: "Conditional request headers
+          are not allowed in unsafe requests unless supported by the endpoint". The same PATCH without it: 200.
+          GitHub has no general optimistic locking on writes.
+      - label: "GitHub REST docs: merge a pull request"
+        url: https://docs.github.com/en/rest/pulls/pulls#merge-a-pull-request
+        confidence: documented
+        says: >-
+          A few endpoints carry their own precondition in the body instead: the merge's sha ("409 Conflict if
+          sha was provided and pull request head did not match"), and a file update's sha.
+    ours: >-
+      In the meddler's storm (M1, M2, M3, M5), Claude's plain Python and artie-bare both did harm in 4 of 4
+      runs and exited 0. artie-goal did no harm: 4 of 5 runs succeeded and the fifth stopped safely.
+    heart: >-
+      Every act carries the validator of the state it was chosen from, and a changed resource answers 412, so the
+      client decides again on what is there now. The goal client then acts only on what is still offered.
+    missing: >-
+      Honesty about the limit: GitHub can't check a condition atomically, so the gateway reads, compares, then
+      writes. That narrows the window to milliseconds; it doesn't close it. Only the endpoints with a body sha
+      (merge, file contents) are truly safe.
+
+  - id: permissions
+    title: "Resource not accessible by integration"
+    fit: strong
+    seen: false
+    hit: >-
+      A workflow or app gets a 403 and has to guess the cause: the GITHUB_TOKEN is read-only by default, scoped to
+      the repository that triggered it, restricted on pull requests from forks, or an app's permissions changed.
+      People widen permissions until it works.
+    sources:
+      - label: "GitHub Community #57878"
+        url: https://github.com/orgs/community/discussions/57878
+        confidence: reported
+        says: "One of many threads on the same 403 and the permissions block that fixes it."
+      - label: "GoReleaser: resource not accessible by integration"
+        url: https://goreleaser.com/errors/resource-not-accessible-by-integration
+        confidence: reported
+        says: >-
+          The GITHUB_TOKEN is scoped to the triggering repository, so writing to another one (a Homebrew tap)
+          needs a personal access token.
+    ours: "Not measured. Our runs use one personal token with full access to the scratch repository."
+    heart: >-
+      The same as the merge: an act the token can't make isn't offered, and hr:unavailable says which permission
+      is missing. A person or an agent sees "contents: write needed" before trying, not a 403 after.
+    missing: >-
+      The gateway doesn't read what the caller's token may do. GitHub tells fine-grained tokens and apps which
+      permissions an endpoint needs in a response header (X-Accepted-GitHub-Permissions, to be confirmed), which
+      could feed this.
+
+  - id: duplicate-creates
+    title: "A retry makes a second issue"
+    fit: medium
+    seen: false
+    hit: >-
+      A create times out, the script retries, and there are now two issues or two comments. GitHub's API takes
+      no idempotency key, so careful bots embed a marker and look for it before resending.
+    sources:
+      - label: "laravel-error-monitor-github"
+        url: https://packagist.org/packages/ashita-planning/laravel-error-monitor-github
+        confidence: reported
+        says: >-
+          A write whose answer never arrived may have succeeded, so it is never simply sent again: the package
+          looks for its fingerprint in the repository's issue list first, not in search, which lags.
+    ours: >-
+      artie-bare retries a write only after an until step, and only the merge, which GitHub refuses twice. No run
+      has timed out on a create yet, so we haven't seen it.
+    heart: >-
+      An act answered 201 names what it made in Location; a client that lost the answer can ask the gateway what
+      that act made. The gateway, not every script, keeps the key.
+    missing: "Idempotent acts in the gateway: a key per act, kept with what it made. Not built."
+
+  - id: lists-lag
+    title: "Lists and search lag writes"
+    fit: medium
+    seen: true
+    hit: >-
+      A script creates something, then looks for it in a list or search, and it isn't there yet. Scripts sleep,
+      or pick the wrong item.
+    sources:
+      - label: "GitHub status, December 2025"
+        url: https://www.githubstatus.com/incidents/ccrzb3ms9j2d
+        confidence: reported
+        says: >-
+          During an incident, search results could be up to three minutes old. Search is an index that can lag
+          the write.
+    ours: >-
+      The ladder waits 10 s before checking a run, because GitHub's lists catch up a few seconds late. The meddler
+      reads each next issue number directly instead of listing.
+    heart: >-
+      A HEART client follows the Location of what it made, not a list. The careful script never searches for its
+      own issues.
+    missing: "Nothing for our own writes. Someone else's new items still come through lists."
+
+  - id: rate-limits
+    title: "Rate limits, especially on writes"
+    fit: against
+    seen: true
+    hit: >-
+      5000 requests an hour, plus secondary limits that change without notice: about 80 content-creating requests
+      a minute and 500 an hour, writes costing 5 points to a read's 1, at most 100 at once.
+    sources:
+      - label: "GitHub REST docs: rate limits"
+        url: https://docs.github.com/en/enterprise-cloud@latest/rest/using-the-rest-api/rate-limits-for-the-rest-api
+        confidence: documented
+        says: "Secondary limits as above; they are subject to change without notice, and may apply for undisclosed reasons."
+      - label: "GitHub REST docs: best practices"
+        url: https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api
+        confidence: documented
+        says: "A conditional request answered 304, made with the same authorization, doesn't count against the primary limit."
+    ours: >-
+      The careful run made 237 GitHub calls for the triage; the bare script made 19 for the same writes. Caution
+      costs calls today.
+    heart: >-
+      Not yet an answer. It could be: most of the careful run's extra calls are re-reads, and a re-read sent with
+      If-None-Match and answered 304 is free.
+    missing: >-
+      The gateway's re-reads as conditional requests, per token. A count of GitHub calls per arm on the care dial.
+
+  - id: agent-tools
+    title: "Too many tools for an agent"
+    fit: strong
+    seen: true
+    hit: >-
+      GitHub's MCP server exposes about 100 tools. Loaded all at once they fill the context, exceed some clients'
+      tool limits, and agents pick the wrong one. GitHub's answer is to let people switch toolsets and single tools
+      on and off by hand.
+    sources:
+      - label: "GitHub changelog, 2025-12-10: tool-specific configuration"
+        url: https://github.blog/changelog/2025-12-10-the-github-mcp-server-adds-support-for-tool-specific-configuration-and-more
+        confidence: documented
+        says: "An X-MCP-Tools header enables single tools, instead of the 27 two toolsets would bring in."
+      - label: "Arcade: lessons from GitHub's MCP server launch"
+        url: https://www.arcade.dev/blog/enterprise-mcp-lessons-from-githubs-mcp-server-launch
+        confidence: secondhand
+        says: "Users loaded every tool into their agent's context and were frustrated when the agent struggled."
+    ours: >-
+      artie-goal, reasoning from what each representation offers, came through the storm without harm. It saw a
+      handful of acts at a time, not 100 tools.
+    heart: >-
+      The tools an agent sees are the acts this resource offers now. A closed issue offers no "close"; a draft
+      offers no "merge". The list is short because the state makes it short, not because someone configured it.
+    missing: >-
+      A measured comparison: the same goal by an agent on GitHub's MCP server and on heart-mcp, counting tokens,
+      tools seen and wrong calls.
+
+  - id: agent-mistakes
+    title: "Agents act on the wrong thing"
+    fit: medium
+    seen: true
+    hit: >-
+      Agents close issues as duplicates of issues that don't match, say an issue is solved when it isn't, or write
+      a review without reading the pull request.
+    sources:
+      - label: "A report about the Claude Code issue bot (third-party mirror)"
+        url: https://claudeissues.com/issue/66135-bug-fix-github-action-bot-incorrectly-closing-feature-and-support-request
+        confidence: secondhand
+        says: "The bot closed issues as duplicates of issues that didn't match them."
+      - label: "Gigazine on GitHub Copilot's coding agent, 2025"
+        url: https://gigazine.net/gsc_news/en/20250522-github-copilot-coding-agent-error
+        confidence: secondhand
+        says: "In a Microsoft repository, the agent claimed to have solved issues it hadn't."
+    ours: >-
+      Under M3 (the team says the duplicate is a different crash), the Python and bare runs closed it as a
+      duplicate anyway. artie-goal kept the team's call.
+    heart: >-
+      HEART can't make the judgement right. It can make acting on a changed state fail, and a goal's "Done when"
+      can say what must be true afterwards, checked by code, not by the model's word.
+    missing: "The goal grammar (\"Once…\", \"Done when\") in spec/ideas/goals-that-work-alongside-others.md, unbuilt."
+
+  - id: token-no-trigger
+    title: "Actions' own writes don't start workflows"
+    fit: none
+    seen: false
+    hit: >-
+      A pull request opened with the GITHUB_TOKEN doesn't start its checks (or starts them awaiting approval), so
+      an auto-merge waits forever. People switch to an app token or a personal token.
+    sources:
+      - label: "GitHub docs: triggering a workflow"
+        url: https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow
+        confidence: documented
+        says: "Events triggered by the GITHUB_TOKEN will not create a new workflow run, except workflow_dispatch and repository_dispatch."
+    ours: "Not met: the scratch repository has no workflows."
+    heart: >-
+      Nothing to fix; it's GitHub's rule against loops. At most, why-absent could say "checks haven't started"
+      instead of the merge simply never appearing.
+    missing: "-"
+
+  - id: merge-races
+    title: "Two green pull requests, a red main"
+    fit: none
+    seen: false
+    hit: "Each pull request passes on its own; together they break the main branch."
+    sources:
+      - label: "Graphite: what is a merge queue"
+        url: https://graphite.dev/blog/what-is-a-merge-queue
+        confidence: secondhand
+        says: "The merge race, and merge queues that test each change on top of the ones ahead of it."
+    ours: "Not met."
+    heart: "GitHub's merge queue answers this. HEART would only drive it."
+    missing: "-"
+
+  - id: backport-conflicts
+    title: "Backports resolved silently and wrongly"
+    fit: none
+    seen: false
+    hit: >-
+      Backport bots cherry-pick onto release branches; with conflicts resolved automatically, a backport can carry
+      a line the original never had.
+    sources:
+      - label: "gophercloud #2685"
+        url: https://github.com/gophercloud/gophercloud/pull/2685
+        confidence: reported
+        says: "Every cherry-pick used the 'theirs' strategy, which resolved conflicts automatically and put in a line the original didn't have."
+    ours: "Not met."
+    heart: "A git content problem, not an API one. Out of HEART's reach."
+    missing: "-"
+
+  - id: webhooks
+    title: "Events arrive twice, or out of order"
+    fit: medium
+    seen: false
+    hit: >-
+      A bot driven by webhooks gets the same delivery twice or events out of order, and acts on a state that has
+      already moved.
+    sources:
+      - label: "Hookdeck: delivery guarantees"
+        url: https://hookdeck.com/webhooks/guides/webhook-delivery-guarantees
+        confidence: secondhand
+        says: "Webhooks are delivered at least once; exactly once is at least once with idempotent handling."
+    ours: "Not met: our runs aren't driven by webhooks."
+    heart: >-
+      Treat the event as a hint and act on the resource as it is now: read it, act with its validator. A stale or
+      repeated event then finds nothing to do.
+    missing: "Weak evidence: no GitHub-specific source checked. Worth confirming before it's claimed."
+
+workflows:
+  - name: "Merge Dependabot's pull requests once checks pass, unless a person objects"
+    pains: [why-not-merge, mergeable-later, lost-updates, permissions, agent-tools]
+    why: >-
+      Among the most automated things on GitHub. It waits, it needs to know why it can't merge yet, and a
+      person's "request changes" or a push must stop it. It's the goal note's "Once…" in one sentence.
+    today: "An Actions workflow with gh pr merge --auto, branch protection and a repository setting."
+  - name: "Triage: label, assign, close duplicates"
+    pains: [lost-updates, duplicate-creates, agent-mistakes, agent-tools]
+    why: "What our trial already does; where teammates and bots collide on the same issues."
+    today: "Probot apps, Actions with github-script, or an agent with GitHub's MCP server."
+  - name: "Cut a release"
+    pains: [duplicate-creates, rate-limits, permissions]
+    why: "Many writes in a row, where a retried step must not tag or publish twice."
+    today: "release-please, semantic-release, goreleaser."
+  - name: "Backport a fix"
+    pains: [backport-conflicts]
+    why: "Its hard part is git, not the API; listed to say it isn't ours."
+    today: "korthout/backport-action, Mergify."

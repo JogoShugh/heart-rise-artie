@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="walk-title walk-desc">
+<title id="walk-title">The walk: from the bookmark to merge, or why not</title>
+<desc id="walk-desc">From the gateway's bookmark the client is offered the pull request list, then each pull request, which offers merge when GitHub would accept it, or says why not.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="walk-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="60" y="80" width="200" height="70" rx="10"/>
+<text class="h" x="160" y="110" text-anchor="middle">The bookmark</text>
+<text class="s" x="160" y="130" text-anchor="middle">github:pulls-list</text>
+<path class="line" d="M260 115 L358 115" marker-end="url(#walk-head)"/>
+<rect class="box" x="360" y="80" width="200" height="70" rx="10"/>
+<text class="h" x="460" y="110" text-anchor="middle">Labelled list</text>
+<text class="s" x="460" y="130" text-anchor="middle">item links, titled</text>
+<path class="line" d="M560 115 L658 115" marker-end="url(#walk-head)"/>
+<rect class="hl" x="660" y="80" width="200" height="70" rx="10"/>
+<text class="h" x="760" y="110" text-anchor="middle">Pull request</text>
+<text class="s" x="760" y="130" text-anchor="middle">merge? or why not</text>
+<path class="line" d="M720 150 L650 230" marker-end="url(#walk-head)"/>
+<path class="line" d="M790 150 L830 230" marker-end="url(#walk-head)"/>
+<rect class="hl" x="530" y="232" width="180" height="64" rx="10"/>
+<text class="h" x="620" y="259" text-anchor="middle">Merge</text>
+<text class="s" x="620" y="279" text-anchor="middle">form offered</text>
+<rect class="box" x="760" y="232" width="160" height="64" rx="10"/>
+<text class="h" x="840" y="259" text-anchor="middle">Why not</text>
+<text class="s" x="840" y="279" text-anchor="middle">hr:unavailable</text>
+<text class="s" x="480" y="40" text-anchor="middle">Each stop offers the next: no address is built by the client</text>
+<text class="s" x="480" y="350" text-anchor="middle">This is the path the merge watch takes, look after look</text>
+</svg>

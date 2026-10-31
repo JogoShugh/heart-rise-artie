@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Journal — ARTIE Three-Layer Verification (live)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDE7D6; --paper-deep: #E4DCC6; --ink: #262019; --ink-soft: #4A4032;
+    --moss: #45573A; --moss-deep: #2E3B26; --fern: #8DA179; --rust: #9C4A2B;
+    --rust-deep: #7A3820; --gold: #B8862E; --line: #C9BFA0; --card: #F7F3E7;
+    --shadow: rgba(38, 32, 25, 0.12);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: radial-gradient(ellipse at top left, rgba(141,161,121,0.10), transparent 55%), var(--paper);
+    color: var(--ink); font-family: 'Public Sans', sans-serif; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--fern); color: var(--ink); }
+  a { color: var(--moss-deep); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 28px 140px; }
+  .hero { padding: 96px 0 56px; position: relative; }
+  .hero::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 8px, transparent 8px 14px);
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--moss-deep); display: flex; align-items: center;
+    gap: 10px; margin-bottom: 22px;
+  }
+  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--moss); }
+  h1.title {
+    font-family: 'Fraunces', serif; font-optical-sizing: auto; font-weight: 480;
+    font-size: clamp(38px, 6vw, 64px); line-height: 1.04; letter-spacing: -0.015em;
+    margin: 0 0 22px; color: var(--ink);
+  }
+  h1.title em { font-style: italic; font-weight: 340; color: var(--moss-deep); }
+  .dek { font-size: 18px; color: var(--ink-soft); max-width: 58ch; margin: 0 0 28px; }
+  .meta-row {
+    display: flex; flex-wrap: wrap; gap: 10px 22px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px; color: var(--ink-soft);
+  }
+  .meta-row span b { color: var(--ink); font-weight: 600; }
+  .lede { padding: 48px 0 8px; font-size: 17px; color: var(--ink-soft); }
+  .lede p { margin: 0 0 18px; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+  section.entry { margin-top: 84px; }
+  .entry-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 6px; }
+  .entry-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--paper);
+    background: var(--moss-deep); padding: 3px 9px; border-radius: 3px;
+    letter-spacing: 0.04em; flex-shrink: 0;
+  }
+  h2.entry-title {
+    font-family: 'Fraunces', serif; font-weight: 480; font-size: 29px;
+    letter-spacing: -0.01em; margin: 0; color: var(--ink);
+  }
+  .entry-sub {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: var(--ink-soft);
+    margin: 0 0 20px 52px;
+  }
+  .entry-narrative { margin: 0 0 22px; color: var(--ink-soft); max-width: 62ch; }
+  .entry-narrative strong { color: var(--ink); font-weight: 600; }
+  .specimen {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 2px 10px var(--shadow); margin: 0 0 22px; overflow: hidden;
+  }
+  .specimen-label {
+    display: flex; align-items: center; justify-content: space-between; padding: 9px 16px;
+    background: var(--paper-deep); border-bottom: 1px solid var(--line);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--moss-deep);
+  }
+  .specimen-label.output { color: var(--ink-soft); }
+  pre {
+    margin: 0; padding: 16px 18px; font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    line-height: 1.55; overflow-x: auto; color: var(--ink); white-space: pre-wrap; word-break: break-word;
+  }
+  pre .c { color: var(--ink-soft); font-style: italic; }
+  .verdict {
+    display: flex; gap: 12px; align-items: flex-start; padding: 14px 18px; border-radius: 8px;
+    font-size: 15px; margin: 0 0 22px;
+  }
+  .verdict.ok { background: rgba(141,161,121,0.16); border: 1px solid var(--fern); }
+  .verdict.bug { background: rgba(156,74,43,0.10); border: 1px solid var(--rust); }
+  .verdict-mark {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 4px;
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .verdict.ok .verdict-mark { background: var(--moss-deep); color: var(--paper); }
+  .verdict.bug .verdict-mark { background: var(--rust); color: var(--paper); }
+  .verdict p { margin: 0; color: var(--ink-soft); }
+  .verdict strong { color: var(--ink); }
+  .seal-row {
+    display: flex; align-items: center; gap: 20px; margin: 36px 0; padding: 22px 24px;
+    background: var(--moss-deep); border-radius: 10px; color: var(--paper);
+  }
+  .seal {
+    flex-shrink: 0; width: 76px; height: 76px; border-radius: 50%; border: 2px dashed var(--gold);
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    transform: rotate(-8deg); font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); line-height: 1.3;
+  }
+  .seal-text h3 { font-family: 'Fraunces', serif; font-weight: 480; font-size: 20px; margin: 0 0 4px; color: var(--paper); }
+  .seal-text p { margin: 0; font-size: 14.5px; color: rgba(237,231,214,0.82); }
+  .hash-pair { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 22px; }
+  .hash-chip { flex: 1 1 240px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .hash-chip .label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); margin-bottom: 6px; }
+  .hash-chip .value { font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; color: var(--moss-deep); word-break: break-all; }
+  .colophon { margin-top: 100px; padding-top: 32px; border-top: 1px solid var(--line); font-size: 14px; color: var(--ink-soft); }
+  .colophon h3 { font-family: 'Fraunces', serif; font-weight: 480; font-size: 19px; color: var(--ink); margin: 0 0 10px; }
+  .colophon ul { padding-left: 20px; margin: 12px 0; }
+  .colophon li { margin-bottom: 6px; }
+  @media (max-width: 640px) { .hero { padding: 64px 0 40px; } .entry-sub { margin-left: 0; } .seal-row { flex-direction: column; text-align: center; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Field Journal · Live Session Transcript</div>
+    <h1 class="title">Three beds, three<br><em>layers</em>, one proof.</h1>
+    <p class="dek">Regenerated by <code>capture.sh</code> + <code>render_journal.py</code> against a freshly reset instance. Every value below was read from a real response on the run that produced this file — not hand-written.</p>
+    <div class="meta-row">
+      <span>Subject: <b>spring-artie-backend</b></span>
+      <span>Dialects: <b>HAL-FORMS · hal-schema-forms</b></span>
+      <span>Beds observed: <b>3</b></span>
+    </div>
+  </header>
+
+  <div class="lede">
+    <p>The backend tracks garden beds as event-sourced aggregates — nothing about a bed's current state is stored directly, it's folded from an append-only log. Each bed exposes its available actions two ways: <strong>HAL-FORMS</strong>, embedded inline, and <strong>hal-schema-forms</strong>, split into three content-addressed layers.</p>
+    <p>The narrative below is fixed — it describes the design, which doesn't change run to run. Every value inside a <code>&lt;pre&gt;</code> block and every verdict banner is computed fresh from this run's actual captured data.</p>
+  </div>
+
+  
+  <section class="entry" id="reset">
+    <div class="entry-head"><span class="entry-num">00</span><h2 class="entry-title">Returning to bare soil</h2></div>
+    <p class="entry-sub">why determinism matters before anything else</p>
+    <p class="entry-narrative">Content-addressed data never goes stale — a schema's hash is valid forever. <strong>Mutable state is the opposite</strong>: a bed's status depends on real history, and Postgres doesn't forget between runs. So every session starts by truncating the event log and replanting the same three seed beds.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>docker compose exec -T postgres psql -U artie -d gardenbed &lt;&lt;'SQL'
+TRUNCATE garden_bed_event, garden_bed_snapshot, garden_bed RESTART IDENTITY CASCADE;
+<span class="c">-- ...reinsert seed beds and events...</span>
+SQL</pre></div>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>TRUNCATE TABLE
+INSERT 0 4
+INSERT 0 7
+ setval 
+--------
+      4
+(1 row)</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>Reset ran cleanly. Bed-1 status right now: <strong>EMPTY</strong> — freshly planted soil, as expected.</p>
+    </div>
+  </section>
+
+  <section class="entry" id="sow">
+    <div class="entry-head"><span class="entry-num">01</span><h2 class="entry-title">Planting bed-1 — garden:sow-seed</h2></div>
+    <p class="entry-sub">layer 1 → layer 2 → layer 3, captured live</p>
+    <p class="entry-narrative">An <strong>EMPTY</strong> bed allows exactly one action: sowing a seed. With no <code>Prefer</code> header (rung L0) everything arrives in one response: state, the form, and its full schema.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/hal+json' \
+     -H 'Accept-Profile: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;' \
+     http://localhost:8080/beds/1</pre></div>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>id: 1
+label: bed-1
+status: EMPTY
+cropName: null
+growthPoints: 0
+moistureLevel: 0
+_links:
+  self:
+    href: /beds/1
+  curies:
+    -
+      name: garden
+      href: &quot;/profiles/garden#{rel}&quot;
+      templated: true
+    -
+      name: hr
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      templated: true
+  &quot;hr:unavailable&quot;:
+    href: /unavailable/sha256-d1995ab17483fab3
+    type: application/json
+    integrity: &quot;sha256-0ZlasXSD+rMFQ7ma65GUvxVZMKwxgWGRFyrwmUUdjy0=&quot;
+_forms:
+  &quot;garden:sow-seed&quot;:
+    title: &quot;Sow a seed&quot;
+    description: &quot;Plants a seed in an empty bed. The bed becomes planted.&quot;
+    _links:
+      target:
+        href: /beds/1/actions/sow-seed
+    method: POST
+    contentType: application/json
+    schema:
+      properties:
+        depthCm:
+          description: &quot;How deep to sow, in centimetres&quot;
+          examples:
+            - 2
+          maximum: 10
+          minimum: 1
+          title: Depth
+          type: number
+        seedType:
+          description: &quot;The kind of seed to sow&quot;
+          examples:
+            - basil
+          title: Seed
+          type: string
+      required:
+        - seedType
+      title: &quot;Sow Seed&quot;
+      type: object
+      &quot;$id&quot;: /schemas/sha256-60ab557222ed326e</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>L0 is collapsed: the <code>garden:sow-seed</code> form is inline with its full schema (fields: depthCm, seedType).</p>
+    </div>
+
+    <p class="entry-narrative">The same request with <code>Prefer: forms=link, schema=link</code> (rung L2) returns state plus one link:</p>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>id: 1
+label: bed-1
+status: EMPTY
+cropName: null
+growthPoints: 0
+moistureLevel: 0
+_links:
+  self:
+    href: /beds/1
+  curies:
+    -
+      name: hr
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      templated: true
+  &quot;hr:forms&quot;:
+    href: /affordance-sets/sha256-29c8f0014210ad01
+    type: &quot;application/hal+json&quot;
+    profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;
+    integrity: &quot;sha256-KcjwAUIQrQFuIO6qTC2V1Fs3rxnWDhaM2DUXR8EE86U=&quot;</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>No <code>_forms</code> in Layer 1. Just state and a typed link to the pointer-only set: <code>/affordance-sets/sha256-29c8f0014210ad01</code></p>
+    </div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>The response names its profile in a header, not a media-type parameter: <code>Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;, &lt;https://github.com/jogoshugh/heart-rise&gt;; rel=&quot;profile&quot;</code></p>
+    </div>
+
+    <p class="entry-narrative">At <code>Prefer: forms=link</code> (rung L1) the link points somewhere else: <code>/affordance-sets/sha256-dcf6be2f1e74ed71</code>. That set embeds the schemas, so its bytes differ, and so does its address (SPEC §6.5):</p>
+    <div class="specimen"><div class="specimen-label output">output (L1 set, schemas embedded)</div><pre>_forms:
+  &quot;garden:sow-seed&quot;:
+    _links:
+      target:
+        href: /beds/{id}/actions/sow-seed
+        templated: true
+    contentType: application/json
+    description: &quot;Plants a seed in an empty bed. The bed becomes planted.&quot;
+    &quot;hr:templatePointers&quot;:
+      id: /id
+    method: POST
+    schema:
+      &quot;$id&quot;: /schemas/sha256-60ab557222ed326e
+      properties:
+        depthCm:
+          description: &quot;How deep to sow, in centimetres&quot;
+          examples:
+            - 2
+          maximum: 10
+          minimum: 1
+          title: Depth
+          type: number
+        seedType:
+          description: &quot;The kind of seed to sow&quot;
+          examples:
+            - basil
+          title: Seed
+          type: string
+      required:
+        - seedType
+      title: &quot;Sow Seed&quot;
+      type: object
+    title: &quot;Sow a seed&quot;
+_links:
+  curies:
+    -
+      href: &quot;/profiles/garden#{rel}&quot;
+      name: garden
+      templated: true
+    -
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      name: hr
+      templated: true
+  &quot;hr:unavailable&quot;:
+    href: /unavailable/sha256-d1995ab17483fab3
+    integrity: &quot;sha256-0ZlasXSD+rMFQ7ma65GUvxVZMKwxgWGRFyrwmUUdjy0=&quot;
+    type: application/json</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p><code>target.href</code> is a literal, unresolved URI Template (<code>/beds/{id}/actions/sow-seed</code>) — byte-identical for every EMPTY bed, real HTTP caches included.</p>
+    </div>
+
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl /schemas/sha256-60ab557222ed326e</pre></div>
+    <div class="specimen"><div class="specimen-label output">output — headers</div><pre>Cache-Control: public, max-age=31536000, immutable</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>The schema's URL is its own fingerprint — immutable is an honest promise here, not an optimistic one.</p>
+    </div>
+  </section>
+
+  <section class="entry" id="water">
+    <div class="entry-head"><span class="entry-num">02</span><h2 class="entry-title">Watering bed-1 — garden:water-cell</h2></div>
+    <p class="entry-sub">the halforms dialect's writable-field check</p>
+    <p class="entry-narrative">After sowing, bed-1 is <strong>PLANTED</strong> and watering is the only legal action. This entry checks the HAL-FORMS dialect specifically for a known historical fault: Kotlin <code>val</code> properties (getter-only, no setter) can cause Spring HATEOAS's reflection-based property inspection to mark a field <code>readOnly: true</code> — confirmed against a real, open Spring HATEOAS GitHub issue (#1310) rather than assumed.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H 'Accept: application/prs.hal-forms+json' \
+     http://localhost:8080/beds/2</pre></div>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>id: 2
+label: bed-2
+status: PLANTED
+cropName: tomato
+growthPoints: 80
+moistureLevel: 40
+_links:
+  self:
+    href: /beds/2
+_templates:
+  default:
+    method: POST
+    properties:
+      -
+        name: milliliters
+        min: 1
+        max: 1000
+        type: number
+    target: /beds/2/actions/water-cell</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>Every input field renders writable. If this had regressed to <code>val</code>, this check would fail loudly instead of silently shipping a form nobody can fill in.</p>
+    </div>
+  </section>
+
+  <section class="entry" id="harvest">
+    <div class="entry-head"><span class="entry-num">03</span><h2 class="entry-title">Harvesting bed-3 — zero fields, on purpose</h2></div>
+    <p class="entry-sub">the one that looks broken but isn't</p>
+    <p class="entry-narrative">Bed-3's seed data reaches <strong>READY_TO_HARVEST</strong> before the script starts. Its only action, harvest, needs no input at all.</p>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>_forms:
+  &quot;garden:harvest&quot;:
+    _links:
+      target:
+        href: /beds/{id}/actions/harvest
+        templated: true
+    contentType: application/json
+    description: &quot;Picks the crop from a bed that is ready. The bed becomes empty again.&quot;
+    &quot;hr:templatePointers&quot;:
+      id: /id
+    method: POST
+    schema:
+      &quot;$id&quot;: /schemas/sha256-7ab6ce2f03278bdf
+      properties: {}
+      title: Harvest
+      type: object
+    title: &quot;Harvest the crop&quot;
+_links:
+  curies:
+    -
+      href: &quot;/profiles/garden#{rel}&quot;
+      name: garden
+      templated: true
+    -
+      href: &quot;https://github.com/jogoshugh/heart-rise/rels/{rel}&quot;
+      name: hr
+      templated: true
+  &quot;hr:unavailable&quot;:
+    href: /unavailable/sha256-0b7168a23ddb1595
+    integrity: &quot;sha256-C3Fooj3bFZWkmnJK+qklt435QZ66sBzrL3fqv9NCKQM=&quot;
+    type: application/json</pre></div>
+    <div class="verdict ok"><span class="verdict-mark">Correct, not a bug</span><p><code>harvest()</code> in the service layer takes no body. Empty <code>properties</code> reports the truth.</p></div>
+  </section>
+
+  <section class="entry" id="proof">
+    <div class="entry-head"><span class="entry-num">04</span><h2 class="entry-title">The actual point: two beds, one URL</h2></div>
+    <p class="entry-sub">what all three layers exist to prove</p>
+    <p class="entry-narrative">Bed-1 reached <strong>READY_TO_HARVEST</strong> the long way — sown, watered, grown. Bed-3 arrived at the identical status from seed data. Neither bed knows about the other.</p>
+    <div class="hash-pair">
+      <div class="hash-chip"><div class="label">bed-1 forms href</div><div class="value">/affordance-sets/sha256-00bb074be861484e</div></div>
+      <div class="hash-chip"><div class="label">bed-3 forms href</div><div class="value">/affordance-sets/sha256-00bb074be861484e</div></div>
+    </div>
+    <div class="seal-row"><div class="seal">verified<br>match</div><div class="seal-text"><h3>Identical, not merely similar.</h3><p>Two independently-arrived-at beds, one shared, cached resource.</p></div></div>
+  </section>
+
+  <section class="entry" id="pit">
+    <div class="entry-head"><span class="entry-num">05</span><h2 class="entry-title">Asking bed-2 what it looked like, in the past</h2></div>
+    <p class="entry-sub">the payoff of event sourcing over current-state storage</p>
+    <p class="entry-narrative">Asking for bed-2's state before its first event occurred should return the same thing as a bed with no history at all.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl http://localhost:8080/beds/2?asOf=2026-07-08T00:00:00Z</pre></div>
+    <div class="specimen"><div class="specimen-label output">output</div><pre>id: 2
+label: bed-2
+status: EMPTY
+cropName: null
+growthPoints: 0
+moistureLevel: 0
+_links:
+  self:
+    href: /beds/2
+_templates:
+  default:
+    method: POST
+    properties:
+      -
+        name: depthCm
+        min: 1
+        max: 10
+        type: number
+      -
+        name: seedType
+        regex: &quot;^(?=\\s*\\S).*$&quot;
+        required: true
+        type: text
+    target: /beds/2/actions/sow-seed</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>Folded state at that instant: status=EMPTY, growthPoints=0 — zero qualifying events folds to the same empty seed state as no history at all.</p>
+    </div>
+  </section>
+
+  <section class="entry" id="errors">
+    <div class="entry-head"><span class="entry-num">06</span><h2 class="entry-title">Ways to fail, correctly</h2></div>
+    <p class="entry-sub">distinct failure modes, distinct status codes, checked live</p>
+    <p class="entry-narrative">A missing precondition, a stale write, an illegal transition, a bad body, and an unknown resource are different problems. SPEC 0.4 gives each its own code, and checks acts in that order.</p>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>act without If-Match → <strong>428</strong>, stale If-Match → <strong>412</strong>, act not in the manifest → <strong>409</strong>, body fails the schema → <strong>422</strong>, unknown schema → <strong>404</strong>, Layer 1 revalidation, nothing changed → <strong>304</strong>. Each problem has its own code.</p>
+    </div>
+  </section>
+
+  <section class="entry" id="home">
+    <div class="entry-head"><span class="entry-num">07</span><h2 class="entry-title">Saying what the server serves</h2></div>
+    <p class="entry-sub">the service index as JSON Home, and Preference-Applied on every response</p>
+    <p class="entry-narrative">Many servers start at L0. Asked for <code>application/json-home</code>, the service index lists the dialects and the <code>Prefer</code> values it honours, as standard link hints. Every bed response then says, in <code>Preference-Applied</code>, what it really is. Captured from the server started with <code>HEART_MAX_RUNG</code> at each level, each asked for L2.</p>
+    <div class="specimen"><div class="specimen-label">input</div><pre>curl -H "Accept: application/json-home" http://localhost:8080/
+curl -I -H "Accept: application/hal+json" -H "Prefer: forms=link, schema=link" http://localhost:8080/beds/2</pre></div>
+    <div class="specimen"><div class="specimen-label output">output (server at L2)</div><pre>api:
+  title: &quot;Garden beds&quot;
+  links:
+    describedBy: &quot;https://github.com/jogoshugh/heart-rise/spec&quot;
+resources:
+  item:
+    hrefTemplate: /beds/{id}
+    hrefVars:
+      id: &quot;https://github.com/jogoshugh/heart-rise/vars/bed-id&quot;
+    hints:
+      allow:
+        - GET
+      formats:
+        &quot;application/prs.hal-forms+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-forms&quot;
+        &quot;application/hal+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;
+      accept-prefer:
+        - &quot;forms=link&quot;
+        - &quot;schema=link&quot;
+      precondition-req:
+        - etag
+  collection:
+    hrefTemplate: &quot;/beds{?name,id}&quot;
+    hrefVars:
+      name: &quot;https://github.com/jogoshugh/heart-rise/vars/bed-name&quot;
+      id: &quot;https://github.com/jogoshugh/heart-rise/vars/bed-id&quot;
+    hints:
+      allow:
+        - GET
+      formats:
+        &quot;application/prs.hal-forms+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-forms&quot;
+        &quot;application/hal+json&quot;:
+          links:
+            profile: &quot;https://github.com/jogoshugh/heart-rise/hal-schema-forms&quot;</pre></div>
+    <div class="verdict ok">
+      <span class="verdict-mark">Correct</span>
+      <p>server at L2: declares <strong>forms=link, schema=link</strong>, applies <strong>forms=link, schema=link</strong>, ETag &quot;seq-3.hsf.L2&quot;; server at L1: declares <strong>forms=link</strong>, applies <strong>forms=link</strong>, ETag &quot;seq-3.hsf.L1&quot;; server at L0: declares <strong>nothing</strong>, applies <strong>nothing</strong>, ETag &quot;seq-3.hsf.L0&quot;. Each server declares exactly what it applies, and the ETag names the rung served.</p>
+    </div>
+  </section>
+
+  <div class="colophon">
+    <h3>Colophon</h3>
+    <p>This file is generated, not hand-written. <code>capture.sh</code> resets the database and runs the real HTTP walkthrough against a live instance of <code>spring-artie-backend</code>, saving every response to <code>run/</code>. <code>render_journal.py</code> reads those files, fills this fixed narrative template with the real values, and computes each verdict banner by inspecting the actual data — a hash comparison that fails will render a fail banner here, not a stale claim of success.</p>
+    <p>The narrative prose itself does not regenerate — it describes the system's design, which is stable between runs. What's genuinely live is the data and the pass/fail verdicts built from it.</p>
+  </div>
+</div>
+</body>
+</html>

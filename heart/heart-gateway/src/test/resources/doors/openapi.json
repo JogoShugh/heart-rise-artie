@@ -1,0 +1,192 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Doors",
+    "version": "1.0.0",
+    "description": "Doors that open, close and lock."
+  },
+  "paths": {
+    "/doors/{id}": {
+      "get": {
+        "operationId": "getDoor",
+        "tags": [
+          "doors"
+        ],
+        "summary": "Get a door",
+        "description": "One door, by its number.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The door's number",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The door"
+          }
+        }
+      }
+    },
+    "/doors/{id}/actions/open": {
+      "post": {
+        "operationId": "open",
+        "tags": [
+          "doors"
+        ],
+        "summary": "Open the door",
+        "description": "Opens a closed door.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The door's number",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The door after the act"
+          },
+          "409": {
+            "description": "Not allowed now"
+          }
+        }
+      }
+    },
+    "/doors/{id}/actions/close": {
+      "post": {
+        "operationId": "close",
+        "tags": [
+          "doors"
+        ],
+        "summary": "Close the door",
+        "description": "Closes an open door.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The door's number",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The door after the act"
+          },
+          "409": {
+            "description": "Not allowed now"
+          }
+        }
+      }
+    },
+    "/doors/{id}/actions/lock": {
+      "post": {
+        "operationId": "lock",
+        "tags": [
+          "doors"
+        ],
+        "summary": "Lock the door",
+        "description": "Locks a closed door.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The door's number",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The door after the act"
+          },
+          "409": {
+            "description": "Not allowed now"
+          }
+        }
+      }
+    },
+    "/doors/{id}/actions/unlock": {
+      "post": {
+        "operationId": "unlock",
+        "tags": [
+          "doors"
+        ],
+        "summary": "Unlock the door",
+        "description": "Unlocks a locked door.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "The door's number",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The door after the act"
+          },
+          "409": {
+            "description": "Not allowed now"
+          }
+        }
+      }
+    }
+  }
+}

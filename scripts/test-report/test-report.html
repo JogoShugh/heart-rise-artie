@@ -1,0 +1,303 @@
+<title>ARTIE Test Baseline</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single reading column; summary first, then one section per suite. */
+:root {
+  --bg: #f4f6f5; --surface: #ffffff; --ink: #15211d; --muted: #5a6964; --line: #cfd8d4;
+  --link: #2a4fd6; --link-soft: #e3e9fc; --ok: #2f7d4f; --ok-soft: #e0f0e6;
+  --bad: #b3261e; --bad-soft: #fbe3e1; --code-bg: #eef2f0;
+  --f-display: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #18221f; --ink: #e4ece9; --muted: #98a8a2; --line: #2e3d38;
+  --link: #8ea6ff; --link-soft: #1f2a4d; --ok: #6fca93; --ok-soft: #1b3326;
+  --bad: #ff8a80; --bad-soft: #3d1a17; --code-bg: #1d2925; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18221f; --ink: #e4ece9; --muted: #98a8a2; --line: #2e3d38;
+  --link: #8ea6ff; --link-soft: #1f2a4d; --ok: #6fca93; --ok-soft: #1b3326;
+  --bad: #ff8a80; --bad-soft: #3d1a17; --code-bg: #1d2925; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.6 var(--f-body); }
+.wrap { max-width: 820px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 52px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; line-height: 1.2; text-wrap: balance; }
+h1 { font-size: clamp(1.9rem, 5vw, 2.6rem); }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 68ch; }
+section { display: grid; gap: 14px; min-width: 0; }
+.eyebrow { font: 500 0.75rem var(--f-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--link); }
+.muted { color: var(--muted); }
+code { font: 0.86em var(--f-mono); background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.big { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.big b { font: 700 3rem var(--f-display); color: var(--ok); font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tr:last-child td { border-bottom: 0; }
+th { font: 500 0.72rem var(--f-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.cls { font: 0.8rem var(--f-mono); color: var(--muted); }
+.st { font: 500 0.7rem var(--f-mono); padding: 1px 7px; border-radius: 99px; }
+.st.pass { background: var(--ok-soft); color: var(--ok); }
+.st.fail { background: var(--bad-soft); color: var(--bad); }
+.st.skip { background: var(--code-bg); color: var(--muted); }
+.example { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 12px; min-width: 0; }
+.example h3 { color: var(--ink); }
+.example dl { margin: 0; display: grid; grid-template-columns: 7.5rem 1fr; gap: 6px 14px; }
+.example dt { font: 500 0.75rem var(--f-mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding-top: 3px; }
+.example dd { margin: 0; min-width: 0; }
+figure.code { margin: 0; min-width: 0; }
+figure.code figcaption { font: 0.75rem var(--f-mono); color: var(--muted); margin-bottom: 4px; }
+pre { margin: 0; background: var(--code-bg); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 0.8rem/1.5 var(--f-mono); }
+pre code { background: none; padding: 0; }
+.redgreen { border-left: 3px solid var(--bad); padding-left: 12px; font-size: 0.92rem; }
+.redgreen.ok { border-color: var(--ok); }
+ul.plain { margin: 0; padding-left: 18px; font-size: 0.95rem; }
+@media (max-width: 560px) { .example dl { grid-template-columns: 1fr; } .example dt { padding-top: 6px; } }
+</style>
+
+<div class="wrap">
+
+<header style="display:grid;gap:12px">
+  <div class="eyebrow">~/repos/artie · baseline · results from run at 2026-10-04T20:24:08.124Z UTC</div>
+  <h1>Test baseline</h1>
+  <p class="muted"><b>Historical (marked 2026-10-09).</b> This report shows the design as of 4 October 2026: links without <code>integrity</code>, <code>$id</code> schema pointers, and a client that checked the hash in the URL. All three have since changed. Current evidence is <code>server-spring/journal.html</code>, the Cucumber suites and <code>scripts/live-client-check.sh</code>; see <code>hacklog.md</code>, "Old exhibits".</p>
+  <div class="big"><b>175 / 175</b><span class="muted">checks passing across 3 test suites and 4 live checks</span></div>
+  <p class="muted">Every count, name and status on this page was read from result files by a script: JUnit XML from Gradle, the cache-demo run log, a live hash check against the running Spring server, and the verdicts in <code>journal.html</code>. The explanations were written by hand. Each code excerpt is copied from the current source, with its file and line number.</p>
+</header>
+
+<section>
+  <div class="eyebrow">Summary</div>
+  <div class="tbl"><table><thead><tr><th>Suite</th><th>Kind</th><th class="num">Passing</th></tr></thead><tbody><tr><td>server-spring</td><td>Cucumber + JUnit 5 + WebTestClient</td><td class="num">72 / 72</td></tr><tr><td>client</td><td>Cucumber + JUnit 5</td><td class="num">56 / 56</td></tr><tr><td>koog-first-pass</td><td>JUnit 5 + Ktor MockEngine</td><td class="num">3 / 3</td></tr><tr><td>cache-demo</td><td>end-to-end run vs. server log</td><td class="num">15 / 15</td></tr><tr><td>client live</td><td>ARTIE over HTTP vs. server-spring + Postgres</td><td class="num">12 / 12</td></tr><tr><td>server-spring live</td><td>journal verdicts</td><td class="num">10 / 10</td></tr><tr><td>server-spring live</td><td>served bytes vs. URL hash</td><td class="num">7 / 7</td></tr></tbody></table></div>
+</section>
+
+<section>
+  <div class="eyebrow">The ladder</div>
+  <h2>L0 to L6: where each rung is proven</h2>
+  <p class="muted">Server = server-spring. Client = ARTIE. "Live" means against server-spring and Postgres in Docker. HAL Schema Forms is the reference dialect for every rung; HAL-FORMS is the L0 on-ramp (SPEC 0.5 decision).</p>
+  <div class="tbl"><table><thead><tr><th>Rung</th><th>Server</th><th>Client</th></tr></thead><tbody>
+    <tr><td>L0 collapsed</td><td><code>rendering-ladder.feature</code>, journal 01</td><td><code>sync-l0.feature</code>; live full cycle at L0</td></tr>
+    <tr><td>L1 set fetch</td><td><code>rendering-ladder.feature</code></td><td><code>l1-and-sharing.feature</code>; live full cycle at L1</td></tr>
+    <tr><td>L2 schema fetch</td><td><code>rendering-ladder.feature</code>, live hash check</td><td><code>sync-l2.feature</code> (cache, 304, hash check); live full cycle and 304 at L2</td></tr>
+    <tr><td>L3 caching proof</td><td><code>templated-targets.feature</code>, journal 04</td><td><code>l1-and-sharing.feature</code> incl. the concrete-profile counter-case; live: two clients, one cache, one set fetch</td></tr>
+    <tr><td>L4 errors</td><td><code>conditional-acts.feature</code>, <code>layer1-revalidation.feature</code>, journal 06</td><td><code>conditional-acts.feature</code>; live 412 and 422</td></tr>
+    <tr><td>L5 cross-dialect</td><td><code>cross-dialect.feature</code> incl. the on-ramp guard</td><td><code>hal-forms-on-ramp.feature</code>; live: same acts in both dialects on 4 beds, full cycle over HAL-FORMS</td></tr>
+    <tr><td>L6 reasoning</td><td>n/a</td><td><code>reason-l6.feature</code> with a scripted reasoner and the Claude request shape; the real-model scenario has not been run (no API key here)</td></tr>
+  </tbody></table></div>
+</section>
+
+<section>
+  <div class="eyebrow">What changed to get here</div>
+  <h2>Changes in this pass: SPEC 0.4 conformance, one step at a time</h2>
+  <p class="muted">Each step started with a Gherkin feature in <code>server-spring/src/test/resources/features/</code>. The bdd-gates log (<code>.claude/tdd-events.log</code>) shows each one failing before the fix and passing after; the git pre-commit check refuses a commit that skips that order.</p>
+  <ul class="plain">
+    <li><b>Gates installed.</b> Claude Code hooks block production edits without a feature change, log every test run, run Detekt after each edit, and keep the build green before a turn ends. Konsist tests guard the domain boundary (server) and the Transport boundary (client).</li>
+    <li><b>Step 1 · rendering ladder.</b> No <code>Prefer</code> now returns L0: everything in one response. <code>forms=cid</code> gives L1, <code>forms=cid, schema=cid</code> gives L2. L1 and L2 sets have different addresses, and Layer 2 no longer sends <code>Vary</code>. (§6.4, §6.5)</li>
+    <li><b>Step 2 · Layer 1 caching.</b> <code>Cache-Control: no-cache</code>, ETags like <code>"seq-1.hsf.L2"</code> that differ per dialect and rung, and <code>304</code> on revalidation. Before, an L1 ETag revalidated an L2 request: a wrong cache hit. (§6.1, §6.2)</li>
+    <li><b>Step 3 · conditional acts.</b> An act without <code>If-Match</code> gets <code>428</code>; a bad body gets <code>422</code>, not <code>400</code>; checks run in the order 428, 412, 409, 422. (§6.2)</li>
+    <li><b>Step 4 · profiles.</b> <code>Link: rel="profile"</code> on every Layer 1 response; <code>Accept-Profile</code> negotiation; <code>406</code> for an unsatisfiable <code>Accept</code>; the media-type <code>profile</code> parameter is gone. (§6.1)</li>
+    <li><b>Step 5 · templates.</b> <code>{bedId}</code> became <code>{id}</code>, the Layer 1 property it resolves from. Before, a rule-following client posted to <code>/beds/actions/water-cell</code> and got <code>404</code>. (§6.9.1)</li>
+    <li><b>L5 guard.</b> Both dialects offer the same acts in every state, now checked over HTTP.</li>
+    <li><b>Client C1 · real wire format.</b> ARTIE parsed a format no SPEC version defines. It now reads 0.4 <code>_forms</code>, checks <code>Link: rel="profile"</code>, and holds the ETag.</li>
+    <li><b>Client C2 · conditional acts.</b> <code>If-Match</code> on every act; templates expanded by the <code>[0.5]</code> rule only; <code>412</code>, <code>409</code>, <code>428</code> and <code>422</code> each handled their own way.</li>
+    <li><b>Client C3 · real HTTP.</b> <code>HttpTransport</code> and live scenarios against server-spring. The second live run found a server bug: the first snapshot (event 5) answered <code>500</code> after its event was committed. Fixed, with a Postgres test.</li>
+    <li><b>One web stack.</b> Production ran Spring MVC on Tomcat (pulled in by the HATEOAS starter) while the tests ran WebFlux. Production now runs WebFlux on Netty, guarded by <code>runtime-stack.feature</code>.</li>
+    <li><b>Spec decision.</b> HAL-FORMS is the L0 on-ramp; HAL Schema Forms is the reference dialect for L0–L6.</li>
+    <li><b>Client L1, L3, L5, L6.</b> L1 walk; L3 shared-cache proof and its concrete counter-case; ARTIE reads HAL-FORMS; the Reason step, whose choice is checked against the manifest and schema before anything is sent.</li>
+    <li><b>Client C4 · L2 walk.</b> Layer 1, set, schemas, through an HTTP cache that serves immutable layers without a request and revalidates Layer 1 to <code>304</code>. Bytes that do not hash to their address are refused.</li>
+  </ul>
+</section>
+
+<!-- 1. server-spring -->
+<section>
+  <div class="eyebrow">Suite 1 · server-spring · 72 / 72</div>
+  <h2>Server: SPEC 0.4 conformance scenarios, content addresses, form metadata</h2>
+  <p class="muted"><code>RunCucumberTest</code> rows are Gherkin scenarios. They run the real controllers and the real <code>GardenBedService</code> against an in-memory event store, so no database is needed.</p>
+  <div class="tbl"><table><thead><tr><th>Result</th><th>Class</th><th>Test</th><th class="num">Time</th></tr></thead><tbody><tr><td><span class="st pass">PASS</span></td><td class="cls">ArchitectureBoundaryTest</td><td>domain imports no web, service, or storage types()</td><td class="num">0.286s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An act without If-Match is refused with 428</td><td class="num">1.532s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>A stale If-Match is refused with 412</td><td class="num">0.065s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An affordance absent from the manifest is refused with 409, even with a fresh ETag</td><td class="num">0.021s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>A body that fails the schema is refused with 422: {&quot;milliliters&quot;: 0}</td><td class="num">0.063s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>A body that fails the schema is refused with 422: {&quot;milliliters&quot;: 5000}</td><td class="num">0.017s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>A body that fails the schema is refused with 422: {&quot;milliliters&quot;: &quot;lots&quot;}</td><td class="num">0.017s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>A body that fails the schema is refused with 422: {}</td><td class="num">0.016s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>A body that is not JSON at all is a bad request, not a schema failure</td><td class="num">0.012s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The first failing check decides the status: sow-seed, If-Match none, {&quot;seedType&quot;: &quot;&quot;} gives 428</td><td class="num">0.011s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The first failing check decides the status: sow-seed, If-Match &quot;seq-0.hsf.L0&quot;, {&quot;seedType&quot;: &quot;&quot;} gives 412</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The first failing check decides the status: sow-seed, If-Match &quot;seq-1.hsf.L0&quot;, {&quot;seedType&quot;: &quot;&quot;} gives 409</td><td class="num">0.011s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The first failing check decides the status: harvest, If-Match &quot;seq-1.hf.L0&quot;, {} gives 409</td><td class="num">0.014s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The first failing check decides the status: water-cell, If-Match &quot;seq-1.hsf.L2&quot;, {&quot;milliliters&quot;: 0} gives 422</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The first failing check decides the status: water-cell, If-Match &quot;seq-1.hsf.L2&quot;, {&quot;milliliters&quot;: 100} gives 200</td><td class="num">0.119s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Both dialects offer the same acts in every state: EMPTY</td><td class="num">0.020s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Both dialects offer the same acts in every state: PLANTED</td><td class="num">0.012s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Both dialects offer the same acts in every state: READY_TO_HARVEST</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>HAL-FORMS is the L0 on-ramp: it ignores layering preferences: Prefer &quot;forms=cid&quot;</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>HAL-FORMS is the L0 on-ramp: it ignores layering preferences: Prefer &quot;forms=cid, schema=cid&quot;</td><td class="num">0.011s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 1 is no-cache with a strong ETag per dialect and rung: hal-schema-forms, Prefer &quot;&quot;</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 1 is no-cache with a strong ETag per dialect and rung: hal-schema-forms, Prefer &quot;forms=cid&quot;</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 1 is no-cache with a strong ETag per dialect and rung: hal-schema-forms, Prefer &quot;forms=cid, schema=cid&quot;</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 1 is no-cache with a strong ETag per dialect and rung: hal-forms, Prefer &quot;&quot;</td><td class="num">0.007s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Unchanged state revalidates to 304 with no body: hal-schema-forms, Prefer &quot;&quot;</td><td class="num">0.011s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Unchanged state revalidates to 304 with no body: hal-schema-forms, Prefer &quot;forms=cid, schema=cid&quot;</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Unchanged state revalidates to 304 with no body: hal-forms, Prefer &quot;&quot;</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Changed state revalidates to 200 with a new ETag</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An ETag from another rung does not revalidate</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An act accepts an If-Match from any variant of the current state: hal-schema-forms, Prefer &quot;&quot;</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An act accepts an If-Match from any variant of the current state: hal-schema-forms, Prefer &quot;forms=cid, schema=cid&quot;</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An act accepts an If-Match from any variant of the current state: hal-forms, Prefer &quot;&quot;</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;application/hal+json&quot;, Accept-Profile &quot;&lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;&quot;</td><td class="num">0.012s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;application/hal+json&quot;, Accept-Profile &quot;&quot;</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;application/prs.hal-forms+json, application/hal+json;q=0.5&quot;, Accept-Profile &quot;&lt;https://github.com/jogoshugh/heart-rise/hal-forms&gt;&quot;</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;application/hal+json;q=0.5, application/prs.hal-forms+json&quot;, Accept-Profile &quot;&quot;</td><td class="num">0.007s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;*/*&quot;, Accept-Profile &quot;&lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;&quot;</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;&quot;, Accept-Profile &quot;&lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;&quot;</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;&quot;, Accept-Profile &quot;&lt;https://github.com/jogoshugh/heart-rise/hal-forms&gt;&quot;</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;&quot;, Accept-Profile &quot;&quot;</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Accept and Accept-Profile pick the dialect and its profile: Accept &quot;&quot;, Accept-Profile &quot;&lt;https://example.org/unknown-profile&gt;&quot;</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 1 also names the parent heart-rise profile</td><td class="num">0.007s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 1 varies on every header that picks its representation: application/hal+json</td><td class="num">0.007s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 1 varies on every header that picks its representation: application/prs.hal-forms+json</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An Accept the server cannot satisfy gets 406</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The affordance-set link names its profile, not a media-type parameter</td><td class="num">0.017s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>L0 is the default: state, forms, and full schemas in one response</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>An unrecognised Prefer token degrades to L0</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>L1 and L2 link to an affordance set rendered for their rung: Prefer forms=cid</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>L1 and L2 link to an affordance set rendered for their rung: Prefer forms=cid, schema=cid</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>L1 and L2 affordance sets have different addresses</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Each affordance set is immutable, does not vary, and hashes to its own address: Prefer forms=cid</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Each affordance set is immutable, does not vary, and hashes to its own address: Prefer forms=cid, schema=cid</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Layer 2 ignores Prefer: one address, one representation</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The affordance-set link is named by the heart-rise rel, in its hr: short form</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The application starts as a reactive application, not a servlet one</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Every template variable resolves from Layer 1: EMPTY</td><td class="num">0.010s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Every template variable resolves from Layer 1: PLANTED</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Every template variable resolves from Layer 1: READY_TO_HARVEST</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>The expanded template is the URI the act is accepted at</td><td class="num">0.013s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RunCucumberTest</td><td>Two beds in the same state share one affordance set</td><td class="num">0.009s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">EventStorePostgresTest</td><td>a failing snapshot write does not fail an append that committed()</td><td class="num">0.264s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">EventStorePostgresTest</td><td>a sequence number already taken is a concurrent append()</td><td class="num">0.013s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">EventStorePostgresTest</td><td>appending past the snapshot interval takes and then refreshes a snapshot()</td><td class="num">0.059s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">ContentAddressHttpTest</td><td>each affordance-set URL is the sha256 of the bytes served at it()</td><td class="num">0.008s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">ContentAddressHttpTest</td><td>each schema URL is the sha256 of the bytes served at it()</td><td class="num">0.004s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">ContentAddressHttpTest</td><td>L1 and L2 renderings are different bytes at different URLs()</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">JsonSchemaDialectSupportTest</td><td>every served schema is genuinely canonical JSON()</td><td class="num">0.000s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">JsonSchemaDialectSupportTest</td><td>every affordance-set&#x27;s served JSON hashes to its own URL and is canonical()</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">JsonSchemaDialectSupportTest</td><td>every served schema&#x27;s hash matches its own served bytes()</td><td class="num">0.000s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RequestDtoMetadataTest</td><td>SowSeedRequest fields are writable in HAL-FORMS()</td><td class="num">0.000s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">RequestDtoMetadataTest</td><td>WaterCellRequest fields are writable in HAL-FORMS()</td><td class="num">0.000s</td></tr></tbody></table></div>
+  <div class="example">
+    <h3>Example: the first failing check decides the status code</h3>
+    <dl>
+      <dt>Rule</dt><dd>SPEC 0.5 §6.2: a server checks an act in a fixed order and returns the first failure: <code>428</code> no <code>If-Match</code>, <code>412</code> stale <code>If-Match</code>, <code>409</code> act not in the current manifest, <code>422</code> body fails the schema. The order matters because <code>412</code> tells a client to discard its act, while <code>422</code> says the act itself was malformed.</dd>
+      <dt>How</dt><dd>Bed 2 is PLANTED, at state version 1. Each row sends a request that is wrong in its own way <i>and</i> in every later way: the <code>sow-seed</code> rows are illegal for a planted bed and also carry an empty <code>seedType</code>. Only the evaluation order can pick the code.</dd>
+      <dt>Before</dt><dd>The first run after writing this feature failed 9 scenarios. Rows 1-3 got <code>400</code> instead of <code>428</code>, <code>412</code> and <code>409</code>: Spring's <code>@Valid @RequestBody</code> validated the body before the handler ever looked at <code>If-Match</code>. An act with no <code>If-Match</code> at all went through with <code>200</code>.</dd>
+      <dt>After</dt><dd><code>GardenBedController.act()</code> checks the precondition and the manifest first. The body is bound and validated afterwards, by <code>ActBodyBinder</code>. All rows pass.</dd>
+    </dl>
+    <figure class="code"><figcaption>server-spring/src/test/resources/features/conditional-acts.feature:47</figcaption><pre><code>  Scenario Outline: The first failing check decides the status: &lt;action&gt;, If-Match &lt;if-match&gt;, &lt;body&gt; gives &lt;status&gt;
+    When a client posts &lt;body&gt; to &lt;action&gt; on bed 2 with If-Match &lt;if-match&gt;
+    Then the response status is &lt;status&gt;
+
+    Examples: each row breaks every later check too, so only the order picks the code
+      | action     | if-match       | body                 | status |
+      | sow-seed   | none           | {&quot;seedType&quot;: &quot;&quot;}     | 428    |
+      | sow-seed   | &quot;seq-0.hsf.L0&quot; | {&quot;seedType&quot;: &quot;&quot;}     | 412    |
+      | sow-seed   | &quot;seq-1.hsf.L0&quot; | {&quot;seedType&quot;: &quot;&quot;}     | 409    |
+      | harvest    | &quot;seq-1.hf.L0&quot;  | {}                   | 409    |
+      | water-cell | &quot;seq-1.hsf.L2&quot; | {&quot;milliliters&quot;: 0}   | 422    |
+      | water-cell | &quot;seq-1.hsf.L2&quot; | {&quot;milliliters&quot;: 100} | 200    |</code></pre></figure>
+    <figure class="code"><figcaption>server-spring/src/main/kotlin/com/artie/gardenbed/web/GardenBedController.kt:165</figcaption><pre><code>    /** [0.5] precondition scope: the act&#x27;s If-Match is checked against
+     *  the owning bed&#x27;s state version, accepting an ETag from any
+     *  dialect or rung (see StateETag). Reads state only when If-Match
+     *  is present, so a 428 costs no store read. */
+    private suspend fun checkPreconditions(id: Long, ifMatch: String?, affordance: String) {
+        val failure = if (ifMatch == null) {
+            PreconditionRequiredException(&quot;$affordance on bed $id needs If-Match with the bed&#x27;s current ETag&quot;)
+        } else {
+            val current = service.currentState(id)
+            when {
+                !StateETag.matchesStateVersion(ifMatch, current.lastSequenceNo) -&gt; StaleWriteConflict(
+                    &quot;If-Match $ifMatch does not match state version seq-${current.lastSequenceNo} for bed $id&quot;
+                )
+                affordance !in allowedAffordances(current.status) -&gt; InvalidTransitionException(
+                    &quot;$affordance is not in bed $id&#x27;s current affordance set (status ${current.status})&quot;
+                )
+                else -&gt; null
+            }
+        }
+        failure?.let { throw it }
+    }</code></pre></figure>
+  </div>
+</section>
+
+<!-- 2. client -->
+<section>
+  <div class="eyebrow">Suite 2 · client (the real ARTIE) · 56 / 56</div>
+  <h2>Client: sync at L0 and L2, conditional acts, refusals, the cache</h2>
+  <p class="muted">These scenarios run against a scripted server written as raw HTTP responses. The same client code runs against the real server in <code>live-server.feature</code> (summary row "client live").</p>
+  <div class="tbl"><table><thead><tr><th>Result</th><th>Class</th><th>Test</th><th class="num">Time</th></tr></thead><tbody><tr><td><span class="st pass">PASS</span></td><td class="cls">ArchitectureBoundaryTest</td><td>only Transport implementations import network libraries()</td><td class="num">0.360s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">SmokeTest</td><td>smoke test()</td><td class="num">0.005s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Acting on an affordance absent from the manifest raises an error</td><td class="num">0.101s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The act goes to the resolved target, with the payload as JSON</td><td class="num">0.012s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Resource state reflects the transition</td><td class="num">0.104s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Manifest reflects the transition</td><td class="num">0.004s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The act carries the held ETag and goes to the expanded template</td><td class="num">0.005s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A template variable with no matching Layer 1 property is refused before any request</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>412 means the world moved: re-sync and drop the act</td><td class="num">0.004s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>409 means not legal here: re-sync and report, no retry</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>428 means a precondition is required: re-sync, then resend once with the fresh ETag</td><td class="num">0.004s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>422 means the body is wrong: report the reasons, no re-sync, no retry</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The client finds the set under the full URI name</td><td class="num">0.005s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The client finds the set under the hr: short form name</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The client finds the set under the short form, own prefix name</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A link under another name is not the affordance set: http://api.example.org/rels/forms</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A link under another name is not the affordance set: forms</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A link under another name is not the affordance set: hr:forms</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The client asks for HAL-FORMS by media type and profile, never with Prefer</td><td class="num">0.005s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The template is an affordance named by its key, with a resolved target</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>HAL-FORMS properties become JSON Schema: depthCm has minimum</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>HAL-FORMS properties become JSON Schema: depthCm has maximum</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>HAL-FORMS properties become JSON Schema: depthCm has description</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>HAL-FORMS properties become JSON Schema: depthCm has type</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>HAL-FORMS properties become JSON Schema: seedType has pattern</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Required properties are carried into the schema</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>An act from a HAL-FORMS manifest is conditional like any other</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A HAL-FORMS client cannot be set to a rung above L0</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>At L1 the client fetches the set, whose schemas are embedded, and nothing more</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Two clients behind one shared cache, two beds in one state: one set fetch (templated server)</td><td class="num">0.006s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A server with concrete targets mints a set per bed: two set fetches, one schema fetch</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The reasoner sees names and schemas, never a URI or a method</td><td class="num">0.006s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A selection that fails a deterministic check is rejected before any request: not in the manifest</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A selection that fails a deterministic check is rejected before any request: required field missing</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A selection that fails a deterministic check is rejected before any request: above the schema maximum</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A selection that fails a deterministic check is rejected before any request: wrong type</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A selection that fails a deterministic check is rejected before any request: field the schema lacks</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>An ambiguous intent comes back as a question, and nothing is sent</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The Claude reasoner keeps the manifest last, behind a fixed prefix</td><td class="num">0.005s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The client asks for the dialect and profile, at rung L0</td><td class="num">0.003s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>State is held apart from the manifest</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Each target is resolved against the URL the client entered at</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The schema keeps every JSON Schema keyword: minimum</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The schema keeps every JSON Schema keyword: maximum</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The schema keeps every JSON Schema keyword: description</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Required fields are captured</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The client holds the ETag for its next act</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A response that does not name the hal-schema-forms profile is refused: another profile</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A response that does not name the hal-schema-forms profile is refused: no profile link</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A response that does not name the hal-schema-forms profile is refused: withdrawn media-type</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>The client asks for L2 and walks Layer 1, the set, then the schema</td><td class="num">0.001s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>A second bed in the same state costs one request: the set and schema come from the cache</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Re-syncing an unchanged bed is one conditional request answered 304</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Two affordances that share one schema fetch it once</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>An act at L2 expands the set&#x27;s template from Layer 1 and carries the L2 ETag</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">CucumberTestEngine</td><td>Bytes that do not hash to their address are refused, and not cached</td><td class="num">0.002s</td></tr></tbody></table></div>
+  <div class="example">
+    <h3>Example: a stale act is dropped, not resent</h3>
+    <dl>
+      <dt>Rule</dt><dd>SPEC §6.3: on <code>412</code> the client re-syncs and discards the pending act. The user's intent may mean something else now, so resending it could overwrite someone else's write.</dd>
+      <dt>How</dt><dd>The scripted server answers the act with <code>412</code>, then answers the re-sync GET with a newer bed. The scenario checks the exact requests the client sent after entering: one POST, one GET, and no second POST. It also checks that the client now holds the newer ETag.</dd>
+      <dt>Mutation check</dt><dd>Treating <code>412</code> like <code>428</code> (re-sync, then resend) made this scenario fail, because the resent act was not in the new manifest. The change was reverted. The same rule passes live: <code>live-server.feature</code> has a second client write first, and ARTIE gets <code>StaleAct</code> from the real server.</dd>
+    </dl>
+    <figure class="code"><figcaption>client/src/test/resources/features/conditional-acts.feature:81</figcaption><pre><code>  Scenario: 412 means the world moved: re-sync and drop the act
+    Given the service answers POST &quot;http://garden.test/beds/2/actions/water-cell&quot; with:
+      &quot;&quot;&quot;
+      412 Precondition Failed
+      Content-Type: application/json
+
+      error: stale
+      &quot;&quot;&quot;
+    And the service answers GET &quot;http://garden.test/beds/2&quot; with:
+      &quot;&quot;&quot;
+      200 OK
+      Content-Type: application/hal+json
+      ETag: &quot;seq-5.hsf.L0&quot;
+      Link: &lt;https://github.com/jogoshugh/heart-rise/hal-schema-forms&gt;; rel=&quot;profile&quot;
+
+      id: 2
+      status: READY_TO_HARVEST
+      _links:
+        self: {href: /beds/2}
+      _forms: {}
+      &quot;&quot;&quot;
+    When the client tries to act on &quot;waterCell&quot; with:
+      &quot;&quot;&quot;yaml
+      milliliters: 100
+      &quot;&quot;&quot;
+    Then the client raised a &quot;StaleAct&quot; refusal
+    And the client sent these requests after entering:
+      | POST http://garden.test/beds/2/actions/water-cell |
+      | GET http://garden.test/beds/2                     |
+    And the client holds the ETag &quot;seq-5.hsf.L0&quot;
+    And the client&#x27;s current manifest is empty
+
+  Scenario: 409 means not legal here: re-sync and report, no retry
+    Given the service answers POST &quot;http://garden.test/beds/2/actions/water-cell&quot; with:</code></pre></figure>
+  </div>
+</section>
+
+<!-- 3. koog -->
+<section>
+  <div class="eyebrow">Suite 3 · koog-first-pass (the "before" exhibit) · 3 / 3</div>
+  <h2>Koog agent tool: schema becomes a tool, and payloads are validated</h2>
+  <div class="tbl"><table><thead><tr><th>Result</th><th>Class</th><th>Test</th><th class="num">Time</th></tr></thead><tbody><tr><td><span class="st pass">PASS</span></td><td class="cls">HeartToolTests</td><td>execute with invalid payload throws exception()</td><td class="num">0.214s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">HeartToolTests</td><td>descriptor built from schema()</td><td class="num">0.002s</td></tr><tr><td><span class="st pass">PASS</span></td><td class="cls">HeartToolTests</td><td>execute with concrete data class returns success()</td><td class="num">0.049s</td></tr></tbody></table></div>
+  <div class="example">
+    <h3>Example: an invalid payload throws before the network call</h3>
+    <dl>
+      <dt>Rule</dt><dd>When the LLM fills in a form, the tool checks the arguments against the server's JSON Schema before sending anything. A missing required field is rejected in the agent, not by the server.</dd>
+      <dt>How</dt><dd>The tool is built from a <code>sowSeed</code> schema where <code>plantCultivar</code> and <code>count</code> are both required. The test leaves out <code>count</code> and expects <code>IllegalArgumentException</code>. The Ktor <code>MockEngine</code> always answers "success", so the exception can only come from the validator.</dd>
+    </dl>
+    <figure class="code"><figcaption>exhibits/koog-first-pass/src/test/kotlin/HeartToolTests.kt:164</figcaption><pre><code>    fun `execute with invalid payload throws exception`() {
+        // This tests that the validator catches LLM hallucination before the network call
+        val invalidArgs = buildJsonObject {
+            put(&quot;plantCultivar&quot;, &quot;Kale&quot;)
+            // missing &quot;count&quot;
+        }
+
+        assertThrows&lt;IllegalArgumentException&gt; {
+            runBlocking { tool.execute(invalidArgs) }
+        }
+    }</code></pre></figure>
+  </div>
+</section>
+
+<!-- 4. cache-demo -->
+<section>
+  <div class="eyebrow">Suite 4 · cache-demo · 15 / 15</div>
+  <h2>Caching: shared URLs are fetched once</h2>
+  <p>The Kotlin client (Ktor with <code>HttpCache</code>) syncs 12 beds plus bed-1 again. Afterwards it reads the server's own request log at <code>/__stats</code>, so these checks count requests the server actually received.</p>
+  <div class="tbl"><table><thead><tr><th>Result</th><th>Check</th></tr></thead><tbody><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-5862d2553fee3758.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-596075bb1f473b7e.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-7f39ef1647856c57.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-92df9ea380301c47.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-0860b5e6079dab26.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-0d153e11d7d22e73.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-1dab17420f8f0a8b.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-462bf621f3857b1b.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-50a55b89eca89ced.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-571622ca1c292609.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-63e568e23b636854.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-74d65decfeb2505e.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-a40fdda61a71a003.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-b832343c17bd4642.json  (requested 1 time(s))</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>bed-1 resource requested 2 time(s), statuses: 200, 304  (expected [200, 304])</code></td></tr></tbody></table></div>
+  <p class="muted">Final line of the run: <code>ALL CHECKS PASSED — content-addressed sharing worked, ETag revalidation worked.</code></p>
+  <div class="example">
+    <h3>Example: four beds, one affordance-set fetch</h3>
+    <dl>
+      <dt>Rule</dt><dd>SPEC §6.6: a content-addressed URL is <code>immutable</code>, so once it's cached the client never asks the server for it again.</dd>
+      <dt>Setup</dt><dd>bed-1, bed-2, bed-5 and bed-11 all link to the same 2-action set. The fixture generator decides that, and <code>fixtures/manifest.txt</code> records it.</dd>
+      <dt>Result</dt><dd>The server log shows that set's URL requested exactly once, even though four different beds pointed at it. bed-1's own resource is <code>no-cache</code>, so it is revalidated: it returns <code>200</code> the first time and <code>304 Not Modified</code> the second.</dd>
+    </dl>
+    <figure class="code"><figcaption>exhibits/cache-demo/kotlin-client/src/main/kotlin/ArtieCacheDemo.kt:135</figcaption><pre><code>    val contentAddressed = stats.counts.filterKeys {
+        it.startsWith(&quot;/affordance-sets/&quot;) || it.startsWith(&quot;/schemas/&quot;)
+    }
+    println(&quot;\n-- content-addressed paths (expect count == 1 each) --&quot;)
+    for ((path, count) in contentAddressed.toSortedMap()) {
+        val ok = count == 1
+        if (!ok) failures++
+        println(&quot;  ${if (ok) &quot;PASS&quot; else &quot;FAIL&quot;}  $path  (requested $count time(s))&quot;)
+    }</code></pre></figure>
+  </div>
+</section>
+
+<!-- 5. live spring -->
+<section>
+  <div class="eyebrow">Suite 5 · server-spring live (Docker: Postgres + app) · 17 / 17</div>
+  <h2>Live server: journal verdicts and served-byte hashes</h2>
+  <p><code>docker compose up --build</code> starts Postgres and the app. <code>capture.sh</code> resets the database, records a real HTTP walkthrough in <code>run/</code> using the 0.4 wire format, and <code>render_journal.py</code> computes each journal verdict from that captured data. Then <code>live-hash.sh</code> fetches every content-addressed URL in the capture again and hashes the body with <code>shasum</code>.</p>
+  <div class="tbl"><table><thead><tr><th>Result</th><th>URL</th><th>sha256 of served body (16 hex)</th></tr></thead><tbody><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-6b95b2e3a600a4b1</code></td><td><code>6b95b2e3a600a4b1</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-89d6a263bfd0a42c</code></td><td><code>89d6a263bfd0a42c</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-ccaf11d46fc8ad56</code></td><td><code>ccaf11d46fc8ad56</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/affordance-sets/sha256-f670940f88273f51</code></td><td><code>f670940f88273f51</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-477ef9a340a7912a</code></td><td><code>477ef9a340a7912a</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-4ed779d47421af87</code></td><td><code>4ed779d47421af87</code></td></tr><tr><td><span class="st pass">PASS</span></td><td><code>/schemas/sha256-7ab6ce2f03278bdf</code></td><td><code>7ab6ce2f03278bdf</code></td></tr></tbody></table></div>
+  <p class="muted">Journal: 10 correct, 0 failing, across entries 00 Returning to bare soil, 01 Planting bed-1 — sowSeed, 02 Watering bed-1 — waterCell, 03 Harvesting bed-3 — zero fields, on purpose, 04 The actual point: two beds, one URL, 05 Asking bed-2 what it looked like, in the past, 06 Ways to fail, correctly.</p>
+  <div class="example">
+    <h3>Example: journal entry 06 — each failure gets its own code, against Postgres</h3>
+    <dl>
+      <dt>Rule</dt><dd>The same rule as the Suite 1 example, now checked on the real stack: Spring Boot over R2DBC and Postgres, in Docker.</dd>
+      <dt>How</dt><dd><code>capture.sh</code> sends six requests. An act with no <code>If-Match</code>; one with a stale tag; a <code>sow-seed</code> on a bed that is ready to harvest, with that bed's current ETag; a <code>water-cell</code> with 0 ml and a current ETag; a request for an unknown schema; and a revalidation of bed 2 with the ETag just received. Each status code is saved to a file in <code>run/</code>.</dd>
+      <dt>Result</dt><dd><code>428</code>, <code>412</code>, <code>409</code>, <code>422</code>, <code>404</code>, <code>304</code>. The journal computes its verdict by comparing those files to the expected codes.</dd>
+    </dl>
+    <figure class="code"><figcaption>server-spring/render_journal.py:323</figcaption><pre><code>def entry_06() -&gt; str:
+    expected = [
+        (&quot;06-missing-status.txt&quot;, &quot;428&quot;, &quot;act without If-Match&quot;),
+        (&quot;06-stale-status.txt&quot;, &quot;412&quot;, &quot;stale If-Match&quot;),
+        (&quot;06-invalid-status.txt&quot;, &quot;409&quot;, &quot;act not in the manifest&quot;),
+        (&quot;06-schema-status.txt&quot;, &quot;422&quot;, &quot;body fails the schema&quot;),
+        (&quot;06-notfound-status.txt&quot;, &quot;404&quot;, &quot;unknown schema&quot;),
+        (&quot;06-revalidate-status.txt&quot;, &quot;304&quot;, &quot;Layer 1 revalidation, nothing changed&quot;),
+    ]</code></pre></figure>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">Limits</div>
+  <h2>What this baseline does not cover</h2>
+  <ul class="plain">
+    <li>L6 has not been run against a real model: no <code>ANTHROPIC_API_KEY</code> in this environment. <code>./gradlew llmTest</code> runs it when one is set.</li>
+    <li>RISE is not implemented. ARTIE fetches schemas one after another, not in parallel.</li>
+    <li>HAL-FORMS is served at L0 only. Its Layer 2/3 addressing needs a SPEC decision first; see <code>spec/CONFORMANCE-GAPS.md</code>.</li>
+    <li>The cache-demo exhibit still uses its own 0.3-era fixtures (<code>{bedId}</code>, no <code>Prefer</code>). It demonstrates the caching mechanism, not 0.4 conformance.</li>
+    <li>The Docker build of <code>Dockerfile.origin</code> was verified on 3 Oct, before the fixed random seed. The cache-demo run above used the local <code>server.py</code> with the regenerated fixtures.</li>
+    <li><code>server-node</code> has no tests.</li>
+    <li>The bdd-gates pre-commit check runs only after <code>git config core.hooksPath .githooks</code>. Until then, commits in this pass ran it by hand first.</li>
+  </ul>
+</section>
+
+</div>

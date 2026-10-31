@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HEART Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="What has been built in HEART and ARTIE, in diagrams: the system, the server library, the gateway, the representation layers, the client, scripts and their lock files, the guard, and how it is tested.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+:root {
+  --bg: #f3f6f5; --surface: #ffffff; --fg: #17211d; --muted: #55645d; --rule: #d3ddd8; --link: #2f5f8f;
+  --node: #e8f0ec; --node-line: #6f8f80; --accent: #2f6f55; --edge: #5b6b64; --cluster: #f7faf8;
+  --display: "Literata", Georgia, serif; --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
+  --node: #1f2c27; --node-line: #6f9a86; --accent: #7cc4a2; --edge: #9fb2a9; --cluster: #151d1a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #111816; --surface: #18211e; --fg: #e2ebe6; --muted: #98a9a1; --rule: #2a3732; --link: #8ab8e6;
+  --node: #1f2c27; --node-line: #6f9a86; --accent: #7cc4a2; --edge: #9fb2a9; --cluster: #151d1a; color-scheme: dark; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+main { max-width: 62rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; gap: 2rem; }
+header { display: grid; gap: 0.6rem; }
+.bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; }
+.kicker { font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 { font: 650 2.2rem/1.15 var(--display); margin: 0; text-wrap: balance; }
+h2 { font: 650 1.4rem/1.25 var(--display); margin: 0; text-wrap: balance; }
+p { margin: 0; max-width: 68ch; }
+.lede { color: var(--muted); }
+nav ol { margin: 0; padding-left: 1.2rem; columns: 2 16rem; color: var(--muted); }
+nav a, a { color: var(--link); }
+section { display: grid; gap: 0.8rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1.2rem; min-width: 0; }
+.notes { margin: 0; padding-left: 1.2rem; color: var(--muted); max-width: 68ch; display: grid; gap: 0.2rem; }
+.diagram { overflow-x: auto; padding: 0.5rem 0; min-width: 0; }
+.diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+.tools { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+button { font: 600 0.85rem var(--body); color: var(--fg); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 0.3rem 0.7rem; cursor: pointer; }
+button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+pre.src { margin: 0; font: 0.8rem/1.45 var(--mono); background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 0.75rem; overflow-x: auto; }
+.err { color: #b3261e; font-size: 0.9rem; }
+footer { color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<main>
+  <header>
+    <div class="bar">
+      <span class="kicker">HEART · ARTIE · heart-script</span>
+      <div class="tools" role="group" aria-label="Theme">
+        <button type="button" data-set-theme="light">Light</button>
+        <button type="button" data-set-theme="dark">Dark</button>
+      </div>
+    </div>
+    <h1>HEART Architecture</h1>
+    <p class="lede">What has been built, as of October 20, 2026, in ten diagrams. Each one has its Mermaid source a click away, ready to paste into a README, an issue or any Markdown that renders Mermaid.</p>
+    <nav aria-label="Diagrams"><ol>
+      <li><a href="#system">The system</a></li>
+      <li><a href="#library">The server library</a></li>
+      <li><a href="#gateway">The gateway</a></li>
+      <li><a href="#layers">Rungs and layers</a></li>
+      <li><a href="#act">One act, end to end</a></li>
+      <li><a href="#pipeline">The act pipeline</a></li>
+      <li><a href="#client">The client</a></li>
+      <li><a href="#scripts">Scripts, captures and lock files</a></li>
+      <li><a href="#guard">The replay guard</a></li>
+      <li><a href="#testing">How it is tested</a></li>
+    </ol></nav>
+  </header>
+
+  <section id="system">
+    <h2>1. The system</h2>
+    <p>Who talks to what. Every client reaches every service the same way: it enters at a bookmark and follows links and forms the service hands it.</p>
+    <div class="diagram" data-diagram="system"></div>
+<pre class="mm-src" data-name="system" hidden>
+flowchart TB
+  subgraph People["People and agents"]
+    person["A person"]
+    claude["Claude, as reasoner"]
+    host["An MCP host&lt;br/&gt;Claude Code, Claude Desktop"]
+  end
+  subgraph Clients["Clients"]
+    artie["ARTIE&lt;br/&gt;Kotlin client library"]
+    cli["artie CLI&lt;br/&gt;run, generate"]
+    dash["ARTIE dashboard&lt;br/&gt;exhibit"]
+    mcp["heart-mcp&lt;br/&gt;MCP server over ARTIE"]
+    ts["heart-ts&lt;br/&gt;second client, TypeScript"]
+  end
+  subgraph Services["HEART services"]
+    garden["Garden&lt;br/&gt;server-spring, HTTP and CoAP"]
+    bball["Basketball&lt;br/&gt;domain"]
+    tickets["Tickets&lt;br/&gt;domain"]
+    gateway["heart-gateway&lt;br/&gt;any OpenAPI service as HEART"]
+  end
+  github["GitHub REST API"]
+  buster["Buster&lt;br/&gt;chaos filter, optional"]
+  person --> cli
+  person --> dash
+  host --> mcp
+  cli --> artie
+  dash --> artie
+  mcp --> artie
+  artie -. reason steps .-> claude
+  artie --> garden
+  artie --> bball
+  artie --> tickets
+  artie --> gateway
+  ts --> garden
+  buster -. tampers with answers .- garden
+  gateway --> github
+</pre>
+    <ul class="notes">
+      <li>ARTIE speaks HTTP, plain CoAP and coaps to the same resources.</li>
+      <li>heart-ts was written from the spec, not ported, to prove the spec is enough.</li>
+      <li>The gateway adds HEART in front of an API that never heard of it.</li>
+    </ul>
+  </section>
+
+  <section id="library">
+    <h2>2. The server library</h2>
+    <p>The <code>heart/</code> build. A service declares its resources and acts once; heart-core does the rest, and a binding puts it on the wire.</p>
+    <div class="diagram" data-diagram="library"></div>
+<pre class="mm-src" data-name="library" hidden>
+flowchart TB
+  subgraph Core["heart-core"]
+    decl["Declaration&lt;br/&gt;resource types, states, acts, inputs"]
+    pipeline["ActPipeline&lt;br/&gt;preconditions, schema, domain"]
+    layers["Layers&lt;br/&gt;L0, L1, L2 rendering"]
+    nego["Negotiation&lt;br/&gt;HAL Schema Forms, HAL-FORMS, OpenAPI twin"]
+    etag["StateETag&lt;br/&gt;validator per representation"]
+    integrity["FormIntegrity&lt;br/&gt;a hash per form"]
+    shared["ContentAddress, SharedContent&lt;br/&gt;affordance sets and schemas by hash"]
+    options["Options&lt;br/&gt;choices from state, hr:options"]
+    index["ServiceIndex&lt;br/&gt;the bookmark"]
+    more["Embedded, SearchPages, ItemPath,&lt;br/&gt;Refusals, ServingLimits"]
+  end
+  spring["heart-spring&lt;br/&gt;Spring MVC binding"]
+  http4k["heart-http4k&lt;br/&gt;http4k binding"]
+  coap["heart-coap&lt;br/&gt;CoAP and coaps binding"]
+  es["heart-eventsourcing&lt;br/&gt;state from events"]
+  starter["heart-spring-boot-starter"]
+  tck["heart-tck&lt;br/&gt;conformance features"]
+  gw["heart-gateway"]
+  decl --> pipeline
+  decl --> layers
+  layers --> nego
+  layers --> etag
+  layers --> integrity
+  layers --> shared
+  layers --> options
+  decl --> index
+  Core --> spring
+  Core --> http4k
+  Core --> coap
+  Core --> es
+  spring --> starter
+  coap --> starter
+  es --> starter
+  http4k --> gw
+  tck -. tests .-> spring
+  tck -. tests .-> http4k
+  tck -. tests .-> gw
+</pre>
+    <ul class="notes">
+      <li>The garden, basketball and tickets services are built on the starter: Spring, CoAP and event sourcing.</li>
+      <li>One declaration serves HAL Schema Forms, HAL-FORMS and an OpenAPI twin of the same service.</li>
+    </ul>
+  </section>
+
+  <section id="gateway">
+    <h2>3. The gateway</h2>
+    <p>A generic engine in code, and one folder of YAML per API. GitHub's connector is the worked example.</p>
+    <div class="diagram" data-diagram="gateway"></div>
+<pre class="mm-src" data-name="gateway" hidden>
+flowchart TB
+  subgraph Config["Read at start"]
+    spec["OpenAPI description&lt;br/&gt;api.github.com.json"]
+    conn["Connector folder&lt;br/&gt;connector.yaml"]
+    res["*.resource.yaml&lt;br/&gt;acts: operation, fields, body,&lt;br/&gt;bind, rename, creates"]
+    read["*.reader.yaml&lt;br/&gt;state and links from answers"]
+  end
+  subgraph Engine["heart-gateway"]
+    decl["ActDeclaration&lt;br/&gt;one act, one upstream operation"]
+    schema["ActSchema&lt;br/&gt;the form's schema from the operation's"]
+    dres["DeclaredResource&lt;br/&gt;state, links, acts"]
+    up["Upstream&lt;br/&gt;calls the API as the caller"]
+  end
+  core["heart-core&lt;br/&gt;on heart-http4k"]
+  client["Any HEART client"]
+  gh["GitHub REST API"]
+  spec --> schema
+  conn --> dres
+  res --> decl
+  read --> dres
+  decl --> schema
+  decl --> dres
+  schema --> dres
+  dres --> core
+  client -- "GET, and each act by its own method" --> core
+  core --> dres
+  dres --> up
+  up -- "the operation, renamed fields mapped back" --> gh
+</pre>
+    <ul class="notes">
+      <li>Each act is served by its GitHub operation's own method: close and edit are PATCH, merge and lock PUT, unlabel and unassign DELETE, their fields in the query.</li>
+      <li>A bound field, like merge's head SHA, is filled from the state the client's validator matched, never by the client.</li>
+      <li><code>rename: { content: body }</code> offers a field by one name and sends it by the operation's own.</li>
+      <li>The caller's own GitHub token is passed through; the gateway holds none.</li>
+    </ul>
+  </section>
+
+  <section id="layers">
+    <h2>4. Rungs and layers</h2>
+    <p>The same resource at three rungs. Only the resource is revalidated. What it links to is content-addressed, so it never changes and caches forever.</p>
+    <div class="diagram" data-diagram="layers"></div>
+<pre class="mm-src" data-name="layers" hidden>
+flowchart LR
+  subgraph L0["L0: everything in one answer"]
+    direction TB
+    r0["Resource&lt;br/&gt;state, links, forms with full schemas&lt;br/&gt;no-cache, ETag"]
+  end
+  subgraph L1["L1: forms in a shared set"]
+    direction TB
+    r1["Resource&lt;br/&gt;state and links&lt;br/&gt;no-cache, ETag"]
+    s1["Affordance set&lt;br/&gt;forms with inline schemas&lt;br/&gt;immutable, by hash"]
+    r1 -- "link with hr:integrity" --> s1
+  end
+  subgraph L2["L2: schemas apart too"]
+    direction TB
+    r2["Resource&lt;br/&gt;state and links&lt;br/&gt;no-cache, ETag"]
+    s2["Affordance set&lt;br/&gt;forms, each with its integrity&lt;br/&gt;immutable, by hash"]
+    sc["Schemas&lt;br/&gt;immutable, by hash"]
+    r2 -- "link with hr:integrity" --> s2
+    s2 -- "$ref with hr:integrity" --> sc
+  end
+</pre>
+    <ul class="notes">
+      <li>Resources in the same state share one affordance set, so a client fetches it once.</li>
+      <li>A changed form gives a new set hash, so the resource links somewhere new. Nothing old is edited.</li>
+      <li>The service index answers inline at every rung.</li>
+    </ul>
+  </section>
+
+  <section id="act">
+    <h2>5. One act, end to end</h2>
+    <p>Commenting on a GitHub issue through the gateway, at L2, with a warm cache.</p>
+    <div class="diagram" data-diagram="act"></div>
+<pre class="mm-src" data-name="act" hidden>
+sequenceDiagram
+  participant A as ARTIE
+  participant G as heart-gateway
+  participant H as GitHub
+  A->>G: GET issue, If-None-Match
+  G->>H: GET the issue
+  H-->>G: 200 issue JSON
+  G-->>A: 200 state, links, set link, ETag
+  Note over A: set and schemas cached by hash,&lt;br/&gt;checked against hr:integrity
+  Note over A: guard: form pinned, values fit
+  A->>G: POST /actions/comment, as its form says, If-Match, body
+  G->>G: pipeline: 428, 412, 409, 422 checks
+  G->>H: POST comments, body
+  H-->>G: 201 comment
+  G-->>A: 201 Location of the comment
+</pre>
+    <ul class="notes">
+      <li>No If-Match: 428. A stale one: 412. An act not allowed now: 409, with why. Bad input: 422, at the field.</li>
+      <li>Every request carries a W3C traceparent, so the gateway's own record ties to ARTIE's.</li>
+    </ul>
+  </section>
+
+  <section id="pipeline">
+    <h2>6. The act pipeline</h2>
+    <p>What a HEART server checks, in order, before it does anything. An act is served by one method, and its relation's ALPS type agrees: a PUT or a DELETE is idempotent, a POST or a PATCH is not. A PATCH takes a JSON Merge Patch; a DELETE takes no body, its fields being its query.</p>
+    <div class="diagram" data-diagram="pipeline"></div>
+<pre class="mm-src" data-name="pipeline" hidden>
+flowchart TB
+  req["A request to an act"] --> meth{"By the act's own method?&lt;br/&gt;POST, PUT, PATCH or DELETE"}
+  meth -- no --> e405["405, Allow names it"]
+  meth -- yes --> pre{"If-Match sent?"}
+  pre -- no --> e428["428 precondition required"]
+  pre -- yes --> fresh{"Matches the state now?"}
+  fresh -- no --> e412["412 stale"]
+  fresh -- yes --> offered{"Act offered in this state,&lt;br/&gt;to this caller?"}
+  offered -- no --> e409["409, with the reason"]
+  offered -- yes --> valid{"Body fits the schema&lt;br/&gt;and the choices now?"}
+  valid -- no --> e422["422 at the field"]
+  valid -- yes --> domain["Domain does the act"]
+  domain --> ok["200 new state,&lt;br/&gt;or 201 Location"]
+</pre>
+  </section>
+
+  <section id="client">
+    <h2>7. The client</h2>
+    <p>The <code>client/</code> build: ARTIE, the script DSL, and the command line.</p>
+    <div class="diagram" data-diagram="client"></div>
+<pre class="mm-src" data-name="client" hidden>
+flowchart TB
+  subgraph CLI["artie-cli"]
+    run["artie run&lt;br/&gt;Config, LockFile, Repin"]
+    gen["artie generate&lt;br/&gt;Capture, ScriptWriter, LockWriter"]
+  end
+  subgraph Script["heart-script"]
+    dsl["The DSL&lt;br/&gt;heart, act, follow, until, check, offers"]
+    nav["Navigator&lt;br/&gt;the contract a client implements"]
+    trace["Run and Trace&lt;br/&gt;the capture"]
+  end
+  hostm["heart-script-host&lt;br/&gt;runs .kts"]
+  testm["heart-script-test&lt;br/&gt;Expect, matchers"]
+  subgraph Artie["artie"]
+    an["ArtieNavigator"]
+    ac["ArtieClient&lt;br/&gt;caching, revalidation, integrity"]
+    bind["Bindings&lt;br/&gt;HTTP, CoAP, coaps"]
+    dial["Dialects&lt;br/&gt;HAL Schema Forms, HAL-FORMS"]
+    sc["SchemaCheck"]
+    guard["ScriptGuard"]
+    reas["ClaudeReasoner"]
+    cred["Credentials&lt;br/&gt;env, ~/.artie/credentials, Vault"]
+  end
+  run --> hostm
+  hostm --> dsl
+  dsl --> nav
+  dsl --> trace
+  testm --> dsl
+  nav --> an
+  an --> guard
+  an --> sc
+  an --> reas
+  an --> ac
+  ac --> dial
+  ac --> bind
+  bind --> cred
+  trace --> gen
+</pre>
+    <ul class="notes">
+      <li>A script never names an address but its bookmark. It selects acts and links by relation, and ARTIE does the rest.</li>
+      <li>The Navigator contract is all a script needs, so another client could run the same scripts.</li>
+    </ul>
+  </section>
+
+  <section id="scripts">
+    <h2>8. Scripts, captures and lock files</h2>
+    <p>From a run with a model to a script with none, held to what it was recorded against.</p>
+    <div class="diagram" data-diagram="scripts"></div>
+<pre class="mm-src" data-name="scripts" hidden>
+flowchart TB
+  src["Source script&lt;br/&gt;act with intent words, or hybrid"]
+  r1["artie run&lt;br/&gt;with Claude"]
+  cap["Capture&lt;br/&gt;NAME.trace.yaml"]
+  gen["artie generate"]
+  kts["NAME.kts&lt;br/&gt;no model"]
+  pins["NAME.pins.yaml&lt;br/&gt;rung, form integrity,&lt;br/&gt;method, sets, links"]
+  der["NAME.derivation.yaml&lt;br/&gt;where each value came from"]
+  cfg["NAME.config.yaml&lt;br/&gt;guard, repin, on-change&lt;br/&gt;written by a person"]
+  r2["artie run&lt;br/&gt;guarded"]
+  cap2["New capture"]
+  rep["Run report&lt;br/&gt;docs/reports"]
+  src --> r1 --> cap --> gen
+  gen --> kts
+  gen --> pins
+  gen --> der
+  kts --> r2
+  pins --> r2
+  cfg --> r2
+  r2 --> cap2
+  cap2 --> rep
+  cap2 -- "repin: auto" --> pins
+</pre>
+    <ul class="notes">
+      <li>Three files, three jobs: the script says what to do, the lock file what it was recorded against, the config how strictly to hold to it.</li>
+      <li>Re-pinning happens after the run, only for acts that were done.</li>
+    </ul>
+  </section>
+
+  <section id="guard">
+    <h2>9. The replay guard</h2>
+    <p>What ARTIE checks before every act of a script with a lock file. Nothing is sent when it refuses.</p>
+    <div class="diagram" data-diagram="guard"></div>
+<pre class="mm-src" data-name="guard" hidden>
+flowchart TB
+  start["About to act on a form"] --> pinned{"Pinned in the lock file?"}
+  pinned -- "no, lenient" --> unp["Act, marked unpinned"]
+  pinned -- "no, strict" --> stop1["Refuse"]
+  pinned -- yes --> same{"Form integrity&lt;br/&gt;as pinned?"}
+  same -- yes --> strict{"Strict?"}
+  strict -- no --> held1["Act, held by set or form"]
+  strict -- yes --> set{"Set one recorded&lt;br/&gt;for it?"}
+  set -- yes --> held2["Act, held by set"]
+  set -- no --> stop2["Refuse: another set"]
+  same -- no --> mode{"Lenient with&lt;br/&gt;on-change: values?"}
+  mode -- no --> stop3["Refuse: changed"]
+  mode -- yes --> method{"Method as pinned?"}
+  method -- no --> stop4["Refuse: method changed"]
+  method -- yes --> fits{"Values sent fit&lt;br/&gt;the new schema?"}
+  fits -- no --> stop5["Refuse: says which field"]
+  fits -- yes --> held3["Act, held by values"]
+</pre>
+    <ul class="notes">
+      <li>Every step re-reads the resource, so the form checked is always the one offered now.</li>
+      <li>A title or description change doesn't count; anything the form does, does.</li>
+    </ul>
+  </section>
+
+  <section id="testing">
+    <h2>10. How it is tested</h2>
+    <p>Gherkin first, enforced by hooks, then live runs that become reports.</p>
+    <div class="diagram" data-diagram="testing"></div>
+<pre class="mm-src" data-name="testing" hidden>
+flowchart TB
+  subgraph Gates["bdd-gates hooks"]
+    g1["Feature first"]
+    g2["Red run logged,&lt;br/&gt;failing at test level"]
+    g3["Production code"]
+    g4["Green, lint and&lt;br/&gt;architecture checks"]
+    g5["Commit ordering check"]
+    g1 --> g2 --> g3 --> g4 --> g5
+  end
+  subgraph Suites["Cucumber suites"]
+    t1["heart-core, bindings"]
+    t2["heart-tck, shared by&lt;br/&gt;spring, http4k, gateway"]
+    t3["Gateway against a small GitHub"]
+    t4["ARTIE, scripts, replay"]
+    t5["heart-ts conformance"]
+  end
+  subgraph Live["Live"]
+    l1["Scratch GitHub repository"]
+    l2["Captures and traces, YAML"]
+    l3["Reports on GitHub Pages&lt;br/&gt;and as artifacts"]
+    l1 --> l2 --> l3
+  end
+  Gates --> Suites
+  Suites --> Live
+</pre>
+    <ul class="notes">
+      <li>About 742 scenarios in 125 feature files, most written in the last two weeks.</li>
+      <li>Live runs write only to the scratch repository.</li>
+    </ul>
+  </section>
+
+  <footer>Made from the repository on October 20, 2026. Sources: <code>heart/</code>, <code>client/</code>, <code>heart/heart-gateway/connectors/github</code>, <code>spec/</code>.</footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  const root = document.documentElement;
+  const KEY = "arch-theme";
+  try { const t = localStorage.getItem(KEY); if (t) root.setAttribute("data-theme", t); } catch (e) {}
+  const css = (name) => getComputedStyle(root).getPropertyValue(name).trim();
+
+  function themeVars() {
+    return {
+      fontFamily: '"IBM Plex Sans", system-ui, sans-serif', fontSize: "14px",
+      background: css("--surface"), primaryColor: css("--node"), primaryBorderColor: css("--node-line"),
+      primaryTextColor: css("--fg"), secondaryColor: css("--cluster"), tertiaryColor: css("--cluster"),
+      lineColor: css("--edge"), textColor: css("--fg"), clusterBkg: css("--cluster"), clusterBorder: css("--rule"),
+      edgeLabelBackground: css("--surface"), titleColor: css("--fg"), nodeTextColor: css("--fg"),
+      actorBkg: css("--node"), actorBorder: css("--node-line"), actorTextColor: css("--fg"),
+      signalColor: css("--edge"), signalTextColor: css("--fg"), noteBkgColor: css("--cluster"),
+      noteBorderColor: css("--rule"), noteTextColor: css("--fg"), labelBoxBkgColor: css("--node"),
+    };
+  }
+
+  let run = 0;
+  async function renderAll() {
+    if (!window.mermaid) {
+      document.querySelectorAll(".diagram").forEach((d) => { d.innerHTML = '<p class="err">The diagram library did not load. The Mermaid source is below.</p>'; });
+      return;
+    }
+    const pass = ++run;
+    mermaid.initialize({ startOnLoad: false, theme: "base", themeVariables: themeVars(), securityLevel: "loose",
+      flowchart: { htmlLabels: true, curve: "basis", useMaxWidth: true }, sequence: { useMaxWidth: true } });
+    for (const box of document.querySelectorAll(".diagram")) {
+      const name = box.dataset.diagram;
+      const src = document.querySelector(`pre.mm-src[data-name="${name}"]`).textContent.trim();
+      try {
+        const { svg } = await mermaid.render(`m-${name}-${pass}`, src);
+        if (pass === run) box.innerHTML = svg;
+      } catch (e) {
+        box.innerHTML = '<p class="err">This diagram could not be drawn here. Its Mermaid source is below.</p>';
+      }
+    }
+  }
+
+  // Each diagram gets a source toggle and a copy button.
+  document.querySelectorAll("pre.mm-src").forEach((pre) => {
+    const tools = document.createElement("div");
+    tools.className = "tools";
+    const show = document.createElement("button");
+    show.type = "button"; show.textContent = "Mermaid source"; show.setAttribute("aria-pressed", "false");
+    const copy = document.createElement("button");
+    copy.type = "button"; copy.textContent = "Copy as Markdown";
+    pre.classList.add("src");
+    show.addEventListener("click", () => {
+      pre.hidden = !pre.hidden; show.setAttribute("aria-pressed", String(!pre.hidden));
+    });
+    copy.addEventListener("click", () => {
+      const text = "```mermaid\n" + pre.textContent.trim() + "\n```\n";
+      const done = () => { copy.textContent = "Copied"; setTimeout(() => (copy.textContent = "Copy as Markdown"), 1500); };
+      const fallback = () => {
+        pre.hidden = false; show.setAttribute("aria-pressed", "true");
+        const range = document.createRange(); range.selectNodeContents(pre);
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+        copy.textContent = "Selected: copy it";
+      };
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+    });
+    tools.append(show, copy);
+    pre.before(tools);
+  });
+
+  function setTheme(t) {
+    root.setAttribute("data-theme", t);
+    try { localStorage.setItem(KEY, t); } catch (e) {}
+    document.querySelectorAll("[data-set-theme]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.setTheme === t)));
+    renderAll();
+  }
+  document.querySelectorAll("[data-set-theme]").forEach((b) => b.addEventListener("click", () => setTheme(b.dataset.setTheme)));
+  const current = root.getAttribute("data-theme") || "light";
+  document.querySelectorAll("[data-set-theme]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.setTheme === current)));
+  if (!root.getAttribute("data-theme")) root.setAttribute("data-theme", "light");
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(renderAll);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+# What merge.kts was recorded against, from runs/live-8.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.
+rung: L2
+digest: sha256-iBmq8RVpA5my4yokZ0mDyF5Q/0BWxp2xdPGJuiI4POY=
+forms:
+  github:repos-get:
+    integrity: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+    method: GET
+    sets: []
+  github:open-issue:
+    integrity: sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+    method: POST
+    sets:
+      - sha256-t8352b0vFug59dPyOrG80DIEf+lWTm4RO0sUfhLHR+Y=
+  github:pulls-list:
+    integrity: sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+    method: GET
+    sets: []
+  github:merge:
+    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+    method: PUT
+    sets:
+      - sha256-bJidTCddM+G3kQNm0LnzbxnwrQUVVCGA8+EbU8vwQUM=
+  github:label:
+    integrity: sha256-E6Dht1OvjHWMm1Q2FD4+08H3pne+aT5TyvC+yzhrtHc=
+    method: POST
+    sets:
+      - sha256-MuINIM9xkXKMDPVHEicehbQCi3ZbfvSDPpuqpAuBvxo=
+      - sha256-PU3+UguwcwtEHRyuoSQMlJ+XNVB5HH6hL+fxTFw6OxA=
+  github:comment:
+    integrity: sha256-hBIa40tU8EJokuebe8npx54kItbP3z/jGbJW8FsL26c=
+    method: POST
+    sets:
+      - sha256-PU3+UguwcwtEHRyuoSQMlJ+XNVB5HH6hL+fxTFw6OxA=
+      - sha256-MuINIM9xkXKMDPVHEicehbQCi3ZbfvSDPpuqpAuBvxo=
+links:
+  item: ''

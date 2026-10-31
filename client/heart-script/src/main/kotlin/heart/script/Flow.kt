@@ -1,0 +1,90 @@
+package heart.script
+
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+
+/**
+ * Read the held resource again until [condition] holds, at most [tries] times
+ * [every] apart: for a server that settles a moment after an act. When it
+ * never holds, the script stops here.
+ */
+fun Here.until(tries: Int = 10, every: Duration = 1.seconds, condition: Here.() -> Boolean) {
+    val step = ++run.step
+    for (attempt in 1..tries) {
+        if (condition()) {
+            // A step of its own, even when it held at once: a script made from the run waits here too.
+            run.record(TraceStep.Asked("until", emptyMap()), "held", held)
+            run.trace.last().waited = run.waitedFor(attempt - 1)
+            return
+        }
+        if (attempt == tries) break
+        run.pause(every)
+        held = arrived(step, "\"until\"", navigator.visit(held.address))
+    }
+    throw ScriptStopped(step, "\"until\"", "\"the condition did not hold after $tries tries\"")
+}
+
+/**
+ * Run [block]; when an act in it is refused as stale, someone changed the resource since it was read, read the
+ * held resource again and run [block] again, at most [tries] times in all: its values worked out anew from what
+ * is there now. Any other refusal stops the script at once; after its tries, so does a stale one.
+ */
+fun Here.decide(tries: Int = 3, block: Here.() -> Unit) {
+    for (attempt in 1..tries) {
+        try {
+            block()
+            return
+        } catch (stopped: ScriptStopped) {
+            if (stopped.refused?.kind != Refusal.Stale || attempt == tries) throw stopped
+        }
+        sync()
+    }
+}
+
+/**
+ * Read again the resource at [address], one the server handed over earlier (a link's target, a Location), and run
+ * [block] there; then back where it was, read again. A watch's Until reads the resource it names this way. The
+ * task asks for this read, so it is made even off the rails (spec/ideas/off-the-rails.md): only the way back is care.
+ */
+fun Here.at(address: String, block: Here.() -> Unit) {
+    val step = ++run.step
+    val from = held.address
+    Here(navigator, run, arrived(step, "\"at\"", navigator.visit(address))).inside(block) {
+        held = arrived(step, "\"at\"", navigator.recall(from))
+    }
+}
+
+/**
+ * Enter another server at [entry], a bookmark of its own, with the same client, and run [block] there; then back
+ * where it was, read again (spec/PLAN-LISTENERS.md, slice 7). A handler acts on any resource it can reach: a HEART
+ * server, a plain one through the gateway made from its OpenAPI description, a mail service through its gateway.
+ */
+fun Here.enter(entry: String, block: Here.() -> Unit) {
+    val step = ++run.step
+    val from = held.address
+    Here(navigator, run, arrived(step, "\"enter\"", navigator.enter(entry))).inside(block) {
+        held = arrived(step, "\"enter\"", navigator.recall(from))
+    }
+}
+
+/**
+ * Visit each member the held list links under [rel], page after page by
+ * `next`, coming back to its page after each; then back where it began.
+ */
+fun Here.members(rel: String = "item", block: Here.() -> Unit) {
+    val step = ++run.step
+    val start = held.address
+    while (true) {
+        val page = held.address
+        links(rel).forEach { title ->
+            Here(navigator, run, arrived(step, "\"$rel\"", navigator.follow(rel, title))).block()
+            held = arrived(step, "\"$rel\"", navigator.visit(page))
+        }
+        if (links(NEXT).isEmpty()) break
+        held = arrived(step, "\"$NEXT\"", navigator.follow(NEXT, links(NEXT).first()))
+    }
+    if (held.address != start) held = arrived(step, "\"$rel\"", navigator.visit(start))
+}
+
+/** The IANA relation a list's next page is linked by (RFC 8288, RFC 5005). */
+private const val NEXT = "next"

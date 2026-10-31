@@ -1,0 +1,48 @@
+# docker-compose.yml
+#
+# Postgres + the Spring backend, wired together. UNVERIFIED (no Docker
+# available in the environment this was written in) -- see README.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gardenbed
+      POSTGRES_USER: artie
+      POSTGRES_PASSWORD: artie
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U artie -d gardenbed"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    # The repo root, so the image can build the HEART library beside the server.
+    build:
+      context: ..
+      dockerfile: server-spring/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: gardenbed
+      DB_USER: artie
+      DB_PASSWORD: artie
+      # SPEC §6.11.1: the highest rung served. HEART_MAX_RUNG=L0 docker compose up -d
+      HEART_MAX_RUNG: ${HEART_MAX_RUNG:-L2}
+      HEART_PAGE_SIZE: ${HEART_PAGE_SIZE:-20}
+      # Who the service admits. The SHA-256 of a Bearer token, from .env, which
+      # scripts/dev-credentials.sh makes (the token itself goes in ~/.artie/credentials).
+      # The service does not start without one.
+      HEART_AUTH_BEARER_TOKENS: ${HEART_AUTH_BEARER_TOKENS:?run scripts/dev-credentials.sh first}
+      HEART_AUTH_BASIC_USERS: ${HEART_AUTH_BASIC_USERS:-}
+      # coaps (DTLS with a pre-shared key), from .env too. Plain CoAP stays inside the container.
+      HEART_COAPS_PORT: ${HEART_COAPS_PORT:-5784}
+      HEART_COAPS_PSK: ${HEART_COAPS_PSK:?run scripts/dev-credentials.sh first}
+    ports:
+      - "8080:8080"
+      - "5784:5784/udp"

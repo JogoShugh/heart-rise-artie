@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="reasoned-title reasoned-desc">
+<title id="reasoned-title">The one place the model stays: the reasoned Otherwise</title>
+<desc id="reasoned-desc">When a wait gives up, the server's own reason for withholding merge and the goal's words go to the model, which chooses the comment form the pull request offers and writes one sentence. It is asked every time.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="reasoned-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<rect class="box" x="20" y="40" width="200" height="80" rx="10"/>
+<text class="h" x="120" y="75" text-anchor="middle">The wait gives up</text>
+<text class="s" x="120" y="95" text-anchor="middle">3 minutes, no merge offered</text>
+<path class="line" d="M220 80 L268 80" marker-end="url(#reasoned-head)"/>
+<rect class="box" x="270" y="30" width="380" height="100" rx="10"/>
+<text class="h" x="460" y="60" text-anchor="middle">The server says why</text>
+<text class="m" x="290" y="92">hr:unavailable → merge:</text>
+<text class="m" x="290" y="114">“A draft can't be merged; mark it…”</text>
+<path class="line" d="M650 80 L698 80" marker-end="url(#reasoned-head)"/>
+<rect class="hl" x="700" y="40" width="240" height="80" rx="10"/>
+<text class="h" x="820" y="75" text-anchor="middle">The model</text>
+<text class="s" x="820" y="95" text-anchor="middle">the goal's words + the reason</text>
+<path class="line" d="M820 120 L820 178" marker-end="url(#reasoned-head)"/>
+<rect class="box" x="700" y="180" width="240" height="80" rx="10"/>
+<text class="h" x="820" y="215" text-anchor="middle">Picks a form</text>
+<text class="s" x="820" y="235" text-anchor="middle">comment, as offered</text>
+<path class="line" d="M700 220 L652 220" marker-end="url(#reasoned-head)"/>
+<rect class="hl" x="270" y="180" width="380" height="80" rx="10"/>
+<text class="s" x="460" y="212" text-anchor="middle">“…this pull request wasn't merged because it's</text>
+<text class="s" x="460" y="234" text-anchor="middle">still a draft, so please mark it ready for review…”</text>
+<text class="s" x="480" y="320" text-anchor="middle">Asked afresh at every give-up; nothing of it is kept or replayed.</text>
+</svg>

@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HEART HTML Mockup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Schibsted+Grotesk:wght@600;700&display=swap">
+<style>
+/* Layout: one reading column of numbered steps; each step pairs a mock browser (the person's view) with the wire (request, HTML, answer). */
+:root {
+  --paper: #f5f6f4;
+  --sheet: #ffffff;
+  --ink: #1d2427;
+  --muted: #5d686c;
+  --rule: #d9dedc;
+  --accent: #1f6f5c;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2efea;
+  --code-bg: #eef1ef;
+  --warn: #9a5b00;
+  --warn-soft: #fbf0dc;
+  --bad: #a3322b;
+  --bad-soft: #f8e4e1;
+  --good: #276b33;
+  --good-soft: #e3f1e4;
+  --grey-btn: #eceeed;
+  --grey-ink: #7b8588;
+  --chrome: #e7eae8;
+  --display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #141a1b; --sheet: #1b2324; --ink: #e3e8e6; --muted: #9aa6a5; --rule: #2f3a3b;
+    --accent: #5fbf9f; --accent-ink: #0f1716; --accent-soft: #1f3530; --code-bg: #101617;
+    --warn: #e2a64b; --warn-soft: #33291a; --bad: #ef8a80; --bad-soft: #3a2222; --good: #7fcf8b; --good-soft: #1d3221;
+    --grey-btn: #262f30; --grey-ink: #7f8b8b; --chrome: #232c2d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #141a1b; --sheet: #1b2324; --ink: #e3e8e6; --muted: #9aa6a5; --rule: #2f3a3b;
+  --accent: #5fbf9f; --accent-ink: #0f1716; --accent-soft: #1f3530; --code-bg: #101617;
+  --warn: #e2a64b; --warn-soft: #33291a; --bad: #ef8a80; --bad-soft: #3a2222; --good: #7fcf8b; --good-soft: #1d3221;
+  --grey-btn: #262f30; --grey-ink: #7f8b8b; --chrome: #232c2d; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font: 15px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 40px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: 2.1rem; }
+h2 { font-size: 1.45rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0; max-width: 68ch; }
+code, pre, .mono { font-family: var(--mono); font-size: 0.86em; }
+a { color: var(--accent); }
+.badge { display: inline-block; font: 600 0.72rem/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 8px; border-radius: 4px; background: var(--warn-soft); color: var(--warn); }
+header.top { display: grid; gap: 12px; }
+/* The light and dark switch, shared with the other reports: the system theme holds until the viewer chooses. */
+.toprow { display: flex; gap: 16px; align-items: center; justify-content: space-between; }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--ink); background: var(--sheet); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.theme:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.lede { color: var(--muted); font-size: 1.05rem; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: 0.9rem; }
+.facts b { color: var(--ink); font-weight: 600; }
+
+.step { display: grid; gap: 16px; }
+.step-head { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; align-items: baseline; }
+.step-no { font: 700 1.45rem/1 var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.step-head p { grid-column: 2; color: var(--muted); }
+
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.tabs button { font: 500 0.88rem var(--body); background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 12px; color: var(--muted); cursor: pointer; }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.panel { min-width: 0; }
+
+/* The mock browser */
+.browser { border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: var(--sheet); }
+.bar { display: flex; align-items: center; gap: 10px; background: var(--chrome); padding: 8px 12px; }
+.dots { display: flex; gap: 6px; flex: none; }
+.dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--rule); display: block; }
+.url { flex: 1; min-width: 0; font: 0.8rem var(--mono); background: var(--sheet); border-radius: 6px; padding: 5px 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.view { padding: 22px 24px 26px; display: grid; gap: 16px; position: relative; }
+.view nav { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.86rem; }
+.view nav a { text-decoration: none; }
+.view nav a span { color: var(--muted); font-family: var(--mono); font-size: 0.78rem; margin-left: 4px; }
+.kind { font: 600 0.72rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.view h1.res { font: 600 1.35rem/1.3 var(--body); word-break: break-word; }
+dl.state { display: grid; grid-template-columns: minmax(110px, max-content) 1fr; gap: 6px 18px; margin: 0; font-size: 0.92rem; }
+dl.state dt { color: var(--muted); }
+dl.state dd { margin: 0; min-width: 0; word-break: break-word; }
+.chip { display: inline-block; font-size: 0.8rem; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.more { font: 500 0.85rem var(--body); background: none; border: 0; color: var(--accent); padding: 0; cursor: pointer; justify-self: start; }
+.acts { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; border-top: 1px solid var(--rule); padding-top: 16px; }
+.act { font: 500 0.9rem var(--body); padding: 8px 14px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); cursor: pointer; }
+.act.quiet { background: var(--sheet); color: var(--accent); }
+.act[aria-disabled="true"] { background: var(--grey-btn); border-color: var(--rule); color: var(--grey-ink); cursor: help; }
+.act:focus-visible, .more:focus-visible, .rowmenu:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.reason { font-size: 0.86rem; color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 8px 12px; }
+.live { font-size: 0.88rem; border-radius: 6px; padding: 8px 12px; background: var(--good-soft); color: var(--good); }
+.embedded { display: grid; gap: 6px; font-size: 0.9rem; }
+.embedded h3 { font: 600 0.8rem var(--body); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+/* Dialog inside the mock */
+dialog { border: 1px solid var(--rule); border-radius: 10px; padding: 0; width: min(520px, calc(100vw - 32px)); background: var(--sheet); color: var(--ink); box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+dialog::backdrop { background: rgba(20, 26, 27, 0.45); }
+dialog form { display: grid; gap: 12px; padding: 20px 22px; }
+dialog h2 { font: 600 1.15rem var(--body); }
+dialog .desc { color: var(--muted); font-size: 0.9rem; }
+.field { display: grid; gap: 4px; }
+.field label { font-weight: 500; font-size: 0.9rem; }
+.field label .req { color: var(--bad); margin-left: 2px; }
+.field input[type=text], .field textarea, .field select { font: 0.92rem var(--body); padding: 8px 10px; border: 1px solid var(--rule); border-radius: 6px; background: var(--paper); color: var(--ink); width: 100%; }
+.field textarea { min-height: 84px; resize: vertical; font-family: var(--mono); font-size: 0.85rem; }
+.field .hint { font-size: 0.8rem; color: var(--muted); }
+.field .err { font-size: 0.82rem; color: var(--bad); }
+.field.bad input, .field.bad textarea { border-color: var(--bad); }
+.check { display: flex; gap: 8px; align-items: center; font-weight: 500; font-size: 0.9rem; }
+.problem { border-radius: 6px; padding: 10px 12px; font-size: 0.88rem; background: var(--bad-soft); color: var(--bad); }
+.problem.stale { background: var(--warn-soft); color: var(--warn); }
+.dlg-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: center; border-top: 1px solid var(--rule); padding-top: 12px; }
+.dlg-foot .btns { display: flex; gap: 8px; margin-left: auto; }
+.sim { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.78rem; color: var(--muted); }
+.sim select { font: 0.78rem var(--body); padding: 3px 6px; border-radius: 4px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); }
+
+/* Grid list */
+.gridlist { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.gridlist th { text-align: left; font: 600 0.76rem var(--body); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+.gridlist td { padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.gridlist td:last-child { text-align: right; white-space: nowrap; }
+.rowmenu { font: 500 0.82rem var(--body); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); cursor: pointer; }
+.menu { position: absolute; right: 10px; z-index: 2; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); padding: 6px; display: grid; min-width: 220px; text-align: left; }
+.menu button { font: 0.88rem var(--body); text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 5px; color: var(--ink); cursor: pointer; }
+.menu button:hover { background: var(--accent-soft); }
+.menu button[aria-disabled="true"] { color: var(--grey-ink); cursor: help; }
+.menu small { display: block; color: var(--warn); font-size: 0.76rem; }
+.menu .loading { font-size: 0.8rem; color: var(--muted); padding: 4px 10px; }
+.pager { display: flex; gap: 14px; font-size: 0.88rem; flex-wrap: wrap; }
+.tablewrap { overflow-x: auto; position: relative; }
+@media (max-width: 560px) {
+  .gridlist thead { display: none; }
+  .gridlist tr { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; border-bottom: 1px solid var(--rule); padding: 8px 0; }
+  .gridlist td { border: 0; padding: 0 4px; }
+}
+
+/* Wire panes */
+.wire { display: grid; gap: 14px; }
+.msg { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--sheet); }
+.msg h4 { margin: 0; font: 600 0.78rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding: 8px 12px; background: var(--chrome); }
+.msg pre { margin: 0; padding: 12px 14px; overflow-x: auto; background: var(--code-bg); line-height: 1.5; font-size: 0.8rem; white-space: pre; }
+.msg p { padding: 10px 14px; font-size: 0.88rem; color: var(--muted); max-width: none; }
+.hl { color: var(--accent); font-weight: 500; }
+.dim { color: var(--muted); }
+
+/* Findings */
+.findings { display: grid; gap: 12px; counter-reset: q; }
+.finding { background: var(--sheet); border: 1px solid var(--rule); border-left: 3px solid var(--warn); border-radius: 6px; padding: 14px 16px; display: grid; gap: 6px; }
+.finding h3 { font: 600 1rem var(--body); }
+.finding p { font-size: 0.92rem; }
+.finding .ask { color: var(--ink); font-weight: 500; }
+.finding .src { font-size: 0.8rem; color: var(--muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+footer { color: var(--muted); font-size: 0.85rem; }
+@media (prefers-reduced-motion: no-preference) { .act, .rowmenu { transition: filter 0.15s; } .act:hover { filter: brightness(1.08); } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="top">
+  <div class="toprow"><span class="badge">Draft mockup · nothing built</span><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+  <h1>A HEART resource, opened in a plain browser</h1>
+  <p class="lede">What the HEART GitHub gateway would send a browser if it also spoke HTML. The branch, the draft pull request, their acts and their reasons were read from the running gateway on October 30, 2026. The HTML, the dialogs and the simulated answers are the proposal.</p>
+  <div class="facts">
+    <span>Repository <b>JogoShugh/heart-github-test</b></span>
+    <span>Branch <b>deps/left-pad-1.0.43-1030-175546</b></span>
+    <span>Draft pull request <b>#1873</b></span>
+  </div>
+</header>
+
+<!-- STEP 1 -->
+<section class="step" id="s1">
+  <div class="step-head"><span class="step-no">1</span><h2>Open the branch</h2>
+    <p>A person pastes the branch's address into a browser. The browser asks for HTML, as browsers always do, and the gateway answers with the branch's state, its links, and a button for each act it offers now.</p></div>
+  <div class="tabs" role="tablist" data-for="s1">
+    <button role="tab" aria-selected="true" data-p="view">What the person sees</button>
+    <button role="tab" aria-selected="false" data-p="req">Request</button>
+    <button role="tab" aria-selected="false" data-p="html">HTML sent</button>
+  </div>
+  <div class="panel" data-p="view">
+    <div class="browser">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8392/repos/JogoShugh/heart-github-test/branches/deps%2Fleft-pad-1.0.43-1030-175546</span></div>
+      <main class="view" id="branch-view">
+        <nav aria-label="Links">
+          <a href="#s1">On GitHub<span>alternate</span></a>
+          <a href="#s1">Protection<span>github:protection</span></a>
+        </nav>
+        <div><div class="kind">Branch</div><h1 class="res">deps/left-pad-1.0.43-1030-175546</h1></div>
+        <dl class="state">
+          <dt title="name">Name</dt><dd>deps/left-pad-1.0.43-1030-175546</dd>
+          <dt title="protected">Protected</dt><dd>false</dd>
+        </dl>
+        <div class="live" role="status" aria-live="polite" id="branch-live" hidden></div>
+        <div class="acts" role="toolbar" aria-label="Acts">
+          <button class="act" data-open="d-branch">Branch from here</button>
+          <button class="act" data-open="d-commit">Commit a file</button>
+          <button class="act" data-open="d-pull">Open a pull request</button>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="panel wire" data-p="req" hidden>
+    <div class="msg"><h4>The browser asks</h4><pre>GET /repos/JogoShugh/heart-github-test/branches/deps%2Fleft-pad-1.0.43-1030-175546 HTTP/1.1
+Host: localhost:8392
+<span class="hl">Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</span>
+Cookie: heart-session=&lt;session&gt;</pre>
+    <p>The browser names <code>text/html</code>, so the gateway picks the HTML dialect by name. How the browser signs in to the gateway is still open (finding 1).</p></div>
+    <div class="msg"><h4>The gateway answers</h4><pre>HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+<span class="hl">ETag: "seq-0.hsf.L0.146b337830edd41b"</span>
+Cache-Control: no-cache
+Vary: Accept, Accept-Profile
+Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile"</pre>
+    <p>The ETag is the real one the gateway gave the JSON answer for this branch. The HTML carries it to every form.</p></div>
+    <div class="msg"><h4>Same address, asked for JSON (real answer, trimmed)</h4><pre>{
+  "name": "deps/left-pad-1.0.43-1030-175546",
+  "protected": false,
+  "_links": {
+    "self": { "href": "/repos/JogoShugh/heart-github-test/branches/deps%2Fleft-pad-1.0.43-1030-175546" },
+    "alternate": { "href": "https://github.com/JogoShugh/heart-github-test/tree/deps/left-pad-1.0.43-1030-175546", "type": "text/html" },
+    "github:protection": { "href": "…/branches/deps%2Fleft-pad-1.0.43-1030-175546/protection" },
+    "hr:unavailable": { "href": "/unavailable/…" }
+  },
+  "_forms": {
+    "github:branch-from-here": { "title": "Branch from here", "method": "POST", … },
+    "github:commit-file": { "title": "Commit a file", "method": "PUT", … },
+    "github:open-pull-request": { "title": "Open a pull request", "method": "POST", … }
+  }
+}</pre></div>
+  </div>
+  <div class="panel wire" data-p="html" hidden>
+    <div class="msg"><h4>The HTML the gateway sends (abridged: one dialog shown)</h4><pre>&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+  &lt;meta charset="utf-8"&gt;
+  &lt;title&gt;deps/left-pad-1.0.43-1030-175546 · Branch&lt;/title&gt;
+  &lt;link rel="stylesheet" href="/heart/assets/heart.3f9a1c.css"&gt;
+  <span class="hl">&lt;script src="/heart/assets/htmx-2.0.4.min.js" defer&gt;&lt;/script&gt;</span>
+  <span class="hl">&lt;script src="/heart/assets/heart-forms.8c1e07.js" defer&gt;&lt;/script&gt;</span>
+&lt;/head&gt;
+&lt;body hx-headers='{"Accept": "text/html"}'&gt;
+&lt;main id="resource" data-etag='"seq-0.hsf.L0.146b337830edd41b"'&gt;
+  &lt;nav aria-label="Links"&gt;
+    &lt;a rel="alternate" href="https://github.com/JogoShugh/heart-github-test/tree/deps/left-pad-1.0.43-1030-175546"&gt;On GitHub&lt;/a&gt;
+    &lt;a rel="github:protection" href="…/protection"&gt;Protection&lt;/a&gt;
+  &lt;/nav&gt;
+  &lt;h1&gt;deps/left-pad-1.0.43-1030-175546&lt;/h1&gt;
+  &lt;dl class="state"&gt;
+    &lt;dt title="name"&gt;Name&lt;/dt&gt;&lt;dd&gt;deps/left-pad-1.0.43-1030-175546&lt;/dd&gt;
+    &lt;dt title="protected"&gt;Protected&lt;/dt&gt;&lt;dd&gt;false&lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;div role="status" aria-live="polite" id="announce"&gt;&lt;/div&gt;
+
+  &lt;div class="acts" role="toolbar" aria-label="Acts"&gt;
+    &lt;button <span class="hl">data-rel="github:branch-from-here"</span> data-dialog="act-1"&gt;Branch from here&lt;/button&gt;
+    &lt;button <span class="hl">data-rel="github:commit-file"</span> data-dialog="act-2"&gt;Commit a file&lt;/button&gt;
+    &lt;button <span class="hl">data-rel="github:open-pull-request"</span> data-dialog="act-3"&gt;Open a pull request&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;dialog id="act-2" aria-labelledby="act-2-title"&gt;
+    &lt;form data-rel="github:commit-file"
+          <span class="hl">hx-put="/repos/JogoShugh/heart-github-test/branches/deps%2Fleft-pad-1.0.43-1030-175546/actions/commit-file"</span>
+          <span class="hl">hx-headers='{"If-Match": "\"seq-0.hsf.L0.146b337830edd41b\"", "Accept": "text/html"}'</span>
+          hx-target="#resource" hx-select="#resource" hx-swap="outerHTML"
+          data-schema="/schemas/b2f56ca079a95386"&gt;
+      &lt;h2 id="act-2-title"&gt;Commit a file&lt;/h2&gt;
+      &lt;p&gt;Add a file to this branch, as a new commit.&lt;/p&gt;
+      &lt;label for="act-2-path"&gt;Path&lt;/label&gt;
+      &lt;input id="act-2-path" name="path" <span class="hl">required</span>&gt;
+      &lt;label for="act-2-message"&gt;Message&lt;/label&gt;
+      &lt;input id="act-2-message" name="message" <span class="hl">required</span>&gt;
+      &lt;label for="act-2-content"&gt;Content&lt;/label&gt;
+      &lt;textarea id="act-2-content" name="content" <span class="hl">required</span>
+                aria-describedby="act-2-content-hint"&gt;&lt;/textarea&gt;
+      &lt;p id="act-2-content-hint"&gt;Plain text, as is: the gateway encodes it in base64 before sending it on.&lt;/p&gt;
+      &lt;div class="problem" role="alert" hidden&gt;&lt;/div&gt;
+      &lt;button formmethod="dialog" formnovalidate&gt;Cancel&lt;/button&gt;
+      &lt;button&gt;Commit a file&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/dialog&gt;
+  &lt;!-- act-1 and act-3 follow the same shape --&gt;
+&lt;/main&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+    <p>Each form carries <code>data-rel</code>, so one test can check that the HTML offers exactly the acts the JSON offers. htmx and the checker are served by the gateway itself, cached as immutable files; no outside CDN.</p></div>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="step" id="s2">
+  <div class="step-head"><span class="step-no">2</span><h2>Commit a file, in a dialog</h2>
+    <p>The act changes something, so it opens a dialog over the branch. The fields come from the act's JSON Schema. The branch is bound from the state, so it is not asked for. Try it in step 1's view: press "Commit a file", then pick an answer to simulate.</p></div>
+  <div class="tabs" role="tablist" data-for="s2">
+    <button role="tab" aria-selected="true" data-p="ok">200: committed</button>
+    <button role="tab" aria-selected="false" data-p="rule">422: refused by GitHub</button>
+    <button role="tab" aria-selected="false" data-p="stale">412: changed meanwhile</button>
+  </div>
+  <div class="panel wire" data-p="ok">
+    <div class="msg"><h4>htmx sends</h4><pre>PUT /repos/JogoShugh/heart-github-test/branches/deps%2Fleft-pad-1.0.43-1030-175546/actions/commit-file HTTP/1.1
+<span class="hl">If-Match: "seq-0.hsf.L0.146b337830edd41b"</span>
+Accept: text/html
+HX-Request: true
+Content-Type: application/x-www-form-urlencoded
+
+path=NOTES.md&amp;message=Note+the+left-pad+bump&amp;content=left-pad+1.0.43+is+pinned+until+the+tests+pass.%0A</pre>
+    <p>A browser form sends strings. heart-core turns them into JSON by the act's schema before its usual checks, so the act pipeline sees exactly what an agent would send:</p>
+    <pre>{ "path": "NOTES.md", "message": "Note the left-pad bump", "content": "left-pad 1.0.43 is pinned until the tests pass.\n" }</pre></div>
+    <div class="msg"><h4>The gateway sends GitHub</h4><pre>PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/NOTES.md
+{ "message": "Note the left-pad bump",
+  "content": "bGVmdC1wYWQgMS4wLjQzIGlzIHBpbm5lZCB1bnRpbCB0aGUgdGVzdHMgcGFzcy4K",
+  "branch": "deps/left-pad-1.0.43-1030-175546" }</pre></div>
+    <div class="msg"><h4>The gateway answers the browser</h4><pre>HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+<span class="hl">HX-Trigger: {"heart:done": "Committed NOTES.md."}</span>
+
+&lt;main id="resource" data-etag='"seq-1.hsf.L0.…"'&gt; …the branch, read again… &lt;/main&gt;</pre>
+    <p>htmx swaps the fresh branch in place. The dialog closes and the status line says "Committed NOTES.md." for screen readers and eyes alike. The new ETag goes to every form.</p></div>
+  </div>
+  <div class="panel wire" data-p="rule" hidden>
+    <div class="msg"><h4>GitHub refuses</h4><pre>HTTP/1.1 422 Unprocessable Entity
+{ "message": "Invalid request.\n\n\"sha\" wasn't supplied.", "status": "422" }</pre>
+    <p>NOTES.md already exists on the branch. GitHub only replaces a file when it is told the old file's sha, and this act has no such field.</p></div>
+    <div class="msg"><h4>The gateway answers the browser</h4><pre>HTTP/1.1 422 Unprocessable Content
+Content-Type: text/html; charset=utf-8
+
+&lt;div class="problem" role="alert"&gt;
+  &lt;strong&gt;GitHub refused the commit.&lt;/strong&gt;
+  &lt;p&gt;Invalid request. "sha" wasn't supplied.&lt;/p&gt;
+&lt;/div&gt;</pre>
+    <p>htmx's <code>responseHandling</code> setting lets a 422 swap into the dialog's problem slot. The dialog stays open with the person's text kept. The words are GitHub's, which is honest but not helpful (finding 5).</p></div>
+  </div>
+  <div class="panel wire" data-p="stale" hidden>
+    <div class="msg"><h4>Someone pushed to the branch meanwhile</h4><pre>HTTP/1.1 412 Precondition Failed
+Content-Type: text/html; charset=utf-8
+
+&lt;div class="problem stale" role="alert"&gt;This branch changed since you opened it.&lt;/div&gt;</pre></div>
+    <div class="msg"><h4>What heart-forms.js does next</h4><pre>GET /repos/JogoShugh/heart-github-test/branches/deps%2Fleft-pad-1.0.43-1030-175546
+Accept: text/html
+
+200 OK, ETag: "seq-2.hsf.L0.…"   → still offers github:commit-file
+                                  → dialog stays open, fields kept, new If-Match
+                                  → "This branch changed since you opened it. Check it, then commit again."</pre>
+    <p>If the act were no longer offered, the dialog would close and the button would show the server's reason instead.</p></div>
+  </div>
+</section>
+
+<!-- STEP 3 -->
+<section class="step" id="s3">
+  <div class="step-head"><span class="step-no">3</span><h2>Open a pull request, as a draft</h2>
+    <p>Same dialog shape. The draft field is a boolean, so it renders as a checkbox. A 201 moves the browser to the new pull request. Here GitHub would refuse, because this branch already has one: #1873.</p></div>
+  <div class="tabs" role="tablist" data-for="s3">
+    <button role="tab" aria-selected="true" data-p="refuse">422: one already open (the real case)</button>
+    <button role="tab" aria-selected="false" data-p="created">201: created (on a fresh branch)</button>
+  </div>
+  <div class="panel wire" data-p="refuse">
+    <div class="msg"><h4>htmx sends</h4><pre>POST …/branches/deps%2Fleft-pad-1.0.43-1030-175546/actions/open-pull-request HTTP/1.1
+If-Match: "seq-0.hsf.L0.146b337830edd41b"
+Content-Type: application/x-www-form-urlencoded
+
+title=Bump+left-pad+to+1.0.43&amp;base=deps-main&amp;<span class="hl">draft=on</span></pre>
+    <p>An unchecked box sends nothing and a checked one sends <code>on</code>. The schema says boolean, so heart-core reads <code>on</code> as <code>true</code> and absence as <code>false</code>.</p></div>
+    <div class="msg"><h4>The gateway answers the browser</h4><pre>HTTP/1.1 422 Unprocessable Content
+Content-Type: text/html; charset=utf-8
+
+&lt;div class="problem" role="alert"&gt;
+  &lt;strong&gt;GitHub refused the pull request.&lt;/strong&gt;
+  &lt;p&gt;A pull request already exists for JogoShugh:deps/left-pad-1.0.43-1030-175546.&lt;/p&gt;
+&lt;/div&gt;</pre></div>
+  </div>
+  <div class="panel wire" data-p="created" hidden>
+    <div class="msg"><h4>The gateway answers the browser</h4><pre>HTTP/1.1 201 Created
+Location: /repos/JogoShugh/heart-github-test/pulls/1874
+<span class="hl">HX-Location: {"path": "/repos/JogoShugh/heart-github-test/pulls/1874", "target": "body"}</span></pre>
+    <p>The number is illustrative. <code>HX-Location</code> makes htmx load the new pull request as a real navigation: new address in the bar, back button works. Without htmx, the same answer is a <code>303 See Other</code> to it.</p></div>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step" id="s4">
+  <div class="step-head"><span class="step-no">4</span><h2>The draft pull request: acts it offers, and the ones it can't</h2>
+    <p>Pull request #1873 is a real draft. The gateway offers six acts and explains two it won't offer: Merge and Reopen. Those two show greyed, in their usual place, and say why when pressed.</p></div>
+  <div class="tabs" role="tablist" data-for="s4">
+    <button role="tab" aria-selected="true" data-p="view">What the person sees</button>
+    <button role="tab" aria-selected="false" data-p="why">Why absent, on the wire</button>
+    <button role="tab" aria-selected="false" data-p="html">HTML for a greyed act</button>
+  </div>
+  <div class="panel" data-p="view">
+    <div class="browser">
+      <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8392/repos/JogoShugh/heart-github-test/pulls/1873</span></div>
+      <main class="view">
+        <nav aria-label="Links">
+          <a href="#s4">On GitHub<span>alternate</span></a>
+          <a href="#s4">Commits<span>github:commits</span></a>
+          <a href="#s4">Diff<span>github:diff</span></a>
+          <a href="#s4">Issue<span>github:issues-get</span></a>
+          <a href="#s4">Comments<span>github:issues-list-comments</span></a>
+          <a href="#s4">Statuses<span>github:statuses</span></a>
+        </nav>
+        <div><div class="kind">Pull request</div><h1 class="res">Bump left-pad from x to 1.0.43 (1030-175546)</h1></div>
+        <dl class="state" id="pr-state">
+          <dt title="number">Number</dt><dd>1873</dd>
+          <dt title="state">State</dt><dd>open</dd>
+          <dt title="draft">Draft</dt><dd>true</dd>
+          <dt title="body">Body</dt><dd>Bumps left-pad from x to 1.0.43. Opened by a Dependabot stand-in (exhibits/dependabot-sim).</dd>
+          <dt title="mergeable_state">Mergeable state</dt><dd>clean</dd>
+          <dt title="commits">Commits</dt><dd>1</dd>
+          <dt title="additions">Additions</dt><dd>1</dd>
+          <dt title="deletions">Deletions</dt><dd>0</dd>
+          <dt title="changed_files">Changed files</dt><dd>1</dd>
+          <dt title="comments">Comments</dt><dd>0</dd>
+          <dt title="created_at">Created at</dt><dd>Oct 30, 2026, 5:55 PM EDT</dd>
+          <dt title="updated_at">Updated at</dt><dd>Oct 30, 2026, 5:55 PM EDT</dd>
+        </dl>
+        <button class="more" type="button" id="pr-more">Show 22 more members</button>
+        <div class="embedded">
+          <h3>Embedded</h3>
+          <div>Author <a href="#s4">JogoShugh</a> · Labels <span class="chip">dependencies</span></div>
+        </div>
+        <div class="reason" id="pr-reason" role="status" hidden></div>
+        <div class="acts" role="toolbar" aria-label="Acts">
+          <button class="act" data-open="d-comment">Comment</button>
+          <button class="act quiet" data-open="d-edit">Edit</button>
+          <button class="act quiet" data-open="d-label">Label</button>
+          <button class="act quiet" data-open="d-review">Request a review</button>
+          <button class="act quiet" data-open="d-update">Update the branch</button>
+          <button class="act" aria-disabled="true" data-reason="A draft can't be merged; mark it ready for review first.">Merge</button>
+          <button class="act quiet" data-open="d-close">Close</button>
+          <button class="act" aria-disabled="true" data-reason="The pull request is already open.">Reopen</button>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="panel wire" data-p="why" hidden>
+    <div class="msg"><h4>The pull request's hr:unavailable link, followed (real answer)</h4><pre>GET /unavailable/…
+
+{ "unavailable": [
+    { "rel": "/profiles/github#reopen", "title": "Reopen",
+      "reason": "The pull request is already open." },
+    { "rel": "/profiles/github#merge",  "title": "Merge",
+      "reason": "A draft can't be merged; mark it ready for review first." } ] }</pre>
+    <p>The HTML dialect reads this on the server and writes the greyed buttons into the answer. The browser never follows the link itself.</p></div>
+  </div>
+  <div class="panel wire" data-p="html" hidden>
+    <div class="msg"><h4>A greyed act</h4><pre>&lt;button data-rel="github:merge" <span class="hl">aria-disabled="true"</span>
+        aria-describedby="why-merge"&gt;Merge&lt;/button&gt;
+&lt;p id="why-merge" class="reason" hidden&gt;A draft can't be merged; mark it ready for review first.&lt;/p&gt;</pre>
+    <p><code>aria-disabled</code>, not <code>disabled</code>: the button stays focusable, so keyboard and screen-reader users reach it and hear the reason. Pressing it shows the reason as visible text; it never sends anything. An act the server neither offers nor explains gets no button at all.</p></div>
+  </div>
+</section>
+
+<!-- STEP 5 -->
+<section class="step" id="s5">
+  <div class="step-head"><span class="step-no">5</span><h2>Request a review: a list field</h2>
+    <p>The schema says <code>reviewers</code> is an array of strings. A generic client can render that without knowing GitHub: one text box per entry, with "Add another". Try it on the pull request in step 4.</p></div>
+  <div class="wire">
+    <div class="msg"><h4>htmx sends</h4><pre>POST /repos/JogoShugh/heart-github-test/pulls/1873/actions/request-review
+If-Match: "seq-0.hsf.L0.d6afcdc7a7a6e6c6"
+Content-Type: application/x-www-form-urlencoded
+
+<span class="hl">reviewers=ada&amp;reviewers=lin</span></pre>
+    <p>Repeated names become an array, by the schema. heart-core sees <code>{"reviewers": ["ada", "lin"]}</code>.</p></div>
+  </div>
+</section>
+
+<!-- STEP 6 -->
+<section class="step" id="s6">
+  <div class="step-head"><span class="step-no">6</span><h2>The pull requests, as a grid</h2>
+    <p>The repository links to its open pull requests: 50 of them, real. A list item carries no forms, by the spec, so each row's Actions menu reads that pull request when opened and lists its acts, greyed ones included.</p></div>
+  <div class="browser">
+    <div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8392/repos/JogoShugh/heart-github-test/pulls?state=open</span></div>
+    <div class="view">
+      <div><div class="kind">List · pulls</div><h1 class="res">Open pull requests</h1></div>
+      <div class="tablewrap" id="gridwrap">
+        <table class="gridlist">
+          <thead><tr><th>Title</th><th><span class="sr">Acts</span></th></tr></thead>
+          <tbody id="gridbody"></tbody>
+        </table>
+      </div>
+      <div class="pager"><a href="#s6">First</a><a href="#s6">Next</a><a href="#s6">Last</a></div>
+    </div>
+  </div>
+  <div class="wire">
+    <div class="msg"><h4>What the list holds (real answer, trimmed)</h4><pre>"_links": {
+  "item": [
+    { "href": "/repos/JogoShugh/heart-github-test/pulls/1873", "title": "Bump left-pad from x to 1.0.43 (1030-175546)" },
+    { "href": "/repos/JogoShugh/heart-github-test/pulls/1872", "title": "Bump left-pad from x to 1.0.51 (1030-175539)" },
+    …
+  ],
+  "first": …, "next": …, "last": …
+}</pre>
+    <p>Only a title per item: no state, no draft flag. So the grid has one column. More columns need the gateway to embed each item's state (finding 3).</p></div>
+    <div class="msg"><h4>Opening a row's Actions menu</h4><pre>GET /repos/JogoShugh/heart-github-test/pulls/1872
+Accept: text/html
+<span class="hl">HX-Request: true</span>
+hx-select: .acts        → the menu lists that pull request's acts, greyed ones with reasons</pre></div>
+  </div>
+</section>
+
+<!-- FINDINGS -->
+<section class="step" id="q">
+  <div class="step-head"><span class="step-no">?</span><h2>What the mockup turned up</h2>
+    <p>Each came from the real answers above. The questions are yours to decide.</p></div>
+  <div class="findings">
+    <article class="finding"><h3>1. How does a browser sign in to the gateway?</h3>
+      <p>The gateway calls GitHub as each caller, with the caller's own token. An agent sends the token itself. A browser can't. Options: a "Sign in with GitHub" flow that sets a session cookie, or a token pasted once into a sign-in form.</p>
+      <p class="ask">Which, for the gateway? The garden slice keeps Basic sign-in either way.</p></article>
+    <article class="finding"><h3>2. Merge says "mark it ready for review first", but nothing offers that.</h3>
+      <p>The draft's acts are Comment, Edit, Label, Request a review, Update the branch and Close. None marks it ready. GitHub's REST API has no such operation; only its GraphQL API does. In a browser this is a dead end, plainly visible.</p>
+      <p class="ask">Change the reason's words, or add a "Mark ready for review" act through another route?</p></article>
+    <article class="finding"><h3>3. Lists carry only titles.</h3>
+      <p>The pull requests list has a title per item and nothing else, so the grid can't show state, draft or author columns.</p>
+      <p class="ask">Have the gateway embed each item's state in its lists (GitHub's list answer already holds it), or keep lists as titles?</p></article>
+    <article class="finding"><h3>4. A pull request has 36 state members.</h3>
+      <p>Showing all is noise; choosing some is a view hint. The mockup shows 12 members, folds the other 22 behind "Show 22 more", and never shows <code>hr:address</code>, which is protocol, not state for a person.</p>
+      <p class="ask">Is "first 12 scalars, rest folded" the right generic default until view hints exist?</p></article>
+    <article class="finding"><h3>5. Field labels and help came from GitHub's own words. Fixed.</h3>
+      <p>Commit a file's <code>path</code> was described only as "path parameter", <code>base</code> in three sentences, and no field had a title. Now every field has a title: the connector's own words first, then the operation's title, then the name split at underscores, hyphens and capitals (<code>team_reviewers</code> is "Team reviewers"). The dialogs above show the new words, read live from the gateway. The state's labels follow the same convention (<code>changed_files</code> shows as "Changed files"), with the member's own name kept on hover.</p></article>
+    <article class="finding"><h3>6. Base is free text.</h3>
+      <p>The person types "deps-main" by hand. A choice of the repository's branches is exactly what the parked <code>hr:options</code> plan would give: choices from another resource.</p>
+      <p class="ask">Leave as text for the first slice?</p></article>
+    <article class="finding"><h3>7. "Reopen: already open" adds a greyed button that says the obvious.</h3>
+      <p>Stable slots are good, but a reason that only restates the state is clutter.</p>
+      <p class="ask">Show every listed act greyed, or let the connector mark some reasons as not worth a button?</p></article>
+    <article class="finding"><h3>8. The branch links nowhere back.</h3>
+      <p>Its links are GitHub, protection and self. No link up to the repository or its branches, so the only way back is the browser's Back button.</p>
+      <p class="ask">Add an <code>up</code> link to branches (and pull requests) in the connector?</p></article>
+    <article class="finding"><h3>9. Commit a file can't replace a file.</h3>
+      <p>GitHub needs the old file's sha to replace one, and the act has no such field, so a second commit to the same path is refused with GitHub's words.</p>
+      <p class="ask">Out of scope for HTML; note it for the gateway?</p></article>
+  </div>
+</section>
+
+<footer>Draft for discussion. Branch, pull request, forms, ETags and reasons were read from the HEART GitHub gateway at localhost:8392 on October 30, 2026; HTML, dialogs, and the 200/412/201 answers are proposed, not built. Nothing on this page sends anything.</footer>
+</div>
+
+<!-- Dialogs for the mock -->
+<dialog id="d-branch" aria-labelledby="d-branch-t"><form data-kind="branch">
+  <h2 id="d-branch-t">Branch from here</h2><p class="desc">Start a new branch at this branch's latest commit.</p>
+  <div class="field"><label for="f-bname">Name<span class="req">*</span></label><input type="text" id="f-bname" name="name" required minlength="1" placeholder="fix-blank-names"><span class="hint">The new branch's name, such as fix-blank-names.</span></div>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-branch">Simulate</label><select id="sim-branch"><option value="201">201 Created</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Branch from here</button></span></div>
+</form></dialog>
+
+<dialog id="d-commit" aria-labelledby="d-commit-t"><form data-kind="commit">
+  <h2 id="d-commit-t">Commit a file</h2><p class="desc">Add a file to this branch, as a new commit.</p>
+  <div class="field"><label for="f-path">File path<span class="req">*</span></label><input type="text" id="f-path" name="path" required value="NOTES.md"><span class="hint">Where the file goes, from the repository's root, such as docs/NOTES.md.</span></div>
+  <div class="field"><label for="f-msg">Message<span class="req">*</span></label><input type="text" id="f-msg" name="message" required value="Note the left-pad bump"><span class="hint">The commit message.</span></div>
+  <div class="field"><label for="f-content">Content<span class="req">*</span></label><textarea id="f-content" name="content" required>left-pad 1.0.43 is pinned until the tests pass.</textarea><span class="hint">Plain text, as is: the gateway encodes it in base64 before sending it on.</span></div>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-commit">Simulate</label><select id="sim-commit"><option value="200">200 committed</option><option value="422">422 GitHub refuses</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Commit a file</button></span></div>
+</form></dialog>
+
+<dialog id="d-pull" aria-labelledby="d-pull-t"><form data-kind="pull">
+  <h2 id="d-pull-t">Open a pull request</h2><p class="desc">Propose this branch's changes to another branch, named as base.</p>
+  <div class="field"><label for="f-title">Title</label><input type="text" id="f-title" name="title" value="Bump left-pad to 1.0.43"><span class="hint">The title of the new pull request. Required unless <code>issue</code> is specified.</span></div>
+  <div class="field"><label for="f-body">Body</label><textarea id="f-body" name="body"></textarea><span class="hint">What the pull request changes, and why.</span></div>
+  <div class="field"><label for="f-base">Base branch<span class="req">*</span></label><input type="text" id="f-base" name="base" required value="deps-main"><span class="hint">The branch to merge into, such as main.</span></div>
+  <div class="field"><label class="check"><input type="checkbox" id="f-draft" name="draft" checked> Draft</label><span class="hint">Open it as a draft, not yet ready to merge.</span></div>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-pull">Simulate</label><select id="sim-pull"><option value="422">422 one already open</option><option value="201">201 Created</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Open a pull request</button></span></div>
+</form></dialog>
+
+<dialog id="d-comment" aria-labelledby="d-comment-t"><form data-kind="comment">
+  <h2 id="d-comment-t">Comment</h2><p class="desc">Add a comment to the pull request's conversation.</p>
+  <div class="field"><label for="f-cbody">Body<span class="req">*</span></label><textarea id="f-cbody" name="body" required></textarea><span class="hint">The contents of the comment.</span></div>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-comment">Simulate</label><select id="sim-comment"><option value="201">201 Created</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Comment</button></span></div>
+</form></dialog>
+
+<dialog id="d-edit" aria-labelledby="d-edit-t"><form data-kind="edit">
+  <h2 id="d-edit-t">Edit</h2><p class="desc">Change its title or description.</p>
+  <div class="field"><label for="f-etitle">Title</label><input type="text" id="f-etitle" name="title" value="Bump left-pad from x to 1.0.43 (1030-175546)"><span class="hint">The title of the pull request.</span></div>
+  <div class="field"><label for="f-ebody">Body</label><textarea id="f-ebody" name="body">Bumps left-pad from x to 1.0.43. Opened by a Dependabot stand-in (exhibits/dependabot-sim).</textarea><span class="hint">The contents of the pull request.</span></div>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-edit">Simulate</label><select id="sim-edit"><option value="200">200 saved</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Edit</button></span></div>
+</form></dialog>
+
+<dialog id="d-label" aria-labelledby="d-label-t"><form data-kind="label">
+  <h2 id="d-label-t">Label</h2><p class="desc">Add labels to the pull request.</p>
+  <div class="field" data-list="labels"><label for="f-l0">Labels</label><div class="listbox"><input type="text" id="f-l0" name="labels" value="needs-tests"></div><button type="button" class="more" data-add>Add another</button><span class="hint">The labels to add to the issue's existing labels.</span></div>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-label">Simulate</label><select id="sim-label"><option value="200">200 labelled</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Label</button></span></div>
+</form></dialog>
+
+<dialog id="d-review" aria-labelledby="d-review-t"><form data-kind="review">
+  <h2 id="d-review-t">Request a review</h2><p class="desc">Ask people or teams to review the pull request.</p>
+  <div class="field" data-list="reviewers"><label for="f-r0">Reviewers</label><div class="listbox"><input type="text" id="f-r0" name="reviewers" value="ada"></div><button type="button" class="more" data-add>Add another</button><span class="hint">The people to ask, by their logins, such as octocat.</span></div>
+  <div class="field" data-list="team_reviewers"><label for="f-t0">Team reviewers</label><div class="listbox"><input type="text" id="f-t0" name="team_reviewers"></div><button type="button" class="more" data-add>Add another</button><span class="hint">The teams to ask, by their slugs, such as maintainers.</span></div>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-review">Simulate</label><select id="sim-review"><option value="201">201 requested</option><option value="422">422 not a collaborator</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Request a review</button></span></div>
+</form></dialog>
+
+<dialog id="d-update" aria-labelledby="d-update-t"><form data-kind="update">
+  <h2 id="d-update-t">Update the branch</h2><p class="desc">Bring the latest changes from the base branch into this one.</p>
+  <p class="desc">This act has no fields. The dialog is its confirmation.</p>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-update">Simulate</label><select id="sim-update"><option value="202">202 accepted</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Update the branch</button></span></div>
+</form></dialog>
+
+<dialog id="d-close" aria-labelledby="d-close-t"><form data-kind="close">
+  <h2 id="d-close-t">Close</h2><p class="desc">Close it; a pull request unmerged, an issue as completed.</p>
+  <p class="desc">This act has no fields. The dialog is its confirmation.</p>
+  <div class="problem" role="alert" hidden></div>
+  <div class="dlg-foot"><span class="sim"><label for="sim-close">Simulate</label><select id="sim-close"><option value="200">200 closed</option><option value="412">412 changed</option></select></span><span class="btns"><button type="button" class="act quiet" data-close>Cancel</button><button class="act">Close</button></span></div>
+</form></dialog>
+
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
+<script>
+(function () {
+  // Tabs within each step
+  document.querySelectorAll('.tabs').forEach(function (bar) {
+    var step = bar.closest('.step');
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('button[role=tab]'); if (!b) return;
+      bar.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+      step.querySelectorAll(':scope > .panel').forEach(function (p) { p.hidden = p.dataset.p !== b.dataset.p; });
+    });
+  });
+
+  // Opening dialogs and greyed reasons
+  document.addEventListener('click', function (e) {
+    var open = e.target.closest('[data-open]');
+    if (open) { var d = document.getElementById(open.dataset.open); reset(d); d.showModal(); d._from = open; return; }
+    var grey = e.target.closest('.acts [aria-disabled="true"]');
+    if (grey) { var r = grey.closest('.view').querySelector('.reason'); r.textContent = grey.textContent + ': ' + grey.dataset.reason; r.hidden = false; return; }
+    var close = e.target.closest('[data-close]');
+    if (close) { close.closest('dialog').close(); return; }
+    var add = e.target.closest('[data-add]');
+    if (add) {
+      var box = add.parentElement.querySelector('.listbox'); var first = box.querySelector('input');
+      var n = document.createElement('input'); n.type = 'text'; n.name = first.name; n.setAttribute('aria-label', add.parentElement.querySelector('label').textContent + ', another');
+      box.appendChild(n); n.focus(); return;
+    }
+  });
+
+  function reset(d) {
+    var p = d.querySelector('.problem'); p.hidden = true; p.className = 'problem';
+    d.querySelectorAll('.field').forEach(function (f) { f.classList.remove('bad'); var er = f.querySelector('.err'); if (er) er.remove(); });
+  }
+
+  var outcomes = {
+    commit: { 200: ['done', 'Committed NOTES.md.'], 422: ['problem', 'GitHub refused the commit. Invalid request. "sha" wasn\'t supplied.'], 412: ['stale', 'This branch changed since you opened it. Check it, then commit again.'] },
+    branch: { 201: ['go', 'Created the branch. The browser moves to it.'], 412: ['stale', 'This branch changed since you opened it. Check it, then try again.'] },
+    pull: { 422: ['problem', 'GitHub refused the pull request. A pull request already exists for JogoShugh:deps/left-pad-1.0.43-1030-175546.'], 201: ['go', 'Created a draft pull request. The browser moves to it.'] },
+    comment: { 201: ['done', 'Comment added.'], 412: ['stale', 'This pull request changed since you opened it. Check it, then comment again.'] },
+    edit: { 200: ['done', 'Saved.'], 412: ['stale', 'This pull request changed since you opened it. Check it, then save again.'] },
+    label: { 200: ['done', 'Labelled.'], 412: ['stale', 'This pull request changed since you opened it.'] },
+    review: { 201: ['done', 'Review requested.'], 422: ['problem', 'GitHub refused: Reviews may only be requested from collaborators. One or more of the users or teams you specified is not a collaborator of the JogoShugh/heart-github-test repository.'] },
+    update: { 202: ['done', 'Updating the branch from deps-main.'], 412: ['stale', 'This pull request changed since you opened it.'] },
+    close: { 200: ['done', 'Closed. The view now offers Reopen, and Close shows greyed.'], 412: ['stale', 'This pull request changed since you opened it.'] }
+  };
+
+  document.querySelectorAll('dialog form').forEach(function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var d = form.closest('dialog'); reset(d);
+      var sim = form.querySelector('.sim select').value;
+      var o = outcomes[form.dataset.kind][sim];
+      var p = form.querySelector('.problem');
+      if (o[0] === 'problem' || o[0] === 'stale') {
+        p.textContent = o[1]; p.className = 'problem' + (o[0] === 'stale' ? ' stale' : ''); p.hidden = false; return;
+      }
+      d.close();
+      var view = d._from ? d._from.closest('.view') : null;
+      var live = view && (view.querySelector('.live') || view.querySelector('.reason'));
+      if (live) { live.className = 'live'; live.textContent = o[1]; live.hidden = false; }
+    });
+  });
+
+  function title(n) { return n.split(/[_\-\s]+|(?<=[a-z0-9])(?=[A-Z])/).filter(Boolean).map(function (w) { return w.length > 1 && w === w.toUpperCase() ? w : w.toLowerCase(); }).join(" ").replace(/^./, function (c) { return c.toUpperCase(); }); }
+  // PR members fold
+  var more = document.getElementById('pr-more');
+  var extra = [["id","5091540857"],["node_id","PR_kwDOVM7WJc8AAAABL3q_eQ"],["locked","false"],["milestone","null"],["active_lock_reason","null"],["closed_at","null"],["merged_at","null"],["merge_commit_sha","a54dbfcf10a410c09c1cd52875379da19929aa3c"],["assignee","null"],["assignees","[]"],["requested_reviewers","[]"],["requested_teams","[]"],["head","{ ref: deps/left-pad-1.0.43-1030-175546, sha, repo, … }"],["base","{ ref: deps-main, sha, repo, … }"],["author_association","OWNER"],["auto_merge","null"],["merged","false"],["mergeable","true"],["rebaseable","true"],["merged_by","null"],["review_comments","0"],["maintainer_can_modify","false"]];
+  more.addEventListener('click', function () {
+    var dl = document.getElementById('pr-state');
+    if (more.dataset.open) { dl.querySelectorAll('.x').forEach(function (n) { n.remove(); }); more.textContent = 'Show 22 more members'; delete more.dataset.open; return; }
+    extra.forEach(function (kv) { var dt = document.createElement('dt'); dt.className = 'x'; dt.textContent = title(kv[0]); dt.title = kv[0]; var dd = document.createElement('dd'); dd.className = 'x'; dd.textContent = kv[1]; dl.appendChild(dt); dl.appendChild(dd); });
+    more.textContent = 'Show fewer'; more.dataset.open = '1';
+  });
+
+  // Grid of pull requests
+  var rows = [
+    [1873,'Bump left-pad from x to 1.0.43 (1030-175546)',true],[1872,'Bump left-pad from x to 1.0.51 (1030-175539)',false],
+    [1871,'Bump left-pad from x to 1.0.42 (1030-174340)',null],[1870,'Bump left-pad from x to 1.0.50 (1030-174333)',null],
+    [1868,'Bump left-pad from x to 1.0.41 (1030-173556)',null],[1865,'Bump left-pad from x to 1.0.40 (1030-172751)',null]
+  ];
+  var body = document.getElementById('gridbody'); var wrap = document.getElementById('gridwrap');
+  rows.forEach(function (r) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><a href="#s6">' + r[1] + '</a></td><td><button class="rowmenu" aria-haspopup="menu" aria-expanded="false">Actions ▾</button></td>';
+    tr.querySelector('.rowmenu').dataset.draft = String(r[2]);
+    body.appendChild(tr);
+  });
+  var openMenu = null;
+  function closeMenu() { if (openMenu) { openMenu.btn.setAttribute('aria-expanded', 'false'); openMenu.el.remove(); openMenu = null; } }
+  wrap.addEventListener('click', function (e) {
+    var b = e.target.closest('.rowmenu'); if (!b) { if (!e.target.closest('.menu')) closeMenu(); return; }
+    var was = openMenu && openMenu.btn === b; closeMenu(); if (was) return;
+    var m = document.createElement('div'); m.className = 'menu'; m.setAttribute('role', 'menu');
+    m.style.top = (b.offsetTop + b.offsetHeight + 4) + 'px';
+    m.innerHTML = '<div class="loading">Reading the pull request…</div>';
+    wrap.appendChild(m); b.setAttribute('aria-expanded', 'true'); openMenu = { btn: b, el: m };
+    setTimeout(function () {
+      if (!openMenu || openMenu.el !== m) return;
+      var draft = b.dataset.draft;
+      var acts = ['Comment','Edit','Label','Request a review','Update the branch'];
+      var html = acts.map(function (a) { return '<button role="menuitem">' + a + '</button>'; }).join('');
+      if (draft === 'true') html += '<button role="menuitem" aria-disabled="true">Merge<small>A draft can\'t be merged; mark it ready for review first.</small></button>';
+      else if (draft === 'false') html += '<button role="menuitem">Merge</button>';
+      else html += '<button role="menuitem">Merge</button>';
+      html += '<button role="menuitem">Close</button>';
+      m.innerHTML = html;
+    }, 450);
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+})();
+</script>
+</body>
+</html>

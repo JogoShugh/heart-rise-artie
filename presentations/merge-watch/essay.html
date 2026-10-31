@@ -1,0 +1,403 @@
+<header class="masthead">
+<p class="kicker">HEART and ARTIE · a run report</p>
+<h1>One Goal, Decided Once</h1>
+<p class="dek">A merge watch written in fifteen lines of plain words: the model decides each step once, the steps run on as a script, and the model comes back only where the words say so.</p>
+<p class="howto">Each section is short. The technical detail sits under <b>Technical detail</b> at its end; <b>Show all detail</b> above opens every one.</p>
+</header>
+
+<section id="job">
+<h2><span class="num">1</span>The job</h2>
+<p>Dependency bumps pile up in a repository. A person wants them merged as soon as they can be, left alone when someone objects, and the author told plainly when a bump can’t go in.</p>
+<!--diagram:lifecycle-->
+<ul class="obs">
+<li>Three outcomes for every bump: <b>merged</b>, <b>left</b> (labelled <code>hold</code>, said once), or <b>told why</b> (the wait gave up).</li>
+<li>The work never ends by itself. It runs until a person closes the watch’s issue.</li>
+<li>Only one part needs judgment: putting the server’s reason into a friendly sentence. The rest is rules.</li>
+<li>The aim: decide the rules once with a model, run them many times without one.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the stand-ins that made the bumps</summary>
+<p>A Dependabot stand-in, <code>exhibits/dependabot-sim/bump.kts</code>, opens real pull requests on a scratch repository (<code>JogoShugh/heart-github-test</code>): a branch, a one-line version file, a pull request into <code>deps-main</code>, and its labels.</p>
+<pre><code>artie run bump.kts owner=JogoShugh to=5.0.1 file=deps-501.txt label=dependencies,hold
+artie run bump.kts owner=JogoShugh to=5.0.2 file=deps-502.txt label=dependencies draft=true
+artie run bump.kts owner=JogoShugh to=5.0.3 file=deps-503.txt label=dependencies</code></pre>
+<ul class="obs">
+<li>Two bumps that write the same file conflict once one of them merges; that is how the conflicts in the hour run were made.</li>
+<li>A draft can’t be merged until someone marks it ready, so its wait gives up.</li>
+<li><code>person.kts close=yes</code> closes the watch’s issue at the end, as a person would.</li>
+</ul>
+</details>
+</section>
+
+<section id="history">
+<h2><span class="num">2</span>A short history of hypertext</h2>
+<p>Information that carries its own way forward is an old idea. For forty years each system came with its own reader; then the Web split the client from the content.</p>
+<!--diagram:history-->
+<ul class="obs">
+<li><b>1945</b> Vannevar Bush’s memex, in “As We May Think”: a desk of documents and the trails a reader makes between them. Never built.</li>
+<li><b>1965</b> Ted Nelson coins “hypertext”. <b>1968</b> Douglas Engelbart demonstrates NLS: live, linked, editable, on NLS terminals only.</li>
+<li><b>1987</b> HyperCard: millions of linked stacks, readable only in HyperCard. Content and reader came as a pair.</li>
+<li><b>1989–1991</b> Tim Berners-Lee’s proposal at CERN, then the public Web: URIs name things, HTTP moves them, HTML describes them. Any browser, any site.</li>
+<li><b>1993</b> Mosaic, and forms: pages that say not only where to go but what can be <em>done</em>, with which fields.</li>
+<li><b>2000</b> Roy Fielding names the architecture REST. <b>2008</b> he complains that APIs have dropped its central constraint.</li>
+<li><b>2012–2023</b> HAL puts links into JSON; OpenAPI moves the rules into a description; agents carry them in training.</li>
+<li><b>2026</b> HEART puts the controls back in the answer, and ARTIE reads them, as a browser reads a page.</li>
+</ul>
+<details class="deep"><summary>Technical detail: what each step lacked, and what the Web added</summary>
+<div class="table"><table>
+<tr><th>System</th><th>Links</th><th>Actions</th><th>Generic reader</th></tr>
+<tr><td>Memex (1945)</td><td>trails, by hand</td><td>—</td><td>— (never built)</td></tr>
+<tr><td>NLS (1968)</td><td>yes</td><td>yes, in NLS</td><td>no: NLS terminals</td></tr>
+<tr><td>HyperCard (1987)</td><td>yes</td><td>scripts in the stack</td><td>no: HyperCard</td></tr>
+<tr><td>The Web (1991–1993)</td><td>yes</td><td>forms</td><td><b>yes: any browser</b></td></tr>
+<tr><td>JSON APIs (2000s)</td><td>URLs as data</td><td>in the docs</td><td>no: a client per API</td></tr>
+<tr><td>HEART (2026)</td><td>typed links</td><td>forms with JSON Schema, offered only when allowed</td><td><b>yes: ARTIE</b></td></tr>
+</table></div>
+</details>
+</section>
+
+<section id="fielding">
+<h2><span class="num">3</span>Fielding’s complaint</h2>
+<p>Fielding’s dissertation defined REST by four interface constraints. Eight years later he wrote, in so many words, that the APIs calling themselves REST had dropped the one that matters most.</p>
+<blockquote>REST is defined by four interface constraints: identification of resources; manipulation of resources through representations; self-descriptive messages; and, hypermedia as the engine of application state.<cite>Roy T. Fielding, dissertation, 2000, §5.1.5</cite></blockquote>
+<blockquote>I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.<cite>Roy T. Fielding, “REST APIs must be hypertext-driven”, 20 October 2008</cite></blockquote>
+<blockquote>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?<cite>Roy T. Fielding, 2008</cite></blockquote>
+<!--diagram:drift-->
+<ul class="obs">
+<li>His rules for a REST API, verbatim: “A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API).”</li>
+<li>“A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types.”</li>
+<li>“A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace.”</li>
+<li>What he meant by hypertext, in his comments on that post: “When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”</li>
+<li>And machines: “Machines can follow links when they understand the data format and relationship types.”</li>
+<li>The diagram shows where the rules went instead: an interface file, the docs, a generated client, the model’s training. Each copy is frozen earlier and drifts from the server.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the trade Fielding named, and HEART’s answer to each constraint</summary>
+<blockquote>The trade-off, though, is that a uniform interface degrades efficiency, since information is transferred in a standardized form rather than one which is specific to an application’s needs.<cite>Fielding, dissertation, §5.1.5</cite></blockquote>
+<blockquote>REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution. Many of the constraints are directly opposed to short-term efficiency.<cite>Fielding, comment on “REST APIs must be hypertext-driven”, 2008</cite></blockquote>
+<div class="table"><table>
+<tr><th>Constraint</th><th>In this run</th></tr>
+<tr><td>Identification of resources</td><td>Each pull request, issue and list has a URL the gateway handed over; the script never builds one.</td></tr>
+<tr><td>Manipulation through representations</td><td>Merge is a <code>PUT</code> to the merge form’s target with <code>{"merge_method": "squash"}</code>, as the form’s JSON Schema says.</td></tr>
+<tr><td>Self-descriptive messages</td><td><code>application/hal+json</code>, the HEART profile in <code>Link: rel="profile"</code>, a strong <code>ETag</code>, refusals as RFC 9457 problems.</td></tr>
+<tr><td>Hypermedia as the engine of application state</td><td>Merge is offered as a form only when GitHub would accept it; when not, the why-absent resource says why.</td></tr>
+</table></div>
+</details>
+</section>
+
+<section id="goal">
+<h2><span class="num">4</span>The goal in words</h2>
+<p>The whole job, as the person wrote it. No code, no API names: inputs, one sentence of context, and a list of steps in the words a person would use.</p>
+<pre><code>Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+
+- In {owner}/{repo}
+  - Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 3 minutes.
+      Otherwise, tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`
+- Until someone closes {watch}</code></pre>
+<!--diagram:goalmap-->
+<ul class="obs">
+<li>Six constructs: <b>Whenever</b>, <b>If</b>, <b>Once</b>, <b>Or give up</b>, <b>Otherwise</b>, <b>Until</b>. Each is a plain English word with one meaning.</li>
+<li><code>as watch</code> names the issue so the Until can read it again later, by the address the server gave.</li>
+<li><code>reasoned</code> is the only mark that keeps the model in the loop. Everything else is decided once.</li>
+<li>Nothing in it says GitHub, PUT, or <code>mergeable_state</code>. Those come from the server’s answers at run time.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the front matter</summary>
+<pre><code>---
+start: https://localhost:8392/
+inputs:
+  owner: { question: "Whose repository?" }
+  repo:  { default: heart-github-test, question: "Which repository?" }
+  label: { default: dependencies, question: "Which label marks a dependency bump?" }
+  hold:  { default: hold, question: "Which label means a person objects?" }
+---</code></pre>
+<ul class="obs">
+<li><code>start</code> is the bookmark: the gateway’s service index. Fielding’s “initial URI”.</li>
+<li>Inputs are asked for when not given, and become the script’s inputs later.</li>
+<li>The run: <code>artie run merge.goal.md owner=JogoShugh --reasoner claude --rung L2</code>.</li>
+</ul>
+</details>
+</section>
+
+<section id="once">
+<h2><span class="num">5</span>Decide once, replay forever</h2>
+<p>The first time a step is needed, the model reads the goal’s words against what the server offers right there, and decides. The decision is kept. Every later time, for every pull request, it is replayed with no model.</p>
+<!--diagram:once-->
+<ul class="obs">
+<li>A decision is small: a relation (<code>github:merge</code>), a check as facts (<code>{"github:labels": ["hold"]}</code>), or fields (<code>squash</code>).</li>
+<li>It is made on a real resource, live, not from documentation.</li>
+<li>The replay is safe because the server checks it: a kept decision to merge acts only where the merge form is offered now.</li>
+<li>So the model is needed once per <em>kind</em> of step, not once per pull request or per look.</li>
+</ul>
+<details class="deep"><summary>Technical detail: what the model decided in run 2, with its own reasons</summary>
+<pre><code>why: The start offers github:pulls-list, which filters by labels, so I'll list the pull
+     requests in $owner/$repo narrowed to label $label.
+list pull requests … filtered by label dependencies: decided github:pulls-list
+
+why: The held pull request embeds github:labels including dependencies, so I'll check
+     that it matches the label.
+whenever: … decided the check {"github:labels":["dependencies"]}
+
+why: The condition is that the pull request is labelled $hold, so check that its labels
+     include hold.
+if: it's labelled hold: decided the check {"github:labels":["hold"]}
+
+why: … the PR is mergeable and clean and the github:merge form is offered, so wait on that form.
+once: waits for github:merge
+
+why: The PR is clean and mergeable and offers github:merge, so squash-merge it.
+merge it by squashing: decided github:merge
+
+why: The watch ends once issue 821 is closed, so check that its state is closed.
+until: … decided the check {"state":"closed"}</code></pre>
+<ul class="obs">
+<li>Each reason names what the server offered: “offers github:pulls-list”, “the github:merge form is offered”. The model chose among controls; it didn’t recall an API.</li>
+<li>Run 2 made 12 model calls in all: 6 to decide these steps, 6 for the reasoned comments.</li>
+</ul>
+</details>
+</section>
+
+<section id="offers">
+<h2><span class="num">6</span>The server says what is possible</h2>
+<p>“Once it can be merged” needs no rule about drafts, conflicts or checks. The gateway offers the merge form only when GitHub would accept it, and says why when it won’t.</p>
+<!--diagram:offers-->
+<ul class="obs">
+<li>The wait is just this: look again until <code>github:merge</code> appears among the forms.</li>
+<li>When it never does, the reason is already there, in the server’s words, in <code>hr:unavailable</code>.</li>
+<li>This is Fielding’s “information becomes the affordance”: the client acts on what the representation offers, not on what it knows about GitHub.</li>
+<li>The client knows no rule for mergeability. If GitHub adds one tomorrow, the gateway’s answer changes and the script doesn’t.</li>
+</ul>
+<details class="deep"><summary>Technical detail: draft #823 as the gateway serves it</summary>
+<pre><code>GET /repos/JogoShugh/heart-github-test/pulls/823
+Accept: application/hal+json
+
+200 OK
+Content-Type: application/hal+json
+ETag: "seq-0.hsf.L0.a9a03feab6affc4e"
+Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile"
+
+"_forms": { "github:close": {…}, "github:comment": {…}, "github:edit": {…} }
+"_links": { "hr:unavailable": { "href": "/unavailable/ec82898fc179bc85", … }, … }</code></pre>
+<pre><code>GET /unavailable/ec82898fc179bc85
+
+{ "unavailable": [
+  { "rel": "/profiles/github#reopen", "title": "Reopen",
+    "reason": "The pull request is already open." },
+  { "rel": "/profiles/github#merge", "title": "Merge",
+    "reason": "A draft can't be merged; mark it ready for review first." } ] }</code></pre>
+<p>The comment form the model later chose, as offered:</p>
+<pre><code>"github:comment": {
+  "title": "Comment", "method": "POST", "contentType": "application/json",
+  "_links": { "target": { "href": "/repos/JogoShugh/heart-github-test/pulls/823/actions/comment" } },
+  "schema": { "type": "object", "required": ["body"], "additionalProperties": false,
+              "properties": { "body": { "type": "string", "description": "The contents of the comment." } } } }</code></pre>
+</details>
+</section>
+
+<section id="reasoned">
+<h2><span class="num">7</span>Where the model stays</h2>
+<p>One step changes every time: why this bump couldn’t merge, said kindly to this author. The goal marks it <code>reasoned</code>, so it is never replayed.</p>
+<!--diagram:reasoned-->
+<ul class="obs">
+<li>The model gets the goal’s words and the server’s reason, and picks a form the pull request offers.</li>
+<li>Nothing of it is kept: the next give-up asks again, with its own reason.</li>
+<li>The model writes words; it decides no rule. Whether to give up, and why, came from the server.</li>
+<li>One mark, one place. Everything else in the watch runs without inference.</li>
+</ul>
+<details class="deep"><summary>Technical detail: what the model is sent</summary>
+<pre><code>tell its author in one friendly sentence why it wasn't merged and what to do next.
+The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first.</code></pre>
+<ul class="obs">
+<li>The goal’s words, then the server’s reason from <code>hr:unavailable</code>, verbatim.</li>
+<li>With it, as with every reasoner call: the pull request’s state, its offered forms with their JSON Schemas, and its links by relation and title, never an address.</li>
+<li>The reasoner is told to write words a field takes exactly as the intent describes them: “one sentence” is one sentence.</li>
+</ul>
+</details>
+</section>
+
+<section id="run">
+<h2><span class="num">8</span>The run, step by step</h2>
+<p>Live run 2, 26 October 2026, 07:25 to 07:36 EDT, against GitHub through the gateway. Three bumps arrived during the run; eight pull requests were already open from earlier runs.</p>
+<!--diagram:lanes-->
+
+<h3 class="step">07:25:54 · The watch opens</h3>
+<ul class="obs">
+<li>The run enters at the bookmark, reaches the repository, and opens issue #821, “Merge watch”, kept as <code>watch</code>.</li>
+<li>The repository offers no list of pull requests, so the model goes back to the start, where <code>github:pulls-list</code> takes a <code>labels</code> filter.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the first steps</summary>
+<pre><code>1 enter https://localhost:8392/: done
+2 get repository JogoShugh/heart-github-test: done
+3 Open an issue titled "Merge watch" with the body "Close this issue to stop the watch.": new resource
+4 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8392/: done
+6 list pull requests of JogoShugh/heart-github-test filtered by label dependencies: done</code></pre>
+</details>
+
+<h3 class="step">07:26:28 · The first look: one merge, two held</h3>
+<ul class="obs">
+<li><b>#820</b> (4.0.1, open since an earlier check) offers merge. The model decides the label check, the hold check, the wait and the merge here, on this pull request. Merged.</li>
+<li><b>#805</b> and <b>#810</b> carry <code>hold</code>: left, one note each.</li>
+<li>Five more (#803, #806, #811, #813, #817) don’t offer merge. Their waits begin.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the notes</summary>
+<pre><code>11 merge it by squashing: done
+note: Left …/pulls/810: leave it, and say so once.
+note: Left …/pulls/805: leave it, and say so once.</code></pre>
+<ul class="obs">
+<li>A note is said once per pull request for the whole run, however often the pull request changes.</li>
+</ul>
+</details>
+
+<h3 class="step">07:27:02 · A held bump arrives</h3>
+<ul class="obs">
+<li><b>#822</b> (5.0.1) opens with <code>dependencies</code> and <code>hold</code>. The next look sees it as new, checks it with the kept hold check, and leaves it: one note. No model.</li>
+</ul>
+
+<h3 class="step">07:28:10 · A draft arrives</h3>
+<ul class="obs">
+<li><b>#823</b> (5.0.2) opens as a draft. The kept wait looks for the merge form at each look; it isn’t there.</li>
+</ul>
+
+<h3 class="step">07:29:18 · A mergeable bump arrives</h3>
+<ul class="obs">
+<li><b>#824</b> (5.0.3) opens. GitHub needs a moment to work out whether it can merge, so merge isn’t offered at first.</li>
+</ul>
+
+<h3 class="step">07:29:42 – 07:30:25 · Five waits give up</h3>
+<ul class="obs">
+<li>Three minutes after the first look, the waits on #817, #813, #811, #806 and #803 give up.</li>
+<li>Each goes to the model with its own reason: three drafts, two conflicts. Five comments, one sentence each.</li>
+</ul>
+<details class="deep"><summary>Technical detail: one give-up</summary>
+<pre><code>189 tell its author in one friendly sentence why it wasn't merged and what to do next.
+    The wait gave up, and the server says why: A draft can't be merged; mark it ready
+    for review first.: new resource</code></pre>
+<p>“new resource”: the comment form answered <code>201 Created</code>, with the comment’s address in <code>Location</code>.</p>
+</details>
+
+<h3 class="step">07:30:49 · The mergeable bump merges</h3>
+<ul class="obs">
+<li>#824 now offers merge. The kept decision replays: <code>github:merge</code> with <code>squash</code>. No model.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the replayed act</summary>
+<pre><code>218 act github:merge, merge_method squash: done</code></pre>
+<ul class="obs">
+<li>The act is sent with <code>If-Match</code> set to the ETag of the representation it was chosen from. Had the pull request changed in between, the gateway would answer <code>412</code> instead of merging a state nobody saw.</li>
+</ul>
+</details>
+
+<h3 class="step">07:31:54 · The draft gives up</h3>
+<ul class="obs">
+<li>Three minutes after #823 was first seen, its wait gives up. One more comment.</li>
+</ul>
+
+<h3 class="step">07:36:23 · The watch’s issue is closed</h3>
+<ul class="obs">
+<li>A person closes #821. The next look reads it by the kept name, finds it closed, and the watch ends: 538 steps.</li>
+<li>Held #805 was read 20 times and seen to change once, when GitHub first worked out that it could merge.</li>
+</ul>
+</section>
+
+<section id="said">
+<h2><span class="num">9</span>What the model wrote</h2>
+<p>Six give-ups, six comments. Each is the server’s reason, turned into a request to the author.</p>
+<div class="table"><table>
+<tr><th>Pull request</th><th>The server said</th><th>The model wrote</th></tr>
+<tr><td>#817</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this wasn't merged because it's still a draft, so please mark it ready for review and then it can be merged!</td></tr>
+<tr><td>#813</td><td>The branch has conflicts with its base; resolve them first.</td><td>Hi @JogoShugh, this pull request wasn't merged because its branch has conflicts with the base branch, so please resolve those conflicts and we can try merging again!</td></tr>
+<tr><td>#811</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this wasn't merged because it's still a draft, so please mark it ready for review and then it can be merged.</td></tr>
+<tr><td>#806</td><td>The branch has conflicts with its base; resolve them first.</td><td>Hi @JogoShugh, this pull request wasn't merged because its branch has conflicts with the base branch, so please resolve those conflicts and we can try merging again!</td></tr>
+<tr><td>#803</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this wasn't merged because it's still a draft, so please mark it ready for review first and then it can be merged.</td></tr>
+<tr><td>#823</td><td>A draft can't be merged; mark it ready for review first.</td><td>Hi @JogoShugh, this pull request wasn't merged because it's still a draft, so please mark it ready for review and then it can be merged.</td></tr>
+</table></div>
+<ul class="obs">
+<li>Every comment is one sentence, as the goal asked.</li>
+<li>The facts in each come from the server; the model only phrased them.</li>
+<li>The author’s name comes from the pull request’s embedded <code>author</code>, not from the goal.</li>
+</ul>
+</section>
+
+<section id="script">
+<h2><span class="num">10</span>The script it became</h2>
+<p>From the run’s capture, <code>artie generate</code> writes the same watch as a Kotlin script: every decision named, nothing to ask a model except the one reasoned line.</p>
+<!--diagram:mapping-->
+<ul class="obs">
+<li>Each goal line becomes one script construct. The mapping is kept, line and column, in <code>merge.derivation.yaml</code>.</li>
+<li>Relations are named (<code>github:merge</code>), checks are facts (<code>"github:labels" has hold</code>), the give-up is a duration.</li>
+<li>What the run was offered is pinned in <code>merge.pins.yaml</code>: if the gateway changes a form, the script refuses to act rather than guess.</li>
+</ul>
+<details class="deep"><summary>Technical detail: merge.kts</summary>
+<pre><code>heart("https://localhost:8392/") {
+    act("github:repos-get", "owner" to owner, "repo" to repo, intent = "get repository $owner/$repo") {
+        act("github:open-issue", intent = """Open an issue titled "Merge watch" …""", fields = {
+            "title" to "Merge watch"
+            "body" to "Close this issue to stop the watch."
+        }) {
+            keepAs("watch")
+        }
+    }
+    watch(until = { at("watch") { "state" eq "closed" } }) {
+        act("github:pulls-list", "owner" to owner, "repo" to repo, "labels" to label) {
+            whenever {
+                has { "github:labels" has label }
+                leaveWhere("leave it, and say so once.") { "github:labels" has hold }
+                once("github:merge", giveUp = 3.minutes, otherwise = { why ->
+                    act(intent = "tell its author in one friendly sentence why it wasn't merged and what to do next. The wait gave up, and the server says why: ${why ?: "no reason given"}")
+                }) {
+                    act("github:merge", "merge_method" to "squash") {}
+                }
+            }
+        }
+    }
+}</code></pre>
+<pre><code># merge.pins.yaml (abridged)
+rung: L2
+forms:
+  github:merge:
+    integrity: sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+    method: PUT
+  github:comment:
+    integrity: sha256-hBIa40tU8EJokuebe8npx54kItbP3z/jGbJW8FsL26c=
+    method: POST</code></pre>
+</details>
+</section>
+
+<section id="hour">
+<h2><span class="num">11</span>An hour on the script</h2>
+<p>The generated script ran for an hour against a stream of bumps: held, draft, twins that conflict, and plain ones.</p>
+<div class="table"><table>
+<tr><th>Steps</th><th>Model calls</th><th>Merged</th><th>Left (held)</th><th>Told why</th></tr>
+<tr><td>2,740</td><td><b>5</b>, all at the reasoned Otherwise</td><td>6</td><td>2</td><td>5 (3 drafts, 2 conflicts)</td></tr>
+</table></div>
+<ul class="obs">
+<li>2,735 of 2,740 steps (99.8%) ran with no model: the decisions made once in the goal run did the rest.</li>
+<li>The model was asked only where the words said <code>reasoned</code>, once per give-up.</li>
+</ul>
+</section>
+
+<section id="observations">
+<h2><span class="num">12</span>Observations</h2>
+<ul class="obs">
+<li><b>The controls carried the rules.</b> The goal never said what makes a pull request mergeable. The server said it, by offering merge or not, which is what Fielding meant by information that “becomes the affordance”.</li>
+<li><b>The reason came with the refusal.</b> “A draft can't be merged; mark it ready for review first” is the server’s sentence. The model turned it into a kind one; it didn’t have to work it out.</li>
+<li><b>Decide once is safe because the server re-checks.</b> A kept decision acts only where its form is offered now, under <code>If-Match</code>. Replay can’t act on a state the server no longer offers.</li>
+<li><b>A representation should change only when its resource does.</b> Each pull request used to embed its whole repository, including counts like <code>open_issues</code> that change whenever anything happens in the repository. Every pull request then looked changed every few minutes. The gateway now embeds a repository by what names it, with its counts one link away, and a held pull request is seen to change only when it does.</li>
+<li><b>The model stayed where judgment lives.</b> One marked line, one kind of question. Everything a rule can do, a rule did.</li>
+<li><b>Fielding’s bookmark rule held.</b> The run began at one URI and reached every resource by links and forms the server gave. Not one address was built by the client.</li>
+</ul>
+</section>
+
+<footer class="sources">
+<h2>Sources</h2>
+<ul>
+<li>Roy T. Fielding, <i>Architectural Styles and the Design of Network-based Software Architectures</i>, UC Irvine, 2000, §5.1.5 “Uniform Interface”.</li>
+<li>Roy T. Fielding, “REST APIs must be hypertext-driven”, Untangled, 20 October 2008, and his comments there.</li>
+<li>Vannevar Bush, “As We May Think”, <i>The Atlantic</i>, July 1945.</li>
+<li>Theodor H. Nelson, “Complex information processing: a file structure for the complex, the changing and the indeterminate”, ACM, 1965.</li>
+<li>Tim Berners-Lee, “Information Management: A Proposal”, CERN, March 1989.</li>
+<li>Mike Kelly, JSON Hypertext Application Language, draft-kelly-json-hal, IETF, 2012–2023.</li>
+<li>This repository: <code>exhibits/merge-watch/</code> (the goal, the script, run 2’s output and capture), <code>exhibits/dependabot-sim/</code> (the stand-ins), <code>heart/heart-gateway/connectors/github</code> (the gateway’s GitHub connector).</li>
+</ul>
+</footer>

@@ -1,0 +1,158 @@
+Feature: A script's lock file guards each act before ARTIE sends it
+  spec/PLAN-SCRIPT-GENERATOR.md, "Guards" (spec/ideas/replay-guards-lenient-strict.md).
+  A generated script's lock file pins, by relation, each form's own integrity
+  (HAL-SCHEMA-FORMS-HR Rule 10) and the affordance sets it was offered in.
+  Before ARTIE sends an act, it checks the form it is about to use. A lock file
+  pins every relation its script uses: here, the bookmark's forms as offered,
+  and the one each scenario is about. Lenient, the default: the form must have its pinned integrity, in whatever set holds
+  it now; a relation the lock doesn't pin goes on, marked unpinned. Strict: the
+  set must also be one recorded for it, and an unpinned relation is refused.
+  A refusal is the guard's, by the client: nothing is sent.
+
+  Background:
+    Given a small GitHub knows these callers
+      | token     | caller |
+      | ada-token | ada    |
+    And "acme/rockets" has these issues on the small GitHub
+      | number | title                 | state | author |
+      | 10     | Login fails on Safari | open  | ada    |
+    And ARTIE talks to the GitHub gateway at "https://github.gateway.test" in front of the small GitHub
+    And ARTIE holds the Bearer credential "ada-token" for "https://github.gateway.test"
+    And the client works at rung L2
+
+  Scenario Outline: The form a pinned act uses is checked, and with strict its set too
+    Given ARTIE guards the run "<guard>", pinning "github:close" to its form "<form>" in a set "<set>"
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run <ends>
+    And issue 10 of "acme/rockets" is now "<issue>" on the small GitHub
+
+    Examples:
+      | guard   | form       | set        | ends                          | issue  |
+      | lenient | as offered | changed    | finished                      | closed |
+      | lenient | changed    | as offered | was stopped at step 2 by its guard | open   |
+      | strict  | as offered | changed    | was stopped at step 2 by its guard | open   |
+      | strict  | as offered | as offered | finished                      | closed |
+      | off-the-rails | changed | as offered | finished                 | closed |
+
+  Scenario Outline: Look then leap: one look, at every form the script uses, here the close form <close>
+    spec/ideas/off-the-rails.md. One look, at the entry's manifest of every
+    form the server declares: when each form the lock file pins is there with
+    its pinned integrity, the run leaves the rails. A form changed further on,
+    past the entry, is seen too, and the run stays lenient. Either way it says
+    so, so a reader knows which way it went.
+    Given ARTIE guards the run "look-then-leap", pinning "github:close" to its form "<close>" in a set "as offered"
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run <ends>
+    And issue 10 of "acme/rockets" is now "<state>" on the small GitHub
+    And the run noted
+      | note   |
+      | <note> |
+
+    Examples:
+      | close      | ends                               | state  | note                                                                                                   |
+      | as offered | finished                           | closed | Look then leap: every form the script uses is as the lock file pins it, so the run leaves the rails.  |
+      | changed    | was stopped at step 2 by its guard | open   | Look then leap: github:close changed since the lock file, so the run stays lenient.                    |
+
+  Scenario: Look then leap: a form at the entry changed, the run stays lenient, and its guard refuses that form
+    Given ARTIE guards the run "look-then-leap", the entry's "github:issues-get" pinned as it was before a change
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run was stopped at step 1 by its guard
+    And issue 10 of "acme/rockets" is now "open" on the small GitHub
+    And the run noted
+      | note                                                                                     |
+      | Look then leap: github:issues-get changed since the lock file, so the run stays lenient. |
+
+  Scenario Outline: Look then leap at everything: the server's digest <digest>
+    --look everything: the one look compares the digest of every form the
+    server declares with the one the lock file recorded. Any change, to any
+    form, even one the script never uses, keeps the run lenient.
+    Given ARTIE guards the run "look-then-leap", pinning "github:close" to its form "as offered" in a set "as offered"
+    And ARTIE looks at everything, the lock file recording the server's digest <digest>
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run finished
+    And issue 10 of "acme/rockets" is now "closed" on the small GitHub
+    And the run noted
+      | note   |
+      | <note> |
+
+    Examples:
+      | digest    | note                                                                                                               |
+      | as served | Look then leap: every form the server declares is as when the lock file was written, so the run leaves the rails. |
+      | changed   | Look then leap: the server's forms changed since the lock file was written, so the run stays lenient.             |
+      | not kept  | Look then leap: the lock file records no digest of the server's forms, so the run stays lenient.                  |
+
+  Scenario: Lenient, past an unchanged form in a changed set: the capture warns, naming both sets
+    spec/ideas/replay-guards-lenient-strict.md, the open item, decided: a
+    lenient run goes on, and its capture and report say the set changed.
+    Given ARTIE guards the run "lenient", pinning "github:close" to its form "as offered" in a set "changed"
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run finished, step 3 warned that the set holding "github:close" is not the one pinned
+
+  Scenario Outline: A link followed is checked by what its target leaves to fill; with strict, it must be pinned
+    A link's target names one resource, and differs from one resource to the
+    next; a lock file pins what a script relies on: the variables the target
+    leaves to fill (none, for a plain link), checked in both modes.
+    Given ARTIE guards the run "<guard>", pinning the link "github:repos-get" <pin>
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          follow("github:repos-get")
+      }
+      """
+    Then the run <ends>
+
+    Examples:
+      | guard   | pin          | ends                               |
+      | lenient | as offered   | finished                           |
+      | lenient | to "{/name}" | was stopped at step 2 by its guard |
+      | lenient | not at all   | finished, step 3 marked unpinned   |
+      | strict  | not at all   | was stopped at step 2 by its guard |
+      | strict  | as offered   | finished                           |
+
+  Scenario Outline: A relation the lock file doesn't pin: lenient goes on, marked; strict refuses
+    Given ARTIE guards the run "<guard>", pinning everything it offers but "github:close"
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run <ends>
+    And issue 10 of "acme/rockets" is now "<issue>" on the small GitHub
+
+    Examples:
+      | guard   | ends                               | issue  |
+      | lenient | finished, step 3 marked unpinned   | closed |
+      | strict  | was stopped at step 2 by its guard | open   |

@@ -1,0 +1,20 @@
+{
+  "search": {"rel": "support:search-tickets", "fields": {"name": "log in"}, "item": "Cannot log in"},
+  "maxSteps": 30,
+  "acts": {
+    "support:open-ticket": [
+      {"subject": "Printer jams on every page", "customer": "Lee Park", "description": "It jams after one page.", "priority": "normal"}
+    ],
+    "support:assign": [{"agent": "priya"}, {"agent": "marco"}],
+    "support:comment": [
+      {"text": "Seen this before with old drivers.", "internal": true},
+      {"text": "We are looking into it.", "internal": false}
+    ],
+    "support:ask-customer": [{"question": "Which printer model is it?"}],
+    "support:customer-replies": [{"text": "A LaserJet 4000."}],
+    "support:resolve": [{"resolution": "Updated the printer driver."}],
+    "support:reopen": [{"reason": "It jammed again this morning."}],
+    "support:close": [{}],
+    "support:change-priority": [{"priority": "urgent"}, {"priority": "low"}]
+  }
+}

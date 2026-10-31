@@ -1,0 +1,24 @@
+# An issue's comment: read by issues/get-comment, an issue's listed by issues/list-comments.
+noun: comment
+collection: comments
+read: issues/get-comment
+search: issues/list-comments
+# A comment names its owner and repository only in its own URL, as an issue does.
+address: /url
+filters: [since]
+title: /body
+# The reader's rules read the repository's permissions for the caller, and the caller.
+facts:
+  repository:
+    operation: repos/get
+    pointers:
+      owner: /hr:address/owner
+      repo: /hr:address/repo
+  user:
+    operation: users/get-authenticated
+acts:
+  edit:
+    operation: issues/update-comment
+    title: Edit
+    description: Change its title or description.
+    fields: [body]
