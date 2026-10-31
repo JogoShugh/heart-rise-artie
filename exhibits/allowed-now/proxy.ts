@@ -6,13 +6,15 @@ import { Octokit } from "octokit";
 
 const ALLOWED_NOW = "https://jogoshugh.github.io/heart-rise-artie/rels/allowed-now";
 const PULL = /^\/repos\/[^/]+\/[^/]+\/pulls\/\d+$/;
+// With GITHUB_TOKEN set, the proxy holds the credential: callers need none, and can reach GitHub only through it.
+const TOKEN = process.env.GITHUB_TOKEN;
 
 const app = express();
 
 // What may be done to a pull request now, as GitHub operation names, and why not the rest.
 app.get("/allowed-now/repos/:owner/:repo/pulls/:number", async (req, res) => {
   const { owner, repo, number } = req.params;
-  const github = new Octokit({ auth: req.headers.authorization?.split(" ")[1] });
+  const github = new Octokit({ auth: TOKEN ?? req.headers.authorization?.split(" ")[1] });
   const { data: pull } = await github.rest.pulls.get({ owner, repo, pull_number: Number(number) });
   const { data: compare } = await github.rest.repos.compareCommits({
     owner, repo, base: pull.base.ref, head: pull.head.sha,
@@ -34,6 +36,7 @@ app.get("/allowed-now/repos/:owner/:repo/pulls/:number", async (req, res) => {
 app.use(createProxyMiddleware({
   target: "https://api.github.com",
   changeOrigin: true,
+  headers: TOKEN ? { authorization: `Bearer ${TOKEN}` } : {},
   selfHandleResponse: true,
   on: {
     proxyRes: responseInterceptor(async (body, _proxyRes, req, res) => {
@@ -45,4 +48,5 @@ app.use(createProxyMiddleware({
   },
 }));
 
-app.listen(8400, () => console.log("In front of GitHub at http://localhost:8400"));
+// This machine only: holding a token, the proxy would act as you for anyone who could reach it.
+app.listen(8400, "127.0.0.1", () => console.log("In front of GitHub at http://localhost:8400"));
