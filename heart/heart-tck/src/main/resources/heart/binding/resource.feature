@@ -50,8 +50,9 @@ Feature: A declared resource and its acts, served over HTTP
       | /lamps/7/actions/switch-off |
       | /lamps/7/actions/dim        |
 
-  Scenario: Accept that names no dialect is refused
-    When a client gets "/lamps/7" with Accept "text/html"
+  Scenario: Accept that names nothing the server produces is refused
+    HTML is produced since 2026-10-30, for people (html.feature).
+    When a client gets "/lamps/7" with Accept "image/png"
     Then the response status is 406
 
   Scenario: A resource the server does not hold is not found

@@ -35,6 +35,8 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.3"))
     testImplementation("org.junit.platform:junit-platform-suite")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
+    // The HTML a resource renders is read back as a browser would (html.feature).
+    testImplementation("org.jsoup:jsoup:1.23.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

@@ -26,6 +26,8 @@ dependencies {
     api(testFixtures(project(":heart-core")))
     // A plain response is checked against the schema the OpenAPI description gives it.
     implementation("com.networknt:json-schema-validator:1.5.9")
+    // The HTML a binding serves is read back as a browser would (html.feature).
+    implementation("org.jsoup:jsoup:1.23.2")
 
     // The lamp runs the TCK here: a server that declares only the lamp.
     testImplementation(project(":heart-spring"))

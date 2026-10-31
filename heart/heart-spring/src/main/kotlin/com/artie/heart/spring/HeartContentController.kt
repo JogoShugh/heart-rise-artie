@@ -2,6 +2,7 @@ package com.artie.heart.spring
 
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
+import com.artie.heart.HtmlAssets
 import com.artie.heart.Profile
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.HttpHeaders
@@ -32,6 +33,14 @@ class HeartContentController(private val registry: HeartRegistry) {
     @GetMapping("/unavailable/{address}")
     fun explanation(@PathVariable address: String): ResponseEntity<String> =
         immutable(registry.content.explanations[address], MediaType.APPLICATION_JSON_VALUE)
+
+    /** A HEART page's script or stylesheet, by its published name (spec/PLAN-HTML-DIALECT.md). */
+    @GetMapping("${HtmlAssets.PATH}{name}")
+    fun asset(@PathVariable name: String): ResponseEntity<String> {
+        val asset = HtmlAssets.byName[name] ?: return ResponseEntity.notFound().build()
+        return ResponseEntity.ok().contentType(MediaType.parseMediaType(asset.mediaType))
+            .header(HttpHeaders.CACHE_CONTROL, HtmlAssets.CACHE_CONTROL).body(asset.text)
+    }
 
     private fun immutable(body: String?, type: String): ResponseEntity<String> =
         if (body == null) {

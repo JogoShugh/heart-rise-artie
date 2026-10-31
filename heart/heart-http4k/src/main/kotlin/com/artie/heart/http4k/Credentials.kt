@@ -1,5 +1,6 @@
 package com.artie.heart.http4k
 
+import com.artie.heart.HtmlAssets
 import com.artie.heart.Layers
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.PROBLEM_TYPES
@@ -92,6 +93,7 @@ class Credentials private constructor(
             Regex("^${Layers.SCHEMAS}$ADDRESS$"),
             Regex("^${Layers.EXPLANATIONS}$ADDRESS$"),
             Regex("^/profiles/[A-Za-z0-9_-]+$"),
+            Regex("^${Regex.escape(HtmlAssets.PATH)}[A-Za-z0-9_.-]+$"),
             Regex("^${Regex.escape(OpenApiDocument.PATH)}$"),
             Regex("^${Regex.escape(SwaggerUi.PATH)}$"),
             Regex("^${Regex.escape(SwaggerUi.FILES)}/[A-Za-z0-9_-]+(\\.[A-Za-z0-9]+)+$"),

@@ -44,6 +44,7 @@ class ResourceHandler<S, K>(
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper, limits.validatorRequired)
     private val targets = ActTargets(resource.layers)
+    private val html = HtmlAnswer(resource.layers)
 
     /** The current state, or as of `?asOf=` for a type that keeps its past; any other query is not a route. */
     fun read(request: Request): Response {
@@ -72,14 +73,11 @@ class ResourceHandler<S, K>(
 
     /** [state] as the representation [request] selects, answering 304 when its If-None-Match names it. */
     fun represent(state: S, request: Request): Response {
-        if (Negotiation.wantsPlainJson(request.header(ACCEPT))) return plain(Response(Status.OK), state)
-        val dialect = dialect(request)
-        val rendered = Rendered(state, dialect, limits.rung(dialect, request))
-        val ifNoneMatch = request.header(IF_NONE_MATCH)
-        return if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, rendered.etag)) {
-            rendered.headers(Response(Status.NOT_MODIFIED))
-        } else {
-            rendered.respond(Response(Status.OK))
+        val accept = request.header(ACCEPT)
+        return when {
+            Negotiation.wantsHtml(accept) -> html.represent(state, request)
+            Negotiation.wantsPlainJson(accept) -> plain(Response(Status.OK), state)
+            else -> dialect(request).let { Rendered(state, it, limits.rung(it, request)).answer(request) }
         }
     }
 
@@ -209,6 +207,16 @@ class ResourceHandler<S, K>(
 
         fun respond(response: Response): Response =
             headers(response.header(CONTENT_TYPE, dialect.mediaType)).body(mapper.writeValueAsString(body))
+
+        /** 200 with this representation, or 304 when [request]'s If-None-Match already names it. */
+        fun answer(request: Request): Response {
+            val ifNoneMatch = request.header(IF_NONE_MATCH)
+            return if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, etag)) {
+                headers(Response(Status.NOT_MODIFIED))
+            } else {
+                respond(Response(Status.OK))
+            }
+        }
     }
 
     /** The item path's variables, as the request's path filled them. */

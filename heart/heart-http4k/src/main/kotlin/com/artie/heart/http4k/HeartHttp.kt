@@ -2,6 +2,7 @@ package com.artie.heart.http4k
 
 import com.artie.heart.Caller
 import com.artie.heart.HeartResource
+import com.artie.heart.HtmlAssets
 import com.artie.heart.Layers
 import com.artie.heart.Listing
 import com.artie.heart.OpenApiDocument
@@ -87,6 +88,7 @@ class HeartHttp(
         "${Layers.SCHEMAS}{address}" bind GET to { published.schema(it.path("address").orEmpty()) },
         "${Layers.EXPLANATIONS}{address}" bind GET to { published.explanation(it.path("address").orEmpty()) },
         "/profiles/{name}" bind GET to { published.profile(it.path("name").orEmpty()) },
+        "${HtmlAssets.PATH}{name}" bind GET to ::htmlAsset,
         "/actions/{path}" bind POST to ::actAtBookmark,
     ) + listings.map { listing -> listing.path bind GET to { published.listing(listing, it) } }
 

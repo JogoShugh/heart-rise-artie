@@ -44,6 +44,7 @@ class HeartResourceHandler<S, K>(
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper)
     private val targets = ActTargets(resource.layers)
+    private val html = HtmlAnswer(resource.layers)
 
     suspend fun read(request: ServerRequest): ServerResponse = represent(resource.locate(variables(request)), request)
 
@@ -77,21 +78,17 @@ class HeartResourceHandler<S, K>(
      * state of their own finding, such as a past one.
      */
     suspend fun represent(state: S, request: ServerRequest): ServerResponse {
-        if (HttpNegotiation.wantsPlainJson(request.headers().asHttpHeaders())) {
-            return PlainJson.respond(
+        val headers = request.headers().asHttpHeaders()
+        return when {
+            HttpNegotiation.wantsHtml(headers) -> html.represent(state, request)
+            HttpNegotiation.wantsPlainJson(headers) -> PlainJson.respond(
                 ServerResponse.ok().apply {
                     if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(state))
                 },
                 type.state.bodyOf(state),
             )
-        }
-        val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
-        val rendered = Rendered(state, dialect, limits.rung(dialect, request))
-        val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
-        return if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, rendered.etag)) {
-            ServerResponse.status(HttpStatus.NOT_MODIFIED).headers { rendered.headers(it) }.buildAndAwait()
-        } else {
-            rendered.respond(ServerResponse.ok())
+            else -> HttpNegotiation.dialect(headers).let { Rendered(state, it, limits.rung(it, request)) }
+                .answer(request)
         }
     }
 
@@ -231,6 +228,16 @@ class HeartResourceHandler<S, K>(
         suspend fun respond(builder: ServerResponse.BodyBuilder): ServerResponse =
             builder.contentType(MediaType.parseMediaType(dialect.mediaType)).headers { headers(it) }
                 .bodyValueAndAwait(body)
+
+        /** 200 with this representation, or 304 when [request]'s If-None-Match already names it. */
+        suspend fun answer(request: ServerRequest): ServerResponse {
+            val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
+            return if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, etag)) {
+                ServerResponse.status(HttpStatus.NOT_MODIFIED).headers { headers(it) }.buildAndAwait()
+            } else {
+                respond(ServerResponse.ok())
+            }
+        }
     }
 
     /** The item path's variables, as the request's path filled them. */

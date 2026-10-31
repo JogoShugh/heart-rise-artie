@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.HtmlAssets
 import com.artie.heart.Layers
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.PROBLEM_TYPES
@@ -59,6 +60,7 @@ class HeartAuthFilter(private val credentials: HeartCredentials, realm: String) 
             Regex("^${Layers.SCHEMAS}$ADDRESS$"),
             Regex("^${Layers.EXPLANATIONS}$ADDRESS$"),
             Regex("^/profiles/[A-Za-z0-9_-]+$"),
+            Regex("^${Regex.escape(HtmlAssets.PATH)}[A-Za-z0-9_.-]+$"),
             Regex("^${Regex.escape(OpenApiDocument.PATH)}$"),
             Regex("^${Regex.escape(SwaggerUiPage.PATH)}$"),
             Regex("^${Regex.escape(SwaggerUiPage.FILES)}/[A-Za-z0-9_-]+(\\.[A-Za-z0-9]+)+$"),

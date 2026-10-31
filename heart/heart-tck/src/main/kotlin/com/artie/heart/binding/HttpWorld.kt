@@ -104,9 +104,12 @@ class HttpWorld(
             "hal-schema-forms" -> "application/hal+json"
             "hal-forms" -> "application/prs.hal-forms+json"
             "plain-json" -> "application/json"
+            "html" -> BROWSER
             else -> error("unknown dialect $dialect")
         }
 
+        /** What a browser sends as Accept for a page. */
+        const val BROWSER = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 
         /** A validator whose digest the scenario leaves to be filled: "seq-3.hsf.L0.{digest}". */
         private val DIGEST = Regex("""seq-(\d+)\.(hsf|hf)\.(L\d)\.\{digest}""")

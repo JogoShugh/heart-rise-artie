@@ -64,6 +64,14 @@ object Negotiation {
      */
     fun wantsPlainJson(accept: String?): Boolean = ranksAboveDialects(accept, PLAIN_JSON)
 
+    /**
+     * True when `Accept` names HTML above both dialects, as a browser does: the page for people
+     * ([HtmlView]). A wildcard never selects it, so a client that names nothing still gets HEART.
+     */
+    fun wantsHtml(accept: String?): Boolean = ranksAboveDialects(accept, HTML)
+
+    const val HTML = "text/html"
+
     private fun ranksAboveDialects(accept: String?, mediaType: String): Boolean {
         val accepted = ranked(accept.orEmpty().lowercase()).filter { it.q > 0 }
         val wanted = accepted.firstOrNull { it.value == mediaType } ?: return false
