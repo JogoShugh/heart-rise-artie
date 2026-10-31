@@ -1,6 +1,8 @@
 package com.artie.heart.bdd
 
+import com.artie.heart.ActRequests
 import com.artie.heart.HtmlFields
+import com.artie.heart.HtmlProblem
 import com.artie.heart.HtmlView
 import com.artie.heart.JsonTrees
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 class HtmlSteps(private val world: LampWorld) {
     private lateinit var page: Document
     private lateinit var field: Element
+    private var input: String = ""
 
     @When("lamp {long} is rendered as HTML")
     fun rendered(id: Long) = renderedUnder(id, "seq-3.html.L0.test")
@@ -99,6 +102,26 @@ class HtmlSteps(private val world: LampWorld) {
         assertNull(field.selectFirst(first))
         assertNull(field.selectFirst(second))
     }
+
+    @When("the form {string} is read by the schema {}")
+    fun formRead(form: String, schema: String) {
+        input = ActRequests.fromForm(schema, form)
+    }
+
+    @Then("the form's input is {}")
+    fun inputIs(json: String) = assertEquals(ObjectMapper().readTree(json), ObjectMapper().readTree(input))
+
+    @When("the problem {} is rendered as HTML")
+    fun problemRendered(problem: String) {
+        field = Jsoup.parseBodyFragment(HtmlProblem.of(problem)).body()
+    }
+
+    @Then("the HTML problem reads {string}")
+    fun problemReads(title: String) = assertEquals(title, field.selectFirst(".problem strong")?.text())
+
+    @Then("the HTML problem names the field {string} as {string}")
+    fun problemNames(pointer: String, message: String) =
+        assertEquals(message, field.selectFirst(".problem li[data-pointer=$pointer]")?.text())
 
     private fun form(key: String): Element = checkNotNull(page.selectFirst("dialog form[data-rel=$key]")) { key }
 

@@ -44,7 +44,7 @@ class ResourceHandler<S, K>(
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper, limits.validatorRequired)
     private val targets = ActTargets(resource.layers)
-    private val html = HtmlAnswer(resource.layers)
+    private val html = HtmlAnswer(resource, pipeline, mapper)
 
     /** The current state, or as of `?asOf=` for a type that keeps its past; any other query is not a route. */
     fun read(request: Request): Response {
@@ -91,6 +91,8 @@ class ResourceHandler<S, K>(
             !ActRequests.allowed(act, request.method.name) ->
                 Response(Status.METHOD_NOT_ALLOWED).header(ALLOW, act.method)
             plainJson -> actPlain(act, request)
+            Negotiation.wantsHtml(request.header(ACCEPT)) ->
+                html.act(act, request) { resource.locate(variables(request)) }
             else -> actHeart(act, request)
         }
     }

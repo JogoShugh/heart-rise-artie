@@ -44,7 +44,7 @@ class HeartResourceHandler<S, K>(
     private val type = resource.layers.type
     private val pipeline = ActPipeline(type, mapper)
     private val targets = ActTargets(resource.layers)
-    private val html = HtmlAnswer(resource.layers)
+    private val html = HtmlAnswer(resource, pipeline, mapper)
 
     suspend fun read(request: ServerRequest): ServerResponse = represent(resource.locate(variables(request)), request)
 
@@ -103,6 +103,8 @@ class HeartResourceHandler<S, K>(
                 ServerResponse.status(HttpStatus.METHOD_NOT_ALLOWED).header(HttpHeaders.ALLOW, act.method)
                     .buildAndAwait()
             plainJson -> actPlain(act, request)
+            HttpNegotiation.wantsHtml(request.headers().asHttpHeaders()) ->
+                html.act(act, request) { resource.locate(variables(request)) }
             else -> actHeart(act, request)
         }
     }

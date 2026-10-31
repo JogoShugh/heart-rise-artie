@@ -56,6 +56,14 @@ class HttpWorld(
         return exchange(sent, headers)
     }
 
+    /** An act as a browser sends it with htmx: its form's fields, form-encoded, asking for HTML back. */
+    fun sendForm(method: String, path: String, form: String, headers: Map<String, String>) =
+        exchange(
+            client.method(org.springframework.http.HttpMethod.valueOf(method)).uri(path)
+                .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded").bodyValue(form),
+            headers + mapOf(HttpHeaders.ACCEPT to "text/html", "HX-Request" to "true"),
+        )
+
     /** The latest read of a resource's Layer 1, a lamp's or a pull request's, whatever came after it. */
     fun layer1(): EntityExchangeResult<ByteArray> =
         results.last { it.method.name() == "GET" && it.url.path.matches(LAYER_1) }

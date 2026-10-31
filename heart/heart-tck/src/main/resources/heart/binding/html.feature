@@ -38,6 +38,33 @@ Feature: HTML for people: a resource read in a browser
       | ON     |
       | OFF    |
 
+  Scenario: A browser's act is its form's fields, under the HTML's validator, and answers with the new page
+    When a browser sends PUT "/lamps/7/actions/dim" with "brightness=20&label=" and the HTML's ETag
+    Then the response status is 200
+    And the response has Content-Type "text/html;charset=UTF-8"
+    And the response has HX-Trigger "{\"heart:done\":\"Dim the lamp: done.\"}"
+    And the page shows "brightness" as "20"
+    And lamp 7 has brightness 20 at version 4
+
+  Scenario: A browser's act under the JSON's validator is stale: the HTML is another representation
+    When a browser sends PUT "/lamps/7/actions/dim" with "brightness=20" and the ETag of its hal-schema-forms representation
+    Then the response status is 412
+    And the response is an HTML problem reading "The act is stale: the state has changed"
+    And lamp 7 is still at version 3
+
+  Scenario: A browser's input its schema refuses is refused as HTML, at its field
+    When a browser sends PUT "/lamps/7/actions/dim" with "brightness=500" and the HTML's ETag
+    Then the response status is 422
+    And the response is an HTML problem reading "The body does not match the form's schema"
+    And the HTML problem names the field "/brightness"
+    And lamp 7 is still at version 3
+
+  Scenario: An act the lamp does not offer is refused as HTML, with why
+    When a browser sends POST "/lamps/7/actions/switch-on" with "" and the HTML's ETag
+    Then the response status is 409
+    And the response is an HTML problem reading "The act is not offered in the resource's current state"
+    And lamp 7 is still at version 3
+
   Scenario: The scripts and stylesheet the HTML names are the server's own, immutable
     When a client gets "/lamps/7" as html
     Then each asset the HTML names is served by the server with Cache-Control "public, max-age=31536000, immutable"

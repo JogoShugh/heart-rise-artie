@@ -80,7 +80,10 @@ class HeartAutoConfiguration {
                     GET("$item/history") { handler.history(it) }
                 }
             }
-            onError<Throwable> { failure, _ -> HttpRefusals.of(failure, auth.challenges) ?: throw failure }
+            onError<Throwable> { failure, request ->
+                val html = HttpNegotiation.wantsHtml(request.headers().asHttpHeaders())
+                HttpRefusals.of(failure, auth.challenges, html) ?: throw failure
+            }
         }
 
     /**

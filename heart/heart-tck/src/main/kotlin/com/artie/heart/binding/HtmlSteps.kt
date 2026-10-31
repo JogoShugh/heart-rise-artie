@@ -3,6 +3,7 @@ package com.artie.heart.binding
 import com.artie.heart.binding.HttpWorld.Companion.accept
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -35,6 +36,34 @@ class HtmlSteps(private val http: HttpWorld) {
         assertEquals(forms, offered)
         assertEquals(forms, dialogs)
     }
+
+    @When("a browser sends {word} {string} with {string} and the HTML's ETag")
+    fun browserSends(method: String, path: String, form: String) {
+        val read = http.get(resourceOf(path), mapOf(HttpHeaders.ACCEPT to accept("html")))
+        http.sendForm(method, path, form, mapOf(HttpHeaders.IF_MATCH to checkNotNull(read.responseHeaders.eTag)))
+    }
+
+    @When("a browser sends {word} {string} with {string} and the ETag of its hal-schema-forms representation")
+    fun browserSendsJsonETag(method: String, path: String, form: String) {
+        val read = http.get(resourceOf(path), mapOf(HttpHeaders.ACCEPT to accept("hal-schema-forms")))
+        http.sendForm(method, path, form, mapOf(HttpHeaders.IF_MATCH to checkNotNull(read.responseHeaders.eTag)))
+    }
+
+    @Then("the response is an HTML problem reading {string}")
+    fun htmlProblem(title: String) {
+        assertEquals("text/html;charset=UTF-8", http.last.responseHeaders.contentType.toString())
+        assertEquals(title, page().selectFirst(".problem strong")?.text())
+    }
+
+    @Then("the HTML problem names the field {string}")
+    fun problemNames(pointer: String) = assertTrue(page().select(".problem li[data-pointer=$pointer]").isNotEmpty())
+
+    @Then("the page shows {string} as {string}")
+    fun pageShows(member: String, value: String) =
+        assertEquals(value, page().selectFirst("dl.state dt[title=$member]")?.nextElementSibling()?.text())
+
+    /** The resource an act's target belongs to: `/lamps/7/actions/dim` is `/lamps/7`'s. */
+    private fun resourceOf(target: String) = target.substringBefore("/actions/")
 
     @Then("each asset the HTML names is served by the server with Cache-Control {string}")
     fun assets(cacheControl: String) {

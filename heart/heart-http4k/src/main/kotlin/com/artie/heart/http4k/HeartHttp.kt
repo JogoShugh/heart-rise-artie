@@ -72,6 +72,7 @@ class HeartHttp(
     private val realm = settings.realm ?: layers.first().type.profile.name
 
     private val app: HttpHandler = credentials.filter(realm)
+        .then(htmlRefusals)
         .then(Refusals.filter(settings.mapper, realm))
         // Every read, act and search is handed the credential its request carried (Caller).
         .then(Filter { next -> { request -> Caller.during(request.header("Authorization")) { next(request) } } })

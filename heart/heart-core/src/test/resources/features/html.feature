@@ -74,3 +74,26 @@ Feature: HTML for people, rendered from the declaration
     When a field "f" with the schema {"type":"string","title":"<b>Name</b>","description":"<script>x()</script> & more"} is rendered as HTML
     Then its label reads "<b>Name</b>" and its hint reads "<script>x()</script> & more"
     And the rendered field has no element "b" or "script"
+
+  Scenario Outline: A browser's form fields become the act's JSON, each typed by the act's schema: <case>
+    A browser sends a form's fields as text. Each is read as its property's
+    type says; a field left blank is left out, as a person who fills nothing
+    in means; a value that isn't its type stays text, so the schema check
+    refuses it at that field, as for any client.
+    When the form "<form>" is read by the schema <schema>
+    Then the form's input is <json>
+
+    Examples:
+      | case               | schema                                                                                | form                                    | json                          |
+      | an integer         | {"type":"object","properties":{"n":{"type":"integer"}}}                               | n=20                                    | {"n":20}                      |
+      | a number           | {"type":"object","properties":{"n":{"type":"number"}}}                                | n=2.5                                   | {"n":2.5}                     |
+      | a ticked box       | {"type":"object","properties":{"draft":{"type":"boolean"}}}                           | draft=true                              | {"draft":true}                |
+      | a list             | {"type":"object","properties":{"reviewers":{"type":"array","items":{"type":"string"}}}} | reviewers=ada&reviewers=lin&reviewers= | {"reviewers":["ada","lin"]}   |
+      | a blank field      | {"type":"object","properties":{"title":{"type":"string"},"base":{"type":"string"}}}   | title=&base=main                        | {"base":"main"}               |
+      | text with a space  | {"type":"object","properties":{"title":{"type":"string"}}}                            | title=Fix+the+%3Cform%3E                | {"title":"Fix the <form>"}    |
+      | not a number       | {"type":"object","properties":{"n":{"type":"integer"}}}                               | n=many                                  | {"n":"many"}                  |
+
+  Scenario: A refusal, for a browser, is HTML: its title, its detail, and each violation at its field
+    When the problem {"type":"https://w3id.org/heart-rise/problems/invalid-input","title":"The body does not match the form's schema","status":422,"detail":"request body does not satisfy the affordance schema","violations":[{"pointer":"/brightness","message":"must be at most 100"}]} is rendered as HTML
+    Then the HTML problem reads "The body does not match the form's schema"
+    And the HTML problem names the field "/brightness" as "must be at most 100"
