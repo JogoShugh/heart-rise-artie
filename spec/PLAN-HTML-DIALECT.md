@@ -2,8 +2,8 @@
 
 **Status:** slices 1 to 5 done 2026-10-30 (commits c99a749, 50b8bf2, 749d74b, 56c4bd7; report
 docs/reports/html-for-people/). A 201 moves the browser with `HX-Redirect`, a full navigation, rather than
-`HX-Location`. Still open: the gateway's browser sign-in, field order (schemas are canonical, so alphabetical), a
-client-side JSON Schema validator, and view hints. The author asked for it built with as little of their input as possible ("we are
+`HX-Location`. Still open: the gateway's browser sign-in, field order (schemas are canonical, so alphabetical), and view
+hints. The client-side JSON Schema check is done (f21f635). The author asked for it built with as little of their input as possible ("we are
 going full content negotiation"). Design: spec/ideas/html-dialect-for-people.md (its review and interaction
 defaults); mockup: docs/reports/html-dialect-mockup/.
 
