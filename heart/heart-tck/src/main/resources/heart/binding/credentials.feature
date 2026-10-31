@@ -51,6 +51,16 @@ Feature: A HEART service admits only callers with a credential
       | Bearer realm="home" |
     And the problem's "type" member is "https://w3id.org/heart-rise/problems/not-authenticated"
 
+  Scenario: A browser is refused with a page that asks it to sign in, under the same challenges
+    When a browser with no credential sends GET "/lamps/7"
+    Then the response status is 401
+    And the response has Content-Type "text/html;charset=UTF-8"
+    And the response offers these challenges
+      | challenge           |
+      | Basic realm="home"  |
+      | Bearer realm="home" |
+    And the page asks the browser to sign in to "home"
+
   Scenario: A wrong credential is answered exactly as a missing one
     When a client with no credential sends GET "/lamps/7"
     And a client with Basic "coach:wrong" sends GET "/lamps/7"

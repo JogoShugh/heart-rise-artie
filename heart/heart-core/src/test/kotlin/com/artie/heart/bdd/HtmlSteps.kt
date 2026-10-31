@@ -176,6 +176,23 @@ class HtmlSteps(private val world: LampWorld) {
     @Then("the page is headed {string}")
     fun headed(heading: String) = assertEquals(heading, page.selectFirst("h1")?.text())
 
+    @When("the refusal {} is shown as a page for the realm {string}")
+    fun signInShown(problem: String, realm: String) {
+        page = Jsoup.parse(HtmlProblem.signIn(problem, realm))
+    }
+
+    @Then("the page says {string}")
+    fun says(words: String) = assertTrue(page.select("main p").any { it.text() == words }, page.html())
+
+    /** An empty address is the resource the page was asked at, so following it asks for that resource again. */
+    @Then("the page links {string} to the resource it asked for")
+    fun linksBack(words: String) {
+        val link = checkNotNull(page.selectFirst("main a.sign-in"))
+        assertEquals(words, link.text())
+        assertEquals("", link.attr("href"))
+        assertTrue(link.hasAttr("href"))
+    }
+
     @Then("the HTML lists {string} as {string} linked to {string}")
     fun embeddedListed(heading: String, words: String, href: String) {
         val section = checkNotNull(

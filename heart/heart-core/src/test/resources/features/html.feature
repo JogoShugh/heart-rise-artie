@@ -182,6 +182,15 @@ Feature: HTML for people, rendered from the declaration
       | href    | Title | Id | Status |
       | /beds/1 | bed-1 | 1  | EMPTY  |
 
+  Scenario: A browser refused for want of a credential is shown a page that asks it to sign in
+    The challenges make the browser ask for a user name and password itself.
+    This page is what a person sees once that prompt is dismissed; its link
+    asks for the same resource again, so the browser prompts again.
+    When the refusal {"type":"https://w3id.org/heart-rise/problems/not-authenticated","title":"Not authenticated","status":401,"detail":"This resource needs a Basic or Bearer credential the service admits."} is shown as a page for the realm "home"
+    Then the page is headed "Sign in to home"
+    And the page says "This resource needs a Basic or Bearer credential the service admits."
+    And the page links "Sign in" to the resource it asked for
+
   Scenario: A refusal, for a browser, is HTML: its title, its detail, and each violation at its field
     When the problem {"type":"https://w3id.org/heart-rise/problems/invalid-input","title":"The body does not match the form's schema","status":422,"detail":"request body does not satisfy the affordance schema","violations":[{"pointer":"/brightness","message":"must be at most 100"}]} is rendered as HTML
     Then the HTML problem reads "The body does not match the form's schema"

@@ -1,7 +1,10 @@
 package com.artie.heart.http4k
 
 import com.artie.heart.HtmlAssets
+import com.artie.heart.HtmlProblem
+import com.artie.heart.HtmlView
 import com.artie.heart.Layers
+import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.PROBLEM_TYPES
 import org.http4k.core.Filter
@@ -70,18 +73,23 @@ class Credentials private constructor(
      */
     fun filter(realm: String) = Filter { next ->
         { request ->
-            if (open(request) || admits(request.header("Authorization"))) next(request) else refusal(realm)
+            if (open(request) || admits(request.header("Authorization"))) {
+                next(request)
+            } else {
+                refusal(realm, Negotiation.wantsHtml(request.header("Accept")))
+            }
         }
     }
 
     private fun open(request: Request): Boolean =
         (request.method == Method.GET || request.method == Method.HEAD) && OPEN.any { it.matches(request.uri.path) }
 
-    private fun refusal(realm: String): Response =
-        Response(Status.UNAUTHORIZED).header("Content-Type", Refusals.PROBLEM_JSON)
+    /** The 401: the problem, or for a browser the page that asks a person to sign in; both offer both schemes. */
+    private fun refusal(realm: String, html: Boolean): Response =
+        Response(Status.UNAUTHORIZED).header("Content-Type", if (html) HtmlView.MEDIA_TYPE else Refusals.PROBLEM_JSON)
             .header("WWW-Authenticate", "Basic realm=\"$realm\"")
             .header("WWW-Authenticate", "Bearer realm=\"$realm\"")
-            .body(PROBLEM)
+            .body(if (html) HtmlProblem.signIn(PROBLEM, realm) else PROBLEM)
 
     companion object {
         private val BCRYPT = Regex("""^\$2[aby]?\$\d{2}\$[./A-Za-z0-9]{53}$""")

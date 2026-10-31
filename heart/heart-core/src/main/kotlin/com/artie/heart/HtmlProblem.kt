@@ -21,4 +21,19 @@ object HtmlProblem {
 
     /** [problem], the JSON text of a problem details object, as HTML. */
     fun of(problem: String): String = of(JsonTrees.plain(problem) as? Map<*, *> ?: emptyMap<String, Any?>())
+
+    /**
+     * The page a browser shows a person once they dismiss its own prompt for a credential: [problem], the JSON
+     * text of the 401, headed for [realm]. Its link asks for the same resource again, so the browser prompts again.
+     */
+    fun signIn(problem: String, realm: String): String {
+        val detail = (JsonTrees.plain(problem) as? Map<*, *>)?.get("detail")
+        val title = "Sign in to $realm"
+        return HtmlView.document(
+            title, "",
+            "<h1>${Html.text(title)}</h1>" + (detail?.let { "<p>${Html.text(it)}</p>" }.orEmpty()) +
+                "<p class=\"hint\">Your browser asks for a user name and a password; a token can be the password.</p>" +
+                "<p><a class=\"sign-in\" href=\"\">Sign in</a></p>",
+        )
+    }
 }

@@ -1,7 +1,10 @@
 package com.artie.heart.spring
 
 import com.artie.heart.HtmlAssets
+import com.artie.heart.HtmlProblem
+import com.artie.heart.HtmlView
 import com.artie.heart.Layers
+import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.PROBLEM_TYPES
 import org.springframework.core.Ordered
@@ -26,7 +29,7 @@ import reactor.core.scheduler.Schedulers
  * A refusal is a 401 problem offering both schemes in [realm]. A wrong
  * credential is answered exactly as a missing one.
  */
-class HeartAuthFilter(private val credentials: HeartCredentials, realm: String) : WebFilter, Ordered {
+class HeartAuthFilter(private val credentials: HeartCredentials, private val realm: String) : WebFilter, Ordered {
     /** The challenges a 401 offers, the service's own or a resource's. */
     val challenges = listOf("Basic realm=\"$realm\"", "Bearer realm=\"$realm\"")
 
@@ -45,12 +48,16 @@ class HeartAuthFilter(private val credentials: HeartCredentials, realm: String) 
         (request.method == HttpMethod.GET || request.method == HttpMethod.HEAD) &&
             OPEN.any { it.matches(request.path.pathWithinApplication().value()) }
 
+    /** The 401: the problem, or for a browser the page that asks a person to sign in; both offer both schemes. */
     private fun refuse(exchange: ServerWebExchange): Mono<Void> {
         val response = exchange.response
+        val html = Negotiation.wantsHtml(exchange.request.headers.getFirst(HttpHeaders.ACCEPT))
         response.statusCode = HttpStatus.UNAUTHORIZED
-        response.headers.contentType = MediaType.APPLICATION_PROBLEM_JSON
+        response.headers.contentType =
+            if (html) MediaType.parseMediaType(HtmlView.MEDIA_TYPE) else MediaType.APPLICATION_PROBLEM_JSON
         response.headers[HttpHeaders.WWW_AUTHENTICATE] = challenges
-        return response.writeWith(Mono.just(response.bufferFactory().wrap(PROBLEM)))
+        val body = if (html) HtmlProblem.signIn(String(PROBLEM), realm).toByteArray() else PROBLEM
+        return response.writeWith(Mono.just(response.bufferFactory().wrap(body)))
     }
 
     private companion object {
