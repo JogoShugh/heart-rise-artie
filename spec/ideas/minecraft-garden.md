@@ -6,8 +6,9 @@ Nothing is built. Not to be started before the author asks.
 ## In one sentence
 
 A Paper server plugin runs ARTIE's library, reads a HEART garden, and builds it as a place to walk around: a plot
-per bed, a sign with its name, and, on a right-click, a menu of exactly the acts the bed offers now, the unavailable
-ones greyed with their reasons.
+per resource, a sign with its name, and, on a right-click, a menu of exactly the acts it offers now, the unavailable
+ones greyed with their reasons. Drawing a bed as farmland needs knowledge the plugin lacks; where that knowledge
+should live is the open question below.
 
 ## Why it matters
 
@@ -32,19 +33,47 @@ People do drive Minecraft from remote state, but each one is hand-built for a si
 None of them, as far as known, renders an arbitrary remote service's controls from the service's own answers. That
 is the new part: the plugin knows HAL Schema Forms and nothing about gardens.
 
-## How the answers map onto the game
+## What a generic plugin can draw
+
+Knowing only HAL Schema Forms, the plugin can draw only generic things. That is a browser showing HTML without CSS:
+everything works, nothing looks like a garden.
 
 | HEART | In Minecraft |
 |---|---|
-| Entry point | A fenced area, one plot per bed listed |
-| A bed's state | Farmland sized from the bed's members, crops for its plantings, a sign with its name |
-| A link | A path or a gate to a neighbouring area; following it is walking there |
+| A resource | A plot with a sign: its title, and its state's members on the sign or in a book |
+| A list | One plot per item listed |
+| A link | A path or a gate to a neighbouring plot; following it is walking there |
 | A resource's acts | A chest menu, one item per act: offered in colour, unavailable as a grey barrier with the reason in its lore |
 | An act's fields | A Minecraft dialog (1.21.6, exposed by Paper from about 1.21.7): text, toggle, single choice and number-range inputs, from the JSON Schema |
 | A list | A chest menu as a grid, with arrow items for the list's next and previous links |
 | 422 | The message beside the field, the dialog kept open |
 | 412 | The plot rebuilt from a fresh read, and "this changed since you looked" |
 | 201 with Location | The new plot built, and the player pointed at it |
+
+## Farmland and a court need knowledge from somewhere
+
+Raised by the author: a bed drawn as farmland with crops, or a game drawn as a court with players, needs someone to
+know that a bed is farmland. The question is who.
+
+| Option | Who knows "a bed is farmland" | Cost |
+|---|---|---|
+| A. Domain code in the plugin | The plugin, as in Dockercraft | Generic no more: a new domain is new code |
+| B. View hints in the answers | The server, in a small generic vocabulary (region, grid, cell, marker, counter); the plugin knows only the vocabulary | The protocol gains a presentation vocabulary, to be scoped with care |
+| C. A linked view resource | The server, in a mapping document it links, as a page links a stylesheet: "beds are 4 by 8 regions, plantings are cells holding crop items" | Fielding's optional code-on-demand constraint, as data; one more read, cacheable |
+| D. A local pack | A mapping file per domain the player installs, as a resource pack | Client knowledge again, though data rather than code |
+
+**Leaning: C, written in B's vocabulary.** It is the split that makes the Web work. HTML says what things are, CSS says
+how they look, and the browser knows only HTML and CSS, never the site. Here the HEART answer says what things are,
+the linked view says how they look in a block world, and the plugin knows only the view vocabulary. The server owns
+its look; a new domain needs no change to the plugin.
+
+Basketball in that vocabulary: the court is a region, the players are markers (armor stands with name tags), the score
+is a counter on the sidebar scoreboard, and the acts stay menus and dialogs. The plugin still knows nothing of
+basketball.
+
+The honest limit: the view vocabulary is a second protocol, and it is the hard part. It is also the view-hints question
+already open for the HTML dialect (spec/ideas/html-dialect-for-people.md), so it should be answered once for both: a
+vocabulary that a browser and a block world can each draw.
 
 ## Shape of the plugin
 
@@ -56,14 +85,15 @@ is the new part: the plugin knows HAL Schema Forms and nothing about gardens.
   200 rebuilds the plot.
 - **Libraries.** `paper-plugin.yml`'s library loader gives ARTIE's dependencies their own classloader, which should
   avoid clashes with what the server bundles.
-- **Generic first.** Every act is a menu item and a dialog. Mapping world actions onto acts (a seed placed on farmland
-  is the plant act) needs view hints, the same open question as in the HTML dialect, and comes later.
+- **Generic first.** Every act is a menu item and a dialog. The domain look (option C above) comes later, and with it
+  any mapping of world actions onto acts (a seed placed on farmland is the plant act).
 - **A later treat.** A villager named ARTIE that takes an intent in chat and acts through the reasoner.
 
 ## First slice, read-only
 
-One plot and sign per bed from the garden's entry point; a right-click on the sign opens the chest menu of the bed's
-acts, the unavailable ones greyed with their reasons. No dialogs and no acts sent yet.
+Generic only: one plot and sign per resource the garden's entry point lists; a right-click on the sign opens the chest
+menu of that resource's acts, the unavailable ones greyed with their reasons. No dialogs, no acts sent and no domain
+look yet.
 
 ## What the plugin needs from Paper
 
