@@ -41,7 +41,8 @@ object HtmlList {
 
     /** A page's validator for a browser: it changes when the page does, or the renderer. */
     fun validator(body: Map<*, *>): String =
-        "\"page.${HtmlView.ETAG_TAG}.${ContentAddress.address(HtmlView.VERSION + ContentAddress.canonical(body))}\""
+        "\"page.${HtmlView.ETAG_TAG}." +
+            "${ContentAddress.address(HtmlView.VERSION + HtmlAssets.names + ContentAddress.canonical(body))}\""
 
     private fun row(item: Map<*, *>, summary: Map<*, *>?, columns: List<String>): String {
         val href = item["href"]

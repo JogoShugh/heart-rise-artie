@@ -17,7 +17,7 @@ object HtmlView {
 
     /** What the HTML of [state] is rendered from, and so what its validator names. */
     fun <S, K> source(layers: Layers<S, K>, state: S): Map<String, Any?> =
-        mapOf("html" to VERSION, "l0" to layers.layer1(state, Rung.L0))
+        mapOf("html" to VERSION, "assets" to HtmlAssets.names, "l0" to layers.layer1(state, Rung.L0))
 
     /** [state]'s HTML, its forms sending [etag] as If-Match. */
     fun <S, K> of(layers: Layers<S, K>, state: S, etag: String): String {
@@ -47,7 +47,7 @@ object HtmlView {
 
     /** The bookmark page's validator: it changes when the index does, or the renderer. */
     fun indexValidator(index: ServiceIndex): String =
-        "\"index-$ETAG_TAG-${ContentAddress.address(VERSION + index.body(Dialect.JSONSCHEMA))}\""
+        "\"index-$ETAG_TAG-${ContentAddress.address(VERSION + HtmlAssets.names + index.body(Dialect.JSONSCHEMA))}\""
 
     /** A whole page around [main], with the server's own stylesheet and scripts. */
     internal fun document(title: String, etag: String, main: String): String =
@@ -56,6 +56,7 @@ object HtmlView {
             "<title>${Html.text(title)}</title>" +
             "<link rel=\"stylesheet\"${Html.attr("href", HtmlAssets.href("heart.css"))}>" +
             "<script defer${Html.attr("src", HtmlAssets.href("htmx-2.0.4.min.js"))}></script>" +
+            "<script defer${Html.attr("src", HtmlAssets.href("ajv2020-8.17.1.min.js"))}></script>" +
             "<script defer${Html.attr("src", HtmlAssets.href("heart-forms.js"))}></script>" +
             "</head><body hx-headers='{\"Accept\": \"text/html\"}'>" +
             "<main id=\"resource\"${Html.attr("data-etag", etag)}>$main</main>" +

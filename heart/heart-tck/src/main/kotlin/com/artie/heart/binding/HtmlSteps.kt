@@ -63,7 +63,7 @@ class HtmlSteps(private val http: HttpWorld) {
     }
 
     private companion object {
-        /** htmx, heart-forms.js and heart.css. */
-        const val ASSETS = 3
+        /** htmx, Ajv, heart-forms.js and heart.css. */
+        const val ASSETS = 4
     }
 }

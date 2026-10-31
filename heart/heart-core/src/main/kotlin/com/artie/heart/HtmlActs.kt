@@ -40,6 +40,9 @@ internal object HtmlActs {
         return "<dialog${Html.attr("id", id)}${Html.attr("aria-labelledby", "$id-title")}>" +
             "<form${sending(entry.key, form, etag)}>" +
             "<h2${Html.attr("id", "$id-title")}>${Html.text(entry.title)}</h2>$description$fields" +
+            // The act's whole schema, which heart-forms.js runs before sending; a "<" in it stays a word.
+            "<script type=\"application/schema+json\" class=\"schema\">" +
+            MAPPER.writeValueAsString(schema).replace("<", "\\u003c") + "</script>" +
             "<div class=\"problem\" role=\"alert\" hidden></div>" +
             "<div class=\"buttons\"><button type=\"button\" class=\"quiet\" data-close>Cancel</button>" +
             "<button type=\"submit\">${Html.text(entry.title)}</button></div></form></dialog>"

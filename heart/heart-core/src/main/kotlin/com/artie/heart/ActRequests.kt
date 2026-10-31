@@ -34,15 +34,16 @@ object ActRequests {
     /**
      * A browser's form fields ([form], `application/x-www-form-urlencoded`) as the act's JSON input, each typed as
      * [schema] types it (spec/PLAN-HTML-DIALECT.md). A field left blank is left out, as a person who fills nothing
-     * in means; a list keeps its entries in order, without blank ones; a ticked box is `true`.
+     * in means, and so is a list with no entries; a list keeps its entries in order, without blank ones; a ticked
+     * box is `true`.
      */
     fun fromForm(schema: String, form: String?): String {
         val fields = parse(form).mapNotNull { (name, values) ->
             val (type, items) = InputSchemas.propertyType(schema, name)
             val given = values.filter { it.isNotBlank() }
             when {
-                type == "array" -> name to given.map { typed(it, items) }
                 given.isEmpty() -> null
+                type == "array" -> name to given.map { typed(it, items) }
                 type == "boolean" && given.last() == "on" -> name to true
                 else -> name to typed(given.last(), type)
             }

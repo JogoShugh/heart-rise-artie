@@ -1,6 +1,7 @@
 package com.artie.heart.bdd
 
 import com.artie.heart.ActRequests
+import com.artie.heart.HtmlAssets
 import com.artie.heart.HtmlFields
 import com.artie.heart.HtmlList
 import com.artie.heart.ServiceIndex
@@ -130,6 +131,35 @@ class HtmlSteps(private val world: LampWorld) {
         page = Jsoup.parse(HtmlView.render(JsonTrees.plain(body) as Map<*, *>, "e", emptyList(), emptyList()))
     }
 
+    @Then("the {string} dialog carries the schema of its form")
+    fun carriesSchema(key: String) {
+        val form = (world.layers.layer1(world.lamps.getValue(LAMP))["_forms"] as Map<*, *>)[key] as Map<*, *>
+        val mapper = ObjectMapper()
+        assertEquals(mapper.readTree(mapper.writeValueAsString(form["schema"])), mapper.readTree(carried(key)))
+    }
+
+    @Then("the {string} dialog carries a schema whose {string} is described as {string}")
+    fun carriesWords(key: String, field: String, words: String) = assertEquals(
+        words,
+        ObjectMapper().readTree(carried(key)).path("properties").path(field).path("description").asText(),
+    )
+
+    @Then("the page has no element {string}")
+    fun noElement(name: String) = assertNull(page.selectFirst(name))
+
+    private fun carried(key: String): String =
+        checkNotNull(form(key).selectFirst("script[type=application/schema+json]")).data()
+
+    private var source: Map<String, Any?> = emptyMap()
+
+    @When("lamp {long}'s HTML validator is worked out")
+    fun validatorWorkedOut(id: Long) {
+        source = HtmlView.source(world.layers, world.lamps.getValue(id))
+    }
+
+    @Then("what it names includes the published name of each script and stylesheet")
+    fun namesAssets() = assertEquals(HtmlAssets.byName.keys.sorted(), source["assets"])
+
     @Then("the page is headed {string}")
     fun headed(heading: String) = assertEquals(heading, page.selectFirst("h1")?.text())
 
@@ -210,6 +240,8 @@ class HtmlSteps(private val world: LampWorld) {
         }
 
     private companion object {
+        /** Every lamp scenario renders lamp 7. */
+        const val LAMP = 7L
         val CONSTRAINTS = listOf("min", "max", "step", "minlength", "maxlength", "pattern", "placeholder")
         val PAIR = Regex("(\\w+)=(.*?)(?= \\w+=|$)")
     }

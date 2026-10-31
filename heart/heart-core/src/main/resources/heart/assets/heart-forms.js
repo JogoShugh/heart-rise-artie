@@ -44,13 +44,165 @@
     });
   }
 
+  // ---- Checking a form against its act's whole schema, before anything is sent (Ajv, JSON Schema 2020-12).
+  // HTML's own constraints say what one field needs; the schema says more, such as "at least one of these".
+  // The server still decides: this only spares a person a round trip.
+
+  var ajv = null;
+
+  function schemaOf(form) {
+    if (form.heartSchema !== undefined) return form.heartSchema;
+    var carried = form.querySelector('script.schema');
+    try { form.heartSchema = carried ? JSON.parse(carried.textContent) : null; } catch (e) { form.heartSchema = null; }
+    return form.heartSchema;
+  }
+
+  function validatorOf(form) {
+    if (form.heartValidate !== undefined) return form.heartValidate;
+    var Ajv = window.ajv2020 && (window.ajv2020.default || window.ajv2020);
+    var schema = schemaOf(form);
+    form.heartValidate = null;
+    if (!Ajv || !schema) return null;
+    try {
+      ajv = ajv || new Ajv({ allErrors: true, strict: false, validateFormats: false });
+      var copy = JSON.parse(JSON.stringify(schema));
+      delete copy.$id; // two forms may share one schema; each is compiled on its own
+      form.heartValidate = ajv.compile(copy);
+    } catch (e) { form.heartValidate = null; }
+    return form.heartValidate;
+  }
+
+  // The form's fields as the act's JSON, typed as the server types them (ActRequests.fromForm).
+  function inputOf(form) {
+    var properties = (schemaOf(form) || {}).properties || {};
+    var data = new FormData(form);
+    var names = [];
+    var out = {};
+    data.forEach(function (_, name) { if (names.indexOf(name) < 0) names.push(name); });
+    names.forEach(function (name) {
+      var property = properties[name] || {};
+      var type = Array.isArray(property.type) ? property.type.filter(function (t) { return t !== 'null'; })[0] : property.type;
+      var given = data.getAll(name).map(String).filter(function (v) { return v.trim() !== ''; });
+      // A field left blank is left out, a list with no entries too: "at least one of" means one filled in.
+      if (!given.length) return;
+      if (type === 'array') { out[name] = given.map(function (v) { return typed(v, (property.items || {}).type); }); return; }
+      var last = given[given.length - 1];
+      out[name] = type === 'boolean' && last === 'on' ? true : typed(last, type);
+    });
+    return out;
+  }
+
+  function typed(text, type) {
+    if (type === 'integer') return /^-?\d+$/.test(text) ? Number(text) : text;
+    if (type === 'number') return isNaN(Number(text)) ? text : Number(text);
+    if (type === 'boolean') return text === 'true' ? true : text === 'false' ? false : text;
+    return text;
+  }
+
+  function labelOf(form, name) {
+    var control = name && form.querySelector('[name="' + CSS.escape(name) + '"]');
+    var label = control && control.closest('.field') && control.closest('.field').querySelector('label');
+    return label ? label.childNodes[0].textContent.trim() : name;
+  }
+
+  function said(form, error) {
+    var p = error.params || {};
+    var plural = function (n, one, many) { return n + ' ' + (n === 1 ? one : many); };
+    switch (error.keyword) {
+      case 'required': return 'Fill in ' + labelOf(form, p.missingProperty) + '.';
+      case 'minimum': return 'At least ' + p.limit + '.';
+      case 'maximum': return 'At most ' + p.limit + '.';
+      case 'exclusiveMinimum': return 'More than ' + p.limit + '.';
+      case 'exclusiveMaximum': return 'Less than ' + p.limit + '.';
+      case 'multipleOf': return 'A multiple of ' + p.multipleOf + '.';
+      case 'minLength': return 'At least ' + plural(p.limit, 'character', 'characters') + '.';
+      case 'maxLength': return 'At most ' + plural(p.limit, 'character', 'characters') + '.';
+      case 'minItems': return 'At least ' + plural(p.limit, 'entry', 'entries') + '.';
+      case 'maxItems': return 'At most ' + plural(p.limit, 'entry', 'entries') + '.';
+      case 'uniqueItems': return 'Each entry only once.';
+      case 'pattern': return 'Not in the form this asks for.';
+      case 'enum': return 'Choose one of: ' + (p.allowedValues || []).join(', ') + '.';
+      case 'const': return 'Must be ' + p.allowedValue + '.';
+      case 'type': return p.type === 'integer' ? 'A whole number.' : p.type === 'number' ? 'A number.' : 'Must be ' + p.type + '.';
+      case 'additionalProperties': return labelOf(form, p.additionalProperty) + ' is not asked for.';
+      default: return error.message ? error.message.charAt(0).toUpperCase() + error.message.slice(1) + '.' : 'Not valid.';
+    }
+  }
+
+  // "At least one of" or "exactly one of" whose branches only require fields reads as such.
+  function choiceSaid(form, keyword, branches) {
+    var named = (branches || []).map(function (b) { return (b.required || []).map(function (n) { return labelOf(form, n); }).join(' and '); })
+      .filter(function (words) { return words; });
+    if (!named.length) return 'Check the fields: they do not fit together.';
+    return (keyword === 'oneOf' ? 'Fill in exactly one of: ' : 'Fill in at least one of: ') + named.join(', ') + '.';
+  }
+
+  // What is wrong with [form], each at its field (null for the whole form); empty when it fits its schema.
+  function problemsOf(form) {
+    var validate = validatorOf(form);
+    if (!validate || validate(inputOf(form))) return [];
+    var schema = schemaOf(form);
+    var problems = [];
+    validate.errors.forEach(function (error) {
+      var branch = /^#\/(anyOf|oneOf)\//.exec(error.schemaPath);
+      if (branch) return; // said once, by the anyOf or oneOf itself
+      var root = error.instancePath === '' && (error.keyword === 'anyOf' || error.keyword === 'oneOf');
+      var field = error.keyword === 'required' ? error.params.missingProperty
+        : error.keyword === 'additionalProperties' ? null
+        : (error.instancePath.split('/')[1] || null);
+      var text = root ? choiceSaid(form, error.keyword, schema[error.keyword]) : said(form, error);
+      if (!problems.some(function (p) { return p.field === field && p.text === text; })) problems.push({ field: field, text: text });
+    });
+    return problems;
+  }
+
+  function clearProblems(form) {
+    form.querySelectorAll('.field .error').forEach(function (e) { e.remove(); });
+    form.querySelectorAll('[aria-invalid]').forEach(function (e) { e.removeAttribute('aria-invalid'); });
+    var slot = problemOf(form);
+    if (slot) { slot.hidden = true; slot.replaceChildren(); slot.classList.remove('stale'); }
+  }
+
+  // Shows [problems] in [form]: each beside its field, and what belongs to no one field at the top.
+  function showChecks(form, problems) {
+    var top = [];
+    problems.forEach(function (problem) {
+      var control = problem.field && form.querySelector('[name="' + CSS.escape(problem.field) + '"]');
+      if (!control) { top.push(problem.text); return; }
+      var note = document.createElement('p');
+      note.className = 'error';
+      note.textContent = problem.text;
+      control.closest('.field').appendChild(note);
+      control.setAttribute('aria-invalid', 'true');
+    });
+    var slot = problemOf(form);
+    if (slot) {
+      slot.textContent = top.length ? top.join(' ') : 'Check the fields marked below.';
+      slot.hidden = false;
+    }
+    var first = form.querySelector('[aria-invalid="true"]');
+    if (first) first.focus();
+  }
+
+  // True when [form] may be sent; otherwise its problems are shown and nothing is sent.
+  function checked(form) {
+    clearProblems(form);
+    var problems = problemsOf(form);
+    if (problems.length) showChecks(form, problems);
+    return problems.length === 0;
+  }
+
+  document.addEventListener('htmx:beforeRequest', function (event) {
+    var form = event.detail.elt && event.detail.elt.closest('form');
+    if (form && form.querySelector('script.schema') && !checked(form)) event.preventDefault();
+  });
+
   document.addEventListener('click', function (event) {
     var opener = event.target.closest('[data-dialog]');
     if (opener) {
       var dialog = document.getElementById(opener.getAttribute('data-dialog'));
       if (dialog) {
-        var slot = dialog.querySelector('.problem');
-        if (slot) slot.hidden = true;
+        dialog.querySelectorAll('form').forEach(clearProblems);
         dialog.showModal();
       }
       return;
@@ -142,6 +294,7 @@
     var template = form.getAttribute('data-template');
     if (!template) return;
     event.preventDefault();
+    if (!checked(form)) return;
     window.location.assign(expand(template, new FormData(form)));
   });
 

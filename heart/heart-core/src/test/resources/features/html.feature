@@ -43,6 +43,28 @@ Feature: HTML for people, rendered from the declaration
       | label      | Label      | text    | no       | minlength=1 placeholder=reading     |
     And the "home:switch-off" dialog asks for no fields
 
+  Scenario: Each dialog carries its act's schema, so the browser checks the whole of it before sending
+    HTML's own constraints say only what one field needs. A schema says
+    more: at least one of two fields, one field only with another. The page
+    runs the act's own schema in the browser before it sends anything; the
+    server still decides.
+    When lamp 7 is rendered as HTML
+    Then the "home:dim" dialog carries the schema of its form
+    And the "home:switch-off" dialog carries the schema of its form
+
+  Scenario: A page's validator covers the scripts it names, so a release that changes them is never answered 304
+    Live, 2026-10-30: heart-forms.js changed, the page's state did not, and a
+    browser revalidating the page was told 304 and kept running the old script.
+    When lamp 7's HTML validator is worked out
+    Then what it names includes the published name of each script and stylesheet
+
+  Scenario: A schema's words never end the script that carries them
+    A description from a server, or through a gateway from an upstream, may
+    hold "</script>": inside the page it must stay words.
+    When the representation {"_links":{"self":{"href":"/x"}},"_forms":{"x:act":{"title":"Act","method":"POST","_links":{"target":{"href":"/x/actions/act"}},"schema":{"type":"object","properties":{"f":{"type":"string","description":"</script><b>x</b>"}}}}}} is rendered as HTML
+    Then the "x:act" dialog carries a schema whose "f" is described as "</script><b>x</b>"
+    And the page has no element "b"
+
   Scenario Outline: A field's control and constraints come from its schema: <kind>
     When a field "f" with the schema <schema> is rendered as HTML
     Then the field is a <control> with <constraints>
@@ -89,6 +111,7 @@ Feature: HTML for people, rendered from the declaration
       | a number           | {"type":"object","properties":{"n":{"type":"number"}}}                                | n=2.5                                   | {"n":2.5}                     |
       | a ticked box       | {"type":"object","properties":{"draft":{"type":"boolean"}}}                           | draft=true                              | {"draft":true}                |
       | a list             | {"type":"object","properties":{"reviewers":{"type":"array","items":{"type":"string"}}}} | reviewers=ada&reviewers=lin&reviewers= | {"reviewers":["ada","lin"]}   |
+      | an empty list      | {"type":"object","properties":{"reviewers":{"type":"array","items":{"type":"string"}}}} | reviewers=&reviewers=                  | {}                            |
       | a blank field      | {"type":"object","properties":{"title":{"type":"string"},"base":{"type":"string"}}}   | title=&base=main                        | {"base":"main"}               |
       | text with a space  | {"type":"object","properties":{"title":{"type":"string"}}}                            | title=Fix+the+%3Cform%3E                | {"title":"Fix the <form>"}    |
       | not a number       | {"type":"object","properties":{"n":{"type":"integer"}}}                               | n=many                                  | {"n":"many"}                  |
