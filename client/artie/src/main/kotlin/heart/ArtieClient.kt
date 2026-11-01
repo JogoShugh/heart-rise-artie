@@ -97,12 +97,16 @@ class ArtieClient(
 
     override val recall: (String) -> HeartRepresentation = { url -> held[url]?.also { current = it } ?: enter(url) }
 
-    /** Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI. */
+    /**
+     * Rule 6: a choice the representation offers, picked by relation and title. ARTIE builds no URI.
+     * No [title] means any title will do: the first of the relation is taken.
+     */
     override fun follow(rel: String, title: String?): HeartRepresentation {
         var held = current ?: error("enter a service before following a link")
+        fun matches(candidate: String?) = title == null || candidate == title
         // SPEC §6.1: an embedded resource is followed like a link; following fetches it.
-        fun found(page: HeartRepresentation) = page.links(rel).firstOrNull { it.title == title }
-            ?: page.embedded(rel).firstOrNull { it.title == title }?.self
+        fun found(page: HeartRepresentation) = page.links(rel).firstOrNull { matches(it.title) }
+            ?: page.embedded(rel).firstOrNull { matches(it.title) }?.self
         // A list paged by next links may hold it further on: each next page is followed, as the list offers it.
         var pages = 0
         while (found(held) == null && pages++ < MAX_PAGES) {

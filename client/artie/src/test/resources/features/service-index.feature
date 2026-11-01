@@ -94,6 +94,26 @@ Feature: Enter at the service index and find a bed
     Then the client's last request was GET "http://garden.test/beds/2"
     And the manifest offers exactly "waterCell"
 
+  Scenario: A link chosen by its relation alone is followed whatever its title
+    No title asked for means any title will do: the first link of the relation is taken.
+    Given the service answers GET "http://garden.test/beds/1" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 1
+      label: South border east
+      _links:
+        self: {href: /beds/1}
+      """
+    When the client acts on "searchBeds" with:
+      """yaml
+      name: south border
+      """
+    And the client follows the "item" link
+    Then the client's last request was GET "http://garden.test/beds/1"
+
   Scenario: A lookup form fills its path from its field
     When the client acts on "getBed" with:
       """yaml
