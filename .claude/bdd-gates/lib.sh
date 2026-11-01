@@ -21,11 +21,12 @@ bdd_list() { jq -r --arg k "$1" '.[$k] // [] | .[]' "$(bdd_config)"; }
 
 # Loads the pattern lists once so matching does not re-run jq per path.
 bdd_load() {
-  PROD_PATTERNS=(); PROD_EXCLUDES=(); FEATURE_PATTERNS=(); LINT_PATTERNS=()
+  PROD_PATTERNS=(); PROD_EXCLUDES=(); FEATURE_PATTERNS=(); TEST_PATTERNS=(); LINT_PATTERNS=()
   local p
   while IFS= read -r p; do [ -n "$p" ] && PROD_PATTERNS+=("$p"); done < <(bdd_list prodPatterns)
   while IFS= read -r p; do [ -n "$p" ] && PROD_EXCLUDES+=("$p"); done < <(bdd_list prodExcludePatterns)
   while IFS= read -r p; do [ -n "$p" ] && FEATURE_PATTERNS+=("$p"); done < <(bdd_list featurePatterns)
+  while IFS= read -r p; do [ -n "$p" ] && TEST_PATTERNS+=("$p"); done < <(bdd_list testPatterns)
   while IFS= read -r p; do [ -n "$p" ] && LINT_PATTERNS+=("$p"); done < <(bdd_list lintPatterns)
 }
 
@@ -94,10 +95,9 @@ bdd_refactor_on() {
   bdd_refactor_present && [ "$(bdd_refactor_field head)" = "$(cd "$(bdd_root)" && git rev-parse HEAD)" ]
 }
 
-# True for a test file or a test fixture, which a refactor must leave as it is.
+# True for a test file or a test fixture (testPatterns), or a feature file,
+# which a refactor must leave as it is.
 bdd_is_test() {
-  case "$1" in
-    src/test/* | */src/test/* | src/testFixtures/* | */src/testFixtures/*) return 0 ;;
-  esac
+  _bdd_any "$1" ${TEST_PATTERNS[@]+"${TEST_PATTERNS[@]}"} && return 0
   bdd_is_feature "$1"
 }

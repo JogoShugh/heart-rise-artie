@@ -2,7 +2,7 @@
 
 - `heart-ts/`: a second HEART client, in TypeScript, written from
   `spec/SPEC.md`, `spec/HAL-SCHEMA-FORMS-HR.md` and the Internet-Draft
-  (`standards/`), not ported from ARTIE. About 400 lines: enter at a
+  (`standards/`), not ported from ARTIE. It can enter at a
   bookmark, read state and forms at L0 or L2 with every shared layer checked
   against its link's integrity, act with If-Match, tell the refusals apart,
   follow links by relation and title, and offer a form's choices from state
@@ -12,6 +12,9 @@
   the steps serve (`choices.feature`), with heart-ts's steps.
   `conformance/run.sh` starts the garden, runs them and stops it. Another
   client brings its own steps file with the same phrases.
+  Without `GARDEN_URL` the same scenarios replay `conformance/fixtures/garden/`,
+  offline, which is what the TDD gate runs. `conformance/record.sh` records those
+  fixtures from its own isolated garden; run it when representations change.
 
 Both are by the same author as ARTIE, so they show the specification is
 enough to write a client from; they are not independent in the standards
