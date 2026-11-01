@@ -1,0 +1,20 @@
+{
+  "name": "lo-to-heart",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx server.ts",
+    "check": "node check.mjs"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "http-proxy-middleware": "^3.0.10"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^20.19.43",
+    "puppeteer-core": "^23.11.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3"
+  }
+}
