@@ -4,6 +4,7 @@
 // filling in a form, and a checkbox's value is no string.
 import { Json, JsonObject, isObject, listOf, objectOf, stringOf } from "./json";
 import { Form, JSON_TYPE, schemaKeyOf } from "./wire";
+import { GET, HAL_FORMS, HR_OPTIONS, OBJECT_TYPE } from "./vocabulary";
 
 /** HAL-FORMS property member -> JSON Schema keyword, where they mean the same. */
 const KEYWORDS = new Map([["min", "minimum"], ["max", "maximum"], ["minLength", "minLength"], ["maxLength", "maxLength"], ["regex", "pattern"]]);
@@ -15,7 +16,7 @@ function propertySchema(property: JsonObject): JsonObject {
         const value = property[from];
         if (value !== undefined) schema[to] = value;
     }
-    if (isObject(property.options)) schema["hr:options"] = property.options;
+    if (isObject(property.options)) schema[HR_OPTIONS] = property.options;
     return schema;
 }
 
@@ -26,7 +27,7 @@ const named = (properties: Json | undefined): [string, JsonObject][] =>
 function schemaOf(properties: Json | undefined): JsonObject {
     const entries = named(properties);
     return {
-        type: "object",
+        type: OBJECT_TYPE,
         properties: Object.fromEntries(entries.map(([name, property]) => [name, propertySchema(property)])),
         required: entries.filter(([, property]) => property.required === true).map(([name]) => name),
     };
@@ -41,11 +42,11 @@ function templateForm(name: string, raw: JsonObject, resource: string): Form {
         target: stringOf(raw.target) ?? resource,
         templated: false,
         templatePointers: {},
-        method: String(raw.method ?? "GET"),
+        method: String(raw.method ?? GET),
         contentType: String(raw.contentType ?? JSON_TYPE),
         schema,
         schemaKey: schemaKeyOf(schema),
-        dialect: "hal-forms",
+        dialect: HAL_FORMS,
     };
 }
 

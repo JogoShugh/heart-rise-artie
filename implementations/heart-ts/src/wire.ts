@@ -1,6 +1,7 @@
 // The wire format parsed into types: HAL links, embedded resources, forms and problems.
 import { createHash } from "node:crypto";
 import { Json, JsonObject, isObject, listOf, objectOf, stringMembers, stringOf } from "./json";
+import { BASE64, HAL_SCHEMA_FORMS, HR_INTEGRITY, HR_TEMPLATE_POINTERS, POST, SHA256, REL_VARIABLE } from "./vocabulary";
 
 export const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
 export const PROBLEMS = "https://w3id.org/heart-rise/problems/";
@@ -73,7 +74,7 @@ function relationOf(rel: string, body: JsonObject): string {
     const colon = rel.indexOf(":");
     const curie = listOf(objectOf(body._links).curies).map(objectOf).find((c) => c.name === rel.slice(0, colon));
     const href = stringOf(curie?.href);
-    if (href !== undefined) return href.replace("{rel}", rel.slice(colon + 1));
+    if (href !== undefined) return href.replace(REL_VARIABLE, rel.slice(colon + 1));
     return rel === USUAL_FORMS_LINK ? FORMS_RELATION : rel;
 }
 
@@ -102,22 +103,22 @@ export function formOf(name: string, raw: JsonObject, schema: JsonObject): Form 
         description: stringOf(raw.description),
         target: String(target.href),
         templated: target.templated === true,
-        templatePointers: stringMembers(raw["hr:templatePointers"]),
-        method: String(raw.method ?? "POST"),
+        templatePointers: stringMembers(raw[HR_TEMPLATE_POINTERS]),
+        method: String(raw.method ?? POST),
         contentType: String(raw.contentType ?? JSON_TYPE),
         schema,
         schemaKey: schemaKeyOf(objectOf(raw.schema)),
-        dialect: "hal-schema-forms",
+        dialect: HAL_SCHEMA_FORMS,
     };
 }
 
 export const schemaKeyOf = (declared: JsonObject): string =>
-    stringOf(declared["hr:integrity"]) ?? createHash("sha256").update(JSON.stringify(declared)).digest("base64");
+    stringOf(declared[HR_INTEGRITY]) ?? createHash(SHA256).update(JSON.stringify(declared)).digest(BASE64);
 
 /** Whether [bytes] are what an integrity value such as `sha256-...` names. */
 export function matchesIntegrity(bytes: Buffer, integrity: string): boolean {
     const dash = integrity.indexOf("-");
-    return createHash(integrity.slice(0, dash)).update(bytes).digest("base64") === integrity.slice(dash + 1);
+    return createHash(integrity.slice(0, dash)).update(bytes).digest(BASE64) === integrity.slice(dash + 1);
 }
 
 /** Each violation is a JSON Pointer to the offending value and a message (the draft, Conditional Acts). */

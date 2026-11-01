@@ -1,6 +1,7 @@
 // Templates: pointer, then field, then the owning resource's member.
 import { JsonObject, listOf, resolve } from "./json";
 import { Form } from "./wire";
+import { GET, HAL_FORMS } from "./vocabulary";
 
 /** Where a template's variables are found. */
 interface TemplateScope { pointers: Record<string, string>; state: JsonObject; fields: JsonObject }
@@ -56,17 +57,17 @@ function withQuery(target: URL, form: Form, fields: JsonObject): URL {
     return target;
 }
 
-const QUERY_METHODS = ["GET", "HEAD", "DELETE"];
+const QUERY_METHODS = [GET, "HEAD", "DELETE"];
 
 /** Whether a form's fields leave in its query. HAL-FORMS sends a DELETE's as it sends a GET's. */
 const fieldsInQuery = (form: Form): boolean =>
-    (form.dialect === "hal-forms" ? QUERY_METHODS.includes(form.method) : form.method === "GET");
+    (form.dialect === HAL_FORMS ? QUERY_METHODS.includes(form.method) : form.method === GET);
 
 /** Where an act on [form] goes. HAL-FORMS replaces the target's query, as an HTML form does. */
 export function addressOf(form: Form, held: { url: string; state: JsonObject }, fields: JsonObject): URL {
     const target = new URL(expand(form, held.state, fields), held.url);
     if (!fieldsInQuery(form)) return target;
-    if (form.dialect === "hal-forms") target.search = "";
+    if (form.dialect === HAL_FORMS) target.search = "";
     return withQuery(target, form, fields);
 }
 

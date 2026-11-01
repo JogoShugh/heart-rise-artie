@@ -12,7 +12,7 @@ module.exports = {
       name: "layering-parse-decide-no-http",
       comment: "Modules that parse and decide stay pure. Only the HTTP module talks to the network.",
       severity: "error",
-      from: { path: "^src/(errors|json|wire|halforms|template|choices|refusal|validation)\\.ts$" },
+      from: { path: "^src/(vocabulary|errors|json|wire|halforms|template|choices|refusal|validation)\\.ts$" },
       to: { path: "^src/client\\.ts$", reachable: true },
     },
   ],

@@ -1,5 +1,6 @@
 // Choices from state (HAL-SCHEMA-FORMS-HR Rule 8): deciding, with nothing read here.
 import { Json, JsonObject, isObject, listOf, objectOf, stringOf } from "./json";
+import { DEFAULT_PROMPT_FIELD, DEFAULT_VALUE_FIELD, HR_OPTIONS } from "./vocabulary";
 
 /** One choice for a property (HAL-SCHEMA-FORMS-HR Rule 8): the value sent, and the prompt shown. */
 export interface Choice { value: Json; prompt: string }
@@ -10,7 +11,7 @@ interface PropertyCheck { property: string; sent: Json | undefined; required: bo
 /** The properties of [schema] that carry `hr:options`, with it. */
 export function declared(schema: JsonObject): [string, JsonObject][] {
     return Object.entries(objectOf(schema.properties)).flatMap(([name, property]): [string, JsonObject][] => {
-        const options = objectOf(property)["hr:options"];
+        const options = objectOf(property)[HR_OPTIONS];
         return isObject(options) ? [[name, options]] : [];
     });
 }
@@ -18,8 +19,8 @@ export function declared(schema: JsonObject): [string, JsonObject][] {
 export const requiredOf = (schema: JsonObject): Set<Json> => new Set(listOf(schema.required));
 
 function objectChoice(item: JsonObject, options: JsonObject): Choice[] {
-    const value = stringOf(options.valueField) ?? "value";
-    const prompt = stringOf(options.promptField) ?? "prompt";
+    const value = stringOf(options.valueField) ?? DEFAULT_VALUE_FIELD;
+    const prompt = stringOf(options.promptField) ?? DEFAULT_PROMPT_FIELD;
     const matches = Object.entries(objectOf(options.where)).every(([k, v]) => JSON.stringify(item[k]) === JSON.stringify(v));
     const chosen = item[value];
     if (!matches || chosen === undefined) return [];

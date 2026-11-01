@@ -3,8 +3,10 @@
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 export type JsonObject = { [key: string]: Json };
 
+const SCALAR_TYPES = ["boolean", "number", "string"];
+
 const isJson = (value: unknown): value is Json => {
-    if (typeof value !== "object" || value === null) return ["boolean", "number", "string"].includes(typeof value) || value === null;
+    if (typeof value !== "object" || value === null) return SCALAR_TYPES.includes(typeof value) || value === null;
     return Object.values(value).every(isJson);
 };
 

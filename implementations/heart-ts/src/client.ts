@@ -8,6 +8,7 @@ import { needsRereading, refusalOf } from "./refusal";
 import { addressOf, fill, fillPointer } from "./template";
 import { FormChecks, SchemaFailure } from "./validation";
 import { Dialect, Form, HAL_FORMS_PROFILE, HAL_FORMS_TYPE, JSON_TYPE, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, formsLinkOf, linksOf, matchesIntegrity, stateOf } from "./wire";
+import { ACCEPT_PROFILE, AUTHORIZATION, CACHE_CONTROL, CONTENT_LOCATION, CONTENT_TYPE, ETAG, FORMS_BY_LINK, GET, HAL_FORMS, HR_INTEGRITY, IF_MATCH, IF_NONE_MATCH, L0, L1, L2, LINK_HEADER, MANUAL_REDIRECT, NOT_A_CHOICE, NO_CACHE, OUTSIDE_SCHEMA, PREFERENCE_APPLIED, READ, SCHEMA_BY_LINK, UTF8 } from "./vocabulary";
 
 /** Where shared layers are kept. A `Map` will do; pass something with a limit if a `Map` would grow too far. */
 export interface LayerCache {
@@ -34,7 +35,7 @@ export interface Options {
 }
 
 const bytesOf = async (response: Response): Promise<Buffer> => Buffer.from(await response.arrayBuffer());
-const objectFrom = (bytes: Buffer): JsonObject => objectOf(parseJson(bytes.toString("utf8")));
+const objectFrom = (bytes: Buffer): JsonObject => objectOf(parseJson(bytes.toString(UTF8)));
 
 const problemOf = async (response: Response): Promise<JsonObject> =>
     objectOf(await response.text().then(parseJson).catch(() => null));
@@ -44,21 +45,21 @@ const REFERENCE_DIALECT: Dialect = "hal-schema-forms";
 
 /** The dialect of an answer. HAL-FORMS's own media type says so, as toolchains name no HEART profile. */
 function dialectOf(url: string, response: Response): Dialect {
-    const links = response.headers.get("Link") ?? "";
-    const type = response.headers.get("Content-Type") ?? "";
-    if (links.includes(`<${HAL_FORMS_PROFILE}>`) || type.startsWith(HAL_FORMS_TYPE)) return "hal-forms";
+    const links = response.headers.get(LINK_HEADER) ?? "";
+    const type = response.headers.get(CONTENT_TYPE) ?? "";
+    if (links.includes(`<${HAL_FORMS_PROFILE}>`) || type.startsWith(HAL_FORMS_TYPE)) return HAL_FORMS;
     if (links.includes(`<${PROFILE}>`)) return REFERENCE_DIALECT;
     throw new Error(`${url} does not name the profile ${PROFILE}`);
 }
 
 /** What each rung asks for (SPEC §6.4). */
-const PREFER: Partial<Record<Rung, string>> = { L1: "forms=link", L2: "forms=link, schema=link" };
+const PREFER: Partial<Record<Rung, string>> = { L1: FORMS_BY_LINK, L2: "forms=link, schema=link" };
 
 /** The rung of an answer: what it says it applied (SPEC §6.10), not what was asked. */
 function appliedRung(response: Response, dialect: Dialect): Rung {
-    const applied = (response.headers.get("Preference-Applied") ?? "").split(",").map((token) => token.trim());
-    if (dialect !== REFERENCE_DIALECT || !applied.includes("forms=link")) return "L0";
-    return applied.includes("schema=link") ? "L2" : "L1";
+    const applied = (response.headers.get(PREFERENCE_APPLIED) ?? "").split(",").map((token) => token.trim());
+    if (dialect !== REFERENCE_DIALECT || !applied.includes(FORMS_BY_LINK)) return L0;
+    return applied.includes(SCHEMA_BY_LINK) ? L2 : L1;
 }
 
 /** Methods that carry no body. */
@@ -66,7 +67,7 @@ const BODYLESS = ["DELETE", "HEAD"];
 
 /** Where an act's answer lives: the Content-Location it names, else the resource acted on. */
 function answerUrl(response: Response, target: URL, heldUrl: string): string {
-    const location = response.headers.get("Content-Location");
+    const location = response.headers.get(CONTENT_LOCATION);
     return location ? new URL(location, target).toString() : heldUrl;
 }
 
@@ -81,7 +82,7 @@ export class HeartClient {
     current?: Representation;
 
     constructor(private readonly options: Options = {}) {
-        this.rung = options.rung ?? "L0";
+        this.rung = options.rung ?? L0;
         this.dialect = options.dialect ?? REFERENCE_DIALECT;
         this.layers = options.setCache ?? new Map<string, JsonObject>();
         this.checks = new FormChecks(options.schemaFailures);
@@ -116,7 +117,7 @@ export class HeartClient {
         if (!form) throw new Error(`${name} is not offered now; nothing was sent`);
         await this.admit(form, held, fields);
         const target = addressOf(form, held, fields);
-        if (form.method === "GET") return this.sync(target.toString());
+        if (form.method === GET) return this.sync(target.toString());
         const response = await this.send(target.toString(), this.actRequest(form, held.etag, fields));
         if (!response.ok) throw await this.refusal(name, response);
         return this.answered(answerUrl(response, target, held.url), response);
@@ -130,9 +131,9 @@ export class HeartClient {
 
     /** The conditional request for an act. A DELETE has no body: its fields filled its target or query (SPEC §6.2). */
     private actRequest(form: Form, etag: string, fields: JsonObject): RequestInit {
-        const headers = { ...this.negotiation(), "If-Match": etag };
+        const headers = { ...this.negotiation(), [IF_MATCH]: etag };
         if (BODYLESS.includes(form.method)) return { method: form.method, headers };
-        return { method: form.method, headers: { ...headers, "Content-Type": form.contentType }, body: JSON.stringify(fields) };
+        return { method: form.method, headers: { ...headers, [CONTENT_TYPE]: form.contentType }, body: JSON.stringify(fields) };
     }
 
     // ---- Choices from state (HAL-SCHEMA-FORMS-HR Rule 8) ----
@@ -165,7 +166,7 @@ export class HeartClient {
             if (found) misfits.push(found);
         }
         if (misfits.length) {
-            throw new NotAChoice({ kind: "not-a-choice", message: `${misfits.join("; ")}; nothing was sent`, status: 0, violations: misfits });
+            throw new NotAChoice({ kind: NOT_A_CHOICE, message: `${misfits.join("; ")}; nothing was sent`, status: 0, violations: misfits });
         }
         this.requireSchema(form, fields);
     }
@@ -175,7 +176,7 @@ export class HeartClient {
         const violations = this.checks.outsideSchema(form, fields);
         if (!violations.length) return;
         const message = `${form.name}: ${violations.join("; ")}; nothing was sent`;
-        throw new OutsideSchema({ kind: "outside-schema", message, status: 0, violations });
+        throw new OutsideSchema({ kind: OUTSIDE_SCHEMA, message, status: 0, violations });
     }
 
     private async resolveChoices(options: JsonObject, held: Representation, fields: JsonObject): Promise<Choice[]> {
@@ -200,13 +201,13 @@ export class HeartClient {
     /** A plain JSON resource, read as Layer 1 is (SPEC §6.1): no-cache, revalidated by its ETag. */
     private async plain(url: string): Promise<Json | undefined> {
         const kept = this.plainReads.get(url);
-        const headers: Record<string, string> = { Accept: JSON_TYPE, "Cache-Control": "no-cache" };
-        if (kept) headers["If-None-Match"] = kept.etag;
+        const headers: Record<string, string> = { Accept: JSON_TYPE, [CACHE_CONTROL]: NO_CACHE };
+        if (kept) headers[IF_NONE_MATCH] = kept.etag;
         const response = await this.send(url, { headers });
         if (response.status === 304 && kept) return kept.body;
         if (!response.ok) return undefined;
         const body = parseJson(await response.text());
-        const etag = response.headers.get("ETag");
+        const etag = response.headers.get(ETAG);
         if (etag) this.plainReads.set(url, { etag, body });
         return body;
     }
@@ -214,8 +215,8 @@ export class HeartClient {
     // ---- Sync: Layer 1, then, above L0, the affordance set and its schemas ----
 
     private async sync(url: string): Promise<Representation> {
-        const response = await this.send(url, { headers: { ...this.negotiation(), "Cache-Control": "no-cache" } });
-        if (!response.ok) throw await this.refusal("read", response);
+        const response = await this.send(url, { headers: { ...this.negotiation(), [CACHE_CONTROL]: NO_CACHE } });
+        if (!response.ok) throw await this.refusal(READ, response);
         return this.complete(url, response, await bytesOf(response));
     }
 
@@ -224,14 +225,14 @@ export class HeartClient {
         const body = objectFrom(bytes);
         const rung = appliedRung(response, dialect);
         const links = linksOf(body);
-        const forms = dialect === "hal-forms" ? templatesOf(body, url) : await this.formsAt(url, body, rung);
-        const etag = response.headers.get("ETag") ?? "";
+        const forms = dialect === HAL_FORMS ? templatesOf(body, url) : await this.formsAt(url, body, rung);
+        const etag = response.headers.get(ETAG) ?? "";
         this.current = { url, etag, rung, dialect, state: stateOf(body), forms, links, embedded: embeddedOf(body) };
         return this.current;
     }
 
     private async formsAt(url: string, body: JsonObject, rung: Rung): Promise<Map<string, Form>> {
-        return this.forms(rung === "L0" ? body : await this.affordanceSet(url, body, rung), url);
+        return this.forms(rung === L0 ? body : await this.affordanceSet(url, body, rung), url);
     }
 
     private async affordanceSet(url: string, body: JsonObject, rung: Rung): Promise<JsonObject> {
@@ -252,7 +253,7 @@ export class HeartClient {
     private async schema(raw: JsonObject, base: string): Promise<JsonObject> {
         const schema = objectOf(raw.schema);
         if (typeof schema.$ref !== "string") return schema;
-        return this.shared(new URL(schema.$ref, base).toString(), stringOf(schema["hr:integrity"]));
+        return this.shared(new URL(schema.$ref, base).toString(), stringOf(schema[HR_INTEGRITY]));
     }
 
     /** A shared layer, fetched only through a link that carries its integrity, and checked before use. */
@@ -281,9 +282,9 @@ export class HeartClient {
 
     private negotiation(): Record<string, string> {
         return {
-            ...(this.dialect === "hal-forms"
-                ? { Accept: `${HAL_FORMS_TYPE}, ${MEDIA_TYPE};q=0.5`, "Accept-Profile": `<${HAL_FORMS_PROFILE}>` }
-                : { Accept: MEDIA_TYPE, "Accept-Profile": `<${PROFILE}>` }),
+            ...(this.dialect === HAL_FORMS
+                ? { Accept: `${HAL_FORMS_TYPE}, ${MEDIA_TYPE};q=0.5`, [ACCEPT_PROFILE]: `<${HAL_FORMS_PROFILE}>` }
+                : { Accept: MEDIA_TYPE, [ACCEPT_PROFILE]: `<${PROFILE}>` }),
             ...this.layering(),
         };
     }
@@ -291,11 +292,11 @@ export class HeartClient {
     private async send(url: string, init: RequestInit): Promise<Response> {
         const headers = new Headers(init.headers);
         if (this.options.authorization && new URL(url).origin === this.origin) {
-            headers.set("Authorization", this.options.authorization);
+            headers.set(AUTHORIZATION, this.options.authorization);
         }
-        const response = await fetch(url, { ...init, headers, redirect: "manual" });
+        const response = await fetch(url, { ...init, headers, redirect: MANUAL_REDIRECT });
         this.options.log?.push({
-            method: init.method ?? "GET", url, status: response.status, ifMatch: headers.get("If-Match") ?? undefined,
+            method: init.method ?? GET, url, status: response.status, ifMatch: headers.get(IF_MATCH) ?? undefined,
         });
         return response;
     }
