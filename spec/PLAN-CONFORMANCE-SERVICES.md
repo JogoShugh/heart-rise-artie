@@ -1,6 +1,6 @@
 # Plan: three simulated services behind the shared conformance features
 
-Status: agreed 2026-11-01. Docker packaging of the simulator comes later.
+Status: agreed 2026-11-01. The build and deploy services are event-sourced, with CQRS. Docker packaging of the simulator comes later.
 
 ## Why
 
@@ -67,6 +67,36 @@ One handler serves all three, by host:
 
 Over a port, heart-ts sends the service's host in a header the simulator reads
 (`X-Sim-Host`), so the URLs in the features stay the same in both clients.
+
+### Event-sourced, with commands and queries apart
+
+The build and deploy services are event-sourced, with CQRS, laid out as the
+tickets domain is (`domains/tickets`):
+
+- **Write side.** Each act is a command. A pure `decide(state, command)` returns
+  the events, or a refusal; the events are appended to heart-eventsourcing's
+  `InMemoryEventStore` at the next sequence number. A resource's state is the
+  fold of its events (`EventSourcing.apply`), and its version is the number of
+  the last one, so a write that lost a race is `ConcurrentWriteException`, which
+  heart-core answers 412. Nothing on the write side is read by a query.
+- **Read side.** Projections, fed by the same events, hold what queries need:
+  the job directory and the queue (build), the app directory, each app's
+  releases and deployments (deploy). The bookmark's finding, search pages and
+  the plain lists (`/labels`, `/apps/{name}/releases`) read only these.
+- **History.** Each resource's `/history` is its event stream (heart-core's
+  `past`).
+- **Seed and setup.** A reset forgets every stream and appends the seed's
+  events. The control routes that set up a job or an app append events too
+  (`JobConfigured`, `AppImported`); no state is written directly.
+
+Events, by service:
+
+| Build | Deploy |
+|---|---|
+| `JobConfigured(name, parameters, labels)`, `JobDisabled`, `JobEnabled`, `JobDeleted`, `BuildQueued(id, parameters)`, `BuildStarted(number)`, `BuildFinished(number, result)`, `BuildStopped(number)`, `QueueItemCancelled(id)` | `AppImported(name, environment, region, replicas, release, regions, quota)`, `ReleasePublished(version, status)`, `DeploymentStarted(id, release, environment, region)`, `DeploymentFinished(id)`, `DeploymentCancelled(id)`, `Scaled(replicas)`, `AppRemoved` |
+
+The GitHub service stays the gateway over `GitHubUpstream`: it stands for an
+API we do not own, so its shape is GitHub's, not ours.
 
 ### The build service
 
@@ -180,7 +210,7 @@ both clients' steps follow it.
 ## Phases
 
 1. This plan. One commit.
-2. `heart-sims`: build and deploy services, GitHub wired in, fault layer,
+2. `heart-sims`: build and deploy services (event-sourced, CQRS), GitHub wired in, fault layer,
    control routes, main and jar. Its first test is `schema.feature` rewritten.
 3. One feature at a time: schema, choices, rungs, hal-forms, service (in three
    or four commits), then client's two hand-built services. For each:
