@@ -28,9 +28,6 @@ export const listOf = (value: Json | undefined): Json[] => {
     return Array.isArray(value) ? value : [value];
 };
 
-export const stringsOf = (value: Json | undefined): string[] =>
-    listOf(value).flatMap((item) => (typeof item === "string" ? [item] : []));
-
 export const stringMembers = (value: Json | undefined): Record<string, string> =>
     Object.fromEntries(Object.entries(objectOf(value)).flatMap(([key, member]) => (typeof member === "string" ? [[key, member]] : [])));
 

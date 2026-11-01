@@ -1,5 +1,5 @@
 // Choices from state (HAL-SCHEMA-FORMS-HR Rule 8): deciding, with nothing read here.
-import { Json, JsonObject, isObject, listOf, objectOf, stringOf, stringsOf } from "./json";
+import { Json, JsonObject, isObject, listOf, objectOf, stringOf } from "./json";
 
 /** One choice for a property (HAL-SCHEMA-FORMS-HR Rule 8): the value sent, and the prompt shown. */
 export interface Choice { value: Json; prompt: string }
@@ -15,7 +15,7 @@ export function declared(schema: JsonObject): [string, JsonObject][] {
     });
 }
 
-export const requiredOf = (schema: JsonObject): Set<string> => new Set(stringsOf(schema.required));
+export const requiredOf = (schema: JsonObject): Set<Json> => new Set(listOf(schema.required));
 
 function objectChoice(item: JsonObject, options: JsonObject): Choice[] {
     const value = stringOf(options.valueField) ?? "value";

@@ -159,6 +159,7 @@ Feature: What a client does with what a service sends
     When it enters that service
     Then the choices for "size" of "note" are
       | value | prompt |
+    And the resource was read 1 times
 
   Scenario: A pointer to something that is not a list offers nothing
     Given that service declares the schema {"properties": {"size": {"hr:options": {"pointer": "/sizes"}}}}, with the state {"sizes": 3}
@@ -221,3 +222,131 @@ Feature: What a client does with what a service sends
     And it reads the resource again
     And it tries to submit "note" with {}
     Then it was refused as "outside-schema" before sending, because "text"
+
+  Scenario: A resource is read as HEART, never from a cache
+    When it enters that service
+    Then the last read accepted "application/hal+json", at the profile, with no cache
+
+  Scenario: A shared layer is read as what it may be
+    Given that service applies L2, with a true affordance set
+    When it enters that service
+    Then the affordance set was read accepting "application/hal+json, application/schema+json, application/json"
+    And it offers exactly "from-the-set"
+
+  Scenario: An act with no validator to send sends an empty one
+    Given that service sends no validator
+    When it enters that service
+    And it submits "note" with {}
+    Then it carried an empty validator
+
+  Scenario: A client need not keep a log
+    Given a client with no options
+    When it enters that service
+    Then the representation is at rung L0
+
+  Scenario: A refusal with no violations names none
+    Given that service answers "note" with status 409 and the body {}
+    When it enters that service
+    And it tries to submit "note" with {}
+    Then it names no violations
+
+  Scenario Outline: A violation shows what the service said of it: <shows>
+    Given that service answers "note" with status 422 and the body <body>
+    When it enters that service
+    And it tries to submit "note" with {}
+    Then the only violation is "<shows>"
+
+    Examples:
+      | body                                                  | shows      |
+      | {"violations": [{"message": "only words"}]}           | only words |
+      | {"violations": [{"detail": "a detail"}]}              | a detail   |
+      | {"violations": [{"pointer": "/c"}]}                   | /c         |
+      | {"violations": [{"pointer": "/a", "detail": "a d"}]}  | /a a d     |
+
+  Scenario: Every value outside its choices is said
+    Given that service declares the schema {"properties": {"a": {"hr:options": {"pointer": "/sizes"}}, "b": {"hr:options": {"pointer": "/sizes"}}}}, with the state {"sizes": ["s"]}
+    When it enters that service
+    And it tries to submit "note" with {"a": 1, "b": 2}
+    Then it failed, saying "a: 1 is not one of the choices; b: 2 is not one of the choices; nothing was sent"
+
+  Scenario: Only properties with options have choices
+    Given that service declares the schema {"properties": {"size": {"hr:options": {"pointer": "/sizes"}}, "text": {"type": "string"}}}, with the state {"sizes": []}
+    When it enters that service
+    Then the form "note" has choices for exactly "size"
+
+  Scenario: A field not filled yet is empty in a pointer
+    Given that service declares the schema {"properties": {"size": {"hr:options": {"pointer": "/by/{team}"}}}}, with the state {"by": {"": ["x"]}}
+    When it enters that service
+    Then the choices for "size" of "note" are
+      | value | prompt |
+      | x     | x      |
+
+  Scenario Outline: Choices from another resource: <case>
+    Given that service serves "<path>" with status <status> and the body <body>
+    And that service declares the schema {"properties": {"size": {"hr:options": <options>}}}, with the state {}
+    When it enters that service
+    Then the values for "size" of "note" are <values>
+
+    Examples:
+      | case                  | path           | status | body             | options                                         | values |
+      | a bare list           | /sizes         | 200    | ["x"]            | {"link": {"href": "/sizes"}}                    | ["x"]  |
+      | a list inside         | /sizes         | 200    | {"list": ["y"]}  | {"link": {"href": "/sizes"}, "items": "/list"}  | ["y"]  |
+      | the root as a pointer | /sizes         | 200    | ["z"]            | {"link": {"href": "/sizes"}, "items": ""}       | ["z"]  |
+      | a refused read        | /sizes         | 404    | ["x"]            | {"link": {"href": "/sizes"}}                    | []     |
+      | an untemplated link   | /sizes%7Bx%7D  | 200    | ["w"]            | {"link": {"href": "/sizes{x}"}}                 | ["w"]  |
+
+  Scenario: Another resource is read as plain JSON, never from a cache
+    Given that service serves "/sizes" with status 200 and the body ["x"]
+    And that service declares the schema {"properties": {"size": {"hr:options": {"link": {"href": "/sizes"}}}}}, with the state {}
+    When it enters that service
+    And it resolves the choices for "size" of "note" twice
+    Then the last read accepted "application/json", with no cache
+    And the last read carried no validator
+
+  Scenario: A resource keeps state in anything but the four controls
+    Given that service declares the schema {"type": "object"}, with the state {"kept": 1, "_templates": {}}
+    When it enters that service
+    Then the state has exactly these members
+      | member |
+      | kept   |
+
+  Scenario: Only a link with an address is a link, and only a text is a title
+    Given that service's links are {"odd": "text", "bare": {"title": "x"}, "numbered": {"href": "/a", "title": 5}, "many": [{"href": "/b"}, {"href": "/c"}]}
+    When it enters that service
+    Then it holds exactly the links "self /, numbered /a, many /b, many /c", with no titles
+
+  Scenario: Only an embedded object with a self address is a resource
+    Given that service embeds {"a": {"_links": {"self": {"href": "/a"}}}, "b": "text", "c": {"_links": {}}, "d": {"_links": {"self": {}}}, "e": {"_links": {"self": "text"}}}
+    When it enters that service
+    Then it holds embedded resources at exactly "/a"
+
+  Scenario: A target that is not templated stays as it is
+    Given that service reads "note" at "/a{b}", with pointers {} into the state {}
+    And that service's target is not templated
+    When it enters that service
+    And it submits "note" with {"b": "c"}
+    Then the last request was for "/a%7Bb%7D?b=c"
+
+  Scenario: A link is followed by its relation, whatever its title
+    Given that service links "item" titled "first"
+    When it enters that service
+    And it tries to follow "item" with no title
+    Then it holds a representation
+
+  Scenario Outline: A pointer must be text to count: <case>
+    Given that service reads "note" at "/beds/{id}", with pointers <pointers> into the state {}
+    When it enters that service
+    And it submits "note" with {"id": 4}
+    Then the last request was for "/beds/4"
+
+    Examples:
+      | case      | pointers    |
+      | a number  | {"id": 5}   |
+
+  Scenario: A resource that changed replaces what the client kept
+    Given that service serves "/sizes" with the validator "1" and the body ["x"]
+    And that service declares the schema {"properties": {"size": {"hr:options": {"link": {"href": "/sizes"}}}}}, with the state {}
+    When it enters that service
+    Then the values for "size" of "note" are ["x"]
+    When that service serves "/sizes" with the validator "2" and the body ["y"]
+    Then the values for "size" of "note" are ["y"]

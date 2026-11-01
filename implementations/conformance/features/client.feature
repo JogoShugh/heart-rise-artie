@@ -87,6 +87,7 @@ Feature: What a HEART client must do, against a real HEART service
     And a client at rung L2 with no credential
     When it tries to enter that service
     Then it refused the affordance set for its integrity
+    And it failed, saying "does not match the integrity of the link that led to it"
 
   Scenario: A search's embedded beds are read in place, with no request per bed
     Given a client at rung L0 with the garden's credential

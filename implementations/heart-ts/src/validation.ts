@@ -12,7 +12,6 @@ export interface SchemaFailure { form: string; schema: string; error: string }
 const sentence = (error: ErrorObject): string => `${error.instancePath} ${error.message ?? error.keyword}`.trim();
 
 export class FormChecks {
-    private readonly ajv = new Ajv2020({ strict: false, allErrors: true, validateFormats: false, addUsedSchema: false, logger: false });
     /** By schema key. A schema that failed to compile is kept as undefined, so it is tried and noted once. */
     private readonly checkers = new Map<string, ValidateFunction | undefined>();
 
@@ -32,7 +31,8 @@ export class FormChecks {
 
     private compile(form: Form): ValidateFunction | undefined {
         try {
-            return this.ajv.compile(form.schema);
+            // A fresh compiler each time, as one remembers every `$id` it has seen.
+            return new Ajv2020({ strict: false, allErrors: true, logger: false }).compile(form.schema);
         } catch (error) {
             this.failures.push({ form: form.name, schema: form.schemaKey, error: String(error) });
             return undefined;

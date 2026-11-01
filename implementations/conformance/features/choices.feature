@@ -36,6 +36,7 @@ Feature: A form's choices from state
   Scenario: The other resource is revalidated, not read again in full
     When it resolves the choices for "agent" of "call-agent" twice
     Then the second read of the agents carried the ETag of the first, and was answered 304
+    And the second answer held the same choices as the first
 
   Scenario Outline: A value outside the choices is refused before anything is sent: <case>
     When it tries to submit "<form>" with <body>

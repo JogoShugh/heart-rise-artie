@@ -13,6 +13,7 @@ Feature: A form's schema checks an act just before it is sent
     When it enters that service
     And it submits "note" with <body>
     Then the act "note" was sent 1 times
+    And no schema failure was noted
 
     Examples:
       | case                   | schema                                                                      | body                        |
@@ -58,3 +59,27 @@ Feature: A form's schema checks an act just before it is sent
     And it tries to submit "note" with {"text": "hi"}
     Then it was refused as "invalid-input" with status 422
     And the refusal says "text is too long"
+
+  Scenario: Every way a body breaks the schema is said
+    Given a service offering "note" with the schema {"type": "object", "required": ["a", "b"]}
+    And a client at rung L0 with no credential
+    When it enters that service
+    And it tries to submit "note" with {}
+    Then it failed, saying "note: must have required property 'a'; must have required property 'b'; nothing was sent"
+
+  Scenario: A violation of the whole body has no address to show
+    Given a service offering "note" with the schema {"type": "object", "additionalProperties": false}
+    And a client at rung L0 with no credential
+    When it enters that service
+    And it tries to submit "note" with {"mood": "ok"}
+    Then the only violation is "must NOT have additional properties"
+
+  Scenario: A new schema with the same identifier is compiled as itself
+    Given a service offering "note" with the schema {"$id": "https://garden.example/note", "type": "object"}
+    And a client at rung L0 with no credential
+    When it enters that service
+    And that service now declares the schema {"$id": "https://garden.example/note", "type": "object", "required": ["text"]}
+    And it reads the resource again
+    And it tries to submit "note" with {}
+    Then it was refused as "outside-schema" before sending, because "text"
+    And no schema failure was noted

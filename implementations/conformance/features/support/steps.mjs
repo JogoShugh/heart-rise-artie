@@ -2,6 +2,7 @@
 // would bring its own steps file with the same phrases.
 import { Before, After, Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import http from "node:http";
 import { createRequire } from "node:module";
 import { openGarden } from "./garden-fixture.mjs";
@@ -282,8 +283,12 @@ Then("the agents were read at {string}", function (path) {
 });
 
 When("it resolves the choices for {string} of {string} twice", async function (property, form) {
-    await this.me.heart.choices(form, {});
-    await this.me.heart.choices(form, {});
+    this.resolved = [await this.me.heart.choices(form, {}), await this.me.heart.choices(form, {})];
+});
+
+Then("the second answer held the same choices as the first", function () {
+    assert.ok(Object.values(this.resolved[0]).flat().length > 0);
+    assert.deepEqual(this.resolved[1], this.resolved[0]);
 });
 
 Then("the second read of the agents carried the ETag of the first, and was answered 304", function () {
@@ -306,12 +311,18 @@ function resourceOf(world) {
     return JSON.stringify({
         ...state,
         _links: { self: { href: "/" }, ...links },
+        ...world.service.embedded,
         _forms: { [name]: { _links: { target: { href: target, templated } }, method, schema, ...form } },
     });
 }
 
 function answer(world, req, res, body) {
     const { service } = world;
+    const plain = service.plain[new URL(req.url, "http://fake").pathname];
+    if (plain) {
+        res.writeHead(plain.status, { "Content-Type": plain.type, ...plain.headers });
+        return res.end(plain.body);
+    }
     const refused = req.method !== "GET" ? service.refusal : undefined;
     if (req.method === "GET" && service.readStatus) {
         res.writeHead(service.readStatus);
@@ -325,7 +336,7 @@ function answer(world, req, res, body) {
         res.writeHead(refused.status, { "Content-Type": "application/problem+json" });
         return res.end(refused.body);
     }
-    const headers = { "Content-Type": "application/hal+json", ETag: '"1"', ...service.headers };
+    const headers = { "Content-Type": "application/hal+json", ...service.validator, ...service.headers };
     if (service.profile) headers.Link = `<${heart.PROFILE}>; rel="profile"`;
     res.writeHead(200, headers);
     res.end(body ?? resourceOf(world));
@@ -334,6 +345,8 @@ function answer(world, req, res, body) {
 const recorded = (req, body) => ({
     method: req.method, url: req.url, body,
     authorization: req.headers.authorization, ifMatch: req.headers["if-match"], contentType: req.headers["content-type"],
+    accept: req.headers.accept, profile: req.headers["accept-profile"], cacheControl: req.headers["cache-control"],
+    ifNoneMatch: req.headers["if-none-match"],
 });
 
 async function serve(handler) {
@@ -349,7 +362,7 @@ async function serve(handler) {
 Given("a service offering {string} with the schema {}", async function (name, schema) {
     this.service = {
         name, schema: JSON.parse(schema), target: `/actions/${name}`, templated: false, method: "POST",
-        form: {}, state: {}, links: {}, headers: {}, profile: true,
+        form: {}, state: {}, links: {}, headers: {}, profile: true, plain: {}, validator: { ETag: '"1"' }, embedded: {},
     };
     this.fakeLog = [];
     this.fake = await serve((req, res, body) => {
@@ -528,4 +541,95 @@ Then("the last request was for {string}", function (url) {
 
 Then("the client holds {string}", function (path) {
     assert.equal(new URL(this.me.heart.current.url).pathname, path);
+});
+
+Then("no schema failure was noted", function () {
+    assert.deepEqual(this.me.schemaFailures, []);
+});
+
+Then("the only violation is {string}", function (text) {
+    assert.deepEqual(this.error.violations, [text]);
+});
+
+Then("it names no violations", function () {
+    assert.deepEqual(this.error.violations, []);
+});
+
+Given("that service applies L2, with a true affordance set", function () {
+    const set = JSON.stringify({ _forms: { "from-the-set": { _links: { target: { href: "/x" } }, schema: {} } } });
+    const integrity = `sha256-${createHash("sha256").update(set).digest("base64")}`;
+    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
+    this.service.links["hr:forms"] = { href: "/set", integrity };
+    this.service.plain["/set"] = { status: 200, type: "application/hal+json", headers: {}, body: set };
+});
+
+Given("that service sends no validator", function () {
+    this.service.validator = {};
+});
+
+Given("a client with no options", function () {
+    this.me = { heart: new heart.HeartClient() };
+});
+
+Given("that service serves {string} with status {int} and the body {}", function (path, status, body) {
+    this.service.plain[path] = { status, type: "application/json", headers: {}, body };
+});
+
+Given("that service's links are {}", function (links) {
+    this.service.links = JSON.parse(links);
+});
+
+Given("that service embeds {}", function (embedded) {
+    this.service.embedded = { _embedded: JSON.parse(embedded) };
+});
+
+Given("that service's target is not templated", function () {
+    this.service.templated = false;
+});
+
+const lastRead = (world) => world.fakeLog.filter((r) => r.method === "GET").at(-1);
+
+Then("the last read accepted {string}, at the profile, with no cache", function (accept) {
+    assert.equal(lastRead(this).accept, accept);
+    assert.equal(lastRead(this).profile, `<${heart.PROFILE}>`);
+    assert.equal(lastRead(this).cacheControl, "no-cache");
+});
+
+Then("the last read accepted {string}, with no cache", function (accept) {
+    assert.equal(lastRead(this).accept, accept);
+    assert.equal(lastRead(this).cacheControl, "no-cache");
+});
+
+Then("the last read carried no validator", function () {
+    assert.equal(lastRead(this).ifNoneMatch, undefined);
+});
+
+Then("the affordance set was read accepting {string}", function (accept) {
+    assert.equal(this.fakeLog.find((r) => r.url === "/set").accept, accept);
+});
+
+Then("it carried an empty validator", function () {
+    assert.equal(lastRequest(this).ifMatch, "");
+});
+
+Then("the form {string} has choices for exactly {string}", async function (form, property) {
+    assert.deepEqual(Object.keys(await this.me.heart.choices(form)), [property]);
+});
+
+Then("the values for {string} of {string} are {}", async function (property, form, values) {
+    const choices = await this.me.heart.choices(form);
+    assert.deepEqual(choices[property].map((c) => c.value), JSON.parse(values));
+});
+
+Then("it holds exactly the links {string}, with no titles", function (links) {
+    assert.equal(this.rep.links.map((l) => `${l.rel} ${l.href}`).join(", "), links);
+    assert.ok(this.rep.links.every((l) => l.title === undefined));
+});
+
+Then("it holds embedded resources at exactly {string}", function (href) {
+    assert.deepEqual(this.rep.embedded.map((e) => e.href), [href]);
+});
+
+Given("that service serves {string} with the validator {string} and the body {}", function (path, validator, body) {
+    this.service.plain[path] = { status: 200, type: "application/json", headers: { ETag: `"${validator}"` }, body };
 });
