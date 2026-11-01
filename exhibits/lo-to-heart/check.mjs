@@ -11,6 +11,9 @@ const browser = await puppeteer.launch({
   userDataDir: process.env.CHROME_PROFILE ?? "/tmp/lo-to-heart-chrome",
 });
 const page = await browser.newPage();
+await page.setViewport({ width: 760, height: 400, deviceScaleFactor: 2 });
+// With SHOTS set to a folder, the page is photographed before and after the clicks.
+const shot = async (name) => process.env.SHOTS && (await page.$("#bumps")).screenshot({ path: `${process.env.SHOTS}/${name}.png` });
 const failures = [];
 page.on("requestfailed", (request) => failures.push(`${request.method()} ${request.url()}`));
 page.on("pageerror", (error) => failures.push(`page error: ${error.message}`));
@@ -33,11 +36,13 @@ page.on("response", async (response) => {
 await page.goto("http://localhost:8500/bumps.html");
 await page.waitForNetworkIdle({ idleTime: 1500 });
 console.log("Shown:\n" + await page.$eval("#bumps", (element) => element.innerText));
+await shot("before");
 
 for (const button of await page.$$("#bumps button")) await button.click();
 await page.waitForFunction(() => !document.querySelector("#bumps button"), { timeout: 30000 });
 await page.waitForNetworkIdle({ idleTime: 500 });
 console.log("\nAfter clicking Merge:\n" + await page.$eval("#bumps", (element) => element.innerText));
+await shot("after");
 console.log("\nHosts the browser talked to: " + [...hosts].join(", "));
 console.log("Failures: " + (failures.length ? failures.join("; ") : "none"));
 await browser.close();
