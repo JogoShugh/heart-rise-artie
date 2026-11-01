@@ -177,3 +177,35 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       """
     Then the client's last request was GET "http://garden.test/beds?id=1"
     And the resource links to "item" titled "South border"
+
+  Scenario: A HAL-FORMS query repeats a field's name for each of its values
+    Given the service answers GET "http://garden.test/" with:
+      """
+      200 OK
+      Content-Type: application/prs.hal-forms+json
+      ETag: "index-hf"
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
+
+      _templates:
+        searchBeds:
+          method: GET
+          target: /beds
+          properties:
+            - {name: name, required: true}
+            - {name: tag}
+      """
+    And the service answers GET "http://garden.test/beds?name=border&tag=sunny&tag=raised" with:
+      """
+      200 OK
+      Content-Type: application/prs.hal-forms+json
+      Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile"
+
+      count: 0
+      """
+    When the client enters "http://garden.test/"
+    And the client acts on "searchBeds" with:
+      """yaml
+      name: border
+      tag: [sunny, raised]
+      """
+    Then the client's last request was GET "http://garden.test/beds?name=border&tag=sunny&tag=raised"

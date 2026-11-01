@@ -34,13 +34,21 @@ object HalFormsTemplates {
     /**
      * Where a GET, HEAD or DELETE template goes: its target with the query
      * replaced by the fields, form-urlencoded (the HTML mutate-action-URL
-     * algorithm the HAL-FORMS spec names). A space becomes "+".
+     * algorithm the HAL-FORMS spec names). A space becomes "+". A field with
+     * several values repeats its name for each, as a multiple select does.
      */
     fun getTarget(target: String, fields: JsonObject): String {
-        val query = fields.entries.mapNotNull { (name, value) ->
-            (value as? JsonPrimitive)?.let { "${formEncode(name)}=${formEncode(it.content)}" }
+        val query = fields.entries.flatMap { (name, value) ->
+            valuesOf(value).map { "${formEncode(name)}=${formEncode(it.content)}" }
         }.joinToString("&")
         return target.substringBefore('?') + if (query.isEmpty()) "" else "?$query"
+    }
+
+    /** A field's values as a form submits them: one, or each of a list's; objects have none. */
+    private fun valuesOf(value: JsonElement): List<JsonPrimitive> = when (value) {
+        is JsonPrimitive -> listOf(value)
+        is JsonArray -> value.filterIsInstance<JsonPrimitive>()
+        else -> emptyList()
     }
 
     /** application/x-www-form-urlencoded: letters, digits and "*-._" stay, a space is "+", the rest is %XX. */
