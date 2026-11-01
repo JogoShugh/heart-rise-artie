@@ -30,7 +30,12 @@ class OpenApiDocument(
 
     init {
         require(resources.isNotEmpty()) { "an OpenAPI description needs at least one resource type" }
-        val described = resources.map { OpenApiType(it.layers.type, keepsPast = it.past != null, affordanceLinks) }
+        // Two types may each name an input alike but declare it differently; each then gets its own name.
+        val clashing = resources.flatMap { OpenApiType(it.layers.type, keepsPast = false).schemas().entries }
+            .groupBy({ it.key }, { it.value }).filterValues { it.distinct().size > 1 }.keys
+        val described = resources.map {
+            OpenApiType(it.layers.type, keepsPast = it.past != null, affordanceLinks, qualified = clashing)
+        }
         val types = resources.map { it.layers.type }
         body = ContentAddress.canonical(
             mapOf(

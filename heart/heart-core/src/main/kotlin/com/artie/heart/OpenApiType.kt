@@ -9,6 +9,8 @@ internal class OpenApiType(
     private val type: ResourceType<*, *>,
     private val keepsPast: Boolean,
     private val affordanceLinks: Boolean = false,
+    /** Input names another type gives a different schema: each is prefixed with its type's collection here. */
+    private val qualified: Set<String> = emptySet(),
 ) {
     private val noun = type.finding?.noun ?: type.collection
     private val stateName = noun.replaceFirstChar { it.uppercase() }
@@ -28,6 +30,8 @@ internal class OpenApiType(
     fun schemas(): Map<String, Any?> =
         type.allActs.associate { inputName(it) to JsonTrees.plain(Options.openApi(it.schema)) } +
             (stateName to stateSchema())
+
+    private val inputName: (Act) -> String = { act -> InputNames.of(act, type.collection, qualified) }
 
     fun paths(): Map<String, Any> = buildMap {
         val collection = "/${type.collection}"
@@ -213,8 +217,5 @@ internal class OpenApiType(
             "description" to "The state's $pointer",
             "schema" to mapOf("type" to "string"),
         )
-
-        private fun inputName(act: Act): String =
-            act.input?.simpleName ?: act.name.replaceFirstChar { it.uppercase() }
     }
 }

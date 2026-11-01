@@ -89,6 +89,15 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
     And the component "Dim" is the schema of the act "dim"
     And the operation "switchOn" takes a required application/json body "#/components/schemas/SwitchOff"
 
+  Scenario: Acts of two types that share a name, but not a schema, each keep their own component
+    Given a "dimmer-banks" resource type whose "dim" act takes the schema {"type": "object", "required": ["level"]}
+    When the OpenAPI description of the lamp and the dimmer-banks is rendered
+    Then the acts' bodies are
+      | path                            | method | component      |
+      | /lamps/{id}/actions/dim         | put    | LampsDim       |
+      | /dimmer-banks/{id}/actions/dim  | put    | DimmerBanksDim |
+    And the component "LampsDim" is the schema of the act "dim"
+
   Scenario: The rule about state is prose only: where OpenAPI can say it
     Then the description of "dim" ends "Only allowed when status is ON."
     And the description of "switchOn" ends "Only allowed when status is OFF."

@@ -4,7 +4,9 @@ import com.artie.heart.Acted
 import com.artie.heart.HeartResource
 import com.artie.heart.Layers
 import com.artie.heart.OpenApiDocument
+import com.artie.heart.Offers
 import com.artie.heart.Past
+import com.artie.heart.ResourceType
 import com.artie.heart.fixtures.Lamp
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -25,6 +27,7 @@ class OpenApiSteps(private val world: LampWorld) {
     private val mapper = ObjectMapper()
     private var keepsPast = false
     private val renderings = mutableListOf<OpenApiDocument>()
+    private var other: ResourceType<Lamp, String>? = null
     private val document get() = renderings.last()
     private val json: JsonNode get() = mapper.readTree(document.body)
 
@@ -190,6 +193,36 @@ class OpenApiSteps(private val world: LampWorld) {
     private fun resolve(node: JsonNode): JsonNode {
         val ref = node.path("\$ref").asText()
         return if (ref.isEmpty()) node else ref.removePrefix("#/").split('/').fold(json) { at, key -> at.path(key) }
+    }
+
+    @Given("a {string} resource type whose {string} act takes the schema {}")
+    fun otherType(collection: String, act: String, schema: String) {
+        val lamps = world.type
+        other = ResourceType(
+            collection = collection,
+            profile = lamps.profile,
+            acts = listOf(lamps.act(act).copy(schema = schema, input = null, formerPaths = emptyList())),
+            offers = Offers(keys = listOf("ON"), offered = { listOf(act) }, whyAbsent = { _, _ -> "" }),
+            state = lamps.state,
+        )
+    }
+
+    @When("the OpenAPI description of the lamp and the {word} is rendered")
+    fun renderedWithOther(@Suppress("UNUSED_PARAMETER") collection: String) {
+        val second = HeartResource(
+            layers = Layers(checkNotNull(other) { "no second type declared" }),
+            perform = { lamp: Lamp, _, _ -> Acted(lamp) },
+        )
+        renderings += OpenApiDocument(listOf(lampResource(), second))
+    }
+
+    @Then("the acts' bodies are")
+    fun actBodies(table: DataTable) {
+        table.asMaps().forEach { row ->
+            val body = json.path("paths").path(row["path"]).path(row["method"]).path("requestBody")
+            val ref = body.path("content").path("application/json").path("schema").path("\$ref").asText()
+            assertEquals("#/components/schemas/${row["component"]}", ref, row["path"])
+        }
     }
 
     /** The lamp as a server registers it. The description reads only its declaration and whether it keeps a past. */
