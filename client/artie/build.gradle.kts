@@ -54,13 +54,13 @@ tasks.test {
     // A watch that runs to its time limit keeps every look in its trace: room for it to end and fail its assertions,
     // rather than run out of memory first.
     maxHeapSize = "2g"
-    finalizedBy(logBddRun)
+    finalizedBy("logBddRun")
 }
 
 // Red includes "does not compile": finalize the compile tasks too, so that
 // failure is logged. Gradle runs logBddRun once, after whichever ran.
-tasks.named("compileKotlin") { finalizedBy(logBddRun) }
-tasks.named("compileTestKotlin") { finalizedBy(logBddRun) }
+tasks.named("compileKotlin") { finalizedBy("logBddRun") }
+tasks.named("compileTestKotlin") { finalizedBy("logBddRun") }
 
 detekt {
     buildUponDefaultConfig = true
@@ -69,14 +69,15 @@ detekt {
     baseline = file("detekt-baseline.xml")
 }
 
-// bdd-gates: records "BDD_RUN PASS|FAIL" after every test run, including failed ones.
+// bdd-gates: records "BDD_RUN PASS|FAIL" after every test run, including failed ones, of
+// ARTIE's own features (test) and of the shared conformance features (conformanceTest).
 // The log lives at the repo root, one level up from this build. The Cucumber engine
 // is discovered through junit-platform.properties, so its XML carries the engine's name.
-val logBddRun by tasks.registering {
+fun registerBddRunLog(name: String, results: String) = tasks.register(name) {
     group = "verification"
-    description = "Appends a BDD_RUN fact to ../../.claude/tdd-events.log for the pre-commit TDD-ordering check."
+    description = "Appends a BDD_RUN fact for $results to ../../.claude/tdd-events.log for the pre-commit check."
     doLast {
-        val resultFile = file("build/test-results/test/TEST-io.cucumber.junit.platform.engine.CucumberTestEngine.xml")
+        val resultFile = file("build/test-results/$results/TEST-io.cucumber.junit.platform.engine.CucumberTestEngine.xml")
         val logFile = file("../../.claude/tdd-events.log")
         val timestamp = Instant.now().truncatedTo(ChronoUnit.SECONDS)
         logFile.parentFile.mkdirs()
@@ -101,6 +102,9 @@ val logBddRun by tasks.registering {
         )
     }
 }
+
+registerBddRunLog("logBddRun", "test")
+registerBddRunLog("logConformanceRun", "conformanceTest")
 
 kotlin {
     jvmToolchain(22)
@@ -198,10 +202,11 @@ val conformanceTest by tasks.registering(Test::class) {
     useJUnitPlatform()
     val conformance = file("../../implementations/conformance")
     systemProperty("cucumber.glue", "conformance")
-    systemProperty("cucumber.features", listOf("client", "schema").joinToString(",") { file("$conformance/features/$it.feature").path })
+    systemProperty("cucumber.features", listOf("client", "schema", "choices").joinToString(",") { file("$conformance/features/$it.feature").path })
     systemProperty("cucumber.filter.tags", "not @none")
     systemProperty("conformance.fixtures", file("$conformance/fixtures/garden").path)
     outputs.upToDateWhen { false }
+    finalizedBy("logConformanceRun")
 }
 
 // The conformance features are offline and pass in full, so check holds ARTIE to them.

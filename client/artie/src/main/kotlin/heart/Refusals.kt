@@ -25,7 +25,7 @@ class InvalidPayload(rel: String, val violations: List<String>) :
  * Rule 8). The client checks before sending, as the server would refuse it.
  */
 class NotAChoice(rel: String, val violations: List<String>) :
-    ActRefused("$rel was not sent: ${violations.joinToString("; ")}")
+    ActRefused("$rel: ${violations.joinToString("; ")}; nothing was sent")
 
 /**
  * Not sent: the fields break the form's declared JSON Schema (SPEC §6.3). The client checks before

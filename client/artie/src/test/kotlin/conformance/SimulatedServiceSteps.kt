@@ -15,8 +15,8 @@ import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-/** Steps for the simulated services (heart-sims), as the shared features name them: the build service so far. */
-class BuildServiceSteps(private val world: World) {
+/** Steps for the simulated services (heart-sims), as the shared features name them. */
+class SimulatedServiceSteps(private val world: World) {
     private val actor get() = world.actor
 
     @Given("a client at rung {word} with the {word} service's credential")
@@ -94,7 +94,7 @@ class BuildServiceSteps(private val world: World) {
         world.sims.log.filter { it.method != "GET" && it.url.endsWith("/actions/${segmentOf(form)}") }
 
     private companion object {
-        val CREDENTIALS = mapOf("build" to "Bearer build-token")
+        val CREDENTIALS = mapOf("build" to "Bearer build-token", "deploy" to "Bearer deploy-token")
         const val BUILD_FORM = "ci:build"
         const val PROBLEMS = "https://w3id.org/heart-rise/problems"
         const val HTTP_UNPROCESSABLE = 422

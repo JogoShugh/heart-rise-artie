@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 
 const heartBuild = join(dirname(fileURLToPath(import.meta.url)), "../../../../heart");
 const javaHome = process.env.ARTIE_JAVA_HOME ?? join(homedir(), ".sdkman/candidates/java/21.0.12-graal");
-const HOSTS = new Set(["build.test"]);
+const HOSTS = new Set(["build.test", "deploy.test"]);
 const realFetch = globalThis.fetch;
 let process_;
 let base;
@@ -54,6 +54,8 @@ async function control(method, path, body) {
 export const sims = {
     configureJob: (name, parameters) => control("PUT", `/_sim/build/jobs/${name}`, parameters),
     answerAct: (host, act, status, body) => control("POST", `/_sim/${host}/acts/${act}/answer`, JSON.stringify({ status, body })),
+    setRegions: (app, regions) => control("PUT", `/_sim/deploy/apps/${app}/regions`, JSON.stringify(regions)),
+    publishRelease: (app, version, status) => control("POST", `/_sim/deploy/apps/${app}/releases`, JSON.stringify({ version, status })),
     declareSchema: (host, form, schema) => control("PUT", `/_sim/${host}/forms/${encodeURIComponent(form)}/schema`, schema),
     log: async () => (await control("GET", "/_sim/log")).json(),
 };

@@ -44,23 +44,6 @@ class ActSteps(private val ctx: ClientContext) {
         ctx.lastError = runCatching { ctx.client.act(rel, payload(yaml)) }.exceptionOrNull()
     }
 
-    @Then("the choices of {string} for {string}, by the field {string}, are")
-    fun choicesBy(rel: String, property: String, field: String, table: DataTable) =
-        table.asMaps().groupBy { it.getValue(field) }.forEach { (value, rows) ->
-            val form = ctx.client.choices(rel) ?: error("no form $rel")
-            val shown = form.of(buildJsonObject { put(field, value) })[property].orEmpty()
-                .map { mapOf("value" to it.value.jsonPrimitive.content, "prompt" to it.prompt) }
-            assertEquals(rows.map { mapOf("value" to it["value"], "prompt" to it["prompt"]) }, shown, "$field $value")
-        }
-
-    @Then("the choices of {string} for {string}, with {}, are")
-    fun choices(rel: String, property: String, fields: String, table: DataTable) {
-        val choices = ctx.client.choices(rel)?.of(Json.parseToJsonElement(fields).jsonObject) ?: error("no form $rel")
-        val shown = choices[property].orEmpty()
-            .map { mapOf("value" to it.value.jsonPrimitive.content, "prompt" to it.prompt) }
-        assertEquals(table.asMaps(), shown)
-    }
-
     @Then("the client raised an error mentioning {string}")
     fun raisedError(text: String) {
         val error = assertNotNull(ctx.lastError, "expected an error, none was raised")

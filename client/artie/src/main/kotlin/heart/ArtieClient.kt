@@ -76,7 +76,7 @@ class ArtieClient(
         val form = held.affordance(rel)
             ?: run {
                 decisions.absent("affordance", rel, held.url)
-                error("No affordance '$rel' in current manifest")
+                error("$rel is not offered now; nothing was sent")
             }
         // HAL-SCHEMA-FORMS-HR Rule 8: a value outside the form's choices is never sent.
         choices(rel)?.violations(payload)?.takeIf { it.isNotEmpty() }?.let { throw NotAChoice(rel, it) }
@@ -129,7 +129,7 @@ class ArtieClient(
 
     override fun describe(rel: String): String? {
         val held = current ?: error("enter a service before describing a form")
-        val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
+        val form = held.affordance(rel) ?: error("$rel is not offered now")
         return Alps.describe(bindings, form.relation)
     }
 
@@ -152,7 +152,7 @@ class ArtieClient(
      */
     private fun act(rel: String, payload: JsonObject, resendAllowed: Boolean): HeartRepresentation {
         val held = current ?: error("enter a service before acting")
-        val form = held.affordance(rel) ?: error("No affordance '$rel' in current manifest")
+        val form = held.affordance(rel) ?: error("$rel is not offered now; nothing was sent")
         val validator = validatorFor(held)
         // A DELETE has no body: its fields fill its target's query, a template in HAL Schema Forms, and the
         // query itself in HAL-FORMS, as a GET's do (SPEC §6.2).

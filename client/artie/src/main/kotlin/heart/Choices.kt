@@ -86,7 +86,9 @@ object Choices {
         fields[property]?.let { sent ->
             val allowed = of(options, owner, fields, read).map { it.value }
             val values = if (sent is JsonArray) sent.toList() else listOf(sent)
-            values.firstOrNull { it !in allowed }?.let { "$property: $it is not one of the choices" }
+            // Said as every client says it: a text value bare, as it reads, not quoted as JSON.
+            values.firstOrNull { it !in allowed }
+                ?.let { "$property: ${(it as? JsonPrimitive)?.contentOrNull ?: it} is not one of the choices" }
         }
     }
 
