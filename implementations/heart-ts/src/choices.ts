@@ -5,7 +5,7 @@ import { Json, JsonObject, isObject, listOf, objectOf, stringOf, stringsOf } fro
 export interface Choice { value: Json; prompt: string }
 
 /** What [misfit] needs of one property. */
-export interface PropertyCheck { property: string; sent: Json | undefined; required: boolean; choices: Choice[] }
+interface PropertyCheck { property: string; sent: Json | undefined; required: boolean; choices: Choice[] }
 
 /** The properties of [schema] that carry `hr:options`, with it. */
 export function declared(schema: JsonObject): [string, JsonObject][] {

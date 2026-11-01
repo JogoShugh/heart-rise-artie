@@ -43,18 +43,25 @@ Feature: What a HEART client must do, against a real HEART service
     And the water act was sent once
     And the state's "moistureLevel" is 50
 
-  Scenario Outline: A body the server refuses is told apart from one a rule refuses: <case>
+  Scenario Outline: A body outside the form's schema is refused before anything is sent, at <rung>
+    Given a client at rung <rung> with the garden's credential
+    When it enters at the bookmark
+    And it submits "garden:get-bed" with {"id": 2}
+    And it tries to submit "garden:water-cell" with {"milliliters": 0}
+    Then it was refused as "outside-schema" before sending, because "milliliters"
+
+    Examples:
+      | rung |
+      | L0   |
+      | L2   |
+
+  Scenario: A body a rule refuses is told apart
     Given a client at rung L0 with the garden's credential
     When it enters at the bookmark
     And it submits "garden:get-bed" with {"id": 2}
-    And it tries to submit "garden:water-cell" with <body>
-    Then it was refused as "<kind>" with status 422
-    And the refusal says "<says>"
-
-    Examples:
-      | case                | body                  | kind          | says                                              |
-      | breaks the schema   | {"milliliters": 0}    | invalid-input | milliliters                                       |
-      | refused by a rule   | {"milliliters": 700}  | rule-refused  | The bed would be waterlogged: at most 600 ml now. |
+    And it tries to submit "garden:water-cell" with {"milliliters": 700}
+    Then it was refused as "rule-refused" with status 422
+    And the refusal says "The bed would be waterlogged: at most 600 ml now."
 
   Scenario: An act the representation does not offer is refused before anything is sent
     Given a client at rung L0 with the garden's credential

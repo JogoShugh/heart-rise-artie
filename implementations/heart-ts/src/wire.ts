@@ -18,6 +18,8 @@ export interface Form {
     method: string;
     contentType: string;
     schema: JsonObject;
+    /** Identifies the schema: its integrity value if linked, else a digest of it. */
+    schemaKey: string;
 }
 
 export interface Link { rel: string; href: string; title?: string; integrity?: string }
@@ -82,8 +84,12 @@ export function formOf(name: string, raw: JsonObject, schema: JsonObject): Form 
         method: String(raw.method ?? "POST"),
         contentType: String(raw.contentType ?? "application/json"),
         schema,
+        schemaKey: schemaKeyOf(objectOf(raw.schema)),
     };
 }
+
+const schemaKeyOf = (declared: JsonObject): string =>
+    stringOf(declared["hr:integrity"]) ?? createHash("sha256").update(JSON.stringify(declared)).digest("base64");
 
 /** Whether [bytes] are what an integrity value such as `sha256-...` names. */
 export function matchesIntegrity(bytes: Buffer, integrity: string): boolean {
@@ -94,5 +100,5 @@ export function matchesIntegrity(bytes: Buffer, integrity: string): boolean {
 /** Each violation is a JSON Pointer to the offending value and a message (the draft, Conditional Acts). */
 export function violationsOf(problem: JsonObject): string[] {
     return listOf(problem.violations).map(objectOf)
-        .map((v) => `${v.pointer ?? ""} ${v.message ?? v.detail ?? ""}`.trim());
+        .map((v) => `${stringOf(v.pointer) ?? ""} ${stringOf(v.message) ?? stringOf(v.detail) ?? ""}`.trim());
 }

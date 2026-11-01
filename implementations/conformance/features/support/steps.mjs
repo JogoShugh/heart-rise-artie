@@ -19,6 +19,7 @@ Before(function ({ pickle }) {
 
 After(async function () {
     this.fake?.close();
+    this.otherOrigin?.close();
     await this.garden?.close();
 });
 
@@ -28,7 +29,8 @@ Given("the garden is at its seed state", async function () {
 
 function client(world, rung, authorization) {
     const log = [];
-    return { log, heart: new heart.HeartClient({ rung, authorization, log }) };
+    const schemaFailures = [];
+    return { log, schemaFailures, heart: new heart.HeartClient({ rung, authorization, log, schemaFailures }) };
 }
 
 Given("a client at rung {word} with the garden's credential", function (rung) {
@@ -294,4 +296,236 @@ Then("the second read of the agents carried the ETag of the first, and was answe
 
 Then("the act {string} was sent once", function (form) {
     assert.equal(this.fakeLog.filter((r) => r.method === "POST" && r.url === `/actions/${form}`).length, 1);
+});
+
+// ---- A form's schema, checked just before an act is sent ----
+
+/** One resource offering one form, shaped by [world.service]; every request is kept in [world.fakeLog]. */
+function resourceOf(world) {
+    const { name, schema, target, templated, method, form, state, links } = world.service;
+    return JSON.stringify({
+        ...state,
+        _links: { self: { href: "/" }, ...links },
+        _forms: { [name]: { _links: { target: { href: target, templated } }, method, schema, ...form } },
+    });
+}
+
+function answer(world, req, res, body) {
+    const { service } = world;
+    const refused = req.method !== "GET" ? service.refusal : undefined;
+    if (req.method === "GET" && service.readStatus) {
+        res.writeHead(service.readStatus);
+        return res.end();
+    }
+    if (world.fakeRefusal && req.method !== "GET") {
+        res.writeHead(422, { "Content-Type": "application/problem+json" });
+        return res.end(JSON.stringify(world.fakeRefusal));
+    }
+    if (refused) {
+        res.writeHead(refused.status, { "Content-Type": "application/problem+json" });
+        return res.end(refused.body);
+    }
+    const headers = { "Content-Type": "application/hal+json", ETag: '"1"', ...service.headers };
+    if (service.profile) headers.Link = `<${heart.PROFILE}>; rel="profile"`;
+    res.writeHead(200, headers);
+    res.end(body ?? resourceOf(world));
+}
+
+const recorded = (req, body) => ({
+    method: req.method, url: req.url, body,
+    authorization: req.headers.authorization, ifMatch: req.headers["if-match"], contentType: req.headers["content-type"],
+});
+
+async function serve(handler) {
+    const server = http.createServer(async (req, res) => {
+        const chunks = [];
+        for await (const chunk of req) chunks.push(chunk);
+        handler(req, res, Buffer.concat(chunks).toString("utf8"));
+    });
+    await new Promise((ok) => server.listen(0, "127.0.0.1", ok));
+    return server;
+}
+
+Given("a service offering {string} with the schema {}", async function (name, schema) {
+    this.service = {
+        name, schema: JSON.parse(schema), target: `/actions/${name}`, templated: false, method: "POST",
+        form: {}, state: {}, links: {}, headers: {}, profile: true,
+    };
+    this.fakeLog = [];
+    this.fake = await serve((req, res, body) => {
+        this.fakeLog.push(recorded(req, body));
+        answer(this, req, res);
+    });
+    this.fakeUrl = `http://127.0.0.1:${this.fake.address().port}/`;
+});
+
+Given("that service refuses {string} as invalid input, saying {string}", function (_name, detail) {
+    this.fakeRefusal = { type: "https://w3id.org/heart-rise/problems/invalid-input", title: "Invalid input", detail };
+});
+
+const actsOn = (world, form) => world.fakeLog.filter((r) => r.method === "POST" && r.url === `/actions/${form}`);
+
+Then("the act {string} was sent {int} times", function (form, times) {
+    assert.equal(actsOn(this, form).length, times);
+});
+
+Then("the act {string} was sent with exactly {}", function (form, body) {
+    assert.deepEqual(JSON.parse(actsOn(this, form)[0].body), JSON.parse(body));
+});
+
+Then("it was refused as {string} before sending, because {string}", function (kind, text) {
+    assert.ok(this.error instanceof heart.Refused, `expected a refusal, got ${this.error}`);
+    assert.equal(this.error.kind, kind);
+    assert.ok(this.error.violations.join(" ").includes(text), this.error.violations.join(" "));
+    assert.ok(this.error.message.includes("nothing was sent"), this.error.message);
+    const sent = this.me.log.slice(this.sentBefore).filter((r) => r.method !== "GET");
+    assert.deepEqual(sent, [], "something was sent");
+});
+
+Then("the local log holds one schema failure, for {string}", function (form) {
+    assert.equal(this.me.schemaFailures.length, 1, JSON.stringify(this.me.schemaFailures));
+    const [failure] = this.me.schemaFailures;
+    assert.equal(failure.form, form);
+    assert.ok(failure.schema.length > 0);
+    assert.ok(failure.error.length > 0);
+});
+
+// ---- What a client does with what a service sends ----
+
+Given("that service answers {string} with status {int} and the body {}", function (_name, status, body) {
+    this.service.refusal = { status, body };
+});
+
+Given("that service names no profile", function () {
+    this.service.profile = false;
+});
+
+Given("that service refuses every read with status {int}", function (status) {
+    this.service.readStatus = status;
+});
+
+Given("that service links {string} titled {string}", function (rel, title) {
+    this.service.links[rel] = { href: "/", title };
+});
+
+Given("that service sends {string} to another origin", async function (name) {
+    this.otherLog = [];
+    this.otherOrigin = await serve((req, res, body) => {
+        this.otherLog.push(recorded(req, body));
+        answer(this, req, res, JSON.stringify({ _links: { self: { href: "/" } }, _forms: {} }));
+    });
+    this.service.target = `http://127.0.0.1:${this.otherOrigin.address().port}/actions/${name}`;
+});
+
+Given("that service offers {string} by {word}", function (_name, method) {
+    this.service.method = method;
+});
+
+Given("that service's form names no method", function () {
+    this.service.method = undefined;
+});
+
+Given("that service's form takes {string}", function (type) {
+    this.service.form.contentType = type;
+});
+
+Given("that service reads {string} at {string}, with pointers {} into the state {}", function (_name, target, pointers, state) {
+    Object.assign(this.service, { method: "GET", target, templated: true, state: JSON.parse(state) });
+    this.service.form["hr:templatePointers"] = JSON.parse(pointers);
+});
+
+function declares(world, schema, state) {
+    Object.assign(world.service, { schema: JSON.parse(schema), state: JSON.parse(state) });
+}
+
+Given("that service declares the schema {}, with the state {}", function (schema, state) {
+    declares(this, schema, state);
+});
+
+Given("that service now declares the schema {}", function (schema) {
+    declares(this, schema, "{}");
+});
+
+Given("that service applies L2, with its affordance set linked without an integrity value", function () {
+    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
+    this.service.links["hr:forms"] = { href: "/set" };
+});
+
+Given("that service applies L2, with no affordance set", function () {
+    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
+});
+
+Given("that service answers acts from {string}", function (location) {
+    this.service.headers["Content-Location"] = location;
+});
+
+/** Runs [act], keeping what it throws for a Then to read. */
+async function trying(world, act) {
+    try { world.rep = await act(); } catch (e) { world.error = e; }
+}
+
+When("it tries to read the resource again", async function () {
+    await trying(this, () => this.me.heart.refresh());
+});
+
+When("it reads the resource again", async function () {
+    this.rep = await this.me.heart.refresh();
+});
+
+When("it tries to read the choices of {string}", async function (form) {
+    await trying(this, () => this.me.heart.choices(form));
+});
+
+When("it tries to follow {string} titled {string}", async function (rel, title) {
+    await trying(this, () => this.me.heart.follow(rel, title));
+});
+
+When("it tries to follow {string} with no title", async function (rel) {
+    await trying(this, () => this.me.heart.follow(rel));
+});
+
+Then("it failed, saying {string}", function (text) {
+    assert.ok(this.error, "expected a failure");
+    assert.ok(this.error.message.includes(text), this.error.message);
+});
+
+Then("it holds a representation", function () {
+    assert.equal(this.error, undefined);
+    assert.ok(this.rep);
+});
+
+Then("the resource was read {int} times", function (times) {
+    assert.equal(this.fakeLog.filter((r) => r.method === "GET").length, times);
+});
+
+Then("the service was sent the credential", function () {
+    assert.ok(this.fakeLog[0].authorization);
+});
+
+Then("the other origin was sent none", function () {
+    assert.equal(this.otherLog.length, 1);
+    assert.equal(this.otherLog[0].authorization, undefined);
+});
+
+const lastRequest = (world) => world.fakeLog.at(-1);
+
+Then("the last request was {word} with the body {string}", function (method, body) {
+    assert.equal(lastRequest(this).method, method);
+    assert.equal(lastRequest(this).body, body);
+});
+
+Then("it carried the validator it read", function () {
+    assert.equal(lastRequest(this).ifMatch, '"1"');
+});
+
+Then("it had the content type {string}", function (type) {
+    assert.equal(lastRequest(this).contentType ?? "", type);
+});
+
+Then("the last request was for {string}", function (url) {
+    assert.equal(lastRequest(this).url, url);
+});
+
+Then("the client holds {string}", function (path) {
+    assert.equal(new URL(this.me.heart.current.url).pathname, path);
 });

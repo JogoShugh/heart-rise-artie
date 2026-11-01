@@ -1,10 +1,11 @@
 // The only module that talks to the network. It never builds a URI of its own:
 // targets come from forms, expanded as each form says.
 import { Choice, choicesAmong, declared, misfit, requiredOf } from "./choices";
-import { IntegrityFailure, NotAChoice, Refused } from "./errors";
+import { IntegrityFailure, NotAChoice, OutsideSchema, Refused } from "./errors";
 import { Json, JsonObject, isObject, objectOf, parseJson, resolve, stringMembers, stringOf } from "./json";
 import { needsRereading, refusalOf } from "./refusal";
 import { expand, fill, fillPointer, withQuery } from "./template";
+import { FormChecks, SchemaFailure } from "./validation";
 import { Form, Link, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, linksOf, matchesIntegrity, stateOf } from "./wire";
 
 export interface Options {
@@ -13,13 +14,15 @@ export interface Options {
     authorization?: string;
     /** Every request this client sends, for a test to inspect. */
     log?: { method: string; url: string; status: number; ifMatch?: string }[];
+    /** Schemas that could not be compiled, noted locally. The act goes to the service anyway. */
+    schemaFailures?: SchemaFailure[];
 }
 
 const bytesOf = async (response: Response): Promise<Buffer> => Buffer.from(await response.arrayBuffer());
 const objectFrom = (bytes: Buffer): JsonObject => objectOf(parseJson(bytes.toString("utf8")));
 
 const problemOf = async (response: Response): Promise<JsonObject> =>
-    objectOf(await response.json().catch(() => ({})));
+    objectOf(await response.text().then(parseJson).catch(() => null));
 
 function requireProfile(url: string, response: Response): void {
     const links = response.headers.get("Link") ?? "";
@@ -40,10 +43,12 @@ export class HeartClient {
     private origin?: string;
     /** What the client last read of each plain JSON resource, to revalidate it with its ETag. */
     private readonly plainReads = new Map<string, { etag: string; body: Json }>();
+    private readonly checks: FormChecks;
     current?: Representation;
 
     constructor(private readonly options: Options = {}) {
         this.rung = options.rung ?? "L0";
+        this.checks = new FormChecks(options.schemaFailures);
     }
 
     /** Enter a service at its bookmark. */
@@ -120,6 +125,15 @@ export class HeartClient {
         if (misfits.length) {
             throw new NotAChoice({ kind: "not-a-choice", message: `${misfits.join("; ")}; nothing was sent`, status: 0, violations: misfits });
         }
+        this.requireSchema(form, fields);
+    }
+
+    /** Refuses, sending nothing, what the form's declared schema disallows. */
+    private requireSchema(form: Form, fields: JsonObject): void {
+        const violations = this.checks.outsideSchema(form, fields);
+        if (!violations.length) return;
+        const message = `${form.name}: ${violations.join("; ")}; nothing was sent`;
+        throw new OutsideSchema({ kind: "outside-schema", message, status: 0, violations });
     }
 
     private async resolveChoices(options: JsonObject, held: Representation, fields: JsonObject): Promise<Choice[]> {

@@ -10,4 +10,5 @@ export { HeartClient, Options } from "./client";
 export { Choice } from "./choices";
 export * from "./errors";
 export { Json } from "./json";
+export { SchemaFailure } from "./validation";
 export { Embedded, Form, Link, PROFILE, Representation, Rung } from "./wire";

@@ -22,4 +22,6 @@ export class PreconditionRequired extends Refused {}
 export class NotAuthenticated extends Refused {}
 /** Not sent: a value is not among its property's choices, or a required one has none now. */
 export class NotAChoice extends Refused {}
+/** Not sent: the fields break the schema the service declared for the form. */
+export class OutsideSchema extends Refused {}
 export class IntegrityFailure extends Error {}

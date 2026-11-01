@@ -4,7 +4,7 @@ import { JsonObject } from "./json";
 import { PROBLEMS, violationsOf } from "./wire";
 
 /** What a refused response said. */
-export interface RefusedResponse { name: string; status: number; statusText: string; problem: JsonObject }
+interface RefusedResponse { name: string; status: number; statusText: string; problem: JsonObject }
 
 function unprocessable(message: string, problem: JsonObject): Refused {
     const violations = violationsOf(problem);
@@ -15,7 +15,7 @@ function unprocessable(message: string, problem: JsonObject): Refused {
 
 export function refusalOf({ name, status, statusText, problem }: RefusedResponse): Refused {
     const detail = String(problem.detail ?? problem.title ?? statusText);
-    const said = `${name} was refused (${status}): ${detail}`;
+    const said = `${name} was refused (${String(status)}): ${detail}`;
     switch (status) {
         case 412: return new StaleAct({ kind: "stale", message: `${said}; re-read, not resent`, status });
         case 409: return new NotOffered({ kind: "not-offered", message: said, status });

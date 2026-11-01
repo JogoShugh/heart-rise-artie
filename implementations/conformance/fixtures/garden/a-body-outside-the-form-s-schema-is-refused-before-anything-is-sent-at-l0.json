@@ -44,24 +44,5 @@
       },
       "body": "{\"id\":2,\"label\":\"bed-2\",\"widthFt\":4,\"lengthFt\":8,\"status\":\"PLANTED\",\"cropName\":\"tomato\",\"growthPoints\":80,\"moistureLevel\":40,\"_links\":{\"self\":{\"href\":\"/beds/2\"},\"curies\":[{\"name\":\"garden\",\"href\":\"/profiles/garden#{rel}\",\"templated\":true},{\"name\":\"hr\",\"href\":\"https://w3id.org/heart-rise/rels/{rel}\",\"templated\":true}],\"hr:unavailable\":{\"href\":\"/unavailable/1648f3dc5307f159\",\"type\":\"application/json\",\"integrity\":\"sha256-Fkjz3FMH8VnKolwCT8ID7fvf1jvy2LKP83Ge1Xk4UOA=\"}},\"_forms\":{\"garden:water-cell\":{\"title\":\"Water the bed\",\"description\":\"Pours water into every cell of a planted bed. Enough water makes it ready to harvest.\",\"_links\":{\"target\":{\"href\":\"/beds/2/actions/water-cell\"}},\"method\":\"POST\",\"contentType\":\"application/json\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"properties\":{\"milliliters\":{\"description\":\"Millilitres of water poured into each cell\",\"examples\":[250],\"maximum\":1000,\"minimum\":1,\"title\":\"Water per cell\",\"type\":\"integer\"}},\"required\":[\"milliliters\"],\"title\":\"Water Cell\",\"type\":\"object\",\"$id\":\"/schemas/7f232c04c52671dd\"},\"hr:integrity\":\"sha256-PNINjwmbImFF1BjHGk9F/t6JIDu+xde09JqZZ5PL4cA=\"}}}"
     }
-  },
-  {
-    "request": {
-      "method": "POST",
-      "url": "/beds/2/actions/water-cell",
-      "authorized": true,
-      "ifMatch": "\"seq-3.hsf.L0.b9f977b07094344b\"",
-      "ifNoneMatch": null,
-      "preferred": null,
-      "body": "{\"milliliters\":0}"
-    },
-    "response": {
-      "status": 422,
-      "headers": {
-        "content-length": "274",
-        "content-type": "application/problem+json"
-      },
-      "body": "{\"type\":\"https://w3id.org/heart-rise/problems/invalid-input\",\"title\":\"The body does not match the form's schema\",\"status\":422,\"detail\":\"request body does not satisfy the affordance schema\",\"violations\":[{\"pointer\":\"/milliliters\",\"message\":\"must have a minimum value of 1\"}]}"
-    }
   }
 ]

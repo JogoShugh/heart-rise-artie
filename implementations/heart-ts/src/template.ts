@@ -3,7 +3,7 @@ import { JsonObject, listOf, resolve } from "./json";
 import { Form } from "./wire";
 
 /** Where a template's variables are found. */
-export interface TemplateScope { pointers: Record<string, string>; state: JsonObject; fields: JsonObject }
+interface TemplateScope { pointers: Record<string, string>; state: JsonObject; fields: JsonObject }
 
 const VARIABLE = /\{([^}]+)\}/g;
 
@@ -43,10 +43,15 @@ export function expand(form: Form, state: JsonObject, fields: JsonObject): strin
     return form.templated ? fill(form.target, { pointers: form.templatePointers, state, fields }) : form.target;
 }
 
+/** The names a template takes, from plain variables and query expressions alike. */
+const namesIn = (template: string): string[] =>
+    [...template.matchAll(VARIABLE)].flatMap((match) => (match[1] ?? "").replace("?", "").split(","));
+
 /** Adds to a safe form's [target] each field its template did not take. */
 export function withQuery(target: URL, form: Form, fields: JsonObject): URL {
+    const taken = form.templated ? namesIn(form.target) : [];
     for (const [key, value] of Object.entries(fields)) {
-        if (!form.templated || !form.target.includes(`{${key}}`)) target.searchParams.set(key, String(value));
+        if (!taken.includes(key)) target.searchParams.set(key, String(value));
     }
     return target;
 }

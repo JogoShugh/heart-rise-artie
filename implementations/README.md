@@ -15,6 +15,9 @@
   Without `GARDEN_URL` the same scenarios replay `conformance/fixtures/garden/`,
   offline, which is what the TDD gate runs. `conformance/record.sh` records those
   fixtures from its own isolated garden; run it when representations change.
+  `service.feature` and `schema.feature` hold what a client does with what a
+  service sends. In `heart-ts`, `npm run mutation` runs Stryker. It edits `src/`
+  in place while it runs, so run it where nobody else is working.
 
 Both are by the same author as ARTIE, so they show the specification is
 enough to write a client from; they are not independent in the standards

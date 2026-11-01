@@ -3,7 +3,17 @@
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
 export type JsonObject = { [key: string]: Json };
 
-export const parseJson = (text: string): Json => JSON.parse(text);
+const isJson = (value: unknown): value is Json => {
+    if (typeof value !== "object" || value === null) return ["boolean", "number", "string"].includes(typeof value) || value === null;
+    return Object.values(value).every(isJson);
+};
+
+/** The one place raw text becomes a value; `JSON.parse` itself is untyped. */
+export function parseJson(text: string): Json {
+    const parsed: unknown = JSON.parse(text);
+    if (!isJson(parsed)) throw new Error("not JSON");
+    return parsed;
+}
 
 export const isObject = (value: Json | undefined): value is JsonObject =>
     typeof value === "object" && value !== null && !Array.isArray(value);
