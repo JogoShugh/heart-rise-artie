@@ -6,6 +6,7 @@ import { createHash } from "node:crypto";
 import http from "node:http";
 import { createRequire } from "node:module";
 import { openGarden } from "./garden-fixture.mjs";
+import { sims } from "./sims.mjs";
 
 const require = createRequire(import.meta.url);
 const heart = require("../../../heart-ts/dist/index.js");
@@ -398,8 +399,9 @@ Given("that service refuses {string} as invalid input, saying {string}", functio
 
 const actsOn = (world, form) => world.fakeLog.filter((r) => r.method === "POST" && r.url === `/actions/${form}`);
 
-Then("the act {string} was sent {int} times", function (form, times) {
-    assert.equal(actsOn(this, form).length, times);
+Then("the act {string} was sent {int} times", async function (form, times) {
+    const acts = this.fakeLog ? actsOn(this, form) : await simActsOn(form);
+    assert.equal(acts.length, times);
 });
 
 Then("the act {string} was sent with exactly {}", function (form, body) {
@@ -826,4 +828,66 @@ Then("both hold the same state", function () {
 Then("both offer the act {string}, by the same method", function (act) {
     assert.deepEqual(offeredActs(this.me), [`POST ${act}`]);
     assert.deepEqual(offeredActs(this.other), [`POST ${act}`]);
+});
+
+// ---- The simulated services (heart/heart-sims) ----
+
+const SERVICES = { build: { host: "build.test", credential: "Bearer build-token" } };
+
+/** The act a form names, as its target's last segment: "ci:build" is acted on at .../actions/build. */
+const segmentOf = (form) => form.slice(form.indexOf(":") + 1);
+
+/** The acts on [form] the simulated services received, in order. */
+async function simActsOn(form) {
+    return (await sims.log()).filter((r) => r.method !== "GET" && r.url.endsWith(`/actions/${segmentOf(form)}`));
+}
+
+Given("a client at rung {word} with the {word} service's credential", function (rung, service) {
+    this.me = client(this, rung, SERVICES[service].credential);
+});
+
+Given("the build service has a job {string} whose parameters are {}", async function (name, parameters) {
+    await sims.configureJob(name, parameters);
+});
+
+Given("the build service declares the parameters of its job {string} as {}, without checking them", async function (name, parameters) {
+    await sims.declareSchema(SERVICES.build.host, "ci:build", parameters);
+});
+
+When("the job {string} is given the parameters {}", async function (name, parameters) {
+    await sims.configureJob(name, parameters);
+});
+
+Given("the build service refuses {string} as invalid input, saying {string}", async function (form, detail) {
+    const problem = { type: "https://w3id.org/heart-rise/problems/invalid-input", title: "Invalid input", detail };
+    await sims.answerAct(SERVICES.build.host, segmentOf(form), 422, JSON.stringify(problem));
+});
+
+When("it enters the job {string}", async function (name) {
+    this.rep = await this.me.heart.enter(`http://${SERVICES.build.host}/jobs/${name}`);
+});
+
+Then("the act {string} was sent once, with exactly {}", async function (form, body) {
+    const acts = await simActsOn(form);
+    assert.equal(acts.length, 1);
+    assert.deepEqual(JSON.parse(acts[0].body), JSON.parse(body));
+});
+
+/** A refusal of [kind] before sending: nothing that acts went out after the try. */
+function refusedBeforeSending(world, kind) {
+    assert.ok(world.error instanceof heart.Refused, `expected a refusal, got ${world.error}`);
+    assert.equal(world.error.kind, kind);
+    assert.ok(world.error.message.includes("nothing was sent"), world.error.message);
+    const sent = world.me.log.slice(world.sentBefore).filter((r) => r.method !== "GET");
+    assert.deepEqual(sent, [], "something was sent");
+}
+
+Then("it was refused as {string} before sending, with the one violation {string}", function (kind, violation) {
+    refusedBeforeSending(this, kind);
+    assert.deepEqual(this.error.violations, [violation]);
+});
+
+Then("it was refused as {string} before sending, with the violations", function (kind, table) {
+    refusedBeforeSending(this, kind);
+    assert.deepEqual(this.error.violations, table.raw().map(([violation]) => violation));
 });
