@@ -5,6 +5,8 @@ fixes for pains the reader has just felt, each named as it's needed. HEART is na
 is TypeScript on Node, against GitHub's real API and the scratch repository; the client grows, post by post, into
 `implementations/heart-ts`.
 
+The frame: teams put their own controls in front of systems they don't control, so AI tools do what the team wants, not merely what they can. GitHub is the example because we don't own it; the technique isn't limited to things we own. In an API we do own, the same controls go in from the start, which is more powerful still: no layer to add, no rule to copy. The series should say so early and come back to it at the end.
+
 The running example: a review dashboard for our team's pull requests, under *our* merge policy, which the
 enterprise team won't configure in GitHub. Three clients come to share that policy: the dashboard, a merge CLI, and
 an agent.
