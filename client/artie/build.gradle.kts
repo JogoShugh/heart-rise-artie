@@ -201,3 +201,6 @@ val conformanceTest by tasks.registering(Test::class) {
     systemProperty("conformance.fixtures", file("$conformance/fixtures/garden").path)
     outputs.upToDateWhen { false }
 }
+
+// The conformance features are offline and pass in full, so check holds ARTIE to them.
+tasks.named("check") { dependsOn(conformanceTest) }
