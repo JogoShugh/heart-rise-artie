@@ -57,5 +57,9 @@ export const sims = {
     setRegions: (app, regions) => control("PUT", `/_sim/deploy/apps/${app}/regions`, JSON.stringify(regions)),
     publishRelease: (app, version, status) => control("POST", `/_sim/deploy/apps/${app}/releases`, JSON.stringify({ version, status })),
     declareSchema: (host, form, schema) => control("PUT", `/_sim/${host}/forms/${encodeURIComponent(form)}/schema`, schema),
+    faults: (host, faults) => control("POST", `/_sim/${host}/faults`, JSON.stringify(faults)),
+    template: (host, name, template) => control("PUT", `/_sim/${host}/templates/${name}`, template),
+    deployServesUpTo: (rung) => control("PUT", "/_sim/deploy/rung", rung),
+    startDeploying: (app) => control("POST", `/_sim/deploy/apps/${app}/deployments`),
     log: async () => (await control("GET", "/_sim/log")).json(),
 };

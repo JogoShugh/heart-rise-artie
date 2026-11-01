@@ -69,7 +69,8 @@ object HalFormsTemplates {
         val target = obj["target"]?.jsonPrimitive?.content ?: base
         return AffordanceForm(
             rel = rel,
-            target = URI(base).resolve(target).toString(),
+            // A HAL-FORMS target is never a template: a brace in it is a character like any other, sent encoded.
+            target = URI(base).resolve(target.replace("{", "%7B").replace("}", "%7D")).toString(),
             templated = false,
             method = obj["method"]?.jsonPrimitive?.content ?: "GET",
             contentType = obj["contentType"]?.jsonPrimitive?.content ?: "application/json",

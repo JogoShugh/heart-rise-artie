@@ -3,6 +3,7 @@ package conformance
 import com.artie.heart.sims.Simulator
 import heart.ArtieClient
 import heart.CachingTransport
+import heart.Dialect
 import heart.EventLog
 import heart.EventSink
 import heart.HeartRepresentation
@@ -45,20 +46,31 @@ class World {
         service = InProcessTransport(sims.handler)
     }
 
-    /** ARTIE at [rung], sending [token] on every request it makes, and keeping its event log. */
-    fun client(rung: String, token: String?): Actor {
+    /**
+     * ARTIE at [rung] in [dialect], sending [token] on every request it makes, and keeping its event
+     * log. Its shared layers are kept in [cache], made over its own wire when none is given; null keeps none.
+     */
+    fun client(
+        rung: String,
+        token: String?,
+        dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
+        cache: ((Transport) -> Transport)? = { CachingTransport(it) },
+    ): Actor {
         val log = mutableListOf<HeartRequest>()
         val events = mutableListOf<JsonObject>()
-        val wire = object : Transport {
-            override fun send(request: HeartRequest): HeartResponse {
-                log += request
-                val sent = token?.let { request.copy(headers = request.headers + ("Authorization" to it)) }
-                return service.send(sent ?: request)
-            }
-        }
+        val wire = IntegrityCheck(wire(log, token))
         val eventLog = EventLog(EventSink { events += Json.parseToJsonElement(it).jsonObject }, null, "conformance")
-        val client = ArtieClient(CachingTransport(IntegrityCheck(wire)), Rung.valueOf(rung), events = eventLog)
+        val client = ArtieClient(cache?.invoke(wire) ?: wire, Rung.valueOf(rung), dialect, events = eventLog)
         return Actor(client, log, events)
+    }
+
+    /** The service, as one client reaches it: every request kept in [log], [token] added to each. */
+    fun wire(log: MutableList<HeartRequest>, token: String?) = object : Transport {
+        override fun send(request: HeartRequest): HeartResponse {
+            log += request
+            val sent = token?.let { request.copy(headers = request.headers + ("Authorization" to it)) }
+            return service.send(sent ?: request)
+        }
     }
 
     /** Runs [step], keeping what it throws for a Then to read. */
@@ -71,3 +83,6 @@ class World {
         }
     }
 }
+
+/** The credential each simulated service admits, by the name the features give it. */
+val CREDENTIALS = mapOf("build" to "Bearer build-token", "deploy" to "Bearer deploy-token")

@@ -154,15 +154,15 @@ class ArtieClient(
         val held = current ?: error("enter a service before acting")
         val form = held.affordance(rel) ?: error("$rel is not offered now; nothing was sent")
         val validator = validatorFor(held)
-        // A DELETE has no body: its fields fill its target's query, a template in HAL Schema Forms, and the
-        // query itself in HAL-FORMS, as a GET's do (SPEC §6.2).
-        val deletes = form.method == "DELETE"
-        val target = if (deletes && asking.dialect == Dialect.HAL_FORMS) {
+        // A DELETE or a HEAD has no body: its fields fill its target's query, a template in HAL Schema Forms,
+        // and the query itself in HAL-FORMS, as a GET's do (SPEC §6.2).
+        val bodyless = form.method in BODYLESS
+        val target = if (bodyless && asking.dialect == Dialect.HAL_FORMS) {
             HalFormsTemplates.getTarget(form.target, payload)
         } else {
             targetOf(form, held, payload)
         }
-        val act = Act(target, form.method, form.contentType, payload.toString().takeUnless { deletes }, validator)
+        val act = Act(target, form.method, form.contentType, payload.toString().takeUnless { bodyless }, validator)
         val outcome = bindings.forUri(act.url).act(act, asking)
         decisions.actSent(rel, act, held.url, outcome)
         broughtIntoBeing = outcome is Outcome.Done && outcome.newResource != null
@@ -222,7 +222,7 @@ class ArtieClient(
         decisions.rung(url, layer1Received.appliedAs, applied)
         decisions.forms(url, layer1.formsLink, applied)
         // SPEC §6.7: at L1 and L2 the acts offered are in the set; with no link to it they cannot be known.
-        check(layer1.formsLink != null || applied == Rung.L0) { "$url is at $applied but links no affordance set" }
+        check(layer1.formsLink != null || applied == Rung.L0) { "$url applied $applied but links no affordance set" }
         val synced = layer1.formsLink?.takeIf { applied != Rung.L0 }?.let { link ->
             layer1.withManifest(layers.manifest(link, layer1.formsIntegrity))
         } ?: layer1
@@ -238,6 +238,9 @@ class ArtieClient(
 
         /** SPEC §6.2: the problem type of a 422 whose body was valid but a rule refused. */
         const val RULE_REFUSED = ProblemDetails.BASE + "rule-refused"
+
+        /** The methods whose acts carry no body. */
+        val BODYLESS = setOf("DELETE", "HEAD")
 
         /** What a list of choices is read as (HAL-SCHEMA-FORMS-HR Rule 8). */
         const val JSON_MEDIA_TYPE = "application/json"

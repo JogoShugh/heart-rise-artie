@@ -19,6 +19,9 @@ sealed interface AppEvent {
 
     /** A deployment of [release] to [region] of [environment] began. */
     data class DeploymentStarted(val release: String, val environment: String, val region: String) : AppEvent
+
+    /** The deployment under way was cancelled; the app is idle again. */
+    data class DeploymentCancelled(val reason: String) : AppEvent
 }
 
 /** An app as its events leave it. */
@@ -59,6 +62,7 @@ data class AppState(
                 is AppEvent.DeploymentStarted -> state.copy(
                     status = DEPLOYING, release = event.release, environment = event.environment, region = event.region,
                 )
+                is AppEvent.DeploymentCancelled -> state.copy(status = IDLE)
             }
             return next.copy(version = recorded.sequenceNo)
         }
@@ -73,6 +77,7 @@ val APPS = EventSourcing(
         "RegionsSet" to AppEvent.RegionsSet::class.java,
         "ReleasePublished" to AppEvent.ReleasePublished::class.java,
         "DeploymentStarted" to AppEvent.DeploymentStarted::class.java,
+        "DeploymentCancelled" to AppEvent.DeploymentCancelled::class.java,
     ),
     stateClass = AppState::class.java,
     empty = AppState::empty,
@@ -90,4 +95,6 @@ object AppDecisions {
     /** Starts a deployment; which values may be chosen, the declaration's choices have already checked. */
     fun deploy(release: String, environment: String, region: String): List<AppEvent> =
         listOf(AppEvent.DeploymentStarted(release, environment, region))
+
+    fun cancel(): List<AppEvent> = listOf(AppEvent.DeploymentCancelled("cancelled"))
 }

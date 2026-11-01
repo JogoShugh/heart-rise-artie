@@ -22,7 +22,9 @@ object HeartResponseParser {
 
     fun parse(received: Received, url: String, dialect: Dialect = Dialect.HAL_SCHEMA_FORMS): HeartRepresentation {
         val profiles = received.profiles
-        require(dialect.profile in profiles) {
+        // HAL-FORMS has a media type of its own, which says the dialect; HAL Schema Forms needs its profile.
+        val halForms = dialect == Dialect.HAL_FORMS && received.mediaType == dialect.mediaType
+        require(halForms || dialect.profile in profiles) {
             "response from $url does not name the profile ${dialect.profile} (Link profiles: $profiles)"
         }
         val root = Json.parseToJsonElement(received.body).jsonObject

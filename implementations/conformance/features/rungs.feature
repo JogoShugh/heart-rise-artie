@@ -3,7 +3,8 @@ Feature: The rungs of the ladder, L0 to L2
   Preference-Applied (SPEC §6.4, §6.10). At L1 Layer 1 links to an affordance set
   that carries its schemas; at L2 the set points to them. Shared layers are
   immutable, so a client never reads the same one twice. Clients may share what
-  they have read, by being given one cache.
+  they have read, by being given one cache. The garden, the deploy service and,
+  in HAL-FORMS, the build service serve here.
 
   Scenario: Read a bed at L1, over two hops
     Given the garden is at its seed state
@@ -50,9 +51,8 @@ Feature: The rungs of the ladder, L0 to L2
     Then the two clients read different affordance sets
 
   Scenario Outline: Each rung asks for what it needs: <rung>
-    Given a service offering "note" with the schema {"type": "object"}
-    And a client at rung <rung> with no credential
-    When it enters that service
+    Given a client at rung <rung> with the deploy service's credential
+    When it enters the app "web"
     Then the last read asked for "<prefer>"
 
     Examples:
@@ -61,141 +61,122 @@ Feature: The rungs of the ladder, L0 to L2
       | L2   | forms=link, schema=link |
 
   Scenario: A client at L0 asks for no layering
-    Given a service offering "note" with the schema {"type": "object"}
-    And a client at rung L0 with no credential
-    When it enters that service
+    Given a client at rung L0 with the deploy service's credential
+    When it enters the app "web"
     Then the last read asked for no layering
 
-  Scenario Outline: The answer says the rung, whatever was asked: <applied>
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "<applied>", with a true affordance set
-    And a client at rung L2 with no credential
-    When it enters that service
+  Scenario Outline: The answer says the rung, whatever was asked: served up to <serves>
+    Given the deploy service serves up to rung <serves>
+    And a client at rung L2 with the deploy service's credential
+    When it enters the app "web"
+    Then the representation is at rung <serves>
+    And it offers exactly "cd:deploy"
+
+    Examples:
+      | serves |
+      | L0     |
+      | L1     |
+      | L2     |
+
+  Scenario Outline: The rung is read from Preference-Applied token by token: "<applied>"
+    Given the deploy service says it applied "<applied>"
+    And a client at rung L2 with the deploy service's credential
+    When it enters the app "web"
     Then the representation is at rung <rung>
-    And it offers exactly "from-the-set"
 
     Examples:
       | applied                 | rung |
-      | forms=link              | L1   |
-      | forms=link, schema=link | L2   |
       | schema=link, forms=link | L2   |
-
-  Scenario: A server that ignores Prefer leaves a client at L0
-    Given a service offering "note" with the schema {"type": "object"}
-    And a client at rung L1 with no credential
-    When it enters that service
-    Then the representation is at rung L0
-    And it offers exactly "note"
-
-  Scenario: A token that only resembles forms=link applies nothing
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service says it applied "forms=linked"
-    And a client at rung L1 with no credential
-    When it enters that service
-    Then the representation is at rung L0
+      | forms=linked            | L0   |
 
   Scenario Outline: The affordance set is found by its relation: <case>
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "forms=link", with a true affordance set linked as "<rel>"
-    And that service declares the curie "<curie>" for "https://w3id.org/heart-rise/rels/{rel}"
-    And a client at rung L1 with no credential
-    When it enters that service
-    Then it offers exactly "from-the-set"
+    Given the deploy service links its affordance set as "<rel>", with the curie "<curie>" for "https://w3id.org/heart-rise/rels/{rel}"
+    And a client at rung L1 with the deploy service's credential
+    When it enters the app "web"
+    Then it offers exactly "cd:deploy"
 
     Examples:
-      | case                | rel                                   | curie  |
+      | case                | rel                                    | curie |
       | the relation itself | https://w3id.org/heart-rise/rels/forms | hr    |
-      | the usual prefix    | hr:forms                              | hr     |
-      | another prefix      | garden-hr:forms                       | garden-hr |
+      | the usual prefix    | hr:forms                               | hr    |
+      | another prefix      | cd-hr:forms                            | cd-hr |
 
   Scenario: The prefix hr alone means the relation, if no curie says otherwise
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "forms=link", with a true affordance set linked as "hr:forms"
-    And a client at rung L1 with no credential
-    When it enters that service
-    Then it offers exactly "from-the-set"
+    Given the deploy service links its affordance set as "hr:forms", with no curie
+    And a client at rung L1 with the deploy service's credential
+    When it enters the app "web"
+    Then it offers exactly "cd:deploy"
 
-  Scenario: A link that shares the name but not the relation is no affordance set
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "forms=link", with a true affordance set linked as "hr:forms"
-    And that service declares the curie "hr" for "https://example.com/rels/{rel}"
-    And a client at rung L1 with no credential
-    When it tries to enter that service
+  Scenario Outline: A link under another relation is no affordance set: <case>
+    Given the deploy service links its affordance set as "<rel>", with the curie "hr" for "<curie>"
+    And a client at rung L1 with the deploy service's credential
+    When it tries to enter the app "web"
     Then it failed, saying "applied L1 but links no affordance set"
 
+    Examples:
+      | case                              | rel                               | curie                                  |
+      | the name, with another curie      | hr:forms                          | https://example.com/rels/{rel}         |
+      | a bare name                       | forms                             | https://w3id.org/heart-rise/rels/{rel} |
+      | another relation of the same name | http://api.example.org/rels/forms | https://w3id.org/heart-rise/rels/{rel} |
+
   Scenario: A set that fails its integrity is refused at L1
-    Given a service whose affordance set does not match the integrity of its link
-    And a client at rung L1 with no credential
-    When it tries to enter that service
+    Given the deploy service links its affordance set with an integrity its bytes do not match
+    And a client at rung L1 with the deploy service's credential
+    When it tries to enter the app "web"
     Then it refused the affordance set for its integrity
 
-  Scenario: Clients given one cache read a shared layer once between them
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "forms=link", with a true affordance set
-    And two clients at rung L1 sharing one cache
-    When it enters that service
-    And the other client enters that service
-    Then the affordance set was read 1 times
+  Scenario Outline: A shared layer is read as often as the clients' caches need: <caches>
+    Given two clients at rung L1 with the deploy service's credential and <caches>
+    When it enters the app "web"
+    And the other client enters the app "web"
+    Then the affordance set was read <reads> times
 
-  Scenario: Clients given no cache each keep their own
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "forms=link", with a true affordance set
-    And two clients at rung L1 with their own caches
-    When it enters that service
-    And the other client enters that service
-    Then the affordance set was read 2 times
+    Examples:
+      | caches                       | reads |
+      | one cache between them       | 1     |
+      | a cache each                 | 2     |
+      | one cache that keeps nothing | 2     |
 
   Scenario: A new integrity at the same address is read as new
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "forms=link", with a true affordance set
-    And a client at rung L1 with no credential
-    When it enters that service
-    And that service's affordance set now offers "changed"
+    Given the deploy service serves every affordance set at one address
+    And a client at rung L1 with the deploy service's credential
+    When it enters the app "web"
+    And the deploy service's app "web" starts deploying
     And it reads the resource again
-    Then it offers exactly "changed"
+    Then it offers exactly "cd:cancel"
     And the affordance set was read 2 times
 
   Scenario: Fields of a DELETE stay out of its address, unless its template takes them
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service offers "note" by DELETE
-    And a client at rung L0 with no credential
-    When it enters that service
-    And it submits "note" with {"a": 1}
-    Then the last request was for "/actions/note"
+    Given the deploy service's app "web" starts deploying
+    And a client at rung L0 with the deploy service's credential
+    When it enters the app "web"
+    And it submits "cd:cancel" with {"a": 1}
+    Then the last request was for "/apps/web/actions/cancel"
 
   Scenario: Fields of a HEAD go in the query in HAL-FORMS, with no body
-    Given a HAL-FORMS service whose template "note" is {"method": "HEAD", "target": "/find"}
-    And a HAL-FORMS client with no credential
-    When it enters that service
-    And it tries to submit "note" with {"a": "b"}
-    Then the request before last was HEAD for "/find?a=b"
+    Given the build service's template "build" is {"method": "HEAD", "target": "/jobs/nightly/queue"}
+    And a HAL-FORMS client with the build service's credential
+    When it enters the job "nightly"
+    And it tries to submit "build" with {"a": "b"}
+    Then it sent HEAD for "/jobs/nightly/queue?a=b", with no body
 
   Scenario: The HAL-FORMS media type may carry a parameter
-    Given a HAL-FORMS service offering "note" with the properties []
-    And that service names no profile
-    And that service's media type is "application/prs.hal-forms+json;charset=utf-8"
-    And a HAL-FORMS client with no credential
-    When it enters that service
+    Given the build service names no profile
+    And the build service's media type is "application/prs.hal-forms+json;charset=utf-8"
+    And a HAL-FORMS client with the build service's credential
+    When it enters the job "nightly"
     Then the representation is at rung L0, in HAL-FORMS
 
   Scenario: Options that are not an object are no options
-    Given a HAL-FORMS service offering "note" with the properties [{"name": "s", "options": "text"}]
-    And a HAL-FORMS client with no credential
-    When it enters that service
-    And it submits "note" with {"s": "a"}
-    Then the act "note" was sent 1 times
+    Given the build service's template "build" is {"method": "POST", "target": "/jobs/nightly/actions/build", "properties": [{"name": "s", "options": "text"}]}
+    And a HAL-FORMS client with the build service's credential
+    When it enters the job "nightly"
+    And it submits "build" with {"s": "a"}
+    Then the act "build" was sent 1 times
 
   Scenario: A HAL-FORMS target is never a template
-    Given a HAL-FORMS service whose template "note" is {"method": "POST", "target": "/a{b}"}
-    And a HAL-FORMS client with no credential
-    When it enters that service
-    And it submits "note" with {"b": "c"}
-    Then the last request was for "/a%7Bb%7D"
-
-  Scenario: A cache needs only get and set, and keeps what it likes
-    Given a service offering "note" with the schema {"type": "object"}
-    And that service applies "forms=link", with a true affordance set
-    And two clients at rung L1 sharing a cache that keeps nothing
-    When it enters that service
-    And the other client enters that service
-    Then the affordance set was read 2 times
+    Given the build service's template "build" is {"method": "POST", "target": "/jobs/{name}/actions/build"}
+    And a HAL-FORMS client with the build service's credential
+    When it enters the job "nightly"
+    And it tries to submit "build" with {"name": "nightly"}
+    Then the last request was for "/jobs/%7Bname%7D/actions/build"

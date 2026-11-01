@@ -33,7 +33,14 @@ class CachingTransport(
 
     private val entries = ConcurrentHashMap<String, Entry>()
 
-    fun holds(url: String): Boolean = entries.containsKey(url)
+    /**
+     * Where a response is kept: its URL, and, for a request that names the integrity it
+     * expects (a shared layer's link), that integrity too. The same address with a new
+     * integrity is another entry, never the old bytes again (HAL-SCHEMA-FORMS-HR Rule 2).
+     */
+    private fun key(request: HeartRequest): String = request.integrity?.let { "${request.url} $it" } ?: request.url
+
+    fun holds(url: String): Boolean = entries.keys.any { it == url || it.startsWith("$url ") }
 
     override fun send(request: HeartRequest): HeartResponse {
         val entry = if (request.method == "GET") lookup(request) else null
@@ -48,7 +55,7 @@ class CachingTransport(
         request.header("Cache-Control").orEmpty().split(',').any { it.trim().lowercase() == "no-cache" }
 
     private fun lookup(request: HeartRequest): Entry? =
-        entries[request.url]?.takeIf { e -> e.varied.all { (name, value) -> request.header(name) == value } }
+        entries[key(request)]?.takeIf { e -> e.varied.all { (name, value) -> request.header(name) == value } }
 
     /** A miss, or a stored entry that must be revalidated with its ETag. */
     private fun fetch(request: HeartRequest, entry: Entry?): HeartResponse {
@@ -69,7 +76,7 @@ class CachingTransport(
         val storable = response.status == OK && "no-store" !in directives && "*" !in vary &&
             ((maxAge != null && !revalidate) || (revalidate && etag != null))
         if (!storable) return
-        entries[request.url] = Entry(
+        entries[key(request)] = Entry(
             response = response,
             varied = vary.associateWith { request.header(it) },
             freshUntil = if (revalidate) null else now().plusSeconds(maxAge ?: 0),

@@ -3,7 +3,9 @@ package com.artie.heart.sims
 import com.artie.heart.sims.build.BuildService
 import com.artie.heart.sims.deploy.DeployService
 import com.artie.heart.sims.deploy.Region
+import com.artie.heart.Rung
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
@@ -77,6 +79,25 @@ class Simulator {
     fun publishRelease(app: String, version: String, status: String) =
         runBlocking { deploy.publish(app, version, status) }
 
+    /** Someone else starts deploying the deploy service's app [app]. */
+    fun startDeploying(app: String) = runBlocking { deploy.startDeploying(app) }
+
+    /** The deploy service serves no higher than [rung]. */
+    fun deployServesUpTo(rung: Rung) {
+        deploy.limits.maxRung = rung
+    }
+
+    /** Sets the faults [body] names on the service at [host], from a control request. */
+    private fun setFaults(host: String, body: JsonNode) {
+        val faults = faults(host)
+        body["applied"]?.let { faults.applied = it.asText() }
+        body["mediaType"]?.let { faults.mediaType = it.asText() }
+        body["noProfile"]?.let { faults.noProfile = it.asBoolean() }
+        body["wrongIntegrity"]?.let { faults.wrongIntegrity = it.asBoolean() }
+        body["oneAddress"]?.let { faults.oneAddress = it.asBoolean() }
+        body["setLink"]?.let { faults.setLink = SetLink(it["rel"].asText(), it["curie"]?.asText(), it["href"]?.asText()) }
+    }
+
     /** The faults of the service at [host]. */
     fun faults(host: String): Faults = faults[host] ?: throw IllegalArgumentException("no service $host")
 
@@ -123,6 +144,22 @@ class Simulator {
         },
         "/_sim/{host}/forms/{form}/schema" bind PUT to { request ->
             faults(request.path("host").orEmpty()).declareSchema(request.path("form").orEmpty(), request.bodyString())
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/{host}/templates/{name}" bind PUT to { request ->
+            faults(request.path("host").orEmpty()).template(request.path("name").orEmpty(), request.bodyString())
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/{host}/faults" bind POST to { request ->
+            setFaults(request.path("host").orEmpty(), mapper.readTree(request.bodyString()))
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/deploy/rung" bind PUT to { request ->
+            deployServesUpTo(Rung.valueOf(request.bodyString().trim()))
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/deploy/apps/{name}/deployments" bind POST to { request ->
+            startDeploying(request.path("name").orEmpty())
             Response(Status.NO_CONTENT)
         },
         "/_sim/log" bind GET to {

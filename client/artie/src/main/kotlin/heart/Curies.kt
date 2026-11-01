@@ -13,9 +13,12 @@ import java.net.URI
  */
 object Curies {
 
-    /** The prefix templates a document declares, by name. */
+    /** The prefix "hr" names HEART's own relations, unless a document declares it as something else. */
+    private val DEFAULTS: Map<String?, String?> = mapOf("hr" to "https://w3id.org/heart-rise/rels/{rel}")
+
+    /** The prefix templates a document declares, by name, over [DEFAULTS]. */
     fun of(root: JsonObject): Map<String?, String?> =
-        (root["_links"]?.jsonObject?.get("curies") as? JsonArray).orEmpty().map { it.jsonObject }
+        DEFAULTS + (root["_links"]?.jsonObject?.get("curies") as? JsonArray).orEmpty().map { it.jsonObject }
             .associate { it["name"]?.jsonPrimitive?.content to it["href"]?.jsonPrimitive?.content }
 
     /**

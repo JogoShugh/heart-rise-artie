@@ -12,6 +12,8 @@ import com.artie.heart.Options
 import com.artie.heart.Pick
 import com.artie.heart.Profile
 import com.artie.heart.Relation
+import com.artie.heart.Rung
+import com.artie.heart.ServingLimits
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.ResourceType
 import com.artie.heart.StateView
@@ -34,11 +36,15 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
     private val directory = AppDirectory()
     private val appIds = AtomicLong()
 
+    /** How much the service serves: up to L2, unless a scenario says less. */
+    val limits = ServingLimits()
+
     /** Back to the seed: every stream forgotten, then the app "web" imported, with no regions and no releases. */
     suspend fun reset() {
         store.forget(APPS.stream)
         directory.clear()
         appIds.set(0)
+        limits.maxRung = Rung.L2
         import("web")
     }
 
@@ -50,6 +56,12 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
     suspend fun setRegions(app: String, regions: Map<String, List<Region>>) = append(app, AppDecisions.setRegions(regions))
 
     suspend fun publish(app: String, version: String, status: String) = append(app, AppDecisions.publish(version, status))
+
+    /** Someone else starts deploying [app]: what was last published, or 1.0.0, to its first region. */
+    suspend fun startDeploying(app: String) {
+        val release = directory.releasesOf(app).lastOrNull()?.version ?: "1.0.0"
+        append(app, AppDecisions.deploy(release, "staging", "us-east"))
+    }
 
     private suspend fun append(app: String, events: List<AppEvent>) {
         val id = idOf(app)
@@ -68,9 +80,14 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
 
     private val apps = HeartResource(
         layers = Layers(type()),
-        perform = { app, _, input ->
-            val (release, environment, region) = listOf("release", "environment", "region").map { input.json.path(it).asText() }
-            Acted(record(app.id, app.version + 1, AppDecisions.deploy(release, environment, region)))
+        perform = { app, act, input ->
+            val events = if (act == "cancel") {
+                AppDecisions.cancel()
+            } else {
+                val (release, environment, region) = listOf("release", "environment", "region").map { input.json.path(it).asText() }
+                AppDecisions.deploy(release, environment, region)
+            }
+            Acted(record(app.id, app.version + 1, events))
         },
         loadAt = { variables -> store.state(APPS, idOf(variables.getValue("name"))) },
     )
@@ -80,17 +97,22 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
     val handler: HttpHandler = HeartHttp(
         listOf(apps),
         Credentials.parse(users = "", tokens = Tokens.sha256(TOKEN)),
-        HeartSettings(title = "Deploy", realm = PROFILE.name, listings = listOf(releases)),
+        HeartSettings(title = "Deploy", limits = limits, realm = PROFILE.name, listings = listOf(releases)),
     )
 
     private fun type() = ResourceType(
         collection = "apps",
         profile = PROFILE,
-        acts = listOf(Act("deploy", "deploy", DEPLOY_SCHEMA).withOptions(mapOf("region" to REGION, "release" to release()))),
+        acts = listOf(
+            Act("deploy", "deploy", DEPLOY_SCHEMA).withOptions(mapOf("region" to REGION, "release" to release())),
+            Act("cancel", "cancel", CANCEL_SCHEMA, method = Act.DELETE),
+        ),
         offers = Offers(
             keys = listOf(AppState.IDLE, AppState.DEPLOYING),
-            offered = { status -> if (status == AppState.IDLE) listOf("deploy") else emptyList() },
-            whyAbsent = { _, _ -> "A deployment is in progress." },
+            offered = { status -> if (status == AppState.IDLE) listOf("deploy") else listOf("cancel") },
+            whyAbsent = { status, _ ->
+                if (status == AppState.IDLE) "No deployment is in progress." else "A deployment is in progress."
+            },
         ),
         state = StateView<AppState, String>(
             keyOf = { it.status },
@@ -121,6 +143,9 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
             Pick(value = "name", prompt = "label", where = mapOf("available" to true), maxItems = 1),
         )
 
+        /** A cancellation may say why; a DELETE takes it in its query. */
+        private const val CANCEL_SCHEMA = """{"type": "object", "properties": {"reason": {"type": "string"}}}"""
+
         private const val DEPLOY_SCHEMA = """{"type": "object", "required": ["environment", "region", "release"],
             "properties": {"environment": {"type": "string", "enum": ["staging", "production"]},
             "region": {"type": "string"}, "release": {"type": "string"}}}"""
@@ -134,6 +159,11 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
                     "deploy", AlpsType.UNSAFE, "Deploy",
                     "Deploys a release of the app to a region of an environment.",
                     "Offered while the app is idle; the app is deploying after.",
+                ),
+                Relation(
+                    "cancel", AlpsType.IDEMPOTENT, "Cancel the deployment",
+                    "Cancels the deployment under way.",
+                    "Offered while the app is deploying; the app is idle after.",
                 ),
             ),
         )

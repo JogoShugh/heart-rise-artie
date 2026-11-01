@@ -94,7 +94,6 @@ class SimulatedServiceSteps(private val world: World) {
         world.sims.log.filter { it.method != "GET" && it.url.endsWith("/actions/${segmentOf(form)}") }
 
     private companion object {
-        val CREDENTIALS = mapOf("build" to "Bearer build-token", "deploy" to "Bearer deploy-token")
         const val BUILD_FORM = "ci:build"
         const val PROBLEMS = "https://w3id.org/heart-rise/problems"
         const val HTTP_UNPROCESSABLE = 422

@@ -462,23 +462,23 @@ Then("the other origin was sent none", function () {
     assert.equal(this.otherLog[0].authorization, undefined);
 });
 
-const lastRequest = (world) => world.fakeLog.at(-1);
+const lastRequest = async (world) => (await received(world)).at(-1);
 
-Then("the last request was {word} with the body {string}", function (method, body) {
-    assert.equal(lastRequest(this).method, method);
-    assert.equal(lastRequest(this).body, body);
+Then("the last request was {word} with the body {string}", async function (method, body) {
+    assert.equal((await lastRequest(this)).method, method);
+    assert.equal((await lastRequest(this)).body, body);
 });
 
-Then("it carried the validator it read", function () {
-    assert.equal(lastRequest(this).ifMatch, '"1"');
+Then("it carried the validator it read", async function () {
+    assert.equal((await lastRequest(this)).ifMatch, '"1"');
 });
 
-Then("it had the content type {string}", function (type) {
-    assert.equal(lastRequest(this).contentType ?? "", type);
+Then("it had the content type {string}", async function (type) {
+    assert.equal((await lastRequest(this)).contentType ?? "", type);
 });
 
-Then("the last request was for {string}", function (url) {
-    assert.equal(lastRequest(this).url, url);
+Then("the last request was for {string}", async function (url) {
+    assert.equal((await lastRequest(this)).url, url);
 });
 
 Then("the client holds {string}", function (path) {
@@ -525,29 +525,31 @@ Given("that service's target is not templated", function () {
     this.service.templated = false;
 });
 
-const lastRead = (world) => world.fakeLog.filter((r) => r.method === "GET").at(-1);
+/** The last read of a resource itself: shared layers, which a client reads by their links, are not counted. */
+const lastRead = async (world) => (await received(world))
+    .filter((r) => r.method === "GET" && !/^\/(set$|affordance-sets\/|schemas\/)/.test(r.url)).at(-1);
 
-Then("the last read accepted {string}, at the profile, with no cache", function (accept) {
-    assert.equal(lastRead(this).accept, accept);
-    assert.equal(lastRead(this).profile, `<${heart.PROFILE}>`);
-    assert.equal(lastRead(this).cacheControl, "no-cache");
+Then("the last read accepted {string}, at the profile, with no cache", async function (accept) {
+    assert.equal((await lastRead(this)).accept, accept);
+    assert.equal((await lastRead(this)).profile, `<${heart.PROFILE}>`);
+    assert.equal((await lastRead(this)).cacheControl, "no-cache");
 });
 
-Then("the last read accepted {string}, with no cache", function (accept) {
-    assert.equal(lastRead(this).accept, accept);
-    assert.equal(lastRead(this).cacheControl, "no-cache");
+Then("the last read accepted {string}, with no cache", async function (accept) {
+    assert.equal((await lastRead(this)).accept, accept);
+    assert.equal((await lastRead(this)).cacheControl, "no-cache");
 });
 
-Then("the last read carried no validator", function () {
-    assert.equal(lastRead(this).ifNoneMatch, undefined);
+Then("the last read carried no validator", async function () {
+    assert.equal((await lastRead(this)).ifNoneMatch, undefined);
 });
 
 Then("the affordance set was read accepting {string}", function (accept) {
     assert.equal(this.fakeLog.find((r) => r.url === "/set").accept, accept);
 });
 
-Then("it carried an empty validator", function () {
-    assert.equal(lastRequest(this).ifMatch, "");
+Then("it carried an empty validator", async function () {
+    assert.equal((await lastRequest(this)).ifMatch, "");
 });
 
 Then("the form {string} has choices for exactly {string}", async function (form, property) {
@@ -614,14 +616,14 @@ Then("the representation is at rung L0, in {}", function (dialect) {
     assert.equal(this.rep.dialect, dialects[dialect]);
 });
 
-Then("the last read accepted {string}, at the HAL-FORMS profile, with no cache", function (accept) {
-    assert.equal(lastRead(this).accept, accept);
-    assert.equal(lastRead(this).profile, "<https://w3id.org/heart-rise/hal-forms>");
-    assert.equal(lastRead(this).cacheControl, "no-cache");
+Then("the last read accepted {string}, at the HAL-FORMS profile, with no cache", async function (accept) {
+    assert.equal((await lastRead(this)).accept, accept);
+    assert.equal((await lastRead(this)).profile, "<https://w3id.org/heart-rise/hal-forms>");
+    assert.equal((await lastRead(this)).cacheControl, "no-cache");
 });
 
-Then("the last read asked for no layering", function () {
-    assert.equal(lastRead(this).prefer, undefined);
+Then("the last read asked for no layering", async function () {
+    assert.equal((await lastRead(this)).prefer, undefined);
 });
 
 // ---- The rungs ----
@@ -645,8 +647,8 @@ Then("the two clients read different affordance sets", function () {
     assert.deepEqual(mine.filter((url) => setsRead(this.other.log).includes(url)), []);
 });
 
-Then("the last read asked for {string}", function (prefer) {
-    assert.equal(lastRead(this).prefer, prefer);
+Then("the last read asked for {string}", async function (prefer) {
+    assert.equal((await lastRead(this)).prefer, prefer);
 });
 
 function serveSet(world, offers) {
@@ -686,10 +688,10 @@ Given("that service's media type is {string}", function (type) {
     this.service.headers["Content-Type"] = type;
 });
 
-function pairOfClients(world, setCache) {
+function pairOfClients(world, setCache, authorization) {
     const client = () => {
         const log = [];
-        return { log, heart: new heart.HeartClient({ rung: "L1", log, setCache }) };
+        return { log, heart: new heart.HeartClient({ rung: "L1", log, setCache, authorization }) };
     };
     world.me = client();
     world.other = client();
@@ -707,8 +709,9 @@ When("the other client enters that service", async function () {
     await this.other.heart.enter(this.fakeUrl);
 });
 
-Then("the affordance set was read {int} times", function (times) {
-    assert.equal(this.fakeLog.filter((r) => r.url === "/set").length, times);
+Then("the affordance set was read {int} times", async function (times) {
+    const sets = (await received(this)).filter((r) => r.url === "/set" || r.url.startsWith("/affordance-sets/"));
+    assert.equal(sets.length, times);
 });
 
 // ---- An empty answer, and a cache of the caller's ----
@@ -721,11 +724,9 @@ Given("two clients at rung L1 sharing a cache that keeps nothing", function () {
     pairOfClients(this, { get: () => undefined, set: () => undefined });
 });
 
-Then("the request before last was HEAD for {string}", function (url) {
-    const request = this.fakeLog.at(-2);
-    assert.equal(request.method, "HEAD");
-    assert.equal(request.url, url);
-    assert.equal(request.body, "");
+Then("it sent HEAD for {string}, with no body", async function (url) {
+    const heads = (await received(this)).filter((r) => r.method === "HEAD");
+    assert.deepEqual(heads.map((r) => [r.url, r.body]), [[url, ""]]);
 });
 
 // ---- One resource in two dialects ----
@@ -756,6 +757,20 @@ const SERVICES = {
     build: { host: "build.test", credential: "Bearer build-token" },
     deploy: { host: "deploy.test", credential: "Bearer deploy-token" },
 };
+
+/** One header of a request the simulator logged, whatever its case. */
+const headerOf = (logged, name) => Object.entries(logged.headers).find(([key]) => key.toLowerCase() === name.toLowerCase())?.[1] ?? undefined;
+
+/** What the service received, in order, in one shape: the hand-built service's log, or the simulator's. */
+async function received(world) {
+    if (world.fakeLog) return world.fakeLog;
+    return (await sims.log()).map((r) => ({
+        ...r,
+        prefer: headerOf(r, "Prefer"), accept: headerOf(r, "Accept"), profile: headerOf(r, "Accept-Profile"),
+        cacheControl: headerOf(r, "Cache-Control"), ifMatch: headerOf(r, "If-Match"), ifNoneMatch: headerOf(r, "If-None-Match"),
+        contentType: headerOf(r, "Content-Type"), authorization: headerOf(r, "Authorization"),
+    }));
+}
 
 /** The act a form names, as its target's last segment: "ci:build" is acted on at .../actions/build. */
 const segmentOf = (form) => form.slice(form.indexOf(":") + 1);
@@ -844,4 +859,67 @@ Then("the second read of the releases carried the ETag of the first, and was ans
     assert.equal(reads[0].status, 200);
     assert.equal(reads[1].headers["If-None-Match"] ?? reads[1].headers["if-none-match"], reads[0].etag);
     assert.equal(reads[1].status, 304);
+});
+
+const hostOf = (service) => SERVICES[service].host;
+
+Given("a HAL-FORMS client with the {word} service's credential", function (service) {
+    this.me = halFormsClient(undefined, SERVICES[service].credential);
+});
+
+Given("two clients at rung L1 with the {word} service's credential and {}", function (service, caches) {
+    const kinds = {
+        "one cache between them": () => new Map(),
+        "a cache each": () => undefined,
+        "one cache that keeps nothing": () => ({ get: () => undefined, set: () => undefined }),
+    };
+    pairOfClients(this, kinds[caches](), SERVICES[service].credential);
+});
+
+When("it tries to enter the app {string}", async function (name) {
+    await trying(this, () => this.me.heart.enter(`http://${hostOf("deploy")}/apps/${name}`));
+});
+
+When("the other client enters the app {string}", async function (name) {
+    await this.other.heart.enter(`http://${hostOf("deploy")}/apps/${name}`);
+});
+
+Given("the deploy service serves up to rung {word}", async function (rung) {
+    await sims.deployServesUpTo(rung);
+});
+
+Given("the deploy service's app {string} starts deploying", async function (app) {
+    await sims.startDeploying(app);
+});
+
+Given("the {word} service says it applied {string}", async function (service, applied) {
+    await sims.faults(hostOf(service), { applied });
+});
+
+Given("the {word} service links its affordance set as {string}, with the curie {string} for {string}", async function (service, rel, curie, href) {
+    await sims.faults(hostOf(service), { setLink: { rel, curie, href } });
+});
+
+Given("the {word} service links its affordance set as {string}, with no curie", async function (service, rel) {
+    await sims.faults(hostOf(service), { setLink: { rel } });
+});
+
+Given("the {word} service links its affordance set with an integrity its bytes do not match", async function (service) {
+    await sims.faults(hostOf(service), { wrongIntegrity: true });
+});
+
+Given("the {word} service serves every affordance set at one address", async function (service) {
+    await sims.faults(hostOf(service), { oneAddress: true });
+});
+
+Given("the {word} service names no profile", async function (service) {
+    await sims.faults(hostOf(service), { noProfile: true });
+});
+
+Given("the {word} service's media type is {string}", async function (service, mediaType) {
+    await sims.faults(hostOf(service), { mediaType });
+});
+
+Given("the {word} service's template {string} is {}", async function (service, name, template) {
+    await sims.template(hostOf(service), name, template);
 });

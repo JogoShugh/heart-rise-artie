@@ -14,40 +14,6 @@ Feature: L1, and the L3 sharing property seen from the client
         milliliters: {type: integer, minimum: 1}
       """
 
-  Scenario: At L1 the client fetches the set, whose schemas are embedded, and nothing more
-    Given the service serves affordance set "planted-l1" at its content address:
-      """yaml
-      _forms:
-        waterCell:
-          _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
-          method: POST
-          schema:
-            $id: "{schema:water}"
-            type: object
-            properties:
-              milliliters: {type: integer, minimum: 1}
-      """
-    And the service answers GET "http://garden.test/beds/2" with:
-      """
-      200 OK
-      Content-Type: application/hal+json
-      ETag: "seq-1.hsf.L1"
-      Preference-Applied: forms=link
-      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
-
-      id: 2
-      _links:
-        https://w3id.org/heart-rise/rels/forms: {href: "{set:planted-l1}", integrity: "{integrity:set:planted-l1}"}
-      """
-    And the client works at rung L1
-    When the client enters "http://garden.test/beds/2"
-    Then the client sent these requests:
-      | GET http://garden.test/beds/2           |
-      | GET http://garden.test{set:planted-l1}  |
-    And the client sent GET "http://garden.test/beds/2" with headers:
-      | Prefer | forms=link |
-    And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
-
   Scenario Outline: An answer at <rung> that links no affordance set is an error naming its URL
     Without the set, the client cannot know which acts are offered, so it does not carry on as if none were.
     Given the service answers GET "http://garden.test/beds/7" with:
@@ -64,11 +30,10 @@ Feature: L1, and the L3 sharing property seen from the client
       """
     And the client works at rung <rung>
     When the client tries to enter "http://garden.test/beds/7"
-    Then the client raised an error mentioning "http://garden.test/beds/7 is at <rung> but links no affordance set"
+    Then the client raised an error mentioning "http://garden.test/beds/7 applied <rung> but links no affordance set"
 
     Examples:
       | rung | applied                 |
-      | L1   | forms=link              |
       | L2   | forms=link, schema=link |
 
   Scenario: Two clients behind one shared cache, two beds in one state: one set fetch (templated server)
