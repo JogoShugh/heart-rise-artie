@@ -9,7 +9,20 @@ import { Form } from "./wire";
 /** A local note that a form's schema could not be compiled. It holds no field value. */
 export interface SchemaFailure { form: string; schema: string; error: string }
 
-const sentence = (error: ErrorObject): string => `${error.instancePath} ${error.message ?? error.keyword}`.trim();
+/** RFC 6901: a member name as one token of a JSON Pointer. */
+const token = (name: unknown): string => `/${String(name).replaceAll("~", "~0").replaceAll("/", "~1")}`;
+
+/** By keyword, the parameter naming the member a violation is about when it is not the value at instancePath. */
+const MEMBER_PARAM: Readonly<Record<string, string>> = { required: "missingProperty", additionalProperties: "additionalProperty" };
+
+/** The member a violation is about, one missing or one not allowed; none for every other keyword. */
+const member = (error: ErrorObject): string => {
+    const param = MEMBER_PARAM[error.keyword];
+    return param ? token(error.params[param]) : "";
+};
+
+/** Said the same by every client: the pointer of the value, then the keyword it breaks; the keyword alone at the body. */
+const sentence = (error: ErrorObject): string => `${error.instancePath}${member(error)} ${error.keyword}`.trim();
 
 export class FormChecks {
     /** By schema key. A schema that failed to compile is kept as undefined, so it is tried and noted once. */

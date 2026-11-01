@@ -4,6 +4,12 @@ Feature: A form's schema checks an act just before it is sent
   only what the schema disallows. The service remains the authority: its own
   refusals still count, and a schema the client cannot compile blocks nothing.
 
+  A violation is said the same by every client, whatever validator it uses:
+  the JSON Pointer of the value it is about, then the schema keyword that
+  value breaks ("/text type"). A missing required member, or a member
+  additionalProperties forbids, is said at that member's own pointer. A
+  violation of the body as a whole is the keyword alone.
+
   The service here is a small one the steps serve. It has one resource, which
   offers the act "note".
 
@@ -31,9 +37,10 @@ Feature: A form's schema checks an act just before it is sent
 
     Examples:
       | case                       | schema                                                                                      | body                        | says                  |
-      | a missing required value   | {"type": "object", "required": ["text"]}                                                    | {}                          | text                  |
-      | the wrong type             | {"type": "object", "properties": {"text": {"type": "string"}}}                              | {"text": 7}                 | /text must be string  |
-      | a property it forbids      | {"type": "object", "properties": {"text": {"type": "string"}}, "additionalProperties": false} | {"text": "hi", "mood": "ok"} | additional properties |
+      | a missing required value   | {"type": "object", "required": ["text"]}                                                    | {}                          | /text required             |
+      | the wrong type             | {"type": "object", "properties": {"text": {"type": "string"}}}                              | {"text": 7}                 | /text type                 |
+      | a property it forbids      | {"type": "object", "properties": {"text": {"type": "string"}}, "additionalProperties": false} | {"text": "hi", "mood": "ok"} | /mood additionalProperties |
+      | a value too large          | {"type": "object", "properties": {"ml": {"type": "integer", "maximum": 600}}}               | {"ml": 700}                 | /ml maximum                |
 
   Scenario: A value is sent as given, with nothing added or coerced
     Given a service offering "note" with the schema {"type": "object", "properties": {"text": {"type": "string", "default": "x"}}}
@@ -65,14 +72,14 @@ Feature: A form's schema checks an act just before it is sent
     And a client at rung L0 with no credential
     When it enters that service
     And it tries to submit "note" with {}
-    Then it failed, saying "note: must have required property 'a'; must have required property 'b'; nothing was sent"
+    Then it failed, saying "note: /a required; /b required; nothing was sent"
 
   Scenario: A violation of the whole body has no address to show
-    Given a service offering "note" with the schema {"type": "object", "additionalProperties": false}
+    Given a service offering "note" with the schema {"type": "object", "minProperties": 1}
     And a client at rung L0 with no credential
     When it enters that service
-    And it tries to submit "note" with {"mood": "ok"}
-    Then the only violation is "must NOT have additional properties"
+    And it tries to submit "note" with {}
+    Then the only violation is "minProperties"
 
   Scenario: A new schema with the same identifier is compiled as itself
     Given a service offering "note" with the schema {"$id": "https://garden.example/note", "type": "object"}
@@ -81,5 +88,5 @@ Feature: A form's schema checks an act just before it is sent
     And that service now declares the schema {"$id": "https://garden.example/note", "type": "object", "required": ["text"]}
     And it reads the resource again
     And it tries to submit "note" with {}
-    Then it was refused as "outside-schema" before sending, because "text"
+    Then it was refused as "outside-schema" before sending, because "/text required"
     And no schema failure was noted

@@ -125,12 +125,12 @@ Feature: What a HEART client must do in HAL-FORMS, the L0 on-ramp
 
     Examples:
       | case             | properties                                                 | body         | kind           | says                       |
-      | a required value | [{"name": "a", "required": true}]                          | {}           | outside-schema | required property 'a'      |
-      | below min        | [{"name": "n", "min": 2}]                                  | {"n": 1}     | outside-schema | /n must be >= 2            |
-      | above max        | [{"name": "n", "max": 2}]                                  | {"n": 3}     | outside-schema | /n must be <= 2            |
-      | under minLength  | [{"name": "s", "minLength": 2}]                            | {"s": "a"}   | outside-schema | /s must NOT have fewer     |
-      | over maxLength   | [{"name": "s", "maxLength": 1}]                            | {"s": "ab"}  | outside-schema | /s must NOT have more      |
-      | against regex    | [{"name": "s", "regex": "^a$"}]                            | {"s": "b"}   | outside-schema | /s must match pattern      |
+      | a required value | [{"name": "a", "required": true}]                          | {}           | outside-schema | /a required                |
+      | below min        | [{"name": "n", "min": 2}]                                  | {"n": 1}     | outside-schema | /n minimum                 |
+      | above max        | [{"name": "n", "max": 2}]                                  | {"n": 3}     | outside-schema | /n maximum                 |
+      | under minLength  | [{"name": "s", "minLength": 2}]                            | {"s": "a"}   | outside-schema | /s minLength               |
+      | over maxLength   | [{"name": "s", "maxLength": 1}]                            | {"s": "ab"}  | outside-schema | /s maxLength               |
+      | against regex    | [{"name": "s", "regex": "^a$"}]                            | {"s": "b"}   | outside-schema | /s pattern                 |
       | outside options  | [{"name": "s", "options": {"inline": ["a"]}}]              | {"s": "b"}   | not-a-choice   | s: b is not one of the choices |
 
   Scenario: A regex the client cannot compile blocks nothing, and is noted locally once
