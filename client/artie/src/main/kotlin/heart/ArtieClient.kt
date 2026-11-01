@@ -221,6 +221,8 @@ class ArtieClient(
         val applied = layer1Received.applied
         decisions.rung(url, layer1Received.appliedAs, applied)
         decisions.forms(url, layer1.formsLink, applied)
+        // SPEC §6.7: at L1 and L2 the acts offered are in the set; with no link to it they cannot be known.
+        check(layer1.formsLink != null || applied == Rung.L0) { "$url is at $applied but links no affordance set" }
         val synced = layer1.formsLink?.takeIf { applied != Rung.L0 }?.let { link ->
             layer1.withManifest(layers.manifest(link, layer1.formsIntegrity))
         } ?: layer1

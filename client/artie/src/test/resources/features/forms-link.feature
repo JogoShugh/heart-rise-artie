@@ -58,8 +58,8 @@ Feature: Finding the affordance set: the heart-rise forms rel, full or short
       _links:
         <rel>: {href: "{set:planted}", integrity: "{integrity:set:planted}"}
       """
-    When the client enters "http://garden.test/beds/2"
-    Then the client's current manifest is empty
+    When the client tries to enter "http://garden.test/beds/2"
+    Then the client raised an error mentioning "http://garden.test/beds/2 is at L2 but links no affordance set"
     And the client sent these requests:
       | GET http://garden.test/beds/2 |
 

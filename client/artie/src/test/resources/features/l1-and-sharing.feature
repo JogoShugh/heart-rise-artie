@@ -48,6 +48,29 @@ Feature: L1, and the L3 sharing property seen from the client
       | Prefer | forms=link |
     And the "milliliters" field in the "waterCell" schema has the "minimum" keyword
 
+  Scenario Outline: An answer at <rung> that links no affordance set is an error naming its URL
+    Without the set, the client cannot know which acts are offered, so it does not carry on as if none were.
+    Given the service answers GET "http://garden.test/beds/7" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.<rung>"
+      Preference-Applied: <applied>
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 7
+      _links:
+        self: {href: /beds/7}
+      """
+    And the client works at rung <rung>
+    When the client tries to enter "http://garden.test/beds/7"
+    Then the client raised an error mentioning "http://garden.test/beds/7 is at <rung> but links no affordance set"
+
+    Examples:
+      | rung | applied                 |
+      | L1   | forms=link              |
+      | L2   | forms=link, schema=link |
+
   Scenario: Two clients behind one shared cache, two beds in one state: one set fetch (templated server)
     Given the service serves affordance set "planted" at its content address:
       """yaml

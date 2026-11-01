@@ -22,6 +22,8 @@ import org.eclipse.californium.scandium.config.DtlsConnectorConfig
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite
 import org.eclipse.californium.scandium.dtls.pskstore.AdvancedMultiPskStore
 import java.net.InetSocketAddress
+import java.security.MessageDigest
+import java.util.Base64
 
 /**
  * A scripted CoAP server on this machine for SPEC §6.0.1: one bed, in the
@@ -79,7 +81,11 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
         requests += request
         val path = request.options.uriPathString
         if (request.code == Code.GET) {
-            return if (path in made) newResource(path) else representation(ResponseCode.CONTENT)
+            return when {
+                path in made -> newResource(path)
+                path.startsWith("sets/") -> setResponse()
+                else -> representation(ResponseCode.CONTENT)
+            }
         }
         val refused = refusal.also { refusal = null }
         return when {
@@ -120,8 +126,27 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
         rung?.let { options.addOption(Option(PREFERENCE_APPLIED, it)) }
     }
 
+    /** At L0 the forms come inline; at L1 and L2 the bed links to them as an affordance set, with its integrity. */
     private fun body(): String {
-        val form = if (status == "EMPTY") {
+        val links = """"self": {"href": "/beds/1"}"""
+        if (rung == null) return """{"status": "$status", "_links": {$links}, "_forms": {${form()}}}"""
+        val integrity = "sha256-" + Base64.getEncoder().encodeToString(
+            MessageDigest.getInstance("SHA-256").digest(set().toByteArray(Charsets.UTF_8)),
+        )
+        val forms = """"https://w3id.org/heart-rise/rels/forms": {"href": "/sets/$status", "integrity": "$integrity"}"""
+        return """{"status": "$status", "_links": {$links, $forms}}"""
+    }
+
+    /** The affordance set for the bed's current state. */
+    private fun set(): String = """{"_forms": {${form()}}}"""
+
+    private fun setResponse() = Response(ResponseCode.CONTENT).apply {
+        setPayload(set())
+        options.contentFormat = HAL_JSON
+    }
+
+    private fun form(): String =
+        if (status == "EMPTY") {
             """"sow": {"_links": {"target": {"href": "/beds/1/sow"}}, "method": "POST",
                "contentType": "application/json",
                "schema": {"type": "object", "properties": {"seedType": {"type": "string"}}}}"""
@@ -130,8 +155,6 @@ class FakeCoapServer(var status: String, private val secure: Pair<String, ByteAr
                "contentType": "application/json",
                "schema": {"type": "object", "properties": {"milliliters": {"type": "integer"}}}}"""
         }
-        return """{"status": "$status", "_links": {"self": {"href": "/beds/1"}}, "_forms": {$form}}"""
-    }
 
     private inner class Deliverer : MessageDeliverer {
         override fun deliverRequest(exchange: Exchange) = exchange.sendResponse(answer(exchange.request))
