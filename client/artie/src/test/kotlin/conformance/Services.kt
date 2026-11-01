@@ -84,7 +84,8 @@ object FakeServices {
         if (path == "/users/ada") {
             val form = """{"_links":{"target":{"href":"/users/ada/actions/befriend"}},"method":"POST","schema":{}}"""
             val links = """{"self":{"href":"/users/ada"}}"""
-            HeartResponse(200, profile, """{"login":"ada","name":"Ada Lovelace","_links":$links,"_forms":{"befriend":$form}}""")
+            val controls = """"_links":$links,"_forms":{"befriend":$form}"""
+            HeartResponse(200, profile, """{"login":"ada","name":"Ada Lovelace",$controls}""")
         } else {
             val author = """{"login":"ada","_links":{"self":{"href":"/users/ada","title":"Ada"}}}"""
             val controls = """"_links":{"self":{"href":"/"}},"_forms":{},"_embedded":{"author":$author}"""
