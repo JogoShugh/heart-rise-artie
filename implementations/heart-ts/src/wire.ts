@@ -5,8 +5,12 @@ import { Json, JsonObject, isObject, listOf, objectOf, stringMembers, stringOf }
 export const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
 export const PROBLEMS = "https://w3id.org/heart-rise/problems/";
 export const MEDIA_TYPE = "application/hal+json";
+export const HAL_FORMS_PROFILE = "https://w3id.org/heart-rise/hal-forms";
+export const HAL_FORMS_TYPE = "application/prs.hal-forms+json";
+export const JSON_TYPE = "application/json";
 
 export type Rung = "L0" | "L2";
+export type Dialect = "hal-schema-forms" | "hal-forms";
 
 export interface Form {
     name: string;
@@ -20,6 +24,7 @@ export interface Form {
     schema: JsonObject;
     /** Identifies the schema: its integrity value if linked, else a digest of it. */
     schemaKey: string;
+    dialect: Dialect;
 }
 
 export interface Link { rel: string; href: string; title?: string; integrity?: string }
@@ -35,6 +40,7 @@ export interface Representation {
     url: string;
     etag: string;
     rung: Rung;
+    dialect: Dialect;
     state: JsonObject;
     forms: Map<string, Form>;
     links: Link[];
@@ -82,13 +88,14 @@ export function formOf(name: string, raw: JsonObject, schema: JsonObject): Form 
         templated: target.templated === true,
         templatePointers: stringMembers(raw["hr:templatePointers"]),
         method: String(raw.method ?? "POST"),
-        contentType: String(raw.contentType ?? "application/json"),
+        contentType: String(raw.contentType ?? JSON_TYPE),
         schema,
         schemaKey: schemaKeyOf(objectOf(raw.schema)),
+        dialect: "hal-schema-forms",
     };
 }
 
-const schemaKeyOf = (declared: JsonObject): string =>
+export const schemaKeyOf = (declared: JsonObject): string =>
     stringOf(declared["hr:integrity"]) ?? createHash("sha256").update(JSON.stringify(declared)).digest("base64");
 
 /** Whether [bytes] are what an integrity value such as `sha256-...` names. */

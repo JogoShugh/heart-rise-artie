@@ -2,14 +2,17 @@
 // targets come from forms, expanded as each form says.
 import { Choice, choicesAmong, declared, misfit, requiredOf } from "./choices";
 import { IntegrityFailure, NotAChoice, OutsideSchema, Refused } from "./errors";
+import { templatesOf } from "./halforms";
 import { Json, JsonObject, isObject, objectOf, parseJson, resolve, stringMembers, stringOf } from "./json";
 import { needsRereading, refusalOf } from "./refusal";
-import { expand, fill, fillPointer, withQuery } from "./template";
+import { addressOf, fill, fillPointer } from "./template";
 import { FormChecks, SchemaFailure } from "./validation";
-import { Form, Link, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, linksOf, matchesIntegrity, stateOf } from "./wire";
+import { Dialect, Form, HAL_FORMS_PROFILE, HAL_FORMS_TYPE, JSON_TYPE, Link, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, linksOf, matchesIntegrity, stateOf } from "./wire";
 
 export interface Options {
     rung?: Rung;
+    /** The dialect to ask for. A client reads whichever one comes back. HAL-FORMS is served at L0 only. */
+    dialect?: Dialect;
     /** An Authorization header value, sent only to the bookmark's own origin. */
     authorization?: string;
     /** Every request this client sends, for a test to inspect. */
@@ -24,13 +27,23 @@ const objectFrom = (bytes: Buffer): JsonObject => objectOf(parseJson(bytes.toStr
 const problemOf = async (response: Response): Promise<JsonObject> =>
     objectOf(await response.text().then(parseJson).catch(() => null));
 
-function requireProfile(url: string, response: Response): void {
+/** The dialect a client asks for unless told otherwise, and the one compliance is judged in. */
+const REFERENCE_DIALECT: Dialect = "hal-schema-forms";
+
+/** The dialect of an answer. HAL-FORMS's own media type says so, as toolchains name no HEART profile. */
+function dialectOf(url: string, response: Response): Dialect {
     const links = response.headers.get("Link") ?? "";
-    if (!links.includes(`<${PROFILE}>`)) throw new Error(`${url} does not name the profile ${PROFILE}`);
+    const type = response.headers.get("Content-Type") ?? "";
+    if (links.includes(`<${HAL_FORMS_PROFILE}>`) || type.startsWith(HAL_FORMS_TYPE)) return "hal-forms";
+    if (links.includes(`<${PROFILE}>`)) return REFERENCE_DIALECT;
+    throw new Error(`${url} does not name the profile ${PROFILE}`);
 }
 
-const appliedRung = (response: Response): Rung =>
-    ((response.headers.get("Preference-Applied") ?? "").includes("forms=link") ? "L2" : "L0");
+const appliedRung = (response: Response, dialect: Dialect): Rung =>
+    (dialect === REFERENCE_DIALECT && (response.headers.get("Preference-Applied") ?? "").includes("forms=link") ? "L2" : "L0");
+
+/** Methods that carry no body. */
+const BODYLESS = ["DELETE", "HEAD"];
 
 /** Where an act's answer lives: the Content-Location it names, else the resource acted on. */
 function answerUrl(response: Response, target: URL, heldUrl: string): string {
@@ -40,6 +53,7 @@ function answerUrl(response: Response, target: URL, heldUrl: string): string {
 
 export class HeartClient {
     private readonly rung: Rung;
+    private readonly dialect: Dialect;
     private origin?: string;
     /** What the client last read of each plain JSON resource, to revalidate it with its ETag. */
     private readonly plainReads = new Map<string, { etag: string; body: Json }>();
@@ -48,6 +62,7 @@ export class HeartClient {
 
     constructor(private readonly options: Options = {}) {
         this.rung = options.rung ?? "L0";
+        this.dialect = options.dialect ?? REFERENCE_DIALECT;
         this.checks = new FormChecks(options.schemaFailures);
     }
 
@@ -79,17 +94,17 @@ export class HeartClient {
         const form = held.forms.get(name);
         if (!form) throw new Error(`${name} is not offered now; nothing was sent`);
         await this.admit(form, held, fields);
-        const target = new URL(expand(form, held.state, fields), held.url);
-        if (form.method === "GET") return this.sync(withQuery(target, form, fields).toString());
+        const target = addressOf(form, held, fields);
+        if (form.method === "GET") return this.sync(target.toString());
         const response = await this.send(target.toString(), this.actRequest(form, held.etag, fields));
         if (!response.ok) throw await this.refusal(name, response);
         return this.complete(answerUrl(response, target, held.url), response, await bytesOf(response));
     }
 
-    /** The conditional request for an act. A DELETE has no body: its fields filled its target's query (SPEC §6.2). */
+    /** The conditional request for an act. A DELETE has no body: its fields filled its target or query (SPEC §6.2). */
     private actRequest(form: Form, etag: string, fields: JsonObject): RequestInit {
         const headers = { ...this.negotiation(), "If-Match": etag };
-        if (form.method === "DELETE") return { method: form.method, headers };
+        if (BODYLESS.includes(form.method)) return { method: form.method, headers };
         return { method: form.method, headers: { ...headers, "Content-Type": form.contentType }, body: JSON.stringify(fields) };
     }
 
@@ -141,6 +156,7 @@ export class HeartClient {
     }
 
     private async choiceItems(options: JsonObject, held: Representation, fields: JsonObject): Promise<Json | undefined> {
+        if (Array.isArray(options.inline)) return options.inline;
         if (typeof options.pointer === "string") return resolve(held.state, fillPointer(options.pointer, fields));
         if (isObject(options.link)) return this.linkedItems(options, held, fields);
         return undefined;
@@ -157,7 +173,7 @@ export class HeartClient {
     /** A plain JSON resource, read as Layer 1 is (SPEC §6.1): no-cache, revalidated by its ETag. */
     private async plain(url: string): Promise<Json | undefined> {
         const kept = this.plainReads.get(url);
-        const headers: Record<string, string> = { Accept: "application/json", "Cache-Control": "no-cache" };
+        const headers: Record<string, string> = { Accept: JSON_TYPE, "Cache-Control": "no-cache" };
         if (kept) headers["If-None-Match"] = kept.etag;
         const response = await this.send(url, { headers });
         if (response.status === 304 && kept) return kept.body;
@@ -177,15 +193,18 @@ export class HeartClient {
     }
 
     private async complete(url: string, response: Response, bytes: Buffer): Promise<Representation> {
-        requireProfile(url, response);
+        const dialect = dialectOf(url, response);
         const body = objectFrom(bytes);
-        const rung = appliedRung(response);
+        const rung = appliedRung(response, dialect);
         const links = linksOf(body);
-        const formsBody = rung === "L0" ? body : await this.affordanceSet(url, links);
-        const forms = await this.forms(formsBody, url);
+        const forms = dialect === "hal-forms" ? templatesOf(body, url) : await this.formsAt(url, body, rung);
         const etag = response.headers.get("ETag") ?? "";
-        this.current = { url, etag, rung, state: stateOf(body), forms, links, embedded: embeddedOf(body) };
+        this.current = { url, etag, rung, dialect, state: stateOf(body), forms, links, embedded: embeddedOf(body) };
         return this.current;
+    }
+
+    private async formsAt(url: string, body: JsonObject, rung: Rung): Promise<Map<string, Form>> {
+        return this.forms(rung === "L0" ? body : await this.affordanceSet(url, linksOf(body)), url);
     }
 
     private async affordanceSet(url: string, links: Link[]): Promise<JsonObject> {
@@ -212,7 +231,7 @@ export class HeartClient {
     /** A shared layer, fetched only through a link that carries its integrity, and checked before use. */
     private async shared(url: string, integrity: string | undefined): Promise<JsonObject> {
         if (!integrity) throw new IntegrityFailure(`${url} was linked without an integrity value; nothing was sent`);
-        const response = await this.send(url, { headers: { Accept: `${MEDIA_TYPE}, application/schema+json, application/json` } });
+        const response = await this.send(url, { headers: { Accept: `${MEDIA_TYPE}, application/schema+json, ${JSON_TYPE}` } });
         const bytes = await bytesOf(response);
         if (!matchesIntegrity(bytes, integrity)) throw new IntegrityFailure(`${url} does not match the integrity of the link that led to it`);
         return objectFrom(bytes);
@@ -222,9 +241,10 @@ export class HeartClient {
 
     private negotiation(): Record<string, string> {
         return {
-            Accept: MEDIA_TYPE,
-            "Accept-Profile": `<${PROFILE}>`,
-            ...(this.rung === "L2" ? { Prefer: "forms=link, schema=link" } : {}),
+            ...(this.dialect === "hal-forms"
+                ? { Accept: `${HAL_FORMS_TYPE}, ${MEDIA_TYPE};q=0.5`, "Accept-Profile": `<${HAL_FORMS_PROFILE}>` }
+                : { Accept: MEDIA_TYPE, "Accept-Profile": `<${PROFILE}>` }),
+            ...(this.rung === "L2" && this.dialect === REFERENCE_DIALECT ? { Prefer: "forms=link, schema=link" } : {}),
         };
     }
 

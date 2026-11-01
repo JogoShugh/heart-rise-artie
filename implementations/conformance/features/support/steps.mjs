@@ -307,7 +307,8 @@ Then("the act {string} was sent once", function (form) {
 
 /** One resource offering one form, shaped by [world.service]; every request is kept in [world.fakeLog]. */
 function resourceOf(world) {
-    const { name, schema, target, templated, method, form, state, links } = world.service;
+    const { name, schema, target, templated, method, form, state, links, template } = world.service;
+    if (template) return JSON.stringify({ ...state, _links: { self: { href: "/" }, ...links }, _templates: { [name]: template } });
     return JSON.stringify({
         ...state,
         _links: { self: { href: "/" }, ...links },
@@ -336,8 +337,10 @@ function answer(world, req, res, body) {
         res.writeHead(refused.status, { "Content-Type": "application/problem+json" });
         return res.end(refused.body);
     }
-    const headers = { "Content-Type": "application/hal+json", ...service.validator, ...service.headers };
-    if (service.profile) headers.Link = `<${heart.PROFILE}>; rel="profile"`;
+    const halForms = service.template !== undefined;
+    const type = halForms ? "application/prs.hal-forms+json" : "application/hal+json";
+    const headers = { "Content-Type": type, ...service.validator, ...service.headers };
+    if (service.profile) headers.Link = `<${halForms ? "https://w3id.org/heart-rise/hal-forms" : heart.PROFILE}>; rel="profile"`;
     res.writeHead(200, headers);
     res.end(body ?? resourceOf(world));
 }
@@ -346,7 +349,7 @@ const recorded = (req, body) => ({
     method: req.method, url: req.url, body,
     authorization: req.headers.authorization, ifMatch: req.headers["if-match"], contentType: req.headers["content-type"],
     accept: req.headers.accept, profile: req.headers["accept-profile"], cacheControl: req.headers["cache-control"],
-    ifNoneMatch: req.headers["if-none-match"],
+    ifNoneMatch: req.headers["if-none-match"], prefer: req.headers.prefer,
 });
 
 async function serve(handler) {
@@ -359,17 +362,30 @@ async function serve(handler) {
     return server;
 }
 
-Given("a service offering {string} with the schema {}", async function (name, schema) {
-    this.service = {
-        name, schema: JSON.parse(schema), target: `/actions/${name}`, templated: false, method: "POST",
+async function offering(world, name, service) {
+    world.service = {
+        name, target: `/actions/${name}`, templated: false, method: "POST", ...service,
         form: {}, state: {}, links: {}, headers: {}, profile: true, plain: {}, validator: { ETag: '"1"' }, embedded: {},
     };
-    this.fakeLog = [];
-    this.fake = await serve((req, res, body) => {
-        this.fakeLog.push(recorded(req, body));
-        answer(this, req, res);
+    world.fakeLog = [];
+    world.fake = await serve((req, res, body) => {
+        world.fakeLog.push(recorded(req, body));
+        answer(world, req, res);
     });
-    this.fakeUrl = `http://127.0.0.1:${this.fake.address().port}/`;
+    world.fakeUrl = `http://127.0.0.1:${world.fake.address().port}/`;
+}
+
+Given("a service offering {string} with the schema {}", async function (name, schema) {
+    await offering(this, name, { schema: JSON.parse(schema) });
+});
+
+Given("a HAL-FORMS service offering {string} with the properties {}", async function (name, properties) {
+    const template = { method: "POST", target: `/actions/${name}`, properties: JSON.parse(properties) };
+    await offering(this, name, { template });
+});
+
+Given("a HAL-FORMS service whose template {string} is {}", async function (name, template) {
+    await offering(this, name, { template: JSON.parse(template) });
 });
 
 Given("that service refuses {string} as invalid input, saying {string}", function (_name, detail) {
@@ -632,4 +648,56 @@ Then("it holds embedded resources at exactly {string}", function (href) {
 
 Given("that service serves {string} with the validator {string} and the body {}", function (path, validator, body) {
     this.service.plain[path] = { status: 200, type: "application/json", headers: { ETag: `"${validator}"` }, body };
+});
+
+// ---- HAL-FORMS, the L0 on-ramp ----
+
+const halFormsClient = (rung, authorization) => {
+    const log = [];
+    const schemaFailures = [];
+    return { log, schemaFailures, heart: new heart.HeartClient({ dialect: "hal-forms", rung, authorization, log, schemaFailures }) };
+};
+
+Given("a HAL-FORMS client with the garden's credential", function () {
+    this.me = halFormsClient(undefined, credential);
+});
+
+Given("another HAL-FORMS client with the garden's credential", function () {
+    this.other = halFormsClient(undefined, credential);
+});
+
+Given("a HAL-FORMS client with no credential", function () {
+    this.me = halFormsClient(undefined, undefined);
+});
+
+Given("a HAL-FORMS client at rung {word} with no credential", function (rung) {
+    this.me = halFormsClient(rung, undefined);
+});
+
+Given("that service also says it applied forms by link", function () {
+    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
+});
+
+When("the other client waters bed {int} with {int} ml, in HAL-FORMS", async function (bed, ml) {
+    await this.other.heart.enter(this.garden.bookmark);
+    await this.other.heart.act("getBed", { id: bed });
+    await this.other.heart.follow("item", `bed-${bed}`);
+    await this.other.heart.act("waterCell", { milliliters: ml });
+});
+
+const dialects = { "HAL-FORMS": "hal-forms", "HAL Schema Forms": "hal-schema-forms" };
+
+Then("the representation is at rung L0, in {}", function (dialect) {
+    assert.equal(this.rep.rung, "L0");
+    assert.equal(this.rep.dialect, dialects[dialect]);
+});
+
+Then("the last read accepted {string}, at the HAL-FORMS profile, with no cache", function (accept) {
+    assert.equal(lastRead(this).accept, accept);
+    assert.equal(lastRead(this).profile, "<https://w3id.org/heart-rise/hal-forms>");
+    assert.equal(lastRead(this).cacheControl, "no-cache");
+});
+
+Then("the last read asked for no layering", function () {
+    assert.equal(lastRead(this).prefer, undefined);
 });

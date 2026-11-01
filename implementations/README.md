@@ -5,7 +5,8 @@
   (`standards/`), not ported from ARTIE. It can enter at a
   bookmark, read state and forms at L0 or L2 with every shared layer checked
   against its link's integrity, act with If-Match, tell the refusals apart,
-  follow links by relation and title, and offer a form's choices from state
+  follow links by relation and title, speak HAL-FORMS at L0 as well as HAL
+  Schema Forms, and offer a form's choices from state
   (`hr:options`), sending no value outside them.
 - `conformance/`: what any HEART client must do, as Cucumber scenarios
   against the live garden (`client.feature`), and against a small service
@@ -15,7 +16,7 @@
   Without `GARDEN_URL` the same scenarios replay `conformance/fixtures/garden/`,
   offline, which is what the TDD gate runs. `conformance/record.sh` records those
   fixtures from its own isolated garden; run it when representations change.
-  `service.feature` and `schema.feature` hold what a client does with what a
+  `hal-forms.feature` holds the other dialect. `service.feature` and `schema.feature` hold what a client does with what a
   service sends. In `heart-ts`, `npm run mutation` runs Stryker. It edits `src/`
   in place while it runs, so run it where nobody else is working.
 

@@ -39,7 +39,7 @@ export function fill(template: string, scope: TemplateScope): string {
 }
 
 /** A form's filled target, relative or not, as the form says. */
-export function expand(form: Form, state: JsonObject, fields: JsonObject): string {
+function expand(form: Form, state: JsonObject, fields: JsonObject): string {
     return form.templated ? fill(form.target, { pointers: form.templatePointers, state, fields }) : form.target;
 }
 
@@ -48,12 +48,26 @@ const namesIn = (template: string): string[] =>
     [...template.matchAll(VARIABLE)].flatMap((match) => (match[1] ?? "").replace("?", "").split(","));
 
 /** Adds to a safe form's [target] each field its template did not take. */
-export function withQuery(target: URL, form: Form, fields: JsonObject): URL {
+function withQuery(target: URL, form: Form, fields: JsonObject): URL {
     const taken = form.templated ? namesIn(form.target) : [];
     for (const [key, value] of Object.entries(fields)) {
         if (!taken.includes(key)) target.searchParams.set(key, String(value));
     }
     return target;
+}
+
+const QUERY_METHODS = ["GET", "HEAD", "DELETE"];
+
+/** Whether a form's fields leave in its query. HAL-FORMS sends a DELETE's as it sends a GET's. */
+const fieldsInQuery = (form: Form): boolean =>
+    (form.dialect === "hal-forms" ? QUERY_METHODS.includes(form.method) : form.method === "GET");
+
+/** Where an act on [form] goes. HAL-FORMS replaces the target's query, as an HTML form does. */
+export function addressOf(form: Form, held: { url: string; state: JsonObject }, fields: JsonObject): URL {
+    const target = new URL(expand(form, held.state, fields), held.url);
+    if (!fieldsInQuery(form)) return target;
+    if (form.dialect === "hal-forms") target.search = "";
+    return withQuery(target, form, fields);
 }
 
 /** A pointer whose {name}s are other fields of the form, escaped as RFC 6901 asks. */
