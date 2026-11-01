@@ -27,6 +27,7 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
           properties:
             - {name: depthCm, type: number, min: 1, max: 10, prompt: Depth in cm}
             - {name: seedType, type: text, required: true, regex: "^(?=\\s*\\S).*$"}
+            - {name: covered, type: checkbox}
       """
     And the client works in dialect hal-forms
 
@@ -55,6 +56,15 @@ Feature: L5 from the client: ARTIE at the HAL-FORMS on-ramp
       | depthCm  | description |
       | depthCm  | type        |
       | seedType | pattern     |
+
+  Scenario Outline: A HAL-FORMS input type other than number is a hint, not a JSON Schema type: <property> is <input>
+    A checkbox's value is a boolean, so reading every input type but number as "string" would refuse it.
+    When the client enters "http://garden.test/beds/1"
+    Then the "<property>" field in the "sowSeed" schema has no "type" keyword
+    Examples:
+      | property | input    |
+      | seedType | text     |
+      | covered  | checkbox |
 
   Scenario: Required properties are carried into the schema
     When the client enters "http://garden.test/beds/1"

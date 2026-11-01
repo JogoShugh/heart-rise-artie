@@ -90,9 +90,16 @@ object HalFormsTemplates {
         )
     }
 
+    /**
+     * A HAL-FORMS `type` is an HTML input type: a hint for how to ask, not a limit on the value
+     * (a checkbox's value is a boolean, not a string). Only "number" says what JSON Schema would.
+     */
     private fun property(p: JsonObject): JsonObject {
-        val type = if (p["type"]?.jsonPrimitive?.content == "number") "number" else "string"
+        val number = (p["type"] as? JsonPrimitive)?.content == NUMBER
+        val type: Map<String, JsonElement> = if (number) mapOf("type" to JsonPrimitive(NUMBER)) else emptyMap()
         val mapped: Map<String, JsonElement> = keywords.mapNotNull { (from, to) -> p[from]?.let { to to it } }.toMap()
-        return JsonObject(mapOf("type" to JsonPrimitive(type)) + mapped)
+        return JsonObject(type + mapped)
     }
+
+    private const val NUMBER = "number"
 }

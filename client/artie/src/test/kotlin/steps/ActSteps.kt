@@ -95,6 +95,13 @@ class ActSteps(private val ctx: ClientContext) {
         assertTrue(props[property]?.jsonObject?.containsKey(keyword) == true, "$property lacks $keyword")
     }
 
+    @Then("the {string} field in the {string} schema has no {string} keyword")
+    fun noSchemaKeyword(property: String, rel: String, keyword: String) {
+        val props = ctx.current.affordance(rel)?.schema?.get(PROPERTIES)?.jsonObject ?: error("no $rel properties")
+        val field = props[property]?.jsonObject ?: error("no $property in $rel")
+        assertFalse(field.containsKey(keyword), "$property has $keyword: $field")
+    }
+
     @Then("the {string} schema marks {string} as required")
     fun schemaRequired(rel: String, field: String) {
         val required = ctx.current.affordance(rel)?.schema?.get(REQUIRED)?.jsonArray?.map { it.jsonPrimitive.content }
