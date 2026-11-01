@@ -1,0 +1,67 @@
+[
+  {
+    "request": {
+      "method": "GET",
+      "url": "/",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "2614",
+        "content-type": "application/hal+json",
+        "etag": "\"index-hsf-38eeef393c14ad71\"",
+        "link": "<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\", </openapi.json>; rel=\"service-desc\"; type=\"application/vnd.oai.openapi+json;version=3.1\"",
+        "vary": "Accept, Accept-Profile"
+      },
+      "body": "{\"title\":\"Garden beds\",\"_links\":{\"self\":{\"href\":\"/\"},\"service-desc\":{\"href\":\"/openapi.json\",\"type\":\"application/vnd.oai.openapi+json;version=3.1\"},\"curies\":[{\"name\":\"garden\",\"href\":\"/profiles/garden#{rel}\",\"templated\":true}]},\"_forms\":{\"garden:search-beds\":{\"_links\":{\"target\":{\"href\":\"/beds{?name}\",\"templated\":true}},\"method\":\"GET\",\"title\":\"Find beds by name\",\"description\":\"Lists the beds whose name contains the text given, ignoring case.\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"name\":{\"type\":\"string\",\"minLength\":1,\"title\":\"Name\",\"description\":\"Part of the bed's name; case is ignored\"}},\"required\":[\"name\"]},\"hr:integrity\":\"sha256-NGRUWSBr7T/trSunfj069J4i5SQaGz2MUwdHkkdNcak=\"},\"garden:get-bed\":{\"_links\":{\"target\":{\"href\":\"/beds/{id}\",\"templated\":true}},\"method\":\"GET\",\"title\":\"Get a bed by its id\",\"description\":\"Goes to one bed, given its id.\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"integer\",\"minimum\":1,\"title\":\"Bed id\",\"description\":\"The bed's number\"}},\"required\":[\"id\"]},\"hr:integrity\":\"sha256-AFb34JATuSJQYNqKsNUOme7ZwX2i9PGT7YTvGtoMAN4=\"},\"garden:build-bed\":{\"_links\":{\"target\":{\"href\":\"/actions/build-bed\"}},\"method\":\"POST\",\"contentType\":\"application/json\",\"title\":\"Build a bed\",\"description\":\"Builds a new, empty bed with a name and a size in feet.\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"properties\":{\"label\":{\"description\":\"What the bed is called\",\"examples\":[\"Herbs\"],\"minLength\":1,\"pattern\":\"[\\\\s\\\\S]*\\\\S[\\\\s\\\\S]*\",\"title\":\"Name\",\"type\":\"string\"},\"lengthFt\":{\"description\":\"How long the bed is, in feet\",\"examples\":[8],\"maximum\":100,\"minimum\":1,\"title\":\"Length\",\"type\":\"integer\"},\"widthFt\":{\"description\":\"How wide the bed is, in feet\",\"examples\":[4],\"maximum\":100,\"minimum\":1,\"title\":\"Width\",\"type\":\"integer\"}},\"required\":[\"label\",\"lengthFt\",\"widthFt\"],\"title\":\"Build Bed\",\"type\":\"object\",\"$id\":\"/schemas/d017ea1b10b893b8\"},\"hr:integrity\":\"sha256-1eHk2UR7YAEoI9Wo0kZgv8fljsItrvPrlg7adUORr1s=\"}},\"hr:manifest\":{\"forms\":{\"garden:build-bed\":[\"sha256-1eHk2UR7YAEoI9Wo0kZgv8fljsItrvPrlg7adUORr1s=\"],\"garden:get-bed\":[\"sha256-AFb34JATuSJQYNqKsNUOme7ZwX2i9PGT7YTvGtoMAN4=\"],\"garden:harvest\":[\"sha256-ctSw0zxmj1GCZRzqgkSl2rChcKAMvE87rlSooj2ZQyE=\"],\"garden:search-beds\":[\"sha256-NGRUWSBr7T/trSunfj069J4i5SQaGz2MUwdHkkdNcak=\"],\"garden:sow-seed\":[\"sha256-RzdrH62iji+iBA6Yun7ENeEny+4rJkrkdCqIFYTT0xE=\"],\"garden:water-cell\":[\"sha256-PNINjwmbImFF1BjHGk9F/t6JIDu+xde09JqZZ5PL4cA=\"]},\"digest\":\"sha256-n6KKKaMJuGITV+k4WQyxpDL0k267I46IqjTxVhPLDVE=\"}}"
+    }
+  },
+  {
+    "request": {
+      "method": "GET",
+      "url": "/beds/2",
+      "authorized": true,
+      "ifMatch": null,
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": ""
+    },
+    "response": {
+      "status": 200,
+      "headers": {
+        "cache-control": "no-cache",
+        "content-length": "1146",
+        "content-type": "application/hal+json",
+        "etag": "\"seq-3.hsf.L0.b9f977b07094344b\"",
+        "link": "<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+        "vary": "Accept, Prefer, Accept-Profile"
+      },
+      "body": "{\"id\":2,\"label\":\"bed-2\",\"widthFt\":4,\"lengthFt\":8,\"status\":\"PLANTED\",\"cropName\":\"tomato\",\"growthPoints\":80,\"moistureLevel\":40,\"_links\":{\"self\":{\"href\":\"/beds/2\"},\"curies\":[{\"name\":\"garden\",\"href\":\"/profiles/garden#{rel}\",\"templated\":true},{\"name\":\"hr\",\"href\":\"https://w3id.org/heart-rise/rels/{rel}\",\"templated\":true}],\"hr:unavailable\":{\"href\":\"/unavailable/1648f3dc5307f159\",\"type\":\"application/json\",\"integrity\":\"sha256-Fkjz3FMH8VnKolwCT8ID7fvf1jvy2LKP83Ge1Xk4UOA=\"}},\"_forms\":{\"garden:water-cell\":{\"title\":\"Water the bed\",\"description\":\"Pours water into every cell of a planted bed. Enough water makes it ready to harvest.\",\"_links\":{\"target\":{\"href\":\"/beds/2/actions/water-cell\"}},\"method\":\"POST\",\"contentType\":\"application/json\",\"schema\":{\"$schema\":\"https://json-schema.org/draft/2020-12/schema\",\"properties\":{\"milliliters\":{\"description\":\"Millilitres of water poured into each cell\",\"examples\":[250],\"maximum\":1000,\"minimum\":1,\"title\":\"Water per cell\",\"type\":\"integer\"}},\"required\":[\"milliliters\"],\"title\":\"Water Cell\",\"type\":\"object\",\"$id\":\"/schemas/7f232c04c52671dd\"},\"hr:integrity\":\"sha256-PNINjwmbImFF1BjHGk9F/t6JIDu+xde09JqZZ5PL4cA=\"}}}"
+    }
+  },
+  {
+    "request": {
+      "method": "POST",
+      "url": "/beds/2/actions/water-cell",
+      "authorized": true,
+      "ifMatch": "\"seq-3.hsf.L0.b9f977b07094344b\"",
+      "ifNoneMatch": null,
+      "preferred": null,
+      "body": "{\"milliliters\":0}"
+    },
+    "response": {
+      "status": 422,
+      "headers": {
+        "content-length": "274",
+        "content-type": "application/problem+json"
+      },
+      "body": "{\"type\":\"https://w3id.org/heart-rise/problems/invalid-input\",\"title\":\"The body does not match the form's schema\",\"status\":422,\"detail\":\"request body does not satisfy the affordance schema\",\"violations\":[{\"pointer\":\"/milliliters\",\"message\":\"must have a minimum value of 1\"}]}"
+    }
+  }
+]

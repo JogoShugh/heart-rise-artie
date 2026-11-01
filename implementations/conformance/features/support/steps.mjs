@@ -2,27 +2,28 @@
 // would bring its own steps file with the same phrases.
 import { Before, After, Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import http from "node:http";
 import { createRequire } from "node:module";
+import { openGarden } from "./garden-fixture.mjs";
 
 const require = createRequire(import.meta.url);
 const heart = require("../../../heart-ts/dist/index.js");
 
 setDefaultTimeout(30_000);
-const garden = process.env.GARDEN_URL ?? "http://localhost:8080";
-const bookmark = `${garden}/`;
+const credential = `Bearer ${process.env.GARDEN_TOKEN ?? "fixture"}`;
 
-Before(function () {
+Before(function ({ pickle }) {
     this.error = undefined;
+    this.scenario = pickle.name;
 });
 
-After(function () {
+After(async function () {
     this.fake?.close();
+    await this.garden?.close();
 });
 
-Given("the garden is at its seed state", function () {
-    execFileSync(process.env.GARDEN_RESET, { stdio: "ignore" });
+Given("the garden is at its seed state", async function () {
+    this.garden = await openGarden(this.scenario);
 });
 
 function client(world, rung, authorization) {
@@ -31,11 +32,11 @@ function client(world, rung, authorization) {
 }
 
 Given("a client at rung {word} with the garden's credential", function (rung) {
-    this.me = client(this, rung, `Bearer ${process.env.GARDEN_TOKEN}`);
+    this.me = client(this, rung, credential);
 });
 
 Given("another client at rung {word} with the garden's credential", function (rung) {
-    this.other = client(this, rung, `Bearer ${process.env.GARDEN_TOKEN}`);
+    this.other = client(this, rung, credential);
 });
 
 Given("a client at rung {word} with no credential", function (rung) {
@@ -43,11 +44,11 @@ Given("a client at rung {word} with no credential", function (rung) {
 });
 
 When("it enters at the bookmark", async function () {
-    this.rep = await this.me.heart.enter(bookmark);
+    this.rep = await this.me.heart.enter(this.garden.bookmark);
 });
 
 When("it tries to enter at the bookmark", async function () {
-    try { await this.me.heart.enter(bookmark); } catch (e) { this.error = e; }
+    try { await this.me.heart.enter(this.garden.bookmark); } catch (e) { this.error = e; }
 });
 
 When("it submits {string} with {}", async function (name, body) {
@@ -62,7 +63,7 @@ When("it tries to submit {string} with {}", async function (name, body) {
 });
 
 When("the other client waters bed {int} with {int} ml", async function (bed, ml) {
-    await this.other.heart.enter(bookmark);
+    await this.other.heart.enter(this.garden.bookmark);
     await this.other.heart.act("garden:get-bed", { id: bed });
     await this.other.heart.act("garden:water-cell", { milliliters: ml });
 });

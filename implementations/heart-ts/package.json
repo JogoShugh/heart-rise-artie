@@ -5,9 +5,16 @@
   "description": "A second HEART client, in TypeScript, written from the spec and the Internet-Draft rather than from ARTIE.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": { "build": "tsc" },
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint . && tsc --noEmit && depcruise src"
+  },
   "devDependencies": {
     "@types/node": "20.16.5",
-    "typescript": "5.5.4"
+    "dependency-cruiser": "16.10.4",
+    "eslint": "9.13.0",
+    "eslint-plugin-sonarjs": "2.0.4",
+    "typescript": "5.5.4",
+    "typescript-eslint": "8.11.0"
   }
 }
