@@ -3,7 +3,7 @@
 - `heart-ts/`: a second HEART client, in TypeScript, written from
   `spec/SPEC.md`, `spec/HAL-SCHEMA-FORMS-HR.md` and the Internet-Draft
   (`standards/`), not ported from ARTIE. It can enter at a
-  bookmark, read state and forms at L0 or L2 with every shared layer checked
+  bookmark, read state and forms at L0, L1 or L2 with every shared layer checked
   against its link's integrity, act with If-Match, tell the refusals apart,
   follow links by relation and title, speak HAL-FORMS at L0 as well as HAL
   Schema Forms, and offer a form's choices from state

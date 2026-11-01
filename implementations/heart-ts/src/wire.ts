@@ -9,7 +9,7 @@ export const HAL_FORMS_PROFILE = "https://w3id.org/heart-rise/hal-forms";
 export const HAL_FORMS_TYPE = "application/prs.hal-forms+json";
 export const JSON_TYPE = "application/json";
 
-export type Rung = "L0" | "L2";
+export type Rung = "L0" | "L1" | "L2";
 export type Dialect = "hal-schema-forms" | "hal-forms";
 
 export interface Form {
@@ -63,6 +63,22 @@ function linksUnder(rel: string, value: Json): Link[] {
 
 export function linksOf(body: JsonObject): Link[] {
     return Object.entries(objectOf(body._links)).flatMap(([rel, value]) => linksUnder(rel, value));
+}
+
+/** The relation an affordance set is linked under (SPEC §6.1). A body may write it as a CURIE of any prefix. */
+const FORMS_RELATION = "https://w3id.org/heart-rise/rels/forms";
+const USUAL_FORMS_LINK = "hr:forms";
+
+function relationOf(rel: string, body: JsonObject): string {
+    const colon = rel.indexOf(":");
+    const curie = listOf(objectOf(body._links).curies).map(objectOf).find((c) => c.name === rel.slice(0, colon));
+    const href = stringOf(curie?.href);
+    if (href !== undefined) return href.replace("{rel}", rel.slice(colon + 1));
+    return rel === USUAL_FORMS_LINK ? FORMS_RELATION : rel;
+}
+
+export function formsLinkOf(body: JsonObject): Link | undefined {
+    return linksOf(body).find((link) => relationOf(link.rel, body) === FORMS_RELATION);
 }
 
 function embeddedResource(rel: string, resource: Json): Embedded[] {

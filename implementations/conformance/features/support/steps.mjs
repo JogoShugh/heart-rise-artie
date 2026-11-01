@@ -572,11 +572,7 @@ Then("it names no violations", function () {
 });
 
 Given("that service applies L2, with a true affordance set", function () {
-    const set = JSON.stringify({ _forms: { "from-the-set": { _links: { target: { href: "/x" } }, schema: {} } } });
-    const integrity = `sha256-${createHash("sha256").update(set).digest("base64")}`;
-    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
-    this.service.links["hr:forms"] = { href: "/set", integrity };
-    this.service.plain["/set"] = { status: 200, type: "application/hal+json", headers: {}, body: set };
+    appliesSet(this, "forms=link, schema=link", "hr:forms");
 });
 
 Given("that service sends no validator", function () {
@@ -700,4 +696,91 @@ Then("the last read accepted {string}, at the HAL-FORMS profile, with no cache",
 
 Then("the last read asked for no layering", function () {
     assert.equal(lastRead(this).prefer, undefined);
+});
+
+// ---- The rungs ----
+
+const setsRead = (log) => log.filter((r) => /\/affordance-sets\//.test(r.url)).map((r) => r.url);
+
+When("the other client reads bed {int}", async function (bed) {
+    await this.other.heart.enter(this.garden.bookmark);
+    await this.other.heart.act("garden:get-bed", { id: bed });
+});
+
+Then("no shared layer was read twice", function () {
+    const shared = this.me.log.filter((r) => /\/(affordance-sets|schemas)\//.test(r.url)).map((r) => r.url);
+    assert.ok(shared.length > 0, "no shared layer was read");
+    assert.deepEqual(shared, [...new Set(shared)]);
+});
+
+Then("the two clients read different affordance sets", function () {
+    const mine = setsRead(this.me.log);
+    assert.ok(mine.length > 0);
+    assert.deepEqual(mine.filter((url) => setsRead(this.other.log).includes(url)), []);
+});
+
+Then("the last read asked for {string}", function (prefer) {
+    assert.equal(lastRead(this).prefer, prefer);
+});
+
+function serveSet(world, offers) {
+    const set = JSON.stringify({ _forms: { [offers]: { _links: { target: { href: "/x" } }, schema: {} } } });
+    const integrity = `sha256-${createHash("sha256").update(set).digest("base64")}`;
+    world.service.plain["/set"] = { status: 200, type: "application/hal+json", headers: {}, body: set };
+    return { href: "/set", integrity };
+}
+
+function appliesSet(world, applied, rel) {
+    world.service.headers["Preference-Applied"] = applied;
+    world.setRelation = rel;
+    world.service.links[rel] = serveSet(world, "from-the-set");
+}
+
+Given("that service applies {string}, with a true affordance set", function (applied) {
+    appliesSet(this, applied, "hr:forms");
+});
+
+Given("that service applies {string}, with a true affordance set linked as {string}", function (applied, rel) {
+    appliesSet(this, applied, rel);
+});
+
+Given("that service says it applied {string}", function (applied) {
+    this.service.headers["Preference-Applied"] = applied;
+});
+
+Given("that service declares the curie {string} for {string}", function (name, href) {
+    this.service.links.curies = [{ name, href, templated: true }];
+});
+
+Given("that service's affordance set now offers {string}", function (offers) {
+    this.service.links[this.setRelation] = serveSet(this, offers);
+});
+
+Given("that service's media type is {string}", function (type) {
+    this.service.headers["Content-Type"] = type;
+});
+
+function pairOfClients(world, setCache) {
+    const client = () => {
+        const log = [];
+        return { log, heart: new heart.HeartClient({ rung: "L1", log, setCache }) };
+    };
+    world.me = client();
+    world.other = client();
+}
+
+Given("two clients at rung L1 sharing one cache", function () {
+    pairOfClients(this, new Map());
+});
+
+Given("two clients at rung L1 with their own caches", function () {
+    pairOfClients(this, undefined);
+});
+
+When("the other client enters that service", async function () {
+    await this.other.heart.enter(this.fakeUrl);
+});
+
+Then("the affordance set was read {int} times", function (times) {
+    assert.equal(this.fakeLog.filter((r) => r.url === "/set").length, times);
 });

@@ -7,7 +7,7 @@ import { Json, JsonObject, isObject, objectOf, parseJson, resolve, stringMembers
 import { needsRereading, refusalOf } from "./refusal";
 import { addressOf, fill, fillPointer } from "./template";
 import { FormChecks, SchemaFailure } from "./validation";
-import { Dialect, Form, HAL_FORMS_PROFILE, HAL_FORMS_TYPE, JSON_TYPE, Link, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, linksOf, matchesIntegrity, stateOf } from "./wire";
+import { Dialect, Form, HAL_FORMS_PROFILE, HAL_FORMS_TYPE, JSON_TYPE, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, formsLinkOf, linksOf, matchesIntegrity, stateOf } from "./wire";
 
 export interface Options {
     rung?: Rung;
@@ -17,6 +17,12 @@ export interface Options {
     authorization?: string;
     /** Every request this client sends, for a test to inspect. */
     log?: { method: string; url: string; status: number; ifMatch?: string }[];
+    /**
+     * Shared layers read so far, by address and integrity, so none is read twice.
+     * Give clients one map to share what they read, but only clients that may
+     * all read the same layers: a client finds what another read, with no request.
+     */
+    setCache?: Map<string, JsonObject>;
     /** Schemas that could not be compiled, noted locally. The act goes to the service anyway. */
     schemaFailures?: SchemaFailure[];
 }
@@ -39,8 +45,15 @@ function dialectOf(url: string, response: Response): Dialect {
     throw new Error(`${url} does not name the profile ${PROFILE}`);
 }
 
-const appliedRung = (response: Response, dialect: Dialect): Rung =>
-    (dialect === REFERENCE_DIALECT && (response.headers.get("Preference-Applied") ?? "").includes("forms=link") ? "L2" : "L0");
+/** What each rung asks for (SPEC §6.4). */
+const PREFER: Partial<Record<Rung, string>> = { L1: "forms=link", L2: "forms=link, schema=link" };
+
+/** The rung of an answer: what it says it applied (SPEC §6.10), not what was asked. */
+function appliedRung(response: Response, dialect: Dialect): Rung {
+    const applied = (response.headers.get("Preference-Applied") ?? "").split(",").map((token) => token.trim());
+    if (dialect !== REFERENCE_DIALECT || !applied.includes("forms=link")) return "L0";
+    return applied.includes("schema=link") ? "L2" : "L1";
+}
 
 /** Methods that carry no body. */
 const BODYLESS = ["DELETE", "HEAD"];
@@ -54,6 +67,7 @@ function answerUrl(response: Response, target: URL, heldUrl: string): string {
 export class HeartClient {
     private readonly rung: Rung;
     private readonly dialect: Dialect;
+    private readonly layers: Map<string, JsonObject>;
     private origin?: string;
     /** What the client last read of each plain JSON resource, to revalidate it with its ETag. */
     private readonly plainReads = new Map<string, { etag: string; body: Json }>();
@@ -63,6 +77,7 @@ export class HeartClient {
     constructor(private readonly options: Options = {}) {
         this.rung = options.rung ?? "L0";
         this.dialect = options.dialect ?? REFERENCE_DIALECT;
+        this.layers = options.setCache ?? new Map<string, JsonObject>();
         this.checks = new FormChecks(options.schemaFailures);
     }
 
@@ -204,12 +219,12 @@ export class HeartClient {
     }
 
     private async formsAt(url: string, body: JsonObject, rung: Rung): Promise<Map<string, Form>> {
-        return this.forms(rung === "L0" ? body : await this.affordanceSet(url, linksOf(body)), url);
+        return this.forms(rung === "L0" ? body : await this.affordanceSet(url, body, rung), url);
     }
 
-    private async affordanceSet(url: string, links: Link[]): Promise<JsonObject> {
-        const set = links.find((l) => l.rel === "hr:forms");
-        if (!set) throw new Error(`${url} applied L2 but links no affordance set`);
+    private async affordanceSet(url: string, body: JsonObject, rung: Rung): Promise<JsonObject> {
+        const set = formsLinkOf(body);
+        if (!set) throw new Error(`${url} applied ${rung} but links no affordance set`);
         return this.shared(new URL(set.href, url).toString(), set.integrity);
     }
 
@@ -231,6 +246,14 @@ export class HeartClient {
     /** A shared layer, fetched only through a link that carries its integrity, and checked before use. */
     private async shared(url: string, integrity: string | undefined): Promise<JsonObject> {
         if (!integrity) throw new IntegrityFailure(`${url} was linked without an integrity value; nothing was sent`);
+        const key = `${integrity} ${url}`;
+        const layer = this.layers.get(key) ?? await this.verified(url, integrity);
+        this.layers.set(key, layer);
+        return layer;
+    }
+
+    /** A shared layer read from the service, refused unless its bytes match. */
+    private async verified(url: string, integrity: string): Promise<JsonObject> {
         const response = await this.send(url, { headers: { Accept: `${MEDIA_TYPE}, application/schema+json, ${JSON_TYPE}` } });
         const bytes = await bytesOf(response);
         if (!matchesIntegrity(bytes, integrity)) throw new IntegrityFailure(`${url} does not match the integrity of the link that led to it`);
@@ -239,12 +262,17 @@ export class HeartClient {
 
     // ---- The wire ----
 
+    private layering(): Record<string, string> {
+        const prefer = PREFER[this.rung];
+        return this.dialect === REFERENCE_DIALECT && prefer ? { Prefer: prefer } : {};
+    }
+
     private negotiation(): Record<string, string> {
         return {
             ...(this.dialect === "hal-forms"
                 ? { Accept: `${HAL_FORMS_TYPE}, ${MEDIA_TYPE};q=0.5`, "Accept-Profile": `<${HAL_FORMS_PROFILE}>` }
                 : { Accept: MEDIA_TYPE, "Accept-Profile": `<${PROFILE}>` }),
-            ...(this.rung === "L2" && this.dialect === REFERENCE_DIALECT ? { Prefer: "forms=link, schema=link" } : {}),
+            ...this.layering(),
         };
     }
 
