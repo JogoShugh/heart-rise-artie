@@ -1,86 +1,9 @@
-Feature: A body outside the form's schema is never sent
-  SPEC §6.3: a client populates form fields within the constraints the
-  schema declares. Just before an act is sent, ARTIE checks its fields
-  against the form's own JSON Schema (2020-12), inline or linked. It refuses
-  only what the schema disallows: it never coerces a value, fills in a
-  default or removes a field; it ignores keywords it does not know, such as
-  hr:options; and it does not enforce formats. A refusal sends nothing.
-  A schema ARTIE cannot compile blocks nothing: the act is sent and the
-  service decides, and the event log says so once, with no field values.
-  Each schema is compiled once, kept by its integrity value, or by a digest
-  of it when it came inline.
-
-  Background:
-    Given the service answers GET "http://garden.test/beds/2" with:
-      """
-      200 OK
-      Content-Type: application/hal+json
-      ETag: "seq-1.hsf.L0"
-      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
-
-      id: 2
-      status: PLANTED
-      agents: [priya, zed]
-      _links:
-        self: {href: /beds/2}
-      _forms:
-        waterCell:
-          _links:
-            target: {href: /beds/2/actions/water-cell}
-          method: POST
-          contentType: application/json
-          schema:
-            type: object
-            properties:
-              milliliters: {type: integer, minimum: 1, maximum: 1000}
-              unit: {type: string, default: ml}
-              contact: {type: string, format: email}
-              agent: {type: string, "hr:options": {pointer: /agents}}
-            required: [milliliters]
-      """
-    And the service answers POST "http://garden.test/beds/2/actions/water-cell" with:
-      """
-      200 OK
-      Content-Type: application/hal+json
-      ETag: "seq-2.hsf.L0"
-      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
-
-      id: 2
-      status: PLANTED
-      """
-
-  Scenario Outline: Fields the schema allows are sent exactly as given: <why>
-    When the client enters "http://garden.test/beds/2"
-    And the client acts on "waterCell" with:
-      """yaml
-      <fields>
-      """
-    Then the client sent these requests after entering:
-      | POST http://garden.test/beds/2/actions/water-cell |
-    And that request had the JSON body <fields>
-
-    Examples:
-      | why                                     | fields                                            |
-      | within its limits, no default filled in | {"milliliters": 250}                              |
-      | a field it does not declare is kept     | {"milliliters": 250, "note": "by the gate"}       |
-      | a format is not enforced                | {"milliliters": 250, "contact": "not an address"} |
-      | a keyword it does not know is ignored   | {"milliliters": 250, "agent": "zed"}              |
-
-  Scenario Outline: Fields the schema disallows are refused, and nothing is sent: <why>
-    When the client enters "http://garden.test/beds/2"
-    And the client tries to act on "waterCell" with:
-      """yaml
-      <fields>
-      """
-    Then the client raised a "OutsideSchema" refusal
-    And the client raised an error mentioning "<mentions>"
-    And the client sent no request after entering
-
-    Examples:
-      | why                                   | fields                 | mentions     |
-      | below its minimum                     | {"milliliters": 0}     | /milliliters |
-      | a string is not coerced to an integer | {"milliliters": "250"} | /milliliters |
-      | a required field is missing           | {"unit": "ml"}         | milliliters  |
+Feature: ARTIE's own side of the schema check
+  What a body the schema allows or disallows does is held to every client in
+  implementations/conformance/features/schema.feature. Here, what is ARTIE's
+  own: a schema linked at L2 is checked as an inline one is, and a schema it
+  cannot compile is compiled once by its integrity value and reported once in
+  its event log, with no field values.
 
   Scenario: A linked schema is checked as an inline one is
     Given the service serves schema "water" at its content address:

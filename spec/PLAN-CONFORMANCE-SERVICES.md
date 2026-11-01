@@ -243,3 +243,12 @@ own features hold only ARTIE-specific behaviour.
 ## Later
 
 - A Docker image of the simulator, for clients in other languages.
+- One real-world story across the three (asked for 2026-11-01; start simple first):
+  - a commit pushed to a repository on the GitHub service triggers a build of
+    the job named after that repository;
+  - a successful build feeds a deployment of the same name on the deploy service;
+  - the deploy target is local: the build takes time, the files are copied, the
+    service starts, as a real one would;
+  - the deployed service answers an actuator `/info` with the full and the short
+    commit SHA, and the committer's username and full name, all embedded at build
+    time.

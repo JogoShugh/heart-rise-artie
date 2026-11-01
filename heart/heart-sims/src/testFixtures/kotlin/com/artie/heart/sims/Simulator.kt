@@ -52,6 +52,9 @@ class Simulator {
         log.clear()
     }
 
+    /** The build service's job [name], with [parameters] as the schema of its build act. */
+    fun configureJob(name: String, parameters: String) = runBlocking { build.configure(name, parameters) }
+
     /** The faults of the service at [host]. */
     fun faults(host: String): Faults = faults[host] ?: throw IllegalArgumentException("no service $host")
 
@@ -72,7 +75,7 @@ class Simulator {
     private val control: HttpHandler = routes(
         "/_sim/reset" bind POST to { reset().let { Response(Status.NO_CONTENT) } },
         "/_sim/build/jobs/{name}" bind PUT to { request ->
-            runBlocking { build.configure(request.path("name").orEmpty(), request.bodyString()) }
+            configureJob(request.path("name").orEmpty(), request.bodyString())
             Response(Status.NO_CONTENT)
         },
         "/_sim/{host}/acts/{act}/answer" bind POST to { request ->

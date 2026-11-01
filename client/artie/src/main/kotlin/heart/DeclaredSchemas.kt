@@ -3,7 +3,9 @@ package heart
 import io.github.optimumcode.json.schema.JsonSchema
 import io.github.optimumcode.json.schema.SchemaType
 import io.github.optimumcode.json.schema.ValidationError
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import java.security.MessageDigest
 import java.util.Base64
 
@@ -40,13 +42,30 @@ internal class DeclaredSchemas(private val decisions: DecisionLog) {
             return Check { emptyList() }
         }
         return Check { fields ->
-            mutableListOf<ValidationError>().also { errors -> schema.validate(fields, errors::add) }.map(::sentence)
+            mutableListOf<ValidationError>().also { errors -> schema.validate(fields, errors::add) }
+                .flatMap { sentences(it, form.schema, fields) }
         }
     }
 
-    /** Where in the body, as a JSON Pointer, and what the schema says of it; the message alone at the root. */
-    private fun sentence(error: ValidationError): String =
-        "${error.objectPath}".takeIf { it.isNotEmpty() }?.let { "$it: ${error.message}" } ?: error.message
+    /**
+     * Each violation as every client says it, whatever its validator: the
+     * JSON Pointer of the value, then the keyword it breaks; the keyword
+     * alone at the body. A missing required member is said at its own pointer.
+     */
+    private fun sentences(error: ValidationError, schema: JsonObject, fields: JsonObject): List<String> {
+        val at = "${error.objectPath}"
+        val schemaPath = "${error.schemaPath}".removePrefix("#")
+        val keyword = schemaPath.substringAfterLast('/').replace("~1", "/").replace("~0", "~")
+        if (keyword != REQUIRED) return listOf("$at $keyword".trim())
+        val required = (JsonPointer.resolve(schema, schemaPath) as? JsonArray).orEmpty()
+            .map { it.jsonPrimitive.content }
+        val present = (JsonPointer.resolve(fields, at) as? JsonObject)?.keys.orEmpty()
+        return (required - present).map { "$at/${it.replace("~", "~0").replace("/", "~1")} $REQUIRED" }
+    }
+
+    private companion object {
+        const val REQUIRED = "required"
+    }
 
     private fun digest(schema: JsonObject): String =
         "sha256-" + Base64.getEncoder().encodeToString(

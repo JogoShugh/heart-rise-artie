@@ -13,14 +13,14 @@ internal object ProblemDetails {
     fun type(body: String): String? =
         runCatching { Json.parseToJsonElement(body).jsonObject["type"]?.jsonPrimitive?.content }.getOrNull()
 
-    /** The `violations` of an invalid-input body, or its `error` text, or nothing. */
+    /** The `violations` of an invalid-input body, or its `error` text, or its `detail`, or nothing. */
     fun violations(body: String): List<String> {
         val root = runCatching { Json.parseToJsonElement(body).jsonObject }.getOrNull() ?: return emptyList()
         // Each violation is {pointer, message}. An older server sent strings.
         val listed = (root["violations"] as? JsonArray)?.map { item ->
             (item as? JsonObject)?.let { pointerMessage(it) } ?: item.jsonPrimitive.content
         }
-        return listed ?: listOfNotNull(root["error"]?.jsonPrimitive?.content)
+        return listed ?: listOfNotNull((root["error"] ?: root["detail"])?.jsonPrimitive?.content)
     }
 
     private fun pointerMessage(violation: JsonObject): String =

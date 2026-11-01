@@ -31,7 +31,7 @@ object Integrity {
         }
         if (expected.isEmpty()) throw IntegrityException("$url: no supported algorithm in integrity \"$integrity\"")
         if (expected.none { (algorithm, digest) -> digest(algorithm, bytes).contentEquals(digest) }) {
-            throw IntegrityException("$url does not match its integrity \"$integrity\"")
+            throw IntegrityException("$url does not match the integrity of the link that led to it (\"$integrity\")")
         }
     }
 

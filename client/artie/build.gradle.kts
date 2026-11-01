@@ -39,6 +39,8 @@ dependencies {
     testImplementation("io.cucumber:cucumber-picocontainer:$cucumberVersion")
     // The GitHub gateway and a small GitHub, in process (github-gateway.feature).
     testImplementation(testFixtures("com.artie.heart:heart-gateway"))
+    // The simulated build, deploy and GitHub services the shared conformance features run against, in memory.
+    testImplementation(testFixtures("com.artie.heart:heart-sims"))
     // script-github.feature runs real scripts, through Kotlin's script engine.
     testImplementation(project(":heart-script-host"))
     // script-replay.feature: artie generate's scripts and lock files, run with ARTIE against the gateway.
@@ -196,7 +198,7 @@ val conformanceTest by tasks.registering(Test::class) {
     useJUnitPlatform()
     val conformance = file("../../implementations/conformance")
     systemProperty("cucumber.glue", "conformance")
-    systemProperty("cucumber.features", file("$conformance/features/client.feature").path)
+    systemProperty("cucumber.features", listOf("client", "schema").joinToString(",") { file("$conformance/features/$it.feature").path })
     systemProperty("cucumber.filter.tags", "not @none")
     systemProperty("conformance.fixtures", file("$conformance/fixtures/garden").path)
     outputs.upToDateWhen { false }

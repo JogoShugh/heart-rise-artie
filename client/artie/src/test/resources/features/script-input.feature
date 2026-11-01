@@ -50,7 +50,7 @@ Feature: A script's input, checked by ARTIE before it is sent, and refused by wh
           act("waterCell", "milliliters" to 30)
       }
       """
-    Then the script stopped at step 1, "waterCell": invalid input, refused by the client: "/milliliters: 30 is not a multiple of 50"
+    Then the script stopped at step 1, "waterCell": invalid input, refused by the client: "/milliliters multipleOf"
     And the client sent these requests:
       | GET http://garden.test/beds/2 |
 
