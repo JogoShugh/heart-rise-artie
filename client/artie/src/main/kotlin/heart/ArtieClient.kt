@@ -207,7 +207,7 @@ class ArtieClient(
     /**
      * SPEC §6.7. At L0 one read. At L1/L2 a walk: Layer 1, then the
      * affordance set it links to, then each schema the set points to by
-     * `$ref` (or an older server's `$id`), each URL once. Each fetch carries
+     * `$ref`, each URL once. Each fetch carries
      * the integrity value of the link it follows. A binding's cache makes a
      * URL already held cost nothing; reasoning waits until the manifest is
      * complete. An act's answer is Layer 1 too ([received]), and is completed

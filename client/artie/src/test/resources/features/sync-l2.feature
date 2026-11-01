@@ -99,20 +99,18 @@ Feature: Sync at L2: walk three layers through an HTTP cache
     And the last request had header "If-None-Match" set to "\"seq-1.hsf.L2\""
     And the manifest offers exactly "waterCell"
 
-  Scenario: Two affordances that share one schema fetch it once (an older server's $id pointer is still read)
-    An older server sends no integrity values, so this client accepts unchecked links.
-    Given the client accepts links without integrity
-    And the service serves affordance set "two-waterings" at its content address:
+  Scenario: Two affordances that share one schema fetch it once
+    Given the service serves affordance set "two-waterings" at its content address:
       """yaml
       _forms:
         waterCell:
           _links: {target: {href: "/beds/{id}/actions/water-cell", templated: true}}
           method: POST
-          schema: {$id: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
         waterAgain:
           _links: {target: {href: "/beds/{id}/actions/water-again", templated: true}}
           method: POST
-          schema: {$id: "{schema:water}"}
+          schema: {$ref: "{schema:water}", "hr:integrity": "{integrity:schema:water}"}
       """
     And the service answers GET "http://garden.test/beds/5" with:
       """
@@ -124,7 +122,7 @@ Feature: Sync at L2: walk three layers through an HTTP cache
 
       id: 5
       _links:
-        https://w3id.org/heart-rise/rels/forms: {href: "{set:two-waterings}"}
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:two-waterings}", integrity: "{integrity:set:two-waterings}"}
       """
     When the client enters "http://garden.test/beds/5"
     Then the client sent these requests:
@@ -135,6 +133,37 @@ Feature: Sync at L2: walk three layers through an HTTP cache
       | act        |
       | waterCell  |
       | waterAgain |
+
+  Scenario: A schema with nothing but its $id is a schema that allows anything, not a link
+    A schema is linked only by $ref. heart-core names every inline schema with its $id, so an
+    empty one reads as {$id: ...} alone; it is read where it is, and nothing more is fetched.
+    Given the service serves affordance set "cancel-only" at its content address:
+      """yaml
+      _forms:
+        cancel:
+          _links: {target: {href: "/beds/{id}/actions/cancel", templated: true}}
+          method: POST
+          schema: {$id: "/schemas/0123456789abcdef"}
+      """
+    And the service answers GET "http://garden.test/beds/5" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L2"
+      Preference-Applied: forms=link, schema=link
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 5
+      _links:
+        https://w3id.org/heart-rise/rels/forms: {href: "{set:cancel-only}", integrity: "{integrity:set:cancel-only}"}
+      """
+    When the client enters "http://garden.test/beds/5"
+    Then the client sent these requests:
+      | GET http://garden.test/beds/5            |
+      | GET http://garden.test{set:cancel-only}  |
+    And the manifest offers exactly
+      | act    |
+      | cancel |
 
   Scenario: An act at L2 expands the set's template from Layer 1 and repeats the headers it synced with
     HTTP is stateless: the act carries the same Accept, Accept-Profile and

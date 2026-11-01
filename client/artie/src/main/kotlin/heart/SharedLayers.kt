@@ -24,7 +24,7 @@ internal class SharedLayers(
 
     /**
      * The affordance set at [link], with each schema it points to by `$ref`
-     * (or an older server's `$id`) fetched once and put in place.
+     * fetched once and put in place.
      */
     fun manifest(link: String, integrity: String?): Manifest {
         val fetched = HeartResponseParser.manifest(json(link, integrity), link)
@@ -77,13 +77,10 @@ internal class SharedLayers(
     }
 
     private companion object {
-        /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3), or an older server's lone `$id`. */
-        fun schemaPointer(schema: JsonObject): String? =
-            schema[SCHEMA_REF]?.jsonPrimitive?.content
-                ?: schema.takeIf { it.keys == setOf(SCHEMA_ID) }?.get(SCHEMA_ID)?.jsonPrimitive?.content
+        /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3). A lone `$id` names a schema; it links none. */
+        fun schemaPointer(schema: JsonObject): String? = schema[SCHEMA_REF]?.jsonPrimitive?.content
 
         val ACCEPT = listOf(HAL_JSON, "application/json")
-        const val SCHEMA_ID = "\$id"
         const val SCHEMA_REF = "\$ref"
         const val SCHEMA_INTEGRITY = "hr:integrity"
     }
