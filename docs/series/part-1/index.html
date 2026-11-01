@@ -43,6 +43,7 @@ th, td { text-align: left; vertical-align: top; padding: 0.5rem 0.6rem; border-b
 th { font-weight: 600; color: var(--muted); }
 td.hl { color: var(--accent); font-weight: 600; }
 .next { margin-top: 2.4rem; padding: 1rem 1.2rem; border: 1px solid var(--accent); border-radius: 12px; background: var(--accent-soft); }
+.next > p { margin: 0 0 0.4rem; font-weight: 600; } .next ul { margin: 0; padding-left: 1.2rem; } .next li { margin: 0 0 0.3rem; } .next.prev { margin: 0 0 2.2rem; }
 details.deep { margin: 1rem 0 1.4rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--panel); }
 details.deep > summary { cursor: pointer; padding: 0.7rem 1rem; font: 600 0.95rem/1.4 'IBM Plex Sans', system-ui, sans-serif; color: var(--accent); }
 details.deep > pre { margin: 0 0.8rem 0.8rem; max-height: 28rem; }
@@ -64,7 +65,16 @@ ol.four { font: 400 1rem/1.6 'IBM Plex Sans', system-ui, sans-serif; padding-lef
   <h1>Rules we can't set</h1>
   <p class="dek">When you can't change a system's settings, you can still put your own controls in front of it, so AI tools do what you want, not merely what they can.</p>
 
-  <p>In <a href="../part-0/">part 0</a>, we saw how the Web pairs information with controls, and how most APIs kept the information and left the controls out. Now for a concrete case, one many teams will recognize.</p>
+  <div class="next prev">
+    <p>Previously, in <a href="../part-0/">part 0: LO and behold</a></p>
+    <ul>
+      <li>The Web pairs information with controls, its links and forms, and one generic program, the browser, has worked with every site for decades.</li>
+      <li>Generative AI surprises us, for better and worse, yet we're still held to repeatability, reliability and right behavior.</li>
+      <li>The models were made from the Web's links, while APIs mostly kept the information and left the controls out.</li>
+      <li>This series puts hypermedia controls back into API design, and builds a generic client, heart-ts, a piece at a time.</li>
+    </ul>
+  </div>
+  <p>Now for a concrete case, one many teams will recognize.</p>
 
   <h2>A setting we can't switch on</h2>
   <p>Our team merges a steady stream of dependency bumps in a GitHub repository we don't administer, and our rule is never to merge a branch that's behind its base. GitHub's "Require branches to be up to date before merging" setting would enforce exactly that, so what was tested is what lands, but it belongs to the repository's owners, and they won't switch it on. That's common in large enterprises, where vendors under contract often run functions such as Cloud or DevOps, and any setting we'd like is a request, a negotiation or a no. So the rule is ours to keep, in our own tools.</p>
