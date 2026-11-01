@@ -12,6 +12,7 @@ import heart.EventLog
 import heart.EventSink
 import heart.EventSinks
 import heart.IntegrityCheck
+import heart.OFF_THE_RAILS
 import heart.Dialect
 import heart.HeartRepresentation
 import heart.HeartRiseClient
@@ -127,6 +128,8 @@ class ClientContext {
             "coaps" to CoapBinding(trace = trace, credentials = credentials),
         )
         val bindings = coap + bindings
+        // A run off the rails leaves bodies to the server, as ArtieNavigatorProvider sets it.
+        val care = Care(care.checkedLinks, care.validators, checkedBodies = guard != OFF_THE_RAILS)
         return ArtieClient(transport, rung, dialect, care, events, bindings)
             .also { created += it }
     }

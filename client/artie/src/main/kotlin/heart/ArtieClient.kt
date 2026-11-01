@@ -38,6 +38,7 @@ class ArtieClient(
     }
     private val decisions = DecisionLog(events)
     private val layers = SharedLayers(this.bindings, !care.checkedLinks, decisions)
+    private val schemas = DeclaredSchemas(decisions)
 
     override var current: HeartRepresentation? = null
         private set
@@ -79,6 +80,10 @@ class ArtieClient(
             }
         // HAL-SCHEMA-FORMS-HR Rule 8: a value outside the form's choices is never sent.
         choices(rel)?.violations(payload)?.takeIf { it.isNotEmpty() }?.let { throw NotAChoice(rel, it) }
+        // SPEC §6.3: nor is a body the form's declared schema disallows, unless the run leaves that to the server.
+        if (care.checkedBodies) {
+            schemas.violations(form, payload, held.url).takeIf { it.isNotEmpty() }?.let { throw OutsideSchema(rel, it) }
+        }
         broughtIntoBeing = false
         if (form.method != "GET") return act(rel, payload, resendAllowed = true)
         // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot

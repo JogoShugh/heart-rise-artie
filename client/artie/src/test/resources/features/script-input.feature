@@ -27,7 +27,7 @@ Feature: A script's input, checked by ARTIE before it is sent, and refused by wh
           schema:
             type: object
             properties:
-              milliliters: {type: integer, minimum: 1}
+              milliliters: {type: integer, minimum: 1, multipleOf: 50}
             required: [milliliters]
       """
 
@@ -39,6 +39,18 @@ Feature: A script's input, checked by ARTIE before it is sent, and refused by wh
       }
       """
     Then the script stopped at step 1, "waterCell": invalid input, refused by the client: "milliliters is below 1"
+    And the client sent these requests:
+      | GET http://garden.test/beds/2 |
+
+  Scenario: A value only the form's whole JSON Schema disallows is refused by ARTIE too
+    The script's quick check knows a few keywords; the whole schema is checked last, just before sending.
+    When this script runs with ARTIE
+      """kotlin
+      heart("http://garden.test/beds/2") {
+          act("waterCell", "milliliters" to 30)
+      }
+      """
+    Then the script stopped at step 1, "waterCell": invalid input, refused by the client: "/milliliters: 30 is not a multiple of 50"
     And the client sent these requests:
       | GET http://garden.test/beds/2 |
 

@@ -69,6 +69,13 @@ internal class DecisionLog(private val events: EventLog) {
             ),
         )
 
+    /** A form's schema that could not be compiled: its acts are sent unchecked. Never names a field value. */
+    fun schemaUncompiled(rel: String, schema: String, url: String, reason: String?) =
+        events.emit(
+            "schema.uncompiled", "could not compile the schema of $rel; its acts are sent unchecked", url,
+            mapOf("heart.rel" to rel, "heart.schema" to schema, "heart.schema.error" to reason),
+        )
+
     /** An act or link the representation does not offer: refused before any request. */
     fun absent(kind: String, rel: String, url: String) =
         events.emit("$kind.absent", "$rel is not offered in $url; nothing was sent", url, mapOf("heart.rel" to rel))

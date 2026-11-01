@@ -235,6 +235,8 @@ private fun refusal(client: HeartRiseClient, what: String, refused: RuntimeExcep
         is InvalidPayload -> Answer.Refused(Refusal.InvalidInput, Side.SERVER, refused.violations.joinToString("; "))
         is RuleRefused -> Answer.Refused(Refusal.InvalidInput, Side.SERVER, refused.violations.joinToString("; "))
         is NotAChoice -> Answer.Refused(Refusal.NotAChoice, Side.CLIENT, refused.violations.joinToString("; "))
+        // The client's own check of the whole schema, last before sending.
+        is OutsideSchema -> Answer.Refused(Refusal.InvalidInput, Side.CLIENT, refused.violations.joinToString("; "))
         is NotAuthenticated -> Answer.Refused(Refusal.NotAuthenticated, Side.SERVER, refused.message.orEmpty())
         is Forbidden -> Answer.Refused(Refusal.Forbidden, Side.SERVER, refused.message.orEmpty())
         else -> throw refused

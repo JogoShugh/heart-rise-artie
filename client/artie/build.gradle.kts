@@ -26,6 +26,8 @@ dependencies {
     api("org.eclipse.californium:californium-core:3.14.0")
     // coaps: DTLS with a pre-shared key.
     api("org.eclipse.californium:scandium:3.14.0")
+    // SPEC §6.3: a form's declared JSON Schema (2020-12), checked before an act is sent. Reads kotlinx JSON as is.
+    implementation("io.github.optimumcode:json-schema-validator:0.5.4")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")

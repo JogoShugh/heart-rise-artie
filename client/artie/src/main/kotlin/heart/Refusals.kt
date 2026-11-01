@@ -28,6 +28,13 @@ class NotAChoice(rel: String, val violations: List<String>) :
     ActRefused("$rel was not sent: ${violations.joinToString("; ")}")
 
 /**
+ * Not sent: the fields break the form's declared JSON Schema (SPEC §6.3). The client checks before
+ * sending; [violations] each name where in the body, and what the schema says of it.
+ */
+class OutsideSchema(rel: String, val violations: List<String>) :
+    ActRefused("$rel was not sent, being outside its schema: ${violations.joinToString("; ")}")
+
+/**
  * 422 rule-refused: the body satisfied the schema, but a rule of the resource
  * refused it. The client's form handling was right; [violations] give the
  * rule's own words. Not retried.

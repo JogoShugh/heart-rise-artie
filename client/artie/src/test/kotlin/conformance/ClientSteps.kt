@@ -11,6 +11,7 @@ import heart.IntegrityException
 import heart.InvalidPayload
 import heart.NotAChoice
 import heart.NotAuthenticated
+import heart.OutsideSchema
 import heart.RuleRefused
 import heart.Rung
 import heart.StaleAct
@@ -256,6 +257,7 @@ class ClientSteps {
         is RuleRefused -> "rule-refused" to HTTP_UNPROCESSABLE
         is InvalidPayload -> "invalid-input" to HTTP_UNPROCESSABLE
         is NotAChoice -> "not-a-choice" to 0
+        is OutsideSchema -> "outside-schema" to 0
         else -> "failed" to 0
     }
 

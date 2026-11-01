@@ -102,6 +102,16 @@ class EventSteps(private val ctx: ClientContext) {
         events().forEach { assertEquals(expected, it.keys, "fields of $it") }
     }
 
+    @Then("the event log has {int} {string} line(s)")
+    fun eventCount(count: Int, event: String) =
+        assertEquals(count, events().count { it.text("event_name") == event }, "events: ${memory().lines}")
+
+    @Then("no event line holds any of these values")
+    fun noLineHolds(values: List<String>) {
+        val holding = memory().lines.filter { line -> values.any { it in line } }
+        assertEquals(emptyList(), holding, "lines holding $values")
+    }
+
     @Then("the last event is {string}")
     fun lastEvent(event: String) = assertEquals(event, events().last().text("event_name"))
 
