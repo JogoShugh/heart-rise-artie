@@ -9,6 +9,12 @@ import { addressOf, fill, fillPointer } from "./template";
 import { FormChecks, SchemaFailure } from "./validation";
 import { Dialect, Form, HAL_FORMS_PROFILE, HAL_FORMS_TYPE, JSON_TYPE, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, formsLinkOf, linksOf, matchesIntegrity, stateOf } from "./wire";
 
+/** Where shared layers are kept. A `Map` will do; pass something with a limit if a `Map` would grow too far. */
+export interface LayerCache {
+    get(key: string): JsonObject | undefined;
+    set(key: string, layer: JsonObject): unknown;
+}
+
 export interface Options {
     rung?: Rung;
     /** The dialect to ask for. A client reads whichever one comes back. HAL-FORMS is served at L0 only. */
@@ -22,7 +28,7 @@ export interface Options {
      * Give clients one map to share what they read, but only clients that may
      * all read the same layers: a client finds what another read, with no request.
      */
-    setCache?: Map<string, JsonObject>;
+    setCache?: LayerCache;
     /** Schemas that could not be compiled, noted locally. The act goes to the service anyway. */
     schemaFailures?: SchemaFailure[];
 }
@@ -67,7 +73,7 @@ function answerUrl(response: Response, target: URL, heldUrl: string): string {
 export class HeartClient {
     private readonly rung: Rung;
     private readonly dialect: Dialect;
-    private readonly layers: Map<string, JsonObject>;
+    private readonly layers: LayerCache;
     private origin?: string;
     /** What the client last read of each plain JSON resource, to revalidate it with its ETag. */
     private readonly plainReads = new Map<string, { etag: string; body: Json }>();
@@ -113,7 +119,13 @@ export class HeartClient {
         if (form.method === "GET") return this.sync(target.toString());
         const response = await this.send(target.toString(), this.actRequest(form, held.etag, fields));
         if (!response.ok) throw await this.refusal(name, response);
-        return this.complete(answerUrl(response, target, held.url), response, await bytesOf(response));
+        return this.answered(answerUrl(response, target, held.url), response);
+    }
+
+    /** An act's answer is the resource's new representation; a service that sends none leaves it to be read. */
+    private async answered(url: string, response: Response): Promise<Representation> {
+        const bytes = await bytesOf(response);
+        return bytes.length ? this.complete(url, response, bytes) : this.sync(url);
     }
 
     /** The conditional request for an act. A DELETE has no body: its fields filled its target or query (SPEC §6.2). */

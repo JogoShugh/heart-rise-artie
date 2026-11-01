@@ -7,7 +7,7 @@
 // against the integrity value of the link that led to it; act with If-Match;
 // tell the refusals apart; and follow links by relation and title. It speaks both
 // dialects: HAL Schema Forms, and HAL-FORMS at L0.
-export { HeartClient, Options } from "./client";
+export { HeartClient, LayerCache, Options } from "./client";
 export { Choice } from "./choices";
 export * from "./errors";
 export { Json } from "./json";

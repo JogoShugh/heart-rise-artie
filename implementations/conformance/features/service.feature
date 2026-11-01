@@ -350,3 +350,17 @@ Feature: What a client does with what a service sends
     Then the values for "size" of "note" are ["x"]
     When that service serves "/sizes" with the validator "2" and the body ["y"]
     Then the values for "size" of "note" are ["y"]
+
+  Scenario: An answer with no body is read again
+    Given that service answers acts with no body
+    When it enters that service
+    And it submits "note" with {}
+    Then the resource was read 2 times
+    And the client holds "/"
+
+  Scenario: An answer with no body may name the resource to read
+    Given that service answers acts with no body
+    And that service answers acts from "/elsewhere"
+    When it enters that service
+    And it submits "note" with {}
+    Then the client holds "/elsewhere"

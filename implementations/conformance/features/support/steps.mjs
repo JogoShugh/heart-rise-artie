@@ -325,6 +325,10 @@ function answer(world, req, res, body) {
         return res.end(plain.body);
     }
     const refused = req.method !== "GET" ? service.refusal : undefined;
+    if (req.method !== "GET" && service.emptyActs) {
+        res.writeHead(204, service.headers);
+        return res.end();
+    }
     if (req.method === "GET" && service.readStatus) {
         res.writeHead(service.readStatus);
         return res.end();
@@ -783,4 +787,43 @@ When("the other client enters that service", async function () {
 
 Then("the affordance set was read {int} times", function (times) {
     assert.equal(this.fakeLog.filter((r) => r.url === "/set").length, times);
+});
+
+// ---- An empty answer, and a cache of the caller's ----
+
+Given("that service answers acts with no body", function () {
+    this.service.emptyActs = true;
+});
+
+Given("two clients at rung L1 sharing a cache that keeps nothing", function () {
+    pairOfClients(this, { get: () => undefined, set: () => undefined });
+});
+
+Then("the request before last was HEAD for {string}", function (url) {
+    const request = this.fakeLog.at(-2);
+    assert.equal(request.method, "HEAD");
+    assert.equal(request.url, url);
+    assert.equal(request.body, "");
+});
+
+// ---- One resource in two dialects ----
+
+When("each client reads bed {int} in its own dialect", async function (bed) {
+    await this.me.heart.enter(this.garden.bookmark);
+    await this.me.heart.act("garden:get-bed", { id: bed });
+    await this.other.heart.enter(this.garden.bookmark);
+    await this.other.heart.act("getBed", { id: bed });
+    await this.other.heart.follow("item", `bed-${bed}`);
+});
+
+const offeredActs = (client) => [...client.heart.current.forms.values()]
+    .map((form) => `${form.method} ${form.target.split("/").at(-1)}`);
+
+Then("both hold the same state", function () {
+    assert.deepEqual(this.other.heart.current.state, this.me.heart.current.state);
+});
+
+Then("both offer the act {string}, by the same method", function (act) {
+    assert.deepEqual(offeredActs(this.me), [`POST ${act}`]);
+    assert.deepEqual(offeredActs(this.other), [`POST ${act}`]);
 });

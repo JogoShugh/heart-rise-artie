@@ -168,8 +168,7 @@ Feature: The rungs of the ladder, L0 to L2
     And a HAL-FORMS client with no credential
     When it enters that service
     And it tries to submit "note" with {"a": "b"}
-    Then the last request was HEAD with the body ""
-    And the last request was for "/find?a=b"
+    Then the request before last was HEAD for "/find?a=b"
 
   Scenario: The HAL-FORMS media type may carry a parameter
     Given a HAL-FORMS service offering "note" with the properties []
@@ -192,3 +191,11 @@ Feature: The rungs of the ladder, L0 to L2
     When it enters that service
     And it submits "note" with {"b": "c"}
     Then the last request was for "/a%7Bb%7D"
+
+  Scenario: A cache needs only get and set, and keeps what it likes
+    Given a service offering "note" with the schema {"type": "object"}
+    And that service applies "forms=link", with a true affordance set
+    And two clients at rung L1 sharing a cache that keeps nothing
+    When it enters that service
+    And the other client enters that service
+    Then the affordance set was read 2 times
