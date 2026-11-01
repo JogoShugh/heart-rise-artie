@@ -183,3 +183,19 @@ val llmTest by tasks.registering(Test::class) {
         ?.let { environment("ANTHROPIC_API_KEY", it) }
     outputs.upToDateWhen { false }
 }
+
+// Runs the conformance features any HEART client is held to, with ARTIE's steps
+// (package conformance), against the garden heart-ts recorded. Offline.
+val conformanceTest by tasks.registering(Test::class) {
+    group = "verification"
+    description = "Runs implementations/conformance/features against ARTIE."
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    val conformance = file("../../implementations/conformance")
+    systemProperty("cucumber.glue", "conformance")
+    systemProperty("cucumber.features", file("$conformance/features/client.feature").path)
+    systemProperty("cucumber.filter.tags", "not @none")
+    systemProperty("conformance.fixtures", file("$conformance/fixtures/garden").path)
+    outputs.upToDateWhen { false }
+}
