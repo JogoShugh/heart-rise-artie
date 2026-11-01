@@ -51,7 +51,6 @@ details.deep > p { margin: 0 1rem 0.9rem; font: 400 0.92rem/1.5 'IBM Plex Sans',
 figure.shot { margin: 1.2rem 0; } figure.shot img { display: block; max-width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 8px; background: #fff; }
 figure.shot figcaption { font: 400 0.88rem/1.5 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); margin-top: 0.4rem; }
 ol.four { font: 400 1rem/1.6 'IBM Plex Sans', system-ui, sans-serif; padding-left: 1.4rem; } ol.four li:last-child { color: var(--accent); font-weight: 600; }
-ul.points { padding-left: 1.3rem; margin: 0 0 1.2rem; } ul.points li { margin: 0 0 0.35rem; }
 .sources { margin-top: 3.5rem; border-top: 1px solid var(--rule); padding-top: 1rem; font: 400 0.9rem/1.6 'IBM Plex Sans', system-ui, sans-serif; color: var(--muted); }
 .sources h2 { font-size: 1rem; margin: 0.5rem 0; }
 .sources ul { padding-left: 1.2rem; margin: 0; }
@@ -71,17 +70,9 @@ ul.points { padding-left: 1.3rem; margin: 0 0 1.2rem; } ul.points li { margin: 0
   <blockquote><p>Hence, the first message on the Internet was "lo", as in "lo and behold!"</p><cite>Leonard Kleinrock, "The First Words on the Internet"</cite></blockquote>
 
   <h2>Rules we can't set</h2>
-  <p>Our team merges a steady stream of dependency bumps in a GitHub repository we don't administer.</p>
-  <ul class="points">
-    <li><b>Our rule:</b> never merge a branch that's behind its base; update it first.</li>
-    <li><b>GitHub has a setting for it,</b> but it belongs to the repository's owners, and they won't switch it on.</li>
-    <li><b>So the rule is ours to keep,</b> in our own tools.</li>
-  </ul>
+  <p>Our team merges a steady stream of dependency bumps in a GitHub repository we don't administer. We have a rule: never merge a branch that's behind its base; update it first. GitHub has a setting for exactly that, but it belongs to the people who own the repository, and they won't switch it on. So the rule is ours to keep, in our own tools.</p>
   <p>More and more of those tools are AI: assistants that write our code, agents that act for us. Left alone, they'll do whatever GitHub lets them do. We want them to do what our team allows.</p>
-  <ul class="points">
-    <li><b>In front of a system we don't control,</b> like GitHub, we can add our own controls.</li>
-    <li><b>In an API we own,</b> the same controls can be built in from the start, which is more powerful still: no layer to add, no rule to copy, and every client gets them in every answer.</li>
-  </ul>
+  <p>GitHub is our example because we don't own it: the technique works even in front of systems we don't control. In an API we do own, the same controls can be built in from the start, and that's more powerful still. Then there's no layer to add and no rule to copy: every client, person, script or agent, gets them in every answer.</p>
 
   <h2>The engine that has run the Web since the 1990s</h2>
   <p>In 2000, Roy Fielding's dissertation described the architecture that had made the Web work, and named it REST. At its centre is a uniform interface, defined by four constraints:</p>
@@ -127,17 +118,7 @@ window.merge = async (button, number) =&gt; {
 };
 &lt;/script&gt;</code></pre>
   <h2>A server in the middle</h2>
-  <p>Its first draft kept a GitHub token in the browser. The team said no:</p>
-  <ul class="points">
-    <li>The page calls <code>/github/...</code> on the dashboard's own small server (<a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/lo-to-heart/server.ts"><code>server.ts</code></a>, fifteen lines).</li>
-    <li>The server adds the token and forwards each call to GitHub unchanged.</li>
-    <li>The page never holds a token.</li>
-  </ul>
-  <p>We ran it in a real browser against real pull requests:</p>
-  <ul class="points">
-    <li><b>Offered Merge</b> on <a href="https://github.com/JogoShugh/heart-github-test/pull/2116">#2116</a>, which was fresh, and the merge went through.</li>
-    <li><b>Held back</b> <a href="https://github.com/JogoShugh/heart-github-test/pull/2114">#2114</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/2111">#2111</a> and <a href="https://github.com/JogoShugh/heart-github-test/pull/2108">#2108</a>, each behind its base, with the reason.</li>
-  </ul>
+  <p>Its first draft kept a GitHub token in the browser. The team said no, so the page calls <code>/github/...</code> on the dashboard's own small server, which adds the token and forwards each call to GitHub unchanged (<a href="https://github.com/JogoShugh/heart-rise-artie/blob/claude/auth-branch-4bnmhc/exhibits/lo-to-heart/server.ts"><code>server.ts</code></a>, fifteen lines). We ran it in a real browser against real pull requests. It offered Merge on <a href="https://github.com/JogoShugh/heart-github-test/pull/2116">#2116</a>, which was fresh, and the merge went through. It held back <a href="https://github.com/JogoShugh/heart-github-test/pull/2114">#2114</a>, <a href="https://github.com/JogoShugh/heart-github-test/pull/2111">#2111</a> and <a href="https://github.com/JogoShugh/heart-github-test/pull/2108">#2108</a>, each behind its base, with the reason.</p>
 <figure class="shot"><img src="before.png" alt="The fragment: #2116 with a Merge button; #2114, #2111, #2108 in red, each behind its base, update it first" width="500" height="136"><figcaption>The fragment, as the browser showed it. Merge on #2116 only.</figcaption></figure>
 <figure class="shot"><img src="after.png" alt="After clicking Merge: #2116 merged; the others still held back" width="500" height="136"><figcaption>After clicking Merge.</figcaption></figure>
 <details class="deep"><summary>The squash merge of #2116: what the page sent</summary>
@@ -179,13 +160,7 @@ x-ratelimit-remaining: 4941
   <p>One file, everything in it, made for this repository and this rule, today. Call it level zero: L0, which looks like LO on purpose. It works, and it's what AI tools write by default. They can write generic, reusable work too, but only when we guide them there.</p>
 
   <h2>What the fragment knows, and the browser doesn't</h2>
-  <p>Now look at what the fragment had to know:</p>
-  <ul class="points">
-    <li>four addresses, built by hand from GitHub's documentation;</li>
-    <li>that merging is a <code>PUT</code>, and what its body takes;</li>
-    <li>our rule, and the extra call it needs.</li>
-  </ul>
-  <p>GitHub's own answer for <a href="https://github.com/JogoShugh/heart-github-test/pull/2114">#2114</a>, held back for being 1 commit behind, says <code>"mergeable_state": "clean"</code>. It has 159 links, and not one control.</p>
+  <p>Now look at what the fragment had to know: four addresses built from GitHub's documentation, that merging is a <code>PUT</code> and what it takes, and our rule. GitHub's answer for <a href="https://github.com/JogoShugh/heart-github-test/pull/2114">#2114</a>, held back for being 1 commit behind, says <code>"mergeable_state": "clean"</code>, with 159 links and not one control.</p>
 <details class="deep"><summary>GitHub's whole answer for #2114 (19 KB)</summary>
 <pre><code>{
   "url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/2114",
