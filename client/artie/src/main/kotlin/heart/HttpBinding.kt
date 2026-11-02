@@ -24,6 +24,11 @@ class HttpBinding(private val transport: Transport) : Binding {
         return outcome(transport.send(HeartRequest("GET", url, headers, integrity = integrity)))
     }
 
+    override fun fetchFresh(url: String, accept: List<String>): Outcome {
+        val headers = mapOf("Accept" to accept.joinToString(", ")) + LAYER1_NO_CACHE
+        return outcome(transport.send(HeartRequest("GET", url, headers)))
+    }
+
     override fun act(act: Act, rendering: Rendering): Outcome {
         // A body says its type; a DELETE has none.
         val type = act.body?.let { mapOf("Content-Type" to act.contentType) }.orEmpty()

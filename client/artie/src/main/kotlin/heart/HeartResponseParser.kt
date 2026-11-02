@@ -145,13 +145,16 @@ object HeartResponseParser {
         val templated = target["templated"]?.jsonPrimitive?.booleanOrNull == true
         return AffordanceForm(
             rel = rel,
-            target = if (templated) href else URI(base).resolve(href).toString(),
+            // A target that is no template is kept as written: a brace in it is a character, sent encoded.
+            target = if (templated) href else URI(base).resolve(Uris.braces(href)).toString(),
             templated = templated,
             // A form that names no method is a POST, as one that names no content type sends JSON.
             method = obj["method"]?.jsonPrimitive?.content ?: "POST",
             contentType = obj["contentType"]?.jsonPrimitive?.content ?: "application/json",
             schema = obj["schema"]?.jsonObject ?: error("affordance '$rel' has no schema"),
+            // Only a pointer that is text counts.
             templatePointers = (obj[TEMPLATE_POINTERS] as? JsonObject).orEmpty()
+                .filterValues { it is JsonPrimitive && it.isString }
                 .mapValues { (_, pointer) -> pointer.jsonPrimitive.content },
             title = obj["title"]?.jsonPrimitive?.content,
             description = obj["description"]?.jsonPrimitive?.content,

@@ -157,8 +157,10 @@ class ClientSteps(private val world: World) {
     }
 
     @Then("it was refused as {string} before sending, because {string}")
-    fun refusedAsBeforeSending(kind: String, @Suppress("UNUSED_PARAMETER") text: String) {
-        assertEquals(kind, Kinds.of(assertNotNull(world.error, "expected a refusal")).first)
+    fun refusedAsBeforeSending(kind: String, text: String) {
+        val refusal = assertNotNull(world.error, "expected a refusal")
+        assertEquals(kind, Kinds.of(refusal).first)
+        assertTrue(text in refusal.message.orEmpty(), "it said: ${refusal.message}")
         nothingSent()
     }
 

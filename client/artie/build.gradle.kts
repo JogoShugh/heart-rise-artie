@@ -202,7 +202,7 @@ val conformanceTest by tasks.registering(Test::class) {
     useJUnitPlatform()
     val conformance = file("../../implementations/conformance")
     systemProperty("cucumber.glue", "conformance")
-    systemProperty("cucumber.features", listOf("client", "schema", "choices", "rungs", "hal-forms", "dialects", "refusals", "reads", "links", "acts").joinToString(",") { file("$conformance/features/$it.feature").path })
+    systemProperty("cucumber.features", listOf("client", "schema", "choices", "rungs", "hal-forms", "dialects", "refusals", "reads", "links", "acts", "templates", "options").joinToString(",") { file("$conformance/features/$it.feature").path })
     systemProperty("cucumber.filter.tags", "not @none")
     systemProperty("conformance.fixtures", file("$conformance/fixtures/garden").path)
     outputs.upToDateWhen { false }

@@ -113,6 +113,9 @@ interface Binding {
      */
     fun fetch(url: String, accept: List<String>, integrity: String? = null): Outcome
 
+    /** Reads a resource that may change at any time, as a form's list of choices, never from a cache unasked. */
+    fun fetchFresh(url: String, accept: List<String>): Outcome = fetch(url, accept)
+
     /** A state-changing act, conditional on its validator (SPEC §6.2). */
     fun act(act: Act, rendering: Rendering): Outcome
 }

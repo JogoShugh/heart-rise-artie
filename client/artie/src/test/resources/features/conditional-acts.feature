@@ -189,7 +189,7 @@ Feature: Conditional acts and the four refusals
       """yaml
       milliliters: 100
       """
-    Then the client raised an error mentioning "{bedId}"
+    Then the client raised an error mentioning "the template variable bedId has no string or number value"
     And the client sent no request after entering
 
     Examples:
@@ -221,7 +221,7 @@ Feature: Conditional acts and the four refusals
       """yaml
       milliliters: 100
       """
-    Then the client raised an error mentioning "{bedId}"
+    Then the client raised an error mentioning "the template variable bedId has no string or number value"
     And the client sent no request after entering
 
   Scenario: 412 means the world moved: re-sync and drop the act

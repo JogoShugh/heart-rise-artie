@@ -1023,3 +1023,17 @@ Given("the {word} service links its affordance set without an integrity value", 
 Given("the {word} service links no affordance set", async function (service) {
     await sims.faults(hostOf(service), { noSet: true });
 });
+
+Given("the {word} service's job offers {string} as {} to {string}, with pointers {}", async function (service, form, kind, target, pointers) {
+    const shape = {
+        _links: { target: { href: target, templated: kind !== "an untemplated GET" } },
+        method: "GET",
+        schema: { type: "object" },
+        "hr:templatePointers": JSON.parse(pointers),
+    };
+    await sims.faults(hostOf(service), { reshaped: { [form]: shape } });
+});
+
+Given("the {word} service serves {string} with the validator {string} and the body {}", async function (service, path, validator, body) {
+    await sims.plain(hostOf(service), { path, status: 200, body, validator: `"${validator}"` });
+});

@@ -87,7 +87,11 @@ class ArtieClient(
         // template a target; it puts the fields in the query (mutate-action-URL).
         val target = when (asking.dialect) {
             Dialect.HAL_FORMS -> HalFormsTemplates.getTarget(form.target, payload)
-            Dialect.HAL_SCHEMA_FORMS -> targetOf(form, held, payload)
+            // A field the target's template does not take goes in its query.
+            Dialect.HAL_SCHEMA_FORMS -> {
+                val taken = if (form.templated) UriTemplate.names(form.target) else emptySet()
+                Uris.withQuery(targetOf(form, held, payload), taken, payload)
+            }
         }
         return sync(target)
     }
@@ -132,7 +136,7 @@ class ArtieClient(
 
     /** A plain JSON resource a form's choices come from, read as HTTP allows; null if it is not there. */
     override val listReader: (String) -> JsonElement? = { url ->
-        (this.bindings.forUri(url).fetch(url, listOf(JSON_MEDIA_TYPE)) as? Outcome.Done)
+        (this.bindings.forUri(url).fetchFresh(url, listOf(JSON_MEDIA_TYPE)) as? Outcome.Done)
             ?.let { runCatching { Json.parseToJsonElement(it.received.body) }.getOrNull() }
     }
 

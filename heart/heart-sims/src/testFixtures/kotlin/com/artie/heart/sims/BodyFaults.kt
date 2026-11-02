@@ -78,8 +78,9 @@ class BodyFaults {
     private fun forms(root: ObjectNode): Boolean {
         val forms = root.get("_forms") as? ObjectNode ?: return false
         declared.forEach { (key, schema) -> (forms.get(key) as? ObjectNode)?.set<JsonNode>("schema", schema) }
+        // A form the service does not offer is offered as the patch says.
         reshaped.forEach { (key, patch) ->
-            val form = forms.get(key) as? ObjectNode ?: return@forEach
+            val form = forms.get(key) as? ObjectNode ?: forms.putObject(key)
             patch.properties().forEach { (name, value) -> if (value.isNull) form.remove(name) else form.set<JsonNode>(name, value) }
         }
         return declared.isNotEmpty() || reshaped.isNotEmpty()

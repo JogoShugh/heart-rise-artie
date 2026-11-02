@@ -1,5 +1,7 @@
 package heart
 
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
@@ -25,11 +27,12 @@ object UriTemplate {
         pointers: Map<String, String> = emptyMap(),
         fields: JsonObject = JsonObject(emptyMap()),
     ): String {
-        val values = Values(template, state, pointers, fields)
+        val values = Values(state, pointers, fields)
         return expression.replace(template) { match ->
             val names = match.groupValues[2].split(',').map { it.trim() }
             if (match.groupValues[1] == "?") {
-                names.mapNotNull { name -> values.find(name)?.let { "$name=${encode(it)}" } }
+                // A list's name is repeated for each of its values (RFC 6570 explode, as a form submits).
+                names.flatMap { name -> values.all(name).map { "$name=${encode(it)}" } }
                     .takeIf { it.isNotEmpty() }?.joinToString("&", prefix = "?").orEmpty()
             } else {
                 encode(values.require(names.single()))
@@ -37,25 +40,37 @@ object UriTemplate {
         }
     }
 
+    /** The variables [template] takes, simple and query alike. */
+    fun names(template: String): Set<String> =
+        expression.findAll(template).flatMap { match -> match.groupValues[2].split(',').map { it.trim() } }.toSet()
+
     private class Values(
-        val template: String,
         val state: JsonObject,
         val pointers: Map<String, String>,
         val fields: JsonObject,
     ) {
-        fun find(name: String): String? {
+        private fun valueOf(name: String): JsonElement? {
             val pointer = pointers[name]
-            val value = when {
+            return when {
                 pointer != null -> JsonPointer.resolve(state, pointer)
                 fields.containsKey(name) -> fields[name]
                 else -> state[name]
-            } as? JsonPrimitive
-            return value?.takeIf { it.isString || it.content.toDoubleOrNull() != null }?.content
+            }
+        }
+
+        private fun text(value: JsonElement?): String? = (value as? JsonPrimitive)
+            ?.takeIf { it.isString || it.content.toDoubleOrNull() != null }?.content
+
+        fun find(name: String): String? = text(valueOf(name))
+
+        /** Each string or number value of [name]: one, or each of a list's. */
+        fun all(name: String): List<String> = when (val value = valueOf(name)) {
+            is JsonArray -> value.mapNotNull(::text)
+            else -> listOfNotNull(text(value))
         }
 
         fun require(name: String): String = requireNotNull(find(name)) {
-            val source = pointers[name]?.let { "its template pointer \"$it\"" } ?: "a field or Layer 1 property '$name'"
-            "template variable {$name} in $template has no string or number value from $source"
+            "the template variable $name has no string or number value; nothing was sent"
         }
     }
 

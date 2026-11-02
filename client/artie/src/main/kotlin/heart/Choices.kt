@@ -2,6 +2,7 @@ package heart
 
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
@@ -69,13 +70,15 @@ object Choices {
         val prompt = (options["promptField"] as? JsonPrimitive)?.contentOrNull ?: "prompt"
         return ((items as? JsonArray) ?: emptyList())
             .filter { item -> where.all { (name, wanted) -> (item as? JsonObject)?.get(name) == wanted } }
-            .mapNotNull { item ->
-                when (item) {
-                    is JsonObject -> item[value]?.let { Choice(it, (item[prompt] as? JsonPrimitive)?.content ?: "$it") }
-                    is JsonPrimitive -> Choice(item, item.content)
-                    else -> null
-                }
-            }
+            .mapNotNull { choiceOf(it, value, prompt) }
+    }
+
+    /** One item as a choice: an object by its [value] and [prompt] members, a plain value as itself; else none. */
+    private fun choiceOf(item: JsonElement, value: String, prompt: String): Choice? = when (item) {
+        is JsonObject -> item[value]?.let { Choice(it, (item[prompt] as? JsonPrimitive)?.content ?: "$it") }
+        is JsonNull -> null
+        is JsonPrimitive -> Choice(item, item.content)
+        else -> null
     }
 
     /** One sentence per sent value of [form] that is not among its choices; empty when every one is. */
@@ -85,6 +88,11 @@ object Choices {
         fields: JsonObject,
         read: (String) -> JsonElement?,
     ): List<String> = declared(form.schema).mapNotNull { (property, options) ->
+        val required = (form.schema["required"] as? JsonArray).orEmpty().any { it.jsonPrimitive.content == property }
+        // A required property with no choices now cannot be filled: the act cannot be sent now.
+        if (fields[property] == null && required && of(options, owner, fields, read).isEmpty()) {
+            return@mapNotNull "$property has no choices now"
+        }
         fields[property]?.let { sent ->
             val allowed = of(options, owner, fields, read).map { it.value }
             val values = if (sent is JsonArray) sent.toList() else listOf(sent)
@@ -157,7 +165,7 @@ object Choices {
             .mapValues { it.value.jsonPrimitive.content }
         val href = link.getValue("href").jsonPrimitive.content
         val templated = link["templated"]?.jsonPrimitive?.content == "true"
-        val expanded = if (templated) UriTemplate.expand(href, owner.state, pointers, fields) else href
+        val expanded = if (templated) UriTemplate.expand(href, owner.state, pointers, fields) else Uris.braces(href)
         val answer = read(URI(owner.url).resolve(expanded).toString()) ?: return null
         val items = (options["items"] as? JsonPrimitive)?.content
         return if (items == null) answer else JsonPointer.resolve(answer, items)
