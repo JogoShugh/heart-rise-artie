@@ -82,13 +82,6 @@ Feature: What a HEART client must do, against a real HEART service
     When it tries to enter at the bookmark
     Then it was refused as "not-authenticated" with status 401
 
-  Scenario: A shared layer whose bytes do not match its link's integrity is refused
-    Given a service whose affordance set does not match the integrity of its link
-    And a client at rung L2 with no credential
-    When it tries to enter that service
-    Then it refused the affordance set for its integrity
-    And it failed, saying "does not match the integrity of the link that led to it"
-
   Scenario: A search's embedded beds are read in place, with no request per bed
     Given a client at rung L0 with the garden's credential
     When it enters at the bookmark
@@ -97,15 +90,3 @@ Feature: What a HEART client must do, against a real HEART service
       | relation | title | status  |
       | item     | bed-2 | PLANTED |
     And it read no bed on its own
-
-  Scenario: State is the body without exactly four members; an embedded resource is followed to act
-    Given a service whose resource embeds its author, and keeps a member named "_note"
-    And a client at rung L0 with no credential
-    When it enters that service
-    Then the state has exactly these members
-      | member |
-      | number |
-      | _note  |
-    When it follows the "author" link titled "Ada"
-    Then the state's "name" is "Ada Lovelace"
-    And it offers exactly "befriend"

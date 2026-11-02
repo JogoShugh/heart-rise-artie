@@ -1,6 +1,16 @@
 # Plan: three simulated services behind the shared conformance features
 
-Status: agreed 2026-11-01. The build and deploy services are event-sourced, with CQRS. Docker packaging of the simulator comes later.
+Status: agreed 2026-11-01; done 2026-11-01. The build and deploy services are event-sourced, with CQRS. Docker packaging of the simulator, and the commit-to-build-to-deploy story, come later.
+
+Done as: 180 shared scenarios in twelve features, each run by heart-ts and by
+ARTIE (all pass). The small service heart-ts's steps built is gone, and so is
+service.feature, split by topic into refusals, reads, links, acts, templates
+and options. Changes from the plan below: a job is declared as a type of its
+own, as its parameters are its build act's schema (so a job has no /history);
+heart-core names a clashing act input after its type in the OpenAPI
+description; ARTIE's conformance clients reach the simulated services over
+https, holding credentials by origin as ARTIE does; the fault layer is
+Faults (answers) and BodyFaults (representations), set by name.
 
 ## Why
 

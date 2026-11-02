@@ -1,9 +1,8 @@
-// Steps for client.feature, driving heart-ts. Another client implementation
-// would bring its own steps file with the same phrases.
+// Steps for the shared conformance features, driving heart-ts against the
+// recorded garden and the simulated services (sims.mjs). Another client brings
+// its own steps file with the same phrases.
 import { Before, After, Given, When, Then, setDefaultTimeout } from "@cucumber/cucumber";
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
-import http from "node:http";
 import { createRequire } from "node:module";
 import { openGarden } from "./garden-fixture.mjs";
 import { sims } from "./sims.mjs";
@@ -20,8 +19,6 @@ Before(function ({ pickle }) {
 });
 
 After(async function () {
-    this.fake?.close();
-    this.otherOrigin?.close();
     await this.garden?.close();
 });
 
@@ -130,24 +127,6 @@ Then("it was refused before sending, because {string}", function (text) {
 
 // ---- A service that sends an affordance set whose bytes do not match its link ----
 
-Given("a service whose affordance set does not match the integrity of its link", async function () {
-    const profile = `<${heart.PROFILE}>; rel="profile"`;
-    this.fake = http.createServer((req, res) => {
-        if (req.url === "/set") {
-            res.writeHead(200, { "Content-Type": "application/hal+json" });
-            return res.end(JSON.stringify({ _forms: { harvest: { _links: { target: { href: "/x" } }, method: "POST" } } }));
-        }
-        res.writeHead(200, { "Content-Type": "application/hal+json", Link: profile, ETag: '"1"', "Preference-Applied": "forms=link, schema=link" });
-        res.end(JSON.stringify({ id: 1, _links: { self: { href: "/" }, "hr:forms": { href: "/set", integrity: "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" } } }));
-    });
-    await new Promise((ok) => this.fake.listen(0, "127.0.0.1", ok));
-    this.fakeUrl = `http://127.0.0.1:${this.fake.address().port}/`;
-});
-
-When("it tries to enter that service", async function () {
-    try { await this.me.heart.enter(this.fakeUrl); } catch (e) { this.error = e; }
-});
-
 // ---- Embedded resources (SPEC §6.1, §6.11) ----
 
 Then("it holds these embedded resources", function (table) {
@@ -158,30 +137,6 @@ Then("it holds these embedded resources", function (table) {
 Then("it read no bed on its own", function () {
     const beds = this.me.log.filter((r) => /\/beds\/\d+$/.test(r.url));
     assert.deepEqual(beds, []);
-});
-
-Given("a service whose resource embeds its author, and keeps a member named {string}", async function (member) {
-    const profile = `<${heart.PROFILE}>; rel="profile"`;
-    const headers = { "Content-Type": "application/hal+json", Link: profile, ETag: '"1"' };
-    this.fake = http.createServer((req, res) => {
-        res.writeHead(200, headers);
-        if (req.url === "/users/ada") {
-            return res.end(JSON.stringify({
-                login: "ada", name: "Ada Lovelace", _links: { self: { href: "/users/ada" } },
-                _forms: { befriend: { _links: { target: { href: "/users/ada/actions/befriend" } }, method: "POST", schema: {} } },
-            }));
-        }
-        res.end(JSON.stringify({
-            number: 482, [member]: "kept as state", _links: { self: { href: "/" } }, _forms: {},
-            _embedded: { author: { login: "ada", _links: { self: { href: "/users/ada", title: "Ada" } } } },
-        }));
-    });
-    await new Promise((ok) => this.fake.listen(0, "127.0.0.1", ok));
-    this.fakeUrl = `http://127.0.0.1:${this.fake.address().port}/`;
-});
-
-When("it enters that service", async function () {
-    this.rep = await this.me.heart.enter(this.fakeUrl);
 });
 
 Then("the state has exactly these members", function (table) {
@@ -220,112 +175,9 @@ Then("the second answer held the same choices as the first", function () {
     assert.deepEqual(this.resolved[1], this.resolved[0]);
 });
 
-Then("the act {string} was sent once", function (form) {
-    assert.equal(this.fakeLog.filter((r) => r.method === "POST" && r.url === `/actions/${form}`).length, 1);
-});
-
-// ---- A form's schema, checked just before an act is sent ----
-
-/** One resource offering one form, shaped by [world.service]; every request is kept in [world.fakeLog]. */
-function resourceOf(world) {
-    const { name, schema, target, templated, method, form, state, links, template } = world.service;
-    if (template) return JSON.stringify({ ...state, _links: { self: { href: "/" }, ...links }, _templates: { [name]: template } });
-    return JSON.stringify({
-        ...state,
-        _links: { self: { href: "/" }, ...links },
-        ...world.service.embedded,
-        _forms: { [name]: { _links: { target: { href: target, templated } }, method, schema, ...form } },
-    });
-}
-
-function answer(world, req, res, body) {
-    const { service } = world;
-    const plain = service.plain[new URL(req.url, "http://fake").pathname];
-    if (plain) {
-        res.writeHead(plain.status, { "Content-Type": plain.type, ...plain.headers });
-        return res.end(plain.body);
-    }
-    const refused = req.method !== "GET" ? service.refusal : undefined;
-    if (req.method !== "GET" && service.emptyActs) {
-        res.writeHead(204, service.headers);
-        return res.end();
-    }
-    if (req.method === "GET" && service.readStatus) {
-        res.writeHead(service.readStatus);
-        return res.end();
-    }
-    if (world.fakeRefusal && req.method !== "GET") {
-        res.writeHead(422, { "Content-Type": "application/problem+json" });
-        return res.end(JSON.stringify(world.fakeRefusal));
-    }
-    if (refused) {
-        res.writeHead(refused.status, { "Content-Type": "application/problem+json" });
-        return res.end(refused.body);
-    }
-    const halForms = service.template !== undefined;
-    const type = halForms ? "application/prs.hal-forms+json" : "application/hal+json";
-    const headers = { "Content-Type": type, ...service.validator, ...service.headers };
-    if (service.profile) headers.Link = `<${halForms ? "https://w3id.org/heart-rise/hal-forms" : heart.PROFILE}>; rel="profile"`;
-    res.writeHead(200, headers);
-    res.end(body ?? resourceOf(world));
-}
-
-const recorded = (req, body) => ({
-    method: req.method, url: req.url, body,
-    authorization: req.headers.authorization, ifMatch: req.headers["if-match"], contentType: req.headers["content-type"],
-    accept: req.headers.accept, profile: req.headers["accept-profile"], cacheControl: req.headers["cache-control"],
-    ifNoneMatch: req.headers["if-none-match"], prefer: req.headers.prefer,
-});
-
-async function serve(handler) {
-    const server = http.createServer(async (req, res) => {
-        const chunks = [];
-        for await (const chunk of req) chunks.push(chunk);
-        handler(req, res, Buffer.concat(chunks).toString("utf8"));
-    });
-    await new Promise((ok) => server.listen(0, "127.0.0.1", ok));
-    return server;
-}
-
-async function offering(world, name, service) {
-    world.service = {
-        name, target: `/actions/${name}`, templated: false, method: "POST", ...service,
-        form: {}, state: {}, links: {}, headers: {}, profile: true, plain: {}, validator: { ETag: '"1"' }, embedded: {},
-    };
-    world.fakeLog = [];
-    world.fake = await serve((req, res, body) => {
-        world.fakeLog.push(recorded(req, body));
-        answer(world, req, res);
-    });
-    world.fakeUrl = `http://127.0.0.1:${world.fake.address().port}/`;
-}
-
-Given("a service offering {string} with the schema {}", async function (name, schema) {
-    await offering(this, name, { schema: JSON.parse(schema) });
-});
-
-Given("a HAL-FORMS service offering {string} with the properties {}", async function (name, properties) {
-    const template = { method: "POST", target: `/actions/${name}`, properties: JSON.parse(properties) };
-    await offering(this, name, { template });
-});
-
-Given("a HAL-FORMS service whose template {string} is {}", async function (name, template) {
-    await offering(this, name, { template: JSON.parse(template) });
-});
-
-Given("that service refuses {string} as invalid input, saying {string}", function (_name, detail) {
-    this.fakeRefusal = { type: "https://w3id.org/heart-rise/problems/invalid-input", title: "Invalid input", detail };
-});
-
-const actsOn = (world, form) => world.fakeLog.filter((r) => r.method === "POST" && r.url === `/actions/${form}`);
-
 Then("the act {string} was sent {int} times", async function (form, times) {
-    const acts = this.fakeLog ? actsOn(this, form) : await simActsOn(form);
+    const acts = await simActsOn(form);
     assert.equal(acts.length, times);
-});
-
-Then("the act {string} was sent with exactly {}", function (form, body) {
-    assert.deepEqual(JSON.parse(actsOn(this, form)[0].body), JSON.parse(body));
 });
 
 Then("it was refused as {string} before sending, because {string}", function (kind, text) {
@@ -346,73 +198,6 @@ Then("the local log holds one schema failure, for {string}", function (form) {
 });
 
 // ---- What a client does with what a service sends ----
-
-Given("that service answers {string} with status {int} and the body {}", function (_name, status, body) {
-    this.service.refusal = { status, body };
-});
-
-Given("that service names no profile", function () {
-    this.service.profile = false;
-});
-
-Given("that service refuses every read with status {int}", function (status) {
-    this.service.readStatus = status;
-});
-
-Given("that service links {string} titled {string}", function (rel, title) {
-    this.service.links[rel] = { href: "/", title };
-});
-
-Given("that service sends {string} to another origin", async function (name) {
-    this.otherLog = [];
-    this.otherOrigin = await serve((req, res, body) => {
-        this.otherLog.push(recorded(req, body));
-        answer(this, req, res, JSON.stringify({ _links: { self: { href: "/" } }, _forms: {} }));
-    });
-    this.service.target = `http://127.0.0.1:${this.otherOrigin.address().port}/actions/${name}`;
-});
-
-Given("that service offers {string} by {word}", function (_name, method) {
-    this.service.method = method;
-});
-
-Given("that service's form names no method", function () {
-    this.service.method = undefined;
-});
-
-Given("that service's form takes {string}", function (type) {
-    this.service.form.contentType = type;
-});
-
-Given("that service reads {string} at {string}, with pointers {} into the state {}", function (_name, target, pointers, state) {
-    Object.assign(this.service, { method: "GET", target, templated: true, state: JSON.parse(state) });
-    this.service.form["hr:templatePointers"] = JSON.parse(pointers);
-});
-
-function declares(world, schema, state) {
-    Object.assign(world.service, { schema: JSON.parse(schema), state: JSON.parse(state) });
-}
-
-Given("that service declares the schema {}, with the state {}", function (schema, state) {
-    declares(this, schema, state);
-});
-
-Given("that service now declares the schema {}", function (schema) {
-    declares(this, schema, "{}");
-});
-
-Given("that service applies L2, with its affordance set linked without an integrity value", function () {
-    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
-    this.service.links["hr:forms"] = { href: "/set" };
-});
-
-Given("that service applies L2, with no affordance set", function () {
-    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
-});
-
-Given("that service answers acts from {string}", function (location) {
-    this.service.headers["Content-Location"] = location;
-});
 
 /** Runs [act], keeping what it throws for a Then to read. */
 async function trying(world, act) {
@@ -450,7 +235,7 @@ Then("it holds a representation", function () {
 });
 
 Then("the resource was read {int} times", async function (times) {
-    const reads = (await received(this)).filter((r) => r.method === "GET" && !/^\/(set$|affordance-sets\/|schemas\/)/.test(r.url));
+    const reads = (await received(this)).filter((r) => r.method === "GET" && !/^\/(affordance-sets|schemas)\//.test(r.url));
     assert.equal(reads.length, times);
 });
 
@@ -501,37 +286,9 @@ Then("it names no violations", function () {
     assert.deepEqual(this.error.violations, []);
 });
 
-Given("that service applies L2, with a true affordance set", function () {
-    appliesSet(this, "forms=link, schema=link", "hr:forms");
-});
-
-Given("that service sends no validator", function () {
-    this.service.validator = {};
-});
-
-Given("a client with no options", function () {
-    this.me = { heart: new heart.HeartClient() };
-});
-
-Given("that service serves {string} with status {int} and the body {}", function (path, status, body) {
-    this.service.plain[path] = { status, type: "application/json", headers: {}, body };
-});
-
-Given("that service's links are {}", function (links) {
-    this.service.links = JSON.parse(links);
-});
-
-Given("that service embeds {}", function (embedded) {
-    this.service.embedded = { _embedded: JSON.parse(embedded) };
-});
-
-Given("that service's target is not templated", function () {
-    this.service.templated = false;
-});
-
 /** The last read of a resource itself: shared layers, which a client reads by their links, are not counted. */
 const lastRead = async (world) => (await received(world))
-    .filter((r) => r.method === "GET" && !/^\/(set$|affordance-sets\/|schemas\/)/.test(r.url)).at(-1);
+    .filter((r) => r.method === "GET" && !/^\/(affordance-sets|schemas)\//.test(r.url)).at(-1);
 
 Then("the last read accepted {string}, at the profile, with no cache", async function (accept) {
     assert.equal((await lastRead(this)).accept, accept);
@@ -549,7 +306,7 @@ Then("the last read carried no validator", async function () {
 });
 
 Then("the affordance set was read accepting {string}", async function (accept) {
-    const set = (await received(this)).find((r) => r.url === "/set" || r.url.startsWith("/affordance-sets/"));
+    const set = (await received(this)).find((r) => r.url.startsWith("/affordance-sets/"));
     assert.equal(set.accept, accept);
 });
 
@@ -576,10 +333,6 @@ Then("it holds embedded resources at exactly {string}", function (href) {
     assert.deepEqual(this.rep.embedded.map((e) => e.href), [href]);
 });
 
-Given("that service serves {string} with the validator {string} and the body {}", function (path, validator, body) {
-    this.service.plain[path] = { status: 200, type: "application/json", headers: { ETag: `"${validator}"` }, body };
-});
-
 // ---- HAL-FORMS, the L0 on-ramp ----
 
 const halFormsClient = (rung, authorization) => {
@@ -594,18 +347,6 @@ Given("a HAL-FORMS client with the garden's credential", function () {
 
 Given("another HAL-FORMS client with the garden's credential", function () {
     this.other = halFormsClient(undefined, credential);
-});
-
-Given("a HAL-FORMS client with no credential", function () {
-    this.me = halFormsClient(undefined, undefined);
-});
-
-Given("a HAL-FORMS client at rung {word} with no credential", function (rung) {
-    this.me = halFormsClient(rung, undefined);
-});
-
-Given("that service also says it applied forms by link", function () {
-    this.service.headers["Preference-Applied"] = "forms=link, schema=link";
 });
 
 When("the other client waters bed {int} with {int} ml, in HAL-FORMS", async function (bed, ml) {
@@ -657,43 +398,6 @@ Then("the last read asked for {string}", async function (prefer) {
     assert.equal((await lastRead(this)).prefer, prefer);
 });
 
-function serveSet(world, offers) {
-    const set = JSON.stringify({ _forms: { [offers]: { _links: { target: { href: "/x" } }, schema: {} } } });
-    const integrity = `sha256-${createHash("sha256").update(set).digest("base64")}`;
-    world.service.plain["/set"] = { status: 200, type: "application/hal+json", headers: {}, body: set };
-    return { href: "/set", integrity };
-}
-
-function appliesSet(world, applied, rel) {
-    world.service.headers["Preference-Applied"] = applied;
-    world.setRelation = rel;
-    world.service.links[rel] = serveSet(world, "from-the-set");
-}
-
-Given("that service applies {string}, with a true affordance set", function (applied) {
-    appliesSet(this, applied, "hr:forms");
-});
-
-Given("that service applies {string}, with a true affordance set linked as {string}", function (applied, rel) {
-    appliesSet(this, applied, rel);
-});
-
-Given("that service says it applied {string}", function (applied) {
-    this.service.headers["Preference-Applied"] = applied;
-});
-
-Given("that service declares the curie {string} for {string}", function (name, href) {
-    this.service.links.curies = [{ name, href, templated: true }];
-});
-
-Given("that service's affordance set now offers {string}", function (offers) {
-    this.service.links[this.setRelation] = serveSet(this, offers);
-});
-
-Given("that service's media type is {string}", function (type) {
-    this.service.headers["Content-Type"] = type;
-});
-
 function pairOfClients(world, setCache, authorization) {
     const client = () => {
         const log = [];
@@ -703,32 +407,12 @@ function pairOfClients(world, setCache, authorization) {
     world.other = client();
 }
 
-Given("two clients at rung L1 sharing one cache", function () {
-    pairOfClients(this, new Map());
-});
-
-Given("two clients at rung L1 with their own caches", function () {
-    pairOfClients(this, undefined);
-});
-
-When("the other client enters that service", async function () {
-    await this.other.heart.enter(this.fakeUrl);
-});
-
 Then("the affordance set was read {int} times", async function (times) {
-    const sets = (await received(this)).filter((r) => r.url === "/set" || r.url.startsWith("/affordance-sets/"));
+    const sets = (await received(this)).filter((r) => r.url.startsWith("/affordance-sets/"));
     assert.equal(sets.length, times);
 });
 
 // ---- An empty answer, and a cache of the caller's ----
-
-Given("that service answers acts with no body", function () {
-    this.service.emptyActs = true;
-});
-
-Given("two clients at rung L1 sharing a cache that keeps nothing", function () {
-    pairOfClients(this, { get: () => undefined, set: () => undefined });
-});
 
 Then("it sent {word} for {string}, with no body", async function (method, url) {
     const sent = (await received(this)).filter((r) => r.method === method && r.url === url);
@@ -771,7 +455,6 @@ const headerOf = (logged, name) => Object.entries(logged.headers).find(([key]) =
 
 /** What the service received, in order, in one shape: the hand-built service's log, or the simulator's. */
 async function received(world) {
-    if (world.fakeLog) return world.fakeLog;
     return (await sims.log()).map((r) => ({
         ...r,
         prefer: headerOf(r, "Prefer"), accept: headerOf(r, "Accept"), profile: headerOf(r, "Accept-Profile"),

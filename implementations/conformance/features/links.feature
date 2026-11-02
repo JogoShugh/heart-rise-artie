@@ -30,7 +30,7 @@ Feature: Which links and embedded resources a client takes
       | no such relation   | ghost | it failed, saying "no ghost link is offered" |
 
   Scenario: A resource keeps state in anything but the four controls
-    Given the build service's job also holds {"_templates": {}, "kept": 1}
+    Given the build service's job also holds {"_templates": {}, "_note": "kept as state", "kept": 1}
     And a client at rung L0 with the build service's credential
     When it enters the job "nightly"
     Then the state has exactly these members
@@ -38,7 +38,15 @@ Feature: Which links and embedded resources a client takes
       | id     |
       | name   |
       | queued |
+      | _note  |
       | kept   |
+
+  Scenario: An embedded resource is followed, and read in full
+    Given a client at rung L0 with the GitHub service's credential
+    When it enters the pull request 482 of "acme/web"
+    And it tries to follow "author" with no title
+    Then it holds a representation
+    And the state's "name" is "monalisa acme"
 
   Scenario: Only a link with an address is a link, and only a text is a title
     Given the build service's job links only {"odd": "text", "bare": {"title": "x"}, "numbered": {"href": "/a", "title": 5}, "many": [{"href": "/b"}, {"href": "/c"}]}

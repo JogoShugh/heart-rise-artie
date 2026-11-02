@@ -8,17 +8,19 @@
   follow links by relation and title, speak HAL-FORMS at L0 as well as HAL
   Schema Forms, and offer a form's choices from state
   (`hr:options`), sending no value outside them.
-- `conformance/`: what any HEART client must do, as Cucumber scenarios
-  against the live garden (`client.feature`), and against a small service
-  the steps serve (`choices.feature`), with heart-ts's steps.
-  `conformance/run.sh` starts the garden, runs them and stops it. Another
-  client brings its own steps file with the same phrases.
-  Without `GARDEN_URL` the same scenarios replay `conformance/fixtures/garden/`,
-  offline, which is what the TDD gate runs. `conformance/record.sh` records those
-  fixtures from its own isolated garden; run it when representations change.
-  `hal-forms.feature` holds the other dialect. `service.feature` and `schema.feature` hold what a client does with what a
-  service sends. In `heart-ts`, `npm run mutation` runs Stryker. It edits `src/`
-  in place while it runs, so run it where nobody else is working.
+- `conformance/`: what any HEART client must do, as Cucumber scenarios. Each
+  client brings its own steps for the same feature files: heart-ts's are
+  `conformance/features/support/`, ARTIE's are `client/artie/src/test/kotlin/conformance/`
+  (`./gradlew :artie:conformanceTest`, part of ARTIE's `check`). The scenarios
+  run against two kinds of service:
+
+  | Service | What it is | Features |
+  |---|---|---|
+  | The garden | The reference service, replayed from `conformance/fixtures/garden/` offline; live with `GARDEN_URL` (`run.sh`); re-recorded with `record.sh` when representations change | `client`, `dialects`, and part of `rungs` and `hal-forms` |
+  | The simulated services | `heart/heart-sims`: a build service (a narrow Jenkins) and a deploy service, event-sourced HEART services, and the GitHub gateway in front of a small GitHub, behind a fault layer for what a broken service sends (spec/PLAN-CONFORMANCE-SERVICES.md). ARTIE runs them in memory; heart-ts runs them as one process | `schema`, `choices`, `rungs`, `hal-forms`, `refusals`, `reads`, `links`, `acts`, `templates`, `options` |
+
+  In `heart-ts`, `npm run mutation` runs Stryker. It edits `src/` in place
+  while it runs, so run it where nobody else is working.
 
 Both are by the same author as ARTIE, so they show the specification is
 enough to write a client from; they are not independent in the standards

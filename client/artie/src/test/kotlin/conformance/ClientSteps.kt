@@ -164,26 +164,6 @@ class ClientSteps(private val world: World) {
         nothingSent()
     }
 
-    @Given("a service whose affordance set does not match the integrity of its link")
-    fun mismatchedService() {
-        world.bookmark = FAKE
-        world.service = FakeServices.mismatchedSet()
-    }
-
-    @Given("a service whose resource embeds its author, and keeps a member named {string}")
-    fun authorService(member: String) {
-        world.bookmark = FAKE
-        world.service = FakeServices.embeddedAuthor(member)
-    }
-
-    @When("it tries to enter that service")
-    fun tryEnterService() = world.trying { actor.client.enter(world.bookmark) }
-
-    @When("it enters that service")
-    fun enterService() {
-        world.rep = actor.client.enter(world.bookmark)
-    }
-
     @Then("it refused the affordance set for its integrity")
     fun refusedForIntegrity() {
         assertIs<IntegrityException>(world.error)

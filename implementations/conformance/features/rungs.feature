@@ -136,11 +136,17 @@ Feature: The rungs of the ladder, L0 to L2
       | is linked with no hash   | links its affordance set without an integrity value | was linked without an integrity value; nothing was sent |
       | is not linked at all     | links no affordance set                              | applied L2 but links no affordance set                  |
 
-  Scenario: A set that fails its integrity is refused at L1
+  Scenario Outline: A set that fails its integrity is refused, at <rung>
     Given the deploy service links its affordance set with an integrity its bytes do not match
-    And a client at rung L1 with the deploy service's credential
+    And a client at rung <rung> with the deploy service's credential
     When it tries to enter the app "web"
     Then it refused the affordance set for its integrity
+    And it failed, saying "does not match the integrity of the link that led to it"
+
+    Examples:
+      | rung |
+      | L1   |
+      | L2   |
 
   Scenario Outline: A shared layer is read as often as the clients' caches need: <caches>
     Given two clients at rung L1 with the deploy service's credential and <caches>
