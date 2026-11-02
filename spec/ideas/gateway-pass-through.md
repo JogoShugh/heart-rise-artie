@@ -1,6 +1,8 @@
 # Idea: the gateway as a dam for a plain client (pass-through)
 
-Status: idea, 2026-10-22. Not built.
+Status: idea, 2026-10-22. The transparent rung is built (`X-Gateway-Mode: pass-through`,
+github-pass-through.feature). The plan for the rest, 2026-11-02, is at the end: "Plan: our own controls in front
+of GitHub".
 
 ## Why
 
@@ -88,3 +90,27 @@ hypermedia client does.
 - Whether a refused request should answer with problem+json (HEART's own) or in GitHub's own error shape, so the
   Python's existing error handling reads it.
 - Name of the switch: `GATEWAY_PASS_THROUGH=transparent|described|connector|offered|conditional`, unset meaning off.
+
+## Plan: our own controls in front of GitHub (2026-11-02)
+
+The story (spec/ideas/frame-own-controls in memory, "pitch: own gateway"): GitHub's API gives a client no
+conditional writes, no "what is allowed now", no reasons, and no policy finer than a token's scopes. A gateway the
+owner runs, even on a laptop, adds them. Any client gets most of them by changing its base URL; a HEART client gets
+all of them. On an API the owner builds (the employees service), the same controls are built in, and stronger: its
+conditional write is atomic.
+
+**The owner chooses the controls, not the caller.** The rungs are the gateway's configuration,
+`GATEWAY_DAM=described,connector,offered,conditional`, unset meaning transparent. A caller still asks for pass-through
+with `X-Gateway-Mode: pass-through`.
+
+| # | Step | What it adds |
+|---|---|---|
+| 1 | **`conditional`**: GitHub's JSON answered with a synthetic `ETag` (a digest of the body as read), and `If-None-Match` answered 304 by the gateway. A write that replaces a resource (PATCH, PUT or DELETE on a path GitHub also reads) needs `If-Match`: with none, 428; otherwise the gateway reads the resource again, as the caller, and a different digest is 412 (problem+json). POSTs that add to a resource (a comment) are not conditioned: that is `offered`'s work | Optimistic concurrency GitHub lacks, for a plain client |
+| 2 | **Bare + validators**: `Bare.call` takes headers and gives back the answer's; a bare script can send `If-Match` with the `ETag` of its last read of the resource it writes. `artie generate --bare` with validators writes it so. Target B: to the gateway, passed through | A synthetic-ETag bare script: no HEART forms, no model, no lost edit |
+| 3 | **`described`, `connector`, `offered`**: an operation GitHub's description lacks, 404; one the connector doesn't list, 403, naming it; a write the connector's state rules don't offer now (matched to its act by operation and fixed body), 409 with the rule's reason. All before GitHub is called | The owner's policy and state rules in front of GitHub |
+| 4 | **The meddler ladder** (exhibits/native-vs-heart): one task, one teammate writing straight to GitHub. Arms: bare direct, bare via `transparent`, bare + validators via `conditional`, ARTIE kept script; the earlier ARTIE goal runs beside them | One table: what survives a teammate, what GitHub saw, what the gateway refused. No model needed |
+| 5 | **The window, measured**: GitHub has no atomic conditional write, so the gateway checks, then writes. The time between its read and its write, beside an agent's time between its read and its write | Narrowed, not closed, said plainly; the owned API closes it |
+| 6 | **The write-up**, "Our own controls in front of GitHub": controls by arm, the numbers, GitHub credited where it guards something itself | Bullets, folded details |
+
+Static MCP tools pointed at the gateway come later, with model credit. FastMCP gives the model only the body, so
+they would get the dam's refusals but could not carry a validator.
