@@ -57,10 +57,19 @@ class ScriptSteps {
 
     @Given("the server answers, in order")
     fun answersInOrder(table: DataTable) = table.asMaps().forEach {
+        val headers = it["etag"]?.takeIf { etag -> etag.isNotBlank() }?.let { etag -> mapOf("ETag" to etag) }.orEmpty()
         service.answers.addLast(
             "${it.getValue("method")} ${it.getValue("url")}" to
-                Received(it.getValue("status").toInt(), emptyMap(), it.getValue("body")),
+                Received(it.getValue("status").toInt(), headers, it.getValue("body")),
         )
+    }
+
+    @Then("the bare calls carried these headers")
+    fun carried(table: DataTable) {
+        val names = table.asLists().first().drop(1)
+        val expected = table.asMaps().map { row -> listOf(row.getValue("call")) + names.map { row[it].orEmpty() } }
+        val sent = service.sentHeaders.map { (call, headers) -> listOf(call) + names.map { headers[it].orEmpty() } }
+        assertEquals(expected, sent)
     }
 
     @Given("{string} becomes {string} after {int} more reads")

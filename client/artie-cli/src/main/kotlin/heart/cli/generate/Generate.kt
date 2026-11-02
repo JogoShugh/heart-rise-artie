@@ -20,7 +20,7 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
         "--report needs --script: the report shows the run's script beside the one generated"
     }
     val capture = Capture(captureName, Files.readString(existing(folder, captureName, "capture")))
-    options["--bare"]?.let { upstream -> return bare(capture, upstream, folder, script, out) }
+    if ("--bare" in options) return bare(capture, options, folder, script, out)
     val pins = script.substringBeforeLast('.') + ".pins.yaml"
     // A goal run's steps stand for the lines of the script its moves amount to, which its capture keeps.
     val source = sourceName?.let { existing(folder, it, "script") }?.let { file ->
@@ -75,16 +75,19 @@ const val GENERATE_USAGE =
         " [--inputs a,b]" +
         " [--report <dir>]"
 
-private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare")
+private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare", "--through")
 
 /**
  * `--bare UPSTREAM.yaml` (spec/ideas/bare-runs.md): the run as the calls the gateway made to the service, from its
- * upstream record, sent straight to the service: a script with no lock file, since it pins nothing.
+ * upstream record, sent straight to the service: a script with no lock file, since it pins nothing. With
+ * `--validators` it keeps the ETag of each resource it read for the write that replaces it; with `--through URL`
+ * it sends every call to the gateway there instead, asking it to pass each through.
  */
-private fun bare(capture: Capture, upstream: String, folder: Path, script: String, out: PrintStream) {
+private fun bare(capture: Capture, options: Map<String, String>, folder: Path, script: String, out: PrintStream) {
+    val upstream = options.getValue("--bare")
     if (capture.watchScript != null) return rails(capture, upstream, folder, script, out)
     val run = BareRun(capture, Files.readString(existing(folder, upstream, "upstream record")))
-    val writer = BareWriter(run, upstream)
+    val writer = BareWriter(run, upstream, BareWriter.Wire("--validators" in options, options["--through"]))
     Files.writeString(folder.resolve(script), writer.write())
     val kept = run.writes.size + writer.reads
     out.println(
@@ -104,7 +107,7 @@ private fun rails(capture: Capture, upstream: String, folder: Path, script: Stri
     out.println("wrote $script: the watch's words over ${writer.calls} calls to the service, at fixed addresses")
 }
 
-private val FLAGS = setOf("--keep-reason", "--intents")
+private val FLAGS = setOf("--keep-reason", "--intents", "--validators")
 
 private fun options(args: List<String>): Map<String, String> {
     val rest = ArrayDeque(args.drop(2))

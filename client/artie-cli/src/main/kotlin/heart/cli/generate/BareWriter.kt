@@ -9,7 +9,18 @@ import heart.cli.generate.BareText.plain
  * A bare script's text (spec/ideas/bare-runs.md): the [run]'s writes, in order, and the reads whose answers they
  * send values from, each value an input, an earlier answer read by pointer, or as recorded.
  */
-internal class BareWriter(private val run: BareRun, private val upstreamName: String) {
+internal class BareWriter(
+    private val run: BareRun,
+    private val upstreamName: String,
+    private val wire: Wire = Wire(),
+) {
+    /**
+     * How the script's calls go (spec/ideas/gateway-pass-through.md): keeping [validators], each resource read's
+     * ETag sent back on the write that replaces it; and [through] the gateway at that address, each call passed
+     * through, instead of straight to the service.
+     */
+    class Wire(val validators: Boolean = false, val through: String? = null)
+
     private val inputs = run.capture.inputs.mapNotNull { (name, input) ->
         input["value"]?.toString()?.takeIf { it.isNotEmpty() }?.let { it to name }
     }.sortedByDescending { it.first.length }
@@ -25,16 +36,37 @@ internal class BareWriter(private val run: BareRun, private val upstreamName: St
     fun write(): String {
         run.writes.forEach { (call, waited) ->
             lines[call.number] = call(call, if (waited) ", retry = $RETRIES" else "")
+            // With validators, the read of what this write replaces is kept, for the ETag it is answered with.
+            if (wire.validators && call.method in REPLACING) readBefore(call)?.let { lines[it.number] = call(it, "") }
         }
         val declared = run.capture.inputs.map { (name, input) -> declaration(name, input) }
         val calls = lines.map { (n, line) -> "    " + (if (n in read) "val r$n = " else "") + line }
-        return (listOf(HEAD.format(run.capture.name, upstreamName)) + declared + listOf("", "bare {") + calls + "}")
-            .joinToString("\n") + "\n"
+        return (listOf(head()) + declared + listOf("", opening()) + calls + "}").joinToString("\n") + "\n"
+    }
+
+    /** The last read of the resource [write] replaces, before it; null when the run read it not. */
+    private fun readBefore(write: UpstreamCall): UpstreamCall? =
+        run.calls.take(write.number - 1).lastOrNull { it.method == "GET" && it.url == write.url && it.taken }
+
+    private fun head(): String = if (wire.validators || wire.through != null) {
+        val where = wire.through?.let { "through the gateway at $it" } ?: "straight to the service"
+        WIRED.format(run.capture.name, upstreamName, where)
+    } else {
+        HEAD.format(run.capture.name, upstreamName)
+    }
+
+    private fun opening(): String {
+        val options = listOfNotNull(
+            "validators = true".takeIf { wire.validators },
+            wire.through?.let { "headers = mapOf(\"X-Gateway-Mode\" to \"pass-through\")" },
+        )
+        return if (options.isEmpty()) "bare {" else "bare(${options.joinToString(", ")}) {"
     }
 
     private fun call(call: UpstreamCall, retry: String): String {
         val body = call.body?.let { ", " + value(it, call.number) }.orEmpty()
-        return "call(\"${call.method}\", ${text(call.url, call.number)}$body$retry)"
+        val url = wire.through?.let { call.url.replace(ORIGIN, it.trimEnd('/')) } ?: call.url
+        return "call(\"${call.method}\", ${text(url, call.number)}$body$retry)"
     }
 
     /** The answer value [value] can be read from before the call [before], as an expression; null when none. */
@@ -81,5 +113,14 @@ internal class BareWriter(private val run: BareRun, private val upstreamName: St
         val SHA = Regex("""^[0-9a-f]{40}$""")
         const val HEAD = "// Made by artie generate --bare from %s and %s (spec/ideas/bare-runs.md): the calls the\n" +
             "// run came down to, sent straight to the service, with no entry, no forms, no validators and no checks."
+        const val WIRED = "// Made by artie generate --bare from %s and %s (spec/ideas/bare-runs.md): the calls the\n" +
+            "// run came down to, sent %s, with no entry, no forms and no checks,\n" +
+            "// but with validators: a write that replaces what was read carries the ETag it was read with."
+
+        /** The methods whose writes replace what is at the address, rather than add to it. */
+        val REPLACING = setOf("PATCH", "PUT", "DELETE")
+
+        /** A call's scheme and host, which `--through` replaces with the gateway's. */
+        val ORIGIN = Regex("^https?://[^/]+")
     }
 }

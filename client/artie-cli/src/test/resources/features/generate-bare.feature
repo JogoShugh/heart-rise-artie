@@ -210,3 +210,81 @@ Feature: A run's capture made a bare script: the calls the gateway made, sent st
       | bare.kts         |
     Then artie exits 2
     And artie's last line is: can't generate a bare script from plain.trace.yaml: it keeps no exchanges; record the run with --exchanges
+
+  Scenario: With validators, through the gateway: each write that replaces what was read carries its ETag
+    spec/ideas/gateway-pass-through.md, step 2. --validators keeps the read the
+    gateway made of each resource just before the run wrote it, and the script
+    keeps that read's ETag and sends it back as If-Match. --through sends every
+    call to the gateway instead, asking it to pass each through, so the owner's
+    controls stand in front of GitHub.
+    Given the file "close.trace.yaml" is
+      """
+      ---
+      run:
+        inputs: {}
+      ---
+      mode: script
+      say: act {relation}
+      params:
+        relation: close
+      outcome: done
+      exchanges:
+        - request:
+            method: PATCH
+            url: https://localhost:8392/repos/acme/rockets/issues/452/actions/close
+            headers:
+              traceparent: 00-0189d6a9b7a605907ec3a4d57bc079e5-0000000000000002-01
+          response:
+            status: 200
+      """
+    And the file "close.upstream.yaml" is
+      """
+      ---
+      traceparent: 00-0189d6a9b7a605907ec3a4d57bc079e5-0000000000000002-01
+      request:
+        method: GET
+        url: https://api.github.com/repos/acme/rockets/issues/452
+      response:
+        status: 200
+        body:
+          number: 452
+          state: open
+      ---
+      traceparent: 00-0189d6a9b7a605907ec3a4d57bc079e5-0000000000000002-01
+      request:
+        method: PATCH
+        url: https://api.github.com/repos/acme/rockets/issues/452
+        body:
+          state: closed
+      response:
+        status: 200
+        body:
+          number: 452
+          state: closed
+      """
+    When artie is run with
+      | argument               |
+      | generate               |
+      | close.trace.yaml       |
+      | --bare                 |
+      | close.upstream.yaml    |
+      | --validators           |
+      | --through              |
+      | https://localhost:8392 |
+      | --out                  |
+      | close.kts              |
+    Then artie exits 0
+    And artie prints
+      | line                                                                    |
+      | wrote close.kts: 2 calls of the run's 2 to the service, 1 write and 1 read |
+    And the file "close.kts" reads
+      """
+      // Made by artie generate --bare from close.trace.yaml and close.upstream.yaml (spec/ideas/bare-runs.md): the calls the
+      // run came down to, sent through the gateway at https://localhost:8392, with no entry, no forms and no checks,
+      // but with validators: a write that replaces what was read carries the ETag it was read with.
+
+      bare(validators = true, headers = mapOf("X-Gateway-Mode" to "pass-through")) {
+          call("GET", "https://localhost:8392/repos/acme/rockets/issues/452")
+          call("PATCH", "https://localhost:8392/repos/acme/rockets/issues/452", mapOf("state" to "closed"))
+      }
+      """

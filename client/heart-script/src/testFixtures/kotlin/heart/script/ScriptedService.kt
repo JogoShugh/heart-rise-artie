@@ -105,8 +105,12 @@ class ScriptedService : Navigator, Wire, Writes {
     /** What the server answers bare requests, in order: each by "METHOD url", a status and a body. */
     val answers = ArrayDeque<Pair<String, Received>>()
 
+    /** Each bare call sent, as "METHOD url", with the headers it carried. */
+    val sentHeaders = mutableListOf<Pair<String, Map<String, String>>>()
+
     override fun send(sent: Sent): Received {
         asked += "send" to listOfNotNull(sent.method, sent.url, sent.body).joinToString(" ")
+        sentHeaders += "${sent.method} ${sent.url}" to sent.headers
         val (expected, answer) = answers.removeFirst()
         check(expected == "${sent.method} ${sent.url}") { "the server expected $expected" }
         return answer
