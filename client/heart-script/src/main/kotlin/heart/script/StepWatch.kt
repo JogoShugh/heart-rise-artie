@@ -53,6 +53,7 @@ internal class StepWatch(
         val name = until?.let { u -> BRACE.findAll(u.condition).map { it.groupValues[1] }.firstOrNull { it in named } }
         run.watchFrom = run.trace.size + 1
         run.watchScript = { WatchScript(decided, entry, name, host).text(steps) }
+        run.watchSteps = { WatchData(decided, entry, name, host).steps(steps) }
         val done: Facts.() -> Unit = { that(until != null && over(until, here)) }
         val single = steps.singleOrNull()
         if (single != null) {

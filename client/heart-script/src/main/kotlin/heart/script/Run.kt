@@ -146,6 +146,9 @@ class Run(
     var watchScript: (() -> String)? = null
     var watchFrom: Int? = null
 
+    /** The same watch as data (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md, step 1): its steps, for a script held as data. */
+    var watchSteps: (() -> List<Map<String, Any?>>)? = null
+
     /** What the reasoner is told besides an act's words, for the act a watch is deciding; null otherwise. */
     @Volatile
     internal var besides: String? = null
@@ -240,7 +243,8 @@ class Run(
                 if (model.isNotEmpty()) put("model", element(model))
                 if (usage.isNotEmpty()) put("usage", element(usage))
                 watchScript?.let { script ->
-                    put("watch", element(mapOf("from" to watchFrom, "script" to script())))
+                    val steps = watchSteps?.invoke()
+                    put("watch", element(mapOf("from" to watchFrom, "script" to script(), "steps" to steps)))
                 }
             })
         }

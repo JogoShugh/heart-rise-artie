@@ -216,6 +216,31 @@ class GoalSteps(
         assertTrue(script.lines().any { text in it }, script)
     }
 
+    @Then("the capture {string} keeps the watch as data")
+    fun watchData(capture: String, steps: String) {
+        val kept = watched(capture)?.get("steps")
+        assertEquals(Yaml().load<Any?>(steps), kept, Yaml().dump(kept))
+    }
+
+    @Then("the capture {string} keeps the watch as data, its Once's otherwise")
+    fun watchOtherwise(capture: String, steps: String) {
+        val kept = watched(capture)?.get("steps")
+        assertEquals(Yaml().load<Any?>(steps), onceIn(kept)?.get("otherwise"), Yaml().dump(kept))
+    }
+
+    /** The capture's watch: its first lines' run, then its watch. */
+    private fun watched(capture: String): Map<*, *>? {
+        val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>
+        return (head["run"] as Map<*, *>)["watch"] as? Map<*, *>
+    }
+
+    /** The first Once anywhere in [data], a watch's steps as data. */
+    private fun onceIn(data: Any?): Map<*, *>? = when (data) {
+        is Map<*, *> -> data["once"] as? Map<*, *> ?: data.values.firstNotNullOfOrNull { onceIn(it) }
+        is List<*> -> data.firstNotNullOfOrNull { onceIn(it) }
+        else -> null
+    }
+
     @Then("the capture {string} keeps a watch script with no line with {string}")
     fun noWatchLine(capture: String, text: String) {
         val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>

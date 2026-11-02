@@ -314,6 +314,39 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the capture "tell.trace.yaml" keeps a watch script with a line with "once(\"github:merge\", giveUp = 15.seconds, otherwise = { why ->"
     And the capture "tell.trace.yaml" keeps a watch script with a line with "act(intent = \"tell its author why it wasn't merged. The wait gave up, and the server says why: ${why ?: \"no reason given\"}\")"
     And the capture "tell.trace.yaml" keeps a watch script with no line with "Ada, 1.0"
+    And the capture "tell.trace.yaml" keeps the watch as data
+      """yaml
+      - watch:
+          until:
+            - at: watch
+              field: state
+              is: closed
+          steps:
+            - act: github:pulls-list
+              fields:
+                owner: acme
+                repo: rockets
+                state: open
+              inferred: list the open pull requests of acme/rockets
+              from-intent: a pull request labelled ${label} changes
+              then:
+                - whenever:
+                    - has:
+                        - field: github:labels
+                          has: ${label}
+                    - once:
+                        offered: github:merge
+                        give-up: 15s
+                        steps:
+                          - act: github:merge
+                            fields:
+                              merge_method: squash
+                            intent: merge it by squashing.
+                            then: []
+                        otherwise:
+                          - intent: "tell its author why it wasn't merged. The wait gave up, and the server says why: ${why}"
+                            reasoned: true
+      """
 
   Scenario: A reasoned Otherwise in parts, each after ", then", is one act of the model's each, in order
     The reasoner chooses one act at a time. An Otherwise that says two
@@ -378,6 +411,13 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And ARTIE's reasoner was last asked to "tell its author why it wasn't merged. The wait gave up, and the server says why: A draft can't be merged; mark it ready for review first."
     And the capture "told.trace.yaml" keeps a watch script with a line with "act(intent = \"label it ${told}\")"
     And the capture "told.trace.yaml" keeps a watch script with a line with "act(intent = \"tell its author why it wasn't merged. The wait gave up, and the server says why: ${why ?: \"no reason given\"}\")"
+    And the capture "told.trace.yaml" keeps the watch as data, its Once's otherwise
+      """yaml
+      - intent: label it ${told}
+        reasoned: true
+      - intent: "tell its author why it wasn't merged. The wait gave up, and the server says why: ${why}"
+        reasoned: true
+      """
 
   Scenario: A planner that stops while a watch decides ends the run, saying why, rather than looking again
     A failed look is tried again at the next; a decision the planner won't
