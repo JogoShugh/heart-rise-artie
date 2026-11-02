@@ -206,6 +206,17 @@ class ScriptSteps {
         execute(run)
     }
 
+    @When("this script runs, allowed a reasoner, falling back to its words: {word}")
+    fun runsFallingBack(fallsBack: String, text: String) {
+        script = text
+        execute(Run(navigator = { service }, pause = {}).also { it.reasoning = true; it.fallsBack = fallsBack == "yes" })
+    }
+
+    @Given("the client will refuse {string} at {string} by its guard: {string}")
+    fun refuseByGuard(rel: String, at: String, detail: String) {
+        service.refusals["$rel at $at"] = Answer.Refused(Refusal.Guard, Side.CLIENT, detail)
+    }
+
     @When("this script runs, allowed a reasoner")
     fun runsReasoning(text: String) {
         script = text

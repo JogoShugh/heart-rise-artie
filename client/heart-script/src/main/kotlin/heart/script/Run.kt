@@ -84,6 +84,12 @@ class Run(
     /** Whether `act(intent = …)` with no relation may run: only when the runner allows it (`--reasoner`). */
     var reasoning = false
 
+    /**
+     * Whether an act that carries its words falls back to them when the client refuses it before sending, the form
+     * it was written for no longer holding (`on-change: intent`, spec/ideas/replay-guards-lenient-strict.md).
+     */
+    var fallsBack = false
+
     /** Told of each step as it is traced: a runner prints it. */
     var onStep: (TraceStep) -> Unit = {}
 

@@ -14,13 +14,26 @@ internal fun Here.acted(step: Int, rel: String, fields: Map<String, Any?>, said:
         val refusal = Answer.Refused(Refusal.NotOffered, Side.CLIENT, reason)
         run.record(actAsked(rel, fields), "refused", held, refusal)
         run.trace.lastOrNull()?.said(said)
+        if (fallsBack(said, refusal)) return reasoned(step, said, block)
         throw refused(step, "\"$rel\"", refusal)
     }
     val answer = navigator.act(rel, fields)
     // The step just traced is this act's: it keeps what the act is for.
     run.trace.lastOrNull()?.said(said)
+    if (answer is Answer.Refused && fallsBack(said, answer)) return reasoned(step, said, block)
     go(step, "\"$rel\"", answer, block)
 }
+
+/**
+ * Whether an act that carries a person's words, [said], refused as [refused], falls back to them: the run is set to
+ * (`on-change: intent`) and may reason, and the client refused it before sending anything because the form it was
+ * written for no longer holds: no longer offered, not the one pinned, or the values no longer fit it.
+ */
+private fun Here.fallsBack(said: Said, refused: Answer.Refused): Boolean =
+    run.fallsBack && run.reasoning && said.intent != null && refused.by == Side.CLIENT && refused.kind in CHANGED_FORM
+
+/** The client's refusals that say the form an act was written for no longer holds. */
+private val CHANGED_FORM = setOf(Refusal.NotOffered, Refusal.Guard, Refusal.InvalidInput, Refusal.NotAChoice)
 
 /**
  * What a step is for, in words: a person's, as a goal or a script wrote them ([intent]), or a model's, inferred while

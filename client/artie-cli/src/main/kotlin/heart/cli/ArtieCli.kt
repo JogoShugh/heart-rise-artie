@@ -78,6 +78,7 @@ class ArtieCli(
             navigator(settings)
         })
         run.reasoning = asked.reasoner != null
+        run.fallsBack = config.onChange == "intent"
         run.entry = asked.entry
         run.remember = folder.named(asked.remember)
         if (output == "words") {

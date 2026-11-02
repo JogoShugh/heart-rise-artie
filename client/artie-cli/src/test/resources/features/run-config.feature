@@ -72,4 +72,39 @@ Feature: artie run's config: how strictly a run holds to its lock file, set by a
       | issue.config.yaml | budget: 5     |          |              | issue.config.yaml: no setting budget            |
       | issue.config.yaml | repin: often  |          |              | issue.config.yaml: repin is auto, propose or never |
       | issue.config.yaml | validators: some |       |              | issue.config.yaml: validators is last or none   |
+      | issue.config.yaml | on-change: soon |        |              | issue.config.yaml: on-change is refuse, values or intent |
       | issue.config.yaml | guard: strict | --config | missing.yaml | --config, but no config at missing.yaml         |
+
+  Scenario Outline: on-change: intent lets an act that carries its words fall back to them: <setting>
+    An act written with its relation and its words (as artie generate writes
+    them) whose form is no longer offered stops the run, unless the config says
+    on-change: intent, when the step goes to the reasoner as its words.
+    Given these forms
+      | at         | relation    | leads to   | outcome |
+      | /issues/10 | close-issue | /issues/10 | done    |
+    And the reasoner chooses
+      | intent   | selection | relation    | fields |
+      | close it | act       | close-issue | {}     |
+    And the script "close.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+          act("close", intent = "close it")
+      }
+      """
+    And the file "close.config.yaml" is
+      """
+      on-change: <setting>
+      """
+    When artie is run with
+      | argument   |
+      | run        |
+      | close.kts  |
+      | --reasoner |
+      | claude     |
+    Then artie exits <exit>
+
+    Examples:
+      | setting | exit |
+      | intent  | 0    |
+      | refuse  | 3    |

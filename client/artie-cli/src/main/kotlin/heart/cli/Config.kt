@@ -14,8 +14,9 @@ class Config(
     /** Whether a run writes what it was newly offered into the lock file: auto, propose (says it), never. */
     val repin: String? = null,
     /**
-     * What a lenient run does when a form it uses changed: refuse, the default, or values: act when the form keeps
-     * its pinned method and what the script sends fits it.
+     * What a lenient run does when a form it uses changed: refuse, the default; values: act when the form keeps
+     * its pinned method and what the script sends fits it; or intent: an act that carries its words falls back to
+     * them, the reasoner choosing from what is offered now.
      */
     val onChange: String? = null,
     /** The validator each act carries: last, the default, or none, a blind write (spec/ideas/off-the-rails.md). */
@@ -28,7 +29,7 @@ class Config(
 private val SETTINGS: Map<String, Set<String>> = mapOf(
     "guard" to GUARDS,
     "repin" to setOf("auto", "propose", "never"),
-    "on-change" to setOf("refuse", "values"),
+    "on-change" to setOf("refuse", "values", "intent"),
     "validators" to VALIDATORS,
     "look" to LOOKS,
 )
