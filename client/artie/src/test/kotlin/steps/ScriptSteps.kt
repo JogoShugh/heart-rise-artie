@@ -27,6 +27,10 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         reasoner = ScriptedReasoner(heart.Selection.Act(form, chosen))
     }
 
+    @Then("ARTIE's reasoner was asked, in order")
+    fun reasonerAsked(table: DataTable) =
+        assertEquals(table.asMaps().map { it.getValue("words") }, (reasoner as ScriptedReasoner).intents)
+
     @io.cucumber.java.en.Given("ARTIE's reasoner is Claude, through the scripted Claude API")
     fun reasonerIsClaude() {
         reasoner = heart.ClaudeReasoner(ctx.transport, "test-key")

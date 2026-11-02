@@ -23,6 +23,10 @@ class HttpSteps(private val ctx: ClientContext) {
         ctx.transport.respond(method, ctx.expand(url), parseResponse(ctx.expand(raw)))
     }
 
+    @Given("the service answers {word} {string} {int} times with:")
+    fun serviceAnswersTimes(method: String, url: String, times: Int, raw: String) =
+        repeat(times) { serviceAnswers(method, url, raw) }
+
     @Then("the client sent {word} {string} with headers:")
     fun clientSent(method: String, url: String, headers: Map<String, String>) {
         val request = lastRequestTo(method, ctx.expand(url))

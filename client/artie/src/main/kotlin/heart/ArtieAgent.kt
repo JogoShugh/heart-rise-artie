@@ -22,6 +22,12 @@ sealed interface Decision {
 
     /** The selection was sent and the server refused it (412, 409, 422, ...). */
     data class Refused(val selection: Selection.Act, val refusal: ActRefused) : Decision
+
+    /**
+     * The selection was an act on a resource that changed since the step read it, the read its words were
+     * decided from. Nothing was sent: the new ETag it would carry would never meet a 412.
+     */
+    data class Changed(val selection: Selection.Act) : Decision
 }
 
 /**
@@ -70,15 +76,22 @@ class ArtieAgent(private val client: HeartRiseClient, private val reasoner: Reas
             Decision.Rejected(selection, listOf("${selection.affordance} was already described"))
         }
 
-    /** Sync, reason, check, then act or follow. */
-    fun handle(intent: String, url: String): Decision {
+    /**
+     * Sync, reason, check, then act or follow. [readAs] is the ETag of the resource as the step read it, the read
+     * its words were decided from: an act on it, changed since, is not sent ([Decision.Changed]).
+     */
+    fun handle(intent: String, url: String, readAs: String? = null): Decision {
         val decided = decide(intent, url)
         return when (val selection = (decided as? Decision.Selected)?.selection) {
-            is Selection.Act -> act(selection)
+            is Selection.Act -> if (changedSince(readAs)) Decision.Changed(selection) else act(selection)
             is Selection.Follow -> Decision.Followed(selection, client.follow(selection.rel, selection.title))
             else -> decided
         }
     }
+
+    /** Whether the resource synced is not the one read as [readAs]: someone changed it since. */
+    private fun changedSince(readAs: String?): Boolean =
+        readAs != null && client.current?.etag.let { it != null && it != readAs }
 
     /**
      * Every link but `self` and the affordance-set link, which are ARTIE's plumbing, not choices, and but

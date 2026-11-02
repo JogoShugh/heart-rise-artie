@@ -145,7 +145,12 @@ class ArtieNavigator(
         val rung = client.appliedRung
         val keeps = thinker as? KeepsModelCalls
         keeps?.taken()
-        val failed = answer("reason") { decided = ArtieAgent(client, thinker).handle(intent, at); client.current!! }
+        // The step's words were decided from the resource as held now: an act on it changed since is not sent.
+        val readAs = before?.etag
+        val failed = answer("reason") {
+            decided = ArtieAgent(client, thinker).handle(intent, at, readAs)
+            client.current!!
+        }
         val reasoned = when (val d = decided) {
             null -> Reasoned(null, failed)
             is Decision.Acted -> Reasoned(choice(d.selection), done(d.result, client.broughtIntoBeing, client.reaches))
@@ -153,6 +158,7 @@ class ArtieNavigator(
             is Decision.Refused -> Reasoned(choice(d.selection), refusal(client, d.selection.affordance, d.refusal))
             is Decision.Rejected -> Reasoned(choice(d.selection), rejected(d.reasons))
             is Decision.Asked -> Reasoned(null, Answer.Refused(Refusal.Unclear, Side.CLIENT, d.question))
+            is Decision.Changed -> Reasoned(choice(d.selection), Answer.Refused(Refusal.Stale, Side.CLIENT, CHANGED))
             is Decision.Explained ->
                 Reasoned(null, Answer.Refused(Refusal.NotOffered, Side.SERVER, d.reason ?: "no reason given"))
             is Decision.Selected -> error("ARTIE makes every choice it accepts")
@@ -169,6 +175,9 @@ class ArtieNavigator(
 /** The guards a run may name (spec/ideas/off-the-rails.md), beyond lenient and strict. */
 const val OFF_THE_RAILS = "off-the-rails"
 const val LOOK_THEN_LEAP = "look-then-leap"
+
+/** Why an act chosen on a resource changed since the step read it was not sent. */
+private const val CHANGED = "the resource changed since this step read it; nothing was sent."
 
 /** What [client]'s [select] came to, as the DSL's answer: what it holds, or why it was refused. */
 private fun answered(client: HeartRiseClient, what: String, select: () -> HeartRepresentation): Answer = try {

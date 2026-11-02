@@ -21,6 +21,16 @@ Feature: A script keeps going where the service moved under it: a list paged on,
   it has changed since the form was read (a new ETag), the act is refused
   as stale, as a 412 is, and decided again on the form offered now.
 
+  And words can go out of date before anything is sent (the goal run in
+  exhibits/mcp-over-openapi): a step's words are decided from the
+  resource as the step read it, a goal planner's value among them; ARTIE
+  syncs before its reasoner chooses (SPEC §6.8), and when the resource
+  changed in between, an act on those words, sent with the new ETag,
+  would write over the change and never meet a 412. So an act chosen on
+  a resource changed since the step read it is refused as stale, by the
+  client, before anything is sent, and the step decides again, told what
+  changed.
+
   Scenario: A titled link not on the page held is found on the pages after it, by their next links
     Given the service answers GET "http://garden.test/beds" with:
       """
@@ -218,3 +228,70 @@ Feature: A script keeps going where the service moved under it: a list paged on,
       | case                               | status                 | title              | target                   | method |
       | the act moved to a new address     | 404 Not Found          | Not Found          | /beds/2/actions/irrigate | POST   |
       | the act takes a new method         | 405 Method Not Allowed | Method Not Allowed | /beds/2/actions/water    | PUT    |
+
+  Scenario: An act chosen on a resource changed since the step read it is not sent, and the step decides again
+    Given the service answers GET "http://garden.test/beds/2" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      watered: never
+      _links:
+        self: {href: /beds/2}
+      _forms:
+        water:
+          _links:
+            target: {href: /beds/2/actions/water}
+          method: POST
+          contentType: application/json
+          schema: {type: object, properties: {milliliters: {type: integer}}}
+      """
+    And the service answers GET "http://garden.test/beds/2" 3 times with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-2.hsf.L0"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      watered: today
+      _links:
+        self: {href: /beds/2}
+      _forms:
+        water:
+          _links:
+            target: {href: /beds/2/actions/water}
+          method: POST
+          contentType: application/json
+          schema: {type: object, properties: {milliliters: {type: integer}}}
+      """
+    And the service answers POST "http://garden.test/beds/2/actions/water" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-3.hsf.L0"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      watered: twice today
+      _links:
+        self: {href: /beds/2}
+      _forms: {}
+      """
+    And ARTIE's reasoner will choose to act on "water" with {"milliliters": 100}
+    When this script runs with ARTIE, allowed its reasoner
+      """kotlin
+      heart("http://garden.test/beds/2") {
+          act(intent = "water it")
+      }
+      """
+    Then the script finished
+    And ARTIE's reasoner was asked, in order
+      | words                                                                                                                                                                                                                                                                                 |
+      | water it                                                                                                                                                                                                                                                                              |
+      | water it. Your choice here, water with {"milliliters":"100"}, was refused: the resource changed since this step read it; nothing was sent. Since then: watered was "never", now "today". Decide again from what is there now. If these words would undo or write over that change, do not act: ask, naming it. |
+    And the client sent POST "http://garden.test/beds/2/actions/water" with headers:
+      | If-Match | "seq-2.hsf.L0" |
