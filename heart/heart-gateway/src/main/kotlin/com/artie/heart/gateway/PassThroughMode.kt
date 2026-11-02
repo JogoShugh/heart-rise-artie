@@ -24,22 +24,26 @@ internal class PassThroughMode(
     private val dam: Dam = Dam.NONE,
     /** Whether the upstream reads the resource at a path: a write there replaces it. */
     private val readable: (String) -> Boolean = { false },
+    /** The described, connector and offered rungs, when the gateway has a description and a connector. */
+    private val rungs: DamRungs? = null,
 ) : Filter {
     private val conditional = Conditional(upstream, readable)
 
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
-        if (request.header(MODE) != PASS_THROUGH) next(request) else forward(request)
+        if (request.header(MODE) != PASS_THROUGH) next(request) else forward(request, next)
     }
 
-    private fun forward(request: Request): Response {
+    /** [request] passed through, after the owner's rungs, asking the gateway's own resources ([heart]) as needed. */
+    private fun forward(request: Request, heart: HttpHandler): Response {
         val caller = request.header("Authorization")
         if (!credentials.admits(caller)) {
             return Response(Status.UNAUTHORIZED).header("WWW-Authenticate", "Bearer")
         }
+        val refused = rungs?.refusal(request.removeHeader(MODE), dam, heart)
         val credential = Caller.during(caller) { auth.authorization() }
         val sent = request.removeHeader(MODE).removeHeader("Host").removeHeader("Authorization")
             .let { plain -> credential?.let { plain.header("Authorization", it) } ?: plain }
-        val answer = if (Dam.Rung.CONDITIONAL in dam) conditional.exchange(sent) else upstream(sent)
+        val answer = refused ?: if (Dam.Rung.CONDITIONAL in dam) conditional.exchange(sent) else upstream(sent)
         return HOP_BY_HOP.fold(answer) { forwarded, header -> forwarded.removeHeader(header) }
     }
 

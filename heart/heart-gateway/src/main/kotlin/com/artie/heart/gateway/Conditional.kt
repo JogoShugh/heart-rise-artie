@@ -40,8 +40,8 @@ internal class Conditional(private val upstream: HttpHandler, private val readab
     private fun write(request: Request): Response {
         val sent = request.header(IF_MATCH)
         return when {
-            sent == null -> refused(Status.PRECONDITION_REQUIRED, NO_VALIDATOR)
-            current(request) != sent -> refused(Status.PRECONDITION_FAILED, STALE)
+            sent == null -> damRefusal(Status.PRECONDITION_REQUIRED, NO_VALIDATOR)
+            current(request) != sent -> damRefusal(Status.PRECONDITION_FAILED, STALE)
             else -> upstream(request.removeHeader(IF_MATCH))
         }
     }
@@ -52,13 +52,6 @@ internal class Conditional(private val upstream: HttpHandler, private val readab
             request.header(name)?.let { read.header(name, it) } ?: read
         }
         return upstream(again).takeIf { it.status == Status.OK }?.let { etagOf(it.bodyString()) }
-    }
-
-    /** A refusal as problem+json, with GitHub's own `message` beside the detail, so a GitHub client reads it too. */
-    private fun refused(status: Status, detail: String): Response {
-        val title = status.description
-        val body = """{"title":"$title","status":${status.code},"detail":"$detail","message":"$detail"}"""
-        return Response(status).header("Content-Type", "application/problem+json").body(body)
     }
 
     private companion object {

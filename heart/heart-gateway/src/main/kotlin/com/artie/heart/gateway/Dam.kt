@@ -1,5 +1,19 @@
 package com.artie.heart.gateway
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.http4k.core.Response
+import org.http4k.core.Status
+
+/**
+ * A rung's refusal, before the upstream is asked: problem+json, with the upstream's own `message` member beside
+ * the detail, so a client written for GitHub reads it as it reads GitHub's.
+ */
+internal fun damRefusal(status: Status, detail: String): Response {
+    val body = mapOf("title" to status.description, "status" to status.code, "detail" to detail, "message" to detail)
+    return Response(status).header("Content-Type", "application/problem+json")
+        .body(ObjectMapper().writeValueAsString(body))
+}
+
 /**
  * The controls the gateway's owner puts in front of the upstream for a client that passes through
  * (spec/ideas/gateway-pass-through.md, GATEWAY_DAM): none, the transparent rung, unless the owner names some. The

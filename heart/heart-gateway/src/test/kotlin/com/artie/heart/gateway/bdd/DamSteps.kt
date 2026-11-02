@@ -55,6 +55,12 @@ class DamSteps(private val github: GitHubSteps) {
         "${github.upstream.requests}",
     )
 
+    @Then("the answer's message mentions {string}")
+    fun messageMentions(words: String) {
+        val message = github.lastAnswer.path("message").asText()
+        assertTrue(words in message, message)
+    }
+
     @Then("the issue's title upstream is {string}")
     fun titleUpstream(title: String) = assertEquals(title, github.upstream.issues.single().title)
 

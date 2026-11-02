@@ -100,6 +100,9 @@ class Gateway(
         connector?.check(spec)
     }
 
+    /** The owner's described, connector and offered rungs, for a client passing through. */
+    private val rungs = DamRungs(spec, connector, mapper)
+
     /** Whether the upstream reads the resource at a path: one of its reads' templates matches it. */
     private val readable: (String) -> Boolean = spec.routes.values.filter { it.method == "GET" }
         .map { Regex(it.path.replace(Regex("""\{[^}]+}"""), "[^/]+")) }
@@ -147,7 +150,8 @@ class Gateway(
         dam: Dam = Dam.NONE,
     ): HttpHandler {
         val heart = HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
-        val served = PassThroughMode(recorded, auth, credentials, dam, readable).then(CareAsked(care)).then(heart)
+        val passing = PassThroughMode(recorded, auth, credentials, dam, readable, rungs)
+        val served = passing.then(CareAsked(care)).then(heart)
         val recording = record?.servingFilter?.then(served) ?: served
         // Outside the callers' credentials: GitHub signs its webhooks, and a held read is read again as it came.
         return hub?.filter()?.then(recording) ?: recording
