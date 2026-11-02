@@ -15,7 +15,8 @@ const realFetch = globalThis.fetch;
 let process_;
 let base;
 
-BeforeAll({ timeout: 300_000 }, async function () {
+/** The simulator built from this repository and started as a process; its address. */
+async function started() {
     execFileSync("./gradlew", ["-q", ":heart-sims:installSims"], { cwd: heartBuild, env: { ...process.env, JAVA_HOME: javaHome }, stdio: "ignore" });
     process_ = spawn(join(javaHome, "bin/java"), ["-cp", "heart-sims/build/sims/lib/*", "com.artie.heart.sims.MainKt", "0"], { cwd: heartBuild });
     const port = await new Promise((resolve, reject) => {
@@ -25,7 +26,13 @@ BeforeAll({ timeout: 300_000 }, async function () {
         });
         process_.on("exit", (code) => reject(new Error(`heart-sims exited with ${code}`)));
     });
-    base = `http://127.0.0.1:${port}`;
+    return `http://127.0.0.1:${port}`;
+}
+
+// HEART_SIMS_URL names a simulator already running, such as the heart-sims image
+// (docker run -p 8099:8099 heart-sims); without it, one is built and started here.
+BeforeAll({ timeout: 300_000 }, async function () {
+    base = process.env.HEART_SIMS_URL?.replace(/\/$/, "") ?? (await started());
     globalThis.fetch = (input, init = {}) => {
         const url = new URL(String(input));
         if (!HOSTS.has(url.host)) return realFetch(input, init);

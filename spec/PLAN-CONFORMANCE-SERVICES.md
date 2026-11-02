@@ -1,6 +1,6 @@
 # Plan: three simulated services behind the shared conformance features
 
-Status: agreed 2026-11-01; done 2026-11-01. The build and deploy services are event-sourced, with CQRS. Docker packaging of the simulator, and the commit-to-build-to-deploy story, come later.
+Status: agreed 2026-11-01; done 2026-11-01, and packaged as the heart-sims image the same day (heart/heart-sims/Dockerfile). The build and deploy services are event-sourced, with CQRS. The commit-to-build-to-deploy story comes later.
 
 Done as: 180 shared scenarios in twelve features, each run by heart-ts and by
 ARTIE (all pass). The small service heart-ts's steps built is gone, and so is
@@ -252,7 +252,6 @@ own features hold only ARTIE-specific behaviour.
 
 ## Later
 
-- A Docker image of the simulator, for clients in other languages.
 - One real-world story across the three (asked for 2026-11-01; start simple first):
   - a commit pushed to a repository on the GitHub service triggers a build of
     the job named after that repository;
