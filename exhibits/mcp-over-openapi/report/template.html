@@ -107,7 +107,9 @@ details.src pre { max-height: 28rem; }
       <li><b>Static tools fail loudly, but leave work half done.</b> They said what failed (404, 405, 409, 422), yet often finished the other steps: Bilbo dismissed, Samwise never hired.</li>
       <li><b>Fair to static tools:</b> rebuilt after the change (a restart), they succeed again, and stay cheapest. What breaks them is tools fixed at start-up, not the changes.</li>
       <li><b>Size:</b> one tool per endpoint for GitHub's REST API is {{GITHUB_TOOLS}} tools and {{GITHUB_TOKENS}} tokens before the first move. heart-mcp is 6 tools, about 1k tokens, for any service.</li>
-      <li><b>ARTIE's other ways, compared:</b> an intent run (the goal's steps, each chosen by the model from what is offered then) is the cheapest model arm on HEART, 7.3k tokens, near FastMCP's 4.4k. A script kept from a goal run uses no model at all. Both never overwrote anyone, but under the concurrent edit and midway changes they stopped instead of finishing: a gap in ARTIE, now being fixed.</li>
+      <li><b>ARTIE's intent run</b> (the goal's steps, each chosen by the model from what is offered then) is the cheapest model arm on HEART: 7.3k tokens, near FastMCP's 4.4k. After tonight's fix it keeps both edits (5 of 5, 5.6k tokens) and follows a moved act, a renamed field and a new method midway. A script kept from a goal run uses no model at all, and refuses before sending when a field changes.</li>
+      <li><b>Words that set a value</b> ("change his role to …") while someone else changes it: the static arms wrote over it and said nothing, 10 of 10. heart-mcp wrote it and said whose change it replaced; ARTIE's intent run asked first, 4 of 5.</li>
+      <li><b>ARTIE's goal run still loses the edit:</b> its planner writes the value from its first read, and ARTIE acts with the validator of a later read, so the server can't refuse it. Found tonight; the fix is named under "To act on".</li>
       <li><b>A weaker model (Haiku 5.5) shows the same pattern.</b></li>
     </ul>
   </div>
@@ -137,6 +139,7 @@ details.src pre { max-height: 28rem; }
             <li><b>Hire, promote, dismiss:</b> hire Samwise Gamgee as a gardener, make him "gardener, mayor", dismiss Bilbo Baggins.</li>
             <li><b>A dismissed employee:</b> change the role of Frodo, who is already dismissed.</li>
             <li><b>Someone else changes him:</b> add ", retired" to Frodo's current role. Once the agent has read Frodo, another person changes his role to "keeper of the Red Book".</li>
+            <li><b>Words that set a value:</b> change Frodo's role to "ring bearer, retired", with the same other person at work.</li>
           </ul></li>
         <li><b>Changes</b> to the service, made after the agent's tools were built ("at start") or after its first write ("midway"):
           <ul>
@@ -167,12 +170,24 @@ details.src pre { max-height: 28rem; }
     <li>Each then reported success; none mentioned the other person's change. It was lost without a trace.</li>
     <li>heart-mcp sent the validator it read with; the service refused (412) with Frodo's new state; the model appended to that.</li>
     <li>ARTIE's goal run lost it too, in its planner: the step was rewritten as "set the role to: ring bearer, retired" before acting. A finding to fix.</li>
-    <li>ARTIE's intent run kept the person's words, sent the validator, and was refused (412). It read Frodo again, then stopped: an intent step doesn't decide again after a 412. Safe, not done. Being fixed.</li>
+    <li>ARTIE's intent run keeps the person's words. Refused (412), it reads Frodo again and asks the model again, told what changed: "keeper of the Red Book, retired", 5 of 5. Before tonight's fix it stopped there, safe but not done.</li>
+    <li>Run again after the fix, the goal run still lost it, 5 of 5, and without a 412: ARTIE read Frodo again just before acting and sent that newer validator, while the planner's value came from the first read.</li>
   </ul>
   {{CONCURRENT}}
   <div class="stack">
     {{EXAMPLE_LOST}}
     {{EXAMPLE_KEPT}}
+  </div>
+  <h3>Words that set a value, while someone else changes it</h3>
+  <ul>
+    <li>No right answer is forced here: the person named the value. What must not happen is writing over the other change without a word.</li>
+    <li>Static arms wrote over it and said nothing, every run: no validator, no refusal.</li>
+    <li>heart-mcp was refused (412), read again, wrote the value anyway, and said whose change it replaced. ARTIE's intent run was refused, read again, and asked: "Setting it to 'ring bearer, retired' would overwrite that change. Do you want to overwrite it anyway?"</li>
+    <li>In one intent run the other change landed before ARTIE's last read: it saw "keeper of the Red Book" as the role and set what it was told. No client can flag that; only words like "current role", or the old value named, can.</li>
+  </ul>
+  {{OVERWRITE}}
+  <div class="stack">
+    {{EXAMPLE_ASKED}}
   </div>
 
   <h2>3 · The service changes under the client</h2>
@@ -180,7 +195,7 @@ details.src pre { max-height: 28rem; }
     <li><b>At start:</b> the static arms built their tools, then the service changed. They failed every change, every run.</li>
     <li>HEART clients met each change in the forms offered: new address, new field, new method, the new notice step.</li>
     <li>The ARTIE scripts, hand-written or kept, with their fields written in, broke on the field changes, but refused before sending. With a new required field or the notice step, that still left work half done (Samwise hired, not promoted).</li>
-    <li>ARTIE's intent run followed the moved address, the renamed field and the new method; it asked for the reason; it failed the notice step, because one intent step makes one act and "dismiss him" now takes two.</li>
+    <li>ARTIE's intent run followed the moved address, the renamed field and the new method, at start and midway; it asked for the reason; it failed the notice step, because one intent step makes one act and "dismiss him" now takes two.</li>
     <li>When an update needed a <code>reason</code>, heart-mcp's model wrote one ("Role expanded to include mayor, as requested"); ARTIE's goal run stopped and asked the person for it instead.</li>
   </ul>
   <h3>Changed at start: done / runs</h3>
@@ -189,7 +204,7 @@ details.src pre { max-height: 28rem; }
   {{CHANGES_MIDWAY}}
   <p class="note">The ARTIE scripts act within milliseconds, so midway they usually finish before the change lands.</p>
   <ul>
-    <li>ARTIE's intent run failed every midway change: it acted on the form from the hire's answer, held from before the change, and got 404, 405 or 412. It stopped each time, nothing overwritten. The goal run reads again before each step and so survived. Being fixed: a stale control is read again and decided again.</li>
+    <li>Before tonight's fix, ARTIE's intent run failed every midway change: it acted on the form from the hire's answer, held from before the change, and got 404, 405 or 412, and stopped. Now a 404 or 405 on a resource that has changed since is stale, as a 412 is; the step reads again and decides again on the form offered now.</li>
   </ul>
   <h3>How each run ended</h3>
   {{OUTCOMES}}
@@ -219,6 +234,13 @@ details.src pre { max-height: 28rem; }
     <li>Now each schema is shown once while it stays the same; the model sees "as before" after that, and the state holds the resource's own members only.</li>
   </ul>
   {{LEAN}}
+  <h3>ARTIE's fix, tonight</h3>
+  <ul>
+    <li>An intent step refused as stale reads again and asks the model again, told what it chose, why it was refused, and what changed; it asks rather than writes over that change (intent-decides-again.feature).</li>
+    <li>A 404 or 405 from an act, on a resource whose ETag has changed since, is a form out of date: stale, as a 412 is (script-steadiness.feature).</li>
+  </ul>
+  {{INTENT_FIX}}
+  <p class="note">Midway and at start: the five changes and all five together, on hire, promote, dismiss. Still failing: a new required field and all five (asks for the reason, as it should), and notice (one intent step, one act).</p>
   <h3>Size</h3>
   <ul>
     <li>FastMCP's tools for GitHub's REST description: {{GITHUB_TOOLS}} tools, {{GITHUB_TOKENS}} tokens of definitions, {{GITHUB_PER_TOOL}} per tool on average; the largest single tool is {{GITHUB_LARGEST}} KB.</li>
@@ -234,7 +256,8 @@ details.src pre { max-height: 28rem; }
   <ul>
     <li><b>Done tonight:</b> heart-mcp shows each schema once, and no <code>hr:</code> plumbing (mcp-lean.feature); ARTIE no longer crashes describing an act the service withdrew (form-relations.feature).</li>
     <li><b>ARTIE goal runs:</b> keep a step that says "current" as the person's words, not as a value the planner worked out earlier.</li>
-    <li><b>ARTIE intent steps (in progress):</b> after a 412, decide again from the fresh state, told what changed, and stop rather than overwrite; after a 404 or 405 on a resource that has since changed, treat the control as stale and do the same.</li>
+    <li><b>Done tonight, ARTIE:</b> an intent step decides again after a 412, and asks rather than write over; a form out of date (404, 405) is stale.</li>
+    <li><b>ARTIE goal runs, the validator:</b> an act should carry the validator of the read its words were decided from, not a later one; then the planner's stale value meets a 412, and the step decides again.</li>
     <li><b>ARTIE intent steps (later):</b> let one step take more than one act, so "dismiss him" can give notice first.</li>
     <li><b>Still the cost gap:</b> heart-mcp takes more calls because each step depends on what the last one offered. Showing an act's result together with what is offered next would cut a call per act.</li>
     <li><b>Not tested here:</b> Cloudflare-style code mode, and the npm <code>openapi-mcp-server</code> (running it was not allowed tonight).</li>

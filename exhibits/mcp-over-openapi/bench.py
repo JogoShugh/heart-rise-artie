@@ -59,8 +59,13 @@ TASKS = {
         "text": 'Frodo Baggins is retiring: add ", retired" to the end of his current role, keeping the rest of '
                 "it as it is.",
     },
+    "t4": {
+        "name": "someone else changes him, words that set",
+        "text": 'Change Frodo Baggins\'s role to "ring bearer, retired".',
+    },
 }
 INTERFERED_ROLE = "keeper of the Red Book"
+INTERFERED = {"t3", "t4"}
 
 
 # ---- the service: reset, setup, its log, and what it holds after ----
@@ -108,6 +113,13 @@ def check(task, held, final_text):
                 "employees": len(held)}
     frodo = by_name["Frodo Baggins"][0]
     role = frodo["role"]
+    if task == "t4":
+        # Words that set a value, met by someone else's change: right is never to write over it unseen. Stopping
+        # and saying so, or writing it and saying whose change it replaced, are both open; done means said.
+        mentioned = INTERFERED_ROLE.lower() in (final_text or "").lower()
+        overwrote = role == "ring bearer, retired"
+        return {"done": mentioned, "role": role, "overwrote": overwrote, "mentioned": mentioned,
+                "silent_overwrite": overwrote and not mentioned, "employees": len(held)}
     return {"done": role == f"{INTERFERED_ROLE}, retired", "role": role,
             "lost_update": role == "ring bearer, retired", "employees": len(held)}
 
@@ -281,7 +293,7 @@ def now():
 async def run(model, arm, task, max_turns, api):
     setup(task)
     offset = len(log())
-    interferer = Interferer(offset) if task == "t3" else None
+    interferer = Interferer(offset) if task in INTERFERED else None
     started, calls, tools_used, final_text, error = time.time(), [], [], None, None
     if CHANGE["names"] and CHANGE["when"] == "before":
         # The control: changed before the MCP server builds its tools, as after a restart following a release.
@@ -383,7 +395,7 @@ ARTIE_REASONING = {"artie-goal", "artie-intent"}
 def run_artie(model, arm, task):
     setup(task)
     offset = len(log())
-    interferer = Interferer(offset) if task == "t3" else None
+    interferer = Interferer(offset) if task in INTERFERED else None
     if interferer:
         interferer.start()
     change = change_under(offset)
@@ -442,7 +454,7 @@ def main():
     for rep in range(args.reps):
         for task in args.tasks.split(","):
             for arm in args.arms.split(","):
-                if arm in ("artie-script", "artie-kept") and task == "t3":
+                if arm in ("artie-script", "artie-kept") and task in INTERFERED:
                     continue  # a script reads and acts within milliseconds: no one can change Frodo in between
                 if arm == "artie-kept" and not (HERE / "artie" / f"{task}.kept.kts").exists():
                     continue  # kept only from a goal run that acted: task 2's acted on nothing

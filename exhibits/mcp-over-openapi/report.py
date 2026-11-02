@@ -176,6 +176,36 @@ def models(runs):
     return table(["Arm", "Hire, promote, dismiss", "A dismissed employee", "Someone else changes him"], rows)
 
 
+def fix(before, after):
+    """The intent run before and after tonight's fix: decide again after a 412, a form out of date as stale."""
+    rows = []
+    for name, pick in (("Someone else changes him", lambda r: r["task"] == "t3"),
+                       ("Changed midway", lambda r: r.get("when") == "midway"),
+                       ("Changed at start", lambda r: r.get("when") == "start")):
+        b, a = [r for r in before if pick(r)], [r for r in after if pick(r)]
+        rows.append([name, score(b), score(a), k(median(r["input_processed"] for r in a))])
+    return table(["Intent run", "Before", "After", "Input tokens, after"], rows)
+
+
+def overwrite(runs):
+    """Words that set a value, while someone else changes it: who wrote over it, and who said so."""
+    by = group(runs, "arm")
+    rows = []
+    for arm in STATIC + HEART:
+        g = by.get((arm,), [])
+        if not g:
+            continue
+        n = len(g)
+        refused = sum(any(q["status"] == 412 for q in r["requests"]) for r in g)
+        asked_ = sum(asked(r) for r in g)
+        said = sum(r["check"]["overwrote"] and r["check"]["mentioned"] for r in g)
+        silent = sum(r["check"]["silent_overwrite"] for r in g)
+        rows.append([ARM_NAMES[arm], f"{refused}/{n}", f"{asked_}/{n}", f"{said}/{n}",
+                     f'<span class="{"bad" if silent else "ok"}">{silent}/{n}</span>', k(median(r["input_processed"] for r in g))])
+    return table(["Arm", "Refused 412", "Stopped and asked", "Wrote it, said whose change it replaced",
+                  "Wrote over it, said nothing", "Input tokens"], rows)
+
+
 def example(run, title):
     lines = []
     for tool in run.get("tools") or []:
@@ -196,9 +226,13 @@ def first(runs, **match):
 
 
 def main():
-    base = load("full-sonnet.jsonl", "intent-kept-sonnet.jsonl")
+    base = load("full-sonnet.jsonl", "intent-kept-fixed-sonnet.jsonl")
+    intent_before = [r for r in load("intent-kept-sonnet.jsonl", "changes-intent-kept-sonnet.jsonl") if r["arm"] == "artie-intent"]
+    intent_after = [r for r in load("intent-kept-fixed-sonnet.jsonl", "changes-intent-kept-fixed-sonnet.jsonl")
+                    if r["arm"] == "artie-intent"]
+    t4 = load("t4-sonnet.jsonl")
     lean_runs = load("lean-sonnet.jsonl")
-    nuclear = load("changes-sonnet.jsonl") + load("changes-lean-sonnet.jsonl") + load("changes-intent-kept-sonnet.jsonl")
+    nuclear = load("changes-sonnet.jsonl") + load("changes-lean-sonnet.jsonl") + load("changes-intent-kept-fixed-sonnet.jsonl")
     control = load("control-sonnet.jsonl")
     haiku = load("haiku.jsonl")
     haiku_changes = load("changes-haiku.jsonl")
@@ -213,13 +247,17 @@ def main():
         "CHANGES_CONTROL": changes(control, "before", STATIC + ["heart-mcp-lean"]),
         "OUTCOMES": outcomes(nuclear, STATIC + HEART),
         "LEAN": lean([r for r in base if r["arm"] == "heart-mcp"], lean_runs),
+        "INTENT_FIX": fix(intent_before, intent_after),
+        "OVERWRITE": overwrite(t4),
+        "EXAMPLE_ASKED": example(next(r for r in t4 if r["arm"] == "artie-intent" and asked(r)),
+                                 "ARTIE's intent run: refused 412, decides again, and asks before writing over"),
         "HAIKU": models(haiku) if haiku else "<p>Not run.</p>",
         "HAIKU_CHANGES": changes(haiku_changes, "start", ["fastmcp", "meta-tools", "heart-mcp-lean"]) if haiku_changes else "",
         "GITHUB_TOOLS": f"{scale['tools']:,}",
         "GITHUB_TOKENS": f"{scale['tool_definition_tokens']:,}",
         "GITHUB_PER_TOOL": f"{scale['mean_tokens_per_tool']:,}",
         "GITHUB_LARGEST": f"{scale['largest_tool_chars'] // 1000}",
-        "RUN_COUNT": str(len(base) + len(lean_runs) + len(nuclear) + len(control) + len(haiku) + len(haiku_changes)),
+        "RUN_COUNT": str(len(base) + len(lean_runs) + len(t4) + len(intent_before) + len(nuclear) + len(control) + len(haiku) + len(haiku_changes)),
         "EXAMPLE_LOST": example(first(t3, arm="fastmcp"), "FastMCP loses the other change, and says it succeeded"),
         "EXAMPLE_KEPT": example(first(t3, arm="heart-mcp-lean"), "heart-mcp is refused 412, reads again, keeps both"),
         "EXAMPLE_MOVED": example(first(nuclear, arm="fastmcp", change="moved", when="start"),
