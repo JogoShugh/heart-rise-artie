@@ -107,8 +107,8 @@ details.src pre { max-height: 28rem; }
       <li><b>Static tools fail loudly, but leave work half done.</b> They said what failed (404, 405, 409, 422), yet often finished the other steps: Bilbo dismissed, Samwise never hired.</li>
       <li><b>Fair to static tools:</b> rebuilt after the change (a restart), they succeed again, and stay cheapest. What breaks them is tools fixed at start-up, not the changes.</li>
       <li><b>Size:</b> one tool per endpoint for GitHub's REST API is {{GITHUB_TOOLS}} tools and {{GITHUB_TOKENS}} tokens before the first move. heart-mcp is 6 tools, about 1k tokens, for any service.</li>
-      <li><b>ARTIE's intent run</b> (the goal's steps, each chosen by the model from what is offered then) is the cheapest model arm on HEART: 7.3k tokens, near FastMCP's 4.4k. After tonight's fix it keeps both edits (5 of 5, 5.6k tokens) and follows a moved act, a renamed field and a new method midway. A script kept from a goal run uses no model at all, and refuses before sending when a field changes.</li>
-      <li><b>Words that set a value</b> ("change his role to …") while someone else changes it: the static arms wrote over it and said nothing, 10 of 10. heart-mcp wrote it and said whose change it replaced; ARTIE's intent run asked first, 4 of 5.</li>
+      <li><b>ARTIE's intent run</b> (the goal's steps, each chosen by the model from what is offered then) is the cheapest model arm on HEART: 7.3k tokens, near FastMCP's 4.4k. After tonight's fixes it keeps both edits (5 of 5, 5.6k tokens), and follows every change but a new required field, at start and midway, giving notice before a dismissal. A script kept from a goal run uses no model at all, and refuses before sending when a field changes.</li>
+      <li><b>Words that set a value</b> ("change his role to …") while someone else changes it: the static arms wrote over it and said nothing, 10 of 10. heart-mcp wrote it and said whose change it replaced; ARTIE's intent run asked first, 5 of 5.</li>
       <li><b>ARTIE's goal run still loses the edit:</b> its planner writes the value from its first read, and ARTIE acts with the validator of a later read, so the server can't refuse it. Found tonight; the fix is named under "To act on".</li>
       <li><b>A weaker model (Haiku 5.5) shows the same pattern.</b></li>
     </ul>
@@ -183,7 +183,7 @@ details.src pre { max-height: 28rem; }
     <li>No right answer is forced here: the person named the value. What must not happen is writing over the other change without a word.</li>
     <li>Static arms wrote over it and said nothing, every run: no validator, no refusal.</li>
     <li>heart-mcp was refused (412), read again, wrote the value anyway, and said whose change it replaced. ARTIE's intent run was refused, read again, and asked: "Setting it to 'ring bearer, retired' would overwrite that change. Do you want to overwrite it anyway?"</li>
-    <li>In one intent run the other change landed before ARTIE's last read: it saw "keeper of the Red Book" as the role and set what it was told. No client can flag that; only words like "current role", or the old value named, can.</li>
+    <li>In one earlier intent run the other change landed before ARTIE's last read: it saw "keeper of the Red Book" as the role and set what it was told. No client can flag that; only words like "current role", or the old value named, can.</li>
   </ul>
   {{OVERWRITE}}
   <div class="stack">
@@ -195,7 +195,7 @@ details.src pre { max-height: 28rem; }
     <li><b>At start:</b> the static arms built their tools, then the service changed. They failed every change, every run.</li>
     <li>HEART clients met each change in the forms offered: new address, new field, new method, the new notice step.</li>
     <li>The ARTIE scripts, hand-written or kept, with their fields written in, broke on the field changes, but refused before sending. With a new required field or the notice step, that still left work half done (Samwise hired, not promoted).</li>
-    <li>ARTIE's intent run followed the moved address, the renamed field and the new method, at start and midway; it asked for the reason; it failed the notice step, because one intent step makes one act and "dismiss him" now takes two.</li>
+    <li>ARTIE's intent run followed the moved address, the renamed field, the new method and the notice step, at start and midway; for the new required field it asked the person for the reason, as the goal run does.</li>
     <li>When an update needed a <code>reason</code>, heart-mcp's model wrote one ("Role expanded to include mayor, as requested"); ARTIE's goal run stopped and asked the person for it instead.</li>
   </ul>
   <h3>Changed at start: done / runs</h3>
@@ -238,9 +238,10 @@ details.src pre { max-height: 28rem; }
   <ul>
     <li>An intent step refused as stale reads again and asks the model again, told what it chose, why it was refused, and what changed; it asks rather than writes over that change (intent-decides-again.feature).</li>
     <li>A 404 or 405 from an act, on a resource whose ETag has changed since, is a form out of date: stale, as a 412 is (script-steadiness.feature).</li>
+    <li>What the words ask not offered yet ("dismiss him" before notice), the step is asked again, told the server's reason, for an act offered now toward it, then asks the words again (intent-takes-several-acts.feature).</li>
   </ul>
   {{INTENT_FIX}}
-  <p class="note">Midway and at start: the five changes and all five together, on hire, promote, dismiss. Still failing: a new required field and all five (asks for the reason, as it should), and notice (one intent step, one act).</p>
+  <p class="note">Midway and at start: the five changes and all five together, on hire, promote, dismiss. Still not done: a new required field, alone or with the others, where it asks the person for the reason, as it should.</p>
   <h3>Size</h3>
   <ul>
     <li>FastMCP's tools for GitHub's REST description: {{GITHUB_TOOLS}} tools, {{GITHUB_TOKENS}} tokens of definitions, {{GITHUB_PER_TOOL}} per tool on average; the largest single tool is {{GITHUB_LARGEST}} KB.</li>
@@ -258,7 +259,7 @@ details.src pre { max-height: 28rem; }
     <li><b>ARTIE goal runs:</b> keep a step that says "current" as the person's words, not as a value the planner worked out earlier.</li>
     <li><b>Done tonight, ARTIE:</b> an intent step decides again after a 412, and asks rather than write over; a form out of date (404, 405) is stale.</li>
     <li><b>ARTIE goal runs, the validator:</b> an act should carry the validator of the read its words were decided from, not a later one; then the planner's stale value meets a 412, and the step decides again.</li>
-    <li><b>ARTIE intent steps (later):</b> let one step take more than one act, so "dismiss him" can give notice first.</li>
+    <li><b>Done tonight, ARTIE:</b> an intent step takes acts toward what its words ask when that is not offered yet, so "dismiss him" gives notice first.</li>
     <li><b>Still the cost gap:</b> heart-mcp takes more calls because each step depends on what the last one offered. Showing an act's result together with what is offered next would cut a call per act.</li>
     <li><b>Not tested here:</b> Cloudflare-style code mode, and the npm <code>openapi-mcp-server</code> (running it was not allowed tonight).</li>
   </ul>

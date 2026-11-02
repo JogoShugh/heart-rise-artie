@@ -1,0 +1,218 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8099/
+      given: default
+      default: http://localhost:8099/
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 3
+    input: 1243
+    output: 529
+    cache_read: 2754
+    cache_write: 0
+---
+at: '2026-11-02T11:52:14.464787Z'
+ms: 41
+mode: script
+say: enter {entry}
+line: 5
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T11:52:14.510766Z'
+ms: 2653
+mode: intent
+say: Find the employees named Baggins
+line: 6
+within: 5
+params:
+  relation: staff:search-employees
+  name: Baggins
+values:
+  name:
+    value: Baggins
+    type: string
+    from:
+      - words
+reason:
+  template: Find the employees named Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Find the employees named Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01QX7JttSxCpsvK2bsC1Cujr","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Baggins"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Baggins
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T11:52:17.166559Z'
+ms: 1401
+mode: intent
+say: Open Frodo Baggins
+line: 7
+within: 6
+params:
+  relation: item
+  title: Frodo Baggins
+values:
+  title:
+    value: Frodo Baggins
+    from:
+      - words
+reason:
+  template: Open Frodo Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Frodo Baggins"},{"rel":"item","title":"Bilbo Baggins"}]
+      </links>
+      <intent>
+      Open Frodo Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_012MFUXWZfNAQkoZ2d6jEcNt","name":"select","input":{"action":"follow","rel":"item","title":"Frodo Baggins"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Frodo Baggins
+  method: GET
+  target: http://localhost:8099/employees/1
+  address: http://localhost:8099/employees/1
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T11:52:18.570071Z'
+ms: 3713
+mode: intent
+say: Change his role to "ring bearer, retired"
+line: 8
+within: 7
+params: {}
+reason:
+  template: Change his role to "ring bearer, retired"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"ring bearer","status":"dismissed"}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "ring bearer, retired"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSlwoKEAgTGAI4AUIIdGhpbmtpbmcSDExpeTYhn1UKK6lOKBoMLkHSnvyy5MsR4B/fIjDhLu3kCTlzCVY7p4mIQt8nPYrymzy8GAoDcdqI7rBWul0399LomuCamCm/NH22f9QqtAniAf5ghTz45UHGO2NeUQ6TDFAmTQX2yMtKVpYMB54AOqh3zUd7W107SHruykY9rJHmz/Fk0SZM3udC6s+nyvgnlOExxninJcy/1xpjjVz1K8yOMlyI1mvOOAGldgA9ZAhxpUReiRsC9WhJbQ+J6NjQVkyy/oHBeLiK/b42UVRVMuM16zkcJhDYrn29YOwh16vevwGhdSik9IrJUokib/oRgX1NiT70Je9nJSkSrPb+oPdmmQEOf+x+w6A6JofP6xyZXKzS4uLTKNO4N+4AI6RaZMIz1rlqxq9t2D+dYCl3dmyFt5k2Bo/G6pku/6P/IVCcmRYTLQOhefJ6ZWOZH3/ARPKhTueOq2SJ9DWCoKNecd2WYx4I7jaaqvzv5Nm2EgV9Aqz40LZXGOilntbWmgy2DW/QntCpDN3C+aeh6MLbhElp7dZuVCPoY9TkIUioqaceWmlprj/bTpsQaJ2wCB3useZonRs9XL0CBin3tmsQdvKCXi/gUdqmcRqwEQ8sWftlElv9MQce5y8fbmr3VllwzMSDmyrjc+Z+/6Z/fD66jxrzEEzM1lOE2QiqlqnY490pEpvutSk6ap/XrgPdX9Z0N/yAEA9zKB3WsCjdxoV0U6MA4k1+OPIvbShFz9G0po42SdQfTayPGnyXSZrVAlhlCBe77Bz9NeZ4HdtbjJVn+2zENwnnOgqxVRTrfMXLIKl8LFw48lsFbU7rof2Jslymb5M3p3f0mvnJLunknnAl59TmW6AxRyUL8u3rq4nQTIZ3ROMkqOiL8yUkQv6RJqMlARHKxKV76wUUQG7bVFbvVYUkLLzPpzCkDtefBW7RdB9oQXkVuukc5o48PxbIaSodM+uqNlDYKJWX/SSc74AxmM4adtNZqvDeSIVrMJ/S8EOjf1GvPB/vu+84aXAh21lc7PnmCtrnn50/dsUCT7L02dvo9NdOTF5laXCRLeivYnyLCz0/P//x5D0CS5KMJx40zIkaVRyN0MzqWWObW2sX3vCYk95QQcAdyHM7ZhnyxDA/lbMEGJOo7Q5CRGYJL2Zr21q20UV2U7i8EaCa/OJRLTPKfVzT9PbQN4YBTFliUB6QAtOexlGMjEzcsCN93oAH9AFDqi0ZNMKtEjEkamd6lp+UVwFb9BsmJJZaTAQHu5y/ZgTWrjGGoptjyq2W+3du0IgHpKyZ5muUvdjThZt7m5aIaZhOuWqMWss9et4SYzeQmeYvKZ4Nz1472NLXNxT+LScrKkXe6Zcz1z3ABfciD/zcnjVEhYWOClQvx0f3QAbCubteUbFJOuAVyFRb1QBJIFb+4nlVmO8rgTnMeK7kOMBF1Bui6M0wUrFLeX71cicyImv/KEvhhsz4hPLwjP7efIpq8WjmlDj40tPOq6dU/PiRdlFbzm5RUBUHbdai7REYTdNUdHVrdUp/hEcGGlNcUJPdlZucfMB8fPFOjp0zvKhUroPfwdqGEYl2UCQ0P3umuRaQECr1IpF8kIOT7X2Fv/vMJw9IF+3uOofdZmHONebbxaMMB/qoahb3eidZnyJh9LufKdLscW+5DOww/gwQoDJqShFnmAq4InmtDRFRjKW3ZRBqXDEvYS2v7rXKzUZ8/gCoGAE="},{"type":"tool_use","id":"toolu_018CgfZ1oWEf6NJmN1n7aWou","name":"select","input":{"action":"clarify","question":"I can''t change Frodo''s role because no update action is available for him right now (his status is \"dismissed\"). What would you like to do instead?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: I can't change Frodo's role because no update action is available for him right now (his status is "dismissed"). What would you like to do instead?
