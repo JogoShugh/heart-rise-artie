@@ -50,6 +50,15 @@ Feature: The owner's gateway gives a plain client conditional writes GitHub does
     Then the GitHub gateway answers 412
     And the answer's message is "the resource changed since it was read; read it again and decide again"
 
+  Scenario: A write held to its ETag says how long the gateway's check and the write took
+    GitHub has no conditional write, so the gateway checks, then writes: a
+    teammate on GitHub itself could still land in between. The answer says how
+    wide that is (Server-Timing): the read again, and the write after it.
+    When "ada" gets "/repos/acme/rockets/issues/10" through the GitHub gateway, passed through
+    And "ada" sends PATCH "/repos/acme/rockets/issues/10" with {"state":"closed"} through the GitHub gateway, passed through, with the ETag it read
+    Then the GitHub gateway answers 200
+    And the answer's Server-Timing names "recheck" and "write", each with a duration
+
   Scenario: A write that adds to the issue is not held to its ETag
     When "ada" sends POST "/repos/acme/rockets/issues/10/comments" with {"body":"Seen on 1.2 too."} through the GitHub gateway, passed through
     Then the GitHub gateway answers 201

@@ -38,12 +38,22 @@ internal class Conditional(private val upstream: HttpHandler, private val readab
     }
 
     private fun write(request: Request): Response {
-        val sent = request.header(IF_MATCH)
-        return when {
-            sent == null -> damRefusal(Status.PRECONDITION_REQUIRED, NO_VALIDATOR)
-            current(request) != sent -> damRefusal(Status.PRECONDITION_FAILED, STALE)
-            else -> upstream(request.removeHeader(IF_MATCH))
-        }
+        val sent = request.header(IF_MATCH) ?: return damRefusal(Status.PRECONDITION_REQUIRED, NO_VALIDATOR)
+        val checking = System.nanoTime()
+        val current = current(request)
+        val writing = System.nanoTime()
+        val stale = current != sent
+        return if (stale) damRefusal(Status.PRECONDITION_FAILED, STALE) else written(request, checking, writing)
+    }
+
+    /**
+     * [request] written, the gateway having checked it from [checking] to [writing]. The upstream has no conditional
+     * write, so the gateway checks, then writes: how wide that is, said plainly (Server-Timing).
+     */
+    private fun written(request: Request, checking: Long, writing: Long): Response {
+        val answer = upstream(request.removeHeader(IF_MATCH))
+        val timing = "recheck;dur=${millis(writing - checking)}, write;dur=${millis(System.nanoTime() - writing)}"
+        return answer.header("Server-Timing", timing)
     }
 
     /** The gateway's ETag for the resource [request] writes, read again now as its caller; null if unreadable. */
@@ -66,6 +76,11 @@ internal class Conditional(private val upstream: HttpHandler, private val readab
 
         /** What a read again carries from the write: whose it is, and the shape it asks for. */
         val READ_AS = listOf("Authorization", "Accept")
+
+        /** [nanos] in milliseconds, to a tenth, as Server-Timing gives durations. */
+        fun millis(nanos: Long): String = "%.1f".format(java.util.Locale.ROOT, nanos / NANOS_PER_MILLI)
+
+        const val NANOS_PER_MILLI = 1_000_000.0
 
         /** The gateway's own ETag for an answer: a digest of its body, strong, as the gateway read it. */
         fun etagOf(body: String): String {

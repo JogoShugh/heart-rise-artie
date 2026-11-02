@@ -61,6 +61,14 @@ class DamSteps(private val github: GitHubSteps) {
         assertTrue(words in message, message)
     }
 
+    @Then("the answer's Server-Timing names {string} and {string}, each with a duration")
+    fun serverTiming(first: String, second: String) {
+        val timing = github.lastResponse.header("Server-Timing").orEmpty()
+        listOf(first, second).forEach { name ->
+            assertTrue(Regex("""(^|,\s*)$name;dur=\d+(\.\d+)?""").containsMatchIn(timing), "Server-Timing: $timing")
+        }
+    }
+
     @Then("the issue's title upstream is {string}")
     fun titleUpstream(title: String) = assertEquals(title, github.upstream.issues.single().title)
 
