@@ -30,7 +30,7 @@ from fastmcp.client.transports import StdioTransport
 
 BASE = os.environ.get("BENCH_BASE", "http://localhost:8099")
 TOKEN_VARIABLE = f"ARTIE_TOKEN_LOCALHOST_{BASE.rsplit(':', 1)[1]}"
-TOKEN = os.environ["EMPLOYEES_TOKEN"]
+TOKEN = os.environ.get("BENCH_TOKEN") or os.environ["EMPLOYEES_TOKEN"]
 AUTH = {"Authorization": f"Bearer {TOKEN}"}
 PLAIN = {**AUTH, "Accept": "application/json"}
 HERE = Path(__file__).parent
@@ -67,6 +67,32 @@ TASKS = {
 INTERFERED_ROLE = "keeper of the Red Book"
 INTERFERED = {"t3", "t4"}
 
+# ---- GitHub through the owner's gateway (exhibits/own-controls): heart-sims' small GitHub, the gateway in front ----
+# BENCH_BASE=http://localhost:8098 BENCH_TOKEN=github-token bench.py --arms fastmcp-github --tasks g1 --dam conditional --meddle
+
+GITHUB_SYSTEM = (
+    "You work a GitHub repository's issues through the tools you are given. Do the task you are asked, using only "
+    "the tools. The person who asked is away, so do not ask questions. When you are done, say what happened in one "
+    "or two sentences."
+)
+TASKS["g1"] = {
+    "name": "triage an issue a teammate is closing",
+    "text": 'In the repository acme/web, issue 7 has been triaged: add " (triaged)" to the end of its current '
+            "title, keeping the rest of it as it is, then close it as completed.",
+}
+# The teammate, on GitHub itself, past the gateway, right after the client first reads issue 7 (as ladder.sh).
+TEAMMATE = {"issue": 7, "title": "The nightly build is slow on Mondays", "state": "closed",
+            "state_reason": "not_planned"}
+PASS = {"X-Gateway-Mode": "pass-through"}
+DAM = {"rungs": ""}
+# The issue operations of GitHub's own description, as a host would pick them for an issues task.
+GITHUB_PATHS = ["/repos/{owner}/{repo}/issues", "/repos/{owner}/{repo}/issues/{issue_number}",
+                "/repos/{owner}/{repo}/issues/{issue_number}/comments"]
+
+
+def github(task):
+    return task.startswith("g")
+
 
 # ---- the service: reset, setup, its log, and what it holds after ----
 
@@ -80,7 +106,7 @@ MEDDLE = {"on": False}
 def interfere(task, offset):
     """Someone else changes Frodo once the client has read him: by the sim, right after the read (certain, for any
     client), or by a thread that watches the log (a model's pause lets it in; a script's milliseconds may not)."""
-    if task not in INTERFERED:
+    if task not in INTERFERED or github(task):
         return None
     if MEDDLE["on"]:
         sim("PUT", "/_sim/employees/meddle", json={"employee": 1, "role": INTERFERED_ROLE}).raise_for_status()
@@ -90,6 +116,10 @@ def interfere(task, offset):
 
 def setup(task):
     sim("POST", "/_sim/reset").raise_for_status()
+    if github(task):
+        sim("PUT", "/_sim/github/dam", content=DAM["rungs"]).raise_for_status()
+        if MEDDLE["on"]:
+            sim("PUT", "/_sim/github/meddle", json=TEAMMATE).raise_for_status()
     if task == "t2":
         sim("DELETE", "/employees/1/actions/dismiss", headers=PLAIN).raise_for_status()
 
@@ -112,6 +142,15 @@ def everyone():
 
 
 def check(task, held, final_text):
+    if github(task):
+        issue = sim("GET", "/repos/acme/web/issues/7", headers={**PLAIN, **PASS}).json()
+        title_kept = issue["title"].startswith(TEAMMATE["title"])
+        reason_kept = issue.get("state_reason") == TEAMMATE["state_reason"]
+        triaged = issue["title"].endswith("(triaged)")
+        said = bool(re.search(r"not.planned|already closed|teammate|someone|changed|412|428|409", final_text or "", re.I))
+        return {"done": title_kept and reason_kept and triaged, "title": issue["title"], "state": issue["state"],
+                "state_reason": issue.get("state_reason"), "teammate_title_kept": title_kept,
+                "teammate_reason_kept": reason_kept, "triaged": triaged, "said_why": said}
     by_name = {}
     for one in held:
         by_name.setdefault(f"{one['firstName']} {one['lastName']}", []).append(one)
@@ -266,7 +305,17 @@ def meta_tools():
     return outer
 
 
+def github_tools():
+    """FastMCP's per-endpoint tools for GitHub's issue operations, from GitHub's own description, through the gateway."""
+    spec = json.loads((HERE / "specs/github.json").read_text())
+    spec["paths"] = {path: spec["paths"][path] for path in GITHUB_PATHS}
+    http = httpx2.AsyncClient(base_url=BASE, headers={**PLAIN, **PASS}, timeout=30)
+    return FastMCP.from_openapi(spec, client=http, name="github")
+
+
 def arm_client(arm):
+    if arm == "fastmcp-github":
+        return Client(github_tools())
     if arm == "fastmcp":
         return Client(per_endpoint())
     if arm == "fastmcp-typical":
@@ -307,6 +356,7 @@ def now():
 
 async def run(model, arm, task, max_turns, api):
     setup(task)
+    system = GITHUB_SYSTEM if github(task) else SYSTEM
     offset = len(log())
     interferer = interfere(task, offset)
     started, calls, tools_used, final_text, error = time.time(), [], [], None, None
@@ -316,8 +366,8 @@ async def run(model, arm, task, max_turns, api):
     async with arm_client(arm) as client:
         tools = [as_tool(t) for t in await client.list_tools()]
         change = change_under(offset)
-        base = api.messages.count_tokens(model=model, system=SYSTEM, messages=[{"role": "user", "content": "x"}])
-        with_tools = api.messages.count_tokens(model=model, system=SYSTEM, tools=tools,
+        base = api.messages.count_tokens(model=model, system=system, messages=[{"role": "user", "content": "x"}])
+        with_tools = api.messages.count_tokens(model=model, system=system, tools=tools,
                                                messages=[{"role": "user", "content": "x"}])
         if interferer:
             interferer.start()
@@ -325,7 +375,7 @@ async def run(model, arm, task, max_turns, api):
         cached_tools = cached(tools)
         for _ in range(max_turns):
             t0 = time.time()
-            answer = api.messages.create(model=model, max_tokens=2048, system=SYSTEM, tools=cached_tools,
+            answer = api.messages.create(model=model, max_tokens=2048, system=system, tools=cached_tools,
                                          messages=marked(messages))
             calls.append({**usage_of(answer.usage), "ms": int((time.time() - t0) * 1000), "stop": answer.stop_reason})
             messages.append({"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in answer.content]})
@@ -355,6 +405,7 @@ async def run(model, arm, task, max_turns, api):
     requests = requests_since(offset)
     held = everyone()
     record = {
+        "dam": DAM["rungs"] if github(task) else None,
         "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
         "changed_at": change.fired if change else None,
         "at": now(), "model": model, "arm": arm, "task": task, "seconds": round(time.time() - started, 1),
@@ -363,7 +414,7 @@ async def run(model, arm, task, max_turns, api):
         **totals(calls), "calls": calls,
         "tool_calls": len(tools_used), "tool_errors": sum(t["error"] for t in tools_used), "tools": tools_used,
         "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
-        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and (task in INTERFERED or github(task)) else None),
         "check": check(task, held, final_text), "final_text": final_text, "error": error,
     }
     return record
@@ -444,7 +495,7 @@ def run_artie(model, arm, task):
         **totals(calls), "model_calls": usage.get("calls", 0), "calls": None,
         "tool_calls": len(re.findall(r"^\d+ ", output, re.M)), "tool_errors": None, "tools": None,
         "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
-        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and (task in INTERFERED or github(task)) else None),
         "check": check(task, held, output), "final_text": output[-3000:], "trace": str(trace.relative_to(HERE)),
         "error": None if done.returncode == 0 else f"exit {done.returncode}",
     }
@@ -461,10 +512,12 @@ def main():
     parser.add_argument("--changes", default="", help=f"changes to make under the client; all is {ALL_CHANGES}")
     parser.add_argument("--when", default="start", choices=["before", "start", "midway"])
     parser.add_argument("--meddle", action="store_true", help="the sim changes Frodo right after the client reads him")
+    parser.add_argument("--dam", default="", help="the GitHub gateway owner's rungs (GATEWAY_DAM), for g tasks")
     args = parser.parse_args()
     CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
     CHANGE["when"] = args.when
     MEDDLE["on"] = args.meddle
+    DAM["rungs"] = args.dam
     (HERE / "runs").mkdir(exist_ok=True)
     out = Path(args.out or HERE / f"runs/{datetime.now().strftime('%Y%m%d-%H%M%S')}.jsonl")
     api = anthropic.Anthropic()
