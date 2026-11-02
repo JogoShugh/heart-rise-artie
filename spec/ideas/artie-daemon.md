@@ -10,10 +10,10 @@ compiling the script (ScriptHost.kt makes a new engine per run, with no compile 
 
 | Run | Time |
 |---|---|
-| `artie --help` (the JVM, nothing else) | 0.18 s |
-| A goal file, listing its inputs | 0.2 s |
-| A one-line `.kts`, no calls | 1.8 to 2.2 s |
-| `exhibits/own-controls/scripts/heart.kts`, a full run (3 calls, local) | 2.6 to 2.7 s |
+| `artie --help` (the JVM and argument parsing) | 0.19 s |
+| A one-line `.kts`, no calls | 1.8 to 2.1 s |
+| `exhibits/own-controls/scripts/heart.kts --inputs-of` (compiles, no calls) | 1.9 s |
+| `exhibits/own-controls/scripts/heart.kts`, a full run (3 calls, local) | 2.5 to 2.6 s |
 
 ## The idea
 

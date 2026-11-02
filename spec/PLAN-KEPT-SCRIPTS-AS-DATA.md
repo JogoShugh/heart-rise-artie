@@ -1,83 +1,124 @@
-# Plan: kept scripts as data (YAML), the DSL kept
+# Plan: generated scripts as data (YAML), the DSL kept
 
-Status: proposed, 2026-11-02. No code. The author is not yet sold; step 0 exists to settle it before anything is
-built. Follows spec/PLAN-SCRIPT-GENERATOR.md (kept scripts), spec/PLAN-GOAL-MARKDOWN.md (goal files) and the
-code-mode discussion of the same day (exhibits/own-controls, "Where the tokens go").
+Status: proposed, 2026-11-02; checked against the code the same day, which corrected the first draft (see "Corrected
+on checking"). No code. The author is not yet sold; step 0 exists to settle it before anything is built. Follows
+spec/PLAN-SCRIPT-GENERATOR.md (kept scripts), spec/PLAN-GOAL-MARKDOWN.md (goal files) and the code-mode discussion
+of the same day (exhibits/own-controls, "Where the tokens go").
 
 ## The idea
 
-A kept script (what `artie generate` writes from a run) holds the same steps whether it is Kotlin or data. Written
-as YAML, it is run by ARTIE as data: it can do only what its vocabulary says and what the server offers, so a
-script a model wrote needs no sandbox and no review as code. The Kotlin DSL stays, for people.
+The scripts `artie generate` writes (intent scripts and kept scripts) hold the same steps whether they are Kotlin
+or data. Written as YAML, they are run by ARTIE as data: no code is evaluated, and a step can do only what the
+vocabulary says and what the server offers. The Kotlin DSL stays, for people.
 
 - **Inference authors, determinism operates, and the server's controls hold both.**
 - **Not a level above the DSL:** the same steps, held as data instead of code.
-- **Optional:** `artie run` takes either. A person still writes an intent script straight in Kotlin.
-- **For generated scripts only.** Hand-written scripts use free Kotlin that YAML should not try to hold: 43
-  `var` reads, 25 `if`s, `?:` in templates, local functions, loops (dependabot-sim/watch.kts). They stay `.kts`.
-- **Prior art, credited:** Arazzo (OpenAPI Initiative) is YAML steps over OpenAPI operations; Kestra and Kogito
-  are workflow engines. A HEART kept script differs in what a step binds to: a relation, run only if offered
-  now, held to pins, falling back to its words. Kestra could schedule `artie run` as a task.
+- **Optional:** `artie run` takes either; `artie generate` writes Kotlin unless asked or configured otherwise.
+- **For generated scripts only.** Hand-written scripts use free Kotlin that YAML should not try to hold: `var`
+  reads, `if`s, `?:` in templates, local functions, loops (dependabot-sim/watch.kts). They stay `.kts`.
+- **Prior art, credited:** Arazzo (OpenAPI Initiative) is YAML steps over OpenAPI operations; workflow engines
+  such as Kestra run YAML tasks. A HEART script differs in what a step binds to: a relation, run only if offered
+  now, held to pins, falling back to its words. An engine could schedule `artie run` as a task.
+
+## Scope
+
+| Script | In this plan | Why |
+|---|---|---|
+| Intent script (`NAME.intent.kts` today) | Yes | Generated; words only, so it maps cleanly |
+| Kept script (`NAME.kts` today) | Yes | Generated; the main case |
+| Generated from a goal file's run | Yes, fully | Every line comes from the run and the goal file |
+| Generated from a `.kts` script's run | Only where its copied lines map | The generator copies the run's own script lines as written (ScriptWriter.kt:8, 149-150): input defaults, waits, checks. Free Kotlin among them has no YAML; generate then fails and names the line |
+| Bare script | No; its own fixes come first (below) | It is the unguarded baseline, and its HTTP handling is wrong today |
+| Hand-written scripts | No | Free Kotlin |
 
 ## Why: claims to test
 
 | # | Claim | Evidence so far |
 |---|---|---|
-| 1 | A model-written YAML script is safe to run unreviewed: closed vocabulary, no code evaluated | By construction; to be shown (step 7) |
-| 2 | YAML starts faster: every `.kts` run compiles | ScriptHost.kt:26-39 makes a new JSR-223 engine per run, no compile cache. A one-line `.kts` with no calls took 1.8 to 2.2 s; `heart.kts` (3 calls, local) 2.6 to 2.7 s; a goal file 0.2 s; `artie --help` 0.18 s. The JVM is not the cost; the engine and the compile are |
-| 3 | Only YAML can run in a native image | The script engine needs an embedded compiler, `wholeClasspath` and a Power-assert jar by path (ScriptHost.kt:42-47). No GraalVM setup exists |
+| 1 | A YAML script runs no code: a model-written one needs no sandbox. It is not harmless: it can do whatever the server offers its token, and a `reasoned` step hands the server's words to a model. What it may do is the owner's controls' to limit (token scopes, the gateway's `connector` rung) | By construction; to be shown in step 8 |
+| 2 | YAML starts faster: every `.kts` run starts a script engine and compiles | ScriptHost.kt:26-39: a new JSR-223 engine per run, no compile cache. Measured (3 runs each): JVM and argument parsing alone about 0.19 s (`artie --help`); `heart.kts --inputs-of`, which compiles and makes no calls, 1.9 s; `heart.kts`, a full run of 3 calls to the local test GitHub, 2.5 to 2.6 s. So about 1.7 s is the engine and the compile |
+| 3 | The `.kts` engine can't run in a native image | It needs an embedded compiler, `wholeClasspath` and a Power-assert jar found by path (ScriptHost.kt:42-47). A script compiled ahead into its own native build could run, at a build per script. No GraalVM setup exists |
 | 4 | Other runtimes (heart-ts) can run the same file | Later; not in this plan |
 
-Claim 2 has a cheaper rival: a compile cache for `.kts`, keyed by the script's hash. Step 0 measures both.
+Claim 2 has cheaper rivals: a compile cache for `.kts`, keyed by the script's hash, and an ARTIE daemon
+(spec/ideas/artie-daemon.md, a future idea). Step 0 measures the cache.
+
+## What the file holds, and what comes from elsewhere
+
+No media type is built in anywhere. Each part of a request is either in the file, or comes from the server's
+controls, or from ARTIE's configuration; the format's spec says which.
+
+| Part of a request | Intent and kept scripts |
+|---|---|
+| Method | The server's form |
+| Address | The entry (`start`), then the server's links and forms |
+| Query | Form fields, for a GET form |
+| Accept, Accept-Profile | ARTIE negotiates: `Accept-Profile` from the dialect, by the pinned rung (`rung` in the pins; HttpBinding.kt:107) |
+| Content-Type of a write | The form's declared `contentType` (Layers.kt:137, 181). It is part of the form's integrity (FormIntegrity.kt:10-21), so the pins catch a change |
+| Prefer | ARTIE, from the rung (HttpBinding.kt:108), and `wait=` when it waits (HttpBinding.kt:18) |
+| Body | `fields`, checked against the form's schema before sending |
+| Authorization | ARTIE's credentials for the host; never in the file |
+| If-Match | ARTIE, from the read the step began from |
+| If-None-Match, caching | ARTIE's HTTP cache of affordance sets and schemas |
+| A refusal | Typed: not offered, stale, invalid input, guard; with the server's reason |
+
+For these scripts the absence is the point: what the server's controls carry, the file can't get wrong.
 
 ## Step 0: settle it (no product code)
 
-- **0a. Split the 2.6 s.** Time `artie run X.kts --inputs` (compiles, makes no calls: `heart` returns early in
-  listing mode, Heart.kt:22) against a full run, for `heart.kts` and `merge.kts`.
-- **0b. Native spike, throwaway.** In a worktree, a native-image build of artie-cli with the goal-run path only
-  (no script engine). Does it build; its startup time. Not committed unless the author says.
-- **0c. Coverage on paper.** Hand-write the YAML for `exhibits/merge-watch/merge.kts`,
-  `exhibits/own-controls/scripts/heart.kts` and `exhibits/mcp-over-openapi/artie/t1.kept.kts`, plus a draft JSON
-  Schema. List every construct `artie generate` can emit (ScriptWriter.kt:117-191, WatchText.kt) with its YAML
-  key, and anything that doesn't map.
-- **Decision with the author:** go; no-go; or DSL only, with a compile cache.
+- **0a. Split the 1.7 s** into the engine's start and the compile, with a throwaway timer around
+  `ScriptHost` (not committed), and try a compile cache in the same throwaway: how much of a repeat run it saves.
+- **0b. Native spike, throwaway.** In a worktree, a native-image build of artie-cli without the script engine.
+  Does it build; its startup time. Not committed unless the author says.
+- **0c. Coverage on paper.** Hand-write the YAML of `exhibits/merge-watch/merge.intent.kts`,
+  `exhibits/merge-watch/merge.kts` and `exhibits/mcp-over-openapi/artie/t1.kept.kts` by the rules below, and a
+  draft JSON Schema. List every construct the generator can emit (ScriptWriter.kt:117-191; the watch's text,
+  WatchText.kt) with its YAML, and anything that doesn't map. The mockups go to `exhibits/*/` beside their `.kts`.
+- **Decision with the author:** go; no-go; or Kotlin only, with a compile cache.
 
 ## Steps, if go
 
 Each step features first: Gherkin with tables, written through Edit/Write, a red run at test level logged before
 any `src/main` write, then green; a local commit per step.
 
-1. **A step model for kept scripts.** Today the generator emits Kotlin strings straight from the capture's
-   `Node`s (ScriptWriter.kt:42); the only structured step model is the watch's (`Decisions`, `Chain`, `Chosen`,
-   `Bound`: WatchScript.kt:11, Chosen.kt:38-107). Give the generator one data model of steps, and have
-   ScriptWriter emit Kotlin from it. This is a refactor: generate's features stay green with byte-identical
-   output. **It needs the author's refactor switch.**
-2. **Write YAML.** `artie generate --format yaml` writes `NAME.heart.yaml` from the same model. The default stays
-   `kts`; one setting in a config file makes YAML the default (`generate: { format: yaml }`), and `--format`
-   overrides it either way. Today's config is per script, for runs (`NAME.config.yaml`, Config.kt:38); this one
-   is for generate, so it needs a place of its own (open below). The JSON Schema is
-   published beside it. If a construct has no YAML key, generate fails and names it.
-3. **Run YAML.** `artie run NAME.heart.yaml` validates against the schema, then interprets the steps by calling the
-   same `Here` functions a `.kts` calls: one runtime, so one behaviour. What today reads the Kotlin source must
-   read the YAML instead:
-   - step lines, from `StackWalker` frames in `.kts` files (Run.kt:159-166): from the YAML node's line,
-     through `run.place` (Run.kt:122), as goal runs do;
-   - reason templates parsed from the source line (Sources.kt:37-39): from the step's `inferred` text;
-   - the `until(` text in the trace (Run.kt:269-270): from the condition.
+1. **The watch as data in the capture.** A run's watch is kept in its capture as Kotlin text
+   (Capture.kt:32, `watch.script`, built by StepWatch.kt:55 and WatchScript.kt:62 from `Decisions`). Keep the
+   `Decisions` themselves (WatchScript.kt:11, Chosen.kt:38-107) in the capture, as data; the Kotlin text is made
+   from them when needed. RailsWriter re-parses that text word by word today (RailsWriter.kt:49-132); it reads
+   the data instead. A capture format change: older captures are regenerated, not shimmed (pre-release).
+2. **A step model for generated scripts.** The generator emits Kotlin strings straight from the capture's
+   `Node`s (ScriptWriter.kt:42). Give it one data model of steps, the watch's included, and have ScriptWriter
+   emit Kotlin from it. A refactor: generate's features stay green with byte-identical output. **It needs the
+   author's refactor switch.**
+3. **Write YAML.** `artie generate --format yaml` writes `NAME.heart.yaml` (and `NAME.intent.heart.yaml`) from
+   the same model. The built-in default stays `kts`. One setting in a config file makes YAML the default
+   (`generate: format: yaml`), and `--format` overrides it either way. Today's config is per script and for runs
+   (`NAME.config.yaml`, Config.kt:38); this setting is for generate and needs a place of its own (open). The JSON
+   Schema is published beside the plan's code. If a construct has no YAML, generate fails and names it.
+4. **Run YAML.** `artie run` dispatches on `.heart.yaml` (today every file that is not a goal is taken as Kotlin,
+   ArtieCli.kt:100). The file is checked against the schema, then its steps are interpreted by calling the same
+   `Here` functions a `.kts` calls: one runtime, one behaviour. What today reads the Kotlin source reads the YAML
+   instead:
+   - step lines: from `StackWalker` frames in `.kts` files (Run.kt:159-166); for YAML, the node's line, through
+     `run.place` (Run.kt:122), as goal runs do;
+   - reason templates, parsed from the source line (Sources.kt:37-39): from the step's words;
+   - the `until(` text in the trace (Run.kt:269-270): from the condition;
+   - the check that a script needing a model was given `--reasoner`, a regex on the text (ArtieCli.kt:105): from
+     `kind: intent`, or any `reasoned: true`.
 
    **Parity feature:** one capture, generated both ways, each run against the same service; the traces are equal
-   but for file and line.
-4. **Convert to Kotlin.** `artie convert NAME.heart.yaml --to kts`: the DSL for a person who wants to add code.
+   but for file, line and source text.
+5. **Convert to Kotlin.** `artie convert NAME.heart.yaml --to kts`: the DSL, for a person who wants to add code.
    One way only; Kotlin to YAML isn't possible in general.
-5. **Native runner**, only if 0b is promising: a native ARTIE that runs `.heart.yaml` and goal files; `.kts` stays
+6. **Native runner**, only if 0b is promising: a native ARTIE that runs `.heart.yaml` and goal files; `.kts` stays
    with the JVM ARTIE.
-6. **`heart_do` writes YAML** (spec/PLAN-HEART-MCP-ARTIE-BACKED.md): a model's work, kept as data.
-7. **Measure and report:**
-   - startup and run time, for `.kts` on the JVM, YAML on the JVM and YAML native;
-   - a model-written script that reaches outside the vocabulary, refused by the schema before it runs.
+7. **`heart_do` writes YAML** (spec/PLAN-HEART-MCP-ARTIE-BACKED.md, itself not built yet).
+8. **Measure and report:**
+   - startup and run time: `.kts` on the JVM (with and without a cache), YAML on the JVM, YAML native;
+   - a model-written YAML script that reaches outside the vocabulary, refused by the schema before any request.
 
-Not in this plan: a heart-ts runner, emitters for other languages, an Arazzo export of the OpenAPI twin, and an
-ARTIE daemon (spec/ideas/artie-daemon.md, a future idea).
+Not in this plan: a heart-ts runner, emitters for other languages, an Arazzo export of the OpenAPI twin, and the
+ARTIE daemon.
 
 ## The format (draft)
 
@@ -86,54 +127,104 @@ ARTIE daemon (spec/ideas/artie-daemon.md, a future idea).
 | File | Written by | Role |
 |---|---|---|
 | `NAME.goal.md` | a person | The source; never changed by a tool |
+| `NAME.intent.heart.yaml` | `artie generate` | The intent script; derived, never hand-edited |
 | `NAME.heart.yaml` | `artie generate` | The kept script; derived, never hand-edited |
-| `NAME.pins.yaml` | `artie generate` | The lock file, as now |
-| `NAME.derivation.yaml` | `artie generate` | Ties the script to its source and run, as now |
-| `NAME.kts` | `artie generate` or `artie convert`, on request | For a person to extend |
+| `NAME.pins.yaml`, `NAME.intent.pins.yaml` | `artie generate` | The lock files, as now |
+| `NAME.derivation.yaml` | `artie generate` | Ties a script to its source and run, as now |
+| `NAME.kts` | `artie generate --format kts`, or `artie convert` | For a person to extend |
 
-`.goal.yaml` stays refused (GoalFile.kt:15). `heart: 1` at the top tells a script from a trace.
+`.goal.yaml` stays refused (GoalFile.kt:15).
+
+**Rules**
+
+1. **One YAML style:** block maps and lists only; no flow `{ }` or `[ ]`. Braces in a value then never collide
+   with YAML's own.
+2. **References are `${…}`**, as in the Kotlin DSL's templates, so converting to Kotlin is direct: an input
+   (`${owner}`), a kept value (`${watch}`), a member of the state as read (`${state.title}`), the server's reason
+   (`${why}`). A name or a dotted path, nothing more; nothing is evaluated. An empty reason reads "no reason
+   given" (the Kotlin writes `${why ?: "no reason given"}`).
+3. **`kind`** at the top is `intent` or `kept`, and the schema holds each to its shape:
+   - `intent`: no step has `act` or `fields`; the model decides every step, every run;
+   - `kept`: a step either has `act` (pinned: no model) or says `reasoned: true` (the model decides it every run,
+     as the goal file's `` `reasoned` `` asked). Neither is implied by an absence.
+4. **Words, as the DSL has them** (Said, Reason.kt:43): `intent` is a person's words; `inferred` is a model's,
+   with `from-intent` the person's words they serve. The words a step reasons on are `intent`, else `inferred`.
+5. **Conditions are data:** `at` (a kept name, else the resource held), `field`, and `is` or `has`. The schema
+   checks them.
+6. **Inputs:** `default` and `question` as values. A computed default only as a named generator
+   (`now: MMdd-HHmmss`), as goal files have; any other Kotlin expression fails generate (scope table).
 
 **Vocabulary: what the generator emits, and its YAML**
 
-| DSL | YAML |
+| DSL | YAML key |
 |---|---|
-| `act(rel, pairs, intent, inferred, fromIntent, fields)` | `act`, `intent`, `inferred`, `from-intent`, `fields` |
-| every step's words | `intent`: always the words, whether the step is pinned or not |
-| `act(intent = …)`, no relation: the goal file's `` `reasoned` `` | `reasoned: true`: the model decides this step on every run. Said, not implied by a missing `act` |
+| `heart(entry) { }` | `start`, `steps` |
+| `act(rel, values, intent, inferred, fromIntent, fields)` | `act`, `fields`, `intent`, `inferred`, `from-intent` |
+| `act(intent = …)` with no relation | `intent` (or `inferred`), and in a kept script `reasoned: true` |
 | `follow(rel, title)` | `follow`, `title` |
-| nested block | `then: [steps]` |
+| a step's block | `then` |
 | `keepAs(name)` | `keep-as` |
 | `sync()` | `sync: true` |
-| `decide { }` | `decide: [steps]` |
-| `if (offers(r)) … else note(why(r))` | `if-offered: r`, `then`, `else`; `{why}` in a note |
-| `check(facts)` | `check: [facts]` |
-| `"m" eq v`, `"m" has v`, `at(name) { }` | `{ field, is }`, `{ field, has }`, `{ at, field, is }` |
-| `watch(until = { facts })` | `watch: { until, every, at-most, steps }` |
-| `whenever` with `has`, `leaveWhere` | `whenever: { has, leave: [{ where, say }] }` |
-| `once(rel, giveUp, otherwise = { why -> })` | `once: { offered, give-up, steps, otherwise }` |
-| `val x by input(default, question)` | `inputs: { x: { default, question } }`; a computed default only as a named generator (`{ now: MMdd-HHmmss }`), as goal files have |
+| `decide { }` | `decide` |
+| `if (offers(r)) … else note(why(r))` | `if-offered`, `then`, `else`, `note` |
+| `check(facts)` | `check` |
+| `"m" eq v`, `"m" has v`, `at(name) { }` | `field` with `is` or `has`, and `at` |
+| `watch(every, atMost, until = { })` | `watch`: `every`, `at-most`, `until`, `steps` |
+| `whenever` with `has`, `leaveWhere` | `whenever`: `has`, `leave` (each a `where` and its `say`) |
+| `once(rel, giveUp, otherwise = { why -> })` | `once`: `offered`, `give-up`, `steps`, `otherwise` |
+| `val x by input(default, question)` | `inputs`: `x`: `default`, `question` |
 
-**Values:** `{name}` fills an input, a kept value (`{watch}`), the state as read (`{state.title}`) or the server's
-reason (`{why}`). It is text substitution; nothing is evaluated. Conditions are data, so the schema checks them.
+0c checks this table against what the generator really emits; constructs it finds missing are added there.
 
-**Mockup:** the merge watch, as written in the conversation of 2026-11-02, line for line with `merge.kts`. It
-goes to `exhibits/merge-watch/merge.heart.yaml` in step 0c.
+## Bare scripts: their own fixes, before any YAML
+
+Bare scripts are kept out of this plan's YAML, but checking them found what is wrong with them now, whatever the
+format:
+
+- `Bare.kt` builds every request with `Content-Type` and `Accept` fixed at `application/json` (`CONTENT`); the
+  script can override them only for all its calls at once (`bare(headers = …)`).
+- Every body is sent as JSON, and every answer parsed as JSON.
+- `artie generate --bare` drops the headers the run sent, though the run's recording of its calls keeps them
+  (`*.upstream.yaml`, e.g. client/scripts/generated/github-task-from-reasoned.upstream.yaml).
+
+A bare script can point at GitHub, at the gateway passed through, at the gateway's HEART side, or at a native HEART
+server, which speaks `hal+json`, `prs.hal-forms+json`, `problem+json`, `merge-patch+json` and others, with
+`Prefer` and `Accept-Profile`. Against a native HEART server, a bare script with validators gets the server's own
+atomic conditional write.
+
+The fixes, a step of their own (spec/ideas/bare-runs.md):
+- headers per call, and no built-in media type: each call says what it sends, as recorded;
+- bodies and answers by their media type: JSON types as data, others as text; `problem+json` read as a refusal;
+- `generate --bare` writes each call's recorded headers (Authorization never);
+- a ladder row: a bare script against a native HEART server.
+
+Whether bare scripts then become YAML too (`kind: bare`, with `call`, `url`, `headers`, `body`) is open.
 
 ## Open
 
 - **Extension:** `.heart.yaml`, or another.
-- **An empty reason:** the Kotlin writes `${why ?: "no reason given"}`; YAML needs a rule. Proposed: the runner
-  always fills "no reason given".
-- **Bare scripts:** left as `.kts`. They are the unguarded baseline; making them data adds nothing.
-- **Generate's default format:** `kts`, built in. The author switches it with one config setting, without a code
-  change. Where that setting lives (beside the goal file, in the project, or for the person) is open.
-- **Two formats to keep in step:** generate fails on any construct without a YAML key (step 2), and the parity
-  feature runs on every new construct.
+- **Where generate's format setting lives:** beside the goal file, in the project, or for the person.
+- **Bare scripts as YAML:** after their fixes, or never.
+- **Two formats to keep in step:** generate fails on any construct without YAML (step 3), and the parity feature
+  runs for every construct.
 - **Vocabulary creep:** every new key is a step toward code. A key is added only for a construct the generator
   emits.
+
+## Corrected on checking (2026-11-02)
+
+- **Start-up numbers.** The first draft said a goal file runs in 0.2 s and that `--inputs` lists a script's inputs.
+  `--inputs` takes a file (Arguments.kt:105); those runs stopped at once with exit 2. The listing flag is
+  `--inputs-of`. The numbers above are re-measured with exit codes checked; a goal file's start-up is not measured.
+- **Words.** A mockup put a model's inferred words under `intent`. The DSL keeps them apart (rule 4).
+- **Style and references.** Mockups mixed flow and block maps, and wrote references as `{name}`, which YAML reads
+  as a map. Rules 1 and 2.
+- **HTTP.** The first draft said nothing of headers or media types. The table above, and the bare fixes.
+- **Claims 1 and 3** were stated too strongly; reworded.
+- **Missed in the code:** the capture keeps the watch as Kotlin text (step 1); generate copies a source script's
+  lines as written (scope); the `--reasoner` check is a regex on the text (step 4).
 
 ## Gate notes
 
 - Features before `src/main`, through Edit/Write; the red run at test level, logged and checked.
-- Step 1 is a refactor: the author switches refactor mode on.
+- Step 2 is a refactor: the author switches refactor mode on.
 - No change to spec/SPEC.md is expected. If one turns out to be needed, stop and ask.
