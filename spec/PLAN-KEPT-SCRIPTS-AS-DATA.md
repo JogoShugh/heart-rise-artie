@@ -24,7 +24,7 @@ script a model wrote needs no sandbox and no review as code. The Kotlin DSL stay
 | # | Claim | Evidence so far |
 |---|---|---|
 | 1 | A model-written YAML script is safe to run unreviewed: closed vocabulary, no code evaluated | By construction; to be shown (step 7) |
-| 2 | YAML starts faster: every `.kts` run compiles | ScriptHost.kt:26-39 makes a new JSR-223 engine per run, no compile cache. `heart.kts` (3 calls, local) took 2.6 to 3.0 s; `artie --help` took 0.18 s |
+| 2 | YAML starts faster: every `.kts` run compiles | ScriptHost.kt:26-39 makes a new JSR-223 engine per run, no compile cache. A one-line `.kts` with no calls took 1.8 to 2.2 s; `heart.kts` (3 calls, local) 2.6 to 2.7 s; a goal file 0.2 s; `artie --help` 0.18 s. The JVM is not the cost; the engine and the compile are |
 | 3 | Only YAML can run in a native image | The script engine needs an embedded compiler, `wholeClasspath` and a Power-assert jar by path (ScriptHost.kt:42-47). No GraalVM setup exists |
 | 4 | Other runtimes (heart-ts) can run the same file | Later; not in this plan |
 
@@ -73,7 +73,8 @@ any `src/main` write, then green; a local commit per step.
    - startup and run time, for `.kts` on the JVM, YAML on the JVM and YAML native;
    - a model-written script that reaches outside the vocabulary, refused by the schema before it runs.
 
-Not in this plan: a heart-ts runner, emitters for other languages, an Arazzo export of the OpenAPI twin.
+Not in this plan: a heart-ts runner, emitters for other languages, an Arazzo export of the OpenAPI twin, and an
+ARTIE daemon (spec/ideas/artie-daemon.md, a future idea).
 
 ## The format (draft)
 
