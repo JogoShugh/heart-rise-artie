@@ -59,6 +59,9 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
     /** One host session drives one client; its calls take turns. */
     private val turn = Mutex()
 
+    /** The act schemas this session's model was shown: each is shown once while it stays the same. */
+    private val shown = Shown()
+
     /** How ARTIE reads another resource a form's choices come from (HAL-SCHEMA-FORMS-HR Rule 8). */
     private val read: (String) -> JsonElement? get() = client.listReader
 
@@ -91,12 +94,12 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
     }
 
     private fun look(service: String?): JsonObject {
-        if (service == null) return Views.of(client.enter(held().url), read = read)
+        if (service == null) return Views.of(client.enter(held().url), read = read, shown = shown)
         val bookmark = bookmarks[service]
             ?: error("No service named '$service'. The services are: ${bookmarks.keys.joinToString(", ")}.")
         before.clear()
         client.discover(bookmark)
-        return Views.of(client.enter(bookmark), read = read)
+        return Views.of(client.enter(bookmark), read = read, shown = shown)
     }
 
     /**
@@ -113,9 +116,10 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
                 held,
                 rejection("$name is not offered now. Offered: ${held.affordances.keys.joinToString(", ")}."),
                 read,
+                shown,
             )
             violations.isNotEmpty() ->
-                Views.of(held, rejection("The fields do not satisfy $name's schema or choices.", violations), read)
+                Views.of(held, rejection("The fields do not satisfy $name's schema or choices.", violations), read, shown)
             else -> {
                 // A GET form moves to another resource; any other act changes this one.
                 if (form.method == "GET") before.addLast(held.url)
@@ -125,42 +129,42 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
     }
 
     private fun send(held: HeartRepresentation, name: String, fields: JsonObject): JsonObject = try {
-        Views.of(client.act(name, fields), outcome("acted", "$name was done."), read)
+        Views.of(client.act(name, fields), outcome("acted", "$name was done."), read, shown)
     } catch (refusal: ActRefused) {
-        Views.of(client.current ?: held, refused(refusal), read)
+        Views.of(client.current ?: held, refused(refusal), read, shown)
     } catch (refusal: AccessRefused) {
         val kind = when (refusal) {
             is NotAuthenticated -> "not-authenticated"
             is Forbidden -> "forbidden"
         }
-        Views.of(held, outcome(kind, refusal.message.orEmpty()), read)
+        Views.of(held, outcome(kind, refusal.message.orEmpty()), read, shown)
     }
 
     private fun follow(rel: String, title: String?): JsonObject {
         val held = held()
         if ((rel to title) !in Views.followable(held)) {
-            return Views.of(held, rejection("There is no $rel link titled '$title' here."), read)
+            return Views.of(held, rejection("There is no $rel link titled '$title' here."), read, shown)
         }
         before.addLast(held.url)
-        return Views.of(client.follow(rel, title), read = read)
+        return Views.of(client.follow(rel, title), read = read, shown = shown)
     }
 
     private fun describe(name: String): JsonObject {
         val held = held()
-        if (held.affordance(name) == null) return Views.of(held, rejection("$name is not offered now."), read)
+        if (held.affordance(name) == null) return Views.of(held, rejection("$name is not offered now."), read, shown)
         val text = client.describe(name) ?: "The service gives no further description of $name."
-        return Views.of(held, mapOf("description" to JsonPrimitive(text)), read)
+        return Views.of(held, mapOf("description" to JsonPrimitive(text)), read, shown)
     }
 
     private fun explain(name: String): JsonObject {
         val held = held()
         val reason = client.explain(name) ?: "The service gives no reason why $name is not offered."
-        return Views.of(held, mapOf("explanation" to JsonPrimitive(reason)), read)
+        return Views.of(held, mapOf("explanation" to JsonPrimitive(reason)), read, shown)
     }
 
     private fun back(): JsonObject {
         val previous = before.removeLastOrNull() ?: error("There is no resource before this one.")
-        return Views.of(client.enter(previous), read = read)
+        return Views.of(client.enter(previous), read = read, shown = shown)
     }
 
     private fun held(): HeartRepresentation =

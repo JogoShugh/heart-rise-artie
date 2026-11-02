@@ -1,6 +1,7 @@
 package steps
 
 import heart.HeartRepresentation
+import heart.mcp.Shown
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
@@ -8,6 +9,9 @@ import kotlinx.serialization.json.JsonObject
 class HeldView {
     lateinit var held: HeartRepresentation
     lateinit var view: JsonObject
+
+    /** The act schemas shown to the model in this scenario's session. */
+    val session = Shown()
 
     /** The plain JSON resources ARTIE can read, by address: where a form's choices may come from. */
     val readable = mutableMapOf<String, JsonElement>()

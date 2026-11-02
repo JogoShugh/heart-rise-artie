@@ -5,11 +5,23 @@ import heart.HeartRepresentation
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 import kotlinx.serialization.json.addJsonObject
+
+/**
+ * The act schemas a model was shown in one session, by act: each is shown once while it stays the same, as an
+ * L2 client fetches a shared form set once and knows it after by its address.
+ */
+class Shown {
+    private val seen = mutableSetOf<Pair<String, JsonElement>>()
+
+    /** Whether [act]'s [schema] is new to the model, remembering it if it is. */
+    fun first(act: String, schema: JsonElement): Boolean = seen.add(act to schema)
+}
 
 /**
  * What the host's model is shown of a resource (SPEC §6.8): its state, the
@@ -18,25 +30,33 @@ import kotlinx.serialization.json.addJsonObject
  * address: ARTIE holds those, and builds every request from them.
  */
 internal object Views {
+    /** What an act shows for its schema when the model was shown that same schema before. */
+    const val AS_BEFORE = "as before"
 
     /**
      * The view of [held], with [extra] members. Each act's schema shows its
      * choices from state (HAL-SCHEMA-FORMS-HR Rule 8) as an `enum`, resolved
      * by ARTIE, reading with [read] those that come from another resource.
+     * With [shown], the schemas the model was already shown this session, an
+     * act whose schema is the same shows its name and title and [AS_BEFORE].
+     * The state shows the resource's own members, not HEART's `hr:` ones.
      */
     fun of(
         held: HeartRepresentation,
         extra: Map<String, JsonElement> = emptyMap(),
         read: (String) -> JsonElement? = { null },
+        shown: Shown? = null,
     ): JsonObject = buildJsonObject {
-        putJsonObject("resource") { put("state", held.state) }
+        putJsonObject("resource") { put("state", ownMembers(held.state)) }
         putJsonArray("acts") {
             held.affordances.forEach { (name, form) ->
+                val schema = withoutIds(FormChoices(form, held, read).shownSchema())
+                val first = shown?.first(name, schema) ?: true
                 addJsonObject {
                     put("name", name)
                     form.title?.let { put("title", it) }
-                    form.description?.let { put("description", it) }
-                    put("schema", withoutIds(FormChoices(form, held, read).shownSchema()))
+                    if (first) form.description?.let { put("description", it) }
+                    put("schema", if (first) schema else JsonPrimitive(AS_BEFORE))
                 }
             }
         }
@@ -80,6 +100,10 @@ internal object Views {
             links.filter { it.href !in plumbing && it.followable }.map { rel to it.title }
         }
     }
+
+    /** A state without the members HEART adds for clients (`hr:manifest` on a bookmark): ARTIE reads those. */
+    private fun ownMembers(state: JsonElement): JsonElement =
+        if (state is JsonObject) JsonObject(state.filterKeys { !it.startsWith("hr:") }) else state
 
     /** A schema's `$id` is the address it was served at; the model needs the schema, not where it lives. */
     private fun withoutIds(element: JsonElement): JsonElement = when (element) {

@@ -60,7 +60,7 @@ class EmbeddedViewSteps(private val shown: HeldView) {
 
     @When("heart-mcp shows what it holds")
     fun shows() {
-        view = Views.of(held, read = { shown.readable[it] })
+        view = Views.of(held, read = { shown.readable[it] }, shown = shown.session)
     }
 
     @Then("the view embeds these resources")
