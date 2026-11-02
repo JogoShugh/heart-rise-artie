@@ -101,29 +101,43 @@ details.src pre { max-height: 28rem; }
   <div class="short">
     <h2 style="margin-top:0">In short</h2>
     <ul>
-      <li><b>One task, one teammate.</b> A client retitles issue 7 "… (triaged)" and closes it. Right after the client reads it, a teammate on GitHub itself retitles it and closes it as not planned. No model anywhere: every client here is a script.</li>
+      <li><b>One task, one teammate.</b> A client retitles issue 7 "… (triaged)" and closes it. Right after the client reads it, a teammate on GitHub itself retitles it and closes it as not planned. Two kinds of client: scripts, with no model, and a model (Sonnet 5.5) on static MCP tools built from GitHub's own description.</li>
       <li><b>GitHub as it is:</b> the plain client wrote over both of the teammate's changes, 3 of 3, finished with exit 0, and said nothing.</li>
       <li><b>Validators alone don't help:</b> the same client sending <code>If-Match</code> lost both changes too. GitHub ignores it on a write.</li>
       <li><b>The gateway's <code>offered</code> rung</b> stopped the close with GitHub's own rule, "The issue is already closed.", keeping the teammate's reason; the title was still lost.</li>
       <li><b>The gateway's <code>conditional</code> rung</b> refused the stale write (412) and kept both changes, 3 of 3. The task was not done; the client said why.</li>
       <li><b>A HEART script</b> kept both changes and did the task on the teammate's new title, 3 of 3, and noted why it didn't close.</li>
+      <li><b>A model on static MCP tools</b> lost both changes with no rung. With <code>offered</code>, the 409's reason led it to read again and retitle the new title, keeping both, 3 of 3. With <code>conditional</code>, every write was 428: its tools can't send <code>If-Match</code>, and it said so.</li>
+      <li><b>The tokens are the model's, not the controls'.</b> A refusal is about 50 tokens; the model's extra turns re-read 8k tokens of tool definitions each. The scripts, HEART's included, spend none.</li>
       <li><b>The window is narrowed, not closed.</b> GitHub has no conditional write, so the gateway checks, then writes. A teammate could only land in between; a client's own read-to-write gap is far wider. On an API we own, the check and the write are one.</li>
     </ul>
   </div>
 
   <h2>The ladder</h2>
   <div class="table-scroll"><table>
-    <thead><tr><th>Client</th><th>Owner's rungs</th><th>Teammate's title</th><th>Teammate's close reason</th><th>Task done</th><th>How it ended</th></tr></thead>
+    <thead><tr><th>Client</th><th>Owner's rungs</th><th>Teammate's title</th><th>Teammate's close reason</th><th>Task done</th><th>How it ended</th><th>Tokens</th></tr></thead>
     <tbody>
-      <tr><th>bare, GitHub as it is</th><td>none</td><td class="bad">lost 3/3</td><td class="bad">lost 3/3</td><td>3/3</td><td>exit 0, said nothing</td></tr>
-      <tr><th>bare with validators</th><td>none</td><td class="bad">lost 3/3</td><td class="bad">lost 3/3</td><td>3/3</td><td>exit 0, said nothing</td></tr>
-      <tr><th>bare</th><td><code>offered</code></td><td class="bad">lost 3/3</td><td class="ok">kept 3/3</td><td>title only</td><td>409: "The issue is already closed."</td></tr>
-      <tr><th>bare with validators</th><td><code>conditional</code></td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>0/3</td><td>412: "the resource changed since it was read; read it again and decide again"</td></tr>
-      <tr><th>bare with validators</th><td>all four</td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>0/3</td><td>412, as above</td></tr>
-      <tr><th>HEART script, no model</th><td>none needed</td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>3/3, on the new title</td><td>exit 0; noted "not closed: The issue is already closed."</td></tr>
+      <tr><th>bare, GitHub as it is</th><td>none</td><td class="bad">lost 3/3</td><td class="bad">lost 3/3</td><td>3/3</td><td>exit 0, said nothing</td><td>0</td></tr>
+      <tr><th>bare with validators</th><td>none</td><td class="bad">lost 3/3</td><td class="bad">lost 3/3</td><td>3/3</td><td>exit 0, said nothing</td><td>0</td></tr>
+      <tr><th>bare</th><td><code>offered</code></td><td class="bad">lost 3/3</td><td class="ok">kept 3/3</td><td>title only</td><td>409: "The issue is already closed."</td><td>0</td></tr>
+      <tr><th>bare with validators</th><td><code>conditional</code></td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>0/3</td><td>412: "the resource changed since it was read; read it again and decide again"</td><td>0</td></tr>
+      <tr><th>bare with validators</th><td>all four</td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>0/3</td><td>412, as above</td><td>0</td></tr>
+      <tr><th>model on static MCP tools</th><td>none</td><td class="bad">lost 3/3</td><td class="bad">lost 3/3</td><td>3/3</td><td>said nothing of the teammate</td><td>29k</td></tr>
+      <tr><th>model on static MCP tools</th><td><code>offered</code></td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>3/3, on the new title</td><td>409, read again, retitled the new title, left the close; said why</td><td>53k</td></tr>
+      <tr><th>model on static MCP tools</th><td><code>conditional</code></td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>0/3</td><td>428 on every write: "my tools can't send one"</td><td>52k</td></tr>
+      <tr><th>HEART script, no model</th><td>none needed</td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>3/3, on the new title</td><td>exit 0; noted "not closed: The issue is already closed."</td><td>0</td></tr>
     </tbody>
   </table></div>
-  <p class="note">Final titles: the bare client left "The nightly build is slow (triaged)"; the HEART script left "The nightly build is slow on Mondays (triaged)".</p>
+  <p class="note">Final titles: the bare client, and the model with no rung, left "The nightly build is slow (triaged)"; the HEART script, and the model behind <code>offered</code>, left "The nightly build is slow on Mondays (triaged)". Tokens: input the model took in per run, cached or not.</p>
+
+  <h2>Where the tokens go</h2>
+  <ul>
+    <li><b>The controls themselves are small.</b> The 409 the model read was 183 characters, about 50 tokens.</li>
+    <li><b>The turns are not.</b> Static MCP tools are the controls, sent with every model call: 8,052 tokens of tool definitions for six issue operations, re-read on each of 5 calls behind <code>offered</code> (3 with no rung). That is about 40k of the 53k. GitHub's issue, read twice, is about 1k tokens each time.</li>
+    <li><b>Most of it is cached.</b> The API's prompt cache served 49k of the 53k, at a tenth of the price. Still taken in, every turn.</li>
+    <li><b>A HEART client caches the controls in HTTP instead.</b> Forms arrive with the representation, are shared by key and revalidated with an ETag, and only the acts offered now reach a model. A kept script needs no model at all: the HEART script here spent 0 tokens and did what the model behind <code>offered</code> did.</li>
+    <li><b>Not run here:</b> ARTIE with a model on the gateway's HEART side. Its tokens on GitHub are not measured; on the employees service an ARTIE intent run took 5.6k on the teammate task.</li>
+  </ul>
 
   <h2>The controls</h2>
   <div class="table-scroll"><table>
@@ -154,6 +168,7 @@ details.src pre { max-height: 28rem; }
         <li><b>Teammate:</b> <code>PUT /_sim/github/meddle</code>: right after issue 7 is next read on GitHub, it is retitled "The nightly build is slow on Mondays" and closed as not planned, on GitHub itself, past the gateway.</li>
         <li><b>Rungs:</b> <code>PUT /_sim/github/dam</code> with the owner's words.</li>
         <li><b>Bare client:</b> <code>scripts/bare.kts</code>: read, retitle from what it read, close. <code>artie generate --bare --validators --through URL</code> writes the same shape from a recorded run (generate-bare.feature).</li>
+        <li><b>Model on static MCP tools:</b> FastMCP's tools for GitHub's issue operations (get, update, list, create, comments), from GitHub's own OpenAPI description, calling the gateway passed through; Sonnet 5.5, one agent loop (<code>exhibits/mcp-over-openapi/bench.py --arms fastmcp-github --tasks g1 --meddle --dam …</code>, runs in <code>runs/github-gateway-*.jsonl</code> there).</li>
         <li><b>HEART client:</b> <code>scripts/heart.kts</code>: <code>decide { }</code> around the retitle, and the close only if offered.</li>
         <li><b>Runs:</b> <code>exhibits/own-controls/ladder.sh 3</code> and <code>window.sh 30</code>; the lines and traces are in <code>runs/</code>.</li>
       </ul>
@@ -166,6 +181,7 @@ details.src pre { max-height: 28rem; }
         <li>The small GitHub is GitHub's shape, not GitHub. Its write is in memory, so the measured window is the gateway's part alone.</li>
         <li>The teammate always lands right after the first read: the conflict is certain, not likely. In life it is rarer, and silent when it happens.</li>
         <li>The <code>offered</code> rung matches a raw write to its act by operation and fixed values. A write no act describes passes it.</li>
+        <li>The model behind <code>offered</code> kept the title because it sent the retitle and the close in one PATCH, so the 409 refused both. A retitle sent alone passes <code>offered</code>, as the bare client's did.</li>
         <li>The <code>described</code> rung checks GitHub's own description, which nests "nullable" in places a JSON Schema validator reads differently; GitHub stays the last word.</li>
       </ul>
     </div>
