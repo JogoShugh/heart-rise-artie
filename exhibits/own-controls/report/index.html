@@ -1,0 +1,198 @@
+<title>Our Own Controls</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* One reading column; Spring's leaf green for what worked, an amber for what Spring does its own way. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.top-in { max-width: 46rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 0.55rem; }
+.eyebrow { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.theme:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+main { max-width: 46rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 7vw, 3.3rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin-top: 1.3rem; }
+h3 { font: 600 1rem/1.4 var(--body); margin: 0; }
+p, li { max-width: 68ch; }
+p { margin: 0; }
+.dek { font-family: var(--display); font-weight: 500; font-size: 1.22rem; line-height: 1.5; color: var(--muted); margin-top: -0.5rem; }
+a { color: var(--link); text-underline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.78rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+.three { display: grid; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); gap: 0.8rem; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.45rem; align-content: start; min-width: 0; }
+.card h3 { font-family: var(--display); font-weight: 650; font-size: 1.1rem; }
+.card ul { font-size: 0.92rem; line-height: 1.55; gap: 0.3rem; }
+.verdict { background: var(--leaf-bg); border-left: 3px solid var(--leaf); border-radius: 0 10px 10px 0; padding: 0.95rem 1.1rem; display: grid; gap: 0.45rem; }
+.verdict b { color: var(--leaf); }
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 38rem; font-size: 0.9rem; line-height: 1.5; }
+th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 600; font-variant-numeric: tabular-nums; }
+td.ok { color: var(--leaf); font-weight: 600; white-space: nowrap; }
+td.spring { color: var(--hold); }
+.gaps { list-style: none; padding: 0; counter-reset: gap; gap: 1rem; }
+.gaps > li { counter-increment: gap; display: grid; grid-template-columns: 2.1rem minmax(0, 1fr); gap: 0.8rem; max-width: none; }
+.gaps > li::before { content: counter(gap); font: 600 0.95rem/2rem var(--display); width: 2rem; height: 2rem; text-align: center; border-radius: 50%; border: 1px solid var(--hold); color: var(--hold); background: var(--hold-bg); }
+.gaps .body { display: grid; gap: 0.5rem; min-width: 0; }
+details.src { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+details.src > summary { cursor: pointer; padding: 0.7rem 1rem; list-style: none; font: 600 0.93rem/1.4 var(--body); color: var(--link); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-family: var(--mono); }
+details.src[open] > summary::before { content: "−"; }
+details.src > summary small { font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+details.src > p { font-size: 0.9rem; line-height: 1.55; color: var(--muted); margin: 0 1rem 0.6rem; }
+details.src pre { margin: 0 1rem 1rem; }
+.stack { display: grid; gap: 0.55rem; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
+footer ul { gap: 0.2rem; }
+.ok { color: var(--leaf); font-weight: 600; }
+.bad { color: #b3261e; font-weight: 600; }
+.mid { color: var(--hold); font-weight: 600; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bad { color: #f2a19a; } }
+:root[data-theme="dark"] .bad { color: #f2a19a; }
+table.matrix td { text-align: center; font-variant-numeric: tabular-nums; }
+table td { font-variant-numeric: tabular-nums; }
+.short { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1rem 1.2rem; }
+.short ul { gap: 0.55rem; }
+.note { font-size: 0.9rem; color: var(--muted); }
+details.src pre { max-height: 28rem; }
+</style>
+
+<div class="top"><div class="top-in">
+  <span class="eyebrow">HEART · GitHub gateway · 2 November 2026</span>
+  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+</div></div>
+
+<main>
+  <h1>Our Own Controls</h1>
+  <p class="dek">GitHub's API takes whatever a client sends. A gateway its owner runs, even on a laptop, can add the controls GitHub lacks. Any client gets most of them by changing its base URL; a HEART client gets all of them.</p>
+
+  <div class="short">
+    <h2 style="margin-top:0">In short</h2>
+    <ul>
+      <li><b>One task, one teammate.</b> A client retitles issue 7 "… (triaged)" and closes it. Right after the client reads it, a teammate on GitHub itself retitles it and closes it as not planned. No model anywhere: every client here is a script.</li>
+      <li><b>GitHub as it is:</b> the plain client wrote over both of the teammate's changes, 3 of 3, finished with exit 0, and said nothing.</li>
+      <li><b>Validators alone don't help:</b> the same client sending <code>If-Match</code> lost both changes too. GitHub ignores it on a write.</li>
+      <li><b>The gateway's <code>offered</code> rung</b> stopped the close with GitHub's own rule, "The issue is already closed.", keeping the teammate's reason; the title was still lost.</li>
+      <li><b>The gateway's <code>conditional</code> rung</b> refused the stale write (412) and kept both changes, 3 of 3. The task was not done; the client said why.</li>
+      <li><b>A HEART script</b> kept both changes and did the task on the teammate's new title, 3 of 3, and noted why it didn't close.</li>
+      <li><b>The window is narrowed, not closed.</b> GitHub has no conditional write, so the gateway checks, then writes. A teammate could only land in between; a client's own read-to-write gap is far wider. On an API we own, the check and the write are one.</li>
+    </ul>
+  </div>
+
+  <h2>The ladder</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Client</th><th>Owner's rungs</th><th>Teammate's title</th><th>Teammate's close reason</th><th>Task done</th><th>How it ended</th></tr></thead>
+    <tbody>
+      <tr><th>bare, GitHub as it is</th><td>none</td><td class="bad">lost 3/3</td><td class="bad">lost 3/3</td><td>3/3</td><td>exit 0, said nothing</td></tr>
+      <tr><th>bare with validators</th><td>none</td><td class="bad">lost 3/3</td><td class="bad">lost 3/3</td><td>3/3</td><td>exit 0, said nothing</td></tr>
+      <tr><th>bare</th><td><code>offered</code></td><td class="bad">lost 3/3</td><td class="ok">kept 3/3</td><td>title only</td><td>409: "The issue is already closed."</td></tr>
+      <tr><th>bare with validators</th><td><code>conditional</code></td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>0/3</td><td>412: "the resource changed since it was read; read it again and decide again"</td></tr>
+      <tr><th>bare with validators</th><td>all four</td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>0/3</td><td>412, as above</td></tr>
+      <tr><th>HEART script, no model</th><td>none needed</td><td class="ok">kept 3/3</td><td class="ok">kept 3/3</td><td>3/3, on the new title</td><td>exit 0; noted "not closed: The issue is already closed."</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Final titles: the bare client left "The nightly build is slow (triaged)"; the HEART script left "The nightly build is slow on Mondays (triaged)".</p>
+
+  <h2>The controls</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Control</th><th>GitHub's API</th><th>The owner's rung</th><th>What it stops</th></tr></thead>
+    <tbody>
+      <tr><th>Conditional writes</th><td>ETags for conditional reads; a write takes no <code>If-Match</code></td><td><code>conditional</code>: its own ETag, 428 and 412</td><td>Writing over a change made since the read</td></tr>
+      <tr><th>What is allowed now, and why</th><td>Not said; some writes are refused, some succeed over the state</td><td><code>offered</code>: the connector's rules, 409 with their reason</td><td>Acting on a state that doesn't allow it</td></tr>
+      <tr><th>Bodies that fit</th><td>Checked by GitHub itself, after the call</td><td><code>described</code>: 422 before GitHub is called</td><td>Calls GitHub would refuse anyway, without spending them</td></tr>
+      <tr><th>Which operations</th><td>Token permissions, by area (issues: write)</td><td><code>connector</code>: the operations the owner lists, 403 for the rest</td><td>An agent closing, merging or deleting when the owner allowed only comments and labels</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>GitHub guards some of this itself: it checks bodies, and its tokens are scoped. The rungs add what it doesn't: conditional writes, reasons before the act, and policy per operation.</li>
+    <li>The owner turns the rungs on (<code>GATEWAY_DAM</code>). The caller only asks for pass-through (<code>X-Gateway-Mode: pass-through</code>). Refusals are problem+json with GitHub's own <code>message</code> member, so a client written for GitHub reads them.</li>
+  </ul>
+
+  <h2>The window</h2>
+  <ul>
+    <li>The gateway's check, then write, from its own <code>Server-Timing</code> over 30 writes: read again 0.3 ms, write 0.2 ms (median; slowest write 0.6 ms). Here GitHub is the in-memory small GitHub of the gateway's tests; against GitHub itself the write is GitHub's own latency.</li>
+    <li>A client's own read-to-write gap: a bare script 42 ms; an AI agent at least one model call, 1.3 to 1.7 s (median, Sonnet 5.5, the earlier MCP bench).</li>
+    <li>So the gateway shrinks the window from the client's gap to its own write. It can't close it: GitHub would have to take the condition. On an API we own, it is closed: the employees service checks the version and writes in one step.</li>
+  </ul>
+
+  <details class="src"><summary>How it was run <small>service, teammate, clients</small></summary>
+    <div style="padding:0 1rem 1rem" class="stack">
+      <ul>
+        <li><b>Service:</b> heart-sims' GitHub service, the gateway as shipped with its GitHub connector, in front of the small GitHub of its tests; alone on one port (<code>docker run -p 8098:8099 heart-sims 8099 github.test</code>), reset before every run.</li>
+        <li><b>Teammate:</b> <code>PUT /_sim/github/meddle</code>: right after issue 7 is next read on GitHub, it is retitled "The nightly build is slow on Mondays" and closed as not planned, on GitHub itself, past the gateway.</li>
+        <li><b>Rungs:</b> <code>PUT /_sim/github/dam</code> with the owner's words.</li>
+        <li><b>Bare client:</b> <code>scripts/bare.kts</code>: read, retitle from what it read, close. <code>artie generate --bare --validators --through URL</code> writes the same shape from a recorded run (generate-bare.feature).</li>
+        <li><b>HEART client:</b> <code>scripts/heart.kts</code>: <code>decide { }</code> around the retitle, and the close only if offered.</li>
+        <li><b>Runs:</b> <code>exhibits/own-controls/ladder.sh 3</code> and <code>window.sh 30</code>; the lines and traces are in <code>runs/</code>.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>Limits <small>said plainly</small></summary>
+    <div style="padding:0 1rem 1rem" class="stack">
+      <ul>
+        <li>The small GitHub is GitHub's shape, not GitHub. Its write is in memory, so the measured window is the gateway's part alone.</li>
+        <li>The teammate always lands right after the first read: the conflict is certain, not likely. In life it is rarer, and silent when it happens.</li>
+        <li>The <code>offered</code> rung matches a raw write to its act by operation and fixed values. A write no act describes passes it.</li>
+        <li>The <code>described</code> rung checks GitHub's own description, which nests "nullable" in places a JSON Schema validator reads differently; GitHub stays the last word.</li>
+      </ul>
+    </div>
+  </details>
+
+  <h2>Built here</h2>
+  <ul>
+    <li><code>GATEWAY_DAM</code> and its four rungs, with Server-Timing on a conditioned write (heart-gateway, github-dam-*.feature).</li>
+    <li><code>bare(validators = true, headers = …)</code> and <code>artie generate --bare --validators --through</code> (heart-script, artie-cli).</li>
+    <li>The teammate and the owner's rungs for heart-sims' GitHub service; the gateway's guard held for both clients in the shared suite (acts.feature).</li>
+  </ul>
+</main>
+
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
