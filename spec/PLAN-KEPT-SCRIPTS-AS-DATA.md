@@ -1,7 +1,7 @@
 # Plan: generated scripts as data (YAML), the DSL kept
 
 Status: proposed, 2026-11-02; checked against the code the same day, which corrected the first draft (see "Corrected
-on checking"). No code. The author is not yet sold; step 0 exists to settle it before anything is built. Follows
+on checking"). Step 0 done the same day (see "Step 0: results"); no product code. The author decides next. Follows
 spec/PLAN-SCRIPT-GENERATOR.md (kept scripts), spec/PLAN-GOAL-MARKDOWN.md (goal files) and the code-mode discussion
 of the same day (exhibits/own-controls, "Where the tokens go").
 
@@ -75,6 +75,87 @@ For these scripts the absence is the point: what the server's controls carry, th
   draft JSON Schema. List every construct the generator can emit (ScriptWriter.kt:117-191; the watch's text,
   WatchText.kt) with its YAML, and anything that doesn't map. The mockups go to `exhibits/*/` beside their `.kts`.
 - **Decision with the author:** go; no-go; or Kotlin only, with a compile cache.
+
+## Step 0: results (2026-11-02)
+
+**0a. Where a `.kts` run's time goes.** A throwaway timer (scratchpad, not committed) made ARTIE's engine and
+compiled scripts through it, in one JVM:
+
+| | Time |
+|---|---|
+| The engine made | 0.12 to 0.14 s |
+| The first compile in the process (a one-line script) | 1.6 to 1.7 s |
+| Later compiles in the same process: one line, `heart.kts`, `merge.kts` | 0.03, 0.05, 0.15 to 0.17 s |
+| A second, fresh engine in the same process, made and compiling | 0.11 s |
+
+- The cost is the Kotlin compiler warming up, once per process, not the compile of each script.
+- So a compile cache on disk, which never starts the compiler, would save about 1.6 s a run (not tried); a
+  daemon would too (spec/ideas/artie-daemon.md); and so would YAML, which needs no compiler.
+
+**0b. Native image.** GraalVM 25 (ARTIE needs Java 22; GraalVM 21 can't load its classes). Throwaway, in the
+scratchpad.
+
+- With the script engine on the class path, the build fails at once: the Kotlin compiler jar carries native-image
+  settings for jline that point at a file it doesn't have.
+- Without the engine's jars (the Kotlin compiler, scripting and Power-assert), it builds: 45 MB, in 56 s, at
+  3.4 GB of memory.
+- A `.kts` on it stops: "no Kotlin script engine". Claim 3 holds.
+- Start-up, 3 runs each (the first native run 0.46 s, then):
+
+| | JVM | Native |
+|---|---|---|
+| `artie --help` | 0.19 s | 0.015 s |
+| A goal file, `--inputs-of` | 0.74 s | 0.015 s |
+
+- Caveat: those are small workloads. The native settings were traced from them only; a real run's HTTP, TLS and
+  model calls weren't exercised natively and may need more.
+
+**0c. Coverage.** Mockups, written by hand line for line with their `.kts`:
+`exhibits/merge-watch/merge.intent.heart.yaml`, `exhibits/merge-watch/merge.heart.yaml`,
+`exhibits/mcp-over-openapi/artie/t1.kept.heart.yaml`. Draft schema: `spec/schemas/heart-script.draft.schema.json`.
+
+- All three are valid against the schema.
+- Refused by the schema: a key outside the vocabulary, an expression or a call in a `${…}` reference, a header on
+  a step, an address to call, an unknown kind. A reference the schema lets through is still only looked up by
+  name, never evaluated: `${java.lang.Runtime}` is an input or kept value nobody declared, and the run stops.
+- Rules the schema can't hold, for the runner: `kind: intent` has no `act`; in `kind: kept`, every step without
+  `act` or `follow` says `reasoned: true`.
+- Found while writing them:
+  - every Kotlin block becomes `then` (or `steps`), and statements in it are steps of their own: `keep-as`, `sync`,
+    `whenever`, `has`, `leave-where`, `once`;
+  - `then: []` matters: with a block, even an empty one, the script visits what a step led to and returns
+    (Heart.kt:123); without one, it stays there;
+  - long words fold with `>-`, so the text is the Kotlin string exactly.
+
+| What the generator emits | YAML | In a mockup |
+|---|---|---|
+| `heart(entry) { }` | `start`, `steps` | yes |
+| `val x by input(question, default)` | `inputs` | yes |
+| a default the goal file named (`now: MMdd-HHmmss`), written today as Kotlin (`LocalDateTime.now()…`) | `default: now: …` | schema only |
+| `act(rel, values, fields, intent or inferred and fromIntent) { }` | `act`, `fields`, words, `then` | yes |
+| `act(intent or inferred)`, no relation | words, and `reasoned: true` in a kept script | yes |
+| `follow(rel, title, intent)` | `follow`, `title` | yes |
+| `keepAs(name)` | `keep-as` | yes |
+| `sync()` | `sync` | yes |
+| `watch(until = { facts })` | `watch` | yes |
+| `whenever { }`, `has { }`, `leaveWhere(words) { }` | `whenever`, `has`, `leave-where` | yes |
+| `once(rel, giveUp, otherwise = { why -> })` | `once` | yes |
+| `check(facts)` (Waits.kt:32) | `check` | schema only |
+| `until { … }` (Waits.kt:30) | `until`: `offered` or `facts` | schema only |
+| `at(scope) { watch }`, `listeners { listen(match, from) { } }` | `at`, `listeners` | schema only |
+| `madeBy(…)`, `saying(…)` | `made-by`, `saying` | schema only |
+| `given { facts } then { }` | `given`, `then` | schema only |
+| `doing(words) { }`, `doneWhere { }` | `doing`, `done-where` | schema only |
+| `actOnce(rel, fields, listedIn)` | `act-once` | schema only |
+| a comment the generator writes (`// review: …`, "not decided in this run") | a YAML comment | — |
+
+**Doesn't map yet:**
+- `val n by kept("issue") { long("number") }` (Bindings.kt:20): a Kotlin read, bound to a name. In YAML it would
+  be a reference, `${issue.number}`: a change to how the generator binds values, not a new key.
+- `until { … }`'s condition is Kotlin text the run copied (`step.waitedFor`, Waits.kt:30). Only `offers(rel)` and
+  facts map; any other text fails generate.
+- Lines copied as written from a `.kts` source (ScriptWriter.kt:149-150), as the scope table says.
+- A member name with a `.` in it can't be a reference path. None is known yet.
 
 ## Steps, if go
 
