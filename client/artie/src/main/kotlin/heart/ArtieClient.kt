@@ -117,7 +117,7 @@ class ArtieClient(
         val link = found(held)
             ?: run {
                 decisions.absent("link", rel, held.url)
-                error("No '$rel' link titled '$title' in ${held.url}")
+                error("no $rel link${title?.let { " titled $it" }.orEmpty()} is offered; nothing was sent")
             }
         return sync(link.href)
     }
@@ -159,12 +159,26 @@ class ArtieClient(
         val outcome = bindings.forUri(act.url).act(act, asking)
         decisions.actSent(rel, act, held.url, outcome)
         broughtIntoBeing = outcome is Outcome.Done && outcome.newResource != null
-        // SPEC §6.0, "New resource": the act brought a resource into being, and the client holds it next:
-        // the answer itself when it represents that resource, else read at its own address.
-        if (outcome is Outcome.Done) return outcome.newResource?.let { made ->
-            if (outcome.represents == made) sync(made, outcome.received) else sync(made)
-        } ?: sync(act.url, outcome.received)
+        if (outcome is Outcome.Done) return answered(outcome, act.url, held)
         throw refusal(rel, act.url, outcome, held)
+    }
+
+    /**
+     * What an act's answer leaves held. SPEC §6.0, "New resource": a resource the act brought into being,
+     * from the answer when it represents that resource, else read at its own address. Otherwise the
+     * resource the answer names in Content-Location, or else the one acted on: from the answer's body,
+     * or, when it has none, read again.
+     */
+    private val answered: (Outcome.Done, String, HeartRepresentation) -> HeartRepresentation = { outcome, acted, held ->
+        val hasBody = outcome.received.body.isNotBlank()
+        val made = outcome.newResource
+        when {
+            made != null && outcome.represents == made && hasBody -> sync(made, outcome.received)
+            made != null -> sync(made)
+            hasBody && outcome.represents != null -> sync(outcome.represents, outcome.received, named = true)
+            hasBody -> sync(acted, outcome.received)
+            else -> sync(outcome.represents ?: held.url)
+        }
     }
 
     override val sendsValidators: Boolean get() = care.validators
@@ -203,11 +217,11 @@ class ArtieClient(
      * complete. An act's answer is Layer 1 too ([received]), and is completed
      * the same way.
      */
-    private fun sync(url: String, received: Received? = null): HeartRepresentation {
+    private fun sync(url: String, received: Received? = null, named: Boolean = false): HeartRepresentation {
         val layer1Received = received ?: bindings.forUri(url).read(url, asking).received(url)
         // A client reads whichever dialect comes back, by its media type; else the one it asked for.
         val dialect = Dialect.entries.firstOrNull { it.mediaType == layer1Received.mediaType } ?: asking.dialect
-        val layer1 = HeartResponseParser.parse(layer1Received, url, dialect)
+        val layer1 = HeartResponseParser.parse(layer1Received, url, dialect, named = url.takeIf { named })
         // SPEC §6.11.1: the rung is the one the representation says it is at, read
         // before any link is followed. At L0 there is no set, whatever the body links.
         val applied = layer1Received.applied

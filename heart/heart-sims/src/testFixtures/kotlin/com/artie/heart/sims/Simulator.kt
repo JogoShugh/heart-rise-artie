@@ -3,9 +3,9 @@ package com.artie.heart.sims
 import com.artie.heart.sims.build.BuildService
 import com.artie.heart.sims.deploy.DeployService
 import com.artie.heart.sims.deploy.Region
+import com.artie.heart.sims.github.GitHubService
 import com.artie.heart.Rung
 import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.runBlocking
 import org.http4k.core.HttpHandler
@@ -45,11 +45,14 @@ data class Logged(
 class Simulator {
     val build = BuildService()
     val deploy = DeployService()
+    val github = GitHubService()
 
-    private val faults = mapOf(BUILD to Faults(), DEPLOY to Faults())
+    private val faults = mapOf(BUILD to Faults(), DEPLOY to Faults(), GITHUB to Faults(), ELSEWHERE to Faults())
     private val services: Map<String, HttpHandler> = mapOf(
         BUILD to faults.getValue(BUILD).filter.then(build.handler),
         DEPLOY to faults.getValue(DEPLOY).filter.then(deploy.handler),
+        GITHUB to faults.getValue(GITHUB).filter.then(github.handler),
+        ELSEWHERE to faults.getValue(ELSEWHERE).filter.then(elsewhere),
     )
     private val mapper = ObjectMapper().findAndRegisterModules()
 
@@ -64,6 +67,7 @@ class Simulator {
         runBlocking {
             build.reset()
             deploy.reset()
+            github.reset()
         }
         faults.values.forEach(Faults::clear)
         log.clear()
@@ -85,20 +89,6 @@ class Simulator {
     /** The deploy service serves no higher than [rung]. */
     fun deployServesUpTo(rung: Rung) {
         deploy.limits.maxRung = rung
-    }
-
-    /** Sets the faults [body] names on the service at [host], from a control request. */
-    private fun setFaults(host: String, body: JsonNode) {
-        val faults = faults(host)
-        body["applied"]?.let { faults.applied = it.asText() }
-        body["mediaType"]?.let { faults.mediaType = it.asText() }
-        body["onlyAccept"]?.let { faults.onlyAccept = it.asText() }
-        body["readStatus"]?.let { faults.readStatus = it.asInt() }
-        body["noValidator"]?.let { faults.noValidator = it.asBoolean() }
-        body["noProfile"]?.let { faults.noProfile = it.asBoolean() }
-        body["wrongIntegrity"]?.let { faults.wrongIntegrity = it.asBoolean() }
-        body["oneAddress"]?.let { faults.oneAddress = it.asBoolean() }
-        body["setLink"]?.let { faults.setLink = SetLink(it["rel"].asText(), it["curie"]?.asText(), it["href"]?.asText()) }
     }
 
     /** The faults of the service at [host]. */
@@ -161,7 +151,7 @@ class Simulator {
             Response(Status.NO_CONTENT)
         },
         "/_sim/{host}/faults" bind POST to { request ->
-            setFaults(request.path("host").orEmpty(), mapper.readTree(request.bodyString()))
+            FaultSettings.apply(faults(request.path("host").orEmpty()), mapper.readTree(request.bodyString()))
             Response(Status.NO_CONTENT)
         },
         "/_sim/deploy/rung" bind PUT to { request ->
@@ -185,6 +175,17 @@ class Simulator {
     companion object {
         const val BUILD = "build.test"
         const val DEPLOY = "deploy.test"
+        const val GITHUB = "github.test"
+
+        /** Another origin, for an act a form sends away from the service it came from. */
+        const val ELSEWHERE = "elsewhere.test"
+
+        /** Another origin answers any request as a HEART resource with nothing to offer. */
+        private val elsewhere: HttpHandler = {
+            Response(Status.OK).header("Content-Type", "application/hal+json")
+                .header("Link", "<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\"")
+                .body("""{"_links": {"self": {"href": "/comments"}}, "_forms": {}}""")
+        }
         private val REGIONS = object : TypeReference<Map<String, List<Region>>>() {}
         const val HOST_HEADER = "X-Sim-Host"
     }

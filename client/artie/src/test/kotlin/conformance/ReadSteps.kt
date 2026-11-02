@@ -3,6 +3,9 @@ package conformance
 import com.artie.heart.sims.Simulator
 import heart.ActRefused
 import heart.ArtieClient
+import heart.AuthTransport
+import heart.Credential
+import heart.CredentialSources
 import heart.CachingTransport
 import heart.InvalidPayload
 import heart.IntegrityCheck
@@ -35,12 +38,13 @@ class ReadSteps(private val world: World) {
     fun plainClient(service: String) {
         world.simulated()
         val log = mutableListOf<heart.HeartRequest>()
-        val client = ArtieClient(CachingTransport(IntegrityCheck(world.wire(log, CREDENTIALS.getValue(service)))))
+        val credentials = CredentialSources.of(mapOf(origin(service) to Credential.Bearer(TOKENS.getValue(service))))
+        val client = ArtieClient(AuthTransport(credentials, world.wire(log, null)))
         world.me = Actor(client, log, mutableListOf(), mutableListOf())
     }
 
     @When("it tries to enter the job {string}")
-    fun tryEnterJob(name: String) = world.trying { actor.client.enter("http://${Simulator.BUILD}/jobs/$name") }
+    fun tryEnterJob(name: String) = world.trying { actor.client.enter("${origin("build")}/jobs/$name") }
 
     /** ARTIE reads a resource again by entering it again; before any, there is nothing to read again. */
     @When("it tries to read the resource again")

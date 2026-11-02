@@ -125,6 +125,17 @@ Feature: The rungs of the ladder, L0 to L2
       | a bare name                       | forms                             | https://w3id.org/heart-rise/rels/{rel} |
       | another relation of the same name | http://api.example.org/rels/forms | https://w3id.org/heart-rise/rels/{rel} |
 
+  Scenario Outline: An answer at L2 is refused when its affordance set <case>
+    Given the deploy service <fault>
+    And a client at rung L2 with the deploy service's credential
+    When it tries to enter the app "web"
+    Then it failed, saying "<says>"
+
+    Examples:
+      | case                     | fault                                                | says                                                    |
+      | is linked with no hash   | links its affordance set without an integrity value | was linked without an integrity value; nothing was sent |
+      | is not linked at all     | links no affordance set                              | applied L2 but links no affordance set                  |
+
   Scenario: A set that fails its integrity is refused at L1
     Given the deploy service links its affordance set with an integrity its bytes do not match
     And a client at rung L1 with the deploy service's credential

@@ -454,13 +454,15 @@ Then("the resource was read {int} times", async function (times) {
     assert.equal(reads.length, times);
 });
 
-Then("the service was sent the credential", function () {
-    assert.ok(this.fakeLog[0].authorization);
+Then("the service was sent the credential", async function () {
+    const first = (await received(this)).find((r) => r.service !== "elsewhere.test");
+    assert.ok(first.authorization);
 });
 
-Then("the other origin was sent none", function () {
-    assert.equal(this.otherLog.length, 1);
-    assert.equal(this.otherLog[0].authorization, undefined);
+Then("the other origin was sent none", async function () {
+    const other = (await received(this)).filter((r) => r.service === "elsewhere.test");
+    assert.equal(other.length, 1);
+    assert.equal(other[0].authorization, undefined);
 });
 
 const lastRequest = async (world) => (await received(world)).at(-1);
@@ -471,7 +473,8 @@ Then("the last request was {word} with the body {string}", async function (metho
 });
 
 Then("it carried the validator it read", async function () {
-    assert.equal((await lastRequest(this)).ifMatch, '"1"');
+    const act = (await received(this)).filter((r) => r.method !== "GET").at(-1);
+    assert.equal(act.ifMatch, this.validatorBefore);
 });
 
 Then("it had the content type {string}", async function (type) {
@@ -564,8 +567,8 @@ Then("the values for {string} of {string} are {}", async function (property, for
     assert.deepEqual(choices[property].map((c) => c.value), JSON.parse(values));
 });
 
-Then("it holds exactly the links {string}, with no titles", function (links) {
-    assert.equal(this.rep.links.map((l) => `${l.rel} ${l.href}`).join(", "), links);
+Then("it holds exactly these links, with no titles", function (table) {
+    assert.deepEqual(this.rep.links.map((l) => ({ relation: l.rel, href: l.href })), table.hashes());
     assert.ok(this.rep.links.every((l) => l.title === undefined));
 });
 
@@ -758,6 +761,8 @@ Then("both offer the act {string}, by the same method", function (act) {
 
 const SERVICES = {
     build: { host: "build.test", credential: "Bearer build-token" },
+    GitHub: { host: "github.test", credential: "Bearer github-token" },
+    github: { host: "github.test", credential: "Bearer github-token" },
     deploy: { host: "deploy.test", credential: "Bearer deploy-token" },
 };
 
@@ -966,4 +971,55 @@ When("it tries to enter the job {string}", async function (name) {
 
 Then("it offers exactly these acts", function (table) {
     assert.deepEqual([...this.rep.forms.keys()], table.raw().map(([act]) => act));
+});
+
+When("it enters the pull requests of {string}", async function (repository) {
+    this.rep = await this.me.heart.enter(`http://${hostOf("github")}/repos/${repository}/pulls`);
+});
+
+When("it enters the pull request {int} of {string}", async function (number, repository) {
+    this.rep = await this.me.heart.enter(`http://${hostOf("github")}/repos/${repository}/pulls/${number}`);
+});
+
+Given("the {word} service's job also holds {}", async function (service, members) {
+    await sims.faults(hostOf(service), { members: JSON.parse(members) });
+});
+
+Given("the {word} service's job links only {}", async function (service, links) {
+    await sims.faults(hostOf(service), { linksOnly: JSON.parse(links) });
+});
+
+Given("the {word} service's job embeds only {}", async function (service, embedded) {
+    await sims.faults(hostOf(service), { embedsOnly: JSON.parse(embedded) });
+});
+
+Then("it sent {word} with the body {string} and the content type {string}", async function (method, body, type) {
+    const sent = (await received(this)).filter((r) => r.method === method).at(-1);
+    assert.deepEqual([sent.body, sent.contentType ?? ""], [body, type]);
+});
+
+Given("the {word} service sends {string} to another origin", async function (service, form) {
+    await sims.faults(hostOf(service), { reshaped: { [form]: { _links: { target: { href: "http://elsewhere.test/comments" } } } } });
+});
+
+Given("the {word} service's form {string} names no method or content type", async function (service, form) {
+    await sims.faults(hostOf(service), { reshaped: { [form]: { method: null, contentType: null } } });
+});
+
+Given("the {word} service's form {string} takes {string}", async function (service, form, contentType) {
+    await sims.faults(hostOf(service), { reshaped: { [form]: { contentType } } });
+});
+
+Given("the {word} service answers acts with {word} body, from {}", async function (service, body, from) {
+    const faults = { actsWithNoBody: body === "no" };
+    if (from !== "nowhere") faults.actsFrom = JSON.parse(from);
+    await sims.faults(hostOf(service), faults);
+});
+
+Given("the {word} service links its affordance set without an integrity value", async function (service) {
+    await sims.faults(hostOf(service), { noIntegrity: true });
+});
+
+Given("the {word} service links no affordance set", async function (service) {
+    await sims.faults(hostOf(service), { noSet: true });
 });

@@ -61,11 +61,16 @@ Feature: A form's schema checks an act just before it is sent
     Then it was refused as "invalid-input" with status 422
     And the refusal says "text is too long"
 
-  Scenario: A new schema under the same identifier is compiled as itself
-    Given the build service has a job "nightly" whose parameters are {"$id": "https://build.example/nightly", "type": "object"}
+  Scenario Outline: A schema the service changes is checked as the new one: <case>
+    Given the build service has a job "nightly" whose parameters are <before>
     When it enters the job "nightly"
-    And the job "nightly" is given the parameters {"$id": "https://build.example/nightly", "type": "object", "required": ["text"]}
+    And the job "nightly" is given the parameters <after>
     And it reads the resource again
     And it tries to submit "ci:build" with {}
     Then it was refused as "outside-schema" before sending, with the one violation "/text required"
     And no schema failure was noted
+
+    Examples:
+      | case                     | before                                                    | after                                                                         |
+      | no identifier            | {"type": "object"}                                        | {"type": "object", "required": ["text"]}                                      |
+      | the same identifier      | {"$id": "https://build.example/nightly", "type": "object"} | {"$id": "https://build.example/nightly", "type": "object", "required": ["text"]} |

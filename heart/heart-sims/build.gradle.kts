@@ -13,6 +13,8 @@ plugins {
 dependencies {
     testFixturesApi(project(":heart-http4k"))
     testFixturesImplementation(project(":heart-eventsourcing"))
+    // The gateway in front of its small GitHub: the GitHub service, as heart-gateway's own tests build it.
+    testFixturesImplementation(testFixtures(project(":heart-gateway")))
     testFixturesImplementation("org.http4k:http4k-server-jetty")
     testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind")

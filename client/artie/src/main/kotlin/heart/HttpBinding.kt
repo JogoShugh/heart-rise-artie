@@ -43,7 +43,9 @@ class HttpBinding(private val transport: Transport) : Binding {
                 received(response), code, resolved(response, "Location", requested),
                 represents = resolved(response, "Content-Location", requested),
             )
-            in SUCCESS -> Outcome.Done(received(response), code)
+            in SUCCESS -> Outcome.Done(
+                received(response), code, represents = resolved(response, "Content-Location", requested),
+            )
             PRECONDITION_REQUIRED -> Outcome.PreconditionRequired(code, problem, said)
             PRECONDITION_FAILED -> Outcome.Stale(code, problem, said)
             CONFLICT -> Outcome.NotOffered(code, problem, said)

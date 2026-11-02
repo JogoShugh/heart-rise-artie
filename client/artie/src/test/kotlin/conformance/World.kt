@@ -2,7 +2,10 @@ package conformance
 
 import com.artie.heart.sims.Simulator
 import heart.ArtieClient
+import heart.AuthTransport
 import heart.CachingTransport
+import heart.Credential
+import heart.CredentialSources
 import heart.Dialect
 import heart.EventLog
 import heart.EventSink
@@ -65,6 +68,37 @@ class World {
         val events = mutableListOf<JsonObject>()
         val answers = mutableListOf<Pair<HeartRequest, HeartResponse>>()
         val wire = IntegrityCheck(wire(log, token, answers))
+        return actor(wire, rung, dialect, cache, log, events, answers)
+    }
+
+    /**
+     * ARTIE at [rung] in [dialect] with the credential of the simulated [service], as ARTIE holds
+     * credentials: by origin, sent to that origin only ([AuthTransport]).
+     */
+    fun simulatedClient(
+        rung: String,
+        service: String,
+        dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
+        cache: ((Transport) -> Transport)? = { CachingTransport(it) },
+    ): Actor {
+        simulated()
+        val log = mutableListOf<HeartRequest>()
+        val answers = mutableListOf<Pair<HeartRequest, HeartResponse>>()
+        val credentials = CredentialSources.of(mapOf(origin(service) to Credential.Bearer(TOKENS.getValue(service))))
+        val wire = IntegrityCheck(AuthTransport(credentials, wire(log, null, answers)))
+        return actor(wire, rung, dialect, cache, log, mutableListOf(), answers)
+    }
+
+    @Suppress("LongParameterList")
+    private fun actor(
+        wire: Transport,
+        rung: String,
+        dialect: Dialect,
+        cache: ((Transport) -> Transport)?,
+        log: MutableList<HeartRequest>,
+        events: MutableList<JsonObject>,
+        answers: MutableList<Pair<HeartRequest, HeartResponse>>,
+    ): Actor {
         val eventLog = EventLog(EventSink { events += Json.parseToJsonElement(it).jsonObject }, null, "conformance")
         val client = ArtieClient(cache?.invoke(wire) ?: wire, Rung.valueOf(rung), dialect, events = eventLog)
         return Actor(client, log, events, answers)
@@ -94,5 +128,8 @@ class World {
     }
 }
 
-/** The credential each simulated service admits, by the name the features give it. */
-val CREDENTIALS = mapOf("build" to "Bearer build-token", "deploy" to "Bearer deploy-token")
+/** The Bearer token each simulated service admits, by the name the features give it. */
+val TOKENS = mapOf("build" to "build-token", "deploy" to "deploy-token", "GitHub" to "github-token")
+
+/** Where ARTIE reaches the simulated [service]: over https, so it sends a credential as beyond the machine. */
+fun origin(service: String) = "https://${service.lowercase()}.test"

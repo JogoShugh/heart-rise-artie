@@ -63,7 +63,7 @@ internal class SharedLayers(
         val received = try {
             if (integrity == null && !allowUncheckedLinks) {
                 throw IntegrityException(
-                    "$url was linked without an integrity value; refused (HAL-SCHEMA-FORMS-HR Rule 2)",
+                    "$url was linked without an integrity value; nothing was sent (HAL-SCHEMA-FORMS-HR Rule 2)",
                 )
             }
             bindings.forUri(url).fetch(url, ACCEPT, integrity).received(url)

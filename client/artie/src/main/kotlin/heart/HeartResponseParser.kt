@@ -4,6 +4,7 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.Json
 import java.net.URI
@@ -20,7 +21,13 @@ object HeartResponseParser {
     /** HAL-SCHEMA-FORMS-HR Rule 1. */
     private const val TEMPLATE_POINTERS = "hr:templatePointers"
 
-    fun parse(received: Received, url: String, dialect: Dialect = Dialect.HAL_SCHEMA_FORMS): HeartRepresentation {
+    /** [named], when given, is the resource the answer says it represents (Content-Location): it wins over self. */
+    fun parse(
+        received: Received,
+        url: String,
+        dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
+        named: String? = null,
+    ): HeartRepresentation {
         val profiles = received.profiles
         // HAL-FORMS has a media type of its own, which says the dialect; HAL Schema Forms needs its profile.
         val halForms = dialect == Dialect.HAL_FORMS && received.mediaType == dialect.mediaType
@@ -31,7 +38,7 @@ object HeartResponseParser {
         // An act's response comes from the action URL; its self link says which resource it is.
         val self = linkHref(root, "self")
         return HeartRepresentation(
-            url = self?.let { URI(url).resolve(it).toString() } ?: url,
+            url = named ?: self?.let { URI(url).resolve(it).toString() } ?: url,
             state = stateOf(root),
             manifest = if (dialect == Dialect.HAL_FORMS) {
                 Manifest(HalFormsTemplates.forms(root, url), base = url)
@@ -90,7 +97,8 @@ object HeartResponseParser {
         val templated = obj["templated"]?.jsonPrimitive?.booleanOrNull == true
         return HeartLink(
             href = if (templated) resolveTemplate(href, base) else URI(base).resolve(href).toString(),
-            title = obj["title"]?.jsonPrimitive?.content,
+            // Only a text is a title.
+            title = (obj["title"] as? JsonPrimitive)?.takeIf { it.isString }?.content,
             integrity = obj["integrity"]?.jsonPrimitive?.content,
             templated = templated,
             type = obj["type"]?.jsonPrimitive?.content,
@@ -139,7 +147,8 @@ object HeartResponseParser {
             rel = rel,
             target = if (templated) href else URI(base).resolve(href).toString(),
             templated = templated,
-            method = obj["method"]?.jsonPrimitive?.content ?: error("affordance '$rel' has no method"),
+            // A form that names no method is a POST, as one that names no content type sends JSON.
+            method = obj["method"]?.jsonPrimitive?.content ?: "POST",
             contentType = obj["contentType"]?.jsonPrimitive?.content ?: "application/json",
             schema = obj["schema"]?.jsonObject ?: error("affordance '$rel' has no schema"),
             templatePointers = (obj[TEMPLATE_POINTERS] as? JsonObject).orEmpty()

@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 
 const heartBuild = join(dirname(fileURLToPath(import.meta.url)), "../../../../heart");
 const javaHome = process.env.ARTIE_JAVA_HOME ?? join(homedir(), ".sdkman/candidates/java/21.0.12-graal");
-const HOSTS = new Set(["build.test", "deploy.test"]);
+const HOSTS = new Set(["build.test", "deploy.test", "github.test", "elsewhere.test"]);
 const realFetch = globalThis.fetch;
 let process_;
 let base;

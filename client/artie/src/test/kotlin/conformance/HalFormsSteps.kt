@@ -27,8 +27,7 @@ class HalFormsSteps(private val world: World) {
 
     @Given("a HAL-FORMS client at rung {word} with the {word} service's credential")
     fun simulatedClient(rung: String, service: String) {
-        world.simulated()
-        world.me = world.client(rung, CREDENTIALS.getValue(service), Dialect.HAL_FORMS)
+        world.me = world.simulatedClient(rung, service, Dialect.HAL_FORMS)
     }
 
     @When("the other client waters bed {int} with {int} ml, in HAL-FORMS")

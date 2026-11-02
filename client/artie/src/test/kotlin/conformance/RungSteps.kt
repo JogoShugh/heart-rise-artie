@@ -60,23 +60,20 @@ class RungSteps(private val world: World) {
 
     @Given("a HAL-FORMS client with the {word} service's credential")
     fun halForms(service: String) {
-        world.simulated()
-        world.me = world.client("L0", CREDENTIALS.getValue(service), Dialect.HAL_FORMS)
+        world.me = world.simulatedClient("L0", service, Dialect.HAL_FORMS)
     }
 
     @Given("two clients at rung L1 with the {word} service's credential and {}")
     fun pair(service: String, caches: String) {
-        world.simulated()
-        val token = CREDENTIALS.getValue(service)
-        val shared = CachingTransport(world.wire(mutableListOf(), token))
+        var shared: heart.Transport? = null
         val cache: ((heart.Transport) -> heart.Transport)? = when (caches) {
-            "one cache between them" -> { _ -> shared }
+            "one cache between them" -> { wire -> shared ?: CachingTransport(wire).also { shared = it } }
             "a cache each" -> { wire -> CachingTransport(wire) }
             "one cache that keeps nothing" -> null
             else -> error("no such caches: $caches")
         }
-        world.me = world.client("L1", token, cache = cache)
-        world.other = world.client("L1", token, cache = cache)
+        world.me = world.simulatedClient("L1", service, cache = cache)
+        world.other = world.simulatedClient("L1", service, cache = cache)
     }
 
     @When("it tries to enter the app {string}")
@@ -100,22 +97,22 @@ class RungSteps(private val world: World) {
 
     @Given("the {word} service links its affordance set as {string}, with the curie {string} for {string}")
     fun linksAs(service: String, rel: String, curie: String, href: String) {
-        faults(service).setLink = SetLink(rel, curie, href)
+        faults(service).body.setLink = SetLink(rel, curie, href)
     }
 
     @Given("the {word} service links its affordance set as {string}, with no curie")
     fun linksAsWithNoCurie(service: String, rel: String) {
-        faults(service).setLink = SetLink(rel)
+        faults(service).body.setLink = SetLink(rel)
     }
 
     @Given("the {word} service links its affordance set with an integrity its bytes do not match")
     fun wrongIntegrity(service: String) {
-        faults(service).wrongIntegrity = true
+        faults(service).body.wrongIntegrity = true
     }
 
     @Given("the {word} service serves every affordance set at one address")
     fun oneAddress(service: String) {
-        faults(service).oneAddress = true
+        faults(service).body.oneAddress = true
     }
 
     @Given("the {word} service names no profile")
@@ -144,7 +141,7 @@ class RungSteps(private val world: World) {
 
     private fun faults(service: String) = world.sims.faults("$service.test")
 
-    private fun appUrl(name: String) = "http://${Simulator.DEPLOY}/apps/$name"
+    private fun appUrl(name: String) = "${origin("deploy")}/apps/$name"
 
     /** The last read of a resource itself: shared layers, read by their links, are not counted. */
     private fun lastRead(): HeartRequest = actor.log.last { it.method == "GET" && !SHARED.containsMatchIn(it.url) }

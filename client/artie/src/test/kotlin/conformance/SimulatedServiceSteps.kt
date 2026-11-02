@@ -21,8 +21,7 @@ class SimulatedServiceSteps(private val world: World) {
 
     @Given("a client at rung {word} with the {word} service's credential")
     fun credentialed(rung: String, service: String) {
-        world.simulated()
-        world.me = world.client(rung, CREDENTIALS.getValue(service))
+        world.me = world.simulatedClient(rung, service)
     }
 
     @Given("the build service has a job {string} whose parameters are {}")
@@ -43,7 +42,7 @@ class SimulatedServiceSteps(private val world: World) {
 
     @When("it enters the job {string}")
     fun enterJob(name: String) {
-        world.rep = actor.client.enter("http://${Simulator.BUILD}/jobs/$name")
+        world.rep = actor.client.enter("${origin("build")}/jobs/$name")
     }
 
     @When("it reads the resource again")

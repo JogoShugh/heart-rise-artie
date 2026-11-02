@@ -7,59 +7,6 @@ Feature: What a client does with what a service sends
     Given a service offering "note" with the schema {"type": "object"}
     And a client at rung L0 with no credential
 
-  Scenario Outline: A link is followed only if it is offered: <case>
-    Given that service links "item" titled "first"
-    When it enters that service
-    And it tries to follow "<rel>" titled "<title>"
-    Then <outcome>
-
-    Examples:
-      | case            | rel   | title  | outcome                                                  |
-      | title and rel   | item  | first  | it holds a representation                                |
-      | no such title   | item  | second | it failed, saying "no item link titled second is offered" |
-      | no such rel     | ghost | first  | it failed, saying "no ghost link titled first is offered" |
-
-  Scenario: A link is followed by its relation alone, when no title is asked for
-    Given that service links "item" titled "first"
-    When it enters that service
-    And it tries to follow "ghost" with no title
-    Then it failed, saying "no ghost link is offered"
-
-  Scenario: A credential goes only to the bookmark's own origin
-    Given a client at rung L0 with the garden's credential
-    And that service sends "note" to another origin
-    When it enters that service
-    And it submits "note" with {}
-    Then the service was sent the credential
-    And the other origin was sent none
-
-  Scenario Outline: An act carries what its form says, by <method>
-    Given that service offers "note" by <method>
-    When it enters that service
-    And it submits "note" with {}
-    Then the last request was <method> with the body "<body>"
-    And it carried the validator it read
-    And it had the content type "<type>"
-
-    Examples:
-      | method | body | type             |
-      | POST   | {}   | application/json |
-      | PUT    | {}   | application/json |
-      | DELETE |      |                  |
-
-  Scenario: A form that names no method or content type is a JSON POST
-    Given that service's form names no method
-    When it enters that service
-    And it submits "note" with {}
-    Then the last request was POST with the body "{}"
-    And it had the content type "application/json"
-
-  Scenario: A form's own content type is sent
-    Given that service's form takes "application/vnd.garden+json"
-    When it enters that service
-    And it submits "note" with {}
-    Then it had the content type "application/vnd.garden+json"
-
   Scenario Outline: A safe form's address comes from the form: <case>
     Given that service reads "note" at "<target>", with pointers <pointers> into the state <state>
     When it enters that service
@@ -155,34 +102,6 @@ Feature: What a client does with what a service sends
       | case                | schema                                                                               |
       | optional with none  | {"properties": {"size": {"hr:options": {"pointer": "/none"}}}}                       |
 
-  Scenario: A linked affordance set must carry its integrity
-    Given that service applies L2, with its affordance set linked without an integrity value
-    When it tries to enter that service
-    Then it failed, saying "was linked without an integrity value; nothing was sent"
-
-  Scenario: A representation at L2 must link its affordance set
-    Given that service applies L2, with no affordance set
-    When it tries to enter that service
-    Then it failed, saying "applied L2 but links no affordance set"
-
-  Scenario: An answer's Content-Location names the resource held
-    Given that service answers acts from "/elsewhere"
-    When it enters that service
-    And it submits "note" with {}
-    Then the client holds "/elsewhere"
-
-  Scenario: An answer with no Content-Location is the resource acted on
-    When it enters that service
-    And it submits "note" with {}
-    Then the client holds "/"
-
-  Scenario: A schema the service changes is checked as the new one
-    When it enters that service
-    And that service now declares the schema {"type": "object", "required": ["text"]}
-    And it reads the resource again
-    And it tries to submit "note" with {}
-    Then it was refused as "outside-schema" before sending, because "text"
-
   Scenario: Every value outside its choices is said
     Given that service declares the schema {"properties": {"a": {"hr:options": {"pointer": "/sizes"}}, "b": {"hr:options": {"pointer": "/sizes"}}}}, with the state {"sizes": ["s"]}
     When it enters that service
@@ -223,35 +142,12 @@ Feature: What a client does with what a service sends
     Then the last read accepted "application/json", with no cache
     And the last read carried no validator
 
-  Scenario: A resource keeps state in anything but the four controls
-    Given that service declares the schema {"type": "object"}, with the state {"kept": 1, "_templates": {}}
-    When it enters that service
-    Then the state has exactly these members
-      | member |
-      | kept   |
-
-  Scenario: Only a link with an address is a link, and only a text is a title
-    Given that service's links are {"odd": "text", "bare": {"title": "x"}, "numbered": {"href": "/a", "title": 5}, "many": [{"href": "/b"}, {"href": "/c"}]}
-    When it enters that service
-    Then it holds exactly the links "self /, numbered /a, many /b, many /c", with no titles
-
-  Scenario: Only an embedded object with a self address is a resource
-    Given that service embeds {"a": {"_links": {"self": {"href": "/a"}}}, "b": "text", "c": {"_links": {}}, "d": {"_links": {"self": {}}}, "e": {"_links": {"self": "text"}}}
-    When it enters that service
-    Then it holds embedded resources at exactly "/a"
-
   Scenario: A target that is not templated stays as it is
     Given that service reads "note" at "/a{b}", with pointers {} into the state {}
     And that service's target is not templated
     When it enters that service
     And it submits "note" with {"b": "c"}
     Then the last request was for "/a%7Bb%7D?b=c"
-
-  Scenario: A link is followed by its relation, whatever its title
-    Given that service links "item" titled "first"
-    When it enters that service
-    And it tries to follow "item" with no title
-    Then it holds a representation
 
   Scenario Outline: A pointer must be text to count: <case>
     Given that service reads "note" at "/beds/{id}", with pointers <pointers> into the state {}
@@ -270,17 +166,3 @@ Feature: What a client does with what a service sends
     Then the values for "size" of "note" are ["x"]
     When that service serves "/sizes" with the validator "2" and the body ["y"]
     Then the values for "size" of "note" are ["y"]
-
-  Scenario: An answer with no body is read again
-    Given that service answers acts with no body
-    When it enters that service
-    And it submits "note" with {}
-    Then the resource was read 2 times
-    And the client holds "/"
-
-  Scenario: An answer with no body may name the resource to read
-    Given that service answers acts with no body
-    And that service answers acts from "/elsewhere"
-    When it enters that service
-    And it submits "note" with {}
-    Then the client holds "/elsewhere"

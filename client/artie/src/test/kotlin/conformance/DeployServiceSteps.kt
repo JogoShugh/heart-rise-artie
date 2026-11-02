@@ -33,7 +33,7 @@ class DeployServiceSteps(private val world: World) {
 
     @When("it enters the app {string}")
     fun enterApp(name: String) {
-        world.rep = actor.client.enter("http://${Simulator.DEPLOY}/apps/$name")
+        world.rep = actor.client.enter("${origin("deploy")}/apps/$name")
     }
 
     @Then("the choices for {string} of {string}, by {string}, are")
