@@ -1,5 +1,6 @@
 package conformance
 
+import com.artie.heart.sims.Logged
 import com.artie.heart.sims.Simulator
 import heart.Dialect
 import heart.HeartRequest
@@ -70,12 +71,12 @@ class HalFormsSteps(private val world: World) {
 
     @Then("the last request was {word} with the body {string}")
     fun lastRequestWith(method: String, body: String) {
-        val last = world.sims.log.last()
+        val last = actRequest(world.sims.log)
         assertEquals(method to body, last.method to last.body)
     }
 
     @Then("it had the content type {string}")
-    fun contentType(type: String) = assertEquals(type, world.sims.log.last().headers["Content-Type"].orEmpty())
+    fun contentType(type: String) = assertEquals(type, actRequest(world.sims.log).headers["Content-Type"].orEmpty())
 
     /** The last read of a resource itself: shared layers, read by their links, are not counted. */
     private fun lastRead(): HeartRequest = actor.log.last { it.method == "GET" && "/affordance-sets/" !in it.url }
@@ -84,3 +85,18 @@ class HalFormsSteps(private val world: World) {
         const val GARDEN_CREDENTIAL = "Bearer fixture"
     }
 }
+
+/**
+ * An act's own request, which a scenario's "the last request" means: the last one the simulators took, less any
+ * read again after it of a resource read before. A client reads again after a refused act, to learn whether the
+ * form it acted on was out of date.
+ */
+internal fun actRequest(log: List<Logged>): Logged {
+    var at = log.lastIndex
+    while (at > 0 && readAgain(log, at)) at--
+    return log[at]
+}
+
+/** Whether the request at [at] reads a resource the log shows read before it. */
+private fun readAgain(log: List<Logged>, at: Int): Boolean =
+    log[at].method == "GET" && log.subList(0, at).any { it.method == "GET" && it.url == log[at].url }

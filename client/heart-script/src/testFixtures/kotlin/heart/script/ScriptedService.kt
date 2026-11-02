@@ -155,9 +155,26 @@ class ScriptedService : Navigator, Wire, Writes {
     override fun planner(): Planner? =
         if (missingPlanner != null) null else Planner { moves.removeFirstOrNull() ?: Move.Finish }
 
+    /** What the reasoner chooses, by the words it is given and the state the resource it holds is in. */
+    val reasonsHolding = mutableMapOf<Pair<String, String>, Choice>()
+
+    /** What the reasoner asks instead of choosing, by the words it is given and the state it holds. */
+    val asksHolding = mutableMapOf<Pair<String, String>, String>()
+
+    /** What the run told the reasoner besides the words, each time it told it anything. */
+    val told = mutableListOf<String>()
+
     override fun reason(intent: String): Reasoned {
-        asked += "reason" to intent
-        val chosen = reasons.getValue(intent)
+        // The run may tell the reasoner more after the words, as "<words>. <more>": the words are the step's.
+        val words = (reasons.keys + reasonsHolding.keys.map { it.first } + asksHolding.keys.map { it.first })
+            .firstOrNull { intent == it || intent.startsWith("$it. ") } ?: intent
+        if (intent != words) told += intent.removePrefix("$words. ")
+        asked += "reason" to words
+        val holding = resources[held]?.get("state").orEmpty()
+        asksHolding[words to holding]?.let { question ->
+            return Reasoned(null, Answer.Refused(Refusal.Unclear, Side.CLIENT, question))
+        }
+        val chosen = reasonsHolding[words to holding] ?: reasons.getValue(words)
         val answer = if (chosen.follow) follow(chosen.relation, chosen.title) else act(chosen.relation, chosen.fields)
         // As a client reports its model's calls: the scripted reasoner's one, asked the words, answering its choice.
         return Reasoned(chosen, answer, listOf(ModelCall("scripted-1", "intent: $intent", "chose: ${chosen.relation}")))

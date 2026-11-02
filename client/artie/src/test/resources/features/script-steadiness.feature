@@ -14,6 +14,13 @@ Feature: A script keeps going where the service moved under it: a list paged on,
   read it, and sending the script's value again would overwrite theirs
   unseen, a lost update (RFC 9110 §13.1.1).
 
+  A form can go out of date too (exhibits/mcp-over-openapi, the changes
+  made midway): the service moved its act, or changed its method, after
+  the client read the form. The old target answers 404 or 405, which the
+  server can't tell from any other. ARTIE reads the resource again; when
+  it has changed since the form was read (a new ETag), the act is refused
+  as stale, as a 412 is, and decided again on the form offered now.
+
   Scenario: A titled link not on the page held is found on the pages after it, by their next links
     Given the service answers GET "http://garden.test/beds" with:
       """
@@ -142,3 +149,72 @@ Feature: A script keeps going where the service moved under it: a list paged on,
       | a second 412: the script stops                  | lenient       | watered: today    | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 412 Precondition Failed | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"                                                          |
       | someone else wrote what it writes: it stops     | lenient       | milliliters: 250  | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script stopped at step 1, "water": stale, refused by the client: "since it was read, someone else changed milliliters, which this act writes; sending it again would overwrite theirs" |
       | off the rails: the first 412 stops it           | off-the-rails | watered: today    | {water: {_links: {target: {href: /beds/2/actions/water}}, method: POST, contentType: application/json, schema: {type: object, properties: {milliliters: {type: integer}}}}} | 200 OK                  | the script stopped at step 1, "water": stale, refused by the server: "the resource changed since it was read"                                                          |
+
+  Scenario Outline: A form out of date, refused <status>, is decided again on the form offered now: <case>
+    Given the service answers GET "http://garden.test/beds/2" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-1.hsf.L0"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      _links:
+        self: {href: /beds/2}
+      _forms:
+        water:
+          _links:
+            target: {href: /beds/2/actions/water}
+          method: POST
+          contentType: application/json
+          schema: {type: object, properties: {milliliters: {type: integer}}}
+      """
+    And the service answers POST "http://garden.test/beds/2/actions/water" with:
+      """
+      <status>
+      Content-Type: application/problem+json
+
+      title: <title>
+      """
+    And the service answers GET "http://garden.test/beds/2" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-2.hsf.L0"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      _links:
+        self: {href: /beds/2}
+      _forms:
+        water:
+          _links:
+            target: {href: <target>}
+          method: <method>
+          contentType: application/json
+          schema: {type: object, properties: {milliliters: {type: integer}}}
+      """
+    And the service answers <method> "http://garden.test<target>" with:
+      """
+      200 OK
+      Content-Type: application/hal+json
+      ETag: "seq-3.hsf.L0"
+      Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"
+
+      id: 2
+      _links:
+        self: {href: /beds/2}
+      _forms: {}
+      """
+    When this script runs with ARTIE
+      """kotlin
+      heart("http://garden.test/beds/2") {
+          act("water", "milliliters" to 100)
+      }
+      """
+    Then the script finished
+
+    Examples:
+      | case                               | status                 | title              | target                   | method |
+      | the act moved to a new address     | 404 Not Found          | Not Found          | /beds/2/actions/irrigate | POST   |
+      | the act takes a new method         | 405 Method Not Allowed | Method Not Allowed | /beds/2/actions/water    | PUT    |

@@ -137,7 +137,7 @@ class RungSteps(private val world: World) {
         assertEquals(listOf(""), world.sims.log.filter { it.method == method && it.url == url }.map { it.body })
 
     @Then("the last request was for {string}")
-    fun lastRequest(url: String) = assertEquals(url, world.sims.log.last().url)
+    fun lastRequest(url: String) = assertEquals(url, actRequest(world.sims.log).url)
 
     private fun faults(service: String) = world.sims.faults("$service.test")
 

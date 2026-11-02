@@ -156,6 +156,25 @@ class ScriptSteps {
         )
     }
 
+    @Given("the reasoner chooses, by the state it holds")
+    fun reasonerChoosesHolding(table: DataTable) = table.asMaps().forEach { row ->
+        val fields = kotlinx.serialization.json.Json.parseToJsonElement(row.getValue("fields"))
+            as kotlinx.serialization.json.JsonObject
+        service.reasonsHolding[row.getValue("intent") to row.getValue("holding")] = Choice(
+            row.getValue("relation"),
+            fields.mapValues { (_, v) -> (v as kotlinx.serialization.json.JsonPrimitive).content },
+            follow = row.getValue("selection") == "follow",
+        )
+    }
+
+    @Given("the reasoner asks, by the state it holds")
+    fun reasonerAsksHolding(table: DataTable) = table.asMaps().forEach { row ->
+        service.asksHolding[row.getValue("intent") to row.getValue("holding")] = row.getValue("question")
+    }
+
+    @Then("the reasoner was told, besides the words, in order")
+    fun reasonerTold(table: DataTable) = assertEquals(table.asMaps().map { it.getValue("told") }, service.told)
+
     @Given("the reasoner writes")
     fun reasonerWrites(table: DataTable) = table.asMaps().forEach {
         service.writes[it.getValue("intent")] = it.getValue("words")

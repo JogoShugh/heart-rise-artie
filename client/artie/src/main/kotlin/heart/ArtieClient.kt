@@ -210,10 +210,20 @@ class ArtieClient(
             is Outcome.Invalid if outcome.problemType == RULE_REFUSED ->
                 RuleRefused(said, outcome.violations) to "reported"
             is Outcome.Invalid -> InvalidPayload(said, outcome.violations) to "reported"
+            is Outcome.Failed if outcome.code in OUT_OF_DATE && changedSince(held) ->
+                StaleAct(said) to "the form was out of date: discarded after re-sync"
             else -> UnexpectedResponse(said, outcome.code) to "reported"
         }
         decisions.actRefused(rel, target, outcome, handled)
         return refused
+    }
+
+    /**
+     * Whether the resource [held] has changed since it was read, read again now (a new ETag). A 404 or 405 from an
+     * act's target is then the form's being out of date, the act moved or its method changed, and stale, as a 412 is.
+     */
+    private val changedSince: (HeartRepresentation) -> Boolean = { held ->
+        held.etag != null && sync(held.url).etag != held.etag
     }
 
     /**
@@ -255,6 +265,9 @@ class ArtieClient(
 
         /** The methods whose acts carry no body. */
         val BODYLESS = setOf("DELETE", "HEAD")
+
+        /** What an act's target answers when the form it came from is out of date: moved, or another method now. */
+        val OUT_OF_DATE = setOf("404", "405", "410", "4.04", "4.05")
 
         /** What a list of choices is read as (HAL-SCHEMA-FORMS-HR Rule 8). */
         const val JSON_MEDIA_TYPE = "application/json"
