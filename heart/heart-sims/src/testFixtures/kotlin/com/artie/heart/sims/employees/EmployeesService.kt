@@ -1,6 +1,8 @@
 package com.artie.heart.sims.employees
 
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.Status
 
 /**
  * The employees service: Spring HATEOAS's example employees, served as a
@@ -22,10 +24,23 @@ class EmployeesService {
     @Volatile
     private var handicapped = false
 
+    /** Who someone else will change, and to what role, right after a client next reads them; null when no one. */
+    @Volatile
+    private var meddler: Pair<Long, String>? = null
+
     fun reset() {
         staff.reset()
         handicapped = false
+        meddler = null
         heart = HeartEmployees(staff)
+    }
+
+    /**
+     * Once, until a reset: right after a client next reads the employee [id], someone else changes their role to
+     * [role], as a person at another desk would, before the client can act on what it read.
+     */
+    fun meddle(id: Long, role: String) {
+        meddler = id to role
     }
 
     /** From now on, until a reset, the employees are served as Spring HATEOAS serves them. */
@@ -41,5 +56,15 @@ class EmployeesService {
     /** Every employee not dismissed, in id order. */
     fun all(): List<Employee> = staff.working()
 
-    val handler: HttpHandler = { request -> if (handicapped) spring.handler(request) else heart.handler(request) }
+    val handler: HttpHandler = { request ->
+        val response = if (handicapped) spring.handler(request) else heart.handler(request)
+        // The read is answered as it was; the change lands after it, before the client's next request.
+        meddler?.takeIf { (id) -> request.method == Method.GET && request.uri.path == "/employees/$id" }
+            ?.takeIf { response.status == Status.OK || response.status == Status.NOT_MODIFIED }
+            ?.let { (id, role) ->
+                meddler = null
+                staff.changeRole(id, role)
+            }
+        response
+    }
 }

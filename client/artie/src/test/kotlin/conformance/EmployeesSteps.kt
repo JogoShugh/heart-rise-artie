@@ -22,6 +22,9 @@ class EmployeesSteps(private val world: World) {
     @Given("the employees service has changed: {word}")
     fun changed(change: String) = world.sims.employees.change(setOf(Change.valueOf(change.uppercase())))
 
+    @Given("someone else will change employee {int}'s role to {string} right after a client reads him")
+    fun meddles(id: Int, role: String) = world.sims.employees.meddle(id.toLong(), role)
+
     @Given("the employees service is handicapped as Spring HATEOAS")
     fun handicapped() = world.sims.employees.handicapAsSpring()
 

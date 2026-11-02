@@ -52,6 +52,11 @@ class Staff {
     fun save(id: Long, firstName: String, lastName: String, role: String): Employee =
         Employee(id, firstName, lastName, role, (employees[id]?.version ?: 0) + 1).also { employees[id] = it }
 
+    /** Someone else's change: the employee [id]'s role is [role] now, a new version. */
+    fun changeRole(id: Long, role: String) {
+        get(id)?.let { replace(it, it.copy(role = role, version = it.version + 1)) }
+    }
+
     /** Spring's delete: the employee [id] is no more. */
     fun remove(id: Long) {
         employees.remove(id)

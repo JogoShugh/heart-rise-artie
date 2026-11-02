@@ -77,6 +77,26 @@ Feature: The employees service, a HEART service that can be handicapped as Sprin
       | HAL-FORMS        | L0   | searchEmployees        | giveNotice        | dismiss       | update       |
       | HAL Schema Forms | L2   | staff:search-employees | staff:give-notice | staff:dismiss | staff:update |
 
+  Scenario Outline: Someone else changes an employee right after the client reads him: its update is stale, in <dialect>
+    Another person at another desk changes Frodo's role just after the
+    client has read him, before it can act. The client's update carries
+    the ETag it read, so it is refused (412), never written over theirs;
+    the client reads him again and holds what the other person left.
+    Given someone else will change employee 1's role to "keeper of the Red Book" right after a client reads him
+    And a client asking in <dialect> at rung <rung> for the employees service
+    When it enters the employees service at its bookmark
+    And it submits "<search>" with {"name": "Frodo"}
+    And it follows the "item" link titled "Frodo Baggins"
+    Then the state's "role" is "ring bearer"
+    When it tries to submit "<update>" with {"firstName": "Frodo", "lastName": "Baggins", "role": "ring bearer, retired"}
+    Then it was refused as "stale" with status 412
+    And the state's "role" is "keeper of the Red Book"
+
+    Examples:
+      | dialect          | rung | search                 | update       |
+      | HAL-FORMS        | L0   | searchEmployees        | update       |
+      | HAL Schema Forms | L2   | staff:search-employees | staff:update |
+
   Scenario: Handicapped as Spring, it is walked by every affordance it offers
     Given the employees service is handicapped as Spring HATEOAS
     And a client asking in HAL-FORMS at rung L0 for the employees service

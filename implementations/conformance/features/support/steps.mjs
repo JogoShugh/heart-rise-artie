@@ -741,6 +741,10 @@ Given("the employees service has changed: {word}", async function (change) {
     await sims.changeEmployees(change);
 });
 
+Given("someone else will change employee {int}'s role to {string} right after a client reads him", async function (id, role) {
+    await sims.meddleEmployee(id, role);
+});
+
 Given("the employees service is handicapped as Spring HATEOAS", async function () {
     await sims.handicapEmployees("spring");
 });

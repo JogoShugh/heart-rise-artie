@@ -182,6 +182,11 @@ class Simulator(private val alone: String? = null) {
             employees.change(names.map { Change.valueOf(it.uppercase()) }.toSet())
             Response(Status.NO_CONTENT)
         },
+        "/_sim/employees/meddle" bind PUT to { request ->
+            val meddle = mapper.readTree(request.bodyString())
+            employees.meddle(meddle.path("employee").asLong(), meddle.path("role").asText())
+            Response(Status.NO_CONTENT)
+        },
         "/_sim/employees/employees" bind GET to {
             Response(Status.OK).header("Content-Type", "application/json").body(mapper.writeValueAsString(employees.all()))
         },

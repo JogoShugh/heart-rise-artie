@@ -71,6 +71,7 @@ export const sims = {
     startDeploying: (app) => control("POST", `/_sim/deploy/apps/${app}/deployments`),
     changeEmployees: (changes) => control("PUT", "/_sim/employees/changes", changes),
     handicapEmployees: (handicap) => control("PUT", "/_sim/employees/handicap", handicap),
+    meddleEmployee: (employee, role) => control("PUT", "/_sim/employees/meddle", JSON.stringify({ employee, role })),
     employees: async () => (await control("GET", "/_sim/employees/employees")).json(),
     log: async () => (await control("GET", "/_sim/log")).json(),
 };
