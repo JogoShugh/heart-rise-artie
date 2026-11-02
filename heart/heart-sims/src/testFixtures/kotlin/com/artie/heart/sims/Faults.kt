@@ -114,7 +114,10 @@ class Faults {
         mediaType?.let { answer = answer.replaceHeader("Content-Type", it) }
         if (noProfile) answer = answer.removeHeader("Link")
         if (noValidator) answer = answer.removeHeader("ETag")
-        return body.rewritten(answer.bodyString())?.let { answer.body(it) } ?: answer
+        // Only JSON is reshaped; anything else, such as Swagger UI's script, streams through unread.
+        if ("json" !in answer.header("Content-Type").orEmpty()) return answer
+        val text = answer.bodyString()
+        return answer.body(body.rewritten(text) ?: text)
     }
 
     companion object {
