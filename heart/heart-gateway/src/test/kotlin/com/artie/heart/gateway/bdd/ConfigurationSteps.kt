@@ -89,6 +89,12 @@ class ConfigurationSteps {
     @Then("the gateway takes care as {string}")
     fun care(care: String) = assertEquals(care, config.serving.care.toString())
 
+    @Then("the gateway puts no controls in front of the upstream")
+    fun noDam() = assertEquals(emptySet<com.artie.heart.gateway.Dam.Rung>(), config.serving.dam.rungs)
+
+    @Then("the gateway puts {string} in front of the upstream")
+    fun dam(words: String) = assertEquals(words, config.serving.dam.toString())
+
     @Then("it refuses to start, saying {string}")
     fun refuses(says: String) = assertEquals(says, read.exceptionOrNull()?.message)
 }

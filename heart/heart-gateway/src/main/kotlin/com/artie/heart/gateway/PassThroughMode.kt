@@ -20,7 +20,13 @@ internal class PassThroughMode(
     private val upstream: HttpHandler,
     private val auth: UpstreamAuth,
     private val credentials: Credentials,
+    /** The controls the gateway's owner puts in front of the upstream; none, the transparent rung. */
+    private val dam: Dam = Dam.NONE,
+    /** Whether the upstream reads the resource at a path: a write there replaces it. */
+    private val readable: (String) -> Boolean = { false },
 ) : Filter {
+    private val conditional = Conditional(upstream, readable)
+
     override fun invoke(next: HttpHandler): HttpHandler = { request ->
         if (request.header(MODE) != PASS_THROUGH) next(request) else forward(request)
     }
@@ -33,7 +39,8 @@ internal class PassThroughMode(
         val credential = Caller.during(caller) { auth.authorization() }
         val sent = request.removeHeader(MODE).removeHeader("Host").removeHeader("Authorization")
             .let { plain -> credential?.let { plain.header("Authorization", it) } ?: plain }
-        return HOP_BY_HOP.fold(upstream(sent)) { answer, header -> answer.removeHeader(header) }
+        val answer = if (Dam.Rung.CONDITIONAL in dam) conditional.exchange(sent) else upstream(sent)
+        return HOP_BY_HOP.fold(answer) { forwarded, header -> forwarded.removeHeader(header) }
     }
 
     companion object {

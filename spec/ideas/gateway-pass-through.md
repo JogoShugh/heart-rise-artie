@@ -93,7 +93,7 @@ hypermedia client does.
 
 ## Plan: our own controls in front of GitHub (2026-11-02)
 
-The story (spec/ideas/frame-own-controls in memory, "pitch: own gateway"): GitHub's API gives a client no
+The story: GitHub's API gives a client no
 conditional writes, no "what is allowed now", no reasons, and no policy finer than a token's scopes. A gateway the
 owner runs, even on a laptop, adds them. Any client gets most of them by changing its base URL; a HEART client gets
 all of them. On an API the owner builds (the employees service), the same controls are built in, and stronger: its

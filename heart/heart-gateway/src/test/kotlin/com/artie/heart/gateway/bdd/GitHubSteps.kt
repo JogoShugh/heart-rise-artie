@@ -51,6 +51,13 @@ class GitHubSteps {
         }
     internal var careAsked: String? = null
 
+    /** The controls the owner puts in front of GitHub for a client passing through (GATEWAY_DAM), in its words. */
+    internal var dam = ""
+        set(words) {
+            field = words
+            started = null
+        }
+
     private val gateway: HttpHandler get() {
         val handler = (started ?: start().also { started = it }).getOrThrow()
         return { request -> handler(careAsked?.let { request.header(GatewayCare.HEADER, it) } ?: request) }
@@ -655,6 +662,7 @@ class GitHubSteps {
             HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired)),
             standingCare,
             hubSecret?.let { com.artie.heart.gateway.Hub(it, upstreamUrl) },
+            com.artie.heart.gateway.Dam.parse(dam),
         )
     }
 

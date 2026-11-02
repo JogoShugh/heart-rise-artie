@@ -18,6 +18,8 @@ class Serving(
     val limits: ServingLimits,
     val tls: Tls? = null,
     val care: GatewayCare = GatewayCare.EVERY,
+    /** The controls the owner puts in front of the upstream for a client passing through (GATEWAY_DAM). */
+    val dam: Dam = Dam.NONE,
 )
 
 /** A keystore to serve https from (GATEWAY_TLS_KEYSTORE), and its password, a secret never written back. */
@@ -94,7 +96,14 @@ class GatewayConfig private constructor(
                     error("GATEWAY_CARE ${unknown.message}")
                 }
             } ?: GatewayCare.EVERY
-            return Serving(port, credentials, ServingLimits(validatorRequired = required), tls, care)
+            val dam = value("GATEWAY_DAM")?.let { words ->
+                try {
+                    Dam.parse(words)
+                } catch (unknown: IllegalArgumentException) {
+                    error("GATEWAY_DAM ${unknown.message}")
+                }
+            } ?: Dam.NONE
+            return Serving(port, credentials, ServingLimits(validatorRequired = required), tls, care, dam)
         }
 
         private fun auth(value: (String) -> String?): UpstreamAuth = when (val scheme = value("UPSTREAM_AUTH")) {

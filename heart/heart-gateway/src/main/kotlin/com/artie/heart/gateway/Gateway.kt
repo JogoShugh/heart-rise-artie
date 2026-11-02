@@ -100,6 +100,11 @@ class Gateway(
         connector?.check(spec)
     }
 
+    /** Whether the upstream reads the resource at a path: one of its reads' templates matches it. */
+    private val readable: (String) -> Boolean = spec.routes.values.filter { it.method == "GET" }
+        .map { Regex(it.path.replace(Regex("""\{[^}]+}"""), "[^/]+")) }
+        .let { reads -> { path -> reads.any { it.matches(path) } } }
+
     /** The resource files' resources, by noun: an act of one may make another (a repository's open-issue). */
     private val declared: Map<String, DeclaredResource> by lazy {
         val standards = Standards(links.signal(byPath = emptyMap(), byRelation = emptyMap()))
@@ -138,9 +143,11 @@ class Gateway(
         settings: HeartSettings = HeartSettings(mapper = mapper),
         care: GatewayCare = GatewayCare.EVERY,
         hub: Hub? = null,
+        /** The controls the owner puts in front of the upstream for a client passing through (GATEWAY_DAM). */
+        dam: Dam = Dam.NONE,
     ): HttpHandler {
         val heart = HeartHttp(resources, credentials, settings, passthrough?.routes.orEmpty())
-        val served = PassThroughMode(recorded, auth, credentials).then(CareAsked(care)).then(heart)
+        val served = PassThroughMode(recorded, auth, credentials, dam, readable).then(CareAsked(care)).then(heart)
         val recording = record?.servingFilter?.then(served) ?: served
         // Outside the callers' credentials: GitHub signs its webhooks, and a held read is read again as it came.
         return hub?.filter()?.then(recording) ?: recording

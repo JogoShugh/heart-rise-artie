@@ -42,5 +42,6 @@ fun main() {
     val serving = config.serving
     val heart = HeartSettings(mapper = mapper, limits = serving.limits)
     val hub = config.webhookSecret?.let { Hub(it, settings.url, mapper) }
-    gateway.handler(serving.credentials, heart, serving.care, hub).asServer(listener(serving)).start().block()
+    gateway.handler(serving.credentials, heart, serving.care, hub, serving.dam).asServer(listener(serving)).start()
+        .block()
 }

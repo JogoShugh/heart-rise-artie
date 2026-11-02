@@ -146,6 +146,22 @@ Feature: The gateway is configured by its environment
       | all off       | off-the-rails            | the gateway takes care as "no-offers, no-race, no-reread, trust-copies=60" |
       | a word it doesn't know | no-manners      | it refuses to start, saying "GATEWAY_CARE names no-offers, no-race, no-reread, trust-copies=SECONDS or off-the-rails, not no-manners" |
 
+  Scenario Outline: The owner names the controls in front of the upstream for a client passing through: <case>
+    spec/ideas/gateway-pass-through.md, github-dam-*.feature. Unset, a request passed through is untouched.
+    Given the environment
+      | UPSTREAM_URL             | http://garden:8080 |
+      | GATEWAY_PROFILE          | garden             |
+      | GATEWAY_DAM              | <dam>              |
+      | HEART_AUTH_BEARER_TOKENS | 5e884898da28047151d0e56f8dc6292773603d0d6aff2bdcb2c38e8f3b2ba4c1 |
+    When the gateway reads its configuration
+    Then <puts>
+
+    Examples:
+      | case                   | dam                     | puts                                                                 |
+      | unset                  |                         | the gateway puts no controls in front of the upstream                |
+      | some                   | conditional, connector  | the gateway puts "connector, conditional" in front of the upstream   |
+      | a word it doesn't know | strict                  | it refuses to start, saying "GATEWAY_DAM names no rung strict; the rungs are described, connector, offered, conditional" |
+
   Scenario: Who may call the gateway is required, as on every HEART server
     Given the environment
       | UPSTREAM_URL    | http://garden:8080 |
