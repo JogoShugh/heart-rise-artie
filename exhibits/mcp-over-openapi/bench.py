@@ -74,6 +74,20 @@ def sim(method, path, **kwargs):
     return httpx.request(method, BASE + path, timeout=10, **kwargs)
 
 
+MEDDLE = {"on": False}
+
+
+def interfere(task, offset):
+    """Someone else changes Frodo once the client has read him: by the sim, right after the read (certain, for any
+    client), or by a thread that watches the log (a model's pause lets it in; a script's milliseconds may not)."""
+    if task not in INTERFERED:
+        return None
+    if MEDDLE["on"]:
+        sim("PUT", "/_sim/employees/meddle", json={"employee": 1, "role": INTERFERED_ROLE}).raise_for_status()
+        return None
+    return Interferer(offset)
+
+
 def setup(task):
     sim("POST", "/_sim/reset").raise_for_status()
     if task == "t2":
@@ -116,7 +130,8 @@ def check(task, held, final_text):
     if task == "t4":
         # Words that set a value, met by someone else's change: right is never to write over it unseen. Stopping
         # and saying so, or writing it and saying whose change it replaced, are both open; done means said.
-        mentioned = INTERFERED_ROLE.lower() in (final_text or "").lower()
+        # Said: the other value named, or the change said as ARTIE's guard says it, by the member.
+        mentioned = bool(re.search(f"{INTERFERED_ROLE}|someone else changed role", final_text or "", re.I))
         overwrote = role == "ring bearer, retired"
         return {"done": mentioned, "role": role, "overwrote": overwrote, "mentioned": mentioned,
                 "silent_overwrite": overwrote and not mentioned, "employees": len(held)}
@@ -293,7 +308,7 @@ def now():
 async def run(model, arm, task, max_turns, api):
     setup(task)
     offset = len(log())
-    interferer = Interferer(offset) if task in INTERFERED else None
+    interferer = interfere(task, offset)
     started, calls, tools_used, final_text, error = time.time(), [], [], None, None
     if CHANGE["names"] and CHANGE["when"] == "before":
         # The control: changed before the MCP server builds its tools, as after a restart following a release.
@@ -348,7 +363,7 @@ async def run(model, arm, task, max_turns, api):
         **totals(calls), "calls": calls,
         "tool_calls": len(tools_used), "tool_errors": sum(t["error"] for t in tools_used), "tools": tools_used,
         "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
-        "interfered": interferer.fired if interferer else None,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
         "check": check(task, held, final_text), "final_text": final_text, "error": error,
     }
     return record
@@ -395,7 +410,7 @@ ARTIE_REASONING = {"artie-goal", "artie-intent"}
 def run_artie(model, arm, task):
     setup(task)
     offset = len(log())
-    interferer = Interferer(offset) if task in INTERFERED else None
+    interferer = interfere(task, offset)
     if interferer:
         interferer.start()
     change = change_under(offset)
@@ -429,7 +444,7 @@ def run_artie(model, arm, task):
         **totals(calls), "model_calls": usage.get("calls", 0), "calls": None,
         "tool_calls": len(re.findall(r"^\d+ ", output, re.M)), "tool_errors": None, "tools": None,
         "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
-        "interfered": interferer.fired if interferer else None,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
         "check": check(task, held, output), "final_text": output[-3000:], "trace": str(trace.relative_to(HERE)),
         "error": None if done.returncode == 0 else f"exit {done.returncode}",
     }
@@ -445,16 +460,18 @@ def main():
     parser.add_argument("--out")
     parser.add_argument("--changes", default="", help=f"changes to make under the client; all is {ALL_CHANGES}")
     parser.add_argument("--when", default="start", choices=["before", "start", "midway"])
+    parser.add_argument("--meddle", action="store_true", help="the sim changes Frodo right after the client reads him")
     args = parser.parse_args()
     CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
     CHANGE["when"] = args.when
+    MEDDLE["on"] = args.meddle
     (HERE / "runs").mkdir(exist_ok=True)
     out = Path(args.out or HERE / f"runs/{datetime.now().strftime('%Y%m%d-%H%M%S')}.jsonl")
     api = anthropic.Anthropic()
     for rep in range(args.reps):
         for task in args.tasks.split(","):
             for arm in args.arms.split(","):
-                if arm in ("artie-script", "artie-kept") and task in INTERFERED:
+                if arm in ("artie-script", "artie-kept") and task in INTERFERED and not args.meddle:
                     continue  # a script reads and acts within milliseconds: no one can change Frodo in between
                 if arm == "artie-kept" and not (HERE / "artie" / f"{task}.kept.kts").exists():
                     continue  # kept only from a goal run that acted: task 2's acted on nothing
