@@ -182,6 +182,16 @@ class Simulator(private val alone: String? = null) {
             employees.change(names.map { Change.valueOf(it.uppercase()) }.toSet())
             Response(Status.NO_CONTENT)
         },
+        "/_sim/github/dam" bind PUT to { request ->
+            github.dam(com.artie.heart.gateway.Dam.parse(request.bodyString()))
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/github/meddle" bind PUT to { request ->
+            val meddle = mapper.readTree(request.bodyString())
+            val change = meddle.properties().filter { it.key != "issue" }.associate { it.key to it.value.asText() }
+            github.meddle(meddle.path("issue").asLong(), change)
+            Response(Status.NO_CONTENT)
+        },
         "/_sim/employees/meddle" bind PUT to { request ->
             val meddle = mapper.readTree(request.bodyString())
             employees.meddle(meddle.path("employee").asLong(), meddle.path("role").asText())

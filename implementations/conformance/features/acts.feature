@@ -71,3 +71,13 @@ Feature: What an act carries, and what its answer leaves held
       | a body that names none               | its  | nowhere         | /jobs/nightly | 1     |
       | no body, read again                  | no   | nowhere         | /jobs/nightly | 2     |
       | no body, naming the resource to read | no   | "/jobs/release" | /jobs/release | 2     |
+
+  Scenario: A teammate changes the issue on GitHub itself right after the client reads it: its act is stale
+    GitHub takes no If-Match, but the gateway in front of it does: it reads the
+    issue again before it acts, and a teammate's change made on GitHub since the
+    client read it is a stale act (412), never written over.
+    Given a teammate will close issue 7 of "acme/web" on GitHub itself right after a client reads it
+    And a client at rung L0 with the GitHub service's credential
+    When it enters the issue 7 of "acme/web"
+    And it tries to submit "github:edit" with {"title": "The nightly build is slow on Mondays"}
+    Then it was refused as "stale" with status 412

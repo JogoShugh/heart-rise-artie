@@ -25,6 +25,19 @@ class LinkAndActSteps(private val world: World) {
         world.rep = actor.client.enter("${origin("GitHub")}/repos/$repository/pulls/$number")
     }
 
+    @When("it enters the issue {int} of {string}")
+    fun enterIssue(number: Int, repository: String) {
+        world.rep = actor.client.enter("${origin("GitHub")}/repos/$repository/issues/$number")
+    }
+
+    @io.cucumber.java.en.Given(
+        "a teammate will close issue {int} of {string} on GitHub itself right after a client reads it",
+    )
+    fun teammateCloses(number: Int, repository: String) {
+        check(repository == "acme/web") { "the GitHub service holds acme/web" }
+        world.sims.github.meddle(number.toLong(), mapOf("state" to "closed", "state_reason" to "not_planned"))
+    }
+
     @When("it tries to follow {string} titled {string}")
     fun tryFollowTitled(rel: String, title: String) = world.trying { actor.client.follow(rel, title) }
 

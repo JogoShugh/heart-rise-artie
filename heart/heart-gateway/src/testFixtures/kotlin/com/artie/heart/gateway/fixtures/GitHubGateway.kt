@@ -27,6 +27,8 @@ object GitHubGateway {
         connector: Path,
         validatorRequired: Boolean = true,
         webhookSecret: String? = null,
+        /** The controls the owner puts in front of GitHub for a client passing through (GATEWAY_DAM). */
+        dam: com.artie.heart.gateway.Dam = com.artie.heart.gateway.Dam.NONE,
     ): HttpHandler {
         val mapper = ObjectMapper()
         val loaded = Connector.load(connector, mapper)
@@ -39,6 +41,6 @@ object GitHubGateway {
         )
         val settings = HeartSettings(limits = ServingLimits(validatorRequired = validatorRequired))
         val hub = webhookSecret?.let { com.artie.heart.gateway.Hub(it, "https://api.github.com", mapper) }
-        return gateway.handler(Credentials.forwarded(), settings, hub = hub)
+        return gateway.handler(Credentials.forwarded(), settings, hub = hub, dam = dam)
     }
 }

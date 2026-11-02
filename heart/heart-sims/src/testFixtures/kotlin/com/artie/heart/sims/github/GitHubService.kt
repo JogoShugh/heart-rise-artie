@@ -1,5 +1,6 @@
 package com.artie.heart.sims.github
 
+import com.artie.heart.gateway.Dam
 import com.artie.heart.gateway.fixtures.GitHubGateway
 import com.artie.heart.gateway.fixtures.GitHubUpstream
 import com.artie.heart.gateway.fixtures.Issue
@@ -23,6 +24,23 @@ class GitHubService(private val connector: Path = findConnector()) {
     private var gateway: HttpHandler = GitHubGateway.handler(upstream, connector)
 
     val handler: HttpHandler = { request -> gateway(request) }
+
+    /** From now on, until a reset, the gateway stands with [dam]'s rungs in front of GitHub, for a client passing through. */
+    fun dam(dam: Dam) {
+        gateway = GitHubGateway.handler(upstream, connector, dam = dam)
+    }
+
+    /**
+     * Once, until a reset: right after the issue [number] is next read on GitHub, a teammate changes it there, on
+     * GitHub itself, as [change] says: its title, its state and state reason.
+     */
+    fun meddle(number: Long, change: Map<String, String>) {
+        upstream.afterNextIssueRead[number] = { issue ->
+            change["title"]?.let { issue.title = it }
+            change["state"]?.let { issue.state = it }
+            if ("state_reason" in change) issue.stateReason = change["state_reason"]
+        }
+    }
 
     fun reset() {
         upstream = GitHubUpstream().apply {

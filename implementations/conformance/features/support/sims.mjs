@@ -72,6 +72,7 @@ export const sims = {
     changeEmployees: (changes) => control("PUT", "/_sim/employees/changes", changes),
     handicapEmployees: (handicap) => control("PUT", "/_sim/employees/handicap", handicap),
     meddleEmployee: (employee, role) => control("PUT", "/_sim/employees/meddle", JSON.stringify({ employee, role })),
+    meddleGitHub: (change) => control("PUT", "/_sim/github/meddle", JSON.stringify(change)),
     employees: async () => (await control("GET", "/_sim/employees/employees")).json(),
     log: async () => (await control("GET", "/_sim/log")).json(),
 };

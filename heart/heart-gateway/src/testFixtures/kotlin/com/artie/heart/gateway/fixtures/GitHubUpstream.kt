@@ -131,6 +131,9 @@ class GitHubUpstream {
     /** What happens to a pull request just after it is next read: GitHub works something out, or someone writes. */
     val afterNextRead = mutableMapOf<Long, (Pull) -> Unit>()
 
+    /** What happens to an issue just after it is next read: someone writes, on GitHub itself. */
+    val afterNextIssueRead = mutableMapOf<Long, (Issue) -> Unit>()
+
     /** Each pull request as it was before its last change. */
     val beforeChange = mutableMapOf<Long, JsonNode>()
 
@@ -273,7 +276,9 @@ class GitHubUpstream {
                 .header("Location", "https://api.github.com/repos/$owner/$repo/issues/${issue.number}")
         },
         "/repos/{owner}/{repo}/issues/{number}" bind Method.GET to { request ->
-            issue(request)?.let { json(Response(Status.OK), issueBody(it)) } ?: Response(Status.NOT_FOUND)
+            issue(request)?.let { issue ->
+                json(Response(Status.OK), issueBody(issue)).also { afterNextIssueRead.remove(issue.number)?.invoke(issue) }
+            } ?: Response(Status.NOT_FOUND)
         },
         "/repos/{owner}/{repo}/issues/{number}" bind Method.PATCH to { request ->
             issue(request)?.let { issue ->

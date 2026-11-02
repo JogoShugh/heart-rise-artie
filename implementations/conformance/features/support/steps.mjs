@@ -664,6 +664,15 @@ When("it enters the pull request {int} of {string}", async function (number, rep
     this.rep = await this.me.heart.enter(`http://${hostOf("github")}/repos/${repository}/pulls/${number}`);
 });
 
+When("it enters the issue {int} of {string}", async function (number, repository) {
+    this.rep = await this.me.heart.enter(`http://${hostOf("github")}/repos/${repository}/issues/${number}`);
+});
+
+Given("a teammate will close issue {int} of {string} on GitHub itself right after a client reads it", async function (number, repository) {
+    assert.equal(repository, "acme/web", "the GitHub service holds acme/web");
+    await sims.meddleGitHub({ issue: number, state: "closed", state_reason: "not_planned" });
+});
+
 Given("the {word} service's job also holds {}", async function (service, members) {
     await sims.faults(hostOf(service), { members: JSON.parse(members) });
 });
