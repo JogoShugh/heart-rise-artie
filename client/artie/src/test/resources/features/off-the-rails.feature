@@ -60,7 +60,7 @@ Feature: Off the rails: a run that reads only what it must, checks only what the
     Examples:
       | guard         | whom       | said                                  |
       | lenient       | the client | "colour is not in the schema"         |
-      | off-the-rails | the server | ": property 'colour' is not defined in the schema and the schema does not allow additional properties" |
+      | off-the-rails | the server | "property 'colour' is not defined in the schema and the schema does not allow additional properties" |
 
   Scenario Outline: Validators <validators>, the gateway's switch <switch>: the comment is sent <how>
     By default each act carries the last validator the run was given. With

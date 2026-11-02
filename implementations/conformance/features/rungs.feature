@@ -70,7 +70,9 @@ Feature: The rungs of the ladder, L0 to L2
     And a client at rung L2 with the deploy service's credential
     When it enters the app "web"
     Then the representation is at rung <serves>
-    And it offers exactly "cd:deploy"
+    And it offers exactly these acts
+      | cd:deploy |
+      | cd:scale  |
 
     Examples:
       | serves |
@@ -93,7 +95,9 @@ Feature: The rungs of the ladder, L0 to L2
     Given the deploy service links its affordance set as "<rel>", with the curie "<curie>" for "https://w3id.org/heart-rise/rels/{rel}"
     And a client at rung L1 with the deploy service's credential
     When it enters the app "web"
-    Then it offers exactly "cd:deploy"
+    Then it offers exactly these acts
+      | cd:deploy |
+      | cd:scale  |
 
     Examples:
       | case                | rel                                    | curie |
@@ -105,7 +109,9 @@ Feature: The rungs of the ladder, L0 to L2
     Given the deploy service links its affordance set as "hr:forms", with no curie
     And a client at rung L1 with the deploy service's credential
     When it enters the app "web"
-    Then it offers exactly "cd:deploy"
+    Then it offers exactly these acts
+      | cd:deploy |
+      | cd:scale  |
 
   Scenario Outline: A link under another relation is no affordance set: <case>
     Given the deploy service links its affordance set as "<rel>", with the curie "hr" for "<curie>"

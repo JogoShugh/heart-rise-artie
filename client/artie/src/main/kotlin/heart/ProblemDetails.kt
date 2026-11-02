@@ -13,6 +13,12 @@ internal object ProblemDetails {
     fun type(body: String): String? =
         runCatching { Json.parseToJsonElement(body).jsonObject["type"]?.jsonPrimitive?.content }.getOrNull()
 
+    /** What a problem says of itself: its `detail`, else its `title`; null when the body is no problem. */
+    fun said(body: String): String? {
+        val root = runCatching { Json.parseToJsonElement(body).jsonObject }.getOrNull() ?: return null
+        return (root["detail"] ?: root["title"])?.jsonPrimitive?.content
+    }
+
     /** The `violations` of an invalid-input body, or its `error` text, or its `detail`, or nothing. */
     fun violations(body: String): List<String> {
         val root = runCatching { Json.parseToJsonElement(body).jsonObject }.getOrNull() ?: return emptyList()
@@ -23,6 +29,8 @@ internal object ProblemDetails {
         return listed ?: listOfNotNull((root["error"] ?: root["detail"])?.jsonPrimitive?.content)
     }
 
+    /** A violation as every client says it: where, then what the service said of it; either may be missing. */
     private fun pointerMessage(violation: JsonObject): String =
-        "${violation["pointer"]?.jsonPrimitive?.content}: ${violation["message"]?.jsonPrimitive?.content}"
+        listOfNotNull(violation["pointer"], violation["message"] ?: violation["detail"])
+            .map { it.jsonPrimitive.content }.filter { it.isNotEmpty() }.joinToString(" ")
 }

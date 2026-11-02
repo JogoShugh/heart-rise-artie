@@ -7,18 +7,22 @@ package heart
  */
 sealed class ActRefused(message: String) : RuntimeException(message)
 
-/** 412: someone else wrote first. The client has re-synced; the act is dropped, never resent. */
-class StaleAct(rel: String) : ActRefused("$rel was refused as stale (412); re-synced, act dropped")
+/*
+ * A refusal the server sent is said as every client says it: "<rel> was refused (<code>): <what the
+ * problem said>", the problem's detail, else its title ([said]).
+ */
+
+/** 412: someone else wrote first. The client has re-read; the act is dropped, never resent. */
+class StaleAct(said: String) : ActRefused("$said; re-read, not resent")
 
 /** 428: a blind write, sent with no validator, to a server that takes none (spec/ideas/off-the-rails.md). */
-class ValidatorRequired(rel: String) : ActRefused("$rel was sent with no validator, and the server asks for one (428)")
+class ValidatorRequired(said: String) : ActRefused(said)
 
-/** 409: the act is not legal in the resource's current state. The client has re-synced. */
-class IllegalTransition(rel: String) : ActRefused("$rel is not legal in the current state (409); re-synced")
+/** 409: the act is not legal in the resource's current state. The client has re-read. */
+class IllegalTransition(said: String) : ActRefused(said)
 
 /** 422: the body does not satisfy the affordance's schema. Not retried. */
-class InvalidPayload(rel: String, val violations: List<String>) :
-    ActRefused("$rel body was refused (422): ${violations.joinToString("; ")}")
+class InvalidPayload(said: String, val violations: List<String>) : ActRefused(said)
 
 /**
  * Not sent: a value is not among its property's choices (HAL-SCHEMA-FORMS-HR
@@ -39,8 +43,7 @@ class OutsideSchema(rel: String, val violations: List<String>) :
  * refused it. The client's form handling was right; [violations] give the
  * rule's own words. Not retried.
  */
-class RuleRefused(rel: String, val violations: List<String>) :
-    ActRefused("$rel was refused by a rule of the resource (422): ${violations.joinToString("; ")}")
+class RuleRefused(said: String, val violations: List<String>) : ActRefused(said)
 
 /**
  * The service refused access to a resource, for a read or an act. Each
@@ -48,11 +51,18 @@ class RuleRefused(rel: String, val violations: List<String>) :
  */
 sealed class AccessRefused(message: String) : RuntimeException(message)
 
-/** 401: the service wants a credential ([schemes]), or refused the one ARTIE sent ([sent]). */
-class NotAuthenticated(val origin: String, val schemes: List<String>, val sent: String?) : AccessRefused(
-    if (sent == null) "$origin asks for a credential (${schemes.joinToString()}); ARTIE sent none"
-    else "$origin refused the $sent credential ARTIE sent",
-)
+/**
+ * 401: the service wants a credential ([schemes]), or refused the one ARTIE sent ([sent]). For an
+ * act, [said] says it as every client does.
+ */
+class NotAuthenticated(val origin: String, val schemes: List<String>, val sent: String?, said: String? = null) :
+    AccessRefused(
+        said ?: if (sent == null) {
+            "$origin asks for a credential (${schemes.joinToString()}); ARTIE sent none"
+        } else {
+            "$origin refused the $sent credential ARTIE sent"
+        },
+    )
 
 /** 403: the service knows who is asking, and does not allow this. */
 class Forbidden(val origin: String, val sent: String?) : AccessRefused(
@@ -65,7 +75,7 @@ class Forbidden(val origin: String, val sent: String?) : AccessRefused(
  * could not be read. A refusal, said as an act's is, so a run stops at its step instead of crashing.
  */
 class ReadRefused(val url: String, val code: String) :
-    RuntimeException("$url could not be read: the server answered $code") {
+    RuntimeException("$url: read was refused ($code)") {
     /** Not found (HTTP 404 or 410, CoAP 4.04), as against any other error. */
     val notFound: Boolean get() = code in NOT_FOUND
 
@@ -75,4 +85,4 @@ class ReadRefused(val url: String, val code: String) :
 }
 
 /** Any other outcome; [code] is the binding's own word for it (HTTP: the status code). */
-class UnexpectedResponse(rel: String, code: String) : ActRefused("$rel got the unexpected answer $code")
+class UnexpectedResponse(said: String, val code: String) : ActRefused(said)

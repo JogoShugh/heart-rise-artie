@@ -72,7 +72,7 @@ Feature: A script's input, checked by ARTIE before it is sent, and refused by wh
           act("waterCell", "milliliters" to 5000)
       }
       """
-    Then the script stopped at step 1, "waterCell": invalid input, refused by the server: "/milliliters: must be at most 1000"
+    Then the script stopped at step 1, "waterCell": invalid input, refused by the server: "/milliliters must be at most 1000"
     And the client sent these requests:
       | GET http://garden.test/beds/2                     |
       | POST http://garden.test/beds/2/actions/water-cell |

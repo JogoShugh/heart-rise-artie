@@ -80,7 +80,9 @@ Feature: What a HEART client must do in HAL-FORMS, the L0 on-ramp
     And a HAL-FORMS client with the deploy service's credential
     When it enters the app "web"
     Then the representation is at rung L0, in HAL Schema Forms
-    And it offers exactly "cd:deploy"
+    And it offers exactly these acts
+      | cd:deploy |
+      | cd:scale  |
 
   Scenario Outline: In HAL-FORMS the forms are the templates: <case>
     Given <service fault>

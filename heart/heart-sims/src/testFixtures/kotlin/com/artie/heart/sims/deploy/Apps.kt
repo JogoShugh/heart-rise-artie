@@ -1,5 +1,6 @@
 package com.artie.heart.sims.deploy
 
+import com.artie.heart.RuleRefusedException
 import com.artie.heart.eventsourcing.EventSourcing
 import com.artie.heart.eventsourcing.Recorded
 
@@ -22,6 +23,9 @@ sealed interface AppEvent {
 
     /** The deployment under way was cancelled; the app is idle again. */
     data class DeploymentCancelled(val reason: String) : AppEvent
+
+    /** The app now runs on [replicas] instances. */
+    data class Scaled(val replicas: Int) : AppEvent
 }
 
 /** An app as its events leave it. */
@@ -33,6 +37,7 @@ data class AppState(
     val region: String?,
     val release: String?,
     val regions: Map<String, List<Region>>,
+    val replicas: Int,
     val version: Int,
 ) {
     /** The app as its representation shows it. */
@@ -43,6 +48,7 @@ data class AppState(
         "environment" to environment,
         "region" to region,
         "release" to release,
+        "replicas" to replicas,
         "regions" to regions.mapValues { (_, listed) ->
             listed.map { mapOf("name" to it.name, "label" to it.label, "available" to it.available) }
         },
@@ -52,7 +58,7 @@ data class AppState(
         const val IDLE = "idle"
         const val DEPLOYING = "deploying"
 
-        fun empty(id: Long) = AppState(id, "", IDLE, null, null, null, emptyMap(), 0)
+        fun empty(id: Long) = AppState(id, "", IDLE, null, null, null, emptyMap(), 1, 0)
 
         fun apply(state: AppState, recorded: Recorded<AppEvent>): AppState {
             val next = when (val event = recorded.event) {
@@ -63,6 +69,7 @@ data class AppState(
                     status = DEPLOYING, release = event.release, environment = event.environment, region = event.region,
                 )
                 is AppEvent.DeploymentCancelled -> state.copy(status = IDLE)
+                is AppEvent.Scaled -> state.copy(replicas = event.replicas)
             }
             return next.copy(version = recorded.sequenceNo)
         }
@@ -78,6 +85,7 @@ val APPS = EventSourcing(
         "ReleasePublished" to AppEvent.ReleasePublished::class.java,
         "DeploymentStarted" to AppEvent.DeploymentStarted::class.java,
         "DeploymentCancelled" to AppEvent.DeploymentCancelled::class.java,
+        "Scaled" to AppEvent.Scaled::class.java,
     ),
     stateClass = AppState::class.java,
     empty = AppState::empty,
@@ -97,4 +105,12 @@ object AppDecisions {
         listOf(AppEvent.DeploymentStarted(release, environment, region))
 
     fun cancel(): List<AppEvent> = listOf(AppEvent.DeploymentCancelled("cancelled"))
+
+    /** Scales the app; more than [QUOTA] instances is a rule the service keeps, not one its schema says. */
+    fun scale(replicas: Int): List<AppEvent> {
+        if (replicas > QUOTA) throw RuleRefusedException.at("/replicas", "at most $QUOTA")
+        return listOf(AppEvent.Scaled(replicas))
+    }
+
+    const val QUOTA = 10
 }

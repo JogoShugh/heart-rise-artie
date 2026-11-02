@@ -100,6 +100,10 @@ class ClientSteps(private val world: World) {
         assertEquals(Rung.valueOf(rung), actor.client.appliedRung)
     }
 
+    @Then("it offers exactly these acts")
+    fun offersActs(table: io.cucumber.datatable.DataTable) =
+        assertEquals(table.asList(), world.held.affordances.keys.toList())
+
     @Then("it offers exactly {string}")
     fun offers(names: String) {
         assertEquals(names.split(",").map { it.trim() }.toSet(), held.affordances.keys)
@@ -125,7 +129,14 @@ class ClientSteps(private val world: World) {
 
     @Then("the refusal says {string}")
     fun refusalSays(text: String) {
-        val said = assertNotNull(world.error, "expected a refusal").message.orEmpty()
+        // What a refusal says is its message and each violation it names, as every client's steps read it.
+        val refusal = assertNotNull(world.error, "expected a refusal")
+        val violations = when (refusal) {
+            is heart.RuleRefused -> refusal.violations
+            is heart.InvalidPayload -> refusal.violations
+            else -> emptyList()
+        }
+        val said = (listOf(refusal.message.orEmpty()) + violations).joinToString(" ")
         assertTrue(text in said, "the refusal said: $said")
     }
 

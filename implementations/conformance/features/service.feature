@@ -7,46 +7,6 @@ Feature: What a client does with what a service sends
     Given a service offering "note" with the schema {"type": "object"}
     And a client at rung L0 with no credential
 
-  Scenario Outline: Each refusal is told apart: status <status>, <says>
-    Given that service answers "note" with status <status> and the body <body>
-    When it enters that service
-    And it tries to submit "note" with {}
-    Then it was refused as "<kind>" with status <status>
-    And the refusal says "<says>"
-    And the resource was read <reads> times
-
-    Examples:
-      | status | body                                                                                                               | kind                  | says                              | reads |
-      | 412    | {"detail": "changed"}                                                                                              | stale                 | changed; re-read, not resent      | 2     |
-      | 409    | {"title": "taken"}                                                                                                 | not-offered           | note was refused (409): taken     | 2     |
-      | 428    | {"title": "no validator"}                                                                                          | precondition-required | note was refused (428): no validator | 1  |
-      | 401    | {"title": "who"}                                                                                                   | not-authenticated     | note was refused (401): who       | 1     |
-      | 500    | {"title": "broke"}                                                                                                 | failed                | note was refused (500): broke     | 1     |
-      | 500    | not json                                                                                                           | failed                | (500): Internal Server Error      | 1     |
-      | 422    | {"type": "https://w3id.org/heart-rise/problems/rule-refused", "violations": [{"pointer": "/a", "message": "big"}]} | rule-refused          | /a big                            | 1     |
-      | 422    | {"violations": [{"pointer": "/b", "detail": "small"}]}                                                             | invalid-input         | /b small                          | 1     |
-      | 422    | {"violations": [{"message": "only words"}]}                                                                        | invalid-input         | only words                        | 1     |
-
-  Scenario: A resource that does not name the profile is not read
-    Given that service names no profile
-    When it tries to enter that service
-    Then it failed, saying "does not name the profile"
-
-  Scenario: A read that is refused is named as a read
-    Given that service refuses every read with status 503
-    When it tries to enter that service
-    Then it was refused as "failed" with status 503
-    And the refusal says "read was refused (503)"
-
-  Scenario: Nothing can be done before entering
-    When it tries to read the resource again
-    Then it failed, saying "enter a service first"
-
-  Scenario: Choices are asked of an offered form only
-    When it enters that service
-    And it tries to read the choices of "ghost"
-    Then it failed, saying "ghost is not offered now"
-
   Scenario Outline: A link is followed only if it is offered: <case>
     Given that service links "item" titled "first"
     When it enters that service
@@ -222,46 +182,6 @@ Feature: What a client does with what a service sends
     And it reads the resource again
     And it tries to submit "note" with {}
     Then it was refused as "outside-schema" before sending, because "text"
-
-  Scenario: A resource is read as HEART, never from a cache
-    When it enters that service
-    Then the last read accepted "application/hal+json", at the profile, with no cache
-
-  Scenario: A shared layer is read as what it may be
-    Given that service applies L2, with a true affordance set
-    When it enters that service
-    Then the affordance set was read accepting "application/hal+json, application/schema+json, application/json"
-    And it offers exactly "from-the-set"
-
-  Scenario: An act with no validator to send sends an empty one
-    Given that service sends no validator
-    When it enters that service
-    And it submits "note" with {}
-    Then it carried an empty validator
-
-  Scenario: A client need not keep a log
-    Given a client with no options
-    When it enters that service
-    Then the representation is at rung L0
-
-  Scenario: A refusal with no violations names none
-    Given that service answers "note" with status 409 and the body {}
-    When it enters that service
-    And it tries to submit "note" with {}
-    Then it names no violations
-
-  Scenario Outline: A violation shows what the service said of it: <shows>
-    Given that service answers "note" with status 422 and the body <body>
-    When it enters that service
-    And it tries to submit "note" with {}
-    Then the only violation is "<shows>"
-
-    Examples:
-      | body                                                  | shows      |
-      | {"violations": [{"message": "only words"}]}           | only words |
-      | {"violations": [{"detail": "a detail"}]}              | a detail   |
-      | {"violations": [{"pointer": "/c"}]}                   | /c         |
-      | {"violations": [{"pointer": "/a", "detail": "a d"}]}  | /a a d     |
 
   Scenario: Every value outside its choices is said
     Given that service declares the schema {"properties": {"a": {"hr:options": {"pointer": "/sizes"}}, "b": {"hr:options": {"pointer": "/sizes"}}}}, with the state {"sizes": ["s"]}

@@ -5,8 +5,10 @@ import heart.InvalidPayload
 import heart.NotAChoice
 import heart.NotAuthenticated
 import heart.OutsideSchema
+import heart.ReadRefused
 import heart.RuleRefused
 import heart.StaleAct
+import heart.UnexpectedResponse
 import heart.ValidatorRequired
 
 /** A refusal as the conformance features name it: its kind, and the status that brought it (0 when none was sent). */
@@ -26,6 +28,8 @@ object Kinds {
         is InvalidPayload -> "invalid-input" to HTTP_UNPROCESSABLE
         is NotAChoice -> "not-a-choice" to 0
         is OutsideSchema -> "outside-schema" to 0
+        is UnexpectedResponse -> "failed" to refusal.code.toInt()
+        is ReadRefused -> "failed" to refusal.code.toInt()
         else -> "failed" to 0
     }
 }

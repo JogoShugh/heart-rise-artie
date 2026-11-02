@@ -80,7 +80,8 @@ internal class SharedLayers(
         /** A `$ref` to a separate schema (HAL-SCHEMA-FORMS-HR Rule 3). A lone `$id` names a schema; it links none. */
         fun schemaPointer(schema: JsonObject): String? = schema[SCHEMA_REF]?.jsonPrimitive?.content
 
-        val ACCEPT = listOf(HAL_JSON, "application/json")
+        /** A shared layer is an affordance set or a schema: whatever it may be served as. */
+        val ACCEPT = listOf(HAL_JSON, "application/schema+json", "application/json")
         const val SCHEMA_REF = "\$ref"
         const val SCHEMA_INTEGRITY = "hr:integrity"
     }

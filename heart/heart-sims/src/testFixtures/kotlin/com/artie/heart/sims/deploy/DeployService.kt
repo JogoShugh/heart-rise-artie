@@ -81,11 +81,14 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
     private val apps = HeartResource(
         layers = Layers(type()),
         perform = { app, act, input ->
-            val events = if (act == "cancel") {
-                AppDecisions.cancel()
-            } else {
-                val (release, environment, region) = listOf("release", "environment", "region").map { input.json.path(it).asText() }
-                AppDecisions.deploy(release, environment, region)
+            val events = when (act) {
+                "cancel" -> AppDecisions.cancel()
+                "scale" -> AppDecisions.scale(input.json.path("replicas").asInt())
+                else -> {
+                    val (release, environment, region) =
+                        listOf("release", "environment", "region").map { input.json.path(it).asText() }
+                    AppDecisions.deploy(release, environment, region)
+                }
             }
             Acted(record(app.id, app.version + 1, events))
         },
@@ -106,10 +109,11 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
         acts = listOf(
             Act("deploy", "deploy", DEPLOY_SCHEMA).withOptions(mapOf("region" to REGION, "release" to release())),
             Act("cancel", "cancel", CANCEL_SCHEMA, method = Act.DELETE),
+            Act("scale", "scale", SCALE_SCHEMA, method = Act.PUT),
         ),
         offers = Offers(
             keys = listOf(AppState.IDLE, AppState.DEPLOYING),
-            offered = { status -> if (status == AppState.IDLE) listOf("deploy") else listOf("cancel") },
+            offered = { status -> if (status == AppState.IDLE) listOf("deploy", "scale") else listOf("cancel") },
             whyAbsent = { status, _ ->
                 if (status == AppState.IDLE) "No deployment is in progress." else "A deployment is in progress."
             },
@@ -144,6 +148,10 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
         )
 
         /** A cancellation may say why; a DELETE takes it in its query. */
+        /** How many instances the app runs on. */
+        private const val SCALE_SCHEMA =
+            """{"type": "object", "required": ["replicas"], "properties": {"replicas": {"type": "integer", "minimum": 1}}}"""
+
         private const val CANCEL_SCHEMA = """{"type": "object", "properties": {"reason": {"type": "string"}}}"""
 
         private const val DEPLOY_SCHEMA = """{"type": "object", "required": ["environment", "region", "release"],
@@ -159,6 +167,11 @@ class DeployService(private val store: EventStore = InMemoryEventStore()) {
                     "deploy", AlpsType.UNSAFE, "Deploy",
                     "Deploys a release of the app to a region of an environment.",
                     "Offered while the app is idle; the app is deploying after.",
+                ),
+                Relation(
+                    "scale", AlpsType.IDEMPOTENT, "Scale the app",
+                    "Sets how many instances the app runs on.",
+                    "Offered while the app is idle.",
                 ),
                 Relation(
                     "cancel", AlpsType.IDEMPOTENT, "Cancel the deployment",

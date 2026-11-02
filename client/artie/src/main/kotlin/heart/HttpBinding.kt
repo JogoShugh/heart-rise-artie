@@ -37,19 +37,21 @@ class HttpBinding(private val transport: Transport) : Binding {
     private fun outcome(response: HeartResponse, requested: String? = null): Outcome {
         val code = response.status.toString()
         val problem = ProblemDetails.type(response.body)
+        val said = ProblemDetails.said(response.body)
         return when (response.status) {
             CREATED -> Outcome.Done(
                 received(response), code, resolved(response, "Location", requested),
                 represents = resolved(response, "Content-Location", requested),
             )
             in SUCCESS -> Outcome.Done(received(response), code)
-            PRECONDITION_REQUIRED -> Outcome.PreconditionRequired(code, problem)
-            PRECONDITION_FAILED -> Outcome.Stale(code, problem)
-            CONFLICT -> Outcome.NotOffered(code, problem)
-            UNPROCESSABLE -> Outcome.Invalid(ProblemDetails.violations(response.body), code, problem)
-            UNAUTHORIZED -> Outcome.Unauthenticated(challengeSchemes(response), response.credentialSent, code, problem)
+            PRECONDITION_REQUIRED -> Outcome.PreconditionRequired(code, problem, said)
+            PRECONDITION_FAILED -> Outcome.Stale(code, problem, said)
+            CONFLICT -> Outcome.NotOffered(code, problem, said)
+            UNPROCESSABLE -> Outcome.Invalid(ProblemDetails.violations(response.body), code, problem, said)
+            UNAUTHORIZED ->
+                Outcome.Unauthenticated(challengeSchemes(response), response.credentialSent, code, problem, said)
             FORBIDDEN -> Outcome.Denied(response.credentialSent, code, problem)
-            else -> Outcome.Failed(code, problem)
+            else -> Outcome.Failed(code, problem, said)
         }
     }
 

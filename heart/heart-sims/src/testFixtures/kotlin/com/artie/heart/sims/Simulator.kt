@@ -93,6 +93,8 @@ class Simulator {
         body["applied"]?.let { faults.applied = it.asText() }
         body["mediaType"]?.let { faults.mediaType = it.asText() }
         body["onlyAccept"]?.let { faults.onlyAccept = it.asText() }
+        body["readStatus"]?.let { faults.readStatus = it.asInt() }
+        body["noValidator"]?.let { faults.noValidator = it.asBoolean() }
         body["noProfile"]?.let { faults.noProfile = it.asBoolean() }
         body["wrongIntegrity"]?.let { faults.wrongIntegrity = it.asBoolean() }
         body["oneAddress"]?.let { faults.oneAddress = it.asBoolean() }

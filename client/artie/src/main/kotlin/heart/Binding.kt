@@ -31,7 +31,12 @@ class Received(
  * different handling (SPEC §6.3). [code] is the binding's own word for it (HTTP:
  * the status code), and is only reported, never acted on.
  */
-sealed class Outcome(val code: String, val problemType: String?) {
+sealed class Outcome(
+    val code: String,
+    val problemType: String?,
+    /** What a refusal's problem said of it: its detail, else its title; null when it said nothing. */
+    val said: String? = null,
+) {
     /**
      * The request succeeded. [newResource] is where a resource the act brought into
      * being lives (SPEC §6.0, "New resource"), absolute; null when it made none.
@@ -44,19 +49,26 @@ sealed class Outcome(val code: String, val problemType: String?) {
         val newResource: String? = null,
         val represents: String? = null,
     ) : Outcome(code, null)
-    class PreconditionRequired(code: String, problemType: String?) : Outcome(code, problemType)
-    class Stale(code: String, problemType: String?) : Outcome(code, problemType)
-    class NotOffered(code: String, problemType: String?) : Outcome(code, problemType)
-    class Invalid(val violations: List<String>, code: String, problemType: String?) : Outcome(code, problemType)
-    class Failed(code: String, problemType: String?) : Outcome(code, problemType)
+    class PreconditionRequired(code: String, problemType: String?, said: String? = null) :
+        Outcome(code, problemType, said)
+    class Stale(code: String, problemType: String?, said: String? = null) : Outcome(code, problemType, said)
+    class NotOffered(code: String, problemType: String?, said: String? = null) : Outcome(code, problemType, said)
+    class Invalid(val violations: List<String>, code: String, problemType: String?, said: String? = null) :
+        Outcome(code, problemType, said)
+    class Failed(code: String, problemType: String?, said: String? = null) : Outcome(code, problemType, said)
 
     /**
      * The service wants a credential, or refused the one sent (HTTP 401).
      * [schemes] are the schemes it asked for; [sent] is the scheme ARTIE
      * sent, or null if none. Never the credential itself.
      */
-    class Unauthenticated(val schemes: List<String>, val sent: String?, code: String, problemType: String?) :
-        Outcome(code, problemType) {
+    class Unauthenticated(
+        val schemes: List<String>,
+        val sent: String?,
+        code: String,
+        problemType: String?,
+        said: String? = null,
+    ) : Outcome(code, problemType, said) {
         fun refusal(url: String) = NotAuthenticated(originOf(url), schemes, sent)
     }
 

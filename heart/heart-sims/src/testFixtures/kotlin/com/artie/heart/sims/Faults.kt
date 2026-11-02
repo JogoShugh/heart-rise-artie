@@ -51,6 +51,12 @@ class Faults {
     /** A media type each read says instead. */
     @Volatile var mediaType: String? = null
 
+    /** A status every read is answered with, instead of the resource. */
+    @Volatile var readStatus: Int? = null
+
+    /** Whether each read leaves out its validator. */
+    @Volatile var noValidator = false
+
     /** The one media type the service answers in, whatever a request accepts. */
     @Volatile var onlyAccept: String? = null
 
@@ -59,7 +65,7 @@ class Faults {
 
     /** Serves [body] at [path] with [status], as JSON, with [validator] as its ETag when given. */
     fun serve(path: String, status: Int, body: String, validator: String? = null) {
-        val answer = Response(Status(status, "")).header("Content-Type", "application/json").body(body)
+        val answer = Response(Status.fromCode(status) ?: Status(status, "")).header("Content-Type", "application/json").body(body)
         plain[path] = validator?.let { answer.header("ETag", it) } ?: answer
     }
 
@@ -69,7 +75,7 @@ class Faults {
     /** Answers act [act] with [status] and [body]: a problem when the body is JSON, plain text otherwise. */
     fun answerAct(act: String, status: Int, body: String) {
         val type = if (body.trimStart().startsWith("{")) PROBLEM_JSON else "text/plain"
-        acts[act] = Response(Status(status, "")).header("Content-Type", type).body(body)
+        acts[act] = Response(Status.fromCode(status) ?: Status(status, "")).header("Content-Type", type).body(body)
     }
 
     /** Declares [schema] for the form [key] in every read, while the service goes on checking its own. */
@@ -93,6 +99,8 @@ class Faults {
         noProfile = false
         mediaType = null
         onlyAccept = null
+        readStatus = null
+        noValidator = false
         plain.clear()
         behindOneAddress = null
     }
@@ -103,6 +111,7 @@ class Faults {
         val act = request.uri.path.substringAfterLast("/actions/", "").takeIf { request.method != Method.GET }
         act?.let { acts[it] }?.let { return it }
         plain[request.uri.path]?.let { return it }
+        readStatus?.takeIf { request.method == Method.GET }?.let { return Response(Status.fromCode(it) ?: Status(it, "")) }
         if (oneAddress && request.uri.path == ONE_ADDRESS) {
             return next(request.uri(request.uri.path(checkNotNull(behindOneAddress) { "no set linked yet" })))
         }
@@ -115,6 +124,7 @@ class Faults {
         applied?.let { answer = answer.replaceHeader("Preference-Applied", it) }
         mediaType?.let { answer = answer.replaceHeader("Content-Type", it) }
         if (noProfile) answer = answer.removeHeader("Link")
+        if (noValidator) answer = answer.removeHeader("ETag")
         val body = (runCatching { mapper.readTree(answer.bodyString()) }.getOrNull() as? ObjectNode) ?: return answer
         if (!rewrite(body)) return answer
         return answer.body(mapper.writeValueAsString(body))

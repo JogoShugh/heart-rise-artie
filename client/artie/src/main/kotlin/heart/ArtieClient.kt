@@ -82,7 +82,7 @@ class ArtieClient(
             schemas.violations(form, payload, held.url).takeIf { it.isNotEmpty() }?.let { throw OutsideSchema(rel, it) }
         }
         broughtIntoBeing = false
-        if (form.method != "GET") return act(rel, payload, resendAllowed = true)
+        if (form.method != "GET") return send(rel, payload)
         // HAL Schema Forms fills the target template from the fields. HAL-FORMS cannot
         // template a target; it puts the fields in the query (mutate-action-URL).
         val target = when (asking.dialect) {
@@ -142,12 +142,8 @@ class ArtieClient(
         return held.manifest.unavailable?.let { layers.reason(it, held.manifest.relationOf(rel)) }
     }
 
-    /**
-     * One act and its refusal handling (SPEC §6.3). Precondition required is
-     * the only refusal that resends, and only once: the client always sends a
-     * validator, so a second one would mean something else is wrong.
-     */
-    private fun act(rel: String, payload: JsonObject, resendAllowed: Boolean): HeartRepresentation {
+    /** One act and its refusal handling (SPEC §6.3). No refusal is resent: each is told apart and reported. */
+    private fun send(rel: String, payload: JsonObject): HeartRepresentation {
         val held = current ?: error("enter a service before acting")
         val form = held.affordance(rel) ?: error("$rel is not offered now; nothing was sent")
         val validator = validatorFor(held)
@@ -168,12 +164,6 @@ class ArtieClient(
         if (outcome is Outcome.Done) return outcome.newResource?.let { made ->
             if (outcome.represents == made) sync(made, outcome.received) else sync(made)
         } ?: sync(act.url, outcome.received)
-        // A blind write (validator null) asked for one is refused as it is: sending none again would be refused again.
-        if (outcome is Outcome.PreconditionRequired && resendAllowed && validator != null) {
-            sync(held.url)
-            decisions.actRefused(rel, act.url, outcome, "re-synced and resent once")
-            return act(rel, payload, resendAllowed = false)
-        }
         throw refusal(rel, act.url, outcome, held)
     }
 
@@ -181,21 +171,24 @@ class ArtieClient(
 
     /** The validator an act on [held] carries: the one held, or none when the run sends blind writes. */
     private val validatorFor: (HeartRepresentation) -> String? = { held ->
-        if (care.validators) held.etag ?: error("no validator held for ${held.url}; an act needs one") else null
+        // A representation sent with no validator is acted on with an empty one: still conditional, never blind.
+        if (care.validators) held.etag.orEmpty() else null
     }
 
     /** Stale and not offered re-sync first, so the client never keeps a manifest the server has refused. */
     private fun refusal(rel: String, target: String, outcome: Outcome, held: HeartRepresentation): RuntimeException {
+        // Said as every client says a refusal: the act, the code, and what the problem said, if anything.
+        val said = "$rel was refused (${outcome.code})" + outcome.said?.let { ": $it" }.orEmpty()
         val (refused, handled) = when (outcome) {
-            is Outcome.Unauthenticated -> outcome.refusal(target) to "reported"
+            is Outcome.Unauthenticated -> NotAuthenticated(target, outcome.schemes, outcome.sent, said) to "reported"
             is Outcome.Denied -> outcome.refusal(target) to "reported"
-            is Outcome.Stale -> StaleAct(rel).also { sync(held.url) } to "discarded after re-sync"
-            is Outcome.NotOffered -> IllegalTransition(rel).also { sync(held.url) } to "re-synced and reported"
-            is Outcome.PreconditionRequired -> ValidatorRequired(rel) to "reported"
+            is Outcome.Stale -> StaleAct(said).also { sync(held.url) } to "discarded after re-sync"
+            is Outcome.NotOffered -> IllegalTransition(said).also { sync(held.url) } to "re-synced and reported"
+            is Outcome.PreconditionRequired -> ValidatorRequired(said) to "reported"
             is Outcome.Invalid if outcome.problemType == RULE_REFUSED ->
-                RuleRefused(rel, outcome.violations) to "reported"
-            is Outcome.Invalid -> InvalidPayload(rel, outcome.violations) to "reported"
-            else -> UnexpectedResponse(rel, outcome.code) to "reported"
+                RuleRefused(said, outcome.violations) to "reported"
+            is Outcome.Invalid -> InvalidPayload(said, outcome.violations) to "reported"
+            else -> UnexpectedResponse(said, outcome.code) to "reported"
         }
         decisions.actRefused(rel, target, outcome, handled)
         return refused

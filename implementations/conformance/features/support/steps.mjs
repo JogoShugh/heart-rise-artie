@@ -449,8 +449,9 @@ Then("it holds a representation", function () {
     assert.ok(this.rep);
 });
 
-Then("the resource was read {int} times", function (times) {
-    assert.equal(this.fakeLog.filter((r) => r.method === "GET").length, times);
+Then("the resource was read {int} times", async function (times) {
+    const reads = (await received(this)).filter((r) => r.method === "GET" && !/^\/(set$|affordance-sets\/|schemas\/)/.test(r.url));
+    assert.equal(reads.length, times);
 });
 
 Then("the service was sent the credential", function () {
@@ -544,12 +545,14 @@ Then("the last read carried no validator", async function () {
     assert.equal((await lastRead(this)).ifNoneMatch, undefined);
 });
 
-Then("the affordance set was read accepting {string}", function (accept) {
-    assert.equal(this.fakeLog.find((r) => r.url === "/set").accept, accept);
+Then("the affordance set was read accepting {string}", async function (accept) {
+    const set = (await received(this)).find((r) => r.url === "/set" || r.url.startsWith("/affordance-sets/"));
+    assert.equal(set.accept, accept);
 });
 
 Then("it carried an empty validator", async function () {
-    assert.equal((await lastRequest(this)).ifMatch, "");
+    const act = (await received(this)).filter((r) => r.method !== "GET").at(-1);
+    assert.equal(act.ifMatch, "");
 });
 
 Then("the form {string} has choices for exactly {string}", async function (form, property) {
@@ -939,4 +942,28 @@ Given("the {word} service serves only HAL Schema Forms", async function (service
 
 Given("the {word} service serves {string} with status {int} and the body {}", async function (service, path, status, body) {
     await sims.plain(hostOf(service), { path, status, body });
+});
+
+Given("the {word} service answers {string} with status {int} and the body {}", async function (service, form, status, body) {
+    await sims.answerAct(hostOf(service), segmentOf(form), status, body);
+});
+
+Given("the {word} service refuses every read with status {int}", async function (service, readStatus) {
+    await sims.faults(hostOf(service), { readStatus });
+});
+
+Given("the {word} service sends no validator", async function (service) {
+    await sims.faults(hostOf(service), { noValidator: true });
+});
+
+Given("a client with no options but the {word} service's credential", function (service) {
+    this.me = { heart: new heart.HeartClient({ authorization: SERVICES[service].credential }) };
+});
+
+When("it tries to enter the job {string}", async function (name) {
+    await trying(this, () => this.me.heart.enter(`http://${hostOf("build")}/jobs/${name}`));
+});
+
+Then("it offers exactly these acts", function (table) {
+    assert.deepEqual([...this.rep.forms.keys()], table.raw().map(([act]) => act));
 });

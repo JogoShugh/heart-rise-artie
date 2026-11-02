@@ -105,9 +105,9 @@ Feature: Embedded resources: read in place, followed to act
 
     Examples:
       | status                    | reason                                                                                                       |
-      | 404 Not Found             | not found, refused by the server: "http://garden.test/users/lin could not be read: the server answered 404"  |
-      | 400 Bad Request           | unreadable, refused by the server: "http://garden.test/users/lin could not be read: the server answered 400" |
-      | 500 Internal Server Error | unreadable, refused by the server: "http://garden.test/users/lin could not be read: the server answered 500" |
+      | 404 Not Found             | not found, refused by the server: "http://garden.test/users/lin: read was refused (404)"  |
+      | 400 Bad Request           | unreadable, refused by the server: "http://garden.test/users/lin: read was refused (400)" |
+      | 500 Internal Server Error | unreadable, refused by the server: "http://garden.test/users/lin: read was refused (500)" |
 
   Scenario: The reasoner sees each embedded resource as a link, with its state and no URI
     Given the reasoner will follow the "pulls:author" link titled "Ada"
