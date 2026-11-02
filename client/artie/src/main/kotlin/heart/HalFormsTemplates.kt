@@ -73,7 +73,8 @@ object HalFormsTemplates {
             // A HAL-FORMS target is never a template: a brace in it is a character like any other, sent encoded.
             target = URI(base).resolve(target.replace("{", "%7B").replace("}", "%7D")).toString(),
             templated = false,
-            method = obj["method"]?.jsonPrimitive?.content ?: "GET",
+            // An HTTP method is case-sensitive; Spring HATEOAS writes a template's in lower case.
+            method = (obj["method"]?.jsonPrimitive?.content ?: "GET").uppercase(),
             contentType = obj["contentType"]?.jsonPrimitive?.content ?: "application/json",
             schema = schema(obj["properties"] as? JsonArray ?: JsonArray(emptyList())),
         )

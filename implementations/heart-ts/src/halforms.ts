@@ -42,7 +42,8 @@ function templateForm(name: string, raw: JsonObject, resource: string): Form {
         target: stringOf(raw.target) ?? resource,
         templated: false,
         templatePointers: {},
-        method: String(raw.method ?? GET),
+        // An HTTP method is case-sensitive; Spring HATEOAS writes a template's in lower case.
+        method: String(raw.method ?? GET).toUpperCase(),
         contentType: String(raw.contentType ?? JSON_TYPE),
         schema,
         schemaKey: schemaKeyOf(schema),

@@ -20,6 +20,9 @@ class Arguments(val script: String) {
     var remember: String? = null
     var report: String? = null
     var rung: String? = null
+
+    /** `--dialect hal-forms|hal-schema-forms`: the dialect the client asks in; HAL Schema Forms by default. */
+    var dialect: String? = null
     var reasoner: String? = null
 
     /** `--model NAME`: the model the reasoner asks, as its runtime names it (spec/PLAN-LOCAL-MODEL.md). */
@@ -67,6 +70,9 @@ const val USAGE = "usage: artie run <script> [name=value …] [options]"
 /** The rungs a run may pin (SPEC §6.10). */
 private val RUNGS = setOf("L0", "L1", "L2")
 
+/** The dialects a run may ask in: HAL-FORMS for a service that speaks only it, as Spring HATEOAS ones may. */
+private val DIALECTS = setOf("hal-forms", "hal-schema-forms")
+
 /** The reasoners a run may allow `reason(…)` steps to use. */
 private val REASONERS = setOf("claude")
 
@@ -102,6 +108,9 @@ private val VALUED: Map<String, (Arguments, String) -> Unit> = mapOf(
     "--remember" to { a, v -> a.remember = v },
     "--report" to { a, v -> a.report = v },
     "--rung" to { a, v -> a.rung = v.takeIf { it in RUNGS } ?: throw BadArguments("--rung is L0, L1 or L2") },
+    "--dialect" to { a, v ->
+        a.dialect = v.takeIf { it in DIALECTS } ?: throw BadArguments("--dialect is hal-forms or hal-schema-forms")
+    },
     "--reasoner" to { a, v -> a.reasoner = v.takeIf { it in REASONERS } ?: throw BadArguments("--reasoner is claude") },
     "--model" to { a, v -> a.model = v },
     "--model-url" to { a, v -> a.modelUrl = v.takeIf(ORIGIN::matches) ?: throw BadArguments(NOT_AN_ORIGIN) },

@@ -47,7 +47,8 @@ class ArtieNavigatorProvider : NavigatorProvider {
             val transport = CachingTransport(IntegrityCheck(AuthTransport(credentials, wire)))
             val coaps = mapOf("coaps" to CoapBinding(credentials = credentials))
             val care = Care(validators = guarding.validators != "none", checkedBodies = guarding.guard != OFF_THE_RAILS)
-            val client = ArtieClient(transport, rung, care = care, bindings = coaps)
+            val dialect = settings.dialect?.let(Dialect::named) ?: Dialect.HAL_SCHEMA_FORMS
+            val client = ArtieClient(transport, rung, dialect, care = care, bindings = coaps)
             val claude = settings.reasoner == "claude"
             // The model's address (spec/PLAN-LOCAL-MODEL.md): Anthropic's needs a key; another takes one only
             // when the credentials file holds one for it.

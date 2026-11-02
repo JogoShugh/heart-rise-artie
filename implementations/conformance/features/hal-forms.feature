@@ -162,6 +162,20 @@ Feature: What a HEART client must do in HAL-FORMS, the L0 on-ramp
     And the last request was for "/jobs/nightly"
     And it had the content type "application/json"
 
+  Scenario Outline: A template's method is sent as an HTTP method, whatever its case: <method>
+    Spring HATEOAS writes its templates' methods in lower case; an HTTP method is case-sensitive.
+    Given the build service's template "build" is {"method": "<method>", "target": "/jobs/nightly/actions/build"}
+    And a HAL-FORMS client with the build service's credential
+    When it enters the job "nightly"
+    And it tries to submit "build" with {"a": 1}
+    Then it sent <sent> with the body "{\"a\":1}" and the content type "application/json"
+
+    Examples:
+      | method | sent  |
+      | post   | POST  |
+      | put    | PUT   |
+      | patch  | PATCH |
+
   Scenario: A template's own title and content type are kept
     Given the build service's template "build" is {"method": "PUT", "target": "/jobs/nightly/config", "title": "Configure", "contentType": "application/vnd.jenkins+json"}
     And a HAL-FORMS client with the build service's credential

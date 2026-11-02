@@ -444,6 +444,29 @@ Feature: artie run: a script, run from the command line
       | L2   | 0    | L2    |
       | L9   | 2    |       |
 
+  Scenario Outline: The dialect the client asks in, chosen by the run: <dialect>
+    A service that speaks only HAL-FORMS, such as one built with Spring HATEOAS, is read by asking for it.
+    Given the script "issue.kts" is
+      """kotlin
+      heart("scripted://service/") {
+          act("issues-get", "number" to 10)
+      }
+      """
+    When artie is run with
+      | argument  |
+      | run       |
+      | issue.kts |
+      | --dialect |
+      | <dialect> |
+    Then artie exits <exit>
+    And the client was made to ask in the dialect "<asked>"
+
+    Examples:
+      | dialect          | exit | asked            |
+      | hal-forms        | 0    | hal-forms        |
+      | hal-schema-forms | 0    | hal-schema-forms |
+      | html             | 2    |                  |
+
   Scenario: A script that reasons is stopped before its first request, unless the run allows a reasoner
     Given the script "close.kts" is
       """kotlin

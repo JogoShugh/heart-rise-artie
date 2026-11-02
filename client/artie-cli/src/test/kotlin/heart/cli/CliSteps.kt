@@ -25,6 +25,7 @@ class CliSteps(private val script: ScriptSteps) {
     private var exit = -1
     private var printed = listOf<String>()
     private var askedRung: String? = null
+    private var askedDialect: String? = null
     private var askedReasoner: String? = null
     private var askedModel: String? = null
     private var askedModelUrl: String? = null
@@ -137,6 +138,7 @@ class CliSteps(private val script: ScriptSteps) {
         val args = table.asMaps().map { it["argument"].orEmpty() }.filter { it.isNotEmpty() }
         val client = { settings: heart.script.ClientSettings ->
             askedRung = settings.rung.orEmpty()
+            askedDialect = settings.dialect.orEmpty()
             askedReasoner = settings.reasoner.orEmpty()
             askedModel = settings.model.name
             askedModelUrl = settings.model.url
@@ -197,6 +199,9 @@ class CliSteps(private val script: ScriptSteps) {
 
     @Then("the client was made to ask at rung {string}")
     fun rung(rung: String) = assertEquals(rung, askedRung.orEmpty())
+
+    @Then("the client was made to ask in the dialect {string}")
+    fun dialect(dialect: String) = assertEquals(dialect, askedDialect.orEmpty())
 
     @Then("the client was made to keep its exchanges")
     fun keepsExchanges() = assertEquals(true, askedExchanges)

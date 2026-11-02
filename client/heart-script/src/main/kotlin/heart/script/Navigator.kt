@@ -271,6 +271,8 @@ fun interface NavigatorProvider {
  * What a run asks of the client it is given: the [rung] to read at (L0, L1, L2: SPEC §6.10), and the
  * [reasoner] to use for `act(intent = …)` steps (for ARTIE: `claude`). Null: the client's own choice, or none.
  */
+// Settings name each of their parts once, by name, each with its default; grouping them would only rename them.
+@Suppress("LongParameterList")
 class ClientSettings(
     val rung: String? = null,
     val reasoner: String? = null,
@@ -282,6 +284,8 @@ class ClientSettings(
     val guarding: Guarding = Guarding(),
     /** The model the reasoner asks, and where (spec/PLAN-LOCAL-MODEL.md); each null for the client's default. */
     val model: Model = Model(),
+    /** The dialect the client asks in, `hal-forms` or `hal-schema-forms`; null for HAL Schema Forms. */
+    val dialect: String? = null,
 )
 
 /** A run's model (spec/PLAN-LOCAL-MODEL.md): its [name] as its runtime knows it, and the origin it answers at. */
