@@ -737,6 +737,10 @@ Given("a client asking in {} at rung {word} for the employees service", function
     this.me = { log, schemaFailures, heart: new heart.HeartClient(options) };
 });
 
+Given("the employees service has changed: {word}", async function (change) {
+    await sims.changeEmployees(change);
+});
+
 Given("the employees service is handicapped as Spring HATEOAS", async function () {
     await sims.handicapEmployees("spring");
 });

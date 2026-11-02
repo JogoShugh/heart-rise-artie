@@ -18,6 +18,7 @@ data class Employee(
 ) {
     companion object {
         const val WORKING = "working"
+        const val ON_NOTICE = "on notice"
         const val DISMISSED = "dismissed"
     }
 }
@@ -35,8 +36,8 @@ class Staff {
         hire("Bilbo", "Baggins", "burglar")
     }
 
-    /** Every employee still working, in id order. */
-    fun working(): List<Employee> = employees.values.filter { it.status == Employee.WORKING }
+    /** Every employee not dismissed, in id order. */
+    fun working(): List<Employee> = employees.values.filter { it.status != Employee.DISMISSED }
 
     /** Every employee, dismissed ones too, in id order. */
     fun everyone(): List<Employee> = employees.values.toList()

@@ -4,6 +4,7 @@ import com.artie.heart.sims.build.BuildService
 import com.artie.heart.sims.deploy.DeployService
 import com.artie.heart.sims.deploy.Region
 import com.artie.heart.sims.github.GitHubService
+import com.artie.heart.sims.employees.Change
 import com.artie.heart.sims.employees.EmployeesService
 import com.artie.heart.Rung
 import com.fasterxml.jackson.core.type.TypeReference
@@ -174,6 +175,11 @@ class Simulator(private val alone: String? = null) {
         "/_sim/employees/handicap" bind PUT to { request ->
             require(request.bodyString().trim() == "spring") { "the employees service is handicapped only as spring" }
             employees.handicapAsSpring()
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/employees/changes" bind PUT to { request ->
+            val names = request.bodyString().split(",").map { it.trim() }.filter { it.isNotEmpty() }
+            employees.change(names.map { Change.valueOf(it.uppercase()) }.toSet())
             Response(Status.NO_CONTENT)
         },
         "/_sim/employees/employees" bind GET to {

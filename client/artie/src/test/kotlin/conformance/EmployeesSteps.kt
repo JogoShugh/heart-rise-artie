@@ -1,5 +1,6 @@
 package conformance
 
+import com.artie.heart.sims.employees.Change
 import heart.Dialect
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
@@ -17,6 +18,9 @@ class EmployeesSteps(private val world: World) {
         world.simulated()
         world.me = world.client(rung, "Bearer employees-token", DIALECTS.getValue(dialect))
     }
+
+    @Given("the employees service has changed: {word}")
+    fun changed(change: String) = world.sims.employees.change(setOf(Change.valueOf(change.uppercase())))
 
     @Given("the employees service is handicapped as Spring HATEOAS")
     fun handicapped() = world.sims.employees.handicapAsSpring()
