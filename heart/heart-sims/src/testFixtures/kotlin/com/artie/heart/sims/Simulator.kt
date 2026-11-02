@@ -41,9 +41,11 @@ data class Logged(
  * each one received kept in [log]. A request to any other host reaches the
  * control routes under `/_sim/`, which steps use to reset, set up and look.
  * Over a port, a client names the service it means in `X-Sim-Host`, so its
- * addresses stay the same as in memory.
+ * addresses stay the same as in memory. Run with [alone], the simulator serves
+ * that one service at its root to a client that names none, as a real service
+ * would; the control routes stay under `/_sim/`.
  */
-class Simulator {
+class Simulator(private val alone: String? = null) {
     val build = BuildService()
     val deploy = DeployService()
     val github = GitHubService()
@@ -99,7 +101,10 @@ class Simulator {
     fun faults(host: String): Faults = faults[host] ?: throw IllegalArgumentException("no service $host")
 
     val handler: HttpHandler = { request ->
-        val host = request.header(HOST_HEADER) ?: request.uri.host
+        val host = request.header(HOST_HEADER)
+            ?: request.uri.host.takeIf { it in services }
+            ?: alone.takeUnless { request.uri.path.startsWith("/_sim/") }
+            ?: ""
         try {
             services[host]?.let { service ->
                 service(request).also { answer ->

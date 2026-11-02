@@ -60,7 +60,8 @@ class SpringHandicap(private val staff: Staff) {
     private fun idOf(request: Request) = request.path("id")?.toLongOrNull() ?: -1
 
     /** Where the request came: Spring writes every link absolute, against the address it was asked at. */
-    private fun origin(request: Request) = "http://${request.header(HOST_HEADER) ?: request.uri.authority}"
+    private fun origin(request: Request) =
+        "http://${request.header(HOST_HEADER) ?: request.header("Host") ?: request.uri.authority}"
 
     private fun halForms(request: Request) = request.header("Accept").orEmpty().let { HAL_FORMS in it || HAL !in it }
 
