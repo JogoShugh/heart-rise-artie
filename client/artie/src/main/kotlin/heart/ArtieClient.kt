@@ -130,7 +130,8 @@ class ArtieClient(
 
     override fun describe(rel: String): String? {
         val held = current ?: error("enter a service before describing a form")
-        val form = held.affordance(rel) ?: error("$rel is not offered now")
+        // A relation not offered now says nothing: a goal run may ask about one it saw before the resource changed.
+        val form = held.affordance(rel) ?: return null
         return Alps.describe(bindings, form.relation)
     }
 

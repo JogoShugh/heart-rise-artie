@@ -16,6 +16,9 @@ class FormRelationSteps(private val ctx: ClientContext) {
     @Then("the client describes {string} as {string}")
     fun describes(name: String, doc: String) = assertEquals(doc, ctx.client.describe(name))
 
+    @Then("the client describes {string} as nothing")
+    fun describesNothing(name: String) = assertNull(ctx.client.describe(name))
+
     @Then("the client explains {string} as {string}")
     fun explains(rel: String, reason: String) = assertEquals(reason, ctx.client.explain(rel))
 

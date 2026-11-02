@@ -82,6 +82,15 @@ Feature: Forms named by link relations, described for the reasoner
       | GET http://garden.test/profiles/garden |
     And the request for "http://garden.test/profiles/garden" had header "Accept" set to "application/alps+json"
 
+  Scenario: A relation the held resource does not offer now is described as nothing, and nothing is sent
+    A goal run may ask about an act it saw offered before the service changed the
+    resource; the client says nothing of it, as for a relation its profile does not
+    describe, and the run goes on.
+    When the client enters "http://garden.test/beds/2"
+    Then the client describes "garden:harvest" as nothing
+    And the client sent these requests:
+      | GET http://garden.test/beds/2 |
+
   Scenario: The reasoner may ask for a descriptor first; it is shown the detail, then chooses
     Given the reasoner will describe "garden:water-cell", then select "garden:water-cell" with {"milliliters": 250}
     When the agent handles "what does watering do? then water bed 2" at "http://garden.test/beds/2"
