@@ -229,12 +229,17 @@ def first(runs, **match):
 def main():
     kept = [r for r in load("intent-kept-fixed-sonnet.jsonl") if r["arm"] == "artie-kept"]
     toward = load("intent-toward-sonnet.jsonl")
-    base = load("full-sonnet.jsonl") + kept + [r for r in toward if r["task"] != "t4"]
+    # The goal run's concurrent edit and words that set a value, run again once a step's own read guards its act.
+    validator = load("validator-sonnet.jsonl")
+    goal_now = [r for r in validator if r["arm"] == "artie-goal"]
+    base = ([r for r in load("full-sonnet.jsonl") if not (r["arm"] == "artie-goal" and r["task"] == "t3")] + kept
+            + [r for r in toward if r["task"] not in ("t3", "t4")] + [r for r in validator if r["task"] == "t3"])
     intent_before = [r for r in load("intent-kept-sonnet.jsonl", "changes-intent-kept-sonnet.jsonl") if r["arm"] == "artie-intent"]
     intent_stale = [r for r in load("intent-kept-fixed-sonnet.jsonl", "changes-intent-kept-fixed-sonnet.jsonl")
                     if r["arm"] == "artie-intent"]
     intent_now = [r for r in toward if r["task"] == "t3"] + load("changes-intent-toward-sonnet.jsonl")
-    t4 = [r for r in load("t4-sonnet.jsonl") if r["arm"] != "artie-intent"] + [r for r in toward if r["task"] == "t4"]
+    t4 = ([r for r in load("t4-sonnet.jsonl") if r["arm"] not in ("artie-intent", "artie-goal")]
+          + [r for r in validator if r["task"] == "t4"])
     lean_runs = load("lean-sonnet.jsonl")
     nuclear = (load("changes-sonnet.jsonl") + load("changes-lean-sonnet.jsonl")
                + [r for r in load("changes-intent-kept-fixed-sonnet.jsonl") if r["arm"] == "artie-kept"]
@@ -263,7 +268,7 @@ def main():
         "GITHUB_TOKENS": f"{scale['tool_definition_tokens']:,}",
         "GITHUB_PER_TOOL": f"{scale['mean_tokens_per_tool']:,}",
         "GITHUB_LARGEST": f"{scale['largest_tool_chars'] // 1000}",
-        "RUN_COUNT": str(len(base) + len(lean_runs) + len(t4) + len(intent_before) + len(intent_stale) + len(nuclear) + len(control) + len(haiku) + len(haiku_changes)),
+        "RUN_COUNT": str(len(base) + len(lean_runs) + len(t4) + len(intent_before) + len(intent_stale) + len(goal_now) + len(nuclear) + len(control) + len(haiku) + len(haiku_changes)),
         "EXAMPLE_LOST": example(first(t3, arm="fastmcp"), "FastMCP loses the other change, and says it succeeded"),
         "EXAMPLE_KEPT": example(first(t3, arm="heart-mcp-lean"), "heart-mcp is refused 412, reads again, keeps both"),
         "EXAMPLE_MOVED": example(first(nuclear, arm="fastmcp", change="moved", when="start"),

@@ -108,8 +108,8 @@ details.src pre { max-height: 28rem; }
       <li><b>Fair to static tools:</b> rebuilt after the change (a restart), they succeed again, and stay cheapest. What breaks them is tools fixed at start-up, not the changes.</li>
       <li><b>Size:</b> one tool per endpoint for GitHub's REST API is {{GITHUB_TOOLS}} tools and {{GITHUB_TOKENS}} tokens before the first move. heart-mcp is 6 tools, about 1k tokens, for any service.</li>
       <li><b>ARTIE's intent run</b> (the goal's steps, each chosen by the model from what is offered then) is the cheapest model arm on HEART: 7.3k tokens, near FastMCP's 4.4k. After tonight's fixes it keeps both edits (5 of 5, 5.6k tokens), and follows every change but a new required field, at start and midway, giving notice before a dismissal. A script kept from a goal run uses no model at all, and refuses before sending when a field changes.</li>
-      <li><b>Words that set a value</b> ("change his role to …") while someone else changes it: the static arms wrote over it and said nothing, 10 of 10. heart-mcp wrote it and said whose change it replaced; ARTIE's intent run asked first, 5 of 5.</li>
-      <li><b>ARTIE's goal run still loses the edit:</b> its planner writes the value from its first read, and ARTIE acts with the validator of a later read, so the server can't refuse it. Found tonight; the fix is named under "To act on".</li>
+      <li><b>Words that set a value</b> ("change his role to …") while someone else changes it: the static arms wrote over it and said nothing, 10 of 10. heart-mcp wrote it and said whose change it replaced; ARTIE's goal and intent runs asked first, 5 of 5.</li>
+      <li><b>ARTIE's goal run lost the edit until tonight:</b> its planner wrote the value from the step's read, and ARTIE acted with the ETag of a later read, so the server couldn't refuse it. Now an act chosen on a resource changed since the step read it is not sent, and the step decides again: 5 of 5 kept both.</li>
       <li><b>A weaker model (Haiku 5.5) shows the same pattern.</b></li>
     </ul>
   </div>
@@ -169,9 +169,9 @@ details.src pre { max-height: 28rem; }
     <li>Static arms read Frodo, computed the new role, and wrote it back over the other person's change. No validator was sent, so the service could not tell.</li>
     <li>Each then reported success; none mentioned the other person's change. It was lost without a trace.</li>
     <li>heart-mcp sent the validator it read with; the service refused (412) with Frodo's new state; the model appended to that.</li>
-    <li>ARTIE's goal run lost it too, in its planner: the step was rewritten as "set the role to: ring bearer, retired" before acting. A finding to fix.</li>
+    <li>ARTIE's goal run lost it too, before tonight's fix (0 of 5): its planner wrote "update the role to: ring bearer, retired" from the step's read of Frodo, and ARTIE read Frodo again before acting and sent that newer ETag, so no 412 came.</li>
     <li>ARTIE's intent run keeps the person's words. Refused (412), it reads Frodo again and asks the model again, told what changed: "keeper of the Red Book, retired", 5 of 5. Before tonight's fix it stopped there, safe but not done.</li>
-    <li>Run again after the fix, the goal run still lost it, 5 of 5, and without a 412: ARTIE read Frodo again just before acting and sent that newer validator, while the planner's value came from the first read.</li>
+    <li>Now an act chosen on a resource that changed since the step read it is refused by the client, nothing sent, and the step decides again, told what changed: the goal run kept both, 5 of 5, with one PUT.</li>
   </ul>
   {{CONCURRENT}}
   <div class="stack">
@@ -182,7 +182,7 @@ details.src pre { max-height: 28rem; }
   <ul>
     <li>No right answer is forced here: the person named the value. What must not happen is writing over the other change without a word.</li>
     <li>Static arms wrote over it and said nothing, every run: no validator, no refusal.</li>
-    <li>heart-mcp was refused (412), read again, wrote the value anyway, and said whose change it replaced. ARTIE's intent run was refused, read again, and asked: "Setting it to 'ring bearer, retired' would overwrite that change. Do you want to overwrite it anyway?"</li>
+    <li>heart-mcp was refused (412), read again, wrote the value anyway, and said whose change it replaced. ARTIE's goal and intent runs asked first; the intent run's words: "Setting it to 'ring bearer, retired' would overwrite that change. Do you want to overwrite it anyway?"</li>
     <li>In one earlier intent run the other change landed before ARTIE's last read: it saw "keeper of the Red Book" as the role and set what it was told. No client can flag that; only words like "current role", or the old value named, can.</li>
   </ul>
   {{OVERWRITE}}
@@ -239,6 +239,7 @@ details.src pre { max-height: 28rem; }
     <li>An intent step refused as stale reads again and asks the model again, told what it chose, why it was refused, and what changed; it asks rather than writes over that change (intent-decides-again.feature).</li>
     <li>A 404 or 405 from an act, on a resource whose ETag has changed since, is a form out of date: stale, as a 412 is (script-steadiness.feature).</li>
     <li>What the words ask not offered yet ("dismiss him" before notice), the step is asked again, told the server's reason, for an act offered now toward it, then asks the words again (intent-takes-several-acts.feature).</li>
+    <li>An act chosen on a resource that changed since the step read it, the read its words were decided from, is not sent: stale, by the client (script-steadiness.feature). This was the goal run's lost edit.</li>
   </ul>
   {{INTENT_FIX}}
   <p class="note">Midway and at start: the five changes and all five together, on hire, promote, dismiss. Still not done: a new required field, alone or with the others, where it asks the person for the reason, as it should.</p>
@@ -258,7 +259,8 @@ details.src pre { max-height: 28rem; }
     <li><b>Done tonight:</b> heart-mcp shows each schema once, and no <code>hr:</code> plumbing (mcp-lean.feature); ARTIE no longer crashes describing an act the service withdrew (form-relations.feature).</li>
     <li><b>ARTIE goal runs:</b> keep a step that says "current" as the person's words, not as a value the planner worked out earlier.</li>
     <li><b>Done tonight, ARTIE:</b> an intent step decides again after a 412, and asks rather than write over; a form out of date (404, 405) is stale.</li>
-    <li><b>ARTIE goal runs, the validator:</b> an act should carry the validator of the read its words were decided from, not a later one; then the planner's stale value meets a 412, and the step decides again.</li>
+    <li><b>Done tonight, ARTIE:</b> an act chosen on a resource changed since the step read it is not sent; the goal run keeps both edits.</li>
+    <li><b>Next:</b> the same behaviour in heart-ts and heart-mcp, and heart-mcp backed by ARTIE itself, to close its cost gap.</li>
     <li><b>Done tonight, ARTIE:</b> an intent step takes acts toward what its words ask when that is not offered yet, so "dismiss him" gives notice first.</li>
     <li><b>Still the cost gap:</b> heart-mcp takes more calls because each step depends on what the last one offered. Showing an act's result together with what is offered next would cut a call per act.</li>
     <li><b>Not tested here:</b> Cloudflare-style code mode, and the npm <code>openapi-mcp-server</code> (running it was not allowed tonight).</li>
