@@ -373,6 +373,11 @@ def totals(calls):
 # ---- ARTIE, native: a goal run with the reasoner, or a script with no model ----
 
 ARTIE = HERE / "../../client/artie-cli/build/install/artie/bin/artie"
+# A goal run plans from the words; an intent run is the goal's steps as act(intent = …), each chosen from what is
+# offered then; a kept script is artie generate's script from a clean goal run, held to its pins, with no model.
+ARTIE_SOURCES = {"artie-goal": "{task}.goal.md", "artie-intent": "{task}.intent.kts", "artie-kept": "{task}.kept.kts",
+                 "artie-script": "{task}.kts"}
+ARTIE_REASONING = {"artie-goal", "artie-intent"}
 
 
 def run_artie(model, arm, task):
@@ -385,9 +390,9 @@ def run_artie(model, arm, task):
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     trace = HERE / f"runs/artie/{arm}-{task}-{stamp}.yaml"
     trace.parent.mkdir(exist_ok=True)
-    source = HERE / ("artie/" + (f"{task}.goal.md" if arm == "artie-goal" else f"{task}.kts"))
+    source = HERE / "artie" / ARTIE_SOURCES[arm].format(task=task)
     command = [str(ARTIE.resolve()), "run", str(source), "--rung", "L2", "--trace", str(trace)]
-    if arm == "artie-goal":
+    if arm in ARTIE_REASONING:
         command += ["--reasoner", "claude", "--model", model]
     env = {**os.environ, TOKEN_VARIABLE: TOKEN}
     started = time.time()
@@ -406,7 +411,7 @@ def run_artie(model, arm, task):
     return {
         "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
         "changed_at": change.fired if change else None,
-        "at": now(), "model": model if arm == "artie-goal" else None, "arm": arm, "task": task,
+        "at": now(), "model": model if arm in ARTIE_REASONING else None, "arm": arm, "task": task,
         "seconds": round(time.time() - started, 1), "exit": done.returncode,
         "tools_offered": None, "tool_definition_tokens": None,
         **totals(calls), "model_calls": usage.get("calls", 0), "calls": None,
@@ -437,8 +442,10 @@ def main():
     for rep in range(args.reps):
         for task in args.tasks.split(","):
             for arm in args.arms.split(","):
-                if arm == "artie-script" and task == "t3":
+                if arm in ("artie-script", "artie-kept") and task == "t3":
                     continue  # a script reads and acts within milliseconds: no one can change Frodo in between
+                if arm == "artie-kept" and not (HERE / "artie" / f"{task}.kept.kts").exists():
+                    continue  # kept only from a goal run that acted: task 2's acted on nothing
                 try:
                     if arm.startswith("artie-"):
                         record = run_artie(args.model, arm, task)

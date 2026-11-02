@@ -1,0 +1,218 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8099/
+      given: default
+      default: http://localhost:8099/
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 3
+    input: 1243
+    output: 492
+    cache_read: 2754
+    cache_write: 0
+---
+at: '2026-11-02T10:03:18.394500Z'
+ms: 45
+mode: script
+say: enter {entry}
+line: 5
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T10:03:18.444294Z'
+ms: 2853
+mode: intent
+say: Find the employees named Baggins
+line: 6
+within: 5
+params:
+  relation: staff:search-employees
+  name: Baggins
+values:
+  name:
+    value: Baggins
+    type: string
+    from:
+      - words
+reason:
+  template: Find the employees named Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Find the employees named Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_019V6KscLSnvxrKNJERyFYQ5","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Baggins"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Baggins
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T10:03:21.294513Z'
+ms: 1555
+mode: intent
+say: Open Frodo Baggins
+line: 7
+within: 6
+params:
+  relation: item
+  title: Frodo Baggins
+values:
+  title:
+    value: Frodo Baggins
+    from:
+      - words
+reason:
+  template: Open Frodo Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Frodo Baggins"},{"rel":"item","title":"Bilbo Baggins"}]
+      </links>
+      <intent>
+      Open Frodo Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01VUCNqfYn8RDMF6FZPMM7iE","name":"select","input":{"action":"follow","rel":"item","title":"Frodo Baggins"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Frodo Baggins
+  method: GET
+  target: http://localhost:8099/employees/1
+  address: http://localhost:8099/employees/1
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: dismissed
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T10:03:22.848248Z'
+ms: 2580
+mode: intent
+say: Change his role to "ring bearer, retired"
+line: 8
+within: 7
+params: {}
+reason:
+  template: Change his role to "ring bearer, retired"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"ring bearer","status":"dismissed"}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "ring bearer, retired"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS8gkKEAgTGAI4AUIIdGhpbmtpbmcSDFwW653izSvkJT2pvBoMFEdnVB4D9N9ix5lLIjDo4KZEIgh6OoYgKbpVugoFJzstUk1Iys07xss0+If9q8UH7N0J6zECyrEcejTrDEcqjwmSFd1QaaIhuERWOnjoO/CzThsxW9vDVFs3Sj6gaSegpHZYzGB1raGB48i3LnTQQ+Quy5IEqgGiBw8Z1PmFYqb9TvqiLOwdlNXBDemm+GhdGonSc79R9yO7iLZ1qZpLw2+TRJlHVY8tmdz/OQJqbzwEewqoPGMB1qIhNu9oGEtkH0h2DXyAtckF6y56Yc/V1BGZ/cURKFhpvYdmvdHq2RiuBMFbHe9QAw85d0AI8B693dTnxZUuqjuQ8xY2SCy8rKONW7YcmrFLIwnL8kFvU5vA0HnoTPhmI37Xtj9F63qlRkiFgdmFWPSob+2k54bXYVn2/JX2Dkgm5plQIG9BYJWWNGYeH5tMouHHr7Oqn9mTSlLfdMbjW5VoRhh5qw4FPLowQwaRQkGacUrH+wXlNdw6/g8bl0swI2cCRqFdpN7NPCljCmjRQMeG2kdb59UvF3Gw4OVzRB0hzJyBj7RrzDAZFVqu6gJk6GgTzDtADF8oC/LX0WAJvg+sWc//Q1SoOama052WCOWLNVAvdxjGSoreDpjphQoDFm5cTdnzSZOZ55lgqD+w5n2bSMzE1ISgi0k6SGeyhs81KXfv8PS3DXMIIcgUwTXgN8DVF3cNxiBg4Tbo48hqxfE2yDxQi4KU51ZhPQ/aOe4VdYrk+5ICXP67+/NNw0DRaKSSWZBWGVh3Si5UOVlgSXc5W0ccoA+udh3n1hzrlyFuR+dHRITvPUjK7yZ0N2RCjF2L0Rvtv0IWMbV2spmrkzplzh19zHsrTIGadmlQpsq8XxuDXJMbu+7TelOjgH+am1JfNyaxDs3hSCcz2pTBJyNNKTa3PBmTJfo8LqkEWobhdXrBYyffSR6b5rb9BMoy2xuTyTnvR2EmFdRhMNheY9FViQucsKUYXUvmp1QRbgqCGWeIZb9yViUh56daoj7I4Lhfir3QUbcL9+pMmsoZ5FAhCo/Artj9rhR25/oDDzrX4IBsU8hzCfnnyPwUxXPuW/7rcLGEnmLpxVaTEUGZAjp8uUs1LEqJyxaOXzqd46drsVpK8z0hdbzTbf8pk3RuDVkqZD1wUfoaJI+Qq1IiQ/hb7fg9SCxr4NPE4Ul087DzpUspHvDFvfZOAeaLON+O4DUOFzUQUfCSnhLR6gyVO8EsAszu4IjUULY1xoH/PD6IRZq/wE7FPmvQ01iv3SMYoVwiV1VGNBOow0V92htM77a4JcMAiK3GWQQXVJxT4fgOkzp/3bwei7phr72jargfE6X4bl/FCXs6Ncz+IxH6YpR+caG3McpMG5IAz3rSBsGBZAgvbH+mK/Py1JCchnxBINDioSSZk+t/AWUExNp1CazVj5w4Xc8Q5OhAcN2nHA/Yq615ZrN/Fqgxi+TWYqP8DBFlQ/yQB3WQgQnoowqwFpkDsqrzePIHtQGVP7lOFoSJ5zAmFQJ8igEDp/76P8sPYlDO85H/v1g2Y2PoE4SppPuLyg7DOGxk8kmLPwNFgbvjqC2C0dCaNbiu1zxfRCR/qKTURbcgJWn1yfY8WFppB1Uif80P3lcAIDxNkhYeuO6MpI4oDJ1turQYAQ=="},{"type":"tool_use","id":"toolu_01VxfZPNU1ViUqyGS7Qwo7Ui","name":"select","input":{"action":"explain","affordance":"update"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: not offered
+  by: the server
+  detail: no reason given

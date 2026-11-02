@@ -1,0 +1,172 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8099/
+      given: default
+      default: http://localhost:8099/
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 2
+    input: 1277
+    output: 260
+    cache_read: 1836
+    cache_write: 0
+---
+at: '2026-11-02T10:05:15.926878Z'
+ms: 42
+mode: script
+say: enter {entry}
+line: 5
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-Ieyh8GdyoS25Y/kOerY4oxsQIYDt+fAgRoKfUM2I9jA=
+      digest: sha256-rhKdQAdpQo2kd4lTvmwTclTfEwT4JvNvNzHHm8RcQmU=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T10:05:15.974042Z'
+ms: 1781
+mode: intent
+say: Hire Samwise Gamgee as a gardener
+line: 6
+within: 5
+params:
+  relation: staff:hire
+  firstName: Samwise
+  lastName: Gamgee
+  role: gardener
+values:
+  firstName:
+    value: Samwise
+    type: string
+    from:
+      - words
+  lastName:
+    value: Gamgee
+    type: string
+    from:
+      - words
+  role:
+    value: gardener
+    type: string
+    from:
+      - words
+reason:
+  template: Hire Samwise Gamgee as a gardener
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-Ieyh8GdyoS25Y/kOerY4oxsQIYDt+fAgRoKfUM2I9jA="]},"digest":"sha256-rhKdQAdpQo2kd4lTvmwTclTfEwT4JvNvNzHHm8RcQmU="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Hire Samwise Gamgee as a gardener
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01USVok5jxMAHJJ8Mwbacri1","name":"select","input":{"action":"act","affordance":"staff:hire","fields":{"firstName":"Samwise","lastName":"Gamgee","role":"gardener"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:hire
+  title: Hire an employee
+  method: POST
+  target: http://localhost:8099/actions/hire
+  address: http://localhost:8099/actions/hire
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+  if-match: '"index-hsf-f5e32bdb058defb4"'
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: new resource
+address: http://localhost:8099/employees/3
+now:
+  state:
+    id: 3
+    firstName: Samwise
+    lastName: Gamgee
+    role: gardener
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T10:05:17.763220Z'
+ms: 1930
+mode: intent
+say: Change his role to "gardener, mayor"
+line: 7
+within: 6
+params: {}
+reason:
+  template: Change his role to "gardener, mayor"
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":3,"firstName":"Samwise","lastName":"Gamgee","role":"gardener","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"reason":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role","reason"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Change his role to "gardener, mayor"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSvgUKEAgTGAI4AUIIdGhpbmtpbmcSDG8NtuVseWjrYDERZhoMDeOF5jJ+Erce108SIjBAT2v9Of8OQj8uq+jFDDCGLJJhJS2VAOxHjICFAg6Y9XaTxNp3AaKzyQtGN3lscIgq2wQFicxVARK/yK3kln/Wx/APBYNeESrhOsKXCy/tFG7aGRw5yXVH9Ak2cwQBl5OIXTExgInLoeR7eFJhhwLKv8p5N28KsKjXlmd1dvMWFBOrxRcCyqlD66EC7OIULZeeUyJtMvcW3cCV6H9PGXWROmsAFfXjVqcO+TC7/vfXK5Ss5nwYRdQzNjQf1E7z3hI/ZHYtlqvRXmM+SEgAUeaQsbl6PQs6+2QySMLIjZdgYQTOa+pqywlAk6ShlU22V+c3qdKIvQKGlb+YTJmoNo4JGBzHPLQiGwvxv2bxgYmboM9rWZFoGSoWugn6voViH9evxkPcRh0jPEMpvfEVCbrwjxItapPA4tXciG4LbD7FDzQfbdmZo/9AHjLUVP8kRD5JHEG0fIztCp5DnPY/BNe/GgCFeLuRsJQuzTyROOmClsfbJrNVo/B7fSqGrGKEWSq0RgaH7clDs1piTaqPF+IRKMiqf0A3HWw9J6Vi04aHwnOIGDMK5l5uJ+VXV0SLi1EP5J6qOHoo/ITf9bSDppYaxegBnNNwyrziiP5Gz+AE04UTKPLqG0ymaPiFoYvH9V7fHaj97P1RtPEYzk+6MZ+Qlau97/5EpXIZ6lC5Suw+vfxSzG0XNGmxZahHF2roUxrRKAjkQb1HIzf52KV1Ij7WCSHN8QUtHcTWqJtHNf6dAzzypabhf0TI7DRoXY5P40mPXONLLg0DXvAXhK4eJFITpDaP3EDDh4ORujzbdwA2HiNXxbtDVhU/croDNHnmxrjxTDC3+wxWEw3IyRQbfX/MYct+5o39vHy/Rdzg5JgYAQ=="},{"type":"tool_use","id":"toolu_01FLVKhfzB7wYh9MzUbMPwdh","name":"select","input":{"action":"clarify","question":"What reason should I record for changing Samwise Gamgee''s role to \"gardener, mayor\"?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8099/employees/3
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: What reason should I record for changing Samwise Gamgee's role to "gardener, mayor"?

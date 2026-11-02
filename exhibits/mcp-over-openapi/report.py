@@ -20,10 +20,12 @@ ARM_NAMES = {
     "heart-mcp": "heart-mcp, as first met",
     "heart-mcp-lean": "heart-mcp, lean",
     "artie-goal": "ARTIE goal run",
+    "artie-intent": "ARTIE intent run",
+    "artie-kept": "ARTIE kept script, no model",
     "artie-script": "ARTIE script, no model",
 }
 STATIC = ["fastmcp", "fastmcp-typical", "meta-tools"]
-HEART = ["heart-mcp", "heart-mcp-lean", "artie-goal", "artie-script"]
+HEART = ["heart-mcp", "heart-mcp-lean", "artie-goal", "artie-intent", "artie-kept", "artie-script"]
 CHANGES = ["moved", "renamed", "required", "method", "notice", "moved,renamed,required,method,notice"]
 CHANGE_NAMES = {"moved": "moved", "renamed": "renamed", "required": "required", "method": "method",
                 "notice": "notice", "moved,renamed,required,method,notice": "all five"}
@@ -53,7 +55,8 @@ def group(runs, *keys):
 
 
 def asked(run):
-    return "the planner asks" in (run.get("final_text") or "")
+    text = run.get("final_text") or ""
+    return "the planner asks" in text or "unclear to the reasoner" in text
 
 
 def outcome(run):
@@ -119,10 +122,12 @@ def concurrent(runs):
         lost = sum(bool(r["check"].get("lost_update")) for r in g)
         noticed = sum("red book" in (r.get("final_text") or "").lower() for r in g)
         refused = sum(any(q["status"] == 412 for q in r["requests"]) for r in g)
+        stopped = sum(outcome(r) == "failed, said so" and not r["check"].get("lost_update") for r in g)
         rows.append([ARM_NAMES[arm], score(g), f'<span class="{"bad" if lost else "ok"}">{lost}/{len(g)}</span>',
-                     f"{noticed}/{len(g)}", f"{refused}/{len(g)}", k(median(r["input_processed"] for r in g))])
-    return table(["Arm", "Kept both changes", "Lost the other change", "Mentioned the other change", "Refused 412, read again",
-                  "Input tokens"], rows)
+                     f"{noticed}/{len(g)}", f"{refused}/{len(g)}", f"{stopped}/{len(g)}",
+                     k(median(r["input_processed"] for r in g))])
+    return table(["Arm", "Kept both changes", "Lost the other change", "Mentioned the other change", "Refused 412",
+                  "Stopped, said why", "Input tokens"], rows)
 
 
 def changes(runs, when, arms):
@@ -191,9 +196,9 @@ def first(runs, **match):
 
 
 def main():
-    base = load("full-sonnet.jsonl")
+    base = load("full-sonnet.jsonl", "intent-kept-sonnet.jsonl")
     lean_runs = load("lean-sonnet.jsonl")
-    nuclear = load("changes-sonnet.jsonl") + load("changes-lean-sonnet.jsonl")
+    nuclear = load("changes-sonnet.jsonl") + load("changes-lean-sonnet.jsonl") + load("changes-intent-kept-sonnet.jsonl")
     control = load("control-sonnet.jsonl")
     haiku = load("haiku.jsonl")
     haiku_changes = load("changes-haiku.jsonl")
