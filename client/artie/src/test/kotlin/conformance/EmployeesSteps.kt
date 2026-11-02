@@ -8,30 +8,30 @@ import io.cucumber.java.en.When
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.assertEquals
 
-/** Steps for spring.feature: the Spring service, Spring HATEOAS's affordances example as it answers. */
-class SpringSteps(private val world: World) {
+/** Steps for employees.feature: a HEART service, or handicapped as Spring HATEOAS's affordances example. */
+class EmployeesSteps(private val world: World) {
     private val actor get() = world.actor
 
-    @Given("a client asking in {} for the Spring service")
-    fun client(dialect: String) {
+    @Given("a client asking in {} at rung {word} for the employees service")
+    fun client(dialect: String, rung: String) {
         world.simulated()
-        world.me = world.client("L0", "Bearer spring-token", DIALECTS.getValue(dialect))
+        world.me = world.client(rung, "Bearer employees-token", DIALECTS.getValue(dialect))
     }
 
-    @Given("the Spring service answers as a HEART service")
-    fun asHeart() = world.sims.spring.answerAsHeart()
+    @Given("the employees service is handicapped as Spring HATEOAS")
+    fun handicapped() = world.sims.employees.handicapAsSpring()
 
-    @When("it enters the Spring service at its bookmark")
+    @When("it enters the employees service at its bookmark")
     fun enterBookmark() {
         world.rep = actor.client.enter(BOOKMARK)
     }
 
-    @When("it enters the employees of the Spring service")
+    @When("it enters the employees of the employees service")
     fun enter() {
         world.rep = actor.client.enter(EMPLOYEES)
     }
 
-    @When("it tries to enter the employees of the Spring service")
+    @When("it tries to enter the employees of the employees service")
     fun tryEnter() = world.trying { actor.client.enter(EMPLOYEES) }
 
     @When("it follows {string} with no title")
@@ -47,15 +47,15 @@ class SpringSteps(private val world: World) {
         assertEquals(table.asMaps(), held)
     }
 
-    @Then("the Spring service holds these employees")
+    @Then("the employees service holds these employees")
     fun holds(table: DataTable) =
-        assertEquals(table.asMaps(), world.sims.spring.all().map { mapOf("firstName" to it.firstName) })
+        assertEquals(table.asMaps(), world.sims.employees.all().map { mapOf("firstName" to it.firstName) })
 
     private fun text(value: kotlinx.serialization.json.JsonElement?) = value?.jsonPrimitive?.content.orEmpty()
 
     private companion object {
-        const val EMPLOYEES = "http://spring.test/employees"
-        const val BOOKMARK = "http://spring.test/"
+        const val BOOKMARK = "http://employees.test/"
+        const val EMPLOYEES = "http://employees.test/employees"
         val DIALECTS = mapOf("HAL-FORMS" to Dialect.HAL_FORMS, "HAL Schema Forms" to Dialect.HAL_SCHEMA_FORMS)
     }
 }

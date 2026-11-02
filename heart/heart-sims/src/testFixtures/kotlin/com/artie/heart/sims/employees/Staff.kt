@@ -1,4 +1,4 @@
-package com.artie.heart.sims.spring
+package com.artie.heart.sims.employees
 
 import com.artie.heart.ConcurrentWriteException
 import java.util.concurrent.ConcurrentSkipListMap

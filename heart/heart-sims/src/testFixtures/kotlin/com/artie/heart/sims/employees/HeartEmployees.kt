@@ -1,4 +1,4 @@
-package com.artie.heart.sims.spring
+package com.artie.heart.sims.employees
 
 import com.artie.heart.Act
 import com.artie.heart.Acted
@@ -38,7 +38,7 @@ class HeartEmployees(private val staff: Staff) {
         bookmarkActs = listOf(Act("hire", "hire", EMPLOYEE_SCHEMA)),
         offers = Offers(
             keys = listOf(Employee.WORKING, Employee.DISMISSED),
-            offered = { status -> if (status == Employee.WORKING) listOf("update", "dismiss") else emptyList() },
+            offered = { status -> if (status == Employee.WORKING) listOf("dismiss", "update") else emptyList() },
             whyAbsent = { _, _ -> "The employee was dismissed." },
         ),
         state = StateView<Employee, String>(
@@ -99,8 +99,8 @@ class HeartEmployees(private val staff: Staff) {
     )
 
     companion object {
-        /** The Bearer token the Spring service admits when it answers as HEART. */
-        const val TOKEN = "spring-token"
+        /** The Bearer token the employees service admits. */
+        const val TOKEN = "employees-token"
 
         private const val EMPLOYEE_SCHEMA = """{"type": "object", "required": ["firstName", "lastName", "role"],
             "properties": {"firstName": {"type": "string", "minLength": 1},

@@ -4,7 +4,7 @@ import com.artie.heart.sims.build.BuildService
 import com.artie.heart.sims.deploy.DeployService
 import com.artie.heart.sims.deploy.Region
 import com.artie.heart.sims.github.GitHubService
-import com.artie.heart.sims.spring.SpringService
+import com.artie.heart.sims.employees.EmployeesService
 import com.artie.heart.Rung
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -47,14 +47,14 @@ class Simulator {
     val build = BuildService()
     val deploy = DeployService()
     val github = GitHubService()
-    val spring = SpringService()
+    val employees = EmployeesService()
 
-    private val faults = mapOf(BUILD to Faults(), DEPLOY to Faults(), GITHUB to Faults(), SPRING to Faults(), ELSEWHERE to Faults())
+    private val faults = mapOf(BUILD to Faults(), DEPLOY to Faults(), GITHUB to Faults(), EMPLOYEES to Faults(), ELSEWHERE to Faults())
     private val services: Map<String, HttpHandler> = mapOf(
         BUILD to faults.getValue(BUILD).filter.then(build.handler),
         DEPLOY to faults.getValue(DEPLOY).filter.then(deploy.handler),
         GITHUB to faults.getValue(GITHUB).filter.then(github.handler),
-        SPRING to faults.getValue(SPRING).filter.then(spring.handler),
+        EMPLOYEES to faults.getValue(EMPLOYEES).filter.then(employees.handler),
         ELSEWHERE to faults.getValue(ELSEWHERE).filter.then(elsewhere),
     )
     private val mapper = ObjectMapper().findAndRegisterModules()
@@ -71,7 +71,7 @@ class Simulator {
             build.reset()
             deploy.reset()
             github.reset()
-            spring.reset()
+            employees.reset()
         }
         faults.values.forEach(Faults::clear)
         log.clear()
@@ -166,16 +166,13 @@ class Simulator {
             startDeploying(request.path("name").orEmpty())
             Response(Status.NO_CONTENT)
         },
-        "/_sim/spring/mode" bind PUT to { request ->
-            when (request.bodyString().trim()) {
-                "heart" -> spring.answerAsHeart()
-                "spring" -> spring.reset()
-                else -> throw IllegalArgumentException("the Spring service answers as spring or heart")
-            }
+        "/_sim/employees/handicap" bind PUT to { request ->
+            require(request.bodyString().trim() == "spring") { "the employees service is handicapped only as spring" }
+            employees.handicapAsSpring()
             Response(Status.NO_CONTENT)
         },
-        "/_sim/spring/employees" bind GET to {
-            Response(Status.OK).header("Content-Type", "application/json").body(mapper.writeValueAsString(spring.all()))
+        "/_sim/employees/employees" bind GET to {
+            Response(Status.OK).header("Content-Type", "application/json").body(mapper.writeValueAsString(employees.all()))
         },
         "/_sim/log" bind GET to {
             Response(Status.OK).header("Content-Type", "application/json").body(mapper.writeValueAsString(log))
@@ -192,8 +189,8 @@ class Simulator {
         const val DEPLOY = "deploy.test"
         const val GITHUB = "github.test"
 
-        /** Spring HATEOAS's affordances example, as it answers: no HEART service. */
-        const val SPRING = "spring.test"
+        /** Spring HATEOAS's example employees, as a HEART service, or handicapped as Spring serves them. */
+        const val EMPLOYEES = "employees.test"
 
         /** Another origin, for an act a form sends away from the service it came from. */
         const val ELSEWHERE = "elsewhere.test"

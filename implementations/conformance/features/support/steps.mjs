@@ -726,30 +726,31 @@ Then("the client holds {string}, gone", function (path) {
     assert.equal(this.me.heart.current.gone, true);
 });
 
-// ---- The Spring service: Spring HATEOAS's affordances example, as it answers ----
+// ---- The employees service: a HEART service, or handicapped as Spring HATEOAS's affordances example ----
 
-const springEmployees = "http://spring.test/employees";
+const employeesService = "http://employees.test";
 
-Given("a client asking in {} for the Spring service", function (dialect) {
+Given("a client asking in {} at rung {word} for the employees service", function (dialect, rung) {
     const log = [];
     const schemaFailures = [];
-    this.me = { log, schemaFailures, heart: new heart.HeartClient({ dialect: dialects[dialect], authorization: "Bearer spring-token", log, schemaFailures }) };
+    const options = { dialect: dialects[dialect], rung, authorization: "Bearer employees-token", log, schemaFailures };
+    this.me = { log, schemaFailures, heart: new heart.HeartClient(options) };
 });
 
-Given("the Spring service answers as a HEART service", async function () {
-    await sims.springAnswersAs("heart");
+Given("the employees service is handicapped as Spring HATEOAS", async function () {
+    await sims.handicapEmployees("spring");
 });
 
-When("it enters the Spring service at its bookmark", async function () {
-    this.rep = await this.me.heart.enter("http://spring.test/");
+When("it enters the employees service at its bookmark", async function () {
+    this.rep = await this.me.heart.enter(`${employeesService}/`);
 });
 
-When("it enters the employees of the Spring service", async function () {
-    this.rep = await this.me.heart.enter(springEmployees);
+When("it enters the employees of the employees service", async function () {
+    this.rep = await this.me.heart.enter(`${employeesService}/employees`);
 });
 
-When("it tries to enter the employees of the Spring service", async function () {
-    await trying(this, () => this.me.heart.enter(springEmployees));
+When("it tries to enter the employees of the employees service", async function () {
+    await trying(this, () => this.me.heart.enter(`${employeesService}/employees`));
 });
 
 When("it follows {string} with no title", async function (rel) {
@@ -761,6 +762,6 @@ Then("it embeds these employees", function (table) {
     assert.deepEqual(held, table.hashes());
 });
 
-Then("the Spring service holds these employees", async function (table) {
-    assert.deepEqual((await sims.springEmployees()).map((e) => ({ firstName: e.firstName })), table.hashes());
+Then("the employees service holds these employees", async function (table) {
+    assert.deepEqual((await sims.employees()).map((e) => ({ firstName: e.firstName })), table.hashes());
 });
