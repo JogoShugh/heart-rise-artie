@@ -720,3 +720,8 @@ Given("the {word} service's job offers {string} as {} to {string}, with pointers
 Given("the {word} service serves {string} with the validator {string} and the body {}", async function (service, path, validator, body) {
     await sims.plain(hostOf(service), { path, status: 200, body, validator: `"${validator}"` });
 });
+
+Then("the client holds {string}, gone", function (path) {
+    assert.equal(new URL(this.me.heart.current.url).pathname, path);
+    assert.equal(this.me.heart.current.gone, true);
+});

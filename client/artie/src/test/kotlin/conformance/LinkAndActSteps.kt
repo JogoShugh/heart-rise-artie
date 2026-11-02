@@ -114,6 +114,12 @@ class LinkAndActSteps(private val world: World) {
     @Then("the client holds {string}")
     fun clientHolds(path: String) = assertEquals(path, pathOf(world.held.url))
 
+    @Then("the client holds {string}, gone")
+    fun clientHoldsGone(path: String) {
+        val held = checkNotNull(actor.client.current) { "nothing held" }
+        assertEquals(path to true, pathOf(held.url) to held.gone)
+    }
+
     private fun faults(service: String) = world.sims.faults("${service.lowercase()}.test")
 
     private fun reshape(service: String, form: String, patch: String) {

@@ -19,6 +19,14 @@ class HeartRepresentation(
     /** Its links and the resources it embeds. */
     val related: Related = Related(),
 ) {
+    /** Removed by a DELETE answered with no body: held as it was last read, and not read again. */
+    var gone: Boolean = false
+        private set
+
+    /** This representation, as left by a DELETE that removed it. */
+    fun asGone(): HeartRepresentation =
+        HeartRepresentation(url, state, manifest, etag, forms, related).also { it.gone = true }
+
     val affordances: Map<String, AffordanceForm> get() = manifest.forms
 
     /** Every link but `curies`, by the relation the server wrote. */

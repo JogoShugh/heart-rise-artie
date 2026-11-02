@@ -63,7 +63,8 @@ function appliedRung(response: Response, dialect: Dialect): Rung {
 }
 
 /** Methods that carry no body. */
-const BODYLESS = ["DELETE", "HEAD"];
+const DELETE = "DELETE";
+const BODYLESS = [DELETE, "HEAD"];
 
 /** Where an act's answer lives: the Content-Location it names, else the resource acted on. */
 function answerUrl(response: Response, target: URL, heldUrl: string): string {
@@ -120,13 +121,18 @@ export class HeartClient {
         if (form.method === GET) return this.sync(target.toString());
         const response = await this.send(target.toString(), this.actRequest(form, held.etag, fields));
         if (!response.ok) throw await this.refusal(name, response);
-        return this.answered(answerUrl(response, target, held.url), response);
+        return this.answered(answerUrl(response, target, held.url), response, form.method === DELETE ? held : undefined);
     }
 
-    /** An act's answer is the resource's new representation; a service that sends none leaves it to be read. */
-    private async answered(url: string, response: Response): Promise<Representation> {
+    /**
+     * An act's answer is the resource's new representation; a service that sends none leaves it to be read,
+     * except after a DELETE, which removed it: what was [deleted] is held as gone, and nothing is read.
+     */
+    private async answered(url: string, response: Response, deleted?: Representation): Promise<Representation> {
         const bytes = await bytesOf(response);
-        return bytes.length ? this.complete(url, response, bytes) : this.sync(url);
+        if (bytes.length) return this.complete(url, response, bytes);
+        if (deleted) return (this.current = { ...deleted, gone: true });
+        return this.sync(url);
     }
 
     /** The conditional request for an act. A DELETE has no body: its fields filled its target or query (SPEC §6.2). */

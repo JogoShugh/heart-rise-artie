@@ -46,6 +46,8 @@ export interface Representation {
     forms: Map<string, Form>;
     links: Link[];
     embedded: Embedded[];
+    /** Removed by a DELETE answered with no body: held as it was last read, and not read again. */
+    gone?: true;
 }
 
 /** SPEC §6.1: the state is the body without exactly these four members; any other member is state. */

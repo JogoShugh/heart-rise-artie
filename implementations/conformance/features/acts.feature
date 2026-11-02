@@ -47,6 +47,16 @@ Feature: What an act carries, and what its answer leaves held
     Then the service was sent the credential
     And the other origin was sent none
 
+  Scenario: A DELETE answered with no body removed the resource: it is held as gone, and not read again
+    Spring HATEOAS answers a DELETE 204 with no body; reading the resource again would only find it gone.
+    Given the deploy service's app "web" starts deploying
+    And the deploy service answers acts with no body, from nowhere
+    And a client at rung L0 with the deploy service's credential
+    When it enters the app "web"
+    And it submits "cd:cancel" with {}
+    Then the resource was read 1 times
+    And the client holds "/apps/web", gone
+
   Scenario Outline: What an act's answer leaves held: <case>
     Given the build service answers acts with <body> body, from <from>
     And a client at rung L0 with the build service's credential

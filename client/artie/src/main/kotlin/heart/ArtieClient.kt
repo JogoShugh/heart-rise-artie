@@ -163,6 +163,9 @@ class ArtieClient(
         val outcome = bindings.forUri(act.url).act(act, asking)
         decisions.actSent(rel, act, held.url, outcome)
         broughtIntoBeing = outcome is Outcome.Done && outcome.newResource != null
+        // A DELETE answered with no body removed the resource: it is held as gone, and not read again.
+        val removed = form.method == "DELETE" && outcome is Outcome.Done && outcome.received.body.isBlank()
+        if (removed) return held.asGone().also { current = it }
         if (outcome is Outcome.Done) return answered(outcome, act.url, held)
         throw refusal(rel, act.url, outcome, held)
     }
