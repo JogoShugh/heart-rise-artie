@@ -52,7 +52,10 @@ any `src/main` write, then green; a local commit per step.
    `Bound`: WatchScript.kt:11, Chosen.kt:38-107). Give the generator one data model of steps, and have
    ScriptWriter emit Kotlin from it. This is a refactor: generate's features stay green with byte-identical
    output. **It needs the author's refactor switch.**
-2. **Write YAML.** `artie generate --format yaml` writes `NAME.heart.yaml` from the same model. The JSON Schema is
+2. **Write YAML.** `artie generate --format yaml` writes `NAME.heart.yaml` from the same model. The default stays
+   `kts`; one setting in a config file makes YAML the default (`generate: { format: yaml }`), and `--format`
+   overrides it either way. Today's config is per script, for runs (`NAME.config.yaml`, Config.kt:38); this one
+   is for generate, so it needs a place of its own (open below). The JSON Schema is
    published beside it. If a construct has no YAML key, generate fails and names it.
 3. **Run YAML.** `artie run NAME.heart.yaml` validates against the schema, then interprets the steps by calling the
    same `Here` functions a `.kts` calls: one runtime, so one behaviour. What today reads the Kotlin source must
@@ -95,7 +98,8 @@ ARTIE daemon (spec/ideas/artie-daemon.md, a future idea).
 | DSL | YAML |
 |---|---|
 | `act(rel, pairs, intent, inferred, fromIntent, fields)` | `act`, `intent`, `inferred`, `from-intent`, `fields` |
-| `act(intent = …)`, no relation | `intent` alone: the model chooses |
+| every step's words | `intent`: always the words, whether the step is pinned or not |
+| `act(intent = …)`, no relation: the goal file's `` `reasoned` `` | `reasoned: true`: the model decides this step on every run. Said, not implied by a missing `act` |
 | `follow(rel, title)` | `follow`, `title` |
 | nested block | `then: [steps]` |
 | `keepAs(name)` | `keep-as` |
@@ -121,7 +125,8 @@ goes to `exhibits/merge-watch/merge.heart.yaml` in step 0c.
 - **An empty reason:** the Kotlin writes `${why ?: "no reason given"}`; YAML needs a rule. Proposed: the runner
   always fills "no reason given".
 - **Bare scripts:** left as `.kts`. They are the unguarded baseline; making them data adds nothing.
-- **Generate's default format:** stays `.kts` until the author decides.
+- **Generate's default format:** `kts`, built in. The author switches it with one config setting, without a code
+  change. Where that setting lives (beside the goal file, in the project, or for the person) is open.
 - **Two formats to keep in step:** generate fails on any construct without a YAML key (step 2), and the parity
   feature runs on every new construct.
 - **Vocabulary creep:** every new key is a step toward code. A key is added only for a construct the generator
