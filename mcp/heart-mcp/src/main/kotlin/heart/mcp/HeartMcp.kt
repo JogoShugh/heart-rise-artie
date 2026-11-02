@@ -119,7 +119,12 @@ class HeartMcp(private val client: HeartRiseClient, private val bookmarks: Map<S
                 shown,
             )
             violations.isNotEmpty() ->
-                Views.of(held, rejection("The fields do not satisfy $name's schema or choices.", violations), read, shown)
+                Views.of(
+                    held,
+                    rejection("The fields do not satisfy $name's schema or choices.", violations),
+                    read,
+                    shown,
+                )
             else -> {
                 // A GET form moves to another resource; any other act changes this one.
                 if (form.method == "GET") before.addLast(held.url)
