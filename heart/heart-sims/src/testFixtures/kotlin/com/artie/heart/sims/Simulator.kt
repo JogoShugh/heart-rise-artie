@@ -166,6 +166,14 @@ class Simulator {
             startDeploying(request.path("name").orEmpty())
             Response(Status.NO_CONTENT)
         },
+        "/_sim/spring/mode" bind PUT to { request ->
+            when (request.bodyString().trim()) {
+                "heart" -> spring.answerAsHeart()
+                "spring" -> spring.reset()
+                else -> throw IllegalArgumentException("the Spring service answers as spring or heart")
+            }
+            Response(Status.NO_CONTENT)
+        },
         "/_sim/spring/employees" bind GET to {
             Response(Status.OK).header("Content-Type", "application/json").body(mapper.writeValueAsString(spring.all()))
         },

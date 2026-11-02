@@ -15,7 +15,15 @@ class SpringSteps(private val world: World) {
     @Given("a client asking in {} for the Spring service")
     fun client(dialect: String) {
         world.simulated()
-        world.me = world.client("L0", null, DIALECTS.getValue(dialect))
+        world.me = world.client("L0", "Bearer spring-token", DIALECTS.getValue(dialect))
+    }
+
+    @Given("the Spring service answers as a HEART service")
+    fun asHeart() = world.sims.spring.answerAsHeart()
+
+    @When("it enters the Spring service at its bookmark")
+    fun enterBookmark() {
+        world.rep = actor.client.enter(BOOKMARK)
     }
 
     @When("it enters the employees of the Spring service")
@@ -47,6 +55,7 @@ class SpringSteps(private val world: World) {
 
     private companion object {
         const val EMPLOYEES = "http://spring.test/employees"
+        const val BOOKMARK = "http://spring.test/"
         val DIALECTS = mapOf("HAL-FORMS" to Dialect.HAL_FORMS, "HAL Schema Forms" to Dialect.HAL_SCHEMA_FORMS)
     }
 }

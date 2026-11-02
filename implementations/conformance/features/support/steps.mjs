@@ -733,7 +733,15 @@ const springEmployees = "http://spring.test/employees";
 Given("a client asking in {} for the Spring service", function (dialect) {
     const log = [];
     const schemaFailures = [];
-    this.me = { log, schemaFailures, heart: new heart.HeartClient({ dialect: dialects[dialect], log, schemaFailures }) };
+    this.me = { log, schemaFailures, heart: new heart.HeartClient({ dialect: dialects[dialect], authorization: "Bearer spring-token", log, schemaFailures }) };
+});
+
+Given("the Spring service answers as a HEART service", async function () {
+    await sims.springAnswersAs("heart");
+});
+
+When("it enters the Spring service at its bookmark", async function () {
+    this.rep = await this.me.heart.enter("http://spring.test/");
 });
 
 When("it enters the employees of the Spring service", async function () {

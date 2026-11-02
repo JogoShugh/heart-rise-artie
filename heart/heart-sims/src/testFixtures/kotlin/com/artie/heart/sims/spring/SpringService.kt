@@ -13,11 +13,6 @@ import org.http4k.core.Status
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
-import java.util.concurrent.ConcurrentSkipListMap
-import java.util.concurrent.atomic.AtomicLong
-
-/** An employee as Spring's example keeps it. */
-data class Employee(val id: Long, val firstName: String, val lastName: String, val role: String)
 
 /**
  * The Spring service: Spring HATEOAS's own affordances example
@@ -28,48 +23,62 @@ data class Employee(val id: Long, val firstName: String, val lastName: String, v
  * act answered 204 with no body (a create and an update name the employee in
  * Location). Asked for application/hal+json, it answers its own JSON: a `links`
  * array, no forms. A reset seeds Frodo and Bilbo, as the example's loader does.
+ *
+ * Switched to HEART ([answerAsHeart]), the same employees are served by
+ * heart-core instead ([HeartEmployees]): both dialects, a profile and ETags.
+ * A reset switches it back to answering as Spring.
  */
 class SpringService {
     private val mapper = ObjectMapper()
-    private val employees = ConcurrentSkipListMap<Long, Employee>()
-    private val ids = AtomicLong()
+    private val staff = Staff()
+    private val heart = HeartEmployees(staff)
+
+    @Volatile
+    private var asHeart = false
 
     fun reset() {
-        employees.clear()
-        ids.set(0)
-        save("Frodo", "Baggins", "ring bearer")
-        save("Bilbo", "Baggins", "burglar")
+        staff.reset()
+        asHeart = false
     }
 
-    /** Every employee, in id order. */
-    fun all(): List<Employee> = employees.values.toList()
+    /** From now on, until a reset, the employees are served as a HEART service. */
+    fun answerAsHeart() {
+        asHeart = true
+    }
 
-    private fun save(firstName: String, lastName: String, role: String, id: Long = ids.incrementAndGet()): Employee =
-        Employee(id, firstName, lastName, role).also { employees[id] = it }
+    /** Every employee still working, in id order. */
+    fun all(): List<Employee> = staff.working()
 
-    val handler: HttpHandler = routes(
+    private val spring: HttpHandler = routes(
         "/employees" bind GET to { request -> list(request) },
         "/employees" bind POST to { request ->
-            val made = fromBody(request, ids.incrementAndGet())
+            val made = fromBody(request, null)
             Response(Status.NO_CONTENT).header("Location", "${origin(request)}/employees/${made.id}")
         },
         "/employees/{id}" bind GET to { request ->
-            employees[idOf(request)]?.let { one(request, it) } ?: Response(Status.NOT_FOUND)
+            staff.get(idOf(request))?.let { one(request, it) } ?: Response(Status.NOT_FOUND)
         },
         "/employees/{id}" bind PUT to { request ->
             val saved = fromBody(request, idOf(request))
             Response(Status.NO_CONTENT).header("Location", "${origin(request)}/employees/${saved.id}")
         },
         "/employees/{id}" bind DELETE to { request ->
-            employees.remove(idOf(request))
+            staff.remove(idOf(request))
             Response(Status.NO_CONTENT)
         },
     )
 
-    private fun fromBody(request: Request, id: Long): Employee {
+    val handler: HttpHandler = { request -> if (asHeart) heart.handler(request) else spring(request) }
+
+    /** Spring's save: a new employee when there is no [id], the employee [id] as given otherwise. */
+    private fun fromBody(request: Request, id: Long?): Employee {
         val body = mapper.readTree(request.bodyString())
         fun text(name: String) = body.path(name).asText("")
-        return save(text("firstName"), text("lastName"), text("role"), id)
+        return if (id == null) {
+            staff.hire(text("firstName"), text("lastName"), text("role"))
+        } else {
+            staff.save(id, text("firstName"), text("lastName"), text("role"))
+        }
     }
 
     private fun idOf(request: Request) = request.path("id")?.toLongOrNull() ?: -1
@@ -83,14 +92,14 @@ class SpringService {
         val origin = origin(request)
         val body = if (halForms(request)) {
             mapper.createObjectNode().apply {
-                putObject("_embedded").putArray("employees").apply { all().forEach { add(employee(it, origin)) } }
+                putObject("_embedded").putArray("employees").apply { staff.everyone().forEach { add(employee(it, origin)) } }
                 putObject("_links").putObject("self").put("href", "$origin/employees")
                 set<ObjectNode>("_templates", templates(mapOf("default" to "post")))
             }
         } else {
             mapper.createObjectNode().apply {
                 putArray("links").addObject().put("rel", "self").put("href", "$origin/employees")
-                putArray("content").apply { all().forEach { add(plain(it, origin)) } }
+                putArray("content").apply { staff.everyone().forEach { add(plain(it, origin)) } }
             }
         }
         return answer(request, body)

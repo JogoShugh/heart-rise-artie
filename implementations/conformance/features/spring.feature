@@ -33,3 +33,30 @@ Feature: A Spring HATEOAS service, as it ships
     Given a client asking in HAL Schema Forms for the Spring service
     When it tries to enter the employees of the Spring service
     Then it failed, saying "does not name the profile"
+
+  Scenario Outline: The same employees, served as a HEART service, walked alike in <dialect>
+    Switched to HEART, the Spring service keeps the same employees at the same
+    addresses, served by heart-core: a profile, ETags, and both dialects. A new
+    employee comes from hiring, which its bookmark offers; a dismissed one stays,
+    with nothing more to offer.
+    Given the Spring service answers as a HEART service
+    And a client asking in <dialect> for the Spring service
+    When it enters the Spring service at its bookmark
+    And it submits "<hire>" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener"}
+    Then the client holds "/employees/3"
+    And it offers exactly these acts
+      | <update>  |
+      | <dismiss> |
+    When it submits "<update>" with {"firstName": "Samwise", "lastName": "Gamgee", "role": "gardener, mayor"}
+    Then the state's "role" is "gardener, mayor"
+    When it submits "<dismiss>" with {}
+    Then the state's "status" is "dismissed"
+    And the Spring service holds these employees
+      | firstName |
+      | Frodo     |
+      | Bilbo     |
+
+    Examples:
+      | dialect          | hire       | update       | dismiss       |
+      | HAL-FORMS        | hire       | update       | dismiss       |
+      | HAL Schema Forms | staff:hire | staff:update | staff:dismiss |

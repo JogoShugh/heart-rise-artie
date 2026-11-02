@@ -69,6 +69,7 @@ export const sims = {
     template: (host, name, template) => control("PUT", `/_sim/${host}/templates/${name}`, template),
     deployServesUpTo: (rung) => control("PUT", "/_sim/deploy/rung", rung),
     startDeploying: (app) => control("POST", `/_sim/deploy/apps/${app}/deployments`),
+    springAnswersAs: (mode) => control("PUT", "/_sim/spring/mode", mode),
     springEmployees: async () => (await control("GET", "/_sim/spring/employees")).json(),
     log: async () => (await control("GET", "/_sim/log")).json(),
 };
