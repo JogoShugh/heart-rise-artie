@@ -1,6 +1,9 @@
 # Idea: MCP over OpenAPI, as others build it, set beside heart-mcp
 
-Status: idea, 2026-11-01. From a question: what is the usual way to give an agent MCP tools over an API that has
+Status: run, 2026-11-02, in exhibits/mcp-over-openapi (bench.py, report/index.html): FastMCP's from_openapi
+over the twin and over a typical spec, meta-tools, heart-mcp (as first met and lean), an ARTIE goal run and an
+ARTIE script, on the employees service in heart-sims, with a concurrent edit and five changes made under the
+client. Code Mode and the npm openapi-mcp-server were not run. First written 2026-11-01. From a question: what is the usual way to give an agent MCP tools over an API that has
 an OpenAPI description? Is it one tool per endpoint, or something more dynamic, even hypermedia?
 
 ## What others do (as of November 2026)

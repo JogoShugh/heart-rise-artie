@@ -28,12 +28,13 @@ import yaml
 from fastmcp import Client, FastMCP
 from fastmcp.client.transports import StdioTransport
 
-BASE = "http://localhost:8099"
+BASE = os.environ.get("BENCH_BASE", "http://localhost:8099")
+TOKEN_VARIABLE = f"ARTIE_TOKEN_LOCALHOST_{BASE.rsplit(':', 1)[1]}"
 TOKEN = os.environ["EMPLOYEES_TOKEN"]
 AUTH = {"Authorization": f"Bearer {TOKEN}"}
 PLAIN = {**AUTH, "Accept": "application/json"}
 HERE = Path(__file__).parent
-HEART_MCP = HERE / "../../mcp/heart-mcp-server/build/install/heart-mcp/bin/heart-mcp"
+HEART_MCP = Path(os.environ.get("HEART_MCP_BIN", HERE / "../../mcp/heart-mcp-server/build/install/heart-mcp/bin/heart-mcp"))
 OPENAPI_MCP = "@ivotoby/openapi-mcp-server@1.16.1"
 JAVA_22 = "/Users/josh/Library/Java/JavaVirtualMachines/openjdk-22.0.1/Contents/Home"
 
@@ -130,6 +131,46 @@ class Interferer(threading.Thread):
             time.sleep(0.05)
 
 
+CHANGE = {"names": "", "when": "start"}
+ALL_CHANGES = "moved,renamed,required,method,notice"
+
+
+class ChangeUnder(threading.Thread):
+    """
+    The service changes under the client (PUT /_sim/employees/changes): at the start, once the client is ready
+    (an MCP server has built its tools from the description as it was), or midway, once the client's first act
+    has been answered.
+    """
+
+    def __init__(self, offset):
+        super().__init__(daemon=True)
+        self.offset, self.fired, self.stopped = offset, None, threading.Event()
+
+    def apply(self):
+        sim("PUT", "/_sim/employees/changes", content=CHANGE["names"]).raise_for_status()
+        self.fired = now()
+
+    def run(self):
+        while not self.stopped.is_set():
+            for entry in log()[self.offset:]:
+                acted = entry["method"] in ("POST", "PUT", "PATCH", "DELETE") and 200 <= entry["status"] < 300
+                if acted and "X-Interferer" not in entry["headers"]:
+                    self.apply()
+                    return
+            time.sleep(0.05)
+
+
+def change_under(offset):
+    if not CHANGE["names"]:
+        return None
+    change = ChangeUnder(offset)
+    if CHANGE["when"] in ("start", "before"):
+        change.apply()
+    else:
+        change.start()
+    return change
+
+
 def requests_since(offset):
     seen = [e for e in log()[offset:] if "X-Interferer" not in e["headers"] and e["url"] != "/openapi.json"]
     return [{"method": e["method"], "url": e["url"], "status": e["status"],
@@ -210,10 +251,12 @@ def arm_client(arm):
                "API_HEADERS": f"Authorization:Bearer {TOKEN},Accept:application/json",
                "TOOLS_MODE": arm.removeprefix("openapi-mcp-"), "VERBOSE": "false"}
         return Client(StdioTransport("npx", ["-y", OPENAPI_MCP], env=env, log_file=HERE / "runs/openapi-mcp.log"))
-    if arm == "heart-mcp":
-        env = {**os.environ, "JAVA_HOME": JAVA_22, "HEART_BOOKMARKS": f"employees={BASE}/",
-               "ARTIE_TOKEN_LOCALHOST_8099": TOKEN}
-        return Client(StdioTransport(str(HEART_MCP.resolve()), [], env=env, log_file=HERE / "runs/heart-mcp.log"))
+    if arm in ("heart-mcp", "heart-mcp-lean"):
+        # heart-mcp as the benchmark first met it (HEART_MCP_BIN, a frozen copy), or as built now: each act's
+        # schema shown once, no hr: members in the state (mcp-lean.feature).
+        binary = HEART_MCP if arm == "heart-mcp" else HERE / "../../mcp/heart-mcp-server/build/install/heart-mcp/bin/heart-mcp"
+        env = {**os.environ, "JAVA_HOME": JAVA_22, "HEART_BOOKMARKS": f"employees={BASE}/", TOKEN_VARIABLE: TOKEN}
+        return Client(StdioTransport(str(binary.resolve()), [], env=env, log_file=HERE / f"runs/{arm}.log"))
     raise SystemExit(f"no arm {arm}")
 
 
@@ -240,8 +283,12 @@ async def run(model, arm, task, max_turns, api):
     offset = len(log())
     interferer = Interferer(offset) if task == "t3" else None
     started, calls, tools_used, final_text, error = time.time(), [], [], None, None
+    if CHANGE["names"] and CHANGE["when"] == "before":
+        # The control: changed before the MCP server builds its tools, as after a restart following a release.
+        sim("PUT", "/_sim/employees/changes", content=CHANGE["names"]).raise_for_status()
     async with arm_client(arm) as client:
         tools = [as_tool(t) for t in await client.list_tools()]
+        change = change_under(offset)
         base = api.messages.count_tokens(model=model, system=SYSTEM, messages=[{"role": "user", "content": "x"}])
         with_tools = api.messages.count_tokens(model=model, system=SYSTEM, tools=tools,
                                                messages=[{"role": "user", "content": "x"}])
@@ -276,9 +323,13 @@ async def run(model, arm, task, max_turns, api):
             error = f"stopped after {max_turns} turns"
     if interferer:
         interferer.stopped.set()
+    if change:
+        change.stopped.set()
     requests = requests_since(offset)
     held = everyone()
     record = {
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
         "at": now(), "model": model, "arm": arm, "task": task, "seconds": round(time.time() - started, 1),
         "tools_offered": len(tools), "tool_names": [t["name"] for t in tools],
         "tool_definition_tokens": with_tools.input_tokens - base.input_tokens,
@@ -330,6 +381,7 @@ def run_artie(model, arm, task):
     interferer = Interferer(offset) if task == "t3" else None
     if interferer:
         interferer.start()
+    change = change_under(offset)
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     trace = HERE / f"runs/artie/{arm}-{task}-{stamp}.yaml"
     trace.parent.mkdir(exist_ok=True)
@@ -337,11 +389,13 @@ def run_artie(model, arm, task):
     command = [str(ARTIE.resolve()), "run", str(source), "--rung", "L2", "--trace", str(trace)]
     if arm == "artie-goal":
         command += ["--reasoner", "claude", "--model", model]
-    env = {**os.environ, "ARTIE_TOKEN_LOCALHOST_8099": TOKEN}
+    env = {**os.environ, TOKEN_VARIABLE: TOKEN}
     started = time.time()
     done = subprocess.run(command, env=env, capture_output=True, text=True, timeout=900)
     if interferer:
         interferer.stopped.set()
+    if change:
+        change.stopped.set()
     output = (done.stdout + done.stderr).strip()
     run_doc = next(iter(yaml.safe_load_all(trace.read_text())), {}) if trace.exists() else {}
     usage = ((run_doc or {}).get("run") or {}).get("usage") or {}
@@ -350,6 +404,8 @@ def run_artie(model, arm, task):
     requests = requests_since(offset)
     held = everyone()
     return {
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
         "at": now(), "model": model if arm == "artie-goal" else None, "arm": arm, "task": task,
         "seconds": round(time.time() - started, 1), "exit": done.returncode,
         "tools_offered": None, "tool_definition_tokens": None,
@@ -370,7 +426,11 @@ def main():
     parser.add_argument("--model", default="claude-sonnet-5-5")
     parser.add_argument("--max-turns", type=int, default=25)
     parser.add_argument("--out")
+    parser.add_argument("--changes", default="", help=f"changes to make under the client; all is {ALL_CHANGES}")
+    parser.add_argument("--when", default="start", choices=["before", "start", "midway"])
     args = parser.parse_args()
+    CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
+    CHANGE["when"] = args.when
     (HERE / "runs").mkdir(exist_ok=True)
     out = Path(args.out or HERE / f"runs/{datetime.now().strftime('%Y%m%d-%H%M%S')}.jsonl")
     api = anthropic.Anthropic()

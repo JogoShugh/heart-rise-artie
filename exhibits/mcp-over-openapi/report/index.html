@@ -1,0 +1,370 @@
+<title>Static Tools, Moving Service</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* One reading column; Spring's leaf green for what worked, an amber for what Spring does its own way. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.top-in { max-width: 46rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 0.55rem; }
+.eyebrow { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.theme:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+main { max-width: 46rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 7vw, 3.3rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin-top: 1.3rem; }
+h3 { font: 600 1rem/1.4 var(--body); margin: 0; }
+p, li { max-width: 68ch; }
+p { margin: 0; }
+.dek { font-family: var(--display); font-weight: 500; font-size: 1.22rem; line-height: 1.5; color: var(--muted); margin-top: -0.5rem; }
+a { color: var(--link); text-underline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.78rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+.three { display: grid; grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr)); gap: 0.8rem; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.9rem 1rem; display: grid; gap: 0.45rem; align-content: start; min-width: 0; }
+.card h3 { font-family: var(--display); font-weight: 650; font-size: 1.1rem; }
+.card ul { font-size: 0.92rem; line-height: 1.55; gap: 0.3rem; }
+.verdict { background: var(--leaf-bg); border-left: 3px solid var(--leaf); border-radius: 0 10px 10px 0; padding: 0.95rem 1.1rem; display: grid; gap: 0.45rem; }
+.verdict b { color: var(--leaf); }
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 38rem; font-size: 0.9rem; line-height: 1.5; }
+th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 600; font-variant-numeric: tabular-nums; }
+td.ok { color: var(--leaf); font-weight: 600; white-space: nowrap; }
+td.spring { color: var(--hold); }
+.gaps { list-style: none; padding: 0; counter-reset: gap; gap: 1rem; }
+.gaps > li { counter-increment: gap; display: grid; grid-template-columns: 2.1rem minmax(0, 1fr); gap: 0.8rem; max-width: none; }
+.gaps > li::before { content: counter(gap); font: 600 0.95rem/2rem var(--display); width: 2rem; height: 2rem; text-align: center; border-radius: 50%; border: 1px solid var(--hold); color: var(--hold); background: var(--hold-bg); }
+.gaps .body { display: grid; gap: 0.5rem; min-width: 0; }
+details.src { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+details.src > summary { cursor: pointer; padding: 0.7rem 1rem; list-style: none; font: 600 0.93rem/1.4 var(--body); color: var(--link); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-family: var(--mono); }
+details.src[open] > summary::before { content: "−"; }
+details.src > summary small { font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+details.src > p { font-size: 0.9rem; line-height: 1.55; color: var(--muted); margin: 0 1rem 0.6rem; }
+details.src pre { margin: 0 1rem 1rem; }
+.stack { display: grid; gap: 0.55rem; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
+footer ul { gap: 0.2rem; }
+.ok { color: var(--leaf); font-weight: 600; }
+.bad { color: #b3261e; font-weight: 600; }
+.mid { color: var(--hold); font-weight: 600; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bad { color: #f2a19a; } }
+:root[data-theme="dark"] .bad { color: #f2a19a; }
+table.matrix td { text-align: center; font-variant-numeric: tabular-nums; }
+table td { font-variant-numeric: tabular-nums; }
+.short { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1rem 1.2rem; }
+.short ul { gap: 0.55rem; }
+.note { font-size: 0.9rem; color: var(--muted); }
+details.src pre { max-height: 28rem; }
+</style>
+
+<div class="top"><div class="top-in">
+  <span class="eyebrow">HEART · MCP · 2 November 2026</span>
+  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+</div></div>
+
+<main>
+  <h1>Static Tools, Moving Service</h1>
+  <p class="dek">AI agents work one service through MCP. Some get tools generated from its OpenAPI description, the way most MCP servers are built; others work it through HEART. Then someone else edits the same record, and then the service itself changes under them.</p>
+
+  <div class="short">
+    <h2 style="margin-top:0">In short</h2>
+    <ul>
+      <li><b>Nothing changing: static tools win on cost.</b> Every arm does the work. One tool per endpoint takes 2 to 4 times fewer tokens than heart-mcp, even after tonight's fix cut heart-mcp's by up to 41%.</li>
+      <li><b>Someone else edits the record meanwhile: only heart-mcp keeps both edits.</b> Every static arm overwrote the other person's change, every time, and reported success. heart-mcp was refused (412), read again, and kept both.</li>
+      <li><b>The service changes under the client: static tools break, HEART adapts.</b> After each of five ordinary changes (a moved address, a renamed field, a new required field, a new method, a new workflow step), the static arms failed the task in every run (0 of 54); heart-mcp did it in every run (36 of 36), frozen or lean.</li>
+      <li><b>Static tools fail loudly, but leave work half done.</b> They said what failed (404, 405, 409, 422), yet often finished the other steps: Bilbo dismissed, Samwise never hired.</li>
+      <li><b>Fair to static tools:</b> rebuilt after the change (a restart), they succeed again, and stay cheapest. What breaks them is tools fixed at start-up, not the changes.</li>
+      <li><b>Size:</b> one tool per endpoint for GitHub's REST API is 1,254 tools and 666,289 tokens before the first move. heart-mcp is 6 tools, about 1k tokens, for any service.</li>
+      <li><b>A weaker model (Haiku 5.5) shows the same pattern.</b></li>
+    </ul>
+  </div>
+
+  <h2>Who ran</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Arm</th><th>What the model gets</th><th>Built from</th></tr></thead>
+    <tbody>
+      <tr><th>FastMCP, one tool per endpoint</th><td>5 tools: hire, searchEmployees, getEmployee, update, dismiss</td><td>The service's OpenAPI twin, which heart-core writes, with its state rules in prose ("Only allowed when status is working")</td></tr>
+      <tr><th>FastMCP, typical spec</th><td>The same 5 tools</td><td>The same twin with that prose removed: each operation described by its summary only</td></tr>
+      <tr><th>Meta-tools</th><td>3 tools: list the endpoints, get one's schema, invoke it</td><td>The same twin; Stainless's dynamic mode, built here on FastMCP</td></tr>
+      <tr><th>heart-mcp, as first met</th><td>6 fixed verbs: look, act, follow, describe, explain, back</td><td>Nothing ahead of time; each result shows what the resource offers now</td></tr>
+      <tr><th>heart-mcp, lean</th><td>The same 6 verbs</td><td>Tonight's fix: each act's schema shown once; no <code>hr:</code> plumbing in the state</td></tr>
+      <tr><th>ARTIE goal run</th><td>A goal in steps; ARTIE asks the model to pick from what is offered</td><td>The HEART client's own reasoner</td></tr>
+      <tr><th>ARTIE script, no model</th><td>Nothing: a hand-written script</td><td>Names acts and fields, never addresses</td></tr>
+    </tbody>
+  </table></div>
+  <details class="src"><summary>How it was run <small>model, tasks, what was measured</small></summary>
+    <div style="padding:0 1rem 1rem" class="stack">
+      <ul>
+        <li><b>Service:</b> the employees service in the <code>heart-sims</code> image (Spring HATEOAS's example employees, served by heart-core), reset before every run.</li>
+        <li><b>Model:</b> Claude Sonnet 5.5 for every arm; Haiku 5.5 for a smaller second pass. Same system prompt and task words for every MCP arm; prompt caching as a host does it.</li>
+        <li><b>Tasks:</b>
+          <ul>
+            <li><b>Hire, promote, dismiss:</b> hire Samwise Gamgee as a gardener, make him "gardener, mayor", dismiss Bilbo Baggins.</li>
+            <li><b>A dismissed employee:</b> change the role of Frodo, who is already dismissed.</li>
+            <li><b>Someone else changes him:</b> add ", retired" to Frodo's current role. Once the agent has read Frodo, another person changes his role to "keeper of the Red Book".</li>
+          </ul></li>
+        <li><b>Changes</b> to the service, made after the agent's tools were built ("at start") or after its first write ("midway"):
+          <ul>
+            <li><b>moved:</b> every act at a new address</li>
+            <li><b>renamed:</b> the input <code>role</code> is now <code>position</code></li>
+            <li><b>required:</b> updating needs a <code>reason</code></li>
+            <li><b>method:</b> updating is a PATCH, not a PUT</li>
+            <li><b>notice:</b> dismissing is offered only after a new act, giving notice</li>
+          </ul></li>
+        <li><b>Measured:</b> tokens from the model API's own usage (input taken in, cached or not); tool calls; the HTTP requests the service received, from its log; the service's state after; the agent's last words.</li>
+        <li><b>Runs:</b> 310 in all. The harness, runs and traces are in <code>exhibits/mcp-over-openapi/</code>.</li>
+      </ul>
+    </div>
+  </details>
+
+  <h2>1 · Nothing changes</h2>
+  <ul>
+    <li>Every arm does both tasks, every time.</li>
+    <li>Static tools are cheapest: few calls, small answers, steps done in parallel.</li>
+    <li>With the typical spec, the agent learns "dismissed employees can't be updated" by being refused (409) once per run; with heart-core's twin, it never tries.</li>
+  </ul>
+  <div class="table-scroll"><table class=""><thead><tr><th>Arm</th><th>Hire, promote, dismiss</th><th>A dismissed employee</th><th>Tool definitions</th><th>Model calls (task 1)</th><th>HTTP requests (task 1)</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td><span class="ok">5/5</span> · 4.4k</td><td><span class="ok">5/5</span> · 3.6k</td><td>1.0k</td><td>3</td><td>4</td></tr><tr><th>FastMCP, typical spec</th><td><span class="ok">5/5</span> · 4.2k</td><td><span class="ok">5/5</span> · 4.9k</td><td>925</td><td>3</td><td>4</td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td><span class="ok">5/5</span> · 10.9k</td><td><span class="ok">5/5</span> · 8.4k</td><td>679</td><td>6</td><td>5</td></tr><tr><th>heart-mcp, as first met</th><td><span class="ok">5/5</span> · 26.3k</td><td><span class="ok">5/5</span> · 9.6k</td><td>963</td><td>9</td><td>13</td></tr><tr><th>heart-mcp, lean</th><td><span class="ok">5/5</span> · 15.5k</td><td><span class="ok">5/5</span> · 8.2k</td><td>963</td><td>7</td><td>13</td></tr><tr><th>ARTIE goal run</th><td><span class="ok">5/5</span> · 25.4k</td><td><span class="ok">5/5</span> · 11.7k</td><td>—</td><td>10</td><td>21</td></tr><tr><th>ARTIE script, no model</th><td><span class="ok">5/5</span> · 0</td><td><span class="ok">5/5</span> · 0</td><td>—</td><td>0</td><td>13</td></tr></tbody></table></div>
+  <p class="note">Each cell: runs done · median input tokens per run. Tool definitions: tokens the tools add to every model call.</p>
+
+  <h2>2 · Someone else edits the record meanwhile</h2>
+  <ul>
+    <li>Static arms read Frodo, computed the new role, and wrote it back over the other person's change. No validator was sent, so the service could not tell.</li>
+    <li>Each then reported success; none mentioned the other person's change. It was lost without a trace.</li>
+    <li>heart-mcp sent the validator it read with; the service refused (412) with Frodo's new state; the model appended to that.</li>
+    <li>ARTIE's goal run lost it too, in its planner: the step was rewritten as "set the role to: ring bearer, retired" before acting. A finding to fix.</li>
+  </ul>
+  <div class="table-scroll"><table class=""><thead><tr><th>Arm</th><th>Kept both changes</th><th>Lost the other change</th><th>Mentioned the other change</th><th>Refused 412, read again</th><th>Input tokens</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td><span class="bad">0/5</span></td><td><span class="bad">5/5</span></td><td>0/5</td><td>0/5</td><td>5.2k</td></tr><tr><th>FastMCP, typical spec</th><td><span class="bad">0/5</span></td><td><span class="bad">5/5</span></td><td>0/5</td><td>0/5</td><td>4.8k</td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td><span class="bad">0/5</span></td><td><span class="bad">5/5</span></td><td>0/5</td><td>0/5</td><td>10.6k</td></tr><tr><th>heart-mcp, as first met</th><td><span class="ok">5/5</span></td><td><span class="ok">0/5</span></td><td>5/5</td><td>5/5</td><td>13.6k</td></tr><tr><th>heart-mcp, lean</th><td><span class="ok">5/5</span></td><td><span class="ok">0/5</span></td><td>5/5</td><td>5/5</td><td>11.5k</td></tr><tr><th>ARTIE goal run</th><td><span class="bad">0/5</span></td><td><span class="bad">5/5</span></td><td>0/5</td><td>0/5</td><td>14.4k</td></tr></tbody></table></div>
+  <div class="stack">
+    <details class="src"><summary>FastMCP loses the other change, and says it succeeded</summary><pre><code>→ searchEmployees {&quot;name&quot;: &quot;Baggins&quot;}
+  ← {&quot;count&quot;:2,&quot;items&quot;:[{&quot;id&quot;:1,&quot;title&quot;:&quot;Frodo Baggins&quot;},{&quot;id&quot;:2,&quot;title&quot;:&quot;Bilbo Baggins&quot;}]}
+→ getEmployee {&quot;id&quot;: 1}
+  ← {&quot;id&quot;:1,&quot;firstName&quot;:&quot;Frodo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;ring bearer&quot;,&quot;status&quot;:&quot;working&quot;}
+→ update {&quot;id&quot;: 1, &quot;firstName&quot;: &quot;Frodo&quot;, &quot;lastName&quot;: &quot;Baggins&quot;, &quot;role&quot;: &quot;ring bearer, retired&quot;}
+  ← {&quot;id&quot;:1,&quot;firstName&quot;:&quot;Frodo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;ring bearer, retired&quot;,&quot;status&quot;:&quot;working&quot;}
+
+said: I updated Frodo Baggins&#x27;s role (employee #1) from &quot;ring bearer&quot; to &quot;ring bearer, retired&quot;. His status is still &quot;working&quot;, and I didn&#x27;t dismiss him.</code></pre><p>On the wire:</p><pre><code>GET /employees?name=Baggins → 200
+GET /employees/1 → 200
+PUT /employees/1/actions/update → 200</code></pre></details>
+    <details class="src"><summary>heart-mcp is refused 412, reads again, keeps both</summary><pre><code>→ heart_look {&quot;service&quot;: &quot;employees&quot;}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;title&quot;:&quot;Employees&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:search-employees&quot;,&quot;title&quot;:&quot;Find employees by name&quot;,&quot;description&quot;:&quot;Lists the employees whose name has the text.&quot;,&quot;schema&quot;:{&quot;$schema&quot;:&quot;https://json-schema.
+→ heart_act {&quot;act&quot;: &quot;staff:search-employees&quot;, &quot;fields&quot;: {&quot;name&quot;: &quot;Baggins&quot;}}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;count&quot;:2}},&quot;acts&quot;:[],&quot;links&quot;:[{&quot;rel&quot;:&quot;item&quot;,&quot;title&quot;:&quot;Frodo Baggins&quot;},{&quot;rel&quot;:&quot;item&quot;,&quot;title&quot;:&quot;Bilbo Baggins&quot;}],&quot;outcome&quot;:{&quot;kind&quot;:&quot;acted&quot;,&quot;message&quot;:&quot;staff:search-employees was done.&quot;}}
+→ heart_follow {&quot;rel&quot;: &quot;item&quot;, &quot;title&quot;: &quot;Frodo Baggins&quot;}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:1,&quot;firstName&quot;:&quot;Frodo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;ring bearer&quot;,&quot;status&quot;:&quot;working&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:dismiss&quot;,&quot;title&quot;:&quot;Dismiss the employee&quot;,&quot;description&quot;:&quot;Dismisses the employee, who st
+→ heart_act {&quot;act&quot;: &quot;staff:update&quot;, &quot;fields&quot;: {&quot;firstName&quot;: &quot;Frodo&quot;, &quot;lastName&quot;: &quot;Baggins&quot;, &quot;role&quot;: &quot;ring bearer, retired&quot;}}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:1,&quot;firstName&quot;:&quot;Frodo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;keeper of the Red Book&quot;,&quot;status&quot;:&quot;working&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:dismiss&quot;,&quot;title&quot;:&quot;Dismiss the employee&quot;,&quot;schema&quot;:&quot;as before&quot;},{&quot;name&quot;:&quot;sta
+→ heart_act {&quot;act&quot;: &quot;staff:update&quot;, &quot;fields&quot;: {&quot;firstName&quot;: &quot;Frodo&quot;, &quot;lastName&quot;: &quot;Baggins&quot;, &quot;role&quot;: &quot;keeper of the Red Book, retired&quot;}}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:1,&quot;firstName&quot;:&quot;Frodo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;keeper of the Red Book, retired&quot;,&quot;status&quot;:&quot;working&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:dismiss&quot;,&quot;title&quot;:&quot;Dismiss the employee&quot;,&quot;schema&quot;:&quot;as before&quot;},{&quot;n
+
+said: I updated Frodo Baggins&#x27;s role to &quot;keeper of the Red Book, retired&quot;.
+
+My first attempt was refused as stale. His role had changed from &quot;ring bearer&quot; to &quot;keeper of the Red Book&quot; since I read it. I re-read the record and added &quot;, retired&quot; to the new role. His status still shows &quot;working&quot;, and I didn&#x27;t dismiss him.</code></pre><p>On the wire:</p><pre><code>GET / → 200
+GET / → 200
+GET /employees?name=Baggins → 200
+GET /employees/1 → 200
+GET /affordance-sets/2f822c4fedc9305e → 200
+GET /schemas/efddc7bd8bbcef73 → 200
+GET /schemas/10847085ef79da90 → 200
+PUT /employees/1/actions/update → 412
+GET /employees/1 → 200
+PUT /employees/1/actions/update → 200</code></pre></details>
+  </div>
+
+  <h2>3 · The service changes under the client</h2>
+  <ul>
+    <li><b>At start:</b> the static arms built their tools, then the service changed. They failed every change, every run.</li>
+    <li>HEART clients met each change in the forms offered: new address, new field, new method, the new notice step.</li>
+    <li>The ARTIE script, with its fields written in, broke on the field changes, but refused before sending.</li>
+    <li>When an update needed a <code>reason</code>, heart-mcp's model wrote one ("Role expanded to include mayor, as requested"); ARTIE's goal run stopped and asked the person for it instead.</li>
+  </ul>
+  <h3>Changed at start: done / runs</h3>
+  <div class="table-scroll"><table class="matrix"><thead><tr><th>Arm</th><th>moved</th><th>renamed</th><th>required</th><th>method</th><th>notice</th><th>all five</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td></tr><tr><th>FastMCP, typical spec</th><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td></tr><tr><th>heart-mcp, as first met</th><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td></tr><tr><th>heart-mcp, lean</th><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td></tr><tr><th>ARTIE goal run</th><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="bad">0/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="bad">0/2</span></td></tr><tr><th>ARTIE script, no model</th><td><span class="ok">2/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td><td><span class="ok">2/2</span></td><td><span class="bad">0/2</span></td><td><span class="bad">0/2</span></td></tr></tbody></table></div>
+  <h3>Changed midway, after the first write: done / runs</h3>
+  <div class="table-scroll"><table class="matrix"><thead><tr><th>Arm</th><th>moved</th><th>renamed</th><th>required</th><th>method</th><th>notice</th><th>all five</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td></tr><tr><th>FastMCP, typical spec</th><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td><td><span class="bad">0/1</span></td></tr><tr><th>heart-mcp, as first met</th><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td></tr><tr><th>heart-mcp, lean</th><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td></tr><tr><th>ARTIE goal run</th><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="bad">0/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="bad">0/1</span></td></tr><tr><th>ARTIE script, no model</th><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td><td><span class="ok">1/1</span></td></tr></tbody></table></div>
+  <p class="note">The ARTIE script acts within milliseconds, so midway it usually finishes before the change lands.</p>
+  <h3>How each run ended</h3>
+  <div class="table-scroll"><table class=""><thead><tr><th>Arm</th><th>Done</th><th>Stopped to ask</th><th>Failed, said so</th><th>Failed, said it succeeded</th><th>Refusals (4xx)</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td>0</td><td>0</td><td>18</td><td>0</td><td>41</td></tr><tr><th>FastMCP, typical spec</th><td>0</td><td>0</td><td>18</td><td>0</td><td>39</td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td>0</td><td>0</td><td>18</td><td>0</td><td>46</td></tr><tr><th>heart-mcp, as first met</th><td>18</td><td>0</td><td>0</td><td>0</td><td>6</td></tr><tr><th>heart-mcp, lean</th><td>18</td><td>0</td><td>0</td><td>0</td><td>6</td></tr><tr><th>ARTIE goal run</th><td>12</td><td>5</td><td>1</td><td>0</td><td>0</td></tr><tr><th>ARTIE script, no model</th><td>10</td><td>0</td><td>8</td><td>0</td><td>0</td></tr></tbody></table></div>
+  <ul>
+    <li>Static tools mostly said what failed: "returned a 404", "a position field was required", "none of my tools can give notice".</li>
+    <li>But they kept going with the steps that still worked, leaving the work half done.</li>
+  </ul>
+  <ul>
+    <li>One ARTIE goal run crashed (all five changes, midway): it asked ARTIE to describe an act that the change had just withdrawn. Fixed tonight (ARTIE now says nothing of it, <code>9a3712b</code>); run again, it stops and asks for the reason like the others.</li>
+  </ul>
+  <div class="stack">
+    <details class="src"><summary>FastMCP after the acts moved: 404, and half the work done</summary><pre><code>→ hire {&quot;firstName&quot;: &quot;Samwise&quot;, &quot;lastName&quot;: &quot;Gamgee&quot;, &quot;role&quot;: &quot;gardener&quot;}
+  ← Error calling tool &#x27;hire&#x27;: HTTP error 404: Not Found
+→ searchEmployees {&quot;name&quot;: &quot;Baggins&quot;}
+  ← {&quot;count&quot;:2,&quot;items&quot;:[{&quot;id&quot;:1,&quot;title&quot;:&quot;Frodo Baggins&quot;},{&quot;id&quot;:2,&quot;title&quot;:&quot;Bilbo Baggins&quot;}]}
+→ searchEmployees {&quot;name&quot;: &quot;Gamgee&quot;}
+  ← {&quot;count&quot;:0,&quot;items&quot;:[]}
+→ hire {&quot;firstName&quot;: &quot;Samwise&quot;, &quot;lastName&quot;: &quot;Gamgee&quot;, &quot;role&quot;: &quot;gardener&quot;}
+  ← Error calling tool &#x27;hire&#x27;: HTTP error 404: Not Found
+→ getEmployee {&quot;id&quot;: 2}
+  ← {&quot;id&quot;:2,&quot;firstName&quot;:&quot;Bilbo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;burglar&quot;,&quot;status&quot;:&quot;working&quot;}
+→ dismiss {&quot;id&quot;: 2}
+  ← Error calling tool &#x27;dismiss&#x27;: HTTP error 404: Not Found
+
+said: Only the lookups worked. I couldn&#x27;t hire Samwise Gamgee, change his role, or dismiss Bilbo Baggins.
+
+The `hire` call returned a 404 error twice, and a search confirmed Samwise isn&#x27;t in the system. That left no employee to update, so I skipped the role change to &quot;gardener, mayor&quot;. The `dismiss` call for Bilbo (id 2) also returned a 404. Bilbo&#x27;s status is still &quot;working&quot;.</code></pre><p>On the wire:</p><pre><code>POST /actions/hire → 404
+GET /employees?name=Baggins → 200
+GET /employees?name=Gamgee → 200
+POST /actions/hire → 404
+GET /employees/2 → 200
+DELETE /employees/2/actions/dismiss → 404</code></pre></details>
+    <details class="src"><summary>Meta-tools after notice was added: no tool for it</summary><pre><code>→ list_api_endpoints {}
+  ← [{&quot;name&quot;:&quot;hire&quot;,&quot;description&quot;:&quot;Offered by the bookmark, always; the answer is the new employee.&quot;},{&quot;name&quot;:&quot;searchEmployees&quot;,&quot;description&quot;:&quot;Lists the employees whose name has the text.&quot;},{&quot;name&quot;:&quot;getEmployee&quot;,&quot;description
+→ get_api_endpoint_schema {&quot;endpoint&quot;: &quot;hire&quot;}
+  ← {&quot;name&quot;:&quot;hire&quot;,&quot;description&quot;:&quot;Offered by the bookmark, always; the answer is the new employee.&quot;,&quot;input_schema&quot;:{&quot;type&quot;:&quot;object&quot;,&quot;properties&quot;:{&quot;firstName&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;minLength&quot;:1},&quot;lastName&quot;:{&quot;type&quot;:&quot;string&quot;,&quot;minLe
+→ get_api_endpoint_schema {&quot;endpoint&quot;: &quot;update&quot;}
+  ← {&quot;name&quot;:&quot;update&quot;,&quot;description&quot;:&quot;Offered while the employee is working or on notice.\n\nOnly allowed when status is working or on notice.&quot;,&quot;input_schema&quot;:{&quot;type&quot;:&quot;object&quot;,&quot;properties&quot;:{&quot;id&quot;:{&quot;type&quot;:&quot;integer&quot;,&quot;minimum&quot;:1.0
+→ get_api_endpoint_schema {&quot;endpoint&quot;: &quot;dismiss&quot;}
+  ← {&quot;name&quot;:&quot;dismiss&quot;,&quot;description&quot;:&quot;Offered while the employee is working; nothing is offered after.\n\nOnly allowed when status is working or on notice.&quot;,&quot;input_schema&quot;:{&quot;type&quot;:&quot;object&quot;,&quot;properties&quot;:{&quot;id&quot;:{&quot;type&quot;:&quot;integer&quot;
+→ searchEmployees {}
+  ← Unknown tool: &#x27;searchEmployees&#x27;
+→ invoke_api_endpoint {&quot;endpoint&quot;: &quot;hire&quot;, &quot;args&quot;: {&quot;firstName&quot;: &quot;Samwise&quot;, &quot;lastName&quot;: &quot;Gamgee&quot;, &quot;role&quot;: &quot;gardener&quot;}}
+  ← {&quot;id&quot;:3,&quot;firstName&quot;:&quot;Samwise&quot;,&quot;lastName&quot;:&quot;Gamgee&quot;,&quot;role&quot;:&quot;gardener&quot;,&quot;status&quot;:&quot;working&quot;}
+→ invoke_api_endpoint {&quot;endpoint&quot;: &quot;searchEmployees&quot;, &quot;args&quot;: {&quot;search&quot;: &quot;Baggins&quot;}}
+  ← {&quot;count&quot;:3,&quot;items&quot;:[{&quot;id&quot;:1,&quot;title&quot;:&quot;Frodo Baggins&quot;},{&quot;id&quot;:2,&quot;title&quot;:&quot;Bilbo Baggins&quot;},{&quot;id&quot;:3,&quot;title&quot;:&quot;Samwise Gamgee&quot;}]}
+→ invoke_api_endpoint {&quot;endpoint&quot;: &quot;update&quot;, &quot;args&quot;: {&quot;id&quot;: 3, &quot;firstName&quot;: &quot;Samwise&quot;, &quot;lastName&quot;: &quot;Gamgee&quot;, &quot;role&quot;: &quot;gardener, mayor&quot;}}
+  ← {&quot;id&quot;:3,&quot;firstName&quot;:&quot;Samwise&quot;,&quot;lastName&quot;:&quot;Gamgee&quot;,&quot;role&quot;:&quot;gardener, mayor&quot;,&quot;status&quot;:&quot;working&quot;}
+→ invoke_api_endpoint {&quot;endpoint&quot;: &quot;getEmployee&quot;, &quot;args&quot;: {&quot;id&quot;: 2}}
+  ← {&quot;id&quot;:2,&quot;firstName&quot;:&quot;Bilbo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;burglar&quot;,&quot;status&quot;:&quot;working&quot;}
+→ invoke_api_endpoint {&quot;endpoint&quot;: &quot;dismiss&quot;, &quot;args&quot;: {&quot;id&quot;: 2}}
+  ← Error calling tool &#x27;dismiss&#x27;: HTTP error 409: Conflict - {&quot;type&quot;: &quot;https://w3id.org/heart-rise/problems/not-offered&quot;, &quot;title&quot;: &quot;The act is not offered in the resource&#x27;s current state&quot;, &quot;status&quot;: 409, &quot;detail&quot;: &quot;staff:dis
+→ invoke_api_endpoint {&quot;endpoint&quot;: &quot;getEmployee&quot;, &quot;args&quot;: {&quot;id&quot;: 2}}
+  ← {&quot;id&quot;:2,&quot;firstName&quot;:&quot;Bilbo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;burglar&quot;,&quot;status&quot;:&quot;working&quot;}
+→ list_api_endpoints {&quot;search&quot;: &quot;notice&quot;}
+  ← [{&quot;name&quot;:&quot;dismiss&quot;,&quot;description&quot;:&quot;Offered while the employee is working; nothing is offered after.\n\nOnly allowed when status is working or on notice.&quot;},{&quot;name&quot;:&quot;update&quot;,&quot;description&quot;:&quot;Offered while the employee is work
+
+said: I hired Samwise Gamgee as a gardener (id 3) and then changed his role to &quot;gardener, mayor&quot;. I did not dismiss Bilbo Baggins (id 2). The service refused with &quot;Notice must be given first&quot;, and none of the tools I have can give notice. Bilbo is still working as a burglar.</code></pre><p>On the wire:</p><pre><code>POST /actions/hire → 201
+GET /employees → 200
+PUT /employees/3/actions/update → 200
+GET /employees/2 → 200
+DELETE /employees/2/actions/dismiss → 409
+GET /employees/2 → 200</code></pre></details>
+    <details class="src"><summary>heart-mcp after notice was added: finds and gives notice, then dismisses</summary><pre><code>→ heart_look {&quot;service&quot;: &quot;employees&quot;}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;title&quot;:&quot;Employees&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:search-employees&quot;,&quot;title&quot;:&quot;Find employees by name&quot;,&quot;description&quot;:&quot;Lists the employees whose name has the text.&quot;,&quot;schema&quot;:{&quot;$schema&quot;:&quot;https://json-schema.
+→ heart_act {&quot;act&quot;: &quot;staff:hire&quot;, &quot;fields&quot;: {&quot;firstName&quot;: &quot;Samwise&quot;, &quot;lastName&quot;: &quot;Gamgee&quot;, &quot;role&quot;: &quot;gardener&quot;}}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:3,&quot;firstName&quot;:&quot;Samwise&quot;,&quot;lastName&quot;:&quot;Gamgee&quot;,&quot;role&quot;:&quot;gardener&quot;,&quot;status&quot;:&quot;working&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:give-notice&quot;,&quot;title&quot;:&quot;Give notice&quot;,&quot;description&quot;:&quot;Puts the employee on notice, before d
+→ heart_act {&quot;act&quot;: &quot;staff:update&quot;, &quot;fields&quot;: {&quot;firstName&quot;: &quot;Samwise&quot;, &quot;lastName&quot;: &quot;Gamgee&quot;, &quot;role&quot;: &quot;gardener, mayor&quot;}}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:3,&quot;firstName&quot;:&quot;Samwise&quot;,&quot;lastName&quot;:&quot;Gamgee&quot;,&quot;role&quot;:&quot;gardener, mayor&quot;,&quot;status&quot;:&quot;working&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:give-notice&quot;,&quot;title&quot;:&quot;Give notice&quot;,&quot;schema&quot;:&quot;as before&quot;},{&quot;name&quot;:&quot;staff:update&quot;,
+→ heart_look {&quot;service&quot;: &quot;employees&quot;}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;title&quot;:&quot;Employees&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:search-employees&quot;,&quot;title&quot;:&quot;Find employees by name&quot;,&quot;schema&quot;:&quot;as before&quot;},{&quot;name&quot;:&quot;staff:get-employee&quot;,&quot;title&quot;:&quot;Get an employee by number&quot;,&quot;schema&quot;:&quot;as be
+→ heart_act {&quot;act&quot;: &quot;staff:search-employees&quot;, &quot;fields&quot;: {&quot;name&quot;: &quot;Baggins&quot;}}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;count&quot;:2}},&quot;acts&quot;:[],&quot;links&quot;:[{&quot;rel&quot;:&quot;item&quot;,&quot;title&quot;:&quot;Frodo Baggins&quot;},{&quot;rel&quot;:&quot;item&quot;,&quot;title&quot;:&quot;Bilbo Baggins&quot;}],&quot;outcome&quot;:{&quot;kind&quot;:&quot;acted&quot;,&quot;message&quot;:&quot;staff:search-employees was done.&quot;}}
+→ heart_follow {&quot;rel&quot;: &quot;item&quot;, &quot;title&quot;: &quot;Bilbo Baggins&quot;}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:2,&quot;firstName&quot;:&quot;Bilbo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;burglar&quot;,&quot;status&quot;:&quot;working&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:give-notice&quot;,&quot;title&quot;:&quot;Give notice&quot;,&quot;schema&quot;:&quot;as before&quot;},{&quot;name&quot;:&quot;staff:update&quot;,&quot;title&quot;:&quot;
+→ heart_act {&quot;act&quot;: &quot;staff:give-notice&quot;}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:2,&quot;firstName&quot;:&quot;Bilbo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;burglar&quot;,&quot;status&quot;:&quot;on notice&quot;}},&quot;acts&quot;:[{&quot;name&quot;:&quot;staff:dismiss&quot;,&quot;title&quot;:&quot;Dismiss the employee&quot;,&quot;description&quot;:&quot;Dismisses the employee, who stay
+→ heart_act {&quot;act&quot;: &quot;staff:dismiss&quot;}
+  ← {&quot;resource&quot;:{&quot;state&quot;:{&quot;id&quot;:2,&quot;firstName&quot;:&quot;Bilbo&quot;,&quot;lastName&quot;:&quot;Baggins&quot;,&quot;role&quot;:&quot;burglar&quot;,&quot;status&quot;:&quot;dismissed&quot;}},&quot;acts&quot;:[],&quot;links&quot;:[],&quot;outcome&quot;:{&quot;kind&quot;:&quot;acted&quot;,&quot;message&quot;:&quot;staff:dismiss was done.&quot;}}
+
+said: I hired Samwise Gamgee as a gardener (employee #3) and then changed his role to &quot;gardener, mayor&quot;. I also dismissed Bilbo Baggins (employee #2). The service made me put him on notice first, and he&#x27;s now marked dismissed but stays on record.</code></pre><p>On the wire:</p><pre><code>GET / → 200
+GET / → 200
+POST /actions/hire → 201
+GET /affordance-sets/0489e15c599ce443 → 200
+GET /schemas/efddc7bd8bbcef73 → 200
+GET /schemas/10847085ef79da90 → 200
+PUT /employees/3/actions/update → 200
+GET / → 200
+GET / → 200
+GET /employees?name=Baggins → 200
+GET /employees/2 → 200
+POST /employees/2/actions/give-notice → 200
+GET /affordance-sets/e90ab1498c6b5e60 → 200
+DELETE /employees/2/actions/dismiss → 200
+GET /affordance-sets/70ba68bb191fc588 → 200</code></pre></details>
+  </div>
+  <h3>Control: changed before the tools were built (a restart)</h3>
+  <div class="table-scroll"><table class="matrix"><thead><tr><th>Arm</th><th>moved</th><th>renamed</th><th>required</th><th>method</th><th>notice</th><th>all five</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td></tr><tr><th>FastMCP, typical spec</th><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td></tr><tr><th>heart-mcp, lean</th><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td><td><span class="ok">2/2</span></td></tr></tbody></table></div>
+  <ul>
+    <li>Rebuilt from the changed description, the static tools do the task again. The failures above come from tools fixed at start-up, not from changes too hard to follow.</li>
+    <li>So static tools need a restart, a new spec, and luck in timing for each release; a HEART client needs none of these.</li>
+  </ul>
+
+  <h2>4 · What it costs</h2>
+  <h3>heart-mcp's fix, tonight</h3>
+  <ul>
+    <li>heart-mcp repeated each offered act's full schema in every result, and showed the bookmark's <code>hr:manifest</code> digests to the model.</li>
+    <li>Now each schema is shown once while it stays the same; the model sees "as before" after that, and the state holds the resource's own members only.</li>
+  </ul>
+  <div class="table-scroll"><table class=""><thead><tr><th>Task</th><th>heart-mcp, as first met</th><th>heart-mcp, lean</th><th>Change</th><th>Lean, done</th></tr></thead><tbody><tr><th>Hire, promote, dismiss</th><td>26.3k</td><td>15.5k</td><td>-41%</td><td><span class="ok">5/5</span></td></tr><tr><th>A dismissed employee</th><td>9.6k</td><td>8.2k</td><td>-14%</td><td><span class="ok">5/5</span></td></tr><tr><th>Someone else changes him</th><td>13.6k</td><td>11.5k</td><td>-16%</td><td><span class="ok">5/5</span></td></tr></tbody></table></div>
+  <h3>Size</h3>
+  <ul>
+    <li>FastMCP's tools for GitHub's REST description: 1,254 tools, 666,289 tokens of definitions, 531 per tool on average; the largest single tool is 43 KB.</li>
+    <li>Meta-tools stay at about 0.7k tokens, and heart-mcp at about 1k, however large the API.</li>
+  </ul>
+
+  <h2>5 · A weaker model</h2>
+  <div class="table-scroll"><table class=""><thead><tr><th>Arm</th><th>Hire, promote, dismiss</th><th>A dismissed employee</th><th>Someone else changes him</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td><span class="ok">3/3</span> · 6.5k</td><td><span class="ok">3/3</span> · 3.7k</td><td><span class="bad">0/3</span> · 5.2k</td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td><span class="ok">3/3</span> · 11.9k</td><td><span class="ok">3/3</span> · 7.6k</td><td><span class="bad">0/3</span> · 11.5k</td></tr><tr><th>heart-mcp, lean</th><td><span class="ok">3/3</span> · 19.6k</td><td><span class="ok">3/3</span> · 8.2k</td><td><span class="ok">3/3</span> · 15.1k</td></tr></tbody></table></div>
+  <h3>All five changes at start, Haiku 5.5</h3>
+  <div class="table-scroll"><table class="matrix"><thead><tr><th>Arm</th><th>all five</th></tr></thead><tbody><tr><th>FastMCP, one tool per endpoint</th><td><span class="bad">0/3</span></td></tr><tr><th>Meta-tools (list, schema, invoke)</th><td><span class="bad">0/3</span></td></tr><tr><th>heart-mcp, lean</th><td><span class="ok">3/3</span></td></tr></tbody></table></div>
+
+  <h2>To act on</h2>
+  <ul>
+    <li><b>Done tonight:</b> heart-mcp shows each schema once, and no <code>hr:</code> plumbing (mcp-lean.feature); ARTIE no longer crashes describing an act the service withdrew (form-relations.feature).</li>
+    <li><b>ARTIE goal runs:</b> keep a step that says "current" as the person's words, not as a value the planner worked out earlier.</li>
+    <li><b>Still the cost gap:</b> heart-mcp takes more calls because each step depends on what the last one offered. Showing an act's result together with what is offered next would cut a call per act.</li>
+    <li><b>Not tested here:</b> Cloudflare-style code mode, and the npm <code>openapi-mcp-server</code> (running it was not allowed tonight).</li>
+  </ul>
+
+  <footer>
+    <span>heart-sims, heart-mcp and the harness on <code>claude/auth-branch-4bnmhc</code> of <a href="https://github.com/JogoShugh/heart-rise-artie">heart-rise-artie</a>; runs and traces in <code>exhibits/mcp-over-openapi/runs/</code>.</span>
+    <span>The ways compared are others' good work: FastMCP's <code>from_openapi</code>, and the meta-tools pattern as Stainless describes it.</span>
+  </footer>
+</main>
+    <span>The run, the trace and the before-and-after state are kept beside the clone, in <code>wild/fresh-run/</code>. The example is <a href="https://github.com/spring-projects/spring-hateoas-examples/tree/main/affordances">spring-projects/spring-hateoas-examples, affordances</a>.</span>
+  </footer>
+</main>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+
