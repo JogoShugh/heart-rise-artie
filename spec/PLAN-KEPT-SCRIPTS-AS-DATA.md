@@ -150,8 +150,13 @@ scratchpad.
 | a comment the generator writes (`// review: …`, "not decided in this run") | a YAML comment | — |
 
 **Doesn't map yet:**
-- `val n by kept("issue") { long("number") }` (Bindings.kt:20): a Kotlin read, bound to a name. In YAML it would
-  be a reference, `${issue.number}`: a change to how the generator binds values, not a new key.
+- **A value carried from an earlier answer**, the commonest gap: 7 of the 10 generated scripts in the repository
+  have it, and the three mockups happen to be the three without. The generator writes `var pull = 0L`, sets it in
+  the step that brought it (`pull = state.long("number")`), and uses it later (`"Fixed in 1.2 by #$pull."`,
+  client/scripts/generated/github-task-from-reasoned.kts:11, 39, 51); or `val n by kept("issue") { long("number") }`
+  (Bindings.kt:20). In YAML: `keep-as: pull` on that step, and `${pull.number}` where it's used, read from the
+  state as it was kept, as the variable was. A change to how the generator binds values, not a new key. A fourth
+  mockup, of github-task-from-reasoned.kts, should show it.
 - `until { … }`'s condition is Kotlin text the run copied (`step.waitedFor`, Waits.kt:30). Only `offers(rel)` and
   facts map; any other text fails generate.
 - Lines copied as written from a `.kts` source (ScriptWriter.kt:149-150), as the scope table says.
