@@ -172,6 +172,22 @@ class ScriptSteps {
         service.asksHolding[row.getValue("intent") to row.getValue("holding")] = row.getValue("question")
     }
 
+    @Given("the reasoner, told the words are not offered yet, chooses")
+    fun reasonerChoosesToward(table: DataTable) = table.asMaps().forEach { row ->
+        service.towardHolding[row.getValue("intent") to row.getValue("holding")] =
+            Choice(row.getValue("relation"), follow = row.getValue("selection") == "follow")
+    }
+
+    @Given("the reasoner, told the words are not offered yet, asks")
+    fun reasonerAsksToward(table: DataTable) = table.asMaps().forEach { row ->
+        service.towardAsks[row.getValue("intent") to row.getValue("holding")] = row.getValue("question")
+    }
+
+    @Given("the server says why {string} is not offered: {string}")
+    fun whyNot(rel: String, why: String) {
+        service.whyNot[rel] = why
+    }
+
     @Then("the reasoner was told, besides the words, in order")
     fun reasonerTold(table: DataTable) = assertEquals(table.asMaps().map { it.getValue("told") }, service.told)
 

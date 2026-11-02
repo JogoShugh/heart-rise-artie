@@ -48,8 +48,11 @@ internal fun Here.reasoned(step: Int, said: Said, block: (Here.() -> Unit)?) {
     val key = Triple(intent, held.address, held.offered).takeIf { run.goal == null }
     key?.let { run.reasoned[it] }?.let { chosen -> return again(step, chosen, said, block) }
     val before = run.trace.size
-    val reasoned = decided(intent)
-    if (key != null && reasoned.answer !is Answer.Refused) reasoned.chosen?.let { run.reasoned[key] = it }
+    val decided = decided(step, intent)
+    val reasoned = decided.reasoned
+    // A step that took acts toward its words is no one choice to make again: it is decided again each time.
+    val kept = key?.takeIf { decided.toward == 0 && reasoned.answer !is Answer.Refused }
+    if (kept != null) reasoned.chosen?.let { run.reasoned[kept] = it }
     val answer = reasoned.answer
     // A model's words are kept as inferred on the reason step the client traced, so a script made from the run
     // says whose they were; a client that traces none is left as it is.
@@ -57,31 +60,59 @@ internal fun Here.reasoned(step: Int, said: Said, block: (Here.() -> Unit)?) {
     go(step, "\"intent\"", answer, block)
 }
 
+/** What an intent step came to: the reasoner's last decision, and how many acts it made toward the words first. */
+private class Decided(val reasoned: Reasoned, val toward: Int)
+
 /**
- * [intent] handed to the reasoner. Its act refused as stale, someone changed the resource since it chose (SPEC
- * §6.2: never sent again, the intent derived again against the new state): the held resource is read again, and
- * the reasoner asked again, told what it chose, why that was refused, and what changed since, at most
- * [STALE_DECISIONS] times in all.
+ * [intent] handed to the reasoner, as step [step]. Its act refused as stale, someone changed the resource since it
+ * chose (SPEC §6.2: never sent again, the intent derived again against the new state): the held resource is read
+ * again, and the reasoner asked again, told what it chose, why that was refused, and what changed since, at most
+ * [STALE_DECISIONS] times in all. What the words ask not offered here, the reasoner is asked again, told the
+ * server's reason, for an act offered now toward it; made, the step holds what it led to and asks the words again
+ * there, at most [TOWARD_ACTS] acts toward them. A reasoner that makes no act toward them, asking or explaining
+ * again, ends the step with that.
  */
-private fun Here.decided(intent: String): Reasoned {
+private fun Here.decided(step: Int, intent: String): Decided {
     var reasoned = navigator.reason(intent)
-    var decisions = 1
-    while (decisions < STALE_DECISIONS) {
+    var stale = 1
+    var toward = 0
+    while (true) {
         val refused = reasoned.answer as? Answer.Refused
-        if (refused?.kind != Refusal.Stale) break
-        val chose = held.state
-        sync()
-        val earlier = run.besides
-        run.besides = listOfNotNull(earlier, toldAgain(reasoned.chosen, refused, chose, held.state)).joinToString(" ")
-        reasoned = try {
-            navigator.reason(intent)
-        } finally {
-            run.besides = earlier
+        when {
+            refused?.kind == Refusal.Stale && stale < STALE_DECISIONS -> {
+                val chose = held.state
+                sync()
+                reasoned = told(intent, toldAgain(reasoned.chosen, refused, chose, held.state))
+                stale++
+            }
+            // A goal's planner is told a refusal and takes the steps toward it itself: only a script's.
+            refused?.kind == Refusal.NotOffered && toward < TOWARD_ACTS && run.goal == null -> {
+                val first = told(intent, towardIt(refused))
+                if (first.answer is Answer.Refused) return Decided(first, toward)
+                held = arrived(step, "\"intent\"", first.answer)
+                toward++
+                reasoned = navigator.reason(intent)
+            }
+            else -> return Decided(reasoned, toward)
         }
-        decisions++
     }
-    return reasoned
 }
+
+/** [intent] handed to the reasoner, told [more] besides the words, after anything the run tells it already. */
+private fun Here.told(intent: String, more: String): Reasoned {
+    val earlier = run.besides
+    run.besides = listOfNotNull(earlier, more).joinToString(" ")
+    return try {
+        navigator.reason(intent)
+    } finally {
+        run.besides = earlier
+    }
+}
+
+/** What the reasoner is told when what the words ask is not offered here, [refused] with the server's reason. */
+private fun towardIt(refused: Answer.Refused): String =
+    "What these words ask is not offered here now: ${refused.detail} If an act offered here now is a step toward " +
+        "it, choose that act; these words are asked again after it. If none is, ask."
 
 /** What the reasoner is told, deciding again: its [chosen] refused as [refused], and each member changed since. */
 private fun toldAgain(chosen: Choice?, refused: Answer.Refused, was: JsonObject, now: JsonObject): String {
@@ -109,6 +140,9 @@ private fun fieldsText(fields: Map<String, Any?>): String = JsonObject(
 
 /** How many times an intent step decides, its act refused as stale each time, before the refusal stops it. */
 private const val STALE_DECISIONS = 3
+
+/** How many acts an intent step makes toward what its words ask, when that is not offered, before it stops. */
+private const val TOWARD_ACTS = 3
 
 /** [chosen], what the reasoner chose before on these words here, made again as step [step], with no model. */
 private fun Here.again(step: Int, chosen: Choice, said: Said, block: (Here.() -> Unit)?) {

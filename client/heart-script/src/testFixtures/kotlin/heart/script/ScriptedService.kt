@@ -164,17 +164,35 @@ class ScriptedService : Navigator, Wire, Writes {
     /** What the run told the reasoner besides the words, each time it told it anything. */
     val told = mutableListOf<String>()
 
+    /** What the reasoner chooses, told that what the words ask is not offered yet, by the words and the state. */
+    val towardHolding = mutableMapOf<Pair<String, String>, Choice>()
+
+    /** What the reasoner asks, told that what the words ask is not offered yet, by the words and the state. */
+    val towardAsks = mutableMapOf<Pair<String, String>, String>()
+
+    /** Why the server doesn't offer an act, by relation, where a feature says. */
+    val whyNot = mutableMapOf<String, String>()
+
     override fun reason(intent: String): Reasoned {
         // The run may tell the reasoner more after the words, as "<words>. <more>": the words are the step's.
         val words = (reasons.keys + reasonsHolding.keys.map { it.first } + asksHolding.keys.map { it.first })
             .firstOrNull { intent == it || intent.startsWith("$it. ") } ?: intent
-        if (intent != words) told += intent.removePrefix("$words. ")
+        val besides = intent.removePrefix(words).removePrefix(". ")
+        if (intent != words) told += besides
         asked += "reason" to words
         val holding = resources[held]?.get("state").orEmpty()
-        asksHolding[words to holding]?.let { question ->
+        val toward = besides.startsWith("What these words ask is not offered")
+        (if (toward) towardAsks else asksHolding)[words to holding]?.let { question ->
             return Reasoned(null, Answer.Refused(Refusal.Unclear, Side.CLIENT, question))
         }
-        val chosen = reasonsHolding[words to holding] ?: reasons.getValue(words)
+        val chosen = (if (toward) towardHolding[words to holding] else null)
+            ?: reasonsHolding[words to holding] ?: reasons.getValue(words)
+        // A choice the resource doesn't offer, where a feature gives the server's reason for it, is answered with
+        // that reason, as an explain is: nothing sent.
+        val why = whyNot[chosen.relation]
+        if (why != null && !chosen.follow && forms.none { it.at == held && it.relation == chosen.relation }) {
+            return Reasoned(chosen, Answer.Refused(Refusal.NotOffered, Side.SERVER, why))
+        }
         val answer = if (chosen.follow) follow(chosen.relation, chosen.title) else act(chosen.relation, chosen.fields)
         // As a client reports its model's calls: the scripted reasoner's one, asked the words, answering its choice.
         return Reasoned(chosen, answer, listOf(ModelCall("scripted-1", "intent: $intent", "chose: ${chosen.relation}")))
