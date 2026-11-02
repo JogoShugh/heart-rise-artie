@@ -53,7 +53,14 @@ internal class Conditional(private val upstream: HttpHandler, private val readab
     private fun written(request: Request, checking: Long, writing: Long): Response {
         val answer = upstream(request.removeHeader(IF_MATCH))
         val timing = "recheck;dur=${millis(writing - checking)}, write;dur=${millis(System.nanoTime() - writing)}"
-        return answer.header("Server-Timing", timing)
+        // The write changed the resource: its answer, the resource as it is now, carries the ETag the next write needs.
+        val text = answer.bodyString()
+        val current = if (answer.status == Status.OK && text.isNotBlank()) {
+            answer.body(text).replaceHeader(ETAG, etagOf(text))
+        } else {
+            answer.body(text)
+        }
+        return current.header("Server-Timing", timing)
     }
 
     /** The gateway's ETag for the resource [request] writes, read again now as its caller; null if unreadable. */

@@ -58,6 +58,9 @@ Feature: The owner's gateway gives a plain client conditional writes GitHub does
     And "ada" sends PATCH "/repos/acme/rockets/issues/10" with {"state":"closed"} through the GitHub gateway, passed through, with the ETag it read
     Then the GitHub gateway answers 200
     And the answer's Server-Timing names "recheck" and "write", each with a duration
+    And the answer's ETag is the gateway's own
+    When "ada" sends PATCH "/repos/acme/rockets/issues/10" with {"title":"Safari login"} through the GitHub gateway, passed through, with the ETag it read
+    Then the GitHub gateway answers 200
 
   Scenario: A write that adds to the issue is not held to its ETag
     When "ada" sends POST "/repos/acme/rockets/issues/10/comments" with {"body":"Seen on 1.2 too."} through the GitHub gateway, passed through

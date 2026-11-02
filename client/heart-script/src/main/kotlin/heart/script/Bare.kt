@@ -76,7 +76,8 @@ class Bare internal constructor(
         val began = Instant.now()
         return wire.send(sent).also { answer ->
             trace(sent, answer, began)
-            if (validators && method == "GET") kept(url, answer)
+            // A read gives the ETag; so does a write's own answer, the resource as that write left it.
+            if (validators && (method == "GET" || method in REPLACING)) kept(url, answer)
         }
     }
 

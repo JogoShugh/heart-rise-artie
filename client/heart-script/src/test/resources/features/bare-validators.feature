@@ -33,6 +33,29 @@ Feature: A bare script with validators: plain HTTP done right, no HEART
       | no validators: none sent     |                                                                      |          |              |
       | through the gateway          | validators = true, headers = mapOf("X-Gateway-Mode" to "pass-through") | "gw-1"   | pass-through |
 
+  Scenario: A write's own answer gives the ETag the next write carries
+    Its own write changed the resource: the ETag it read is no longer current,
+    and the answer to the write gives the one that is.
+    Given the server answers, in order
+      | method | url                                 | status | etag   | body                    |
+      | GET    | https://gw.test/repos/a/b/issues/12 | 200    | "gw-1" | {"title":"Login fails"} |
+      | PATCH  | https://gw.test/repos/a/b/issues/12 | 200    | "gw-2" | {"title":"Login fails (triaged)"} |
+      | PATCH  | https://gw.test/repos/a/b/issues/12 | 200    | "gw-3" | {"state":"closed"}      |
+    When this script runs
+      """kotlin
+      bare(validators = true) {
+          call("GET", "https://gw.test/repos/a/b/issues/12")
+          call("PATCH", "https://gw.test/repos/a/b/issues/12", mapOf("title" to "Login fails (triaged)"))
+          call("PATCH", "https://gw.test/repos/a/b/issues/12", mapOf("state" to "closed"))
+      }
+      """
+    Then the script finished
+    And the bare calls carried these headers
+      | call                                      | If-Match |
+      | GET https://gw.test/repos/a/b/issues/12   |          |
+      | PATCH https://gw.test/repos/a/b/issues/12 | "gw-1"   |
+      | PATCH https://gw.test/repos/a/b/issues/12 | "gw-2"   |
+
   Scenario: A write refused as stale stops the script, saying so
     Given the server answers, in order
       | method | url                                 | status | etag   | body                                                       |
