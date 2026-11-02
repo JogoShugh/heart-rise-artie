@@ -197,6 +197,9 @@ private fun answered(client: HeartRiseClient, what: String, select: () -> HeartR
     Answer.Refused(Refusal.NoBinding, Side.CLIENT, refused.message.orEmpty())
 } catch (failed: IntegrityException) {
     Answer.Refused(Refusal.IntegrityMismatch, Side.CLIENT, failed.message.orEmpty())
+} catch (failed: heart.script.ModelFailed) {
+    // The reasoner's model could not answer: the client's own part failed, and nothing was sent.
+    Answer.Refused(Refusal.ModelFailed, Side.CLIENT, failed.message.orEmpty())
 }
 
 /**

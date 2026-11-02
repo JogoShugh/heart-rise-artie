@@ -16,6 +16,11 @@ Feature: Claude plans a goal run, one move at a time
       | github:close   |
     And the goal is "Open issue $number of $owner/$repo. Close it." with the input number = 10, the first sentence done
 
+  Scenario: The model can't answer: the planner says its model failed, in the API's words
+    Given the Claude API will answer 400 with "credit balance is too low"
+    When the planner is asked its next move
+    Then the planner's model failed: "Claude API answered 400: credit balance is too low"
+
   Scenario Outline: The model's tool call is the move: <move>
     Given the Claude API will answer with the move <input>
     When the planner is asked its next move

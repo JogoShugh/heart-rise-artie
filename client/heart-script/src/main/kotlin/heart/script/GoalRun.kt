@@ -12,10 +12,16 @@ const val MAX_MOVES = 50
 fun runGoal(goal: Goal, planner: Planner, maxMoves: Int = goal.limits.moves) {
     val run = Run.current
     goal.inputs.forEach { run.declare(it) }
-    if (goal.steps.isEmpty()) {
-        GoalRun(goal, planner, run, maxMoves).start()
-    } else {
-        StepRun(goal, planner, run, maxMoves).start()
+    try {
+        if (goal.steps.isEmpty()) {
+            GoalRun(goal, planner, run, maxMoves).start()
+        } else {
+            StepRun(goal, planner, run, maxMoves).start()
+        }
+    } catch (failed: ModelFailed) {
+        // The planner's model could not answer: the run stops where it was, the client's own part failed.
+        val said = "the model failed: ${failed.message}"
+        throw GoalStopped(run.step, "\"goal\"", "\"$said\"", Answer.Refused(Refusal.ModelFailed, Side.CLIENT, said))
     }
 }
 

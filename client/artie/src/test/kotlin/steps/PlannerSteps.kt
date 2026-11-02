@@ -90,10 +90,21 @@ class PlannerSteps(private val ctx: ClientContext) {
         (checkNotNull(planner) as ClaudePlanner).usage.counts(),
     )
 
+    /** What the planner's model said when it could not answer. */
+    private var failed: String? = null
+
     @When("the planner is asked its next move")
     fun asked() {
-        move = checkNotNull(planner).next(checkNotNull(view))
+        move = try {
+            checkNotNull(planner).next(checkNotNull(view))
+        } catch (e: heart.script.ModelFailed) {
+            failed = e.message
+            null
+        }
     }
+
+    @Then("the planner's model failed: {string}")
+    fun modelFailed(said: String) = assertEquals(said, failed)
 
     @Then("the move is {}")
     fun moveIs(said: String) = assertEquals(said, words(checkNotNull(move)))

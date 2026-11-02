@@ -58,6 +58,9 @@ enum class Refusal(val words: String) {
     NoReasoner("no reasoner"),
     Unclear("unclear to the reasoner"),
 
+    /** The model the client reasons or plans with could not answer ([ModelFailed]). */
+    ModelFailed("the model failed"),
+
     /** A script's lock file refused the act: what it is about to use is not what the script was recorded with. */
     Guard("guard"),
 }

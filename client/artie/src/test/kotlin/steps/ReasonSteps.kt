@@ -237,6 +237,10 @@ class ReasonSteps(private val ctx: ClientContext) {
         assertFalse(request.headers.containsKey("x-api-key"), "headers: ${request.headers.keys}")
     }
 
+    @Given("the Claude API will answer {int} with {string}")
+    fun claudeFails(status: Int, body: String) =
+        ctx.transport.respond("POST", ClaudeReasoner.ENDPOINT, HeartResponse(status, emptyMap(), body))
+
     @Given("the Claude API will answer with the text {string}")
     fun claudeAnswersInWords(text: String) {
         val body = """{"id":"msg_1","type":"message","role":"assistant","content":[""" +

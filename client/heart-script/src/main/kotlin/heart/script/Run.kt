@@ -18,7 +18,14 @@ open class ScriptStopped(
  * A goal run that stops for good: its planner stopped it, or it went past its limits. A watch notes a failed look
  * and looks again; this it never swallows, or a decision the planner won't make would be asked again forever.
  */
-class GoalStopped(step: Int, what: String, reason: String) : ScriptStopped(step, what, reason)
+class GoalStopped(step: Int, what: String, reason: String, refused: Answer.Refused? = null) :
+    ScriptStopped(step, what, reason, refused)
+
+/**
+ * A model a client reasons or plans with could not answer: its API refused or failed, in its own words. The
+ * client's own part failed, so a run stops at the step that needed it, refused by the client.
+ */
+class ModelFailed(message: String) : RuntimeException(message)
 
 /**
  * One input a script declares: [default] when not given; [question] asked of a person, if the run allows. A

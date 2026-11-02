@@ -44,8 +44,9 @@ class ClaudePlanner(
         val response = transport.send(
             HeartRequest("POST", endpoint, ClaudeReasoner.headers(apiKey), request(view).toString()),
         )
-        check(response.status in SUCCESS) {
-            "Claude API answered ${response.status}: ${response.body.take(ERROR_EXCERPT)}"
+        if (response.status !in SUCCESS) {
+            val said = response.body.take(ERROR_EXCERPT)
+            throw heart.script.ModelFailed("Claude API answered ${response.status}: $said")
         }
         val message = Json.parseToJsonElement(response.body).jsonObject
         usage.add(message["usage"] as? JsonObject)

@@ -33,9 +33,17 @@ class GoalSteps(
     private val shown = mutableListOf<PlanView>()
     private var refused: String? = null
 
+    /** What the planner's model answers when it can't, in the API's words; null when it can. */
+    private var plannerFails: String? = null
+
     @Given("the planner will move")
     fun plannerMoves(table: DataTable) {
         moves = table.asMaps().map(::move)
+    }
+
+    @Given("the planner's model will fail: {string}")
+    fun plannerFails(said: String) {
+        plannerFails = said
     }
 
     /** The reasoner of the last goal run, to count what it was asked. */
@@ -266,6 +274,7 @@ class GoalSteps(
         val left = ArrayDeque(moves)
         return Planner { view ->
             shown += view
+            plannerFails?.let { throw heart.script.ModelFailed(it) }
             if (left.size == 1 && left.first() === LOOP) LOOP else left.removeFirstOrNull() ?: Move.Finish
         }
     }

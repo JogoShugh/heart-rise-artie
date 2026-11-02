@@ -245,7 +245,7 @@ class ArtieCli(
 
     private companion object {
         val IMPORTS = listOf("heart.script.*", "heart.script.test.*")
-        val CLIENT_FAILED = setOf(Refusal.Unreachable, Refusal.IntegrityMismatch)
+        val CLIENT_FAILED = setOf(Refusal.Unreachable, Refusal.IntegrityMismatch, Refusal.ModelFailed)
 
         /** An act that names no relation, only its intent: a step the reasoner chooses. */
         val REASONS = Regex("""\bact\(\s*intent\s*=""")
