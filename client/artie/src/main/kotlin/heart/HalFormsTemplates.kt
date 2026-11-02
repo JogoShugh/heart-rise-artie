@@ -5,6 +5,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.net.URI
@@ -78,14 +79,16 @@ object HalFormsTemplates {
         )
     }
 
+    /** The schema the properties say. An entry that is no object, or names no property, says nothing. */
     private fun schema(properties: JsonArray): JsonObject {
-        val props = properties.map { it.jsonObject }
-        val required = props.filter { it["required"]?.jsonPrimitive?.booleanOrNull == true }
-            .map { JsonPrimitive(it.getValue("name").jsonPrimitive.content) }
+        val named = properties.filterIsInstance<JsonObject>()
+            .mapNotNull { p -> (p["name"] as? JsonPrimitive)?.contentOrNull?.let { it to p } }
+        val required = named.filter { (_, p) -> p["required"]?.jsonPrimitive?.booleanOrNull == true }
+            .map { (name, _) -> JsonPrimitive(name) }
         return JsonObject(
             mapOf(
                 "type" to JsonPrimitive("object"),
-                PROPERTIES to JsonObject(props.associate { it.getValue("name").jsonPrimitive.content to property(it) }),
+                PROPERTIES to JsonObject(named.associate { (name, p) -> name to property(p) }),
                 REQUIRED to JsonArray(required),
             ),
         )
@@ -93,14 +96,12 @@ object HalFormsTemplates {
 
     /**
      * A HAL-FORMS `type` is an HTML input type: a hint for how to ask, not a limit on the value
-     * (a checkbox's value is a boolean, not a string). Only "number" says what JSON Schema would.
+     * (a checkbox's value is a boolean, and a number may come as text), so it says nothing here.
+     * Its `options`, written inline or linked, are its choices (HAL-SCHEMA-FORMS-HR Rule 8).
      */
     private fun property(p: JsonObject): JsonObject {
-        val number = (p["type"] as? JsonPrimitive)?.content == NUMBER
-        val type: Map<String, JsonElement> = if (number) mapOf("type" to JsonPrimitive(NUMBER)) else emptyMap()
         val mapped: Map<String, JsonElement> = keywords.mapNotNull { (from, to) -> p[from]?.let { to to it } }.toMap()
-        return JsonObject(type + mapped)
+        val options = (p["options"] as? JsonObject)?.let { mapOf(Choices.KEYWORD to it) }.orEmpty()
+        return JsonObject(mapped + options)
     }
-
-    private const val NUMBER = "number"
 }

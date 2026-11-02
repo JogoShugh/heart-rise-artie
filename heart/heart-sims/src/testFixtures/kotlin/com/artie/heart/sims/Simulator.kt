@@ -92,6 +92,7 @@ class Simulator {
         val faults = faults(host)
         body["applied"]?.let { faults.applied = it.asText() }
         body["mediaType"]?.let { faults.mediaType = it.asText() }
+        body["onlyAccept"]?.let { faults.onlyAccept = it.asText() }
         body["noProfile"]?.let { faults.noProfile = it.asBoolean() }
         body["wrongIntegrity"]?.let { faults.wrongIntegrity = it.asBoolean() }
         body["oneAddress"]?.let { faults.oneAddress = it.asBoolean() }
@@ -148,6 +149,13 @@ class Simulator {
         },
         "/_sim/{host}/templates/{name}" bind PUT to { request ->
             faults(request.path("host").orEmpty()).template(request.path("name").orEmpty(), request.bodyString())
+            Response(Status.NO_CONTENT)
+        },
+        "/_sim/{host}/plain" bind POST to { request ->
+            val plain = mapper.readTree(request.bodyString())
+            faults(request.path("host").orEmpty()).serve(
+                plain["path"].asText(), plain["status"].asInt(), plain["body"].asText(), plain["validator"]?.asText(),
+            )
             Response(Status.NO_CONTENT)
         },
         "/_sim/{host}/faults" bind POST to { request ->

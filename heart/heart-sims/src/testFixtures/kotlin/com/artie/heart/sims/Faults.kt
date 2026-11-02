@@ -51,6 +51,18 @@ class Faults {
     /** A media type each read says instead. */
     @Volatile var mediaType: String? = null
 
+    /** The one media type the service answers in, whatever a request accepts. */
+    @Volatile var onlyAccept: String? = null
+
+    /** Plain resources served at a path, in place of whatever the service has there. */
+    private val plain = ConcurrentHashMap<String, Response>()
+
+    /** Serves [body] at [path] with [status], as JSON, with [validator] as its ETag when given. */
+    fun serve(path: String, status: Int, body: String, validator: String? = null) {
+        val answer = Response(Status(status, "")).header("Content-Type", "application/json").body(body)
+        plain[path] = validator?.let { answer.header("ETag", it) } ?: answer
+    }
+
     /** The set behind the one address, as last linked. */
     @Volatile private var behindOneAddress: String? = null
 
@@ -80,6 +92,8 @@ class Faults {
         oneAddress = false
         noProfile = false
         mediaType = null
+        onlyAccept = null
+        plain.clear()
         behindOneAddress = null
     }
 
@@ -88,10 +102,12 @@ class Faults {
     private fun answer(request: Request, next: HttpHandler): Response {
         val act = request.uri.path.substringAfterLast("/actions/", "").takeIf { request.method != Method.GET }
         act?.let { acts[it] }?.let { return it }
+        plain[request.uri.path]?.let { return it }
         if (oneAddress && request.uri.path == ONE_ADDRESS) {
             return next(request.uri(request.uri.path(checkNotNull(behindOneAddress) { "no set linked yet" })))
         }
-        return rewritten(next(request))
+        val asked = onlyAccept?.let { request.replaceHeader("Accept", it) } ?: request
+        return rewritten(next(asked))
     }
 
     private fun rewritten(response: Response): Response {

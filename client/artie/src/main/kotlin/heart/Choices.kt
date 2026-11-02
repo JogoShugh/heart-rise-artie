@@ -60,6 +60,8 @@ object Choices {
         val items = when {
             options["pointer"] != null -> JsonPointer.resolve(owner.state, pointer(options, fields))
             options["link"] != null -> linked(options, owner, fields, read)
+            // HAL-FORMS writes its choices inline, as values or as {value, prompt}.
+            options["inline"] != null -> options["inline"]
             else -> null
         }
         val where = (options["where"] as? JsonObject) ?: none

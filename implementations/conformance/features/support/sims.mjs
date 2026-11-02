@@ -58,6 +58,7 @@ export const sims = {
     publishRelease: (app, version, status) => control("POST", `/_sim/deploy/apps/${app}/releases`, JSON.stringify({ version, status })),
     declareSchema: (host, form, schema) => control("PUT", `/_sim/${host}/forms/${encodeURIComponent(form)}/schema`, schema),
     faults: (host, faults) => control("POST", `/_sim/${host}/faults`, JSON.stringify(faults)),
+    plain: (host, plain) => control("POST", `/_sim/${host}/plain`, JSON.stringify(plain)),
     template: (host, name, template) => control("PUT", `/_sim/${host}/templates/${name}`, template),
     deployServesUpTo: (rung) => control("PUT", "/_sim/deploy/rung", rung),
     startDeploying: (app) => control("POST", `/_sim/deploy/apps/${app}/deployments`),

@@ -27,12 +27,6 @@ class ArtieClient(
     /** Bindings for other URI schemes, by scheme (SPEC §6.0). */
     bindings: Map<String, Binding> = emptyMap(),
 ) : HeartRiseClient {
-    init {
-        require(rung <= dialect.maxRung) {
-            "$dialect is served at ${dialect.maxRung} only (SPEC §6.1); rung $rung is not available in it"
-        }
-    }
-
     private val bindings = HttpBinding(transport).let { http ->
         Bindings(mapOf("http" to http, "https" to http, "coap" to CoapBinding()) + bindings)
     }
@@ -49,8 +43,11 @@ class ArtieClient(
     override var broughtIntoBeing: Boolean = false
         private set
 
-    /** The rendering asked for: the client's own ([dialect], [rung]), or less if discovery found less. */
-    private var asking = Rendering(dialect, rung)
+    /**
+     * The rendering asked for: the client's own ([dialect], [rung], no higher than the dialect is
+     * served: HAL-FORMS asks for no layering), or less if discovery found less.
+     */
+    private var asking = Rendering(dialect, minOf(rung, dialect.maxRung))
 
     override fun discover(url: String) {
         val outcome = bindings.forUri(url).fetch(url, listOf(HomeDocument.MEDIA_TYPE))
@@ -215,7 +212,9 @@ class ArtieClient(
      */
     private fun sync(url: String, received: Received? = null): HeartRepresentation {
         val layer1Received = received ?: bindings.forUri(url).read(url, asking).received(url)
-        val layer1 = HeartResponseParser.parse(layer1Received, url, asking.dialect)
+        // A client reads whichever dialect comes back, by its media type; else the one it asked for.
+        val dialect = Dialect.entries.firstOrNull { it.mediaType == layer1Received.mediaType } ?: asking.dialect
+        val layer1 = HeartResponseParser.parse(layer1Received, url, dialect)
         // SPEC §6.11.1: the rung is the one the representation says it is at, read
         // before any link is followed. At L0 there is no set, whatever the body links.
         val applied = layer1Received.applied

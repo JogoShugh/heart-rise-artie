@@ -91,7 +91,10 @@ class HttpBinding(private val transport: Transport) : Binding {
          * (RFC 9110 §13.1.1).
          */
         fun negotiation(rendering: Rendering): Map<String, String> = buildMap {
-            put("Accept", rendering.dialect.mediaType)
+            // A HAL-FORMS client still reads the reference dialect, if that is all a service serves.
+            val halForms = rendering.dialect == Dialect.HAL_FORMS
+            val fallback = if (halForms) ", ${Dialect.HAL_SCHEMA_FORMS.mediaType};q=0.5" else ""
+            put("Accept", rendering.dialect.mediaType + fallback)
             put("Accept-Profile", "<${rendering.dialect.profile}>")
             rendering.rung.prefer?.let { put("Prefer", it) }
         }
@@ -99,12 +102,14 @@ class HttpBinding(private val transport: Transport) : Binding {
         /** SPEC §6.1, §6.11.1: the profile from `Link: rel="profile"`, the rung from Preference-Applied. */
         fun received(response: HeartResponse): Received {
             val preferenceApplied = response.header("Preference-Applied")
+            val mediaType = response.header("Content-Type")?.substringBefore(';')?.trim()?.lowercase()
             return Received(
                 bytes = response.bytes,
-                mediaType = response.header("Content-Type")?.substringBefore(';')?.trim()?.lowercase(),
+                mediaType = mediaType,
                 profiles = profileLink.findAll(response.header("Link").orEmpty()).map { it.groupValues[1] }.toList(),
                 validator = response.header("ETag"),
-                applied = Rung.applied(preferenceApplied),
+                // HAL-FORMS is served at L0 only: a layering header on it means nothing (SPEC §6.1).
+                applied = if (mediaType == Dialect.HAL_FORMS.mediaType) Rung.L0 else Rung.applied(preferenceApplied),
                 appliedAs = preferenceApplied,
             )
         }

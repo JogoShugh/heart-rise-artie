@@ -48,11 +48,13 @@ function expand(form: Form, state: JsonObject, fields: JsonObject): string {
 const namesIn = (template: string): string[] =>
     [...template.matchAll(VARIABLE)].flatMap((match) => (match[1] ?? "").replace("?", "").split(","));
 
-/** Adds to a safe form's [target] each field its template did not take. */
+/** Adds to a safe form's [target] each field its template did not take; a list's name once for each value. */
 function withQuery(target: URL, form: Form, fields: JsonObject): URL {
     const taken = form.templated ? namesIn(form.target) : [];
     for (const [key, value] of Object.entries(fields)) {
-        if (!taken.includes(key)) target.searchParams.set(key, String(value));
+        if (taken.includes(key)) continue;
+        target.searchParams.delete(key);
+        for (const each of listOf(value)) target.searchParams.append(key, String(each));
     }
     return target;
 }

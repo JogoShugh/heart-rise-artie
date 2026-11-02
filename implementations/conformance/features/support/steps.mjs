@@ -724,9 +724,9 @@ Given("two clients at rung L1 sharing a cache that keeps nothing", function () {
     pairOfClients(this, { get: () => undefined, set: () => undefined });
 });
 
-Then("it sent HEAD for {string}, with no body", async function (url) {
-    const heads = (await received(this)).filter((r) => r.method === "HEAD");
-    assert.deepEqual(heads.map((r) => [r.url, r.body]), [[url, ""]]);
+Then("it sent {word} for {string}, with no body", async function (method, url) {
+    const sent = (await received(this)).filter((r) => r.method === method && r.url === url);
+    assert.deepEqual(sent.map((r) => r.body), [""], JSON.stringify(sent));
 });
 
 // ---- One resource in two dialects ----
@@ -922,4 +922,21 @@ Given("the {word} service's media type is {string}", async function (service, me
 
 Given("the {word} service's template {string} is {}", async function (service, name, template) {
     await sims.template(hostOf(service), name, template);
+});
+
+Given("a HAL-FORMS client at rung {word} with the {word} service's credential", function (rung, service) {
+    this.me = halFormsClient(rung, SERVICES[service].credential);
+});
+
+Given("the build service's job {string} has the HAL-FORMS parameters {}", async function (job, properties) {
+    const template = { method: "POST", target: `/jobs/${job}/actions/build`, contentType: "application/json", properties: JSON.parse(properties) };
+    await sims.template(hostOf("build"), "build", JSON.stringify(template));
+});
+
+Given("the {word} service serves only HAL Schema Forms", async function (service) {
+    await sims.faults(hostOf(service), { onlyAccept: "application/hal+json" });
+});
+
+Given("the {word} service serves {string} with status {int} and the body {}", async function (service, path, status, body) {
+    await sims.plain(hostOf(service), { path, status, body });
 });

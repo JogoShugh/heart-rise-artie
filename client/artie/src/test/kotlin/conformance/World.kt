@@ -17,8 +17,13 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import steps.InProcessTransport
 
-/** One client in a scenario: ARTIE, every request it sent, and every line of its event log. */
-class Actor(val client: ArtieClient, val log: MutableList<HeartRequest>, val events: MutableList<JsonObject>)
+/** One client in a scenario: ARTIE, every request it sent and the answer to each, and every line of its event log. */
+class Actor(
+    val client: ArtieClient,
+    val log: MutableList<HeartRequest>,
+    val events: MutableList<JsonObject>,
+    val answers: MutableList<Pair<HeartRequest, HeartResponse>>,
+)
 
 /**
  * What one conformance scenario holds, shared by its step classes: the
@@ -58,18 +63,23 @@ class World {
     ): Actor {
         val log = mutableListOf<HeartRequest>()
         val events = mutableListOf<JsonObject>()
-        val wire = IntegrityCheck(wire(log, token))
+        val answers = mutableListOf<Pair<HeartRequest, HeartResponse>>()
+        val wire = IntegrityCheck(wire(log, token, answers))
         val eventLog = EventLog(EventSink { events += Json.parseToJsonElement(it).jsonObject }, null, "conformance")
         val client = ArtieClient(cache?.invoke(wire) ?: wire, Rung.valueOf(rung), dialect, events = eventLog)
-        return Actor(client, log, events)
+        return Actor(client, log, events, answers)
     }
 
     /** The service, as one client reaches it: every request kept in [log], [token] added to each. */
-    fun wire(log: MutableList<HeartRequest>, token: String?) = object : Transport {
+    fun wire(
+        log: MutableList<HeartRequest>,
+        token: String?,
+        answers: MutableList<Pair<HeartRequest, HeartResponse>> = mutableListOf(),
+    ) = object : Transport {
         override fun send(request: HeartRequest): HeartResponse {
             log += request
             val sent = token?.let { request.copy(headers = request.headers + ("Authorization" to it)) }
-            return service.send(sent ?: request)
+            return service.send(sent ?: request).also { answers += request to it }
         }
     }
 

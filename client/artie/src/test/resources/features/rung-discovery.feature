@@ -68,7 +68,7 @@ Feature: Which rung a response is at, and which rung to ask for
       | L2, both dialects    | {application/hal+json: {}, application/prs.hal-forms+json: {}} | accept-prefer: [forms=link, schema=link] | application/hal+json           | asked for "forms=link, schema=link"      |
       | L1                   | {application/hal+json: {}, application/prs.hal-forms+json: {}} | accept-prefer: [forms=link]              | application/hal+json           | asked for "forms=link"                   |
       | L0, HAL Schema Forms | {application/hal+json: {}}                                      |                                          | application/hal+json           | had no "Prefer" header                   |
-      | L0, HAL-FORMS only   | {application/prs.hal-forms+json: {}}                            |                                          | application/prs.hal-forms+json | had no "Prefer" header                   |
+      | L0, HAL-FORMS only   | {application/prs.hal-forms+json: {}}                            |                                          | application/prs.hal-forms+json, application/hal+json;q=0.5 | had no "Prefer" header                   |
 
   Scenario: A client set to L1 asks for L1 even when the server offers L2
     Given the client works at rung L1

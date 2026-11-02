@@ -30,8 +30,12 @@ class RungSteps(private val world: World) {
     @Then("the representation is at rung L0, in {}")
     fun inDialect(dialect: String) {
         assertEquals(Rung.L0, actor.client.appliedRung)
-        assertEquals("HAL-FORMS", dialect)
-        assertTrue(world.held.affordances.isNotEmpty(), "no template was read")
+        val (_, answer) = actor.answers.last { (asked, _) ->
+            asked.method == "GET" && !SHARED.containsMatchIn(asked.url)
+        }
+        val type = answer.header("Content-Type").orEmpty().substringBefore(';').trim()
+        assertEquals(DIALECTS.getValue(dialect), type)
+        assertTrue(world.held.affordances.isNotEmpty(), "no form was read")
     }
 
     @Then("no shared layer was read twice")
@@ -131,9 +135,9 @@ class RungSteps(private val world: World) {
     fun setReads(times: Int) =
         assertEquals(times, world.sims.log.count { it.method == "GET" && it.url.startsWith("/affordance-sets/") })
 
-    @Then("it sent HEAD for {string}, with no body")
-    fun sentHead(url: String) =
-        assertEquals(listOf(url to ""), world.sims.log.filter { it.method == "HEAD" }.map { it.url to it.body })
+    @Then("it sent {word} for {string}, with no body")
+    fun sentWithNoBody(method: String, url: String) =
+        assertEquals(listOf(""), world.sims.log.filter { it.method == method && it.url == url }.map { it.body })
 
     @Then("the last request was for {string}")
     fun lastRequest(url: String) = assertEquals(url, world.sims.log.last().url)
@@ -149,5 +153,11 @@ class RungSteps(private val world: World) {
 
     private companion object {
         val SHARED = Regex("/(affordance-sets|schemas)/")
+
+        /** Each dialect, as the features name it, by the media type it is served in. */
+        val DIALECTS = mapOf(
+            "HAL-FORMS" to Dialect.HAL_FORMS.mediaType,
+            "HAL Schema Forms" to Dialect.HAL_SCHEMA_FORMS.mediaType,
+        )
     }
 }
