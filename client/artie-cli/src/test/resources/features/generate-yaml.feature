@@ -667,10 +667,14 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
   Scenario: After an act, what it changed is checked, as the run saw it: what it sent, and text it changed to
     A kept script made from a run that did only part of its work, or run
     after a release that changed what an act does, would otherwise finish
-    as if it were right. After each act, the members its answer changed are
-    checked: one the act sent, by the same value or reference; one it
-    changed to text or a truth, by that value. A number or a time it changed
-    to may differ every run, so it isn't checked unless the act sent it.
+    as if it were right. An act works on the resource the run holds; one
+    whose form's method changes it (not GET), and that made no new resource,
+    answers with that resource's next state. The members that answer changed
+    from the state held before are checked: one the act sent, by the same
+    value or reference; one it changed to text or a truth, by that value. A
+    number or a time it changed to may differ every run, so it isn't checked
+    unless the act sent it. No address is compared: a search, a GET form,
+    goes elsewhere and is never checked.
     Given the file "run.trace.yaml" is
       """
       ---
@@ -739,6 +743,7 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       chose:
         kind: form
         relation: retire
+        method: PUT
       guard:
         rung: L2
         form: sha256-retire

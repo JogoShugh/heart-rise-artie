@@ -94,7 +94,6 @@ chose:
   relation: item
   title: Anna Miller
 outcome: done
-address: http://localhost:8099/employees/3
 now:
   state:
     id: 3
@@ -113,6 +112,7 @@ opens: true
 chose:
   kind: form
   relation: staff:give-notice
+  method: POST
   title: Give notice
 guard:
   rung: L2
@@ -125,7 +125,6 @@ guard:
     integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
   if-match: '"seq-1.hsf.L2.223269219190c9ed"'
 outcome: done
-address: http://localhost:8099/employees/3
 now:
   state:
     id: 3
@@ -181,7 +180,6 @@ chose:
   relation: item
   title: Maria Miller
 outcome: done
-address: http://localhost:8099/employees/5
 now:
   state:
     id: 5
@@ -200,6 +198,7 @@ opens: true
 chose:
   kind: form
   relation: staff:dismiss
+  method: DELETE
   title: Dismiss the employee
 guard:
   rung: L2
@@ -212,7 +211,6 @@ guard:
     integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
   if-match: '"seq-2.hsf.L2.35c0b9edcb817baf"'
 outcome: done
-address: http://localhost:8099/employees/5
 now:
   state:
     id: 5

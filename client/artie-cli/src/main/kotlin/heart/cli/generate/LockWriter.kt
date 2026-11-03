@@ -9,7 +9,8 @@ class LockWriter(capture: Capture) {
     // says nothing of it, since the service's root answers at L0 whatever is asked: a run that acted only there pins
     // none, and its script reads at whatever rung it is run at.
     private val rung = capture.steps.filterIndexed { i, step ->
-        val atEntry = i > 0 && capture.steps[i - 1].address == capture.steps.first().params["entry"]?.toString()
+        // A form taken at the entry: the step before it entered.
+        val atEntry = i > 0 && capture.steps[i - 1].say.startsWith("enter")
         !(atEntry && step.guard["rung"] == "L0")
     }.mapNotNull { it.guard["rung"]?.toString() }.maxOrNull()
     private val forms = linkedMapOf<String, Pair<String, LinkedHashSet<String>>>()

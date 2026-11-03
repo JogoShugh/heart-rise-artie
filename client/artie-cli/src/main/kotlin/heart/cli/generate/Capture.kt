@@ -76,9 +76,6 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     val chose: Map<*, *> = doc["chose"].map()
     val guard: Map<*, *> = doc["guard"].map()
 
-    /** The resource the step left the run at. */
-    val address: String? = doc["address"]?.toString()
-
     /** Why an act wasn't made: its kind (a guard, the server) and its detail; empty for one that was. */
     val refused: Map<*, *> = doc["refused"].map()
     val template: String? = doc["reason"].map()["template"]?.toString()
