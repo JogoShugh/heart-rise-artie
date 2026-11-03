@@ -647,6 +647,17 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the small GitHub gave that held answer only after pull request 1 was merged
     And the planner was asked 12 times
     And ARTIE's reasoner was asked 5 times
+    And the capture "both.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      listeners:
+        until:
+          - at: watch
+            field: state
+            is: closed
+        listen:
+          - match: an issue labelled scan changes
+          - match: a pull request labelled dependabot changes
+      """
 
   Scenario: Whenevers side by side whose lists aren't reached from where they stand each go back to the start, and listen from there
     Found by the live run g12: the Whenevers are under the issue, which
@@ -810,6 +821,12 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the capture "trays.trace.yaml" keeps a watch script with a line with "given { \"github:labels\" has \"transplanted\" } then {"
     And the capture "trays.trace.yaml" keeps a watch script with no line with "if ("
     And the capture "trays.trace.yaml" keeps a watch script with no line with "mapOf("
+    And the capture "trays.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      given:
+        - field: github:labels
+          has: transplanted
+      """
 
   Scenario: A list a step sent is sent again as a list, and a look that fails still keeps what the watch did
     Found by the live seed bench run b1: an alert's chain commented, then
@@ -989,6 +1006,15 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | author | body                     |
       | ada    | Seen by the bench watch. |
     And issue 12 of "acme/rockets" is assigned to "ada" on the small GitHub
+    And the capture "both.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      act: github:assign
+      fields:
+        assignees:
+          - ada
+      intent: Say on it that the watch has seen it, and assign it to ada, unless it's said already.
+      then: []
+      """
 
   Scenario: A step that says unless is done only once its check is made, and an act the server answered is done
     Found by the live seed bench run b2: told "say it, unless it's said
@@ -1069,6 +1095,32 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
               }
           }
       }
+      """
+    And the capture "unless.trace.yaml" keeps the watch as data
+      """yaml
+      - watch:
+          until:
+            - at: watch
+              field: state
+              is: closed
+          steps:
+            - act: github:issues-list-for-repo
+              fields:
+                owner: acme
+                repo: rockets
+                state: open
+                labels: alert
+              inferred: list the open issues of acme/rockets labelled alert
+              from-intent: an issue labelled alert changes
+              then:
+                - whenever:
+                    - has:
+                        - field: state
+                          is: open
+                    - act-once: github:comment
+                      fields:
+                        body: Seen by the bench watch.
+                      listed-in: github:issues-list-comments
       """
     When artie generated "unless-gen.kts" from "unless.trace.yaml" and "unless.goal.md"
     And "acme/rockets" has these issues on the small GitHub
@@ -1334,6 +1386,24 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And issue 12 of "acme/rockets" now has these comments on the small GitHub
       | author | body                     |
       | ada    | Seen by the bench watch. |
+    And the capture "undone.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      doing: Say on it that the watch has seen it, unless it's said already.
+      steps:
+        - follow: github:issues-list-comments
+          then:
+            - done-where:
+                - field: count
+                  is: 2
+        - done-where:
+            - field: item
+              is: Seen by the bench watch.
+        - act: github:comment
+          fields:
+            body: Seen by the bench watch.
+          intent: Say on it that the watch has seen it, unless it's said already.
+          then: []
+      """
 
   Scenario: A check naming what the resource it is made on doesn't hold is refused, and the planner told what it holds
     Found by the live seed bench runs b10 and b12: the planner read the
@@ -1548,6 +1618,14 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the capture "hold.trace.yaml" keeps a watch script with a line with "has { \"github:labels\" has label }"
     And the capture "hold.trace.yaml" keeps a watch script with a line with "leaveWhere(\"leave it.\") { \"github:labels\" has hold }"
     And the capture "hold.trace.yaml" keeps a watch script with no line with "if ("
+    And the capture "hold.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      leave-where:
+        say: leave it.
+        facts:
+          - field: github:labels
+            has: ${hold}
+      """
 
   Scenario: An act refused before it was sent may be asked again in the same words
     Found by the live seed bench run b17: the reasoner's first choice for
@@ -1776,6 +1854,14 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And the planner was asked 6 times
     And the capture "bot.trace.yaml" keeps a watch script with a line with "madeBy(bot)"
     And the capture "bot.trace.yaml" keeps a watch script with a line with "saying(\"failed\")"
+    And the capture "bot.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      made-by: ${bot}
+      """
+    And the capture "bot.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      saying: failed
+      """
 
   Scenario: An embedded resource is named by any of its own values, as its login names an assignee
     Found by the live seed bench run b20: "Every alert is assigned to the

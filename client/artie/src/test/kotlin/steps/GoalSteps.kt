@@ -228,6 +228,32 @@ class GoalSteps(
         assertEquals(Yaml().load<Any?>(steps), onceIn(kept)?.get("otherwise"), Yaml().dump(kept))
     }
 
+    @Then("the capture {string} keeps, in the watch as data, a step with")
+    fun watchStepWith(capture: String, step: String) {
+        val watch = watched(capture)
+        val expected = Yaml().load<Map<*, *>>(step)
+        assertTrue(
+            holds(watch?.get("steps"), expected),
+            "no step with $expected in:\n${Yaml().dump(watch?.get("steps"))}\nThe script:\n${watch?.get("script")}",
+        )
+    }
+
+    /** Whether [data], or anything in it however deep, is a map holding [expected]: its keys, each with its value. */
+    private fun holds(data: Any?, expected: Map<*, *>): Boolean = when (data) {
+        is Map<*, *> -> covers(data, expected) || data.values.any { holds(it, expected) }
+        is List<*> -> data.any { holds(it, expected) }
+        else -> false
+    }
+
+    /** Whether [actual] has each key of [expected], each value covering its own: a map by key, a list by item. */
+    private fun covers(actual: Any?, expected: Any?): Boolean = when (expected) {
+        is Map<*, *> -> actual is Map<*, *> &&
+            expected.all { (key, value) -> key in actual && covers(actual[key], value) }
+        is List<*> -> actual is List<*> && actual.size == expected.size &&
+            expected.indices.all { covers(actual[it], expected[it]) }
+        else -> actual == expected
+    }
+
     /** The capture's watch: its first lines' run, then its watch. */
     private fun watched(capture: String): Map<*, *>? {
         val head = Yaml().loadAll(Files.readString(replay.folder.resolve(capture))).first() as Map<*, *>
