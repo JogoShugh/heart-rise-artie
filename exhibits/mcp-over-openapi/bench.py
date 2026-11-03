@@ -503,6 +503,25 @@ L2_HEADERS = (
 )
 HEART_HEADERS = {"code-heart": "", "code-heart-hsf": HSF_HEADERS, "code-heart-l2": L2_HEADERS}
 
+# Three more, each changing one thing. code-heart-noapi: told nothing, with the OpenAPI description its index links
+# to withheld (a proxy answers /openapi.json 404, sandbox/no-openapi.conf), so it has the hypermedia alone.
+# code-heart-hsf-doc and code-heart-l2-doc: the format's documentation beside the program (the sandbox reaches no
+# other network, so the profile's URI can't be followed). code-heart-l2-16: L2 with 16 turns, not 8.
+FORMAT_DOC = HERE / "../../spec/HAL-SCHEMA-FORMS-HR.md"
+DOC_TOLD = (
+    " The format the service answers in, HAL Schema Forms with its H.E.A.R.T. profile, is documented in the file "
+    "hal-schema-forms.md beside your program."
+)
+HEART_HEADERS.update({
+    "code-heart-noapi": "", "code-heart-hsf-doc": HSF_HEADERS + DOC_TOLD, "code-heart-l2-doc": L2_HEADERS + DOC_TOLD,
+    "code-heart-l2-16": L2_HEADERS,
+})
+ARM_TURNS = {"code-heart-l2-16": 16}
+ARM_SERVICE = {"code-heart-noapi": os.environ.get("BENCH_SANDBOX_NOAPI", "http://heart-bench-noapi:8099")}
+ARM_DOCS = {"code-heart-hsf-doc", "code-heart-l2-doc"}
+# What the sandbox holds for the arm running now: the service's address, and whether the format's documentation.
+SANDBOX = {"service": SANDBOX_SERVICE, "doc": False}
+
 RUN_PLAIN_PROGRAM = {
     **RUN_PROGRAM,
     "description": "Run a Python 3.12 program in the sandbox. Returns its exit code, its standard output and its "
@@ -576,8 +595,10 @@ def sandboxed(program, library):
         Path(folder, "program.py").write_text(program)
         if library:
             Path(folder, "api.py").write_text(library)
+        if SANDBOX["doc"]:
+            Path(folder, "hal-schema-forms.md").write_text(FORMAT_DOC.read_text())
         command = ["docker", "run", "--rm", "--network", SANDBOX_NET, "--read-only", "--cpus", "1",
-                   "--memory", "256m", "--pids-limit", "64", "-e", f"API_BASE={SANDBOX_SERVICE}",
+                   "--memory", "256m", "--pids-limit", "64", "-e", f"API_BASE={SANDBOX['service']}",
                    "-e", f"API_TOKEN={TOKEN}", "-v", f"{folder}:/code:ro", "-w", "/code", SANDBOX_IMAGE,
                    "python", "program.py"]
         try:
@@ -626,6 +647,7 @@ def run_code(model, arm, task, max_turns, api):
         interferer.start()
     change = change_under(offset)
     started = time.time()
+    SANDBOX.update(service=ARM_SERVICE.get(arm, SANDBOX_SERVICE), doc=arm in ARM_DOCS)
     if arm in HEART_HEADERS:
         library, system = "", CODE_HEART_SYSTEM + HEART_HEADERS[arm]
     else:
@@ -768,7 +790,7 @@ def main():
                     continue  # kept only from a goal run that acted: task 2's acted on nothing
                 try:
                     if arm.startswith("code-"):
-                        record = run_code(args.model, arm, task, min(args.max_turns, 8), api)
+                        record = run_code(args.model, arm, task, ARM_TURNS.get(arm, min(args.max_turns, 8)), api)
                     elif arm.startswith("artie-"):
                         record = run_artie(args.model, arm, task)
                     else:

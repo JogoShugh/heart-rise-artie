@@ -115,7 +115,7 @@ footer ul { gap: 0.2rem; }
     <ul>
       <li><b>The question:</b> as a service evolves, which architecture keeps a repeated process right, safe and auditable, and where must the model sit for that?</li>
       <li><b>Six clients, two choices.</b> The architecture: a bag of endpoints, or hypermedia. Where the model sits: in every run, or at the edges. Code mode ran on both architectures; ARTIE on hypermedia, with the model at the edges.</li>
-      <li><b>Wayfinding.</b> From endpoints, the client builds every address itself. Code mode worked the way out again each run (27 programs for two tasks), or froze it (saved programs with employee IDs and an ETag written in). From hypermedia, told nothing but the address, code mode found its way every run, about 100 different programs per variant: through the links and forms, and, as the service answers by itself, also through the OpenAPI description its index links to (19 of 20 runs). ARTIE's kept script follows what the server hands it: the search's <code>item</code> link titled "Bilbo Baggins", the new employee's <code>Location</code>.</li>
+      <li><b>Wayfinding.</b> From endpoints, the client builds every address itself. Code mode worked the way out again each run (27 programs for two tasks), or froze it (saved programs with employee IDs and an ETag written in). From hypermedia, told nothing but the address, code mode found its way every run, about 100 different programs per variant: through the links and forms, and, as the service answers by itself, also through the OpenAPI description its index links to (19 of 20 runs). With that withheld, HAL-FORMS alone was enough: 20 of 20. ARTIE's kept script follows what the server hands it: the search's <code>item</code> link titled "Bilbo Baggins", the new employee's <code>Location</code>.</li>
       <li><b>Evolution.</b> A release renamed a field. The frozen code broke silently, 8 runs of 8, each exit 0. Fresh code adapted on either architecture, by reading the service again every run. ARTIE's pins noticed the changed form before any write; the model repaired that one step, once, and the repair was kept.</li>
       <li><b>Controls.</b> The endpoint side had no conditional writes until we added them to its OpenAPI twin, and using them stays the client's choice. The HEART side refuses a write without <code>If-Match</code> (428): code mode on it met 57 of those refusals, then sent the ETag. A control guards only what the client pairs with it: one program sent a fresh ETag with a role computed before the teammate's change, and wrote over it. ARTIE takes both from the representation it acts on, and kept the teammate's change every time.</li>
       <li><b>Security.</b> Code mode ran model-written code every run, so it needed a sandbox every run. ARTIE ran none: its script is data in a closed vocabulary.</li>
@@ -322,6 +322,26 @@ flowchart TD
     <li>ARTIE's 56 304s are its state read again before each use (Layer 1 is <code>no-cache</code>): a conditional GET, answered with no body. Its 70 form-set and schema fetches are <code>immutable</code> for a year and served from its cache within a run; each run here started a new process with an empty cache, so each fetched them once. A cache kept between runs would take them to zero.</li>
   </ul>
 
+  <h2>Code mode on HEART: what it needed</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Variant</th><th>Answers in</th><th>Told, beyond the address</th><th>Turns allowed (used: median, most)</th><th>Right</th><th>Why wrong</th><th>Input tokens</th></tr></thead>
+    <tbody>
+      <tr><th>As the service answers</th><td>HAL-FORMS</td><td>nothing; it read the OpenAPI description its index links to, in 19 of 20 runs</td><td>8 (6, 8)</td><td class="ok">20 / 20</td><td></td><td>456,893</td></tr>
+      <tr><th>Description withheld</th><td>HAL-FORMS</td><td>nothing; <code>/openapi.json</code> answers 404</td><td>8 (6.5, 7)</td><td class="ok">20 / 20</td><td></td><td>316,303</td></tr>
+      <tr><th>HSF</th><td>HAL Schema Forms, forms in the answer</td><td>the headers that ask for it</td><td>8 (7, 8)</td><td class="bad">19 / 20</td><td>1 lost update</td><td>460,370</td></tr>
+      <tr><th>HSF, with the format's document</th><td>the same</td><td>the headers; the document beside the program</td><td>8 (8, 8)</td><td class="bad">11 / 20</td><td>9 out of turns</td><td>951,909</td></tr>
+      <tr><th>L2</th><td>HAL Schema Forms, forms and schemas by link</td><td>the headers, and <code>Prefer: forms=link, schema=link</code></td><td>8 (8, 8)</td><td class="bad">15 / 20</td><td>5 out of turns</td><td>551,629</td></tr>
+      <tr><th>L2, with the format's document</th><td>the same</td><td>the same; the document beside the program</td><td>8 (8, 8)</td><td class="bad">1 / 20</td><td>19 out of turns</td><td>981,525</td></tr>
+      <tr><th>L2, 16 turns</th><td>the same</td><td>the headers, and <code>Prefer</code></td><td>16 (8.5, 10)</td><td class="ok">20 / 20</td><td></td><td>656,688</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Knowing the format is enough; the service needn't be known.</b> No model has seen this employees service. With its description withheld, code mode found its way by HAL-FORMS alone: right 20 of 20, in at most 7 turns, on fewer tokens than with the description.</li>
+    <li><b>Forms by link cost turns.</b> L2 needs 8 to 10: with 8, 5 runs ran out; with 16, none did, and none used more than 10. Its sharing and caching pay a client that keeps a cache; a new program every run pays each hop again.</li>
+    <li><b>The format's document cost more than it gave.</b> Read inside the sandbox, through a 4,000-character window on each program's output, it used up the turns: HSF fell from 19 to 11, L2 from 15 to 1. Every one of those misses ran out of turns; none wrote anything.</li>
+    <li><b>The server's control held for every variant.</b> In each, a write without <code>If-Match</code> was refused 428, and the program then sent the ETag. The one lost update was a value the client paired with a fresher ETag, which no server can see.</li>
+  </ul>
+
   <h2>Self-repair</h2>
   <ul>
     <li><b>At the release:</b> in run 7, ARTIE's pins refused the changed forms, each step fell back to its words, the model chose <code>position</code>, and the acts were done. After the run, the repairs were written into the kept scripts and their pins (<code>keep: auto</code>), so runs 8 to 10 ran with no model.</li>
@@ -335,7 +355,7 @@ flowchart TD
   <ul>
     <li><b>Fresh code mode was right every time.</b> Every write to an existing record carried <code>If-Match</code>, 30 of 30, once the description offered it.</li>
     <li><b>It adapts with no machinery of its own.</b> It reads the current description every run, so a rename costs it nothing extra. ARTIE needed its pins and a fallback for the same.</li>
-    <li><b>It found its way from a bookmark, told nothing.</b> Given only the address, it read <code>/</code> and used everything it found there: the links, the forms, and the OpenAPI description <code>/</code> links to. Right 20 of 20 as the service answers by itself.</li>
+    <li><b>It found its way from a bookmark, told nothing.</b> Given only the address, it read <code>/</code> and used everything it found there: the links, the forms, and the OpenAPI description <code>/</code> links to. Right 20 of 20 as the service answers by itself, and 20 of 20 with the description withheld.</li>
     <li><b>A saved program with a status check would have recovered.</b> An <code>assert r['status'] &lt; 300</code> would have exited nonzero, and the model would have written a new one. These programs had none, and no person added one.</li>
     <li><b>Its sandbox held:</b> no network but the service, read-only, 1 CPU, 256 MB, 64 processes, 120 s.</li>
     <li><b>It can carry ARTIE.</b> Code mode could run ARTIE in a container beside its sandbox: find the way through hypermedia on the first pass, keep it as a <code>.heart.yaml</code>, run that each later time, and write again only when ARTIE's exit says a form changed (spec/ideas/code-mode-runs-artie.md).</li>
@@ -685,6 +705,7 @@ params:
         <li><b>Teammate:</b> <code>PUT /_sim/employees/meddle</code>: right after Frodo is next read, his role becomes "keeper of the Red Book". <b>Rename:</b> <code>PUT /_sim/employees/changes</code>, <code>renamed</code>: hire and update take <code>position</code> for <code>role</code>.</li>
         <li><b>ARTIE:</b> <code>artie generate --format yaml</code> from one goal run per task with the model (t1 25,390 input tokens, 10 calls; t3 17,093, 7 calls), then <code>artie run</code> on the <code>.heart.yaml</code>, its config <code>on-change: intent</code> and <code>keep: auto</code>, with the reasoner given only for the fallback.</li>
         <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --tasks t1,t3 --reps 10 --sequence</code>, Sonnet 5.5, the same service, sequence and harness for every arm. Code mode on endpoints in <code>runs/code-vs-data-fresh.jsonl</code>; on HEART in <code>runs/code-heart.jsonl</code>, <code>runs/code-heart-hsf.jsonl</code> and <code>runs/code-heart-l2.jsonl</code>, with every program it ran; ARTIE's in <code>runs/artie-keep.jsonl</code>; saved programs in <code>runs/codemode/</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
+        <li><b>Code mode on HEART, four more variants</b> (<code>runs/code-heart-more.jsonl</code>), each changing one thing: the OpenAPI description withheld by a proxy that answers <code>/openapi.json</code> 404 (<code>sandbox/no-openapi.conf</code>); the format's document, spec/HAL-SCHEMA-FORMS-HR.md, beside the program, with the prompt saying so (the sandbox reaches no other network); L2 with 16 turns.</li>
         <li><b>Code mode on HEART, told:</b> "The service is at the address in the environment variable API_BASE; every request needs the header Authorization: Bearer followed by the environment variable API_TOKEN." HSF, also: "Accept: application/hal+json; Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;". L2, also: "Prefer: forms=link, schema=link".</li>
       </ul>
     </div>
@@ -694,7 +715,8 @@ params:
     <div class="in">
       <ul>
         <li>One model, one service, two tasks, ten runs each.</li>
-        <li>Every code-mode client had 8 turns. On HEART at L2, fetching each form set and schema by link used them up in 5 t3 runs before a write landed.</li>
+        <li>Every code-mode client had 8 turns, but one variant with 16. On HEART at L2, fetching each form set and schema by link used them up in 5 t3 runs before a write landed.</li>
+        <li>A program's output reaches the model 4,000 characters at a time, so a document read in the sandbox takes several turns.</li>
         <li>t3's kept script had one review by hand; the saved programs had none. A reviewer would likely have caught the fixed IDs and ETag, and might have added a status check.</li>
         <li>Code mode's 412 path was never tested: its programs read Frodo again after the teammate, so no write of theirs was stale.</li>
         <li>The rename is one kind of change. A change the pins don't see (the same form, a new meaning) would pass ARTIE's guard too.</li>
