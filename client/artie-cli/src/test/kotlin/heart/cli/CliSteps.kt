@@ -218,6 +218,30 @@ class CliSteps(private val script: ScriptSteps) {
     @Then("the file {string} reads")
     fun fileReads(name: String, text: String) = assertEquals(text, Files.readString(folder.resolve(name)).trimEnd())
 
+    @Then("the file {string} is a script as data, by spec\\/schemas\\/heart-script.draft.schema.json")
+    fun scriptAsData(name: String) {
+        val schema = generateSequence(java.nio.file.Path.of("").toAbsolutePath()) { it.parent }
+            .map { it.resolve("spec/schemas/heart-script.draft.schema.json") }.first { Files.exists(it) }
+        val validator = io.github.optimumcode.json.schema.JsonSchema.fromJsonElement(
+            Json.parseToJsonElement(Files.readString(schema)),
+            io.github.optimumcode.json.schema.SchemaType.DRAFT_2020_12,
+        )
+        val document = org.yaml.snakeyaml.Yaml().load<Any?>(Files.readString(folder.resolve(name)))
+        val errors = mutableListOf<io.github.optimumcode.json.schema.ValidationError>()
+        validator.validate(json(document), errors::add)
+        assertTrue(errors.isEmpty(), errors.joinToString("\n") { "${it.objectPath}: ${it.message}" })
+    }
+
+    /** [value], read from YAML, as JSON. */
+    private fun json(value: Any?): kotlinx.serialization.json.JsonElement = when (value) {
+        null -> kotlinx.serialization.json.JsonNull
+        is Map<*, *> -> JsonObject(value.entries.associate { (k, v) -> k.toString() to json(v) })
+        is List<*> -> JsonArray(value.map(::json))
+        is Number -> kotlinx.serialization.json.JsonPrimitive(value)
+        is Boolean -> kotlinx.serialization.json.JsonPrimitive(value)
+        else -> kotlinx.serialization.json.JsonPrimitive(value.toString())
+    }
+
     /** Each selection a trace made, in order: its relation and the values it sent, as text. */
     private fun selections(trace: String): List<String> =
         org.yaml.snakeyaml.Yaml().loadAll(Files.readString(folder.resolve(trace))).toList().drop(1)

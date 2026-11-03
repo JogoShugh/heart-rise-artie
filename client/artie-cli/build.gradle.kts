@@ -28,6 +28,8 @@ dependencies {
     runtimeOnly("org.slf4j:slf4j-nop:1.7.36")
 
     testImplementation(testFixtures(project(":heart-script")))
+    // A script as data checked against its schema (spec/schemas/heart-script.draft.schema.json).
+    testImplementation("io.github.optimumcode:json-schema-validator:0.5.4")
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.cucumber:cucumber-junit-platform-engine:$cucumberVersion")
     testImplementation("io.cucumber:cucumber-picocontainer:$cucumberVersion")

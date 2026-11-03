@@ -19,6 +19,12 @@ class Variable(val name: String, val step: Int, val pointer: String, val kind: K
     val declared: String
         get() = "val $name by kept(${KotlinText.quoted(keptAs)}) { $read }"
 
+    /** How a script held as data reads it: the resource kept as [keptAs], then the member at [pointer]. */
+    val reference: String
+        get() = reference(
+            keptAs + pointer.split('/').drop(1).joinToString("") { ".${it.replace("~1", "/").replace("~0", "~")}" },
+        )
+
     enum class Kind(val read: String) {
         WHOLE("long"), DECIMAL("double"), TEXT("text"), BOOL("bool");
 
@@ -40,6 +46,8 @@ class Argument(
     val review: String? = null,
     /** Each text in the value an input or an earlier answer gave, with the name the script knows it by. */
     val named: Map<String, String> = emptyMap(),
+    /** The value as data (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md): each value read again a `${…}` reference. */
+    val value: Any? = null,
 )
 
 /**
@@ -84,25 +92,32 @@ class Bindings(
         val input = from.firstNotNullOfOrNull { it.map()["input"]?.toString() }
         val held = sources.first(from)
         val marked = Marked(source, step, field, why)
+        val data = data(value, type)
         return when {
-            input != null -> Argument(field, marked.input(input, inputAs(input, type)))
-            field in asInputs -> Argument(field, marked.madeInput(field, text, inputAs(field, type)))
+            input != null -> Argument(field, marked.input(input, inputAs(input, type)), value = reference(input))
+            field in asInputs ->
+                Argument(field, marked.madeInput(field, text, inputAs(field, type)), value = reference(field))
             // A goal run's step words are the planner's: what the person said is the goal, its "words" source.
             if (capture.source != null) "words" in from else literal(step, field, text) ->
-                Argument(field, marked.words(text, constant(value, type)))
+                Argument(field, marked.words(text, constant(value, type)), value = data)
             held != null -> variable(held.first, held.second).let { variable ->
                 val tie = tie(from, held)
                 val named = slotted[held] ?: variable.name
                 val expression = marked.answer(variable, named, tie, variableAs(variable, type))
-                Argument(field, expression, tie, mapOf(text to named))
+                Argument(field, expression, tie, mapOf(text to named), variable.reference)
             }
-            "chosen" in from ->
-                Argument(field, marked.model(constant(value, type)), "the reasoner chose it, asked \"${step.say}\"")
+            "chosen" in from -> Argument(
+                field,
+                marked.model(constant(value, type)),
+                "the reasoner chose it, asked \"${step.say}\"",
+                value = data,
+            )
             value is String -> names(step, text, from).let {
                 val written = structured(text, type, it) ?: KotlinText.templated(text, it)
-                Argument(field, marked.string(written, it.values, from), named = it)
+                val read = filled(text, type, it) { name -> referenceOf(name) }
+                Argument(field, marked.string(written, it.values, from), named = it, value = read)
             }
-            else -> Argument(field, marked.said(constant(value, type), from))
+            else -> Argument(field, marked.said(constant(value, type), from), value = data)
         }
     }
 
@@ -181,13 +196,6 @@ class Bindings(
             ?.let { "step ${held.first} holds it at ${held.second}, and at ${it.joinToString(", ")} too" }
     }
 
-    private fun inputAs(name: String, type: String?): String = when (type) {
-        "integer" -> "$name.toLong()"
-        "number" -> "$name.toDouble()"
-        "boolean" -> "$name.toBoolean()"
-        else -> name
-    }
-
     private fun variableAs(variable: Variable, type: String?): String = when {
         type == "string" && variable.kind != Variable.Kind.TEXT -> "\"$${variable.name}\""
         type == "integer" && variable.kind == Variable.Kind.TEXT -> "${variable.name}.toLong()"
@@ -215,6 +223,14 @@ class Bindings(
 }
 
 internal fun Any?.list(): List<*> = this as? List<*> ?: emptyList<Any?>()
+
+/** The input [name] as a field of [type] takes it. */
+private fun inputAs(name: String, type: String?): String = when (type) {
+    "integer" -> "$name.toLong()"
+    "number" -> "$name.toDouble()"
+    "boolean" -> "$name.toBoolean()"
+    else -> name
+}
 
 /**
  * [text], the JSON a field of [type] array or object was sent as, as Kotlin: `listOf(…)`, `mapOf(…)`, each string

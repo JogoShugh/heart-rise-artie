@@ -203,7 +203,7 @@ class ScriptWriter(
 }
 
 /** A capture's nodes walked (Walk.kt): what each step is in the script, decided once, before it is written. */
-private class Walker(
+internal class Walker(
     private val capture: Capture,
     private val bindings: Bindings,
     private val watch: WatchLines,
@@ -249,7 +249,7 @@ private class Walker(
 }
 
 /** How many selections in [block], however deep, the reasoner makes on every run: kept as reason steps, or words. */
-private fun reasoned(block: Block): Int = block.statements.sumOf { walked ->
+internal fun reasoned(block: Block): Int = block.statements.sumOf { walked ->
     val selection = walked as? Walked.Selection
     val asked = selection?.call.let { it == Call.Reasoned || it is Call.Words }
     (if (asked) 1 else 0) + (selection?.let { reasoned(it.block) } ?: 0)
@@ -272,6 +272,20 @@ private fun spoken(words: String, arguments: List<Argument>, goal: Boolean): Str
  * earlier answer gave put as the variable of [names] the script reads it from ([arguments]). Null when there are none.
  */
 private fun said(capture: Capture, step: Step, names: Set<String>, arguments: List<Argument>): String? {
+    val words = words(capture, step, names, arguments) ?: return null
+    val from = words.fromIntent?.let { ", fromIntent = " + kotlinString(it) }.orEmpty()
+    return words.intent?.let { "intent = " + kotlinString(it) }
+        ?: ("inferred = " + kotlinString(words.inferred.orEmpty()) + from)
+}
+
+/**
+ * What a step was for, in words, each with the slots a script writes (`$title`, `${'$'}{issue}`): a person's
+ * ([intent]), else a model's ([inferred]) with the person's it serves ([fromIntent]).
+ */
+internal class Words(val intent: String?, val inferred: String?, val fromIntent: String?)
+
+/** [step]'s words, as [said] writes them: null when there are none. */
+internal fun words(capture: Capture, step: Step, names: Set<String>, arguments: List<Argument>): Words? {
     val goal = capture.source != null
     // A goal run's acts are the planner's, each in its words, but the act that did a step's job has the step's;
     // a script's are its author's, but where it said they were a model's.
@@ -282,11 +296,10 @@ private fun said(capture: Capture, step: Step, names: Set<String>, arguments: Li
     }
     val inferred = if (goal) intent(step, names) else step.inferred
     // The person's words a model's serve: a step that names no act, or an act on the way to a step's job.
-    val from = (if (goal) capture.marks(step)["fromIntent"]?.toString() else step.fromIntent)
-        ?.let { ", fromIntent = " + kotlinString(it) }.orEmpty()
+    val from = if (goal) capture.marks(step)["fromIntent"]?.toString() else step.fromIntent
     return when {
-        person != null -> "intent = " + kotlinString(person)
-        inferred != null -> "inferred = " + kotlinString(spoken(inferred, arguments, goal)) + from
+        person != null -> Words(person, null, null)
+        inferred != null -> Words(null, spoken(inferred, arguments, goal), from)
         else -> null
     }
 }
@@ -302,7 +315,7 @@ private fun keeps(capture: Capture, step: Step, keepReason: Boolean): Boolean = 
  * Which parts of a script call the model, and how often: [kept] steps on every run, [asked] acts in the watch each
  * time one is reached. Null when none do.
  */
-private fun calls(kept: Int, asked: Int): String? {
+internal fun calls(kept: Int, asked: Int): String? {
     val steps = (if (kept == 1) "1 step calls" else "$kept steps call") + " the model on every run"
     val acts = if (asked == 1) "1 act in the watch" else "$asked acts in the watch"
     return when {
@@ -318,7 +331,7 @@ private fun acts(step: Step): Boolean = !step.follows && (step.relation != null 
     step.chose["method"]?.toString()?.uppercase() != "GET"
 
 /** [value] as one shell word. */
-private fun shell(value: String): String = if (value.matches(Regex("[A-Za-z0-9._/:@=+-]+"))) value else
+internal fun shell(value: String): String = if (value.matches(Regex("[A-Za-z0-9._/:@=+-]+"))) value else
     "'" + value.replace("'", "'\\''") + "'"
 
 /** An input as the capture kept its declaration: required, or with its default or its question. */

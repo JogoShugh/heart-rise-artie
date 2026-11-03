@@ -22,12 +22,7 @@ internal object KotlinText {
      * that name: `"fix-$stamp"`. The longest value is put back first, so a shorter one inside it is left alone.
      */
     fun templated(text: String, names: Map<String, String>): String {
-        var pieces: List<Piece> = listOf(Piece(text, null))
-        names.entries.filter { it.key.isNotEmpty() }.sortedByDescending { it.key.length }.forEach { (value, name) ->
-            pieces = pieces.flatMap { piece ->
-                if (piece.name != null) listOf(piece) else split(piece.text, value, name)
-            }
-        }
+        val pieces = cut(text, names)
         val out = StringBuilder()
         pieces.forEachIndexed { i, piece ->
             val next = pieces.getOrNull(i + 1)?.takeIf { it.name == null }?.text?.firstOrNull()
@@ -67,6 +62,23 @@ internal object KotlinText {
         .replace(OWN, "$")
         .replace(Regex("""\$\{[^}]*}"""), "\u0000")
         .replace(Regex("""\$[A-Za-z_][A-Za-z0-9_]*"""), "\u0000")
+
+    /**
+     * [text] in pieces, each a part [names] names, with its name, or a part between them, with none: the longest
+     * value first, each a whole word (`1` is not in `1.2`).
+     */
+    fun pieces(text: String, names: Map<String, String>): List<Pair<String, String?>> =
+        cut(text, names).map { it.text to it.name }
+
+    private fun cut(text: String, names: Map<String, String>): List<Piece> {
+        var pieces: List<Piece> = listOf(Piece(text, null))
+        names.entries.filter { it.key.isNotEmpty() }.sortedByDescending { it.key.length }.forEach { (value, name) ->
+            pieces = pieces.flatMap { piece ->
+                if (piece.name != null) listOf(piece) else split(piece.text, value, name)
+            }
+        }
+        return pieces
+    }
 
     private fun split(text: String, value: String, name: String): List<Piece> {
         val found = whole(value).findAll(text).toList()

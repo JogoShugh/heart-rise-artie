@@ -19,9 +19,11 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     asked(report == null || sourceName != null) {
         "--report needs --script: the report shows the run's script beside the one generated"
     }
+    val format = format(options, report)
     val capture = Capture(captureName, Files.readString(existing(folder, captureName, "capture")))
     if ("--bare" in options) return bare(capture, options, folder, script, out)
-    val pins = script.substringBeforeLast('.') + ".pins.yaml"
+    // A script as data is NAME.heart.yaml; its lock file is NAME.pins.yaml, as a Kotlin script's is.
+    val pins = script.removeSuffix(".heart.yaml").substringBeforeLast('.') + ".pins.yaml"
     // A goal run's steps stand for the lines of the script its moves amount to, which its capture keeps.
     val source = sourceName?.let { existing(folder, it, "script") }?.let { file ->
         capture.source?.takeIf { heart.cli.isGoal(file) }?.lines() ?: Files.readAllLines(file)
@@ -29,6 +31,7 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     val asInputs = options["--inputs"]?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()
         .associateWith { sentOnce(capture, it) }
     val chosen = ScriptWriter.Options("--keep-reason" in options, asInputs, intents = "--intents" in options)
+    if (format == "yaml") return asData(ScriptYaml(capture, source, sourceName, script, pins, chosen), folder, out)
     val writer = ScriptWriter(capture, source, sourceName, script, pins, chosen)
     val text = writer.write()
     val lock = LockWriter(capture)
@@ -73,9 +76,9 @@ private fun derivationReport(builder: Path?, folder: Path, page: String, files: 
 const val GENERATE_USAGE =
     "usage: artie generate <capture.yaml> --out <script.kts> [--script <source.kts>] [--keep-reason] [--intents]" +
         " [--inputs a,b]" +
-        " [--report <dir>]"
+        " [--report <dir>] [--format kts|yaml]"
 
-private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare", "--through")
+private val VALUED = setOf("--out", "--script", "--inputs", "--report", "--bare", "--through", "--format")
 
 /**
  * `--bare UPSTREAM.yaml` (spec/ideas/bare-runs.md): the run as the calls the gateway made to the service, from its
@@ -141,4 +144,4 @@ private fun asked(possible: Boolean, why: () -> String) {
 private fun existing(folder: Path, name: String, what: String): Path =
     folder.resolve(name).takeIf { Files.exists(it) } ?: throw BadArguments("no $what at $name")
 
-private fun count(n: Int, thing: String) = if (n == 1) "1 $thing" else "$n ${thing}s"
+internal fun count(n: Int, thing: String) = if (n == 1) "1 $thing" else "$n ${thing}s"

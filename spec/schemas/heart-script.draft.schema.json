@@ -11,9 +11,10 @@
     "kind": { "enum": ["intent", "kept"] },
     "start": { "$ref": "#/$defs/text" },
     "inputs": {
+      "description": "Each input by its name: nothing for one that must be given, else its default and question.",
       "type": "object",
       "propertyNames": { "$ref": "#/$defs/name" },
-      "additionalProperties": { "$ref": "#/$defs/input" }
+      "additionalProperties": { "anyOf": [{ "type": "null" }, { "$ref": "#/$defs/input" }] }
     },
     "steps": { "$ref": "#/$defs/steps" }
   },
