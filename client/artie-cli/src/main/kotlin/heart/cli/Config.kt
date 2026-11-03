@@ -23,6 +23,11 @@ class Config(
     val validators: String? = null,
     /** What look-then-leap's one look compares: used, the default, or everything (spec/ideas/off-the-rails.md). */
     val look: String? = null,
+    /**
+     * Whether a run of a script held as data writes a repair that worked into the script and its lock file: auto,
+     * propose (says it), never, the default (spec/ideas/self-repair-and-keep.md).
+     */
+    val keep: String? = null,
 )
 
 /** The settings a config may hold, and the values each may take. */
@@ -32,6 +37,7 @@ private val SETTINGS: Map<String, Set<String>> = mapOf(
     "on-change" to setOf("refuse", "values", "intent"),
     "validators" to VALIDATORS,
     "look" to LOOKS,
+    "keep" to setOf("auto", "propose", "never"),
 )
 
 /** The config for [asked], whose script is [script], found in [folder]. */
@@ -50,6 +56,7 @@ fun config(asked: Arguments, folder: Path, script: Path): Config {
         onChange = doc["on-change"]?.toString(),
         validators = doc["validators"]?.toString(),
         look = doc["look"]?.toString(),
+        keep = doc["keep"]?.toString(),
     )
 }
 

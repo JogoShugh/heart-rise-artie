@@ -15,9 +15,12 @@ class LockFile(val pins: Pins?, val guard: String?, val rung: String?)
 
 internal const val STOPPED = "stopped before the first request"
 
+/** The name of the lock file for [asked], whose script is [script]: the file --pins names, or NAME.pins.yaml. */
+fun lockName(asked: Arguments, script: Path): String = asked.pins ?: (scriptName(script) + ".pins.yaml")
+
 /** The lock file for [asked], whose script is [script], found in [folder], held to as the flag, then [config], says. */
 fun lockFile(asked: Arguments, folder: Path, script: Path, config: Config = Config()): LockFile {
-    val name = asked.pins ?: (scriptName(script) + ".pins.yaml")
+    val name = lockName(asked, script)
     val file = folder.resolve(name)
     if (!Files.exists(file)) {
         // Off the rails holds to no lock file, so it needs none, and is still off the rails.

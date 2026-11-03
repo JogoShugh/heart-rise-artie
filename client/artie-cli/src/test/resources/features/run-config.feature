@@ -5,7 +5,8 @@ Feature: artie run's config: how strictly a run holds to its lock file, set by a
   run that leaves the default alone. With none, a run behaves as it did before
   there was a config. A flag wins over the config. Its settings: guard (lenient
   or strict) and repin (auto, propose or never; --no-repin wins), which
-  script-replay.feature shows at work.
+  script-replay.feature shows at work, and keep (auto, propose or never), which
+  script-keeps-repair.feature does.
 
   Background:
     Given a service holds these resources
@@ -73,6 +74,7 @@ Feature: artie run's config: how strictly a run holds to its lock file, set by a
       | issue.config.yaml | repin: often  |          |              | issue.config.yaml: repin is auto, propose or never |
       | issue.config.yaml | validators: some |       |              | issue.config.yaml: validators is last or none   |
       | issue.config.yaml | on-change: soon |        |              | issue.config.yaml: on-change is refuse, values or intent |
+      | issue.config.yaml | keep: often   |          |              | issue.config.yaml: keep is auto, propose or never |
       | issue.config.yaml | guard: strict | --config | missing.yaml | --config, but no config at missing.yaml         |
 
   Scenario Outline: on-change: intent lets an act that carries its words fall back to them: <setting>

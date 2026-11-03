@@ -6,7 +6,9 @@ import heart.ScriptGuard
 import heart.cli.arguments
 import heart.cli.config
 import heart.cli.generate.generate
+import heart.cli.keep
 import heart.cli.lockFile
+import heart.cli.lockName
 import heart.cli.repin
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Given
@@ -78,9 +80,39 @@ class ReplaySteps(
         }
         val given = table.asMaps().associate { it.getValue("name") to it.getValue("value") }
         val asData = script.endsWith(".heart.yaml")
-        val run = scripts.run(Files.readString(file), ArtieNavigator(ctx.client, guard = held), given, asData)
+        val navigator = ArtieNavigator(ctx.client, scripts.reasoner(), guard = held)
+        val fallsBack = config.onChange == "intent"
+        val run = scripts.run(Files.readString(file), navigator, given, asData, fallsBack)
         Files.writeString(folder.resolve(capture), run.traceYaml())
         aboutPins = if (guard == null) emptyList() else repin(asked, folder, file, config, run.traceYaml())
+        val finished = scripts.stoppedMessage() == null
+        aboutKept = keep(file, folder.resolve(lockName(asked, file)), config, run.traceYaml(), finished)
+    }
+
+    /** What the run said about its kept script after it ran, as artie run says it. */
+    private var aboutKept = listOf<String>()
+
+    /** Each script artie generated as data, and its lock file, as generated. */
+    private val generatedText = mutableMapOf<String, String>()
+
+    @Then("about its kept script, the run said {string}")
+    fun saidAboutKept(said: String) = assertEquals(said, aboutKept.joinToString("; "))
+
+    @Then("{string} changed only in these lines")
+    fun changedLines(script: String, table: DataTable) {
+        val was = generatedText.getValue(script).lines()
+        val now = Files.readString(folder.resolve(script)).lines()
+        assertEquals(was.size, now.size, "the number of lines changed:\n${now.joinToString("\n")}")
+        val changed = was.zip(now).filter { (a, b) -> a != b }
+            .map { (a, b) -> mapOf("was" to a.trim(), "now" to b.trim()) }
+        assertEquals(table.asMaps(), changed)
+    }
+
+    @Then("{string} and its lock file are as artie generated them")
+    fun asGenerated(script: String) {
+        val pins = heart.cli.scriptName(script) + ".pins.yaml"
+        assertEquals(generatedText.getValue(script), Files.readString(folder.resolve(script)))
+        assertEquals(generatedText.getValue(pins), Files.readString(folder.resolve(pins)))
     }
 
     @Then("the run captured in {string} held its acts by")
@@ -110,6 +142,8 @@ class ReplaySteps(
         val said = ByteArrayOutputStream()
         val args = listOf("generate", capture, "--out", script, "--script", source, "--format", "yaml")
         generate(args, folder, PrintStream(said, true))
+        val pins = heart.cli.scriptName(script) + ".pins.yaml"
+        listOf(script, pins).forEach { generatedText[it] = Files.readString(folder.resolve(it)) }
     }
 
     @Then("the script {string} reads, the same run as {string} written as data")

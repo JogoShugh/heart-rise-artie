@@ -9,10 +9,10 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /** The outcomes of an act that was done. */
-private val DONE = setOf("done", "new resource")
+internal val DONE = setOf("done", "new resource")
 
 /** What a run found to re-pin for a [relation]: the [set] it was offered in, and its form when that changed. */
-private class Found(val relation: String, val set: String?, val form: String? = null, val method: String? = null) {
+internal class Found(val relation: String, val set: String?, val form: String? = null, val method: String? = null) {
     val why: String
         get() = if (form != null) "changed, and what the script sends still fits it" else "offered in a new set"
 }
@@ -55,7 +55,7 @@ private fun found(step: Step, pin: FormPin): Found? {
 }
 
 /** The lock file's [text] with what was [found] written in, every other line as it was. */
-private fun written(text: String, found: Found): String {
+internal fun written(text: String, found: Found): String {
     val lines = text.lines().toMutableList()
     val at = lines.indexOf("  ${scalar(found.relation)}:")
     found.form?.let { lines[at + 1] = "    integrity: ${scalar(it)}" }

@@ -21,6 +21,9 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
 
     private var reasoner: heart.Reasoner? = null
 
+    /** The reasoner the scenario gave ARTIE, if any (script-keeps-repair.feature). */
+    fun reasoner(): heart.Reasoner? = reasoner
+
     @io.cucumber.java.en.Given("ARTIE's reasoner will choose to act on {string} with {}")
     fun reasonerChooses(form: String, fields: String) {
         val chosen = kotlinx.serialization.json.Json.parseToJsonElement(fields) as kotlinx.serialization.json.JsonObject
@@ -160,10 +163,23 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
         clocked = true
     }
 
-    /** [script] run with [navigator], given [inputs]; the run, for its capture (script-replay.feature). */
-    fun run(script: String, navigator: Navigator, inputs: Map<String, String>, asData: Boolean = false): Run {
+    /**
+     * [script] run with [navigator], given [inputs]; the run, for its capture (script-replay.feature). A run that
+     * [fallsBack] hands an act its guard refuses to the act's words (on-change: intent).
+     */
+    fun run(
+        script: String,
+        navigator: Navigator,
+        inputs: Map<String, String>,
+        asData: Boolean = false,
+        fallsBack: Boolean = false,
+    ): Run {
         stopped = null
-        val run = fresh(inputs, navigator).also { it.reasoning = true; it.source = script.takeUnless { asData } }
+        val run = fresh(inputs, navigator).also {
+            it.reasoning = true
+            it.source = script.takeUnless { asData }
+            it.fallsBack = fallsBack
+        }
         lastRun = run
         Run.current = run
         val engine = ScriptHost.engine(listOf("heart.script.*"))

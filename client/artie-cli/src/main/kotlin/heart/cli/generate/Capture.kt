@@ -75,6 +75,9 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     val values: Map<*, *> = doc["values"].map()
     val chose: Map<*, *> = doc["chose"].map()
     val guard: Map<*, *> = doc["guard"].map()
+
+    /** Why an act wasn't made: its kind (a guard, the server) and its detail; empty for one that was. */
+    val refused: Map<*, *> = doc["refused"].map()
     val template: String? = doc["reason"].map()["template"]?.toString()
 
     /** What a scripted act or follow was for, in words, as its script said (`intent = …`), with values filled. */

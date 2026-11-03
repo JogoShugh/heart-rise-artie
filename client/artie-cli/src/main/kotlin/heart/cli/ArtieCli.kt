@@ -113,7 +113,8 @@ class ArtieCli(
             run.model = client.model
         }
         kept()
-        val repinned = repin(asked, folder, file, config, run.traceYaml())
+        val repinned = repin(asked, folder, file, config, run.traceYaml()) +
+            keep(file, folder.resolve(lockName(asked, file)), config, run.traceYaml(), ended.exit == 0)
         if (output == "words") repinned.forEach(out::println)
         asked.report?.let { report(folder.resolve(it), trace, file, run) }
         return ended
