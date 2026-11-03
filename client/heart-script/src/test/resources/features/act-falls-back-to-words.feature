@@ -7,8 +7,10 @@ Feature: An act that carries its words falls back to them when the form it was w
   the client refuses the act before anything is sent. With the run set to
   fall back to the words (on-change: intent), that step is handed to the
   reasoner as an intent step instead, chosen from what is offered now: the
-  model is called only where the service changed. An act with no words, or
-  a run not set to fall back, stops as before.
+  model is called only where the service changed. The words may be a
+  person's, or a model's inferred while the run that made the script ran,
+  as a goal run with no steps of its own leaves them. An act with no words,
+  or a run not set to fall back, stops as before.
 
   Background:
     Given a service holds these resources
@@ -34,10 +36,11 @@ Feature: An act that carries its words falls back to them when the form it was w
     Then <ended>
 
     Examples:
-      | case                                 | falls back | act                               | ended                                                                                     |
-      | the act carries its words: falls back | yes        | act("close", intent = "close it") | the script finished                                                                       |
-      | the run doesn't fall back: it stops  | no         | act("close", intent = "close it") | the script stopped at step 2, "close": not offered, refused by the client: "no reason given" |
-      | the act has no words: it stops       | yes        | act("close")                      | the script stopped at step 2, "close": not offered, refused by the client: "no reason given" |
+      | case                                            | falls back | act                                 | ended                                                                                        |
+      | the act carries its words: falls back           | yes        | act("close", intent = "close it")   | the script finished                                                                          |
+      | the act carries a model's inferred words: falls back | yes   | act("close", inferred = "close it") | the script finished                                                                          |
+      | the run doesn't fall back: it stops             | no         | act("close", intent = "close it")   | the script stopped at step 2, "close": not offered, refused by the client: "no reason given" |
+      | the act has no words: it stops                  | yes        | act("close")                        | the script stopped at step 2, "close": not offered, refused by the client: "no reason given" |
 
   Scenario: Falling back, the reasoner chooses from what is offered now, and the act made is the new one
     When this script runs, allowed a reasoner, falling back to its words: yes

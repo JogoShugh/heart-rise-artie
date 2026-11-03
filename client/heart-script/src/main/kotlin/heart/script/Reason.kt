@@ -25,12 +25,13 @@ internal fun Here.acted(step: Int, rel: String, fields: Map<String, Any?>, said:
 }
 
 /**
- * Whether an act that carries a person's words, [said], refused as [refused], falls back to them: the run is set to
- * (`on-change: intent`) and may reason, and the client refused it before sending anything because the form it was
- * written for no longer holds: no longer offered, not the one pinned, or the values no longer fit it.
+ * Whether an act that carries words, [said], a person's or a model's inferred, refused as [refused], falls back to
+ * them: the run is set to (`on-change: intent`) and may reason, and the client refused it before sending anything
+ * because the form it was written for no longer holds: no longer offered, not the one pinned, or the values no
+ * longer fit it.
  */
 private fun Here.fallsBack(said: Said, refused: Answer.Refused): Boolean =
-    run.fallsBack && run.reasoning && said.intent != null && refused.by == Side.CLIENT && refused.kind in CHANGED_FORM
+    run.fallsBack && run.reasoning && said.words != null && refused.by == Side.CLIENT && refused.kind in CHANGED_FORM
 
 /** The client's refusals that say the form an act was written for no longer holds. */
 private val CHANGED_FORM = setOf(Refusal.NotOffered, Refusal.Guard, Refusal.InvalidInput, Refusal.NotAChoice)
