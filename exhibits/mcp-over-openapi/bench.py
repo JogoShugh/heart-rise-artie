@@ -11,11 +11,13 @@ nowhere; a record with it in is not written.
 """
 import argparse
 import asyncio
+import hashlib
 import json
 import os
 import re
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from datetime import datetime, timezone
@@ -448,14 +450,197 @@ def totals(calls):
             "cache_read": read, "cache_write": write, "input_processed": input_ + read + write}
 
 
+# ---- code mode (spec/PLAN-CODE-MODE-VS-HEART.md): the model writes a program, a sandbox runs it ----
+# As Anthropic's "Code execution with MCP" and Cloudflare's Code Mode do it, steelmanned: one function per operation
+# of the service's OpenAPI description, built from it at the start of each run (so a release is seen), each
+# answering its status, ETag and body, and taking If-Match where the description says a write may; a sandbox with
+# no network but the service, read-only, with a time, memory and process limit.
+
+SANDBOX_NET = os.environ.get("BENCH_SANDBOX_NET", "heart-bench")
+SANDBOX_SERVICE = os.environ.get("BENCH_SANDBOX_SERVICE", "http://heart-sims-tt:8099")
+SANDBOX_IMAGE = "python:3.12-slim"
+SAVED = HERE / "runs/codemode"
+
+CODE_SYSTEM = (
+    "You work an employee records service by writing Python programs. Your one tool, run_program, runs a program in "
+    "a sandbox; `import api` there gives one function per operation of the service, listed below. Each returns a "
+    "dict: status, etag (the ETag header, or None) and body. Print what you need to see. Do the task you are asked, "
+    "using only programs. The person who asked is away, so do not ask questions. When you are done, say what "
+    "happened in one or two sentences.\n\nThe api module:\n\n"
+)
+
+RUN_PROGRAM = {
+    "name": "run_program",
+    "description": "Run a Python 3.12 program in the sandbox, with `import api` available. Returns its exit code, "
+                   "its standard output and its standard error.",
+    "input_schema": {"type": "object", "properties": {"code": {"type": "string", "description": "The program"}},
+                     "required": ["code"]},
+}
+
+
+def api_library(spec):
+    """The api module's source, and its documentation for the model: one function per operation of [spec]."""
+    source = [
+        "import json, os, urllib.error, urllib.parse, urllib.request",
+        "BASE, TOKEN = os.environ['API_BASE'], os.environ['API_TOKEN']",
+        "def _call(method, path, query=None, body=None, if_match=None):",
+        "    query = {k: v for k, v in (query or {}).items() if v is not None}",
+        "    url = BASE + path + ('?' + urllib.parse.urlencode(query) if query else '')",
+        "    headers = {'Authorization': 'Bearer ' + TOKEN, 'Accept': 'application/json'}",
+        "    data = None",
+        "    if body is not None:",
+        "        data, headers['Content-Type'] = json.dumps(body).encode(), 'application/json'",
+        "    if if_match:",
+        "        headers['If-Match'] = if_match",
+        "    request = urllib.request.Request(url, data=data, method=method, headers=headers)",
+        "    try:",
+        "        with urllib.request.urlopen(request, timeout=20) as r:",
+        "            status, etag, text = r.status, r.headers.get('ETag'), r.read().decode()",
+        "    except urllib.error.HTTPError as e:",
+        "        status, etag, text = e.code, e.headers.get('ETag'), e.read().decode()",
+        "    try:",
+        "        parsed = json.loads(text) if text else None",
+        "    except ValueError:",
+        "        parsed = text",
+        "    return {'status': status, 'etag': etag, 'body': parsed}",
+    ]
+    docs = []
+    for path, operations in spec["paths"].items():
+        for method, operation in operations.items():
+            if not isinstance(operation, dict) or "operationId" not in operation:
+                continue
+            name = re.sub(r"\W", "_", operation["operationId"])
+            parameters = operation.get("parameters", [])
+            in_path = [p["name"] for p in parameters if p.get("in") == "path"]
+            in_query = [p["name"] for p in parameters if p.get("in") == "query"]
+            conditional = any(p.get("name") == "If-Match" for p in parameters)
+            takes_body = "requestBody" in operation
+            arguments = in_path + (["body"] if takes_body else []) + [f"{q}=None" for q in in_query] + \
+                (["if_match=None"] if conditional else [])
+            pythonic = re.sub(r"\{(\w+)\}", r"{\1}", path)
+            query = "{" + ", ".join(f"'{q}': {q}" for q in in_query) + "}" if in_query else "None"
+            source.append(f"def {name}({', '.join(arguments)}):")
+            source.append(f"    return _call('{method.upper()}', f'{pythonic}', {query}, "
+                          f"{'body' if takes_body else 'None'}, {'if_match' if conditional else 'None'})")
+            body = ""
+            if takes_body:
+                schema = operation["requestBody"]["content"]["application/json"]["schema"]
+                if "$ref" in schema:
+                    schema = spec["components"]["schemas"][schema["$ref"].rsplit("/", 1)[1]]
+                body = f"\n    body: {json.dumps(schema.get('properties', {}))}, required {schema.get('required', [])}"
+            prose = (operation.get("summary", "") + ". " + operation.get("description", "")).strip()
+            conditional_doc = "\n    if_match: the etag you read; with it, refused 412 if the state moved since" \
+                if conditional else ""
+            docs.append(f"api.{name}({', '.join(arguments)})  # {method.upper()} {path}\n    {prose}{body}"
+                        f"{conditional_doc}")
+    return "\n".join(source) + "\n", "\n\n".join(docs)
+
+
+def sandboxed(program, library):
+    """[program] run in the sandbox beside the api module: its exit code, output and errors."""
+    runs = HERE / "runs"
+    runs.mkdir(exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=runs) as folder:
+        Path(folder, "program.py").write_text(program)
+        Path(folder, "api.py").write_text(library)
+        command = ["docker", "run", "--rm", "--network", SANDBOX_NET, "--read-only", "--cpus", "1",
+                   "--memory", "256m", "--pids-limit", "64", "-e", f"API_BASE={SANDBOX_SERVICE}",
+                   "-e", f"API_TOKEN={TOKEN}", "-v", f"{folder}:/code:ro", "-w", "/code", SANDBOX_IMAGE,
+                   "python", "program.py"]
+        try:
+            done = subprocess.run(command, capture_output=True, text=True, timeout=120)
+            return done.returncode, done.stdout[-4000:], done.stderr[-2000:]
+        except subprocess.TimeoutExpired:
+            return 124, "", "the program ran past its time limit"
+
+
+def program_turns(model, api, task, library, docs, opening, max_turns):
+    """The model writing programs until it says it is done: its calls, the programs it ran, its last word."""
+    messages = [{"role": "user", "content": opening}]
+    tools = cached([RUN_PROGRAM])
+    calls, programs, final_text, finished = [], [], None, None
+    for _ in range(max_turns):
+        t0 = time.time()
+        answer = api.messages.create(model=model, max_tokens=4096, system=CODE_SYSTEM + docs, tools=tools,
+                                     messages=marked(messages))
+        calls.append({**usage_of(answer.usage), "ms": int((time.time() - t0) * 1000), "stop": answer.stop_reason})
+        messages.append({"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in answer.content]})
+        uses = [b for b in answer.content if b.type == "tool_use"]
+        if not uses:
+            final_text = "\n".join(b.text for b in answer.content if b.type == "text")
+            break
+        results = []
+        for use in uses:
+            code = use.input.get("code", "")
+            exit_, out, err = sandboxed(code, library)
+            programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
+                             "lines": code.count("\n") + 1})
+            if exit_ == 0:
+                finished = code
+            results.append({"type": "tool_result", "tool_use_id": use.id, "is_error": exit_ != 0,
+                            "content": f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}"})
+        messages.append({"role": "user", "content": results})
+    return calls, programs, final_text, finished
+
+
+def run_code(model, arm, task, max_turns, api):
+    """code-fresh: a new program each run. code-saved: the first that finished, run again; written anew on failure."""
+    setup(task)
+    offset = len(log())
+    interferer = interfere(task, offset)
+    if interferer:
+        interferer.start()
+    change = change_under(offset)
+    started = time.time()
+    library, docs = api_library(openapi_spec())
+    saved = SAVED / f"{task}.py"
+    calls, programs, final_text, finished, replayed = [], [], None, None, None
+    if arm == "code-saved" and saved.exists():
+        exit_, out, err = sandboxed(saved.read_text(), library)
+        replayed = {"exit": exit_, "stdout": out[-1500:], "stderr": err[-800:]}
+        programs.append({"sha": hashlib.sha256(saved.read_bytes()).hexdigest()[:12], "exit": exit_, "saved": True})
+        if exit_ == 0:
+            final_text = out[-1500:]
+    if final_text is None:
+        opening = TASKS[task]["text"]
+        if replayed:
+            opening += (f"\n\nA program kept from an earlier run of this task failed this time (exit "
+                        f"{replayed['exit']}):\n{replayed['stderr'] or replayed['stdout']}")
+        calls, programs_written, final_text, finished = program_turns(model, api, task, library, docs, opening,
+                                                                      max_turns)
+        programs += programs_written
+    if arm == "code-saved" and finished:
+        SAVED.mkdir(parents=True, exist_ok=True)
+        saved.write_text(finished)
+    if interferer:
+        interferer.stopped.set()
+    if change:
+        change.stopped.set()
+    requests = requests_since(offset)
+    held = everyone()
+    return {
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
+        "at": now(), "model": model if calls else None, "arm": arm, "task": task,
+        "seconds": round(time.time() - started, 1), "tools_offered": 1, "tool_definition_tokens": None,
+        **totals(calls), "calls": calls, "programs": programs, "replayed": replayed,
+        "tool_calls": len(programs), "tool_errors": sum(p["exit"] != 0 for p in programs), "tools": None,
+        "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests), "requests": requests,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "check": check(task, held, final_text), "final_text": final_text, "error": None,
+    }
+
+
 # ---- ARTIE, native: a goal run with the reasoner, or a script with no model ----
 
 ARTIE = HERE / "../../client/artie-cli/build/install/artie/bin/artie"
 # A goal run plans from the words; an intent run is the goal's steps as act(intent = …), each chosen from what is
 # offered then; a kept script is artie generate's script from a clean goal run, held to its pins, with no model.
 ARTIE_SOURCES = {"artie-goal": "{task}.goal.md", "artie-intent": "{task}.intent.kts", "artie-kept": "{task}.kept.kts",
-                 "artie-script": "{task}.kts"}
-ARTIE_REASONING = {"artie-goal", "artie-intent"}
+                 "artie-script": "{task}.kts", "artie-data": "{task}.kept.heart.yaml"}
+# artie-data, the kept script held as data, is given the reasoner only to fall back to its words when a form changed
+# (its config says on-change: intent); it calls the model on no other step.
+ARTIE_REASONING = {"artie-goal", "artie-intent", "artie-data"}
 
 
 def run_artie(model, arm, task):
@@ -513,6 +698,9 @@ def main():
     parser.add_argument("--when", default="start", choices=["before", "start", "midway"])
     parser.add_argument("--meddle", action="store_true", help="the sim changes Frodo right after the client reads him")
     parser.add_argument("--dam", default="", help="the GitHub gateway owner's rungs (GATEWAY_DAM), for g tasks")
+    parser.add_argument("--sequence", action="store_true",
+                        help="spec/PLAN-CODE-MODE-VS-HEART.md: runs 1-3 as they are, 4-6 with a teammate's change "
+                             "(meddle), 7 on with a field renamed")
     args = parser.parse_args()
     CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
     CHANGE["when"] = args.when
@@ -522,6 +710,9 @@ def main():
     out = Path(args.out or HERE / f"runs/{datetime.now().strftime('%Y%m%d-%H%M%S')}.jsonl")
     api = anthropic.Anthropic()
     for rep in range(args.reps):
+        if args.sequence:
+            MEDDLE["on"] = 3 <= rep <= 5
+            CHANGE["names"], CHANGE["when"] = ("renamed", "start") if rep >= 6 else ("", "start")
         for task in args.tasks.split(","):
             for arm in args.arms.split(","):
                 if arm in ("artie-script", "artie-kept") and task in INTERFERED and not args.meddle:
@@ -529,7 +720,9 @@ def main():
                 if arm == "artie-kept" and not (HERE / "artie" / f"{task}.kept.kts").exists():
                     continue  # kept only from a goal run that acted: task 2's acted on nothing
                 try:
-                    if arm.startswith("artie-"):
+                    if arm.startswith("code-"):
+                        record = run_code(args.model, arm, task, min(args.max_turns, 8), api)
+                    elif arm.startswith("artie-"):
                         record = run_artie(args.model, arm, task)
                     else:
                         record = asyncio.run(run(args.model, arm, task, args.max_turns, api))
