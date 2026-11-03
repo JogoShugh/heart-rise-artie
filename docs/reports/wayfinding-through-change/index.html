@@ -114,36 +114,73 @@ footer ul { gap: 0.2rem; }
   <h1>Wayfinding Through Change</h1>
   <p class="dek">One business process, run again and again while the service changes under it. Two architectures: a bag of endpoints, where a model writes code against operations, and hypermedia, where a client follows the controls the server offers. Two places for the model: in the middle of every run, or at the edges, to find the way once and to repair after a change.</p>
 
+  <div class="short frame">
+    <h2 style="margin-top:0">The work this is about</h2>
+    <ul>
+      <li><b>Work done in bulk, again and again:</b> the same business process over many records, every day, for months.</li>
+      <li><b>Its shape can be found up front.</b> One exploratory run with the model finds the way: which links, which forms, which values. Records in different states take different paths, but a few known ones, not a new one each time.</li>
+      <li><b>Inference spent once, to make the work deterministic.</b> The way is kept and run with no model, held to the server's controls. The model comes back only at the edges: where the service changed, or a record is in a state not met before.</li>
+      <li><b>Not infinite novelty.</b> Tasks that are new in every run are another matter; there, a model in the middle of every run earns its keep.</li>
+    </ul>
+  </div>
+
   <div class="short scale">
-    <h2 style="margin-top:0">At 100 and 1,000 runs</h2>
-    <p class="headline">At 1,000 runs: <b>ARTIE, 46,864 input tokens and 1,000 of 1,000 right</b>. Code mode: 7.9 to 32.8 million tokens. Saved code mode, the fewest tokens: <b>12 of 1,000 right, 1.2%</b>.</p>
+    <h2 style="margin-top:0">At scale: 100 to 1,000,000 runs</h2>
+    <p class="headline">At 1,000,000 runs: <b>ARTIE, 46,864 input tokens, every run right</b>. Code mode: 7.95 to 32.8 billion. Saved code mode, the fewest tokens: <b>12 runs right, 0.0012%</b>.</p>
+    <h3>Input tokens</h3>
     <div class="table-scroll"><table>
-      <thead><tr><th>Client</th><th>Right of 20, measured</th><th>Input tokens: 20 runs, measured</th><th>100 runs</th><th>1,000 runs</th><th>Right at 100</th><th>Right at 1,000</th><th>Tokens per right run at 1,000, averaged</th><th>1,000 runs, priced with the cache</th><th>Model calls at 1,000</th><th>Sandbox at 1,000: start time / hosted price</th></tr></thead>
+      <thead><tr><th>Client</th><th>Right of 20, measured</th><th>20 runs, measured</th><th>100 runs</th><th>1,000 runs</th><th>100,000 runs</th><th>1,000,000 runs</th></tr></thead>
       <tbody>
-        <tr class="us"><th>ARTIE as data</th><td>20 (100%)</td><td>46,864</td><td>46,864</td><td>46,864</td><td>100 (100%)</td><td>1,000 (100%)</td><td>47</td><td>18,115</td><td>20</td><td>none: 0 / $0</td></tr>
-        <tr><th>Code mode, fresh (endpoints)</th><td>20 (100%)</td><td>158,995</td><td>794,975</td><td>7,949,750</td><td>100 (100%)</td><td>1,000 (100%)</td><td>7,950</td><td>1,755,872</td><td>4,950</td><td>16 min / $0.15</td></tr>
-        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>20 (100%)</td><td>316,303</td><td>1,581,515</td><td>15,815,150</td><td>100 (100%)</td><td>1,000 (100%)</td><td>15,815</td><td>6,189,322</td><td>6,500</td><td>22 min / $0.25</td></tr>
-        <tr><th>Code mode on HEART, as it answers</th><td>20 (100%)</td><td>456,893</td><td>2,284,465</td><td>22,844,650</td><td>100 (100%)</td><td>1,000 (100%)</td><td>22,845</td><td>8,491,332</td><td>6,300</td><td>21 min / $0.29</td></tr>
-        <tr><th>Code mode on HEART, HSF</th><td><span class="bad">19 (95%)</span></td><td>460,370</td><td>2,301,850</td><td>23,018,500</td><td><span class="bad">95 (95%)</span></td><td><span class="bad">950 (95%)</span></td><td>24,230</td><td>8,943,585</td><td>7,000</td><td>24 min / $0.34</td></tr>
-        <tr><th>Code mode on HEART, L2, 16 turns</th><td>20 (100%)</td><td>656,688</td><td>3,283,440</td><td>32,834,400</td><td>100 (100%)</td><td>1,000 (100%)</td><td>32,834</td><td>11,147,508</td><td>8,500</td><td>30 min / $0.44</td></tr>
-        <tr><th>Code mode, saved</th><td><span class="bad">12 (60%)</span></td><td>16,004</td><td>16,004</td><td>16,004</td><td><span class="bad">12 (12%)</span></td><td><span class="bad">12 (1.2%)</span></td><td>1,334</td><td>2,717</td><td>10</td><td>12 min / $0.02</td></tr>
+        <tr class="us"><th>ARTIE as data</th><td>20 (100%)</td><td>46,864</td><td>46,864</td><td>46,864</td><td>46,864</td><td>46,864</td></tr>
+        <tr><th>Code mode, fresh (endpoints)</th><td>20 (100%)</td><td>158,995</td><td>794,975</td><td>7.9 million</td><td>795 million</td><td>7.95 billion</td></tr>
+        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>20 (100%)</td><td>316,303</td><td>1.6 million</td><td>15.8 million</td><td>1.58 billion</td><td>15.8 billion</td></tr>
+        <tr><th>Code mode on HEART, as it answers</th><td>20 (100%)</td><td>456,893</td><td>2.3 million</td><td>22.8 million</td><td>2.28 billion</td><td>22.8 billion</td></tr>
+        <tr><th>Code mode on HEART, HSF</th><td><span class="bad">19 (95%)</span></td><td>460,370</td><td>2.3 million</td><td>23.0 million</td><td>2.30 billion</td><td>23.0 billion</td></tr>
+        <tr><th>Code mode on HEART, L2, 16 turns</th><td>20 (100%)</td><td>656,688</td><td>3.3 million</td><td>32.8 million</td><td>3.28 billion</td><td>32.8 billion</td></tr>
+        <tr><th>Code mode, saved</th><td><span class="bad">12 (60%)</span></td><td>16,004</td><td>16,004</td><td>16,004</td><td>16,004</td><td>16,004</td></tr>
+      </tbody>
+    </table></div>
+    <h3>Runs right</h3>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>At 100</th><th>At 1,000</th><th>At 100,000</th><th>At 1,000,000</th><th>Tokens per right run at 1,000,000, averaged</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE as data</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>0.05</td></tr>
+        <tr><th>Code mode, fresh (endpoints)</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>7,950</td></tr>
+        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>15,815</td></tr>
+        <tr><th>Code mode on HEART, as it answers</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>22,845</td></tr>
+        <tr><th>Code mode on HEART, HSF</th><td><span class="bad">95 (95%)</span></td><td><span class="bad">950 (95%)</span></td><td><span class="bad">95,000 (95%)</span></td><td><span class="bad">950,000 (95%)</span></td><td>24,230</td></tr>
+        <tr><th>Code mode on HEART, L2, 16 turns</th><td>100 (100%)</td><td>1,000 (100%)</td><td>100,000 (100%)</td><td>1,000,000 (100%)</td><td>32,834</td></tr>
+        <tr><th>Code mode, saved</th><td><span class="bad">12 (12%)</span></td><td><span class="bad">12 (1.2%)</span></td><td><span class="bad">12 (0.012%)</span></td><td><span class="bad">12 (0.0012%)</span></td><td>1,334</td></tr>
+      </tbody>
+    </table></div>
+    <h3>At 1,000,000 runs</h3>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>Input, priced with the cache</th><th>Model calls</th><th>Sandbox start time</th><th>Hosted sandbox price</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE as data</th><td>18,115</td><td>20</td><td>none</td><td>none</td></tr>
+        <tr><th>Code mode, fresh (endpoints)</th><td>1.76 billion</td><td>4.95 million</td><td>260 hours</td><td>$153</td></tr>
+        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>6.19 billion</td><td>6.5 million</td><td>365 hours</td><td>$255</td></tr>
+        <tr><th>Code mode on HEART, as it answers</th><td>8.49 billion</td><td>6.3 million</td><td>352 hours</td><td>$290</td></tr>
+        <tr><th>Code mode on HEART, HSF</th><td>8.94 billion</td><td>7.0 million</td><td>398 hours</td><td>$338</td></tr>
+        <tr><th>Code mode on HEART, L2, 16 turns</th><td>11.15 billion</td><td>8.5 million</td><td>507 hours</td><td>$439</td></tr>
+        <tr><th>Code mode, saved</th><td>2,717</td><td>10</td><td>198 hours</td><td>$20</td></tr>
       </tbody>
     </table></div>
     <ul class="note">
       <li>Projected from the measured runs, not run: the same two tasks, and one release in the period, as here.</li>
       <li>Code mode finds its way in every run, so its measured cost per run is paid each time.</li>
-      <li>ARTIE pays once: its wayfinding (one goal run per task, 42,483) and the first run after the release (4,381: three steps repaired, then kept). Every other run uses no model. A further release that changes a form the scripts use adds its repair once, in the first run after it: here about 4.4k per release, not per run.</li>
-      <li>Right at 100 and 1,000: each client's measured rate, held. Saved code mode is right only before the release (6 runs per task, as here) and wrong, silently, in every run after it: 12 at any count, 12% of 100, 1.2% of 1,000. HSF's 1 miss in 20 was a lost update: about 50 in 1,000.</li>
-      <li>Tokens per right run is an average: ARTIE spends all of its tokens in its first runs and in the first run after the release, and none in the other 998.</li>
-      <li>Sandbox, measured here: a locked-down container starts in 0.255 s against 0.018 s for the same program with none, about 0.24 s more for each program; code mode ran 3 to 8 programs a run. Published: a Firecracker microVM boots in about 125 ms with under 5 MiB of overhead (<a href="https://northflank.com/blog/what-is-aws-firecracker">Northflank</a>); one benchmark puts Docker starts at 180 to 450 ms (<a href="https://dev.to/adwitiya/how-i-built-sandboxes-that-boot-in-28ms-using-firecracker-snapshots-i0k">dev.to</a>). Hosted price at <a href="https://e2b.dev/pricing">E2B's</a> per-second rates ($0.000014 a vCPU, $0.0000045 a GiB), for 1 vCPU and 256 MB kept for the run's median time. ARTIE runs no sandbox; its own start, the JVM, is 0.19 s a run.</li>
+      <li>ARTIE pays once: its wayfinding (one goal run per task, 42,483) and the first run after the release (4,381: three steps repaired, then kept). Every other run uses no model. A further release that changes a form the scripts use adds its repair once, in the first run after it: here about 4.4k per release, not per run. With such a release every 1,000 runs, ARTIE would take about 4.4 million at 1,000,000 runs.</li>
+      <li>Right runs: each client's measured rate, held. Saved code mode is right only before the release (6 runs per task, as here) and wrong, silently, in every run after it: 12 at any count. HSF's 1 miss in 20 was a lost update: about 50,000 in 1,000,000.</li>
+      <li>Tokens per right run is an average: ARTIE spends its tokens in its first runs and in the first run after the release, and none in the others.</li>
       <li>Priced with the cache: cache reads at a tenth of the input price and cache writes at 1.25, as these runs used them.</li>
+      <li>Sandbox, measured here: a locked-down container starts in 0.255 s against 0.018 s for the same program with none, about 0.24 s more for each program; code mode ran 3 to 8 programs a run. Published: a Firecracker microVM boots in about 125 ms with under 5 MiB of overhead (<a href="https://northflank.com/blog/what-is-aws-firecracker">Northflank</a>); one benchmark puts Docker starts at 180 to 450 ms (<a href="https://dev.to/adwitiya/how-i-built-sandboxes-that-boot-in-28ms-using-firecracker-snapshots-i0k">dev.to</a>). Hosted price at <a href="https://e2b.dev/pricing">E2B's</a> per-second rates ($0.000014 a vCPU, $0.0000045 a GiB), for 1 vCPU and 256 MB kept for the run's median time. ARTIE runs no sandbox; its own start, the JVM, is 0.19 s a run.</li>
     </ul>
     <h3>Expected, not measured: code mode running ARTIE</h3>
     <div class="table-scroll"><table>
-      <thead><tr><th>Variant</th><th>The model, when</th><th>Input tokens at 1,000, about</th><th>Right at 1,000, expected</th><th>Sandbox runs</th></tr></thead>
+      <thead><tr><th>Variant</th><th>The model, when</th><th>Input tokens at 1,000 / 1,000,000, about</th><th>Right, expected</th><th>Sandbox runs at 1,000 / 1,000,000</th></tr></thead>
       <tbody>
-        <tr><th>Code mode finds the way through ARTIE once; the harness runs ARTIE's kept script after</th><td>the first run of each task; ARTIE's goal runs; ARTIE's repair after the release</td><td>63,000: about 8k per task for code mode's first program, 42,483 for ARTIE's goal runs, 4,381 for the repair</td><td>1,000, as ARTIE</td><td>2, the first runs</td></tr>
-        <tr><th>The model in every run, choosing to run the kept script and reading its exit</th><td>every run, one or two small calls: no library and no format to read</td><td>3 to 6 million</td><td>1,000, if it runs the kept script every time</td><td>1,000, or none where ARTIE is its tool</td></tr>
+        <tr><th>Code mode finds the way through ARTIE once; the harness runs ARTIE's kept script after</th><td>the first run of each task; ARTIE's goal runs; ARTIE's repair after the release</td><td>63,000 / 63,000: about 8k per task for code mode's first program, 42,483 for ARTIE's goal runs, 4,381 for the repair</td><td>every run, as ARTIE</td><td>2 / 2, the first runs</td></tr>
+        <tr><th>The model in every run, choosing to run the kept script and reading its exit</th><td>every run, one or two small calls: no library and no format to read</td><td>3 to 6 million / 3 to 6 billion</td><td>every run, if it runs the kept script every time</td><td>1,000 / 1,000,000, or none where ARTIE is its tool</td></tr>
       </tbody>
     </table></div>
     <p class="note">Estimates from the measured parts above, for spec/ideas/code-mode-runs-artie.md and spec/PLAN-ARTIE-SKILL.md, which would measure them.</p>
