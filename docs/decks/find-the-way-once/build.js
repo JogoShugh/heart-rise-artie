@@ -529,7 +529,7 @@ add("CONTENT", (s) => {
     ["HAL Schema Forms", "HAL, and _forms: each act’s method, a link to its target, and a JSON Schema for what it takes", "HEART’s reference format: forms named as link relations, with hashes a client can check"],
     ["OpenAPI", "Not an answer: a separate description of every endpoint, its path, method and body", "The same service’s endpoints, as code mode uses them"],
   ].map((r) => r.map((c, j) => (j === 0 ? c : { text: c, options: { align: "left" } }))),
-  { x: 0.6, y: 1.75, w: 12.1, colW: [2.4, 5.0, 4.7], rowH: 0.95, fontSize: 16 });
+  { x: 0.6, y: 1.75, w: 12.1, colW: [2.4, 5.0, 4.7], rowH: [0.5, 0.78, 0.78, 0.78, 0.78], fontSize: 16 });
   foot(s, "The first three put the controls in the answer. The fourth puts them in a document beside it.");
   s.addNotes("HAL-FORMS is the default answer of this service and of Spring HATEOAS. HAL Schema Forms adds JSON Schema and the HEART profile.");
 });
@@ -824,7 +824,7 @@ add("CONTENT", (s) => {
     ["ARTIE, one case", "2,544 tokens, 2 calls", "12,720 tokens, 10 calls", "38,160 tokens, 30 calls"],
     ["Code mode, fresh", "10,166 tokens, 5 calls", "10,374 tokens, 5 calls", "10,225 tokens, 5 calls"],
     ["Code mode, HAL-FORMS alone", "24,444 tokens, 7 calls", "36,380 tokens, 8 calls", "35,348 tokens, 8 calls"],
-  ], { x: 0.6, y: 1.7, w: 12.1, colW: [3.7, 2.8, 2.8, 2.8], rowH: 0.64, fontSize: 15 });
+  ], { x: 0.6, y: 1.7, w: 12.1, colW: [3.7, 2.8, 2.8, 2.8], rowH: [0.55, 0.6, 0.6, 0.6, 0.6], fontSize: 15 });
   big(s, 0.6, 4.85, 3.6, "3", "form sets fetched a run by ARTIE, at every size: one per state");
   big(s, 4.6, 4.85, 3.6, "15 of 15", "runs right, for every client");
   text(s, "Without a case for a state, the model is asked once per record in it. Keeping the new case after its first use takes that back to none (next to build).",
@@ -841,7 +841,7 @@ add("CONTENT", (s) => {
     ["ARTIE, one case", "3 at every size", "28 / 110 / 313", "5.3 / 25.4 / 75.1", "0"],
     ["Code mode, fresh", "none: no forms", "18 / 56 / 163", "11.4 / 13.5 / 14.8", "0"],
     ["Code mode, HAL-FORMS alone", "none: forms inline", "39 / 194 / 600", "21.8 / 28.5 / 29.2", { text: "307: 428 and 405", color: C.rust, bold: true }],
-  ], { x: 0.6, y: 1.7, w: 12.1, colW: [3.3, 2.0, 2.3, 2.3, 2.2], rowH: 0.64, fontSize: 15 });
+  ], { x: 0.6, y: 1.7, w: 12.1, colW: [3.3, 2.0, 2.3, 2.3, 2.2], rowH: [0.55, 0.6, 0.6, 0.6, 0.6], fontSize: 15 });
   text(s, [
     { text: "ARTIE reads each employee and returns to the list, revalidating as it goes; code mode on endpoints reads less.", options: { bullet: BULLET, breakLine: true } },
     { text: "Code mode on HAL-FORMS wrote without If-Match (428) or with the wrong method (405) before it got it right. The server refused each one; nothing wrong was written.", options: { bullet: BULLET, breakLine: true } },
@@ -884,12 +884,12 @@ add("CONTENT", (s) => {
     ["Code mode, fresh", "20 (100%)", "158,995", "1,000,000 (100%)", "7.95 billion"],
     ["Code mode on HAL-FORMS alone", "20 (100%)", "316,303", "1,000,000 (100%)", "15.8 billion"],
     ["Code mode, kept programs", bad("12 (60%)"), "16,004", bad("12 (0.0012%)"), "16,004"],
-  ], { x: 0.6, y: 1.7, w: 12.1, colW: [3.3, 2.1, 2.5, 2.2, 2.0], rowH: 0.64, fontSize: 15 });
+  ], { x: 0.6, y: 1.7, w: 12.1, colW: [3.3, 2.1, 2.5, 2.2, 2.0], rowH: [0.7, 0.6, 0.6, 0.6, 0.6], fontSize: 15 });
   text(s, [
     { text: "Two tasks, 10 runs each: a teammate’s change in the middle of one, and a field renamed from run 7.", options: { bullet: BULLET, breakLine: true } },
     { text: "Kept programs were right only before the release, and wrong, silently, in every run after it.", options: { bullet: BULLET, breakLine: true } },
     { text: "ARTIE paid once per task to find the way (42,483 for both) and once to repair after the release (4,381); every other run used no model.", options: { bullet: BULLET } },
-  ], { x: 0.6, y: 4.85, w: 12.1, h: 1.5, fontSize: 15, paraSpaceAfter: 6 });
+  ], { x: 0.6, y: 5.0, w: 12.1, h: 1.5, fontSize: 15, paraSpaceAfter: 6 });
   s.addNotes("From the Wayfinding Through Change runs, same service, same model. Projections hold each client's measured rate; one release in the period, as measured.");
 });
 
