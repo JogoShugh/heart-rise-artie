@@ -481,6 +481,34 @@ RUN_PROGRAM = {
                      "required": ["code"]},
 }
 
+# code-heart: code mode on the service as it answers by itself, its HEART side, told nothing about it but where it is
+# and how to authenticate; no library, no description, no word of hypermedia, ETags or forms.
+CODE_HEART_SYSTEM = (
+    "You work an employee records service by writing Python programs. Your one tool, run_program, runs a Python "
+    "3.12 program in a sandbox that can reach the service. The service is at the address in the environment "
+    "variable API_BASE; every request needs the header Authorization: Bearer followed by the environment variable "
+    "API_TOKEN. Print what you need to see. Do the task you are asked, using only programs. The person who asked is "
+    "away, so do not ask questions. When you are done, say what happened in one or two sentences."
+)
+
+# code-heart-hsf: the same, told also to ask for HAL Schema Forms, its forms and schemas in the answer (rung L0).
+# code-heart-l2: told also to ask for them by link, as ARTIE does at rung L2. Those headers alone, in each.
+HSF_HEADERS = (
+    " Send these headers with every request too: Accept: application/hal+json; Accept-Profile: "
+    "<https://w3id.org/heart-rise/hal-schema-forms>."
+)
+L2_HEADERS = (
+    " Send these headers with every request too: Accept: application/hal+json; Accept-Profile: "
+    "<https://w3id.org/heart-rise/hal-schema-forms>; Prefer: forms=link, schema=link."
+)
+HEART_HEADERS = {"code-heart": "", "code-heart-hsf": HSF_HEADERS, "code-heart-l2": L2_HEADERS}
+
+RUN_PLAIN_PROGRAM = {
+    **RUN_PROGRAM,
+    "description": "Run a Python 3.12 program in the sandbox. Returns its exit code, its standard output and its "
+                   "standard error.",
+}
+
 
 def api_library(spec):
     """The api module's source, and its documentation for the model: one function per operation of [spec]."""
@@ -546,7 +574,8 @@ def sandboxed(program, library):
     runs.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(dir=runs) as folder:
         Path(folder, "program.py").write_text(program)
-        Path(folder, "api.py").write_text(library)
+        if library:
+            Path(folder, "api.py").write_text(library)
         command = ["docker", "run", "--rm", "--network", SANDBOX_NET, "--read-only", "--cpus", "1",
                    "--memory", "256m", "--pids-limit", "64", "-e", f"API_BASE={SANDBOX_SERVICE}",
                    "-e", f"API_TOKEN={TOKEN}", "-v", f"{folder}:/code:ro", "-w", "/code", SANDBOX_IMAGE,
@@ -558,15 +587,15 @@ def sandboxed(program, library):
             return 124, "", "the program ran past its time limit"
 
 
-def program_turns(model, api, task, library, docs, opening, max_turns):
+def program_turns(model, api, task, library, system, opening, max_turns):
     """The model writing programs until it says it is done: its calls, the programs it ran, its last word."""
     messages = [{"role": "user", "content": opening}]
-    tools = cached([RUN_PROGRAM])
+    tools = cached([RUN_PROGRAM if library else RUN_PLAIN_PROGRAM])
     # Every program that finished, in order: together they did the task, as a saved skill would do it again.
     calls, programs, final_text, finished = [], [], None, []
     for _ in range(max_turns):
         t0 = time.time()
-        answer = api.messages.create(model=model, max_tokens=4096, system=CODE_SYSTEM + docs, tools=tools,
+        answer = api.messages.create(model=model, max_tokens=4096, system=system, tools=tools,
                                      messages=marked(messages))
         calls.append({**usage_of(answer.usage), "ms": int((time.time() - t0) * 1000), "stop": answer.stop_reason})
         messages.append({"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in answer.content]})
@@ -579,7 +608,7 @@ def program_turns(model, api, task, library, docs, opening, max_turns):
             code = use.input.get("code", "")
             exit_, out, err = sandboxed(code, library)
             programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
-                             "lines": code.count("\n") + 1})
+                             "lines": code.count("\n") + 1, **({} if library else {"code": code})})
             if exit_ == 0:
                 finished.append(code)
             results.append({"type": "tool_result", "tool_use_id": use.id, "is_error": exit_ != 0,
@@ -597,7 +626,11 @@ def run_code(model, arm, task, max_turns, api):
         interferer.start()
     change = change_under(offset)
     started = time.time()
-    library, docs = api_library(openapi_spec())
+    if arm in HEART_HEADERS:
+        library, system = "", CODE_HEART_SYSTEM + HEART_HEADERS[arm]
+    else:
+        library, docs = api_library(openapi_spec())
+        system = CODE_SYSTEM + docs
     saved = SAVED / f"{task}.programs.json"
     calls, programs, final_text, finished, replayed = [], [], None, None, None
     if arm == "code-saved" and saved.exists():
@@ -617,7 +650,7 @@ def run_code(model, arm, task, max_turns, api):
         if replayed:
             opening += (f"\n\nA program kept from an earlier run of this task failed this time (exit "
                         f"{replayed['exit']}):\n{replayed['stderr'] or replayed['stdout']}")
-        calls, programs_written, final_text, finished = program_turns(model, api, task, library, docs, opening,
+        calls, programs_written, final_text, finished = program_turns(model, api, task, library, system, opening,
                                                                       max_turns)
         programs += programs_written
     if arm == "code-saved" and finished:
@@ -703,6 +736,7 @@ def main():
     parser.add_argument("--arms", default="fastmcp,fastmcp-typical,meta-tools,heart-mcp,artie-goal,artie-script")
     parser.add_argument("--tasks", default="t1,t2,t3")
     parser.add_argument("--reps", type=int, default=3)
+    parser.add_argument("--start", type=int, default=1, help="the first run's number: with --sequence, its phase")
     parser.add_argument("--model", default="claude-sonnet-5-5")
     parser.add_argument("--max-turns", type=int, default=25)
     parser.add_argument("--out")
@@ -722,7 +756,7 @@ def main():
     (HERE / "runs").mkdir(exist_ok=True)
     out = Path(args.out or HERE / f"runs/{datetime.now().strftime('%Y%m%d-%H%M%S')}.jsonl")
     api = anthropic.Anthropic()
-    for rep in range(args.reps):
+    for rep in range(args.start - 1, args.start - 1 + args.reps):
         if args.sequence:
             MEDDLE["on"] = 3 <= rep <= 5
             CHANGE["names"], CHANGE["when"] = ("renamed", "start") if rep >= 6 else ("", "start")

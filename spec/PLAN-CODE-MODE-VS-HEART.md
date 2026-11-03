@@ -19,7 +19,10 @@ Which client keeps doing the right thing, at what cost in tokens, and what does 
 
 | Arm | How it runs each time | Model each run | Sandbox |
 |---|---|---|---|
-| `code-fresh` | The model writes a program for the task from the API's functions; the sandbox runs it; the model sees the output and may write again, up to 5 turns | yes | yes |
+| `code-fresh` | The model writes a program for the task from the API's functions; the sandbox runs it; the model sees the output and may write again, up to 8 turns | yes | yes |
+| `code-heart` | The same, on the service's HEART side as it answers by itself: no library, no description, told only where the service is and how to authenticate | yes | yes |
+| `code-heart-hsf` | The same, told also to ask for HAL Schema Forms: `Accept: application/hal+json` and its `Accept-Profile`; forms and schemas come in the answer (L0) | yes | yes |
+| `code-heart-l2` | The same, told also `Prefer: forms=link, schema=link`, as ARTIE asks at rung L2: forms and schemas by link | yes | yes |
 | `code-saved` | The first program that finished is saved, reviewed once, and run again each time; if it fails, the model writes a new one from the error (its own fallback, the steelman) | only on failure | yes |
 | `artie-data` | One goal run with the model; the kept `.heart.yaml` replayed each time; a changed form falls back to its words (`on-change: intent`) | only on change | no |
 
@@ -80,7 +83,7 @@ N = 10 runs per arm per task, in order:
 
 ## Cost and limits
 
-- Model cost: `code-fresh` about 20 runs × up to 5 model calls; `code-saved` and `artie-data` only on failure or
+- Model cost: `code-fresh` and `code-heart` about 20 runs × up to 8 model calls each; `code-saved` and `artie-data` only on failure or
   change. Estimated well under the bench's earlier runs.
 - The employees service is ours, so its controls are built in. GitHub through the gateway is the next step, if this
   says something worth saying.
