@@ -97,6 +97,9 @@ ol.notes b { color: var(--fg); }
 .scale { display: grid; gap: 0.7rem; }
 .scale .headline { font-family: var(--display); font-size: 1.15rem; line-height: 1.45; }
 .scale .table-scroll { background: var(--bg); }
+details.more { margin-top: 0.35rem; }
+details.more > summary { cursor: pointer; color: var(--link); font-size: 0.85rem; font-weight: 600; }
+details.more ul { margin-top: 0.35rem; font-size: 0.92rem; line-height: 1.55; color: var(--muted); }
 .scale tr.us th, .scale tr.us td { background: var(--leaf-bg); color: var(--leaf); font-weight: 600; }
 .stack { display: grid; gap: 0.6rem; }
 footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
@@ -117,10 +120,42 @@ footer ul { gap: 0.2rem; }
   <div class="short">
     <h2 style="margin-top:0">In short</h2>
     <ul>
-      <li><b>Four clients, 15 runs each:</b> 5 runs at each group size, 6, 30 and 90 employees. 60 runs in all, and every one moved every employee correctly.</li>
-      <li><b>ARTIE's kept script used no model at any size,</b> and fetched 3 form sets a run, one per state, for 6 employees or 90.</li>
-      <li><b>Without a case for a state, the model is asked for each record in it:</b> with the give-notice case alone, 2, 10 and 30 calls. Keeping that case after the first time (not built yet) takes it back to none.</li>
-      <li><b>Code mode writes a loop,</b> so its tokens per run hardly grow with the number of employees: about 10k on endpoints, 24k to 36k on HAL-FORMS alone. It pays them in every run, with a sandbox.</li>
+      <li><b>Four clients, 15 runs each:</b> 5 runs at each group size, 6, 30 and 90 employees. 60 runs in all, and every one moved every employee correctly.
+        <details class="more"><summary>More</summary>
+          <ul>
+            <li>A run is the goal done once over the whole group: every test employee moved one step through leaving.</li>
+            <li>Before each run the group is created again through the service's own actions: a third working, a third on notice, a third dismissed.</li>
+            <li>Correct means: each working employee is now on notice, each on notice is now dismissed, the dismissed are left, and no one else is touched.</li>
+            <li>The four clients are two ARTIE scripts and two kinds of code mode; "What ran" below says what each is.</li>
+          </ul>
+        </details>
+      </li>
+      <li><b>ARTIE's kept script used no model at any size,</b> and fetched 3 form sets a run, one per state, for 6 employees or 90.
+        <details class="more"><summary>More</summary>
+          <ul>
+            <li>The kept script is a YAML file (shown below). ARTIE runs it with no model: for each employee it reads what the server offers right now, and takes the matching case: give notice, dismiss, or leave it.</li>
+            <li>A form set is the list of actions the server offers for a resource in one state, published once at its own address and shared by every resource in that state. ARTIE keeps it for the run, so three states mean three fetches, whether there are 6 employees or 90.</li>
+            <li>The model is needed only once, to find the way in the first place. That run isn't counted here: these scripts were written by hand, as <code>artie generate</code> would write them.</li>
+          </ul>
+        </details>
+      </li>
+      <li><b>Without a case for a state, the model is asked for each record in it:</b> with the give-notice case alone, 2, 10 and 30 calls. Keeping that case after the first time (not built yet) takes it back to none.
+        <details class="more"><summary>More</summary>
+          <ul>
+            <li>The "one case" script knows only what to do with working employees. For an employee on notice no case matches, so ARTIE falls back to the step's words and asks the model which offered action fits. The model picks dismiss, correctly, but it is asked for every such employee, in every run.</li>
+            <li>The fix: once the model's choice has worked, write it into the script as a new case, as ARTIE already does when a release renames a field. After that, no model for that state.</li>
+          </ul>
+        </details>
+      </li>
+      <li><b>Code mode writes a loop,</b> so its tokens per run hardly grow with the number of employees: about 10k on endpoints, 24k to 36k on HAL-FORMS alone. It pays them in every run, with a sandbox.
+        <details class="more"><summary>More</summary>
+          <ul>
+            <li>Code mode is the model writing Python in a sandbox. It lists the employees and loops over them, so 90 cost about what 6 did.</li>
+            <li>But it finds the way and writes the program again in every run, so its tokens are paid every time: 1,000 runs cost 10 to 35 million tokens. Each program also starts a sandbox.</li>
+            <li>ARTIE's kept script pays nothing per run; its cost is the one run that found the way.</li>
+          </ul>
+        </details>
+      </li>
     </ul>
   </div>
 
