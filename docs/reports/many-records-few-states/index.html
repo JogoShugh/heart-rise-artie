@@ -136,6 +136,26 @@ footer ul { gap: 0.2rem; }
     <li>More, with his six rules verbatim: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</li>
   </ul>
 
+  <h2>HEART, ARTIE and the formats, in brief</h2>
+  <ul>
+    <li><b>HEART</b> (Hypermedia Enforced Agentic Reliable Transactions): a protocol profile for APIs. Each answer carries, or links to, the actions its resource allows in its state now; an action not offered is not allowed, and the answer can say why. Every write sends the ETag it read (<code>If-Match</code>): a stale one is refused 412, a missing one 428.</li>
+    <li><b>ARTIE</b> (Autonomous Restful Traversal and Interactive Engine): HEART's reference client. Generic, like a browser: coupled to the formats below, not to any API. It follows links and forms, sends the ETag, and caches what it may. It runs a goal written in plain words with a model, and a kept script (<code>.heart.yaml</code>) with none.</li>
+  </ul>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Format</th><th>What an answer holds</th><th>Here</th></tr></thead>
+    <tbody>
+      <tr><th>HAL</th><td>The resource's state, and <code>_links</code>: related resources by relation</td><td>The base of the two below</td></tr>
+      <tr><th>HAL-FORMS</th><td>HAL, and <code>_templates</code>: each action's method, target and fields</td><td>Spring HATEOAS's format, widely used; what this service answers when a client asks for nothing in particular</td></tr>
+      <tr><th>HAL Schema Forms</th><td>HAL, and <code>_forms</code>: each action's method, a link to its target, and a JSON Schema for what it takes</td><td>HEART's reference format, with its profile: forms named as link relations, and integrity hashes a client can check</td></tr>
+      <tr><th>OpenAPI</th><td>Not an answer: a separate description of every endpoint, its path, method and body</td><td>The same service's endpoints, as code mode uses them</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Rungs:</b> at L0 the forms and their schemas are inside each answer. At L2 they are linked: the forms for one state published once at their own address, shared by every resource in that state, and cached for a year. A client asks with <code>Prefer: forms=link, schema=link</code>.</li>
+    <li><b>Kept script and pins:</b> a run's way written as data, run again with no model; its pins record the forms the run was offered, so a changed form is caught before any request.</li>
+    <li><b>Code mode:</b> a model writing programs against an API, run in a sandbox (Anthropic's "code execution with MCP", Cloudflare's Code Mode).</li>
+  </ul>
+
   <h2>Two architectures</h2>
   <div class="pair">
     <div>
