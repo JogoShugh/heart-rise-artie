@@ -106,9 +106,19 @@ class ScriptYaml(
     /** How many of the watch's steps the model decides each time one is reached: those it says are reasoned. */
     private var asked = 0
 
-    /** The steps of [block]: the resources it keeps, then the steps nested in it. */
-    private fun steps(block: Block): List<Map<String, Any?>> =
-        keeps(block) + (members(block)?.let(::overMembers) ?: block.statements.flatMap(::step))
+    /**
+     * The steps of [block]: the resources it keeps, then the steps nested in it. An act that sends a value read from
+     * the resource it acts on is written in a decide that keeps that resource again; kept there alone when nothing
+     * before it opens a block that might read it.
+     */
+    private fun steps(block: Block): List<Map<String, Any?>> {
+        members(block)?.let { return keeps(block) + overMembers(it) }
+        val decided = decided(block, bindings)
+        val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
+        return keeps(block).filter { it["keep-as"] !in inside } + block.statements.flatMap { walked ->
+            decided[walked]?.let { kept -> listOf(decide(kept, step(walked))) } ?: step(walked)
+        }
+    }
 
     /**
      * [members] of one list, visited one by one, as a whenever over it: each member acted on by the first of the run's

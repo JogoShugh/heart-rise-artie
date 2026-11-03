@@ -5,8 +5,13 @@ package heart.cli.generate
  * relation each form's own integrity, its method and every affordance set it was offered in, and each link's target.
  */
 class LockWriter(capture: Capture) {
-    // The rung the run read at: the highest any step was answered at, since a bookmark answers at L0 whatever is asked.
-    private val rung = capture.steps.mapNotNull { it.guard["rung"]?.toString() }.maxOrNull()
+    // The rung the run read at: the highest any step was answered at. A form taken at the entry and answered at L0
+    // says nothing of it, since the service's root answers at L0 whatever is asked: a run that acted only there pins
+    // none, and its script reads at whatever rung it is run at.
+    private val rung = capture.steps.filterIndexed { i, step ->
+        val atEntry = i > 0 && capture.steps[i - 1].address == capture.steps.first().params["entry"]?.toString()
+        !(atEntry && step.guard["rung"] == "L0")
+    }.mapNotNull { it.guard["rung"]?.toString() }.maxOrNull()
     private val forms = linkedMapOf<String, Pair<String, LinkedHashSet<String>>>()
     private val methods = mutableMapOf<String, String>()
     private val links = linkedMapOf<String, String>()
