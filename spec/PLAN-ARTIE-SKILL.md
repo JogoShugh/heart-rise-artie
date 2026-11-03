@@ -50,6 +50,19 @@ Claude does every request itself with `curl`. The new skill replaces it, at the 
 5. **References, loaded only when needed:** the goal syntax, the `.heart.yaml` vocabulary
    (spec/schemas/heart-script.draft.schema.json), the format (spec/HAL-SCHEMA-FORMS-HR.md), the exit codes.
 
+## The minimal skill, first
+
+Before the full `SKILL.md`, the least that could work, from the author (2026-11-03): a skill that says almost nothing
+beyond "use ARTIE for the API you are told to hit". Its whole body:
+
+> For work against a service that answers with hypermedia (HAL Schema Forms, HAL-FORMS), use ARTIE, not your own
+> HTTP: `artie run GOAL.goal.md --reasoner claude` the first time, `artie generate` its trace `--format yaml` to keep
+> it, and `artie run NAME.heart.yaml` every time after. Read its exit and say what it did.
+
+The code mode runs showed that knowing the format matters more than knowing the service; ARTIE knows the format, so
+the skill needn't teach it. The evaluation (step 4) runs this minimal skill first, then the full one, and keeps the
+full one only where it does better.
+
 ## Decisions for the author
 
 - **Where the skill lives:** the user's skills (`~/.claude/skills/artie`), the repository's (`.claude/skills/artie`),
