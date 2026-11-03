@@ -157,6 +157,29 @@ Feature: artie generate --format yaml, with reason steps kept and the run in wor
       """
     And the file "gen.heart.yaml" is a script as data, by spec/schemas/heart-script.draft.schema.json
 
+  Scenario: A script as data named with dots of its own keeps them in its lock file's name, and artie run finds it
+    When artie is run with
+      | argument            |
+      | generate            |
+      | run.trace.yaml      |
+      | --out               |
+      | run.kept.heart.yaml |
+      | --format            |
+      | yaml                |
+    Then artie exits 0
+    And artie prints
+      | line                                                 |
+      | wrote run.kept.heart.yaml: 1 value to review         |
+      | wrote run.kept.pins.yaml: 0 forms and 0 links pinned |
+    When artie is run with
+      | argument            |
+      | run                 |
+      | run.kept.heart.yaml |
+      | --guard             |
+      | strict              |
+      | --inputs-of         |
+    Then artie exits 0
+
   Scenario: --intents writes the run in words only, the intent rung: every act its words, for the reasoner each run
     When artie is run with
       | argument       |

@@ -23,7 +23,7 @@ fun generate(args: List<String>, folder: Path, out: PrintStream, builder: Path? 
     val capture = Capture(captureName, Files.readString(existing(folder, captureName, "capture")))
     if ("--bare" in options) return bare(capture, options, folder, script, out)
     // A script as data is NAME.heart.yaml; its lock file is NAME.pins.yaml, as a Kotlin script's is.
-    val pins = script.removeSuffix(".heart.yaml").substringBeforeLast('.') + ".pins.yaml"
+    val pins = heart.cli.scriptName(script) + ".pins.yaml"
     // A goal run's steps stand for the lines of the script its moves amount to, which its capture keeps.
     val source = sourceName?.let { existing(folder, it, "script") }?.let { file ->
         capture.source?.takeIf { heart.cli.isGoal(file) }?.lines() ?: Files.readAllLines(file)
