@@ -1,0 +1,25 @@
+# Written by hand as artie generate would write it from a goal run that met both states (spec/PLAN-COST-FOLLOWS-
+# STATES.md: generate writing when-offered is not built yet). Each member is moved by what the server offers it:
+# give notice where that is offered, dismiss where that is; otherwise it is left as it is.
+#   artie run t5.kept.heart.yaml
+heart: 1
+kind: kept
+start: http://localhost:8099/
+
+steps:
+  - act: staff:search-employees
+    fields:
+      name: Took
+    intent: Find the employees named Took
+    then:
+      - whenever:
+          - when-offered:
+              - act: staff:give-notice
+                intent: Give notice to anyone working
+                then: []
+              - act: staff:dismiss
+                intent: Dismiss anyone on notice
+                then: []
+            intent: Move this Took one step through leaving
+            otherwise:
+              - note: ${state.firstName} ${state.lastName} is left as is

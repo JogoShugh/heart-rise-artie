@@ -66,6 +66,16 @@ TASKS = {
         "text": 'Change Frodo Baggins\'s role to "ring bearer, retired".',
     },
 }
+TASKS["t5"] = {
+    "name": "every Took one step through leaving",
+    "text": "Move every Took one step through leaving: give notice to anyone working, dismiss anyone on notice, and "
+            "leave the dismissed as they are.",
+}
+# t5 (spec/PLAN-COST-FOLLOWS-STATES.md): the service with its notice release, and a family seeded through its own
+# acts before the run: so many working, so many on notice, so many dismissed. What each was seeded as, by id.
+POPULATION = {"sizes": (2, 2, 2)}
+TOOKS = {}
+STEP_ON = {"working": "on notice", "on notice": "dismissed", "dismissed": "dismissed"}
 INTERFERED_ROLE = "keeper of the Red Book"
 INTERFERED = {"t3", "t4"}
 
@@ -125,6 +135,26 @@ def setup(task):
             sim("PUT", "/_sim/github/meddle", json=TEAMMATE).raise_for_status()
     if task == "t2":
         sim("DELETE", "/employees/1/actions/dismiss", headers=PLAIN).raise_for_status()
+    if task == "t5":
+        seed_tooks()
+
+
+def seed_tooks():
+    """The notice release on, then the Tooks hired, given notice and dismissed through the service's own acts."""
+    sim("PUT", "/_sim/employees/changes", content="notice").raise_for_status()
+    TOOKS.clear()
+    working, notice, dismissed = POPULATION["sizes"]
+    states = ["working"] * working + ["on notice"] * notice + ["dismissed"] * dismissed
+    for n, state in enumerate(states, start=1):
+        hired = sim("POST", "/actions/hire", headers=PLAIN,
+                    json={"firstName": f"Pip{n:02d}", "lastName": "Took", "role": "hobbit"})
+        hired.raise_for_status()
+        number = int(hired.headers["Location"].rsplit("/", 1)[1])
+        if state != "working":
+            sim("POST", f"/employees/{number}/actions/give-notice", headers=PLAIN).raise_for_status()
+        if state == "dismissed":
+            sim("DELETE", f"/employees/{number}/actions/dismiss", headers=PLAIN).raise_for_status()
+        TOOKS[number] = state
 
 
 def log():
@@ -154,6 +184,13 @@ def check(task, held, final_text):
         return {"done": title_kept and reason_kept and triaged, "title": issue["title"], "state": issue["state"],
                 "state_reason": issue.get("state_reason"), "teammate_title_kept": title_kept,
                 "teammate_reason_kept": reason_kept, "triaged": triaged, "said_why": said}
+    if task == "t5":
+        status = {one["id"]: one["status"] for one in held}
+        moved = sum(1 for number, was in TOOKS.items() if status.get(number) == STEP_ON[was])
+        others = [one for one in held if one["id"] not in TOOKS]
+        untouched = all(one["status"] == "working" for one in others)
+        return {"done": moved == len(TOOKS) and untouched, "moved": moved, "tooks": len(TOOKS),
+                "others_untouched": untouched, "employees": len(held), "population": list(POPULATION["sizes"])}
     by_name = {}
     for one in held:
         by_name.setdefault(f"{one['firstName']} {one['lastName']}", []).append(one)
@@ -713,10 +750,12 @@ ARTIE = HERE / "../../client/artie-cli/build/install/artie/bin/artie"
 # A goal run plans from the words; an intent run is the goal's steps as act(intent = …), each chosen from what is
 # offered then; a kept script is artie generate's script from a clean goal run, held to its pins, with no model.
 ARTIE_SOURCES = {"artie-goal": "{task}.goal.md", "artie-intent": "{task}.intent.kts", "artie-kept": "{task}.kept.kts",
-                 "artie-script": "{task}.kts", "artie-data": "{task}.kept.heart.yaml"}
+                 "artie-script": "{task}.kts", "artie-data": "{task}.kept.heart.yaml",
+                 "artie-grow": "{task}.grow.heart.yaml"}
 # artie-data, the kept script held as data, is given the reasoner only to fall back to its words when a form changed
 # (its config says on-change: intent); it calls the model on no other step.
-ARTIE_REASONING = {"artie-goal", "artie-intent", "artie-data"}
+# artie-grow: t5's kept script with the give-notice case alone; a member in another state falls back to its words.
+ARTIE_REASONING = {"artie-goal", "artie-intent", "artie-data", "artie-grow"}
 
 
 def run_artie(model, arm, task):
@@ -769,6 +808,7 @@ def main():
     parser.add_argument("--tasks", default="t1,t2,t3")
     parser.add_argument("--reps", type=int, default=3)
     parser.add_argument("--start", type=int, default=1, help="the first run's number: with --sequence, its phase")
+    parser.add_argument("--population", default="2,2,2", help="t5: how many Tooks working, on notice, dismissed")
     parser.add_argument("--model", default="claude-sonnet-5-5")
     parser.add_argument("--max-turns", type=int, default=25)
     parser.add_argument("--out")
@@ -780,6 +820,7 @@ def main():
                         help="spec/PLAN-CODE-MODE-VS-HEART.md: runs 1-3 as they are, 4-6 with a teammate's change "
                              "(meddle), 7 on with a field renamed")
     args = parser.parse_args()
+    POPULATION["sizes"] = tuple(int(n) for n in args.population.split(","))
     CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
     CHANGE["when"] = args.when
     MEDDLE["on"] = args.meddle
@@ -800,7 +841,8 @@ def main():
                     continue  # kept only from a goal run that acted: task 2's acted on nothing
                 try:
                     if arm.startswith("code-"):
-                        record = run_code(args.model, arm, task, ARM_TURNS.get(arm, min(args.max_turns, 8)), api)
+                        turns = 16 if task == "t5" else ARM_TURNS.get(arm, min(args.max_turns, 8))
+                        record = run_code(args.model, arm, task, turns, api)
                     elif arm.startswith("artie-"):
                         record = run_artie(args.model, arm, task)
                     else:

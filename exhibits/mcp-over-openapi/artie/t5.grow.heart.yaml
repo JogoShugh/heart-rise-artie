@@ -1,0 +1,21 @@
+# t5.kept.heart.yaml with the give-notice case alone, as from a goal run that met only those working. A member that
+# offers an act no case names falls back to the step's words (t5.grow.config.yaml: on-change: intent).
+#   artie run t5.grow.heart.yaml --reasoner claude
+heart: 1
+kind: kept
+start: http://localhost:8099/
+
+steps:
+  - act: staff:search-employees
+    fields:
+      name: Took
+    intent: Find the employees named Took
+    then:
+      - whenever:
+          - when-offered:
+              - act: staff:give-notice
+                intent: Give notice to anyone working
+                then: []
+            intent: Move this Took one step through leaving
+            otherwise:
+              - note: ${state.firstName} ${state.lastName} is left as is
