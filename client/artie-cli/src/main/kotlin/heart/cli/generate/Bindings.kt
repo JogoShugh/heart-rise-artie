@@ -129,9 +129,7 @@ class Bindings(
         step.slots.values.map { it.map()["from"] }
             .filter { from -> from.list().none { it.map()["input"] != null } }
             .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
-        // A goal step marked reasoned is kept in the person's words, each input in braces a slot.
-        val words = capture.marks(step)["reasoned"]?.toString()?.let { slotted(it, capture.inputs.keys) }
-            ?: step.template ?: KotlinText.dollars(step.say)
+        val words = reasonedWords(capture, step)
         val call = Written(source, step).find(KEPT)
         return why.mark(why.kept(step), "act(intent = ${heart.script.kotlinString(words)})", listOf(call))
     }
@@ -223,6 +221,14 @@ class Bindings(
 }
 
 internal fun Any?.list(): List<*> = this as? List<*> ?: emptyList<Any?>()
+
+/**
+ * The words [step], kept as a reason step, says, with a script's slots: a goal step marked reasoned in the person's
+ * words, each input in braces a slot; else the step's template, or what it said.
+ */
+internal fun reasonedWords(capture: Capture, step: Step): String =
+    capture.marks(step)["reasoned"]?.toString()?.let { slotted(it, capture.inputs.keys) }
+        ?: step.template ?: KotlinText.dollars(step.say)
 
 /** The input [name] as a field of [type] takes it. */
 private fun inputAs(name: String, type: String?): String = when (type) {
