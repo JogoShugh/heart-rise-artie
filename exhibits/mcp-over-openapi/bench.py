@@ -177,8 +177,11 @@ def check(task, held, final_text):
         overwrote = role == "ring bearer, retired"
         return {"done": mentioned, "role": role, "overwrote": overwrote, "mentioned": mentioned,
                 "silent_overwrite": overwrote and not mentioned, "employees": len(held)}
-    return {"done": role == f"{INTERFERED_ROLE}, retired", "role": role,
-            "lost_update": role == "ring bearer, retired", "employees": len(held)}
+    # In --sequence, a run with no teammate is right when his own role gets ", retired".
+    teammate = not SEQUENCE["on"] or MEDDLE["on"]
+    expected = f"{INTERFERED_ROLE}, retired" if teammate else "ring bearer, retired"
+    return {"done": role == expected, "role": role, "expected": expected,
+            "lost_update": teammate and role == "ring bearer, retired", "employees": len(held)}
 
 
 class Interferer(threading.Thread):
@@ -559,7 +562,8 @@ def program_turns(model, api, task, library, docs, opening, max_turns):
     """The model writing programs until it says it is done: its calls, the programs it ran, its last word."""
     messages = [{"role": "user", "content": opening}]
     tools = cached([RUN_PROGRAM])
-    calls, programs, final_text, finished = [], [], None, None
+    # Every program that finished, in order: together they did the task, as a saved skill would do it again.
+    calls, programs, final_text, finished = [], [], None, []
     for _ in range(max_turns):
         t0 = time.time()
         answer = api.messages.create(model=model, max_tokens=4096, system=CODE_SYSTEM + docs, tools=tools,
@@ -577,7 +581,7 @@ def program_turns(model, api, task, library, docs, opening, max_turns):
             programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
                              "lines": code.count("\n") + 1})
             if exit_ == 0:
-                finished = code
+                finished.append(code)
             results.append({"type": "tool_result", "tool_use_id": use.id, "is_error": exit_ != 0,
                             "content": f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}"})
         messages.append({"role": "user", "content": results})
@@ -594,14 +598,20 @@ def run_code(model, arm, task, max_turns, api):
     change = change_under(offset)
     started = time.time()
     library, docs = api_library(openapi_spec())
-    saved = SAVED / f"{task}.py"
+    saved = SAVED / f"{task}.programs.json"
     calls, programs, final_text, finished, replayed = [], [], None, None, None
     if arm == "code-saved" and saved.exists():
-        exit_, out, err = sandboxed(saved.read_text(), library)
-        replayed = {"exit": exit_, "stdout": out[-1500:], "stderr": err[-800:]}
-        programs.append({"sha": hashlib.sha256(saved.read_bytes()).hexdigest()[:12], "exit": exit_, "saved": True})
+        # The saved programs, run again in order; the first that fails ends the replay.
+        outputs, exit_, err = [], 0, ""
+        for code in json.loads(saved.read_text()):
+            exit_, out, err = sandboxed(code, library)
+            outputs.append(out)
+            programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_, "saved": True})
+            if exit_ != 0:
+                break
+        replayed = {"exit": exit_, "stdout": "".join(outputs)[-1500:], "stderr": err[-800:]}
         if exit_ == 0:
-            final_text = out[-1500:]
+            final_text = replayed["stdout"]
     if final_text is None:
         opening = TASKS[task]["text"]
         if replayed:
@@ -612,7 +622,7 @@ def run_code(model, arm, task, max_turns, api):
         programs += programs_written
     if arm == "code-saved" and finished:
         SAVED.mkdir(parents=True, exist_ok=True)
-        saved.write_text(finished)
+        saved.write_text(json.dumps(finished, indent=2))
     if interferer:
         interferer.stopped.set()
     if change:
@@ -660,7 +670,8 @@ def run_artie(model, arm, task):
         command += ["--reasoner", "claude", "--model", model]
     env = {**os.environ, TOKEN_VARIABLE: TOKEN}
     started = time.time()
-    done = subprocess.run(command, env=env, capture_output=True, text=True, timeout=900)
+    # Run beside the script, as a person does, so its lock file and config are found beside it.
+    done = subprocess.run(command, env=env, capture_output=True, text=True, timeout=900, cwd=source.parent)
     if interferer:
         interferer.stopped.set()
     if change:
