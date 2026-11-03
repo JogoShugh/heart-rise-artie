@@ -88,6 +88,19 @@ class ScriptSteps {
         execute(Run(navigator = { service }, pause = {}))
     }
 
+    /** A script held as data (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md), made step by step, with no engine. */
+    @When("this script held as data runs")
+    fun runsAsData(text: String) {
+        val with = Run(navigator = { service }, pause = {})
+        run = with
+        Run.current = with
+        try {
+            runData(org.yaml.snakeyaml.Yaml().load(text))
+        } catch (e: ScriptStopped) {
+            stopped = e
+        }
+    }
+
     @When("the script runs unattended, given")
     fun unattended(table: DataTable) = runUnattended(table, reasoning = false)
 

@@ -159,7 +159,14 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
         doing(reading.text(step["doing"].toString())) { inner(step, "steps", reading) }
     },
     "done-where" to Maker(setOf("done-where")) { step, reading -> doneWhere(facts(step["done-where"], reading)) },
+    "decide" to Maker(setOf("decide")) { step, reading ->
+        val decided = step["decide"] as? Map<*, *> ?: stop("decide holds its steps, and how many tries")
+        decide((decided["tries"] as? Number)?.toInt() ?: DECIDE_TRIES) { inner(decided, "steps", reading) }
+    },
 )
+
+/** How many times a decide runs its block, as Kotlin's `decide` does by default. */
+private const val DECIDE_TRIES = 3
 
 /** How many times a wait looks, as Kotlin's `until` does by default. */
 private const val UNTIL_TRIES = 10

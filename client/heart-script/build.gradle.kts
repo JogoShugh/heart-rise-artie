@@ -24,6 +24,8 @@ dependencies {
     testFixturesApi("io.cucumber:cucumber-java:$cucumberVersion")
     // The features run real scripts, in the engine artie run uses.
     testFixturesImplementation(project(":heart-script-host"))
+    // A script held as data, read as artie run reads it (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md).
+    testFixturesImplementation("org.yaml:snakeyaml:2.2")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.cucumber:cucumber-junit-platform-engine:$cucumberVersion")

@@ -45,6 +45,41 @@ Feature: A script decides again on what is there now, after its act was refused 
       | refused once: decided again  | 1     | the script finished                                                                                    |
       | refused on every try: stops  | 2     | the script stopped at step 4, "close": stale, refused by the server: "The issue changed since it was read." |
 
+  Scenario Outline: A script held as data decides again the same way: <case>
+    spec/PLAN-KEPT-SCRIPTS-AS-DATA.md: decide is a key of a script held as
+    data too, for a kept script a person reviewed (spec/PLAN-CODE-MODE-VS-HEART.md),
+    its values a reference to the state held, read again with it.
+    Given the server will refuse "close" at "/issues/10" as stale <times> times: "The issue changed since it was read."
+    When this script held as data runs
+      """yaml
+      heart: 1
+      kind: kept
+      start: scripted://service/
+      steps:
+        - act: issues-get
+          fields:
+            number: 10
+        - decide:
+            tries: 2
+            steps:
+              - act: close
+                fields:
+                  reason: seen ${state.state}
+      """
+    Then <ended>
+    And the client was asked, in order
+      | call   | what                                 |
+      | enter  | scripted://service/                  |
+      | act    | issues-get {"number":10}             |
+      | act    | close {"reason":"seen open"}         |
+      | return | /issues/10                           |
+      | act    | close {"reason":"seen open"}         |
+
+    Examples:
+      | case                         | times | ended                                                                                                  |
+      | refused once: decided again  | 1     | the script finished                                                                                    |
+      | refused on every try: stops  | 2     | the script stopped at step 4, "close": stale, refused by the server: "The issue changed since it was read." |
+
   Scenario: Any other refusal in decide stops the script at once, reading nothing again
     When this script runs
       """kotlin

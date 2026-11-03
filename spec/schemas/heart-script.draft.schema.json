@@ -95,8 +95,26 @@
         { "$ref": "#/$defs/given" },
         { "$ref": "#/$defs/doing" },
         { "$ref": "#/$defs/doneWhere" },
-        { "$ref": "#/$defs/note" }
+        { "$ref": "#/$defs/note" },
+        { "$ref": "#/$defs/decide" }
       ]
+    },
+    "decide": {
+      "description": "decide(tries) { … }: its steps, run again on the state read again when an act in them is refused as stale; for a kept script a person reviewed.",
+      "type": "object",
+      "required": ["decide"],
+      "additionalProperties": false,
+      "properties": {
+        "decide": {
+          "type": "object",
+          "required": ["steps"],
+          "additionalProperties": false,
+          "properties": {
+            "tries": { "type": "integer", "minimum": 1 },
+            "steps": { "$ref": "#/$defs/steps" }
+          }
+        }
+      }
     },
     "act": {
       "description": "act(rel, …): pinned, no model. With then, the script visits what the act led to and returns, even with no steps in it.",
