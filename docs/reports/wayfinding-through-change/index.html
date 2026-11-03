@@ -98,7 +98,7 @@ footer ul { gap: 0.2rem; }
 <body>
 
 <div class="top"><div class="top-in">
-  <span class="eyebrow">HEART · employees service · 2 November 2026</span>
+  <span class="eyebrow">HEART · employees service · 3 November 2026</span>
   <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
 </div></div>
 
@@ -111,12 +111,11 @@ footer ul { gap: 0.2rem; }
     <ul>
       <li><b>The question:</b> as a service evolves, which architecture keeps a repeated process right, safe and auditable, and where must the model sit for that?</li>
       <li><b>Wayfinding.</b> From endpoints, the client builds every address itself. Code mode worked the way out again each run (27 programs for two tasks), or froze it (saved programs with employee IDs and an ETag written in). From hypermedia, ARTIE's kept script follows what the server hands it: the search's <code>item</code> link titled "Bilbo Baggins", the new employee's <code>Location</code>.</li>
-      <li><b>Evolution.</b> A release renamed a field. The frozen code broke silently, 8 runs of 8, each exit 0. Fresh code adapted by reading the whole description again every run. ARTIE's pins noticed the changed form before any write, and the model repaired that one step.</li>
+      <li><b>Evolution.</b> A release renamed a field. The frozen code broke silently, 8 runs of 8, each exit 0. Fresh code adapted by reading the whole description again every run. ARTIE's pins noticed the changed form before any write; the model repaired that one step, once, and the repair was kept.</li>
       <li><b>Controls.</b> The endpoint side had no conditional writes until we added them to its OpenAPI twin, and using them stays the client's choice. The HEART side offers its controls with the state: the forms allowed now, an ETag, a 412 when stale. No client wrote over the teammate.</li>
       <li><b>Security.</b> Code mode ran model-written code every run, so it needed a sandbox every run. ARTIE ran none: its script is data in a closed vocabulary.</li>
-      <li><b>Compliance.</b> ARTIE's process is one kept script a person can review and diff, pinned to the server's forms, with a trace of every refusal and its reason. Code mode's was 27 different programs.</li>
-      <li><b>The model at the edges.</b> ARTIE called it once per task to find the way, and after the release to repair: 8 runs of 20. Code mode called it in every fresh run. The tokens follow: 17,524 against 158,995, plus 42,483 once for ARTIE's wayfinding.</li>
-      <li><b>Repaired, not yet kept.</b> ARTIE repaired in memory on every run after the release; its kept script and pins were not rewritten. Keeping the repair is the next step for self-repair.</li>
+      <li><b>Compliance.</b> ARTIE's process is one kept script a person can review, pinned to the server's forms, with a trace of every refusal and its reason; a release changed it by a few lines of diff. Code mode's was 27 different programs.</li>
+      <li><b>The model at the edges.</b> ARTIE called it once per task to find the way, and once after the release to repair: 2 runs of 20. Code mode called it in every fresh run. The tokens follow: 4,381 against 158,995, plus 42,483 once for ARTIE's wayfinding.</li>
     </ul>
   </div>
 
@@ -126,7 +125,7 @@ footer ul { gap: 0.2rem; }
     <tbody>
       <tr><th>Code mode, fresh</th><td>endpoints: the OpenAPI twin</td><td>The model reads every operation and writes a program, each run</td><td>The client: it sends <code>If-Match</code> if it chooses to</td><td>the middle of every run</td></tr>
       <tr><th>Code mode, saved</th><td>endpoints</td><td>The programs from run 1, with the way frozen in them</td><td>The client, as written in run 1</td><td>run 1; again only if a program exits nonzero</td></tr>
-      <tr><th>ARTIE as data</th><td>hypermedia: HEART</td><td>The kept script follows the links and forms offered now, by relation and title</td><td>The server: what is offered now, ETags, refusals with reasons. ARTIE holds its script to its pins</td><td>the edges: once to find the way; again only to repair a changed step</td></tr>
+      <tr><th>ARTIE as data</th><td>hypermedia: HEART</td><td>The kept script follows the links and forms offered now, by relation and title</td><td>The server: what is offered now, ETags, refusals with reasons. ARTIE holds its script to its pins</td><td>the edges: once to find the way; once per change to repair a step, and the repair is kept</td></tr>
     </tbody>
   </table></div>
   <ul class="note">
@@ -142,7 +141,7 @@ footer ul { gap: 0.2rem; }
       <tr><th>Addresses</th><td>Built by the program from path templates and IDs</td><td>Built, with IDs 3 and 2 written in</td><td>Handed over by the server: links, forms, <code>Location</code></td></tr>
       <tr><th>Finding Bilbo</th><td>Search, read his ID, build <code>/employees/2</code></td><td><code>/employees/2</code>, written in</td><td>Follow <code>item</code> titled "Bilbo Baggins"</td></tr>
       <tr><th>The ETag it sends</th><td>Read in this run</td><td>In t1's dismiss, one written in from run 1</td><td>Read in this run, with the form it acts on</td></tr>
-      <tr><th>The way, across 20 runs</th><td>27 different programs</td><td>6 programs, frozen</td><td>2 kept scripts, unchanged</td></tr>
+      <tr><th>The way, across 20 runs</th><td>27 different programs</td><td>6 programs, frozen</td><td>2 kept scripts; after the release, the same scripts with the renamed field</td></tr>
     </tbody>
   </table></div>
 
@@ -157,8 +156,8 @@ footer ul { gap: 0.2rem; }
       <tr><th>fresh · t3</th><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y t split"><span><b>✓</b>7.4k</span></td><td class="y t"><span><b>✓</b>7.8k</span></td><td class="y t"><span><b>✓</b>7.4k</span></td><td class="y split"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.9k</span></td><td class="y"><span><b>✓</b>7.4k</span></td></tr>
       <tr><th>saved · t1</th><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="n split"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td></tr>
       <tr><th>saved · t3</th><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y t split"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="n split"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td></tr>
-      <tr><th>ARTIE · t1</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>3.1k</span></td></tr>
-      <tr><th>ARTIE · t3</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y t split"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>1.3k</span></td></tr>
+      <tr><th>ARTIE · t1</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td></tr>
+      <tr><th>ARTIE · t3</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y t split"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td></tr>
     </tbody>
   </table></div>
   <p class="note">Each cell: right (✓) or wrong (✗), and the model's input tokens for that run. An amber outline marks a run the teammate changed Frodo in. The teammate acts in t3 only; t1's runs 4 to 6 are runs as they are.</p>
@@ -166,7 +165,7 @@ footer ul { gap: 0.2rem; }
     <thead><tr><th>Change</th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
     <tbody>
       <tr><th>A teammate sets Frodo's role to "keeper of the Red Book" right after the client's first read</th><td>Read Frodo again before writing; that read already held the teammate's role. Wrote with its ETag: 200, "keeper of the Red Book, retired"</td><td>The same: its kept program reads again before writing. 200</td><td>Read once, wrote with that ETag: <b>412</b>. <code>decide</code> read again and wrote ", retired" on the new role: 200</td></tr>
-      <tr><th>A release renames <code>role</code> to <code>position</code> in the hire and update forms</th><td>Its library and docs are made from the description each run, so the model wrote <code>position</code> from the start. No refusal</td><td class="bad">Sent <code>role</code>: 422 "required property 'position' not found". Printed it, exit 0. t1 went on: update 404, then dismissed Bilbo</td><td>Held each form to its pin; hire and update had changed, so it sent nothing and fell back to the step's words. The model chose <code>position</code>: 2 calls in t1, 1 in t3</td></tr>
+      <tr><th>A release renames <code>role</code> to <code>position</code> in the hire and update forms</th><td>Its library and docs are made from the description each run, so the model wrote <code>position</code> from the start. No refusal</td><td class="bad">Sent <code>role</code>: 422 "required property 'position' not found". Printed it, exit 0. t1 went on: update 404, then dismissed Bilbo</td><td>Held each form to its pin; hire and update had changed, so it sent nothing and fell back to the step's words. The model chose <code>position</code> (2 calls in t1, 1 in t3), and the repair was kept: runs 8 to 10 needed no model</td></tr>
     </tbody>
   </table></div>
 
@@ -187,7 +186,7 @@ footer ul { gap: 0.2rem; }
     <tbody>
       <tr><th>Runs that executed model-written code</th><td>20</td><td>20</td><td class="ok">0</td></tr>
       <tr><th>Sandbox</th><td>every run</td><td>every run</td><td class="ok">none needed</td></tr>
-      <tr><th>What a reviewer approves</th><td>A new program most runs: 27 in 20</td><td>6 programs, with IDs and an ETag frozen in</td><td>2 kept scripts: data in a closed vocabulary, pinned to the server's forms</td></tr>
+      <tr><th>What a reviewer approves</th><td>A new program most runs: 27 in 20</td><td>6 programs, with IDs and an ETag frozen in</td><td>2 kept scripts: data in a closed vocabulary, pinned to the server's forms; per release, a diff of a few lines</td></tr>
       <tr><th>How a failure shows</th><td>The model says so in words</td><td class="bad">Exit 0 and a printed 422</td><td>An exit code and reason; a YAML trace of each refusal</td></tr>
       <tr><th>Partial work left behind</th><td>none</td><td class="bad">t1: Bilbo dismissed, Samwise not hired</td><td>none</td></tr>
     </tbody>
@@ -198,28 +197,27 @@ footer ul { gap: 0.2rem; }
     <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
     <tbody>
       <tr><th>Right</th><td class="ok">20 / 20</td><td class="bad">12 / 20</td><td class="ok">20 / 20</td></tr>
-      <tr><th>Runs that needed the model</th><td>20</td><td>2</td><td>8, all after the release</td></tr>
-      <tr><th>Model calls</th><td>99</td><td>10</td><td>12</td></tr>
-      <tr><th>Input tokens, cached or not</th><td>158,995</td><td>16,004 (run 1 only)</td><td>17,524 (renamed runs only)</td></tr>
-      <tr><th>Output tokens</th><td>10,411</td><td>974</td><td>2,000</td></tr>
+      <tr><th>Runs that needed the model</th><td>20</td><td>2</td><td>2, the first after the release</td></tr>
+      <tr><th>Model calls</th><td>99</td><td>10</td><td>3</td></tr>
+      <tr><th>Input tokens, cached or not</th><td>158,995</td><td>16,004 (run 1 only)</td><td class="ok">4,381 (run 7 only)</td></tr>
+      <tr><th>Output tokens</th><td>10,411</td><td>974</td><td>478</td></tr>
       <tr><th>Before these runs</th><td>nothing</td><td>nothing (run 1 is its first write)</td><td>one goal run per task to find the way: 42,483 input tokens</td></tr>
-      <tr><th>Seconds per run, median</th><td>10.1</td><td>1.3</td><td>1.1 (3.2 to 6.3 after the release)</td></tr>
-      <tr><th>HTTP requests</th><td>114</td><td>110</td><td>281, 65 of them 304</td></tr>
+      <tr><th>Seconds per run, median</th><td>10.1</td><td>1.3</td><td>0.9 (2.5 and 4.8 in run 7)</td></tr>
+      <tr><th>HTTP requests</th><td>114</td><td>110</td><td>272, 56 of them 304</td></tr>
     </tbody>
   </table></div>
   <ul class="note">
-    <li>With its wayfinding counted, ARTIE's model took 60,007 tokens against fresh code mode's 158,995. Saved code mode took the fewest, and was wrong after the release.</li>
+    <li>With its wayfinding counted, ARTIE's model took 46,864 tokens against fresh code mode's 158,995. Saved code mode took the fewest, and was wrong after the release.</li>
     <li>ARTIE made more requests: it reads forms and schemas, and revalidates them (the 304s).</li>
   </ul>
 
-  <h2>Self-repair, done but not kept</h2>
+  <h2>Self-repair</h2>
   <ul>
-    <li><b>What happened:</b> in each of runs 7 to 10, ARTIE's pins refused the changed form, it fell back to the step's words, the model chose <code>position</code>, and the act was done. Then the run ended. The kept script, pins and config are unchanged on disk, so each later run repaired again: 3,093 tokens in t1, 1,288 in t3, every time.</li>
-    <li><b>The optimization:</b> keep the repair. After a repaired act is done, write the chosen step into the kept script and its form into the pins, so only the first run after a change pays. With it, 17,524 tokens would have been 4,381.</li>
-    <li><b>What exists:</b> <code>repin: auto</code> or <code>propose</code> writes new pins, but only when the script's own values still fit a changed form (<code>on-change: values</code>). A repair by the model needs the step itself written again.</li>
-    <li><b>What a run can tell is safe:</b> the repair was chosen among forms the server offered, and the server took it with <code>If-Match</code>; what is saved is data in the closed vocabulary, not code.</li>
-    <li><b>What it must take care with:</b> a value made from state is saved as a reference, never as the literal. t3's repair sent "ring bearer, retired"; saved, that must be <code>${state.role}, retired</code>. ARTIE's trace records where each value came from (<code>/role</code> of the state read), so it can.</li>
-    <li><b>What a run can't tell:</b> that the meaning stayed when the name changed. For that: checks in the kept script (the end state the first run reached), and <code>propose</code> for a person to approve, where compliance asks for review.</li>
+    <li><b>At the release:</b> in run 7, ARTIE's pins refused the changed forms, each step fell back to its words, the model chose <code>position</code>, and the acts were done. After the run, the repairs were written into the kept scripts and their pins (<code>keep: auto</code>), so runs 8 to 10 ran with no model.</li>
+    <li><b>Kept without a person only where it is safe:</b> the run finished; the repair made the act the script was making; and every value it sent is one the script sent. Each is copied as the script wrote it, so an input stays an input and <code>${state.role}, retired</code> stays a reference, never the literal "ring bearer, retired".</li>
+    <li><b>Not kept automatically:</b> a value the script never sent, such as a new required <code>reason</code>; a repair that made another act; a run that didn't finish. <code>keep: propose</code> says what it would keep and writes nothing, where compliance asks for a person.</li>
+    <li><b>What a run can't tell:</b> that the meaning stayed when the name changed. The next guard is checks in the kept script, written from the end state the first run reached.</li>
+    <li><b>What a reviewer sees:</b> one line per field and one per pin. The hand-review comment in t3's script stays as it was.</li>
   </ul>
 
   <h2>Where code mode did well</h2>
@@ -369,7 +367,53 @@ links:
   item: ''</code></pre>
       <div class="file">t1.kept.config.yaml, t3.kept.config.yaml</div>
 <pre><code><span class="c"># A kept script held as data falls back to its words, with the model, only where a form changed.</span>
-on-change: intent</code></pre>
+on-change: intent
+<span class="c"># A repair that worked is kept in the script and its pins, where every value it sent is the script's own.</span>
+keep: auto</code></pre>
+    </div>
+  </details>
+
+  <details class="src"><summary>ARTIE · what keep wrote after the release <small>the diff a reviewer approves</small></summary>
+    <div class="in">
+      <div class="file">t1.kept.heart.yaml</div>
+<pre><code>@@ steps: staff:hire
+     fields:
+       firstName: Samwise
+       lastName: Gamgee
+<span class="hl">-      role: gardener</span>
+<span class="hl">+      position: gardener</span>
+     intent: Hire Samwise Gamgee as a gardener
+@@ steps: staff:update
+         fields:
+           firstName: Samwise
+           lastName: Gamgee
+<span class="hl">-          role: gardener, mayor</span>
+<span class="hl">+          position: gardener, mayor</span>
+         intent: Change his role to "gardener, mayor"</code></pre>
+      <div class="file">t3.kept.heart.yaml</div>
+<pre><code>                   fields:
+                     firstName: Frodo
+                     lastName: Baggins
+<span class="hl">-                    role: ${state.role}, retired</span>
+<span class="hl">+                    position: ${state.role}, retired</span>
+                   intent: Add ", retired" to the end of his current role, keeping the rest of it as it is</code></pre>
+      <div class="file">t1.kept.pins.yaml (t3's update pin changed the same way)</div>
+<pre><code>   staff:hire:
+<span class="hl">-    integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=</span>
+<span class="hl">+    integrity: sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=</span>
+     method: POST
+     sets: []
+   staff:update:
+<span class="hl">-    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=</span>
+<span class="hl">+    integrity: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=</span>
+     method: PUT
+     sets:
+       - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+<span class="hl">+      - sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=</span></code></pre>
+      <ul>
+        <li>What the run said: <code>kept staff:hire: firstName, lastName, position (was role)</code>; <code>kept staff:update: firstName, lastName, position (was role)</code>.</li>
+        <li>The full diff is <code>runs/keep/kept-after-rename.diff</code>.</li>
+      </ul>
     </div>
   </details>
 
@@ -476,7 +520,7 @@ params:
   lastName: Baggins
   role: <span class="hl">keeper of the Red Book, retired</span></code></pre>
       <ul>
-        <li>Trimmed to the lines that matter; the full trace is <code>runs/artie/artie-data-t3-20261102-230021.yaml</code>.</li>
+        <li>Trimmed to the lines that matter; the full trace is <code>runs/artie/artie-data-t3-20261103-071322.yaml</code>.</li>
         <li>On the wire: <code>PUT /employees/1/actions/update</code> with <code>If-Match: "seq-1.hsf.L2.a903f9549f3b7164"</code>, 412; then a read, then the same act with <code>"seq-2.hsf.L2.60e873853d6ada59"</code>, 200.</li>
       </ul>
     </div>
@@ -491,8 +535,8 @@ params:
         <li><b>Code mode's library:</b> generated from the twin's description on each run: one function per operation, each answering status, ETag and body, with <code>if_match</code> where a write takes it, documented "refused 412 if the state moved since".</li>
         <li><b>Sandbox:</b> <code>python:3.12-slim</code> in Docker on an internal network with only the service, read-only, 1 CPU, 256 MB, 64 processes, 120 s.</li>
         <li><b>Teammate:</b> <code>PUT /_sim/employees/meddle</code>: right after Frodo is next read, his role becomes "keeper of the Red Book". <b>Rename:</b> <code>PUT /_sim/employees/changes</code>, <code>renamed</code>: hire and update take <code>position</code> for <code>role</code>.</li>
-        <li><b>ARTIE:</b> <code>artie generate --format yaml</code> from one goal run per task with the model (t1 25,390 input tokens, 10 calls; t3 17,093, 7 calls), then <code>artie run</code> on the <code>.heart.yaml</code>, with the reasoner given only for the fallback.</li>
-        <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --arms code-fresh,code-saved,artie-data --tasks t1,t3 --reps 10 --sequence</code>, Sonnet 5.5. Lines in <code>runs/code-vs-data-fresh.jsonl</code>; saved programs in <code>runs/codemode/</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
+        <li><b>ARTIE:</b> <code>artie generate --format yaml</code> from one goal run per task with the model (t1 25,390 input tokens, 10 calls; t3 17,093, 7 calls), then <code>artie run</code> on the <code>.heart.yaml</code>, its config <code>on-change: intent</code> and <code>keep: auto</code>, with the reasoner given only for the fallback.</li>
+        <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --tasks t1,t3 --reps 10 --sequence</code>, Sonnet 5.5, the same service, sequence and harness for every arm. Code mode's lines in <code>runs/code-vs-data-fresh.jsonl</code>, ARTIE's in <code>runs/artie-keep.jsonl</code>; saved programs in <code>runs/codemode/</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
       </ul>
     </div>
   </details>
@@ -504,8 +548,8 @@ params:
         <li>t3's kept script had one review by hand; the saved programs had none. A reviewer would likely have caught the fixed IDs and ETag, and might have added a status check.</li>
         <li>Code mode's 412 path was never tested: its programs read Frodo again after the teammate, so no write of theirs was stale.</li>
         <li>The rename is one kind of change. A change the pins don't see (the same form, a new meaning) would pass ARTIE's guard too.</li>
-        <li>ARTIE's tokens here are the fallback's only. Its goal runs came from earlier benches, counted above, not in the 20 runs.</li>
-        <li>An earlier run of this comparison, with harness bugs since fixed, is set aside; this run alone counts.</li>
+        <li>ARTIE's goal runs, which found the way, came from earlier benches: counted above, not in the 20 runs.</li>
+        <li>A repair is kept only where every value it sent was the script's own. A release that needs a new value, such as a required reason, sends ARTIE to the model on every run until a person keeps it.</li>
       </ul>
     </div>
   </details>
