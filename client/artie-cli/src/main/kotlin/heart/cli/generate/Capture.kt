@@ -31,6 +31,9 @@ class Capture(val name: String, text: String) {
     /** A goal run's watch, as the script its decisions amount to (spec/PLAN-LISTENERS.md, slice 8); else null. */
     val watchScript: String? = watch["script"]?.toString()
 
+    /** The same watch as data (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md, step 1); null for a capture made before it. */
+    val watchSteps: List<*>? = watch["steps"] as? List<*>
+
     /** The step a goal run's watch began at: the steps from there on are its looks, which its script makes again. */
     val watchFrom: Int? = (watch["from"] as? Number)?.toInt()
 

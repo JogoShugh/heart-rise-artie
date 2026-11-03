@@ -104,6 +104,19 @@ class ReplaySteps(
         generate(listOf("generate", capture, "--out", script, "--script", source), folder, PrintStream(said, true))
     }
 
+    @Given("artie generated {string} as data from {string} and {string}")
+    fun generatedAsData(script: String, capture: String, source: String) {
+        val said = ByteArrayOutputStream()
+        val args = listOf("generate", capture, "--out", script, "--script", source, "--format", "yaml")
+        generate(args, folder, PrintStream(said, true))
+    }
+
+    @Then("the script {string} reads, the same run as {string} written as data")
+    fun readsAsData(script: String, kts: String, text: String) {
+        val beside = "\nwritten as Kotlin:\n" + Files.readString(folder.resolve(kts))
+        assertEquals(text, Files.readString(folder.resolve(script)).trimEnd(), beside)
+    }
+
     @Given("the gateway's issue forms change: {}")
     fun formsChange(change: String) {
         ctx.inProcess = changed(change)
