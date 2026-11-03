@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Code Mode Against ARTIE</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Our Own Controls' column and palette, for the same series: leaf green for right, amber for a note, red for wrong. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --bad: #b3261e; --bad-bg: #fbe4e1; --comment: #6b7a6d;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    --bad: #f2a19a; --bad-bg: #3a1d1a; --comment: #8a9a8c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  --bad: #f2a19a; --bad-bg: #3a1d1a; --comment: #8a9a8c;
+  color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.top-in { max-width: 48rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 0.55rem; }
+.eyebrow { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.theme:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+main { max-width: 48rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 7vw, 3.3rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin-top: 1.3rem; }
+h3 { font: 600 1rem/1.4 var(--body); margin: 0; }
+p, li { max-width: 70ch; }
+p { margin: 0; }
+.dek { font-family: var(--display); font-weight: 500; font-size: 1.22rem; line-height: 1.5; color: var(--muted); margin-top: -0.5rem; }
+a { color: var(--link); text-underline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.78rem/1.6 var(--mono); max-height: 32rem; }
+pre code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+pre .c { color: var(--comment); font-style: italic; }
+pre .hl { background: var(--hold-bg); color: var(--hold); border-radius: 3px; padding: 0 0.15em; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: 0.9rem; line-height: 1.5; }
+th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; font-variant-numeric: tabular-nums; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 600; }
+td.num { text-align: right; white-space: nowrap; }
+.ok { color: var(--leaf); font-weight: 600; }
+.bad { color: var(--bad); font-weight: 600; }
+.mid { color: var(--hold); font-weight: 600; }
+.short { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1rem 1.2rem; }
+.short ul { gap: 0.55rem; }
+.note { font-size: 0.9rem; color: var(--muted); }
+/* The run-by-run grid: one cell per run, right or wrong, and the model's input tokens for it. */
+table.grid { min-width: 40rem; font-size: 0.8rem; }
+table.grid th, table.grid td { padding: 0.4rem 0.35rem; text-align: center; }
+table.grid tbody th { text-align: left; white-space: nowrap; padding-left: 0.8rem; font-size: 0.85rem; }
+table.grid thead .phase th { text-transform: none; letter-spacing: 0; font-size: 0.78rem; color: var(--fg); border-bottom: 0; padding-bottom: 0; }
+table.grid td span { display: block; border-radius: 6px; padding: 0.3rem 0.1rem; font-family: var(--mono); line-height: 1.3; }
+table.grid td span b { display: block; font-family: var(--body); font-size: 0.95rem; }
+table.grid td.y span { background: var(--leaf-bg); color: var(--leaf); }
+table.grid td.n span { background: var(--bad-bg); color: var(--bad); }
+table.grid td.y.t span { box-shadow: inset 0 0 0 1.5px var(--hold); }
+table.grid .split { border-left: 2px solid var(--rule); }
+details.src { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+details.src > summary { cursor: pointer; padding: 0.7rem 1rem; list-style: none; font: 600 0.93rem/1.4 var(--body); color: var(--link); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-family: var(--mono); }
+details.src[open] > summary::before { content: "−"; }
+details.src > summary small { font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+details.src .in { padding: 0 1rem 1rem; display: grid; gap: 0.7rem; min-width: 0; }
+details.src .in > ul { font-size: 0.92rem; line-height: 1.55; }
+.file { font: 500 0.78rem var(--mono); color: var(--muted); margin-bottom: -0.35rem; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.8rem; }
+.pair > div { display: grid; gap: 0.5rem; align-content: start; min-width: 0; }
+.stack { display: grid; gap: 0.6rem; }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
+footer ul { gap: 0.2rem; }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <span class="eyebrow">HEART · employees service · 2 November 2026</span>
+  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+</div></div>
+
+<main>
+  <h1>Code Mode Against ARTIE</h1>
+  <p class="dek">Two tasks, ten runs each, while a teammate changes a record and a release renames a field. Code mode has a model write a program each run, or saves one and replays it. ARTIE does the task once with a model, keeps it as data, and replays it held to the server's controls.</p>
+
+  <div class="short">
+    <h2 style="margin-top:0">In short</h2>
+    <ul>
+      <li><b>Three clients, one model (Sonnet 5.5), one service.</b> Code mode was steelmanned: a Python library built from the service's OpenAPI description, with <code>If-Match</code> on every write; a locked-down sandbox; up to 5 turns.</li>
+      <li><b>ARTIE as data: 20 of 20, on 17,524 input tokens.</b> Runs 1 to 6 used no model, including the teammate's change. After the rename, its pins caught the changed forms before any write, and it fell back to its words with the model.</li>
+      <li><b>Fresh code mode: 20 of 20, on 158,995 input tokens.</b> About 9 times ARTIE's, with a model and a sandbox every run, and 27 different programs across 20 runs.</li>
+      <li><b>Saved code mode: 12 of 20.</b> After the rename, all 8 runs were wrong and each exited 0. The programs printed the service's 422 and carried on, so nothing wrote them again. In t1 it dismissed Bilbo without hiring Samwise.</li>
+      <li><b>No client wrote over the teammate's change.</b> Code mode read Frodo a second time, after the teammate, so its write was current. ARTIE read once; its write was refused 412, and <code>decide</code> read again and wrote on the teammate's role.</li>
+      <li><b>ARTIE needs no sandbox.</b> It runs no code a model wrote: its script is data in a closed vocabulary, and the model's part is a choice among the forms offered now.</li>
+      <li><b>What ARTIE paid instead:</b> a goal run with the model, once per task (42,483 tokens, before these runs), and more HTTP requests (281 against 114), most of them forms, schemas and 304 revalidations.</li>
+    </ul>
+  </div>
+
+  <h2>The three clients</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Client</th><th>Each run</th><th>Model</th><th>Sandbox</th></tr></thead>
+    <tbody>
+      <tr><th>Code mode, fresh</th><td>The model writes Python against <code>import api</code>, one function per operation; the sandbox runs it; the model reads the output and may write again, up to 5 turns</td><td>every run</td><td>every run</td></tr>
+      <tr><th>Code mode, saved</th><td>The programs that finished in run 1, run again in order. A program that exits nonzero sends the model back to write anew from the error</td><td>only on failure</td><td>every run</td></tr>
+      <tr><th>ARTIE as data</th><td><code>artie run t1.kept.heart.yaml</code>: the kept script, held to its pins before every act. A changed form falls back to that step's words (<code>on-change: intent</code>)</td><td>only on change</td><td>none</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Same task words for all three. t1: "Hire Samwise Gamgee as a gardener. Then change Samwise's role to "gardener, mayor". Then dismiss Bilbo Baggins." t3: "Frodo Baggins is retiring: add ", retired" to the end of his current role, keeping the rest of it as it is."</p>
+
+  <h2>Results, 20 runs each</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>Right</th><td class="ok">20 / 20</td><td class="bad">12 / 20</td><td class="ok">20 / 20</td></tr>
+      <tr><th>Input tokens, cached or not</th><td>158,995</td><td>16,004 (run 1 only)</td><td>17,524 (renamed runs only)</td></tr>
+      <tr><th>Output tokens</th><td>10,411</td><td>974</td><td>2,000</td></tr>
+      <tr><th>Model calls</th><td>99</td><td>10</td><td>12</td></tr>
+      <tr><th>Runs that needed the model</th><td>20</td><td>2</td><td>8</td></tr>
+      <tr><th>Runs in a sandbox</th><td>20</td><td>20</td><td class="ok">0</td></tr>
+      <tr><th>Programs</th><td>79 run, 27 different, 19 exited nonzero</td><td>6 kept from run 1, replayed</td><td>none; 2 kept scripts</td></tr>
+      <tr><th>Seconds per run, median</th><td>10.1</td><td>1.3</td><td>1.1 (3.2 to 6.3 after the rename)</td></tr>
+      <tr><th>HTTP requests</th><td>114</td><td>110</td><td>281, 65 of them 304</td></tr>
+      <tr><th>Refused by the service</th><td>0</td><td class="bad">16 (422, then 404)</td><td>3 (412, the teammate)</td></tr>
+      <tr><th>Writes over the teammate</th><td class="ok">0</td><td class="ok">0</td><td class="ok">0</td></tr>
+      <tr><th>Made before these runs</th><td>nothing</td><td>nothing (run 1 is its first write)</td><td>one goal run per task: 42,483 input tokens</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Counting ARTIE's goal runs too: 60,007 tokens against fresh code mode's 158,995, about five fresh runs' worth up front. Saved code mode was cheapest, and wrong after the release.</p>
+
+  <h2>Run by run</h2>
+  <div class="table-scroll"><table class="grid">
+    <thead>
+      <tr class="phase"><th></th><th colspan="3">as they are</th><th colspan="3" class="split">teammate (t3 only)</th><th colspan="4" class="split">field renamed</th></tr>
+      <tr><th></th><th>1</th><th>2</th><th>3</th><th class="split">4</th><th>5</th><th>6</th><th class="split">7</th><th>8</th><th>9</th><th>10</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>fresh · t1</th><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y split"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y split"><span><b>✓</b>8.5k</span></td><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>8.7k</span></td><td class="y"><span><b>✓</b>6.6k</span></td></tr>
+      <tr><th>fresh · t3</th><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y t split"><span><b>✓</b>7.4k</span></td><td class="y t"><span><b>✓</b>7.8k</span></td><td class="y t"><span><b>✓</b>7.4k</span></td><td class="y split"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>7.9k</span></td><td class="y"><span><b>✓</b>7.4k</span></td></tr>
+      <tr><th>saved · t1</th><td class="y"><span><b>✓</b>8.6k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="n split"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td></tr>
+      <tr><th>saved · t3</th><td class="y"><span><b>✓</b>7.4k</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y t split"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="n split"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td><td class="n"><span><b>✗</b>0</span></td></tr>
+      <tr><th>ARTIE · t1</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>3.1k</span></td><td class="y"><span><b>✓</b>3.1k</span></td></tr>
+      <tr><th>ARTIE · t3</th><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y"><span><b>✓</b>0</span></td><td class="y t split"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y t"><span><b>✓</b>0</span></td><td class="y split"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>1.3k</span></td><td class="y"><span><b>✓</b>1.3k</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Each cell: right (✓) or wrong (✗), and the model's input tokens for that run. An amber outline marks a run the teammate changed Frodo in. The teammate acts in t3 only; t1's runs 4 to 6 are runs as they are.</p>
+
+  <h2>At each change</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Change</th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>Teammate sets Frodo's role to "keeper of the Red Book" right after the client's first read</th><td>Read Frodo again before writing; that read already held the teammate's role. Wrote with its ETag: 200, "keeper of the Red Book, retired"</td><td>The same: its kept program reads again before writing. 200</td><td>Read once, wrote with that ETag: <b>412</b>. <code>decide</code> read again and wrote ", retired" on the new role: 200</td></tr>
+      <tr><th>Release renames <code>role</code> to <code>position</code> in the hire and update forms</th><td>Its library and docs are built from the description each run, so the model wrote <code>position</code> from the start. No refusal</td><td class="bad">Sent <code>role</code>: 422 "required property 'position' not found". Printed it, exit 0. t1 went on: update 404, then dismissed Bilbo</td><td>Held each form to its pin; hire and update had changed, so it sent nothing and fell back to the step's words. The model chose <code>position</code>: 2 calls in t1, 1 in t3</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where code mode did well</h2>
+  <ul>
+    <li><b>Fresh code mode was right every time.</b> Every write to an existing record carried <code>If-Match</code>, 30 of 30, once the description offered it.</li>
+    <li><b>It adapts with no machinery of its own.</b> It reads the current description every run, so a rename costs it nothing extra. ARTIE needed its pins and a fallback for the same.</li>
+    <li><b>A saved program with a status check would have recovered.</b> An <code>assert r['status'] &lt; 300</code> would have exited nonzero, and the model would have written a new one. These programs had none, and no person added one.</li>
+    <li><b>Its sandbox held:</b> no network but the service, read-only, 1 CPU, 256 MB, 64 processes, 120 s.</li>
+  </ul>
+
+  <h2>The scripts</h2>
+  <p class="note">ARTIE's kept scripts, as generated from one goal run each and replayed in every ARTIE run; and the programs code mode saved in run 1 and replayed in runs 2 to 10, as the model wrote them.</p>
+  <div class="stack">
+
+  <details class="src"><summary>ARTIE · t1.kept.heart.yaml <small>generated, not edited</small></summary>
+    <div class="in">
+<pre><code><span class="c"># Generated by artie generate from ../runs/artie/artie-goal-t1-20261102-003323.yaml, the run of t1.goal.md.
+# Every selection as that run made it, nested as it nested, with no model.
+# What it was offered is pinned in t1.kept.pins.yaml, held to before every act.
+#   artie run t1.kept.heart.yaml</span>
+heart: 1
+kind: kept
+start: http://localhost:8099/
+
+steps:
+  - act: staff:hire
+    fields:
+      firstName: Samwise
+      lastName: Gamgee
+      role: gardener
+    intent: Hire Samwise Gamgee as a gardener
+    then:
+      - sync: true
+      - act: staff:update
+        fields:
+          firstName: Samwise
+          lastName: Gamgee
+          role: gardener, mayor
+        intent: Change his role to "gardener, mayor"
+        then: []
+  - act: staff:search-employees
+    fields:
+      name: Baggins
+    intent: Find the employees named Baggins
+    then:
+      - follow: item
+        title: Bilbo Baggins
+        intent: Open Bilbo Baggins
+        then:
+          - act: staff:dismiss
+            intent: Dismiss him
+            then: []</code></pre>
+      <ul>
+        <li>No IDs and no ETags: it finds Bilbo by following the search's <code>item</code> link with his title, and each act sends the ETag of the state it was offered on.</li>
+        <li>Each <code>intent</code> is the step's words, kept for the fallback when a form changes.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>ARTIE · t3.kept.heart.yaml <small>generated, then reviewed once by hand</small></summary>
+    <div class="in">
+<pre><code><span class="c"># Generated by artie generate from ../runs/artie/artie-goal-t3-20261102-081644.yaml, the run of t3.goal.md.
+# Every selection as that run made it, nested as it nested, with no model.
+# What it was offered is pinned in t3.kept.pins.yaml, held to before every act.
+# A value marked "review:" holds a value the reasoner chose: check it before keeping the script.
+#   artie run t3.kept.heart.yaml</span>
+heart: 1
+kind: kept
+start: http://localhost:8099/
+
+steps:
+  - act: staff:search-employees
+    fields:
+      name: Baggins
+    intent: Find the employees named Baggins
+    then:
+      - follow: item
+        title: Frodo Baggins
+        intent: Open Frodo Baggins
+        then:
+          <span class="c"># Reviewed by hand (spec/PLAN-CODE-MODE-VS-HEART.md): the run's value was the reasoner's, from the role it
+          # read then; kept as the role read now, with ", retired" after it, as the words say, and decided again on
+          # what is there if a teammate changed it since.</span>
+          - <span class="hl">decide:</span>
+              steps:
+                - act: staff:update
+                  fields:
+                    firstName: Frodo
+                    lastName: Baggins
+                    role: <span class="hl">${state.role}, retired</span>
+                  intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
+                  then: []</code></pre>
+      <ul>
+        <li>The review: the generated value was the literal the model chose then. A person made it <code>${state.role}, retired</code> and wrapped it in <code>decide</code>, so a 412 reads Frodo again and runs the step again.</li>
+        <li>That is the one hand edit in this comparison. Code mode's saved programs had none.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>ARTIE · pins and config <small>what each act is held to</small></summary>
+    <div class="in">
+      <div class="file">t1.kept.pins.yaml</div>
+<pre><code><span class="c"># What t1.kept.heart.yaml was recorded against, from ../runs/artie/artie-goal-t1-20261102-003323.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.</span>
+rung: L2
+digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+forms:
+  staff:hire:
+    integrity: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+    method: POST
+    sets: []
+  staff:update:
+    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+    method: PUT
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  staff:search-employees:
+    integrity: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+    method: GET
+    sets: []
+  staff:dismiss:
+    integrity: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+    method: DELETE
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+links:
+  item: ''</code></pre>
+      <div class="file">t3.kept.pins.yaml</div>
+<pre><code><span class="c"># What t3.kept.heart.yaml was recorded against, from ../runs/artie/artie-goal-t3-20261102-081644.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
+# also refuses one offered in a set not recorded for it.</span>
+rung: L2
+digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+forms:
+  staff:search-employees:
+    integrity: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+    method: GET
+    sets: []
+  staff:update:
+    integrity: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+    method: PUT
+    sets:
+      - sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+links:
+  item: ''</code></pre>
+      <div class="file">t1.kept.config.yaml, t3.kept.config.yaml</div>
+<pre><code><span class="c"># A kept script held as data falls back to its words, with the model, only where a form changed.</span>
+on-change: intent</code></pre>
+    </div>
+  </details>
+
+  <details class="src"><summary>Code mode, saved · t1 <small>three programs, as the model wrote them in run 1</small></summary>
+    <div class="in">
+      <div class="file">program 1</div>
+<pre><code>import api
+r=api.hire({"firstName":"Samwise","lastName":"Gamgee","role":"gardener"})
+print(r)
+s=api.searchEmployees(name="Bilbo Baggins")
+print(s)</code></pre>
+      <div class="file">program 2</div>
+<pre><code>import api
+g=api.getEmployee(<span class="hl">3</span>);print(g)
+u=api.update(<span class="hl">3</span>,{"firstName":"Samwise","lastName":"Gamgee","role":"gardener, mayor"},if_match=g['etag']);print(u)
+b=api.getEmployee(<span class="hl">2</span>);print(b)</code></pre>
+      <div class="file">program 3</div>
+<pre><code>import api
+print(api.dismiss(<span class="hl">2</span>,if_match=<span class="hl">'"seq-1.json.8b9e801bed8b4db8"'</span>))</code></pre>
+      <ul>
+        <li>Employee IDs 3 and 2, and in program 3 an ETag, are written in as run 1 saw them. They held in runs 2 to 6 only because the service starts each run from the same state.</li>
+        <li>No program checks a status. A refusal is printed, and the program exits 0.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>Code mode, saved · t3 <small>three programs, as the model wrote them in run 1</small></summary>
+    <div class="in">
+      <div class="file">program 1</div>
+<pre><code>import api
+r=api.searchEmployees(name="Frodo")
+print(r)</code></pre>
+      <div class="file">program 2</div>
+<pre><code>import api
+print(api.getEmployee(<span class="hl">1</span>))</code></pre>
+      <div class="file">program 3</div>
+<pre><code>import api
+r=api.getEmployee(<span class="hl">1</span>)
+b=r['body']
+print(api.update(1,{"firstName":b['firstName'],"lastName":b['lastName'],"role":b['role']+", retired"},if_match=r['etag']))
+print(api.getEmployee(1))</code></pre>
+      <ul>
+        <li>Program 3 reads Frodo again and writes with that read's ETag. That second read is why the teammate's change was kept: it landed before the read, not after.</li>
+        <li>It sends <code>role</code>; after the rename the service wants <code>position</code>.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>After the rename, what each printed <small>run 7</small></summary>
+    <div class="in">
+      <div class="file">Code mode, saved · t1 · exit 0</div>
+<pre><code>{'status': <span class="hl">422</span>, 'etag': None, 'body': {'type': 'https://w3id.org/heart-rise/problems/invalid-input', 'title': "The body does not match the form's schema", 'status': 422, 'detail': 'request body does not satisfy the affordance schema', 'violations': [{'pointer': '/position', 'message': "required property 'position' not found"}]}}
+{'status': 200, 'etag': None, 'body': {'count': 1, 'items': [{'id': 2, 'title': 'Bilbo Baggins'}]}}
+{'status': <span class="hl">404</span>, 'etag': None, 'body': {'error': 'no employee 3'}}
+{'status': <span class="hl">404</span>, 'etag': None, 'body': {'error': 'no employee 3'}}
+{'status': 200, 'etag': '"seq-1.json.8b9e801bed8b4db8"', 'body': {'id': 2, 'firstName': 'Bilbo', 'lastName': 'Baggins', 'role': 'burglar', 'status': 'working'}}
+{'status': 200, 'etag': '"seq-2.json.bba86145e7f63247"', 'body': {'id': 2, 'firstName': 'Bilbo', 'lastName': 'Baggins', 'role': 'burglar', 'status': <span class="hl">'dismissed'</span>}}</code></pre>
+      <div class="file">Code mode, saved · t3 · exit 0</div>
+<pre><code>{'status': 200, 'etag': None, 'body': {'count': 1, 'items': [{'id': 1, 'title': 'Frodo Baggins'}]}}
+{'status': 200, 'etag': '"seq-1.json.6b180d7809883934"', 'body': {'id': 1, 'firstName': 'Frodo', 'lastName': 'Baggins', 'role': 'ring bearer', 'status': 'working'}}
+{'status': <span class="hl">422</span>, 'etag': None, 'body': {'type': 'https://w3id.org/heart-rise/problems/invalid-input', 'title': "The body does not match the form's schema", 'status': 422, 'detail': 'request body does not satisfy the affordance schema', 'violations': [{'pointer': '/position', 'message': "required property 'position' not found"}]}}
+{'status': 200, 'etag': '"seq-1.json.6b180d7809883934"', 'body': {'id': 1, 'firstName': 'Frodo', 'lastName': 'Baggins', 'role': 'ring bearer', 'status': 'working'}}</code></pre>
+      <div class="file">ARTIE · t3 · from its trace</div>
+<pre><code>outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: guard
+  by: the client
+  detail: 'staff:update changed: pinned sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=, offered sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I='
+---
+mode: intent
+say: Add ", retired" to the end of his current role, keeping the rest of it as it is
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  <span class="hl">position: ring bearer, retired</span></code></pre>
+    </div>
+  </details>
+
+  <details class="src"><summary>The teammate, in ARTIE's trace <small>t3, run 4</small></summary>
+    <div class="in">
+<pre><code>outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: stale
+  by: the client
+  detail: since it was read, someone else changed role, which this act writes; sending it again would overwrite theirs
+---
+say: return to {address}
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: <span class="hl">keeper of the Red Book</span>
+    status: working
+---
+mode: script
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  role: <span class="hl">keeper of the Red Book, retired</span></code></pre>
+      <ul>
+        <li>Trimmed to the lines that matter; the full trace is <code>runs/artie/artie-data-t3-20261102-230021.yaml</code>.</li>
+        <li>On the wire: <code>PUT /employees/1/actions/update</code> with <code>If-Match: "seq-1.hsf.L2.a903f9549f3b7164"</code>, 412; then a read, then the same act with <code>"seq-2.hsf.L2.60e873853d6ada59"</code>, 200.</li>
+      </ul>
+    </div>
+  </details>
+  </div>
+
+  <details class="src"><summary>How it was run <small>service, sandbox, bench</small></summary>
+    <div class="in">
+      <ul>
+        <li><b>Service:</b> heart-sims' employees service (<code>employees.test</code>), reset before every run. ARTIE uses its HEART side; code mode uses its OpenAPI twin, the same operations.</li>
+        <li><b>The twin, made fair first:</b> plain JSON reads carry an <code>ETag</code> and answer 304 to <code>If-None-Match</code>; plain acts take an optional <code>If-Match</code> and refuse a stale one with 412; the description says so (spec/SPEC.md, decided 2026-11-02). Before that, code mode couldn't make a conditional write.</li>
+        <li><b>Code mode's library:</b> generated from the twin's description on each run: one function per operation, each answering status, ETag and body, with <code>if_match</code> where a write takes it, documented "refused 412 if the state moved since".</li>
+        <li><b>Sandbox:</b> <code>python:3.12-slim</code> in Docker on an internal network with only the service, read-only, 1 CPU, 256 MB, 64 processes, 120 s.</li>
+        <li><b>Teammate:</b> <code>PUT /_sim/employees/meddle</code>: right after Frodo is next read, his role becomes "keeper of the Red Book". <b>Rename:</b> <code>PUT /_sim/employees/changes</code>, <code>renamed</code>: hire and update take <code>position</code> for <code>role</code>.</li>
+        <li><b>ARTIE:</b> <code>artie generate --format yaml</code> from one goal run per task with the model (t1 25,390 input tokens, 10 calls; t3 17,093, 7 calls), then <code>artie run</code> on the <code>.heart.yaml</code>, with the reasoner given only for the fallback.</li>
+        <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --arms code-fresh,code-saved,artie-data --tasks t1,t3 --reps 10 --sequence</code>, Sonnet 5.5. Lines in <code>runs/code-vs-data-fresh.jsonl</code>; saved programs in <code>runs/codemode/</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="src"><summary>Limits <small>said plainly</small></summary>
+    <div class="in">
+      <ul>
+        <li>One model, one service, two tasks, ten runs each.</li>
+        <li>t3's kept script had one review by hand; the saved programs had none. A reviewer would likely have caught the fixed IDs and ETag, and might have added a status check.</li>
+        <li>Code mode's 412 path was never tested: its programs read Frodo again after the teammate, so no write of theirs was stale.</li>
+        <li>The rename is one kind of change. A change the pins don't see (the same form, a new meaning) would pass ARTIE's guard too.</li>
+        <li>ARTIE's tokens here are the fallback's only. Its goal runs came from earlier benches, counted above, not in the 20 runs.</li>
+        <li>An earlier run of this comparison, with harness bugs since fixed, is set aside; this run alone counts.</li>
+      </ul>
+    </div>
+  </details>
+
+  <footer>
+    <ul>
+      <li>Built for this: the twin's validators (heart-core, both servers, the TCK); <code>artie generate --format yaml</code>; <code>artie run NAME.heart.yaml</code>, with <code>decide</code> held as data.</li>
+      <li>Credit: code mode as Anthropic ("Code execution with MCP") and Cloudflare (Code Mode) describe it.</li>
+    </ul>
+  </footer>
+</main>
+
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+})();
+</script>
+</body>
+</html>
