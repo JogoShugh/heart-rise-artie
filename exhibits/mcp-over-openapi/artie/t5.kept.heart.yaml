@@ -9,8 +9,8 @@ start: http://localhost:8099/
 steps:
   - act: staff:search-employees
     fields:
-      name: Took
-    intent: Find the employees named Took
+      name: Miller
+    intent: Find the employees named Miller
     then:
       - whenever:
           - when-offered:
@@ -20,6 +20,6 @@ steps:
               - act: staff:dismiss
                 intent: Dismiss anyone on notice
                 then: []
-            intent: Move this Took one step through leaving
+            intent: Move this employee one step through leaving
             otherwise:
               - note: ${state.firstName} ${state.lastName} is left as is

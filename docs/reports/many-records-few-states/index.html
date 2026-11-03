@@ -115,35 +115,141 @@ footer ul { gap: 0.2rem; }
 
 <main>
   <h1>Many Records, a Few States</h1>
-  <p class="dek">One goal over many employees, each in one of three states. A kept script branches on what the server offers each record, so the model and the forms it needs follow the states, not the number of records.</p>
+  <p class="dek">One goal over many employees, each in one of three states. ARTIE runs the goal once with a model, writes the way it found as a script, and runs that script after with no model: the model and the forms it needs follow the states, not the number of records.</p>
+
+  <h2>Information and controls, in brief</h2>
+  <ul>
+    <li><b>Every answer can carry two things:</b> what is true now (information) and what can be done now (controls). Fielding's hypertext keeps them together.</li>
+    <li><b>The browser is generic because it is coupled to formats, not sites.</b> It knows HTML and forms, and no bank, wiki or shop; each sends its own controls. ARTIE is coupled the same way: to HAL, the HEART profile, JSON Schema and problem details, and to no API.</li>
+    <li><b>On the Web, controls followed the state:</b> a form present when an act was possible, absent with a reason when it wasn't. Nobody needed the server's rules in advance.</li>
+    <li><b>APIs took the controls out of the answer, and the rules drifted:</b> into interface files, then documentation, then generated clients, and now a model's training, each copy staler than the last. One SDK per API, now one set of agent tools per API.</li>
+    <li><b>HEART puts them back in the answer, true now:</b> links instead of addresses a client builds, forms offered by state, and a reason when one isn't. With them, one generic client serves a person, an agent and a script, and a job can be written as a goal in plain words.</li>
+    <li>The full story, on one GitHub pull request: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</li>
+  </ul>
+
+  <h2>Fielding, in brief</h2>
+  <ul>
+    <li><b>The complaint (2008):</b> most "REST APIs" are a list of operations a client must know in advance. "That is RPC. It screams RPC."</li>
+    <li><b>Enter knowing almost nothing:</b> "A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types…"</li>
+    <li><b>Information and controls together:</b> "When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions."</li>
+    <li><b>For change over time:</b> "REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution."</li>
+    <li>More, with his six rules verbatim: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</li>
+  </ul>
+
+  <h2>Two architectures</h2>
+  <div class="pair">
+    <div>
+      <h3>A bag of endpoints</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  D["1 Description: every operation"] --> M{{"2 Model writes code"}}
+  M --> P["3 Program builds URLs"]
+  P --> S[("Service")]
+  S -- "4 status, body" --> P
+</pre></div>
+      <ol class="notes">
+        <li>The client is told every operation up front: paths, methods, bodies.</li>
+        <li>The model works out the way and writes the code: every run (fresh), or once (saved).</li>
+        <li>The program builds each address itself, from path templates and IDs.</li>
+        <li>The server's rules show only after the call: a changed operation is an error, if the program reads it.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Hypermedia</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  B(["1 Bookmark"]) --> R["2 State + controls now"]
+  R --> C{{"3 Client picks a control"}}
+  C -- "act + If-Match" --> S[("Service")]
+  S -- "4 next state or refusal" --> R
+</pre></div>
+      <ol class="notes">
+        <li>The client enters at a bookmark, knowing only media types.</li>
+        <li>Each answer carries what is true now and what can be done now: the links, the forms this state allows, an ETag.</li>
+        <li>The client selects a link or a form; an act carries the ETag it read.</li>
+        <li>The server answers with the next state, or refuses with a reason: 409 not offered, 412 stale, 428 no validator, 422 doesn't fit.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>How ARTIE uses the model</h2>
+  <div class="pair">
+    <div>
+      <h3>Wayfinding: sync, reason, act</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  W(["Goal words"]) --> Y["1 Sync"]
+  Y --> Q{{"2 Reason: model"}}
+  Q --> A["3 Act"]
+  A --> Y
+  A -. "4 trace" .-> G["artie generate"]
+  G --> K[".heart.yaml + pins"]
+</pre></div>
+      <ol class="notes">
+        <li><b>Sync, no model:</b> read the representation; fetch its forms and schemas by link; revalidate them with their ETags.</li>
+        <li><b>Reason, the model:</b> it sees only the state, the forms offered now and the step's words, and picks one form and its values. ARTIE checks the values against the form's schema.</li>
+        <li><b>Act, no model:</b> send it with <code>If-Match</code>. A 412 reads again and decides again.</li>
+        <li>Every exchange is traced. <code>artie generate</code> turns the trace into a kept script and its pins.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>A kept run: the model only where something changed</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  T(["Next step"]) --> Y["1 Sync"]
+  Y --> P{"2 Pin holds?"}
+  P -- "yes" --> A["3 Act, no model"]
+  P -- "changed" --> F{{"4 Words: model"}}
+  F --> A
+  A --> T
+  A -. "5 after the run" .-> K["Keep the repair"]
+</pre></div>
+      <ol class="notes">
+        <li><b>Sync:</b> the same deterministic read as above.</li>
+        <li><b>Guard:</b> the form the step uses is held to its pin before any request.</li>
+        <li><b>Act:</b> the script's own values, with <code>If-Match</code>; no model.</li>
+        <li><b>A changed form:</b> the step falls back to its words, and the model chooses from what is offered now.</li>
+        <li><b>Keep:</b> a repair that worked, every value the script's own, is written into the script and its pins, so the next run needs no model.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="short frame">
+    <h2 style="margin-top:0">The work this is about</h2>
+    <ul>
+      <li><b>Work done in bulk, again and again:</b> the same business process over many records, every day, for months.</li>
+      <li><b>Its shape can be found up front.</b> One exploratory run with the model finds the way: which links, which forms, which values. Records in different states take different paths, but a few known ones, not a new one each time.</li>
+      <li><b>Inference spent once, to make the work deterministic.</b> The way is kept and run with no model, held to the server's controls. The model comes back only at the edges: where the service changed, or a record is in a state not met before.</li>
+      <li><b>Not infinite novelty.</b> Tasks that are new in every run are another matter; there, a model in the middle of every run earns its keep.</li>
+    </ul>
+  </div>
 
   <div class="short">
     <h2 style="margin-top:0">In short</h2>
     <ul>
-      <li><b>Four clients, 15 runs each:</b> 5 runs at each group size, 6, 30 and 90 employees. 60 runs in all, and every one moved every employee correctly.
+      <li><b>ARTIE found the way once, in plain words, and wrote it down.</b> One goal run with the model over 6 employees (48,491 tokens, 18 calls), then <code>artie generate</code> wrote the script: a loop over the list, acting on what each employee offers.
         <details class="more"><summary>More</summary>
           <ul>
-            <li>A run is the goal done once over the whole group: every test employee moved one step through leaving.</li>
-            <li>Before each run the group is created again through the service's own actions: a third working, a third on notice, a third dismissed.</li>
-            <li>Correct means: each working employee is now on notice, each on notice is now dismissed, the dismissed are left, and no one else is touched.</li>
-            <li>The four clients are two ARTIE scripts and two kinds of code mode; "What ran" below says what each is.</li>
+            <li>The goal is plain text (shown below). The model planned each move: search, open each employee, give notice or dismiss, go back.</li>
+            <li><code>artie generate</code> saw that the run visited the members of one list one by one, and wrote that as a loop (<code>whenever</code>) with one case per action the run took (<code>when-offered</code>), not as six steps by name.</li>
+            <li>The script is held to the forms the run was offered (its pins), so a changed form is caught before any request.</li>
           </ul>
         </details>
       </li>
-      <li><b>ARTIE's kept script used no model at any size,</b> and fetched 3 form sets a run, one per state, for 6 employees or 90.
+      <li><b>The script then used no model at any size,</b> and fetched 3 form sets a run, one per state, for 6 employees or 90: right in 15 runs of 15.
         <details class="more"><summary>More</summary>
           <ul>
-            <li>The kept script is a YAML file (shown below). ARTIE runs it with no model: for each employee it reads what the server offers right now, and takes the matching case: give notice, dismiss, or leave it.</li>
-            <li>A form set is the list of actions the server offers for a resource in one state, published once at its own address and shared by every resource in that state. ARTIE keeps it for the run, so three states mean three fetches, whether there are 6 employees or 90.</li>
-            <li>The model is needed only once, to find the way in the first place. That run isn't counted here: these scripts were written by hand, as <code>artie generate</code> would write them.</li>
+            <li>For each employee it reads what the server offers right now, and takes the matching case: give notice, dismiss, or leave it.</li>
+            <li>A form set is the list of actions the server offers for a resource in one state, published once at its own address and shared by every resource in that state. ARTIE keeps it for the run: three states, three fetches, however many employees.</li>
+            <li>Correct means: each working employee now on notice, each on notice now dismissed, the dismissed left, and no one else touched.</li>
           </ul>
         </details>
       </li>
-      <li><b>Without a case for a state, the model is asked for each record in it:</b> with the give-notice case alone, 2, 10 and 30 calls. Keeping that case after the first time (not built yet) takes it back to none.
+      <li><b>Without a case for a state, the model is asked for each record in it:</b> a script with the give-notice case alone asked 2, 10 and 30 times. Keeping the new case after the first time (not built yet) takes it back to none.
         <details class="more"><summary>More</summary>
           <ul>
-            <li>The "one case" script knows only what to do with working employees. For an employee on notice no case matches, so ARTIE falls back to the step's words and asks the model which offered action fits. The model picks dismiss, correctly, but it is asked for every such employee, in every run.</li>
-            <li>The fix: once the model's choice has worked, write it into the script as a new case, as ARTIE already does when a release renames a field. After that, no model for that state.</li>
+            <li>That script knows only what to do with working employees. For one on notice no case matches, so ARTIE falls back to the step's words and asks the model which offered action fits. The model picks dismiss, correctly, but for every such employee, in every run.</li>
+            <li>The fix: once the model's choice has worked, write it into the script as a new case, as ARTIE already does when a release renames a field.</li>
           </ul>
         </details>
       </li>
@@ -151,8 +257,7 @@ footer ul { gap: 0.2rem; }
         <details class="more"><summary>More</summary>
           <ul>
             <li>Code mode is the model writing Python in a sandbox. It lists the employees and loops over them, so 90 cost about what 6 did.</li>
-            <li>But it finds the way and writes the program again in every run, so its tokens are paid every time: 1,000 runs cost 10 to 35 million tokens. Each program also starts a sandbox.</li>
-            <li>ARTIE's kept script pays nothing per run; its cost is the one run that found the way.</li>
+            <li>But it finds the way and writes the program again in every run: 1,000 runs cost 10 to 35 million tokens, and each program starts a sandbox.</li>
           </ul>
         </details>
       </li>
@@ -161,11 +266,11 @@ footer ul { gap: 0.2rem; }
 
   <div class="short scale">
     <h2 style="margin-top:0">Tokens and cost: 90 employees a run, at scale</h2>
-    <p class="headline">At 1,000,000 runs of 90 employees: <b>ARTIE's kept script, no model tokens</b> after the run that found its way. Code mode: 10.2 billion on endpoints, 34.7 billion on HAL-FORMS alone.</p>
+    <p class="headline">At 1,000,000 runs of 90 employees: <b>ARTIE, 48,491 input tokens, all of them in the one goal run that found its way</b>. Code mode: 10.2 billion on endpoints, 34.7 billion on HAL-FORMS alone.</p>
     <div class="table-scroll"><table>
       <thead><tr><th>Client</th><th>Input tokens a run, measured</th><th>1,000 runs</th><th>1,000,000 runs</th><th>1,000,000 runs, priced with the cache</th><th>Model calls at 1,000,000</th><th>Sandbox at 1,000,000: start time / hosted price</th><th>Right, measured</th></tr></thead>
       <tbody>
-        <tr class="us"><th>ARTIE, the kept script</th><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>none</td><td>15 of 15 (100%)</td></tr>
+        <tr class="us"><th>ARTIE, the script generated from its goal run</th><td>0, after the goal run (48,491 once)</td><td>48,491</td><td>48,491</td><td>19,558</td><td>18</td><td>none</td><td>15 of 15 (100%)</td></tr>
         <tr><th>ARTIE, one case</th><td>38,160</td><td>38.2 million</td><td>38.2 billion</td><td>13.4 billion</td><td>30 million</td><td>none</td><td>15 of 15 (100%)</td></tr>
         <tr><th>ARTIE, one case, the new case kept after its first run (expected; not built yet)</th><td>38,160 the first run, then 0</td><td>38,160</td><td>38,160</td><td>13,374</td><td>30</td><td>none</td><td></td></tr>
         <tr><th>Code mode, fresh (endpoints)</th><td>10,182</td><td>10.2 million</td><td>10.2 billion</td><td>2.79 billion</td><td>5 million</td><td>263 hours / $224</td><td>15 of 15 (100%)</td></tr>
@@ -174,7 +279,7 @@ footer ul { gap: 0.2rem; }
     </table></div>
     <ul class="note">
       <li>Projected from the 5 measured runs at 90 employees (their mean), not run. Every client was right in every run, so the projections hold the same rate: 100%.</li>
-      <li>ARTIE's kept script was written by hand: the run with the model that would find its way, once, is not in these figures. In the release runs, such a goal run took 17k to 25k tokens a task.</li>
+      <li>ARTIE's 48,491 tokens and 18 calls are its goal run at 6 employees, once. Its script needs no model at any size after that.</li>
       <li>Priced with the cache: cache reads at a tenth of the input price, cache writes at 1.25.</li>
       <li>Sandbox: about 0.24 s more to start each program in a sandbox than with none, measured here; code mode ran 4 to 7 programs a run. Hosted price at E2B's per-second rates ($0.000014 a vCPU, $0.0000045 a GiB), for 1 vCPU and 256 MB kept for the run's median time. ARTIE runs no sandbox.</li>
     </ul>
@@ -184,32 +289,25 @@ footer ul { gap: 0.2rem; }
   <div class="table-scroll"><table>
     <thead><tr><th>Client</th><th>What it is</th><th>The model</th><th>Sandbox</th></tr></thead>
     <tbody>
-      <tr class="us"><th>ARTIE, the kept script</th><td>The script below: search the employees, then for each, the first case its offer matches</td><td>never</td><td>none</td></tr>
-      <tr><th>ARTIE, one case</th><td>The same script with the give-notice case alone. An employee offering dismiss matches no case, so that step falls back to its words</td><td>once for each employee on notice</td><td>none</td></tr>
+      <tr class="us"><th>ARTIE, the script generated from its goal run</th><td>The goal below, run once with the model at 6 employees; <code>artie generate</code> wrote the script below from that run, and ARTIE ran it</td><td>the goal run, once</td><td>none</td></tr>
+      <tr><th>ARTIE, one case</th><td>The same loop with the give-notice case alone. An employee offering dismiss matches no case, so that step falls back to its words</td><td>once for each employee on notice</td><td>none</td></tr>
       <tr><th>Code mode, fresh (endpoints)</th><td>Writes Python against a library made from the service's OpenAPI description, every run</td><td>every run</td><td>every run</td></tr>
       <tr><th>Code mode, HAL-FORMS alone</th><td>Writes Python against the hypermedia, told only the address and the token; the OpenAPI description withheld</td><td>every run</td><td>every run</td></tr>
     </tbody>
   </table></div>
 
   <h2>The service and the goal</h2>
-  <div class="pair">
-    <div>
-      <div class="table-scroll"><table>
-        <thead><tr><th>An employee's state</th><th>What the server offers</th></tr></thead>
-        <tbody>
-          <tr><th>working</th><td>give notice, update</td></tr>
-          <tr><th>on notice</th><td>dismiss, update</td></tr>
-          <tr><th>dismissed</th><td>nothing</td></tr>
-        </tbody>
-      </table></div>
-    </div>
-    <div>
-      <p><b>The goal, as every client was given it:</b> "Move every employee named Miller one step through leaving: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are." (Miller is the surname every test employee was given, so a search by it finds them all.)</p>
-      <p class="note">The employees service with its notice release. Before each run the test employees are seeded through the service's own acts: as many working, on notice and dismissed.</p>
-    </div>
-  </div>
+  <div class="table-scroll"><table>
+    <thead><tr><th>An employee's state</th><th>What the server offers</th></tr></thead>
+    <tbody>
+      <tr><th>working</th><td>give notice, update</td></tr>
+      <tr><th>on notice</th><td>dismiss, update</td></tr>
+      <tr><th>dismissed</th><td>nothing</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">The employees service with its notice release. Before each run the test employees, all named Miller, are created through the service's own actions: a third working, a third on notice, a third dismissed.</p>
 
-  <h2>How ARTIE's kept script works</h2>
+  <h2>How the generated script works</h2>
   <div class="diagram"><pre class="mermaid">
 flowchart TD
   S(["1 Search by surname"]) --> E["2 Each employee in the list"]
@@ -225,13 +323,23 @@ flowchart TD
     <li>An employee that offers none of the cases takes <code>otherwise</code>, with no model.</li>
   </ol>
 
-  <h2>The scripts</h2>
-  <p class="note">The scripts search for the test employees by their surname, Miller (<code>name: Miller</code>). Both written by hand, as <code>artie generate</code> would write them from a goal run: the first from one that met both states, the second from one that met only those working. Generate writing <code>when-offered</code> itself is the next build.</p>
-  <div class="file">artie/t5.kept.heart.yaml: a case for each state</div>
-<pre><code><span class="c"># Written by hand as artie generate would write it from a goal run that met both states (spec/PLAN-COST-FOLLOWS-</span>
-<span class="c"># STATES.md: generate writing when-offered is not built yet). Each member is moved by what the server offers it:</span>
-<span class="c"># give notice where that is offered, dismiss where that is; otherwise it is left as it is.</span>
-<span class="c">#   artie run t5.kept.heart.yaml</span>
+  <h2>The goal, and the script ARTIE wrote from it</h2>
+  <div class="file">artie/t5.goal.md: the goal, as a person writes it</div>
+<pre><code>---
+start: http://localhost:8099/
+limits: { moves: 100 }
+---
+
+Move every employee named Miller one step through leaving: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are.
+
+- Find the employees named Miller
+  - Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are `moves 60`</code></pre>
+  <div class="file">artie/t5.generated.heart.yaml: what <code>artie generate</code> wrote from the goal run</div>
+<pre><code><span class="c"># Generated by artie generate from ../runs/artie/artie-goal-t5-20261103-122953.yaml, the run of t5.goal.md.</span>
+<span class="c"># Every selection as that run made it, nested as it nested, with no model.</span>
+<span class="c"># The members of a list the run visited one by one are each acted on by what they offer (when-offered).</span>
+<span class="c"># What it was offered is pinned in t5.generated.pins.yaml, held to before every act.</span>
+<span class="c">#   artie run t5.generated.heart.yaml</span>
 heart: 1
 kind: kept
 start: http://localhost:8099/
@@ -245,15 +353,22 @@ steps:
       - whenever:
           - when-offered:
               - act: staff:give-notice
-                intent: Give notice to anyone working
+                inferred: give notice to this employee
+                from-intent: &quot;Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are&quot;
                 then: []
               - act: staff:dismiss
-                intent: Dismiss anyone on notice
+                inferred: dismiss this employee
+                from-intent: &quot;Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are&quot;
                 then: []
-            intent: Move this employee one step through leaving
+            intent: &quot;Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are&quot;
             otherwise:
-              - note: ${state.firstName} ${state.lastName} is left as is</code></pre>
-  <div class="file">artie/t5.grow.heart.yaml: the give-notice case alone</div>
+              - note: none of these acts is offered here</code></pre>
+  <ul class="note">
+    <li>The run opened six employees one by one; generate wrote the loop, not six steps by name.</li>
+    <li><code>from-intent</code> keeps the goal step's words with each case, so a changed form falls back to them.</li>
+  </ul>
+  <details class="src"><summary>ARTIE, one case <small>the give-notice case alone, written by hand</small></summary>
+    <div class="in">
 <pre><code><span class="c"># t5.kept.heart.yaml with the give-notice case alone, as from a goal run that met only those working. A member that</span>
 <span class="c"># offers an act no case names falls back to the step&#x27;s words (t5.grow.config.yaml: on-change: intent).</span>
 <span class="c">#   artie run t5.grow.heart.yaml --reasoner claude</span>
@@ -275,6 +390,8 @@ steps:
             intent: Move this employee one step through leaving
             otherwise:
               - note: ${state.firstName} ${state.lastName} is left as is</code></pre>
+    </div>
+  </details>
   <details class="src"><summary>Code mode on HAL-FORMS: its last program, at 90 employees <small>a loop it wrote, its fourth try</small></summary>
     <div class="in">
 <pre><code>import os,urllib.request,json,collections
@@ -314,7 +431,7 @@ print(c)</code></pre>
   <div class="table-scroll"><table>
     <thead><tr><th>Client</th><th>6 employees</th><th>30 employees</th><th>90 employees</th></tr></thead>
     <tbody>
-      <tr class="us"><th>ARTIE, the kept script</th><td>0 tokens, 0 calls</td><td>0 tokens, 0 calls</td><td>0 tokens, 0 calls</td></tr>
+      <tr class="us"><th>ARTIE, the script generated from its goal run</th><td>0 tokens, 0 calls</td><td>0 tokens, 0 calls</td><td>0 tokens, 0 calls</td></tr>
       <tr><th>ARTIE, one case</th><td>2,544 tokens, 2 calls</td><td>12,720 tokens, 10 calls</td><td>38,160 tokens, 30 calls</td></tr>
       <tr><th>Code mode, fresh (endpoints)</th><td>10,166 tokens, 5 calls</td><td>10,374 tokens, 5 calls</td><td>10,225 tokens, 5 calls</td></tr>
       <tr><th>Code mode, HAL-FORMS alone</th><td>24,444 tokens, 7 calls</td><td>36,380 tokens, 8 calls</td><td>35,348 tokens, 8 calls</td></tr>
@@ -324,7 +441,7 @@ print(c)</code></pre>
   <div class="table-scroll"><table>
     <thead><tr><th>Client</th><th>Form sets fetched</th><th>Requests: 6 / 30 / 90 employees</th><th>Seconds: 6 / 30 / 90 employees</th><th>Refused by the server, 5 runs at 90</th></tr></thead>
     <tbody>
-      <tr class="us"><th>ARTIE, the kept script</th><td>3 at every size: one per state</td><td>28 / 110 / 313</td><td>1.3 / 1.8 / 3.2</td><td>0</td></tr>
+      <tr class="us"><th>ARTIE, the script generated from its goal run</th><td>3 at every size: one per state</td><td>28 / 110 / 313</td><td>1.1 / 1.7 / 3.1</td><td>0</td></tr>
       <tr><th>ARTIE, one case</th><td>3 at every size</td><td>28 / 110 / 313</td><td>5.3 / 25.4 / 75.1</td><td>0</td></tr>
       <tr><th>Code mode, fresh (endpoints)</th><td>none: no forms</td><td>18 / 56 / 163</td><td>11.4 / 13.5 / 14.8</td><td>0</td></tr>
       <tr><th>Code mode, HAL-FORMS alone</th><td>none: forms in each answer</td><td>39 / 194 / 600</td><td>21.8 / 28.5 / 29.2</td><td>307: 428 without If-Match, 405 wrong method</td></tr>
@@ -334,17 +451,18 @@ print(c)</code></pre>
     <li><b>The cost follows the states, not the records.</b> Employees in the same state share one form set, fetched once a run; the kept script asks no model at any size.</li>
     <li><b>A state with no case costs a model call per record.</b> That is what keeping a new case once is for: the one-case run would then cost 1 call, then none.</li>
     <li><b>Requests grow with the records for every client.</b> ARTIE reads each employee and returns to the list, revalidating as it goes; code mode on endpoints reads less.</li>
-    <li><b>At 1,000 runs of 90 employees,</b> projected: code mode about 10 million tokens on endpoints and 35 million on HAL-FORMS alone; ARTIE's kept script none, after the run that found its way.</li>
+    <li><b>At 1,000 runs of 90 employees,</b> projected: code mode about 10 million tokens on endpoints and 35 million on HAL-FORMS alone; ARTIE's script 48,491, all of them in the one goal run that found its way.</li>
   </ul>
 
   <details class="src"><summary>How it was run <small>bench, seeding, files</small></summary>
     <div class="in">
       <ul>
-        <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --arms artie-data,artie-grow,code-fresh,code-heart-noapi --tasks t5 --reps 5 --population N,N,N</code>, for N of 2, 10 and 30. Sonnet 5.5; code mode had 16 turns and the sandbox of the other runs.</li>
+        <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --arms artie-generated,artie-grow,code-fresh,code-heart-noapi --tasks t5 --reps 5 --population N,N,N</code>, for N of 2, 10 and 30. Sonnet 5.5; code mode had 16 turns and the sandbox of the other runs.</li>
         <li><b>Seeding:</b> the notice release on (<code>PUT /_sim/employees/changes</code>), then each employee hired, given notice and dismissed through the service's own acts, before the measured requests.</li>
-        <li><b>Names:</b> the test employees' surname is shown here as Miller; the run files use the surname the runs were seeded with.</li>
+        <li><b>Names:</b> the goal run and the generated script's runs seeded employees named Miller; the one-case script's and code mode's runs seeded another surname, shown here as Miller.</li>
         <li><b>Right:</b> every employee moved one step (working to on notice, on notice to dismissed), the dismissed left, and no one else touched.</li>
-        <li><b>Files:</b> <code>runs/states-2.jsonl</code>, <code>runs/states-10.jsonl</code>, <code>runs/states-30.jsonl</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
+        <li><b>The goal run:</b> <code>artie run t5.goal.md --reasoner claude</code> at 6 employees (<code>runs/artie/artie-goal-t5-20261103-122953.yaml</code>), then <code>artie generate</code> its trace <code>--format yaml</code>: <code>artie/t5.generated.heart.yaml</code> and its pins.</li>
+        <li><b>Files:</b> the generated script's runs in <code>runs/states-generated-2.jsonl</code>, <code>-10</code>, <code>-30</code>; the others in <code>runs/states-2.jsonl</code>, <code>-10</code>, <code>-30</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
         <li>The plan: spec/PLAN-COST-FOLLOWS-STATES.md. The release-through-change runs: <a href="https://claude.ai/artifact/UJjeDjCGzWTEczKcPJDFoC">Wayfinding Through Change</a>.</li>
       </ul>
     </div>
@@ -353,7 +471,7 @@ print(c)</code></pre>
   <details class="src"><summary>Limits <small>said plainly</small></summary>
     <div class="in">
       <ul>
-        <li>ARTIE's kept scripts were written by hand; the cost of the goal run that would find the way is not in these figures.</li>
+        <li>The one-case script was written by hand, as generate would write it from a run that met only those working.</li>
         <li>One service, one model, one goal; 5 runs per size.</li>
         <li>The test employees are seeded the same way each run, so each run meets the same states in the same proportions.</li>
       </ul>

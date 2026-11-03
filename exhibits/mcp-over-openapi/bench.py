@@ -67,14 +67,24 @@ TASKS = {
     },
 }
 TASKS["t5"] = {
-    "name": "every Took one step through leaving",
-    "text": "Move every Took one step through leaving: give notice to anyone working, dismiss anyone on notice, and "
-            "leave the dismissed as they are.",
+    "name": "every employee named Miller one step through leaving",
+    "text": "Move every employee named Miller one step through leaving: give notice to anyone working, dismiss anyone "
+            "on notice, and leave the dismissed as they are.",
 }
-# t5 (spec/PLAN-COST-FOLLOWS-STATES.md): the service with its notice release, and a family seeded through its own
-# acts before the run: so many working, so many on notice, so many dismissed. What each was seeded as, by id.
+# t5 (spec/PLAN-COST-FOLLOWS-STATES.md): the service with its notice release, and employees named Miller seeded through
+# its own acts before the run: so many working, so many on notice, so many dismissed. What each was seeded as, by id.
 POPULATION = {"sizes": (2, 2, 2)}
-TOOKS = {}
+SEEDED = {}
+FIRST_NAMES = (
+    'Anna', 'James', 'Maria', 'David', 'Laura', 'Michael', 'Sarah', 'Robert', 'Emily', 'Daniel', 'Olivia', 'Thomas',
+    'Grace', 'Peter', 'Hannah', 'Paul', 'Julia', 'Mark', 'Rachel', 'Simon', 'Claire', 'Andrew', 'Megan', 'Steven',
+    'Alice', 'Brian', 'Helen', 'Kevin', 'Nora', 'Gary', 'Diana', 'Eric', 'Fiona', 'Henry', 'Irene', 'Jack',
+    'Karen', 'Leo', 'Molly', 'Nathan', 'Paula', 'Ryan', 'Sophie', 'Tyler', 'Vera', 'Walter', 'Amy', 'Ben',
+    'Carla', 'Dennis', 'Ellen', 'Frank', 'Gina', 'Hugo', 'Ivy', 'Jason', 'Kate', 'Liam', 'Mia', 'Noah',
+    'Owen', 'Pam', 'Quinn', 'Rosa', 'Sam', 'Tina', 'Uma', 'Victor', 'Wendy', 'Xavier', 'Yara', 'Zack',
+    'Abby', 'Carl', 'Dora', 'Ethan', 'Faye', 'Glen', 'Holly', 'Ian', 'Joan', 'Kurt', 'Lena', 'Max',
+    'Nina', 'Oscar', 'Pia', 'Reid', 'Sofia', 'Tess',
+)
 STEP_ON = {"working": "on notice", "on notice": "dismissed", "dismissed": "dismissed"}
 INTERFERED_ROLE = "keeper of the Red Book"
 INTERFERED = {"t3", "t4"}
@@ -136,25 +146,25 @@ def setup(task):
     if task == "t2":
         sim("DELETE", "/employees/1/actions/dismiss", headers=PLAIN).raise_for_status()
     if task == "t5":
-        seed_tooks()
+        seed_employees()
 
 
-def seed_tooks():
-    """The notice release on, then the Tooks hired, given notice and dismissed through the service's own acts."""
+def seed_employees():
+    """The notice release on, then the Millers hired, given notice and dismissed through the service's own acts."""
     sim("PUT", "/_sim/employees/changes", content="notice").raise_for_status()
-    TOOKS.clear()
+    SEEDED.clear()
     working, notice, dismissed = POPULATION["sizes"]
     states = ["working"] * working + ["on notice"] * notice + ["dismissed"] * dismissed
     for n, state in enumerate(states, start=1):
         hired = sim("POST", "/actions/hire", headers=PLAIN,
-                    json={"firstName": f"Pip{n:02d}", "lastName": "Took", "role": "hobbit"})
+                    json={"firstName": FIRST_NAMES[n - 1], "lastName": "Miller", "role": "clerk"})
         hired.raise_for_status()
         number = int(hired.headers["Location"].rsplit("/", 1)[1])
         if state != "working":
             sim("POST", f"/employees/{number}/actions/give-notice", headers=PLAIN).raise_for_status()
         if state == "dismissed":
             sim("DELETE", f"/employees/{number}/actions/dismiss", headers=PLAIN).raise_for_status()
-        TOOKS[number] = state
+        SEEDED[number] = state
 
 
 def log():
@@ -186,10 +196,10 @@ def check(task, held, final_text):
                 "teammate_reason_kept": reason_kept, "triaged": triaged, "said_why": said}
     if task == "t5":
         status = {one["id"]: one["status"] for one in held}
-        moved = sum(1 for number, was in TOOKS.items() if status.get(number) == STEP_ON[was])
-        others = [one for one in held if one["id"] not in TOOKS]
+        moved = sum(1 for number, was in SEEDED.items() if status.get(number) == STEP_ON[was])
+        others = [one for one in held if one["id"] not in SEEDED]
         untouched = all(one["status"] == "working" for one in others)
-        return {"done": moved == len(TOOKS) and untouched, "moved": moved, "tooks": len(TOOKS),
+        return {"done": moved == len(SEEDED) and untouched, "moved": moved, "seeded": len(SEEDED),
                 "others_untouched": untouched, "employees": len(held), "population": list(POPULATION["sizes"])}
     by_name = {}
     for one in held:
@@ -751,7 +761,7 @@ ARTIE = HERE / "../../client/artie-cli/build/install/artie/bin/artie"
 # offered then; a kept script is artie generate's script from a clean goal run, held to its pins, with no model.
 ARTIE_SOURCES = {"artie-goal": "{task}.goal.md", "artie-intent": "{task}.intent.kts", "artie-kept": "{task}.kept.kts",
                  "artie-script": "{task}.kts", "artie-data": "{task}.kept.heart.yaml",
-                 "artie-grow": "{task}.grow.heart.yaml"}
+                 "artie-grow": "{task}.grow.heart.yaml", "artie-generated": "{task}.generated.heart.yaml"}
 # artie-data, the kept script held as data, is given the reasoner only to fall back to its words when a form changed
 # (its config says on-change: intent); it calls the model on no other step.
 # artie-grow: t5's kept script with the give-notice case alone; a member in another state falls back to its words.
@@ -808,7 +818,7 @@ def main():
     parser.add_argument("--tasks", default="t1,t2,t3")
     parser.add_argument("--reps", type=int, default=3)
     parser.add_argument("--start", type=int, default=1, help="the first run's number: with --sequence, its phase")
-    parser.add_argument("--population", default="2,2,2", help="t5: how many Tooks working, on notice, dismissed")
+    parser.add_argument("--population", default="2,2,2", help="t5: how many employees working, on notice, dismissed")
     parser.add_argument("--model", default="claude-sonnet-5-5")
     parser.add_argument("--max-turns", type=int, default=25)
     parser.add_argument("--out")
