@@ -4,6 +4,17 @@ Status: proposed, 2026-11-03. Plan only; nothing built. Grows spec/ideas/branchi
 "grows by use") on the keep built the same day (spec/ideas/self-repair-and-keep.md). Read in the frame of
 docs/reports/wayfinding-through-change/.
 
+## Progress (2026-11-03)
+
+- **Built:** `when-offered` in the data runner and the draft schema (Kotlin already had `offers(rel)`), and its
+  fallback to the step's words for a member offering an act no case names (heart-script, when-offered.feature).
+- **Run:** the bench's t5, seeded through the service's own acts instead of a heart-sims route; 6, 30 and 90 Tooks,
+  5 runs each, every run right for all four clients. ARTIE's kept script, written by hand as generate would write it:
+  no model at any size, 3 form sets a run. With one case alone: one model call per record in the other state. Code
+  mode: about 10k (endpoints) and 24k to 36k (HAL-FORMS alone) tokens a run at every size. In the report
+  (docs/reports/wayfinding-through-change/, "Many records, a few states").
+- **Not built yet:** generate writing `when-offered` from a goal run (step 3), and keep adding a case (step 4).
+
 ## The question
 
 Take a hypermedia API whose shape is stable for resources of the same type in the same state. One goal runs over
