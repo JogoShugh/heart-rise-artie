@@ -86,6 +86,8 @@ FIRST_NAMES = (
     'Nina', 'Oscar', 'Pia', 'Reid', 'Sofia', 'Tess',
 )
 STEP_ON = {"working": "on notice", "on notice": "dismissed", "dismissed": "dismissed"}
+# The surname t5 is run for (--surname): the employees seeded share it, and the task names it.
+SURNAME = {"name": "Miller"}
 INTERFERED_ROLE = "keeper of the Red Book"
 INTERFERED = {"t3", "t4"}
 
@@ -157,7 +159,7 @@ def seed_employees():
     states = ["working"] * working + ["on notice"] * notice + ["dismissed"] * dismissed
     for n, state in enumerate(states, start=1):
         hired = sim("POST", "/actions/hire", headers=PLAIN,
-                    json={"firstName": FIRST_NAMES[n - 1], "lastName": "Miller", "role": "clerk"})
+                    json={"firstName": FIRST_NAMES[n - 1], "lastName": SURNAME["name"], "role": "clerk"})
         hired.raise_for_status()
         number = int(hired.headers["Location"].rsplit("/", 1)[1])
         if state != "working":
@@ -795,12 +797,21 @@ CODE_ARTIE_SYSTEM = (
     "its own container. ARTIE enters at the service's address and follows the links and forms the service offers; "
     "it knows nothing else about the service. You have two tools. artie_find gives ARTIE a goal in plain words: it "
     "does the goal with its own model, then keeps the way it found as a script under the name you give, held to "
-    "the forms the service offered. artie_run runs a kept script with no model; if a form it uses has changed, the "
+    "the forms the service offered. A goal is a sentence of plain words, then its steps as a Markdown list, one a "
+    "line; a step nested under another works on what that one found. Steps nested under a step run once, in order, "
+    "so a step done for each of many says so in its own words, with its conditions, as in\n\n"
+    "Ship the open orders of {customer}.\n\n- Find the open orders of {customer}\n"
+    "  - Move each of them on: pack any not packed, ship any packed, leave any shipped\n\n"
+    "artie_run runs a kept script with no model; if a form it uses has changed, the "
     "step falls back to its words and the repair is kept. Both answer ARTIE's exit code, what it did, and where it "
     "ended with what was true there, so there is no need to look again after them. artie_look reads one address "
     "the service has handed ARTIE, a bookmark, with no model. Kept scripts are listed with the task: if one does "
     "the task, run it; use artie_find for a task no kept script does, or after a kept script failed. The person who "
     "asked is away, so do not ask questions. When you are done, say what happened in one or two sentences."
+)
+INPUTS_TOLD = (
+    " A task may come with inputs: values that change from run to run, given by name. Write each in a goal as "
+    "{name}, in braces, never its value: ARTIE keeps it as an input of the script, given again each run."
 )
 ARTIE_FIND = {
     "name": "artie_find",
@@ -948,7 +959,21 @@ def handed_addresses():
     return seen
 
 
-def run_code_artie(model, task, max_turns, api):
+def task_inputs(task):
+    """The values a task comes with, structured, as a queue or a form hands them over: t5's surname."""
+    return {"surname": SURNAME["name"]} if task == "t5" else {}
+
+
+def declared_inputs(script):
+    """The inputs the kept script [script] declares."""
+    doc = yaml.safe_load(script.read_text()) or {}
+    return list((doc.get("inputs") or {}).keys())
+
+
+def run_code_artie(model, task, max_turns, api, escalate=False):
+    """code-artie: code mode with ARTIE as its one tool. With [escalate] (code-artie-escalate), the harness runs the
+    scripts that did the task last time with no model, and calls the model only when ARTIE exits nonzero."""
+    arm = "code-artie-escalate" if escalate else "code-artie"
     setup(task)
     offset = len(log())
     interferer = interfere(task, offset)
@@ -959,60 +984,113 @@ def run_code_artie(model, task, max_turns, api):
     kept_dir = ARTIE_WORK / "kept"
     kept_dir.mkdir(parents=True, exist_ok=True)
     (ARTIE_WORK / "traces").mkdir(exist_ok=True)
-    kept = sorted(kept_dir.glob("*.heart.yaml"))
-    opening = TASKS[task]["text"]
-    if kept:
-        words = {p: (kept_dir / p.name.replace(".heart.yaml", ".goal.md")).read_text().split("---", 2)[-1].strip()
-                 for p in kept}
-        opening += "\n\nKept scripts:\n" + "\n".join(f"- {p.name[:-len('.heart.yaml')]}: {w}" for p, w in words.items())
+    inputs = task_inputs(task)
     artie_calls, inner = [], []
 
-    def handle(use):
-        name = named(use.input.get("name"))
+    def artie(tool, name, arguments):
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
         trace = f"{name}-{stamp}.yaml"
-        reasoned = ["--reasoner", "claude", "--model", model, "--trace", f"../traces/{trace}"]
-        if use.name == "artie_find":
-            (kept_dir / f"{name}.goal.md").write_text(
-                f"---\nstart: {BASE}/\nlimits: {{ moves: 100 }}\n---\n\n{use.input.get('goal', '').strip()}\n")
+        exit_, out = arguments(trace)
+        usage = artie_usage(trace)
+        inner.append({"input": usage.get("input", 0), "output": usage.get("output", 0),
+                      "cache_read": usage.get("cache_read", 0), "cache_write": usage.get("cache_write", 0),
+                      "calls": usage.get("calls", 0)})
+        artie_calls.append({"tool": tool, "name": name, "exit": exit_, "trace": trace,
+                            "model_calls": usage.get("calls", 0), "by": "model" if calls_open["on"] else "harness"})
+        lines = out.splitlines()
+        shown = "\n".join(lines[-40:]) if len(lines) > 40 else out
+        return exit_, f"exit {exit_}\n{shown}{ended(trace)}"
+
+    def reasoned(trace):
+        return ["--reasoner", "claude", "--model", model, "--trace", f"../traces/{trace}"]
+
+    def run_kept(name):
+        given = [f"{k}={inputs[k]}" for k in declared_inputs(kept_dir / f"{name}.heart.yaml") if k in inputs]
+        return artie("artie_run", name, lambda trace: artie_in_container(
+            ["run", f"{name}.heart.yaml"] + given + reasoned(trace), model))
+
+    def find(name, goal):
+        named_inputs = [k for k in inputs if "{" + k + "}" in goal]
+        front = "".join(f"  {k}:\n" for k in named_inputs)
+        # A goal in one paragraph is one step: ARTIE's default of 10 moves a step stops it a few members into a list.
+        (kept_dir / f"{name}.goal.md").write_text(
+            f"---\nstart: {BASE}/\nlimits: {{ moves: 200, step: 100 }}\n" + (f"inputs:\n{front}" if front else "") +
+            f"---\n\n{goal.strip()}\n")
+        given = [f"{k}={inputs[k]}" for k in named_inputs]
+
+        def go(trace):
             # The goal run reads at L2; a kept script reads at its lock file's rung, as artie run does by itself.
-            exit_, out = artie_in_container(["run", f"{name}.goal.md", "--rung", "L2"] + reasoned, model)
+            exit_, out = artie_in_container(["run", f"{name}.goal.md"] + given + ["--rung", "L2"] + reasoned(trace),
+                                            model)
             if exit_ == 0:
                 made, said = artie_in_container(["generate", f"../traces/{trace}", "--out", f"{name}.heart.yaml",
                                                  "--format", "yaml", "--script", f"{name}.goal.md"], model)
                 (kept_dir / f"{name}.config.yaml").write_text("on-change: intent\nkeep: auto\n")
                 out += f"\n\nartie generate (exit {made}):\n{said}"
+            return exit_, out
+        return artie("artie_find", name, go)
+
+    def look(address):
+        if address not in handed_addresses():
+            return 1, f"ARTIE reads only an address the service has handed it; it was never handed {address}"
+        looks = ARTIE_WORK / "looks"
+        looks.mkdir(exist_ok=True)
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        (looks / f"look-{stamp}.heart.yaml").write_text(f"heart: 1\nkind: kept\nstart: {address}\nsteps: []\n")
+        return artie("artie_look", "look", lambda trace: artie_in_container(
+            ["run", f"../looks/look-{stamp}.heart.yaml", "--rung", "L2", "--trace", f"../traces/{trace}"], model))
+
+    def handle(use):
+        name = named(use.input.get("name"))
+        if use.name == "artie_find":
+            exit_, text = find(name, use.input.get("goal", ""))
         elif use.name == "artie_look":
-            address = str(use.input.get("address", ""))
-            if address not in handed_addresses():
-                return f"ARTIE reads only an address the service has handed it; it was never handed {address}", True
-            looks = ARTIE_WORK / "looks"
-            looks.mkdir(exist_ok=True)
-            (looks / f"look-{stamp}.heart.yaml").write_text(f"heart: 1\nkind: kept\nstart: {address}\nsteps: []\n")
-            exit_, out = artie_in_container(["run", f"../looks/look-{stamp}.heart.yaml", "--rung", "L2",
-                                             "--trace", f"../traces/{trace}"], model)
+            exit_, text = look(str(use.input.get("address", "")))
         elif (kept_dir / f"{name}.heart.yaml").exists():
-            exit_, out = artie_in_container(["run", f"{name}.heart.yaml"] + reasoned, model)
+            exit_, text = run_kept(name)
         else:
             return f"no kept script named {name}", True
-        usage = artie_usage(trace)
-        inner.append({"input": usage.get("input", 0), "output": usage.get("output", 0),
-                      "cache_read": usage.get("cache_read", 0), "cache_write": usage.get("cache_write", 0),
-                      "calls": usage.get("calls", 0)})
-        artie_calls.append({"tool": use.name, "name": name, "exit": exit_, "trace": trace, "model_calls": usage.get("calls", 0)})
-        lines = out.splitlines()
-        shown = "\n".join(lines[-40:]) if len(lines) > 40 else out
-        return f"exit {exit_}\n{shown}{ended(trace)}", exit_ != 0
+        return text, exit_ != 0
 
-    tools = [ARTIE_FIND, ARTIE_RUN, ARTIE_LOOK]
-    calls, final_text = tool_turns(model, api, CODE_ARTIE_SYSTEM, opening, tools, handle, max_turns)
+    calls_open = {"on": False}
+    plan = kept_dir / f"{task}.plan.json"
+    calls, final_text, failed = [], None, None
+    if escalate and plan.exists():
+        # The scripts that did this task last time, run by the harness in order, with no model.
+        for name in json.loads(plan.read_text()):
+            exit_, text = run_kept(name)
+            if exit_ != 0:
+                failed = text
+                break
+        else:
+            final_text = "the kept scripts ran: " + ", ".join(json.loads(plan.read_text()))
+    if final_text is None:
+        calls_open["on"] = True
+        kept = sorted(kept_dir.glob("*.heart.yaml"))
+        opening = TASKS[task]["text"]
+        if inputs:
+            opening += "\n\nInputs: " + ", ".join(f"{k} = {v}" for k, v in inputs.items())
+        if kept:
+            words = {p: (kept_dir / p.name.replace(".heart.yaml", ".goal.md")).read_text().split("---", 2)[-1].strip()
+                     for p in kept}
+            opening += "\n\nKept scripts:\n" + "\n".join(
+                f"- {p.name[:-len('.heart.yaml')]}: {w}" for p, w in words.items())
+        if failed:
+            opening += f"\n\nThe kept scripts that did this task last time were run again, and one failed:\n{failed}"
+        tools = [ARTIE_FIND, ARTIE_RUN, ARTIE_LOOK]
+        calls, final_text = tool_turns(model, api, CODE_ARTIE_SYSTEM + (INPUTS_TOLD if inputs else ""), opening, tools,
+                                       handle, max_turns)
+        done = [a["name"] for a in artie_calls if a["by"] == "model" and a["exit"] == 0
+                and a["tool"] in ("artie_find", "artie_run")]
+        if escalate and final_text is not None and done:
+            plan.write_text(json.dumps(list(dict.fromkeys(done))))
     outer = totals(calls)
     artie_total = totals(inner)
-    return finished_record(model, "code-artie", task, started, offset, interferer, change, calls + inner, final_text, {
+    return finished_record(model, arm, task, started, offset, interferer, change, calls + inner, final_text, {
         "outer": outer, "artie": {**artie_total, "model_calls": sum(i["calls"] for i in inner)},
-        "model_calls": outer["model_calls"] + sum(i["calls"] for i in inner),
-        "artie_calls": artie_calls, "programs": [], "tool_calls": len(artie_calls), "sandbox_runs": 0,
-        "tool_errors": sum(a["exit"] != 0 for a in artie_calls)})
+        "model_calls": outer["model_calls"] + sum(i["calls"] for i in inner), "inputs": inputs,
+        "escalated": bool(calls), "artie_calls": artie_calls, "programs": [], "tool_calls": len(artie_calls),
+        "sandbox_runs": 0, "tool_errors": sum(a["exit"] != 0 for a in artie_calls)})
 
 
 def finished_record(model, arm, task, started, offset, interferer, change, calls, final_text, more):
@@ -1100,6 +1178,7 @@ def main():
     parser.add_argument("--start", type=int, default=1, help="the first run's number: with --sequence, its phase")
     parser.add_argument("--population", default="2,2,2", help="t5: how many employees working, on notice, dismissed")
     parser.add_argument("--model", default="claude-sonnet-5-5")
+    parser.add_argument("--surname", default="Miller", help="t5: the surname of the employees seeded and moved")
     parser.add_argument("--max-turns", type=int, default=25)
     parser.add_argument("--out")
     parser.add_argument("--changes", default="", help=f"changes to make under the client; all is {ALL_CHANGES}")
@@ -1111,6 +1190,8 @@ def main():
                              "(meddle), 7 on with a field renamed")
     args = parser.parse_args()
     POPULATION["sizes"] = tuple(int(n) for n in args.population.split(","))
+    SURNAME["name"] = args.surname
+    TASKS["t5"]["text"] = TASKS["t5"]["text"].replace("Miller", args.surname)
     CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
     CHANGE["when"] = args.when
     MEDDLE["on"] = args.meddle
@@ -1133,8 +1214,8 @@ def main():
                     turns = 16 if task == "t5" else ARM_TURNS.get(arm, min(args.max_turns, 8))
                     if arm == "code-skill":
                         record = run_code_skill(args.model, task, turns, api)
-                    elif arm == "code-artie":
-                        record = run_code_artie(args.model, task, turns, api)
+                    elif arm in ("code-artie", "code-artie-escalate"):
+                        record = run_code_artie(args.model, task, turns, api, escalate=arm == "code-artie-escalate")
                     elif arm.startswith("code-"):
                         record = run_code(args.model, arm, task, turns, api)
                     elif arm.startswith("artie-"):
