@@ -56,16 +56,16 @@ The condition for each branch is the offer. The server decides the state; the sc
 3. **Generate writes it.** From a goal run whose `whenever` met members with different offers, `artie generate`
    writes one case per act chosen, in the order the reasoner chose them, and `otherwise` for members where nothing was
    chosen. A value the reasoner judged per member stays words, or is marked for review.
-4. **Grows by use, kept.** A member in a state the script hasn't met falls to `otherwise`, which, with
-   `on-change: intent`, is its words: the model chooses once. `keep: auto` adds the new case where every value is the
-   script's own; `propose` shows it.
+4. **Grows by use, kept.** A member offering an act no case names falls to its words, with `on-change: intent`: the
+   model chooses once. `keep: auto` adds the new case where every value is the script's own; `propose` shows it. A
+   member offering nothing the goal could use takes `otherwise` with no model.
 
 ## The runs
 
 | Run | Population (working, on notice, dismissed) | What it shows |
 |---|---|---|
-| Wayfinding | 2, 2, 0 | one goal run; the kept script with two cases |
-| Grow | 2, 2, 2 | the dismissed met for the first time: `otherwise` holds, nothing is acted on; with a new state that offers an act, one model call, one case kept |
+| Wayfinding | 2, 0, 0 | one goal run; the kept script with one case, give notice |
+| Grow | 2, 2, 2 | those on notice met for the first time: dismiss is offered, no case matches, one model call, the dismiss case kept. The dismissed offer nothing: `otherwise` notes it, with no model |
 | Scale | 10, 10, 10, then 30, 30, 30 | model calls and form sets per run, against the number of resources |
 | Release | 30, 30, 30, with `renamed` | the repair kept once, for every member after it |
 
