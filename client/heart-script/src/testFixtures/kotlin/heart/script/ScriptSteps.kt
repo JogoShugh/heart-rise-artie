@@ -88,10 +88,20 @@ class ScriptSteps {
         execute(Run(navigator = { service }, pause = {}))
     }
 
+    /** A script held as data, allowed a reasoner, falling back to its words where [fallsBack] says yes. */
+    @When("this script held as data runs, allowed a reasoner, falling back to its words: {word}")
+    fun runsAsDataFallingBack(fallsBack: String, text: String) {
+        val with = Run(navigator = { service }, pause = {})
+        with.reasoning = true
+        with.fallsBack = fallsBack == "yes"
+        runsAsData(text, with)
+    }
+
     /** A script held as data (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md), made step by step, with no engine. */
     @When("this script held as data runs")
-    fun runsAsData(text: String) {
-        val with = Run(navigator = { service }, pause = {})
+    fun runsAsData(text: String) = runsAsData(text, Run(navigator = { service }, pause = {}))
+
+    private fun runsAsData(text: String, with: Run) {
         run = with
         Run.current = with
         try {
@@ -141,6 +151,12 @@ class ScriptSteps {
     fun askedInOrder(table: DataTable) = assertEquals(
         table.asMaps().map { it.getValue("call") to it.getValue("what") },
         service.asked,
+    )
+
+    @Then("the client's acts and reasons, joined, are {string}")
+    fun actsAndReasons(joined: String) = assertEquals(
+        joined,
+        service.asked.filter { it.first in setOf("act", "reason") }.joinToString("; ") { "${it.first} ${it.second}" },
     )
 
     @Then("the client was asked nothing")

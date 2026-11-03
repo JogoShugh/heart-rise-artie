@@ -100,8 +100,22 @@
         { "$ref": "#/$defs/doing" },
         { "$ref": "#/$defs/doneWhere" },
         { "$ref": "#/$defs/note" },
-        { "$ref": "#/$defs/decide" }
+        { "$ref": "#/$defs/decide" },
+        { "$ref": "#/$defs/whenOffered" }
       ]
+    },
+    "whenOffered": {
+      "description": "when-offered: the first case whose act is offered here, else otherwise. The server decided the state; the offer says it (spec/PLAN-COST-FOLLOWS-STATES.md).",
+      "type": "object",
+      "required": ["when-offered"],
+      "additionalProperties": false,
+      "properties": {
+        "when-offered": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/act" } },
+        "intent": { "$ref": "#/$defs/text" },
+        "inferred": { "$ref": "#/$defs/text" },
+        "from-intent": { "$ref": "#/$defs/text" },
+        "otherwise": { "$ref": "#/$defs/steps" }
+      }
     },
     "decide": {
       "description": "decide(tries) { … }: its steps, run again on the state read again when an act in them is refused as stale; for a kept script a person reviewed.",
