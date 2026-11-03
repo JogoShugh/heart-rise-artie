@@ -22,8 +22,27 @@ refused by state? Yes, in four levels; the first three need no change to the app
 
 ## The module: `heart-spring-hateoas`
 
-A dependency and one switch (`@EnableHypermediaSupport` gains HEART's media type, or a property). Spring MVC first,
-which is what most Spring HATEOAS apps run; WebFlux after.
+**One dependency, off by default.** Added to the app's build, it changes nothing until a property switches it on
+(`heart.hateoas.upgrade=true`, in `application.properties`, an environment variable or a command-line argument).
+Switched on, it upgrades the app's answers transparently: where Spring HATEOAS wrote `_templates`, the answer
+carries `_forms`, each with its JSON Schema, the HEART profile named, ETags on every representation; the app's
+controllers stay as they are. Its options:
+
+| Property | Default | What it does |
+|---|---|---|
+| `heart.hateoas.upgrade` | `false` | the switch |
+| `heart.hateoas.relations.prefix`, `.names` | `app`, none | how forms are named as link relations, and renames |
+| `heart.hateoas.keep-templates` | `false` | still answer HAL-FORMS to a client that asks for it by its media type, while clients move |
+| `heart.hateoas.conditional-writes` | `true` | level 2's 428 and 412; off for a route list |
+| `heart.hateoas.max-rung` | `L2` | the highest rung answered |
+
+**Built for the apps that are out there.** The proof is the wild project as it is: Spring Boot 2.3, Spring HATEOAS
+1.1, Spring MVC, Java 8 source on a Java 11 runtime. So the module is built for Java 11 against Spring HATEOAS 1.x
+(Boot 2), with its dependencies provided by the app; a second build for Spring HATEOAS 2.x (Boot 3, the `jakarta`
+names) follows. It can't take heart-core as a jar, which is built for Java 21: it carries the little it needs
+(schemas from input types, content addressing, integrity over the bytes served, the refusals' order and problem
+details) and is held to the same rules by heart-tck, not by sharing code. Spring MVC first, which is what most
+Spring HATEOAS apps run; WebFlux after.
 
 | Level | What a client gets | Built from | The app changes |
 |---|---|---|---|
@@ -39,15 +58,19 @@ Level 4 reuses the app's own rules for what it offers: nothing is declared twice
 - **Names.** Spring names an affordance by its method (`updateEmployee`; the first on a link is `default` in
   HAL-FORMS). HEART names a form as a link relation. The module writes `{prefix}:{method in kebab case}`
   (`staff:update-employee`), the prefix configured, with a table to rename; HAL-FORMS keeps Spring's names.
-- **Versions.** Spring HATEOAS 1.x (Boot 2) and 2.x (Boot 3) differ a little, and older versions say less about each
-  property's constraints. Target Boot 3; fill missing constraints from the input type's Bean Validation annotations.
-  The example moves to Boot 3 for the proof; Boot 2.3 too, if cheap.
+- **Versions.** Spring HATEOAS 1.x and 2.x differ a little, and older versions say less about each property's
+  constraints: missing ones are filled from the input type's Bean Validation annotations (`javax` on Boot 2,
+  `jakarta` on Boot 3).
 - **Cost.** One extra in-process GET per write, for the ETag (level 2) and the check (level 4).
 
 ## The proof
 
-1. The `affordances` example, unchanged but for the dependency: ARTIE runs it with no `--dialect` and no
-   workaround: `_forms`, ETags, a 412 when someone changes Frodo between the read and the write, decided again.
+On the wild project itself (wild/fresh-run/spring-hateoas-examples, `affordances`), its code untouched: one
+dependency in its `pom.xml`, the module built and installed into the local Maven repository.
+
+0. Switched off: every answer the same bytes as before the dependency, and ARTIE's HAL-FORMS run as on 2026-11-02.
+1. Switched on: ARTIE runs it with no `--dialect` and no workaround: `_forms` with schemas, ETags, a 412 when
+   someone changes Frodo between the read and the write, decided again.
 2. At L2: one form set per state, fetched once a run.
 3. heart-tck against it, levels 1 to 3; level 4 with `.because`.
 4. Other clients: heart-ts, and code mode told only the address.
@@ -56,8 +79,9 @@ Level 4 reuses the app's own rules for what it offers: nothing is declared twice
 ## Steps (feature first, as always)
 
 0. The decisions below.
-1. The module in heart/, with a small test app holding the example's employee controller.
-2. Level 1, then level 2: the proof's first run.
+1. The module in heart/ (its own Gradle build for Java 11), with a small test app holding the example's employee
+   controller, on Spring HATEOAS 1.1; the switch off first, answers unchanged.
+2. Level 1, then level 2: the proof's runs 0 and 1, on the wild project.
 3. Level 3.
 4. Level 4.
 5. The TCK, the other clients, the report.
@@ -66,7 +90,7 @@ Level 4 reuses the app's own rules for what it offers: nothing is declared twice
 
 - The name: `heart-spring-hateoas`, or another.
 - Spring MVC first and WebFlux after, or both at once.
-- Boot 3 only, or Boot 2 too.
+- The property names above.
 - The shape of level 4's addition: `.because("…")` on the affordance, or an annotation on the handler method.
 - Releasing: built and kept here until you say; publishing it (Maven Central) or proposing it to the Spring HATEOAS
   project is yours to do.
