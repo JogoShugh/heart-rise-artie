@@ -11,7 +11,7 @@ run:
     cache_read: 0
     cache_write: 0
 ---
-at: '2026-11-03T12:13:39.108493Z'
+at: '2026-11-03T12:29:41.138554Z'
 ms: 51
 mode: script
 say: enter {entry}
@@ -30,12 +30,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
   forms:
     - staff:search-employees
     - staff:get-employee
@@ -46,8 +46,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:39.165891Z'
-ms: 38
+at: '2026-11-03T12:29:41.195810Z'
+ms: 37
 mode: script
 say: act {relation}, name {name}
 intent: Find the employees named Baggins
@@ -95,8 +95,8 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:39.206657Z'
-ms: 16
+at: '2026-11-03T12:29:41.235298Z'
+ms: 11
 mode: script
 say: follow {relation}, titled {title}
 intent: Open Frodo Baggins
@@ -144,21 +144,23 @@ now:
 keeps:
   /firstName:
     - 4
+    - 6
   /lastName:
     - 4
+    - 6
   /role:
     - 4
 ---
-at: '2026-11-03T12:13:39.224633Z'
-ms: 6
+at: '2026-11-03T12:29:41.248279Z'
+ms: 10
 mode: script
-say: act {relation}, firstName {firstName}, lastName {lastName}, position {position}
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
 intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
 params:
   relation: staff:update
   firstName: Frodo
   lastName: Baggins
-  position: ring bearer, retired
+  role: ring bearer, retired
 values:
   firstName:
     value: Frodo
@@ -172,7 +174,7 @@ values:
     from:
       - step: 3
         pointer: /lastName
-  position:
+  role:
     value: ring bearer, retired
     type: string
     from:
@@ -180,6 +182,92 @@ values:
           ring bearer:
             step: 3
             pointer: /role
+chose:
+  kind: form
+  relation: staff:update
+  title: Update the employee
+  method: PUT
+  target: /employees/{id}/actions/update
+  address: http://localhost:8099/employees/1/actions/update
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+  schema:
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-1.hsf.L2.a903f9549f3b7164"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: refused
+address: http://localhost:8099/employees/1
+refused:
+  kind: stale
+  by: the client
+  detail: since it was read, someone else changed role, which this act writes; sending it again would overwrite theirs
+---
+at: '2026-11-03T12:29:41.260469Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8099/employees/1
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: keeper of the Red Book
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-03T12:29:41.263812Z'
+ms: 3
+mode: script
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  role: keeper of the Red Book, retired
+values:
+  firstName:
+    value: Frodo
+    type: string
+    from:
+      - step: 3
+        pointer: /firstName
+  lastName:
+    value: Baggins
+    type: string
+    from:
+      - step: 3
+        pointer: /lastName
+  role:
+    value: keeper of the Red Book, retired
+    type: string
+    from:
+      - constant
 opens: true
 chose:
   kind: form
@@ -192,13 +280,13 @@ chose:
 guard:
   rung: L2
   set:
-    href: http://localhost:8099/affordance-sets/7a56bc3294ac7c2d
-    integrity: sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
-  form: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
   schema:
-    href: http://localhost:8099/schemas/8e4da418fd30a4aa
-    integrity: sha256-jk2kGP0wpKriwx6TpL4lbUDBpZe/Boe6eDjTVfsb6ok=
-  if-match: '"seq-1.hsf.L2.738be21f4263ba61"'
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-2.hsf.L2.60e873853d6ada59"'
   checked: lenient
   held: set
 offered:
@@ -215,7 +303,7 @@ now:
     id: 1
     firstName: Frodo
     lastName: Baggins
-    role: ring bearer, retired
+    role: keeper of the Red Book, retired
     status: working
   forms:
     - staff:dismiss
@@ -226,8 +314,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:39.232885Z'
-ms: 3
+at: '2026-11-03T12:29:41.268345Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -239,7 +327,7 @@ now:
     id: 1
     firstName: Frodo
     lastName: Baggins
-    role: ring bearer, retired
+    role: keeper of the Red Book, retired
     status: working
   forms:
     - staff:dismiss
@@ -250,8 +338,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:39.236833Z'
-ms: 3
+at: '2026-11-03T12:29:41.271213Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -269,8 +357,8 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:39.240204Z'
-ms: 2
+at: '2026-11-03T12:29:41.274130Z'
+ms: 1
 mode: script
 say: return to {address}
 params:
@@ -287,12 +375,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
   forms:
     - staff:search-employees
     - staff:get-employee

@@ -11,8 +11,8 @@ run:
     cache_read: 0
     cache_write: 0
 ---
-at: '2026-11-03T12:13:26.349277Z'
-ms: 50
+at: '2026-11-03T12:29:38.019909Z'
+ms: 52
 mode: script
 say: enter {entry}
 params:
@@ -46,8 +46,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:26.406360Z'
-ms: 45
+at: '2026-11-03T12:29:38.078497Z'
+ms: 43
 mode: script
 say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
 intent: Hire Samwise Gamgee as a gardener
@@ -120,8 +120,8 @@ keeps:
   /role:
     - 4
 ---
-at: '2026-11-03T12:13:26.454453Z'
-ms: 3
+at: '2026-11-03T12:29:38.125029Z'
+ms: 4
 mode: script
 say: return to {address}
 params:
@@ -144,8 +144,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:26.458500Z'
-ms: 6
+at: '2026-11-03T12:29:38.130202Z'
+ms: 5
 mode: script
 say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
 intent: Change his role to "gardener, mayor"
@@ -221,7 +221,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:26.467088Z'
+at: '2026-11-03T12:29:38.137780Z'
 ms: 3
 mode: script
 say: return to {address}
@@ -245,7 +245,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:26.470605Z'
+at: '2026-11-03T12:29:38.141952Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -279,8 +279,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:26.473562Z'
-ms: 5
+at: '2026-11-03T12:29:38.145223Z'
+ms: 4
 mode: script
 say: act {relation}, name {name}
 intent: Find the employees named Baggins
@@ -328,7 +328,7 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:26.479781Z'
+at: '2026-11-03T12:29:38.150599Z'
 ms: 3
 mode: script
 say: follow {relation}, titled {title}
@@ -375,8 +375,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:26.483988Z'
-ms: 5
+at: '2026-11-03T12:29:38.154777Z'
+ms: 6
 mode: script
 say: act {relation}
 intent: Dismiss him
@@ -426,7 +426,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:26.489402Z'
+at: '2026-11-03T12:29:38.161128Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -448,7 +448,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:26.492243Z'
+at: '2026-11-03T12:29:38.164009Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -467,7 +467,7 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:26.494944Z'
+at: '2026-11-03T12:29:38.166286Z'
 ms: 1
 mode: script
 say: return to {address}

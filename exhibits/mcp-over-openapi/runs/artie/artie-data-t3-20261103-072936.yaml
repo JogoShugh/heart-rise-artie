@@ -5,13 +5,13 @@ run:
     name: claude-sonnet-5-5
     url: https://api.anthropic.com
   usage:
-    calls: 1
-    input: 370
-    output: 176
-    cache_read: 918
+    calls: 0
+    input: 0
+    output: 0
+    cache_read: 0
     cache_write: 0
 ---
-at: '2026-11-03T12:13:33.319605Z'
+at: '2026-11-03T12:29:37.001260Z'
 ms: 51
 mode: script
 say: enter {entry}
@@ -30,12 +30,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
   forms:
     - staff:search-employees
     - staff:get-employee
@@ -46,8 +46,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:33.377242Z'
-ms: 38
+at: '2026-11-03T12:29:37.059138Z'
+ms: 37
 mode: script
 say: act {relation}, name {name}
 intent: Find the employees named Baggins
@@ -95,8 +95,8 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:33.418133Z'
-ms: 11
+at: '2026-11-03T12:29:37.099057Z'
+ms: 12
 mode: script
 say: follow {relation}, titled {title}
 intent: Open Frodo Baggins
@@ -144,16 +144,13 @@ now:
 keeps:
   /firstName:
     - 4
-    - 5
   /lastName:
     - 4
-    - 5
   /role:
     - 4
-    - 5
 ---
-at: '2026-11-03T12:13:33.431434Z'
-ms: 0
+at: '2026-11-03T12:29:37.113484Z'
+ms: 5
 mode: script
 say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
 intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
@@ -177,70 +174,6 @@ values:
         pointer: /lastName
   role:
     value: ring bearer, retired
-    from:
-      - parts:
-          ring bearer:
-            step: 3
-            pointer: /role
-chose:
-  kind: form
-  relation: staff:update
-  title: Update the employee
-  method: PUT
-  target: /employees/{id}/actions/update
-  address: http://localhost:8099/employees/1/actions/update
-  picked: relation
-  not sent:
-    - position
-guard:
-  rung: L2
-  set:
-    href: http://localhost:8099/affordance-sets/7a56bc3294ac7c2d
-    integrity: sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
-  form: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-  schema:
-    href: http://localhost:8099/schemas/8e4da418fd30a4aa
-    integrity: sha256-jk2kGP0wpKriwx6TpL4lbUDBpZe/Boe6eDjTVfsb6ok=
-  if-match: '"seq-1.hsf.L2.738be21f4263ba61"'
-  checked: lenient
-offered:
-  forms:
-    - staff:dismiss
-    - staff:update
-  links:
-    - hr:forms
-    - self
-outcome: refused
-address: http://localhost:8099/employees/1
-refused:
-  kind: guard
-  by: the client
-  detail: 'staff:update changed: pinned sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=, offered sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I='
----
-at: '2026-11-03T12:13:33.434231Z'
-ms: 1619
-mode: intent
-say: Add ", retired" to the end of his current role, keeping the rest of it as it is
-params:
-  relation: staff:update
-  firstName: Frodo
-  lastName: Baggins
-  position: ring bearer, retired
-values:
-  firstName:
-    value: Frodo
-    type: string
-    from:
-      - step: 3
-        pointer: /firstName
-  lastName:
-    value: Baggins
-    type: string
-    from:
-      - step: 3
-        pointer: /lastName
-  position:
-    value: ring bearer, retired
     type: string
     from:
       - parts:
@@ -248,23 +181,6 @@ values:
             step: 3
             pointer: /role
 opens: true
-judgement: false
-model:
-  - model: claude-sonnet-5-5
-    asked: |-
-      <state>
-      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"ring bearer","status":"working"}
-      </state>
-      <offers>
-      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"position":{"minLength":1,"type":"string"}},"required":["firstName","lastName","position"],"type":"object"}}}
-      </offers>
-      <links>
-      []
-      </links>
-      <intent>
-      Add ", retired" to the end of his current role, keeping the rest of it as it is
-      </intent>
-    answered: '[{"type":"thinking","thinking":"","signature":"CAQS4QUKEAgTGAI4AUIIdGhpbmtpbmcSDHlLPmzkctCl9xSyihoMtBdeEnbBUqlABKK2IjD87c/kI9MV1o8bEBJ5Ru9ObAzv9SJcfGRw6KV+1OJ+qZuvhDXeWNUPDSjHtlrBjbsq/gQF0U5+/S1VWBk2wQqhsHVi9GVhhNtiEilD8Ogq7ok3EZZzSqqEZfjk28BHt+97S9az6vTGW8PP6fcrSav3zQlVqY3uvmZ7iiwWrpEiJDiFF2B2ctndCk+6rvhtMiZ8Epg7cpYvhsjDCUWTRLo076ISdGYVH3W8sPPhbThaVitbnQhrIpeUp1RRKkmLBosFi0fKQYQ5d9LMfnw99uJACibb3uCdSMTuDgJ4hwdCuH7/fHApUYRlK0F5nxC9ABItklW2OiG8wuimLv0dySkwLCrM6rRJBB9VaIaZMOOQ63KyG2oFGKTOOBnofoUp9QHIFlbKH3zL1B+Gf+EJ4Pe9VupaXddYsIVXxNwtpzi4zf5J07uflR0I4yEqxkfOhuHL+IURreWAzol4cNhPBZHKZuwSmsokdI3f/9iFw89qACcKovi6EAn0DLWNDOwA2rs3hD65XI/3yqLXC7sYQUslh2XyKBR5JYd/iFPZ0jxi70QCrjLL/V99+fEQLZUgYgdZLG2gMdvGI00s5Edf/1u2b6r38H6N9mhP3VRXjbHl7gwywZSVtXqlVhHjAcl69x88cEFszlZWFbmdv7Ha3SKugxfcdafZfE6gl0m7gQIE6U4fB2JpnDPZAwnX8wCsIuTrHsdeAqWS/XkGh5NXZ/qsT6e/J4LslMu3/y8sSpAoy1Aqtl/wETlT/PlYoe92Bar8wbwX8umdzXd5CXk+xvbEOmdYVKfm0m4zI7CGI7zaWJWDJP23oT7d+df6D/8gN1nJdmDFyXvgV/zbS0qVARhz4ycAazVdh6sHBRJ1Q/wHTeqJz8YZ3blGe+fYPIP/Qs9sxMdGKRyUvdKsKvPp7ceqxxgB"},{"type":"tool_use","id":"toolu_011jXccK7dYV4Ckt7WipUg1a","name":"select","input":{"action":"act","affordance":"staff:update","fields":{"firstName":"Frodo","lastName":"Baggins","position":"ring bearer, retired"}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
   relation: staff:update
@@ -276,13 +192,15 @@ chose:
 guard:
   rung: L2
   set:
-    href: http://localhost:8099/affordance-sets/7a56bc3294ac7c2d
-    integrity: sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
-  form: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
   schema:
-    href: http://localhost:8099/schemas/8e4da418fd30a4aa
-    integrity: sha256-jk2kGP0wpKriwx6TpL4lbUDBpZe/Boe6eDjTVfsb6ok=
-  if-match: '"seq-1.hsf.L2.738be21f4263ba61"'
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-1.hsf.L2.a903f9549f3b7164"'
+  checked: lenient
+  held: set
 offered:
   forms:
     - staff:dismiss
@@ -308,7 +226,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:35.055412Z'
+at: '2026-11-03T12:29:37.121464Z'
 ms: 4
 mode: script
 say: return to {address}
@@ -332,7 +250,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:35.060192Z'
+at: '2026-11-03T12:29:37.126292Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -351,7 +269,7 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:35.063016Z'
+at: '2026-11-03T12:29:37.129331Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -369,12 +287,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
   forms:
     - staff:search-employees
     - staff:get-employee

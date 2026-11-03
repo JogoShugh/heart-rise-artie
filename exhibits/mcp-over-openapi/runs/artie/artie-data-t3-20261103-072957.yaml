@@ -11,8 +11,8 @@ run:
     cache_read: 0
     cache_write: 0
 ---
-at: '2026-11-03T12:13:21.174543Z'
-ms: 52
+at: '2026-11-03T12:29:58.245647Z'
+ms: 51
 mode: script
 say: enter {entry}
 params:
@@ -30,12 +30,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
-      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
+      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
   forms:
     - staff:search-employees
     - staff:get-employee
@@ -46,8 +46,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:21.233148Z'
-ms: 36
+at: '2026-11-03T12:29:58.304101Z'
+ms: 39
 mode: script
 say: act {relation}, name {name}
 intent: Find the employees named Baggins
@@ -95,7 +95,7 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:21.272495Z'
+at: '2026-11-03T12:29:58.345225Z'
 ms: 10
 mode: script
 say: follow {relation}, titled {title}
@@ -149,16 +149,16 @@ keeps:
   /role:
     - 4
 ---
-at: '2026-11-03T12:13:21.284655Z'
-ms: 5
+at: '2026-11-03T12:29:58.357024Z'
+ms: 4
 mode: script
-say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
+say: act {relation}, firstName {firstName}, lastName {lastName}, position {position}
 intent: Add ", retired" to the end of his current role, keeping the rest of it as it is
 params:
   relation: staff:update
   firstName: Frodo
   lastName: Baggins
-  role: ring bearer, retired
+  position: ring bearer, retired
 values:
   firstName:
     value: Frodo
@@ -172,7 +172,7 @@ values:
     from:
       - step: 3
         pointer: /lastName
-  role:
+  position:
     value: ring bearer, retired
     type: string
     from:
@@ -192,13 +192,13 @@ chose:
 guard:
   rung: L2
   set:
-    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
-    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
-  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+    href: http://localhost:8099/affordance-sets/7a56bc3294ac7c2d
+    integrity: sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
+  form: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
   schema:
-    href: http://localhost:8099/schemas/10847085ef79da90
-    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
-  if-match: '"seq-1.hsf.L2.a903f9549f3b7164"'
+    href: http://localhost:8099/schemas/8e4da418fd30a4aa
+    integrity: sha256-jk2kGP0wpKriwx6TpL4lbUDBpZe/Boe6eDjTVfsb6ok=
+  if-match: '"seq-1.hsf.L2.738be21f4263ba61"'
   checked: lenient
   held: set
 offered:
@@ -226,7 +226,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:21.292118Z'
+at: '2026-11-03T12:29:58.363019Z'
 ms: 3
 mode: script
 say: return to {address}
@@ -250,7 +250,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:21.296345Z'
+at: '2026-11-03T12:29:58.366375Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -269,8 +269,8 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:21.299460Z'
-ms: 1
+at: '2026-11-03T12:29:58.369185Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -287,12 +287,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
-      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
+      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
   forms:
     - staff:search-employees
     - staff:get-employee

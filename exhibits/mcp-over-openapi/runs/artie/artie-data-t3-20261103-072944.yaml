@@ -11,8 +11,8 @@ run:
     cache_read: 0
     cache_write: 0
 ---
-at: '2026-11-03T12:13:27.380669Z'
-ms: 50
+at: '2026-11-03T12:29:45.223385Z'
+ms: 54
 mode: script
 say: enter {entry}
 params:
@@ -46,7 +46,7 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:27.437097Z'
+at: '2026-11-03T12:29:45.282801Z'
 ms: 37
 mode: script
 say: act {relation}, name {name}
@@ -95,8 +95,8 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:27.477211Z'
-ms: 9
+at: '2026-11-03T12:29:45.323471Z'
+ms: 12
 mode: script
 say: follow {relation}, titled {title}
 intent: Open Frodo Baggins
@@ -151,7 +151,7 @@ keeps:
   /role:
     - 4
 ---
-at: '2026-11-03T12:13:27.488312Z'
+at: '2026-11-03T12:29:45.337379Z'
 ms: 9
 mode: script
 say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
@@ -216,7 +216,7 @@ refused:
   by: the client
   detail: since it was read, someone else changed role, which this act writes; sending it again would overwrite theirs
 ---
-at: '2026-11-03T12:13:27.499814Z'
+at: '2026-11-03T12:29:45.349398Z'
 ms: 3
 mode: script
 say: return to {address}
@@ -240,7 +240,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:27.504032Z'
+at: '2026-11-03T12:29:45.353634Z'
 ms: 4
 mode: script
 say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
@@ -314,8 +314,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:27.509771Z'
-ms: 3
+at: '2026-11-03T12:29:45.359015Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -338,7 +338,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:27.513099Z'
+at: '2026-11-03T12:29:45.362187Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -357,7 +357,7 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:27.515749Z'
+at: '2026-11-03T12:29:45.364852Z'
 ms: 1
 mode: script
 say: return to {address}

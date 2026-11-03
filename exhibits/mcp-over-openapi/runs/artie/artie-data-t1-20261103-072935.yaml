@@ -11,8 +11,8 @@ run:
     cache_read: 0
     cache_write: 0
 ---
-at: '2026-11-03T12:13:35.970874Z'
-ms: 51
+at: '2026-11-03T12:29:35.951277Z'
+ms: 52
 mode: script
 say: enter {entry}
 params:
@@ -30,12 +30,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
   forms:
     - staff:search-employees
     - staff:get-employee
@@ -46,16 +46,16 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:36.029351Z'
-ms: 44
+at: '2026-11-03T12:29:36.009941Z'
+ms: 46
 mode: script
-say: act {relation}, firstName {firstName}, lastName {lastName}, position {position}
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
 intent: Hire Samwise Gamgee as a gardener
 params:
   relation: staff:hire
   firstName: Samwise
   lastName: Gamgee
-  position: gardener
+  role: gardener
 values:
   firstName:
     value: Samwise
@@ -67,7 +67,7 @@ values:
     type: string
     from:
       - constant
-  position:
+  role:
     value: gardener
     type: string
     from:
@@ -83,8 +83,8 @@ chose:
   picked: relation
 guard:
   rung: L0
-  form: sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
-  if-match: '"index-hsf-c8005a80098c4db6"'
+  form: sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+  if-match: '"index-hsf-1cabcac1d5b82c1c"'
   checked: lenient
   held: form
 offered:
@@ -120,7 +120,7 @@ keeps:
   /role:
     - 4
 ---
-at: '2026-11-03T12:13:36.075949Z'
+at: '2026-11-03T12:29:36.062387Z'
 ms: 4
 mode: script
 say: return to {address}
@@ -144,16 +144,16 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:36.080863Z'
-ms: 6
+at: '2026-11-03T12:29:36.067504Z'
+ms: 7
 mode: script
-say: act {relation}, firstName {firstName}, lastName {lastName}, position {position}
+say: act {relation}, firstName {firstName}, lastName {lastName}, role {role}
 intent: Change his role to "gardener, mayor"
 params:
   relation: staff:update
   firstName: Samwise
   lastName: Gamgee
-  position: gardener, mayor
+  role: gardener, mayor
 values:
   firstName:
     value: Samwise
@@ -167,7 +167,7 @@ values:
     from:
       - step: 2
         pointer: /lastName
-  position:
+  role:
     value: gardener, mayor
     type: string
     from:
@@ -187,13 +187,13 @@ chose:
 guard:
   rung: L2
   set:
-    href: http://localhost:8099/affordance-sets/7a56bc3294ac7c2d
-    integrity: sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
-  form: sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
   schema:
-    href: http://localhost:8099/schemas/8e4da418fd30a4aa
-    integrity: sha256-jk2kGP0wpKriwx6TpL4lbUDBpZe/Boe6eDjTVfsb6ok=
-  if-match: '"seq-1.hsf.L2.9bab5fd2bdc521ea"'
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-1.hsf.L2.e2fb3b99798c9371"'
   checked: lenient
   held: set
 offered:
@@ -221,8 +221,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:36.088979Z'
-ms: 4
+at: '2026-11-03T12:29:36.076039Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -245,7 +245,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:36.093325Z'
+at: '2026-11-03T12:29:36.080098Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -263,12 +263,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
   forms:
     - staff:search-employees
     - staff:get-employee
@@ -279,8 +279,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-03T12:13:36.096277Z'
-ms: 4
+at: '2026-11-03T12:29:36.082991Z'
+ms: 5
 mode: script
 say: act {relation}, name {name}
 intent: Find the employees named Baggins
@@ -328,8 +328,8 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:36.101537Z'
-ms: 3
+at: '2026-11-03T12:29:36.089463Z'
+ms: 4
 mode: script
 say: follow {relation}, titled {title}
 intent: Open Bilbo Baggins
@@ -375,8 +375,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:36.105610Z'
-ms: 6
+at: '2026-11-03T12:29:36.094955Z'
+ms: 5
 mode: script
 say: act {relation}
 intent: Dismiss him
@@ -394,16 +394,15 @@ chose:
 guard:
   rung: L2
   set:
-    href: http://localhost:8099/affordance-sets/7a56bc3294ac7c2d
-    integrity: sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4=
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
   form: sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
   schema:
     href: http://localhost:8099/schemas/efddc7bd8bbcef73
     integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.d9099fd97e7bd846"'
+  if-match: '"seq-1.hsf.L2.6eed9ad4eac6d427"'
   checked: lenient
-  warning: 'the set holding staff:dismiss changed: pinned sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=, offered sha256-ela8MpSsfC3GERfq+rm0Ti5a4+/nWyO/8GG5LJtCGw4='
-  held: form
+  held: set
 offered:
   forms:
     - staff:dismiss
@@ -427,8 +426,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:36.112181Z'
-ms: 4
+at: '2026-11-03T12:29:36.100572Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -449,8 +448,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-03T12:13:36.116700Z'
-ms: 1
+at: '2026-11-03T12:29:36.103533Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -468,7 +467,7 @@ now:
       - Frodo Baggins
       - Bilbo Baggins
 ---
-at: '2026-11-03T12:13:36.118774Z'
+at: '2026-11-03T12:29:36.106675Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -486,12 +485,12 @@ now:
         staff:get-employee:
           - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
         staff:hire:
-          - sha256-qcwlYZ6VgYc/4oFd1esl4UAVEo6FL8xk89aLtyvDvvU=
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
         staff:search-employees:
           - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
         staff:update:
-          - sha256-xIvxD4COqb+5cf/6pGTt7zK4RcUzcr4d/oN8pwGq1+I=
-      digest: sha256-gmDCrbMtTxTCgBlJ342Sdg2HGkp/bB+cTvc8vr50NJE=
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
   forms:
     - staff:search-employees
     - staff:get-employee
