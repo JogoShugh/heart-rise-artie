@@ -51,6 +51,13 @@ class CliSteps(private val script: ScriptSteps) {
         Files.writeString(folder.resolve(name), text)
     }
 
+    /** A capture of a real run, kept beside the features in captures/, too long to read well in one. */
+    @Given("the file {string} is the capture {string}")
+    fun fileIsCapture(name: String, capture: String) {
+        val kept = checkNotNull(javaClass.getResource("/captures/$capture")) { "no capture $capture" }
+        Files.writeString(folder.resolve(name), kept.readText())
+    }
+
     /**
      * Line [number] of [name] put as [text], [indent] spaces before it, each `\n` in it a line break: one file,
      * broken one way. A table trims its cells, so the indent is its own column.

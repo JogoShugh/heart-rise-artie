@@ -54,6 +54,9 @@ class ScriptYaml(
     var kept = 0
         private set
 
+    /** Whether a list's members the run visited one by one are written as a whenever (Members.kt). */
+    private var looped = false
+
     fun write(): String {
         capture.finished()
         // A goal run's watch, as the capture keeps it as data, after the steps before it; with --intents, in words.
@@ -89,6 +92,8 @@ class ScriptYaml(
             else -> "# Every selection as that run made it, nested as it nested; " +
                 "where the reasoner chose a value, its reason step is kept."
         },
+        "# The members of a list the run visited one by one are each acted on by what they offer (when-offered)."
+            .takeIf { looped },
         "# What it was offered is pinned in $pins, held to before every act.",
         calls(kept, asked)?.let { "# $it: artie run needs --reasoner." },
         "# A value marked \"review:\" holds a value the reasoner chose: check it before keeping the script."
@@ -103,7 +108,24 @@ class ScriptYaml(
 
     /** The steps of [block]: the resources it keeps, then the steps nested in it. */
     private fun steps(block: Block): List<Map<String, Any?>> =
-        keeps(block) + block.statements.flatMap(::step)
+        keeps(block) + (members(block)?.let(::overMembers) ?: block.statements.flatMap(::step))
+
+    /**
+     * [members] of one list, visited one by one, as a whenever over it: each member acted on by the first of the run's
+     * acts it offers now, in the order the run first made them, else noted; the step's words kept for a member that
+     * offers an act the run never met.
+     */
+    private fun overMembers(members: List<Walked.Selection>): List<Map<String, Any?>> {
+        looped = true
+        val acts = cases(members).map { case ->
+            act(case.step) + listOfNotNull(("then" to steps(case.block)).takeIf { case.step.opens })
+        }
+        val offered = linkedMapOf<String, Any?>("when-offered" to acts)
+        words(capture, members.first().step, names, emptyList())?.let { it.fromIntent ?: it.intent }
+            ?.let { offered["intent"] = text(it) }
+        offered["otherwise"] = listOf(mapOf("note" to "none of these acts is offered here"))
+        return listOf(mapOf("whenever" to listOf(offered)))
+    }
 
     private fun keeps(block: Block): List<Map<String, Any?>> =
         (block.keeps.map { it.keptAs }.distinct() + listOfNotNull(block.watched)).map { mapOf("keep-as" to it) }
@@ -152,10 +174,6 @@ class ScriptYaml(
         return act
     }
 
-    /** [argument]'s value, with its review note when a person should look at it. */
-    private fun noted(argument: Argument): Any? =
-        argument.review?.let { Noted(argument.value, "review: $it") } ?: argument.value
-
     /** [words] as data, each slot the reference that reads it again. */
     private fun said(words: Words): Map<String, Any?> = listOfNotNull(
         words.intent?.let { "intent" to text(it) },
@@ -175,6 +193,10 @@ class ScriptYaml(
 }
 
 /** An input as the capture kept its declaration: nothing for a required one, else its default and question. */
+/** [argument]'s value, with its review note when a person should look at it. */
+private fun noted(argument: Argument): Any? =
+    argument.review?.let { Noted(argument.value, "review: $it") } ?: argument.value
+
 private fun declared(input: Map<*, *>, type: String?): Map<String, Any?>? {
     val default = input["now"]?.let { mapOf("now" to it.toString()) } ?: input["default"]?.toString()
     val declared = listOfNotNull(
