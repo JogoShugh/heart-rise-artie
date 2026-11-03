@@ -13,7 +13,11 @@ docs/reports/wayfinding-through-change/.
   no model at any size, 3 form sets a run. With one case alone: one model call per record in the other state. Code
   mode: about 10k (endpoints) and 24k to 36k (HAL-FORMS alone) tokens a run at every size. In the report
   (docs/reports/wayfinding-through-change/, "Many records, a few states").
-- **Not built yet:** generate writing `when-offered` from a goal run (step 3), and keep adding a case (step 4).
+- **Built since (step 3):** `artie generate --format yaml` writes the members of a list a goal run visited one by one
+  as a `whenever` with a `when-offered` case per act (generate-yaml.feature). From a real goal run in plain words
+  (`artie/t5.goal.md`, 48,491 tokens once), the generated script was right in 15 runs of 15 at 6, 30 and 90
+  employees, with no model.
+- **Not built yet:** keep adding a case (step 4), and the same loop in the Kotlin generator.
 
 ## The question
 
