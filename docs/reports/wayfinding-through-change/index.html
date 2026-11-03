@@ -120,7 +120,7 @@ footer ul { gap: 0.2rem; }
       <li><b>Controls.</b> The endpoint side had no conditional writes until we added them to its OpenAPI twin, and using them stays the client's choice. The HEART side refuses a write without <code>If-Match</code> (428): code mode on it met 57 of those refusals, then sent the ETag. A control guards only what the client pairs with it: one program sent a fresh ETag with a role computed before the teammate's change, and wrote over it. ARTIE takes both from the representation it acts on, and kept the teammate's change every time.</li>
       <li><b>Security.</b> Code mode ran model-written code every run, so it needed a sandbox every run. ARTIE ran none: its script is data in a closed vocabulary.</li>
       <li><b>Compliance.</b> ARTIE's process is one kept script a person can review, pinned to the server's forms, with a trace of every refusal and its reason; a release changed it by a few lines of diff. Code mode's was a different program almost every run.</li>
-      <li><b>The model at the edges.</b> ARTIE called it once per task to find the way, and once after the release to repair: 2 runs of 20, 4,381 tokens, plus 42,483 once for its wayfinding. Code mode called it in every run: 158,995 tokens with a library made for it, 456,893 to 551,629 finding its way through the hypermedia.</li>
+      <li><b>The model at the edges.</b> ARTIE called it once per task to find the way, and once after the release to repair: 2 runs of 20, 4,381 tokens, plus 42,483 once for its wayfinding. Code mode called it in every run: 158,995 tokens with a library made for it, 456,893 to 551,629 finding its way through the hypermedia. Priced with the prompt cache, as the API bills it: ARTIE 2,958; code mode 35,117 with a library, 123,786 to 178,872 on HEART.</li>
     </ul>
   </div>
 
@@ -310,6 +310,7 @@ flowchart TD
       <tr><th>Model calls</th><td>99</td><td>10</td><td>126</td><td>140</td><td>157</td><td>3</td></tr>
       <tr><th>Input tokens, cached or not</th><td>158,995</td><td>16,004 (run 1 only)</td><td>456,893</td><td>460,370</td><td>551,629</td><td class="ok">4,381 (run 7 only)</td></tr>
       <tr><th>Output tokens</th><td>10,411</td><td>974</td><td>32,655</td><td>43,369</td><td>48,215</td><td>521</td></tr>
+      <tr><th>Input, priced as uncached</th><td>35,117</td><td>2,717</td><td>169,827</td><td>178,872</td><td>172,446</td><td class="ok">2,958</td></tr>
       <tr><th>Before these runs</th><td>nothing</td><td>nothing (run 1 is its first write)</td><td>nothing</td><td>nothing</td><td>nothing</td><td>one goal run per task to find the way: 42,483 input tokens</td></tr>
       <tr><th>Seconds per run, median</th><td>10.1</td><td>1.3</td><td>19.2</td><td>22.4</td><td>24.2</td><td>0.9 (3.6 and 5.0 in run 7)</td></tr>
       <tr><th>HTTP requests</th><td>114</td><td>110</td><td>220</td><td>226</td><td>265</td><td>272, 56 of them 304</td></tr>
@@ -324,21 +325,24 @@ flowchart TD
 
   <h2>Code mode on HEART: what it needed</h2>
   <div class="table-scroll"><table>
-    <thead><tr><th>Variant</th><th>Answers in</th><th>Told, beyond the address</th><th>Turns allowed (used: median, most)</th><th>Right</th><th>Why wrong</th><th>Input tokens</th></tr></thead>
+    <thead><tr><th>Variant</th><th>Answers in</th><th>Told, beyond the address</th><th>Turns allowed (used: median, most)</th><th>Right</th><th>Why wrong</th><th>Input tokens</th><th>Priced as uncached</th></tr></thead>
     <tbody>
-      <tr><th>As the service answers</th><td>HAL-FORMS</td><td>nothing; it read the OpenAPI description its index links to, in 19 of 20 runs</td><td>8 (6, 8)</td><td class="ok">20 / 20</td><td></td><td>456,893</td></tr>
-      <tr><th>Description withheld</th><td>HAL-FORMS</td><td>nothing; <code>/openapi.json</code> answers 404</td><td>8 (6.5, 7)</td><td class="ok">20 / 20</td><td></td><td>316,303</td></tr>
-      <tr><th>HSF</th><td>HAL Schema Forms, forms in the answer</td><td>the headers that ask for it</td><td>8 (7, 8)</td><td class="bad">19 / 20</td><td>1 lost update</td><td>460,370</td></tr>
-      <tr><th>HSF, with the format's document</th><td>the same</td><td>the headers; the document beside the program</td><td>8 (8, 8)</td><td class="bad">11 / 20</td><td>9 out of turns</td><td>951,909</td></tr>
-      <tr><th>L2</th><td>HAL Schema Forms, forms and schemas by link</td><td>the headers, and <code>Prefer: forms=link, schema=link</code></td><td>8 (8, 8)</td><td class="bad">15 / 20</td><td>5 out of turns</td><td>551,629</td></tr>
-      <tr><th>L2, with the format's document</th><td>the same</td><td>the same; the document beside the program</td><td>8 (8, 8)</td><td class="bad">1 / 20</td><td>19 out of turns</td><td>981,525</td></tr>
-      <tr><th>L2, 16 turns</th><td>the same</td><td>the headers, and <code>Prefer</code></td><td>16 (8.5, 10)</td><td class="ok">20 / 20</td><td></td><td>656,688</td></tr>
+      <tr><th>As the service answers</th><td>HAL-FORMS</td><td>nothing; it read the OpenAPI description its index links to, in 19 of 20 runs</td><td>8 (6, 8)</td><td class="ok">20 / 20</td><td></td><td>456,893</td><td>169,827</td></tr>
+      <tr><th>Description withheld</th><td>HAL-FORMS</td><td>nothing; <code>/openapi.json</code> answers 404</td><td>8 (6.5, 7)</td><td class="ok">20 / 20</td><td></td><td>316,303</td><td>123,786</td></tr>
+      <tr><th>HSF</th><td>HAL Schema Forms, forms in the answer</td><td>the headers that ask for it</td><td>8 (7, 8)</td><td class="bad">19 / 20</td><td>1 lost update</td><td>460,370</td><td>178,872</td></tr>
+      <tr><th>HSF, with the format's document</th><td>the same</td><td>the headers; the document beside the program</td><td>8 (8, 8)</td><td class="bad">11 / 20</td><td>9 out of turns</td><td>951,909</td><td>301,545</td></tr>
+      <tr><th>HSF, the document in the prompt</th><td>the same</td><td>the headers; the document in the system prompt, cached</td><td>8 (6, 8)</td><td class="ok">20 / 20</td><td></td><td>1,245,587</td><td>265,448</td></tr>
+      <tr><th>L2</th><td>HAL Schema Forms, forms and schemas by link</td><td>the headers, and <code>Prefer: forms=link, schema=link</code></td><td>8 (8, 8)</td><td class="bad">15 / 20</td><td>5 out of turns</td><td>551,629</td><td>172,446</td></tr>
+      <tr><th>L2, with the format's document</th><td>the same</td><td>the same; the document beside the program</td><td>8 (8, 8)</td><td class="bad">1 / 20</td><td>19 out of turns</td><td>981,525</td><td>307,389</td></tr>
+      <tr><th>L2, the document in the prompt</th><td>the same</td><td>the same; the document in the system prompt, cached</td><td>8 (8, 8)</td><td class="bad">17 / 20</td><td>3 out of turns</td><td>1,625,453</td><td>313,935</td></tr>
+      <tr><th>L2, 16 turns</th><td>the same</td><td>the headers, and <code>Prefer</code></td><td>16 (8.5, 10)</td><td class="ok">20 / 20</td><td></td><td>656,688</td><td>222,950</td></tr>
     </tbody>
   </table></div>
+  <p class="note">Priced as uncached: uncached input, with cache writes at 1.25 and cache reads at 0.1 of the input price, as the API bills them.</p>
   <ul>
     <li><b>Knowing the format is enough; the service needn't be known.</b> No model has seen this employees service. With its description withheld, code mode found its way by HAL-FORMS alone: right 20 of 20, in at most 7 turns, on fewer tokens than with the description.</li>
     <li><b>Forms by link cost turns.</b> L2 needs 8 to 10: with 8, 5 runs ran out; with 16, none did, and none used more than 10. Its sharing and caching pay a client that keeps a cache; a new program every run pays each hop again.</li>
-    <li><b>The format's document cost more than it gave.</b> Read inside the sandbox, through a 4,000-character window on each program's output, it used up the turns: HSF fell from 19 to 11, L2 from 15 to 1. Every one of those misses ran out of turns; none wrote anything.</li>
+    <li><b>The format's document helps in the prompt, and hurts in the sandbox.</b> In the system prompt, the same bytes every run and cached: HSF right 20 of 20, L2 17 of 20 in 8 turns, over 90% of their input read from the cache. Read inside the sandbox, through a 4,000-character window on each program's output, it used up the turns: HSF 11 of 20, L2 1. None of those misses wrote anything.</li>
     <li><b>The server's control held for every variant.</b> In each, a write without <code>If-Match</code> was refused 428, and the program then sent the ETag. The one lost update was a value the client paired with a fresher ETag, which no server can see.</li>
   </ul>
 
@@ -705,7 +709,7 @@ params:
         <li><b>Teammate:</b> <code>PUT /_sim/employees/meddle</code>: right after Frodo is next read, his role becomes "keeper of the Red Book". <b>Rename:</b> <code>PUT /_sim/employees/changes</code>, <code>renamed</code>: hire and update take <code>position</code> for <code>role</code>.</li>
         <li><b>ARTIE:</b> <code>artie generate --format yaml</code> from one goal run per task with the model (t1 25,390 input tokens, 10 calls; t3 17,093, 7 calls), then <code>artie run</code> on the <code>.heart.yaml</code>, its config <code>on-change: intent</code> and <code>keep: auto</code>, with the reasoner given only for the fallback.</li>
         <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --tasks t1,t3 --reps 10 --sequence</code>, Sonnet 5.5, the same service, sequence and harness for every arm. Code mode on endpoints in <code>runs/code-vs-data-fresh.jsonl</code>; on HEART in <code>runs/code-heart.jsonl</code>, <code>runs/code-heart-hsf.jsonl</code> and <code>runs/code-heart-l2.jsonl</code>, with every program it ran; ARTIE's in <code>runs/artie-keep.jsonl</code>; saved programs in <code>runs/codemode/</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
-        <li><b>Code mode on HEART, four more variants</b> (<code>runs/code-heart-more.jsonl</code>), each changing one thing: the OpenAPI description withheld by a proxy that answers <code>/openapi.json</code> 404 (<code>sandbox/no-openapi.conf</code>); the format's document, spec/HAL-SCHEMA-FORMS-HR.md, beside the program, with the prompt saying so (the sandbox reaches no other network); L2 with 16 turns.</li>
+        <li><b>Code mode on HEART, four more variants</b> (<code>runs/code-heart-more.jsonl</code>), each changing one thing: the OpenAPI description withheld by a proxy that answers <code>/openapi.json</code> 404 (<code>sandbox/no-openapi.conf</code>); the format's document, spec/HAL-SCHEMA-FORMS-HR.md, beside the program, with the prompt saying so (the sandbox reaches no other network); L2 with 16 turns. Two more (<code>runs/code-heart-docprompt.jsonl</code>): the same document in the system prompt, marked for the prompt cache.</li>
         <li><b>Code mode on HEART, told:</b> "The service is at the address in the environment variable API_BASE; every request needs the header Authorization: Bearer followed by the environment variable API_TOKEN." HSF, also: "Accept: application/hal+json; Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;". L2, also: "Prefer: forms=link, schema=link".</li>
       </ul>
     </div>

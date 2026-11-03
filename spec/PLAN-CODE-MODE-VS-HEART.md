@@ -23,6 +23,10 @@ Which client keeps doing the right thing, at what cost in tokens, and what does 
 | `code-heart` | The same, on the service's HEART side as it answers by itself: no library, no description, told only where the service is and how to authenticate | yes | yes |
 | `code-heart-hsf` | The same, told also to ask for HAL Schema Forms: `Accept: application/hal+json` and its `Accept-Profile`; forms and schemas come in the answer (L0) | yes | yes |
 | `code-heart-l2` | The same, told also `Prefer: forms=link, schema=link`, as ARTIE asks at rung L2: forms and schemas by link | yes | yes |
+| `code-heart-noapi` | `code-heart` with `/openapi.json` withheld by a proxy (sandbox/no-openapi.conf): the hypermedia alone | yes | yes |
+| `code-heart-hsf-doc`, `code-heart-l2-doc` | HSF and L2 with the format's document beside the program | yes | yes |
+| `code-heart-l2-16` | L2 with 16 turns | yes | yes |
+| `code-heart-hsf-docprompt`, `code-heart-l2-docprompt` | HSF and L2 with the format's document in the system prompt, cached | yes | yes |
 | `code-saved` | The first program that finished is saved, reviewed once, and run again each time; if it fails, the model writes a new one from the error (its own fallback, the steelman) | only on failure | yes |
 | `artie-data` | One goal run with the model; the kept `.heart.yaml` replayed each time; a changed form falls back to its words (`on-change: intent`) | only on change | no |
 

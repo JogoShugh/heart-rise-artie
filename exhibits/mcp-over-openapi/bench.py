@@ -516,6 +516,13 @@ HEART_HEADERS.update({
     "code-heart-noapi": "", "code-heart-hsf-doc": HSF_HEADERS + DOC_TOLD, "code-heart-l2-doc": L2_HEADERS + DOC_TOLD,
     "code-heart-l2-16": L2_HEADERS,
 })
+# code-heart-hsf-docprompt and code-heart-l2-docprompt: the format's document in the system prompt, the same bytes
+# every run, marked for the prompt cache, so it is read at a cache read's price and costs no turns.
+DOC_IN_PROMPT = (
+    " The format the service answers in, HAL Schema Forms with its H.E.A.R.T. profile, is documented below.\n\n"
+)
+ARM_DOC_PROMPT = {"code-heart-hsf-docprompt", "code-heart-l2-docprompt"}
+HEART_HEADERS.update({"code-heart-hsf-docprompt": HSF_HEADERS, "code-heart-l2-docprompt": L2_HEADERS})
 ARM_TURNS = {"code-heart-l2-16": 16}
 ARM_SERVICE = {"code-heart-noapi": os.environ.get("BENCH_SANDBOX_NOAPI", "http://heart-bench-noapi:8099")}
 ARM_DOCS = {"code-heart-hsf-doc", "code-heart-l2-doc"}
@@ -648,7 +655,10 @@ def run_code(model, arm, task, max_turns, api):
     change = change_under(offset)
     started = time.time()
     SANDBOX.update(service=ARM_SERVICE.get(arm, SANDBOX_SERVICE), doc=arm in ARM_DOCS)
-    if arm in HEART_HEADERS:
+    if arm in ARM_DOC_PROMPT:
+        text = CODE_HEART_SYSTEM + HEART_HEADERS[arm] + DOC_IN_PROMPT + FORMAT_DOC.read_text()
+        library, system = "", [{"type": "text", "text": text, "cache_control": {"type": "ephemeral"}}]
+    elif arm in HEART_HEADERS:
         library, system = "", CODE_HEART_SYSTEM + HEART_HEADERS[arm]
     else:
         library, docs = api_library(openapi_spec())

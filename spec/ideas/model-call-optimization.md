@@ -38,6 +38,22 @@ rules, so no call carries them.
    bytes every time, so it is cached across runs, not read again by a program each run. Cheaper, but still in every
    call's context; ARTIE needs none of it.
 
+## Measured since (2026-11-03)
+
+Item 4, on the bench (runs/code-heart-docprompt.jsonl): the format's document in a cached system prompt, against the
+same document read in the sandbox, 20 runs each, 8 turns.
+
+| Variant | Right | Input tokens | Priced as uncached |
+|---|---|---|---|
+| HSF, document read in the sandbox | 11 / 20 | 951,909 | 301,545 |
+| HSF, document in the prompt | 20 / 20 | 1,245,587 | 265,448 |
+| L2, document read in the sandbox | 1 / 20 | 981,525 | 307,389 |
+| L2, document in the prompt | 17 / 20 | 1,625,453 | 313,935 |
+| ARTIE, kept script (for scale) | 20 / 20 | 4,381 | 2,958 |
+
+Over 90% of the prompt variants' input was read from the cache. Priced as uncached: cache writes at 1.25, cache
+reads at 0.1 of the input price.
+
 ## To measure, when taken up
 
 - Price per right run, not tokens alone: cache reads, cache writes and uncached input priced apart, from the API's
