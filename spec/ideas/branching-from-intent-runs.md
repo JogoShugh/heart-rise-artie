@@ -62,6 +62,20 @@ So the script grows by use: a run takes a branch it knows, with no model, or tea
 - **Values that depend on state.** A fixed value (250 ml) is copied; one the reasoner judged from the state stays
   a reason step, or is marked for review, as judged values are today.
 
+## Since: the keep, and the cost following the states (added 2026-11-03)
+
+- **"Grows by use" has its mechanism.** `keep: auto` (spec/ideas/self-repair-and-keep.md, built 2026-11-03) writes a
+  repair that worked into the kept script and its lock file, where every value it sent is the script's own. Adding
+  a branch is the same act: the run falls to the words where no case matches, the model chooses once, and the new
+  case is kept. In the code mode runs, the same keep took a release's repair from 17,524 tokens to 4,381.
+- **Many resources, a few states.** With `whenever`, one script visits every member of a list. Resources in the same
+  state share one affordance set, so the forms are fetched once per state, and the model is asked once per state it
+  hasn't met. The cost follows the states, not the resources: the case for hypermedia APIs that keep their shape
+  per state for a long time, where repeatability and cost matter.
+- **Option 2 needs one step the vocabulary lacks:** take the first case whose act is offered here, else something
+  else. `once: offered` waits for an act; `given` tests facts. Planned in spec/PLAN-COST-FOLLOWS-STATES.md, with the
+  run that tests the claim.
+
 ## Open
 
 - Whether the else branch of 2 stops, asks, or falls back to the intent words: the same choice as `on-change`

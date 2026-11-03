@@ -1,0 +1,101 @@
+# Plan: one goal over many resources in a few states, the cost following the states
+
+Status: proposed, 2026-11-03. Plan only; nothing built. Grows spec/ideas/branching-from-intent-runs.md (options 2 and
+"grows by use") on the keep built the same day (spec/ideas/self-repair-and-keep.md). Read in the frame of
+docs/reports/wayfinding-through-change/.
+
+## The question
+
+Take a hypermedia API whose shape is stable for resources of the same type in the same state. One goal runs over
+many of them, in several states. Does a client's cost grow with the resources, or with the states?
+
+- **Hypothesis, for ARTIE:** it reasons once per state it hasn't met, keeps a script that branches on what the server
+  offers, and runs it after that with no model. The form sets it fetches are one per state, since resources in the
+  same state share one. Model calls and form sets follow the states, not the resources.
+- **For code mode:** it writes a loop too, so its model cost needn't grow with the resources either. It pays for the
+  wayfinding in every run, and for a sandbox.
+
+The middle ground this speaks to: services that won't change shape often, where repeatability, reliability and cost
+matter a great deal.
+
+## The service and the goal
+
+heart-sims' employees service with its `notice` release: dismissing is offered only after notice is given. What each
+state offers:
+
+| State | Offered |
+|---|---|
+| working | give notice, update |
+| on notice | dismiss, update |
+| dismissed | nothing |
+
+One family, the Tooks, seeded N working, M on notice and K dismissed. The goal: "Move every Took one step through
+leaving: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are."
+
+The condition for each branch is the offer. The server decides the state; the script only reads what it offers.
+
+## What gets built (feature first, as always)
+
+1. **Seeding in heart-sims:** a `/_sim/employees/seed` route that makes the family in the given states, outside the
+   measured requests.
+2. **A step that branches on what is offered now.** The vocabulary has `once: offered` (waits for an act) and `given`
+   (facts), but not "take the first case whose act is offered here". Proposed, for the author to name:
+
+   ```yaml
+   - whenever:
+       - when-offered:
+           - act: staff:give-notice
+             intent: Give notice to anyone working
+           - act: staff:dismiss
+             intent: Dismiss anyone on notice
+         otherwise:
+           - note: nothing to do for ${state.firstName}
+   ```
+
+   In the schema, in the runner (heart-script's DataSteps), and in the Kotlin DSL, so both forms behave alike.
+3. **Generate writes it.** From a goal run whose `whenever` met members with different offers, `artie generate`
+   writes one case per act chosen, in the order the reasoner chose them, and `otherwise` for members where nothing was
+   chosen. A value the reasoner judged per member stays words, or is marked for review.
+4. **Grows by use, kept.** A member in a state the script hasn't met falls to `otherwise`, which, with
+   `on-change: intent`, is its words: the model chooses once. `keep: auto` adds the new case where every value is the
+   script's own; `propose` shows it.
+
+## The runs
+
+| Run | Population (working, on notice, dismissed) | What it shows |
+|---|---|---|
+| Wayfinding | 2, 2, 0 | one goal run; the kept script with two cases |
+| Grow | 2, 2, 2 | the dismissed met for the first time: `otherwise` holds, nothing is acted on; with a new state that offers an act, one model call, one case kept |
+| Scale | 10, 10, 10, then 30, 30, 30 | model calls and form sets per run, against the number of resources |
+| Release | 30, 30, 30, with `renamed` | the repair kept once, for every member after it |
+
+Arms: ARTIE (goal run, then the kept script), ARTIE's intent script (words per step: the model per member, as a
+contrast), code mode on endpoints, and code mode on HEART with HAL-FORMS alone. 5 runs per row per arm.
+
+## Measures
+
+| Measure | The prediction for ARTIE's kept script |
+|---|---|
+| Model calls per run | 0 once each state has a case, whatever N |
+| Form sets fetched per run | one per state met |
+| Requests per member | flat as N grows |
+| Right, per member | every member moved one step, the dismissed left |
+| Writes over a change | 0 |
+| Tokens, seconds, requests | as evidence, against the number of resources |
+
+## Decisions for the author
+
+- The new step's name and shape (`when-offered`, `choose`, `offered:` cases), and whether it lives in the release
+  train too.
+- The sizes, and 5 runs per row.
+- Whether code mode on HEART runs with the 16 turns L2 needed, or the 8 the others had.
+
+## Steps
+
+0. The decisions above.
+1. Seeding in heart-sims (heart-sims features).
+2. The step, in heart-script's DSL and the data runner (heart-script features), and in the draft schema.
+3. Generate writes it (artie-cli features).
+4. Keep adds a case (artie and artie-cli features).
+5. The bench's runs (exhibits/mcp-over-openapi or an exhibit of its own), then the report: cost against resources,
+   one line per arm.
