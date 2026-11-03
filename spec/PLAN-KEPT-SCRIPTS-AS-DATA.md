@@ -162,6 +162,21 @@ scratchpad.
 - Lines copied as written from a `.kts` source (ScriptWriter.kt:149-150), as the scope table says.
 - A member name with a `.` in it can't be a reference path. None is known yet.
 
+## Progress (2026-11-02)
+
+The author said go. Done, each test first:
+
+| Step | Commit | What |
+|---|---|---|
+| 1 | `02bf437`, `c719739` | A goal run's capture keeps its watch as data beside its Kotlin; every watch construct proven but `at` |
+| 2 | `1ef152a` | Refactor: generate walks a capture into a model of steps (`Walk.kt`), Kotlin written from it, byte for byte |
+| 3 | `6e69aa3`, `99f27a9`, `97a8fc7`, `11a7629` | `artie generate --format yaml`: acts and carried values (`${issue.number}`), a watch, follow, sync, waits and checks, `--keep-reason`, `--intents` |
+| 4 | `0b6ed1a`, `3a35967` | `artie run NAME.heart.yaml`: no engine, no compile; every key made through the DSL; proven on a reasoned run (same selections) and a watch (answers a new alert, no model) |
+
+- Timing, the employees kept script, same service and pins: `.kts` 2.5 to 3.0 s, `.heart.yaml` 0.86 to 0.89 s, the same 12 steps.
+- Not yet: the default format as a config setting (where it lives is the author's); `at` proven; a kept script's lines
+  copied from a `.kts` source; native ARTIE (step 6); `heart_do` (step 7).
+
 ## Steps, if go
 
 Each step features first: Gherkin with tables, written through Edit/Write, a red run at test level logged before

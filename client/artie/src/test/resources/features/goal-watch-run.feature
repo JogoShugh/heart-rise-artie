@@ -1683,6 +1683,20 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
           - field: github:labels
             has: ${hold}
       """
+    When artie generated "hold.heart.yaml" as data from "hold.trace.yaml" and "hold.goal.md"
+    And "acme/rockets" has these issues on the small GitHub
+      | number | title           | state | author |
+      | 12     | Mites on tray 9 | open  | ada    |
+    And issue 12 of "acme/rockets" is labelled "alert" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "on-hold" on the small GitHub
+    And "hold.heart.yaml" runs with ARTIE, captured in "hold-data.trace.yaml", given
+      | name  | value   |
+      | label | alert   |
+      | hold  | on-hold |
+    Then the run finished
+    And the run noted
+      | note                                                                    |
+      | Left https://github.gateway.test/repos/acme/rockets/issues/12: leave it. |
 
   Scenario: An act refused before it was sent may be asked again in the same words
     Found by the live seed bench run b17: the reasoner's first choice for

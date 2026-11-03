@@ -40,8 +40,9 @@ private fun span(text: Any?): Duration? = text?.toString()?.let { said ->
 internal fun facts(list: Any?, reading: Reading): Facts.() -> Unit = {
     val all = (list as? List<*>).orEmpty().map { it as? Map<*, *> ?: stop("a fact is not a map: $it") }
     all.groupBy { it["at"]?.toString() }.forEach { (name, group) ->
-        val hold: Facts.() -> Unit = { group.forEach { fact(it, reading.at(here)) } }
-        if (name == null) hold() else at(name, hold)
+        // Named for what it does, never "hold": Facts.hold() would answer instead, and add no fact.
+        val wanted: Facts.() -> Unit = { group.forEach { fact(it, reading.at(here)) } }
+        if (name == null) wanted(this) else at(name, wanted)
     }
 }
 
