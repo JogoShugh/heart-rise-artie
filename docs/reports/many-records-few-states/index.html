@@ -169,7 +169,7 @@ footer ul { gap: 0.2rem; }
       </table></div>
     </div>
     <div>
-      <p><b>The goal, as every client was given it:</b> "Move every Took one step through leaving: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are." (Took is the surname every test employee was given, so a search by it finds them all.)</p>
+      <p><b>The goal, as every client was given it:</b> "Move every employee named Miller one step through leaving: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are." (Miller is the surname every test employee was given, so a search by it finds them all.)</p>
       <p class="note">The employees service with its notice release. Before each run the test employees are seeded through the service's own acts: as many working, on notice and dismissed.</p>
     </div>
   </div>
@@ -177,7 +177,7 @@ footer ul { gap: 0.2rem; }
   <h2>How ARTIE's kept script works</h2>
   <div class="diagram"><pre class="mermaid">
 flowchart TD
-  S(["1 Search: Took"]) --> E["2 Each Took in the list"]
+  S(["1 Search by surname"]) --> E["2 Each employee in the list"]
   E --> O{"3 What does it offer?"}
   O -- "give notice" --> G["act: give notice"]
   O -- "dismiss" --> D["act: dismiss"]
@@ -191,7 +191,7 @@ flowchart TD
   </ol>
 
   <h2>The scripts</h2>
-  <p class="note">The scripts search for the test employees by their surname, Took (<code>name: Took</code>). Both written by hand, as <code>artie generate</code> would write them from a goal run: the first from one that met both states, the second from one that met only those working. Generate writing <code>when-offered</code> itself is the next build.</p>
+  <p class="note">The scripts search for the test employees by their surname, Miller (<code>name: Miller</code>). Both written by hand, as <code>artie generate</code> would write them from a goal run: the first from one that met both states, the second from one that met only those working. Generate writing <code>when-offered</code> itself is the next build.</p>
   <div class="file">artie/t5.kept.heart.yaml: a case for each state</div>
 <pre><code><span class="c"># Written by hand as artie generate would write it from a goal run that met both states (spec/PLAN-COST-FOLLOWS-</span>
 <span class="c"># STATES.md: generate writing when-offered is not built yet). Each member is moved by what the server offers it:</span>
@@ -204,8 +204,8 @@ start: http://localhost:8099/
 steps:
   - act: staff:search-employees
     fields:
-      name: Took
-    intent: Find the employees named Took
+      name: Miller
+    intent: Find the employees named Miller
     then:
       - whenever:
           - when-offered:
@@ -215,7 +215,7 @@ steps:
               - act: staff:dismiss
                 intent: Dismiss anyone on notice
                 then: []
-            intent: Move this Took one step through leaving
+            intent: Move this employee one step through leaving
             otherwise:
               - note: ${state.firstName} ${state.lastName} is left as is</code></pre>
   <div class="file">artie/t5.grow.heart.yaml: the give-notice case alone</div>
@@ -229,15 +229,15 @@ start: http://localhost:8099/
 steps:
   - act: staff:search-employees
     fields:
-      name: Took
-    intent: Find the employees named Took
+      name: Miller
+    intent: Find the employees named Miller
     then:
       - whenever:
           - when-offered:
               - act: staff:give-notice
                 intent: Give notice to anyone working
                 then: []
-            intent: Move this Took one step through leaving
+            intent: Move this employee one step through leaving
             otherwise:
               - note: ${state.firstName} ${state.lastName} is left as is</code></pre>
   <details class="src"><summary>Code mode on HAL-FORMS: its last program, at 90 employees <small>a loop it wrote, its fourth try</small></summary>
@@ -247,7 +247,7 @@ b=os.environ[&#x27;API_BASE&#x27;];t=os.environ[&#x27;API_TOKEN&#x27;]
 H={&#x27;Authorization&#x27;:&#x27;Bearer &#x27;+t}
 def g(p):
     r=urllib.request.urlopen(urllib.request.Request(b+p,headers=H));return json.load(r),r.headers[&#x27;ETag&#x27;]
-items=[];p=&#x27;/employees?name=took&#x27;
+items=[];p=&#x27;/employees?name=miller&#x27;
 while p:
     d,_=g(p);items+=d[&#x27;_links&#x27;][&#x27;item&#x27;];n=d[&#x27;_links&#x27;].get(&#x27;next&#x27;);p=n[&#x27;href&#x27;] if n else None
 res=collections.Counter();errs=[]
@@ -307,6 +307,7 @@ print(c)</code></pre>
       <ul>
         <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --arms artie-data,artie-grow,code-fresh,code-heart-noapi --tasks t5 --reps 5 --population N,N,N</code>, for N of 2, 10 and 30. Sonnet 5.5; code mode had 16 turns and the sandbox of the other runs.</li>
         <li><b>Seeding:</b> the notice release on (<code>PUT /_sim/employees/changes</code>), then each employee hired, given notice and dismissed through the service's own acts, before the measured requests.</li>
+        <li><b>Names:</b> the test employees' surname is shown here as Miller; the run files use the surname the runs were seeded with.</li>
         <li><b>Right:</b> every employee moved one step (working to on notice, on notice to dismissed), the dismissed left, and no one else touched.</li>
         <li><b>Files:</b> <code>runs/states-2.jsonl</code>, <code>runs/states-10.jsonl</code>, <code>runs/states-30.jsonl</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
         <li>The plan: spec/PLAN-COST-FOLLOWS-STATES.md. The release-through-change runs: <a href="https://claude.ai/artifact/UJjeDjCGzWTEczKcPJDFoC">Wayfinding Through Change</a>.</li>
