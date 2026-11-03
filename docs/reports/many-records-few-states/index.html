@@ -112,21 +112,21 @@ footer ul { gap: 0.2rem; }
 
 <main>
   <h1>Many Records, a Few States</h1>
-  <p class="dek">One goal over a family of records in three states. A kept script branches on what the server offers each record, so the model and the forms it needs follow the states, not the number of records.</p>
+  <p class="dek">One goal over many employees, each in one of three states. A kept script branches on what the server offers each record, so the model and the forms it needs follow the states, not the number of records.</p>
 
   <div class="short">
     <h2 style="margin-top:0">In short</h2>
     <ul>
-      <li><b>Four clients, 15 runs each:</b> 5 runs at each family size, 6, 30 and 90 Tooks. 60 runs in all, and every one moved every Took correctly.</li>
-      <li><b>ARTIE's kept script used no model at any size,</b> and fetched 3 form sets a run, one per state, for 6 Tooks or 90.</li>
+      <li><b>Four clients, 15 runs each:</b> 5 runs at each group size, 6, 30 and 90 employees. 60 runs in all, and every one moved every employee correctly.</li>
+      <li><b>ARTIE's kept script used no model at any size,</b> and fetched 3 form sets a run, one per state, for 6 employees or 90.</li>
       <li><b>Without a case for a state, the model is asked for each record in it:</b> with the give-notice case alone, 2, 10 and 30 calls. Keeping that case after the first time (not built yet) takes it back to none.</li>
-      <li><b>Code mode writes a loop,</b> so its tokens per run hardly grow with the family: about 10k on endpoints, 24k to 36k on HAL-FORMS alone. It pays them in every run, with a sandbox.</li>
+      <li><b>Code mode writes a loop,</b> so its tokens per run hardly grow with the number of employees: about 10k on endpoints, 24k to 36k on HAL-FORMS alone. It pays them in every run, with a sandbox.</li>
     </ul>
   </div>
 
   <div class="short scale">
-    <h2 style="margin-top:0">Tokens and cost: 90 Tooks a run, at scale</h2>
-    <p class="headline">At 1,000,000 runs of 90 Tooks: <b>ARTIE's kept script, no model tokens</b> after the run that found its way. Code mode: 10.2 billion on endpoints, 34.7 billion on HAL-FORMS alone.</p>
+    <h2 style="margin-top:0">Tokens and cost: 90 employees a run, at scale</h2>
+    <p class="headline">At 1,000,000 runs of 90 employees: <b>ARTIE's kept script, no model tokens</b> after the run that found its way. Code mode: 10.2 billion on endpoints, 34.7 billion on HAL-FORMS alone.</p>
     <div class="table-scroll"><table>
       <thead><tr><th>Client</th><th>Input tokens a run, measured</th><th>1,000 runs</th><th>1,000,000 runs</th><th>1,000,000 runs, priced with the cache</th><th>Model calls at 1,000,000</th><th>Sandbox at 1,000,000: start time / hosted price</th><th>Right, measured</th></tr></thead>
       <tbody>
@@ -138,7 +138,7 @@ footer ul { gap: 0.2rem; }
       </tbody>
     </table></div>
     <ul class="note">
-      <li>Projected from the 5 measured runs at 90 Tooks (their mean), not run. Every client was right in every run, so the projections hold the same rate: 100%.</li>
+      <li>Projected from the 5 measured runs at 90 employees (their mean), not run. Every client was right in every run, so the projections hold the same rate: 100%.</li>
       <li>ARTIE's kept script was written by hand: the run with the model that would find its way, once, is not in these figures. In the release runs, such a goal run took 17k to 25k tokens a task.</li>
       <li>Priced with the cache: cache reads at a tenth of the input price, cache writes at 1.25.</li>
       <li>Sandbox: about 0.24 s more to start each program in a sandbox than with none, measured here; code mode ran 4 to 7 programs a run. Hosted price at E2B's per-second rates ($0.000014 a vCPU, $0.0000045 a GiB), for 1 vCPU and 256 MB kept for the run's median time. ARTIE runs no sandbox.</li>
@@ -149,8 +149,8 @@ footer ul { gap: 0.2rem; }
   <div class="table-scroll"><table>
     <thead><tr><th>Client</th><th>What it is</th><th>The model</th><th>Sandbox</th></tr></thead>
     <tbody>
-      <tr class="us"><th>ARTIE, the kept script</th><td>The script below: search the Tooks, then for each, the first case its offer matches</td><td>never</td><td>none</td></tr>
-      <tr><th>ARTIE, one case</th><td>The same script with the give-notice case alone. A Took offering dismiss matches no case, so that step falls back to its words</td><td>once for each Took on notice</td><td>none</td></tr>
+      <tr class="us"><th>ARTIE, the kept script</th><td>The script below: search the employees, then for each, the first case its offer matches</td><td>never</td><td>none</td></tr>
+      <tr><th>ARTIE, one case</th><td>The same script with the give-notice case alone. An employee offering dismiss matches no case, so that step falls back to its words</td><td>once for each employee on notice</td><td>none</td></tr>
       <tr><th>Code mode, fresh (endpoints)</th><td>Writes Python against a library made from the service's OpenAPI description, every run</td><td>every run</td><td>every run</td></tr>
       <tr><th>Code mode, HAL-FORMS alone</th><td>Writes Python against the hypermedia, told only the address and the token; the OpenAPI description withheld</td><td>every run</td><td>every run</td></tr>
     </tbody>
@@ -160,7 +160,7 @@ footer ul { gap: 0.2rem; }
   <div class="pair">
     <div>
       <div class="table-scroll"><table>
-        <thead><tr><th>A Took's state</th><th>What the server offers</th></tr></thead>
+        <thead><tr><th>An employee's state</th><th>What the server offers</th></tr></thead>
         <tbody>
           <tr><th>working</th><td>give notice, update</td></tr>
           <tr><th>on notice</th><td>dismiss, update</td></tr>
@@ -169,8 +169,8 @@ footer ul { gap: 0.2rem; }
       </table></div>
     </div>
     <div>
-      <p><b>The goal:</b> "Move every Took one step through leaving: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are."</p>
-      <p class="note">The employees service with its notice release. Before each run the family is seeded through the service's own acts: as many working, on notice and dismissed.</p>
+      <p><b>The goal, as every client was given it:</b> "Move every Took one step through leaving: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are." (Took is the surname every test employee was given, so a search by it finds them all.)</p>
+      <p class="note">The employees service with its notice release. Before each run the test employees are seeded through the service's own acts: as many working, on notice and dismissed.</p>
     </div>
   </div>
 
@@ -186,12 +186,12 @@ flowchart TD
   <ol class="notes">
     <li>One search, as the server offers it, by name.</li>
     <li><code>whenever</code> visits each member of the list, by its link.</li>
-    <li><code>when-offered</code> takes the first case whose act the Took offers now. The server decided its state; the script only reads the offer.</li>
-    <li>A Took that offers none of the cases takes <code>otherwise</code>, with no model.</li>
+    <li><code>when-offered</code> takes the first case whose act the employee offers now. The server decided its state; the script only reads the offer.</li>
+    <li>An employee that offers none of the cases takes <code>otherwise</code>, with no model.</li>
   </ol>
 
   <h2>The scripts</h2>
-  <p class="note">Both written by hand, as <code>artie generate</code> would write them from a goal run: the first from one that met both states, the second from one that met only those working. Generate writing <code>when-offered</code> itself is the next build.</p>
+  <p class="note">The scripts search for the test employees by their surname, Took (<code>name: Took</code>). Both written by hand, as <code>artie generate</code> would write them from a goal run: the first from one that met both states, the second from one that met only those working. Generate writing <code>when-offered</code> itself is the next build.</p>
   <div class="file">artie/t5.kept.heart.yaml: a case for each state</div>
 <pre><code><span class="c"># Written by hand as artie generate would write it from a goal run that met both states (spec/PLAN-COST-FOLLOWS-</span>
 <span class="c"># STATES.md: generate writing when-offered is not built yet). Each member is moved by what the server offers it:</span>
@@ -240,7 +240,7 @@ steps:
             intent: Move this Took one step through leaving
             otherwise:
               - note: ${state.firstName} ${state.lastName} is left as is</code></pre>
-  <details class="src"><summary>Code mode on HAL-FORMS: its last program, at 90 Tooks <small>a loop it wrote, its fourth try</small></summary>
+  <details class="src"><summary>Code mode on HAL-FORMS: its last program, at 90 employees <small>a loop it wrote, its fourth try</small></summary>
     <div class="in">
 <pre><code>import os,urllib.request,json,collections
 b=os.environ[&#x27;API_BASE&#x27;];t=os.environ[&#x27;API_TOKEN&#x27;]
@@ -268,7 +268,7 @@ c=collections.Counter()
 for i in items: c[g(i[&#x27;href&#x27;])[0][&#x27;status&#x27;]]+=1
 print(c)</code></pre>
       <ul>
-        <li>It decides each Took's state from its <code>status</code> member, then takes the matching form's target and method from <code>_templates</code>, with the ETag it read.</li>
+        <li>It decides each employee's state from its <code>status</code> member, then takes the matching form's target and method from <code>_templates</code>, with the ETag it read.</li>
         <li>Its earlier programs in the run wrote without <code>If-Match</code> (428) or dismissed with the wrong method (405); the server refused them, and nothing wrong was written.</li>
       </ul>
     </div>
@@ -277,7 +277,7 @@ print(c)</code></pre>
   <h2>Results</h2>
   <h3>The model, per run (median of 5)</h3>
   <div class="table-scroll"><table>
-    <thead><tr><th>Client</th><th>6 Tooks</th><th>30 Tooks</th><th>90 Tooks</th></tr></thead>
+    <thead><tr><th>Client</th><th>6 employees</th><th>30 employees</th><th>90 employees</th></tr></thead>
     <tbody>
       <tr class="us"><th>ARTIE, the kept script</th><td>0 tokens, 0 calls</td><td>0 tokens, 0 calls</td><td>0 tokens, 0 calls</td></tr>
       <tr><th>ARTIE, one case</th><td>2,544 tokens, 2 calls</td><td>12,720 tokens, 10 calls</td><td>38,160 tokens, 30 calls</td></tr>
@@ -287,7 +287,7 @@ print(c)</code></pre>
   </table></div>
   <h3>The wire and the time, per run (median of 5)</h3>
   <div class="table-scroll"><table>
-    <thead><tr><th>Client</th><th>Form sets fetched</th><th>Requests: 6 / 30 / 90 Tooks</th><th>Seconds: 6 / 30 / 90 Tooks</th><th>Refused by the server, 5 runs at 90</th></tr></thead>
+    <thead><tr><th>Client</th><th>Form sets fetched</th><th>Requests: 6 / 30 / 90 employees</th><th>Seconds: 6 / 30 / 90 employees</th><th>Refused by the server, 5 runs at 90</th></tr></thead>
     <tbody>
       <tr class="us"><th>ARTIE, the kept script</th><td>3 at every size: one per state</td><td>28 / 110 / 313</td><td>1.3 / 1.8 / 3.2</td><td>0</td></tr>
       <tr><th>ARTIE, one case</th><td>3 at every size</td><td>28 / 110 / 313</td><td>5.3 / 25.4 / 75.1</td><td>0</td></tr>
@@ -296,18 +296,18 @@ print(c)</code></pre>
     </tbody>
   </table></div>
   <ul>
-    <li><b>The cost follows the states, not the records.</b> Tooks in the same state share one form set, fetched once a run; the kept script asks no model at any size.</li>
+    <li><b>The cost follows the states, not the records.</b> Employees in the same state share one form set, fetched once a run; the kept script asks no model at any size.</li>
     <li><b>A state with no case costs a model call per record.</b> That is what keeping a new case once is for: the one-case run would then cost 1 call, then none.</li>
-    <li><b>Requests grow with the records for every client.</b> ARTIE reads each Took and returns to the list, revalidating as it goes; code mode on endpoints reads less.</li>
-    <li><b>At 1,000 runs of 90 Tooks,</b> projected: code mode about 10 million tokens on endpoints and 35 million on HAL-FORMS alone; ARTIE's kept script none, after the run that found its way.</li>
+    <li><b>Requests grow with the records for every client.</b> ARTIE reads each employee and returns to the list, revalidating as it goes; code mode on endpoints reads less.</li>
+    <li><b>At 1,000 runs of 90 employees,</b> projected: code mode about 10 million tokens on endpoints and 35 million on HAL-FORMS alone; ARTIE's kept script none, after the run that found its way.</li>
   </ul>
 
   <details class="src"><summary>How it was run <small>bench, seeding, files</small></summary>
     <div class="in">
       <ul>
         <li><b>Bench:</b> <code>exhibits/mcp-over-openapi/bench.py --arms artie-data,artie-grow,code-fresh,code-heart-noapi --tasks t5 --reps 5 --population N,N,N</code>, for N of 2, 10 and 30. Sonnet 5.5; code mode had 16 turns and the sandbox of the other runs.</li>
-        <li><b>Seeding:</b> the notice release on (<code>PUT /_sim/employees/changes</code>), then each Took hired, given notice and dismissed through the service's own acts, before the measured requests.</li>
-        <li><b>Right:</b> every Took moved one step (working to on notice, on notice to dismissed), the dismissed left, and no one else touched.</li>
+        <li><b>Seeding:</b> the notice release on (<code>PUT /_sim/employees/changes</code>), then each employee hired, given notice and dismissed through the service's own acts, before the measured requests.</li>
+        <li><b>Right:</b> every employee moved one step (working to on notice, on notice to dismissed), the dismissed left, and no one else touched.</li>
         <li><b>Files:</b> <code>runs/states-2.jsonl</code>, <code>runs/states-10.jsonl</code>, <code>runs/states-30.jsonl</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
         <li>The plan: spec/PLAN-COST-FOLLOWS-STATES.md. The release-through-change runs: <a href="https://claude.ai/artifact/UJjeDjCGzWTEczKcPJDFoC">Wayfinding Through Change</a>.</li>
       </ul>
@@ -319,7 +319,7 @@ print(c)</code></pre>
       <ul>
         <li>ARTIE's kept scripts were written by hand; the cost of the goal run that would find the way is not in these figures.</li>
         <li>One service, one model, one goal; 5 runs per size.</li>
-        <li>The family is seeded the same way each run, so each run meets the same states in the same proportions.</li>
+        <li>The test employees are seeded the same way each run, so each run meets the same states in the same proportions.</li>
       </ul>
     </div>
   </details>
