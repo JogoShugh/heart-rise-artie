@@ -94,6 +94,10 @@ details.src .in > ul { font-size: 0.92rem; line-height: 1.55; }
 .diagram pre.mermaid { background: none; padding: 0; margin: 0; max-height: none; font: 0.85rem/1.4 var(--body); text-align: center; }
 ol.notes { font-size: 0.88rem; line-height: 1.5; gap: 0.25rem; color: var(--muted); }
 ol.notes b { color: var(--fg); }
+.scale { display: grid; gap: 0.7rem; }
+.scale .headline { font-family: var(--display); font-size: 1.15rem; line-height: 1.45; }
+.scale .table-scroll { background: var(--bg); }
+.scale tr.us th, .scale tr.us td { background: var(--leaf-bg); color: var(--leaf); font-weight: 600; }
 .stack { display: grid; gap: 0.6rem; }
 footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
 footer ul { gap: 0.2rem; }
@@ -109,6 +113,30 @@ footer ul { gap: 0.2rem; }
 <main>
   <h1>Wayfinding Through Change</h1>
   <p class="dek">One business process, run again and again while the service changes under it. Two architectures: a bag of endpoints, where a model writes code against operations, and hypermedia, where a client follows the controls the server offers. Two places for the model: in the middle of every run, or at the edges, to find the way once and to repair after a change.</p>
+
+  <div class="short scale">
+    <h2 style="margin-top:0">At 100 and 1,000 runs</h2>
+    <p class="headline">At 1,000 runs: <b>ARTIE 46,864 input tokens</b>, the same as at 20. Code mode: <b>7.9 to 32.8 million</b>.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>20 runs, measured</th><th>100 runs</th><th>1,000 runs</th><th>1,000 runs, priced with the cache</th><th>Model calls at 1,000</th><th>Sandbox runs at 1,000</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE as data</th><td>46,864</td><td>46,864</td><td>46,864</td><td>18,115</td><td>20</td><td>0</td></tr>
+        <tr><th>Code mode, fresh (endpoints)</th><td>158,995</td><td>794,975</td><td>7,949,750</td><td>1,755,872</td><td>4,950</td><td>1,000</td></tr>
+        <tr><th>Code mode on HEART, HAL-FORMS alone</th><td>316,303</td><td>1,581,515</td><td>15,815,150</td><td>6,189,322</td><td>6,500</td><td>1,000</td></tr>
+        <tr><th>Code mode on HEART, as it answers</th><td>456,893</td><td>2,284,465</td><td>22,844,650</td><td>8,491,332</td><td>6,300</td><td>1,000</td></tr>
+        <tr><th>Code mode on HEART, HSF</th><td>460,370</td><td>2,301,850</td><td>23,018,500</td><td>8,943,585</td><td>7,000</td><td>1,000</td></tr>
+        <tr><th>Code mode on HEART, L2, 16 turns</th><td>656,688</td><td>3,283,440</td><td>32,834,400</td><td>11,147,508</td><td>8,500</td><td>1,000</td></tr>
+        <tr><th>Code mode, saved</th><td>16,004</td><td>16,004</td><td>16,004</td><td>2,717</td><td>10</td><td>1,000</td></tr>
+      </tbody>
+    </table></div>
+    <ul class="note">
+      <li>Projected from the measured runs, not run: the same two tasks, and one release in the period, as here.</li>
+      <li>Code mode finds its way in every run, so its measured cost per run is paid each time.</li>
+      <li>ARTIE pays once: its wayfinding (one goal run per task, 42,483) and the first run after the release (4,381). Its kept runs use no model. Each further release adds about one repair, 4.4k.</li>
+      <li>Saved code mode costs nothing more, and was wrong in every run after the release.</li>
+      <li>Priced with the cache: cache reads at a tenth of the input price and cache writes at 1.25, as these runs used them.</li>
+    </ul>
+  </div>
 
   <div class="short">
     <h2 style="margin-top:0">In short</h2>
