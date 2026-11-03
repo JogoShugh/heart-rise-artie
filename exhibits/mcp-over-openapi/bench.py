@@ -103,13 +103,14 @@ def sim(method, path, **kwargs):
 
 
 MEDDLE = {"on": False}
+SEQUENCE = {"on": False}
 
 
 def interfere(task, offset):
     """Someone else changes Frodo once the client has read him: by the sim, right after the read (certain, for any
     client), or by a thread that watches the log (a model's pause lets it in; a script's milliseconds may not)."""
-    if task not in INTERFERED or github(task):
-        return None
+    if task not in INTERFERED or github(task) or (SEQUENCE["on"] and not MEDDLE["on"]):
+        return None  # in --sequence, a run with no teammate has none
     if MEDDLE["on"]:
         sim("PUT", "/_sim/employees/meddle", json={"employee": 1, "role": INTERFERED_ROLE}).raise_for_status()
         return None
@@ -705,6 +706,7 @@ def main():
     CHANGE["names"] = ALL_CHANGES if args.changes == "all" else args.changes
     CHANGE["when"] = args.when
     MEDDLE["on"] = args.meddle
+    SEQUENCE["on"] = args.sequence
     DAM["rungs"] = args.dam
     (HERE / "runs").mkdir(exist_ok=True)
     out = Path(args.out or HERE / f"runs/{datetime.now().strftime('%Y%m%d-%H%M%S')}.jsonl")
