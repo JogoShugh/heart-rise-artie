@@ -754,6 +754,286 @@ def run_code(model, arm, task, max_turns, api):
     }
 
 
+# ---- Two more ways to keep code mode's work (spec/ideas/code-mode-runs-artie.md) ----
+# code-skill: code mode at its best keeping, as Anthropic's "Code execution with MCP" and Agent Skills describe it.
+# The model saves working code as a skill, a function taking the values a person would change, with a SKILL.md;
+# a later run reads the skill, fills its arguments and runs it, and writes programs again only if it fails.
+# code-artie: code mode with ARTIE, in its own container, as its one tool. The model writes no program: it gives
+# ARTIE a goal in plain words once, ARTIE finds the way and keeps it as a .heart.yaml, and later runs run that.
+
+SKILLS = HERE / "runs/codemode/skills"
+SKILL_TOLD = (
+    "\n\nWhen programs have done the task, save the work as a skill with save_skill, so that the next time the task "
+    "is asked it is run again rather than written again: a module whose run(**arguments) does the whole task, "
+    "taking as arguments the values a person would change, looking up IDs and ETags each time rather than writing "
+    "them in, and raising an exception on any status it did not expect, so that a failure shows. Give it a SKILL.md "
+    "saying what it does and its arguments. Saved skills are listed with the task: if one fits, run it with "
+    "run_skill and its arguments, and write programs only if it fails; then save the skill again."
+)
+SAVE_SKILL = {
+    "name": "save_skill",
+    "description": "Save a skill for later runs: its SKILL.md and a Python module defining run(**arguments), which "
+                   "runs in the sandbox with `import api` available.",
+    "input_schema": {"type": "object", "properties": {
+        "name": {"type": "string", "description": "a short name, lower case with hyphens"},
+        "skill_md": {"type": "string", "description": "what the skill does, and its arguments"},
+        "code": {"type": "string", "description": "the module, defining run(**arguments)"}},
+        "required": ["name", "skill_md", "code"]},
+}
+RUN_SKILL = {
+    "name": "run_skill",
+    "description": "Run a saved skill in the sandbox: run(**arguments). Returns its exit code, its standard output "
+                   "and its standard error.",
+    "input_schema": {"type": "object", "properties": {
+        "name": {"type": "string"}, "arguments": {"type": "object"}}, "required": ["name", "arguments"]},
+}
+
+ARTIE_WORK = HERE / "runs/code-artie"
+ARTIE_IMAGE = "eclipse-temurin:25-jre-alpine"
+CODE_ARTIE_SYSTEM = (
+    "You work an employee records service through ARTIE, a generic client for hypermedia services, which runs in "
+    "its own container. ARTIE enters at the service's address and follows the links and forms the service offers; "
+    "it knows nothing else about the service. You have two tools. artie_find gives ARTIE a goal in plain words: it "
+    "does the goal with its own model, then keeps the way it found as a script under the name you give, held to "
+    "the forms the service offered. artie_run runs a kept script with no model; if a form it uses has changed, the "
+    "step falls back to its words and the repair is kept. Both answer ARTIE's exit code, what it did, and where it "
+    "ended with what was true there, so there is no need to look again after them. artie_look reads one address "
+    "the service has handed ARTIE, a bookmark, with no model. Kept scripts are listed with the task: if one does "
+    "the task, run it; use artie_find for a task no kept script does, or after a kept script failed. The person who "
+    "asked is away, so do not ask questions. When you are done, say what happened in one or two sentences."
+)
+ARTIE_FIND = {
+    "name": "artie_find",
+    "description": "ARTIE does the goal with its own model and keeps the way it found as a script named name.",
+    "input_schema": {"type": "object", "properties": {
+        "name": {"type": "string", "description": "a short name for the kept script, lower case with hyphens"},
+        "goal": {"type": "string", "description": "the goal, in plain words"}}, "required": ["name", "goal"]},
+}
+ARTIE_RUN = {
+    "name": "artie_run",
+    "description": "Run the kept script named name, with no model unless a form it uses has changed.",
+    "input_schema": {"type": "object", "properties": {"name": {"type": "string"}}, "required": ["name"]},
+}
+# A bookmark is any address the service handed over (a link, a form's target, a Location), not only its root: ARTIE
+# enters there and reads what is true and what is offered, with no model. One it was never handed, it won't read.
+ARTIE_LOOK = {
+    "name": "artie_look",
+    "description": "Read one address the service has handed ARTIE in an earlier run: what is true there now, and "
+                   "what it offers. No model.",
+    "input_schema": {"type": "object", "properties": {"address": {"type": "string"}}, "required": ["address"]},
+}
+
+
+def named(name):
+    return re.sub(r"[^a-z0-9-]+", "-", str(name).lower()).strip("-") or "task"
+
+
+def tool_turns(model, api, system, opening, tools, handle, max_turns):
+    """The model calling [tools] until it says it is done; [handle] answers each call with its text and exit."""
+    messages = [{"role": "user", "content": opening}]
+    calls, final_text = [], None
+    for _ in range(max_turns):
+        t0 = time.time()
+        answer = api.messages.create(model=model, max_tokens=4096, system=system, tools=cached(tools),
+                                     messages=marked(messages))
+        calls.append({**usage_of(answer.usage), "ms": int((time.time() - t0) * 1000), "stop": answer.stop_reason})
+        messages.append({"role": "assistant", "content": [b.model_dump(exclude_none=True) for b in answer.content]})
+        uses = [b for b in answer.content if b.type == "tool_use"]
+        if not uses:
+            final_text = "\n".join(b.text for b in answer.content if b.type == "text")
+            break
+        results = []
+        for use in uses:
+            text, failed = handle(use)
+            results.append({"type": "tool_result", "tool_use_id": use.id, "is_error": failed, "content": text})
+        messages.append({"role": "user", "content": results})
+    return calls, final_text
+
+
+def skill_program(code, arguments):
+    """The saved module, then a call of its run with [arguments]."""
+    return f"{code}\n\nif __name__ == '__main__':\n    import json\n    run(**json.loads({json.dumps(arguments)!r}))\n"
+
+
+def run_code_skill(model, task, max_turns, api):
+    setup(task)
+    offset = len(log())
+    interferer = interfere(task, offset)
+    if interferer:
+        interferer.start()
+    change = change_under(offset)
+    started = time.time()
+    SANDBOX.update(service=SANDBOX_SERVICE, doc=False)
+    library, docs = api_library(openapi_spec())
+    system = CODE_SYSTEM + docs + SKILL_TOLD
+    saved = sorted(SKILLS.glob("*/SKILL.md"))
+    opening = TASKS[task]["text"]
+    if saved:
+        opening += "\n\nSaved skills:\n\n" + "\n\n".join(f"## {p.parent.name}\n{p.read_text()}" for p in saved)
+    programs, skill_runs, skills_saved = [], [], []
+
+    def handle(use):
+        if use.name == "save_skill":
+            folder = SKILLS / named(use.input.get("name"))
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / "SKILL.md").write_text(use.input.get("skill_md", ""))
+            (folder / "skill.py").write_text(use.input.get("code", ""))
+            skills_saved.append(folder.name)
+            return f"saved {folder.name}", False
+        if use.name == "run_skill":
+            source = SKILLS / named(use.input.get("name")) / "skill.py"
+            if not source.exists():
+                return f"no skill named {use.input.get('name')}", True
+            arguments = use.input.get("arguments") or {}
+            exit_, out, err = sandboxed(skill_program(source.read_text(), arguments), library)
+            skill_runs.append({"name": source.parent.name, "arguments": arguments, "exit": exit_})
+        else:
+            code = use.input.get("code", "")
+            exit_, out, err = sandboxed(code, library)
+            programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
+                             "lines": code.count("\n") + 1, "code": code})
+        return f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}", exit_ != 0
+
+    tools = [RUN_PROGRAM, SAVE_SKILL] + ([RUN_SKILL] if saved else [])
+    calls, final_text = tool_turns(model, api, system, opening, tools, handle, max_turns)
+    return finished_record(model, "code-skill", task, started, offset, interferer, change, calls, final_text, {
+        "programs": programs, "skill_runs": skill_runs, "skills_saved": skills_saved,
+        "tool_calls": len(programs) + len(skill_runs), "sandbox_runs": len(programs) + len(skill_runs),
+        "tool_errors": sum(p["exit"] != 0 for p in programs + skill_runs)})
+
+
+def artie_in_container(arguments, model):
+    """ARTIE, run in its own container on the service's network, so the service is at localhost: the one place
+    ARTIE sends a credential over plain HTTP. It holds the model key; no model-written code runs beside it."""
+    command = ["docker", "run", "--rm", "--network", "container:heart-sims-tt", "-e", "ANTHROPIC_API_KEY",
+               "-e", f"{TOKEN_VARIABLE}={TOKEN}", "-v", f"{ARTIE.resolve().parent.parent}:/artie:ro",
+               "-v", f"{ARTIE_WORK.resolve()}:/work", "-w", "/work/kept", ARTIE_IMAGE, "/artie/bin/artie"]
+    done = subprocess.run(command + arguments, capture_output=True, text=True, timeout=900)
+    return done.returncode, (done.stdout + done.stderr).strip()
+
+
+def trace_docs(trace):
+    path = ARTIE_WORK / "traces" / trace
+    return [d or {} for d in yaml.safe_load_all(path.read_text())] if path.exists() else []
+
+
+def artie_usage(trace):
+    """The model usage ARTIE's own run wrote in its trace."""
+    docs = trace_docs(trace)
+    return ((docs[0] if docs else {}).get("run") or {}).get("usage") or {}
+
+
+def ended(trace):
+    """What ARTIE's last act left, where, and what it offers then; or, for a run with no act, what it read."""
+    docs = [d for d in trace_docs(trace) if (d.get("now") or {}).get("state") is not None]
+    acted = [d for d in docs if (d.get("chose") or {}).get("kind") == "form"]
+    last = (acted or docs or [None])[-1]
+    if not last:
+        return ""
+    now_ = last["now"]
+    state = json.dumps(now_["state"])
+    state = state if len(state) <= 1500 else state[:1500] + " …"
+    where = "After its last act" if acted else "Read"
+    return f"\n{where}, at {last.get('address')}: {state}; offered: {', '.join(now_.get('forms') or []) or 'nothing'}"
+
+
+def handed_addresses():
+    """Every address the service has handed ARTIE in its runs here."""
+    seen = set()
+    for path in (ARTIE_WORK / "traces").glob("*.yaml"):
+        for doc in trace_docs(path.name):
+            for address in (doc.get("address"), (doc.get("chose") or {}).get("address")):
+                if address:
+                    seen.add(str(address))
+    return seen
+
+
+def run_code_artie(model, task, max_turns, api):
+    setup(task)
+    offset = len(log())
+    interferer = interfere(task, offset)
+    if interferer:
+        interferer.start()
+    change = change_under(offset)
+    started = time.time()
+    kept_dir = ARTIE_WORK / "kept"
+    kept_dir.mkdir(parents=True, exist_ok=True)
+    (ARTIE_WORK / "traces").mkdir(exist_ok=True)
+    kept = sorted(kept_dir.glob("*.heart.yaml"))
+    opening = TASKS[task]["text"]
+    if kept:
+        words = {p: (kept_dir / p.name.replace(".heart.yaml", ".goal.md")).read_text().split("---", 2)[-1].strip()
+                 for p in kept}
+        opening += "\n\nKept scripts:\n" + "\n".join(f"- {p.name[:-len('.heart.yaml')]}: {w}" for p, w in words.items())
+    artie_calls, inner = [], []
+
+    def handle(use):
+        name = named(use.input.get("name"))
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        trace = f"{name}-{stamp}.yaml"
+        reasoned = ["--reasoner", "claude", "--model", model, "--trace", f"../traces/{trace}"]
+        if use.name == "artie_find":
+            (kept_dir / f"{name}.goal.md").write_text(
+                f"---\nstart: {BASE}/\nlimits: {{ moves: 100 }}\n---\n\n{use.input.get('goal', '').strip()}\n")
+            # The goal run reads at L2; a kept script reads at its lock file's rung, as artie run does by itself.
+            exit_, out = artie_in_container(["run", f"{name}.goal.md", "--rung", "L2"] + reasoned, model)
+            if exit_ == 0:
+                made, said = artie_in_container(["generate", f"../traces/{trace}", "--out", f"{name}.heart.yaml",
+                                                 "--format", "yaml", "--script", f"{name}.goal.md"], model)
+                (kept_dir / f"{name}.config.yaml").write_text("on-change: intent\nkeep: auto\n")
+                out += f"\n\nartie generate (exit {made}):\n{said}"
+        elif use.name == "artie_look":
+            address = str(use.input.get("address", ""))
+            if address not in handed_addresses():
+                return f"ARTIE reads only an address the service has handed it; it was never handed {address}", True
+            looks = ARTIE_WORK / "looks"
+            looks.mkdir(exist_ok=True)
+            (looks / f"look-{stamp}.heart.yaml").write_text(f"heart: 1\nkind: kept\nstart: {address}\nsteps: []\n")
+            exit_, out = artie_in_container(["run", f"../looks/look-{stamp}.heart.yaml", "--rung", "L2",
+                                             "--trace", f"../traces/{trace}"], model)
+        elif (kept_dir / f"{name}.heart.yaml").exists():
+            exit_, out = artie_in_container(["run", f"{name}.heart.yaml"] + reasoned, model)
+        else:
+            return f"no kept script named {name}", True
+        usage = artie_usage(trace)
+        inner.append({"input": usage.get("input", 0), "output": usage.get("output", 0),
+                      "cache_read": usage.get("cache_read", 0), "cache_write": usage.get("cache_write", 0),
+                      "calls": usage.get("calls", 0)})
+        artie_calls.append({"tool": use.name, "name": name, "exit": exit_, "trace": trace, "model_calls": usage.get("calls", 0)})
+        lines = out.splitlines()
+        shown = "\n".join(lines[-40:]) if len(lines) > 40 else out
+        return f"exit {exit_}\n{shown}{ended(trace)}", exit_ != 0
+
+    tools = [ARTIE_FIND, ARTIE_RUN, ARTIE_LOOK]
+    calls, final_text = tool_turns(model, api, CODE_ARTIE_SYSTEM, opening, tools, handle, max_turns)
+    outer = totals(calls)
+    artie_total = totals(inner)
+    return finished_record(model, "code-artie", task, started, offset, interferer, change, calls + inner, final_text, {
+        "outer": outer, "artie": {**artie_total, "model_calls": sum(i["calls"] for i in inner)},
+        "model_calls": outer["model_calls"] + sum(i["calls"] for i in inner),
+        "artie_calls": artie_calls, "programs": [], "tool_calls": len(artie_calls), "sandbox_runs": 0,
+        "tool_errors": sum(a["exit"] != 0 for a in artie_calls)})
+
+
+def finished_record(model, arm, task, started, offset, interferer, change, calls, final_text, more):
+    if interferer:
+        interferer.stopped.set()
+    if change:
+        change.stopped.set()
+    requests = requests_since(offset)
+    held = everyone()
+    return {
+        "change": CHANGE["names"] or None, "when": CHANGE["when"] if CHANGE["names"] else None,
+        "changed_at": change.fired if change else None,
+        "at": now(), "model": model, "arm": arm, "task": task, "seconds": round(time.time() - started, 1),
+        "tools_offered": None, "tool_definition_tokens": None, **totals(calls), "calls": calls,
+        "tools": None, "http": len(requests), "http_4xx": sum(400 <= r["status"] < 500 for r in requests),
+        "requests": requests,
+        "interfered": interferer.fired if interferer else ({"by": "meddle"} if MEDDLE["on"] and task in INTERFERED else None),
+        "check": check(task, held, final_text), "final_text": final_text, "error": None, **more,
+    }
+
+
 # ---- ARTIE, native: a goal run with the reasoner, or a script with no model ----
 
 ARTIE = HERE / "../../client/artie-cli/build/install/artie/bin/artie"
@@ -850,8 +1130,12 @@ def main():
                 if arm == "artie-kept" and not (HERE / "artie" / f"{task}.kept.kts").exists():
                     continue  # kept only from a goal run that acted: task 2's acted on nothing
                 try:
-                    if arm.startswith("code-"):
-                        turns = 16 if task == "t5" else ARM_TURNS.get(arm, min(args.max_turns, 8))
+                    turns = 16 if task == "t5" else ARM_TURNS.get(arm, min(args.max_turns, 8))
+                    if arm == "code-skill":
+                        record = run_code_skill(args.model, task, turns, api)
+                    elif arm == "code-artie":
+                        record = run_code_artie(args.model, task, turns, api)
+                    elif arm.startswith("code-"):
                         record = run_code(args.model, arm, task, turns, api)
                     elif arm.startswith("artie-"):
                         record = run_artie(args.model, arm, task)
