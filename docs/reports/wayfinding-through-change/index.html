@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Code Mode Against ARTIE</title>
+<title>Wayfinding Through Change</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,54 +103,50 @@ footer ul { gap: 0.2rem; }
 </div></div>
 
 <main>
-  <h1>Code Mode Against ARTIE</h1>
-  <p class="dek">Two tasks, ten runs each, while a teammate changes a record and a release renames a field. Code mode has a model write a program each run, or saves one and replays it. ARTIE does the task once with a model, keeps it as data, and replays it held to the server's controls.</p>
+  <h1>Wayfinding Through Change</h1>
+  <p class="dek">One business process, run again and again while the service changes under it. Two architectures: a bag of endpoints, where a model writes code against operations, and hypermedia, where a client follows the controls the server offers. Two places for the model: in the middle of every run, or at the edges, to find the way once and to repair after a change.</p>
 
   <div class="short">
     <h2 style="margin-top:0">In short</h2>
     <ul>
-      <li><b>Three clients, one model (Sonnet 5.5), one service.</b> Code mode was steelmanned: a Python library built from the service's OpenAPI description, with <code>If-Match</code> on every write; a locked-down sandbox; up to 5 turns.</li>
-      <li><b>ARTIE as data: 20 of 20, on 17,524 input tokens.</b> Runs 1 to 6 used no model, including the teammate's change. After the rename, its pins caught the changed forms before any write, and it fell back to its words with the model.</li>
-      <li><b>Fresh code mode: 20 of 20, on 158,995 input tokens.</b> About 9 times ARTIE's, with a model and a sandbox every run, and 27 different programs across 20 runs.</li>
-      <li><b>Saved code mode: 12 of 20.</b> After the rename, all 8 runs were wrong and each exited 0. The programs printed the service's 422 and carried on, so nothing wrote them again. In t1 it dismissed Bilbo without hiring Samwise.</li>
-      <li><b>No client wrote over the teammate's change.</b> Code mode read Frodo a second time, after the teammate, so its write was current. ARTIE read once; its write was refused 412, and <code>decide</code> read again and wrote on the teammate's role.</li>
-      <li><b>ARTIE needs no sandbox.</b> It runs no code a model wrote: its script is data in a closed vocabulary, and the model's part is a choice among the forms offered now.</li>
-      <li><b>What ARTIE paid instead:</b> a goal run with the model, once per task (42,483 tokens, before these runs), and more HTTP requests (281 against 114), most of them forms, schemas and 304 revalidations.</li>
+      <li><b>The question:</b> as a service evolves, which architecture keeps a repeated process right, safe and auditable, and where must the model sit for that?</li>
+      <li><b>Wayfinding.</b> From endpoints, the client builds every address itself. Code mode worked the way out again each run (27 programs for two tasks), or froze it (saved programs with employee IDs and an ETag written in). From hypermedia, ARTIE's kept script follows what the server hands it: the search's <code>item</code> link titled "Bilbo Baggins", the new employee's <code>Location</code>.</li>
+      <li><b>Evolution.</b> A release renamed a field. The frozen code broke silently, 8 runs of 8, each exit 0. Fresh code adapted by reading the whole description again every run. ARTIE's pins noticed the changed form before any write, and the model repaired that one step.</li>
+      <li><b>Controls.</b> The endpoint side had no conditional writes until we added them to its OpenAPI twin, and using them stays the client's choice. The HEART side offers its controls with the state: the forms allowed now, an ETag, a 412 when stale. No client wrote over the teammate.</li>
+      <li><b>Security.</b> Code mode ran model-written code every run, so it needed a sandbox every run. ARTIE ran none: its script is data in a closed vocabulary.</li>
+      <li><b>Compliance.</b> ARTIE's process is one kept script a person can review and diff, pinned to the server's forms, with a trace of every refusal and its reason. Code mode's was 27 different programs.</li>
+      <li><b>The model at the edges.</b> ARTIE called it once per task to find the way, and after the release to repair: 8 runs of 20. Code mode called it in every fresh run. The tokens follow: 17,524 against 158,995, plus 42,483 once for ARTIE's wayfinding.</li>
+      <li><b>Repaired, not yet kept.</b> ARTIE repaired in memory on every run after the release; its kept script and pins were not rewritten. Keeping the repair is the next step for self-repair.</li>
     </ul>
   </div>
 
-  <h2>The three clients</h2>
+  <h2>Two architectures, three clients</h2>
   <div class="table-scroll"><table>
-    <thead><tr><th>Client</th><th>Each run</th><th>Model</th><th>Sandbox</th></tr></thead>
+    <thead><tr><th>Client</th><th>Architecture</th><th>How it finds its way</th><th>Who holds the controls</th><th>Where the model sits</th></tr></thead>
     <tbody>
-      <tr><th>Code mode, fresh</th><td>The model writes Python against <code>import api</code>, one function per operation; the sandbox runs it; the model reads the output and may write again, up to 5 turns</td><td>every run</td><td>every run</td></tr>
-      <tr><th>Code mode, saved</th><td>The programs that finished in run 1, run again in order. A program that exits nonzero sends the model back to write anew from the error</td><td>only on failure</td><td>every run</td></tr>
-      <tr><th>ARTIE as data</th><td><code>artie run t1.kept.heart.yaml</code>: the kept script, held to its pins before every act. A changed form falls back to that step's words (<code>on-change: intent</code>)</td><td>only on change</td><td>none</td></tr>
+      <tr><th>Code mode, fresh</th><td>endpoints: the OpenAPI twin</td><td>The model reads every operation and writes a program, each run</td><td>The client: it sends <code>If-Match</code> if it chooses to</td><td>the middle of every run</td></tr>
+      <tr><th>Code mode, saved</th><td>endpoints</td><td>The programs from run 1, with the way frozen in them</td><td>The client, as written in run 1</td><td>run 1; again only if a program exits nonzero</td></tr>
+      <tr><th>ARTIE as data</th><td>hypermedia: HEART</td><td>The kept script follows the links and forms offered now, by relation and title</td><td>The server: what is offered now, ETags, refusals with reasons. ARTIE holds its script to its pins</td><td>the edges: once to find the way; again only to repair a changed step</td></tr>
     </tbody>
   </table></div>
-  <p class="note">Same task words for all three. t1: "Hire Samwise Gamgee as a gardener. Then change Samwise's role to "gardener, mayor". Then dismiss Bilbo Baggins." t3: "Frodo Baggins is retiring: add ", retired" to the end of his current role, keeping the rest of it as it is."</p>
+  <ul class="note">
+    <li>One service, the same operations on both sides: heart-sims' employees service, its HEART side for ARTIE and its OpenAPI twin for code mode. One model, Sonnet 5.5. The same task words.</li>
+    <li>t1: "Hire Samwise Gamgee as a gardener. Then change Samwise's role to "gardener, mayor". Then dismiss Bilbo Baggins." t3: "Frodo Baggins is retiring: add ", retired" to the end of his current role, keeping the rest of it as it is."</li>
+    <li>Code mode steelmanned: a Python library made from the description on each run, <code>If-Match</code> wherever the description offers it, a locked-down sandbox, up to 5 turns.</li>
+  </ul>
 
-  <h2>Results, 20 runs each</h2>
+  <h2>Wayfinding</h2>
   <div class="table-scroll"><table>
     <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
     <tbody>
-      <tr><th>Right</th><td class="ok">20 / 20</td><td class="bad">12 / 20</td><td class="ok">20 / 20</td></tr>
-      <tr><th>Input tokens, cached or not</th><td>158,995</td><td>16,004 (run 1 only)</td><td>17,524 (renamed runs only)</td></tr>
-      <tr><th>Output tokens</th><td>10,411</td><td>974</td><td>2,000</td></tr>
-      <tr><th>Model calls</th><td>99</td><td>10</td><td>12</td></tr>
-      <tr><th>Runs that needed the model</th><td>20</td><td>2</td><td>8</td></tr>
-      <tr><th>Runs in a sandbox</th><td>20</td><td>20</td><td class="ok">0</td></tr>
-      <tr><th>Programs</th><td>79 run, 27 different, 19 exited nonzero</td><td>6 kept from run 1, replayed</td><td>none; 2 kept scripts</td></tr>
-      <tr><th>Seconds per run, median</th><td>10.1</td><td>1.3</td><td>1.1 (3.2 to 6.3 after the rename)</td></tr>
-      <tr><th>HTTP requests</th><td>114</td><td>110</td><td>281, 65 of them 304</td></tr>
-      <tr><th>Refused by the service</th><td>0</td><td class="bad">16 (422, then 404)</td><td>3 (412, the teammate)</td></tr>
-      <tr><th>Writes over the teammate</th><td class="ok">0</td><td class="ok">0</td><td class="ok">0</td></tr>
-      <tr><th>Made before these runs</th><td>nothing</td><td>nothing (run 1 is its first write)</td><td>one goal run per task: 42,483 input tokens</td></tr>
+      <tr><th>Addresses</th><td>Built by the program from path templates and IDs</td><td>Built, with IDs 3 and 2 written in</td><td>Handed over by the server: links, forms, <code>Location</code></td></tr>
+      <tr><th>Finding Bilbo</th><td>Search, read his ID, build <code>/employees/2</code></td><td><code>/employees/2</code>, written in</td><td>Follow <code>item</code> titled "Bilbo Baggins"</td></tr>
+      <tr><th>The ETag it sends</th><td>Read in this run</td><td>In t1's dismiss, one written in from run 1</td><td>Read in this run, with the form it acts on</td></tr>
+      <tr><th>The way, across 20 runs</th><td>27 different programs</td><td>6 programs, frozen</td><td>2 kept scripts, unchanged</td></tr>
     </tbody>
   </table></div>
-  <p class="note">Counting ARTIE's goal runs too: 60,007 tokens against fresh code mode's 158,995, about five fresh runs' worth up front. Saved code mode was cheapest, and wrong after the release.</p>
 
-  <h2>Run by run</h2>
+  <h2>The service changes</h2>
   <div class="table-scroll"><table class="grid">
     <thead>
       <tr class="phase"><th></th><th colspan="3">as they are</th><th colspan="3" class="split">teammate (t3 only)</th><th colspan="4" class="split">field renamed</th></tr>
@@ -166,15 +162,65 @@ footer ul { gap: 0.2rem; }
     </tbody>
   </table></div>
   <p class="note">Each cell: right (✓) or wrong (✗), and the model's input tokens for that run. An amber outline marks a run the teammate changed Frodo in. The teammate acts in t3 only; t1's runs 4 to 6 are runs as they are.</p>
-
-  <h2>At each change</h2>
   <div class="table-scroll"><table>
     <thead><tr><th>Change</th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
     <tbody>
-      <tr><th>Teammate sets Frodo's role to "keeper of the Red Book" right after the client's first read</th><td>Read Frodo again before writing; that read already held the teammate's role. Wrote with its ETag: 200, "keeper of the Red Book, retired"</td><td>The same: its kept program reads again before writing. 200</td><td>Read once, wrote with that ETag: <b>412</b>. <code>decide</code> read again and wrote ", retired" on the new role: 200</td></tr>
-      <tr><th>Release renames <code>role</code> to <code>position</code> in the hire and update forms</th><td>Its library and docs are built from the description each run, so the model wrote <code>position</code> from the start. No refusal</td><td class="bad">Sent <code>role</code>: 422 "required property 'position' not found". Printed it, exit 0. t1 went on: update 404, then dismissed Bilbo</td><td>Held each form to its pin; hire and update had changed, so it sent nothing and fell back to the step's words. The model chose <code>position</code>: 2 calls in t1, 1 in t3</td></tr>
+      <tr><th>A teammate sets Frodo's role to "keeper of the Red Book" right after the client's first read</th><td>Read Frodo again before writing; that read already held the teammate's role. Wrote with its ETag: 200, "keeper of the Red Book, retired"</td><td>The same: its kept program reads again before writing. 200</td><td>Read once, wrote with that ETag: <b>412</b>. <code>decide</code> read again and wrote ", retired" on the new role: 200</td></tr>
+      <tr><th>A release renames <code>role</code> to <code>position</code> in the hire and update forms</th><td>Its library and docs are made from the description each run, so the model wrote <code>position</code> from the start. No refusal</td><td class="bad">Sent <code>role</code>: 422 "required property 'position' not found". Printed it, exit 0. t1 went on: update 404, then dismissed Bilbo</td><td>Held each form to its pin; hire and update had changed, so it sent nothing and fell back to the step's words. The model chose <code>position</code>: 2 calls in t1, 1 in t3</td></tr>
     </tbody>
   </table></div>
+
+  <h2>Who holds which control</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Control</th><th>Endpoint side: the OpenAPI twin</th><th>HEART side</th></tr></thead>
+    <tbody>
+      <tr><th>Conditional writes</th><td>An ETag on reads and an optional <code>If-Match</code>, added for this comparison (spec/SPEC.md, 2026-11-02). A write without one goes through</td><td>An ETag with every representation; ARTIE sent one with every act, 43 of 43; a stale one is refused 412</td></tr>
+      <tr><th>What can be done now</th><td>Every operation, always listed; the server refuses after the call</td><td>Only the forms the state allows are offered</td></tr>
+      <tr><th>A changed operation noticed</th><td>By the server's 422, if the program reads it</td><td>By the client's pins, before any request</td></tr>
+      <tr><th>Deciding again on new state</th><td>Up to each program</td><td><code>decide</code> reads again and runs its steps again</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Security and compliance</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>Runs that executed model-written code</th><td>20</td><td>20</td><td class="ok">0</td></tr>
+      <tr><th>Sandbox</th><td>every run</td><td>every run</td><td class="ok">none needed</td></tr>
+      <tr><th>What a reviewer approves</th><td>A new program most runs: 27 in 20</td><td>6 programs, with IDs and an ETag frozen in</td><td>2 kept scripts: data in a closed vocabulary, pinned to the server's forms</td></tr>
+      <tr><th>How a failure shows</th><td>The model says so in words</td><td class="bad">Exit 0 and a printed 422</td><td>An exit code and reason; a YAML trace of each refusal</td></tr>
+      <tr><th>Partial work left behind</th><td>none</td><td class="bad">t1: Bilbo dismissed, Samwise not hired</td><td>none</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Where the model sits</h2>
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Code mode, fresh</th><th>Code mode, saved</th><th>ARTIE as data</th></tr></thead>
+    <tbody>
+      <tr><th>Right</th><td class="ok">20 / 20</td><td class="bad">12 / 20</td><td class="ok">20 / 20</td></tr>
+      <tr><th>Runs that needed the model</th><td>20</td><td>2</td><td>8, all after the release</td></tr>
+      <tr><th>Model calls</th><td>99</td><td>10</td><td>12</td></tr>
+      <tr><th>Input tokens, cached or not</th><td>158,995</td><td>16,004 (run 1 only)</td><td>17,524 (renamed runs only)</td></tr>
+      <tr><th>Output tokens</th><td>10,411</td><td>974</td><td>2,000</td></tr>
+      <tr><th>Before these runs</th><td>nothing</td><td>nothing (run 1 is its first write)</td><td>one goal run per task to find the way: 42,483 input tokens</td></tr>
+      <tr><th>Seconds per run, median</th><td>10.1</td><td>1.3</td><td>1.1 (3.2 to 6.3 after the release)</td></tr>
+      <tr><th>HTTP requests</th><td>114</td><td>110</td><td>281, 65 of them 304</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="note">
+    <li>With its wayfinding counted, ARTIE's model took 60,007 tokens against fresh code mode's 158,995. Saved code mode took the fewest, and was wrong after the release.</li>
+    <li>ARTIE made more requests: it reads forms and schemas, and revalidates them (the 304s).</li>
+  </ul>
+
+  <h2>Self-repair, done but not kept</h2>
+  <ul>
+    <li><b>What happened:</b> in each of runs 7 to 10, ARTIE's pins refused the changed form, it fell back to the step's words, the model chose <code>position</code>, and the act was done. Then the run ended. The kept script, pins and config are unchanged on disk, so each later run repaired again: 3,093 tokens in t1, 1,288 in t3, every time.</li>
+    <li><b>The optimization:</b> keep the repair. After a repaired act is done, write the chosen step into the kept script and its form into the pins, so only the first run after a change pays. With it, 17,524 tokens would have been 4,381.</li>
+    <li><b>What exists:</b> <code>repin: auto</code> or <code>propose</code> writes new pins, but only when the script's own values still fit a changed form (<code>on-change: values</code>). A repair by the model needs the step itself written again.</li>
+    <li><b>What a run can tell is safe:</b> the repair was chosen among forms the server offered, and the server took it with <code>If-Match</code>; what is saved is data in the closed vocabulary, not code.</li>
+    <li><b>What it must take care with:</b> a value made from state is saved as a reference, never as the literal. t3's repair sent "ring bearer, retired"; saved, that must be <code>${state.role}, retired</code>. ARTIE's trace records where each value came from (<code>/role</code> of the state read), so it can.</li>
+    <li><b>What a run can't tell:</b> that the meaning stayed when the name changed. For that: checks in the kept script (the end state the first run reached), and <code>propose</code> for a person to approve, where compliance asks for review.</li>
+  </ul>
 
   <h2>Where code mode did well</h2>
   <ul>
@@ -182,6 +228,7 @@ footer ul { gap: 0.2rem; }
     <li><b>It adapts with no machinery of its own.</b> It reads the current description every run, so a rename costs it nothing extra. ARTIE needed its pins and a fallback for the same.</li>
     <li><b>A saved program with a status check would have recovered.</b> An <code>assert r['status'] &lt; 300</code> would have exited nonzero, and the model would have written a new one. These programs had none, and no person added one.</li>
     <li><b>Its sandbox held:</b> no network but the service, read-only, 1 CPU, 256 MB, 64 processes, 120 s.</li>
+    <li><b>It can carry ARTIE.</b> Code mode could run ARTIE in a container beside its sandbox: find the way through hypermedia on the first pass, keep it as a <code>.heart.yaml</code>, run that each later time, and write again only when ARTIE's exit says a form changed (spec/ideas/code-mode-runs-artie.md).</li>
   </ul>
 
   <h2>The scripts</h2>
