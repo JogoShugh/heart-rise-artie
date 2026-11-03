@@ -17,9 +17,8 @@ class WatchLines(private val capture: Capture) {
     fun imports(): List<String> = UNITS.filter { script?.contains(".$it") == true }
         .map { "import kotlin.time.Duration.Companion.$it" }
 
-    /** In the block of [step]'s act, the resource it led to, kept by name when its step named it for the watch. */
-    fun kept(step: Step, depth: Int): List<String> = capture.marks(step)["as"]?.toString()?.takeIf { it in names }
-        ?.let { listOf(INDENT.repeat(depth) + "keepAs(\"$it\")") }.orEmpty()
+    /** The name the resource [step]'s act led to is kept by in its block, when its step named it for the watch. */
+    fun kept(step: Step): String? = capture.marks(step)["as"]?.toString()?.takeIf { it in names }
 
     /**
      * The watch's lines, at [depth]; with [intents] (`--intents`), each act that keeps its words written as them

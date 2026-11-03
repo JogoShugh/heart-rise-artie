@@ -30,6 +30,7 @@ class ScriptWriter(
     private val why = Why(derivations)
     private val bindings = Bindings(capture, source, options.asInputs.keys, derivations)
     private val watch = WatchLines(capture)
+    private val walker = Walker(capture, bindings, watch, options) { names }
 
     /** How many values the script marks for a person to review. */
     var reviews = 0
@@ -44,11 +45,12 @@ class ScriptWriter(
         // A goal run's detours are left out: the script does only what the goal needed.
         val root = Node.of(capture).let { if (capture.source != null) Detours.trimmed(it, capture) else it }
         // Twice: the first pass meets every variable, so the second can read each in the block it belongs to.
-        block(root, 1)
+        block(walker.walk(root), 1)
         reviews = 0
-        kept = 0
         derivations.clear()
-        val body = block(root, 1)
+        val walked = walker.walk(root)
+        kept = reasoned(walked)
+        val body = block(walked, 1)
         val entry = capture.steps.first()
         val heart = "heart(${KotlinText.quoted(capture.entry)}) {"
         return derivations.strip(
@@ -113,30 +115,26 @@ class ScriptWriter(
         return lines.mapIndexed { i, line -> if (i == 0) derivations.anchor("inputs", first, line) else line }
     }
 
-    /** The statements of [node]'s block, at [depth]: what it reads, then the steps nested in it. */
-    private fun block(node: Node, depth: Int): List<String> {
-        val reads = reads(node.step.number, depth)
-        // A resource the watch reads again and a value read from it are kept once, by the one name.
-        val watched = watch.kept(node.step, depth).takeIf { reads.isEmpty() }.orEmpty()
-        return reads + watched + node.children.flatMap { statement(it, depth) }
+    /** The statements of [block], at [depth]: what it keeps, then the steps nested in it. */
+    private fun block(block: Block, depth: Int): List<String> {
+        val watched = block.watched?.let { listOf(INDENT.repeat(depth) + "keepAs(\"$it\")") }.orEmpty()
+        return reads(block.keeps, depth) + watched + block.statements.flatMap { statement(it, depth) }
     }
 
-    /** The resource [step] led to, kept by the name its values are read by, once however many it has. */
-    private fun reads(step: Int, depth: Int): List<String> =
-        bindings.variables.values.filter { it.step == step }.distinctBy { it.keptAs }.map {
-            val set = derivations.lines(Regex("^\\s*(?:${it.name}\\s*=[^=]|keepAs\\(\"${it.keptAs}\"\\))"))
-            INDENT.repeat(depth) + why.mark(why.answer(it, null), "keepAs(\"${it.keptAs}\")", listOf(set))
-        }
+    /** The resources [keeps] names, each kept by the name its values are read by, once however many it has. */
+    private fun reads(keeps: List<Variable>, depth: Int): List<String> = keeps.map {
+        val set = derivations.lines(Regex("^\\s*(?:${it.name}\\s*=[^=]|keepAs\\(\"${it.keptAs}\"\\))"))
+        INDENT.repeat(depth) + why.mark(why.answer(it, null), "keepAs(\"${it.keptAs}\")", listOf(set))
+    }
 
-    /** The lines of [node]'s step, the first of which begins its row. */
-    private fun statement(node: Node, depth: Int): List<String> {
-        val step = node.step
+    /** The lines of [walked], the first of which begins its row. */
+    private fun statement(walked: Walked, depth: Int): List<String> {
+        val step = walked.step
         val pad = INDENT.repeat(depth)
-        val lines = when {
-            step.relation != null -> selection(node, depth)
-            step.say == "sync" -> listOf("${pad}sync()")
-            step.say == "until" || step.say == "check" -> waits(step, pad)
-            else -> emptyList()
+        val lines = when (walked) {
+            is Walked.Selection -> selection(walked, depth)
+            is Walked.Sync -> listOf("${pad}sync()")
+            is Walked.Waits -> waits(step, pad)
         }
         return lines.mapIndexed { i, line ->
             if (i == 0) derivations.anchor("${step.number}", step.line, line) else line
@@ -150,25 +148,20 @@ class ScriptWriter(
         pad + why.mark(why.copied(step.say, source != null), line, listOfNotNull(copied?.let(::listOf)))
     }
 
-    private fun selection(node: Node, depth: Int): List<String> {
-        val step = node.step
+    /** [walked] as Kotlin: its call, then its block, or what it led to kept where it stands when it opens none. */
+    private fun selection(walked: Walked.Selection, depth: Int): List<String> {
+        val step = walked.step
         val pad = INDENT.repeat(depth)
-        val keep = keeps(capture, step, options.keepReason)
-        // --intents: the act in its words alone, a person's or a model's, for the reasoner to choose each time.
-        val words = said(capture, step, names, emptyList()).takeIf { options.intents && !keep }
-        if (keep || words != null) kept++
-        val call = when {
-            keep -> listOf(pad + bindings.kept(step))
-            words != null -> listOf("${pad}act($words)")
-            step.follows -> listOf(pad + follow(step))
-            else -> act(step, pad)
+        val call = when (val how = walked.call) {
+            Call.Reasoned -> listOf(pad + bindings.kept(step))
+            is Call.Words -> listOf("${pad}act(${how.words})")
+            Call.Follow -> listOf(pad + follow(step))
+            Call.Act -> act(step, pad)
         }
-        // A resource just made may change on its own (GitHub works out a new pull request's mergeability): an
-        // act in its block reads it again first, as a reasoned run did, or its validator is stale.
-        val fresh = step.outcome == "new resource" && node.children.any { acts(it.step) }
-        val inner = listOfNotNull("${INDENT.repeat(depth + 1)}sync()".takeIf { fresh }) + block(node, depth + 1)
+        val inner = listOfNotNull("${INDENT.repeat(depth + 1)}sync()".takeIf { walked.fresh }) +
+            block(walked.block, depth + 1)
         return when {
-            !step.opens -> call + reads(step.number, depth)
+            !step.opens -> call + reads(walked.block.keeps, depth)
             inner.isEmpty() -> call.dropLast(1) + (call.last() + " {}")
             else -> call.dropLast(1) + (call.last() + " {") + inner + "$pad}"
         }
@@ -207,6 +200,59 @@ class ScriptWriter(
         const val INDENT = "    "
         const val WIDTH = 120
     }
+}
+
+/** A capture's nodes walked (Walk.kt): what each step is in the script, decided once, before it is written. */
+private class Walker(
+    private val capture: Capture,
+    private val bindings: Bindings,
+    private val watch: WatchLines,
+    private val options: ScriptWriter.Options,
+    /** The names the script knows, which a step's intent may keep. */
+    private val names: () -> Set<String>,
+) {
+    /** [node]'s block, walked: the resources it keeps, then the steps nested in it. */
+    fun walk(node: Node): Block {
+        val keeps = bindings.variables.values.filter { it.step == node.step.number }.distinctBy { it.keptAs }
+        // A resource the watch reads again and a value read from it are kept once, by the one name.
+        val watched = watch.kept(node.step).takeIf { keeps.isEmpty() }
+        return Block(keeps, watched, node.children.mapNotNull(::walked))
+    }
+
+    /** What [node]'s step is in the script: a selection, a sync, a wait or a check; null for none of these. */
+    private fun walked(node: Node): Walked? {
+        val step = node.step
+        return when {
+            step.relation != null -> selection(node)
+            step.say == "sync" -> Walked.Sync(step)
+            step.say == "until" || step.say == "check" -> Walked.Waits(step)
+            else -> null
+        }
+    }
+
+    private fun selection(node: Node): Walked.Selection {
+        val step = node.step
+        val keep = keeps(capture, step, options.keepReason)
+        // --intents: the act in its words alone, a person's or a model's, for the reasoner to choose each time.
+        val words = said(capture, step, names(), emptyList()).takeIf { options.intents && !keep }
+        val call = when {
+            keep -> Call.Reasoned
+            words != null -> Call.Words(words)
+            step.follows -> Call.Follow
+            else -> Call.Act
+        }
+        // A resource just made may change on its own (GitHub works out a new pull request's mergeability): an
+        // act in its block reads it again first, as a reasoned run did, or its validator is stale.
+        val fresh = step.outcome == "new resource" && node.children.any { acts(it.step) }
+        return Walked.Selection(step, call, fresh, walk(node))
+    }
+}
+
+/** How many selections in [block], however deep, the reasoner makes on every run: kept as reason steps, or words. */
+private fun reasoned(block: Block): Int = block.statements.sumOf { walked ->
+    val selection = walked as? Walked.Selection
+    val asked = selection?.call.let { it == Call.Reasoned || it is Call.Words }
+    (if (asked) 1 else 0) + (selection?.let { reasoned(it.block) } ?: 0)
 }
 
 /**
