@@ -1,22 +1,42 @@
 Feature: Plain JSON: the same state with every control stripped
   The OpenAPI twin (spec/ideas/openapi-vs-heart-demo.md). A client that
-  asks for application/json gets what a typical JSON data API returns: the
-  resource's state and nothing else. No links, no forms, no profile and no
-  validator to send back. Acts are the same POSTs at the same addresses and
-  need no If-Match. The server still enforces the same rules, so an act the
-  state does not allow is refused after it is sent (409), where HEART never
-  offers it.
+  asks for application/json gets what a well-built JSON data API returns:
+  the resource's state, and HTTP's validator for it. No links, no forms and
+  no profile. Acts are the same POSTs at the same addresses and need no
+  If-Match; a client that sends the ETag it read is refused if the state
+  moved since (412), as HTTP has always offered (spec/SPEC.md, "The OpenAPI
+  twin keeps HTTP's validators", 2026-11-02). The server still enforces the
+  same rules, so an act the state does not allow is refused after it is
+  sent (409), where HEART never offers it.
 
   Background:
     Given lamp 7 is "ON" at version 3 in the lamp server
 
-  Scenario: A plain read is the state alone
+  Scenario: A plain read is the state alone, with its validator
     When a client gets "/lamps/7" as plain-json
     Then the response status is 200
     And the response has Content-Type "application/json"
     And the response body is exactly {"id":7,"status":"ON","brightness":50}
     And the response's only Link is the forms link to an affordance set
-    And the response carries no ETag header
+    And the response has an ETag
+    When a client gets "/lamps/7" again with the ETag it was given
+    Then the response status is 304
+
+  Scenario Outline: A plain act may send the ETag it read, and is refused if the state moved since: <case>
+    When a client gets "/lamps/7" as plain-json
+    And lamp 7 is "ON" at version <now> in the lamp server
+    And a client puts {"brightness": 20} to "/lamps/7/actions/dim" as plain-json with the ETag it read
+    Then the response status is <status>
+
+    Examples:
+      | case                     | now | status |
+      | nothing changed: done    | 3   | 200    |
+      | changed since: refused   | 4   | 412    |
+
+  Scenario: A plain act's answer carries the new state's validator
+    When a client puts {"brightness": 20} to "/lamps/7/actions/dim" as plain-json with If-Match ""
+    Then the response status is 200
+    And the response has an ETag
 
   Scenario: A plain answer links the affordance set of the state it shows
     The body stays the plain state. A standing link in the Link header names

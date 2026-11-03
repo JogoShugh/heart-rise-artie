@@ -110,7 +110,11 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
       | ON    |
       | OFF   |
 
-  Scenario: An act answers with the state, and documents its refusals; no validator is asked for
+  Scenario: An act answers with the state, and documents its refusals; it may send the validator it read
+    The twin keeps HTTP's validators (spec/SPEC.md, 2026-11-02): each read
+    and each act's answer carries the state's ETag, and an act may send it
+    back as If-Match, optional, refused 412 when the state moved since. A
+    bookmark act adds a resource, and takes none.
     Then the operation "dim" answers 200 with "#/components/schemas/Lamp"
     And the operation "dim" documents the responses
       | status |
@@ -118,13 +122,17 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
       | 401    |
       | 404    |
       | 409    |
+      | 412    |
       | 422    |
-    And the operation "dim" has no "If-Match" parameter
+    And the operation "dim" has an optional "If-Match" header parameter
+    And the operation "dim" answers 200 with the header "ETag"
+    And the operation "getLamp" answers 200 with the header "ETag"
     And the operation "installLamp" documents the responses
       | status |
       | 201    |
       | 401    |
       | 422    |
+    And the operation "installLamp" has no "If-Match" parameter
 
   Scenario: Both credentials the service admits are security schemes
     Then its security schemes are

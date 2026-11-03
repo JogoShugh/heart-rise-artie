@@ -28,9 +28,10 @@ Same model (Sonnet 5.5), same task words, same service, same system prompt where
 ## The service and the task
 
 The employees service of heart-sims (`employees.test`), our own API: HEART for ARTIE, its OpenAPI twin for code mode
-(the same operations). Checked 2026-11-02: a plain JSON read carries no `ETag`, and the twin declares neither `ETag`
-nor `If-Match`, though a write with a stale `If-Match` is refused (412). So code mode can't make a conditional write
-today; the steelman fixes that first (step 0). Two tasks of the earlier bench:
+(the same operations). Checked 2026-11-02: a plain JSON read carries no `ETag`, a plain act ignores `If-Match`, and
+the twin declares neither, by design (the TCK's plain-json.feature: "no validator to send back"). So code mode can't
+make a conditional write today; the steelman fixes that first (step 0, decided in spec/SPEC.md the same day). Two
+tasks of the earlier bench:
 
 - **t3:** "Frodo Baggins is retiring: add ', retired' to the end of his current role."
 - **t1:** hire, promote, dismiss.

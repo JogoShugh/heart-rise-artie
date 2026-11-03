@@ -77,7 +77,15 @@ class ResourceHandler<S, K>(
         val accept = request.header(ACCEPT)
         return when {
             Negotiation.wantsHtml(accept) -> html.represent(state, request)
-            Negotiation.wantsPlainJson(accept) -> plain(Response(Status.OK), state)
+            Negotiation.wantsPlainJson(accept) -> {
+                val ifNoneMatch = request.header(IF_NONE_MATCH)
+                val etag = StateETag.plain(type, state)
+                if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, etag)) {
+                    Response(Status.NOT_MODIFIED).header("ETag", etag).header(VARY, ACCEPT)
+                } else {
+                    plain(Response(Status.OK), state)
+                }
+            }
             else -> dialect(request).let { Rendered(state, it, limits.rung(it, request)).answer(request) }
         }
     }
@@ -166,24 +174,27 @@ class ResourceHandler<S, K>(
     }
 
     /**
-     * An act in plain JSON, the OpenAPI twin: no If-Match is asked for, so
-     * the act is checked only against the state now, and refused after it
-     * is sent when that state does not offer it.
+     * An act in plain JSON, the OpenAPI twin: no If-Match is asked for, so with none the act is checked only
+     * against the state now, and refused after it is sent when that state does not offer it. With one, it is held
+     * to the plain ETag the client read, and refused (412) if the state moved since.
      */
     private fun actPlain(act: Act, request: Request): Response {
         val variables = variables(request)
         val name = act.name
         val done = runBlocking {
-            val checked = pipeline.checkOffered(name) { resource.locate(variables) }
+            val read = suspend { resource.locate(variables) }
+            val checked = pipeline.checkPlain(name, request.header(IF_MATCH), read) { current, held ->
+                StateETag.matches(held, StateETag.plain(type, current))
+            }
             pipeline.run(name, input(act, request), checked) { input -> resource.perform(checked, name, input) }
         }
         val answered = added(Response(Status.OK).header(CONTENT_LOCATION, resource.location(done.state)), done)
         return plain(answered, done.state)
     }
 
-    /** Plain JSON: a body with no links, forms, profile or validator; only Accept chooses it. */
+    /** Plain JSON: a body with no links, forms or profile, and its validator; only Accept chooses it. */
     private fun plain(response: Response, state: S): Response =
-        response.header(CONTENT_TYPE, JSON).header(VARY, ACCEPT)
+        response.header(CONTENT_TYPE, JSON).header(VARY, ACCEPT).header("ETag", StateETag.plain(type, state))
             .let { if (limits.affordanceLinks) it.header(LINK, resource.layers.formsLink(state)) else it }
             .body(mapper.writeValueAsString(type.state.bodyOf(state)))
 

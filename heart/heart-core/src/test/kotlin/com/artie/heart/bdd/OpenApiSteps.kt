@@ -170,6 +170,14 @@ class OpenApiSteps(private val world: LampWorld) {
     fun noParameter(operationId: String, name: String) =
         assertFalse(operation(operationId).path("parameters").any { it.path("name").asText() == name })
 
+    @Then("the operation {string} has an optional {string} header parameter")
+    fun optionalHeader(operationId: String, name: String) {
+        val parameter = operation(operationId).path("parameters").firstOrNull { it.path("name").asText() == name }
+        assertTrue(parameter != null, "no $name parameter")
+        assertEquals("header", parameter?.path("in")?.asText())
+        assertFalse(parameter?.path("required")?.asBoolean() ?: true)
+    }
+
     @Then("its security schemes are")
     fun securitySchemes(table: DataTable) {
         val expected = table.asMaps()

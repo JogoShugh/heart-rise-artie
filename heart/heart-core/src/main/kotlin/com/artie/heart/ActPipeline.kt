@@ -57,6 +57,17 @@ class ActPipeline<S, K>(
      * for, so the act is checked only against the state [current] reads now.
      * An act the state does not offer is still refused, after it was sent.
      */
+    /**
+     * A plain JSON act, the OpenAPI twin's: with no [validator], checked against the state now, as before; with
+     * one, held to it as a HEART act is ([check]), so a stale one is refused (412) before the act's own checks.
+     */
+    suspend fun checkPlain(
+        act: String,
+        validator: String?,
+        current: suspend () -> S,
+        matches: (S, String) -> Boolean,
+    ): S = if (validator == null) checkOffered(act, current) else check(act, validator, current, matches)
+
     suspend fun checkOffered(act: String, current: suspend () -> S): S {
         require(!type.atBookmark(act)) { "$act is offered by the bookmark" }
         val state = current()

@@ -31,6 +31,16 @@
         },
         "description" : "The act is not allowed in the resource's current state"
       },
+      "Stale" : {
+        "content" : {
+          "application/problem+json" : {
+            "schema" : {
+              "$ref" : "#/components/schemas/Problem"
+            }
+          }
+        },
+        "description" : "If-Match named a state the resource is no longer in: read it again, and decide again"
+      },
       "Unauthorized" : {
         "content" : {
           "application/problem+json" : {
@@ -421,7 +431,15 @@
                 }
               }
             },
-            "description" : "The bed"
+            "description" : "The bed",
+            "headers" : {
+              "ETag" : {
+                "description" : "The state's validator: send it back as If-None-Match to read again, or as If-Match to act",
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
           },
           "400" : {
             "$ref" : "#/components/responses/BadRequest"
@@ -450,6 +468,14 @@
             "minimum" : 1,
             "type" : "integer"
           }
+        }, {
+          "description" : "The ETag of the state the act was decided on: if the state moved since, the act is refused",
+          "in" : "header",
+          "name" : "If-Match",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "requestBody" : {
           "content" : {
@@ -470,7 +496,15 @@
                 }
               }
             },
-            "description" : "The bed after the act"
+            "description" : "The bed after the act",
+            "headers" : {
+              "ETag" : {
+                "description" : "The state's validator: send it back as If-None-Match to read again, or as If-Match to act",
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
           },
           "401" : {
             "$ref" : "#/components/responses/Unauthorized"
@@ -480,6 +514,9 @@
           },
           "409" : {
             "$ref" : "#/components/responses/NotOffered"
+          },
+          "412" : {
+            "$ref" : "#/components/responses/Stale"
           },
           "422" : {
             "$ref" : "#/components/responses/Unprocessable"
@@ -502,6 +539,14 @@
             "minimum" : 1,
             "type" : "integer"
           }
+        }, {
+          "description" : "The ETag of the state the act was decided on: if the state moved since, the act is refused",
+          "in" : "header",
+          "name" : "If-Match",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "requestBody" : {
           "content" : {
@@ -522,7 +567,15 @@
                 }
               }
             },
-            "description" : "The bed after the act"
+            "description" : "The bed after the act",
+            "headers" : {
+              "ETag" : {
+                "description" : "The state's validator: send it back as If-None-Match to read again, or as If-Match to act",
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
           },
           "401" : {
             "$ref" : "#/components/responses/Unauthorized"
@@ -532,6 +585,9 @@
           },
           "409" : {
             "$ref" : "#/components/responses/NotOffered"
+          },
+          "412" : {
+            "$ref" : "#/components/responses/Stale"
           },
           "422" : {
             "$ref" : "#/components/responses/Unprocessable"
@@ -554,6 +610,14 @@
             "minimum" : 1,
             "type" : "integer"
           }
+        }, {
+          "description" : "The ETag of the state the act was decided on: if the state moved since, the act is refused",
+          "in" : "header",
+          "name" : "If-Match",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "requestBody" : {
           "content" : {
@@ -574,7 +638,15 @@
                 }
               }
             },
-            "description" : "The bed after the act"
+            "description" : "The bed after the act",
+            "headers" : {
+              "ETag" : {
+                "description" : "The state's validator: send it back as If-None-Match to read again, or as If-Match to act",
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
           },
           "401" : {
             "$ref" : "#/components/responses/Unauthorized"
@@ -584,6 +656,9 @@
           },
           "409" : {
             "$ref" : "#/components/responses/NotOffered"
+          },
+          "412" : {
+            "$ref" : "#/components/responses/Stale"
           },
           "422" : {
             "$ref" : "#/components/responses/Unprocessable"

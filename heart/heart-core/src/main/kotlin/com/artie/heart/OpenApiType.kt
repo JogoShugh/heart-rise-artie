@@ -86,7 +86,7 @@ internal class OpenApiType(
             "parameters" to itemParameters + listOfNotNull(asOf.takeIf { keepsPast }),
             "responses" to listOfNotNull(
                 "200" to OpenApiShapes.withFormsLink(
-                    OpenApiShapes.json("The $noun", OpenApiShapes.ref(stateName)),
+                    withETag(OpenApiShapes.json("The $noun", OpenApiShapes.ref(stateName))),
                     affordanceLinks,
                 ),
                 ("400" to OpenApiShapes.response("BadRequest")).takeIf { keepsPast },
@@ -119,15 +119,16 @@ internal class OpenApiType(
             "tags" to listOf(type.collection),
             "summary" to relation.title,
             "description" to "${relation.doc}\n\n${onlyWhen(act)}${Options.prose(act)}",
-            "parameters" to itemParameters + OpenApiShapes.queryParameters(act),
+            "parameters" to itemParameters + OpenApiShapes.queryParameters(act) + OpenApiShapes.IF_MATCH,
             "responses" to mapOf(
                 "200" to OpenApiShapes.withFormsLink(
-                    OpenApiShapes.json("The $noun after the act", OpenApiShapes.ref(stateName)),
+                    withETag(OpenApiShapes.json("The $noun after the act", OpenApiShapes.ref(stateName))),
                     affordanceLinks,
                 ),
                 "401" to OpenApiShapes.response("Unauthorized"),
                 "404" to OpenApiShapes.response("NotFound"),
                 "409" to OpenApiShapes.response("NotOffered"),
+                "412" to OpenApiShapes.response("Stale"),
                 "422" to OpenApiShapes.response("Unprocessable"),
             ),
         ).let { operation ->

@@ -82,12 +82,22 @@ class HeartResourceHandler<S, K>(
         val headers = request.headers().asHttpHeaders()
         return when {
             HttpNegotiation.wantsHtml(headers) -> html.represent(state, request)
-            HttpNegotiation.wantsPlainJson(headers) -> PlainJson.respond(
-                ServerResponse.ok().apply {
-                    if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(state))
-                },
-                type.state.bodyOf(state),
-            )
+            HttpNegotiation.wantsPlainJson(headers) -> {
+                val etag = StateETag.plain(type, state)
+                val ifNoneMatch = request.headers().firstHeader(HttpHeaders.IF_NONE_MATCH)
+                if (ifNoneMatch != null && Validators.notModified(ifNoneMatch, etag)) {
+                    ServerResponse.status(HttpStatus.NOT_MODIFIED).header(HttpHeaders.ETAG, etag)
+                        .header(HttpHeaders.VARY, HttpHeaders.ACCEPT).buildAndAwait()
+                } else {
+                    PlainJson.respond(
+                        ServerResponse.ok().apply {
+                            if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(state))
+                        },
+                        type.state.bodyOf(state),
+                        etag,
+                    )
+                }
+            }
             else -> HttpNegotiation.dialect(headers).let { Rendered(state, it, limits.rung(it, request)) }
                 .answer(request)
         }
@@ -170,6 +180,7 @@ class HeartResourceHandler<S, K>(
                     if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state))
                 },
                 type.state.bodyOf(done.state),
+                StateETag.plain(type, done.state),
             )
         }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
@@ -188,14 +199,17 @@ class HeartResourceHandler<S, K>(
     }
 
     /**
-     * An act in plain JSON, the OpenAPI twin: no If-Match is asked for, so
-     * the act is checked only against the state now, and refused after it
-     * is sent when that state does not offer it.
+     * An act in plain JSON, the OpenAPI twin: no If-Match is asked for, so with none the act is checked only
+     * against the state now, and refused after it is sent when that state does not offer it. With one, it is held
+     * to the plain ETag the client read, and refused (412) if the state moved since.
      */
     private suspend fun actPlain(act: Act, request: ServerRequest): ServerResponse {
         val name = act.name
         val variables = variables(request)
-        val checked = pipeline.checkOffered(name) { resource.locate(variables) }
+        val ifMatch = request.headers().firstHeader(HttpHeaders.IF_MATCH)
+        val checked = pipeline.checkPlain(name, ifMatch, { resource.locate(variables) }) { current, held ->
+            StateETag.matches(held, StateETag.plain(type, current))
+        }
         val body = input(act, request)
         val done = pipeline.run(name, body, checked) { input -> resource.perform(checked, name, input) }
         return PlainJson.respond(
@@ -203,6 +217,7 @@ class HeartResourceHandler<S, K>(
                 .header(HttpHeaders.CONTENT_LOCATION, resource.location(done.state))
                 .apply { if (limits.affordanceLinks) header(HttpHeaders.LINK, resource.layers.formsLink(done.state)) },
             type.state.bodyOf(done.state),
+            StateETag.plain(type, done.state),
         )
     }
 

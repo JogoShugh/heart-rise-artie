@@ -20,6 +20,17 @@ object StateETag {
     }
 
     /**
+     * The plain JSON representation's ETag, the OpenAPI twin's (SPEC, "The OpenAPI twin keeps HTTP's validators"):
+     * no dialect and no rung, as it has neither, so `"seq-5.json.e8e98768123683fa"`.
+     */
+    fun plain(stateVersion: Int, body: Any?): String =
+        "\"seq-$stateVersion.json.${ContentAddress.address(ContentAddress.canonical(body))}\""
+
+    /** [state]'s plain ETag, as [type] declares its version and its plain body. */
+    fun <S> plain(type: ResourceType<S, *>, state: S): String =
+        plain(type.state.versionOf(state), type.state.bodyOf(state))
+
+    /**
      * RFC 9110 §13.1.1: `*` matches any current representation; otherwise
      * some listed entity-tag must equal [current] by strong comparison,
      * character for character. A weak tag (`W/"..."`) never equals a strong one.

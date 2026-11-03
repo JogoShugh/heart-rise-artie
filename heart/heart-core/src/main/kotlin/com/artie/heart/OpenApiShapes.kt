@@ -84,7 +84,27 @@ internal object OpenApiShapes {
             "The body breaks the act's schema, or a rule of the resource refuses it",
             PROBLEM_JSON,
         ),
+        "Stale" to content(
+            "If-Match named a state the resource is no longer in: read it again, and decide again",
+            PROBLEM_JSON,
+        ),
     )
+
+    /** The validator every plain answer about a resource carries (SPEC: the OpenAPI twin keeps HTTP's validators). */
+    val ETAG: Map<String, Any> = mapOf(
+        "description" to "The state's validator: send it back as If-None-Match to read again, or as If-Match to act",
+        "schema" to mapOf("type" to "string"),
+    )
+
+    /** An act's If-Match, optional: with it, the act is refused (412) if the state moved since it was read. */
+    val IF_MATCH: Map<String, Any> = mapOf(
+        "name" to "If-Match",
+        "in" to "header",
+        "required" to false,
+        "description" to "The ETag of the state the act was decided on: if the state moved since, the act is refused",
+        "schema" to mapOf("type" to "string"),
+    )
+
 
     fun ref(name: String): Map<String, Any> = mapOf("\$ref" to "#/components/schemas/$name")
 
@@ -131,4 +151,11 @@ internal object OpenApiShapes {
         "properties" to properties.toMap(),
         "required" to properties.map { it.first },
     )
+}
+
+/** [response], carrying the state's validator ([OpenApiShapes.ETAG]). */
+internal fun withETag(response: Map<String, Any>): Map<String, Any> {
+    @Suppress("UNCHECKED_CAST")
+    val headers = response["headers"] as? Map<String, Any> ?: emptyMap()
+    return response + ("headers" to headers + ("ETag" to OpenApiShapes.ETAG))
 }
