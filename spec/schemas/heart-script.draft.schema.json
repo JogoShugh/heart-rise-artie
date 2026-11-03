@@ -43,6 +43,10 @@
       "additionalProperties": false,
       "properties": {
         "question": { "type": "string" },
+        "type": {
+          "description": "The type a field takes the input as, where it isn't text: the input, given as text, is read as one wherever it is a whole value.",
+          "enum": ["integer", "number", "boolean"]
+        },
         "default": {
           "anyOf": [
             { "type": ["string", "number", "boolean"] },

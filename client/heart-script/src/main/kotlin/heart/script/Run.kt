@@ -30,8 +30,16 @@ class ModelFailed(message: String) : RuntimeException(message)
 /**
  * One input a script declares: [default] when not given; [question] asked of a person, if the run allows. A
  * default made fresh each run, the time now, keeps its [now] pattern, so a script made from the run makes it too.
+ * A script held as data may say its [type] (integer, number or boolean): the input, which arrives as text, is read
+ * as one where it is a whole value.
  */
-class Declared(val name: String, val default: String?, val question: String?, val now: String? = null) {
+class Declared(
+    val name: String,
+    val default: String?,
+    val question: String?,
+    val now: String? = null,
+    val type: String? = null,
+) {
     val kind: String get() = when {
         default != null -> "optional"
         question != null -> "question"

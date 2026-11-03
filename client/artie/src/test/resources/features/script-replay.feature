@@ -289,3 +289,30 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | number | 12      |
     Then the run finished
     And issue 12 of "acme/rockets" is now "closed" on the small GitHub
+
+  Scenario: The script held as data does the same: its number input sent as a number, its lock file its own
+    The same capture, generated as data. Its input number is sent as the
+    integer the form asks for, as the Kotlin script's number.toLong() sends
+    it. Its lock file is data.pins.yaml, beside data.heart.yaml, and a run
+    re-pins that one, so a strict run on another issue then finishes.
+    Given artie generated "data.heart.yaml" as data from "run.trace.yaml" and "close.kts"
+    And the gateway's issue forms change: close takes a milestone
+    And the file "data.config.yaml" is
+      """
+      on-change: values
+      repin: auto
+      """
+    When "data.heart.yaml" runs with ARTIE, held "lenient" to its lock file, captured in "data.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 11      |
+    Then the run finished
+    And about its pins, the run said "re-pinned github:comment: offered in a new set; re-pinned github:close: changed, and what the script sends still fits it"
+    When "data.heart.yaml" runs with ARTIE, held "strict" to its lock file, captured in "strict.trace.yaml", given
+      | name   | value   |
+      | owner  | acme    |
+      | repo   | rockets |
+      | number | 12      |
+    Then the run finished
+    And issue 12 of "acme/rockets" is now "closed" on the small GitHub

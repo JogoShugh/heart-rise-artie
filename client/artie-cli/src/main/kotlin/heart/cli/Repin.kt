@@ -28,7 +28,7 @@ internal class Found(val relation: String, val set: String?, val form: String? =
  */
 fun repin(asked: Arguments, folder: Path, script: Path, config: Config, trace: String): List<String> {
     val mode = if (asked.noRepin) "never" else config.repin ?: "never"
-    val lock = folder.resolve(asked.pins ?: (script.fileName.toString().substringBeforeLast('.') + ".pins.yaml"))
+    val lock = folder.resolve(lockName(asked, script))
     if (mode == "never" || !Files.exists(lock)) return emptyList()
     val pinned = pins(Files.readString(lock)).forms
     val found = Capture("run", trace).steps

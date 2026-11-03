@@ -21,6 +21,7 @@ fun runData(script: Map<*, *>) {
                 default = (default as? String) ?: default?.takeIf { it !is Map<*, *> }?.toString(),
                 question = declared?.get("question")?.toString(),
                 now = (default as? Map<*, *>)?.get("now")?.toString(),
+                type = declared?.get("type")?.toString(),
             ),
         )
     }
@@ -84,9 +85,20 @@ internal class Reading(private val run: Run, private val here: Here?, val why: S
             name == "why" && members.isEmpty() -> why ?: NO_REASON
             name == "state" && here != null -> here.state[pointer(members)]
             run.kept[name] != null -> run.kept.getValue(name).state[pointer(members)]
-            members.isEmpty() && run.declared.any { it.name == name } -> run.value(name)
+            members.isEmpty() && run.declared.any { it.name == name } -> typed(name)
             else -> stop("\${$path} reads nothing: no input, and nothing kept, is named $name")
         }
+    }
+
+    /** The input [name], read as the type it declares: text that isn't one stays text, for the form to refuse. */
+    private fun typed(name: String): Any {
+        val value = run.value(name)
+        return when (run.declared.first { it.name == name }.type) {
+            "integer" -> value.toLongOrNull()
+            "number" -> value.toDoubleOrNull()
+            "boolean" -> value.toBooleanStrictOrNull()
+            else -> null
+        } ?: value
     }
 
     private fun pointer(members: List<String>): String =

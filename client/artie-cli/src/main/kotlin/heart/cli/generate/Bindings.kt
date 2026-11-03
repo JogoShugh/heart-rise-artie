@@ -69,6 +69,15 @@ class Bindings(
     /** The variables, by the step and pointer they are read from, in the order they were first needed. */
     val variables = linkedMapOf<Pair<Int, String>, Variable>()
 
+    /** Each input the run sent as an integer, a number or a truth, with that type: a script as data declares it. */
+    val inputTypes = linkedMapOf<String, String>()
+
+    /** The reference that reads the input [name], sent as a field of [type]; the type noted, if it isn't text. */
+    private fun inputReference(name: String, type: String?): String {
+        if (type in setOf("integer", "number", "boolean")) inputTypes[name] = checkNotNull(type)
+        return reference(name)
+    }
+
     private val sources = Sources(capture)
 
     /** The variable each slot names, a reason step's or a scripted step's, by the step and pointer it came from. */
@@ -94,9 +103,11 @@ class Bindings(
         val marked = Marked(source, step, field, why)
         val data = data(value, type)
         return when {
-            input != null -> Argument(field, marked.input(input, inputAs(input, type)), value = reference(input))
-            field in asInputs ->
-                Argument(field, marked.madeInput(field, text, inputAs(field, type)), value = reference(field))
+            input != null ->
+                Argument(field, marked.input(input, inputAs(input, type)), value = inputReference(input, type))
+            field in asInputs -> Argument(
+                field, marked.madeInput(field, text, inputAs(field, type)), value = inputReference(field, type),
+            )
             // A goal run's step words are the planner's: what the person said is the goal, its "words" source.
             if (capture.source != null) "words" in from else literal(step, field, text) ->
                 Argument(field, marked.words(text, constant(value, type)), value = data)

@@ -70,7 +70,7 @@ class ScriptYaml(
         val steps = steps(walked) + watch
         val kind = if (options.intents) "intent" else "kept"
         val document = linkedMapOf<String, Any?>("heart" to 1, "kind" to kind, "start" to capture.entry)
-        val inputs = capture.inputs.mapValues { (_, input) -> declared(input) }
+        val inputs = capture.inputs.mapValues { (name, input) -> declared(input, bindings.inputTypes[name]) }
         return (header() + YamlText.lines(document) + "" +
             (if (inputs.isEmpty()) emptyList() else YamlText.lines(mapOf("inputs" to inputs)) + "") +
             YamlText.lines(mapOf("steps" to steps))).joinToString("\n", postfix = "\n")
@@ -175,9 +175,13 @@ class ScriptYaml(
 }
 
 /** An input as the capture kept its declaration: nothing for a required one, else its default and question. */
-private fun declared(input: Map<*, *>): Map<String, Any?>? {
+private fun declared(input: Map<*, *>, type: String?): Map<String, Any?>? {
     val default = input["now"]?.let { mapOf("now" to it.toString()) } ?: input["default"]?.toString()
-    val declared = listOfNotNull(default?.let { "default" to it }, input["question"]?.let { "question" to it })
+    val declared = listOfNotNull(
+        default?.let { "default" to it },
+        input["question"]?.let { "question" to it },
+        type?.let { "type" to it },
+    )
     return declared.toMap().takeIf { it.isNotEmpty() }
 }
 
