@@ -77,7 +77,8 @@ class ReplaySteps(
             )
         }
         val given = table.asMaps().associate { it.getValue("name") to it.getValue("value") }
-        val run = scripts.run(Files.readString(file), ArtieNavigator(ctx.client, guard = held), given)
+        val asData = script.endsWith(".heart.yaml")
+        val run = scripts.run(Files.readString(file), ArtieNavigator(ctx.client, guard = held), given, asData)
         Files.writeString(folder.resolve(capture), run.traceYaml())
         aboutPins = if (guard == null) emptyList() else repin(asked, folder, file, config, run.traceYaml())
     }

@@ -161,14 +161,15 @@ class ScriptSteps(private val ctx: ClientContext, private val gateway: GitHubGat
     }
 
     /** [script] run with [navigator], given [inputs]; the run, for its capture (script-replay.feature). */
-    fun run(script: String, navigator: Navigator, inputs: Map<String, String>): Run {
+    fun run(script: String, navigator: Navigator, inputs: Map<String, String>, asData: Boolean = false): Run {
         stopped = null
-        val run = fresh(inputs, navigator).also { it.reasoning = true; it.source = script }
+        val run = fresh(inputs, navigator).also { it.reasoning = true; it.source = script.takeUnless { asData } }
         lastRun = run
         Run.current = run
         val engine = ScriptHost.engine(listOf("heart.script.*"))
         try {
-            engine.eval(script)
+            // A script held as data is made step by step, with no engine (spec/PLAN-KEPT-SCRIPTS-AS-DATA.md).
+            if (asData) heart.script.runData(org.yaml.snakeyaml.Yaml().load(script)) else engine.eval(script)
         } catch (e: ScriptException) {
             stopped = generateSequence(e as Throwable) { it.cause }.filterIsInstance<ScriptStopped>().firstOrNull()
                 ?: throw e

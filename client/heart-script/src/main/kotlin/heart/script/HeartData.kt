@@ -26,59 +26,45 @@ fun runData(script: Map<*, *>) {
     }
     val steps = script["steps"] as? List<*> ?: emptyList<Any?>()
     val start = script["start"]?.toString() ?: throw ScriptStopped(0, "", "the script names no start")
-    heart(Reading(run, null).text(start)) { made(steps) }
+    heart(Reading(run, null).text(start)) { made(steps, null) }
 }
 
-/** [steps], made in turn where the script stands. */
-internal fun Here.made(steps: List<*>) = steps.forEach { made(it as? Map<*, *> ?: stop("a step is not a map: $it")) }
+/** [steps], made in turn where the script stands; [why], the reason a wait gave up, in an Otherwise's steps. */
+internal fun Here.made(steps: List<*>, why: String?) =
+    steps.forEach { made(it as? Map<*, *> ?: stop("a step is not a map: $it"), why) }
 
-private fun Here.made(step: Map<*, *>) {
-    val reading = Reading(run, this)
-    val then: (Here.() -> Unit)? = (step["then"] as? List<*>)?.let { inner -> { made(inner) } }
-    when {
-        "act" in step -> {
-            only(step, ACT)
-            // Read where the script stands, before the act, as a Kotlin script's fields block is.
-            val values = (step["fields"] as? Map<*, *>).orEmpty().map { (k, v) -> k.toString() to reading.value(v) }
-            val words = said(step, reading)
-            act(
-                step["act"].toString(),
-                intent = words.intent, inferred = words.inferred, fromIntent = words.fromIntent,
-                fields = { values.forEach { (name, value) -> name to value } },
-                block = then,
-            )
-        }
-        "keep-as" in step -> {
-            only(step, setOf("keep-as"))
-            keepAs(step["keep-as"].toString())
-        }
-        else -> stop("a step this run can't make yet: ${step.keys.joinToString(", ")}")
-    }
+/** [step], made by the maker its key names (DataSteps.kt), once its keys are all that maker's. */
+private fun Here.made(step: Map<*, *>, why: String?) {
+    val key = MAKERS.keys.firstOrNull { it in step }
+    val maker = key?.let(MAKERS::getValue)
+        ?: REASONED.takeIf { "intent" in step || "inferred" in step }
+        ?: stop("not a step a script can make: ${step.keys.joinToString(", ")}")
+    val outside = step.keys.map { it.toString() }.filter { it !in maker.keys }
+    if (outside.isNotEmpty()) stop("not in a script's vocabulary: ${outside.joinToString(", ")}")
+    maker.make(this, step, Reading(run, this, why))
 }
+
+/** A step's maker (DataSteps.kt): the keys it may hold, and what it does where the script stands. */
+internal class Maker(val keys: Set<String>, val make: Here.(Map<*, *>, Reading) -> Unit)
 
 /** The words of [step], each reference read. */
-private fun said(step: Map<*, *>, reading: Reading) = Said(
+internal fun said(step: Map<*, *>, reading: Reading) = Said(
     intent = step["intent"]?.let { reading.text(it.toString()) },
     inferred = step["inferred"]?.let { reading.text(it.toString()) },
     fromIntent = step["from-intent"]?.let { reading.text(it.toString()) },
 )
 
 /** Stops the run at a step it can't make, before anything is sent for it. */
-private fun stop(why: String): Nothing = throw ScriptStopped(0, "", why)
-
-/** A step's keys must be [keys]'s: anything else is outside the vocabulary. */
-private fun only(step: Map<*, *>, keys: Set<String>) {
-    val outside = step.keys.map { it.toString() }.filter { it !in keys }
-    if (outside.isNotEmpty()) stop("not in a script's vocabulary: ${outside.joinToString(", ")}")
-}
-
-private val ACT = setOf("act", "fields", "intent", "inferred", "from-intent", "then")
+internal fun stop(why: String): Nothing = throw ScriptStopped(0, "", why)
 
 /**
  * The references in a script's values, read where it stands ([here]): an input by its name; a resource kept by its
  * name, then the members under it; `state`, the state held; `why`, the reason a wait gave up ([why]).
  */
-internal class Reading(private val run: Run, private val here: Here?, private val why: String? = null) {
+internal class Reading(private val run: Run, private val here: Here?, val why: String? = null) {
+    /** The same references, read where [there] stands: a fact read on a resource kept, or on a member. */
+    fun at(there: Here) = Reading(run, there, why)
+
     /** [value] with each reference read: a value that is one reference alone, the value it reads. */
     fun value(value: Any?): Any? = when (value) {
         is String -> REFERENCE.matchEntire(value)?.let { read(it.groupValues[1]) } ?: text(value)

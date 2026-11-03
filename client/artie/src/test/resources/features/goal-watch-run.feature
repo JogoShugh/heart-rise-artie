@@ -1184,6 +1184,19 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
                           body: Seen by the bench watch.
                         listed-in: github:issues-list-comments
       """
+    And "acme/rockets" has these issues on the small GitHub
+      | number | title                       | state | author |
+      | 14     | Aphids on the bench 3 basil | open  | ada    |
+    And issue 14 of "acme/rockets" is labelled "alert" on the small GitHub
+    And "unless.heart.yaml" runs with ARTIE, captured in "unless-data.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 14 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
+    And issue 13 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                     |
+      | ada    | Seen by the bench watch. |
 
   Scenario: A check's values are the planner's own, and an act asked again just after it is made is refused
     Found by the live seed bench run b5: the first alert already had the

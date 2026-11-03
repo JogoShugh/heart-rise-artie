@@ -22,7 +22,7 @@ fun Here.holds(facts: Map<String, Any?>): Boolean = holds(facts, held)
 /** Facts as a map, from data the script already has: each value a value (equality) or a [Matcher]. */
 fun Here.check(facts: Map<String, Any?>) = checkFacts(facts.map { (member, value) -> fact(member to value) })
 
-private fun Here.checkFacts(facts: List<Fact>) {
+internal fun Here.checkFacts(facts: List<Fact>) {
     val step = ++run.step
     val tested = facts.map { fact ->
         val (present, value) = state.find(fact.member)
