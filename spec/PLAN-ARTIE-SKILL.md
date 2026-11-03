@@ -59,7 +59,9 @@ Claude does every request itself with `curl`. The new skill replaces it, at the 
   and no second model).
 - **The image:** JRE now, native later; a local build only, or published.
 - **`keep:` by default:** `propose` (a person approves each repair) or `auto` (safe repairs kept).
-- **The old `heart-client` skill:** retire it, or keep it for protocol teaching only.
+- **The old `heart-client` skill:** decided 2026-11-03, the author: replace it. Backed up, with its session notes and
+  traces, at `~/.claude/skill-backups/heart-client-2026-11-03/`, outside the skills folder so it isn't loaded. It
+  stays in place until the new skill is written (step 3), then the new one takes its place.
 
 ## Steps
 
