@@ -50,6 +50,9 @@ class ScriptYaml(
     var reviews = 0
         private set
 
+    /** How many acts the script checks after, by what they changed (Checks.kt). */
+    private var checked = 0
+
     /** How many steps before a watch the model decides on every run: kept as reason steps, or as words. */
     var kept = 0
         private set
@@ -67,6 +70,7 @@ class ScriptYaml(
         // Twice: the first pass meets every variable, so the second can read each from the resource it is kept in.
         steps(walker.walk(root))
         reviews = 0
+        checked = 0
         val walked = walker.walk(root)
         kept = reasoned(walked)
         asked = asked(watch)
@@ -95,6 +99,7 @@ class ScriptYaml(
         "# The members of a list the run visited one by one are each acted on by what they offer (when-offered)."
             .takeIf { looped },
         "# What it was offered is pinned in $pins, held to before every act.",
+        "# After an act, what it changed is checked: the run stops where that no longer holds.".takeIf { checked > 0 },
         calls(kept, asked)?.let { "# $it: artie run needs --reasoner." },
         "# A value marked \"review:\" holds a value the reasoner chose: check it before keeping the script."
             .takeIf { reviews > 0 },
@@ -128,7 +133,9 @@ class ScriptYaml(
     private fun overMembers(members: List<Walked.Selection>): List<Map<String, Any?>> {
         looped = true
         val acts = cases(members).map { case ->
-            act(case.step) + listOfNotNull(("then" to steps(case.block)).takeIf { case.step.opens })
+            val act = act(case.step)
+            val then = (act["then"] as? List<*>).orEmpty() + (if (case.step.opens) steps(case.block) else emptyList())
+            act + listOfNotNull(("then" to then).takeIf { case.step.opens || then.isNotEmpty() })
         }
         val offered = linkedMapOf<String, Any?>("when-offered" to acts)
         words(capture, members.first().step, names, emptyList())?.let { it.fromIntent ?: it.intent }
@@ -170,7 +177,9 @@ class ScriptYaml(
         }
         // A step that opens none holds no block: what it led to is kept where it stands.
         if (!step.opens) return listOf(made) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) }.distinct()
-        made["then"] = listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }) + steps(selection.block)
+        // A resource made new is read again first; then what the act changed is checked, then the steps in it.
+        made["then"] = listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }) +
+            (made["then"] as? List<*>).orEmpty() + steps(selection.block)
         return listOf(made)
     }
 
@@ -181,6 +190,10 @@ class ScriptYaml(
         val act = linkedMapOf<String, Any?>("act" to step.relation)
         if (arguments.isNotEmpty()) act["fields"] = arguments.associate { it.field to noted(it) }
         words(capture, step, names, arguments)?.let { act.putAll(said(it)) }
+        checks(capture, step, arguments.associate { it.field to it.value }).takeIf { it.isNotEmpty() }?.let {
+            act["then"] = it
+            checked++
+        }
         return act
     }
 
