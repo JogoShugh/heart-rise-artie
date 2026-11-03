@@ -36,7 +36,7 @@ private val SETTINGS: Map<String, Set<String>> = mapOf(
 
 /** The config for [asked], whose script is [script], found in [folder]. */
 fun config(asked: Arguments, folder: Path, script: Path): Config {
-    val name = asked.config ?: (script.fileName.toString().substringBeforeLast('.') + ".config.yaml")
+    val name = asked.config ?: (scriptName(script) + ".config.yaml")
     val file = folder.resolve(name)
     if (!Files.exists(file)) {
         if (asked.config != null) throw BadArguments("$STOPPED: --config, but no config at $name")

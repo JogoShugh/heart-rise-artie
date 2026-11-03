@@ -97,19 +97,15 @@ class ArtieCli(
         val stopped = Thread { kept() }
         Runtime.getRuntime().addShutdownHook(stopped)
         val ended = try {
-            if (isGoal(file)) {
-                pursued(asked, file, run) { client }
-            } else {
-                // A script that reasons, an act with an intent and no relation, is known before it runs, by its
-                // text: without --reasoner, nothing is sent.
-                if (!asked.inputsOf && asked.reasoner == null && REASONS.containsMatchIn(text)) {
-                    throw BadArguments("stopped before the first request: act(intent = …) needs --reasoner")
-                }
-                execute(run, text).also { if (asked.inputsOf) return listed(run, text) }
+            when {
+                isGoal(file) -> pursued(asked, file, run) { client }
+                isData(file) -> held(run, text) { stopped(it, run) }
+                else -> execute(run, text, asked)
             }
         } finally {
             runCatching { Runtime.getRuntime().removeShutdownHook(stopped) }
         }
+        if (asked.inputsOf && !isGoal(file)) return listed(run, text)
         // What the run's model calls took, as its client counted them, and which model took them: a client never
         // made took nothing.
         if (made.isInitialized()) {
@@ -165,7 +161,12 @@ class ArtieCli(
         }
     }
 
-    private fun execute(run: Run, script: String): Ended {
+    private fun execute(run: Run, script: String, asked: Arguments): Ended {
+        // A script that reasons, an act with an intent and no relation, is known before it runs, by its text:
+        // without --reasoner, nothing is sent.
+        if (!asked.inputsOf && asked.reasoner == null && REASONS.containsMatchIn(script)) {
+            throw BadArguments("stopped before the first request: act(intent = …) needs --reasoner")
+        }
         // A reason step's template is read from the script's own text.
         run.source = script
         Run.current = run
@@ -241,7 +242,13 @@ class ArtieCli(
     }
 
     /** How a run ended; [drawing], a failed check's condition drawn with its values, printed above [line]. */
-    private class Ended(val exit: Int, val ended: String, val line: String, val steps: Int, val drawing: String? = null)
+    internal class Ended(
+        val exit: Int,
+        val ended: String,
+        val line: String,
+        val steps: Int,
+        val drawing: String? = null,
+    )
 
     private companion object {
         val IMPORTS = listOf("heart.script.*", "heart.script.test.*")

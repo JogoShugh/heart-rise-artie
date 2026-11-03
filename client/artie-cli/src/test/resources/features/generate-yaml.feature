@@ -7,6 +7,9 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
   brought into the run is read from the resource that step kept, by its
   member, ${issue.number}; a value the reasoner chose is the constant it
   was, with its review note as a YAML comment. The lock file is the same.
+  artie run runs it (step 4): each step made through the same functions a
+  Kotlin script calls, each reference read where it names, nothing
+  evaluated; so it makes the same selections the run it came from made.
 
   Background:
     Given a service holds these resources
@@ -112,6 +115,15 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
               intent: close it, since it's done
       """
     And the file "gen.heart.yaml" is a script as data, by spec/schemas/heart-script.draft.schema.json
+    When artie is run with
+      | argument                    |
+      | run                         |
+      | gen.heart.yaml              |
+      | title=Login fails on Safari |
+      | --trace                     |
+      | gen.trace.yaml              |
+    Then artie exits 0
+    And the run traced in "gen.trace.yaml" made the same selections as the run traced in "run.trace.yaml"
 
   Scenario: A follow, a read again, a wait and a check, each written as data from the capture
     The capture of generate.feature's "Without the script" scenario. A
