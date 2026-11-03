@@ -86,12 +86,6 @@ class ScriptYaml(
     /** How many of the watch's steps the model decides each time one is reached: those it says are reasoned. */
     private var asked = 0
 
-    private fun asked(data: Any?): Int = when (data) {
-        is Map<*, *> -> (if (data["reasoned"] == true) 1 else 0) + data.values.sumOf { asked(it) }
-        is List<*> -> data.sumOf { asked(it) }
-        else -> 0
-    }
-
     /** The steps of [block]: the resources it keeps, then the steps nested in it. */
     private fun steps(block: Block): List<Map<String, Any?>> =
         keeps(block) + block.statements.flatMap(::step)
@@ -99,21 +93,33 @@ class ScriptYaml(
     private fun keeps(block: Block): List<Map<String, Any?>> =
         (block.keeps.map { it.keptAs }.distinct() + listOfNotNull(block.watched)).map { mapOf("keep-as" to it) }
 
-    private fun step(walked: Walked): List<Map<String, Any?>> {
-        val selection = walked as? Walked.Selection
-        if (selection == null || selection.call != Call.Act || selection.fresh) {
-            throw BadArguments("step ${walked.step.number} of ${capture.name} can't be written as YAML yet")
-        }
+    private fun step(walked: Walked): List<Map<String, Any?>> = when (walked) {
+        is Walked.Selection -> selection(walked)
+        is Walked.Sync -> listOf(mapOf("sync" to true))
+        is Walked.Waits -> listOf(waited(walked.step))
+    }
+
+    /** An act or a follow, its words, and its block: begun with a read again of a resource it just made. */
+    private fun selection(selection: Walked.Selection): List<Map<String, Any?>> {
         val step = selection.step
-        val arguments = bindings.arguments(step)
-        reviews += arguments.count { it.review != null }
-        val act = linkedMapOf<String, Any?>("act" to step.relation)
-        if (arguments.isNotEmpty()) act["fields"] = arguments.associate { it.field to noted(it) }
-        words(capture, step, names, arguments)?.let { act.putAll(said(it)) }
+        if (selection.call is Call.Reasoned || selection.call is Call.Words) {
+            throw BadArguments("step ${step.number} of ${capture.name}, kept for the reasoner, can't be data yet")
+        }
+        val made = linkedMapOf<String, Any?>()
+        val arguments = if (selection.call == Call.Follow) emptyList() else bindings.arguments(step)
+        if (selection.call == Call.Follow) {
+            made["follow"] = step.relation
+            step.params["title"]?.let { made["title"] = it.toString() }
+        } else {
+            reviews += arguments.count { it.review != null }
+            made["act"] = step.relation
+            if (arguments.isNotEmpty()) made["fields"] = arguments.associate { it.field to noted(it) }
+        }
+        words(capture, step, names, arguments)?.let { made.putAll(said(it)) }
         // A step that opens none holds no block: what it led to is kept where it stands.
-        if (!step.opens) return listOf(act) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) }.distinct()
-        act["then"] = steps(selection.block)
-        return listOf(act)
+        if (!step.opens) return listOf(made) + selection.block.keeps.map { mapOf("keep-as" to it.keptAs) }.distinct()
+        made["then"] = listOfNotNull(mapOf("sync" to true).takeIf { selection.fresh }) + steps(selection.block)
+        return listOf(made)
     }
 
     /** [argument]'s value, with its review note when a person should look at it. */
@@ -133,14 +139,54 @@ class ScriptYaml(
         if (name.isEmpty()) "$" else bindings.referenceOf(name)
     }
 
-    /** An input as the capture kept its declaration: nothing for a required one, else its default and question. */
-    private fun declared(input: Map<*, *>): Map<String, Any?>? {
-        val default = input["now"]?.let { mapOf("now" to it.toString()) } ?: input["default"]?.toString()
-        val declared = listOfNotNull(default?.let { "default" to it }, input["question"]?.let { "question" to it })
-        return declared.toMap().takeIf { it.isNotEmpty() }
-    }
-
     private companion object {
         val SLOT = Regex("""\$\{'\$'}|\$\{([^}]*)}|\$([A-Za-z_][A-Za-z0-9_]*)""")
     }
 }
+
+/** An input as the capture kept its declaration: nothing for a required one, else its default and question. */
+private fun declared(input: Map<*, *>): Map<String, Any?>? {
+    val default = input["now"]?.let { mapOf("now" to it.toString()) } ?: input["default"]?.toString()
+    val declared = listOfNotNull(default?.let { "default" to it }, input["question"]?.let { "question" to it })
+    return declared.toMap().takeIf { it.isNotEmpty() }
+}
+
+/** How many steps in [data], a watch's, however deep, the model decides each time: those it says are reasoned. */
+private fun asked(data: Any?): Int = when (data) {
+    is Map<*, *> -> (if (data["reasoned"] == true) 1 else 0) + data.values.sumOf { asked(it) }
+    is List<*> -> data.sumOf { asked(it) }
+    else -> 0
+}
+
+/**
+ * A wait or a check as data, from what the capture kept of it, never from a script's Kotlin: until a relation is
+ * offered; each fact checked, a member equal to a value or holding one.
+ */
+internal fun waited(step: Step): Map<String, Any?> {
+    if (step.say == "until") {
+        val relation = OFFERS.matchEntire(step.waitedFor.orEmpty().trim())?.groupValues?.get(1)
+            ?: throw BadArguments("step ${step.number}: a wait for ${step.waitedFor} can't be data yet")
+        return mapOf("until" to mapOf("offered" to relation))
+    }
+    val facts = step.params["facts"].list().map { it.map() }
+    if (facts.isEmpty()) throw BadArguments("step ${step.number}: a check the capture can't write back")
+    return mapOf("check" to facts.map { fact(step, it) })
+}
+
+private fun fact(step: Step, fact: Map<*, *>): Map<String, Any?> {
+    val test = fact["test"].toString()
+    val key = when (test.substringBefore(' ')) {
+        "eq" -> "is"
+        "has" -> "has"
+        else -> throw BadArguments("step ${step.number}: a check \"$test\" can't be data yet")
+    }
+    val argument = test.substringAfter(' ', "")
+    val value: Any? = when {
+        argument == "null" -> null
+        argument == "true" || argument == "false" -> argument.toBoolean()
+        else -> argument.toLongOrNull() ?: argument.toDoubleOrNull() ?: argument
+    }
+    return mapOf("field" to fact["member"].toString(), key to value)
+}
+
+private val OFFERS = Regex("""offers\("([^"]+)"\)""")

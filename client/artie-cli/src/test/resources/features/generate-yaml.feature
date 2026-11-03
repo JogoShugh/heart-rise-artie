@@ -112,3 +112,255 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
               intent: close it, since it's done
       """
     And the file "gen.heart.yaml" is a script as data, by spec/schemas/heart-script.draft.schema.json
+
+  Scenario: A follow, a read again, a wait and a check, each written as data from the capture
+    The capture of generate.feature's "Without the script" scenario. A
+    follow that opens nothing stands alone; the block of an act that made a
+    resource reads it again first, sync; the wait and the check are the
+    capture's, never the Kotlin of a script: until a relation is offered,
+    and a member's value checked.
+    Given the file "run.trace.yaml" is
+      """
+      ---
+      run:
+        inputs:
+          owner:
+            value: acme
+            given: given
+          stamp:
+            value: 1018-2200
+            given: default
+            default: 1018-2200
+      ---
+      mode: script
+      say: enter {entry}
+      line: 1
+      params:
+        entry: http://localhost:8392/
+      opens: true
+      outcome: done
+      now:
+        state:
+          title: Rockets
+          hr:manifest:
+            forms:
+              repos-get:
+                - sha256-repos
+            digest: sha256-every-form
+      ---
+      mode: intent
+      say: open the repository acme
+      line: 2
+      within: 1
+      params:
+        relation: repos-get
+        owner: acme
+      values:
+        owner:
+          value: acme
+          type: string
+          from:
+            - input: owner
+      reason:
+        template: open the repository $owner
+        slots:
+          owner:
+            value: acme
+            from:
+              - input: owner
+      opens: true
+      chose:
+        kind: form
+        relation: repos-get
+      guard:
+        rung: L2
+        form: sha256-repos
+      outcome: done
+      now:
+        state:
+          name: rockets
+          head_sha: abc123
+      ---
+      mode: intent
+      say: follow its branches
+      line: 3
+      within: 2
+      params:
+        relation: branches
+      reason:
+        template: follow its branches
+        slots: {}
+      chose:
+        kind: link
+        relation: branches
+        target: /repos/{owner}/branches
+      guard:
+        rung: L2
+      outcome: done
+      ---
+      mode: intent
+      say: start a branch named fix-1018-2200
+      line: 4
+      within: 2
+      params:
+        relation: start-branch
+        name: fix-1018-2200
+      values:
+        name:
+          value: fix-1018-2200
+          type: string
+          from:
+            - parts:
+                1018-2200:
+                  input: stamp
+      reason:
+        template: start a branch named fix-$stamp
+        slots:
+          stamp:
+            value: 1018-2200
+            from:
+              - input: stamp
+      opens: true
+      chose:
+        kind: form
+        relation: start-branch
+      guard:
+        rung: L2
+        set:
+          integrity: sha256-set1
+        form: sha256-start
+      outcome: new resource
+      now:
+        state:
+          ref: fix-1018-2200
+          sha: abc123
+      ---
+      mode: script
+      say: until
+      line: 5
+      within: 4
+      params: {}
+      waited:
+        for: offers("merge")
+        reads: 2
+      outcome: held
+      ---
+      mode: intent
+      say: merge it
+      line: 6
+      within: 4
+      params:
+        relation: merge
+        sha: abc123
+        merge_method: squash
+      values:
+        sha:
+          value: abc123
+          type: string
+          from:
+            - step: 4
+              pointer: /sha
+            - step: 2
+              pointer: /head_sha
+        merge_method:
+          value: squash
+          type: string
+          from:
+            - chosen
+      reason:
+        template: merge it
+        slots: {}
+      chose:
+        kind: form
+        relation: merge
+      guard:
+        rung: L2
+        set:
+          integrity: sha256-set2
+        form: sha256-merge
+      outcome: done
+      ---
+      mode: script
+      say: check
+      line: 7
+      within: 4
+      params:
+        facts:
+          - member: merged
+            test: eq true
+            held: 'true'
+            holds: true
+      outcome: held
+      ---
+      mode: script
+      say: return to {address}
+      line: 4
+      within: 2
+      params:
+        address: http://localhost:8392/repos/acme/branches
+      outcome: done
+      ---
+      mode: script
+      say: return to {address}
+      line: 2
+      within: 1
+      params:
+        address: http://localhost:8392/
+      outcome: done
+      """
+    When artie is run with
+      | argument       |
+      | generate       |
+      | run.trace.yaml |
+      | --out          |
+      | gen.heart.yaml |
+      | --format       |
+      | yaml           |
+    Then artie exits 0
+    And artie prints
+      | line                                           |
+      | wrote gen.heart.yaml: 1 value to review        |
+      | wrote gen.pins.yaml: 3 forms and 1 link pinned |
+    And the file "gen.heart.yaml" reads
+      """yaml
+      # Generated by artie generate from run.trace.yaml.
+      # Every selection as that run made it, nested as it nested, with no model.
+      # What it was offered is pinned in gen.pins.yaml, held to before every act.
+      # A value marked "review:" holds a value the reasoner chose: check it before keeping the script.
+      #   artie run gen.heart.yaml owner=acme
+      heart: 1
+      kind: kept
+      start: http://localhost:8392/
+
+      inputs:
+        owner:
+        stamp:
+          default: 1018-2200
+
+      steps:
+        - act: repos-get
+          fields:
+            owner: ${owner}
+          intent: open the repository ${owner}
+          then:
+            - keep-as: headSha
+            - follow: branches
+              intent: follow its branches
+            - act: start-branch
+              fields:
+                name: fix-${stamp}
+              intent: start a branch named fix-${stamp}
+              then:
+                - sync: true
+                - until:
+                    offered: merge
+                - act: merge
+                  fields:
+                    sha: ${headSha.head_sha}
+                    merge_method: squash # review: the reasoner chose it, asked "merge it"
+                  intent: merge it
+                - check:
+                    - field: merged
+                      is: true
+      """
+    And the file "gen.heart.yaml" is a script as data, by spec/schemas/heart-script.draft.schema.json
