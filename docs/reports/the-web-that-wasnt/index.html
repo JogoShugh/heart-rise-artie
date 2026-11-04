@@ -80,6 +80,7 @@ blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rul
 .controls label { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .controls select { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.6rem; }
 blockquote.fielding { border-left-color: var(--leaf); color: var(--fg); font: 500 1.08rem/1.55 var(--display); padding: 0.6rem 1rem; }
+blockquote.fielding p + p { margin-top: 0.6rem; }
 blockquote cite { display: block; margin-top: 0.35rem; font: 400 0.85rem var(--body); color: var(--muted); font-style: normal; }
 details[data-level] { border-left: 2px solid var(--rule); padding-left: 0.9rem; display: grid; gap: 0.6rem; }
 details[data-level] > summary { cursor: pointer; color: var(--link); font-size: 0.9rem; font-weight: 600; list-style: none; }
@@ -121,13 +122,12 @@ details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
       <li>In 2008 he objected to APIs that list their operations up front, and called one of them RPC.</li>
     </ul>
     <details data-level="3"><summary>In his words</summary>
-      <ul>
-        <li>“I am getting frustrated by the number of people calling any HTTP-based interface a REST API.”</li>
-        <li>“That is RPC. It screams RPC.”</li>
-        <li>“if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period.”</li>
-        <li>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types…”</li>
-      </ul>
-      <p class="note">Roy T. Fielding, dissertation, 2000, §5.1.5; <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a> and its comments, 20 October 2008.</p>
+      <blockquote class="fielding"><p>“I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.</p>
+      <p>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?”</p>
+      <cite>The post’s opening</cite></blockquote>
+      <blockquote class="fielding"><p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API).”</p>
+      <cite>From the same post</cite></blockquote>
+      <p class="note">Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a>, 20 October 2008; the rule itself, dissertation, 2000, §5.1.5.</p>
     </details>
   </details>
 
