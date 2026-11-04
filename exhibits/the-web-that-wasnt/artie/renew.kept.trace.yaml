@@ -1,0 +1,262 @@
+---
+run:
+  inputs: {}
+---
+at: '2026-11-04T16:01:34.641277Z'
+ms: 57
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8140/
+opens: true
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+      digest: sha256-xNb4bBcVbsAztdAvDVTA9FjlnQ+A7EMhGvJxgHia7DQ=
+  forms:
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-04T16:01:34.706363Z'
+ms: 46
+mode: script
+say: act {relation}, name {name}
+inferred: search loans for Ana's loan of Matilda
+fromIntent: Find Matilda, and renew it if renewing is offered; otherwise say why it can't be renewed
+params:
+  relation: library:search-loans
+  name: Matilda
+values:
+  name:
+    value: Matilda
+    type: string
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: library:search-loans
+  title: Find loans by title
+  method: GET
+  target: /loans{?name}
+  address: http://localhost:8140/loans?name=Matilda
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+  act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=
+  checked: lenient
+  held: form
+offered:
+  forms:
+    - library:get-loan
+    - library:search-loans
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8140/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-04T16:01:34.754983Z'
+ms: 7
+mode: script
+say: follow {relation}, titled {title}
+inferred: open the item "Matilda"
+fromIntent: Find Matilda, and renew it if renewing is offered; otherwise say why it can't be renewed
+params:
+  relation: item
+  title: Matilda
+values:
+  title:
+    value: Matilda
+    from:
+      - constant
+opens: true
+chose:
+  kind: link
+  relation: item
+  title: Matilda
+  method: GET
+  target: http://localhost:8140/loans/3311
+  address: http://localhost:8140/loans/3311
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-04T16:01:34.763446Z'
+ms: 5
+mode: script
+say: act {relation}
+intent: Find Matilda, and renew it if renewing is offered; otherwise say why it can't be renewed
+params:
+  relation: library:renew
+opens: true
+chose:
+  kind: form
+  relation: library:renew
+  title: Renew
+  method: POST
+  target: /loans/{id}/actions/renew
+  address: http://localhost:8140/loans/3311/actions/renew
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
+    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
+  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  schema:
+    href: http://localhost:8140/schemas/efddc7bd8bbcef73
+    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
+  if-match: '"seq-1.hsf.L2.c283a2a3a2a1bf77"'
+  checked: lenient
+  held: set
+offered:
+  forms:
+    - library:renew
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-04T16:01:34.769055Z'
+ms: 3
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans/3311
+outcome: done
+address: http://localhost:8140/loans/3311
+now:
+  state:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable
+  forms:
+    - library:renew
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-04T16:01:34.772610Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/loans?name=Matilda
+outcome: done
+address: http://localhost:8140/loans?name=Matilda
+now:
+  state:
+    count: 1
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Matilda
+---
+at: '2026-11-04T16:01:34.775200Z'
+ms: 1
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/
+outcome: done
+address: http://localhost:8140/
+now:
+  state:
+    title: Riverside Public Library
+    hr:manifest:
+      forms:
+        library:get-loan:
+          - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
+        library:renew:
+          - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:return:
+          - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-loans:
+          - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
+      digest: sha256-xNb4bBcVbsAztdAvDVTA9FjlnQ+A7EMhGvJxgHia7DQ=
+  forms:
+    - library:search-loans
+    - library:get-loan
+  links:
+    self:
+      - null
+    service-desc:
+      - null

@@ -1,0 +1,35 @@
+note: 'Matilda as HAL-FORMS: renew and return are both offered as templates.'
+request:
+  method: GET
+  url: /loans/3311
+  headers:
+    Accept: application/prs.hal-forms+json
+    Authorization: <Ana's card and PIN>
+response:
+  status: 200
+  headers:
+    Content-Type: application/prs.hal-forms+json
+    ETag: '"seq-1.hf.L0.5cf9f95956933146"'
+  body:
+    id: 3311
+    title: Matilda
+    author: Roald Dahl
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable
+    _links:
+      self:
+        href: /loans/3311
+    _templates:
+      renew:
+        title: Renew
+        method: POST
+        contentType: application/json
+        target: /loans/3311/actions/renew
+        properties: []
+      return:
+        title: Return
+        method: POST
+        contentType: application/json
+        target: /loans/3311/actions/return
+        properties: []

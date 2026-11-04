@@ -1,0 +1,29 @@
+note: 'The Hobbit as HAL-FORMS: only return is offered; renew is absent.'
+request:
+  method: GET
+  url: /loans/3310
+  headers:
+    Accept: application/prs.hal-forms+json
+    Authorization: <Ana's card and PIN>
+response:
+  status: 200
+  headers:
+    Content-Type: application/prs.hal-forms+json
+    ETag: '"seq-1.hf.L0.28eb708ac7774259"'
+  body:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+    _links:
+      self:
+        href: /loans/3310
+    _templates:
+      return:
+        title: Return
+        method: POST
+        contentType: application/json
+        target: /loans/3310/actions/return
+        properties: []
