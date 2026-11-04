@@ -43,6 +43,9 @@ class ScriptWriter(
     /** How many acts the script checks after, by what they changed (Checked.kt). */
     private var checked = 0
 
+    /** Whether a list's members the run visited one by one are written as a whenever (Members.kt). */
+    private var looped = false
+
     fun write(): String {
         capture.finished()
         // A goal run's detours are left out: the script does only what the goal needed.
@@ -91,6 +94,8 @@ class ScriptWriter(
             "// Every selection as that run made it, nested as it nested; " +
                 "where the reasoner chose a value, its reason step is kept."
         },
+        "// The members of a list the run visited one by one are each acted on by what they offer (whenOffered)."
+            .takeIf { looped },
         "// What it was offered is pinned in $pins, held to before every act.",
         "// After an act, what it changed is checked: the run stops where that no longer holds.".takeIf { checked > 0 },
         // How often the script calls the model, said where a person sees it first.
@@ -128,6 +133,13 @@ class ScriptWriter(
     private fun block(block: Block, depth: Int): List<String> {
         val pad = INDENT.repeat(depth)
         val watched = block.watched?.let { listOf("${pad}keepAs(\"$it\")") }.orEmpty()
+        // A list's members visited one by one: a whenever, each acted on by what it offers (Members.kt).
+        members(block)?.let { members ->
+            looped = true
+            val words = words(capture, members.first().step, names, emptyList())?.let { it.fromIntent ?: it.intent }
+            val cases = cases(members).map { it.step.relation.orEmpty() to statement(it, depth + CASE_DEPTH) }
+            return reads(block.keeps, depth) + watched + overMembers(depth, words, cases)
+        }
         val decided = decided(block, capture)
         val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
         return reads(block.keeps.filter { it.keptAs !in inside }, depth) + watched +
@@ -215,7 +227,9 @@ class ScriptWriter(
         }?.also { checked++ }
         val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
             listOfNotNull(intent)).joinToString(", ") + ")"
-        val long = arguments.any { it.review != null } || Derivations.visible(oneLine) > WIDTH
+        // An act that sends nothing has no values to set out a line each: one line, however long.
+        val long = arguments.isNotEmpty() &&
+            (arguments.any { it.review != null } || Derivations.visible(oneLine) > WIDTH)
         if (!long) return listOf(oneLine) to facts
         val head = "${pad}act(" + (listOf(relation) + listOfNotNull(intent) + "fields = {").joinToString(", ")
         return listOf(head) + arguments.map {
