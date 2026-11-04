@@ -159,23 +159,20 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
         doing(reading.text(step["doing"].toString())) { inner(step, "steps", reading) }
     },
     "done-where" to Maker(setOf("done-where")) { step, reading -> doneWhere(facts(step["done-where"], reading)) },
-    // The first case whose act is offered here, else otherwise (spec/PLAN-COST-FOLLOWS-STATES.md): the server
-    // decided the state, and the offer says it; Kotlin says the same with `when { offers(rel) -> … }`. A member
-    // that offers an act no case names is the step's words, where the run falls back to them: the script grows by
-    // use (spec/ideas/branching-from-intent-runs.md). One that offers nothing takes otherwise, with no model.
+    // The first case whose act is offered here, else otherwise (spec/PLAN-COST-FOLLOWS-STATES.md), through Kotlin's
+    // whenOffered, so the two behave alike: a member that offers an act no case names is the step's words, where
+    // the run falls back to them (spec/ideas/branching-from-intent-runs.md); one that offers nothing, otherwise.
     "when-offered" to Maker(setOf("when-offered", "otherwise") + WORDS) { step, reading ->
         val cases = (step["when-offered"] as? List<*>).orEmpty()
             .map { it as? Map<*, *> ?: stop("a case is not a map: $it") }
         if (cases.isEmpty()) stop("when-offered names no case")
-        val case = cases.firstOrNull { case ->
-            offers(case["act"]?.toString() ?: stop("a when-offered case is an act: ${case.keys.joinToString()}"))
-        }
-        val worded = step.keys.any { it in WORDS }
-        when {
-            case != null -> made(listOf(case), reading.why)
-            worded && run.fallsBack && held.offered.isNotEmpty() ->
-                REASONED.make(this, step.filterKeys { it in WORDS }, reading)
-            else -> inner(step, "otherwise", reading)
+        val words = said(step, reading)
+        whenOffered(words.intent, words.inferred, words.fromIntent, otherwise = { inner(step, "otherwise", reading) }) {
+            cases.forEach { offered ->
+                val rel = offered["act"]?.toString()
+                    ?: stop("a when-offered case is an act: ${offered.keys.joinToString()}")
+                case(rel) { made(listOf(offered), reading.why) }
+            }
         }
     },
     "decide" to Maker(setOf("decide")) { step, reading ->
