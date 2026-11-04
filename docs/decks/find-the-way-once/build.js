@@ -955,20 +955,21 @@ add("CONTENT", (s) => {
   const bad = (t) => ({ text: t, fill: "FBE4E1", color: C.rust, bold: true });
   table(s, [
     ["The change", "Kept programs", "Kept skill, run by a harness", "ARTIE’s kept script"],
-    ["Acts moved to new addresses", ok("right*"), ok("right*"), once("pins re-recorded: model once")],
-    ["Update became a PATCH", ok("right*"), ok("right*"), once("pin re-recorded: model once")],
+    ["Acts moved to new addresses", ok("right*"), ok("right*"), ok("right: the pin holds the act")],
+    ["Update became a PATCH", ok("right*"), ok("right*"), once("a new act: model once")],
     ["role renamed position", bad("422, exit 0: wrong"), once("422, then rewritten"), once("stopped before the write, repaired")],
     ["Dismiss needs notice first", bad("409, exit 0: wrong"), once("409, then rewritten"), once("gave notice, then dismissed")],
     ["Update needs a reason", bad("422, exit 0: wrong"), bad("made up a reason, and kept it"), once("stopped and asked for it")],
     ["More records than a page", bad("34 of 90, exit 0"), bad("50 of 90, exit 0"), ok("right: follows next")],
     ["A teammate changed him first", ok("right"), once("412, rewritten twice"), ok("412, read again: no model")],
-  ], { x: 0.6, y: 1.6, w: 12.1, colW: [3.4, 2.6, 3.0, 3.1], rowH: [0.5, 0.48, 0.48, 0.48, 0.48, 0.48, 0.48, 0.48], fontSize: 14 });
+  ], { x: 0.6, y: 1.6, w: 12.1, colW: [3.4, 2.6, 3.0, 3.1], rowH: [0.46, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44], fontSize: 14 });
   text(s, [
+    { text: "A pin holds what a form does, not where it is: a move goes on with no model; a new method or field is a new act.", options: { bullet: BULLET, breakLine: true } },
     { text: "The goal changed for one of the seven: a reason, which only a person can give. ARTIE asked; the skill made one up.", options: { bullet: BULLET, breakLine: true } },
     { text: "The kept script is the goal’s lock file: a release re-records it, and a person reviews the diff.", options: { bullet: BULLET } },
-  ], { x: 0.6, y: 5.6, w: 12.1, h: 0.85, fontSize: 15, paraSpaceAfter: 4 });
+  ], { x: 0.6, y: 5.3, w: 12.1, h: 1.15, fontSize: 15, paraSpaceAfter: 4 });
   foot(s, "* The SDK was generated from the description at the start of every run. Task t1, one run per release, on the way kept before it.", false, 6.5);
-  s.addNotes("Measured 4 November 2026. Kept programs and skills copy the domain: field names, state rules, paging. ARTIE's pins hold each form's target and method too, so a move or a new method called the model once (4,362 and 1,265 tokens) though ARTIE never built an address; letting a change of target alone through is a next step. The rename and teammate rows are from the 20-run sequence; the paging from the runs at 90 employees.");
+  s.addNotes("Measured 4 November 2026. Kept programs and skills copy the domain: field names, state rules, paging. A pin holds what a form does, not where it is: its act, the method, content type, template pointers and schema with the target set aside. ARTIE never builds an address, so a moved form goes on with no model; a new method is a new act, and called the model once (1,265 tokens). Strict stops at any change. The rename and teammate rows are from the 20-run sequence; the paging from the runs at 90 employees.");
 });
 
 // 32. Close: where the model earns its keep

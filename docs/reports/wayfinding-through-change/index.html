@@ -229,6 +229,7 @@ footer ul { gap: 0.2rem; }
   <ul>
     <li><b>Rungs:</b> at L0 the forms and their schemas are inside each answer. At L2 they are linked: the forms for one state published once at their own address, shared by every resource in that state, and cached for a year. A client asks with <code>Prefer: forms=link, schema=link</code>.</li>
     <li><b>Kept script and pins:</b> a run's way written as data, run again with no model; its pins record the forms the run was offered, so a changed form is caught before any request.</li>
+    <li><b>A pin holds what a form does, not where it is:</b> each form's act (method, content type, template pointers and schema), its target set aside. ARTIE never builds an address, so a form the server moves goes on with no model; a new method or a renamed field is a new act, and stops the step. Strict stops at any change.</li>
     <li><b>Code mode:</b> a model writing programs against an API, run in a sandbox (Anthropic's "code execution with MCP", Cloudflare's Code Mode).</li>
   </ul>
 
@@ -471,6 +472,7 @@ flowchart TD
     <li><b>At the release:</b> in run 7, ARTIE's pins refused the changed forms, each step fell back to its words, the model chose <code>position</code>, and the acts were done. After the run, the repairs were written into the kept scripts and their pins (<code>keep: auto</code>), so runs 8 to 10 ran with no model.</li>
     <li><b>Kept without a person only where it is safe:</b> the run finished; the repair made the act the script was making; and every value it sent is one the script sent. Each is copied as the script wrote it, so an input stays an input and <code>${state.role}, retired</code> stays a reference, never the literal "ring bearer, retired".</li>
     <li><b>Not kept automatically:</b> a value the script never sent, such as a new required <code>reason</code>; a repair that made another act; a run that didn't finish. <code>keep: propose</code> says what it would keep and writes nothing, where compliance asks for a person.</li>
+    <li><b>Moved, not changed:</b> a release that served the acts at new addresses, run on t1's kept script: each form's integrity changed and its act didn't, so hire, update and dismiss went on, held by their acts: 0 tokens, 2 runs of 2 right. A release that made update a PATCH changed its act: one model call, 1,265 tokens, and the repair was kept.</li>
     <li><b>What a run can't tell by its pins:</b> that the meaning stayed when the name changed. <code>artie generate</code> writes a check after each act that changes the resource it holds, from what the first run saw it change (<code>status</code> becomes "on notice"): a release that changed what an act does stops the run there, as the scripts code mode had ARTIE keep do.</li>
     <li><b>What a reviewer sees:</b> one line per field and one per pin. The hand-review comment in t3's script stays as it was.</li>
   </ul>

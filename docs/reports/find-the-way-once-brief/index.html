@@ -244,8 +244,8 @@ flowchart TD
       <tr><th>The change</th><th>Kept programs</th><th>Kept skill, run by a harness</th><th>Task words</th><th class="split">ARTIE's kept script</th><th>Goal</th></tr>
     </thead>
     <tbody>
-      <tr><th>Acts moved to new addresses</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="m split">pins re-recorded; model once, 4,362</td><td></td></tr>
-      <tr><th>Update became a PATCH</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="m split">pin re-recorded; model once, 1,265</td><td></td></tr>
+      <tr><th>Acts moved to new addresses</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="y split">right: the pins hold the act, not its address; no model</td><td></td></tr>
+      <tr><th>Update became a PATCH</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="m split">a new method is a new act: model once, 1,265</td><td></td></tr>
       <tr><th><code>role</code> renamed <code>position</code></th><td class="n">422, exit 0: wrong</td><td class="m">422, then rewritten; 12,601</td><td></td><td class="m split">stopped before the write, repaired; 3,105</td><td></td></tr>
       <tr><th>Dismiss needs notice first</th><td class="n">409, exit 0: wrong</td><td class="m">409, then rewritten; 12,507</td><td></td><td class="m split">gave notice, then dismissed; 3,855, each run until a person keeps it</td><td></td></tr>
       <tr><th>Update needs a reason</th><td class="n">422, exit 0: wrong</td><td class="n">made up a reason, "role change", and kept it; 12,091</td><td class="n">never asked</td><td class="m split">stopped before the write: "What reason should I give…?"</td><td class="m">needs the reason: a person adds it</td></tr>
@@ -258,6 +258,7 @@ flowchart TD
   <ul>
     <li><b>The goal is the stable layer.</b> Of seven changes, one reached it: a reason, which only a person can give. ARTIE stopped and asked; the skill made one up.</li>
     <li><b>The kept script is the goal's lock file.</b> A release re-records it, and a person reviews the diff; the goal changes when the task does.</li>
+    <li><b>A pin holds what a form does, not where it is.</b> Its act: the method, content type, template pointers and schema, the target set aside. ARTIE never builds an address, so a form the server moves goes on with no model. A new method or a new field is a new act, and stops the step before the write. Strict stops at any change.</li>
     <li><b>Kept code holds the domain.</b> Field names, the state rules and the paging were the code's own copies; in kept programs, each went wrong without a word.</li>
   </ul>
   <details class="more"><summary>More</summary>
@@ -265,7 +266,7 @@ flowchart TD
       <li>Task t1 (hire, promote, dismiss): one run per release, on the way kept before it. The rename and the teammate are from the 20-run sequence; the paging from the runs at 90 employees. Figures are the model's input tokens.</li>
       <li>* The SDK was generated from the description at the start of every run: code mode at its best. One built once needs a rebuild for each of these.</li>
       <li>Every release changed the description and the answer; ARTIE itself never changed.</li>
-      <li>ARTIE's pins hold each form's target and method too (the profile's Rule 10), so a move or a new method called the model once, though ARTIE never built an address. A pin that lets a change of target alone go through is a next step.</li>
+      <li>A form's own integrity covers its target too (the profile's Rule 10), so a moved form has a new one. The lock file also pins each form's act, the same digest with the target set aside: a lenient run goes past a form whose integrity changed while its act did not, and its trace says it was held by its act. With <code>repin: auto</code>, the new integrity is written into the lock file. A lock file without acts holds to the integrity alone.</li>
       <li>A repair that makes a new act (give notice) is proposed, not kept, so the model is called each run until a person keeps it.</li>
     </ul>
   </details>
