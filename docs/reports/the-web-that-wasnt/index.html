@@ -76,24 +76,66 @@ details.more ul { font-size: 0.92rem; line-height: 1.55; }
 .stat span { font-size: 0.85rem; color: var(--muted); }
 .label { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rule); color: var(--muted); font-size: 0.95rem; }
+.controls { display: flex; gap: 0.5rem; align-items: center; }
+.controls label { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.controls select { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.6rem; }
+blockquote.fielding { border-left-color: var(--leaf); color: var(--fg); font: 500 1.08rem/1.55 var(--display); padding: 0.6rem 1rem; }
+blockquote cite { display: block; margin-top: 0.35rem; font: 400 0.85rem var(--body); color: var(--muted); font-style: normal; }
+details[data-level] { border-left: 2px solid var(--rule); padding-left: 0.9rem; display: grid; gap: 0.6rem; }
+details[data-level] > summary { cursor: pointer; color: var(--link); font-size: 0.9rem; font-weight: 600; list-style: none; }
+details[data-level] > summary::-webkit-details-marker { display: none; }
+details[data-level] > summary::before { content: "+"; display: inline-block; width: 1.1rem; font-family: var(--mono); }
+details[data-level][open] > summary::before { content: "\2212"; }
+details[data-level] > summary small { font-weight: 400; color: var(--muted); margin-left: 0.35rem; }
+details[data-level="3"] { border-left-style: dotted; }
+details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
 </style>
 </head>
 <body>
 
 <div class="top"><div class="top-in">
   <span class="eyebrow">HEART · Riverside Public Library · 4 November 2026</span>
-  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+  <div class="controls">
+    <label for="detail">Detail</label>
+    <select id="detail" aria-label="How much detail to show">
+      <option value="1">Summary</option>
+      <option value="2">More</option>
+      <option value="3">Everything</option>
+    </select>
+    <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+  </div>
 </div></div>
 
 <main>
   <h1>The Web That Wasn't</h1>
   <p class="dek">One library built twice: as if web pages had never carried forms, and as HEART serves it.</p>
 
-  <div class="pair">
+  <blockquote class="fielding">“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”<cite>Roy T. Fielding, 2008</cite></blockquote>
+  <ul>
+    <li><b>On the human web, the most followed rule there is:</b> every page carries what you can do from where you are.</li>
+    <li><b>On the machine web, JSON over HTTP, the least followed:</b> the data in one place, the operations in a document beside it.</li>
+  </ul>
+  <details data-level="2"><summary>Fielding's complaint <small>2008</small></summary>
+    <ul>
+      <li>He named the rule in 2000: hypermedia as the engine of application state.</li>
+      <li>In 2008 he objected to APIs that list their operations up front, and called one of them RPC.</li>
+    </ul>
+    <details data-level="3"><summary>In his words</summary>
+      <ul>
+        <li>“I am getting frustrated by the number of people calling any HTTP-based interface a REST API.”</li>
+        <li>“That is RPC. It screams RPC.”</li>
+        <li>“if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period.”</li>
+        <li>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types…”</li>
+      </ul>
+      <p class="note">Roy T. Fielding, dissertation, 2000, §5.1.5; <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a> and its comments, 20 October 2008.</p>
+    </details>
+  </details>
+
+  <h2>The same moment, two webs</h2>
+  <div class="pair" style="grid-template-columns: minmax(0, 1fr)">
     <figure><span class="label">The web that wasn't</span><img src="media/renew-409.png" alt="A renewal typed by hand and sent, answered 409 Conflict: a hold is waiting." loading="lazy"><figcaption>Renew sent by hand; refused after.</figcaption></figure>
     <figure><span class="label">The web as it is</span><img src="media/hobbit-greyed.png" alt="The Hobbit's page: Renew greyed with the reason, Return offered." loading="lazy"><figcaption>Renew greyed; the page says why first.</figcaption></figure>
   </div>
-
   <ul>
     <li><b>Same library, same rules:</b> Ana Torres's three books; renew is refused while a hold is waiting or after three renewals.</li>
     <li><b>The web that wasn't:</b> a document of every address, pages of numbers, a POST typed by hand.</li>
@@ -102,7 +144,7 @@ blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rul
 
   <h2>The web that wasn't</h2>
   <figure><img src="media/web-that-wasnt.gif" alt="WebWalker opens forms.html, Ana's loans as numbers, and a renewal refused with 409." loading="lazy"><figcaption>Perl and CGI.pm; WebWalker, a browser with a method menu and a body box.</figcaption></figure>
-  <details class="more"><summary>How it works</summary>
+  <details data-level="2"><summary>How it works</summary>
     <ul>
       <li><code>forms.cgi</code> writes <code>forms.html</code> from <code>library.def</code>: every operation, always listed.</li>
       <li><code>library.cgi</code> answers with data only, and reads each POST's body through CGI.pm's <code>param()</code>.</li>
@@ -111,15 +153,38 @@ blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rul
       <figure><img src="media/forms-html.png" alt="forms.html: Renew a loan, POST, its address and body." loading="lazy"><figcaption><code>forms.html</code></figcaption></figure>
       <figure><img src="media/loans-data.png" alt="Ana's loans as a table of numbers." loading="lazy"><figcaption>Her loans</figcaption></figure>
     </div>
+    <details data-level="3"><summary>library.def, and the POST by hand</summary>
+<pre><code>operation: renew
+title: Renew a loan
+method: POST
+address: /cgi-bin/library.cgi/loans/{loanId}/renew
+body: card={card}&amp;pin={pin}
+field: loanId | the loan number, from List your loans
+answer: 200 | renewed: due three weeks later
+answer: 409 | it cannot be renewed (the answer says why)</code></pre>
+<pre><code>curl -X POST -d 'card=…&amp;pin=…' http://localhost:8150/cgi-bin/library.cgi/loans/3310/renew
+HTTP/1.1 409 Conflict
+Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></pre>
+      <p class="note">Apache 2.4, mod_cgid, CGI.pm, in Docker: <code>exhibits/the-web-that-wasnt/perl</code>.</p>
+    </details>
   </details>
 
   <h2>The web as it is</h2>
   <figure><img src="media/heart-html.gif" alt="Ana opens her account, renews Matilda, then finds The Hobbit's Renew greyed with the reason." loading="lazy"><figcaption>HEART's HTML, from one declaration: Ana renews <i>Matilda</i>; <i>The Hobbit</i> says why not.</figcaption></figure>
-  <details class="more"><summary>Stills</summary>
+  <details data-level="2"><summary>Stills</summary>
     <div class="pair">
       <figure><img src="media/account.png" alt="Ana's account, linking her three books." loading="lazy"><figcaption>Her account</figcaption></figure>
       <figure><img src="media/matilda-offers.png" alt="Matilda with Renew and Return." loading="lazy"><figcaption><i>Matilda</i></figcaption></figure>
     </div>
+    <details data-level="3"><summary>The same loan as HAL-FORMS</summary>
+<pre><code>GET /loans/3310   Accept: application/prs.hal-forms+json
+
+"standing": "hold waiting",
+"_templates": {
+  "return": { "method": "POST", "target": "/loans/3310/actions/return" }
+}</code></pre>
+      <p class="note">The library: <code>heart/heart-sims</code>, declared once for heart-core; 26 scenarios in <code>library.feature</code>.</p>
+    </details>
   </details>
 
   <h2>The same document, thirty years apart</h2>
@@ -156,6 +221,25 @@ Answers  200 renewed
       <tr><th><code>forms.html</code></th><td class="n">listed, as always</td><td>409 after sending</td></tr>
     </tbody>
   </table></div>
+  <details data-level="2"><summary>What an agent reads</summary>
+<pre><code>GET /loans/3310   Accept: application/hal+json (HAL Schema Forms)
+
+"standing": "hold waiting",
+"_links": { "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0" } },
+"_forms": {
+  "library:return": { "method": "POST", "_links": { "target": { "href": "/loans/3310/actions/return" } } }
+}</code></pre>
+    <details data-level="3"><summary>Why renew is absent, as served</summary>
+<pre><code>GET /unavailable/61bc1cd6003e61f0
+
+{ "unavailable": [ {
+    "rel": "/profiles/library#renew",
+    "title": "Renew",
+    "reason": "A hold is waiting for this book, so it can't be renewed."
+} ] }</code></pre>
+      <p class="note">The same document for every loan in the same state.</p>
+    </details>
+  </details>
 
   <h2>An agent: ARTIE with Claude</h2>
 <pre><code>Renew each of Ana's books that can be renewed, and say why for any that can't.
@@ -169,7 +253,7 @@ Answers  200 renewed
   <p>It renewed <i>Matilda</i>, and said of the others:</p>
   <blockquote>The Hobbit offers no renew form (standing: hold waiting, so another patron has a hold).</blockquote>
   <blockquote>Charlotte's Web can't be renewed (renewed the most allowed, 3 renewals).</blockquote>
-  <details class="more"><summary>The kept script, and how it was run</summary>
+  <details data-level="2"><summary>The kept script</summary>
 <pre><code>steps:
   - act: library:get-account
     fields:
@@ -180,12 +264,57 @@ Answers  200 renewed
               - act: library:renew</code></pre>
     <ul>
       <li>Kept by <code>artie generate</code> from the run: every book the account links, renewed when it offers renew, with no model.</li>
-      <li>The model's first run: 25,192 input tokens, Claude Sonnet 5.5, ARTIE at L2.</li>
-      <li>Sources: <code>exhibits/the-web-that-wasnt</code> (Perl, captures, ARTIE) and <code>heart/heart-sims</code> (the library, <code>library.feature</code>).</li>
     </ul>
+    <details data-level="3"><summary>In full: the script, its pins, the run</summary>
+<pre><code>inputs:
+  card:
+    type: integer
+
+steps:
+  - act: library:get-account
+    fields:
+      id: ${card}
+    intent: Look up Ana's account by her library card number ${card}
+    then:
+      - whenever:
+          - when-offered:
+              - act: library:renew
+                inferred: renew this book (Matilda)
+                from-intent: "For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed"
+                then: []
+            intent: "For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed"
+            otherwise:
+              - note: none of these acts is offered here</code></pre>
+<pre><code># renew.pins.yaml: held to before every act
+library:renew:
+  integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+  method: POST</code></pre>
+      <ul>
+        <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2; 10 calls; 25,192 input tokens (7,332 sent, 16,074 read from cache, 1,786 written to it); 1,684 output.</li>
+        <li><b>Each run after:</b> 11 steps, no model.</li>
+        <li><b>Sources:</b> <code>exhibits/the-web-that-wasnt/artie</code>: the goal, its trace and run report, the kept script and its pins.</li>
+      </ul>
+    </details>
   </details>
 </main>
 
+<script>
+// How much of the page is open: Summary, More (each section's first drill-down) or Everything. Kept in this
+// browser where it can be.
+(function () {
+  var select = document.getElementById('detail'), key = 'heart-report-detail';
+  function apply(level) {
+    document.querySelectorAll('details[data-level]').forEach(function (d) { d.open = Number(d.dataset.level) <= level; });
+  }
+  try { var kept = localStorage.getItem(key); if (kept) select.value = kept; } catch (e) {}
+  apply(Number(select.value));
+  select.addEventListener('change', function () {
+    apply(Number(select.value));
+    try { localStorage.setItem(key, select.value); } catch (e) {}
+  });
+})();
+</script>
 <script>
 // The light and dark switch every generated report shares: a button with id "theme" switches the page's
 // data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
