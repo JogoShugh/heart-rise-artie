@@ -902,16 +902,73 @@ add("CONTENT", (s) => {
     ["Client (two tasks, a teammate, a release)", "Right of 20", "Tokens, 20 runs", "100 runs", "The model"],
     [{ text: "ARTIE alone", color: C.green }, us("20 (100%)"), "46,864", us("46,864"), "the edges"],
     [{ text: "A harness running ARTIE, code mode on failure", color: C.green }, us("20 (100%)"), "56,366", us("56,366"), "first runs; ARTIE's at the release"],
+    ["A harness running kept skills, code mode on failure", "20 (100%)", "74,415", "74,415", "first runs, teammate, release"],
     ["Code mode with ARTIE as its tool", "20 (100%)", "107,607", "354,235", "every run, choosing a script"],
     ["Code mode, fresh", "20 (100%)", "158,995", "794,975", "every run"],
     ["Code mode, keeping skills", "20 (100%)", "188,747", "845,282", "every run"],
     ["Code mode, kept programs", bad("12 (60%)"), "16,004", "16,004", "run 1"],
-  ], { x: 0.6, y: 1.7, w: 12.1, colW: [4.1, 1.7, 1.9, 1.7, 2.7], rowH: [0.55, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], fontSize: 14 });
+  ], { x: 0.6, y: 1.6, w: 12.1, colW: [4.9, 1.4, 1.7, 1.4, 2.7], rowH: [0.5, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44, 0.44], fontSize: 13 });
   text(s, [
     { text: "One kept script, any surname: Miller at 6, Smith at 30, Garcia at 90 employees, 15 of 15 right, no model after the first run.", options: { bullet: BULLET, breakLine: true } },
     { text: "With ARTIE as its tool, code mode wrote no program and needed no sandbox; the model never held the token.", options: { bullet: BULLET } },
   ], { x: 0.6, y: 5.45, w: 12.1, h: 1.0, fontSize: 15, paraSpaceAfter: 6 });
   s.addNotes("Measured 3 November 2026 on the same bench. The harness: a plain runner replays the scripts ARTIE kept, and calls code mode only when ARTIE exits nonzero.");
+});
+
+// 31b2. Act IX: what each layer knows
+add("CONTENT", (s) => {
+  head(s, "ACT IX  ·  THE STACK OF COUPLINGS", "What each layer knows, and so what a release can break");
+  const stack = (x, title, layers) => {
+    label(s, x, 1.6, 5.8, title);
+    layers.forEach(([name, knows, fill, color], i) => {
+      const y = 2.0 + i * 0.82;
+      box(s, x, y, 5.8, 0.72, fill);
+      text(s, [
+        { text: name, options: { bold: true, fontSize: 16, color: color || C.ink, breakLine: true } },
+        { text: knows, options: { fontSize: 13, color: color ? C.pale : C.sage } },
+      ], { x: x + 0.2, y: y + 0.06, w: 5.4, h: 0.62, valign: "middle" });
+    });
+  };
+  stack(0.6, "KEPT CODE ON ENDPOINTS", [
+    ["Task words", "what the person asked", C.mist],
+    ["Kept program or skill", "field names, state rules, paging, IDs: copies of the domain", "FBE4E1"],
+    ["SDK", "paths, methods, bodies", C.mist],
+    ["OpenAPI description", "out of band: true when published", C.mist],
+    ["Service", "its rules, true now", C.ink, C.white],
+  ]);
+  stack(6.9, "ARTIE ON HYPERMEDIA", [
+    ["Goal", "the task, in plain words", "E3F1E2"],
+    ["Kept script and pins", "relations, inputs, each form’s digest: a lock file", C.mist],
+    ["ARTIE", "the media type, registered relations such as next", C.mist],
+    ["Each answer", "in band: the state, and the controls allowed now", C.mist],
+    ["Service", "its rules, true now", C.ink, C.white],
+  ]);
+  foot(s, "The higher a layer, the longer it should last. On endpoints the domain sits in kept code; on hypermedia it stays in the answers.", false, 6.2);
+  s.addNotes("Read top down: each layer depends on the one below. A release changes the service; the question is how far up the change must travel. Next slide: measured.");
+});
+
+// 31c. Act IX: how far a change travels
+add("CONTENT", (s) => {
+  head(s, "ACT IX  ·  HOW FAR A CHANGE TRAVELS", "Kept code holds the domain; the goal holds the task");
+  const ok = (t) => ({ text: t, fill: "E3F1E2", color: C.green, bold: true });
+  const once = (t) => ({ text: t, fill: "FBF1DF", color: "8A5200", bold: true });
+  const bad = (t) => ({ text: t, fill: "FBE4E1", color: C.rust, bold: true });
+  table(s, [
+    ["The change", "Kept programs", "Kept skill, run by a harness", "ARTIE’s kept script"],
+    ["Acts moved to new addresses", ok("right*"), ok("right*"), once("pins re-recorded: model once")],
+    ["Update became a PATCH", ok("right*"), ok("right*"), once("pin re-recorded: model once")],
+    ["role renamed position", bad("422, exit 0: wrong"), once("422, then rewritten"), once("stopped before the write, repaired")],
+    ["Dismiss needs notice first", bad("409, exit 0: wrong"), once("409, then rewritten"), once("gave notice, then dismissed")],
+    ["Update needs a reason", bad("422, exit 0: wrong"), bad("made up a reason, and kept it"), once("stopped and asked for it")],
+    ["More records than a page", bad("34 of 90, exit 0"), bad("50 of 90, exit 0"), ok("right: follows next")],
+    ["A teammate changed him first", ok("right"), once("412, rewritten twice"), ok("412, read again: no model")],
+  ], { x: 0.6, y: 1.6, w: 12.1, colW: [3.4, 2.6, 3.0, 3.1], rowH: [0.5, 0.48, 0.48, 0.48, 0.48, 0.48, 0.48, 0.48], fontSize: 14 });
+  text(s, [
+    { text: "The goal changed for one of the seven: a reason, which only a person can give. ARTIE asked; the skill made one up.", options: { bullet: BULLET, breakLine: true } },
+    { text: "The kept script is the goal’s lock file: a release re-records it, and a person reviews the diff.", options: { bullet: BULLET } },
+  ], { x: 0.6, y: 5.6, w: 12.1, h: 0.85, fontSize: 15, paraSpaceAfter: 4 });
+  foot(s, "* The SDK was generated from the description at the start of every run. Task t1, one run per release, on the way kept before it.", false, 6.5);
+  s.addNotes("Measured 4 November 2026. Kept programs and skills copy the domain: field names, state rules, paging. ARTIE's pins hold each form's target and method too, so a move or a new method called the model once (4,362 and 1,265 tokens) though ARTIE never built an address; letting a change of target alone through is a next step. The rename and teammate rows are from the 20-run sequence; the paging from the runs at 90 employees.");
 });
 
 // 32. Close: where the model earns its keep

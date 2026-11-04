@@ -102,6 +102,24 @@ details.more > summary { cursor: pointer; color: var(--link); font-size: 0.85rem
 details.more ul { margin-top: 0.35rem; font-size: 0.92rem; line-height: 1.55; color: var(--muted); }
 .scale tr.us th, .scale tr.us td { background: var(--leaf-bg); color: var(--leaf); font-weight: 600; }
 .stack { display: grid; gap: 0.6rem; }
+/* How far a change travels: two stacks of what each layer knows, then one row per change. */
+ol.layers { list-style: none; padding: 0; gap: 0.3rem; }
+ol.layers li { max-width: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 0.45rem 0.7rem; font-size: 0.86rem; line-height: 1.4; color: var(--muted); }
+ol.layers li b { display: block; color: var(--fg); font-size: 0.92rem; }
+ol.layers li.base { background: var(--code-bg); text-align: center; }
+table.ladder { min-width: 44rem; font-size: 0.8rem; }
+table.ladder th, table.ladder td { padding: 0.45rem 0.5rem; }
+table.ladder thead tr.side th { text-transform: none; letter-spacing: 0; font: 600 0.85rem var(--display); color: var(--fg); border-bottom: 0; padding-bottom: 0; }
+table.ladder .split { border-left: 2px solid var(--rule); }
+table.ladder td.y { background: var(--leaf-bg); color: var(--leaf); }
+table.ladder td.m { background: var(--hold-bg); color: var(--hold); }
+table.ladder td.n { background: var(--bad-bg); color: var(--bad); }
+table.ladder td.y, table.ladder td.m, table.ladder td.n { font-weight: 600; }
+.key { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.82rem; color: var(--muted); }
+.key span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 3px; margin-right: 0.35rem; vertical-align: -0.1rem; }
+.key .y::before { background: var(--leaf-bg); box-shadow: inset 0 0 0 1.5px var(--leaf); }
+.key .m::before { background: var(--hold-bg); box-shadow: inset 0 0 0 1.5px var(--hold); }
+.key .n::before { background: var(--bad-bg); box-shadow: inset 0 0 0 1.5px var(--bad); }
 footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
 footer ul { gap: 0.2rem; }
 </style>
@@ -196,6 +214,61 @@ flowchart TD
       </ol>
     </div>
   </div>
+
+  <h2>How far a change travels</h2>
+  <div class="pair">
+    <div>
+      <h3>Kept code on endpoints</h3>
+      <ol class="layers">
+        <li><b>Task words</b>what the person asked</li>
+        <li><b>Kept program or skill</b>field names, state rules, paging, IDs</li>
+        <li><b>SDK</b>paths, methods, bodies</li>
+        <li><b>OpenAPI description</b>out of band: true when published</li>
+        <li class="base"><b>Service</b></li>
+      </ol>
+    </div>
+    <div>
+      <h3>ARTIE on hypermedia</h3>
+      <ol class="layers">
+        <li><b>Goal</b>the task, in plain words</li>
+        <li><b>Kept script and pins</b>relations, inputs, each form's digest</li>
+        <li><b>ARTIE</b>the media type, registered relations such as <code>next</code></li>
+        <li><b>Each answer</b>in band: the state, and the controls allowed now</li>
+        <li class="base"><b>Service</b></li>
+      </ol>
+    </div>
+  </div>
+  <div class="table-scroll"><table class="ladder">
+    <thead>
+      <tr class="side"><th></th><th colspan="3">Endpoints</th><th colspan="2" class="split">Hypermedia</th></tr>
+      <tr><th>The change</th><th>Kept programs</th><th>Kept skill, run by a harness</th><th>Task words</th><th class="split">ARTIE's kept script</th><th>Goal</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>Acts moved to new addresses</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="m split">pins re-recorded; model once, 4,362</td><td></td></tr>
+      <tr><th>Update became a PATCH</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="m split">pin re-recorded; model once, 1,265</td><td></td></tr>
+      <tr><th><code>role</code> renamed <code>position</code></th><td class="n">422, exit 0: wrong</td><td class="m">422, then rewritten; 12,601</td><td></td><td class="m split">stopped before the write, repaired; 3,105</td><td></td></tr>
+      <tr><th>Dismiss needs notice first</th><td class="n">409, exit 0: wrong</td><td class="m">409, then rewritten; 12,507</td><td></td><td class="m split">gave notice, then dismissed; 3,855, each run until a person keeps it</td><td></td></tr>
+      <tr><th>Update needs a reason</th><td class="n">422, exit 0: wrong</td><td class="n">made up a reason, "role change", and kept it; 12,091</td><td class="n">never asked</td><td class="m split">stopped before the write: "What reason should I give…?"</td><td class="m">needs the reason: a person adds it</td></tr>
+      <tr><th>More records than a page</th><td class="n">34 of 90, exit 0</td><td class="n">50 of 90, exit 0</td><td></td><td class="y split">right: follows <code>next</code></td><td></td></tr>
+      <tr><th>A teammate changed him first</th><td class="y">right</td><td class="m">412; rewritten twice; 23,569</td><td></td><td class="y split">412, read again, went on; no model</td><td></td></tr>
+      <tr><th>The task itself changes</th><td class="m">rewritten</td><td class="m">rewritten</td><td class="m">changes</td><td class="m split">found again</td><td class="m">changes</td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="y">right, no model</span><span class="m">the model, or a person, once</span><span class="n">wrong, or made up</span><span>blank: that layer didn't change</span></div>
+  <ul>
+    <li><b>The goal is the stable layer.</b> Of seven changes, one reached it: a reason, which only a person can give. ARTIE stopped and asked; the skill made one up.</li>
+    <li><b>The kept script is the goal's lock file.</b> A release re-records it, and a person reviews the diff; the goal changes when the task does.</li>
+    <li><b>Kept code holds the domain.</b> Field names, the state rules and the paging were the code's own copies; in kept programs, each went wrong without a word.</li>
+  </ul>
+  <details class="more"><summary>More</summary>
+    <ul>
+      <li>Task t1 (hire, promote, dismiss): one run per release, on the way kept before it. The rename and the teammate are from the 20-run sequence; the paging from the runs at 90 employees. Figures are the model's input tokens.</li>
+      <li>* The SDK was generated from the description at the start of every run: code mode at its best. One built once needs a rebuild for each of these.</li>
+      <li>Every release changed the description and the answer; ARTIE itself never changed.</li>
+      <li>ARTIE's pins hold each form's target and method too (the profile's Rule 10), so a move or a new method called the model once, though ARTIE never built an address. A pin that lets a change of target alone go through is a next step.</li>
+      <li>A repair that makes a new act (give notice) is proposed, not kept, so the model is called each run until a person keeps it.</li>
+    </ul>
+  </details>
 
   <h2>Fielding, in brief</h2>
   <ul>

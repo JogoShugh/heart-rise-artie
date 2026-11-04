@@ -590,13 +590,13 @@ def api_library(spec):
     source = [
         "import json, os, urllib.error, urllib.parse, urllib.request",
         "BASE, TOKEN = os.environ['API_BASE'], os.environ['API_TOKEN']",
-        "def _call(method, path, query=None, body=None, if_match=None):",
+        "def _call(method, path, query=None, body=None, if_match=None, content_type='application/json'):",
         "    query = {k: v for k, v in (query or {}).items() if v is not None}",
         "    url = BASE + path + ('?' + urllib.parse.urlencode(query) if query else '')",
         "    headers = {'Authorization': 'Bearer ' + TOKEN, 'Accept': 'application/json'}",
         "    data = None",
         "    if body is not None:",
-        "        data, headers['Content-Type'] = json.dumps(body).encode(), 'application/json'",
+        "        data, headers['Content-Type'] = json.dumps(body).encode(), content_type",
         "    if if_match:",
         "        headers['If-Match'] = if_match",
         "    request = urllib.request.Request(url, data=data, method=method, headers=headers)",
@@ -622,19 +622,24 @@ def api_library(spec):
             in_query = [p["name"] for p in parameters if p.get("in") == "query"]
             conditional = any(p.get("name") == "If-Match" for p in parameters)
             takes_body = "requestBody" in operation
+            # The body's media type as the description gives it: JSON, or a JSON Merge Patch after the method release.
+            content_type = next(iter(operation["requestBody"]["content"])) if takes_body else "application/json"
             arguments = in_path + (["body"] if takes_body else []) + [f"{q}=None" for q in in_query] + \
                 (["if_match=None"] if conditional else [])
             pythonic = re.sub(r"\{(\w+)\}", r"{\1}", path)
             query = "{" + ", ".join(f"'{q}': {q}" for q in in_query) + "}" if in_query else "None"
             source.append(f"def {name}({', '.join(arguments)}):")
             source.append(f"    return _call('{method.upper()}', f'{pythonic}', {query}, "
-                          f"{'body' if takes_body else 'None'}, {'if_match' if conditional else 'None'})")
+                          f"{'body' if takes_body else 'None'}, {'if_match' if conditional else 'None'}, "
+                          f"'{content_type}')")
             body = ""
             if takes_body:
-                schema = operation["requestBody"]["content"]["application/json"]["schema"]
+                schema = operation["requestBody"]["content"][content_type]["schema"]
                 if "$ref" in schema:
                     schema = spec["components"]["schemas"][schema["$ref"].rsplit("/", 1)[1]]
                 body = f"\n    body: {json.dumps(schema.get('properties', {}))}, required {schema.get('required', [])}"
+                if content_type != "application/json":
+                    body += f", sent as {content_type}"
             prose = (operation.get("summary", "") + ". " + operation.get("description", "")).strip()
             conditional_doc = "\n    if_match: the etag you read; with it, refused 412 if the state moved since" \
                 if conditional else ""

@@ -1,0 +1,1 @@
+Hires an employee (first, last, role), updates their role to new_role, then dismisses another employee found by name search (dismiss_name). Args: first, last, role, new_role, dismiss_name. Raises on unexpected status.
