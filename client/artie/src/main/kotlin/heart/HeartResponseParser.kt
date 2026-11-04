@@ -28,13 +28,14 @@ object HeartResponseParser {
         dialect: Dialect = Dialect.HAL_SCHEMA_FORMS,
         named: String? = null,
     ): HeartRepresentation {
-        val profiles = received.profiles
+        val root = Json.parseToJsonElement(received.body).jsonObject
+        // A host that can't send the Link header (a static file host) names the profile in the resource's own links.
+        val profiles = received.profiles.ifEmpty { listOfNotNull(linkHref(root, "profile")) }
         // HAL-FORMS has a media type of its own, which says the dialect; HAL Schema Forms needs its profile.
         val halForms = dialect == Dialect.HAL_FORMS && received.mediaType == dialect.mediaType
         require(halForms || dialect.profile in profiles) {
             "response from $url does not name the profile ${dialect.profile} (Link profiles: $profiles)"
         }
-        val root = Json.parseToJsonElement(received.body).jsonObject
         // An act's response comes from the action URL; its self link says which resource it is.
         val self = linkHref(root, "self")
         return HeartRepresentation(

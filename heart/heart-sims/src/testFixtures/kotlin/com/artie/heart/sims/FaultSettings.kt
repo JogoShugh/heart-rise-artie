@@ -24,6 +24,7 @@ object FaultSettings {
         "members" to { f, v -> f.body.members = v },
         "linksOnly" to { f, v -> f.body.linksOnly = v },
         "embedsOnly" to { f, v -> f.body.embedsOnly = v },
+        "profileLink" to { f, v -> f.body.profileLink = v.asText() },
         "reshaped" to { f, v -> v.properties().forEach { (key, patch) -> f.body.reshaped[key] = patch } },
         "setLink" to { f, v -> f.body.setLink = SetLink(v["rel"].asText(), v["curie"]?.asText(), v["href"]?.asText()) },
     )

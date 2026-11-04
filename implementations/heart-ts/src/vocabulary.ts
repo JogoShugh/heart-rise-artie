@@ -28,6 +28,8 @@ export const SCHEMA_BY_LINK = "schema=link";
 // Dialects (SPEC §6.1)
 export const HAL_FORMS = "hal-forms";
 export const HAL_SCHEMA_FORMS = "hal-schema-forms";
+/** The link relation a resource names its profile by, from a host that can't send the Link header. */
+export const PROFILE_REL = "profile";
 
 // Members a HEART form may carry
 export const HR_OPTIONS = "hr:options";

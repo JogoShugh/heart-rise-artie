@@ -8,7 +8,7 @@ import { needsRereading, refusalOf } from "./refusal";
 import { addressOf, fill, fillPointer } from "./template";
 import { FormChecks, SchemaFailure } from "./validation";
 import { Dialect, Form, HAL_FORMS_PROFILE, HAL_FORMS_TYPE, JSON_TYPE, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, formsLinkOf, linksOf, matchesIntegrity, stateOf } from "./wire";
-import { ACCEPT_PROFILE, AUTHORIZATION, CACHE_CONTROL, CONTENT_LOCATION, CONTENT_TYPE, ETAG, FORMS_BY_LINK, GET, HAL_FORMS, HR_INTEGRITY, IF_MATCH, IF_NONE_MATCH, L0, L1, L2, LINK_HEADER, MANUAL_REDIRECT, NOT_A_CHOICE, NO_CACHE, OUTSIDE_SCHEMA, PREFERENCE_APPLIED, READ, SCHEMA_BY_LINK, UTF8 } from "./vocabulary";
+import { ACCEPT_PROFILE, AUTHORIZATION, CACHE_CONTROL, CONTENT_LOCATION, CONTENT_TYPE, ETAG, FORMS_BY_LINK, GET, HAL_FORMS, HR_INTEGRITY, IF_MATCH, IF_NONE_MATCH, L0, L1, L2, LINK_HEADER, MANUAL_REDIRECT, NOT_A_CHOICE, NO_CACHE, OUTSIDE_SCHEMA, PREFERENCE_APPLIED, PROFILE_REL, READ, SCHEMA_BY_LINK, UTF8 } from "./vocabulary";
 
 /** Where shared layers are kept. A `Map` will do; pass something with a limit if a `Map` would grow too far. */
 export interface LayerCache {
@@ -43,9 +43,16 @@ const problemOf = async (response: Response): Promise<JsonObject> =>
 /** The dialect a client asks for unless told otherwise, and the one compliance is judged in. */
 const REFERENCE_DIALECT: Dialect = "hal-schema-forms";
 
+/** The profiles an answer names: in its Link header, or, from a host that can't send one, in its own links (SPEC §6.1). */
+function profilesOf(response: Response, body: JsonObject): string {
+    const header = response.headers.get(LINK_HEADER);
+    if (header !== null) return header;
+    return linksOf(body).filter((link) => link.rel === PROFILE_REL).map((link) => `<${link.href}>`).join(", ");
+}
+
 /** The dialect of an answer. HAL-FORMS's own media type says so, as toolchains name no HEART profile. */
-function dialectOf(url: string, response: Response): Dialect {
-    const links = response.headers.get(LINK_HEADER) ?? "";
+function dialectOf(url: string, response: Response, body: JsonObject): Dialect {
+    const links = profilesOf(response, body);
     const type = response.headers.get(CONTENT_TYPE) ?? "";
     if (links.includes(`<${HAL_FORMS_PROFILE}>`) || type.startsWith(HAL_FORMS_TYPE)) return HAL_FORMS;
     if (links.includes(`<${PROFILE}>`)) return REFERENCE_DIALECT;
@@ -227,8 +234,8 @@ export class HeartClient {
     }
 
     private async complete(url: string, response: Response, bytes: Buffer): Promise<Representation> {
-        const dialect = dialectOf(url, response);
         const body = objectFrom(bytes);
+        const dialect = dialectOf(url, response, body);
         const rung = appliedRung(response, dialect);
         const links = linksOf(body);
         const forms = dialect === HAL_FORMS ? templatesOf(body, url) : await this.formsAt(url, body, rung);

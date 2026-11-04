@@ -34,6 +34,9 @@ class BodyFaults {
     /** The only `_embedded` each representation has. */
     @Volatile var embedsOnly: JsonNode? = null
 
+    /** The profile each representation names in its own `_links`, as a static host's file would. */
+    @Volatile var profileLink: String? = null
+
     /** Where each read links the affordance set instead. */
     @Volatile var setLink: SetLink? = null
 
@@ -60,6 +63,7 @@ class BodyFaults {
         members = null
         linksOnly = null
         embedsOnly = null
+        profileLink = null
         setLink = null
         wrongIntegrity = false
         noIntegrity = false
@@ -71,7 +75,7 @@ class BodyFaults {
     /** [body] with each fault applied, or null when none changed it. */
     fun rewritten(body: String): String? {
         val root = (runCatching { mapper.readTree(body) }.getOrNull() as? ObjectNode) ?: return null
-        val changed = listOf(forms(root), templates(root), state(root), links(root)).any { it }
+        val changed = listOf(forms(root), templates(root), state(root), links(root), profile(root)).any { it }
         return if (changed) mapper.writeValueAsString(root) else null
     }
 
@@ -97,6 +101,13 @@ class BodyFaults {
         embedsOnly?.let { root.set<JsonNode>("_embedded", it) }
         linksOnly?.let { root.set<JsonNode>("_links", it) }
         return members != null || embedsOnly != null || linksOnly != null
+    }
+
+    private fun profile(root: ObjectNode): Boolean {
+        val href = profileLink ?: return false
+        val links = root.get("_links") as? ObjectNode ?: root.putObject("_links")
+        links.putObject("profile").put("href", href)
+        return true
     }
 
     private fun links(root: ObjectNode): Boolean {

@@ -10,6 +10,12 @@ Feature: How a client reads what a service serves
     When it tries to enter the job "nightly"
     Then it failed, saying "does not name the profile"
 
+  Scenario: A resource that names the profile in its own links, as a static host serves it, is read
+    Given the build service names its profile only in its own links
+    And a client at rung L0 with the build service's credential
+    When it enters the job "nightly"
+    Then it offers exactly "ci:build"
+
   Scenario: A read that is refused is named as a read
     Given the build service refuses every read with status 503
     And a client at rung L0 with the build service's credential

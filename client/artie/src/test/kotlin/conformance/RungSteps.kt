@@ -120,6 +120,12 @@ class RungSteps(private val world: World) {
         faults(service).noProfile = true
     }
 
+    @Given("the {word} service names its profile only in its own links")
+    fun profileInLinks(service: String) {
+        faults(service).noProfile = true
+        faults(service).body.profileLink = Dialect.HAL_SCHEMA_FORMS.profile
+    }
+
     @Given("the {word} service's media type is {string}")
     fun mediaType(service: String, type: String) {
         faults(service).mediaType = type

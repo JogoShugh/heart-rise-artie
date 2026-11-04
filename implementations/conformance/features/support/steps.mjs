@@ -607,6 +607,10 @@ Given("the {word} service names no profile", async function (service) {
     await sims.faults(hostOf(service), { noProfile: true });
 });
 
+Given("the {word} service names its profile only in its own links", async function (service) {
+    await sims.faults(hostOf(service), { noProfile: true, profileLink: heart.PROFILE });
+});
+
 Given("the {word} service's media type is {string}", async function (service, mediaType) {
     await sims.faults(hostOf(service), { mediaType });
 });
