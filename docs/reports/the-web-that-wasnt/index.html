@@ -81,6 +81,8 @@ blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rul
 .controls select { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.6rem; }
 blockquote.fielding { border-left-color: var(--leaf); color: var(--fg); font: 500 1.08rem/1.55 var(--display); padding: 0.6rem 1rem; }
 blockquote.fielding p + p { margin-top: 0.6rem; }
+.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.6rem; overflow-x: auto; }
+.diagram pre.mermaid { background: none; padding: 0; margin: 0; max-height: none; font: 0.85rem/1.4 var(--body); text-align: center; }
 .lead { font: 500 1.15rem/1.55 var(--display); }
 .lead b { color: var(--leaf); }
 pre .add { color: var(--leaf); }
@@ -136,6 +138,48 @@ details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
       <blockquote class="fielding"><p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API).”</p>
       <cite>From the same post</cite></blockquote>
       <p class="note">Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a>, 20 October 2008; the rule itself, dissertation, 2000, §5.1.5.</p>
+    </details>
+  </details>
+
+  <h2>HEART, in brief</h2>
+  <p>HTTP services that answer the way web pages do: each answer carries its state and the controls that state allows. ARTIE is its generic client, as a browser is HTML's.</p>
+  <details data-level="2"><summary>How it works, and the loop it shares with the human web</summary>
+    <ul>
+      <li><b>One declaration, every reader:</b> a service declares its acts, what each state offers, and why an act is absent; heart-core serves it as HTML, HAL-FORMS, HAL Schema Forms and an OpenAPI twin.</li>
+      <li><b>The human web's loop is look, think, act.</b> ARTIE's is the same loop by other names: sync, reason, act.</li>
+    </ul>
+    <div class="pair" style="grid-template-columns: minmax(0, 1fr)">
+      <div class="diagram"><pre class="mermaid">
+flowchart LR
+  D["Declaration: acts, offers by state, why absent"] --> C{{"heart-core"}}
+  C --> H["HTML: a person in a browser"]
+  C --> F["HAL-FORMS"]
+  C --> S["HAL Schema Forms: ARTIE"]
+  C --> O["OpenAPI twin"]
+</pre></div>
+      <div class="diagram"><pre class="mermaid">
+flowchart LR
+  L(["Look / Sync"]) --> T{{"Think / Reason"}}
+  T --> A["Act / Act"]
+  A -- "the next page, or a refusal" --> L
+</pre></div>
+    </div>
+    <div class="table-scroll"><table>
+      <thead><tr><th>The human web</th><th>ARTIE</th></tr></thead>
+      <tbody>
+        <tr><td><b>Look:</b> read the page</td><td><b>Sync:</b> read the state and the controls offered now, with its ETag</td></tr>
+        <tr><td><b>Think:</b> choose what to press</td><td><b>Reason:</b> choose among the offered controls: the model once, or a kept script with none</td></tr>
+        <tr><td><b>Act:</b> press it</td><td><b>Act:</b> send the form, with If-Match; the answer is the next state</td></tr>
+      </tbody>
+    </table></div>
+    <details data-level="3"><summary>Rungs, profile, and APIs you don't own</summary>
+      <ul>
+        <li><b>Rungs:</b> at L0 the forms and their schemas are inside each answer; at L2 they are linked, one set per state, shared by every resource in it and checked by integrity.</li>
+        <li><b>Profile:</b> each relation, such as <code>library:renew</code>, is named and described once, in an ALPS document the answers link to.</li>
+        <li><b>Refusals:</b> an act not offered is refused 409, a stale one 412, a body that doesn't fit its form 422, each with the reason.</li>
+        <li><b>APIs you don't own:</b> the HEART gateway serves an OpenAPI service as HEART, with your own controls in front.</li>
+        <li><b>More:</b> <a href="https://jogoshugh.github.io/heart-rise-artie/reports/architecture/">HEART Architecture</a>, ten diagrams of what is built.</li>
+      </ul>
     </details>
   </details>
 
@@ -400,6 +444,22 @@ library:renew:
   </details>
 </main>
 
+<!-- pages-only: on GitHub Pages the diagrams are drawn by Mermaid; an artifact draws them itself. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var dark = root.dataset.theme === 'dark' ||
+    (root.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+  mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral', securityLevel: 'strict',
+    fontFamily: 'IBM Plex Sans, system-ui, sans-serif', flowchart: { useMaxWidth: true } });
+  // Each diagram is drawn once its section is open, so it is laid out at its real size.
+  function draw() { mermaid.run({ querySelector: 'details[open] pre.mermaid:not([data-processed])' }); }
+  document.querySelectorAll('details').forEach(function (d) { d.addEventListener('toggle', draw); });
+  window.addEventListener('load', draw);
+})();
+</script>
+<!-- /pages-only -->
 <script>
 // How much of the page is open: Summary, More (each section's first drill-down) or Everything. Kept in this
 // browser where it can be.
