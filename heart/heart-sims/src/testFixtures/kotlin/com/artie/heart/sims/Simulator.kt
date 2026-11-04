@@ -6,6 +6,7 @@ import com.artie.heart.sims.deploy.Region
 import com.artie.heart.sims.github.GitHubService
 import com.artie.heart.sims.employees.Change
 import com.artie.heart.sims.employees.EmployeesService
+import com.artie.heart.sims.library.LibraryService
 import com.artie.heart.Rung
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -51,13 +52,15 @@ class Simulator(private val alone: String? = null) {
     val deploy = DeployService()
     val github = GitHubService()
     val employees = EmployeesService()
+    val library = LibraryService()
 
-    private val faults = mapOf(BUILD to Faults(), DEPLOY to Faults(), GITHUB to Faults(), EMPLOYEES to Faults(), ELSEWHERE to Faults())
+    private val faults = listOf(BUILD, DEPLOY, GITHUB, EMPLOYEES, LIBRARY, ELSEWHERE).associateWith { Faults() }
     private val services: Map<String, HttpHandler> = mapOf(
         BUILD to faults.getValue(BUILD).filter.then(build.handler),
         DEPLOY to faults.getValue(DEPLOY).filter.then(deploy.handler),
         GITHUB to faults.getValue(GITHUB).filter.then(github.handler),
         EMPLOYEES to faults.getValue(EMPLOYEES).filter.then(employees.handler),
+        LIBRARY to faults.getValue(LIBRARY).filter.then(library.handler),
         ELSEWHERE to faults.getValue(ELSEWHERE).filter.then(elsewhere),
     )
     private val mapper = ObjectMapper().findAndRegisterModules()
@@ -75,6 +78,7 @@ class Simulator(private val alone: String? = null) {
             deploy.reset()
             github.reset()
             employees.reset()
+            library.reset()
         }
         faults.values.forEach(Faults::clear)
         log.clear()
@@ -217,6 +221,9 @@ class Simulator(private val alone: String? = null) {
 
         /** Spring HATEOAS's example employees, as a HEART service, or handicapped as Spring serves them. */
         const val EMPLOYEES = "employees.test"
+
+        /** Riverside Public Library, the library of "The Web That Wasn't": a member's loans, renewed and returned. */
+        const val LIBRARY = "library.test"
 
         /** Another origin, for an act a form sends away from the service it came from. */
         const val ELSEWHERE = "elsewhere.test"

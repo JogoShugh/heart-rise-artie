@@ -18,6 +18,14 @@ dependencies {
     testFixturesImplementation("org.http4k:http4k-server-jetty")
     testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     testFixturesImplementation("com.fasterxml.jackson.core:jackson-databind")
+
+    // The simulated services' own features (library.feature), run against them in memory.
+    testImplementation(platform("io.cucumber:cucumber-bom:7.18.0"))
+    testImplementation("io.cucumber:cucumber-java")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine")
+    testImplementation("org.junit.platform:junit-platform-suite")
+    testImplementation(kotlin("test"))
+    testImplementation("com.fasterxml.jackson.core:jackson-databind")
 }
 
 kotlin {
