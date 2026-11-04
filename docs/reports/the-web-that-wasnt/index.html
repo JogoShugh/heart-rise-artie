@@ -81,6 +81,10 @@ blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rul
 .controls select { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.6rem; }
 blockquote.fielding { border-left-color: var(--leaf); color: var(--fg); font: 500 1.08rem/1.55 var(--display); padding: 0.6rem 1rem; }
 blockquote.fielding p + p { margin-top: 0.6rem; }
+pre .add { color: var(--leaf); }
+pre .del { color: var(--bad); }
+details[data-level] h3 { margin-top: 0.7rem; }
+details[data-level] h3 small { font-weight: 400; color: var(--muted); }
 blockquote cite { display: block; margin-top: 0.35rem; font: 400 0.85rem var(--body); color: var(--muted); font-style: normal; }
 details[data-level] { border-left: 2px solid var(--rule); padding-left: 0.9rem; display: grid; gap: 0.6rem; }
 details[data-level] > summary { cursor: pointer; color: var(--link); font-size: 0.9rem; font-weight: 600; list-style: none; }
@@ -143,25 +147,31 @@ details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
   </ul>
 
   <h2>The web that wasn't</h2>
-  <figure><img src="media/web-that-wasnt.gif" alt="WebWalker opens forms.html, Ana's loans as numbers, and a renewal refused with 409." loading="lazy"><figcaption>Perl and CGI.pm; WebWalker, a browser with a method menu and a body box.</figcaption></figure>
+  <figure><img src="media/web-that-wasnt.gif" alt="WebWalker opens the site's OpenAPI description, forms.html made from it, Ana's loans as numbers, and a renewal refused with 409." loading="lazy"><figcaption>Perl and CGI.pm, an OpenAPI description in YAML; WebWalker, a browser with a method menu and a body box.</figcaption></figure>
   <details data-level="2"><summary>How it works</summary>
     <ul>
-      <li><code>forms.cgi</code> writes <code>forms.html</code> from <code>library.def</code>: every operation, always listed.</li>
+      <li>The site publishes <code>openapi.yaml</code>; <code>forms.cgi</code> reads it with <code>YAML::XS</code> and writes <code>forms.html</code>, the page people browse it by.</li>
       <li><code>library.cgi</code> answers with data only, and reads each POST's body through CGI.pm's <code>param()</code>.</li>
     </ul>
     <div class="pair">
-      <figure><img src="media/forms-html.png" alt="forms.html: Renew a loan, POST, its address and body." loading="lazy"><figcaption><code>forms.html</code></figcaption></figure>
-      <figure><img src="media/loans-data.png" alt="Ana's loans as a table of numbers." loading="lazy"><figcaption>Her loans</figcaption></figure>
+      <figure><img src="media/openapi-yaml.png" alt="The site's openapi.yaml shown in WebWalker." loading="lazy"><figcaption><code>openapi.yaml</code></figcaption></figure>
+      <figure><img src="media/forms-html.png" alt="forms.html: Renew a loan, POST, its address and body." loading="lazy"><figcaption><code>forms.html</code>, from it</figcaption></figure>
     </div>
-    <details data-level="3"><summary>library.def, and the POST by hand</summary>
-<pre><code>operation: renew
-title: Renew a loan
-method: POST
-address: /cgi-bin/library.cgi/loans/{loanId}/renew
-body: card={card}&amp;pin={pin}
-field: loanId | the loan number, from List your loans
-answer: 200 | renewed: due three weeks later
-answer: 409 | it cannot be renewed (the answer says why)</code></pre>
+    <figure><img src="media/loans-data.png" alt="Ana's loans as a table of numbers." loading="lazy"><figcaption>Her loans: numbers to copy</figcaption></figure>
+    <details data-level="3"><summary>The YAML, and the POST by hand</summary>
+<pre><code>/loans/{loanId}/renew:
+  post:
+    operationId: renewLoan
+    summary: Renew a loan
+    description: Only while it is renewed fewer than three times and no one's hold is waiting.
+    requestBody:
+      content:
+        application/x-www-form-urlencoded:
+          schema: { $ref: '#/components/schemas/Member' }   # card, pin
+    responses:
+      '200': { description: 'renewed: due three weeks later' }
+      '409': { description: it cannot be renewed (the answer says why) }
+      '401': { description: wrong card number or PIN }</code></pre>
 <pre><code>curl -X POST -d 'card=…&amp;pin=…' http://localhost:8150/cgi-bin/library.cgi/loans/3310/renew
 HTTP/1.1 409 Conflict
 Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></pre>
@@ -187,17 +197,19 @@ Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></p
     </details>
   </details>
 
-  <h2>The same document, thirty years apart</h2>
+  <h2>The same document, then and now</h2>
   <div class="pair">
-    <div><span class="label">forms.html, from library.def</span>
-<pre><code>3. RENEW A LOAN
-Method   POST
-Address  /cgi-bin/library.cgi/loans/{loanId}/renew
-Body     card={card}&amp;pin={pin}
-Answers  200 renewed
-         409 it cannot be renewed
-         401 wrong card number or PIN</code></pre></div>
-    <div><span class="label">The OpenAPI twin, from the declaration</span>
+    <div><span class="label">1996: the Perl site's openapi.yaml</span>
+<pre><code>/loans/{loanId}/renew:
+  post:
+    summary: Renew a loan
+    description: Only while it is renewed
+      fewer than three times and no one's
+      hold is waiting.
+    responses:
+      '200': renewed
+      '409': it cannot be renewed</code></pre></div>
+    <div><span class="label">2026: heart-core's OpenAPI twin</span>
 <pre><code>/loans/{id}/actions/renew:
   post:
     description: Offered while the book is out,
@@ -208,7 +220,7 @@ Answers  200 renewed
       '200': The loan after the act
       '409': NotOffered</code></pre></div>
   </div>
-  <p class="note">Both list renew for every loan, always. Whether this loan can be renewed now, each says only after the call.</p>
+  <p class="note">Both list renew for every loan, always; in 1996, <code>forms.html</code> was its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
 
   <h2>One loan, every client</h2>
   <div class="table-scroll"><table>
@@ -238,6 +250,90 @@ Answers  200 renewed
     "reason": "A hold is waiting for this book, so it can't be renewed."
 } ] }</code></pre>
       <p class="note">The same document for every loan in the same state.</p>
+    </details>
+  </details>
+
+  <h2>Adding the controls back, step by step</h2>
+  <p>A loan as JSON over HTTP, given back what Ana's page gives her: data, then the controls with it.</p>
+  <ol>
+    <li><b>The answer links itself</b> and names its vocabulary.</li>
+    <li><b>The acts arrive as forms:</b> where to send, how, and what to put in.</li>
+    <li><b>The forms follow the state:</b> only what this loan can do now.</li>
+    <li><b>What's absent says why.</b></li>
+    <li><b>A version tag guards the act:</b> stale is refused.</li>
+    <li><b>One form set per state,</b> shared by every loan in it.</li>
+  </ol>
+  <details data-level="2"><summary>The wire, step by step</summary>
+    <h3>Before · JSON over HTTP</h3>
+<pre><code>GET /loans/3310   Accept: application/json
+
+{ "id": 3310, "title": "The Hobbit", "author": "J. R. R. Tolkien",
+  "due": "2026-11-12", "renewals": 0, "standing": "hold waiting" }</code></pre>
+    <p class="note">Data only. What can be done is in the OpenAPI document, for every loan alike.</p>
+    <h3>1 · The answer links itself and names its vocabulary</h3>
+<pre><code><span class="add">+ "_links": {
++   "self": { "href": "/loans/3310" },
++   "curies": [ { "name": "library", "href": "/profiles/library#{rel}", "templated": true } ]
++ }</span></code></pre>
+    <p class="note">Each relation, such as <code>library:renew</code>, is defined once, in the library's profile.</p>
+    <h3>2 · The acts arrive as forms <small>(Matilda)</small></h3>
+<pre><code><span class="add">+ "_forms": {
++   "library:renew": {
++     "title": "Renew",
++     "_links": { "target": { "href": "/loans/3311/actions/renew" } },
++     "method": "POST",
++     "contentType": "application/json",
++     "schema": { "type": "object", "properties": {} }
++   },
++   "library:return": { … }
++ }</span></code></pre>
+    <h3>3 · The forms follow the state <small>(The Hobbit)</small></h3>
+<pre><code>  "standing": "hold waiting",
+  "_forms": {
+<span class="del">-   "library:renew": { … },</span>
+    "library:return": { … }
+  }</code></pre>
+    <p class="note">The server offers only what this loan can do now. A client acts on what is there, with no rule of its own.</p>
+    <h3>4 · What's absent says why</h3>
+<pre><code><span class="add">+ "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0" }</span>
+
+GET /unavailable/61bc1cd6003e61f0
+{ "unavailable": [ { "rel": "/profiles/library#renew", "title": "Renew",
+    "reason": "A hold is waiting for this book, so it can't be renewed." } ] }</code></pre>
+    <p class="note">A person sees it beside the greyed button; an agent reads it as data.</p>
+    <h3>5 · A version tag guards the act</h3>
+<pre><code>ETag: "seq-1.hsf.L0.d96396fb7e046607"
+
+POST /loans/3311/actions/renew   If-Match: "seq-0.stale"
+412 Precondition Failed   The act is stale: the state has changed</code></pre>
+    <h3>6 · One form set per state, shared <small>(L2)</small></h3>
+<pre><code><span class="del">- "_forms": { … },</span>
+<span class="add">+ "hr:forms": { "href": "/affordance-sets/31a5b6105822d925",
++               "integrity": "sha256-MaW2EFgi2SXHXtDeNNqfRqaPpMhuPfrUB/RV+oPsfQ8=" }</span></code></pre>
+    <p class="note">Every loan with a hold waiting links the same set: fetched once, checked by its integrity.</p>
+    <details data-level="3"><summary>What the library declares, step by step</summary>
+<pre><code>// 1 · its vocabulary
+Profile(name = "library", relations = listOf(Relation("renew", AlpsType.UNSAFE, "Renew", …), …))
+
+// 2 · its acts
+acts = listOf(Act("renew", "renew", NO_INPUT), Act("return", "return", NO_INPUT))
+
+// 3 · what each state offers
+keyOf = { it.standing }
+offered = { standing -> when (standing) {
+    RENEWABLE -> listOf("renew", "return")
+    RETURNED -> emptyList()
+    else -> listOf("return")
+} }
+
+// 4 · why, when it doesn't
+whyAbsent = { standing, _ -> WHY.getValue(standing) }   // ON_HOLD: "A hold is waiting for this book, …"
+
+// 5 · the version every act is checked against
+versionOf = { it.version }
+
+// 6 · nothing to declare: the client asks for L2 with Prefer: forms=link</code></pre>
+      <p class="note">heart-core writes the wire from it: the HTML, both JSON dialects, the profile and the OpenAPI twin. For an API you don't own, the HEART gateway does the same from its OpenAPI description: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/take-heart/">Take HEART</a>; for a GitHub pull request, step by step: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</p>
     </details>
   </details>
 

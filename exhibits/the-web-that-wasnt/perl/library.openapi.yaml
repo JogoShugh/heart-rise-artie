@@ -1,0 +1,108 @@
+# Riverside Public Library's API description, as the web that wasn't would have published it in 1996:
+# every operation, always listed. forms.cgi reads it and writes forms.html, the page people browse it by.
+openapi: 3.0.3
+info:
+  title: Riverside Public Library
+  version: 1996-11-01
+  description: See your loans, renew them and return them from home.
+servers:
+  - url: /cgi-bin/library.cgi
+paths:
+  /loans:
+    get:
+      operationId: listLoans
+      summary: List your loans
+      parameters:
+        - $ref: '#/components/parameters/card'
+        - $ref: '#/components/parameters/pin'
+      responses:
+        '200':
+          description: 'your loans: loan number, book number, title, due date'
+        '401':
+          description: wrong card number or PIN
+  /loans/{loanId}:
+    get:
+      operationId: getLoan
+      summary: Look at one loan
+      parameters:
+        - $ref: '#/components/parameters/loanId'
+        - $ref: '#/components/parameters/card'
+        - $ref: '#/components/parameters/pin'
+      responses:
+        '200':
+          description: the loan
+        '404':
+          description: no such loan
+  /loans/{loanId}/renew:
+    post:
+      operationId: renewLoan
+      summary: Renew a loan
+      description: Only while it is renewed fewer than three times and no one's hold is waiting.
+      parameters:
+        - $ref: '#/components/parameters/loanId'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Member'
+      responses:
+        '200':
+          description: 'renewed: due three weeks later'
+        '409':
+          description: it cannot be renewed (the answer says why)
+        '401':
+          description: wrong card number or PIN
+  /loans/{loanId}/return:
+    post:
+      operationId: returnLoan
+      summary: Return a loan
+      parameters:
+        - $ref: '#/components/parameters/loanId'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Member'
+      responses:
+        '200':
+          description: returned
+        '409':
+          description: it was returned already
+        '401':
+          description: wrong card number or PIN
+components:
+  parameters:
+    loanId:
+      name: loanId
+      in: path
+      required: true
+      description: the loan number, from List your loans
+      schema:
+        type: integer
+    card:
+      name: card
+      in: query
+      required: true
+      description: your library card number, 8 digits, on the back of your card
+      schema:
+        type: string
+    pin:
+      name: pin
+      in: query
+      required: true
+      description: your 4-digit PIN
+      schema:
+        type: string
+  schemas:
+    Member:
+      type: object
+      required: [card, pin]
+      properties:
+        card:
+          type: string
+          description: your library card number
+        pin:
+          type: string
+          description: your PIN

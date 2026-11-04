@@ -52,7 +52,10 @@
       body: sends ? $("body").value : undefined,
       headers: sends ? { "Content-Type": "application/x-www-form-urlencoded" } : {},
     });
-    $("page").srcdoc = await answer.text();
+    const text = await answer.text();
+    const html = (answer.headers.get("Content-Type") || "").includes("text/html");
+    const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    $("page").srcdoc = html ? text : `<pre style="font: 13px 'Courier New', monospace; margin: 8px">${escaped}</pre>`;
     const failed = answer.status >= 400;
     $("status").innerHTML = `Document: Done. ${failed ? "<b>" : ""}${answer.status} ${answer.statusText}${failed ? "</b>" : ""}`;
   }
