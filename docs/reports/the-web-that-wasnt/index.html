@@ -81,6 +81,8 @@ blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rul
 .controls select { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.6rem; }
 blockquote.fielding { border-left-color: var(--leaf); color: var(--fg); font: 500 1.08rem/1.55 var(--display); padding: 0.6rem 1rem; }
 blockquote.fielding p + p { margin-top: 0.6rem; }
+.lead { font: 500 1.15rem/1.55 var(--display); }
+.lead b { color: var(--leaf); }
 pre .add { color: var(--leaf); }
 pre .del { color: var(--bad); }
 details[data-level] h3 { margin-top: 0.7rem; }
@@ -115,10 +117,12 @@ details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
   <h1>The Web That Wasn't</h1>
   <p class="dek">One library built twice: as if web pages had never carried forms, and as HEART serves it.</p>
 
+  <h2>Information and Controls</h2>
   <blockquote class="fielding">“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”<cite>Roy T. Fielding, 2008</cite></blockquote>
+  <p class="lead">Hypermedia as the engine of application state, <b>HATEOAS</b>, is the most followed constraint of all time on the human web, and the least followed on the machine web.</p>
   <ul>
-    <li><b>On the human web, the most followed rule there is:</b> every page carries what you can do from where you are.</li>
-    <li><b>On the machine web, JSON over HTTP, the least followed:</b> the data in one place, the operations in a document beside it.</li>
+    <li><b>The human web:</b> every page you have ever loaded follows it. It carries what you can do, from where you are, now.</li>
+    <li><b>The machine web, JSON over HTTP:</b> the data in one answer, the operations in a document beside it, the same for every state.</li>
   </ul>
   <details data-level="2"><summary>Fielding's complaint <small>2008</small></summary>
     <ul>
@@ -147,18 +151,19 @@ details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
   </ul>
 
   <h2>The web that wasn't</h2>
-  <figure><img src="media/web-that-wasnt.gif" alt="WebWalker opens the site's OpenAPI description, forms.html made from it, Ana's loans as numbers, and a renewal refused with 409." loading="lazy"><figcaption>Perl and CGI.pm, an OpenAPI description in YAML; WebWalker, a browser with a method menu and a body box.</figcaption></figure>
+  <p>Imagine the equivalent of YAML existed in 1996, and the equivalent of OpenAPI was made then, named <code>forms.yaml</code>. Pages never got forms of their own.</p>
+  <figure><img src="media/web-that-wasnt.gif" alt="WebWalker opens the site's forms.yaml, forms.html made from it, Ana's loans as numbers, and a renewal refused with 409." loading="lazy"><figcaption>Perl and CGI.pm, the site's <code>forms.yaml</code>; WebWalker, a browser with a method menu and a body box.</figcaption></figure>
   <details data-level="2"><summary>How it works</summary>
     <ul>
-      <li>The site publishes <code>openapi.yaml</code>; <code>forms.cgi</code> reads it with <code>YAML::XS</code> and writes <code>forms.html</code>, the page people browse it by.</li>
+      <li>The site publishes <code>forms.yaml</code>; <code>forms.cgi</code> reads it with <code>YAML::XS</code> and writes <code>forms.html</code>, the page people browse it by.</li>
       <li><code>library.cgi</code> answers with data only, and reads each POST's body through CGI.pm's <code>param()</code>.</li>
     </ul>
     <div class="pair">
-      <figure><img src="media/openapi-yaml.png" alt="The site's openapi.yaml shown in WebWalker." loading="lazy"><figcaption><code>openapi.yaml</code></figcaption></figure>
+      <figure><img src="media/forms-yaml.png" alt="The site's forms.yaml shown in WebWalker." loading="lazy"><figcaption><code>forms.yaml</code></figcaption></figure>
       <figure><img src="media/forms-html.png" alt="forms.html: Renew a loan, POST, its address and body." loading="lazy"><figcaption><code>forms.html</code>, from it</figcaption></figure>
     </div>
     <figure><img src="media/loans-data.png" alt="Ana's loans as a table of numbers." loading="lazy"><figcaption>Her loans: numbers to copy</figcaption></figure>
-    <details data-level="3"><summary>The YAML, and the POST by hand</summary>
+    <details data-level="3"><summary>forms.yaml, and the POST by hand</summary>
 <pre><code>/loans/{loanId}/renew:
   post:
     operationId: renewLoan
@@ -199,7 +204,7 @@ Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></p
 
   <h2>The same document, then and now</h2>
   <div class="pair">
-    <div><span class="label">1996: the Perl site's openapi.yaml</span>
+    <div><span class="label">1996: the Perl site's forms.yaml</span>
 <pre><code>/loans/{loanId}/renew:
   post:
     summary: Renew a loan
@@ -220,17 +225,17 @@ Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></p
       '200': The loan after the act
       '409': NotOffered</code></pre></div>
   </div>
-  <p class="note">Both list renew for every loan, always; in 1996, <code>forms.html</code> was its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
+  <p class="note">Both list renew for every loan, always; <code>forms.yaml</code> is the OpenAPI of the web that wasn't, and <code>forms.html</code> its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
 
   <h2>One loan, every client</h2>
   <div class="table-scroll"><table>
-    <thead><tr><th><i>The Hobbit</i>, asked for as</th><th>Renew</th><th>Why not</th></tr></thead>
+    <thead><tr><th><i>The Hobbit</i>, read from</th><th>Renew</th><th>Why not</th></tr></thead>
     <tbody>
       <tr><th>HTML, a person</th><td class="m">greyed</td><td>beside the button</td></tr>
       <tr><th>HAL-FORMS</th><td class="m">absent</td><td>not in HAL-FORMS</td></tr>
       <tr><th>HAL Schema Forms, an agent</th><td class="m">absent</td><td>linked: <code>hr:unavailable</code></td></tr>
       <tr><th>OpenAPI</th><td class="n">listed, as always</td><td>409 after the call</td></tr>
-      <tr><th><code>forms.html</code></th><td class="n">listed, as always</td><td>409 after sending</td></tr>
+      <tr><th><code>forms.yaml</code>, the web that wasn't</th><td class="n">listed, as always</td><td>409 after sending</td></tr>
     </tbody>
   </table></div>
   <details data-level="2"><summary>What an agent reads</summary>
