@@ -157,6 +157,52 @@ footer ul { gap: 0.2rem; }
     <li><b>Code mode and ARTIE fit together.</b> Code mode reads the task in plain words; ARTIE does the acts. Run by a plain harness, the model is called only when ARTIE fails.</li>
   </ul>
 
+  <h2>Two architectures</h2>
+  <div class="pair">
+    <div>
+      <h3>A bag of endpoints</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  D["1 Description: every operation"] --> M{{"2 Model writes code"}}
+  M --> P["3 Program builds URLs"]
+  P --> S[("Service")]
+  S -- "4 status, body" --> P
+</pre></div>
+      <ol class="notes">
+        <li>The client is told every operation up front: paths, methods, bodies.</li>
+        <li>The model works out the way and writes the code, every run.</li>
+        <li>The program builds each address itself, from templates and IDs.</li>
+        <li>The server's rules show only after the call.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Hypermedia</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  B(["1 Bookmark"]) --> R["2 State + controls now"]
+  R --> C{{"3 Client picks a control"}}
+  C -- "act + If-Match" --> S[("Service")]
+  S -- "4 next state or refusal" --> R
+</pre></div>
+      <ol class="notes">
+        <li>The client enters at a bookmark, knowing only media types.</li>
+        <li>Each answer carries what is true now and what can be done now.</li>
+        <li>The client picks a link or a form; an act carries the ETag it read.</li>
+        <li>The server answers with the next state, or refuses with a reason.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>Fielding, in brief</h2>
+  <ul>
+    <li><b>The principle (2000):</b> REST's least-followed constraint is hypermedia as the engine of application state: the client moves from state to state by choosing among the controls each answer carries.</li>
+    <li><b>Information and controls together:</b> "When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions."</li>
+    <li><b>The complaint (2008):</b> most "REST APIs" are a list of operations a client must know in advance. "That is RPC. It screams RPC."</li>
+    <li><b>Enter knowing almost nothing:</b> "A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types…"</li>
+    <li><b>For change over time:</b> "REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution."</li>
+  </ul>
+  <p class="note">Roy T. Fielding, dissertation, 2000, §5.1.5; "REST APIs must be hypertext-driven" and its comments, 20 October 2008. More: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</p>
+
   <details class="src"><summary>Limits <small>said plainly</small></summary>
     <div class="in">
       <ul>
@@ -171,6 +217,18 @@ footer ul { gap: 0.2rem; }
   <p class="note">The whole story: <a href="https://claude.ai/artifact/UJjeDjCGzWTEczKcPJDFoC">Wayfinding Through Change</a> and <a href="https://claude.ai/artifact/1keHg2DB916cgXdDE8CqZD">Many Records, a Few States</a>.</p>
 </main>
 
+<!-- pages-only: on GitHub Pages the diagrams are drawn by Mermaid; an artifact draws them itself. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var dark = root.dataset.theme === 'dark' ||
+    (root.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'neutral', securityLevel: 'strict',
+    fontFamily: 'IBM Plex Sans, system-ui, sans-serif', flowchart: { useMaxWidth: true } });
+})();
+</script>
+<!-- /pages-only -->
 <script>
 // The light and dark switch every generated report shares: a button with id "theme" switches the page's
 // data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
