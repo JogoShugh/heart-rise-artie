@@ -76,13 +76,19 @@ details.more ul { font-size: 0.92rem; line-height: 1.55; }
 .stat span { font-size: 0.85rem; color: var(--muted); }
 .label { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 blockquote { margin: 0; padding: 0.5rem 0.9rem; border-left: 3px solid var(--rule); color: var(--muted); font-size: 0.95rem; }
-.controls { display: flex; gap: 0.5rem; align-items: center; }
+.controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.5rem; align-items: center; }
 .controls label { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 .controls select { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.3rem 0.6rem; }
 blockquote.fielding { border-left-color: var(--leaf); color: var(--fg); font: 500 1.08rem/1.55 var(--display); padding: 0.6rem 1rem; }
 blockquote.fielding p + p { margin-top: 0.6rem; }
 .diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.6rem; overflow-x: auto; }
 .diagram pre.mermaid { background: none; padding: 0; margin: 0; max-height: none; font: 0.85rem/1.4 var(--body); text-align: center; }
+details.overheard { background: var(--hold-bg); border-radius: 10px; padding: 0.55rem 0.9rem; display: grid; gap: 0.45rem; }
+details.overheard > summary { cursor: pointer; color: var(--hold); font: 600 0.88rem var(--body); }
+details.overheard > summary small { font-weight: 400; margin-left: 0.3rem; }
+details.overheard .setting { font-size: 0.85rem; color: var(--muted); font-style: italic; }
+details.overheard .setting:empty { display: none; }
+details.overheard .line { font: 500 1rem/1.5 var(--display); }
 .lead { font: 500 1.15rem/1.55 var(--display); }
 .lead b { color: var(--leaf); }
 pre .add { color: var(--leaf); }
@@ -111,6 +117,11 @@ details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
       <option value="2">More</option>
       <option value="3">Everything</option>
     </select>
+    <label for="overheard">Overheard</label>
+    <select id="overheard" aria-label="Show or hide the overheard conversations">
+      <option value="closed">Closed</option>
+      <option value="open">Open</option>
+    </select>
     <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
   </div>
 </div></div>
@@ -119,6 +130,15 @@ details[data-level] ul { font-size: 0.93rem; line-height: 1.55; }
   <h1>The Web That Wasn't</h1>
   <p class="dek">One library built twice: as if web pages had never carried forms, and as HEART serves it.</p>
 
+  <details class="overheard"><summary>Overheard <small>1996, the library's help line</small></summary>
+    <p class="setting">The web that wasn't. Ana Torres calls Riverside Public Library from her kitchen; Marcus answers.</p>
+    <p class="line"><b>Ana:</b> I just want to renew <i>The Hobbit</i>. Why am I picking POST from a menu and typing my card number into a box?</p>
+    <p class="line"><b>Marcus:</b> That's how renewing works online. It's all in <code>forms.html</code>.</p>
+    <p class="line"><b>Ana:</b> I typed every bit of it, and it said 409. A hold is waiting. Couldn't it have told me before I typed it all?</p>
+    <p class="line"><b>Marcus:</b> The page doesn't know what you can do. <code>forms.yaml</code> does, for every book alike.</p>
+    <p class="line"><b>Ana:</b> Why can't the page just show me a Renew button when I can, and say why when I can't?</p>
+    <p class="line"><b>Marcus:</b> …Huh.</p>
+  </details>
   <h2>Information and Controls</h2>
   <blockquote class="fielding">“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”<cite>Roy T. Fielding, 2008</cite></blockquote>
   <p class="lead">Hypermedia as the engine of application state, <b>HATEOAS</b>, is the most followed constraint of all time on the human web, and the least followed on the machine web.</p>
@@ -229,6 +249,12 @@ Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></p
   </details>
 
   <h2>The web as it is</h2>
+  <details class="overheard"><summary>Overheard <small>today, Ana's kitchen</small></summary>
+    <p class="setting">The web we got. Ana renews from her phone.</p>
+    <p class="line"><b>Ana:</b> There's a Renew button on <i>Matilda</i>. On <i>The Hobbit</i> it's grey, and it says a hold is waiting.</p>
+    <p class="line"><b>Marcus:</b> The page only offers what the book can do now. Nobody types POST.</p>
+  </details>
+
   <figure><img src="media/heart-html.gif" alt="Ana opens her account, renews Matilda, then finds The Hobbit's Renew greyed with the reason." loading="lazy"><figcaption>HEART's HTML, from one declaration: Ana renews <i>Matilda</i>; <i>The Hobbit</i> says why not.</figcaption></figure>
   <details data-level="2"><summary>Stills</summary>
     <div class="pair">
@@ -247,6 +273,14 @@ Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></p
   </details>
 
   <h2>The same document, then and now</h2>
+  <details class="overheard"><summary>Overheard <small>today, the library's IT office</small></summary>
+    <p class="setting">Priya builds the library's API; Sam builds the assistant that renews books for members.</p>
+    <p class="line"><b>Priya:</b> Our loans API is JSON over HTTP, with a full OpenAPI description.</p>
+    <p class="line"><b>Sam:</b> So my agent reads every operation, sends a renew for <i>The Hobbit</i>, and gets a 409.</p>
+    <p class="line"><b>Priya:</b> Renew is listed for every loan. It has to be.</p>
+    <p class="line"><b>Sam:</b> That's <code>forms.yaml</code>. We gave people better than that in 1996.</p>
+  </details>
+
   <div class="pair">
     <div><span class="label">1996: the Perl site's forms.yaml</span>
 <pre><code>/loans/{loanId}/renew:
@@ -303,6 +337,13 @@ Cannot renew. A hold is waiting for this book, so it can't be renewed.</code></p
   </details>
 
   <h2>Adding the controls back, step by step</h2>
+  <details class="overheard"><summary>Overheard <small>the same office, an hour later</small></summary>
+    <p class="setting"></p>
+    <p class="line"><b>Priya:</b> What would it take to give the API what Ana's page has?</p>
+    <p class="line"><b>Sam:</b> Links, forms, forms by state, why absent, a version tag. The page already does all of it.</p>
+    <p class="line"><b>Priya:</b> So the API answers like the page does.</p>
+  </details>
+
   <p>A loan as JSON over HTTP, given back what Ana's page gives her: data, then the controls with it.</p>
   <ol>
     <li><b>The answer links itself</b> and names its vocabulary.</li>
@@ -387,6 +428,13 @@ versionOf = { it.version }
   </details>
 
   <h2>An agent: ARTIE with Claude</h2>
+  <details class="overheard"><summary>Overheard <small>the next week</small></summary>
+    <p class="setting"></p>
+    <p class="line"><b>Sam:</b> The agent found the way once, ten model calls. Every run since uses none.</p>
+    <p class="line"><b>Ana:</b> When the hold on <i>The Hobbit</i> clears, will it renew it?</p>
+    <p class="line"><b>Sam:</b> If the library offers renew then, yes. It acts on what's offered.</p>
+  </details>
+
 <pre><code>Renew each of Ana's books that can be renewed, and say why for any that can't.
 
 - Look up Ana's account by her library card number {card}
@@ -474,6 +522,16 @@ library:renew:
     apply(Number(select.value));
     try { localStorage.setItem(key, select.value); } catch (e) {}
   });
+})();
+</script>
+<script>
+// The overheard conversations, closed or open together, apart from the Detail levels; kept where it can be.
+(function () {
+  var select = document.getElementById('overheard'), key = 'heart-report-overheard';
+  function apply() { document.querySelectorAll('details.overheard').forEach(function (d) { d.open = select.value === 'open'; }); }
+  try { var kept = localStorage.getItem(key); if (kept) select.value = kept; } catch (e) {}
+  apply();
+  select.addEventListener('change', function () { apply(); try { localStorage.setItem(key, select.value); } catch (e) {} });
 })();
 </script>
 <script>
