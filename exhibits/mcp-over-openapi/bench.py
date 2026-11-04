@@ -763,7 +763,8 @@ def run_code(model, arm, task, max_turns, api):
 # code-artie: code mode with ARTIE, in its own container, as its one tool. The model writes no program: it gives
 # ARTIE a goal in plain words once, ARTIE finds the way and keeps it as a .heart.yaml, and later runs run that.
 
-SKILLS = HERE / "runs/codemode/skills"
+# Each arm keeps its skills apart: code-skill-escalate starts from none, as code-artie-escalate did.
+SKILLS = {"code-skill": HERE / "runs/codemode/skills", "code-skill-escalate": HERE / "runs/codemode/skills-escalate"}
 SKILL_TOLD = (
     "\n\nWhen programs have done the task, save the work as a skill with save_skill, so that the next time the task "
     "is asked it is run again rather than written again: a module whose run(**arguments) does the whole task, "
@@ -782,6 +783,17 @@ SAVE_SKILL = {
         "code": {"type": "string", "description": "the module, defining run(**arguments)"}},
         "required": ["name", "skill_md", "code"]},
 }
+# code-skill-escalate: kept skills run by a plain harness with no model, as code-artie-escalate runs ARTIE's kept
+# scripts. Code mode is called only when a skill raises, with what it said.
+SKILL_HARNESS_TOLD = (
+    " The next time this task is asked, a plain harness with no model runs the skills you saved this time, in the "
+    "order saved, each with the arguments you gave save_skill, and calls you only if one fails. So give save_skill "
+    "the arguments this task runs it with."
+)
+SKILL_INPUTS_TOLD = (
+    " A task may come with inputs: values that change from run to run, given by name. In save_skill's arguments, "
+    "write each as {name}, in braces, never its value: the harness gives it again each run."
+)
 RUN_SKILL = {
     "name": "run_skill",
     "description": "Run a saved skill in the sandbox: run(**arguments). Returns its exit code, its standard output "
@@ -789,6 +801,10 @@ RUN_SKILL = {
     "input_schema": {"type": "object", "properties": {
         "name": {"type": "string"}, "arguments": {"type": "object"}}, "required": ["name", "arguments"]},
 }
+
+SAVE_SKILL_WITH_ARGUMENTS = {**SAVE_SKILL, "input_schema": {**SAVE_SKILL["input_schema"], "properties": {
+    **SAVE_SKILL["input_schema"]["properties"],
+    "arguments": {"type": "object", "description": "the arguments this task runs it with"}}}}
 
 ARTIE_WORK = HERE / "runs/code-artie"
 ARTIE_IMAGE = "eclipse-temurin:25-jre-alpine"
@@ -866,7 +882,30 @@ def skill_program(code, arguments):
     return f"{code}\n\nif __name__ == '__main__':\n    import json\n    run(**json.loads({json.dumps(arguments)!r}))\n"
 
 
-def run_code_skill(model, task, max_turns, api):
+def templated(arguments, inputs):
+    """[arguments] with each input's value written {name}, as the harness keeps them."""
+    def one(value):
+        if isinstance(value, str):
+            for name, given in inputs.items():
+                value = value.replace(given, "{" + name + "}")
+        return value
+    return {k: one(v) for k, v in arguments.items()}
+
+
+def filled(arguments, inputs):
+    """[arguments] with each {name} given this run's input."""
+    def one(value):
+        if isinstance(value, str):
+            for name, given in inputs.items():
+                value = value.replace("{" + name + "}", given)
+        return value
+    return {k: one(v) for k, v in arguments.items()}
+
+
+def run_code_skill(model, task, max_turns, api, escalate=False):
+    """code-skill: code mode keeping skills, the model in every run. With [escalate] (code-skill-escalate), a plain
+    harness runs the skills that did the task last time with no model, and calls the model only when one raises."""
+    arm = "code-skill-escalate" if escalate else "code-skill"
     setup(task)
     offset = len(log())
     interferer = interfere(task, offset)
@@ -876,39 +915,73 @@ def run_code_skill(model, task, max_turns, api):
     started = time.time()
     SANDBOX.update(service=SANDBOX_SERVICE, doc=False)
     library, docs = api_library(openapi_spec())
-    system = CODE_SYSTEM + docs + SKILL_TOLD
-    saved = sorted(SKILLS.glob("*/SKILL.md"))
-    opening = TASKS[task]["text"]
-    if saved:
-        opening += "\n\nSaved skills:\n\n" + "\n\n".join(f"## {p.parent.name}\n{p.read_text()}" for p in saved)
-    programs, skill_runs, skills_saved = [], [], []
+    folder_of = SKILLS[arm]
+    inputs = task_inputs(task) if escalate else {}
+    system = CODE_SYSTEM + docs + SKILL_TOLD + (SKILL_HARNESS_TOLD + (SKILL_INPUTS_TOLD if inputs else "")
+                                                if escalate else "")
+    programs, skill_runs, skills_saved, plan_saved = [], [], [], {}
+    by = {"who": "harness"}
+
+    def run_skill(name, arguments):
+        source = folder_of / named(name) / "skill.py"
+        if not source.exists():
+            return 1, f"no skill named {name}"
+        exit_, out, err = sandboxed(skill_program(source.read_text(), arguments), library)
+        skill_runs.append({"name": source.parent.name, "arguments": arguments, "exit": exit_, "by": by["who"]})
+        return exit_, f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}"
 
     def handle(use):
         if use.name == "save_skill":
-            folder = SKILLS / named(use.input.get("name"))
+            folder = folder_of / named(use.input.get("name"))
             folder.mkdir(parents=True, exist_ok=True)
             (folder / "SKILL.md").write_text(use.input.get("skill_md", ""))
             (folder / "skill.py").write_text(use.input.get("code", ""))
             skills_saved.append(folder.name)
+            if "arguments" in use.input:
+                plan_saved[folder.name] = templated(use.input.get("arguments") or {}, inputs)
             return f"saved {folder.name}", False
         if use.name == "run_skill":
-            source = SKILLS / named(use.input.get("name")) / "skill.py"
-            if not source.exists():
-                return f"no skill named {use.input.get('name')}", True
-            arguments = use.input.get("arguments") or {}
-            exit_, out, err = sandboxed(skill_program(source.read_text(), arguments), library)
-            skill_runs.append({"name": source.parent.name, "arguments": arguments, "exit": exit_})
-        else:
-            code = use.input.get("code", "")
-            exit_, out, err = sandboxed(code, library)
-            programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
-                             "lines": code.count("\n") + 1, "code": code})
+            exit_, text = run_skill(use.input.get("name"), use.input.get("arguments") or {})
+            return text, exit_ != 0
+        code = use.input.get("code", "")
+        exit_, out, err = sandboxed(code, library)
+        programs.append({"sha": hashlib.sha256(code.encode()).hexdigest()[:12], "exit": exit_,
+                         "lines": code.count("\n") + 1, "code": code})
         return f"exit {exit_}\nstdout:\n{out or '(none)'}\nstderr:\n{err or '(none)'}", exit_ != 0
 
-    tools = [RUN_PROGRAM, SAVE_SKILL] + ([RUN_SKILL] if saved else [])
-    calls, final_text = tool_turns(model, api, system, opening, tools, handle, max_turns)
-    return finished_record(model, "code-skill", task, started, offset, interferer, change, calls, final_text, {
-        "programs": programs, "skill_runs": skill_runs, "skills_saved": skills_saved,
+    plan = folder_of / f"{task}.plan.json"
+    calls, final_text, failed = [], None, None
+    if escalate and plan.exists():
+        # The skills that did this task last time, run by the harness in order, with no model.
+        said = []
+        for step in json.loads(plan.read_text()):
+            exit_, text = run_skill(step["name"], filled(step["arguments"], inputs))
+            said.append(text)
+            if exit_ != 0:
+                failed = f"{step['name']} with {json.dumps(filled(step['arguments'], inputs))}: {text}"
+                break
+        else:
+            final_text = "\n".join(said)
+    if final_text is None:
+        by["who"] = "model"
+        saved = sorted(folder_of.glob("*/SKILL.md"))
+        opening = TASKS[task]["text"]
+        if inputs:
+            opening += "\n\nInputs: " + ", ".join(f"{k} = {v}" for k, v in inputs.items())
+        if saved:
+            opening += "\n\nSaved skills:\n\n" + "\n\n".join(f"## {p.parent.name}\n{p.read_text()}" for p in saved)
+        if failed:
+            opening += f"\n\nThe saved skills that did this task last time were run again, and one failed:\n{failed}"
+        tools = [RUN_PROGRAM, SAVE_SKILL_WITH_ARGUMENTS if escalate else SAVE_SKILL] + ([RUN_SKILL] if saved else [])
+        calls, final_text = tool_turns(model, api, system, opening, tools, handle, max_turns)
+        ran = {r["name"]: templated(r["arguments"], inputs) for r in skill_runs if r["by"] == "model" and r["exit"] == 0}
+        # The harness keeps what the model saved with arguments; failing that, the skills it ran and finished.
+        if escalate and final_text is not None and (plan_saved or ran):
+            plan.write_text(json.dumps([{"name": k, "arguments": v} for k, v in (plan_saved or ran).items()],
+                                       indent=2))
+    return finished_record(model, arm, task, started, offset, interferer, change, calls, final_text, {
+        "programs": programs, "skill_runs": skill_runs, "skills_saved": skills_saved, "inputs": inputs,
+        "escalated": bool(calls),
         "tool_calls": len(programs) + len(skill_runs), "sandbox_runs": len(programs) + len(skill_runs),
         "tool_errors": sum(p["exit"] != 0 for p in programs + skill_runs)})
 
@@ -1212,8 +1285,8 @@ def main():
                     continue  # kept only from a goal run that acted: task 2's acted on nothing
                 try:
                     turns = 16 if task == "t5" else ARM_TURNS.get(arm, min(args.max_turns, 8))
-                    if arm == "code-skill":
-                        record = run_code_skill(args.model, task, turns, api)
+                    if arm in ("code-skill", "code-skill-escalate"):
+                        record = run_code_skill(args.model, task, turns, api, escalate=arm == "code-skill-escalate")
                     elif arm in ("code-artie", "code-artie-escalate"):
                         record = run_code_artie(args.model, task, turns, api, escalate=arm == "code-artie-escalate")
                     elif arm.startswith("code-"):
