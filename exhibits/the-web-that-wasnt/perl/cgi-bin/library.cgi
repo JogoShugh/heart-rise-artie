@@ -12,9 +12,9 @@ my $DATA = $ENV{LIBRARY_DATA} || '/data/loans.txt';
 my %MEMBER = (card => '21000451', pin => '1234');    # Ana Torres
 my @SEED = (
     # loan  book  title              author              due          renewals hold returned
-    [3310, 4471, 'The Hobbit',      'J. R. R. Tolkien', '1996-11-12', 0, 1, 0],
-    [3311, 4472, 'Matilda',         'Roald Dahl',       '1996-11-12', 0, 0, 0],
-    [3312, 4473, "Charlotte's Web", 'E. B. White',      '1996-11-12', 3, 0, 0],
+    [3310, 4471, 'The Hobbit',      'J. R. R. Tolkien', '1997-11-12', 0, 1, 0],
+    [3311, 4472, 'Matilda',         'Roald Dahl',       '1997-11-12', 0, 0, 0],
+    [3312, 4473, "Charlotte's Web", 'E. B. White',      '1997-11-12', 3, 0, 0],
 );
 my $MOST_RENEWALS = 3;
 

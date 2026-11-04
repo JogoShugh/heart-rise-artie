@@ -1,4 +1,4 @@
-# The web that wasn't: Riverside Public Library as a 1996 site would run it, Apache and CGI scripts in Perl,
+# The web that wasn't: Riverside Public Library as a 1997 site would run it, Apache and CGI scripts in Perl,
 # with CGI.pm. forms.html is written by forms.cgi from forms.yaml; library.cgi answers with data only.
 #   docker build -t web-that-wasnt exhibits/the-web-that-wasnt/perl
 #   docker run --rm -d --name web-that-wasnt -p 8150:80 web-that-wasnt
