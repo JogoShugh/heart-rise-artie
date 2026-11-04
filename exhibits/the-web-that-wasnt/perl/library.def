@@ -1,0 +1,46 @@
+# library.def -- everything the Riverside Public Library server can do.
+# forms.cgi reads this file and writes forms.html from it, so forms.html is always up to date.
+# Blocks are separated by a blank line. In addresses and bodies, {name} is a value you type in.
+
+operation: loans
+title: List your loans
+method: GET
+address: /cgi-bin/library.cgi/loans?card={card}&pin={pin}
+field: card | your library card number, 8 digits, on the back of your card
+field: pin | your 4-digit PIN
+answer: 200 | your loans: loan number, book number, title, due date
+answer: 401 | wrong card number or PIN
+
+operation: loan
+title: Look at one loan
+method: GET
+address: /cgi-bin/library.cgi/loans/{loanId}?card={card}&pin={pin}
+field: loanId | the loan number, from List your loans
+field: card | your library card number
+field: pin | your PIN
+answer: 200 | the loan
+answer: 404 | no such loan
+
+operation: renew
+title: Renew a loan
+method: POST
+address: /cgi-bin/library.cgi/loans/{loanId}/renew
+body: card={card}&pin={pin}
+field: loanId | the loan number, from List your loans
+field: card | your library card number
+field: pin | your PIN
+answer: 200 | renewed: due three weeks later
+answer: 409 | it cannot be renewed (the answer says why)
+answer: 401 | wrong card number or PIN
+
+operation: return
+title: Return a loan
+method: POST
+address: /cgi-bin/library.cgi/loans/{loanId}/return
+body: card={card}&pin={pin}
+field: loanId | the loan number, from List your loans
+field: card | your library card number
+field: pin | your PIN
+answer: 200 | returned
+answer: 409 | it was returned already
+answer: 401 | wrong card number or PIN
