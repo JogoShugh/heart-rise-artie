@@ -40,6 +40,30 @@ Feature: A script's lock file guards each act before ARTIE sends it
       | strict  | as offered | as offered | finished                      | closed |
       | off-the-rails | changed | as offered | finished                 | closed |
 
+  Scenario Outline: A form moved to a new address, its act otherwise the same: lenient goes on, strict stops
+    A form's integrity covers its target (HAL-SCHEMA-FORMS-HR Rule 10), so a
+    form the server moved has a new one. ARTIE never builds an address: it acts
+    at the target the form gives. So the lock file also pins each form's act:
+    its method, content type, template pointers and schema, the target set
+    aside. Lenient, a form whose integrity changed but whose act did not goes
+    on, and its capture says what held it. Strict stops at any change.
+    Given ARTIE guards the run "<guard>", pinning "github:close" to its form "changed", its act "<act>"
+    When this script runs with ARTIE
+      """kotlin
+      heart("https://github.gateway.test/") {
+          act("github:issues-get", "owner" to "acme", "repo" to "rockets", "issue_number" to 10)
+          act("github:close")
+      }
+      """
+    Then the run <ends>
+    And issue 10 of "acme/rockets" is now "<issue>" on the small GitHub
+
+    Examples:
+      | guard   | act        | ends                               | issue  |
+      | lenient | as offered | finished, step 3 held by its act   | closed |
+      | lenient | changed    | was stopped at step 2 by its guard | open   |
+      | strict  | as offered | was stopped at step 2 by its guard | open   |
+
   Scenario Outline: Look then leap: one look, at every form the script uses, here the close form <close>
     spec/ideas/off-the-rails.md. One look, at the entry's manifest of every
     form the server declares: when each form the lock file pins is there with

@@ -194,9 +194,19 @@ class ReplaySteps(
     fun pinsMethod(lock: String, relation: String, method: String) {
         val file = folder.resolve(lock)
         val text = Files.readString(file)
-        val at = Regex("(?m)^  ${Regex.escape(relation)}:\\n    integrity: .*\\n    method: .*$").find(text)
+        val at = Regex("(?m)^  ${Regex.escape(relation)}:\\n    integrity: .*\\n(    act: .*\\n)?    method: .*$")
+            .find(text)
         val was = checkNotNull(at) { "$lock pins no method for $relation" }.value
         Files.writeString(file, text.replace(was, was.substringBeforeLast("method: ") + "method: $method"))
+    }
+
+    @Then("the lock file {string} pins the act of {string} as issue {int} offers it now")
+    fun pinsAct(lock: String, relation: String, number: Int) {
+        val forms = Yaml().load<Map<String, Any?>>(Files.readString(folder.resolve(lock)))["forms"] as Map<*, *>
+        val client = ctx.newClient(ctx.dialect, ctx.rung)
+        val issue = client.enter("https://github.gateway.test/repos/acme/rockets/issues/$number")
+        val offered = checkNotNull(issue.affordance(relation)) { "issue $number offers no $relation" }
+        assertEquals(heart.FormAct.of(offered), (forms[relation] as Map<*, *>)["act"])
     }
 
     @Then("the lock file {string} pins rung {string}")

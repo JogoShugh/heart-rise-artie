@@ -26,6 +26,28 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
         ctx.pins = bookmark() + (relation to (pinnedForm to if (set == "changed") CHANGED else setNow))
     }
 
+    @Given("ARTIE guards the run {string}, pinning {string} to its form {string}, its act {string}")
+    fun pinningAct(guard: String, relation: String, form: String, act: String) {
+        pinning(guard, relation, form, "as offered")
+        ctx.acts = mapOf(relation to if (act == "changed") CHANGED else offeredAct(relation))
+    }
+
+    @Then("the run finished, step {int} held by its act")
+    fun heldByAct(step: Int) {
+        finished()
+        val steps = (Json.parseToJsonElement(Run.current.traceJson()).jsonObject.getValue("steps")
+            as kotlinx.serialization.json.JsonArray).map { it.jsonObject }
+        val guard = steps[step - 1]["guard"] as? JsonObject
+        assertEquals("act", guard?.get("held")?.jsonPrimitive?.content, "guard: $guard")
+    }
+
+    /** The act of [relation]'s form, as ARTIE reads it on issue 10 now. */
+    private fun offeredAct(relation: String): String {
+        val client = ctx.newClient(ctx.dialect, ctx.rung)
+        val issue = client.enter("https://github.gateway.test/repos/acme/rockets/issues/10")
+        return heart.FormAct.of(checkNotNull(issue.affordance(relation)) { "issue 10 offers no $relation" })
+    }
+
     @Given("ARTIE looks at everything, the lock file recording the server's digest {}")
     fun looksAtEverything(digest: String) {
         ctx.lookEverything = true

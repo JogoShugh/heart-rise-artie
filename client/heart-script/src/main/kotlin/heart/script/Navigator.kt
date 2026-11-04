@@ -81,10 +81,16 @@ class Pins(
 )
 
 /**
- * One form's pin: its own integrity (HAL-SCHEMA-FORMS-HR Rule 10), the affordance sets it was offered in, and its
- * [method], which a form that changed must keep for a run to go past it by the values it sends.
+ * One form's pin: its own integrity (HAL-SCHEMA-FORMS-HR Rule 10), the affordance sets it was offered in, its
+ * [method], which a form that changed must keep for a run to go past it by the values it sends, and its [act]: a
+ * digest of the form with its target set aside, so a form the server moved, and changed in nothing else, goes on.
  */
-class FormPin(val integrity: String?, val sets: List<String> = emptyList(), val method: String? = null)
+class FormPin(
+    val integrity: String?,
+    val sets: List<String> = emptyList(),
+    val method: String? = null,
+    val act: String? = null,
+)
 
 /** What came of a selection, in the core's terms (SPEC §6.0); [used], the affordance the client used, if any. */
 sealed interface Answer {
@@ -124,9 +130,12 @@ class Guard(
     /**
      * What held the act to the lock file, when it passed: `set`, offered in a set recorded for it, which covers every
      * form in it; `form`, its own integrity alone, its set new or none (a lookup form of the service index);
-     * `values`, the form changed, but kept its method, and what the script sent fits it (`on-change: values`).
+     * `act`, the form changed only in its target, moved by the server; `values`, the form changed, but kept its
+     * method, and what the script sent fits it (`on-change: values`).
      */
     val held: String? = null,
+    /** The form's act: a digest of it with its target set aside (its method, content type, pointers and schema). */
+    val act: String? = null,
 )
 
 /**

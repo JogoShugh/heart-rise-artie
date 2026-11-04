@@ -56,6 +56,7 @@ internal object UsedAffordances {
                 unpinned = guard != null && !guard.strict && guard.unpinned(rel),
                 warning = guard?.warning(held, rel),
                 held = guard?.heldBy(held, rel, fields),
+                act = FormAct.of(form),
             ),
         )
     }

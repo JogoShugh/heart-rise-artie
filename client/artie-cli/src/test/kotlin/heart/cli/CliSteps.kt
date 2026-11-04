@@ -222,6 +222,9 @@ class CliSteps(private val script: ScriptSteps) {
         assertEquals(guard, askedGuard)
     }
 
+    @Then("the client was made holding {string}'s act {string}")
+    fun holdsAct(rel: String, act: String) = assertEquals(act, askedPins?.forms?.get(rel)?.act)
+
     @Then("the file {string} reads")
     fun fileReads(name: String, text: String) = assertEquals(text, Files.readString(folder.resolve(name)).trimEnd())
 

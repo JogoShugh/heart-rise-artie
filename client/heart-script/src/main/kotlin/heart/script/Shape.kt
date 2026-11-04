@@ -82,6 +82,7 @@ private fun guard(guard: Guard): JsonObject = buildJsonObject {
     guard.rung?.let { put("rung", it) }
     guard.set?.let { put("set", pinned(it)) }
     guard.form?.let { put("form", it) }
+    guard.act?.let { put("act", it) }
     guard.schema?.let { put("schema", pinned(it)) }
     guard.ifMatch?.let { put("if-match", it) }
     guard.checked?.let { put("checked", it) }

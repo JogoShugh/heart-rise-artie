@@ -10,7 +10,8 @@ import kotlinx.serialization.json.JsonObject
 /**
  * A script's lock file, held to before ARTIE sends an act (spec/PLAN-SCRIPT-GENERATOR.md, "Guards";
  * spec/ideas/replay-guards-lenient-strict.md). Lenient: the form about to be used must have its pinned integrity,
- * in whatever set holds it now; a relation the lock doesn't pin goes on, marked unpinned. With [values]
+ * in whatever set holds it now, or, changed only in its target, its pinned act ([FormAct]): the server moved it,
+ * and ARTIE acts at the target the form gives. A relation the lock doesn't pin goes on, marked unpinned. With [values]
  * (`on-change: values`), a lenient run also goes past a changed form that kept its pinned method, when what the
  * script sends fits its new schema. [strict]: the set must also be one recorded for it, and an unpinned relation
  * is refused. Bytes are checked against their links' integrity as always (Rule 2), whatever the mode.
@@ -45,11 +46,16 @@ class ScriptGuard(
         }
     }
 
-    /** Why the changed [form] [rel], pinned as [pin], may not be used to send [sent]; null when its values hold it. */
+    /**
+     * Why the changed [form] [rel], pinned as [pin], may not be used to send [sent]; null when its act holds it (only
+     * its target changed: the server moved it), or, with [values], what is sent.
+     */
     private fun changed(rel: String, pin: FormPin, form: AffordanceForm, sent: JsonObject): Answer.Refused? {
         val misfits = SchemaCheck.violations(sent, form.schema)
         return when {
-            strict || !values -> refused("$rel changed: pinned ${pin.integrity}, offered ${form.integrity}")
+            strict -> refused("$rel changed: pinned ${pin.integrity}, offered ${form.integrity}")
+            moved(pin, form) -> null
+            !values -> refused("$rel changed: pinned ${pin.integrity}, offered ${form.integrity}")
             pin.method == null -> refused("$rel changed, and the lock file doesn't pin its method")
             pin.method != form.method ->
                 refused("$rel changed its method: pinned ${pin.method}, offered ${form.method}")
@@ -70,7 +76,7 @@ class ScriptGuard(
         val passed = pin != null && form != null && refusal(held, rel, sent) == null
         return when {
             !passed -> null
-            pin?.integrity != null && pin.integrity != form?.integrity -> "values"
+            pin?.integrity != null && pin.integrity != form?.integrity -> if (moved(pin, form)) "act" else "values"
             held?.formsIntegrity in pin?.sets.orEmpty() -> "set"
             else -> "form"
         }
@@ -128,6 +134,10 @@ class ScriptGuard(
 
     companion object {
         private val NOTHING = JsonObject(emptyMap())
+
+        /** Whether [form] is the act [pin] recorded, at another target: the server moved it, and changed nothing. */
+        private fun moved(pin: FormPin, form: AffordanceForm?): Boolean =
+            pin.act != null && form != null && pin.act == FormAct.of(form)
 
         /** The variables [target] leaves to fill, as its template writes them (`{/name}`); empty for a plain link. */
         fun variables(target: String): String = Regex("\\{[^}]*}").findAll(target).joinToString("") { it.value }

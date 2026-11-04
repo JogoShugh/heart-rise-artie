@@ -295,6 +295,7 @@ Feature: artie run: a script, run from the command line
       forms:
         issues-get:
           integrity: sha256-abc
+          act: sha256-abc-act
           sets: []
       links: {}
       """
@@ -306,6 +307,7 @@ Feature: artie run: a script, run from the command line
       | <value>    |
     Then artie exits 0
     And the client was made holding the lock file pinning "issues-get" to "sha256-abc", "<guard>"
+    And the client was made holding "issues-get"'s act "sha256-abc-act"
     And the client was made to ask at rung "L2"
 
     Examples:

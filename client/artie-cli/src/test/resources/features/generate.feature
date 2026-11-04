@@ -283,6 +283,7 @@ Feature: artie generate: a run's capture, made a script with no model in it
         set:
           integrity: sha256-set1
         form: sha256-start
+        act: sha256-start-act
       outcome: new resource
       now:
         state:
@@ -405,8 +406,9 @@ Feature: artie generate: a run's capture, made a script with no model in it
     And the file "gen.pins.yaml" reads
       """
       # What gen.kts was recorded against, from run.trace.yaml. artie run holds the script to it before every act:
-      # --guard lenient (the default) refuses a form no longer offered, or whose integrity changed; --guard strict
-      # also refuses one offered in a set not recorded for it.
+      # --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+      # target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+      # one offered in a set not recorded for it.
       rung: L2
       digest: sha256-every-form
       forms:
@@ -415,6 +417,7 @@ Feature: artie generate: a run's capture, made a script with no model in it
           sets: []
         start-branch:
           integrity: sha256-start
+          act: sha256-start-act
           sets:
             - sha256-set1
         merge:

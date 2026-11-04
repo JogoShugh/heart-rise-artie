@@ -263,8 +263,8 @@ Feature: A generated script makes the same requests, holds to its lock file, and
 
   Scenario: A form held by its values is re-pinned, and the next run holds to it strictly
     With repin: auto, a form that changed but held by the values sent is
-    written into the lock file as offered now: its new integrity, its method
-    and its set. A strict run on another issue then finishes.
+    written into the lock file as offered now: its new integrity, its act,
+    its method and its set. A strict run on another issue then finishes.
     Given the gateway's issue forms change: close takes a milestone
     And the file "gen.config.yaml" is
       """
@@ -282,6 +282,7 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | github:comment    | form   |
       | github:close      | values |
     And about its pins, the run said "re-pinned github:comment: offered in a new set; re-pinned github:close: changed, and what the script sends still fits it"
+    And the lock file "gen.pins.yaml" pins the act of "github:close" as issue 12 offers it now
     When "gen.kts" runs with ARTIE, held "strict" to its lock file, captured in "strict.trace.yaml", given
       | name   | value   |
       | owner  | acme    |

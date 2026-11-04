@@ -34,7 +34,7 @@ private class Repair(val refused: Step, val made: Step) {
 
     /** The form the repair acted on, as the lock file pins it. */
     val pin = Found(relation, made.guard["set"].map()["integrity"]?.toString(), made.guard["form"]?.toString(),
-        made.chose["method"]?.toString())
+        made.chose["method"]?.toString(), made.guard["act"]?.toString())
 
     /** What it sends now, as a person reads it: `content (was body)`. */
     val said: String get() = fields.joinToString { (name, from) -> if (from == name) name else "$name (was $from)" }
