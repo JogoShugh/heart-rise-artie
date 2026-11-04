@@ -1,9 +1,12 @@
 ---
 run:
-  inputs: {}
+  inputs:
+    card:
+      value: '21000451'
+      given: given
 ---
-at: '2026-11-04T16:01:34.641277Z'
-ms: 57
+at: '2026-11-04T17:07:31.943948Z'
+ms: 77
 mode: script
 say: enter {entry}
 params:
@@ -16,16 +19,22 @@ now:
     title: Riverside Public Library
     hr:manifest:
       forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
         library:get-loan:
           - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
         library:renew:
           - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
         library:return:
           - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
         library:search-loans:
           - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
-      digest: sha256-xNb4bBcVbsAztdAvDVTA9FjlnQ+A7EMhGvJxgHia7DQ=
+      digest: sha256-XDzrMkZrDTnosldep8wEIt8luy6Eh8HYT1/3wADSO1c=
   forms:
+    - library:search-accounts
+    - library:get-account
     - library:search-loans
     - library:get-loan
   links:
@@ -34,61 +43,136 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-04T16:01:34.706363Z'
-ms: 46
+at: '2026-11-04T17:07:32.028684Z'
+ms: 50
 mode: script
-say: act {relation}, name {name}
-inferred: search loans for Ana's loan of Matilda
-fromIntent: Find Matilda, and renew it if renewing is offered; otherwise say why it can't be renewed
+say: act {relation}, id {id}
+intent: Look up Ana's account by her library card number 21000451
 params:
-  relation: library:search-loans
-  name: Matilda
+  relation: library:get-account
+  id: 21000451
 values:
-  name:
-    value: Matilda
-    type: string
+  id:
+    value: 21000451
+    type: integer
     from:
-      - constant
+      - input: card
 opens: true
 chose:
   kind: form
-  relation: library:search-loans
-  title: Find loans by title
+  relation: library:get-account
+  title: Get an account by library card number
   method: GET
-  target: /loans{?name}
-  address: http://localhost:8140/loans?name=Matilda
+  target: /accounts/{id}
+  address: http://localhost:8140/accounts/21000451
   picked: relation
 guard:
   rung: L0
-  form: sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
-  act: sha256-Z7N30vs6QUGs1xK2hP+w1F0UgY7gyXs1+HawMkOt274=
+  form: sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
+  act: sha256-KruEAjUF9OytsEfoyyqCjormTfGPvM76KLq9Lh4CCGs=
   checked: lenient
   held: form
 offered:
   forms:
+    - library:get-account
     - library:get-loan
+    - library:search-accounts
     - library:search-loans
   links:
     - self
     - service-desc
 outcome: done
-address: http://localhost:8140/loans?name=Matilda
+address: http://localhost:8140/accounts/21000451
 now:
   state:
-    count: 1
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
   forms: []
   links:
     self:
       - null
+    hr:forms:
+      - null
     item:
+      - The Hobbit
       - Matilda
+      - Charlotte's Web
 ---
-at: '2026-11-04T16:01:34.754983Z'
-ms: 7
+at: '2026-11-04T17:07:32.081730Z'
+ms: 6
 mode: script
 say: follow {relation}, titled {title}
-inferred: open the item "Matilda"
-fromIntent: Find Matilda, and renew it if renewing is offered; otherwise say why it can't be renewed
+params:
+  relation: item
+  title: The Hobbit
+values:
+  title:
+    value: The Hobbit
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: The Hobbit
+  method: GET
+  target: http://localhost:8140/loans/3310
+  address: http://localhost:8140/loans/3310
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3310
+now:
+  state:
+    id: 3310
+    title: The Hobbit
+    author: J. R. R. Tolkien
+    due: '2026-11-12'
+    renewals: 0
+    standing: hold waiting
+  forms:
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-04T17:07:32.090399Z'
+ms: 4
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000451
+outcome: done
+address: http://localhost:8140/accounts/21000451
+now:
+  state:
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Hobbit
+      - Matilda
+      - Charlotte's Web
+---
+at: '2026-11-04T17:07:32.095003Z'
+ms: 4
+mode: script
+say: follow {relation}, titled {title}
 params:
   relation: item
   title: Matilda
@@ -97,7 +181,6 @@ values:
     value: Matilda
     from:
       - constant
-opens: true
 chose:
   kind: link
   relation: item
@@ -111,6 +194,7 @@ guard:
 offered:
   forms: []
   links:
+    - hr:forms
     - item
     - self
 outcome: done
@@ -132,11 +216,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-04T16:01:34.763446Z'
-ms: 5
+at: '2026-11-04T17:07:32.100542Z'
+ms: 4
 mode: script
 say: act {relation}
-intent: Find Matilda, and renew it if renewing is offered; otherwise say why it can't be renewed
+inferred: renew this book (Matilda)
+fromIntent: 'For each book she has out: renew it if renewing is offered; otherwise say why it can''t be renewed'
 params:
   relation: library:renew
 opens: true
@@ -187,8 +272,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-04T16:01:34.769055Z'
-ms: 3
+at: '2026-11-04T17:07:32.106Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -212,25 +297,101 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-04T16:01:34.772610Z'
+at: '2026-11-04T17:07:32.109289Z'
 ms: 2
 mode: script
 say: return to {address}
 params:
-  address: http://localhost:8140/loans?name=Matilda
+  address: http://localhost:8140/accounts/21000451
 outcome: done
-address: http://localhost:8140/loans?name=Matilda
+address: http://localhost:8140/accounts/21000451
 now:
   state:
-    count: 1
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
   forms: []
   links:
     self:
       - null
+    hr:forms:
+      - null
     item:
+      - The Hobbit
       - Matilda
+      - Charlotte's Web
 ---
-at: '2026-11-04T16:01:34.775200Z'
+at: '2026-11-04T17:07:32.112488Z'
+ms: 3
+mode: script
+say: follow {relation}, titled {title}
+params:
+  relation: item
+  title: Charlotte's Web
+values:
+  title:
+    value: Charlotte's Web
+    from:
+      - constant
+chose:
+  kind: link
+  relation: item
+  title: Charlotte's Web
+  method: GET
+  target: http://localhost:8140/loans/3312
+  address: http://localhost:8140/loans/3312
+  picked: title
+guard:
+  checked: lenient
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3312
+now:
+  state:
+    id: 3312
+    title: Charlotte's Web
+    author: E. B. White
+    due: '2026-11-12'
+    renewals: 3
+    standing: renewed the most allowed
+  forms:
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-04T17:07:32.117399Z'
+ms: 2
+mode: script
+say: return to {address}
+params:
+  address: http://localhost:8140/accounts/21000451
+outcome: done
+address: http://localhost:8140/accounts/21000451
+now:
+  state:
+    id: 21000451
+    name: Ana Torres
+    booksOut: 3
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Hobbit
+      - Matilda
+      - Charlotte's Web
+---
+at: '2026-11-04T17:07:32.120061Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -243,16 +404,22 @@ now:
     title: Riverside Public Library
     hr:manifest:
       forms:
+        library:get-account:
+          - sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0=
         library:get-loan:
           - sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8=
         library:renew:
           - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
         library:return:
           - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+        library:search-accounts:
+          - sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM=
         library:search-loans:
           - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
-      digest: sha256-xNb4bBcVbsAztdAvDVTA9FjlnQ+A7EMhGvJxgHia7DQ=
+      digest: sha256-XDzrMkZrDTnosldep8wEIt8luy6Eh8HYT1/3wADSO1c=
   forms:
+    - library:search-accounts
+    - library:get-account
     - library:search-loans
     - library:get-loan
   links:

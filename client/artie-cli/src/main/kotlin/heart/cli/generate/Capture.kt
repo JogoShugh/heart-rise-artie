@@ -92,6 +92,9 @@ class Step(val number: Int, private val doc: Map<*, *>) {
     val waitedFor: String? = doc["waited"].map()["for"]?.toString()
     val state: Map<*, *> = doc["now"].map()["state"].map()
 
+    /** The titles of the items the step's answer linked (RFC 6573 `item`), in order: a list's members. */
+    val items: List<String> = doc["now"].map()["links"].map()["item"].list().map { it.toString() }
+
     /** The traceparent of each request the step sent, when the run kept its exchanges (`--exchanges`). */
     val traceparents: List<String> = (doc["exchanges"] as? List<*>).orEmpty()
         .mapNotNull { it.map()["request"].map()["headers"].map()["traceparent"]?.toString() }

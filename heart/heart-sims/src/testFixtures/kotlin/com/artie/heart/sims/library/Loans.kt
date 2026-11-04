@@ -43,6 +43,12 @@ data class Loan(
     }
 }
 
+/** A member's account, by library card number: the books they have out now. */
+data class Account(val card: Long, val name: String, val loans: List<Loan>) {
+    /** Changes whenever one of its loans does, or a loan leaves it. */
+    val version: Int get() = loans.sumOf { it.version } + loans.size
+}
+
 /** The loans of the library's one member, Ana Torres, kept once for every way the service answers. */
 class Ledger {
     private val loans = ConcurrentSkipListMap<Long, Loan>()
@@ -61,6 +67,9 @@ class Ledger {
     /** Every loan, in loan-number order. */
     fun all(): List<Loan> = loans.values.toList()
 
+    /** Ana's account: the books she has out now. */
+    fun account(): Account = Account(ANA_CARD, "Ana Torres", all().filterNot { it.returned })
+
     /** [next] in place of [current], only if nothing else changed the loan since; a stale write otherwise. */
     fun replace(current: Loan, next: Loan): Loan {
         if (!loans.replace(current.id, current, next)) {
@@ -70,6 +79,9 @@ class Ledger {
     }
 
     companion object {
+        /** Ana Torres's library card number, which is her account's number too. */
+        const val ANA_CARD = 21000451L
+
         private val DUE: LocalDate = LocalDate.parse("2026-11-12")
 
         val SEED = listOf(

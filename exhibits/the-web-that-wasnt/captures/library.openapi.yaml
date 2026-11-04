@@ -38,6 +38,14 @@ components:
             $ref: '#/components/schemas/Problem'
       description: The body breaks the act's schema, or a rule of the resource refuses it
   schemas:
+    Account:
+      properties:
+        id:
+          minimum: 1
+          type: integer
+      required:
+      - id
+      type: object
     Error:
       properties:
         error:
@@ -150,6 +158,76 @@ info:
 jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
 openapi: 3.1.1
 paths:
+  /accounts:
+    get:
+      description: Lists the accounts whose member's name has the text.
+      operationId: searchAccounts
+      parameters:
+      - description: Part of the member's name; case is ignored
+        in: query
+        name: name
+        required: false
+        schema:
+          minLength: 1
+          type: string
+      - description: The number on the back of the library card
+        in: query
+        name: id
+        required: false
+        schema:
+          minimum: 1
+          type: integer
+      - description: The page of matches, from 1
+        in: query
+        name: page
+        required: false
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchPage'
+          description: The matches, a page at a time
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      summary: Find accounts by name
+      tags:
+      - accounts
+  /accounts/{id}:
+    get:
+      description: A safe lookup; the account links each book the member has out, titled with the book.
+      operationId: getAccount
+      parameters:
+      - description: The account's id
+        in: path
+        name: id
+        required: true
+        schema:
+          minimum: 1
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: The account
+          headers:
+            ETag:
+              description: 'The state''s validator: send it back as If-None-Match to read again, or as If-Match
+                to act'
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      summary: Get an account by library card number
+      tags:
+      - accounts
   /loans:
     get:
       description: Lists the loans whose book's title has the text.
@@ -332,5 +410,7 @@ security:
 servers:
 - url: /
 tags:
+- description: 'A member''s loans at Riverside Public Library: renewing and returning books.'
+  name: accounts
 - description: 'A member''s loans at Riverside Public Library: renewing and returning books.'
   name: loans

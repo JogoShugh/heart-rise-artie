@@ -45,6 +45,24 @@ class LibrarySteps {
         answer = send(Method.GET, "/loans/$loan", ACCEPT.getValue("HTML"), basic(card, pin))
     }
 
+    @When("Ana looks up her account by her card number, as {}")
+    fun looksUpAccount(asked: String) {
+        dialect = asked
+        val found = send(Method.GET, "/accounts?id=${HeartLibrary.CARD}", ACCEPT.getValue(HSF))
+        val account = mapper.readTree(found.bodyString())["_links"]["item"][0]["href"].asText()
+        answer = send(Method.GET, account, ACCEPT.getValue(asked))
+    }
+
+    @Then("the account links her loans: {}")
+    fun linksLoans(titles: String) {
+        val linked = if (dialect == "HTML") {
+            ITEM.findAll(body()).map { it.groupValues[1].replace("&#39;", "'") }.toList()
+        } else {
+            json()["_links"]["item"].map { it["title"].asText() }
+        }
+        assertEquals(titles.split(", "), linked, body())
+    }
+
     @Then("the loan offers {}")
     fun offers(acts: String) = assertEquals(acts.split(", "), offered(), body())
 
@@ -146,6 +164,9 @@ class LibrarySteps {
             HAL_FORMS to "application/prs.hal-forms+json",
             "HTML" to "text/html",
         )
+
+        /** An item link in the HTML, by its text. */
+        val ITEM = Regex("""<a rel="item" href="[^"]*">([^<]*)""")
 
         /** An act's button in the HTML: its relation, and whether it is greyed. */
         val BUTTON = Regex("""<button type="button" class="act" data-rel="library:([\w-]+)"( aria-disabled="true")?""")

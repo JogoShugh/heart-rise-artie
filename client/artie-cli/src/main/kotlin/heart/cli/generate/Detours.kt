@@ -7,6 +7,9 @@ package heart.cli.generate
  * selection, as its author wrote it.
  */
 internal object Detours {
+    /** The link a list names each of its members by (RFC 6573). */
+    private const val ITEM = "item"
+
     fun trimmed(root: Node, capture: Capture): Node {
         val used = used(capture)
         prune(root, used)
@@ -14,8 +17,21 @@ internal object Detours {
     }
 
     private fun prune(node: Node, used: Set<Int>) {
-        node.children.removeAll { !needed(it, used) }
+        val members = members(node, used)
+        node.children.removeAll { it !in members && !needed(it, used) }
         node.children.forEach { prune(it, used) }
+    }
+
+    /**
+     * The members of the list [node]'s answer linked, when the run opened every one of them and acted in one at
+     * least: each is kept, acted on or not, so the script goes through the list each time it runs. A run that opened
+     * some of them only looked around.
+     */
+    private fun members(node: Node, used: Set<Int>): Set<Node> {
+        val visits = node.children.filter { it.step.follows && it.step.relation == ITEM }
+        val opened = visits.mapNotNull { it.step.chose["title"]?.toString() }.toSet()
+        val every = node.step.items.isNotEmpty() && opened == node.step.items.toSet()
+        return if (every && visits.any { needed(it, used) }) visits.toSet() else emptySet()
     }
 
     private fun needed(node: Node, used: Set<Int>): Boolean = steps(node).any { it.number in used || acts(it) }

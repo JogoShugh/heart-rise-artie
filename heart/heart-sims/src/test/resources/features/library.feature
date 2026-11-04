@@ -62,6 +62,23 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
     Then the answer is 200
     And loan 3311 offers nothing as HAL Schema Forms, and renewing is absent, because "It was returned."
 
+  Scenario Outline: Ana's account links each book she has out, by its title, as <dialect>
+    Her account is found from the bookmark by her library card number, so a
+    person or an agent reaches every loan from there, with no title in hand.
+    When Ana looks up her account by her card number, as <dialect>
+    Then the account links her loans: The Hobbit, Matilda, Charlotte's Web
+
+    Examples:
+      | dialect          |
+      | HAL Schema Forms |
+      | HAL-FORMS        |
+      | HTML             |
+
+  Scenario: A book returned leaves her account
+    When Ana returns loan 3311
+    And Ana looks up her account by her card number, as HAL Schema Forms
+    Then the account links her loans: The Hobbit, Charlotte's Web
+
   Scenario Outline: Searching the loans by title: "<text>"
     When Ana searches the loans for "<text>"
     Then she finds <found>

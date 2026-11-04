@@ -6,6 +6,7 @@ import com.artie.heart.AlpsType
 import com.artie.heart.Finding
 import com.artie.heart.Found
 import com.artie.heart.HeartResource
+import com.artie.heart.Hypermedia
 import com.artie.heart.Layers
 import com.artie.heart.Named
 import com.artie.heart.Offers
@@ -21,8 +22,9 @@ import com.artie.heart.sims.Tokens
 import org.http4k.core.HttpHandler
 
 /**
- * Riverside Public Library, the library of "The Web That Wasn't", declared once for heart-core: a member's loans,
- * each offering renew and return as its state allows, and saying why when it doesn't. The same declaration serves
+ * Riverside Public Library, the library of "The Web That Wasn't", declared once for heart-core: a member's account,
+ * found by library card number and linking each book out, and the loans, each offering renew and return as its
+ * state allows, and saying why when it doesn't. The same declaration serves
  * HTML to a person in a browser, HAL-FORMS, HAL Schema Forms, a profile and an OpenAPI twin. Ana Torres signs in
  * with her library card number and PIN; an agent, with the library's Bearer token.
  */
@@ -67,8 +69,48 @@ class HeartLibrary(private val ledger: Ledger) {
         },
     )
 
+    private val accountType = ResourceType(
+        collection = "accounts",
+        profile = PROFILE,
+        acts = emptyList(),
+        offers = Offers(keys = listOf(OPEN), offered = { emptyList() }, whyAbsent = { _, _ -> "" }),
+        state = StateView<Account, String>(
+            keyOf = { OPEN },
+            idOf = { it.card },
+            versionOf = { it.version },
+            bodyOf = { linkedMapOf("id" to it.card, "name" to it.name, "booksOut" to it.loans.size) },
+            // Each loan she has out, by its book's title: where a person or an agent goes from her account.
+            hypermediaOf = { account ->
+                val loans = account.loans.map { mapOf("href" to "/loans/${it.id}", "title" to it.title) }
+                Hypermedia(links = mapOf("item" to loans))
+            },
+        ),
+        finding = Finding(
+            noun = "account",
+            search = Named("searchAccounts", "search-accounts"),
+            lookup = Named("getAccount", "get-account"),
+            nameDescription = "Part of the member's name; case is ignored",
+            idTitle = "Library card number",
+            idDescription = "The number on the back of the library card",
+        ),
+    )
+
+    private val accounts = HeartResource(
+        layers = Layers(accountType),
+        load = { id ->
+            ledger.account().takeIf { it.card == id } ?: throw ResourceNotFoundException("no account $id")
+        },
+        perform = { current, _, _ -> Acted(current) },
+        find = { name, id ->
+            listOf(ledger.account())
+                .filter { id == null || it.card == id }
+                .filter { name == null || it.name.contains(name, ignoreCase = true) }
+                .map { Found(it.card, it.name) }
+        },
+    )
+
     val handler: HttpHandler = HeartHttp(
-        listOf(loans),
+        listOf(accounts, loans),
         Credentials.parse(users = "$CARD:$PIN_HASH", tokens = Tokens.sha256(TOKEN)),
         HeartSettings(title = "Riverside Public Library", realm = PROFILE.name),
     )
@@ -99,6 +141,9 @@ class HeartLibrary(private val ledger: Ledger) {
 
         private const val NO_INPUT = """{"type": "object", "properties": {}}"""
 
+        /** An account's one standing: it offers no acts of its own, only its loans. */
+        private const val OPEN = "open"
+
         /** Why a loan in each standing can't do what it doesn't offer. */
         private val WHY = mapOf(
             Loan.RENEWABLE to "It can be renewed and returned.",
@@ -121,6 +166,16 @@ class HeartLibrary(private val ledger: Ledger) {
                     "return", AlpsType.UNSAFE, "Return",
                     "Gives the book back to the library.",
                     "Offered while the book is out; nothing is offered after.",
+                ),
+                Relation(
+                    "search-accounts", AlpsType.SAFE, "Find accounts by name",
+                    "Lists the accounts whose member's name has the text.",
+                    "A safe search; each result links to the account, titled with the member's name.",
+                ),
+                Relation(
+                    "get-account", AlpsType.SAFE, "Get an account by library card number",
+                    "Goes to one member's account, given the number on their library card.",
+                    "A safe lookup; the account links each book the member has out, titled with the book.",
                 ),
                 Relation(
                     "search-loans", AlpsType.SAFE, "Find loans by title",
