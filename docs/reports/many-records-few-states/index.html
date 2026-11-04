@@ -278,7 +278,7 @@ flowchart TD
           <ul>
             <li>The kept script searches by <code>${surname}</code>, then acts on each employee by what it offers, and checks what each act changed: status "on notice" after give notice, "dismissed" after dismiss.</li>
             <li>Code mode itself, kept as a skill, also took the surname as an argument, and decided each employee's state from its <code>status</code> in its own code. It paid about 5k to 13k a run to read the task and fill the argument, and ran its skill in a sandbox.</li>
-            <li>With ARTIE as its tool in every run, code mode spent about 3k to 12k a run choosing the script and reading employees again to confirm.</li>
+            <li>With ARTIE as its tool in every run, code mode spent about 3k to 6k a run choosing the script and reading ARTIE's count of what it did.</li>
           </ul>
         </details>
       </li>
@@ -295,7 +295,7 @@ flowchart TD
 
   <div class="short scale">
     <h2 style="margin-top:0">Tokens and cost: 90 employees a run, at scale</h2>
-    <p class="headline">At 1,000,000 runs of 90 employees: <b>ARTIE, 48,491 input tokens, all of them in the one goal run that found its way</b>; <b>a harness running the script code mode had ARTIE keep, 51,254, for any surname</b>. Code mode: 7.9 billion keeping a skill, 10.2 billion on endpoints, 10.4 billion with ARTIE as its tool, 34.7 billion on HAL-FORMS alone.</p>
+    <p class="headline">At 1,000,000 runs of 90 employees: <b>ARTIE, 48,491 input tokens, all of them in the one goal run that found its way</b>; <b>a harness running the script code mode had ARTIE keep, 51,254, for any surname</b>. Code mode: 3.5 billion with ARTIE as its tool, 7.9 billion keeping a skill, 10.2 billion on endpoints, 34.7 billion on HAL-FORMS alone.</p>
     <div class="table-scroll"><table>
       <thead><tr><th>Client</th><th>Input tokens a run, measured</th><th>1,000 runs</th><th>1,000,000 runs</th><th>1,000,000 runs, priced with the cache</th><th>Model calls at 1,000,000</th><th>Sandbox at 1,000,000: start time / hosted price</th><th>Right, measured</th></tr></thead>
       <tbody>
@@ -305,14 +305,14 @@ flowchart TD
         <tr class="us"><th>A harness running the script code mode had ARTIE keep</th><td>0, after the first run (51,254 once)</td><td>51,254</td><td>51,254</td><td>23,157</td><td>20</td><td>none</td><td>15 of 15 (100%)</td></tr>
         <tr><th>Code mode, keeping a skill (endpoints)</th><td>7,904</td><td>7.9 million</td><td>7.9 billion</td><td>2.22 billion</td><td>2.8 million</td><td>120 hours / $74</td><td>15 of 15 (100%)</td></tr>
         <tr><th>Code mode, fresh (endpoints)</th><td>10,182</td><td>10.2 million</td><td>10.2 billion</td><td>2.79 billion</td><td>5 million</td><td>263 hours / $224</td><td>15 of 15 (100%)</td></tr>
-        <tr><th>Code mode with ARTIE as its tool</th><td>10,398</td><td>10.4 million</td><td>10.4 billion</td><td>2.46 billion</td><td>4.4 million</td><td>none</td><td><span class="bad">14 of 15 (93%)</span></td></tr>
+        <tr><th>Code mode with ARTIE as its tool</th><td>3,513</td><td>3.5 million</td><td>3.5 billion</td><td>569 million</td><td>2 million</td><td>none</td><td>15 of 15 (100%)</td></tr>
         <tr><th>Code mode, HAL-FORMS alone</th><td>34,722</td><td>34.7 million</td><td>34.7 billion</td><td>11.4 billion</td><td>8.4 million</td><td>487 hours / $442</td><td>15 of 15 (100%)</td></tr>
       </tbody>
     </table></div>
     <ul class="note">
       <li>Projected from the 5 measured runs at 90 employees (their mean), not run, at each client's measured rate of runs right.</li>
       <li>The harness ran the script code mode had ARTIE keep from its first run, at 6 Millers (51,254 tokens: 3,112 code mode's, 48,142 ARTIE's goal run), with the surname given as an input: Miller at 6 employees, Smith at 30, Garcia at 90, no model.</li>
-      <li>Code mode with ARTIE as its tool chose the kept script each run, and at 30 and 90 employees read some employees again to confirm: ARTIE's answer showed it only the last 40 lines of a 125-step run. In one run of 15 the model refused the task outright (stop reason <code>refusal</code>), and nothing was done.</li>
+      <li>Code mode with ARTIE as its tool chose the kept script each run and read ARTIE's last line, which counts what the run did: <code>finished, 125 steps; acted: staff:search-employees 1, staff:give-notice 30, staff:dismiss 30; noted 30</code>. In one run of 15, at 30 employees, it wanted to confirm the ones left as they were, and had ARTIE find the way again: 88,126 tokens.</li>
       <li>ARTIE's 48,491 tokens and 18 calls are its goal run at 6 employees, once. Its script needs no model at any size after that.</li>
       <li>Priced with the cache: cache reads at a tenth of the input price, cache writes at 1.25.</li>
       <li>Sandbox: about 0.24 s more to start each program in a sandbox than with none, measured here; code mode ran 4 to 7 programs a run. Hosted price at E2B's per-second rates ($0.000014 a vCPU, $0.0000045 a GiB), for 1 vCPU and 256 MB kept for the run's median time. ARTIE runs no sandbox.</li>
@@ -579,7 +579,7 @@ def run(name="Miller"):
       <tr><th>Code mode, HAL-FORMS alone</th><td>24,444 tokens, 7 calls</td><td>36,380 tokens, 8 calls</td><td>35,348 tokens, 8 calls</td></tr>
       <tr class="us"><th>A harness running the script code mode had ARTIE keep</th><td>0 tokens, 0 calls (51,254 in its first run)</td><td>0 tokens, 0 calls</td><td>0 tokens, 0 calls</td></tr>
       <tr><th>Code mode, keeping a skill (endpoints)</th><td>8,896 tokens, 4 calls</td><td>9,849 tokens, 4 calls</td><td>5,074 tokens, 2 calls</td></tr>
-      <tr><th>Code mode with ARTIE as its tool</th><td>3,238 tokens, 2 calls</td><td>9,251 tokens, 4 calls</td><td>9,129 tokens, 4 calls</td></tr>
+      <tr><th>Code mode with ARTIE as its tool</th><td>3,249 tokens, 2 calls</td><td>6,268 tokens, 3 calls</td><td>3,513 tokens, 2 calls</td></tr>
     </tbody>
   </table></div>
   <h3>The wire and the time, per run (median of 5)</h3>
@@ -592,7 +592,7 @@ def run(name="Miller"):
       <tr><th>Code mode, HAL-FORMS alone</th><td>none: forms in each answer</td><td>39 / 194 / 600</td><td>21.8 / 28.5 / 29.2</td><td>307: 428 without If-Match, 405 wrong method</td></tr>
       <tr class="us"><th>A harness running the script code mode had ARTIE keep</th><td>3 at every size</td><td>28 / 110 / 313</td><td>4.6 / 6.7 / 11.4, ARTIE in its own container</td><td>0</td></tr>
       <tr><th>Code mode, keeping a skill (endpoints)</th><td>none: no forms</td><td>19 / 79 / 156</td><td>11.6 / 15.7 / 4.9</td><td>7</td></tr>
-      <tr><th>Code mode with ARTIE as its tool</th><td>3 at every size</td><td>28 / 116 / 323</td><td>8.1 / 29.5 / 37.8</td><td>0</td></tr>
+      <tr><th>Code mode with ARTIE as its tool</th><td>3 at every size</td><td>28 / 112 / 313</td><td>8.3 / 27.2 / 14.3</td><td>0</td></tr>
     </tbody>
   </table></div>
   <ul>
@@ -611,7 +611,7 @@ def run(name="Miller"):
         <li><b>Right:</b> every employee moved one step (working to on notice, on notice to dismissed), the dismissed left, and no one else touched.</li>
         <li><b>The goal run:</b> <code>artie run t5.goal.md --reasoner claude</code> at 6 employees (<code>runs/artie/artie-goal-t5-20261103-122953.yaml</code>), then <code>artie generate</code> its trace <code>--format yaml</code>: <code>artie/t5.generated.heart.yaml</code> and its pins.</li>
         <li><b>Files:</b> the generated script's runs in <code>runs/states-generated-2.jsonl</code>, <code>-10</code>, <code>-30</code>; the others in <code>runs/states-2.jsonl</code>, <code>-10</code>, <code>-30</code>; ARTIE's traces in <code>runs/artie/</code>.</li>
-        <li><b>Code mode keeping a skill, and with ARTIE as its tool:</b> <code>--arms code-skill</code> (<code>runs/skill-artie-states-2.jsonl</code>, <code>-10</code>, <code>-30</code>) and <code>--arms code-artie</code> (<code>runs/code-artie-states-final-2.jsonl</code>, …), each starting with nothing kept. ARTIE ran in its own container, sharing the service container's network.</li>
+        <li><b>Code mode keeping a skill, and with ARTIE as its tool:</b> <code>--arms code-skill</code> (<code>runs/skill-artie-states-2.jsonl</code>, <code>-10</code>, <code>-30</code>) and <code>--arms code-artie</code> (<code>runs/code-artie-states-counted-2.jsonl</code>, …, the last 5 runs of each), each starting with nothing kept. ARTIE ran in its own container, sharing the service container's network.</li>
         <li><b>The harness:</b> <code>--arms code-artie-escalate --tasks t5 --reps 5 --surname S --population N,N,N</code>, for Miller at 2, Smith at 10 and Garcia at 30 (<code>runs/escalate-states.jsonl</code>): the surname given to the task as an input, and to the kept script as <code>surname=S</code>.</li>
         <li>The plan: spec/PLAN-COST-FOLLOWS-STATES.md. The release-through-change runs: <a href="https://claude.ai/artifact/UJjeDjCGzWTEczKcPJDFoC">Wayfinding Through Change</a>.</li>
       </ul>
@@ -623,7 +623,7 @@ def run(name="Miller"):
       <ul>
         <li>The one-case script was written by hand, as generate would write it from a run that met only those working.</li>
         <li>One service, one model, one goal; 5 runs per size.</li>
-        <li>The task here is dismissing people, and in one run the model declined it. A gentler domain with three states would carry the same point.</li>
+        <li>The task here is dismissing people, and in one run of an earlier set the model declined it (stop reason <code>refusal</code>). A gentler domain with three states would carry the same point.</li>
         <li>The harness was told nothing about the seeded states: it ran the one kept script at every size. The script's checks after each act catch a wrong result; they can't catch a goal that asked for less than the task, which a person reviewing the kept script would.</li>
         <li>The test employees are seeded the same way each run, so each run meets the same states in the same proportions.</li>
       </ul>
