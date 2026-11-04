@@ -63,6 +63,26 @@ The code mode runs showed that knowing the format matters more than knowing the 
 the skill needn't teach it. The evaluation (step 4) runs this minimal skill first, then the full one, and keeps the
 full one only where it does better.
 
+**What the bench's code-artie runs taught the minimal skill (2026-11-03).** Three things belong in it, short:
+
+- **The goal's shape.** A goal in one paragraph lets the planner call it done early: over a list of six employees it
+  stopped after three, and the model patched the rest with goals naming the ones done ("skip Anna, James…"), which
+  froze names into kept scripts. A goal written as a sentence, then its steps as a Markdown list, with a step done
+  for each of many saying so in its own words, conditions included, found the way in one run:
+
+  ```markdown
+  Ship the open orders of {customer}.
+
+  - Find the open orders of {customer}
+    - Move each of them on: pack any not packed, ship any packed, leave any shipped
+  ```
+
+  Steps nested under a step run once, in order: conditions written as steps under it ("If packed, ship") don't loop.
+- **Inputs.** Values that change from run to run are written `{name}` in the goal, never their value; the kept script
+  takes them (`artie run NAME.heart.yaml surname=Smith`), and one script then serves every value with no model.
+- **Reading the answer.** ARTIE's answer says what its last act left and what is offered there; a bookmark the
+  service handed over can be read again with no model. Without that, the model ran whole goal runs only to look.
+
 ## Decisions for the author
 
 - **Where the skill lives:** the user's skills (`~/.claude/skills/artie`), the repository's (`.claude/skills/artie`),

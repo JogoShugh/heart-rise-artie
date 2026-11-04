@@ -893,6 +893,27 @@ add("CONTENT", (s) => {
   s.addNotes("From the Wayfinding Through Change runs, same service, same model. Projections hold each client's measured rate; one release in the period, as measured.");
 });
 
+// 31b. Act IX: code mode and ARTIE together
+add("CONTENT", (s) => {
+  head(s, "ACT IX  ·  CODE MODE AND ARTIE TOGETHER", "Code mode reads the task; ARTIE does the acts");
+  const us = (t) => ({ text: t, bold: true, color: C.green });
+  const bad = (t) => ({ text: t, bold: true, color: C.rust });
+  table(s, [
+    ["Client (two tasks, a teammate, a release)", "Right of 20", "Tokens, 20 runs", "100 runs", "The model"],
+    [{ text: "ARTIE alone", color: C.green }, us("20 (100%)"), "46,864", us("46,864"), "the edges"],
+    [{ text: "A harness running ARTIE, code mode on failure", color: C.green }, us("20 (100%)"), "56,366", us("56,366"), "first runs; ARTIE's at the release"],
+    ["Code mode with ARTIE as its tool", "20 (100%)", "107,607", "354,235", "every run, choosing a script"],
+    ["Code mode, fresh", "20 (100%)", "158,995", "794,975", "every run"],
+    ["Code mode, keeping skills", "20 (100%)", "188,747", "845,282", "every run"],
+    ["Code mode, kept programs", bad("12 (60%)"), "16,004", "16,004", "run 1"],
+  ], { x: 0.6, y: 1.7, w: 12.1, colW: [4.1, 1.7, 1.9, 1.7, 2.7], rowH: [0.55, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5], fontSize: 14 });
+  text(s, [
+    { text: "One kept script, any surname: Miller at 6, Smith at 30, Garcia at 90 employees, 15 of 15 right, no model after the first run.", options: { bullet: BULLET, breakLine: true } },
+    { text: "With ARTIE as its tool, code mode wrote no program and needed no sandbox; the model never held the token.", options: { bullet: BULLET } },
+  ], { x: 0.6, y: 5.45, w: 12.1, h: 1.0, fontSize: 15, paraSpaceAfter: 6 });
+  s.addNotes("Measured 3 November 2026 on the same bench. The harness: a plain runner replays the scripts ARTIE kept, and calls code mode only when ARTIE exits nonzero.");
+});
+
 // 32. Close: where the model earns its keep
 add("CONTENT", (s) => {
   head(s, "CLOSE  ·  WHERE THE MODEL EARNS ITS KEEP", "Find the way once; the model at the edges");
@@ -900,7 +921,7 @@ add("CONTENT", (s) => {
   card(s, 6.8, 1.75, 5.9, 2.1, "The same work, in bulk", "Find the way once, keep it, run it with none. The model returns only at the edges: a changed form, a state not met before.", { fill: C.green, size: 17 });
   text(s, [
     { text: "They combine. ", options: { bold: true } },
-    { text: "Code mode could run ARTIE in a container: find the way through hypermedia once, keep the .heart.yaml, run it after, and write again only when ARTIE’s exit says a form changed (an idea, not measured).", options: {} },
+    { text: "Code mode gave ARTIE each task as a goal once and ran what ARTIE kept: right 20 of 20. Run by a harness that calls code mode only when ARTIE fails, it cost 56,366 tokens in all.", options: {} },
   ], { x: 0.6, y: 4.2, w: 12.1, h: 1.2, fontSize: 18 });
   foot(s, "The middle ground: services stable in shape for resources of one type in one state, where repeatability and cost matter.");
   s.addNotes("Not against code mode: about where the model sits. Inference spent once, to make the work deterministic.");
