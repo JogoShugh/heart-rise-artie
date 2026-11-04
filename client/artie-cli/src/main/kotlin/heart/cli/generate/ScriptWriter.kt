@@ -40,6 +40,9 @@ class ScriptWriter(
     var kept = 0
         private set
 
+    /** How many acts the script checks after, by what they changed (Checked.kt). */
+    private var checked = 0
+
     fun write(): String {
         capture.finished()
         // A goal run's detours are left out: the script does only what the goal needed.
@@ -47,6 +50,7 @@ class ScriptWriter(
         // Twice: the first pass meets every variable, so the second can read each in the block it belongs to.
         block(walker.walk(root), 1)
         reviews = 0
+        checked = 0
         derivations.clear()
         val walked = walker.walk(root)
         kept = reasoned(walked)
@@ -88,6 +92,7 @@ class ScriptWriter(
                 "where the reasoner chose a value, its reason step is kept."
         },
         "// What it was offered is pinned in $pins, held to before every act.",
+        "// After an act, what it changed is checked: the run stops where that no longer holds.".takeIf { checked > 0 },
         // How often the script calls the model, said where a person sees it first.
         calls(kept, asked)?.let { "// $it: artie run needs --reasoner." },
         ("// A line marked \"review:\" holds a value the reasoner chose: check it before keeping the script.")
@@ -115,10 +120,22 @@ class ScriptWriter(
         return lines.mapIndexed { i, line -> if (i == 0) derivations.anchor("inputs", first, line) else line }
     }
 
-    /** The statements of [block], at [depth]: what it keeps, then the steps nested in it. */
+    /**
+     * The statements of [block], at [depth]: what it keeps, then the steps nested in it. An act that sends a value read
+     * from the resource it acts on is in a decide that keeps that resource again (Decided.kt), as the script held as
+     * data has it; kept there alone when nothing before it opens a block that might read it.
+     */
     private fun block(block: Block, depth: Int): List<String> {
-        val watched = block.watched?.let { listOf(INDENT.repeat(depth) + "keepAs(\"$it\")") }.orEmpty()
-        return reads(block.keeps, depth) + watched + block.statements.flatMap { statement(it, depth) }
+        val pad = INDENT.repeat(depth)
+        val watched = block.watched?.let { listOf("${pad}keepAs(\"$it\")") }.orEmpty()
+        val decided = decided(block, capture)
+        val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
+        return reads(block.keeps.filter { it.keptAs !in inside }, depth) + watched +
+            block.statements.flatMap { walked ->
+                val kept = decided[walked] ?: return@flatMap statement(walked, depth)
+                listOf("${pad}decide {") + kept.map { "$pad${INDENT}keepAs(\"$it\")" } + statement(walked, depth + 1) +
+                    "$pad}"
+            }
     }
 
     /** The resources [keeps] names, each kept by the name its values are read by, once however many it has. */
@@ -152,16 +169,20 @@ class ScriptWriter(
     private fun selection(walked: Walked.Selection, depth: Int): List<String> {
         val step = walked.step
         val pad = INDENT.repeat(depth)
+        var facts: String? = null
         val call = when (val how = walked.call) {
             Call.Reasoned -> listOf(pad + bindings.kept(step))
             is Call.Words -> listOf("${pad}act(${how.words})")
             Call.Follow -> listOf(pad + follow(step))
-            Call.Act -> act(step, pad)
+            Call.Act -> act(step, pad).let { (lines, checked) -> facts = checked; lines }
         }
-        val inner = listOfNotNull("${INDENT.repeat(depth + 1)}sync()".takeIf { walked.fresh }) +
+        // A resource made new is read again first; then what the act changed is checked, then the steps in it.
+        val checks = listOfNotNull(facts?.let { "${INDENT.repeat(depth + 1)}check($it)" })
+        val inner = listOfNotNull("${INDENT.repeat(depth + 1)}sync()".takeIf { walked.fresh }) + checks +
             block(walked.block, depth + 1)
         return when {
-            !step.opens -> call + reads(walked.block.keeps, depth)
+            !step.opens && checks.isEmpty() -> call + reads(walked.block.keeps, depth)
+            !step.opens -> call.dropLast(1) + (call.last() + " {") + checks + "$pad}" + reads(walked.block.keeps, depth)
             inner.isEmpty() -> call.dropLast(1) + (call.last() + " {}")
             else -> call.dropLast(1) + (call.last() + " {") + inner + "$pad}"
         }
@@ -179,21 +200,27 @@ class ScriptWriter(
 
     /**
      * `act("rel", "field" to value, …, intent = "…")` on one line; when a value is marked or the line is long, its
-     * values in a block, one a line: `act("rel", intent = "…", fields = { "field" to value })`.
+     * values in a block, one a line: `act("rel", intent = "…", fields = { "field" to value })`. With it, the facts
+     * checked after it (Checked.kt), `"status" eq "on notice"`, a member it sent by the expression it sends.
      */
-    private fun act(step: Step, pad: String): List<String> {
+    private fun act(step: Step, pad: String): Pair<List<String>, String?> {
         val relation = why.relation(step, source)
         val arguments = bindings.arguments(step)
         val intent = said(capture, step, names, arguments)
         reviews += arguments.count { it.review != null }
+        val sent = arguments.associate { it.field to it.expression }
+        val facts = checked(capture, step, sent.keys).takeIf { it.isNotEmpty() }?.joinToString(", ") {
+            val value = (it.value as? String)?.let(KotlinText::quoted) ?: "${it.value}"
+            KotlinText.quoted(it.field) + " eq " + if (it.sent) sent.getValue(it.field) else value
+        }?.also { checked++ }
         val oneLine = "${pad}act(" + (listOf(relation) + arguments.map { "\"${it.field}\" to ${it.expression}" } +
             listOfNotNull(intent)).joinToString(", ") + ")"
         val long = arguments.any { it.review != null } || Derivations.visible(oneLine) > WIDTH
-        if (!long) return listOf(oneLine)
+        if (!long) return listOf(oneLine) to facts
         val head = "${pad}act(" + (listOf(relation) + listOfNotNull(intent) + "fields = {").joinToString(", ")
         return listOf(head) + arguments.map {
             "$pad$INDENT\"${it.field}\" to ${it.expression}" + (it.review?.let { why -> " // review: $why" } ?: "")
-        } + "$pad})"
+        } + "$pad})" to facts
     }
 
     private companion object {

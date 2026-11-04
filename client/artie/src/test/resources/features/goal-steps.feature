@@ -107,7 +107,9 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
     are kept only where no step's words are, as inferred. A step that only
     says where its sub-steps happen, On {issue}, names no act: the act that
     gets there keeps the planner's words, inferred, from the step's,
-    fromIntent.
+    fromIntent. The comment, made from the title of the issue it is on, is
+    in a decide that keeps the issue again: refused as stale, someone having
+    changed the issue since it was read, it is worked out again.
     Given line 10 of "fix.goal.md" reads '- Comment "Fixed: {issue.title}."', indented 2
     And line 12 of "fix.goal.md" reads '- Close it `reasoned`', indented 2
     And the planner will move
@@ -136,8 +138,9 @@ Feature: A goal in steps, done step by step: the runner keeps the structure, the
     Then the script "fix-gen.kts" nests its acts as
       | relation          | depth |
       | github:issues-get | 1     |
-      | github:comment    | 2     |
+      | github:comment    | 3     |
       | github:issues-get | 1     |
+    And the script "fix-gen.kts" has a line with "decide {"
     And the script "fix-gen.kts" has a line with "val issueTitle by kept(\"issue\") { text(\"title\") }"
     And the script "fix-gen.kts" has a line with "keepAs(\"issue\")"
     And the script "fix-gen.kts" has no line with "var "
