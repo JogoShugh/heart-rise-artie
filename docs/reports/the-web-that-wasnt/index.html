@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Web That Wasn't</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The series' palette: leaf green for right, amber for a note, red for wrong. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --bad: #b3261e; --bad-bg: #fbe4e1;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    --bad: #f2a19a; --bad-bg: #3a1d1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  --bad: #f2a19a; --bad-bg: #3a1d1a;
+  color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.top-in { max-width: 52rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 0.55rem; }
+.eyebrow { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.theme:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+main { max-width: 52rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.3rem; }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 7vw, 3.3rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin-top: 1.4rem; }
+h3 { font: 600 1rem/1.4 var(--body); margin: 0; }
+p, li { max-width: 70ch; }
+p { margin: 0; }
+.dek { font-family: var(--display); font-weight: 500; font-size: 1.22rem; line-height: 1.5; color: var(--muted); margin-top: -0.4rem; }
+a { color: var(--link); text-underline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.78rem/1.6 var(--mono); }
+pre code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+figure { margin: 0; display: grid; gap: 0.4rem; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+figcaption { font-size: 0.86rem; color: var(--muted); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.8rem; }
+.pair > * { min-width: 0; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: 0.9rem; line-height: 1.5; }
+th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.y { background: var(--leaf-bg); color: var(--leaf); font-weight: 600; }
+td.m { background: var(--hold-bg); color: var(--hold); font-weight: 600; }
+td.n { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+.note { font-size: 0.9rem; color: var(--muted); }
+details.more > summary { cursor: pointer; color: var(--link); font-size: 0.88rem; font-weight: 600; }
+details.more[open] > summary { margin-bottom: 0.5rem; }
+details.more ul { font-size: 0.92rem; line-height: 1.55; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.6rem; }
+.stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.7rem 0.9rem; }
+.stat b { display: block; font: 650 1.5rem/1.2 var(--display); }
+.stat span { font-size: 0.85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <span class="eyebrow">HEART · Riverside Public Library · 4 November 2026</span>
+  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+</div></div>
+
+<main>
+  <h1>The Web That Wasn't</h1>
+  <p class="dek">One library built twice: once as if web pages had never carried forms, and once as HEART serves it. Ana Torres renews her books in both.</p>
+
+  <ul>
+    <li><b>Ana's loans:</b> <i>The Hobbit</i> (a hold is waiting), <i>Matilda</i> (can be renewed), <i>Charlotte's Web</i> (renewed three times, the most allowed).</li>
+    <li><b>The same rules in both:</b> renew moves a book three weeks on, at most three times, never while someone's hold is waiting.</li>
+  </ul>
+
+  <h2>The web that wasn't</h2>
+  <p>Apache, CGI scripts in Perl, CGI.pm. No page holds a form.</p>
+  <figure>
+    <img src="media/web-that-wasnt.gif" alt="WebWalker, a browser with a method menu and a body box, opening forms.html, Ana's loans as a table of numbers, and a renewal refused with 409." loading="lazy">
+    <figcaption>Ana in WebWalker, the browser of that world: an address bar, a method menu and a body box.</figcaption>
+  </figure>
+  <ul>
+    <li><b><code>forms.html</code></b> is written by <code>forms.cgi</code> from <code>library.def</code>: every operation, its method, its address with <code>{placeholders}</code> and its body, always listed.</li>
+    <li><b>Pages are data only:</b> loan numbers and book numbers to copy. No links, nothing to press.</li>
+    <li><b>Ana types the POST herself:</b> the address with her loan number, and <code>card=…&amp;pin=…</code> in the body box. <code>library.cgi</code> reads it through CGI.pm's <code>param()</code>.</li>
+    <li><b>She finds out after sending:</b> <code>409 Conflict</code>, a hold is waiting.</li>
+  </ul>
+  <div class="pair">
+    <figure><img src="media/forms-html.png" alt="forms.html: Renew a loan, POST, its address and body with placeholders, what to type and the answers." loading="lazy"><figcaption><code>forms.html</code>: renewing, as the site publishes it.</figcaption></figure>
+    <figure><img src="media/loans-data.png" alt="Ana's loans: a table of loan numbers, book numbers, titles and due dates, with no links." loading="lazy"><figcaption>Her loans: numbers to copy.</figcaption></figure>
+  </div>
+  <figure><img src="media/renew-409.png" alt="The renewal of The Hobbit typed by hand and sent, answered 409 Conflict: a hold is waiting." loading="lazy"><figcaption>The renewal she typed, refused only after it was sent.</figcaption></figure>
+
+  <h2>The web as it is</h2>
+  <p>The library declared once for heart-core, read in a plain browser as HTML.</p>
+  <figure>
+    <img src="media/heart-html.gif" alt="Ana opens her loans, renews Matilda in a dialog, then finds The Hobbit's Renew greyed with the reason." loading="lazy">
+    <figcaption>Ana renews <i>Matilda</i>; <i>The Hobbit</i>'s Renew is greyed, and says why before anything is sent.</figcaption>
+  </figure>
+  <div class="pair">
+    <figure><img src="media/matilda-offers.png" alt="Matilda's page with Renew and Return buttons." loading="lazy"><figcaption><i>Matilda</i> offers Renew and Return.</figcaption></figure>
+    <figure><img src="media/hobbit-greyed.png" alt="The Hobbit's page: Renew greyed, the reason shown, Return offered." loading="lazy"><figcaption><i>The Hobbit</i>: Renew absent, with the reason.</figcaption></figure>
+  </div>
+
+  <h2>One loan, three ways</h2>
+  <p>The same declaration, asked for by different clients. <i>The Hobbit</i> right now:</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Asked for</th><th>Renew</th><th>Return</th><th>Why renew is absent</th></tr></thead>
+    <tbody>
+      <tr><th>HTML, a person</th><td class="m">button greyed</td><td class="y">button</td><td>shown beside the greyed button</td></tr>
+      <tr><th>HAL-FORMS</th><td class="m">no <code>_templates.renew</code></td><td class="y"><code>_templates.return</code></td><td>not in HAL-FORMS</td></tr>
+      <tr><th>HAL Schema Forms, an agent</th><td class="m">no <code>library:renew</code> form</td><td class="y"><code>library:return</code> form</td><td>linked: <code>hr:unavailable</code></td></tr>
+      <tr><th><code>forms.html</code>, the web that wasn't</th><td class="n">listed, as always</td><td class="n">listed, as always</td><td>a 409 after sending</td></tr>
+    </tbody>
+  </table></div>
+  <details class="more"><summary>The two documents of every operation</summary>
+    <ul>
+      <li><b><code>forms.html</code></b>, from <code>library.def</code>: four operations, each with its method, address, body and answers.</li>
+      <li><b>The OpenAPI twin</b> heart-core writes from the same declaration as the HTML and both JSON dialects: every operation, always listed, the state each needs in prose.</li>
+      <li>Both are what the client reads before it knows anything about Ana's books. The pages of the web as it is say what can be done to this book, now.</li>
+    </ul>
+  </details>
+
+  <h2>An agent: ARTIE with Claude</h2>
+  <p>The goal, in plain words:</p>
+<pre><code>Renew each of Ana's books that can be renewed, and say why for any that can't.
+
+- Look up Ana's account by her library card number {card}
+  - For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed</code></pre>
+  <div class="stats">
+    <div class="stat"><b>10</b><span>model calls, finding the way once</span></div>
+    <div class="stat"><b>25,192</b><span>input tokens, once</span></div>
+    <div class="stat"><b>0</b><span>model calls each run after</span></div>
+    <div class="stat"><b>1 renewed</b><span>2 left, each with why</span></div>
+  </div>
+  <ul>
+    <li><b>From the bookmark:</b> Ana's account by her card number; it links each book she has out.</li>
+    <li><b>Each book:</b> <i>Matilda</i> offered renew, and was renewed. <i>The Hobbit</i> (a hold waiting) and <i>Charlotte's Web</i> (renewed the most allowed) offered only return, and the run said why.</li>
+    <li><b>Kept:</b> <code>artie generate</code> wrote the way as data. It goes through every book the account links, renewing whichever offers renew then, with no model.</li>
+  </ul>
+<pre><code>steps:
+  - act: library:get-account
+    fields:
+      id: ${card}
+    then:
+      - whenever:
+          - when-offered:
+              - act: library:renew
+            otherwise:
+              - note: none of these acts is offered here</code></pre>
+  <details class="more"><summary>How it was run</summary>
+    <ul>
+      <li><b>The web that wasn't:</b> <code>exhibits/the-web-that-wasnt/perl</code>, Apache 2.4 with mod_cgid and CGI.pm, in Docker. WebWalker is a page beside it.</li>
+      <li><b>The web as it is:</b> the library in <code>heart/heart-sims</code>, served alone as <code>library.test</code>; its features in <code>library.feature</code>, 26 scenarios.</li>
+      <li><b>The agent:</b> ARTIE at L2 with Claude Sonnet 5.5, a Bearer token for Ana's agent; the goal, trace, kept script and its pins in <code>exhibits/the-web-that-wasnt/artie</code>.</li>
+      <li><b>The recordings:</b> headless Chrome, a caption added to each frame.</li>
+    </ul>
+  </details>
+</main>
+
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+})();
+</script>
+</body>
+</html>
