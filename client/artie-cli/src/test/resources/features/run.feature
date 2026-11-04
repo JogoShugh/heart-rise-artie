@@ -20,6 +20,10 @@ Feature: artie run: a script, run from the command line
     And the client cannot reach the server for "lock" at "/issues/10": "connection refused"
 
   Scenario: Each step is a line, with its values, and the run's end is the last
+    The last line says what the run did, counted: each relation it acted by,
+    in the order it first acted, and how many times; then how many notes it
+    made. A caller that reads only the end of a long run, a person or a
+    model, knows what was done without reading every step.
     Given the script "issue.kts" is
       """kotlin
       heart("scripted://service/") {
@@ -37,7 +41,7 @@ Feature: artie run: a script, run from the command line
       | 1 enter scripted://service/: done  |
       | 2 act issues-get, number 10: done  |
       | 3 act close: done                  |
-      | finished, 3 steps                  |
+      | finished, 3 steps; acted: issues-get 1, close 1 |
 
   Scenario: A note the script makes is a line of its own, where it was made
     A watch notes what it left and why; a note no one sees is a failure no
@@ -59,7 +63,7 @@ Feature: artie run: a script, run from the command line
       | 1 enter scripted://service/: done                   |
       | 2 act issues-get, number 10: done                   |
       | note: left the issue open: someone is still on it   |
-      | finished, 2 steps                                   |
+      | finished, 2 steps; acted: issues-get 1; noted 1     |
 
   Scenario: --remember keeps a journal of what a watch did, so a watch run again doesn't do it again
     Given the script "watch.kts" is
@@ -100,7 +104,7 @@ Feature: artie run: a script, run from the command line
 
     Examples:
       | step                                                       | exit | last                                                                                   |
-      | act("close")                                               | 0    | finished, 3 steps                                                                      |
+      | act("close")                                               | 0    | finished, 3 steps; acted: issues-get 1, close 1                                        |
       | expect(Done) { act("comment") }                            | 1    | stopped at step 2, "expect": expected done, but it was new resource                    |
       | check(state["/state"] == "closed") { "should be closed" }  | 1    | stopped at step 2, "check": "should be closed"                                         |
       | check(state["/state"] == "closed")                         | 1    | stopped at step 2, "check": "check failed"                                             |
@@ -507,7 +511,7 @@ Feature: artie run: a script, run from the command line
       | 1 enter scripted://service/: done   |
       | 2 act issues-get, number 10: done   |
       | 3 we're done with this one: done    |
-      | finished, 3 steps                   |
+      | finished, 3 steps; acted: issues-get 1, close 1 |
 
   Scenario Outline: With --model and --model-url, the client reasons with that model at that address
     spec/PLAN-LOCAL-MODEL.md, phase 1: the Messages API is the seam, so a run
@@ -699,8 +703,8 @@ Feature: artie run: a script, run from the command line
 
     Examples:
       | option   | value   | line                                         |
-      | --quiet  |         | finished, 2 steps                            |
-      | --output | json    | {"ended":"finished","exit":0,"steps":2}      |
+      | --quiet  |         | finished, 2 steps; acted: issues-get 1                       |
+      | --output | json    | {"ended":"finished","exit":0,"steps":2,"acted":{"issues-get":1}} |
 
   Scenario Outline: Bad arguments stop the run before its first request
     When artie is run with

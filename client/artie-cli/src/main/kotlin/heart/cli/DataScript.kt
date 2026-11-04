@@ -30,7 +30,7 @@ internal fun held(run: Run, script: String, stopped: (ScriptStopped) -> Ended): 
         .getOrElse { throw BadArguments("$STOPPED: not a script held as data: ${it.message}") }
     return try {
         heart.script.runData(data)
-        Ended(0, "finished", "finished, ${run.trace.size} steps", run.trace.size)
+        finished(run)
     } catch (e: ScriptStopped) {
         stopped(e)
     }

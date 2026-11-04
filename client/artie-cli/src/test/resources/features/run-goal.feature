@@ -53,7 +53,7 @@ Feature: artie run a goal file: a goal in words, planned by the client's planner
       | 2 open issue 10: done             |
       | 3 close it: done                  |
       | 4 return to /: done               |
-      | finished, 4 steps                 |
+      | finished, 4 steps; acted: issues-get 1, close 1 |
     When artie is run with
       | argument        |
       | generate        |

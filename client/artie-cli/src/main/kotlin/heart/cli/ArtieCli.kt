@@ -156,7 +156,7 @@ class ArtieCli(
         Run.current = run
         return try {
             heart.script.runGoal(goal, planning)
-            Ended(0, "finished", "finished, ${run.trace.size} steps", run.trace.size)
+            finished(run)
         } catch (e: ScriptStopped) {
             stopped(e, run)
         }
@@ -174,7 +174,7 @@ class ArtieCli(
         val engine = ScriptHost.engine(IMPORTS)
         return try {
             engine.eval(script)
-            Ended(0, "finished", "finished, ${run.trace.size} steps", run.trace.size)
+            finished(run)
         } catch (e: ScriptException) {
             stopIn(e)?.let { stopped(it, run) }
                 ?: Ended(SCRIPT_ERROR, "failed", "the script failed: ${(e.cause ?: e).message}", run.trace.size)
@@ -227,6 +227,10 @@ class ArtieCli(
                     put("ended", ended.ended)
                     put("exit", ended.exit)
                     put("steps", ended.steps)
+                    if (ended.did.acted.isNotEmpty()) {
+                        put("acted", buildJsonObject { ended.did.acted.forEach { (rel, times) -> put(rel, times) } })
+                    }
+                    if (ended.did.noted > 0) put("noted", ended.did.noted)
                     if (ended.exit != 0) put("line", ended.line)
                 },
             )
@@ -249,6 +253,8 @@ class ArtieCli(
         val line: String,
         val steps: Int,
         val drawing: String? = null,
+        /** What a finished run did, counted (Finished.kt). */
+        val did: Did = Did(),
     )
 
     private companion object {
