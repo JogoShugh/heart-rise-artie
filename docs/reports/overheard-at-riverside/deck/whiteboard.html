@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The whiteboard · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene four · an hour later</span><span class="fiction">Fiction</span></header>
+<h2>The whiteboard</h2>
+<p class="setting">The same office, an hour later. Sam has the marker.</p>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>What would it take to give the API what Ana's page has?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Six things. Her page already does every one.</p></div>
+</div>
+<details class="more"><summary>Before: a loan as JSON over HTTP</summary>
+<pre><code>GET /loans/3310   Accept: application/json
+
+{ "id": 3310, "title": "The Hobbit", "author": "J. R. R. Tolkien",
+  "due": "2026-11-12", "renewals": 0, "standing": "hold waiting" }</code></pre>
+  <p class="note">Data only. What can be done is in the OpenAPI document, for every loan alike.</p>
+</details>
+<ol class="steps">
+  <li><b>The answer links itself and names its vocabulary.</b><span>“So <code>library:renew</code> means the same thing to every client.”</span>
+    <details><summary>On the wire</summary>
+<pre><code><span class="add">+ "_links": {
++   "self": { "href": "/loans/3310" },
++   "curies": [ { "name": "library", "href": "/profiles/library#{rel}", "templated": true } ]
++ }</span></code></pre></details></li>
+  <li><b>The acts arrive as forms.</b><span>“Where to send, which method, what to put in: the OpenAPI operation, moved into the loan.”</span>
+    <details><summary>On the wire <small>(Matilda)</small></summary>
+<pre><code><span class="add">+ "_forms": {
++   "library:renew": {
++     "title": "Renew",
++     "_links": { "target": { "href": "/loans/3311/actions/renew" } },
++     "method": "POST",
++     "contentType": "application/json",
++     "schema": { "type": "object", "properties": {} }
++   },
++   "library:return": { … }
++ }</span></code></pre></details></li>
+  <li><b>The forms follow the state.</b><span>“<i>Matilda</i> gets renew and return. <i>The Hobbit</i> gets return only.”</span>
+    <details><summary>On the wire <small>(The Hobbit)</small></summary>
+<pre><code>  "standing": "hold waiting",
+  "_forms": {
+<span class="del">-   "library:renew": { … },</span>
+    "library:return": { … }
+  }</code></pre></details></li>
+  <li><b>What's absent says why.</b><span>“The grey button with its reason, as data.”</span>
+    <details><summary>On the wire</summary>
+<pre><code><span class="add">+ "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0" }</span>
+
+GET /unavailable/61bc1cd6003e61f0
+{ "unavailable": [ { "rel": "/profiles/library#renew", "title": "Renew",
+    "reason": "A hold is waiting for this book, so it can't be renewed." } ] }</code></pre></details></li>
+  <li><b>A version tag guards the act.</b><span>“Send back the tag you read. Stale is refused, 412, not a surprise.”</span>
+    <details><summary>On the wire</summary>
+<pre><code>ETag: "seq-1.hsf.L0.d96396fb7e046607"
+
+POST /loans/3311/actions/renew   If-Match: "seq-0.stale"
+412 Precondition Failed   The act is stale: the state has changed</code></pre></details></li>
+  <li><b>One form set per state, shared.</b><span>“Every loan with a hold waiting links the same set: fetched once, checked by its hash, cached.”</span>
+    <details><summary>On the wire <small>(L2)</small></summary>
+<pre><code><span class="del">- "_forms": { … },</span>
+<span class="add">+ "hr:forms": { "href": "/affordance-sets/31a5b6105822d925",
++               "integrity": "sha256-MaW2EFgi2SXHXtDeNNqfRqaPpMhuPfrUB/RV+oPsfQ8=" }</span></code></pre></details></li>
+</ol>
+</article>
+<nav class="foot"><a href="deck/information-and-controls.html" rel="prev"><small>Back</small><b>Information and Controls</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#whiteboard">with heart-ts</a></span>
+<a href="deck/in-charge.html" rel="next" data-rel="next"><small>Next</small><b>The server stays in charge</b></a></nav>
+</main></div></body></html>

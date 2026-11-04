@@ -1,0 +1,43 @@
+name: in-charge
+part: Scene four · an hour later
+title: The server stays in charge
+fiction: true
+html: |
+  <h2>The server stays in charge</h2>
+  <div class="script">
+    <div class="line"><span class="who priya">Priya</span><p>Do I rewrite the API?</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>The data stays as it is. You declare the acts once: what each state offers, and why one is missing. HEART serves that as HTML for Ana, as HAL-FORMS and HAL Schema Forms for agents, and as an OpenAPI twin for anyone who still wants one.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>And a client that ignores the forms and posts renew anyway?</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>409, with the reason. A form is an offer. The server stays in charge.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>So the API answers the way the page does.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>The way the web always did, for people.</p></div>
+  </div>
+  <div class="map">
+    <div><code>one declaration</code><span>Acts, what each state offers, and why one is absent.</span></div>
+    <div><code>HTML</code><span>For Ana in a browser: buttons, greyed with a reason.</span></div>
+    <div><code>HAL-FORMS</code><span>The on-ramp, read by Spring HATEOAS clients and ARTIE.</span></div>
+    <div><code>HAL Schema Forms</code><span>The reference dialect: forms as JSON Schema, shared per state.</span></div>
+    <div><code>OpenAPI twin</code><span>For tools that only read OpenAPI.</span></div>
+  </div>
+  <details class="more"><summary>What the library declares</summary>
+  <pre><code>// its vocabulary
+  Profile(name = "library", relations = listOf(Relation("renew", AlpsType.UNSAFE, "Renew", …), …))
+
+  // its acts
+  acts = listOf(Act("renew", "renew", NO_INPUT), Act("return", "return", NO_INPUT))
+
+  // what each state offers
+  keyOf = { it.standing }
+  offered = { standing -> when (standing) {
+      RENEWABLE -> listOf("renew", "return")
+      RETURNED -> emptyList()
+      else -> listOf("return")
+  } }
+
+  // why, when it doesn't
+  whyAbsent = { standing, _ -> WHY.getValue(standing) }   // ON_HOLD: "A hold is waiting for this book, …"
+
+  // the version every act is checked against
+  versionOf = { it.version }</code></pre>
+    <p class="note">heart-core writes the wire from it. For an API you don't own, the HEART gateway does the same from its OpenAPI description, with your own controls in front.</p>
+  </details>

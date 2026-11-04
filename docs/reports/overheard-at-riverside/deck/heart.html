@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HEART, in brief · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Opening</span></header>
+<h2>HEART, in brief</h2>
+<p class="dek">HTTP services that answer the way web pages do: each answer carries its state and the controls that state allows.</p>
+<div class="acronym">
+  <div><span class="letter">H</span><span class="word">Hypermedia</span><span class="means">The controls travel in the answer: links to follow, forms to fill, offered by state.</span></div>
+  <div><span class="letter">E</span><span class="word">Enforced</span><span class="means">The server refuses what it didn't offer (409), what's stale (412) and what doesn't fit (422), each with its reason.</span></div>
+  <div><span class="letter">A</span><span class="word">Agentic</span><span class="means">An agent reads the same answers a person's page is built from.</span></div>
+  <div><span class="letter">R</span><span class="word">Reliable</span><span class="means">Forms are pinned by integrity; a kept script replays with no model, and stops rather than guess.</span></div>
+  <div><span class="letter">T</span><span class="word">Transactions</span><span class="means">Each act is a conditional request on the state you read: If-Match, then the next state.</span></div>
+</div>
+<div class="tabs">
+  <input type="radio" name="heart-tab" id="heart-tab-1" checked><label for="heart-tab-1">Built on standards</label>
+  <input type="radio" name="heart-tab" id="heart-tab-2"><label for="heart-tab-2">Spring HATEOAS</label>
+  <input type="radio" name="heart-tab" id="heart-tab-3"><label for="heart-tab-3">HAL Schema Forms</label>
+  <div class="panel">
+    <ul>
+      <li><b>HAL</b> for links and embedded resources.</li>
+      <li><b>HAL-FORMS</b>, the on-ramp: templates inside each answer.</li>
+      <li><b>JSON Schema 2020-12</b> for what a form takes.</li>
+      <li><b>HTTP as written:</b> ETag and If-Match, Prefer and Preference-Applied, problem details for refusals.</li>
+      <li><b>Profiles:</b> a link with rel="profile", and ALPS for what each relation means.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <ul>
+      <li><b>Today:</b> Spring HATEOAS serves HAL-FORMS, and ARTIE reads it as it is. In Spring's own affordances example, ARTIE lists, creates, updates and deletes employees.</li>
+      <li><b>The other way round:</b> HEART serves HAL-FORMS too, so a Spring HATEOAS client reads a HEART service.</li>
+      <li><b>Planned, not built:</b> one dependency that serves a Spring app's affordances as HAL Schema Forms, with no rewrite.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <ul>
+      <li><b>Forms as JSON Schema,</b> each with where to send it and how.</li>
+      <li><b>Offered by state,</b> and an absent one says why.</li>
+      <li><b>Choices from state:</b> a field can take its choices from the resource, so a client picks from them instead of guessing.</li>
+      <li><b>Cache-friendly:</b> at L2, one form set per state, linked with an integrity hash, shared by every resource in that state and cached for good.</li>
+    </ul>
+  </div>
+</div>
+</article>
+<nav class="foot"><a href="deck/one-loop.html" rel="prev"><small>Back</small><b>One loop, two readers</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#heart">with heart-ts</a></span>
+<a href="deck/help-line.html" rel="next" data-rel="next"><small>Next</small><b>The help line</b></a></nav>
+</main></div></body></html>

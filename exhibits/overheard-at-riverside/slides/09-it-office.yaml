@@ -1,0 +1,42 @@
+name: it-office
+part: Scene three · today
+title: The IT office
+fiction: true
+html: |
+  <h2>The IT office</h2>
+  <p class="setting">Today, the library's IT office. Priya builds the library's API; Sam builds the assistant that renews books for members.</p>
+  <div class="script">
+    <div class="line"><span class="who priya">Priya</span><p>The loans API is done. JSON over HTTP, with a full OpenAPI description: every operation, every field, every status code.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>My agent read all of it, found Ana's loans, and sent a renew for <i>The Hobbit</i>. 409. Hold waiting.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>Well, that's correct.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>Correct, and the first the agent heard of the hold. Renew is listed for every loan.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>It has to be. The description is the same for every loan in every state. The rule's in the text.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>So the agent reads English, guesses the rule, and finds out by trying. A document beside the data, every address, the same for every state, filled in by hand. That's forms.yaml. We gave people better than that in 1997. The real 1997, I mean: pages had forms.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>Ana's page gets a grey button with the reason. My API gets a 409.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>Same server, same rules. Different manners.</p></div>
+  </div>
+  <details class="more"><summary>The two documents, side by side</summary>
+    <div class="pair">
+      <div><span class="label">1997: the Perl site's forms.yaml</span>
+  <pre><code>/loans/{loanId}/renew:
+    post:
+      summary: Renew a loan
+      description: Only while it is renewed
+        fewer than three times and no one's
+        hold is waiting.
+      responses:
+        '200': renewed
+        '409': it cannot be renewed</code></pre></div>
+      <div><span class="label">Today: heart-core's OpenAPI twin</span>
+  <pre><code>/loans/{id}/actions/renew:
+    post:
+      description: Offered while the book is out,
+        renewed fewer than three times, and
+        no one's hold is waiting.
+      requestBody: { $ref: Renew }
+      responses:
+        '200': The loan after the act
+        '409': NotOffered</code></pre></div>
+    </div>
+    <p class="note">Both list renew for every loan, always. forms.yaml is the OpenAPI of the web that wasn't, and forms.html its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
+  </details>

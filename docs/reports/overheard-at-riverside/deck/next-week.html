@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The next week · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene five · the next week</span><span class="fiction">Fiction</span></header>
+<h2>The next week</h2>
+<p class="setting">Ana comes in to return a book. Sam shows her the assistant; Priya is at the next desk.</p>
+<div class="script">
+  <div class="line"><span class="who sam">Sam</span><p>You told it once: “Renew each of my books that can be renewed, and say why for any that can't.”</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>And?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>It renewed <i>Matilda</i>. It said <i>The Hobbit</i> has no renew form, because a hold is waiting, and that <i>Charlotte's Web</i> was renewed the most allowed.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>That's what my phone says.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Same answers, a different client. The first time, the model found the way: ten calls to Claude. We kept what it did as a short script. Every run since: eleven steps, no model.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>When the hold on <i>The Hobbit</i> clears, will it renew it?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>If the library offers renew then, yes. It acts on what's offered.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>We moved renew to a new address on Monday. Did it break?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>No. It remembers what the form does, not where it points. Change the form itself, and it stops instead of guessing.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>And <i>Charlotte's Web</i>?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Done renewing. The library offers return.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>Then I'll bring it back in person. Some things I still like to do by hand.</p></div>
+</div>
+<div class="stats">
+  <div class="stat"><b>10</b><span>model calls, once, to find the way</span></div>
+  <div class="stat"><b>0</b><span>model calls each run after</span></div>
+</div>
+<details class="more"><summary>The kept script, and the run</summary>
+<pre><code>steps:
+  - act: library:get-account
+    fields:
+      id: ${card}
+    then:
+      - whenever:
+          - when-offered:
+              - act: library:renew</code></pre>
+  <ul>
+    <li><b>Kept</b> by <code>artie generate</code> from the run: every book the account links, renewed when it offers renew.</li>
+    <li><b>Pinned</b> by what the form does, its act, not its address: a moved form costs no model call; a changed one stops the run.</li>
+    <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2; 10 calls; 25,192 input tokens (7,332 sent, 16,074 read from cache, 1,786 written to it); 1,684 output.</li>
+  </ul>
+</details>
+</article>
+<nav class="foot"><a href="deck/in-charge.html" rel="prev"><small>Back</small><b>The server stays in charge</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#next-week">with heart-ts</a></span>
+<a href="deck/this-deck.html" rel="next" data-rel="next"><small>Next</small><b>Lo: this deck is HEART too</b></a></nav>
+</main></div></body></html>
