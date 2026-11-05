@@ -49,7 +49,7 @@ close it. Live on `JogoShugh/heart-github-test`, through the GitHub gateway on `
 Before the goal chain, the YAML scripts were generated from a run of the October Kotlin script
 (`github-task-reasoned.kts`): intent, kept and hybrid, each run live (`reasoned-kts`, `intent-*`, `kept-*`,
 `hybrid-1`, and `broken-1`, which stopped where an unquoted `#` began a YAML comment; its issue, #2167, was closed).
-Those runs turned up four bugs, fixed test first in commit 2da62ab:
+Those runs turned up four bugs, fixed test first in commit b46a61d:
 
 - `--intents` wrote the value an earlier answer gave (`open issue 113`); it now reads `${issue.number}`.
 - A script's own check froze its value (`#114`); it now reads `#${pull.number}`.
