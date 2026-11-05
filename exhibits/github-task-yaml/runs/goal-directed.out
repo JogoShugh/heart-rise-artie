@@ -1,0 +1,26 @@
+1 enter https://localhost:8393/: done
+2 get the repository JogoShugh/heart-github-test: done
+3 Open an issue titled "Crash when a bed has no name (steps)" with body: "Opened by a HEART script.": new resource
+4 return to https://localhost:8393/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8393/: done
+6 get the branch main of the repository JogoShugh/heart-github-test: done
+7 Start a new branch from here named fix-blank-names-steps-1105-172025: new resource
+8 Commit a file named fix-steps-1105-172025.md with content "Bed names may not be blank." and commit message "Refuse a bed with no name": done
+9 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/fix-blank-names-steps-1105-172025: done
+10 Open a pull request into main titled "Refuse a bed with no name (steps)" with body: "Relates to #2191": new resource
+11 return to https://localhost:8393/repos/JogoShugh/heart-github-test/pulls/2192: done
+12 until: held
+13 Merge the pull request by squashing its commits: done
+14 return to https://localhost:8393/repos/JogoShugh/heart-github-test/pulls/2192: done
+15 check: held
+16 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/fix-blank-names-steps-1105-172025: done
+17 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/main: done
+18 return to https://localhost:8393/: done
+19 get issue 2191 of JogoShugh/heart-github-test: done
+20 comment on it: Fixed in 1.2 by #2192.: new resource
+21 return to https://localhost:8393/repos/JogoShugh/heart-github-test/issues/2191: done
+22 Close the issue as completed.: done
+23 return to https://localhost:8393/repos/JogoShugh/heart-github-test/issues/2191: done
+24 check: held
+25 return to https://localhost:8393/: done
+finished, 25 steps; acted: github:repos-get 1, github:open-issue 1, github:repos-get-branch 1, github:branch-from-here 1, github:commit-file 1, github:open-pull-request 1, github:merge 1, github:issues-get 1, github:comment 1, github:close 1

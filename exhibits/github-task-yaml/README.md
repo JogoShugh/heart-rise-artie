@@ -14,6 +14,9 @@ close it. Live on `JogoShugh/heart-github-test`, through the GitHub gateway on `
 3. **The replay:** the kept YAML, with no model, held strictly to the lock file.
 4. **The hybrid:** `github-task.hybrid.goal.md` is the same goal with its close marked `reasoned`; generated from
    its run, `github-task.hybrid.heart.yaml` keeps that one step in words and pins the rest.
+5. **The case named (the slide after the hybrid):** `github-task.directed.goal.md` says the close as its case,
+   "Close it as completed, since the fix shipped in 1.2", so only one of the three closes fits. `artie generate`
+   pins `github:close` with no reason step, and the replay needs no model.
 
 ## The runs
 
@@ -23,6 +26,8 @@ close it. Live on `JogoShugh/heart-github-test`, through the GitHub gateway on `
 | `goal-kept` | `github-task.heart.yaml`, guard strict | 0 | 28 | 28 | #2189, #2190 |
 | `goal-1` | `github-task.hybrid.goal.md` | 23 | 106 | 25 | #2183, #2184 |
 | `goal-hybrid` | `github-task.hybrid.heart.yaml`, guard strict | 1 | 33 | 27 | #2185, #2186 |
+| `goal-directed` | `github-task.directed.goal.md` | 23 | 96 | 25 | #2191, #2192 |
+| `directed-kept` | `github-task.directed.heart.yaml`, guard strict | 0 | 28 | 28 | #2193, #2194 |
 
 - Every run merged its pull request and closed its issue as completed. No act was refused.
 - The kept replay has two more checks than the goal run: `artie generate` checks what each act changed.
@@ -64,5 +69,5 @@ gateway on 8393 is a second one, set as the one on 8392 but with the current tok
 
 ## The deck
 
-`deck/edit.mjs` changes slides 30 to 34 and 37 of the unpacked `Take_HEART_1_1.pptx`; the result is
+`deck/edit.mjs` changes slides 30 to 34 and 37, and adds the slide after the hybrid, of the unpacked `Take_HEART_1_1.pptx`; the result is
 `docs/decks/take-heart/Take_HEART_1_2.pptx`. Slide 32 keeps October's Kotlin timings, labelled as such.

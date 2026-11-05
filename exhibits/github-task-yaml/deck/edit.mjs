@@ -84,6 +84,36 @@ function notes(n, words) {
   runs.slice(1).forEach((m) => { doc.xml = doc.xml.replace(m[0], "<a:t></a:t>"); });
   save(doc);
 }
+// A new slide [n], a copy of slide [after] and its notes, shown right after it.
+function addSlideAfter(after, n) {
+  const copy = (from, to, change = (x) => x) =>
+    writeFileSync(`${root}/ppt/${to}`, change(readFileSync(`${root}/ppt/${from}`, "utf8")));
+  copy(`slides/slide${after}.xml`, `slides/slide${n}.xml`);
+  copy(`slides/_rels/slide${after}.xml.rels`, `slides/_rels/slide${n}.xml.rels`,
+    (x) => x.replace(`notesSlide${after}.xml`, `notesSlide${n}.xml`));
+  copy(`notesSlides/notesSlide${after}.xml`, `notesSlides/notesSlide${n}.xml`);
+  copy(`notesSlides/_rels/notesSlide${after}.xml.rels`, `notesSlides/_rels/notesSlide${n}.xml.rels`,
+    (x) => x.replace(`slides/slide${after}.xml`, `slides/slide${n}.xml`));
+  const rels = load("_rels/presentation.xml.rels");
+  const rid = `rId${Math.max(...[...rels.xml.matchAll(/Id="rId(\d+)"/g)].map((m) => Number(m[1]))) + 1}`;
+  const before = rels.xml.match(new RegExp(`Id="(rId\\d+)"[^>]*Target="slides/slide${after}.xml"`))[1];
+  rels.xml = rels.xml.replace("</Relationships>",
+    `<Relationship Id="${rid}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/slide" Target="slides/slide${n}.xml"/></Relationships>`);
+  save(rels);
+  const deck = load("presentation.xml");
+  const id = Math.max(...[...deck.xml.matchAll(/<p:sldId id="(\d+)"/g)].map((m) => Number(m[1]))) + 1;
+  deck.xml = deck.xml.replace(new RegExp(`(<p:sldId id="\\d+" r:id="${before}"/>)`), `$1<p:sldId id="${id}" r:id="${rid}"/>`);
+  save(deck);
+  const types = { path: `${root}/[Content_Types].xml`, xml: readFileSync(`${root}/[Content_Types].xml`, "utf8") };
+  types.xml = types.xml.replace("</Types>",
+    `<Override PartName="/ppt/slides/slide${n}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/>` +
+    `<Override PartName="/ppt/notesSlides/notesSlide${n}.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.notesSlide+xml"/></Types>`);
+  save(types);
+  const app = { path: `${root}/docProps/app.xml`, xml: readFileSync(`${root}/docProps/app.xml`, "utf8") };
+  app.xml = app.xml.replace(/<Slides>(\d+)<\/Slides>/, (_, k) => `<Slides>${Number(k) + 1}</Slides>`)
+    .replace(/<Notes>(\d+)<\/Notes>/, (_, k) => `<Notes>${Number(k) + 1}</Notes>`);
+  save(app);
+}
 
 
 // Slide 30: the task as a plain goal, and Claude's run of it.
@@ -169,6 +199,43 @@ function notes(n, words) {
   notes(32, "Live runs, 18 October 2026, scratch repository JogoShugh/heart-github-test, with the scripts in Kotlin. Ranges: scripted 17.6-18.2 s, intent 45.9-49.6 s, hybrid 24.2-30.1 s. Reasoner: Claude Sonnet 5.5. In every intent run Claude made the same ten choices. The same three on 5 November 2026, one live run each, with no script written by hand: the plain goal 99 s (23 model calls, planning and choosing), the kept YAML artie generate wrote from it 28 s (0), and the hybrid 33 s (1). Those times include a walk of the pages of open pull requests and branches the scratch repository now holds.");
 }
 
+// The follow-up to slide 33, made from it before it changes: name the case, and the hybrid's judgement goes.
+addSlideAfter(33, 38);
+{
+  const s = load("slides/slide38.xml");
+  text(s, 2, ["PREVIEW  ·  …OR NAME THE CASE"]);
+  text(s, 3, ["Name the case, and the judgement goes"]);
+  code(s, 5, [
+    ["I", "# github-task.hybrid.goal.md: a judgement, every run"],
+    ["P", "  - Close it the right way: the fix shipped in 1.2 `reasoned`"],
+    ["I", "# github-task.directed.goal.md: the case, named"],
+    ["B", "  - Close it as completed, since the fix shipped in 1.2"],
+    ["I", "# github-task.directed.heart.yaml, as artie generate wrote it"],
+    ["B", "- act: github:close"],
+    ["P", "  intent: Close it as completed, since the fix shipped in 1.2"],
+    ["P", "  then:"],
+    ["P", "    - check:"],
+    ["P", "        - field: state_reason"],
+    ["P", "          is: completed"],
+  ], 1100);
+  place(s, 4, { cy: 2.4 });
+  place(s, 5, { cy: 2.1 });
+  cells(s, [
+    ["Said as", "GitHub offers", "It records"],
+    ["as completed", "github:close", "completed"],
+    ["as not planned", "github:close-not-planned", "not planned"],
+    ["as a duplicate", "github:close-duplicate", "duplicate"],
+  ]);
+  text(s, 7, [
+    "The hybrid asks the model on every run because “the right way” leaves a choice among three closes.",
+    null,
+    "Named, there is one. artie generate pins github:close, and the replay ran with no model, held strictly to the lock file: 0 model calls, 28 s, closed as completed.",
+  ]);
+  text(s, 9, ["Name the case when you know it. Keep reasoned for what words can’t settle ahead of time."]);
+  save(s);
+  notes(38, "The directed goal is the plain goal with its close step said as the case: \"Close it as completed, since the fix shipped in 1.2\". Its run, live, 5 November 2026: issue #2191, PR #2192, 23 model calls, 96 s. artie generate wrote github-task.directed.heart.yaml with act: github:close and no reason step; replayed with no model, guard strict: issue #2193, PR #2194, 28 s, state_reason completed. Words name one case. Where the case differs from run to run (merged or not, a duplicate or not), a script as data can choose by the resource's state instead, with whenever and has, as the merge watch does, still with no model.");
+}
+
 // Slide 33: the hybrid, as the goal marks it.
 {
   const s = load("slides/slide33.xml");
@@ -213,7 +280,7 @@ function notes(n, words) {
   const s = load("slides/slide37.xml");
   text(s, 4, [null, null, null, null, null,
     "Three ways through GitHub: scripted, intent and hybrid runs in Kotlin, 3 live runs each, issues #49–#65 and PRs #50–#66, 18 October 2026; gateway e171027, ARTIE f494ff4, reasoner Claude Sonnet 5.5.",
-    "GitHub preview, from a plain goal to YAML: github-task.goal.md (issue #2187, PR #2188), the github-task.heart.yaml artie generate wrote from it, replayed strictly with its lock file (#2189, PR #2190), and the hybrid (#2185, PR #2186), on JogoShugh/heart-github-test, 5 November 2026. Scripts and runs: exhibits/github-task-yaml.",
+    "GitHub preview, from a plain goal to YAML: github-task.goal.md (issue #2187, PR #2188), the github-task.heart.yaml artie generate wrote from it, replayed strictly with its lock file (#2189, PR #2190), the hybrid (#2185, PR #2186), and the case named (#2191, PR #2192; replayed #2193, PR #2194), on JogoShugh/heart-github-test, 5 November 2026. Scripts and runs: exhibits/github-task-yaml.",
   ]);
   save(s);
 }
