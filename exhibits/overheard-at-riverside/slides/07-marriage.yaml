@@ -73,26 +73,23 @@ html: |
             <div class="win-status">Document: Done</div>
           </div>
         </div>
-        <p class="mo-cap">What actually happened, right from the beginning: Netscape Navigator, and a page with forms. Each loan carries its own acts, and the reason for the one it can't do. Nothing to copy, nothing to type, and no PIN in the address.</p>
+        <p class="mo-cap">What actually happened, right from the beginning: Netscape Navigator, and a page with forms, written by the same CGI. Each loan carries its own acts, and the reason for the one it can't do. Nothing to copy, nothing to type, and no PIN in the address.</p>
       </section>
     </div>
     <p class="mo-still note">Two stills. Read as HEART, this slide links a script that animates them (<code>deck:code</code>). Plain JSON carries no links, so no code arrives.</p>
   </div>
-  <details class="more"><summary>The married page, as HTML 2.0 wrote it</summary>
-  <pre><code>&lt;TABLE BORDER&gt;
-  &lt;TR&gt;&lt;TH&gt;Loan&lt;TH&gt;Title&lt;TH&gt;Due&lt;TH&gt;
-  &lt;TR&gt;&lt;TD&gt;3310&lt;TD&gt;The Hobbit&lt;TD&gt;1997-11-12
-    &lt;TD&gt;A hold is waiting for this book, so it can't be renewed.
-        &lt;FORM METHOD=POST ACTION="/cgi-bin/library.cgi/loans/3310/return"&gt;&lt;INPUT TYPE=SUBMIT VALUE="Return"&gt;&lt;/FORM&gt;
-  &lt;TR&gt;&lt;TD&gt;3311&lt;TD&gt;Matilda&lt;TD&gt;1997-11-12
-    &lt;TD&gt;&lt;FORM METHOD=POST ACTION="/cgi-bin/library.cgi/loans/3311/renew"&gt;&lt;INPUT TYPE=SUBMIT VALUE="Renew"&gt;&lt;/FORM&gt;
-        &lt;FORM METHOD=POST ACTION="/cgi-bin/library.cgi/loans/3311/return"&gt;&lt;INPUT TYPE=SUBMIT VALUE="Return"&gt;&lt;/FORM&gt;
-  …
-  &lt;/TABLE&gt;</code></pre>
-    <ul>
-      <li><b>Forms in the page:</b> Mosaic added fill-out forms in 1993, and HTML 2.0 (RFC 1866, November 1995) made them standard. The server writes each loan's forms as its state allows, and says why for the act it leaves out.</li>
-      <li><b>A sketch:</b> the Perl site of this story serves no forms, as its web had none. This page is what HTML 2.0 allowed the same CGI script to write; the loans, the rules and the reasons are the Perl site's.</li>
-    </ul>
+  <details class="more"><summary>The CGI, as it actually happened</summary>
+    <p class="note">The same Perl, the same loans, rules and reasons as the web that wasn't. Two things differ: her loans page writes a form for each act a loan allows now, and the reason in place of the one it doesn't; and she signs in with a form, so her card and PIN travel in a POST body, never in the address.</p>
+    <div class="code-pair">
+      <div><span class="label">The web that wasn't: numbers to copy</span>
+      <pre class="source" data-source="exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi" data-from="sub list {"></pre></div>
+      <div><span class="label">What actually happened: each loan with its forms</span>
+      <pre class="source" data-source="exhibits/overheard-at-riverside/married/library.cgi" data-from="sub list {"></pre>
+      <pre class="source" data-source="exhibits/overheard-at-riverside/married/library.cgi" data-from="sub form_for {"></pre></div>
+    </div>
+    <span class="label">What it writes for <i>Matilda</i>, run by married/run.sh</span>
+    <pre class="source" data-source="exhibits/overheard-at-riverside/married/captures/loans.lines.html" data-from="&lt;td&gt;3311&lt;/td&gt;" data-count="14"></pre>
+    <p class="note">The window around the page is drawn; the page in it is this script's. <code>married/run.sh</code> runs it as Apache would and keeps each answer in <code>married/captures/</code>: the sign-in form, her loans page, <i>Matilda</i> renewed from its own button, and a renewal of <i>The Hobbit</i> sent anyway, refused, 409.</p>
   </details>
   <details class="more"><summary>The animation is code on demand</summary>
     <ul>

@@ -5,7 +5,7 @@ fiction: true
 preamble:
   tone: heart
   label: "If the API answered like the page"
-  text: "Your client asks for a loan and gets, in the same answer, what it can do with it now and why the rest isn't there. It chooses among offers instead of reading a manual, and anything stale or not offered is refused with a reason."
+  text: "Priya wants Sam's assistant to get what Ana's page has. In each answer, the loan and what can be done with it now, and why the rest can't; anything stale or not offered refused with a reason. The assistant would choose among offers, not read a manual."
 html: |
   <h2>Give the answer its controls</h2>
   <p class="setting">The same office, an hour later. Sam has the marker.</p>
@@ -66,6 +66,7 @@ html: |
   +               "integrity": "sha256-MaW2EFgi2SXHXtDeNNqfRqaPpMhuPfrUB/RV+oPsfQ8=" }</span></code></pre></details></li>
   </ol>
 points:
-  - "<b>Information:</b> stays as it is, the same JSON members."
-  - "<b>Controls move in:</b> links, forms by state, the reason for each absent one, a version tag, and one shared set per state."
-  - "<b>On standards:</b> HAL, HAL-FORMS and JSON Schema, ETag and If-Match, content-addressed sets."
+  - "An hour later, Priya asks what it would take to give the API what Ana's page has. Sam lists six things on the whiteboard."
+  - "The answer links itself and names its vocabulary. The acts arrive as forms, the forms follow the state, and what's absent says why."
+  - "A version tag guards each act, and every loan in the same state links one shared set of forms, fetched once and cached."
+  - "<b>What it shows:</b> the data stays as it is; the controls move into the answer, on standards already in use."

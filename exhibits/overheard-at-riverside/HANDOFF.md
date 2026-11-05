@@ -4,7 +4,7 @@ Written 2026-11-04 (evening), brought up to date 2026-11-05.
 
 ## Where things are
 
-- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 12, 25 slides. It is built from
+- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 13, 25 slides. It is built from
   `exhibits/overheard-at-riverside/` (`slides/*.yaml`, `page/`, `code/`, `build.mjs`) into
   `docs/reports/overheard-at-riverside/`. To rebuild, run
   `node build.mjs --artifact <scratch>/overheard-at-riverside.html` in the exhibit folder, then publish that file
@@ -56,6 +56,20 @@ Written 2026-11-04 (evening), brought up to date 2026-11-05.
    what may be chosen, not which widget. Undecided.
 
 ## How the deck is put together
+
+- **The story, read aloud:** <https://claude.ai/artifact/H1jUDom6fenZUKBy9uz1Kz>, from `aloud/riverside-aloud.html`: the
+  whole story as prose, with a Play button that reads it in the browser's own voice. Update its text when the
+  story changes.
+- **The cast, then the story in brief.** Slide 1 introduces Ana, Marcus, Priya and Sam in both voices. Each scene's
+  `points` tell what happens to them, by name, in order, and end with "What it shows"; each scene's `preamble`
+  is told through them.
+- **Code read from its file.** A `<pre class="source" data-source="repo/path" data-from="…">` in a slide is filled
+  at build time from that file, from the line holding `data-from` to the next line starting with `data-to` (or
+  `data-count` lines, or a line that is only `}`), with the file and lines under it. A marker that no longer
+  matches stops the build.
+- **What actually happened, in Perl.** `married/library.cgi` is the 1997 CGI with forms in the page and a sign-in
+  form; `sh married/run.sh` runs it as Apache would and keeps each answer in `married/captures/`. The Marriage's
+  page is what it writes; the window around it is drawn.
 
 - **Two voices, one title.** Each scene slide has `points`; a scene's first slide has a `preamble` (what it is
   like to be there), shown in both voices. A slide's title is the same in both, and so is the outline.

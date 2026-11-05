@@ -5,7 +5,7 @@ fiction: true
 preamble:
   tone: heart
   label: "With an agent and a goal"
-  text: "You give an assistant one sentence of purpose and a member's name. The first time, a model finds the way through the library's answers. After that, a kept script does the same with no model, and stops rather than guess if the library changes."
+  text: "Sam gives the assistant one sentence of purpose and Ana's name. The first time, a model finds the way through the library's answers. After that, a kept script does the same with no model, and stops rather than guess if the library changes."
 html: |
   <h2>Find the way once, then keep it</h2>
   <p class="setting">Ana comes in to return a book. Sam shows her the assistant; Priya is at the next desk.</p>
@@ -63,6 +63,7 @@ html: |
     </ul>
   </details>
 points:
-  - "<b>Once, with a model:</b> 11 calls to find the way for a member."
-  - "<b>Kept:</b> a script that takes the member's name. Every run after calls no model."
-  - "<b>Pinned by meaning:</b> a moved form is followed; a changed form stops the run."
+  - "The next week, Ana comes in to return a book, and Sam shows her the assistant."
+  - "Given the goal and her name, it renewed <i>Matilda</i> and said why it couldn't renew the other two: what her phone says. Finding the way took 11 calls to Claude."
+  - "ARTIE kept what it did as a short script that takes a member's name. Runs since call no model. When Priya moved renew to a new address, the script followed the form."
+  - "<b>What it shows:</b> found once with a model, the way is kept, and runs without one."

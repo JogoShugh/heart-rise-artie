@@ -69,7 +69,18 @@ html: |
   versionOf = { it.version }</code></pre>
     <p class="note">heart-core writes the wire from it. For an API you don't own, the HEART gateway does the same from its OpenAPI description, with your own controls in front.</p>
   </details>
+  <details class="more"><summary>The same rule, in 1997's CGI and in today's declaration</summary>
+    <div class="code-pair">
+      <div><span class="label">1997: checked when the request arrives</span>
+      <pre class="source" data-source="exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi" data-from="return answer('409 Conflict', 'Cannot renew', p(&quot;A hold" data-count="4"></pre></div>
+      <div><span class="label">Today: offered by state, and why not, before</span>
+      <pre class="source" data-source="heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt" data-from="private fun offered(standing: String)" data-to="}"></pre>
+      <pre class="source" data-source="heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt" data-from="private val WHY = mapOf(" data-to=")"></pre></div>
+    </div>
+    <p class="note">The same three rules. The CGI finds out after the request; the declaration says, for each standing, what is offered and why the rest isn't, so every answer carries it before the request. heart-core still refuses an act it didn't offer, 409, as the CGI did.</p>
+  </details>
 points:
-  - "<b>Declared once:</b> the acts, what each state offers, and why one is absent."
-  - "<b>Served every way:</b> HTML for people, HAL-FORMS and HAL Schema Forms for agents, an OpenAPI twin. A client asking for application/json sees no change."
-  - "<b>Enforced:</b> a form is an offer. An act sent anyway is refused, 409, with the reason."
+  - "Priya asks whether she has to rewrite the API. Sam says no: she declares the acts once, what each state offers, and why one is missing."
+  - "From that one declaration, HEART serves HTML for Ana, HAL-FORMS and HAL Schema Forms for Sam's assistant, and an OpenAPI twin."
+  - "Apps that ask for application/json get what they always got. An act sent anyway, without its form, is refused, 409, with the reason."
+  - "<b>What it shows:</b> a form is an offer, and the server stays in charge, as the library's 1997 CGI did, but now it says so first."

@@ -24,7 +24,12 @@ html: |
   <details class="more"><summary>Watch her whole visit</summary>
     <figure><img src="media/web-that-wasnt.gif" alt="Ana's visit in WebWalker: forms.yaml, forms.html, her loans, a renewal refused 409, then Matilda renewed." loading="lazy"><figcaption>The Perl site, recorded in headless Chrome: forms.yaml, forms.html, her loans, the 409, then <i>Matilda</i>.</figcaption></figure>
   </details>
+  <details class="more"><summary>The CGI that said 409</summary>
+    <p class="note">The rules are real, and checked in order: returned already, a hold waiting, renewed the most allowed. Only after all three does it move the due date three weeks on. Ana meets them only after she has sent the request.</p>
+    <pre class="source" data-source="exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi" data-from="sub act {"></pre>
+  </details>
 points:
-  - "<b>The rule:</b> in prose beside the operation, the same for every book."
-  - "<b>The cost:</b> she types it all and sends it before she finds out: 409, a hold is waiting."
-  - "<b>The question:</b> why can't each page show what is possible now, and say why the rest isn't?"
+  - "Ana sends the renewal for <i>The Hobbit</i>. The answer is 409: a hold is waiting, so it can't be renewed. She only finds out after typing it all."
+  - "Marcus tries 3311 for her, and <i>Matilda</i> renews. <i>Charlotte's Web</i> would fail too, renewed three times already, yet forms.html offers renew for all three."
+  - "Ana asks why the page can't show a Renew button on the books she can renew, and say why on the others. Marcus writes “buttons?” on a sticky note. In that world, nobody reads it."
+  - "<b>What it shows:</b> a rule kept in prose, away from the page, is learned by refusal."

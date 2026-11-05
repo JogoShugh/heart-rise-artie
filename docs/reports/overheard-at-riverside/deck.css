@@ -98,8 +98,7 @@ details.more > :not(summary) + :not(summary) { margin-top: 0.6rem; }
 .slide .points li::marker { color: var(--leaf); }
 .slide .points b { font-weight: 650; color: var(--fg); }
 :root[data-voice="points"] .slide .points { display: grid; }
-:root[data-voice="points"] .script, :root[data-voice="points"] .setting,
-:root[data-voice="points"] .slide .fiction { display: none; }
+:root[data-voice="points"] .script, :root[data-voice="points"] .setting { display: none; }
 /* A scene's preamble: what it is like to be there. Amber for the web that wasn't, blue for today, green for HEART. */
 .preamble { --tone: var(--hold); --tone-bg: var(--hold-bg); display: grid; gap: 0.3rem; padding: 0.75rem 1rem;
   border-left: 4px solid var(--tone); border-radius: 0 12px 12px 0; background: var(--tone-bg); }
@@ -352,3 +351,18 @@ details.more { min-width: 0; }
   .ww-gap { border-inline: 0; border-block: 2px dashed #fff; }
   .ns-row { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* The people in the story, introduced once, in both voices */
+.cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr)); gap: 0.6rem; }
+.cast > div { display: grid; gap: 0.15rem; padding: 0.6rem 0.8rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); }
+.cast b { font: 650 1.05rem var(--display); }
+.cast span { font-size: 0.88rem; color: var(--muted); line-height: 1.45; }
+
+/* Code read from its own file at build time, and where it came from */
+pre.source { font-size: 0.72rem; }
+.source-at { margin: 0.2rem 0 0; font-size: 0.74rem; color: var(--muted); }
+.source-at code { font-size: 0.95em; }
+
+/* Code beside code, one under the other: long lines want the whole width */
+.code-pair { display: grid; gap: 0.7rem; min-width: 0; }
+.code-pair > div { display: grid; gap: 0.3rem; min-width: 0; }

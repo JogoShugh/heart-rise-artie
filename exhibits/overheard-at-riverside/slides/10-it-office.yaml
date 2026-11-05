@@ -5,7 +5,7 @@ fiction: true
 preamble:
   tone: now
   label: "On the machine web, today"
-  text: "You build software on a JSON API. The data comes from one place, and a document of every operation from another, the same for every loan. Your code joins them, and learns the rules from refusals: Ana's 1997, with better tooling."
+  text: "Priya builds the library's API; Sam builds an assistant that renews books for members. Sam's code gets the data from one place and a document of every operation from another, the same for every loan, and learns the rules from refusals: Ana's 1997, with better tooling."
 html: |
   <h2>The machine web's manual: OpenAPI</h2>
   <figure><img src="media/openapi-list.png" alt="Swagger UI for Riverside Public Library, whose description says which acts a resource allows depends on its state: GET /accounts, GET /accounts/{id}, GET /loans, GET /loans/{id}, POST /loans/{id}/actions/renew, POST /loans/{id}/actions/return." loading="lazy"><figcaption>The library's API as HEART serves it in OpenAPI, shown in Swagger UI: every operation, for every loan alike. It says so itself: which acts a resource allows depends on its state, which the document can only describe in prose.</figcaption></figure>
@@ -50,6 +50,7 @@ html: |
     <p class="note">Both list renew for every loan, always. forms.yaml is the OpenAPI of the web that wasn't, and forms.html its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
   </details>
 points:
-  - "<b>Information:</b> the loan as JSON, data only."
-  - "<b>Controls:</b> an OpenAPI document of every operation, the same for every loan, each rule in prose."
-  - "<b>Who joins them:</b> the agent. It learns a rule the way Ana did in 1997: a 409, after the call."
+  - "The same day, in the library's IT office. Priya builds its API; Sam builds an assistant that renews books for members."
+  - "Priya shows the loans API in Swagger UI: every operation, for every loan alike. Sam's assistant sent renew for <i>The Hobbit</i> and got a 409, the rule in the operation's prose."
+  - "Sam recognizes forms.html: every address, the same for every loan, found out by trying. Ana's page gives her a grey button; his assistant gets a 409."
+  - "<b>What it shows:</b> JSON for the information, OpenAPI for the controls, and the client joining them, as Ana did in 1997."

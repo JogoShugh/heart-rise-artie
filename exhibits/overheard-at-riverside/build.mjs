@@ -18,10 +18,32 @@ const out = join(repo, "docs/reports/overheard-at-riverside");
 const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
 const BRAND = "Overheard at Riverside";
 
+// Code shown as it is, read from its file at build time, so a slide never drifts from the code it shows:
+//   <pre class="source" data-source="repo/path" data-from="text on the first line" data-to="start of the last line"
+//        data-count="lines"></pre>
+// From the first line holding data-from, to the next line starting with data-to (a line that is only "}" when
+// neither data-to nor data-count is given), dedented, with where it came from below it.
+const unescaped = (s) => s.replace(/&quot;/g, '"').replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+const escapedCode = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const sourced = (html) => html.replace(/<pre class="source" ([^>]*)><\/pre>/g, (_, attributes) => {
+  const a = Object.fromEntries([...attributes.matchAll(/data-([\w-]+)="([^"]*)"/g)].map((m) => [m[1], unescaped(m[2])]));
+  const lines = readFileSync(join(repo, a.source), "utf8").split("\n");
+  const start = lines.findIndex((line) => line.includes(a.from));
+  if (start < 0) throw new Error(`${a.source}: no line holds "${a.from}"`);
+  const end = a.count ? start + Number(a.count) - 1
+    : lines.findIndex((line, i) => i > start && (a.to ? line.trimStart().startsWith(a.to) : line === "}"));
+  if (end < start) throw new Error(`${a.source}: no end after "${a.from}"`);
+  const taken = lines.slice(start, end + 1);
+  const indent = Math.min(...taken.filter((l) => l.trim()).map((l) => l.match(/^ */)[0].length));
+  const text = taken.map((l) => l.slice(indent)).join("\n");
+  return `<pre class="source"><code>${escapedCode(text)}</code></pre>` +
+    `<p class="source-at"><code>${a.source}</code>, lines ${start + 1}–${end + 1}</p>`;
+});
+
 // A scene, told two ways under one title (deck.css, data-voice): its conversation, or its points. Both are in the
 // slide's HTML. A scene's first slide opens with a preamble: what it is like to be there, shown either way.
 const shaped = (s) => {
-  let html = s.html;
+  let html = sourced(s.html);
   if (s.preamble) {
     const tone = s.preamble.tone ? ` ${s.preamble.tone}` : "";
     const aside = `<aside class="preamble${tone}"><span class="label">${s.preamble.label}</span><p>${s.preamble.text}</p></aside>\n`;

@@ -5,7 +5,7 @@ fiction: true
 preamble:
   tone: then
   label: "In the web that wasn't"
-  text: "You want to renew three library books. The site gives you a manual of addresses and a page of numbers. You copy, you type, you send, and only then do you learn whether it was allowed."
+  text: "Ana Torres wants to renew her three library books. The library's site gives her a manual of addresses and a page of numbers. She copies, types and sends, and only then learns whether she was allowed."
 html: |
   <h2>Every act from a manual</h2>
   <p class="setting">Fall 1997, a Tuesday evening, in the web that wasn't. Ana Torres has three library books due. She calls Riverside Public Library, and Marcus answers.</p>
@@ -27,7 +27,12 @@ html: |
       <li>WebWalker, the browser of the web that wasn't, has a method menu and a body box, because pages have no forms.</li>
     </ul>
   </details>
+  <details class="more"><summary>The CGI behind forms.html</summary>
+    <p class="note">forms.cgi reads forms.yaml, the OpenAPI of this 1997, and walks every path and method in it. For each it prints the rule, the method, the address with its placeholders, and what to type. Nothing in it knows a loan.</p>
+    <pre class="source" data-source="exhibits/the-web-that-wasnt/perl/cgi-bin/forms.cgi" data-from="my $n = 0;"></pre>
+  </details>
 points:
-  - "<b>Information:</b> her loans, as a page of numbers. Nothing on it can be pressed."
-  - "<b>Controls:</b> forms.html, a manual of every operation, the same for every loan."
-  - "<b>Who joins them:</b> Ana. She finds the loan number and types it into the address by hand."
+  - "Fall 1997, in the web that wasn't. Ana Torres has three books due, and calls Marcus on the library's help line: she thinks she's renewing them wrong."
+  - "Marcus sends her to forms.html. It lists every act the site has, the same for every loan, each with a method, an address with {loanId} in it, and what to type."
+  - "Her loan numbers are on another page. To renew, Ana has to find each number there and type it into the address herself."
+  - "<b>What it shows:</b> the information is on one page and the controls on another, and Ana is the one who joins them."
