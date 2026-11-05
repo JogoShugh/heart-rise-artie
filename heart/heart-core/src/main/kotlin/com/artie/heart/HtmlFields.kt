@@ -11,7 +11,7 @@ internal object HtmlFields {
     /** The members that hold long text by convention, whatever the service. */
     private val LONG_TEXT = setOf("body", "content", "description", "text", "comment")
 
-    fun of(formId: String, name: String, schema: Map<*, *>, required: Boolean): String {
+    fun of(formId: String, name: String, schema: Map<*, *>, required: Boolean, choices: List<Choice>? = null): String {
         val id = "$formId-${Html.token(name)}"
         val label = schema["title"]?.toString() ?: FieldTitle.of(name)
         val hint = schema["description"]?.let { "<p class=\"hint\" id=\"$id-hint\">${Html.text(it)}</p>" }.orEmpty()
@@ -23,17 +23,18 @@ internal object HtmlFields {
         } else {
             "<div class=\"field\"><label for=\"${Html.attr(id)}\">${Html.text(label)}" +
                 (if (required) "<span class=\"required\" aria-hidden=\"true\">*</span>" else "") +
-                "</label>${element(name, schema, control)}$hint</div>"
+                "</label>${element(name, schema, control, choices)}$hint</div>"
         }
     }
 
-    /** The control's element, around its attributes. */
-    private fun element(name: String, schema: Map<*, *>, control: String): String {
-        val choices = schema["enum"] as? List<*>
+    /** The control's element, around its attributes: a choice when the server filled the choices in, or an enum. */
+    private fun element(name: String, schema: Map<*, *>, control: String, filled: List<Choice>?): String {
+        val choices = filled?.map { it.value.asText() to it.prompt }
+            ?: (schema["enum"] as? List<*>)?.map { it.toString() to it.toString() }
         return when {
-            choices != null -> "<select$control>" + choices.joinToString("") { choice ->
-                val selected = if (choice == schema["default"]) " selected" else ""
-                "<option value=\"${Html.attr(choice)}\"$selected>${Html.text(choice)}</option>"
+            choices != null -> "<select$control>" + choices.joinToString("") { (value, prompt) ->
+                val selected = if (value == schema["default"]?.toString()) " selected" else ""
+                "<option value=\"${Html.attr(value)}\"$selected>${Html.text(prompt)}</option>"
             } + "</select>"
             type(schema) == "array" -> "<div class=\"list\" data-list><input type=\"text\"$control></div>" +
                 "<button type=\"button\" class=\"add\" data-add>Add another</button>"

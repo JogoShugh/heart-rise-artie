@@ -24,20 +24,20 @@ object HtmlView {
         val body = layers.layer1(state, Rung.L0)
         val type = layers.type
         val order = type.acts.map { type.profile.reference(it.relation) }
-        return render(body, etag, absent(layers, body), order, fields(listOf(type)))
+        return render(body, etag, absent(layers, body), order, fields(listOf(type), choices(type, state)))
     }
 
     /**
      * The page of [body], an L0 representation: its state, links and embedded resources; its offered forms and
      * the [absent] acts (each `rel`, `title` and `reason`), as buttons in [order], by full relation; each dialog
-     * asking for its fields in the order [fields] gives for its relation.
+     * asking for its fields as [fields] says for its relation.
      */
     fun render(
         body: Map<*, *>,
         etag: String,
         absent: List<Map<*, *>>,
         order: List<String>,
-        fields: Map<String, List<String>> = emptyMap(),
+        fields: Map<String, DialogFields> = emptyMap(),
     ): String {
         val acts = entries(body, absent, order, fields)
         val title = HtmlState.title(body)
@@ -79,24 +79,37 @@ object HtmlView {
 
     /**
      * Each act's fields of [types], by full relation, in the order its input declares them: the canonical schema
-     * the representation carries lists them by name, which is no order to ask a person in.
+     * the representation carries lists them by name, which is no order to ask a person in. With them, the
+     * [choices] the server filled in for its relation.
      */
-    private fun fields(types: List<ResourceType<*, *>>): Map<String, List<String>> =
+    private fun fields(
+        types: List<ResourceType<*, *>>,
+        choices: Map<String, Map<String, List<Choice>>> = emptyMap(),
+    ): Map<String, DialogFields> =
         types.flatMap { type -> type.allActs.map { type.profile.reference(it.relation) to it.schema } }
-            .associate { (relation, schema) -> relation to InputSchemas.propertyNames(schema) }
+            .associate { (relation, schema) ->
+                relation to DialogFields(InputSchemas.propertyNames(schema), choices[relation].orEmpty())
+            }
+
+    /** Each act's choices for [state], by full relation, filled in by the server: a browser follows no link. */
+    private fun <S, K> choices(type: ResourceType<S, K>, state: S): Map<String, Map<String, List<Choice>>> {
+        val body = type.state.bodyOf(state)
+        return type.acts.associate { type.profile.reference(it.relation) to Options.filled(it, state, body) }
+    }
 
     /** The offered forms and the absent acts, one entry per act, in [order]; any not in it after, as they come. */
     private fun entries(
         body: Map<*, *>,
         absent: List<Map<*, *>>,
         order: List<String>,
-        fields: Map<String, List<String>>,
+        fields: Map<String, DialogFields>,
     ): List<HtmlActs.Entry> {
         val curies = Curies((body["_links"] as? Map<*, *>)?.get("curies"))
         val forms = (body["_forms"] as? Map<*, *>).orEmpty().entries.associate { (key, form) ->
             val title = (form as? Map<*, *>)?.get("title")?.toString() ?: key.toString()
             val relation = curies.expand(key.toString())
-            relation to HtmlActs.Entry(key.toString(), title, form as? Map<*, *>, null, fields[relation].orEmpty())
+            val asked = fields[relation] ?: DialogFields()
+            relation to HtmlActs.Entry(key.toString(), title, form as? Map<*, *>, null, asked)
         }
         val greyed = absent.associate { act ->
             val rel = act["rel"].toString()

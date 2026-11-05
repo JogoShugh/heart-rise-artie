@@ -4,7 +4,8 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
   person in a browser, HAL-FORMS, and HAL Schema Forms. Ana Torres signs in
   with her library card number and PIN. A loan can be renewed, three weeks at
   a time, up to three times, unless a hold is waiting for the book; it can be
-  returned while it is out. What a loan can't do now is absent, with the reason.
+  returned while it is out, and a problem with it reported. What a loan can't
+  do now is absent, with the reason.
 
   Background:
     Given Riverside Public Library lends Ana Torres these books
@@ -18,16 +19,16 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
     Then the loan offers <acts>
 
     Examples:
-      | loan | dialect          | acts          |
-      | 3311 | HAL Schema Forms | renew, return |
-      | 3311 | HAL-FORMS        | renew, return |
-      | 3311 | HTML             | renew, return |
-      | 3310 | HAL Schema Forms | return        |
-      | 3310 | HAL-FORMS        | return        |
-      | 3310 | HTML             | return        |
-      | 3312 | HAL Schema Forms | return        |
-      | 3312 | HAL-FORMS        | return        |
-      | 3312 | HTML             | return        |
+      | loan | dialect          | acts                          |
+      | 3311 | HAL Schema Forms | renew, report-problem, return |
+      | 3311 | HAL-FORMS        | renew, report-problem, return |
+      | 3311 | HTML             | renew, report-problem, return |
+      | 3310 | HAL Schema Forms | report-problem, return        |
+      | 3310 | HAL-FORMS        | report-problem, return        |
+      | 3310 | HTML             | report-problem, return        |
+      | 3312 | HAL Schema Forms | report-problem, return        |
+      | 3312 | HAL-FORMS        | report-problem, return        |
+      | 3312 | HTML             | report-problem, return        |
 
   Scenario Outline: Loan <loan> can't be renewed, and says why, as <dialect>
     When Ana reads loan <loan> as <dialect>
@@ -129,29 +130,50 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
       | Harbor Point | 15      | 3     | Harbor Point Logistics |
       | credit union | 2       | 1     | Riverside Credit Union |
 
-  Scenario Outline: A book lent to a member of a company group is renewed for them, not by them: loan <loan>
-    The library renews a company group member's books for the member, with their card: an agent renewing
-    for Harbor Point's staff names whose card it is renewing on. Members on their own renew as before.
-
+  Scenario Outline: A book lent to a member of a company group offers what anyone's does: loan <loan>
     Given the library as it opens, with its five members
     When an agent reads loan <loan>
     Then the loan offers <acts>
 
     Examples:
-      | loan | acts                     |
-      | 3321 | renew-for-member, return |
-      | 3311 | renew, return            |
+      | loan | acts                          |
+      | 3321 | renew, report-problem, return |
+      | 3311 | renew, report-problem, return |
 
-  Scenario Outline: Renewing for a member of a company group takes their card, and no other: <case>
-    Given the library as it opens, with its five members
-    When an agent renews loan 3321 for the member with card <card>
+  Scenario: The kinds of problem a loan can report are the library's own list, linked from the form
+    The kinds are another resource, the library's to change. Adding one changes no form, so every loan in a
+    standing still links one shared set, and a script kept against it still runs.
+
+    When Ana reads loan 3311 as HAL Schema Forms
+    Then reporting a problem takes its "problem" from the list at "/problem-kinds"
+    And that list holds these kinds
+      | value         | prompt              |
+      | damaged       | It's damaged        |
+      | missing-pages | Pages are missing   |
+      | wrong-book    | It's the wrong book |
+      | lost          | I can't find it     |
+
+  Scenario: A person picks the kind of problem from the same list on the loan's page, and may add a comment
+    When Ana reads loan 3311 as HTML
+    Then reporting a problem asks for "problem" from these choices
+      | value         | prompt              |
+      | damaged       | It's damaged        |
+      | missing-pages | Pages are missing   |
+      | wrong-book    | It's the wrong book |
+      | lost          | I can't find it     |
+    And it asks for a "comment" in a text box of at most 200 characters
+
+  Scenario Outline: Reporting a problem with a loan: <case>
+    When Ana reports "<problem>" with loan 3310, with a comment of <length> characters
     Then the answer is <status>
-    And loan 3321 is due "<due>", renewed <renewed>
+    And loan 3310 shows the problem reported as <reported>
 
     Examples:
-      | case                       | card     | status | due        | renewed |
-      | the card of the member     | 21000456 | 200    | 2026-12-03 | 1 time  |
-      | the card of another member | 21000451 | 422    | 2026-11-12 | 0 times |
+      | case                          | problem | length | status | reported |
+      | a kind on the library's list  | damaged | 40     | 200    | damaged  |
+      | no comment                    | lost    | 0      | 200    | lost     |
+      | a kind not on the list        | chewed  | 0      | 422    | none     |
+      | a comment over 200 characters | damaged | 201    | 422    | none     |
 
   Scenario Outline: An OpenAPI client that follows the affordance link learns what loan <loan> allows now
     The library opts in to the affordance link (SPEC §6.1): a plain JSON answer keeps its body, with
@@ -163,6 +185,6 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
     And its affordance link names a set offering <acts>
 
     Examples:
-      | loan | acts          |
-      | 3310 | return        |
-      | 3311 | renew, return |
+      | loan | acts                          |
+      | 3310 | report-problem, return        |
+      | 3311 | renew, report-problem, return |

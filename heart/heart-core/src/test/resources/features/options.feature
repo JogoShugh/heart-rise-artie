@@ -87,6 +87,17 @@ Feature: Choices from state: a form says where a property's choices are (HAL-SCH
     And the template "assignOfficial" property "official" has an options link "/officials?level=senior"
     And that HAL-FORMS representation has a validator, as every Layer 1 representation does
 
+  # A page for a person is one resource's, so the server fills each choice in, as HAL-FORMS's inline options do:
+  # from the resource itself, and from its own copy of another resource. A browser follows no link to find them.
+  Scenario: HTML offers each property's choices in its act's dialog, filled in by the server
+    When the match is rendered as HTML
+    Then the dialogs offer exactly these choices
+      | act            | field        | value | prompt |
+      | foul           | playerNumber | 4     | Ana    |
+      | foul           | playerNumber | 5     | Cy     |
+      | foul           | playerNumber | 9     | Dee    |
+      | assignOfficial | official     | Kim   | Kim    |
+
   # A JSON object's members have no order, so the canonical schema lists them by name. A person filling a form
   # does need one: the team before its players, whose choices depend on it. The forms for people follow the
   # order the input declares.

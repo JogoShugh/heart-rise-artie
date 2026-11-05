@@ -4,9 +4,12 @@ import com.artie.heart.ConcurrentWriteException
 import java.time.LocalDate
 import java.util.concurrent.ConcurrentSkipListMap
 
+/** A problem a member reported with a book: its kind, from the library's list, and what they said about it. */
+data class Report(val problem: String, val comment: String? = null)
+
 /**
  * A book lent to a member: when it is [due], how many times it was renewed, whether someone else's hold is
- * waiting for it, and whether it came back. [version] changes with every act.
+ * waiting for it, whether it came back, and the last problem reported with it. [version] changes with every act.
  */
 data class Loan(
     val id: Long,
@@ -19,6 +22,7 @@ data class Loan(
     val version: Int = 1,
     /** The member it is lent to, by library card number. */
     val card: Long = Ledger.ANA_CARD,
+    val reported: Report? = null,
 ) {
     /** What the loan can do now, as the library decides it: its offer key. */
     val standing: String
@@ -33,6 +37,9 @@ data class Loan(
     fun renewed(): Loan = copy(due = due.plusWeeks(RENEWAL_WEEKS), renewals = renewals + 1, version = version + 1)
 
     fun returnedNow(): Loan = copy(returned = true, version = version + 1)
+
+    /** With [report] as the problem reported with it, in place of any before. */
+    fun reportedNow(report: Report): Loan = copy(reported = report, version = version + 1)
 
     companion object {
         const val RENEWABLE = "renewable"
@@ -76,8 +83,6 @@ class Ledger {
 
     /** Every loan, in loan-number order. */
     fun all(): List<Loan> = loans.values.toList()
-
-    fun member(card: Long): Member? = members[card]
 
     /** A member's account: the books they have out now. */
     fun account(card: Long): Account? = members[card]?.let { member ->

@@ -113,6 +113,20 @@ class OptionSteps {
         page = Jsoup.parse(HtmlView.of(layers, matches.first(), "\"seq-1.html.L0.test\""))
     }
 
+    /** Each dialog's choice fields, as value and prompt, for every act and field the table names, and only those. */
+    @Then("the dialogs offer exactly these choices")
+    fun dialogChoices(table: DataTable) {
+        val expected = table.asMaps().groupBy({ it.getValue("act") to it.getValue("field") }) {
+            it.getValue("value") to it.getValue("prompt")
+        }
+        val offered = expected.keys.associateWith { (act, field) ->
+            val relation = layers.type.act(act).relation
+            checkNotNull(page).select("dialog form[data-rel$=:$relation] select[name=$field] option")
+                .map { it.attr("value") to it.text() }
+        }
+        assertEquals(expected, offered)
+    }
+
     /** The fields an act asks for, in order: its HTML dialog's controls, else its HAL-FORMS template's properties. */
     @Then("the {string} act asks for its fields in this order")
     fun fieldOrder(act: String, table: DataTable) {

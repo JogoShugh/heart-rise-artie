@@ -9,13 +9,15 @@ import com.artie.heart.Found
 import com.artie.heart.HeartResource
 import com.artie.heart.Hypermedia
 import com.artie.heart.Layers
+import com.artie.heart.Listing
 import com.artie.heart.Named
 import com.artie.heart.Offers
+import com.artie.heart.Options
+import com.artie.heart.Pick
 import com.artie.heart.Profile
 import com.artie.heart.Relation
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.ResourceType
-import com.artie.heart.RuleRefusedException
 import com.artie.heart.SearchField
 import com.artie.heart.ServingLimits
 import com.artie.heart.StateView
@@ -27,8 +29,8 @@ import org.http4k.core.HttpHandler
 
 /**
  * Riverside Public Library, the library of "The Web That Wasn't", declared once for heart-core: a member's account,
- * found by library card number and linking each book out, and the loans, each offering renew and return as its
- * state allows, and saying why when it doesn't. The same declaration serves
+ * found by library card number and linking each book out, and the loans, each offering renew, return and reporting
+ * a problem as its state allows, and saying why when it doesn't. The same declaration serves
  * HTML to a person in a browser, HAL-FORMS, HAL Schema Forms, a profile and an OpenAPI twin. Ana Torres signs in
  * with her library card number and PIN; an agent, with the library's Bearer token.
  */
@@ -38,16 +40,16 @@ class HeartLibrary(private val ledger: Ledger) {
         profile = PROFILE,
         acts = listOf(
             Act("renew", "renew", NO_INPUT),
-            Act("renew-for-member", "renew-for-member", CARD_INPUT),
+            Act("report-problem", "report-problem", REPORT_INPUT).withOptions(PROBLEM_KIND),
             Act("return", "return", NO_INPUT),
         ),
         offers = Offers(
-            keys = listOf(Loan.RENEWABLE, FOR_MEMBER, Loan.ON_HOLD, Loan.AT_LIMIT, Loan.RETURNED),
+            keys = listOf(Loan.RENEWABLE, Loan.ON_HOLD, Loan.AT_LIMIT, Loan.RETURNED),
             offered = ::offered,
             whyAbsent = { standing, _ -> WHY.getValue(standing) },
         ),
         state = StateView<Loan, String>(
-            keyOf = ::standing,
+            keyOf = { it.standing },
             idOf = { it.id },
             versionOf = { it.version },
             bodyOf = ::body,
@@ -163,30 +165,21 @@ class HeartLibrary(private val ledger: Ledger) {
             title = "Riverside Public Library",
             realm = PROFILE.name,
             limits = ServingLimits(pageSize = PAGE_SIZE, affordanceLinks = true),
+            listings = listOf(Listing(PROBLEM_KINDS_PATH, "kinds") { PROBLEM_KINDS }),
         ),
     )
 
     /** The acts each standing offers, in the order of their relations, so every rung lists them alike. */
     private fun offered(standing: String): List<String> = when (standing) {
-        Loan.RENEWABLE -> listOf("renew", "return")
-        FOR_MEMBER -> listOf("renew-for-member", "return")
+        Loan.RENEWABLE -> listOf("renew", "report-problem", "return")
         Loan.RETURNED -> emptyList()
-        else -> listOf("return")
+        else -> listOf("report-problem", "return")
     }
 
-    /** The loan's standing, as the library serves it: a company group's renewable books are renewed for the member. */
-    private fun standing(loan: Loan): String =
-        if (loan.standing == Loan.RENEWABLE && ledger.member(loan.card)?.company != null) FOR_MEMBER else loan.standing
-
-    /** The loan after [act]; renewing for a member takes the card of the member it is lent to, and no other. */
+    /** The loan after [act]. A problem's kind is one of the library's list: heart-core checked it against it. */
     private fun acted(loan: Loan, act: String, input: ActInput): Loan = when (act) {
         "renew" -> loan.renewed()
-        "renew-for-member" -> {
-            if (input.json["card"].asLong() != loan.card) {
-                throw RuleRefusedException.at("/card", "That is not the card of the member the book is lent to.")
-            }
-            loan.renewed()
-        }
+        "report-problem" -> loan.reportedNow(Report(input.json["problem"].asText(), input.json["comment"]?.asText()))
         else -> loan.returnedNow()
     }
 
@@ -196,8 +189,14 @@ class HeartLibrary(private val ledger: Ledger) {
         "author" to loan.author,
         "due" to loan.due.toString(),
         "renewals" to loan.renewals,
-        "standing" to standing(loan),
-    )
+        "standing" to loan.standing,
+    ) + reported(loan)
+
+    /** The problem last reported with [loan], when there is one: a loan nobody reported on reads as it did. */
+    private fun reported(loan: Loan): Map<String, Any?> = loan.reported?.let { report ->
+        val said = linkedMapOf("problem" to report.problem, "comment" to report.comment).filterValues { it != null }
+        mapOf("reported" to said)
+    }.orEmpty()
 
     companion object {
         /** Ana Torres's library card number; her PIN is 1234, kept only as its bcrypt hash. */
@@ -209,13 +208,32 @@ class HeartLibrary(private val ledger: Ledger) {
 
         private const val NO_INPUT = """{"type": "object", "properties": {}}"""
 
-        /** Renewing for a member: the number on the back of their library card. */
-        private const val CARD_INPUT = """{"type": "object", "required": ["card"], "properties": {"card": {""" +
-            """"type": "integer", "minimum": 1, "title": "Library card number", """ +
-            """"description": "The number on the back of the library card of the member the book is lent to"}}}"""
+        /** Reporting a problem: its kind, one of the library's list, and a comment if the member has one. */
+        private const val REPORT_INPUT = """{"type": "object", "required": ["problem"], "properties": {""" +
+            """"problem": {"type": "string", "title": "Problem", "description": "What is wrong with the book"}, """ +
+            """"comment": {"type": "string", "maxLength": 200, "title": "Comment", """ +
+            """"description": "Anything the desk should know, in a sentence or two"}}}"""
 
-        /** A company group member's book that can be renewed: the library renews it for the member, on their card. */
-        const val FOR_MEMBER = "renewable for the member"
+        /** Where the library lists the kinds of problem a member can report. */
+        private const val PROBLEM_KINDS_PATH = "/problem-kinds"
+
+        /** The kinds of problem a member can report: the library's own list, changed without changing a form. */
+        private val PROBLEM_KINDS = listOf(
+            mapOf("value" to "damaged", "prompt" to "It's damaged"),
+            mapOf("value" to "missing-pages", "prompt" to "Pages are missing"),
+            mapOf("value" to "wrong-book", "prompt" to "It's the wrong book"),
+            mapOf("value" to "lost", "prompt" to "I can't find it"),
+        )
+
+        /** HAL-SCHEMA-FORMS-HR Rule 8: the problem is one of the kinds the library lists, another resource. */
+        private val PROBLEM_KIND = mapOf(
+            "problem" to Options.fromLink(
+                href = PROBLEM_KINDS_PATH,
+                items = "/kinds",
+                pick = Pick(maxItems = 1),
+                resolve = { _, _ -> PROBLEM_KINDS },
+            ),
+        )
 
         /** The most results one page of a search lists. */
         private const val PAGE_SIZE = 5
@@ -226,7 +244,6 @@ class HeartLibrary(private val ledger: Ledger) {
         /** Why a loan in each standing can't do what it doesn't offer. */
         private val WHY = mapOf(
             Loan.RENEWABLE to "It can be renewed and returned.",
-            FOR_MEMBER to "A company group's books are renewed for the member, with their library card number.",
             Loan.ON_HOLD to "A hold is waiting for this book, so it can't be renewed.",
             Loan.AT_LIMIT to "It has been renewed ${Loan.MOST_RENEWALS} times, the most allowed.",
             Loan.RETURNED to "It was returned.",
@@ -243,10 +260,9 @@ class HeartLibrary(private val ledger: Ledger) {
                     "Offered while the book is out, renewed fewer than three times, and no one's hold is waiting.",
                 ),
                 Relation(
-                    "renew-for-member", AlpsType.UNSAFE, "Renew for the member",
-                    "Keeps a company group member's book three weeks more, given the member's library card number.",
-                    "Offered in place of renew for the books of a company group's members; " +
-                        "a card number not the member's is refused.",
+                    "report-problem", AlpsType.UNSAFE, "Report a problem",
+                    "Tells the library what is wrong with the book: one of the kinds it lists, and a comment.",
+                    "Offered while the book is out; the kind must be one the library lists at /problem-kinds.",
                 ),
                 Relation(
                     "return", AlpsType.UNSAFE, "Return",

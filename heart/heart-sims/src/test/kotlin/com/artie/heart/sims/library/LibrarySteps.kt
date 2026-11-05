@@ -23,6 +23,7 @@ class LibrarySteps {
     private var answer: Response? = null
     private var dialect = HSF
     private var pages = mutableListOf<JsonNode>()
+    private var kinds: JsonNode? = null
 
     @Given("Riverside Public Library lends Ana Torres these books")
     fun lends(table: DataTable) = library.lend(
@@ -96,17 +97,51 @@ class LibrarySteps {
         answer = send(Method.GET, "/loans/$loan", ACCEPT.getValue(HSF), AGENT)
     }
 
-    @When("an agent renews loan {long} for the member with card {long}")
-    fun renewsFor(loan: Long, card: Long) {
-        val read = send(Method.GET, "/loans/$loan", ACCEPT.getValue(HSF), AGENT)
-        val form = checkNotNull(mapper.readTree(read.bodyString())["_forms"]?.get("library:renew-for-member")) {
-            "loan $loan offers no renewing for a member: ${read.bodyString()}"
-        }
-        val sent = request(Method.POST, form["_links"]["target"]["href"].asText(), ACCEPT.getValue(HSF), AGENT)
+    @Then("reporting a problem takes its {string} from the list at {string}")
+    fun problemFrom(property: String, href: String) {
+        val options = reportForm()["schema"]["properties"][property]["hr:options"]
+        assertEquals(href, options["link"]["href"].asText(), options.toString())
+        kinds = options
+    }
+
+    @Then("that list holds these kinds")
+    fun listHolds(table: DataTable) {
+        val options = checkNotNull(kinds)
+        val href = options["link"]["href"].asText()
+        val listed = mapper.readTree(send(Method.GET, href, "application/json").bodyString())
+        val (value, prompt) = options["valueField"].asText() to options["promptField"].asText()
+        val read = listed.at(options["items"].asText()).map { it[value].asText() to it[prompt].asText() }
+        assertEquals(table.asMaps().map { it.getValue("value") to it.getValue("prompt") }, read, listed.toString())
+    }
+
+    @Then("reporting a problem asks for {string} from these choices")
+    fun asksFromChoices(property: String, table: DataTable) {
+        val select = checkNotNull(Regex("""<select[^>]*name="$property"[^>]*>(.*?)</select>""").find(body())) { body() }
+        val choices = OPTION.findAll(select.groupValues[1]).map { it.groupValues[1] to unescaped(it.groupValues[2]) }
+        assertEquals(table.asMaps().map { it.getValue("value") to it.getValue("prompt") }, choices.toList())
+    }
+
+    @Then("it asks for a {string} in a text box of at most {int} characters")
+    fun asksText(property: String, most: Int) =
+        assertTrue(Regex("""<textarea[^>]*name="$property"[^>]*maxlength="$most"""").containsMatchIn(body()), body())
+
+    @When("Ana reports {string} with loan {long}, with a comment of {int} characters")
+    fun reports(problem: String, loan: Long, length: Int) {
+        val read = send(Method.GET, "/loans/$loan", ACCEPT.getValue(HSF))
+        val form = mapper.readTree(read.bodyString())["_forms"]["library:report-problem"]
+        val sent = mapOf("problem" to problem) + if (length > 0) mapOf("comment" to "a".repeat(length)) else emptyMap()
+        val target = form["_links"]["target"]["href"].asText()
         answer = library.handler(
-            sent.header("If-Match", read.header("ETag")).header("Content-Type", "application/json")
-                .body("""{"card": $card}"""),
+            request(Method.POST, target, ACCEPT.getValue(HSF), basic(HeartLibrary.CARD, PIN))
+                .header("If-Match", read.header("ETag")).header("Content-Type", "application/json")
+                .body(mapper.writeValueAsString(sent)),
         )
+    }
+
+    @Then("loan {long} shows the problem reported as {word}")
+    fun reported(loan: Long, problem: String) {
+        val read = mapper.readTree(send(Method.GET, "/loans/$loan", "application/json").bodyString())
+        assertEquals(problem, read["reported"]?.get("problem")?.asText() ?: "none", read.toString())
     }
 
     @When("an agent searches the members by company for {string}")
@@ -236,6 +271,12 @@ class LibrarySteps {
         return if (accept.startsWith("application/hal+json")) request.header("Accept-Profile", PROFILE) else request
     }
 
+    /** The form for reporting a problem, from the last answer. */
+    private fun reportForm(): JsonNode =
+        checkNotNull(json()["_forms"]?.get("library:report-problem")) { "no form for reporting a problem: ${body()}" }
+
+    private fun unescaped(text: String) = text.replace("&#39;", "'")
+
     private fun body(): String = checkNotNull(answer).bodyString()
 
     private fun json(): JsonNode = mapper.readTree(body())
@@ -264,6 +305,9 @@ class LibrarySteps {
 
         /** An item link in the HTML, by its text. */
         val ITEM = Regex("""<a rel="item" href="[^"]*">([^<]*)""")
+
+        /** One choice of a select in the HTML: its value, and its prompt. */
+        val OPTION = Regex("""<option value="([^"]*)"[^>]*>([^<]*)</option>""")
 
         /** An act's button in the HTML: its relation, and whether it is greyed. */
         val BUTTON = Regex("""<button type="button" class="act" data-rel="library:([\w-]+)"( aria-disabled="true")?""")

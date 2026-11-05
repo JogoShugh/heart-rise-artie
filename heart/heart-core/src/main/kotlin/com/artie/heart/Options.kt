@@ -199,7 +199,31 @@ sealed class Options(val pick: Pick) {
             choices.pick.maxItems?.let { put("maxItems", it) }
         }
 
-        private fun inline(choices: FromState, state: Any?, body: JsonNode, schema: JsonNode): List<Map<String, Any?>> {
+        /**
+         * The choices of [act]'s properties for [state], whose body is [body], filled in by the server for a page a
+         * person reads: from the resource itself, for every value of a property the pointer depends on that the
+         * schema lists in an enum; from another resource, by the server's own copy of it.
+         */
+        fun filled(act: Act, state: Any?, body: Map<String, Any?>): Map<String, List<Choice>> {
+            if (act.options.isEmpty()) return emptyMap()
+            val tree = MAPPER.valueToTree<JsonNode>(body)
+            val schema = MAPPER.readTree(act.schema)
+            return act.options.mapValues { (_, options) ->
+                when (options) {
+                    is FromState -> combined(options, state, tree, schema)
+                    is FromLink -> options.choices(state, tree, JsonNodeFactory.instance.objectNode())
+                }
+            }
+        }
+
+        private fun inline(choices: FromState, state: Any?, body: JsonNode, schema: JsonNode): List<Map<String, Any?>> =
+            combined(choices, state, body, schema).map {
+                // Plain values, not JSON trees: the representation is canonicalized for its validator.
+                mapOf("prompt" to it.prompt, "value" to JsonTrees.plain(it.value.toString()))
+            }
+
+        /** Every choice [choices] gives, over each value the schema's enums allow the pointer's variables. */
+        private fun combined(choices: FromState, state: Any?, body: JsonNode, schema: JsonNode): List<Choice> {
             val combinations = choices.variables.fold(listOf(emptyMap<String, JsonNode>())) { done, name ->
                 val values = schema.path("properties").path(name).path("enum").toList()
                 done.flatMap { fields -> values.map { fields + (name to it) } }
@@ -208,10 +232,7 @@ sealed class Options(val pick: Pick) {
                 val node = JsonNodeFactory.instance.objectNode()
                 fields.forEach { (name, value) -> node.set<JsonNode>(name, value) }
                 choices.choices(state, body, node)
-            }.distinctBy { it.value }.map {
-                // Plain values, not JSON trees: the representation is canonicalized for its validator.
-                mapOf("prompt" to it.prompt, "value" to JsonTrees.plain(it.value.toString()))
-            }
+            }.distinctBy { it.value }
         }
     }
 }

@@ -11,15 +11,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
  */
 internal object HtmlActs {
     /**
-     * One act's button: its form key, title, and its form when offered or its reason when not; and the order its
-     * input declares its [fields] in, which its dialog asks in (any the schema has beyond them after, as they come).
+     * One act's button: its form key, title, and its form when offered or its reason when not; and how its dialog
+     * asks for its [fields].
      */
     class Entry(
         val key: String,
         val title: String,
         val form: Map<*, *>?,
         val reason: String?,
-        val fields: List<String> = emptyList(),
+        val fields: DialogFields = DialogFields(),
     )
 
     fun buttons(entries: List<Entry>): String = if (entries.isEmpty()) "" else
@@ -42,10 +42,12 @@ internal object HtmlActs {
         val id = "act-${Html.token(entry.key)}"
         val schema = form["schema"] as? Map<*, *> ?: emptyMap<String, Any?>()
         val required = (schema["required"] as? List<*>).orEmpty().toSet()
+        val order = entry.fields.order
         val properties = (schema["properties"] as? Map<*, *>).orEmpty().entries
-            .sortedBy { (name, _) -> entry.fields.indexOf(name).let { if (it < 0) entry.fields.size else it } }
+            .sortedBy { (name, _) -> order.indexOf(name).let { if (it < 0) order.size else it } }
         val fields = properties.joinToString("") { (name, property) ->
-            HtmlFields.of(id, name.toString(), property as? Map<*, *> ?: emptyMap<String, Any?>(), name in required)
+            val schemaOf = property as? Map<*, *> ?: emptyMap<String, Any?>()
+            HtmlFields.of(id, name.toString(), schemaOf, name in required, entry.fields.choices[name.toString()])
         }
         val description = form["description"]?.let { "<p class=\"desc\">${Html.text(it)}</p>" }.orEmpty()
         return "<dialog${Html.attr("id", id)}${Html.attr("aria-labelledby", "$id-title")}>" +
@@ -77,3 +79,10 @@ internal object HtmlActs {
 
     private val MAPPER = ObjectMapper()
 }
+
+/**
+ * How an act's dialog asks for its fields: in the [order] its input declares them (any the schema has beyond them
+ * after, as they come), and from the [choices] the server filled in for those that have them (HAL-SCHEMA-FORMS-HR
+ * Rule 8), by property.
+ */
+class DialogFields(val order: List<String> = emptyList(), val choices: Map<String, List<Choice>> = emptyMap())
