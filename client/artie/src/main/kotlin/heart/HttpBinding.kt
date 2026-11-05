@@ -104,6 +104,8 @@ class HttpBinding(private val transport: Transport) : Binding {
             val halForms = rendering.dialect == Dialect.HAL_FORMS
             val fallback = if (halForms) ", ${Dialect.HAL_SCHEMA_FORMS.mediaType};q=0.5" else ""
             put("Accept", rendering.dialect.mediaType + fallback)
+            // Plain JSON asks for the state alone: no profile, no layering.
+            if (!rendering.dialect.heart) return@buildMap
             put("Accept-Profile", "<${rendering.dialect.profile}>")
             rendering.rung.prefer?.let { put("Prefer", it) }
         }

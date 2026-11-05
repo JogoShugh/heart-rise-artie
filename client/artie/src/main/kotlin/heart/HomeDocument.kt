@@ -43,7 +43,7 @@ object HomeDocument {
 
     private fun dialects(hints: JsonObject): Set<Dialect> {
         val formats = (hints["formats"] as? JsonObject)?.keys.orEmpty()
-        return Dialect.entries.filter { it.mediaType in formats }.toSet()
+        return Dialect.entries.filter { it.heart && it.mediaType in formats }.toSet()
     }
 
     private fun rung(hints: JsonObject): Rung =

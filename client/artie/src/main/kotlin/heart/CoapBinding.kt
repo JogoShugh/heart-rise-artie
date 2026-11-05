@@ -95,6 +95,7 @@ class CoapBinding(
 
     private fun Request.ask(rendering: Rendering) {
         FORMATS[rendering.dialect.mediaType]?.let { options.accept = it }
+        if (!rendering.dialect.heart) return
         options.addOption(Option(ACCEPT_PROFILE, "<${rendering.dialect.profile}>"))
         rendering.rung.prefer?.let { options.addOption(Option(PREFER, it)) }
     }

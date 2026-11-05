@@ -87,8 +87,8 @@ class ArtieClient(
         // template a target; it puts the fields in the query (mutate-action-URL).
         val target = when (asking.dialect) {
             Dialect.HAL_FORMS -> HalFormsTemplates.getTarget(form.target, payload)
-            // A field the target's template does not take goes in its query.
-            Dialect.HAL_SCHEMA_FORMS -> {
+            // A field the target's template does not take goes in its query. Plain JSON offers no form to get here.
+            Dialect.HAL_SCHEMA_FORMS, Dialect.JSON -> {
                 val taken = if (form.templated) UriTemplate.names(form.target) else emptySet()
                 Uris.withQuery(targetOf(form, held, payload), taken, payload)
             }

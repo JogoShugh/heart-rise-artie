@@ -73,6 +73,12 @@ const client = new HeartClient({ dialect: "hal-forms" });
 
 Whichever one you ask for, the client reads the dialect the answer is in.
 
+An answer that names no HEART profile, such as plain `application/json`, is read
+as data only: its state, and no forms, links or embedded resources. Ask for plain
+JSON with `dialect: "json"`. When a service later names its profile, the same
+client takes the controls it offers, with no change of its own: the upgrade is the
+service's, and optional.
+
 ## When an act is refused
 
 Every refusal is a `Refused`, with a `kind`, a `status`, a `message` and any

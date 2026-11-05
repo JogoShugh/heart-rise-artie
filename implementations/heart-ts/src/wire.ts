@@ -11,7 +11,8 @@ export const HAL_FORMS_TYPE = "application/prs.hal-forms+json";
 export const JSON_TYPE = "application/json";
 
 export type Rung = "L0" | "L1" | "L2";
-export type Dialect = "hal-schema-forms" | "hal-forms";
+/** "json" is no dialect: an answer that names no profile, held as data only (SPEC §6.1). */
+export type Dialect = "hal-schema-forms" | "hal-forms" | "json";
 
 export interface Form {
     name: string;

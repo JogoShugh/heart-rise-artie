@@ -8,7 +8,7 @@ import { needsRereading, refusalOf } from "./refusal";
 import { addressOf, fill, fillPointer } from "./template";
 import { FormChecks, SchemaFailure } from "./validation";
 import { Dialect, Form, HAL_FORMS_PROFILE, HAL_FORMS_TYPE, JSON_TYPE, MEDIA_TYPE, PROFILE, Representation, Rung, embeddedOf, formOf, formsLinkOf, linksOf, matchesIntegrity, stateOf } from "./wire";
-import { ACCEPT_PROFILE, AUTHORIZATION, CACHE_CONTROL, CONTENT_LOCATION, CONTENT_TYPE, ETAG, FORMS_BY_LINK, GET, HAL_FORMS, HR_INTEGRITY, IF_MATCH, IF_NONE_MATCH, L0, L1, L2, LINK_HEADER, MANUAL_REDIRECT, NOT_A_CHOICE, NO_CACHE, OUTSIDE_SCHEMA, PREFERENCE_APPLIED, PROFILE_REL, READ, SCHEMA_BY_LINK, UTF8 } from "./vocabulary";
+import { ACCEPT_PROFILE, AUTHORIZATION, CACHE_CONTROL, CONTENT_LOCATION, CONTENT_TYPE, ETAG, FORMS_BY_LINK, GET, HAL_FORMS, HR_INTEGRITY, IF_MATCH, IF_NONE_MATCH, L0, L1, L2, LINK_HEADER, MANUAL_REDIRECT, NOT_A_CHOICE, NO_CACHE, OUTSIDE_SCHEMA, PLAIN_JSON, PREFERENCE_APPLIED, PROFILE_REL, READ, SCHEMA_BY_LINK, UTF8 } from "./vocabulary";
 
 /** Where shared layers are kept. A `Map` will do; pass something with a limit if a `Map` would grow too far. */
 export interface LayerCache {
@@ -50,13 +50,16 @@ function profilesOf(response: Response, body: JsonObject): string {
     return linksOf(body).filter((link) => link.rel === PROFILE_REL).map((link) => `<${link.href}>`).join(", ");
 }
 
-/** The dialect of an answer. HAL-FORMS's own media type says so, as toolchains name no HEART profile. */
-function dialectOf(url: string, response: Response, body: JsonObject): Dialect {
+/**
+ * The dialect of an answer. HAL-FORMS's own media type says so, as toolchains name no HEART profile.
+ * An answer that names no profile, such as plain JSON, is read as data only: no controls are taken from it.
+ */
+function dialectOf(response: Response, body: JsonObject): Dialect {
     const links = profilesOf(response, body);
     const type = response.headers.get(CONTENT_TYPE) ?? "";
     if (links.includes(`<${HAL_FORMS_PROFILE}>`) || type.startsWith(HAL_FORMS_TYPE)) return HAL_FORMS;
     if (links.includes(`<${PROFILE}>`)) return REFERENCE_DIALECT;
-    throw new Error(`${url} does not name the profile ${PROFILE}`);
+    return PLAIN_JSON;
 }
 
 /** What each rung asks for (SPEC §6.4). */
@@ -235,13 +238,14 @@ export class HeartClient {
 
     private async complete(url: string, response: Response, bytes: Buffer): Promise<Representation> {
         const body = objectFrom(bytes);
-        const dialect = dialectOf(url, response, body);
-        const rung = appliedRung(response, dialect);
-        const links = linksOf(body);
-        const forms = dialect === HAL_FORMS ? templatesOf(body, url) : await this.formsAt(url, body, rung);
+        const dialect = dialectOf(response, body);
         const etag = response.headers.get(ETAG) ?? "";
-        this.current = { url, etag, rung, dialect, state: stateOf(body), forms, links, embedded: embeddedOf(body) };
-        return this.current;
+        const read = { url, etag, dialect, state: stateOf(body) };
+        // Data only: no controls are taken from an answer that names no profile.
+        if (dialect === PLAIN_JSON) return (this.current = { ...read, rung: L0, forms: new Map(), links: [], embedded: [] });
+        const rung = appliedRung(response, dialect);
+        const forms = dialect === HAL_FORMS ? templatesOf(body, url) : await this.formsAt(url, body, rung);
+        return (this.current = { ...read, rung, forms, links: linksOf(body), embedded: embeddedOf(body) });
     }
 
     private async formsAt(url: string, body: JsonObject, rung: Rung): Promise<Map<string, Form>> {
@@ -294,6 +298,8 @@ export class HeartClient {
     }
 
     private negotiation(): Record<string, string> {
+        // Plain JSON asks for the state alone: no profile, no layering.
+        if (this.dialect === PLAIN_JSON) return { Accept: JSON_TYPE };
         return {
             ...(this.dialect === HAL_FORMS
                 ? { Accept: `${HAL_FORMS_TYPE}, ${MEDIA_TYPE};q=0.5`, [ACCEPT_PROFILE]: `<${HAL_FORMS_PROFILE}>` }

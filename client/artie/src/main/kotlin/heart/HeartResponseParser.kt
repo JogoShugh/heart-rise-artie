@@ -10,9 +10,10 @@ import kotlinx.serialization.json.Json
 import java.net.URI
 
 /**
- * Reads a Layer 1 representation in either dialect (SPEC §6.1). It must say it
- * conforms to the dialect's profile (HTTP: `Link: rel="profile"`; the old
- * media-type parameter is not accepted). Plain target hrefs are resolved
+ * Reads a Layer 1 representation in either dialect (SPEC §6.1). Its controls are
+ * read only when it says it conforms to the dialect's profile (HTTP: `Link: rel="profile"`,
+ * or its own `_links.profile` from a host that can't send one; the old media-type
+ * parameter is not accepted); otherwise it is data only. Plain target hrefs are resolved
  * against the URL it came from; templated ones are kept as templates for the
  * act to expand.
  */
@@ -33,8 +34,9 @@ object HeartResponseParser {
         val profiles = received.profiles.ifEmpty { listOfNotNull(linkHref(root, "profile")) }
         // HAL-FORMS has a media type of its own, which says the dialect; HAL Schema Forms needs its profile.
         val halForms = dialect == Dialect.HAL_FORMS && received.mediaType == dialect.mediaType
-        require(halForms || dialect.profile in profiles) {
-            "response from $url does not name the profile ${dialect.profile} (Link profiles: $profiles)"
+        // An answer that names no profile, such as plain JSON, is data only: no controls are taken from it.
+        if (!halForms && (!dialect.heart || dialect.profile !in profiles)) {
+            return HeartRepresentation(named ?: url, stateOf(root), Manifest(base = url), received.validator)
         }
         // An act's response comes from the action URL; its self link says which resource it is.
         val self = linkHref(root, "self")

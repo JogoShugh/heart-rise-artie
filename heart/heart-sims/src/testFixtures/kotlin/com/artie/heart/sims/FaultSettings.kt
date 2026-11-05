@@ -11,7 +11,7 @@ object FaultSettings {
     private val settings: Map<String, (Faults, JsonNode) -> Unit> = mapOf(
         "applied" to { f, v -> f.applied = v.asText() },
         "mediaType" to { f, v -> f.mediaType = v.asText() },
-        "onlyAccept" to { f, v -> f.onlyAccept = v.asText() },
+        "onlyAccept" to { f, v -> f.onlyAccept = v.takeUnless { it.isNull }?.asText() },
         "readStatus" to { f, v -> f.readStatus = v.asInt() },
         "noValidator" to { f, v -> f.noValidator = v.asBoolean() },
         "noProfile" to { f, v -> f.noProfile = v.asBoolean() },

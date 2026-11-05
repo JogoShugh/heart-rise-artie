@@ -122,8 +122,8 @@ Feature: The employees service, a HEART service that can be handicapped as Sprin
       | Bilbo     |
       | Samwise   |
 
-  Scenario: Handicapped as Spring and asked in HEART's reference dialect, it names no profile, and a HEART client takes nothing from it
+  Scenario: Handicapped as Spring and asked in HEART's reference dialect, it names no profile, and a HEART client takes no controls from it
     Given the employees service is handicapped as Spring HATEOAS
     And a client asking in HAL Schema Forms at rung L0 for the employees service
-    When it tries to enter the employees of the employees service
-    Then it failed, saying "does not name the profile"
+    When it enters the employees of the employees service
+    Then it holds data only: its state, no forms, no links

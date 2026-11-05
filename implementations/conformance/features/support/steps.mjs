@@ -475,6 +475,28 @@ Given("a client at rung {word} with the {word} service's credential", function (
     this.me = client(this, rung, SERVICES[service].credential);
 });
 
+Given("a client asking for plain JSON with the {word} service's credential", function (service) {
+    const log = [];
+    this.me = { log, schemaFailures: [], heart: new heart.HeartClient({ dialect: "json", authorization: SERVICES[service].credential, log }) };
+});
+
+Given("the {word} service serves only plain JSON", async function (service) {
+    await sims.faults(hostOf(service), { onlyAccept: "application/json" });
+});
+
+When("the {word} service is upgraded to HEART", async function (service) {
+    await sims.faults(hostOf(service), { onlyAccept: null });
+});
+
+Then("it holds data only: its state, no forms, no links", function () {
+    assert.equal(this.rep.dialect, "json");
+    assert.deepEqual([this.rep.forms.size, this.rep.links.length, this.rep.embedded.length], [0, 0, 0]);
+});
+
+Then("the last read asked for no profile", async function () {
+    assert.equal((await lastRead(this)).profile, undefined);
+});
+
 Given("the build service has a job {string} whose parameters are {}", async function (name, parameters) {
     await sims.configureJob(name, parameters);
 });

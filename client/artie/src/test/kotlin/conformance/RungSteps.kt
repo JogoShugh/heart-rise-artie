@@ -27,6 +27,31 @@ class RungSteps(private val world: World) {
     @Then("the last read asked for no layering")
     fun askedForNone() = assertNull(lastRead().header("Prefer"))
 
+    @Then("the last read asked for no profile")
+    fun askedForNoProfile() = assertNull(lastRead().header("Accept-Profile"))
+
+    @Given("a client asking for plain JSON with the {word} service's credential")
+    fun plainJson(service: String) {
+        world.me = world.simulatedClient("L0", service, Dialect.named("json"))
+    }
+
+    @Given("the {word} service serves only plain JSON")
+    fun onlyPlainJson(service: String) {
+        faults(service).onlyAccept = Dialect.JSON.mediaType
+    }
+
+    @When("the {word} service is upgraded to HEART")
+    fun upgraded(service: String) {
+        faults(service).onlyAccept = null
+    }
+
+    @Then("it holds data only: its state, no forms, no links")
+    fun dataOnly() {
+        val held = world.held
+        val controls = Triple(held.affordances.size, held.related.links.size, held.related.embedded.size)
+        assertEquals(Triple(0, 0, 0), controls)
+    }
+
     @Then("the representation is at rung L0, in {}")
     fun inDialect(dialect: String) {
         assertEquals(Rung.L0, actor.client.appliedRung)
