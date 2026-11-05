@@ -31,9 +31,10 @@ Accept: application/json
   "author": "J. R. R. Tolkien",
   "due": "2026-11-12", "renewals": 0,
   "standing": "hold waiting" }</code></pre></div>
-    <div><span class="label">A client that asks for HEART</span>
+    <div><span class="label">A client that asks for HEART: HAL Schema Forms, at L0</span>
 <pre><code>GET /loans/3310
 Accept: application/hal+json
+Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
 
 200 OK   Content-Type: application/hal+json
 
