@@ -219,3 +219,10 @@ blockquote.said { border-left: 3px solid var(--rule); padding: 0.3rem 0.9rem; co
   .split { grid-template-columns: minmax(0, 1fr); }
   .split .gap { padding-block: 1rem; }
 }
+
+/* Hypertext, briefly: a timeline */
+.timeline { list-style: none; padding: 0 !important; margin: 0; display: grid; gap: 0 !important; border-left: 2px solid var(--rule); }
+.timeline li { position: relative; padding: 0 0 0.9rem 1.1rem; }
+.timeline li::before { content: ""; position: absolute; left: -0.42rem; top: 0.45rem; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--surface); border: 2px solid var(--leaf); }
+.timeline b { font-family: var(--display); }
+.timeline .y { font: 600 0.8rem var(--mono); color: var(--muted); margin-right: 0.4rem; }
