@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Isn't hypermedia bloated? · Overheard at Riverside</title>
+<title>Is hypermedia bloated? Measured · Overheard at Riverside</title>
 <base href="../">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="deck.css">
@@ -8,11 +8,11 @@
 <header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
 <article class="slide"><header><span class="part">Scene six · a month later</span><span class="fiction">Fiction</span></header>
-<h2 class="scene">Isn't hypermedia bloated?</h2><h2 class="topic">Is hypermedia bloated? Measured</h2>
-<ul class="points"><li><b>L0:</b> every answer carries its forms, about 1.3 KB a loan.</li><li><b>L1:</b> one shared form set per state, fetched once: 43% fewer bytes in all, loan answers 63% smaller.</li><li><b>L2:</b> the schemas are shared too. Everything shared is content-addressed and cached.</li></ul>
+<h2>Is hypermedia bloated? Measured</h2>
+<ul class="points"><li><b>L0:</b> every answer carries its forms, about 1.9 KB a loan.</li><li><b>L1:</b> one shared form set per state, fetched once: 56% fewer bytes in all, loan answers 75% smaller.</li><li><b>L2:</b> the schemas are shared too. Everything shared is content-addressed and cached.</li></ul>
 <div class="script">
   <div class="line"><span class="who priya">Priya</span><p>Fifteen people, every book, and the forms in every answer. Isn't that a lot of bytes? And a lot of round trips?</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>At L0, yes: every loan carries its forms, over a kilobyte each.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>At L0, yes: every loan carries its forms, almost two kilobytes each.</p></div>
   <div class="line"><span class="who sam">Sam</span><p>At L1, a loan carries a link to its forms instead. Every loan in the same state links the same set, at an address that never changes, so the client fetches it once and keeps it.</p></div>
   <div class="line"><span class="who priya">Priya</span><p>How many sets, for the whole company?</p></div>
   <div class="line"><span class="who sam">Sam</span><p>Four. At L2 the schemas move out of the sets too, shared the same way: two more requests, here.</p></div>
@@ -20,43 +20,47 @@
 <div class="table-scroll"><table>
   <thead><tr><th>The same run, at</th><th>Requests</th><th>Bytes received</th><th>One loan's answer</th><th>Time on the wire</th></tr></thead>
   <tbody>
-    <tr><td><b>L0</b>, forms in every answer</td><td>110</td><td>89,168</td><td>1,283 bytes</td><td>350 ms</td></tr>
-    <tr><td><b>L1</b>, forms linked, one set per state</td><td>114: 110 + 4 sets, once each</td><td>50,722 (−43%)</td><td>473 bytes (−63%)</td><td>221 ms</td></tr>
-    <tr><td><b>L2</b>, schemas linked too</td><td>116: + 2 schemas</td><td>50,940</td><td>473 bytes</td><td>242 ms</td></tr>
+    <tr><td><b>L0</b>, forms in every answer</td><td>110</td><td>118,348</td><td>1,871 bytes</td><td>246 ms</td></tr>
+    <tr><td><b>L1</b>, forms linked, one set per state</td><td>114: 110 + 4 sets, once each</td><td>52,404 (−56%)</td><td>462 bytes (−75%)</td><td>152 ms</td></tr>
+    <tr><td><b>L2</b>, schemas linked too</td><td>116: + 2 schemas</td><td>51,972</td><td>462 bytes</td><td>154 ms</td></tr>
   </tbody>
 </table></div>
 <p class="note">The kept company script for Harbor Point, run with no model at each rung, measured from its own exchanges. The times are one machine's loopback: read them as proportions.</p>
 <div class="pair">
   <div><span class="label">A loan at L0: its forms inside it</span>
 <pre><code>{ "id": 3321, "title": "The Phantom Tollbooth",
-  "standing": "renewable for the member", …,
+  "standing": "renewable", …,
   "_links": { "self": …, "hr:unavailable": … },
   "_forms": {
-    "library:renew-for-member": {
-      "title": "Renew for the member", "method": "POST",
-      "_links": { "target": { "href": "/loans/3321/actions/renew-for-member" } },
-      "schema": { "required": ["card"], "properties": { "card": … } },
-      "hr:integrity": "sha256-RqWa…" },
+    "library:renew": { "title": "Renew", "method": "POST", … },
+    "library:report-problem": {
+      "title": "Report a problem", "method": "POST",
+      "_links": { "target": { "href": "/loans/3321/actions/report-problem" } },
+      "schema": { "required": ["problem"], "properties": {
+        "problem": { "type": "string", "hr:options": { "link": { "href": "/problem-kinds" }, … } },
+        "comment": { "type": "string", "maxLength": 200 } } },
+      "hr:integrity": "sha256-NNKB…" },
     "library:return": { … }
   } }</code></pre></div>
   <div><span class="label">The same loan at L2: a link to the set</span>
 <pre><code>{ "id": 3321, "title": "The Phantom Tollbooth",
-  "standing": "renewable for the member", …,
+  "standing": "renewable", …,
   "_links": {
     "self": { "href": "/loans/3321" },
     "hr:forms": {
-      "href": "/affordance-sets/e425ee854a3ee9ea",
-      "integrity": "sha256-5CXu…" } } }</code></pre></div>
+      "href": "/affordance-sets/292caa98b3e91085",
+      "integrity": "sha256-KSyq…" } } }</code></pre></div>
 </div>
-<details class="more"><summary>The set every loan renewable for the member links, fetched once</summary>
-<pre><code>GET /affordance-sets/e425ee854a3ee9ea
+<details class="more"><summary>The set every renewable loan links, fetched once</summary>
+<pre><code>GET /affordance-sets/292caa98b3e91085
 
 { "_forms": {
-    "library:renew-for-member": {
-      "title": "Renew for the member", "method": "POST",
-      "_links": { "target": { "href": "/loans/{id}/actions/renew-for-member", "templated": true } },
+    "library:renew": { … },
+    "library:report-problem": {
+      "title": "Report a problem", "method": "POST",
+      "_links": { "target": { "href": "/loans/{id}/actions/report-problem", "templated": true } },
       "hr:templatePointers": { "id": "/id" },
-      "schema": { "$ref": "/schemas/19c8347c0a72993e", "hr:integrity": "sha256-Gcg0…" } },
+      "schema": { "$ref": "/schemas/6770c985e2914e09", "hr:integrity": "sha256-Z3DJ…" } },
     "library:return": { … } } }</code></pre>
   <ul>
     <li><b>Shared:</b> the target is a template, filled from each loan's own id, so one set serves every loan in its state.</li>
@@ -65,7 +69,7 @@
   </ul>
 </details>
 </article>
-<nav class="foot"><a href="deck/company.html" rel="prev"><small>Back</small><b>A company of fifteen</b></a>
+<nav class="foot"><a href="deck/company.html" rel="prev"><small>Back</small><b>A release, found once, kept as loops</b></a>
 <span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#bloat">with heart-ts</a></span>
 <a href="deck/this-deck.html" rel="next" data-rel="next"><small>Next</small><b>Surprise: this deck is HEART too</b></a></nav>
 </main></div></body></html>

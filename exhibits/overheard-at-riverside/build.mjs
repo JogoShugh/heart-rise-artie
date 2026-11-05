@@ -18,12 +18,10 @@ const out = join(repo, "docs/reports/overheard-at-riverside");
 const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
 const BRAND = "Overheard at Riverside";
 
-// A scene, told two ways (deck.css, data-voice): its conversation under its scene title, or its points under a
-// title that names the topic. Both are in the slide's HTML. A scene's first slide opens with a preamble: what it is
-// like to be there, shown either way.
+// A scene, told two ways under one title (deck.css, data-voice): its conversation, or its points. Both are in the
+// slide's HTML. A scene's first slide opens with a preamble: what it is like to be there, shown either way.
 const shaped = (s) => {
   let html = s.html;
-  if (s.topic) html = html.replace(/<h2>(.*?)<\/h2>/, (_, title) => `<h2 class="scene">${title}</h2><h2 class="topic">${s.topic}</h2>`);
   if (s.preamble) {
     const tone = s.preamble.tone ? ` ${s.preamble.tone}` : "";
     const aside = `<aside class="preamble${tone}"><span class="label">${s.preamble.label}</span><p>${s.preamble.text}</p></aside>\n`;
@@ -88,7 +86,7 @@ const codeLink = (s) => {
 slides.forEach((s, i) => {
   const prev = slides[i - 1], next = slides[i + 1];
   const resource = {
-    name: s.name, title: s.title, ...(s.topic ? { topic: s.topic } : {}), part: s.part, fiction: s.fiction === true,
+    name: s.name, title: s.title, part: s.part, fiction: s.fiction === true,
     number: i + 1, of: slides.length, html: s.html,
     _links: {
       self: { href: `${s.name}.json` },
@@ -111,7 +109,7 @@ slides.forEach((s, i) => {
 // is (deck/plain/{name}.json) it has to know from elsewhere, as a client of forms.yaml does.
 writeFileSync(join(out, "deck/plain/contents.json"), json({
   title: BRAND,
-  items: slides.map((s) => ({ name: s.name, title: s.title, ...(s.topic ? { topic: s.topic } : {}), part: s.part, fiction: s.fiction === true })),
+  items: slides.map((s) => ({ name: s.name, title: s.title, part: s.part, fiction: s.fiction === true })),
 }));
 
 writeFileSync(join(out, "deck/contents.json"), json({
@@ -124,7 +122,7 @@ writeFileSync(join(out, "deck/contents.json"), json({
     alternate: { href: "contents.html", type: "text/html", title: "The deck as plain pages" },
   },
   _embedded: {
-    item: slides.map((s) => ({ name: s.name, ...(s.topic ? { topic: s.topic } : {}), part: s.part, fiction: s.fiction === true, _links: { self: link(s) } })),
+    item: slides.map((s) => ({ name: s.name, part: s.part, fiction: s.fiction === true, _links: { self: link(s) } })),
   },
 }));
 // What the deck's own relation means, where its CURIE points.

@@ -1,0 +1,63 @@
+name: company
+part: Scene six · a month later
+title: "A release, found once, kept as loops"
+fiction: true
+preamble:
+  tone: heart
+  label: "When the library changes"
+  text: "The library ships a release: company groups, results a page at a time, and a new form on every loan. Your assistant finds its way through it once. The script it keeps loops over every member and every book, and the old script still runs."
+html: |
+  <h2>A release, found once, kept as loops</h2>
+  <p class="setting">A month later. The library has added company groups, and Harbor Point Logistics has signed up all fifteen of its staff. Every loan can now report a problem, too.</p>
+  <div class="script">
+    <div class="line"><span class="who priya">Priya</span><p>Can the assistant renew for the whole company?</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>Once the model finds the way. It searched the members by company, five to a page, and went through all three pages: every member, every book.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>And the script it kept?</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>Names no one. A loop over every member the search lists, page after page, and inside it a loop over each member's books. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>Every loan has a new form now, for reporting a problem. Did that break Ana's script?</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>No. Her script pins renew, and renew didn't change. A new form beside it is one more offer it doesn't need.</p></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>80</b><span>calls to Claude, once, to find the way</span></div>
+    <div class="stat"><b>0</b><span>model calls each run after</span></div>
+    <div class="stat"><b>14</b><span>of the staff's 23 books renewed</span></div>
+  </div>
+  <div class="pair">
+    <div><span class="label">What they wrote: company.goal.md</span>
+  <pre><code>Renew every book the members of a company group
+  have out that can be renewed, and say why for
+  any that can't.
+
+  - Find the members of the company group {company}
+    - For each member, on every page of the results:
+      open the member, and renew each book they have
+      out if renewing is offered; otherwise say why
+      it can't be renewed</code></pre></div>
+    <div><span class="label">What ARTIE kept: company.heart.yaml</span>
+  <pre><code>inputs:
+    company:
+
+  steps:
+    - act: library:search-members
+      fields:
+        company: ${company}
+      then:
+        - for-each: member     # every member, every page
+          then:
+            - for-each: loan   # every book each has out
+              then:
+                - when-offered:
+                    - act: library:renew</code></pre></div>
+  </div>
+  <details class="more"><summary>The run, and the library's release</summary>
+    <ul>
+      <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 80 calls; 372,635 input tokens (229,755 sent, 141,094 read from cache, 1,786 written to it); 13,220 output; 111 steps.</li>
+      <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The same in Kotlin: <code>each("member") { each("loan") { whenOffered … } }</code>.</li>
+      <li><b>Run with no model</b> on a fresh library: 110 steps. The fifteen have 23 books out: 14 renewable, each renewed once; 5 with a hold waiting and 4 at the limit, left. For the credit union: one renewed, one with a hold.</li>
+      <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. Every loan that is out offers <code>report-problem</code>: a kind of problem, from the list the library keeps at <code>/problem-kinds</code>, and a comment. The accounts search and the renew form are as they were, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>
+    </ul>
+  </details>
+points:
+  - "<b>The release:</b> company groups, five members to a page; and every loan can report a problem."
+  - "<b>Once, with a model:</b> 80 calls; 3 pages, 15 members, 23 books; 14 renewed."
+  - "<b>Kept:</b> a loop over the members, a loop over their books. Ana's script still runs: renew's form didn't change."

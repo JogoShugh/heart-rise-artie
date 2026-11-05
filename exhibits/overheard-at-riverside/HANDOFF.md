@@ -4,7 +4,7 @@ Written 2026-11-04 (evening), brought up to date 2026-11-05.
 
 ## Where things are
 
-- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 11, 24 slides. It is built from
+- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 12, 25 slides. It is built from
   `exhibits/overheard-at-riverside/` (`slides/*.yaml`, `page/`, `code/`, `build.mjs`) into
   `docs/reports/overheard-at-riverside/`. To rebuild, run
   `node build.mjs --artifact <scratch>/overheard-at-riverside.html` in the exhibit folder, then publish that file
@@ -51,37 +51,30 @@ Written 2026-11-04 (evening), brought up to date 2026-11-05.
 
 ## Open questions for the author
 
-1. **A form with fields on Ana's loans.**
-   - Renew and Return take no input, so the Great Divorce (slide 10) moves bare buttons into OpenAPI and back.
-   - Proposed: a `report-problem` act on every loan that is out, with `problem` (damaged, missing pages, wrong
-     item) and `note` (free text, up to 200 characters), so a real schema moves too.
-   - Cost: the library's forms change, so the bloat slide's bytes, the screenshots and the captures are re-recorded.
-   - Undecided.
-2. **The card in `renew-for-member`'s body.**
-   - The form's target already names the loan, and the library knows whose it is, so the card identifies nothing.
-   - Options: (a) keep it, called a confirmation; (b) ask for a value the library can't know, such as Harbor
-     Point's cost center from its staff directory.
-   - Undecided; (b) recommended.
-3. **A second divorce, for the fiction.**
-   - The animation shows the actual web: HTML had the controls, and JSON APIs left them in a separate document.
-   - In the 1997 of the story, the controls never reached the page: the loans page and forms.html, with today's
-     page as its return.
-   - Undecided.
+1. **Radio buttons for a few choices.** heart-core's HTML draws every `hr:options` choice as a select. It could draw
+   four choices or fewer as radio buttons, its own rendering choice; no `hr:radio` keyword, since a form says
+   what may be chosen, not which widget. Undecided.
 
 ## How the deck is put together
 
-- **Two voices.** Each scene slide has `topic` (the title over its points) and `points`; a scene's first slide
-  has a `preamble` (what it is like to be there), shown in both voices. The Conversation / Points switch is per
-  reader.
+- **Two voices, one title.** Each scene slide has `points`; a scene's first slide has a `preamble` (what it is
+  like to be there), shown in both voices. A slide's title is the same in both, and so is the outline.
 - **Code on demand.** A slide's `code` names a script in `code/`. The build links it from the slide's resource
   as `deck:code`, with its SHA-256 as `integrity`; `page/deck.js` loads what a slide links, and the browser
-  runs it only if the bytes match. Plain JSON has no links, so slide 10 shows its three stills.
+  runs it only if the bytes match. Plain JSON has no links, so the animated slides show their stills.
+- **One engine, two animations.** `code/morph.js` knows no slide. The Marriage (slide 7) and the Great Divorce
+  (slide 11) each say in their HTML which stills there are, what each cycle becomes, and which values
+  (`data-token`) are carried from one still to the next.
+- **Story time.** The library's release (company groups, Report a problem, no renewing for a member) arrives in
+  scene six. The slides before it keep the wire excerpts and screens recorded before the release; scene six, the
+  two animations and the live slide show the release.
 
 ## Leftovers worth doing
 
-- **The IT office screenshot** (`exhibits/overheard-at-riverside/media/openapi-list.png`) predates the company
-  release. It shows 6 operations; the library now has 8 (search-members, get-member). Re-shoot it, or leave it as
-  the moment before the release.
+- **The IT office screenshot** (`media/openapi-list.png`) and the kitchen's screens predate the release, as the
+  story has them. Re-shoot them only if the release moves earlier in the story.
+- **The company run report** (`artie/company-report/`) is built from the earlier company run; rebuild it from the
+  new `company.trace.yaml`.
 - **The deck's notes slide** (`slides/24-notes.yaml`) doesn't mention the name and company runs, the generator
   changes, or the rung measurements yet.
 - **The ARTIE run report** says "return ×7", meaning ARTIE's return-to steps rather than the Return act. Kept
@@ -107,6 +100,10 @@ Written 2026-11-04 (evening), brought up to date 2026-11-05.
 
 ## Gotchas met this session
 
+- **Rung traces need `--exchanges`.** `artie/rungs/measure.mjs` reads each exchange; a run without the flag records none,
+  and every rung measures 0.
+- **Gradle wants Java 21.** The default `java` is 25 and fails the build; use
+  `JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal`, as the lint gate does.
 - **An old simulator held 8140 from the morning**, so the new one exited at once. Check with `lsof -i :8140`.
 - **Feature files only through Edit/Write.** A shell append isn't logged as a FEATURE_WRITE.
 - **Running heart-ts's conformance suite:** use `.claude/bdd-gates/bdd-run.sh`. A raw `npx cucumber-js` is blocked.

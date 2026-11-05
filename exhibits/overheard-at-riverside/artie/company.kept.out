@@ -2,11 +2,11 @@
 2 act library:search-members, company Harbor Point: done
 3 follow item, titled Maria Garcia: done
 4 follow item, titled The Phantom Tollbooth: done
-5 act library:renew-for-member, card 21000456: done
+5 act library:renew: done
 6 return to http://localhost:8140/loans/3321: done
 7 return to http://localhost:8140/members/21000456: done
 8 follow item, titled Peter Pan: done
-9 act library:renew-for-member, card 21000456: done
+9 act library:renew: done
 10 return to http://localhost:8140/loans/3322: done
 11 return to http://localhost:8140/members/21000456: done
 12 return to http://localhost:8140/members?company=Harbor+Point: done
@@ -20,13 +20,13 @@ note: none of these acts is offered here
 note: none of these acts is offered here
 19 return to http://localhost:8140/members/21000458: done
 20 follow item, titled Heidi: done
-21 act library:renew-for-member, card 21000458: done
+21 act library:renew: done
 22 return to http://localhost:8140/loans/3325: done
 23 return to http://localhost:8140/members/21000458: done
 24 return to http://localhost:8140/members?company=Harbor+Point: done
 25 follow item, titled Aisha Bello: done
 26 follow item, titled The Westing Game: done
-27 act library:renew-for-member, card 21000459: done
+27 act library:renew: done
 28 return to http://localhost:8140/loans/3326: done
 29 return to http://localhost:8140/members/21000459: done
 30 return to http://localhost:8140/members?company=Harbor+Point: done
@@ -35,20 +35,20 @@ note: none of these acts is offered here
 note: none of these acts is offered here
 33 return to http://localhost:8140/members/21000460: done
 34 follow item, titled Pippi Longstocking: done
-35 act library:renew-for-member, card 21000460: done
+35 act library:renew: done
 36 return to http://localhost:8140/loans/3328: done
 37 return to http://localhost:8140/members/21000460: done
 38 return to http://localhost:8140/members?company=Harbor+Point: done
 39 follow next: done
 40 follow item, titled Hannah Kim: done
 41 follow item, titled Tuck Everlasting: done
-42 act library:renew-for-member, card 21000461: done
+42 act library:renew: done
 43 return to http://localhost:8140/loans/3329: done
 44 return to http://localhost:8140/members/21000461: done
 45 return to http://localhost:8140/members?company=Harbor+Point&page=2: done
 46 follow item, titled Daniel Novak: done
 47 follow item, titled The BFG: done
-48 act library:renew-for-member, card 21000462: done
+48 act library:renew: done
 49 return to http://localhost:8140/loans/3330: done
 50 return to http://localhost:8140/members/21000462: done
 51 follow item, titled The Borrowers: done
@@ -62,11 +62,11 @@ note: none of these acts is offered here
 57 return to http://localhost:8140/members?company=Harbor+Point&page=2: done
 58 follow item, titled Lucas Silva: done
 59 follow item, titled Little Women: done
-60 act library:renew-for-member, card 21000464: done
+60 act library:renew: done
 61 return to http://localhost:8140/loans/3333: done
 62 return to http://localhost:8140/members/21000464: done
 63 follow item, titled Watership Down: done
-64 act library:renew-for-member, card 21000464: done
+64 act library:renew: done
 65 return to http://localhost:8140/loans/3334: done
 66 return to http://localhost:8140/members/21000464: done
 67 return to http://localhost:8140/members?company=Harbor+Point&page=2: done
@@ -78,7 +78,7 @@ note: none of these acts is offered here
 72 follow next: done
 73 follow item, titled Samuel Mensah: done
 74 follow item, titled Black Beauty: done
-75 act library:renew-for-member, card 21000466: done
+75 act library:renew: done
 76 return to http://localhost:8140/loans/3336: done
 77 return to http://localhost:8140/members/21000466: done
 78 follow item, titled The Little Prince: done
@@ -87,7 +87,7 @@ note: none of these acts is offered here
 80 return to http://localhost:8140/members?company=Harbor+Point&page=3: done
 81 follow item, titled Olivia Brooks: done
 82 follow item, titled Anne of Green Gables: done
-83 act library:renew-for-member, card 21000467: done
+83 act library:renew: done
 84 return to http://localhost:8140/loans/3338: done
 85 return to http://localhost:8140/members/21000467: done
 86 return to http://localhost:8140/members?company=Harbor+Point&page=3: done
@@ -96,13 +96,13 @@ note: none of these acts is offered here
 note: none of these acts is offered here
 89 return to http://localhost:8140/members/21000468: done
 90 follow item, titled Mrs. Frisby and the Rats of NIMH: done
-91 act library:renew-for-member, card 21000468: done
+91 act library:renew: done
 92 return to http://localhost:8140/loans/3340: done
 93 return to http://localhost:8140/members/21000468: done
 94 return to http://localhost:8140/members?company=Harbor+Point&page=3: done
 95 follow item, titled Ryan Murphy: done
 96 follow item, titled The Hundred and One Dalmatians: done
-97 act library:renew-for-member, card 21000469: done
+97 act library:renew: done
 98 return to http://localhost:8140/loans/3341: done
 99 return to http://localhost:8140/members/21000469: done
 100 return to http://localhost:8140/members?company=Harbor+Point&page=3: done
@@ -111,10 +111,10 @@ note: none of these acts is offered here
 note: none of these acts is offered here
 103 return to http://localhost:8140/members/21000470: done
 104 follow item, titled Ramona the Pest: done
-105 act library:renew-for-member, card 21000470: done
+105 act library:renew: done
 106 return to http://localhost:8140/loans/3343: done
 107 return to http://localhost:8140/members/21000470: done
 108 return to http://localhost:8140/members?company=Harbor+Point&page=3: done
 109 return to http://localhost:8140/members?company=Harbor+Point: done
 110 return to http://localhost:8140/: done
-finished, 110 steps; acted: library:search-members 1, library:renew-for-member 14; noted 9
+finished, 110 steps; acted: library:search-members 1, library:renew 14; noted 9

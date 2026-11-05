@@ -59,13 +59,13 @@ await step("It tries to renew The Hobbit, and nothing is sent: plain JSON offers
   return { sent: true };
 });
 
-await step("The same client code asks for HEART: The Hobbit offers return only", async () => {
+await step("The same client code asks for HEART: The Hobbit offers report a problem and return, and not renew", async () => {
   const heart = new HeartClient({ authorization: AUTHORIZATION });
   const rep = await heart.enter(`${LIBRARY}/loans/3310`);
   return { dialect: rep.dialect, standing: rep.state.standing, forms: offered(rep) };
 });
 
-await step("And Matilda offers renew and return", async () => {
+await step("And Matilda offers renew, report a problem and return", async () => {
   const heart = new HeartClient({ authorization: AUTHORIZATION });
   const rep = await heart.enter(`${LIBRARY}/loans/3311`);
   return { dialect: rep.dialect, standing: rep.state.standing, forms: offered(rep) };

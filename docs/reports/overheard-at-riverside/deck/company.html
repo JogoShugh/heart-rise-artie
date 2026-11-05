@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>A company of fifteen · Overheard at Riverside</title>
+<title>A release, found once, kept as loops · Overheard at Riverside</title>
 <base href="../">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="deck.css">
@@ -8,25 +8,23 @@
 <header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
 <article class="slide"><header><span class="part">Scene six · a month later</span><span class="fiction">Fiction</span></header>
-<h2 class="scene">A company of fifteen</h2><h2 class="topic">A release, found once, kept as loops</h2>
-<aside class="preamble heart"><span class="label">When the library changes</span><p>The library ships a release: company groups, results a page at a time, and a form that asks for a card. Your assistant finds its way through it once. The script it keeps loops over every member and every book, and the old script still runs.</p></aside>
+<h2>A release, found once, kept as loops</h2>
+<aside class="preamble heart"><span class="label">When the library changes</span><p>The library ships a release: company groups, results a page at a time, and a new form on every loan. Your assistant finds its way through it once. The script it keeps loops over every member and every book, and the old script still runs.</p></aside>
 
-<p class="setting">A month later. The library has added company groups, and Harbor Point Logistics has signed up all fifteen of its staff.</p>
-<ul class="points"><li><b>The release:</b> company groups, five members to a page, and a renew form that asks for the member's card.</li><li><b>Once, with a model:</b> 56 calls; 3 pages, 15 members, 23 books; 14 renewed.</li><li><b>Kept:</b> a loop over the members, a loop over their books, the card read from the member the loop is at. Ana's script still runs.</li></ul>
+<p class="setting">A month later. The library has added company groups, and Harbor Point Logistics has signed up all fifteen of its staff. Every loan can now report a problem, too.</p>
+<ul class="points"><li><b>The release:</b> company groups, five members to a page; and every loan can report a problem.</li><li><b>Once, with a model:</b> 80 calls; 3 pages, 15 members, 23 books; 14 renewed.</li><li><b>Kept:</b> a loop over the members, a loop over their books. Ana's script still runs: renew's form didn't change.</li></ul>
 <div class="script">
   <div class="line"><span class="who priya">Priya</span><p>Can the assistant renew for the whole company?</p></div>
   <div class="line"><span class="who sam">Sam</span><p>Once the model finds the way. It searched the members by company, five to a page, and went through all three pages: every member, every book.</p></div>
-  <div class="line"><span class="who priya">Priya</span><p>A company's books are renewed for the member, though. The form asks for their card, and refuses anyone else's.</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>The model read each member's card number when it opened them, and sent it with each of their books.</p></div>
   <div class="line"><span class="who priya">Priya</span><p>And the script it kept?</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>Names no one, and no card. A loop over every member the search lists, page after page; inside it, a loop over each member's books; and the card read from whichever member the outer loop is at. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>
-  <div class="line"><span class="who priya">Priya</span><p>And Ana's script, from before the company groups?</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>Still runs. Her books are her own, so her forms didn't change.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Names no one. A loop over every member the search lists, page after page, and inside it a loop over each member's books. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>Every loan has a new form now, for reporting a problem. Did that break Ana's script?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>No. Her script pins renew, and renew didn't change. A new form beside it is one more offer it doesn't need.</p></div>
 </div>
 <div class="stats">
-  <div class="stat"><b>56</b><span>model calls, once, to find the way</span></div>
+  <div class="stat"><b>80</b><span>calls to Claude, once, to find the way</span></div>
   <div class="stat"><b>0</b><span>model calls each run after</span></div>
-  <div class="stat"><b>14</b><span>of the staff's 23 books renewed, each on its member's own card</span></div>
+  <div class="stat"><b>14</b><span>of the staff's 23 books renewed</span></div>
 </div>
 <div class="pair">
   <div><span class="label">What they wrote: company.goal.md</span>
@@ -53,21 +51,18 @@ steps:
           - for-each: loan   # every book each has out
             then:
               - when-offered:
-                  - act: library:renew-for-member
-                    fields:
-                      card: ${member.id}</code></pre></div>
+                  - act: library:renew</code></pre></div>
 </div>
-<p class="note">The goal says nothing of cards: the library's form asks for one, and the model took it from the member it had opened. The kept script reads it from the member the outer loop is at.</p>
 <details class="more"><summary>The run, and the library's release</summary>
   <ul>
-    <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 56 calls; 391,900 input tokens (247,234 sent, 144,666 read from cache); 14,453 output; 113 steps.</li>
-    <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The run sent each member's own <code>/id</code> as the card, so the script reads it from the member the loop is at. The same in Kotlin: <code>each("member") { each("loan") { whenOffered … } }</code>, the card read by <code>val memberId by kept("member") { long("id") }</code>.</li>
-    <li><b>Run with no model</b> on a fresh library: 110 steps. The fifteen have 23 books out: 14 renewable, each renewed once on its member's card; 5 with a hold waiting and 4 at the limit, left. Three members had nothing to renew; two renewed two each. For the credit union: one renewed, one with a hold.</li>
-    <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. A company group member's book offers <code>renew-for-member</code> in place of <code>renew</code>: its form asks for the card number of the member it is lent to, and refuses any other (422, at <code>/card</code>). The accounts search is as it was, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>
+    <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 80 calls; 372,635 input tokens (229,755 sent, 141,094 read from cache, 1,786 written to it); 13,220 output; 111 steps.</li>
+    <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The same in Kotlin: <code>each("member") { each("loan") { whenOffered … } }</code>.</li>
+    <li><b>Run with no model</b> on a fresh library: 110 steps. The fifteen have 23 books out: 14 renewable, each renewed once; 5 with a hold waiting and 4 at the limit, left. For the credit union: one renewed, one with a hold.</li>
+    <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. Every loan that is out offers <code>report-problem</code>: a kind of problem, from the list the library keeps at <code>/problem-kinds</code>, and a comment. The accounts search and the renew form are as they were, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>
   </ul>
 </details>
 </article>
-<nav class="foot"><a href="deck/five-members.html" rel="prev"><small>Back</small><b>Five members, no model</b></a>
+<nav class="foot"><a href="deck/five-members.html" rel="prev"><small>Back</small><b>The kept script, five members</b></a>
 <span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#company">with heart-ts</a></span>
-<a href="deck/bloat.html" rel="next" data-rel="next"><small>Next</small><b>Isn't hypermedia bloated?</b></a></nav>
+<a href="deck/bloat.html" rel="next" data-rel="next"><small>Next</small><b>Is hypermedia bloated? Measured</b></a></nav>
 </main></div></body></html>

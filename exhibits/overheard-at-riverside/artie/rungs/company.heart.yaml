@@ -21,10 +21,8 @@ steps:
           - for-each: loan
             then:
               - when-offered:
-                  - act: library:renew-for-member
-                    fields:
-                      card: ${member.id}
-                    inferred: renew this book for the member, card number ${member.id}
+                  - act: library:renew
+                    inferred: renew this book
                     from-intent: "For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can't be renewed"
                     then: []
                 intent: "For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can't be renewed"

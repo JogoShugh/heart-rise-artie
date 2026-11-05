@@ -4,7 +4,7 @@
   "part": "Opening",
   "fiction": false,
   "number": 3,
-  "of": 24,
+  "of": 25,
   "html": "<h2>HEART, in brief</h2>\n<p class=\"dek\">HTTP services that answer the way web pages do: each answer carries its state and the controls that state allows.</p>\n<div class=\"acronym\">\n  <div><span class=\"letter\">H</span><span class=\"word\">Hypermedia</span><span class=\"means\">The controls travel in the answer: links to follow, forms to fill, offered by state.</span></div>\n  <div><span class=\"letter\">E</span><span class=\"word\">Enforced</span><span class=\"means\">The server refuses what it didn't offer (409), what's stale (412) and what doesn't fit (422), each with its reason.</span></div>\n  <div><span class=\"letter\">A</span><span class=\"word\">Agentic</span><span class=\"means\">An agent reads the same answers a person's page is built from.</span></div>\n  <div><span class=\"letter\">R</span><span class=\"word\">Reliable</span><span class=\"means\">Forms are pinned by integrity; a kept script replays with no model, and stops rather than guess.</span></div>\n  <div><span class=\"letter\">T</span><span class=\"word\">Transactions</span><span class=\"means\">Each act is a conditional request on the state you read: If-Match, then the next state.</span></div>\n</div>\n<div class=\"tabs\">\n  <input type=\"radio\" name=\"heart-tab\" id=\"heart-tab-1\" checked><label for=\"heart-tab-1\">Built on standards</label>\n  <input type=\"radio\" name=\"heart-tab\" id=\"heart-tab-2\"><label for=\"heart-tab-2\">Spring HATEOAS</label>\n  <input type=\"radio\" name=\"heart-tab\" id=\"heart-tab-3\"><label for=\"heart-tab-3\">HAL Schema Forms</label>\n  <div class=\"panel\">\n    <ul>\n      <li><b>HAL</b> for links and embedded resources.</li>\n      <li><b>HAL-FORMS</b>, the on-ramp: templates inside each answer.</li>\n      <li><b>JSON Schema 2020-12</b> for what a form takes.</li>\n      <li><b>HTTP as written:</b> ETag and If-Match, Prefer and Preference-Applied, problem details for refusals.</li>\n      <li><b>Profiles:</b> a link with rel=\"profile\", and ALPS for what each relation means.</li>\n    </ul>\n  </div>\n  <div class=\"panel\">\n    <ul>\n      <li><b>Today:</b> Spring HATEOAS serves HAL-FORMS, and ARTIE reads it as it is. In Spring's own affordances example, ARTIE lists, creates, updates and deletes employees.</li>\n      <li><b>The other way round:</b> HEART serves HAL-FORMS too, so a Spring HATEOAS client reads a HEART service.</li>\n      <li><b>Planned, not built:</b> one dependency that serves a Spring app's affordances as HAL Schema Forms, with no rewrite.</li>\n    </ul>\n  </div>\n  <div class=\"panel\">\n    <ul>\n      <li><b>Forms as JSON Schema,</b> each with where to send it and how.</li>\n      <li><b>Offered by state,</b> and an absent one says why.</li>\n      <li><b>Choices from state:</b> a field can take its choices from the resource, so a client picks from them instead of guessing.</li>\n      <li><b>Cache-friendly:</b> at L2, one form set per state, linked with an integrity hash, shared by every resource in that state and cached for good.</li>\n    </ul>\n  </div>\n</div>\n",
   "_links": {
     "self": {
@@ -23,7 +23,7 @@
     },
     "next": {
       "href": "help-line.json",
-      "title": "The help line"
+      "title": "Every act from a manual"
     },
     "alternate": {
       "href": "heart.html",

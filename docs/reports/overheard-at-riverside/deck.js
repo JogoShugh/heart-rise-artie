@@ -45,7 +45,7 @@
       client: function () { return new HeartTs.HeartClient(); },
       items: function (rep) {
         return rep.embedded.filter(function (e) { return e.rel === "item"; }).map(function (e) {
-          return { name: e.state.name, title: e.title, topic: e.state.topic, part: e.state.part, fiction: e.state.fiction, href: new URL(e.href, rep.url).toString() };
+          return { name: e.state.name, title: e.title, part: e.state.part, fiction: e.state.fiction, href: new URL(e.href, rep.url).toString() };
         });
       },
       first: function () { return client.follow("first"); },
@@ -75,13 +75,7 @@
     },
   };
 
-  // A scene has two titles: its scene's, over the conversation, and its topic's, over the points. Both are written
-  // out; deck.css shows the one the voice asks for.
-  function titled(item) {
-    var title = esc(item.title || item.name);
-    if (!item.topic) return title;
-    return '<span class="scene-title">' + title + '</span><span class="topic-title">' + esc(item.topic) + "</span>";
-  }
+  function titled(item) { return esc(item.title || item.name); }
 
   function readContents(rep) {
     atContents = true;
@@ -102,9 +96,7 @@
   }
 
   function nameTab() {
-    if (!shown) return;
-    var s = shown.state, points = document.documentElement.dataset.voice === "points";
-    document.title = (points && s.topic ? s.topic : s.title) + " · Overheard at Riverside";
+    if (shown) document.title = shown.state.title + " · Overheard at Riverside";
   }
 
   // Code on demand: a slide may link a script that extends this client (deck:code), with its digest. The page loads

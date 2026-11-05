@@ -100,11 +100,6 @@ details.more > :not(summary) + :not(summary) { margin-top: 0.6rem; }
 :root[data-voice="points"] .slide .points { display: grid; }
 :root[data-voice="points"] .script, :root[data-voice="points"] .setting,
 :root[data-voice="points"] .slide .fiction { display: none; }
-/* A scene's two titles: the scene's over its conversation, the topic's over its points */
-.slide h2.topic, .topic-title { display: none; }
-:root[data-voice="points"] .slide h2.topic { display: block; }
-:root[data-voice="points"] .slide h2.scene, :root[data-voice="points"] .scene-title { display: none; }
-:root[data-voice="points"] .topic-title { display: inline; }
 /* A scene's preamble: what it is like to be there. Amber for the web that wasn't, blue for today, green for HEART. */
 .preamble { --tone: var(--hold); --tone-bg: var(--hold-bg); display: grid; gap: 0.3rem; padding: 0.75rem 1rem;
   border-left: 4px solid var(--tone); border-radius: 0 12px 12px 0; background: var(--tone-bg); }
@@ -259,15 +254,18 @@ details.more { min-width: 0; }
 .table-scroll thead th { font: 600 0.68rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .stats { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
 
-/* The Great Divorce, as three stills: Ana's page; its information and its controls apart, as plain JSON and as
-   OpenAPI; and the two together again, as HAL Schema Forms. Each token (data-token) is the same value in each
-   still, styled by its own class so a script can carry it from one still to the next (code/divorce.js). */
-.divorce { display: grid; gap: 0.7rem; min-width: 0; }
-.dv-stage { display: grid; gap: 1.6rem; min-width: 0; }
-.dv-scene { display: grid; gap: 0.6rem; min-width: 0; align-content: start; }
-.dv-title { font: 650 1.15rem/1.3 var(--display) !important; }
-.dv-cap { font-size: 0.9rem; color: var(--muted); }
-.dv-still { margin: 0; }
+/* Stills that become one another (code/morph.js animates them, when a slide links it): each token (data-token) is
+   the same value in each still, styled by its own class so the script can carry it from one still to the next.
+   Without the script, the stills stand one after another. */
+.morph { display: grid; gap: 0.7rem; min-width: 0; }
+.mo-stage { display: grid; gap: 1.6rem; min-width: 0; }
+.mo-scene { display: grid; gap: 0.6rem; min-width: 0; align-content: start; }
+.mo-title { font: 650 1.15rem/1.3 var(--display) !important; }
+.mo-cap { font-size: 0.9rem; color: var(--muted); }
+.mo-still { margin: 0; }
+
+/* The Great Divorce: Ana's page; its information and its controls apart, as plain JSON and as OpenAPI; and the
+   two together again, as HAL Schema Forms. */
 .dv-browser { border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--bg); min-width: 0; }
 .dv-url { font: 0.74rem var(--mono); color: var(--muted); background: var(--code-bg); padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--rule); }
 .dv-screen { display: grid; grid-template-columns: minmax(0, 1fr) 13rem; gap: 0.7rem 1rem; padding: 0.9rem; }
@@ -280,7 +278,10 @@ details.more { min-width: 0; }
 .dv-label { font: 600 0.66rem/1.3 var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
 .dv-code { display: grid; padding: 0.7rem 0.8rem; border-radius: 8px; background: var(--code-bg); font: 0.76rem/1.55 var(--mono); min-width: 0; }
 .dv-code > span { --i: 0; display: block; padding-left: calc(var(--i) * 2ch + 2ch); text-indent: -2ch; overflow-wrap: anywhere; }
-.dv-code > .i1 { --i: 1; } .dv-code > .i2 { --i: 2; } .dv-code > .i3 { --i: 3; }
+.dv-code > .i1 { --i: 1; } .dv-code > .i2 { --i: 2; } .dv-code > .i3 { --i: 3; } .dv-code > .i4 { --i: 4; }
+.dv-side { display: grid; gap: 0.8rem; align-content: start; min-width: 0; }
+.dv-dialog { display: grid; gap: 0.3rem; padding: 0.5rem; border: 1px dashed var(--rule); border-radius: 8px; }
+.dv-field { font: 600 0.7rem var(--body); color: var(--muted); }
 .dv-gap { margin: 0; display: grid; align-content: center; text-align: center; font: italic 0.8rem/1.4 var(--display); color: var(--bad);
   border-inline: 2px dashed var(--bad); border-radius: 4px; padding: 0.5rem 0.4rem; }
 /* The tokens, each a value in one of its three forms */
@@ -290,6 +291,10 @@ details.more { min-width: 0; }
 .tk-button { padding: 0.45rem 0.7rem; border-radius: 7px; background: var(--leaf); color: var(--surface); font: 600 0.88rem/1.3 var(--body); }
 .tk-button.tk-off { background: var(--code-bg); color: var(--muted); }
 .tk-note { padding: 0.45rem 0.7rem; border-radius: 7px; background: var(--hold-bg); color: var(--hold); font: 0.8rem/1.4 var(--body); }
+.tk-select, .tk-text { padding: 0.35rem 0.55rem; border: 1px solid var(--rule); border-radius: 6px; background: var(--bg);
+  font: 0.8rem/1.35 var(--body); color: var(--fg); }
+.tk-select::after { content: " ▾"; float: right; color: var(--muted); }
+.tk-text { min-height: 2.6rem; color: var(--muted); font-style: italic; }
 .tk-line { font: 0.76rem/1.55 var(--mono); border-radius: 4px; }
 .tk-line.tk-info { color: var(--link); }
 .tk-line.tk-ctl { color: var(--leaf); font-weight: 600; }
@@ -299,4 +304,51 @@ details.more { min-width: 0; }
   .dv-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dv-apart, .dv-together { grid-template-columns: minmax(0, 1fr); }
   .dv-gap { border-inline: 0; border-block: 2px dashed var(--bad); }
+}
+
+/* The Marriage: WebWalker's two windows, the web that wasn't, become one Netscape Navigator window with the forms in
+   the page. Period screens keep their own colours in either theme, as a screenshot would. */
+.desk97 { background: #008080; border-radius: 12px; padding: 0.7rem; min-width: 0; }
+.ww-pair { display: grid; grid-template-columns: minmax(0, 1fr) 5.5rem minmax(0, 1fr); gap: 0.6rem; align-items: start; }
+.ww-gap { margin: 0; align-self: center; text-align: center; font: italic 0.78rem/1.35 "Times New Roman", Times, serif;
+  color: #fff; border-inline: 2px dashed #fff; padding: 0.5rem 0.3rem; }
+.win { background: #c0c0c0; color: #000; min-width: 0; border: 2px solid; border-color: #dfdfdf #404040 #404040 #dfdfdf;
+  font: 0.7rem/1.35 Tahoma, Verdana, "Segoe UI", sans-serif; }
+.tk-wtitle { display: block; padding: 0.2rem 0.45rem; background: linear-gradient(90deg, #000080, #1084d0); color: #fff;
+  font: 700 0.72rem/1.3 Tahoma, Verdana, "Segoe UI", sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tk-wtitle-off { background: linear-gradient(90deg, #808080, #b5b5b5); color: #dcdcdc; }
+.win-bar { display: flex; gap: 0.3rem; align-items: center; padding: 0.25rem 0.35rem; min-width: 0; }
+.win-box, .tk-wbox { display: block; min-width: 0; padding: 0.1rem 0.3rem; background: #fff; color: #000;
+  border: 1px solid; border-color: #808080 #fff #fff #808080; font: 0.66rem/1.4 "Courier New", Courier, monospace;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tk-wloc { flex: 1; }
+.win-body { flex: 1; color: #808080; min-height: 1.8rem; }
+.win-page { margin: 0 0.3rem; padding: 0.5rem 0.6rem; min-height: 10rem; display: grid; gap: 0.25rem; align-content: start;
+  background: #fff; color: #000; font: 0.8rem/1.4 "Times New Roman", Times, serif; }
+.win-page h4 { margin: 0 0 0.2rem; font: 700 1.05rem "Times New Roman", Times, serif; }
+.win-status { padding: 0.15rem 0.4rem; font: 0.64rem "Courier New", Courier, monospace; }
+.row97, .tk-row97 { display: grid; grid-template-columns: 2.9rem minmax(0, 1fr) 5.4rem; border: 1px solid #808080; background: #fff;
+  color: #000; font: 0.78rem/1.35 "Times New Roman", Times, serif; }
+.row97 > span, .tk-row97 > span { padding: 0.12rem 0.3rem; border-right: 1px solid #808080; min-width: 0; overflow-wrap: anywhere; }
+.row97 > span:last-child, .tk-row97 > span:last-child { border-right: 0; }
+.row97-head { font-weight: 700; }
+.tk-ww-h { margin-top: 0.3rem; font: 700 0.86rem/1.3 "Times New Roman", Times, serif; color: #000; }
+.tk-ww-rule { font: italic 0.78rem/1.35 "Times New Roman", Times, serif; color: #000; }
+.ww-def { font: 0.72rem/1.45 "Courier New", Courier, monospace; overflow-wrap: anywhere; }
+.ww-def b { font: 700 0.76rem "Times New Roman", Times, serif; }
+.ns-menu { padding: 0.15rem 0.45rem; font: 0.7rem Tahoma, Verdana, sans-serif; border-bottom: 1px solid #808080; white-space: nowrap; overflow: hidden; }
+.ns-tools, .ns-dir { display: flex; flex-wrap: wrap; gap: 0.2rem; align-items: center; padding: 0.25rem 0.35rem; }
+.ns-btn, .tk-nsbtn { display: inline-block; padding: 0.08rem 0.45rem; background: #c0c0c0; color: #000;
+  border: 2px solid; border-color: #fff #404040 #404040 #fff; font: 0.68rem/1.35 Arial, Helvetica, sans-serif; white-space: nowrap; }
+.tk-nsbtn { font-size: 0.72rem; }
+.ns-logo { margin-left: auto; width: 1.9rem; height: 1.9rem; display: grid; place-items: center; background: #00007a; color: #fff;
+  font: 700 1.2rem Georgia, "Times New Roman", serif; border: 2px solid; border-color: #fff #404040 #404040 #fff; }
+.ns-page { background: #c0c0c0; }
+.ns-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 0.4rem; align-items: center; }
+.ns-acts { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+.tk-ns-why { font: italic 0.74rem/1.3 "Times New Roman", Times, serif; color: #000; }
+@media (max-width: 40rem) {
+  .ww-pair { grid-template-columns: minmax(0, 1fr); }
+  .ww-gap { border-inline: 0; border-block: 2px dashed #fff; }
+  .ns-row { grid-template-columns: minmax(0, 1fr); }
 }
