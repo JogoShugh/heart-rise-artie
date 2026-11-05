@@ -97,3 +97,17 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
       | 21000451 | 1234 | 200    |
       | 21000451 | 9999 | 401    |
       | 21000999 | 1234 | 401    |
+
+  Scenario Outline: An OpenAPI client that follows the affordance link learns what loan <loan> allows now
+    The library opts in to the affordance link (SPEC §6.1): a plain JSON answer keeps its body, with
+    no controls in it, and names in a Link header the set of forms its state offers. A caller that
+    ignores the header sees no difference.
+
+    When an OpenAPI client reads loan <loan> as plain JSON
+    Then the answer's body has no controls
+    And its affordance link names a set offering <acts>
+
+    Examples:
+      | loan | acts          |
+      | 3310 | return        |
+      | 3311 | renew, return |

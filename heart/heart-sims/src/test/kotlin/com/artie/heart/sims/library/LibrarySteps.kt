@@ -66,6 +66,24 @@ class LibrarySteps {
     @Then("the loan offers {}")
     fun offers(acts: String) = assertEquals(acts.split(", "), offered(), body())
 
+    @When("an OpenAPI client reads loan {long} as plain JSON")
+    fun readsPlain(loan: Long) {
+        answer = send(Method.GET, "/loans/$loan", "application/json")
+    }
+
+    @Then("the answer's body has no controls")
+    fun noControls() =
+        assertEquals(emptyList(), json().fieldNames().asSequence().filter { it.startsWith("_") }.toList())
+
+    @Then("its affordance link names a set offering {}")
+    fun linkedSet(acts: String) {
+        val link = checkNotNull(answer).header("Link").orEmpty()
+        val href = checkNotNull(FORMS_LINK.find(link)) { "no affordance link in \"$link\"" }.groupValues[1]
+        val set = mapper.readTree(send(Method.GET, href, "application/hal+json").bodyString())
+        val offered = set["_forms"].fieldNames().asSequence().map { it.removePrefix("library:") }.toList()
+        assertEquals(acts.split(", "), offered)
+    }
+
     @Then("renewing is absent, because {string}")
     fun renewingAbsent(why: String) = assertEquals(why, whyAbsent("renew"), body())
 
@@ -158,6 +176,9 @@ class LibrarySteps {
         const val HSF = "HAL Schema Forms"
         const val HAL_FORMS = "HAL-FORMS"
         const val PROFILE = "<https://w3id.org/heart-rise/hal-schema-forms>"
+
+        /** The affordance link of a plain JSON answer (SPEC §6.1): the set its state offers. */
+        val FORMS_LINK = Regex("<([^>]+)>;\\s*rel=\"https://w3id.org/heart-rise/rels/forms\"")
 
         val ACCEPT = mapOf(
             HSF to "application/hal+json",

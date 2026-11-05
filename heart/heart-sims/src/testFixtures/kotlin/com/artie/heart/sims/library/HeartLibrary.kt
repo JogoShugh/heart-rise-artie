@@ -14,6 +14,7 @@ import com.artie.heart.Profile
 import com.artie.heart.Relation
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.ResourceType
+import com.artie.heart.ServingLimits
 import com.artie.heart.StateView
 import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartHttp
@@ -112,7 +113,8 @@ class HeartLibrary(private val ledger: Ledger) {
     val handler: HttpHandler = HeartHttp(
         listOf(accounts, loans),
         Credentials.parse(users = "$CARD:$PIN_HASH", tokens = Tokens.sha256(TOKEN)),
-        HeartSettings(title = "Riverside Public Library", realm = PROFILE.name),
+        // The affordance link: each plain JSON answer names the set its state offers, for OpenAPI clients that opt in.
+        HeartSettings(title = "Riverside Public Library", realm = PROFILE.name, limits = ServingLimits(affordanceLinks = true)),
     )
 
     /** The acts each standing offers, in the order of their relations, so every rung lists them alike. */
