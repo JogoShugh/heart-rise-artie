@@ -1,5 +1,5 @@
 ---
-start: http://localhost:8392/
+start: https://localhost:8393/
 inputs:
   owner:
     question: Whose repository?
@@ -8,6 +8,8 @@ inputs:
     question: Which repository?
   stamp:
     default: { now: MMdd-HHmmss }
+  version:
+    question: Which release ships the fix?
 ---
 
 Fix the blank-bed-name crash, start to finish: an issue, a fix on its own branch, a pull request merged, and the
@@ -23,8 +25,8 @@ issue closed.
       - Merge it by squashing its commits
       - Verify: it merged
 - On {issue}
-  - Comment "Fixed in 1.2 by #{pr.number}."
-  - Close it the right way: the fix shipped in 1.2 `reasoned`
+  - Comment "Fixed in {version} by #{pr.number}."
+  - Close it the right way: the fix shipped in {version} `reasoned`
   - Verify:
     - it is closed
     - its reason is completed
