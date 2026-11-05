@@ -16,6 +16,10 @@ class Capture(val name: String, text: String) {
 
     val steps: List<Step> = documents.drop(1).mapIndexed { i, doc -> Step(i + 1, doc) }
 
+    /** The input the run was given [value] by, if any: a step that used the value names the input instead. */
+    fun inputGiven(value: String): String? =
+        inputs.entries.firstOrNull { (_, input) -> input["value"]?.toString() == value }?.key
+
     /** A goal run's moves, as the script they amount to (spec/PLAN-PLAIN-TEXT-RUN.md); null for a script's run. */
     val source: String? = (documents.firstOrNull()?.get("run") as? Map<*, *>)?.get("source")?.toString()
 

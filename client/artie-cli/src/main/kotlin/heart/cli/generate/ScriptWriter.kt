@@ -201,7 +201,9 @@ class ScriptWriter(
     }
 
     private fun follow(step: Step): String {
-        val title = step.params["title"]?.let { ", ${KotlinText.quoted(it.toString())}" }.orEmpty()
+        // A title the run was given as an input is followed by that input, for whatever it is next time.
+        val title = step.params["title"]?.toString()
+            ?.let { ", ${capture.inputGiven(it) ?: KotlinText.quoted(it)}" }.orEmpty()
         val said = said(capture, step, names, emptyList())?.let { ", $it" }.orEmpty()
         return "follow(${why.relation(step, source)}$title$said)"
     }

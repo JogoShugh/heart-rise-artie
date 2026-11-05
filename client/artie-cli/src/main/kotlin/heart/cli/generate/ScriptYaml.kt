@@ -170,7 +170,8 @@ class ScriptYaml(
             is Call.Words -> words(capture, step, names, emptyList())?.let { made.putAll(said(it)) }
             Call.Follow -> {
                 made["follow"] = step.relation
-                step.params["title"]?.let { made["title"] = it.toString() }
+                // A title the run was given as an input is followed by that input, for whatever it is next time.
+                step.params["title"]?.toString()?.let { made["title"] = capture.inputGiven(it)?.let(::reference) ?: it }
                 words(capture, step, names, emptyList())?.let { made.putAll(said(it)) }
             }
             Call.Act -> made.putAll(act(step))

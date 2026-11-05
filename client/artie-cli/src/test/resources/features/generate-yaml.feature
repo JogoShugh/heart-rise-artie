@@ -235,6 +235,30 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       """
     And the file "gen.heart.yaml" is a script as data, by spec/schemas/heart-script.draft.schema.json
 
+  Scenario Outline: A result the run followed by an input's value is followed by that input, as <form>
+    A goal run searched the accounts for the member named in its input,
+    Ana Torres, and followed the result of that title. The script follows the
+    result titled by the input, so it serves whichever member it is given,
+    not Ana alone.
+    Given the file "run.trace.yaml" is the capture "library-member.trace.yaml"
+    When artie is run with
+      | argument       |
+      | generate       |
+      | run.trace.yaml |
+      | --out          |
+      | <out>          |
+      | --format       |
+      | <form>         |
+    Then artie exits 0
+    And the file "<out>" has these lines
+      | line      |
+      | <follows> |
+
+    Examples:
+      | form | out            | follows                                                                                 |
+      | yaml | gen.heart.yaml | title: ${member}                                                                         |
+      | kts  | gen.heart.kts  | follow("item", member, intent = "Find the account of the member named ${member}") {    |
+
   Scenario: An input the run sent as a number is declared with its type
     A script's inputs arrive as text. Where the run sent an input as an
     integer, the Kotlin script says number.toLong(); held as data, the input
