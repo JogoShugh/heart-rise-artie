@@ -1,11 +1,11 @@
 # Handoff: Overheard at Riverside, and what it pulled in
 
-Written 2026-11-04 (evening), to pick up later.
+Written 2026-11-04 (evening), brought up to date 2026-11-05.
 
 ## Where things are
 
-- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 10, 24 slides. It is built from
-  `exhibits/overheard-at-riverside/` (`slides/*.yaml`, `page/`, `build.mjs`) into
+- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 11, 24 slides. It is built from
+  `exhibits/overheard-at-riverside/` (`slides/*.yaml`, `page/`, `code/`, `build.mjs`) into
   `docs/reports/overheard-at-riverside/`. To rebuild, run
   `node build.mjs --artifact <scratch>/overheard-at-riverside.html` in the exhibit folder, then publish that file
   with every file under `docs/reports/overheard-at-riverside/` (except `index.html`) in the `files` map.
@@ -51,18 +51,31 @@ Written 2026-11-04 (evening), to pick up later.
 
 ## Open questions for the author
 
-1. **The nested `whenever: - whenever:` reads oddly.**
-   - What it means: the outer loop is each member the search lists, page after page; the inner loop is each book
-     that member has out.
-   - Options:
-     - (a) the generator writes a comment on each `whenever` naming what it goes through, taken from the run;
-     - (b) a clearer keyword, such as `for-each:` with a label, which changes the script format and its schema.
+1. **A form with fields on Ana's loans.**
+   - Renew and Return take no input, so the Great Divorce (slide 10) moves bare buttons into OpenAPI and back.
+   - Proposed: a `report-problem` act on every loan that is out, with `problem` (damaged, missing pages, wrong
+     item) and `note` (free text, up to 200 characters), so a real schema moves too.
+   - Cost: the library's forms change, so the bloat slide's bytes, the screenshots and the captures are re-recorded.
    - Undecided.
-2. **Showing the plain-text goal.**
-   - Show `member.goal.md` and `company.goal.md` beside their kept scripts on the slides ("what you wrote, what ARTIE
-     kept").
-   - Have `artie generate` copy the goal into the kept script's header comment.
-   - Undecided. The scripts carry the goal only step by step today, as `intent:` and `from-intent:`.
+2. **The card in `renew-for-member`'s body.**
+   - The form's target already names the loan, and the library knows whose it is, so the card identifies nothing.
+   - Options: (a) keep it, called a confirmation; (b) ask for a value the library can't know, such as Harbor
+     Point's cost center from its staff directory.
+   - Undecided; (b) recommended.
+3. **A second divorce, for the fiction.**
+   - The animation shows the actual web: HTML had the controls, and JSON APIs left them in a separate document.
+   - In the 1997 of the story, the controls never reached the page: the loans page and forms.html, with today's
+     page as its return.
+   - Undecided.
+
+## How the deck is put together
+
+- **Two voices.** Each scene slide has `topic` (the title over its points) and `points`; a scene's first slide
+  has a `preamble` (what it is like to be there), shown in both voices. The Conversation / Points switch is per
+  reader.
+- **Code on demand.** A slide's `code` names a script in `code/`. The build links it from the slide's resource
+  as `deck:code`, with its SHA-256 as `integrity`; `page/deck.js` loads what a slide links, and the browser
+  runs it only if the bytes match. Plain JSON has no links, so slide 10 shows its three stills.
 
 ## Leftovers worth doing
 

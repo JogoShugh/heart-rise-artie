@@ -1,0 +1,125 @@
+name: divorce
+part: Between the scenes
+title: The Great Divorce
+fiction: false
+code:
+  file: divorce.js
+  title: The divorce, and the return, animated
+html: |
+  <h2>The Great Divorce</h2>
+  <p class="dek">What a loan is, and what you can do with it: together on Ana's page, split apart on the machine web, and together again in HAL Schema Forms.</p>
+  <div class="divorce">
+    <div class="dv-stage">
+      <section class="dv-scene" data-scene="page">
+        <h3 class="dv-title">A page: information and controls together</h3>
+        <div class="dv-browser">
+          <div class="dv-url">library.test/loans/3310</div>
+          <div class="dv-screen">
+            <b class="dv-book">The Hobbit</b>
+            <div class="dv-fields">
+              <div class="tk tk-card" data-token="id"><small>ID</small><span>3310</span></div>
+              <div class="tk tk-card" data-token="title"><small>Title</small><span>The Hobbit</span></div>
+              <div class="tk tk-card" data-token="author"><small>Author</small><span>J. R. R. Tolkien</span></div>
+              <div class="tk tk-card" data-token="due"><small>Due</small><span>2026-11-12</span></div>
+              <div class="tk tk-card" data-token="renewals"><small>Renewals</small><span>0</span></div>
+              <div class="tk tk-card" data-token="standing"><small>Standing</small><span>hold waiting</span></div>
+            </div>
+            <div class="dv-acts">
+              <div class="tk tk-button tk-off" data-token="renew">Renew</div>
+              <div class="tk tk-note" data-token="why">A hold is waiting for this book, so it can't be renewed.</div>
+              <div class="tk tk-button" data-token="return">Return</div>
+            </div>
+          </div>
+        </div>
+        <p class="dv-cap">Ana's page for <i>The Hobbit</i>. What the loan is, on the left. What she can do with it now, on the right: Return, and Renew greyed, with the reason.</p>
+      </section>
+      <section class="dv-scene" data-scene="apart">
+        <h3 class="dv-title">The Divorce of Information from Controls</h3>
+        <div class="dv-apart">
+          <div class="dv-doc">
+            <span class="dv-label">Information · GET /loans/3310 · application/json</span>
+            <div class="dv-code">
+              <span>{</span>
+              <span class="tk tk-line tk-info i1" data-token="id">"id": 3310,</span>
+              <span class="tk tk-line tk-info i1" data-token="title">"title": "The Hobbit",</span>
+              <span class="tk tk-line tk-info i1" data-token="author">"author": "J. R. R. Tolkien",</span>
+              <span class="tk tk-line tk-info i1" data-token="due">"due": "2026-11-12",</span>
+              <span class="tk tk-line tk-info i1" data-token="renewals">"renewals": 0,</span>
+              <span class="tk tk-line tk-info i1" data-token="standing">"standing": "hold waiting"</span>
+              <span>}</span>
+            </div>
+          </div>
+          <p class="dv-gap"><span>The client joins them, and learns the rule from a 409</span></p>
+          <div class="dv-doc">
+            <span class="dv-label">Controls · openapi.yaml · every loan alike</span>
+            <div class="dv-code">
+              <span>paths:</span>
+              <span class="tk tk-line tk-ctl i1" data-token="renew">/loans/{id}/actions/renew:</span>
+              <span class="i2">post:</span>
+              <span class="tk tk-line tk-said i3" data-token="why">description: Offered while the book is out, renewed fewer than three times, and no one's hold is waiting. Only allowed when standing is renewable.</span>
+              <span class="tk tk-line tk-ctl i1" data-token="return">/loans/{id}/actions/return:</span>
+              <span class="i2">post:</span>
+              <span class="i3">description: Offered while the book is out; nothing is offered after.</span>
+            </div>
+          </div>
+        </div>
+        <p class="dv-cap">The data, alone, says nothing of what it allows. The operations, alone, are the same for every loan, and this loan's reason is now a rule in prose. The client joins the two each time.</p>
+      </section>
+      <section class="dv-scene" data-scene="return">
+        <h3 class="dv-title">The Return of Information and Controls</h3>
+        <div class="dv-together">
+          <div class="dv-doc">
+            <span class="dv-label">Information and controls · GET /loans/3310 · HAL Schema Forms</span>
+            <div class="dv-code">
+              <span>{</span>
+              <span class="tk tk-line tk-info i1" data-token="id">"id": 3310,</span>
+              <span class="tk tk-line tk-info i1" data-token="title">"title": "The Hobbit",</span>
+              <span class="tk tk-line tk-info i1" data-token="author">"author": "J. R. R. Tolkien",</span>
+              <span class="tk tk-line tk-info i1" data-token="due">"due": "2026-11-12",</span>
+              <span class="tk tk-line tk-info i1" data-token="renewals">"renewals": 0,</span>
+              <span class="tk tk-line tk-info i1" data-token="standing">"standing": "hold waiting",</span>
+              <span class="i1">"_links": {</span>
+              <span class="i2">"self": { "href": "/loans/3310" }, "curies": [ … ],</span>
+              <span class="i2">"hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0", … }</span>
+              <span class="i1">},</span>
+              <span class="i1">"_forms": {</span>
+              <span class="tk tk-line tk-ctl i2" data-token="return">"library:return": { "title": "Return", "method": "POST",</span>
+              <span class="i3">"_links": { "target": { "href": "/loans/3310/actions/return" } }, … }</span>
+              <span class="i1">}</span>
+              <span>}</span>
+            </div>
+          </div>
+          <div class="dv-doc">
+            <span class="dv-label">What's absent, and why · GET /unavailable/61bc1cd6003e61f0</span>
+            <div class="dv-code">
+              <span>{ "unavailable": [ {</span>
+              <span class="i1">"rel": "/profiles/library#renew",</span>
+              <span class="tk tk-line tk-ctl i1" data-token="renew">"title": "Renew",</span>
+              <span class="tk tk-line tk-said i1" data-token="why">"reason": "A hold is waiting for this book, so it can't be renewed."</span>
+              <span>} ] }</span>
+            </div>
+          </div>
+        </div>
+        <p class="dv-cap">The same page as HAL Schema Forms: the same data, the one act this loan allows now, and a link to what's absent and why. Nothing is lost, and there is nothing to join.</p>
+      </section>
+    </div>
+    <p class="dv-still note">Three stills. Read as HEART, this slide links a script that animates them (<code>deck:code</code>). Plain JSON carries no links, so no code arrives.</p>
+  </div>
+  <details class="more"><summary>The same divorce in 1997</summary>
+    <div class="split">
+      <figure class="half"><img src="media/loans-data.png" alt="Her loans page: loan numbers, book numbers, titles and due dates, with no links." loading="lazy"><figcaption><b>Information:</b> her loans page. Numbers, titles, due dates.</figcaption></figure>
+      <p class="gap"><span>Ana joins them, with a sticky note and her own typing</span></p>
+      <figure class="half"><img src="media/forms-html.png" alt="forms.html at RENEW A LOAN, the same for every loan." loading="lazy"><figcaption><b>Controls:</b> forms.html. Every operation, for every loan.</figcaption></figure>
+    </div>
+  </details>
+  <details class="more"><summary>The animation is code on demand</summary>
+    <ul>
+      <li>This slide's resource links a script under <code>deck:code</code>, with its SHA-256 as <code>integrity</code>. heart-ts loads it, and the browser runs it only if the bytes match.</li>
+      <li>The page knew no animation. It runs what a slide links, and shows a slide that links none as written.</li>
+      <li>Switch to Plain JSON at the top: no links, so no code, and the three stills.</li>
+    </ul>
+    <blockquote class="fielding"><p>“The final addition to our constraint set for REST comes from the code-on-demand style of Section 3.5.3 (Figure 5-8). REST allows client functionality to be extended by downloading and executing code in the form of applets or scripts. This simplifies clients by reducing the number of features required to be pre-implemented. Allowing features to be downloaded after deployment improves system extensibility. However, it also reduces visibility, and thus is only an optional constraint within REST.”</p>
+    <p>“The notion of an optional constraint may seem like an oxymoron. However, it does have a purpose in the architectural design of a system that encompasses multiple organizational boundaries. It means that the architecture only gains the benefit (and suffers the disadvantages) of the optional constraints when they are known to be in effect for some realm of the overall system. For example, if all of the client software within an organization is known to support Java applets [45], then services within that organization can be constructed such that they gain the benefit of enhanced functionality via downloadable Java classes. At the same time, however, the organization's firewall may prevent the transfer of Java applets from external sources, and thus to the rest of the Web it will appear as if those clients do not support code-on-demand. An optional constraint allows us to design an architecture that supports the desired behavior in the general case, but with the understanding that it may be disabled within some contexts.”</p>
+    <cite>Roy T. Fielding, dissertation, 2000, §5.1.7, Code-On-Demand</cite></blockquote>
+  </details>
+  <p class="note">Every value here is from the running library service: its HTML page, its plain JSON, its OpenAPI twin and its HAL Schema Forms answer, trimmed where marked …. Next: Fielding's name for keeping the two together.</p>

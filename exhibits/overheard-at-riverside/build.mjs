@@ -6,6 +6,7 @@
 // deck/plain/ holds the same deck as an old-school JSON API: the data alone, and a list of names.
 // --artifact also writes the page without its document skeleton, as an Artifact publishes it.
 import { build } from "esbuild";
+import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,16 +18,27 @@ const out = join(repo, "docs/reports/overheard-at-riverside");
 const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
 const BRAND = "Overheard at Riverside";
 
-// A scene's points: the same slide's topic as plain bullets, in place of its conversation when a reader asks for
-// points. Both are in the slide's HTML; the page shows one (deck.css, data-voice).
-const withPoints = (s) => {
-  if (!s.points) return s;
-  const list = `<ul class="points">${s.points.map((p) => `<li>${p}</li>`).join("")}</ul>\n`;
-  const at = s.html.indexOf('<div class="script">');
-  return { ...s, html: at < 0 ? s.html + list : s.html.slice(0, at) + list + s.html.slice(at) };
+// A scene, told two ways (deck.css, data-voice): its conversation under its scene title, or its points under a
+// title that names the topic. Both are in the slide's HTML. A scene's first slide opens with a preamble: what it is
+// like to be there, shown either way.
+const shaped = (s) => {
+  let html = s.html;
+  if (s.topic) html = html.replace(/<h2>(.*?)<\/h2>/, (_, title) => `<h2 class="scene">${title}</h2><h2 class="topic">${s.topic}</h2>`);
+  if (s.preamble) {
+    const tone = s.preamble.tone ? ` ${s.preamble.tone}` : "";
+    const aside = `<aside class="preamble${tone}"><span class="label">${s.preamble.label}</span><p>${s.preamble.text}</p></aside>\n`;
+    const end = html.search(/<\/h2>(?!<h2)/) + "</h2>".length;
+    html = `${html.slice(0, end)}\n${aside}${html.slice(end)}`;
+  }
+  if (s.points) {
+    const list = `<ul class="points">${s.points.map((p) => `<li>${p}</li>`).join("")}</ul>\n`;
+    const at = html.indexOf('<div class="script">');
+    html = at < 0 ? html + list : html.slice(0, at) + list + html.slice(at);
+  }
+  return { ...s, html };
 };
 const slides = readdirSync(join(here, "slides")).filter((f) => f.endsWith(".yaml")).sort()
-  .map((f) => withPoints(parse(readFileSync(join(here, "slides", f), "utf8"))));
+  .map((f) => shaped(parse(readFileSync(join(here, "slides", f), "utf8"))));
 const names = new Set(slides.map((s) => s.name));
 if (names.size !== slides.length) throw new Error("two slides share a name");
 if (new Set(slides.map((s) => s.title)).size !== slides.length) throw new Error("two slides share a title");
@@ -57,10 +69,27 @@ ${next ? `<a href="deck/${next.name}.html" rel="next" data-rel="next"><small>Nex
 </main></div></body></html>
 `;
 
+// Code on demand (Fielding, dissertation §5.1.7): a slide may link a script that extends the client, here an
+// animation. The link carries the script's digest; the browser runs it only if the bytes match. The page knows no
+// script by name, and a client that skips the link (plain JSON has none) shows the slide as it is.
+rmSync(join(out, "code"), { recursive: true, force: true });
+mkdirSync(join(out, "code"), { recursive: true });
+const codeLink = (s) => {
+  if (!s.code) return {};
+  const bytes = readFileSync(join(here, "code", s.code.file));
+  copyFileSync(join(here, "code", s.code.file), join(out, "code", s.code.file));
+  const integrity = `sha256-${createHash("sha256").update(bytes).digest("base64")}`;
+  return {
+    curies: [{ name: "deck", href: "../rels.html#{rel}", templated: true }],
+    "deck:code": { href: `../code/${s.code.file}`, type: "text/javascript", title: s.code.title, integrity },
+  };
+};
+
 slides.forEach((s, i) => {
   const prev = slides[i - 1], next = slides[i + 1];
   const resource = {
-    name: s.name, title: s.title, part: s.part, fiction: s.fiction === true, number: i + 1, of: slides.length, html: s.html,
+    name: s.name, title: s.title, ...(s.topic ? { topic: s.topic } : {}), part: s.part, fiction: s.fiction === true,
+    number: i + 1, of: slides.length, html: s.html,
     _links: {
       self: { href: `${s.name}.json` },
       profile: { href: PROFILE },
@@ -68,6 +97,7 @@ slides.forEach((s, i) => {
       ...(prev ? { prev: link(prev) } : {}),
       ...(next ? { next: link(next) } : {}),
       alternate: { href: `${s.name}.html`, type: "text/html", title: "This slide as a plain page" },
+      ...codeLink(s),
     },
   };
   writeFileSync(join(out, "deck", `${s.name}.json`), json(resource));
@@ -81,7 +111,7 @@ slides.forEach((s, i) => {
 // is (deck/plain/{name}.json) it has to know from elsewhere, as a client of forms.yaml does.
 writeFileSync(join(out, "deck/plain/contents.json"), json({
   title: BRAND,
-  items: slides.map((s) => ({ name: s.name, title: s.title, part: s.part, fiction: s.fiction === true })),
+  items: slides.map((s) => ({ name: s.name, title: s.title, ...(s.topic ? { topic: s.topic } : {}), part: s.part, fiction: s.fiction === true })),
 }));
 
 writeFileSync(join(out, "deck/contents.json"), json({
@@ -94,9 +124,19 @@ writeFileSync(join(out, "deck/contents.json"), json({
     alternate: { href: "contents.html", type: "text/html", title: "The deck as plain pages" },
   },
   _embedded: {
-    item: slides.map((s) => ({ name: s.name, part: s.part, fiction: s.fiction === true, _links: { self: link(s) } })),
+    item: slides.map((s) => ({ name: s.name, ...(s.topic ? { topic: s.topic } : {}), part: s.part, fiction: s.fiction === true, _links: { self: link(s) } })),
   },
 }));
+// What the deck's own relation means, where its CURIE points.
+writeFileSync(join(out, "rels.html"), `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relations · ${BRAND}</title><link rel="stylesheet" href="deck.css"></head><body>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage"><article class="slide">
+<h1>The deck's relations</h1>
+<h2 id="code">deck:code</h2>
+<p>A script the client may run to extend what it can show for this slide: code on demand, REST's one optional constraint (Fielding, dissertation, §5.1.7). <code>integrity</code> is the script's SHA-256; a browser runs it only if the bytes match. A client that does not run it shows the slide as written.</p>
+</article></main></div></body></html>
+`);
 writeFileSync(join(out, "deck/contents.html"), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contents · ${BRAND}</title><base href="../"><link rel="stylesheet" href="deck.css"></head><body>

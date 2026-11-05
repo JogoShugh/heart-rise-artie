@@ -1,7 +1,12 @@
 name: company
 part: Scene six · a month later
 title: A company of fifteen
+topic: "A release, found once, kept as loops"
 fiction: true
+preamble:
+  tone: heart
+  label: "When the library changes"
+  text: "The library ships a release: company groups, results a page at a time, and a form that asks for a card. Your assistant finds its way through it once. The script it keeps loops over every member and every book, and the old script still runs."
 html: |
   <h2>A company of fifteen</h2>
   <p class="setting">A month later. The library has added company groups, and Harbor Point Logistics has signed up all fifteen of its staff.</p>
@@ -59,7 +64,6 @@ html: |
     </ul>
   </details>
 points:
-  - "A new release: company groups, searched by company, five members to a page."
-  - "A group member's book offers renew-for-member, which needs the card of the member it is lent to; any other card is refused."
-  - "One model run (56 calls) went through 3 pages, 15 members and 23 books, and renewed 14, each with its member's card."
-  - "The kept script loops over the members and their books, and reads the card from the member the loop is at."
+  - "<b>The release:</b> company groups, five members to a page, and a renew form that asks for the member's card."
+  - "<b>Once, with a model:</b> 56 calls; 3 pages, 15 members, 23 books; 14 renewed."
+  - "<b>Kept:</b> a loop over the members, a loop over their books, the card read from the member the loop is at. Ana's script still runs."

@@ -2,7 +2,7 @@
    deck: an outline on the left, one slide on a stage, the way back and on at its foot. */
 :root {
   --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
-  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --link-bg: #e4ecf4; --code-bg: #eaeee8;
   --bad: #b3261e; --bad-bg: #fbe4e1; --gate: #b3261e; --paper: #fbfaf5;
   --display: "Literata", Georgia, "Times New Roman", serif;
   --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -12,14 +12,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
-    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --link-bg: #17222d; --code-bg: #1c251e;
     --bad: #f2a19a; --bad-bg: #3a1d1a; --gate: #f2a19a; --paper: #151c17;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
-  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --link-bg: #17222d; --code-bg: #1c251e;
   --bad: #f2a19a; --bad-bg: #3a1d1a; --gate: #f2a19a; --paper: #151c17;
   color-scheme: dark;
 }
@@ -96,9 +96,22 @@ details.more > :not(summary) + :not(summary) { margin-top: 0.6rem; }
 /* A scene told as points: its topic in plain bullets, in place of the conversation and its setting. */
 .slide .points { display: none; gap: 0.5rem; font: 500 1.08rem/1.5 var(--display); }
 .slide .points li::marker { color: var(--leaf); }
+.slide .points b { font-weight: 650; color: var(--fg); }
 :root[data-voice="points"] .slide .points { display: grid; }
 :root[data-voice="points"] .script, :root[data-voice="points"] .setting,
 :root[data-voice="points"] .slide .fiction { display: none; }
+/* A scene's two titles: the scene's over its conversation, the topic's over its points */
+.slide h2.topic, .topic-title { display: none; }
+:root[data-voice="points"] .slide h2.topic { display: block; }
+:root[data-voice="points"] .slide h2.scene, :root[data-voice="points"] .scene-title { display: none; }
+:root[data-voice="points"] .topic-title { display: inline; }
+/* A scene's preamble: what it is like to be there. Amber for the web that wasn't, blue for today, green for HEART. */
+.preamble { --tone: var(--hold); --tone-bg: var(--hold-bg); display: grid; gap: 0.3rem; padding: 0.75rem 1rem;
+  border-left: 4px solid var(--tone); border-radius: 0 12px 12px 0; background: var(--tone-bg); }
+.preamble.now { --tone: var(--link); --tone-bg: var(--link-bg); }
+.preamble.heart { --tone: var(--leaf); --tone-bg: var(--leaf-bg); }
+.preamble .label { color: var(--tone); }
+.preamble p { font: 500 1.12rem/1.55 var(--display); max-width: 64ch; }
 .line { display: grid; grid-template-columns: 5.2rem minmax(0, 1fr); gap: 0.8rem; align-items: baseline; }
 .line .who { font: 600 0.72rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--leaf); text-align: right; }
 .line .who.ana { color: var(--hold); }
@@ -245,3 +258,45 @@ details.more { min-width: 0; }
 .table-scroll tr:last-child td { border-bottom: 0; }
 .table-scroll thead th { font: 600 0.68rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 .stats { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
+
+/* The Great Divorce, as three stills: Ana's page; its information and its controls apart, as plain JSON and as
+   OpenAPI; and the two together again, as HAL Schema Forms. Each token (data-token) is the same value in each
+   still, styled by its own class so a script can carry it from one still to the next (code/divorce.js). */
+.divorce { display: grid; gap: 0.7rem; min-width: 0; }
+.dv-stage { display: grid; gap: 1.6rem; min-width: 0; }
+.dv-scene { display: grid; gap: 0.6rem; min-width: 0; align-content: start; }
+.dv-title { font: 650 1.15rem/1.3 var(--display) !important; }
+.dv-cap { font-size: 0.9rem; color: var(--muted); }
+.dv-still { margin: 0; }
+.dv-browser { border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; background: var(--bg); min-width: 0; }
+.dv-url { font: 0.74rem var(--mono); color: var(--muted); background: var(--code-bg); padding: 0.4rem 0.8rem; border-bottom: 1px solid var(--rule); }
+.dv-screen { display: grid; grid-template-columns: minmax(0, 1fr) 13rem; gap: 0.7rem 1rem; padding: 0.9rem; }
+.dv-book { grid-column: 1 / -1; font: 650 1.2rem var(--body); }
+.dv-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; align-content: start; }
+.dv-acts { display: grid; gap: 0.45rem; align-content: start; padding: 0.55rem; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+.dv-apart { display: grid; grid-template-columns: minmax(0, 1fr) 6.5rem minmax(0, 1fr); gap: 0.8rem; align-items: stretch; }
+.dv-together { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 0.8rem; align-items: start; }
+.dv-doc { display: grid; gap: 0.35rem; align-content: start; min-width: 0; }
+.dv-label { font: 600 0.66rem/1.3 var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.dv-code { display: grid; padding: 0.7rem 0.8rem; border-radius: 8px; background: var(--code-bg); font: 0.76rem/1.55 var(--mono); min-width: 0; }
+.dv-code > span { --i: 0; display: block; padding-left: calc(var(--i) * 2ch + 2ch); text-indent: -2ch; overflow-wrap: anywhere; }
+.dv-code > .i1 { --i: 1; } .dv-code > .i2 { --i: 2; } .dv-code > .i3 { --i: 3; }
+.dv-gap { margin: 0; display: grid; align-content: center; text-align: center; font: italic 0.8rem/1.4 var(--display); color: var(--bad);
+  border-inline: 2px dashed var(--bad); border-radius: 4px; padding: 0.5rem 0.4rem; }
+/* The tokens, each a value in one of its three forms */
+.tk-card { display: grid; gap: 0.1rem; padding: 0.4rem 0.6rem; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface);
+  font: 0.92rem/1.35 var(--body); color: var(--fg); }
+.tk-card small { font: 600 0.62rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.tk-button { padding: 0.45rem 0.7rem; border-radius: 7px; background: var(--leaf); color: var(--surface); font: 600 0.88rem/1.3 var(--body); }
+.tk-button.tk-off { background: var(--code-bg); color: var(--muted); }
+.tk-note { padding: 0.45rem 0.7rem; border-radius: 7px; background: var(--hold-bg); color: var(--hold); font: 0.8rem/1.4 var(--body); }
+.tk-line { font: 0.76rem/1.55 var(--mono); border-radius: 4px; }
+.tk-line.tk-info { color: var(--link); }
+.tk-line.tk-ctl { color: var(--leaf); font-weight: 600; }
+.tk-line.tk-said { color: var(--hold); }
+@media (max-width: 40rem) {
+  .dv-screen { grid-template-columns: minmax(0, 1fr); }
+  .dv-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dv-apart, .dv-together { grid-template-columns: minmax(0, 1fr); }
+  .dv-gap { border-inline: 0; border-block: 2px dashed var(--bad); }
+}

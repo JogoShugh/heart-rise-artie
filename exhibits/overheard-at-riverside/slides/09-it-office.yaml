@@ -1,7 +1,12 @@
 name: it-office
 part: Scene three · today
 title: The IT office
+topic: "The machine web's manual: OpenAPI"
 fiction: true
+preamble:
+  tone: now
+  label: "On the machine web, today"
+  text: "You build software on a JSON API. The data comes from one place, and a document of every operation from another, the same for every loan. Your code joins them, and learns the rules from refusals: Ana's 1997, with better tooling."
 html: |
   <h2>The IT office</h2>
   <figure><img src="media/openapi-list.png" alt="Swagger UI for Riverside Public Library, whose description says which acts a resource allows depends on its state: GET /accounts, GET /accounts/{id}, GET /loans, GET /loans/{id}, POST /loans/{id}/actions/renew, POST /loans/{id}/actions/return." loading="lazy"><figcaption>The library's API as HEART serves it in OpenAPI, shown in Swagger UI: every operation, for every loan alike. It says so itself: which acts a resource allows depends on its state, which the document can only describe in prose.</figcaption></figure>
@@ -46,6 +51,6 @@ html: |
     <p class="note">Both list renew for every loan, always. forms.yaml is the OpenAPI of the web that wasn't, and forms.html its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
   </details>
 points:
-  - "A typical JSON API: data in each answer, operations in an OpenAPI document, the same for every state."
-  - "An agent that reads the document learns a rule only when it is refused."
-  - "An OpenAPI document is forms.html with a Try it out button: complete, static, and out of band."
+  - "<b>Information:</b> the loan as JSON, data only."
+  - "<b>Controls:</b> an OpenAPI document of every operation, the same for every loan, each rule in prose."
+  - "<b>Who joins them:</b> the agent. It learns a rule the way Ana did in 1997: a 409, after the call."

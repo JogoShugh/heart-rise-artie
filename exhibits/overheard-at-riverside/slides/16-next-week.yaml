@@ -1,7 +1,12 @@
 name: next-week
 part: Scene five · the next week
 title: The next week
+topic: "Find the way once, then keep it"
 fiction: true
+preamble:
+  tone: heart
+  label: "With an agent and a goal"
+  text: "You give an assistant one sentence of purpose and a member's name. The first time, a model finds the way through the library's answers. After that, a kept script does the same with no model, and stops rather than guess if the library changes."
 html: |
   <h2>The next week</h2>
   <p class="setting">Ana comes in to return a book. Sam shows her the assistant; Priya is at the next desk.</p>
@@ -59,7 +64,6 @@ html: |
     </ul>
   </details>
 points:
-  - "One goal in plain words, run once with a model (11 calls), found the way for a member."
-  - "The run is kept as a script that takes the member's name; every run after it calls no model."
-  - "The script is pinned by what each form does, not by its address: a moved form is followed, a changed form stops the run."
-  - "The results match the human web: the same renewals and reasons Ana sees on her phone."
+  - "<b>Once, with a model:</b> 11 calls to find the way for a member."
+  - "<b>Kept:</b> a script that takes the member's name. Every run after calls no model."
+  - "<b>Pinned by meaning:</b> a moved form is followed; a changed form stops the run."

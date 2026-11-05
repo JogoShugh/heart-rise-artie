@@ -1,7 +1,12 @@
 name: help-line
 part: Scene one · 1997
 title: The help line
+topic: "Every act from a manual"
 fiction: true
+preamble:
+  tone: then
+  label: "In the web that wasn't"
+  text: "You want to renew three library books. The site gives you a manual of addresses and a page of numbers. You copy, you type, you send, and only then do you learn whether it was allowed."
 html: |
   <h2>The help line</h2>
   <p class="setting">Fall 1997, a Tuesday evening, in the web that wasn't. Ana Torres has three library books due. She calls Riverside Public Library, and Marcus answers.</p>
@@ -24,6 +29,6 @@ html: |
     </ul>
   </details>
 points:
-  - "A web without forms: every act is documented once, in one page (forms.html), the same for every loan."
-  - "The client builds each request by hand from that page: method, address template, fields."
-  - "Identifiers come out of band: the loan number has to be found elsewhere and typed in."
+  - "<b>Information:</b> her loans, as a page of numbers. Nothing on it can be pressed."
+  - "<b>Controls:</b> forms.html, a manual of every operation, the same for every loan."
+  - "<b>Who joins them:</b> Ana. She finds the loan number and types it into the address by hand."

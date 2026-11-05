@@ -1,7 +1,12 @@
 name: whiteboard
 part: Scene four · an hour later
 title: The whiteboard
+topic: "Give the answer its controls"
 fiction: true
+preamble:
+  tone: heart
+  label: "If the API answered like the page"
+  text: "Your client asks for a loan and gets, in the same answer, what it can do with it now and why the rest isn't there. It chooses among offers instead of reading a manual, and anything stale or not offered is refused with a reason."
 html: |
   <h2>The whiteboard</h2>
   <p class="setting">The same office, an hour later. Sam has the marker.</p>
@@ -62,6 +67,6 @@ html: |
   +               "integrity": "sha256-MaW2EFgi2SXHXtDeNNqfRqaPpMhuPfrUB/RV+oPsfQ8=" }</span></code></pre></details></li>
   </ol>
 points:
-  - "Six changes give the API what the page already has: links and a vocabulary, forms, forms by state, reasons for what is absent, a version guard, and shared form sets."
-  - "Each rests on a standard: HAL links, HAL-FORMS and JSON Schema, ETag and If-Match, content-addressed sets."
-  - "The data stays as it is; the controls are added beside it."
+  - "<b>Information:</b> stays as it is, the same JSON members."
+  - "<b>Controls move in:</b> links, forms by state, the reason for each absent one, a version tag, and one shared set per state."
+  - "<b>On standards:</b> HAL, HAL-FORMS and JSON Schema, ETag and If-Match, content-addressed sets."

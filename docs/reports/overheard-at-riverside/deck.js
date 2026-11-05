@@ -45,7 +45,7 @@
       client: function () { return new HeartTs.HeartClient(); },
       items: function (rep) {
         return rep.embedded.filter(function (e) { return e.rel === "item"; }).map(function (e) {
-          return { name: e.state.name, title: e.title, part: e.state.part, fiction: e.state.fiction, href: new URL(e.href, rep.url).toString() };
+          return { name: e.state.name, title: e.title, topic: e.state.topic, part: e.state.part, fiction: e.state.fiction, href: new URL(e.href, rep.url).toString() };
         });
       },
       first: function () { return client.follow("first"); },
@@ -75,6 +75,14 @@
     },
   };
 
+  // A scene has two titles: its scene's, over the conversation, and its topic's, over the points. Both are written
+  // out; deck.css shows the one the voice asks for.
+  function titled(item) {
+    var title = esc(item.title || item.name);
+    if (!item.topic) return title;
+    return '<span class="scene-title">' + title + '</span><span class="topic-title">' + esc(item.topic) + "</span>";
+  }
+
   function readContents(rep) {
     atContents = true;
     items = way.items(rep);
@@ -82,7 +90,7 @@
     items.forEach(function (item, i) {
       if (item.part !== part) { part = item.part; html += '<li class="group">' + esc(part) + "</li>"; }
       html += '<li><a href="#' + esc(item.name) + '" data-name="' + esc(item.name) + '"><span class="n">' + (i + 1) + "</span>" +
-        "<span>" + esc(item.title) + "</span>" + (item.fiction ? '<span class="f">Fiction</span>' : "") + "</a></li>";
+        "<span>" + titled(item) + "</span>" + (item.fiction ? '<span class="f">Fiction</span>' : "") + "</a></li>";
     });
     list.innerHTML = html;
   }
@@ -90,7 +98,36 @@
   function footLink(rep, rel, label) {
     var to = way.neighbor(rep, rel);
     if (!to) return '<span class="off" data-rel="' + rel + '"><small>' + label + "</small><b>—</b></span>";
-    return '<a href="#' + esc(to.name) + '" data-rel="' + rel + '"><small>' + label + "</small><b>" + esc(to.title || to.name) + "</b></a>";
+    return '<a href="#' + esc(to.name) + '" data-rel="' + rel + '"><small>' + label + "</small><b>" + titled(to) + "</b></a>";
+  }
+
+  function nameTab() {
+    if (!shown) return;
+    var s = shown.state, points = document.documentElement.dataset.voice === "points";
+    document.title = (points && s.topic ? s.topic : s.title) + " · Overheard at Riverside";
+  }
+
+  // Code on demand: a slide may link a script that extends this client (deck:code), with its digest. The page loads
+  // it once, the browser checks the bytes against the digest, and the script registers how to start on a slide and
+  // how to stop. A slide that links none, or a way that offers no links, is shown as written.
+  var running = null;
+  function runCode(rep) {
+    if (running) { running(); running = null; }
+    var link = linkOf(rep, "deck:code");
+    if (!link) return;
+    var src = new URL(link.href, rep.url).toString();
+    window.deckCode = window.deckCode || {};
+    var start = function () {
+      var mount = window.deckCode[src];
+      if (mount && shown === rep) running = mount(slide) || null;
+    };
+    if (window.deckCode[src]) return start();
+    var script = document.createElement("script");
+    script.src = src;
+    if (link.integrity) script.integrity = link.integrity;
+    script.onload = start;
+    script.onerror = function () { console.warn("deck:code was not run: " + src); };
+    document.head.append(script);
   }
 
   function showSource(rep) {
@@ -135,8 +172,9 @@
     list.querySelectorAll("a").forEach(function (a) {
       if (a.dataset.name === s.name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    document.title = s.title + " · Overheard at Riverside";
+    nameTab();
     showSource(rep);
+    runCode(rep);
   }
 
   // One move: a request through heart-ts, then the slide it read on the stage, and its name in the address.
@@ -218,6 +256,7 @@
       b.setAttribute("aria-pressed", String(b.dataset.voice === told));
     });
     try { localStorage.setItem("overheard-voice", told); } catch (e) { /* kept for this visit only */ }
+    nameTab();
   }
   document.querySelectorAll("button[data-voice]").forEach(function (button) {
     button.addEventListener("click", function () { voice(button.dataset.voice); });
