@@ -40,7 +40,8 @@ steps:
       - follow: item
         title: ${member}
         then:
-          - whenever:
+          - for-each: loan
+            then:
               - when-offered:
                   - act: library:renew</code></pre>
   <ul>

@@ -4,7 +4,7 @@ Written 2026-11-04 (evening), to pick up later.
 
 ## Where things are
 
-- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 8, 23 slides. It is built from
+- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 9, 23 slides. It is built from
   `exhibits/overheard-at-riverside/` (`slides/*.yaml`, `page/`, `build.mjs`) into
   `docs/reports/overheard-at-riverside/`. To rebuild, run
   `node build.mjs --artifact <scratch>/overheard-at-riverside.html` in the exhibit folder, then publish that file
@@ -41,7 +41,7 @@ Written 2026-11-04 (evening), to pick up later.
 - **Runs:** in `exhibits/overheard-at-riverside/artie/`.
   - **By name:** `member.goal.md` → `member.heart.yaml`, from one Claude run of 11 calls. `five-members.mjs` ran it
     for five members, with results in `five-members.yaml`.
-  - **By company:** `company.goal.md` → `company.heart.yaml`, from one Claude run of 79 calls and about 370,000
+  - **By company:** `company.goal.md` → `company.heart.yaml`, from one Claude run of 56 calls and about 392,000
     input tokens. Run with no model, it renewed 14 books, each once.
   - **Rungs:** `rungs/` holds the same company script at L0, L1 and L2, measured by `measure.mjs` into
     `rungs.yaml`.

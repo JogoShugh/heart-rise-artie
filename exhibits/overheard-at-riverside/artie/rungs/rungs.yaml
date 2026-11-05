@@ -2,49 +2,49 @@ what: company.heart.yaml for Harbor Point, run with no model at L0, L1 and L2, m
 measured:
   L0:
     requests: 110
-    bytes received: 77365
-    ms on the wire: 253
+    bytes received: 89168
+    ms on the wire: 350
     loan reads: 37
-    bytes per loan read: 1069
+    bytes per loan read: 1283
     by kind:
       resource:
         requests: 110
         distinct: 57
-        bytes: 77365
+        bytes: 89168
   L1:
     requests: 114
-    bytes received: 49761
-    ms on the wire: 147
+    bytes received: 50722
+    ms on the wire: 221
     loan reads: 37
-    bytes per loan read: 462
+    bytes per loan read: 473
     by kind:
       resource:
         requests: 110
         distinct: 57
-        bytes: 46866
+        bytes: 47549
       affordance set:
         requests: 4
         distinct: 4
-        bytes: 2895
+        bytes: 3173
   L2:
-    requests: 115
-    bytes received: 49946
-    ms on the wire: 140
+    requests: 116
+    bytes received: 50940
+    ms on the wire: 242
     loan reads: 37
-    bytes per loan read: 462
+    bytes per loan read: 473
     by kind:
       resource:
         requests: 110
         distinct: 57
-        bytes: 46866
+        bytes: 47549
       affordance set:
         requests: 4
         distinct: 4
-        bytes: 3047
+        bytes: 3145
       schema:
-        requests: 1
-        distinct: 1
-        bytes: 33
+        requests: 2
+        distinct: 2
+        bytes: 246
 fragments:
   L0 loan:
     id: 3321
@@ -52,7 +52,7 @@ fragments:
     author: Norton Juster
     due: 2026-11-12
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
     _links:
       self:
         href: /loans/3321
@@ -64,23 +64,30 @@ fragments:
           href: https://w3id.org/heart-rise/rels/{rel}
           templated: true
       hr:unavailable:
-        href: /unavailable/fc81f545088ea825
+        href: /unavailable/822204cca858ab35
         type: application/json
-        integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+        integrity: sha256-giIEzKhYqzXKShCibJ3Cn410hnIfT4x6gqU99tyRZNs=
     _forms:
-      library:renew:
-        title: Renew
-        description: Keeps the book three weeks more.
+      library:renew-for-member:
+        title: Renew for the member
+        description: Keeps a company group member's book three weeks more, given the member's library card number.
         _links:
           target:
-            href: /loans/3321/actions/renew
+            href: /loans/3321/actions/renew-for-member
         method: POST
         contentType: application/json
         schema:
-          properties: {}
+          properties:
+            card:
+              description: The number on the back of the library card of the member the book is lent to
+              minimum: 1
+              title: Library card number
+              type: integer
+          required:
+            - card
           type: object
-          $id: /schemas/efddc7bd8bbcef73
-        hr:integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+          $id: /schemas/19c8347c0a72993e
+        hr:integrity: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
       library:return:
         title: Return
         description: Gives the book back to the library.
@@ -100,7 +107,7 @@ fragments:
     author: Norton Juster
     due: 2026-11-12
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
     _links:
       self:
         href: /loans/3321
@@ -109,17 +116,17 @@ fragments:
           href: https://w3id.org/heart-rise/rels/{rel}
           templated: true
       hr:forms:
-        href: /affordance-sets/4e5d07820d8d6a99
+        href: /affordance-sets/a78a86e4b5ec30bb
         type: application/hal+json
         profile: https://w3id.org/heart-rise/hal-schema-forms
-        integrity: sha256-Tl0Hgg2NapnYeDnz0WHQZPaOwA/X5ElIhyfsuYQVOLY=
+        integrity: sha256-p4qG5LXsMLs/rLMysgyAgXbQA3u0zjej5sc5PDT7Lxs=
   L2 loan:
     id: 3321
     title: The Phantom Tollbooth
     author: Norton Juster
     due: 2026-11-12
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
     _links:
       self:
         href: /loans/3321
@@ -128,29 +135,29 @@ fragments:
           href: https://w3id.org/heart-rise/rels/{rel}
           templated: true
       hr:forms:
-        href: /affordance-sets/0c4acb672a0d51fd
+        href: /affordance-sets/e425ee854a3ee9ea
         type: application/hal+json
         profile: https://w3id.org/heart-rise/hal-schema-forms
-        integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
+        integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
   L2 affordance set:
-    url: /affordance-sets/0c4acb672a0d51fd
+    url: /affordance-sets/e425ee854a3ee9ea
     body:
       _forms:
-        library:renew:
+        library:renew-for-member:
           _links:
             target:
-              href: /loans/{id}/actions/renew
+              href: /loans/{id}/actions/renew-for-member
               templated: true
           contentType: application/json
-          description: Keeps the book three weeks more.
-          hr:integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+          description: Keeps a company group member's book three weeks more, given the member's library card number.
+          hr:integrity: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
           hr:templatePointers:
             id: /id
           method: POST
           schema:
-            $ref: /schemas/efddc7bd8bbcef73
-            hr:integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-          title: Renew
+            $ref: /schemas/19c8347c0a72993e
+            hr:integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+          title: Renew for the member
         library:return:
           _links:
             target:
@@ -175,6 +182,6 @@ fragments:
             name: hr
             templated: true
         hr:unavailable:
-          href: /unavailable/fc81f545088ea825
-          integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+          href: /unavailable/822204cca858ab35
+          integrity: sha256-giIEzKhYqzXKShCibJ3Cn410hnIfT4x6gqU99tyRZNs=
           type: application/json

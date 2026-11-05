@@ -8,15 +8,17 @@ html: |
   <div class="script">
     <div class="line"><span class="who priya">Priya</span><p>Can the assistant renew for the whole company?</p></div>
     <div class="line"><span class="who sam">Sam</span><p>Once the model finds the way. It searched the members by company, five to a page, and went through all three pages: every member, every book.</p></div>
+    <div class="line"><span class="who priya">Priya</span><p>A company's books are renewed for the member, though. The form asks for their card, and refuses anyone else's.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>The model read each member's card number when it opened them, and sent it with each of their books.</p></div>
     <div class="line"><span class="who priya">Priya</span><p>And the script it kept?</p></div>
-    <div class="line"><span class="who sam">Sam</span><p>Names no one. A loop over every member the search lists, page after page, and inside it, a loop over each member's books. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>Names no one, and no card. A loop over every member the search lists, page after page; inside it, a loop over each member's books; and the card read from whichever member the outer loop is at. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>
     <div class="line"><span class="who priya">Priya</span><p>And Ana's script, from before the company groups?</p></div>
-    <div class="line"><span class="who sam">Sam</span><p>Still runs. Its forms didn't change.</p></div>
+    <div class="line"><span class="who sam">Sam</span><p>Still runs. Her books are her own, so her forms didn't change.</p></div>
   </div>
   <div class="stats">
-    <div class="stat"><b>79</b><span>model calls, once, to find the way</span></div>
+    <div class="stat"><b>56</b><span>model calls, once, to find the way</span></div>
     <div class="stat"><b>0</b><span>model calls each run after</span></div>
-    <div class="stat"><b>14</b><span>books renewed, each once, across 15 members</span></div>
+    <div class="stat"><b>14</b><span>of the staff's 23 books renewed, each on its member's own card</span></div>
   </div>
   <pre><code>inputs:
     company:
@@ -26,15 +28,19 @@ html: |
       fields:
         company: ${company}
       then:
-        - whenever:              # every member, page after page
-            - whenever:          # every book each one has out
+        - for-each: member          # every member, page after page
+          then:
+            - for-each: loan        # every book each one has out
+              then:
                 - when-offered:
-                    - act: library:renew</code></pre>
+                    - act: library:renew-for-member
+                      fields:
+                        card: ${member.id}    # the member the outer loop is at</code></pre>
   <details class="more"><summary>The run, and the library's release</summary>
     <ul>
-      <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 79 calls; 369,436 input tokens (228,342 sent, 141,094 read from cache); 13,641 output; 111 steps.</li>
-      <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The same in Kotlin: <code>whenever { whenever { whenOffered … } }</code>.</li>
-      <li><b>Run with no model</b> on a fresh library: 110 steps, the same fourteen books renewed, each once; the nine with a hold waiting or at the limit left.</li>
-      <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. The accounts search is as it was, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>
+      <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 56 calls; 391,900 input tokens (247,234 sent, 144,666 read from cache); 14,453 output; 113 steps.</li>
+      <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The run sent each member's own <code>/id</code> as the card, so the script reads it from the member the loop is at. The same in Kotlin: <code>each("member") { each("loan") { whenOffered … } }</code>, the card read by <code>val memberId by kept("member") { long("id") }</code>.</li>
+      <li><b>Run with no model</b> on a fresh library: 110 steps. The fifteen have 23 books out: 14 renewable, each renewed once on its member's card; 5 with a hold waiting and 4 at the limit, left. Three members had nothing to renew; two renewed two each. For the credit union: one renewed, one with a hold.</li>
+      <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. A company group member's book offers <code>renew-for-member</code> in place of <code>renew</code>: its form asks for the card number of the member it is lent to, and refuses any other (422, at <code>/card</code>). The accounts search is as it was, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>
     </ul>
   </details>

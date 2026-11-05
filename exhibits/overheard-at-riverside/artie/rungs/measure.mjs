@@ -40,7 +40,7 @@ for (const rung of ["L0", "L1", "L2"]) {
     "bytes per loan read": Math.round(loans.reduce((n, x) => n + bytes(x.response.body), 0) / Math.max(loans.length, 1)),
     "by kind": Object.fromEntries(Object.entries(byKind).map(([k, v]) => [k, { requests: v.requests, distinct: v.distinct.size, bytes: v.bytes }])),
   };
-  const renewable = loans.find((x) => x.response.body?.standing === "renewable");
+  const renewable = loans.find((x) => x.response.body?.standing?.startsWith("renewable"));
   if (renewable) fragments[`${rung} loan`] = renewable.response.body;
   if (rung === "L2") {
     const set = exchanges.find((x) => kind(x.request.url) === "affordance set" && JSON.stringify(x.response.body).includes("library:renew"));
