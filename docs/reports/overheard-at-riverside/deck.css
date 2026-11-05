@@ -57,7 +57,7 @@ a:focus-visible, button:focus-visible, summary:focus-visible, label:focus-visibl
 .outline .how { margin-top: 1rem; color: var(--muted); font-size: 0.8rem; line-height: 1.5; }
 
 .stage { min-width: 0; display: grid; gap: 0.9rem; align-content: start; }
-.slide { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: clamp(1.1rem, 3vw, 2.2rem);
+.slide { grid-template-columns: minmax(0, 1fr); background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: clamp(1.1rem, 3vw, 2.2rem);
   min-height: 30rem; display: grid; gap: 1rem; align-content: start; transition: opacity 0.15s ease; }
 .slide.loading { opacity: 0.45; }
 .slide > header { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; }
@@ -226,3 +226,8 @@ blockquote.said { border-left: 3px solid var(--rule); padding: 0.3rem 0.9rem; co
 .timeline li::before { content: ""; position: absolute; left: -0.42rem; top: 0.45rem; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--surface); border: 2px solid var(--leaf); }
 .timeline b { font-family: var(--display); }
 .timeline .y { font: 600 0.8rem var(--mono); color: var(--muted); margin-right: 0.4rem; }
+details.more { min-width: 0; }
+.script { min-width: 0; }
+.steps > li { grid-template-columns: minmax(0, 1fr); }
+.steps details, .steps li > * { min-width: 0; }
+.pair > div, .split > * { min-width: 0; }
