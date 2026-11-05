@@ -4,7 +4,7 @@
   "part": "Closing",
   "fiction": false,
   "number": 14,
-  "of": 16,
+  "of": 18,
   "html": "<h2>Lo: this deck is HEART too</h2>\n<p class=\"dek\">You've been using a HEART client the whole time.</p>\n<div class=\"map\">\n  <div><code>contents.json</code><span>The bookmark: the only address this page knows. It embeds every slide, and the outline is drawn from it.</span></div>\n  <div><code>help-line.json</code><span>One slide. Its HTML is the information; its links are the controls: next, prev, contents, and a plain page.</span></div>\n  <div><code>heart-ts</code><span>The second HEART client, built for the browser. → and ← follow next and prev; the outline follows the contents, then an item.</span></div>\n  <div><code>no headers, no acts</code><span>A static host can't send the profile header, so each file names its profile in its own links. It takes no POST, so the deck offers no acts; the library shows those.</span></div>\n</div>\n<ul>\n  <li><b>The page knows no slides.</b> Add, cut or reorder them by changing the resources; this page's code doesn't change.</li>\n  <li><b>See for yourself:</b> open “This slide's resource” below any slide: what heart-ts asked, and what it read.</li>\n  <li><b>Without the client,</b> each slide links a plain HTML page of itself, as <code>alternate</code>, typed <code>text/html</code>.</li>\n</ul>\n",
   "_links": {
     "self": {
@@ -22,8 +22,8 @@
       "title": "The next week"
     },
     "next": {
-      "href": "one-web.json",
-      "title": "One web"
+      "href": "upgrade.json",
+      "title": "Upgrading is optional"
     },
     "alternate": {
       "href": "this-deck.html",

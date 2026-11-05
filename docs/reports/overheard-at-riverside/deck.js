@@ -1,17 +1,19 @@
-// The deck's client. It knows one address, the contents, and reads everything else through heart-ts: the outline
-// from what the contents embeds, each slide by following a link the last resource offered (next, prev, contents,
-// item). The page holds no list of slides and builds no slide address of its own.
+// The deck's client, heart-ts, reading the deck one of two ways, as the switch at the top says.
+// HEART: the page knows one address, the contents. The outline comes from what the contents embeds, and every
+// move follows a link the last resource offered (next, prev, contents, item); the page builds no slide address.
+// Plain JSON: the same slides as an old-school JSON API, data only. heart-ts reads them as it reads any answer
+// that names no profile: state, and no controls. So the page has to know the list, build each address from
+// deck/plain/{name}.json, and find Back and Next by counting, as a client of forms.yaml would.
 (function () {
   "use strict";
-  var BOOKMARK = new URL("deck/contents.json", document.baseURI).toString();
-  var client = new HeartTs.HeartClient();
   var slide = document.getElementById("slide");
   var list = document.getElementById("outline-list");
   var source = document.getElementById("source");
-  var where = document.getElementById("where");
-  var items = [];          // what the contents embeds: one per slide, in story order
+  var modeNote = document.getElementById("mode-note");
+  var items = [];          // the slides, in story order: { name, title, part, fiction, href }
   var atContents = false;  // whether the client holds the contents now, or a slide
   var shown = null;        // the slide on the stage
+  var client, way;
 
   // What the client asked and what came back, by address, to show a slide's own resource as it was read.
   var exchanges = new Map();
@@ -29,28 +31,66 @@
   };
 
   var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
-  var resolved = function (href, base) { return new URL(href, base).toString(); };
-  var itemNamed = function (name) { return items.find(function (i) { return i.state.name === name; }); };
-  var itemAt = function (url) { return items.find(function (i) { return resolved(i.href, BOOKMARK) === url; }); };
+  var address = function (path) { return new URL(path, document.baseURI).toString(); };
+  var itemNamed = function (name) { return items.find(function (i) { return i.name === name; }); };
   var linkOf = function (rep, rel) { return rep.links.find(function (l) { return l.rel === rel; }); };
+  var withContents = function (step) {
+    var there = atContents ? Promise.resolve() : client.follow("contents").then(readContents);
+    return there.then(step);
+  };
+
+  var WAYS = {
+    heart: {
+      bookmark: address("deck/contents.json"),
+      client: function () { return new HeartTs.HeartClient(); },
+      items: function (rep) {
+        return rep.embedded.filter(function (e) { return e.rel === "item"; }).map(function (e) {
+          return { name: e.state.name, title: e.title, part: e.state.part, fiction: e.state.fiction, href: new URL(e.href, rep.url).toString() };
+        });
+      },
+      first: function () { return client.follow("first"); },
+      to: function (item) { return withContents(function () { return client.follow("item", item.title); }); },
+      neighbor: function (rep, rel) {
+        var link = linkOf(rep, rel), href = link && new URL(link.href, rep.url).toString();
+        return link && (items.find(function (i) { return i.href === href; }) || { name: "", title: link.title });
+      },
+      step: function (rel) { return client.follow(rel); },
+      note: "<b>HEART</b> The page knows one address. It follows the links each slide offers.",
+      read: "heart-ts followed a link the last answer offered.",
+    },
+    plain: {
+      bookmark: address("deck/plain/contents.json"),
+      client: function () { return new HeartTs.HeartClient({ dialect: "json" }); },
+      items: function (rep) { return rep.state.items.map(function (i) { return Object.assign({}, i); }); },
+      first: function () { return WAYS.plain.to(items[0]); },
+      // No link came with it: the page builds the address from a pattern it knows.
+      to: function (item) { return client.enter(address("deck/plain/" + encodeURIComponent(item.name) + ".json")); },
+      neighbor: function (rep, rel) {
+        var at = items.findIndex(function (i) { return i.name === rep.state.name; });
+        return items[at + (rel === "next" ? 1 : -1)];
+      },
+      step: function (rel) { return WAYS.plain.to(WAYS.plain.neighbor(shown, rel)); },
+      note: "<b>Plain JSON</b> Data only, no links. The page knows the list, builds every address and counts its way on.",
+      read: "No links came with it: the page built this address from deck/plain/{name}.json, and found Back and Next by counting the list.",
+    },
+  };
 
   function readContents(rep) {
     atContents = true;
-    items = rep.embedded.filter(function (e) { return e.rel === "item"; });
+    items = way.items(rep);
     var html = "", part = null;
     items.forEach(function (item, i) {
-      if (item.state.part !== part) { part = item.state.part; html += '<li class="group">' + esc(part) + "</li>"; }
-      html += '<li><a href="#' + esc(item.state.name) + '" data-name="' + esc(item.state.name) + '"><span class="n">' + (i + 1) + "</span>" +
-        "<span>" + esc(item.title) + "</span>" + (item.state.fiction ? '<span class="f">Fiction</span>' : "") + "</a></li>";
+      if (item.part !== part) { part = item.part; html += '<li class="group">' + esc(part) + "</li>"; }
+      html += '<li><a href="#' + esc(item.name) + '" data-name="' + esc(item.name) + '"><span class="n">' + (i + 1) + "</span>" +
+        "<span>" + esc(item.title) + "</span>" + (item.fiction ? '<span class="f">Fiction</span>' : "") + "</a></li>";
     });
     list.innerHTML = html;
   }
 
   function footLink(rep, rel, label) {
-    var link = linkOf(rep, rel), item = link && itemAt(resolved(link.href, rep.url));
-    if (!link) return '<span class="off" data-rel="' + rel + '"><small>' + label + "</small><b>—</b></span>";
-    var name = item ? item.state.name : "";
-    return '<a href="#' + esc(name) + '" data-rel="' + rel + '"><small>' + label + "</small><b>" + esc(link.title || name) + "</b></a>";
+    var to = way.neighbor(rep, rel);
+    if (!to) return '<span class="off" data-rel="' + rel + '"><small>' + label + "</small><b>—</b></span>";
+    return '<a href="#' + esc(to.name) + '" data-rel="' + rel + '"><small>' + label + "</small><b>" + esc(to.title || to.name) + "</b></a>";
   }
 
   function showSource(rep) {
@@ -63,17 +103,22 @@
   function drawSource(rep, seen) {
     var alternate = linkOf(rep, "alternate");
     if (seen) {
-      var lead = document.createElement("pre");
-      lead.className = "asked";
-      lead.textContent = "GET " + new URL(rep.url).pathname.split("/").slice(-2).join("/") + "\n" + seen.asked.join("\n") +
+      var lead = document.createElement("div");
+      var asked = document.createElement("pre");
+      asked.className = "asked";
+      asked.textContent = "GET " + new URL(rep.url).pathname.split("/").slice(-3).join("/") + "\n" + seen.asked.join("\n") +
         "\n\n" + seen.status + (seen.etag ? "   ETag: " + seen.etag : "");
+      var how = document.createElement("p");
+      how.className = "note";
+      how.textContent = way.read + " heart-ts read it as " + (rep.dialect === "json" ? "data only." : rep.dialect + ".");
+      lead.append(how, asked);
       source.append(JsonView.box({ a: JSON.parse(seen.text), labelA: "the answer's body", lead: lead,
         summary: "This slide's resource <small>· what heart-ts asked, and read</small>" }));
     }
     if (alternate) {
       var plain = document.createElement("a");
       plain.className = "plain";
-      plain.href = resolved(alternate.href, rep.url);
+      plain.href = new URL(alternate.href, rep.url).toString();
       plain.textContent = (alternate.title || "Plain page") + " ↗";
       source.append(plain);
     }
@@ -86,7 +131,7 @@
     slide.innerHTML = '<header><span class="part">' + esc(s.part) + "</span>" + (s.fiction ? '<span class="fiction">Fiction</span>' : "") +
       "</header>" + s.html;
     document.querySelector(".foot").innerHTML = footLink(rep, "prev", "Back") +
-      '<span class="where" id="where">' + s.number + " / " + s.of + "</span>" + footLink(rep, "next", "Next");
+      '<span class="where">' + s.number + " / " + s.of + "</span>" + footLink(rep, "next", "Next");
     list.querySelectorAll("a").forEach(function (a) {
       if (a.dataset.name === s.name) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
@@ -109,19 +154,34 @@
     }).finally(function () { slide.classList.remove("loading"); });
   }
 
-  // To a slide by name: back to the contents, if the client isn't there, then its item.
   function goTo(name, how) {
     var item = itemNamed(name);
     if (!item || (shown && shown.state.name === name)) return Promise.resolve();
-    return move(function () {
-      var there = atContents ? Promise.resolve() : client.follow("contents").then(readContents);
-      return there.then(function () { return client.follow("item", item.title); });
-    }, how);
+    return move(function () { return way.to(item); }, how);
   }
 
   function follow(rel) {
-    if (!shown || !linkOf(shown, rel)) return;
-    move(function () { return client.follow(rel); }, "push");
+    if (!shown || !way.neighbor(shown, rel)) return;
+    move(function () { return way.step(rel); }, "push");
+  }
+
+  // Enter at the way's bookmark; then the slide named, or the first.
+  function start(mode, wanted) {
+    way = WAYS[mode];
+    client = way.client();
+    shown = null;
+    document.querySelectorAll("[data-mode]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.mode === mode)); });
+    document.documentElement.dataset.mode = mode;
+    modeNote.innerHTML = way.note;
+    try { localStorage.setItem("overheard-mode", mode); } catch (e) { /* kept for this visit only */ }
+    return client.enter(way.bookmark).then(function (rep) {
+      readContents(rep);
+      if (itemNamed(wanted)) return goTo(wanted, "replace");
+      return move(function () { return way.first(); }, "replace");
+    }).catch(function (error) {
+      slide.innerHTML = '<h2>The deck could not be read</h2><p class="note">' + esc(error.message) +
+        '</p><p><a href="deck/contents.html">Read it as plain pages</a></p>';
+    });
   }
 
   document.querySelector(".foot").addEventListener("click", function (event) {
@@ -136,8 +196,13 @@
     if (event.key === "ArrowRight") follow("next");
     if (event.key === "ArrowLeft") follow("prev");
   });
-  // The outline's links are plain anchors: the address changes, and the deck follows it there.
+  // The outline's links are plain anchors: the address changes, and the deck goes there.
   window.addEventListener("hashchange", function () { goTo(decodeURIComponent(location.hash.slice(1))); });
+  document.querySelectorAll("[data-mode]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      if (WAYS[button.dataset.mode] !== way) start(button.dataset.mode, shown && shown.state.name);
+    });
+  });
 
   var toggle = document.getElementById("outline-toggle"), outline = document.getElementById("outline");
   toggle.addEventListener("click", function () {
@@ -146,14 +211,7 @@
   });
   list.addEventListener("click", function () { outline.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); });
 
-  // Enter at the bookmark; then the slide the address names, or the first.
-  client.enter(BOOKMARK).then(function (rep) {
-    readContents(rep);
-    var wanted = decodeURIComponent(location.hash.slice(1));
-    if (itemNamed(wanted)) return goTo(wanted, "replace");
-    return move(function () { return client.follow("first"); }, "replace");
-  }).catch(function (error) {
-    slide.innerHTML = '<h2>The deck could not be read</h2><p class="note">' + esc(error.message) +
-      '</p><p><a href="deck/contents.html">Read it as plain pages</a></p>';
-  });
+  var kept = "heart";
+  try { kept = localStorage.getItem("overheard-mode") === "plain" ? "plain" : "heart"; } catch (e) { /* HEART, then */ }
+  start(kept, decodeURIComponent(location.hash.slice(1)));
 })();

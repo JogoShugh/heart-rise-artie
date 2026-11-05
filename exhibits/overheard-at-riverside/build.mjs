@@ -3,6 +3,7 @@
 // slides/*.yaml, in file order, become deck/<name>.json: the slide's HTML and part as state, and links to the
 // slides before and after, to the contents, and to a plain HTML page of itself. deck/contents.json embeds them
 // all. A static host sends no Link header, so each names its profile in its own links (SPEC §6.1).
+// deck/plain/ holds the same deck as an old-school JSON API: the data alone, and a list of names.
 // --artifact also writes the page without its document skeleton, as an Artifact publishes it.
 import { build } from "esbuild";
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
@@ -27,7 +28,7 @@ const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&l
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 
 rmSync(join(out, "deck"), { recursive: true, force: true });
-mkdirSync(join(out, "deck"), { recursive: true });
+mkdirSync(join(out, "deck/plain"), { recursive: true });
 mkdirSync(join(out, "media"), { recursive: true });
 
 // A slide as a plain page: the same HTML, its part, and plain links on. What a reader without the client follows.
@@ -63,7 +64,17 @@ slides.forEach((s, i) => {
   };
   writeFileSync(join(out, "deck", `${s.name}.json`), json(resource));
   writeFileSync(join(out, "deck", `${s.name}.html`), plainPage(s, prev, next));
+  // The same slide as an old-school JSON API serves it: the data, and no links, no profile.
+  const { _links: _, ...data } = resource;
+  writeFileSync(join(out, "deck/plain", `${s.name}.json`), json(data));
 });
+
+// The old-school list: what a plain JSON client needs to know the slides exist, in order. Where each one
+// is (deck/plain/{name}.json) it has to know from elsewhere, as a client of forms.yaml does.
+writeFileSync(join(out, "deck/plain/contents.json"), json({
+  title: BRAND,
+  items: slides.map((s) => ({ name: s.name, title: s.title, part: s.part, fiction: s.fiction === true })),
+}));
 
 writeFileSync(join(out, "deck/contents.json"), json({
   title: BRAND,

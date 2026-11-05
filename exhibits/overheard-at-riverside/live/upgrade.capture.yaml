@@ -1,0 +1,260 @@
+what: "Riverside's library, live from heart-sims: one client, heart-ts, as plain JSON and as HEART"
+at: 2026-11-05T00:25:32.628Z
+service: heart-sims library.test (heart/heart-sims), Bearer credential not recorded
+steps:
+  - say: "An old-school client asks for plain JSON: The Hobbit, data only"
+    outcome:
+      dialect: json
+      state:
+        id: 3310
+        title: The Hobbit
+        author: J. R. R. Tolkien
+        due: 2026-11-12
+        renewals: 0
+        standing: hold waiting
+      forms: []
+      links: 0
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3310
+          headers:
+            accept: application/json
+            cache-control: no-cache
+        response:
+          status: 200
+          content-type: application/json
+          etag: '"seq-1.json.d41721359acd5110"'
+          body:
+            id: 3310
+            title: The Hobbit
+            author: J. R. R. Tolkien
+            due: 2026-11-12
+            renewals: 0
+            standing: hold waiting
+  - say: "It tries to renew The Hobbit, and nothing is sent: plain JSON offers no acts"
+    outcome:
+      stopped: library:renew is not offered now; nothing was sent
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3310
+          headers:
+            accept: application/json
+            cache-control: no-cache
+        response:
+          status: 200
+          content-type: application/json
+          etag: '"seq-1.json.d41721359acd5110"'
+          body:
+            id: 3310
+            title: The Hobbit
+            author: J. R. R. Tolkien
+            due: 2026-11-12
+            renewals: 0
+            standing: hold waiting
+  - say: "The same client code asks for HEART: The Hobbit offers return only"
+    outcome:
+      dialect: hal-schema-forms
+      standing: hold waiting
+      forms:
+        - library:return
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3310
+          headers:
+            accept: application/hal+json
+            accept-profile: <https://w3id.org/heart-rise/hal-schema-forms>
+            cache-control: no-cache
+        response:
+          status: 200
+          content-type: application/hal+json
+          etag: '"seq-1.hsf.L0.3619e672f0d0c70d"'
+          body:
+            id: 3310
+            title: The Hobbit
+            author: J. R. R. Tolkien
+            due: 2026-11-12
+            renewals: 0
+            standing: hold waiting
+            _links:
+              self:
+                href: /loans/3310
+              curies:
+                - name: library
+                  href: /profiles/library#{rel}
+                  templated: true
+                - name: hr
+                  href: https://w3id.org/heart-rise/rels/{rel}
+                  templated: true
+              hr:unavailable:
+                href: /unavailable/61bc1cd6003e61f0
+                type: application/json
+                integrity: sha256-Ybwc1gA+YfAiY7ZpXlBplOiul6mouOPJFqTT74MgPzU=
+            _forms:
+              library:return:
+                title: Return
+                description: Gives the book back to the library.
+                _links:
+                  target:
+                    href: /loans/3310/actions/return
+                method: POST
+                contentType: application/json
+                schema:
+                  properties: {}
+                  type: object
+                  $id: /schemas/efddc7bd8bbcef73
+                hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+  - say: And Matilda offers renew and return
+    outcome:
+      dialect: hal-schema-forms
+      standing: renewable
+      forms:
+        - library:renew
+        - library:return
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3311
+          headers:
+            accept: application/hal+json
+            accept-profile: <https://w3id.org/heart-rise/hal-schema-forms>
+            cache-control: no-cache
+        response:
+          status: 200
+          content-type: application/hal+json
+          etag: '"seq-1.hsf.L0.d96396fb7e046607"'
+          body:
+            id: 3311
+            title: Matilda
+            author: Roald Dahl
+            due: 2026-11-12
+            renewals: 0
+            standing: renewable
+            _links:
+              self:
+                href: /loans/3311
+              curies:
+                - name: library
+                  href: /profiles/library#{rel}
+                  templated: true
+                - name: hr
+                  href: https://w3id.org/heart-rise/rels/{rel}
+                  templated: true
+              hr:unavailable:
+                href: /unavailable/fc81f545088ea825
+                type: application/json
+                integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+            _forms:
+              library:renew:
+                title: Renew
+                description: Keeps the book three weeks more.
+                _links:
+                  target:
+                    href: /loans/3311/actions/renew
+                method: POST
+                contentType: application/json
+                schema:
+                  properties: {}
+                  type: object
+                  $id: /schemas/efddc7bd8bbcef73
+                hr:integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+              library:return:
+                title: Return
+                description: Gives the book back to the library.
+                _links:
+                  target:
+                    href: /loans/3311/actions/return
+                method: POST
+                contentType: application/json
+                schema:
+                  properties: {}
+                  type: object
+                  $id: /schemas/efddc7bd8bbcef73
+                hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+  - say: "A plain JSON parser reads the HEART answer: the data is all there, the controls are extra members"
+    outcome:
+      title: Matilda
+      due: 2026-11-12
+      standing: renewable
+      extra:
+        - _links
+        - _forms
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3311
+          headers:
+            accept: application/hal+json
+        response:
+          status: 200
+          content-type: application/hal+json
+          etag: '"seq-1.hsf.L0.d96396fb7e046607"'
+          body:
+            id: 3311
+            title: Matilda
+            author: Roald Dahl
+            due: 2026-11-12
+            renewals: 0
+            standing: renewable
+            _links:
+              self:
+                href: /loans/3311
+              curies:
+                - name: library
+                  href: /profiles/library#{rel}
+                  templated: true
+                - name: hr
+                  href: https://w3id.org/heart-rise/rels/{rel}
+                  templated: true
+              hr:unavailable:
+                href: /unavailable/fc81f545088ea825
+                type: application/json
+                integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
+            _forms:
+              library:renew:
+                title: Renew
+                description: Keeps the book three weeks more.
+                _links:
+                  target:
+                    href: /loans/3311/actions/renew
+                method: POST
+                contentType: application/json
+                schema:
+                  properties: {}
+                  type: object
+                  $id: /schemas/efddc7bd8bbcef73
+                hr:integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+              library:return:
+                title: Return
+                description: Gives the book back to the library.
+                _links:
+                  target:
+                    href: /loans/3311/actions/return
+                method: POST
+                contentType: application/json
+                schema:
+                  properties: {}
+                  type: object
+                  $id: /schemas/efddc7bd8bbcef73
+                hr:integrity: sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
+  - say: A browser asks for text/html, and gets the page
+    outcome:
+      status: 200
+      type: text/html;charset=UTF-8
+    exchanges:
+      - request:
+          method: GET
+          url: /loans/3311
+          headers:
+            accept: text/html
+        response:
+          status: 200
+          content-type: text/html;charset=UTF-8
+          etag: '"seq-1.html.L0.dc7ed50846abfcfb"'
+          body: >-
+            <!doctype html>
+
+            <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,
+            initial-scale=1"><title>Matilda</title><link rel=…

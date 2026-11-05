@@ -194,3 +194,15 @@ blockquote.said { border-left: 3px solid var(--rule); padding: 0.3rem 0.9rem; co
 }
 @media (max-width: 40rem) { .brand b { font-size: 0.95rem; } }
 .source pre.asked { margin: 0 0 0.5rem; font-size: 0.74rem; }
+
+/* What the deck is served as: plain JSON, or HEART */
+.bar-in { flex-wrap: wrap; }
+.mode { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; overflow: hidden; background: var(--surface); }
+.mode button { font: 600 0.78rem var(--mono); color: var(--muted); background: transparent; border: 0; padding: 0.35rem 0.75rem; cursor: pointer; }
+.mode button[aria-pressed="true"] { color: var(--fg); background: var(--leaf-bg); }
+:root[data-mode="plain"] .mode button[aria-pressed="true"] { background: var(--hold-bg); }
+.mode-note { margin: 0; font-size: 0.84rem; color: var(--muted); padding: 0.45rem 0.8rem; border-radius: 10px; background: var(--leaf-bg); }
+.mode-note b { color: var(--leaf); margin-right: 0.4rem; font: 600 0.7rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; }
+:root[data-mode="plain"] .mode-note { background: var(--hold-bg); }
+:root[data-mode="plain"] .mode-note b { color: var(--hold); }
+.mode-note:empty { display: none; }

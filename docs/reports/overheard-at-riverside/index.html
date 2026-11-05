@@ -11,6 +11,10 @@
 </head><body>
 <header class="bar"><div class="bar-in">
   <div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation</span></div>
+  <div class="mode" role="group" aria-label="What the deck is served as">
+    <button type="button" data-mode="plain" aria-pressed="false">Plain JSON</button>
+    <button type="button" data-mode="heart" aria-pressed="true">HEART</button>
+  </div>
   <button class="pill outline-toggle" id="outline-toggle" type="button" aria-controls="outline" aria-expanded="false">Outline</button>
   <button class="pill" id="theme" type="button">◐ Dark</button>
 </div></header>
@@ -22,6 +26,7 @@
     <p class="how">Move with ← and →, or pick from the outline. Every slide has its own address.</p>
   </nav>
   <main class="stage">
+    <p class="mode-note" id="mode-note"></p>
     <article class="slide" id="slide" aria-live="polite"><p class="note">Reading the deck…</p></article>
     <nav class="foot" aria-label="Back and on">
       <span class="off" data-rel="prev"><small>Back</small><b>—</b></span>

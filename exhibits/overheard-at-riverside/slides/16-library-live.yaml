@@ -1,0 +1,25 @@
+name: library-live
+part: Closing
+title: The library, live, both ways
+fiction: false
+html: |
+  <h2>The library, live, both ways</h2>
+  <p class="dek">One heart-ts client against Riverside's running library service, recorded.</p>
+  <ol class="steps">
+    <li><b>Asked for plain JSON.</b><span><i>The Hobbit</i> comes back as data: its title, due 2026-11-12, standing “hold waiting”. No forms, no links.</span></li>
+    <li><b>It tries to renew.</b><span>“library:renew is not offered now; nothing was sent.” Plain JSON offers no acts.</span></li>
+    <li><b>The same code, asking for HEART.</b><span><i>The Hobbit</i> offers return only.</span></li>
+    <li><b>And <i>Matilda</i></b><span>offers renew and return.</span></li>
+    <li><b>A plain JSON parser reads the HEART answer.</b><span>Title, due date and standing are all there; <code>_links</code> and <code>_forms</code> are extra members it ignores. The upgrade breaks no old client.</span></li>
+    <li><b>A browser asks for text/html.</b><span>It gets <i>Matilda</i>'s page, from the same service.</span></li>
+  </ol>
+  <details class="more"><summary>How the service decides what to send</summary>
+    <ul>
+      <li><code>Accept: application/json</code>: plain JSON, the state with no controls.</li>
+      <li><code>Accept: application/hal+json</code>: HAL Schema Forms.</li>
+      <li><code>Accept: text/html</code>: the page, for people.</li>
+      <li>No Accept, or <code>*/*</code>: one default, HAL-FORMS at L0. HTTP reads a missing Accept as “anything”, so both get the same answer.</li>
+      <li>A client upgrades when it asks for HEART; a service upgrades when it names its profile. Both are optional.</li>
+    </ul>
+    <p class="note">Run by <code>exhibits/overheard-at-riverside/live/upgrade.mjs</code> against heart-sims; every exchange is in <code>upgrade.capture.yaml</code> beside it.</p>
+  </details>
