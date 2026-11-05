@@ -27,7 +27,7 @@ pins=()
 [[ -f ${script%.heart.yaml}.pins.yaml ]] && pins=(--pins ${script%.heart.yaml}.pins.yaml)
 began=$(date +%s)
 since=$(date -u -r $began +%Y-%m-%dT%H:%M:%SZ)
-/Users/josh/repos/artie/client/artie-cli/build/install/artie/bin/artie run $script owner=JogoShugh version=1.3 \
+/Users/josh/repos/artie/client/artie-cli/build/install/artie/bin/artie run $script owner=JogoShugh version=${VERSION:-1.3} \
   $pins --exchanges --trace runs/$name.trace.yaml "$@" > runs/$name.out 2>&1 &
 pid=$!
 closed=""

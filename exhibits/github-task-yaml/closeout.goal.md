@@ -16,7 +16,8 @@ Close each issue that is ready, the way its labels say it ended. Keep watching u
   - Open an issue titled "Close-out watch", saying "Close this issue to stop the watch." `as watch`
   - Whenever an issue labelled {label} changes `as issue`
     - If it's closed, leave it.
-    - If it's labelled {shipped}, comment "Fixed in {version}." and close it as completed.
+    - If it's labelled {shipped}, comment "Fixed in {version}."
+    - If it's labelled {shipped}, close it as completed.
     - If it's labelled {wontfix}, close it as not planned.
     - If it's labelled {duplicate}, close it as a duplicate.
 - Until someone closes {watch}

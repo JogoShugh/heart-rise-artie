@@ -132,8 +132,8 @@ function addSlideAfter(after, n) {
     ["B", "      - Merge it by squashing its commits"],
     ["P", "      - Verify: it merged"],
     ["P", "- On {issue}"],
-    ["B", "  - Comment \"Fixed in 1.2 by #{pr.number}.\""],
-    ["B", "  - Close it the right way: the fix shipped in 1.2"],
+    ["B", "  - Comment \"Fixed in {version} by #{pr.number}.\""],
+    ["B", "  - Close it the right way: the fix shipped in {version}"],
     ["P", "  - Verify:"],
     ["P", "    - it is closed"],
     ["P", "    - its reason is completed"],
@@ -142,9 +142,9 @@ function addSlideAfter(after, n) {
   place(s, 5, { cy: 3.55 });
   text(s, 27, ["23"]);
   text(s, 28, ["model calls: planning, then choosing"]);
-  text(s, 31, ["99 s"]);
+  text(s, 31, ["90 s"]);
   save(s);
-  notes(30, "Real run of github-task.goal.md, the task in plain words, against JogoShugh/heart-github-test through the gateway, 5 November 2026: issue #2187, PR #2188, 25 steps, 99 seconds. 23 model calls (Claude Sonnet 5.5): the planner turns each line into moves, and the reasoner chooses among the forms and links the gateway offered; ARTIE checked each choice before sending. No script was written by hand: not Kotlin, not YAML.");
+  notes(30, "Real run of github-task.goal.md, the task in plain words, against JogoShugh/heart-github-test through the gateway, 5 November 2026, given version=1.2: issue #2195, PR #2196, 25 steps, 90 seconds. 23 model calls (Claude Sonnet 5.5): the planner turns each line into moves, and the reasoner chooses among the forms and links the gateway offered; ARTIE checked each choice before sending. No script was written by hand: not Kotlin, not YAML. What varies is an input ({owner}, {repo}, {stamp}, {version}) or found on the walk and kept (as issue, as pr).");
 }
 
 // Slide 31: the kept script artie generate wrote from that run, as YAML, its lock file, and the replay.
@@ -158,82 +158,83 @@ function addSlideAfter(after, n) {
     ["P", "    title: Refuse a bed with no name (steps)"],
     ["P", "    body: \"Relates to #${issue.number}\""],
     ["P", "  then:"],
-    ["P", "    - sync: true"],
     ["P", "    - keep-as: pr"],
     ["P", "    - until:"],
     ["P", "        offered: github:merge"],
     ["B", "    - act: github:merge"],
-    ["P", "      fields:"],
-    ["P", "        merge_method: squash"],
+    ["P", "…"],
+    ["B", "- act: github:comment"],
+    ["P", "  fields:"],
+    ["P", "    body: \"Fixed in ${version} by #${pr.number}.\""],
   ]);
-  place(s, 4, { cy: 3.2 });
-  place(s, 5, { cy: 2.9 });
+  place(s, 4, { cy: 3.4 });
+  place(s, 5, { cy: 3.1 });
   code(s, 7, [
     ["I", "# github-task.pins.yaml (lock file)"],
     ["B", "github:merge:"],
     ["P", "  integrity: sha256-uJuM7+5OJxJsXKNcZdbk…"],
     ["P", "  act: sha256-rIPDcwcEW99MvpphQzxb…"],
   ]);
-  place(s, 6, { y: 5.1 });
-  place(s, 7, { y: 5.25 });
+  place(s, 6, { y: 5.25 });
+  place(s, 7, { y: 5.4 });
   cells(s, [
     [null, "From the goal", "Replayed"],
     ["Model calls", "23", "0"],
-    ["Time", "99 s", "28 s"],
-    ["Steps", "25", "28, with 2 more checks"],
+    ["Time", "90 s", "27 s"],
+    ["Release, an input", "version=1.2", "version=1.3"],
     ["Each act checked", "against offers", "strictly, to lock"],
     ["Values to review", "—", "0 of 19"],
-    ["Live result", "#2187, PR #2188", "#2189, PR #2190"],
+    ["Live result", "#2195, PR #2196", "#2197, PR #2198"],
   ]);
-  text(s, 9, ["The lock file pins each form’s integrity, and its act with the target set aside. A strict replay refuses a form no longer offered, or changed in any way."]);
+  text(s, 9, ["The lock file pins each form’s integrity, and its act with the target set aside. Given 1.3, the replay commented “Fixed in 1.3 by #2198.”"]);
   save(s);
-  notes(31, "artie generate --format yaml read the capture of the goal run on slide 30 and wrote github-task.heart.yaml: every selection named, each value read again as a reference (${issue.number}, ${pr.number}, ${stamp}) from what the goal said and kept (as issue, as pr), 19 fields and 0 to review, with a lock file of what was offered. It ran live with no model, guard strict, 5 November 2026: issue #2189, PR #2190, 28 seconds. After each act that changed what it acted on, the replay checks the change: two more steps than the goal run.");
+  notes(31, "artie generate --format yaml read the capture of the goal run on slide 30 and wrote github-task.heart.yaml: every selection named, and every value that varies read again as a reference: inputs (${owner}, ${repo}, ${stamp}, ${version}) and what the walk found and kept (${issue.number}, ${pr.number}). 19 fields, 0 to review, with a lock file of what was offered. It ran live with no model, guard strict, given version=1.3, 5 November 2026: issue #2197, PR #2198, 27 seconds, 28 steps (after each act that changed what it acted on, the replay checks the change).");
 }
 
 // Slide 32: the October runs, said as such; the intent rung in plain words.
 {
   const s = load("slides/slide32.xml");
   text(s, 13, ["Every move in plain words; Claude picks the form and fields from what’s offered."]);
-  text(s, 24, ["All 9 runs finished: 9 issues opened and closed, 9 pull requests merged, every committed file read back from GitHub. Kotlin scripts, 18 October; from a plain goal to YAML on 5 November: 99 s, 28 s and 33 s."]);
+  text(s, 24, ["All 9 runs finished: 9 issues opened and closed, 9 pull requests merged, every committed file read back from GitHub. Kotlin scripts, 18 October; from a plain goal to YAML on 5 November: 90 s, 27 s and 34 s."]);
   save(s);
-  notes(32, "Live runs, 18 October 2026, scratch repository JogoShugh/heart-github-test, with the scripts in Kotlin. Ranges: scripted 17.6-18.2 s, intent 45.9-49.6 s, hybrid 24.2-30.1 s. Reasoner: Claude Sonnet 5.5. In every intent run Claude made the same ten choices. The same three on 5 November 2026, one live run each, with no script written by hand: the plain goal 99 s (23 model calls, planning and choosing), the kept YAML artie generate wrote from it 28 s (0), and the hybrid 33 s (1). Those times include a walk of the pages of open pull requests and branches the scratch repository now holds.");
+  notes(32, "Live runs, 18 October 2026, scratch repository JogoShugh/heart-github-test, with the scripts in Kotlin. Ranges: scripted 17.6-18.2 s, intent 45.9-49.6 s, hybrid 24.2-30.1 s. Reasoner: Claude Sonnet 5.5. In every intent run Claude made the same ten choices. The same three on 5 November 2026, one live run each, with no script written by hand: the plain goal 90 s (23 model calls, planning and choosing), the kept YAML artie generate wrote from it 27 s (0), and the hybrid 34 s (1). Those times include a walk of the pages of open pull requests and branches the scratch repository now holds.");
 }
 
-// The follow-up to slide 33, made from it before it changes: name the case, and the hybrid's judgement goes.
+// The follow-up to slide 33, made from it before it changes: every kind of closure named, the walk finds which.
 addSlideAfter(33, 38);
 {
   const s = load("slides/slide38.xml");
-  text(s, 2, ["PREVIEW  ·  …OR NAME THE CASE"]);
-  text(s, 3, ["Name the case, and the judgement goes"]);
+  text(s, 2, ["PREVIEW  ·  …OR NAME EVERY CASE"]);
+  text(s, 3, ["Name every case; the walk finds which"]);
   code(s, 5, [
-    ["I", "# github-task.hybrid.goal.md: a judgement, every run"],
-    ["P", "  - Close it the right way: the fix shipped in 1.2 `reasoned`"],
-    ["I", "# github-task.directed.goal.md: the case, named"],
-    ["B", "  - Close it as completed, since the fix shipped in 1.2"],
-    ["I", "# github-task.directed.heart.yaml, as artie generate wrote it"],
-    ["B", "- act: github:close"],
-    ["P", "  intent: Close it as completed, since the fix shipped in 1.2"],
+    ["I", "# closeout.goal.md (excerpt): every kind of closure, named"],
+    ["P", "- Whenever an issue labelled {label} changes"],
+    ["B", "  - If it's labelled {shipped}, close it as completed."],
+    ["B", "  - If it's labelled {wontfix}, close it as not planned."],
+    ["B", "  - If it's labelled {duplicate}, close it as a duplicate."],
+    ["I", "# closeout.heart.yaml, as artie generate wrote it (excerpt)"],
+    ["P", "- given:"],
+    ["P", "    - field: github:labels"],
+    ["P", "      has: ${wontfix}"],
     ["P", "  then:"],
-    ["P", "    - check:"],
-    ["P", "        - field: state_reason"],
-    ["P", "          is: completed"],
+    ["B", "    - act: github:close-not-planned"],
   ], 1100);
   place(s, 4, { cy: 2.4 });
   place(s, 5, { cy: 2.1 });
   cells(s, [
-    ["Said as", "GitHub offers", "It records"],
-    ["as completed", "github:close", "completed"],
-    ["as not planned", "github:close-not-planned", "not planned"],
-    ["as a duplicate", "github:close-duplicate", "duplicate"],
+    ["Labelled", "Pinned for that case", "Closed as"],
+    ["shipped", "github:comment, github:close", "completed"],
+    ["wontfix", "github:close-not-planned", "not planned"],
+    ["duplicate", "github:close-duplicate", "duplicate"],
   ]);
   text(s, 7, [
-    "The hybrid asks the model on every run because “the right way” leaves a choice among three closes.",
+    "Three issues, one per label, so the walk met every case. Claude decided each If once, as a check on the issue’s labels, and artie generate kept each as a given, its close pinned.",
     null,
-    "Named, there is one. artie generate pins github:close, and the replay ran with no model, held strictly to the lock file: 0 model calls, 28 s, closed as completed.",
+    "Replayed with no model on three new issues, release 1.4: each closed its own way. 0 model calls, 52 s.",
   ]);
-  text(s, 9, ["Name the case when you know it. Keep reasoned for what words can’t settle ahead of time."]);
+  text(s, 9, ["The cases are in the words; which one applies is found on the walk. Labels and release are inputs."]);
   save(s);
-  notes(38, "The directed goal is the plain goal with its close step said as the case: \"Close it as completed, since the fix shipped in 1.2\". Its run, live, 5 November 2026: issue #2191, PR #2192, 23 model calls, 96 s. artie generate wrote github-task.directed.heart.yaml with act: github:close and no reason step; replayed with no model, guard strict: issue #2193, PR #2194, 28 s, state_reason completed. Words name one case. Where the case differs from run to run (merged or not, a duplicate or not), a script as data can choose by the resource's state instead, with whenever and has, as the merge watch does, still with no model.");
+  notes(38, "closeout.goal.md is a watch: whenever an issue labelled {label} changes, it closes the issue the way its labels say it ended; every label and the release are inputs. To meet every case, three issues were staged, one labelled shipped, one wontfix, one duplicate. Claude's run, live, 5 November 2026: 22 model calls, 132 s; #2207 closed as completed with \"Fixed in 1.3.\", #2208 as not planned, #2209 as a duplicate. artie generate wrote closeout.heart.yaml: each If a given on the issue's labels, each close pinned. Replayed with no model, guard strict, release 1.4, on three new issues: #2211 completed with \"Fixed in 1.4.\", #2212 not planned, #2213 duplicate; 52 s. A case the walk never met would stay in words for the model, so stage every case you mean to keep.");
 }
 
 // Slide 33: the hybrid, as the goal marks it.
@@ -242,20 +243,20 @@ addSlideAfter(33, 38);
   code(s, 5, [
     ["I", "# github-task.hybrid.goal.md (excerpt)"],
     ["P", "- On {issue}"],
-    ["P", "  - Comment \"Fixed in 1.2 by #{pr.number}.\""],
-    ["B", "  - Close it the right way: the fix shipped in 1.2 `reasoned`"],
+    ["P", "  - Comment \"Fixed in {version} by #{pr.number}.\""],
+    ["B", "  - Close it the right way: the fix shipped in {version} `reasoned`"],
     ["I", "# github-task.hybrid.heart.yaml, as artie generate wrote it"],
     ["P", "- act: github:comment"],
     ["P", "  fields:"],
-    ["P", "    body: \"Fixed in 1.2 by #${pr.number}.\""],
-    ["B", "- intent: \"Close it the right way: the fix shipped in 1.2\""],
+    ["P", "    body: \"Fixed in ${version} by #${pr.number}.\""],
+    ["B", "- intent: \"Close it the right way: the fix shipped in ${version}\""],
     ["B", "  reasoned: true"],
   ], 1100);
   place(s, 4, { cy: 2.25 });
   place(s, 5, { cy: 1.95 });
   cells(s, [
     ["Hybrid run", "Claude chose", "Step time"],
-    ["5 November", "github:close", "5.8 s"],
+    ["5 November", "github:close", "5.4 s"],
   ]);
   keepRows(s, 2);
   text(s, 7, [
@@ -264,23 +265,23 @@ addSlideAfter(33, 38);
     "Claude chose github:close, and the check confirmed GitHub recorded it as completed. Every other step ran exactly as written, held strictly to the lock file.",
   ]);
   save(s);
-  notes(33, "The hybrid comes from the goal: the close step is marked `reasoned`, so artie generate keeps it as a reason step and pins the rest. Goal run: issue #2183, PR #2184. The hybrid replay, live, 5 November 2026: issue #2185, PR #2186, 33 s, one model call; the close step took 5.8 s, the model's choice and GitHub's answer together. In October's three Kotlin hybrid runs, the model's one call took 5.5 to 9.8 seconds.");
+  notes(33, "The hybrid comes from the goal: the close step is marked `reasoned`, so artie generate keeps it as a reason step and pins the rest. Goal run, version=1.2: issue #2215, PR #2216. The hybrid replay, live, version=1.3, 5 November 2026: issue #2217, PR #2218, 34 s, one model call; the close step took 5.4 s, the model's choice and GitHub's answer together. The next slide removes the judgement: name every case, and let the walk find which.");
 }
 
-// Slide 34: the words come first, in a plain goal.
+// Slide 34 (35 once the new slide is in): the words come first, in a plain goal.
 {
   const s = load("slides/slide34.xml");
   text(s, 5, [null, "the task in plain words, a goal; the model maps each line to the forms offered"]);
-  text(s, 18, ["Hybrid: pin the routine, mark the one step that needs judgement reasoned."]);
+  text(s, 18, ["Hybrid: pin the routine, mark the one step that needs judgement reasoned; or name every case."]);
   save(s);
 }
 
-// Slide 37: where the runs are.
+// Slide 37 (38): where the runs are.
 {
   const s = load("slides/slide37.xml");
   text(s, 4, [null, null, null, null, null,
     "Three ways through GitHub: scripted, intent and hybrid runs in Kotlin, 3 live runs each, issues #49–#65 and PRs #50–#66, 18 October 2026; gateway e171027, ARTIE f494ff4, reasoner Claude Sonnet 5.5.",
-    "GitHub preview, from a plain goal to YAML: github-task.goal.md (issue #2187, PR #2188), the github-task.heart.yaml artie generate wrote from it, replayed strictly with its lock file (#2189, PR #2190), the hybrid (#2185, PR #2186), and the case named (#2191, PR #2192; replayed #2193, PR #2194), on JogoShugh/heart-github-test, 5 November 2026. Scripts and runs: exhibits/github-task-yaml.",
+    "From a plain goal to YAML, 5 November 2026, on JogoShugh/heart-github-test: github-task.goal.md (#2195, PR #2196) and its kept YAML replayed strictly (#2197, PR #2198); the hybrid (#2215–#2218); the close-out watch (#2207–#2209) and its replay with no model (#2211–#2213). Scripts and runs: exhibits/github-task-yaml.",
   ]);
   save(s);
 }
