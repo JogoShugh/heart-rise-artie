@@ -340,8 +340,6 @@ details.more { min-width: 0; }
 .ns-btn, .tk-nsbtn { display: inline-block; padding: 0.08rem 0.45rem; background: #c0c0c0; color: #000;
   border: 2px solid; border-color: #fff #404040 #404040 #fff; font: 0.68rem/1.35 Arial, Helvetica, sans-serif; white-space: nowrap; }
 .tk-nsbtn { font-size: 0.72rem; }
-.ns-logo { margin-left: auto; width: 1.9rem; height: 1.9rem; display: grid; place-items: center; background: #00007a; color: #fff;
-  font: 700 1.2rem Georgia, "Times New Roman", serif; border: 2px solid; border-color: #fff #404040 #404040 #fff; }
 .ns-page { background: #c0c0c0; }
 .ns-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 0.4rem; align-items: center; }
 .ns-acts { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
@@ -366,3 +364,17 @@ pre.source { font-size: 0.72rem; }
 /* Code beside code, one under the other: long lines want the whole width */
 .code-pair { display: grid; gap: 0.7rem; min-width: 0; }
 .code-pair > div { display: grid; gap: 0.3rem; min-width: 0; }
+
+/* Navigator 3.0's toolbar: a picture over each label, as it showed them by default; its directory buttons below;
+   and the N over a night sky, top right. Drawn, as the rest of the window is. */
+.ns-tools { gap: 0.1rem; align-items: stretch; }
+.ns-tool { display: grid; justify-items: center; gap: 0.05rem; min-width: 2.7rem; padding: 0.15rem 0.3rem; color: #000;
+  font: 0.62rem/1.1 Arial, Helvetica, sans-serif; border: 1px solid transparent; }
+.ns-tool:hover { border-color: #fff #404040 #404040 #fff; }
+.ns-tool svg { width: 1.25rem; height: 1.25rem; }
+.ns-logo { margin-left: auto; align-self: center; width: 2.5rem; height: 2.5rem; display: grid; place-items: center; color: #fff;
+  font: 700 1.55rem/1 Georgia, "Times New Roman", serif; border: 2px solid; border-color: #404040 #fff #fff #404040;
+  background: radial-gradient(circle at 30% 25%, #fff 0 1px, transparent 1.5px), radial-gradient(circle at 75% 20%, #fff 0 1px, transparent 1.5px),
+    radial-gradient(circle at 20% 70%, #cfe 0 1px, transparent 1.5px), radial-gradient(circle at 85% 65%, #fff 0 0.8px, transparent 1.3px),
+    radial-gradient(ellipse at 50% 120%, #3a5fcf 0 45%, transparent 46%), linear-gradient(#000038, #0a1a6a); }
+@media (max-width: 40rem) { .ns-tool { min-width: 2.3rem; padding: 0.1rem 0.15rem; } .ns-tool svg { width: 1.05rem; height: 1.05rem; } }
