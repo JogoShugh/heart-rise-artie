@@ -20,6 +20,28 @@ internal fun reference(path: String): String = "\${$path}"
 internal fun Bindings.referenceOf(name: String): String =
     variables.values.firstOrNull { it.name == name }?.reference ?: reference(name)
 
+/** The variables [step]'s slots are read from, where an earlier answer of [capture] filled them, made now. */
+internal fun Bindings.slotsRead(capture: Capture, step: Step) {
+    val sources = Sources(capture)
+    step.slots.values.map { it.map()["from"] }
+        .filter { from -> from.list().none { it.map()["input"] != null } }
+        .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
+}
+
+/**
+ * [text], a check's, with each value a variable holds, found whole in it, written as the reference that reads it
+ * again: "Seen in #10." checks "Seen in #${'$'}{issue.number}.", so another run checks its own.
+ */
+internal fun Bindings.readAgain(capture: Capture, text: String): String {
+    var said = text
+    for (variable in variables.values) {
+        val value = capture.step(variable.step)?.read(variable.pointer)?.toString()
+        if (value == null || value.length < 2) continue
+        said = Regex("(?<![\\w$])${Regex.escape(value)}(?!\\w)").replace(said) { variable.reference }
+    }
+    return said
+}
+
 /** [value] as data, as a field of [type] takes it: text that is a number, a truth or JSON for those types, read so. */
 internal fun data(value: Any?, type: String?): Any? = when {
     value !is String -> value

@@ -105,7 +105,8 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
         val until = step["until"] as? Map<*, *> ?: stop("until holds a relation offered, or facts")
         val tries = (step["tries"] as? Number)?.toInt() ?: UNTIL_TRIES
         val offered = until["offered"]?.toString()
-        until(tries, span(step["every"]) ?: 1.seconds) {
+        val waitingFor = offered?.let { "offers(${kotlinString(it, false)})" }
+        until(tries, span(step["every"]) ?: 1.seconds, waitingFor) {
             if (offered != null) offers(offered) else holds(facts(until["facts"], reading))
         }
     },

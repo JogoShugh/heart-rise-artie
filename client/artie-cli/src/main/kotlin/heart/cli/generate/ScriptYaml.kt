@@ -157,7 +157,7 @@ class ScriptYaml(
     private fun step(walked: Walked): List<Map<String, Any?>> = when (walked) {
         is Walked.Selection -> selection(walked)
         is Walked.Sync -> listOf(mapOf("sync" to true))
-        is Walked.Waits -> listOf(waited(walked.step))
+        is Walked.Waits -> listOf(readAgain(bindings, capture, waited(walked.step)))
     }
 
     /**
@@ -271,6 +271,18 @@ internal fun waited(step: Step): Map<String, Any?> {
     val facts = step.params["facts"].list().map { it.map() }
     if (facts.isEmpty()) throw BadArguments("step ${step.number}: a check the capture can't write back")
     return mapOf("check" to facts.map { fact(step, it) })
+}
+
+/** [wait], with each text a check holds read again where it holds a value an earlier answer gave. */
+private fun readAgain(bindings: Bindings, capture: Capture, wait: Map<String, Any?>): Map<String, Any?> {
+    val facts = wait["check"] as? List<*> ?: return wait
+    return mapOf(
+        "check" to facts.map { fact ->
+            (fact as Map<*, *>).entries.associate { (key, value) ->
+                key.toString() to if (key != "field" && value is String) bindings.readAgain(capture, value) else value
+            }
+        },
+    )
 }
 
 private fun fact(step: Step, fact: Map<*, *>): Map<String, Any?> {

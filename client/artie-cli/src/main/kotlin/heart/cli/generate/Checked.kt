@@ -19,7 +19,7 @@ internal fun checked(capture: Capture, step: Step, sent: Set<String>): List<Chec
         ?.takeIf { held -> changes && step.state.keys.all { it in held.keys } } ?: return emptyList()
     return step.state.entries.mapNotNull { (member, after) ->
         val field = member.toString()
-        val repeats = (after is String && !TIME.containsMatchIn(after)) || after is Boolean
+        val repeats = (after is String && !TIME.containsMatchIn(after) && !HASH.matches(after)) || after is Boolean
         when {
             before[member] == after -> null
             field in sent -> Checked(field, true, null)
@@ -34,3 +34,6 @@ private val CHANGING = setOf("POST", "PUT", "PATCH", "DELETE")
 
 /** A value that begins as a date does: a time, which a later run won't repeat. */
 private val TIME = Regex("""^\d{4}-\d{2}-\d{2}""")
+
+/** A value made of hex digits, a digit among them, such as a commit's hash: made anew each run. */
+private val HASH = Regex("""^(?=[0-9a-f]*\d)[0-9a-f]{7,}$""")

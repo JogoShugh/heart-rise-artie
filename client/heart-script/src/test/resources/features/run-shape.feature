@@ -48,6 +48,34 @@ Feature: The trace keeps a run's shape: blocks, waits, how links were picked, ju
       | 5    | until  | 3    |       | state["/state"] == "closed" | 2     |
       | 6    | return | 2    |       |                              |       |
 
+  Scenario: An until in a script held as data says what it waited for, as a Kotlin script's does
+    A script as data has no Kotlin line to read the condition from, so the
+    run says it as a Kotlin script writes it, offers("close"): a script
+    generated from that run waits for the same.
+    Given these forms
+      | at         | relation | leads to   | outcome |
+      | /issues/10 | close    | /issues/10 | done    |
+    When this script held as data runs
+      """yaml
+      heart: 1
+      kind: kept
+      start: scripted://service/
+      steps:
+        - act: issues-get
+          fields:
+            number: 10
+          then:
+            - until:
+                offered: close
+      """
+    Then the script finished
+    And the trace's steps are shaped
+      | step | does   | line | opens | waited for      | reads |
+      | 1    | enter  |      | yes   |                 |       |
+      | 2    | act    |      | yes   |                 |       |
+      | 3    | until  |      |       | offers("close") | 0     |
+      | 4    | return |      |       |                 |       |
+
   Scenario: How a link was picked, a judgement, and what later steps read
     Given the reasoner chooses
       | intent             | selection | relation | fields                               |

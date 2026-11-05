@@ -6,15 +6,21 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Read the held resource again until [condition] holds, at most [tries] times
  * [every] apart: for a server that settles a moment after an act. When it
- * never holds, the script stops here.
+ * never holds, the script stops here. [waitingFor] says the condition as a
+ * Kotlin script writes it, for a script with no Kotlin line to read it from.
  */
-fun Here.until(tries: Int = 10, every: Duration = 1.seconds, condition: Here.() -> Boolean) {
+fun Here.until(
+    tries: Int = 10,
+    every: Duration = 1.seconds,
+    waitingFor: String? = null,
+    condition: Here.() -> Boolean,
+) {
     val step = ++run.step
     for (attempt in 1..tries) {
         if (condition()) {
             // A step of its own, even when it held at once: a script made from the run waits here too.
             run.record(TraceStep.Asked("until", emptyMap()), "held", held)
-            run.trace.last().waited = run.waitedFor(attempt - 1)
+            run.trace.last().waited = run.waitedFor(attempt - 1, waitingFor)
             return
         }
         if (attempt == tries) break

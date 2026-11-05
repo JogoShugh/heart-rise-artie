@@ -273,13 +273,14 @@ class Run(
         }
 
     /**
-     * What the until just traced waited for, as the script wrote its condition on that line, and how many
-     * [reads] it took.
+     * What the until just traced waited for, as [said] says it, else as the script wrote its condition on that
+     * line, and how many [reads] it took.
      */
-    internal fun waitedFor(reads: Int): kotlinx.serialization.json.JsonObject =
+    internal fun waitedFor(reads: Int, said: String? = null): kotlinx.serialization.json.JsonObject =
         kotlinx.serialization.json.buildJsonObject {
             val written = trace.last().line?.let { source?.lines()?.getOrNull(it - 1) }
-            val condition = written?.substringAfter("until(", "")?.substringAfter("{", "")?.substringBeforeLast("}")
+            val condition = said
+                ?: written?.substringAfter("until(", "")?.substringAfter("{", "")?.substringBeforeLast("}")
             condition?.trim()?.takeIf { it.isNotEmpty() }
                 ?.let { put("for", kotlinx.serialization.json.JsonPrimitive(it)) }
             put("reads", kotlinx.serialization.json.JsonPrimitive(reads))

@@ -291,7 +291,8 @@ internal class Walker(
         val words = said(capture, step, names(), emptyList()).takeIf { options.intents && !keep }
         val call = when {
             keep -> Call.Reasoned
-            words != null -> Call.Words(words)
+            // Its words still read what an earlier answer gave from where that answer is kept.
+            words != null -> Call.Words(words).also { bindings.slotsRead(capture, step) }
             step.follows -> Call.Follow
             else -> Call.Act
         }

@@ -149,9 +149,7 @@ class Bindings(
      * earlier answer filled is a variable the script reads, as the source script did.
      */
     fun kept(step: Step): String {
-        step.slots.values.map { it.map()["from"] }
-            .filter { from -> from.list().none { it.map()["input"] != null } }
-            .forEach { from -> sources.first(from)?.let { variable(it.first, it.second) } }
+        slotsRead(capture, step)
         val words = reasonedWords(capture, step)
         val call = Written(source, step).find(KEPT)
         return why.mark(why.kept(step), "act(intent = ${heart.script.kotlinString(words)})", listOf(call))
