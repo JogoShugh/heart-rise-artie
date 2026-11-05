@@ -1,0 +1,51 @@
+# The GitHub task of Take HEART, Part 1, in words, as data: open an issue, branch, commit, open a pull request, wait
+# until merge is offered, merge it, then comment on the issue and close it. Each act is said in words, for the
+# reasoner to choose from what the gateway offers on every run. Written from artie generate --intents on the
+# 19 October run of github-task-reasoned.kts; the scripts are YAML now, run by artie run with no compiler.
+#   artie run github-task.intent.heart.yaml owner=JogoShugh stamp=… --reasoner claude
+heart: 1
+kind: intent
+start: https://localhost:8393/
+
+inputs:
+  owner:
+  repo:
+    default: heart-github-test
+  stamp:
+    question: What makes this run's branch and file names new?
+
+steps:
+  - intent: open the repository ${owner}/${repo}
+    then:
+      - intent: open an issue titled "Crash when a bed has no name (reasoned)", saying it was opened by a HEART script
+        then:
+          - keep-as: issue
+  - intent: open the branch main of ${owner}/${repo}
+    then:
+      - intent: start a new branch from here, named fix-blank-names-reasoned-${stamp}
+        then:
+          - sync: true
+          - intent: commit a file named fix-reasoned-${stamp}.md, saying "Bed names may not be blank.", with the message "Refuse a bed with no name"
+          - intent: 'open a pull request into main titled "Refuse a bed with no name (reasoned)", saying it relates to #${issue.number}'
+            then:
+              - sync: true
+              - keep-as: pull
+              - until:
+                  offered: github:merge
+              - intent: merge it, squashing its commits
+              - check:
+                  - field: merged
+                    is: true
+  - intent: open issue ${issue.number} in ${owner}/${repo}
+    then:
+      - intent: "comment on it: Fixed in 1.2 by #${pull.number}."
+        then:
+          - check:
+              - field: body
+                is: "Fixed in 1.2 by #${pull.number}."
+      - intent: close it, since the fix is done
+      - check:
+          - field: state
+            is: closed
+          - field: state_reason
+            is: completed

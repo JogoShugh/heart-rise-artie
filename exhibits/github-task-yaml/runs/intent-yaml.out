@@ -1,0 +1,25 @@
+1 enter https://localhost:8393/: done
+2 open the repository JogoShugh/heart-github-test: done
+3 open an issue titled "Crash when a bed has no name (reasoned)", saying it was opened by a HEART script: new resource
+4 return to https://localhost:8393/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8393/: done
+6 open the branch main of JogoShugh/heart-github-test: done
+7 start a new branch from here, named fix-blank-names-reasoned-1105-163144: new resource
+8 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1105-163144: done
+9 commit a file named fix-reasoned-1105-163144.md, saying "Bed names may not be blank.", with the message "Refuse a bed with no name": done
+10 open a pull request into main titled "Refuse a bed with no name (reasoned)", saying it relates to #2174: new resource
+11 return to https://localhost:8393/repos/JogoShugh/heart-github-test/pulls/2175: done
+12 until: held
+13 merge it, squashing its commits: done
+14 check: held
+15 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/fix-blank-names-reasoned-1105-163144: done
+16 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/main: done
+17 return to https://localhost:8393/: done
+18 open issue 2174 in JogoShugh/heart-github-test: done
+19 comment on it: Fixed in 1.2 by #2175.: new resource
+20 check: held
+21 return to https://localhost:8393/repos/JogoShugh/heart-github-test/issues/2174: done
+22 close it, since the fix is done: done
+23 check: held
+24 return to https://localhost:8393/: done
+finished, 24 steps; acted: github:repos-get 1, github:open-issue 1, github:repos-get-branch 1, github:branch-from-here 1, github:commit-file 1, github:open-pull-request 1, github:merge 1, github:issues-get 1, github:comment 1, github:close 1
