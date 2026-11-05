@@ -77,6 +77,8 @@ class Ledger {
     /** Every loan, in loan-number order. */
     fun all(): List<Loan> = loans.values.toList()
 
+    fun member(card: Long): Member? = members[card]
+
     /** A member's account: the books they have out now. */
     fun account(card: Long): Account? = members[card]?.let { member ->
         Account(member.card, member.name, all().filter { it.card == card && !it.returned }, member.company)

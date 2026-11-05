@@ -129,6 +129,30 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
       | Harbor Point | 15      | 3     | Harbor Point Logistics |
       | credit union | 2       | 1     | Riverside Credit Union |
 
+  Scenario Outline: A book lent to a member of a company group is renewed for them, not by them: loan <loan>
+    The library renews a company group member's books for the member, with their card: an agent renewing
+    for Harbor Point's staff names whose card it is renewing on. Members on their own renew as before.
+
+    Given the library as it opens, with its five members
+    When an agent reads loan <loan>
+    Then the loan offers <acts>
+
+    Examples:
+      | loan | acts                     |
+      | 3321 | renew-for-member, return |
+      | 3311 | renew, return            |
+
+  Scenario Outline: Renewing for a member of a company group takes their card, and no other: <case>
+    Given the library as it opens, with its five members
+    When an agent renews loan 3321 for the member with card <card>
+    Then the answer is <status>
+    And loan 3321 is due "<due>", renewed <renewed>
+
+    Examples:
+      | case                       | card     | status | due        | renewed |
+      | the card of the member     | 21000456 | 200    | 2026-12-03 | 1 time  |
+      | the card of another member | 21000451 | 422    | 2026-11-12 | 0 times |
+
   Scenario Outline: An OpenAPI client that follows the affordance link learns what loan <loan> allows now
     The library opts in to the affordance link (SPEC §6.1): a plain JSON answer keeps its body, with
     no controls in it, and names in a Link header the set of forms its state offers. A caller that

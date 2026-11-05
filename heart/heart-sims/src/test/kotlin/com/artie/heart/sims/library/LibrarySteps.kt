@@ -90,6 +90,25 @@ class LibrarySteps {
     fun accountLinks(books: String) =
         assertEquals(books.split(", "), items(json()).map { it["title"].asText() }, body())
 
+    @When("an agent reads loan {long}")
+    fun agentReads(loan: Long) {
+        dialect = HSF
+        answer = send(Method.GET, "/loans/$loan", ACCEPT.getValue(HSF), AGENT)
+    }
+
+    @When("an agent renews loan {long} for the member with card {long}")
+    fun renewsFor(loan: Long, card: Long) {
+        val read = send(Method.GET, "/loans/$loan", ACCEPT.getValue(HSF), AGENT)
+        val form = checkNotNull(mapper.readTree(read.bodyString())["_forms"]?.get("library:renew-for-member")) {
+            "loan $loan offers no renewing for a member: ${read.bodyString()}"
+        }
+        val sent = request(Method.POST, form["_links"]["target"]["href"].asText(), ACCEPT.getValue(HSF), AGENT)
+        answer = library.handler(
+            sent.header("If-Match", read.header("ETag")).header("Content-Type", "application/json")
+                .body("""{"card": $card}"""),
+        )
+    }
+
     @When("an agent searches the members by company for {string}")
     fun searchesMembers(company: String) {
         pages = mutableListOf()
@@ -208,11 +227,13 @@ class LibrarySteps {
         accept: String,
         authorization: String = basic(HeartLibrary.CARD, PIN),
         ifMatch: String? = null,
-    ): Response {
-        var request = Request(method, path).header("Authorization", authorization).header("Accept", accept)
-        if (accept.startsWith("application/hal+json")) request = request.header("Accept-Profile", PROFILE)
-        ifMatch?.let { request = request.header("If-Match", it) }
-        return library.handler(request)
+    ): Response = library.handler(
+        request(method, path, accept, authorization).let { r -> ifMatch?.let { r.header("If-Match", it) } ?: r },
+    )
+
+    private fun request(method: Method, path: String, accept: String, authorization: String): Request {
+        val request = Request(method, path).header("Authorization", authorization).header("Accept", accept)
+        return if (accept.startsWith("application/hal+json")) request.header("Accept-Profile", PROFILE) else request
     }
 
     private fun body(): String = checkNotNull(answer).bodyString()

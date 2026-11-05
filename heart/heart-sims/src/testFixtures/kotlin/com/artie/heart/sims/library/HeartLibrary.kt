@@ -1,6 +1,7 @@
 package com.artie.heart.sims.library
 
 import com.artie.heart.Act
+import com.artie.heart.ActInput
 import com.artie.heart.Acted
 import com.artie.heart.AlpsType
 import com.artie.heart.Finding
@@ -14,6 +15,7 @@ import com.artie.heart.Profile
 import com.artie.heart.Relation
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.ResourceType
+import com.artie.heart.RuleRefusedException
 import com.artie.heart.SearchField
 import com.artie.heart.ServingLimits
 import com.artie.heart.StateView
@@ -34,14 +36,18 @@ class HeartLibrary(private val ledger: Ledger) {
     private val type = ResourceType(
         collection = "loans",
         profile = PROFILE,
-        acts = listOf(Act("renew", "renew", NO_INPUT), Act("return", "return", NO_INPUT)),
+        acts = listOf(
+            Act("renew", "renew", NO_INPUT),
+            Act("renew-for-member", "renew-for-member", CARD_INPUT),
+            Act("return", "return", NO_INPUT),
+        ),
         offers = Offers(
-            keys = listOf(Loan.RENEWABLE, Loan.ON_HOLD, Loan.AT_LIMIT, Loan.RETURNED),
+            keys = listOf(Loan.RENEWABLE, FOR_MEMBER, Loan.ON_HOLD, Loan.AT_LIMIT, Loan.RETURNED),
             offered = ::offered,
             whyAbsent = { standing, _ -> WHY.getValue(standing) },
         ),
         state = StateView<Loan, String>(
-            keyOf = { it.standing },
+            keyOf = ::standing,
             idOf = { it.id },
             versionOf = { it.version },
             bodyOf = ::body,
@@ -60,9 +66,7 @@ class HeartLibrary(private val ledger: Ledger) {
     private val loans = HeartResource(
         layers = Layers(type),
         load = { id -> ledger.get(id) ?: throw ResourceNotFoundException("no loan $id") },
-        perform = { current, act, _ ->
-            Acted(ledger.replace(current, if (act == "renew") current.renewed() else current.returnedNow()))
-        },
+        perform = { current, act, input -> Acted(ledger.replace(current, acted(current, act, input))) },
         find = { title, id ->
             ledger.all()
                 .filter { id == null || it.id == id }
@@ -165,8 +169,25 @@ class HeartLibrary(private val ledger: Ledger) {
     /** The acts each standing offers, in the order of their relations, so every rung lists them alike. */
     private fun offered(standing: String): List<String> = when (standing) {
         Loan.RENEWABLE -> listOf("renew", "return")
+        FOR_MEMBER -> listOf("renew-for-member", "return")
         Loan.RETURNED -> emptyList()
         else -> listOf("return")
+    }
+
+    /** The loan's standing, as the library serves it: a company group's renewable books are renewed for the member. */
+    private fun standing(loan: Loan): String =
+        if (loan.standing == Loan.RENEWABLE && ledger.member(loan.card)?.company != null) FOR_MEMBER else loan.standing
+
+    /** The loan after [act]; renewing for a member takes the card of the member it is lent to, and no other. */
+    private fun acted(loan: Loan, act: String, input: ActInput): Loan = when (act) {
+        "renew" -> loan.renewed()
+        "renew-for-member" -> {
+            if (input.json["card"].asLong() != loan.card) {
+                throw RuleRefusedException.at("/card", "That is not the card of the member the book is lent to.")
+            }
+            loan.renewed()
+        }
+        else -> loan.returnedNow()
     }
 
     private fun body(loan: Loan): Map<String, Any?> = linkedMapOf(
@@ -175,7 +196,7 @@ class HeartLibrary(private val ledger: Ledger) {
         "author" to loan.author,
         "due" to loan.due.toString(),
         "renewals" to loan.renewals,
-        "standing" to loan.standing,
+        "standing" to standing(loan),
     )
 
     companion object {
@@ -188,6 +209,14 @@ class HeartLibrary(private val ledger: Ledger) {
 
         private const val NO_INPUT = """{"type": "object", "properties": {}}"""
 
+        /** Renewing for a member: the number on the back of their library card. */
+        private const val CARD_INPUT = """{"type": "object", "required": ["card"], "properties": {"card": {""" +
+            """"type": "integer", "minimum": 1, "title": "Library card number", """ +
+            """"description": "The number on the back of the library card of the member the book is lent to"}}}"""
+
+        /** A company group member's book that can be renewed: the library renews it for the member, on their card. */
+        const val FOR_MEMBER = "renewable for the member"
+
         /** The most results one page of a search lists. */
         private const val PAGE_SIZE = 5
 
@@ -197,6 +226,7 @@ class HeartLibrary(private val ledger: Ledger) {
         /** Why a loan in each standing can't do what it doesn't offer. */
         private val WHY = mapOf(
             Loan.RENEWABLE to "It can be renewed and returned.",
+            FOR_MEMBER to "A company group's books are renewed for the member, with their library card number.",
             Loan.ON_HOLD to "A hold is waiting for this book, so it can't be renewed.",
             Loan.AT_LIMIT to "It has been renewed ${Loan.MOST_RENEWALS} times, the most allowed.",
             Loan.RETURNED to "It was returned.",
@@ -211,6 +241,12 @@ class HeartLibrary(private val ledger: Ledger) {
                     "renew", AlpsType.UNSAFE, "Renew",
                     "Keeps the book three weeks more.",
                     "Offered while the book is out, renewed fewer than three times, and no one's hold is waiting.",
+                ),
+                Relation(
+                    "renew-for-member", AlpsType.UNSAFE, "Renew for the member",
+                    "Keeps a company group member's book three weeks more, given the member's library card number.",
+                    "Offered in place of renew for the books of a company group's members; " +
+                        "a card number not the member's is refused.",
                 ),
                 Relation(
                     "return", AlpsType.UNSAFE, "Return",
