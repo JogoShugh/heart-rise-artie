@@ -12,11 +12,38 @@
 <div class="script">
   <div class="line"><span class="who priya">Priya</span><p>Do I rewrite the API?</p></div>
   <div class="line"><span class="who sam">Sam</span><p>The data stays as it is. You declare the acts once: what each state offers, and why one is missing. HEART serves that as HTML for Ana, as HAL-FORMS and HAL Schema Forms for agents, and as an OpenAPI twin for anyone who still wants one.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And every app already calling us with <code>application/json</code>?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>It gets what it gets today: the loan's data, and no controls. Only a client that asks for HEART gets them.</p></div>
   <div class="line"><span class="who priya">Priya</span><p>And a client that ignores the forms and posts renew anyway?</p></div>
   <div class="line"><span class="who sam">Sam</span><p>409, with the reason. A form is an offer. The server stays in charge.</p></div>
   <div class="line"><span class="who priya">Priya</span><p>So the API answers the way the page does.</p></div>
   <div class="line"><span class="who sam">Sam</span><p>The way the web always did, for people.</p></div>
 </div>
+<details class="more"><summary>The same loan, asked two ways, live</summary>
+  <div class="pair">
+    <div><span class="label">An app that asks for application/json, as before</span>
+<pre><code>GET /loans/3310
+Accept: application/json
+
+200 OK   Content-Type: application/json
+
+{ "id": 3310, "title": "The Hobbit",
+  "author": "J. R. R. Tolkien",
+  "due": "2026-11-12", "renewals": 0,
+  "standing": "hold waiting" }</code></pre></div>
+    <div><span class="label">A client that asks for HEART</span>
+<pre><code>GET /loans/3310
+Accept: application/hal+json
+
+200 OK   Content-Type: application/hal+json
+
+{ "id": 3310, "title": "The Hobbit", …,
+  "standing": "hold waiting",
+<span class="add">  "_links": { "self": …, "hr:unavailable": … },
+  "_forms": { "library:return": { … } }</span> }</code></pre></div>
+  </div>
+  <p class="note">From the running library service, by <code>live/upgrade.mjs</code>. Adopting HEART changes nothing for the first: the same data, no controls.</p>
+</details>
 <div class="map">
   <div><code>one declaration</code><span>Acts, what each state offers, and why one is absent.</span></div>
   <div><code>HTML</code><span>For Ana in a browser: buttons, greyed with a reason.</span></div>
