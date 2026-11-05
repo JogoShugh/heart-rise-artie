@@ -9,18 +9,23 @@
 <div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
 <article class="slide"><header><span class="part">Scene three · today</span><span class="fiction">Fiction</span></header>
 <h2>The IT office</h2>
-<p class="setting">Today, the library's IT office. Priya builds the library's API; Sam builds the assistant that renews books for members.</p>
+<figure><img src="media/openapi-list.png" alt="Swagger UI for Riverside Public Library: GET /accounts, GET /accounts/{id}, GET /loans, GET /loans/{id}, POST /loans/{id}/actions/renew, POST /loans/{id}/actions/return." loading="lazy"><figcaption>The library's API as HEART serves it in OpenAPI, shown in Swagger UI: every operation, for every loan alike.</figcaption></figure>
+<p class="setting">Today. Priya, who builds the library's API, has it on her screen. Sam builds the assistant that renews books for members.</p>
 <div class="script">
-  <div class="line"><span class="who priya">Priya</span><p>The loans API is done. JSON over HTTP, with a full OpenAPI description: every operation, every field, every status code.</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>My agent read all of it, found Ana's loans, and sent a renew for <i>The Hobbit</i>. 409. Hold waiting.</p></div>
-  <div class="line"><span class="who priya">Priya</span><p>Well, that's correct.</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>Correct, and the first the agent heard of the hold. Renew is listed for every loan.</p></div>
-  <div class="line"><span class="who priya">Priya</span><p>It has to be. The description is the same for every loan in every state. The rule's in the text.</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>So the agent reads English, guesses the rule, and finds out by trying. A document beside the data, every address, the same for every state, filled in by hand. That's forms.yaml. We gave people better than that in 1997. The real 1997, I mean: pages had forms.</p></div>
-  <div class="line"><span class="who priya">Priya</span><p>Ana's page gets a grey button with the reason. My API gets a 409.</p></div>
-  <div class="line"><span class="who sam">Sam</span><p>Same server, same rules. Different manners.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>There's the loans API. Every operation, every field, every status code.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>And renew, for every loan. My agent sent one for <i>The Hobbit</i> and got a 409.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>The rule's in the description: fewer than three renewals, no hold waiting.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Remember forms.html? Every address, the same for every loan, and you found out by trying.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>…This one has a Try it out button.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Ana's page gives her a grey button with the reason. My agent gets a 409.</p></div>
 </div>
-<details class="more"><summary>The two documents, side by side</summary>
+<details class="more"><summary>Renew, opened, beside 1997's forms.html</summary>
+  <div class="pair">
+    <figure><img src="media/openapi-renew.png" alt="Swagger UI's renew operation: offered while the book is out, renewed fewer than three times, and no one's hold is waiting; an id, an If-Match, Try it out." loading="lazy"><figcaption>Today: renew, its rule in prose, and Try it out.</figcaption></figure>
+    <figure><img src="media/forms-html.png" alt="forms.html at RENEW A LOAN: method POST, an address with {loanId}, a body with {card} and {pin}." loading="lazy"><figcaption>1997: RENEW A LOAN in forms.html, and what to type.</figcaption></figure>
+  </div>
+</details>
+<details class="more"><summary>The two documents behind them</summary>
   <div class="pair">
     <div><span class="label">1997: the Perl site's forms.yaml</span>
 <pre><code>/loans/{loanId}/renew:

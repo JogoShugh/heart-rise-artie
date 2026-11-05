@@ -6,7 +6,7 @@
 // deck/plain/ holds the same deck as an old-school JSON API: the data alone, and a list of names.
 // --artifact also writes the page without its document skeleton, as an Artifact publishes it.
 import { build } from "esbuild";
-import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "yaml";
@@ -109,9 +109,10 @@ await build({
 
 for (const f of ["index.html", "deck.css", "deck.js"]) copyFileSync(join(here, "page", f), join(out, f));
 for (const f of ["json-view.js", "json-view.css", "theme-switch.js"]) copyFileSync(join(repo, "docs/reports/assets", f), join(out, f));
-const media = join(repo, "docs/reports/the-web-that-wasnt/media");
+// The deck's own screens, then the ones it shares with the report.
+const media = [join(here, "media"), join(repo, "docs/reports/the-web-that-wasnt/media")];
 const used = new Set(slides.flatMap((s) => [...s.html.matchAll(/media\/([\w.-]+)/g)].map((m) => m[1])));
-for (const f of used) copyFileSync(join(media, f), join(out, "media", f));
+for (const f of used) copyFileSync(join(media.find((dir) => existsSync(join(dir, f))) ?? media[0], f), join(out, "media", f));
 
 const at = process.argv.indexOf("--artifact");
 if (at > 0) {
