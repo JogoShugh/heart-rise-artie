@@ -38,15 +38,6 @@ reference: `${version}`, `${issue.number}`, `${pr.number}`.
 - Times include walking the pages of open pull requests and branches the scratch repository now holds.
 - `closeout.sh` stages the three issues, runs the watch, and closes the watch's issue once all three are closed.
 
-## Tries that didn't count
-
-| Run | What happened | Left on GitHub |
-|---|---|---|
-| `goal-wandered` | "From the main branch, start a new branch…" sent the planner paging through branches; "Open the branch main of {owner}/{repo}" goes straight there | #2182, closed as not planned |
-| `closeout-stopped` | The API ran out of credit after 16 calls | #2199 and watch #2202, closed as not planned |
-| `closeout-stuck` | One If did two acts ("comment … and close it"); after the comment it couldn't get back to the issue. Now two Ifs | #2203 and watch #2206, closed as not planned |
-| `goal-1`, `goal-2`, `goal-kept`, `goal-hybrid`, `goal-directed`, `directed-kept` | Earlier runs with the release written into the words as "1.2"; superseded | — |
-
 ## Not yet
 
 - **A run of a YAML script can't be generated from.** It doesn't record its steps' nesting or where each value came
@@ -54,10 +45,9 @@ reference: `${version}`, `${issue.number}`, `${pr.number}`.
 - **A case the walk never met** stays in words for the model in the generated script: stage every case you mean to
   keep.
 
-## `from-kotlin/`: the first try, kept for the record
+## Fixed along the way
 
-The YAML generated from a run of the October Kotlin script (`github-task-reasoned.kts`), and its runs. They turned
-up four bugs, fixed test first in commit b46a61d:
+Four bugs in `artie generate` and the YAML runner, fixed test first in commit b46a61d:
 
 - `--intents` wrote the value an earlier answer gave (`open issue 113`); it now reads `${issue.number}`.
 - A script's own check froze its value (`#114`); it now reads `#${pull.number}`.
