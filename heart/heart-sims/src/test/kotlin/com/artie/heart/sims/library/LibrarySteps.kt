@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.util.Base64
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /** library.feature: Riverside Public Library, read and acted on in memory, as each dialect's client would. */
 class LibrarySteps {
@@ -21,6 +22,7 @@ class LibrarySteps {
     private val mapper = ObjectMapper()
     private var answer: Response? = null
     private var dialect = HSF
+    private var pages = mutableListOf<JsonNode>()
 
     @Given("Riverside Public Library lends Ana Torres these books")
     fun lends(table: DataTable) = library.lend(
@@ -87,6 +89,30 @@ class LibrarySteps {
     @Then("that account links {}")
     fun accountLinks(books: String) =
         assertEquals(books.split(", "), items(json()).map { it["title"].asText() }, body())
+
+    @When("an agent searches the members by company for {string}")
+    fun searchesMembers(company: String) {
+        pages = mutableListOf()
+        var page: String? = "/members?company=${URLEncoder.encode(company, UTF_8)}"
+        while (page != null) {
+            val answered = mapper.readTree(send(Method.GET, page, ACCEPT.getValue(HSF), AGENT).bodyString())
+            pages.add(answered)
+            page = answered["_links"]?.get("next")?.get("href")?.asText()
+        }
+    }
+
+    @Then("the search lists {int} members, {int} to a page, over {int} pages")
+    fun listsMembers(members: Int, perPage: Int, count: Int) {
+        assertEquals(count, pages.size)
+        assertEquals(members, pages.sumOf { items(it).size })
+        assertTrue(pages.all { items(it).size <= perPage }, "a page lists more than $perPage")
+    }
+
+    @Then("every member it lists works at {string}")
+    fun worksAt(company: String) = pages.flatMap(::items).forEach { item ->
+        val member = mapper.readTree(send(Method.GET, item["href"].asText(), "application/json", AGENT).bodyString())
+        assertEquals(company, member["company"]?.asText(), member.toString())
+    }
 
     @When("an OpenAPI client reads loan {long} as plain JSON")
     fun readsPlain(loan: Long) {

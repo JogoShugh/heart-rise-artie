@@ -14,6 +14,7 @@ import com.artie.heart.Profile
 import com.artie.heart.Relation
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.ResourceType
+import com.artie.heart.SearchField
 import com.artie.heart.ServingLimits
 import com.artie.heart.StateView
 import com.artie.heart.http4k.Credentials
@@ -108,11 +109,57 @@ class HeartLibrary(private val ledger: Ledger) {
         },
     )
 
+    // The company groups: each member found by the company they work for, five to a page, linking their books.
+    private val memberType = ResourceType(
+        collection = "members",
+        profile = PROFILE,
+        acts = emptyList(),
+        offers = Offers(keys = listOf(OPEN), offered = { emptyList() }, whyAbsent = { _, _ -> "" }),
+        state = StateView<Account, String>(
+            keyOf = { OPEN },
+            idOf = { it.card },
+            versionOf = { it.version },
+            bodyOf = { linkedMapOf("id" to it.card, "name" to it.name, "company" to it.company, "booksOut" to it.loans.size) },
+            hypermediaOf = { member ->
+                Hypermedia(links = mapOf("item" to member.loans.map { mapOf("href" to "/loans/${it.id}", "title" to it.title) }))
+            },
+        ),
+        finding = Finding(
+            noun = "member",
+            search = Named("searchMembers", "search-members"),
+            lookup = Named("getMember", "get-member"),
+            collectionPath = "/members",
+            fields = listOf(
+                SearchField("company", "Company", "Part of the company's name; case is ignored"),
+                SearchField(
+                    "id", "Library card number", "The number on the back of the library card",
+                    mapOf("type" to "integer", "minimum" to 1),
+                ),
+            ),
+        ),
+    )
+
+    private val members = HeartResource(
+        layers = Layers(memberType),
+        load = { id -> ledger.account(id)?.takeIf { it.company != null } ?: throw ResourceNotFoundException("no member $id") },
+        perform = { current, _, _ -> Acted(current) },
+        search = { values ->
+            val company = values["company"]
+            ledger.accounts()
+                .filter { it.company != null && (company == null || it.company.contains(company, ignoreCase = true)) }
+                .map { Found(it.card, it.name) }
+        },
+    )
+
     val handler: HttpHandler = HeartHttp(
-        listOf(accounts, loans),
+        listOf(accounts, members, loans),
         Credentials.parse(users = "$CARD:$PIN_HASH", tokens = Tokens.sha256(TOKEN)),
         // The affordance link: each plain JSON answer names the set its state offers, for OpenAPI clients that opt in.
-        HeartSettings(title = "Riverside Public Library", realm = PROFILE.name, limits = ServingLimits(affordanceLinks = true)),
+        HeartSettings(
+            title = "Riverside Public Library",
+            realm = PROFILE.name,
+            limits = ServingLimits(pageSize = PAGE_SIZE, affordanceLinks = true),
+        ),
     )
 
     /** The acts each standing offers, in the order of their relations, so every rung lists them alike. */
@@ -140,6 +187,9 @@ class HeartLibrary(private val ledger: Ledger) {
         const val TOKEN = "library-token"
 
         private const val NO_INPUT = """{"type": "object", "properties": {}}"""
+
+        /** The most results one page of a search lists. */
+        private const val PAGE_SIZE = 5
 
         /** An account's one standing: it offers no acts of its own, only its loans. */
         private const val OPEN = "open"
@@ -176,6 +226,16 @@ class HeartLibrary(private val ledger: Ledger) {
                     "get-account", AlpsType.SAFE, "Get an account by library card number",
                     "Goes to one member's account, given the number on their library card.",
                     "A safe lookup; the account links each book the member has out, titled with the book.",
+                ),
+                Relation(
+                    "search-members", AlpsType.SAFE, "Find members by company",
+                    "Lists the members in the company group whose name has the text, five to a page.",
+                    "A safe search; each result links to the member, titled with their name; each page links the next.",
+                ),
+                Relation(
+                    "get-member", AlpsType.SAFE, "Get a member of a company group by library card number",
+                    "Goes to one member of a company group, given the number on their library card.",
+                    "A safe lookup; the member links each book they have out, titled with the book.",
                 ),
                 Relation(
                     "search-loans", AlpsType.SAFE, "Find loans by title",

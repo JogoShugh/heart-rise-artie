@@ -115,6 +115,20 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
       | Liam Chen    | Coraline                             |
       | Sofia Rossi  | The Giver, Frindle, Number the Stars |
 
+  Scenario Outline: The library's company groups: a search by company lists its members five to a page: <company>
+    The library adds groups for the companies whose staff it serves. A search of the members by company
+    lists each, by name, five to a page, each page linking the next. The accounts search is as it was.
+
+    Given the library as it opens, with its five members
+    When an agent searches the members by company for "<company>"
+    Then the search lists <members> members, 5 to a page, over <pages> pages
+    And every member it lists works at "<works at>"
+
+    Examples:
+      | company      | members | pages | works at               |
+      | Harbor Point | 15      | 3     | Harbor Point Logistics |
+      | credit union | 2       | 1     | Riverside Credit Union |
+
   Scenario Outline: An OpenAPI client that follows the affordance link learns what loan <loan> allows now
     The library opts in to the affordance link (SPEC §6.1): a plain JSON answer keeps its body, with
     no controls in it, and names in a Link header the set of forms its state offers. A caller that
