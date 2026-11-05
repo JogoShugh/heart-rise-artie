@@ -1,0 +1,27 @@
+name: separation
+part: Between the scenes
+title: Information here, controls over there
+fiction: false
+html: |
+  <h2>Information here, controls over there</h2>
+  <p class="dek">Both webs in this story split one thing in two: what a loan is, and what you can do with it.</p>
+  <div class="split">
+    <p class="era">1997</p>
+    <figure class="half"><img src="media/loans-data.png" alt="Her loans page: loan numbers, book numbers, titles and due dates, with no links." loading="lazy"><figcaption><b>Information:</b> her loans page. Numbers, titles, due dates.</figcaption></figure>
+    <p class="gap"><span>Ana joins them, with a sticky note and her own typing</span></p>
+    <figure class="half"><img src="media/forms-html.png" alt="forms.html at RENEW A LOAN, the same for every loan." loading="lazy"><figcaption><b>Controls:</b> forms.html. Every operation, for every loan.</figcaption></figure>
+    <p class="era">Today</p>
+    <figure class="half">
+  <pre><code>GET /loans/3310
+  Accept: application/json
+
+  { "id": 3310, "title": "The Hobbit",
+    "author": "J. R. R. Tolkien",
+    "due": "2026-11-12", "renewals": 0,
+    "standing": "hold waiting" }</code></pre>
+      <figcaption><b>Information:</b> the loan, as JSON. Nothing in it says what it allows.</figcaption></figure>
+    <p class="gap"><span>The agent joins them, reading prose and guessing</span></p>
+    <figure class="half"><img src="media/openapi-renew.png" alt="Swagger UI's renew operation: offered while the book is out, renewed fewer than three times, and no one's hold is waiting." loading="lazy"><figcaption><b>Controls:</b> the OpenAPI document. Renew, for every loan, its rule in prose.</figcaption></figure>
+  </div>
+  <p class="lead">Neither half knows about the other. The client joins them every time, and learns it joined them wrong only after the call: 409.</p>
+  <p class="note">Next: Fielding's name for keeping the two together.</p>

@@ -206,3 +206,16 @@ blockquote.said { border-left: 3px solid var(--rule); padding: 0.3rem 0.9rem; co
 :root[data-mode="plain"] .mode-note { background: var(--hold-bg); }
 :root[data-mode="plain"] .mode-note b { color: var(--hold); }
 .mode-note:empty { display: none; }
+
+/* Information here, controls over there: two halves and the gap a client fills, per era */
+.split { display: grid; grid-template-columns: 4.5rem minmax(0, 1fr) 7.5rem minmax(0, 1fr); gap: 0.9rem 0.8rem; align-items: center; }
+.split .era { margin: 0; font: 650 1.05rem var(--display); color: var(--muted); }
+.split .half { align-self: stretch; padding: 0.6rem; border-radius: 12px; background: var(--paper); border: 1px solid var(--rule); }
+.split .half pre { font-size: 0.74rem; }
+.split .gap { margin: 0; text-align: center; font: italic 0.82rem/1.4 var(--display); color: var(--bad); position: relative; padding-block: 1.6rem; }
+.split .gap::before { content: ""; position: absolute; left: 0; right: 0; top: 0.6rem; border-top: 2px dashed var(--bad); }
+.split .gap::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.6rem; border-top: 2px dashed var(--bad); }
+@media (max-width: 48rem) {
+  .split { grid-template-columns: minmax(0, 1fr); }
+  .split .gap { padding-block: 1rem; }
+}
