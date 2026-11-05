@@ -1,5 +1,7 @@
 package heart.cli.generate
 
+import java.net.URI
+
 /*
  * A list's members a run visited one by one (spec/PLAN-COST-FOLLOWS-STATES.md, step 3): written one by one, by name,
  * a script serves those members alone. A list the run went through, every member of every page, is written as a
@@ -17,7 +19,35 @@ private const val NEXT = "next"
  * A list the run went through, page after page: its [members], each opened by its item link, and, when each member
  * is a list of its own, those lists' members gone through the same way ([inner]); null when each holds an act or none.
  */
-internal class Loop(val members: List<Walked.Selection>, val inner: Loop?)
+internal class Loop(val members: List<Walked.Selection>, val inner: Loop?, private val opener: String? = null) {
+    /**
+     * What the loop calls each member, by which the steps inside read it: where its members live, as one of them
+     * (`/members/…`, a member; `/loans/…`, a loan); else what the search that made the list names
+     * (`staff:search-employees`, an employee); `item` where neither can be told.
+     */
+    val name: String
+        get() {
+            val place = members.first().step.chose["address"]?.toString()
+                ?.let { runCatching { URI(it).path }.getOrNull() }?.split('/')?.firstOrNull { it.isNotEmpty() }
+            val searched = opener?.substringAfter(':')?.takeIf { it.startsWith(SEARCH) }?.removePrefix(SEARCH)
+            return (place ?: searched)?.let(::one) ?: ITEM
+        }
+
+    /** The list [opened] made, as this loop over its [members]. */
+    fun openedBy(opened: String?) = Loop(members, inner, opened)
+
+    private companion object {
+        const val SEARCH = "search-"
+        const val PLURAL_IES = 3
+
+        /** One of [many]: members a member, entries an entry. */
+        fun one(many: String): String = when {
+            many.endsWith("ies") -> many.dropLast(PLURAL_IES) + "y"
+            many.endsWith("s") -> many.dropLast(1)
+            else -> many
+        }
+    }
+}
 
 /**
  * The list [block] went through, as one loop: every member of its page, and of each page after it the run reached by
@@ -26,7 +56,7 @@ internal class Loop(val members: List<Walked.Selection>, val inner: Loop?)
  * run made it: a page the run picked some members of, or a member [chosen] by its title, as an input gave it.
  */
 internal fun loop(block: Block, chosen: (String) -> Boolean): Loop? =
-    pages(block)?.takeUnless { members -> members.any { chosen(title(it)) } }?.let(::over)
+    pages(block)?.takeUnless { members -> members.any { chosen(title(it)) } }?.let(::over)?.openedBy(block.opener)
 
 /** The acts made on [members], one for each form, in the order the run first made them. */
 internal fun cases(members: List<Walked.Selection>): List<Walked.Selection> =

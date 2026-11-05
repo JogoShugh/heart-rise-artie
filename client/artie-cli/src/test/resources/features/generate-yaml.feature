@@ -125,13 +125,14 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
     Then artie exits 0
     And the run traced in "gen.trace.yaml" made the same selections as the run traced in "run.trace.yaml"
 
-  Scenario: A list's members the run visited one by one are written as a whenever, each acted on by what it offers
+  Scenario: A list's members the run visited one by one are written as a for-each, each acted on by what it offers
     spec/PLAN-COST-FOLLOWS-STATES.md, step 3. A goal run visited the
     employees a search found, one after another: Anna, given notice; Maria,
     dismissed; Laura, offering neither, left. Written one by one, by name,
     the script would serve those three alone. Members of one list, each
-    opened by its item link and acted on once, are written as a whenever
-    over the list: when-offered makes, for each member, the first of the
+    opened by its item link and acted on once, are written as a for-each
+    over the list, named after where its members live (/employees/…, an
+    employee): when-offered makes, for each member, the first of the
     run's acts that the member offers now, in the order the run first made
     them, and otherwise notes the member it leaves. The step's words stay
     with it, so a member offering an act the run never met falls back to
@@ -164,7 +165,8 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
             name: Miller
           intent: Find the employees named Miller
           then:
-            - whenever:
+            - for-each: employee
+              then:
                 - when-offered:
                     - act: staff:give-notice
                       inferred: give notice to this employee
@@ -186,7 +188,7 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       """
     And the file "gen.heart.yaml" is a script as data, by spec/schemas/heart-script.draft.schema.json
 
-  Scenario: A list's members are written as a whenever when the run acted on one of them alone
+  Scenario: A list's members are written as a for-each when the run acted on one of them alone
     A goal run went through each book on a library account: The Hobbit,
     offering no renew, left; Matilda, renewed; Charlotte's Web, offering no
     renew, left. The books it left are members it met, not detours: the
@@ -223,7 +225,8 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
             id: ${card}
           intent: Look up Ana's account by her library card number ${card}
           then:
-            - whenever:
+            - for-each: loan
+              then:
                 - when-offered:
                     - act: library:renew
                       inferred: renew this book (Matilda)
@@ -276,16 +279,20 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       | --format       |
       | <form>         |
     Then artie exits 0
-    And the file "<out>" has 2 lines that read "<loop>"
-    And the file "<out>" has 1 line that reads "<offered>"
+    And the file "<out>" has these lines, in order
+      | line      |
+      | <members> |
+      | <books>   |
+      | <offered> |
     And the file "<out>" mentions "<follow>" nowhere
+    And the file "<out>" mentions "whenever" nowhere
     And the file "<out>" mentions "Maria Garcia" nowhere
     And the file "<out>" mentions "The Westing Game" nowhere
 
     Examples:
-      | form | out            | loop        | offered         | follow  |
-      | yaml | gen.heart.yaml | - whenever: | - when-offered: | follow: |
-      | kts  | gen.heart.kts  | whenever {  | whenOffered(    | follow( |
+      | form | out            | members            | books             | offered         | follow  |
+      | yaml | gen.heart.yaml | - for-each: member | - for-each: loan  | - when-offered: | follow: |
+      | kts  | gen.heart.kts  | each("member") {   | each("loan") {    | whenOffered(    | follow( |
 
   Scenario: The company script, held as data, is a script as data
     Given the file "run.trace.yaml" is the capture "library-company.trace.yaml"

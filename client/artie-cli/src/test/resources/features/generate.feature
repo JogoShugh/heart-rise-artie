@@ -566,9 +566,10 @@ Feature: artie generate: a run's capture, made a script with no model in it
       | refused |
       | failed  |
 
-  Scenario: A list's members the run visited one by one are written as a whenever, each acted on by what it offers
+  Scenario: A list's members the run visited one by one are written as an each, each acted on by what it offers
     The Kotlin script says what the script held as data says, for the same
-    capture (generate-yaml.feature): a whenever over the list, and in it
+    capture (generate-yaml.feature): an each over the list, named after where
+    its members live (/employees/…, an employee), and in it
     whenOffered, the first of the run's acts the member offers now, in the
     order the run first made them, each checked by what it changed; the
     step's words kept, for a member offering an act the run never met; and
@@ -592,7 +593,7 @@ Feature: artie generate: a run's capture, made a script with no model in it
 
       heart("http://localhost:8099/") {
           act("staff:search-employees", "name" to "Miller", intent = "Find the employees named Miller") {
-              whenever {
+              each("employee") {
                   whenOffered(
                       intent = "Move each of them one step: give notice to anyone working, dismiss anyone on notice, and leave the dismissed as they are",
                       otherwise = { note("none of these acts is offered here") },

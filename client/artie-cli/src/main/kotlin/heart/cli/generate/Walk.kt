@@ -16,6 +16,8 @@ class Block(
     val statements: List<Walked>,
     /** The titles of the items the resource it was opened at linked: the list its follows went through, if any. */
     val listed: List<String> = emptyList(),
+    /** The relation of the step that opened it, such as the search that made the list. */
+    val opener: String? = null,
 )
 
 /** One statement of a generated script: a step of the run, and its row. */

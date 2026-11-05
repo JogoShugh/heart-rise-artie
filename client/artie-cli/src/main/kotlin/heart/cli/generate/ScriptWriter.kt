@@ -137,11 +137,12 @@ class ScriptWriter(
         // (Members.kt), as the script held as data writes it.
         fun over(loop: Loop, at: Int): List<String> {
             val padded = INDENT.repeat(at)
-            loop.inner?.let { return listOf("${padded}whenever {") + over(it, at + 1) + "$padded}" }
+            val opened = "${padded}each(${KotlinText.quoted(loop.name)}) {"
+            loop.inner?.let { return listOf(opened) + over(it, at + 1) + "$padded}" }
             val words = words(capture, loop.members.first().step, names, emptyList())
                 ?.let { it.fromIntent ?: it.intent }
             val cases = cases(loop.members).map { it.step.relation.orEmpty() to statement(it, at + CASE_DEPTH) }
-            return overMembers(at, words, cases)
+            return overMembers(at, loop.name, words, cases)
         }
         loop(block) { capture.inputGiven(it) != null }?.let { loop ->
             looped = true
@@ -266,7 +267,7 @@ internal class Walker(
         val keeps = bindings.variables.values.filter { it.step == node.step.number }.distinctBy { it.keptAs }
         // A resource the watch reads again and a value read from it are kept once, by the one name.
         val watched = watch.kept(node.step).takeIf { keeps.isEmpty() }
-        return Block(keeps, watched, node.children.mapNotNull(::walked), node.step.items)
+        return Block(keeps, watched, node.children.mapNotNull(::walked), node.step.items, node.step.relation)
     }
 
     /** What [node]'s step is in the script: a selection, a sync, a wait or a check; null for none of these. */

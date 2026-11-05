@@ -117,9 +117,12 @@ class ScriptYaml(
      * before it opens a block that might read it.
      */
     private fun steps(block: Block): List<Map<String, Any?>> {
-        // A list the run went through: a whenever over it, with what each member offers, or its own list (Members.kt).
-        fun over(loop: Loop): List<Map<String, Any?>> =
-            listOf(mapOf("whenever" to (loop.inner?.let(::over) ?: listOf(offered(loop.members)))))
+        // A list the run went through: a for-each over it, by the name its members are read by, with what each
+        // offers, or its own list (Members.kt).
+        fun over(loop: Loop): List<Map<String, Any?>> {
+            val inside = loop.inner?.let(::over) ?: listOf(offered(loop.members))
+            return listOf(linkedMapOf("for-each" to loop.name, "then" to inside))
+        }
         loop(block) { capture.inputGiven(it) != null }?.let { return keeps(block) + over(it) }
         val decided = decided(block, capture)
         val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
