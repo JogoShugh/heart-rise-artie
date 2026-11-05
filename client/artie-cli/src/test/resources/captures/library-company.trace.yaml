@@ -5,61 +5,62 @@ run:
       value: Harbor Point
       given: given
   source: |-
-    act(intent = "search accounts for the company $company")
-    act(intent = "open the member Maria Garcia")
-    act(intent = """open the book "The Phantom Tollbooth"""")
-    act(intent = "renew the book")
-    act(intent = """open the book "Peter Pan"""")
-    act(intent = "renew the book")
-    act(intent = "open the member James Wilson")
-    act(intent = """open the book "Bridge to Terabithia"""")
-    act(intent = "open the member Kevin O'Brien")
-    act(intent = """open the book "A Wrinkle in Time"""")
-    act(intent = """open the book "Heidi"""")
-    act(intent = "renew the book")
-    act(intent = "open the member Aisha Bello")
-    act(intent = """open the book "The Westing Game"""")
-    act(intent = "renew the book")
-    act(intent = "open the member Thomas Becker")
-    act(intent = """open the book "Island of the Blue Dolphins"""")
-    act(intent = """open the book "Pippi Longstocking"""")
-    act(intent = "renew the book")
+    act(intent = "search accounts for company $company")
+    act(intent = "open member Maria Garcia")
+    act(intent = """open the item "The Phantom Tollbooth"""")
+    act(intent = """open the item "The Phantom Tollbooth"""")
+    act(intent = "renew this book for the member, card number 21000456")
+    act(intent = """open the item "Peter Pan"""")
+    act(intent = "renew this book for the member, card number 21000456")
+    act(intent = "open member James Wilson")
+    act(intent = """open the item "Bridge to Terabithia"""")
+    act(intent = "open member Kevin O'Brien")
+    act(intent = """open the item "A Wrinkle in Time"""")
+    act(intent = """open the item "Heidi"""")
+    act(intent = "renew this book for the member, card number 21000458")
+    act(intent = "open member Aisha Bello")
+    act(intent = """open the item "The Westing Game"""")
+    act(intent = "renew this book for the member, card number 21000459")
+    act(intent = "open member Thomas Becker")
+    act(intent = """open the item "Island of the Blue Dolphins"""")
+    act(intent = """open the item "Pippi Longstocking"""")
+    act(intent = "renew this book for the member, card number 21000460")
     act(intent = "follow the next page link")
-    act(intent = "open the member Hannah Kim")
-    act(intent = """open the book "Tuck Everlasting"""")
-    act(intent = "renew the book")
-    act(intent = "open the member Daniel Novak")
-    act(intent = """open the book "The BFG"""")
-    act(intent = "renew the book")
-    act(intent = """open the book "The Borrowers"""")
-    act(intent = "open the member Fatima Rahman")
-    act(intent = """open the book "Stuart Little"""")
-    act(intent = "open the member Lucas Silva")
-    act(intent = """open the book "Little Women"""")
-    act(intent = "renew the book")
-    act(intent = """open the book "Watership Down"""")
-    act(intent = "renew the book")
-    act(intent = "open the member Emma Johansson")
-    act(intent = """open the book "The Wind in the Willows"""")
+    act(intent = "open member Hannah Kim")
+    act(intent = """open the item "Tuck Everlasting"""")
+    act(intent = "renew this book for the member, card number 21000461")
+    act(intent = "open member Daniel Novak")
+    act(intent = """open the item "The BFG"""")
+    act(intent = "renew this book for the member, card number 21000462")
+    act(intent = """open the item "The Borrowers"""")
+    act(intent = "open member Fatima Rahman")
+    act(intent = """open the item "Stuart Little"""")
+    act(intent = "open member Lucas Silva")
+    act(intent = """open the item "Little Women"""")
+    act(intent = "renew this book for the member, card number 21000464")
+    act(intent = """open the item "Watership Down"""")
+    act(intent = "renew this book for the member, card number 21000464")
+    act(intent = "open member Emma Johansson")
+    act(intent = """open the item "The Wind in the Willows"""")
     act(intent = "follow the next page link")
-    act(intent = "open the member Samuel Mensah")
-    act(intent = """open the book "Black Beauty"""")
-    act(intent = "renew the book")
-    act(intent = """open the book "The Little Prince"""")
-    act(intent = "open the member Olivia Brooks")
-    act(intent = """open the book "Anne of Green Gables"""")
-    act(intent = "renew the book")
-    act(intent = "open the member Nadia Petrova")
-    act(intent = """open the book "Treasure Island"""")
-    act(intent = """open the book "Mrs. Frisby and the Rats of NIMH"""")
-    act(intent = "renew the book")
-    act(intent = "open the member Ryan Murphy")
-    act(intent = """open the book "The Hundred and One Dalmatians"""")
-    act(intent = "renew the book")
-    act(intent = "open the member Chloe Dubois")
-    act(intent = """open the book "The Cricket in Times Square"""")
-    act(intent = """open the book "Ramona the Pest"""")
-    act(intent = "renew the book")
+    act(intent = "open member Samuel Mensah")
+    act(intent = """open the item "Black Beauty"""")
+    act(intent = "renew this book for the member, card number 21000466")
+    act(intent = """open the item "The Little Prince"""")
+    act(intent = "open member Olivia Brooks")
+    act(intent = """open the item "Anne of Green Gables"""")
+    act(intent = "renew this book for the member, card number 21000467")
+    act(intent = "open member Nadia Petrova")
+    act(intent = """open the item "Treasure Island"""")
+    act(intent = """open the item "Mrs. Frisby and the Rats of NIMH"""")
+    act(intent = "renew this book for the member, card number 21000468")
+    act(intent = "open member Ryan Murphy")
+    act(intent = """open the item "The Hundred and One Dalmatians"""")
+    act(intent = "renew this book for the member, card number 21000469")
+    act(intent = "open member Chloe Dubois")
+    act(intent = """open the item "The Cricket in Times Square"""")
+    act(intent = """open the item "Ramona the Pest"""")
+    act(intent = "renew this book for the member, card number 21000470")
   marks:
     '1':
       intent: Find the members of the company group ${company}
@@ -170,178 +171,186 @@ run:
     '54':
       fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
     '55':
+      fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
+    '56':
       intent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
   moves:
-    - 'why: A company group is likely an account; searching accounts finds it and its members.'
-    - 'search accounts for the company Harbor Point: acted library:search-members, done, at http://localhost:8140/members?company=Harbor+Point'
-    - 'why: The search for Harbor Point members returned the member list, so finding the members is done.'
+    - 'why: Company group is likely an account; search accounts for it.'
+    - 'search accounts for company Harbor Point: acted library:search-members, done, at http://localhost:8140/members?company=Harbor+Point'
+    - 'why: The search for Harbor Point members returned the member list, so this step''s work is done.'
     - 'done: Find the members of the company group Harbor Point'
-    - 'why: Start with the first member on page one of the results.'
-    - 'open the member Maria Garcia: followed item, done, at http://localhost:8140/members/21000456'
-    - 'why: Maria has 2 books out; open the first one to see if renewing is offered.'
-    - 'open the book "The Phantom Tollbooth": followed item, done, at http://localhost:8140/loans/3321'
-    - 'why: Renewing is offered for this book, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3321'
-    - 'why: The first loan is renewed; go back to Maria to open her second book.'
+    - 'why: Start with the first member on page 1 of the results.'
+    - 'open member Maria Garcia: followed item, done, at http://localhost:8140/members/21000456'
+    - 'why: Member holds two books; open the first to see if renewing is offered.'
+    - 'open the item "The Phantom Tollbooth": followed item, done, at http://localhost:8140/loans/3321'
+    - 'why: Renewing needs the member''s card number, which this loan doesn''t show; check the member''s record for it.'
     - back to http://localhost:8140/members/21000456
-    - 'why: Open Maria''s second book, Peter Pan, to check whether renewing is offered.'
-    - 'open the book "Peter Pan": followed item, done, at http://localhost:8140/loans/3322'
-    - 'why: Renewing is offered for Peter Pan, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3322'
-    - 'why: Maria''s two books are renewed; return to the results list to open the next member.'
+    - 'why: Reopen the first loan to see whether a renew form is offered.'
+    - 'open the item "The Phantom Tollbooth": followed item, done, at http://localhost:8140/loans/3321'
+    - 'why: The loan is renewable for the member; use the renew-for-member form with the member''s card number (member id 21000456).'
+    - 'renew this book for the member, card number 21000456: acted library:renew-for-member, done, at http://localhost:8140/loans/3321'
+    - 'why: The first book is renewed; return to the member to open their second book.'
+    - back to http://localhost:8140/members/21000456
+    - 'why: Open the second book, Peter Pan, to see if renewing is offered.'
+    - 'open the item "Peter Pan": followed item, done, at http://localhost:8140/loans/3322'
+    - 'why: Peter Pan is renewable; renew it with the member''s card number 21000456.'
+    - 'renew this book for the member, card number 21000456: acted library:renew-for-member, done, at http://localhost:8140/loans/3322'
+    - 'why: Maria''s two books are renewed; return to the results to open the next member.'
     - back to http://localhost:8140/members?company=Harbor+Point
-    - 'why: Maria is done; open the next member, James Wilson, on page one.'
-    - 'open the member James Wilson: followed item, done, at http://localhost:8140/members/21000457'
-    - 'why: James has 1 book out; open it to see if renewing is offered.'
-    - 'open the book "Bridge to Terabithia": followed item, done, at http://localhost:8140/loans/3323'
-    - 'why: Bridge to Terabithia can''t be renewed: only return is offered, and its standing is "hold waiting" (another member has a hold on it). James is done, so I''m going back to the results for the next member.'
+    - 'why: Maria is done; open the next member, James Wilson, on page 1.'
+    - 'open member James Wilson: followed item, done, at http://localhost:8140/members/21000457'
+    - 'why: James has one book out; open it to see if renewing is offered.'
+    - 'open the item "Bridge to Terabithia": followed item, done, at http://localhost:8140/loans/3323'
+    - 'why: Renew isn''t offered for "Bridge to Terabithia" (loan 3323) because another member has a hold waiting on it; go back to the results for the next member.'
     - back to http://localhost:8140/members?company=Harbor+Point
-    - 'why: James is done; open the next member, Kevin O''Brien, on page one.'
-    - 'open the member Kevin O''Brien: followed item, done, at http://localhost:8140/members/21000458'
-    - 'why: Kevin has 2 books out; open the first, "A Wrinkle in Time", to see if renewing is offered.'
-    - 'open the book "A Wrinkle in Time": followed item, done, at http://localhost:8140/loans/3324'
-    - 'why: A Wrinkle in Time can''t be renewed: only return is offered, and its standing is "renewed the most allowed" (3 renewals). Going back to Kevin for his second book.'
+    - 'why: Maria and James are done; open the next member, Kevin O''Brien, on page 1.'
+    - 'open member Kevin O''Brien: followed item, done, at http://localhost:8140/members/21000458'
+    - 'why: Kevin has two books; open the first, A Wrinkle in Time, to see if renewing is offered.'
+    - 'open the item "A Wrinkle in Time": followed item, done, at http://localhost:8140/loans/3324'
+    - 'why: Renew isn''t offered for A Wrinkle in Time (renewed the most allowed, 3 renewals); go back to Kevin to open his second book.'
     - back to http://localhost:8140/members/21000458
-    - 'why: Open Kevin''s second book, Heidi, to check whether renewing is offered.'
-    - 'open the book "Heidi": followed item, done, at http://localhost:8140/loans/3325'
-    - 'why: Renewing is offered for Heidi (renewable, 0 renewals), so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3325'
-    - 'why: Kevin''s books are handled; return to the results to open the next member or the next page.'
+    - 'why: Open Kevin''s second book, Heidi, to see if renewing is offered.'
+    - 'open the item "Heidi": followed item, done, at http://localhost:8140/loans/3325'
+    - 'why: Heidi is renewable; renew with Kevin''s card number 21000458.'
+    - 'renew this book for the member, card number 21000458: acted library:renew-for-member, done, at http://localhost:8140/loans/3325'
+    - 'why: Kevin''s books are handled; return to the results to open the next member or page.'
     - back to http://localhost:8140/members?company=Harbor+Point
-    - 'why: Kevin is done; open the next member on page one, Aisha Bello.'
-    - 'open the member Aisha Bello: followed item, done, at http://localhost:8140/members/21000459'
-    - 'why: Aisha has 1 book out; open The Westing Game to see if renewing is offered.'
-    - 'open the book "The Westing Game": followed item, done, at http://localhost:8140/loans/3326'
-    - 'why: The Westing Game is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3326'
-    - 'why: Aisha''s only book is renewed; return to the results to find the next member or page.'
+    - 'why: Kevin is done; open the next member on page 1, Aisha Bello.'
+    - 'open member Aisha Bello: followed item, done, at http://localhost:8140/members/21000459'
+    - 'why: Aisha has one book out; open it to see if renewing is offered.'
+    - 'open the item "The Westing Game": followed item, done, at http://localhost:8140/loans/3326'
+    - 'why: The Westing Game is renewable; renew with Aisha''s card number 21000459.'
+    - 'renew this book for the member, card number 21000459: acted library:renew-for-member, done, at http://localhost:8140/loans/3326'
+    - 'why: Aisha''s book is renewed; return to the results to find the next member or page.'
     - back to http://localhost:8140/members?company=Harbor+Point
-    - 'why: Aisha is done; open the next member on page one, Thomas Becker.'
-    - 'open the member Thomas Becker: followed item, done, at http://localhost:8140/members/21000460'
-    - 'why: Thomas has 2 books out; open the first, Island of the Blue Dolphins, to see if renewing is offered.'
-    - 'open the book "Island of the Blue Dolphins": followed item, done, at http://localhost:8140/loans/3327'
-    - 'why: Island of the Blue Dolphins can''t be renewed (only return offered; hold waiting). Go back to Thomas for his second book.'
+    - 'why: Aisha is done; open the next member on page 1, Thomas Becker.'
+    - 'open member Thomas Becker: followed item, done, at http://localhost:8140/members/21000460'
+    - 'why: Thomas has two books; open the first, Island of the Blue Dolphins, to see if renewing is offered.'
+    - 'open the item "Island of the Blue Dolphins": followed item, done, at http://localhost:8140/loans/3327'
+    - 'why: Island of the Blue Dolphins can''t be renewed (hold waiting); return to Thomas to open his second book.'
     - back to http://localhost:8140/members/21000460
-    - 'why: Open Thomas''s second book, Pippi Longstocking, to check whether renewing is offered.'
-    - 'open the book "Pippi Longstocking": followed item, done, at http://localhost:8140/loans/3328'
-    - 'why: Pippi Longstocking is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3328'
-    - 'why: Thomas''s books are handled; return to the results to find the next member or the next page.'
+    - 'why: Open Thomas''s second book, Pippi Longstocking, to see if renewing is offered.'
+    - 'open the item "Pippi Longstocking": followed item, done, at http://localhost:8140/loans/3328'
+    - 'why: Pippi Longstocking is renewable; renew with Thomas''s card number 21000460.'
+    - 'renew this book for the member, card number 21000460: acted library:renew-for-member, done, at http://localhost:8140/loans/3328'
+    - 'why: Thomas''s books are handled; return to the results to find the next member or page.'
     - back to http://localhost:8140/members?company=Harbor+Point
-    - 'why: All five members on page one are handled; go to the next page of results.'
+    - 'why: All five members on page 1 are handled; go to the next page of results.'
     - 'follow the next page link: followed next, done, at http://localhost:8140/members?company=Harbor+Point&page=2'
-    - 'why: Page two members start with Hannah Kim; open her first.'
-    - 'open the member Hannah Kim: followed item, done, at http://localhost:8140/members/21000461'
-    - 'why: Hannah has 1 book out; open Tuck Everlasting to see if renewing is offered.'
-    - 'open the book "Tuck Everlasting": followed item, done, at http://localhost:8140/loans/3329'
-    - 'why: Tuck Everlasting is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3329'
-    - 'why: Hannah''s only book is renewed; return to page two of the results to open the next member.'
+    - 'why: Page 2 members start with Hannah Kim; open her.'
+    - 'open member Hannah Kim: followed item, done, at http://localhost:8140/members/21000461'
+    - 'why: Hannah has one book out; open it to see if renewing is offered.'
+    - 'open the item "Tuck Everlasting": followed item, done, at http://localhost:8140/loans/3329'
+    - 'why: Tuck Everlasting is renewable; renew with Hannah''s card number 21000461.'
+    - 'renew this book for the member, card number 21000461: acted library:renew-for-member, done, at http://localhost:8140/loans/3329'
+    - 'why: Hannah''s book is renewed; return to page 2 to check for more members.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=2
-    - 'why: Hannah is done; open the next member on page two, Daniel Novak.'
-    - 'open the member Daniel Novak: followed item, done, at http://localhost:8140/members/21000462'
-    - 'why: Daniel has 2 books out; open the first, The BFG, to see if renewing is offered.'
-    - 'open the book "The BFG": followed item, done, at http://localhost:8140/loans/3330'
-    - 'why: The BFG is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3330'
-    - 'why: The BFG is renewed; go back to Daniel to open his second book.'
+    - 'why: Hannah is done; open the next member on page 2, Daniel Novak.'
+    - 'open member Daniel Novak: followed item, done, at http://localhost:8140/members/21000462'
+    - 'why: Daniel has two books; open the first, The BFG, to see if renewing is offered.'
+    - 'open the item "The BFG": followed item, done, at http://localhost:8140/loans/3330'
+    - 'why: The BFG is renewable; renew with Daniel''s card number 21000462.'
+    - 'renew this book for the member, card number 21000462: acted library:renew-for-member, done, at http://localhost:8140/loans/3330'
+    - 'why: The BFG is renewed; return to Daniel to open his second book.'
     - back to http://localhost:8140/members/21000462
-    - 'why: Open Daniel''s second book, The Borrowers, to check whether renewing is offered.'
-    - 'open the book "The Borrowers": followed item, done, at http://localhost:8140/loans/3331'
-    - 'why: The Borrowers can''t be renewed: only return is offered and its standing is "renewed the most allowed" (3 renewals). Daniel is done, so I''m returning to page two to check for more members.'
+    - 'why: Open Daniel''s second book, The Borrowers, to see if renewing is offered.'
+    - 'open the item "The Borrowers": followed item, done, at http://localhost:8140/loans/3331'
+    - 'why: Renew isn''t offered for The Borrowers (renewed the most allowed, 3 renewals); Daniel is done, so return to page 2 to check for more members.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=2
-    - 'why: Daniel is done; open the next member on page two, Fatima Rahman.'
-    - 'open the member Fatima Rahman: followed item, done, at http://localhost:8140/members/21000463'
-    - 'why: Fatima has 1 book out; open Stuart Little to see if renewing is offered.'
-    - 'open the book "Stuart Little": followed item, done, at http://localhost:8140/loans/3332'
-    - 'why: Stuart Little can''t be renewed (only return offered; hold waiting). Fatima is done; return to page two to check for more members.'
+    - 'why: Hannah and Daniel are done; open the next member on page 2, Fatima Rahman.'
+    - 'open member Fatima Rahman: followed item, done, at http://localhost:8140/members/21000463'
+    - 'why: Fatima has one book out; open it to see if renewing is offered.'
+    - 'open the item "Stuart Little": followed item, done, at http://localhost:8140/loans/3332'
+    - 'why: Stuart Little can''t be renewed (hold waiting); return to page 2 to check for more members or pages.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=2
-    - 'why: Fatima is done; open the next member on page two, Lucas Silva.'
-    - 'open the member Lucas Silva: followed item, done, at http://localhost:8140/members/21000464'
-    - 'why: Lucas has 2 books out; open the first, Little Women, to see if renewing is offered.'
-    - 'open the book "Little Women": followed item, done, at http://localhost:8140/loans/3333'
-    - 'why: Little Women is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3333'
-    - 'why: Little Women is renewed; go back to Lucas to open his second book.'
+    - 'why: Fatima is done; the next member on page 2 is Lucas Silva.'
+    - 'open member Lucas Silva: followed item, done, at http://localhost:8140/members/21000464'
+    - 'why: Lucas has two books; open the first, Little Women, to see if renewing is offered.'
+    - 'open the item "Little Women": followed item, done, at http://localhost:8140/loans/3333'
+    - 'why: Little Women is renewable; renew with Lucas''s card number 21000464.'
+    - 'renew this book for the member, card number 21000464: acted library:renew-for-member, done, at http://localhost:8140/loans/3333'
+    - 'why: Little Women is renewed; return to Lucas to open his second book.'
     - back to http://localhost:8140/members/21000464
-    - 'why: Open Lucas''s second book, Watership Down, to check whether renewing is offered.'
-    - 'open the book "Watership Down": followed item, done, at http://localhost:8140/loans/3334'
-    - 'why: Watership Down is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3334'
-    - 'why: Lucas''s books are done; return to page two to check for more members or a next page.'
+    - 'why: Open Lucas''s second book, Watership Down, to see if renewing is offered.'
+    - 'open the item "Watership Down": followed item, done, at http://localhost:8140/loans/3334'
+    - 'why: Watership Down is renewable; renew with Lucas''s card number 21000464.'
+    - 'renew this book for the member, card number 21000464: acted library:renew-for-member, done, at http://localhost:8140/loans/3334'
+    - 'why: Lucas''s books are done; return to page 2 to check for more members or a next page.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=2
-    - 'why: Lucas is done; the next member on page two is Emma Johansson.'
-    - 'open the member Emma Johansson: followed item, done, at http://localhost:8140/members/21000465'
-    - 'why: Emma has 1 book out; open The Wind in the Willows to see if renewing is offered.'
-    - 'open the book "The Wind in the Willows": followed item, done, at http://localhost:8140/loans/3335'
-    - 'why: The Wind in the Willows can''t be renewed (renewed the most allowed, only return offered); Emma is done, so return to page two to check for more members or pages.'
+    - 'why: Lucas is done; the next member on page 2 is Emma Johansson.'
+    - 'open member Emma Johansson: followed item, done, at http://localhost:8140/members/21000465'
+    - 'why: Emma has one book out; open it to see if renewing is offered.'
+    - 'open the item "The Wind in the Willows": followed item, done, at http://localhost:8140/loans/3335'
+    - 'why: The Wind in the Willows can''t be renewed (renewed the most allowed, 3 renewals); return to page 2 to check for more members or a next page.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=2
-    - 'why: Page two is finished and count is 15, so a third page remains; follow next.'
+    - 'why: Page 2 members are all handled and the count is 15, so go to the next page.'
     - 'follow the next page link: followed next, done, at http://localhost:8140/members?company=Harbor+Point&page=3'
-    - 'why: Page three has five members; start with the first, Samuel Mensah.'
-    - 'open the member Samuel Mensah: followed item, done, at http://localhost:8140/members/21000466'
-    - 'why: Samuel has 2 books out; open the first, Black Beauty, to see if renewing is offered.'
-    - 'open the book "Black Beauty": followed item, done, at http://localhost:8140/loans/3336'
-    - 'why: Black Beauty is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3336'
-    - 'why: Black Beauty is renewed; return to Samuel Mensah to open his second book.'
+    - 'why: Page 3 has five members; start with Samuel Mensah.'
+    - 'open member Samuel Mensah: followed item, done, at http://localhost:8140/members/21000466'
+    - 'why: Samuel has two books; open the first, Black Beauty, to see if renewing is offered.'
+    - 'open the item "Black Beauty": followed item, done, at http://localhost:8140/loans/3336'
+    - 'why: Black Beauty is renewable; renew with Samuel''s card number 21000466.'
+    - 'renew this book for the member, card number 21000466: acted library:renew-for-member, done, at http://localhost:8140/loans/3336'
+    - 'why: Black Beauty is renewed; return to Samuel to open his second book.'
     - back to http://localhost:8140/members/21000466
-    - 'why: Open Samuel''s second book, The Little Prince, to check whether renewing is offered.'
-    - 'open the book "The Little Prince": followed item, done, at http://localhost:8140/loans/3337'
-    - 'why: The Little Prince can''t be renewed (only return offered; hold waiting). Samuel is done; return to page three for the next member.'
+    - 'why: Open Samuel''s second book, The Little Prince, to see if renewing is offered.'
+    - 'open the item "The Little Prince": followed item, done, at http://localhost:8140/loans/3337'
+    - 'why: The Little Prince can''t be renewed (hold waiting, no renew form); Samuel is done, so return to page 3 for the next member.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=3
-    - 'why: Samuel is done; open the next member on page three, Olivia Brooks.'
-    - 'open the member Olivia Brooks: followed item, done, at http://localhost:8140/members/21000467'
-    - 'why: Olivia has 1 book out; open Anne of Green Gables to see if renewing is offered.'
-    - 'open the book "Anne of Green Gables": followed item, done, at http://localhost:8140/loans/3338'
-    - 'why: Anne of Green Gables is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3338'
-    - 'why: Olivia''s only book is renewed; return to page three to open the next member.'
+    - 'why: Samuel is done; open the next member on page 3, Olivia Brooks.'
+    - 'open member Olivia Brooks: followed item, done, at http://localhost:8140/members/21000467'
+    - 'why: Olivia has one book out; open it to see if renewing is offered.'
+    - 'open the item "Anne of Green Gables": followed item, done, at http://localhost:8140/loans/3338'
+    - 'why: Anne of Green Gables is renewable; renew with Olivia''s card number 21000467.'
+    - 'renew this book for the member, card number 21000467: acted library:renew-for-member, done, at http://localhost:8140/loans/3338'
+    - 'why: Olivia''s book is renewed; return to page 3 to open the next member.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=3
-    - 'why: Olivia is done; open the next member on page three, Nadia Petrova.'
-    - 'open the member Nadia Petrova: followed item, done, at http://localhost:8140/members/21000468'
-    - 'why: Nadia has 2 books out; open the first, Treasure Island, to see if renewing is offered.'
-    - 'open the book "Treasure Island": followed item, done, at http://localhost:8140/loans/3339'
-    - 'why: Treasure Island can''t be renewed (hold waiting, only return offered); go back to Nadia for her second book.'
+    - 'why: Samuel and Olivia are done; open the next member on page 3, Nadia Petrova.'
+    - 'open member Nadia Petrova: followed item, done, at http://localhost:8140/members/21000468'
+    - 'why: Nadia has two books; open the first, Treasure Island, to see if renewing is offered.'
+    - 'open the item "Treasure Island": followed item, done, at http://localhost:8140/loans/3339'
+    - 'why: Treasure Island can''t be renewed (hold waiting, no renew form); return to Nadia to open her second book.'
     - back to http://localhost:8140/members/21000468
-    - 'why: Open Nadia''s second book, Mrs. Frisby and the Rats of NIMH, to check whether renewing is offered.'
-    - 'open the book "Mrs. Frisby and the Rats of NIMH": followed item, done, at http://localhost:8140/loans/3340'
-    - 'why: Mrs. Frisby is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3340'
-    - 'why: Nadia''s books are handled; return to page three to open the next member.'
+    - 'why: Open Nadia''s second book, Mrs. Frisby and the Rats of NIMH, to see if renewing is offered.'
+    - 'open the item "Mrs. Frisby and the Rats of NIMH": followed item, done, at http://localhost:8140/loans/3340'
+    - 'why: Mrs. Frisby is renewable; renew with Nadia''s card number 21000468.'
+    - 'renew this book for the member, card number 21000468: acted library:renew-for-member, done, at http://localhost:8140/loans/3340'
+    - 'why: Nadia''s books are handled; return to page 3 to open the next member.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=3
-    - 'why: Nadia is done; open the next member on page three, Ryan Murphy.'
-    - 'open the member Ryan Murphy: followed item, done, at http://localhost:8140/members/21000469'
-    - 'why: Ryan has 1 book out; open The Hundred and One Dalmatians to see if renewing is offered.'
-    - 'open the book "The Hundred and One Dalmatians": followed item, done, at http://localhost:8140/loans/3341'
-    - 'why: The Hundred and One Dalmatians is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3341'
-    - 'why: Ryan''s book is renewed; return to page three to open the next member, if any.'
+    - 'why: Samuel, Olivia, Nadia are done; open the next member on page 3, Ryan Murphy.'
+    - 'open member Ryan Murphy: followed item, done, at http://localhost:8140/members/21000469'
+    - 'why: Ryan has one book out; open it to see if renewing is offered.'
+    - 'open the item "The Hundred and One Dalmatians": followed item, done, at http://localhost:8140/loans/3341'
+    - 'why: The Hundred and One Dalmatians is renewable; renew with Ryan''s card number 21000469.'
+    - 'renew this book for the member, card number 21000469: acted library:renew-for-member, done, at http://localhost:8140/loans/3341'
+    - 'why: Ryan''s book is renewed; return to page 3 to open the next member or find a next page.'
     - back to http://localhost:8140/members?company=Harbor+Point&page=3
-    - 'why: Ryan is done; open the remaining member on page three, Chloe Dubois.'
-    - 'open the member Chloe Dubois: followed item, done, at http://localhost:8140/members/21000470'
-    - 'why: Chloe has 2 books out; open the first, The Cricket in Times Square, to see if renewing is offered.'
-    - 'open the book "The Cricket in Times Square": followed item, done, at http://localhost:8140/loans/3342'
-    - 'why: The Cricket in Times Square can''t be renewed (only return offered; renewed the most allowed). Back to Chloe for her second book.'
+    - 'why: Ryan is done; open the last member on page 3, Chloe Dubois.'
+    - 'open member Chloe Dubois: followed item, done, at http://localhost:8140/members/21000470'
+    - 'why: Chloe has two books; open the first, The Cricket in Times Square, to see if renewing is offered.'
+    - 'open the item "The Cricket in Times Square": followed item, done, at http://localhost:8140/loans/3342'
+    - 'why: The Cricket in Times Square can''t be renewed (3 renewals, the most allowed); return to Chloe to open her second book.'
     - back to http://localhost:8140/members/21000470
-    - 'why: Chloe''s second book, Ramona the Pest, still needs checking for renewal.'
-    - 'open the book "Ramona the Pest": followed item, done, at http://localhost:8140/loans/3343'
-    - 'why: Ramona the Pest is renewable and library:renew is offered, so renew it.'
-    - 'renew the book: acted library:renew, done, at http://localhost:8140/loans/3343'
-    - 'why: All 15 members across three pages are handled. Every renewable book was renewed, and the others are explained below.'
+    - 'why: Open Chloe''s second book, Ramona the Pest, to see if renewing is offered.'
+    - 'open the item "Ramona the Pest": followed item, done, at http://localhost:8140/loans/3343'
+    - 'why: Ramona the Pest is renewable; renew with Chloe''s card number 21000470.'
+    - 'renew this book for the member, card number 21000470: acted library:renew-for-member, done, at http://localhost:8140/loans/3343'
+    - 'why: Chloe''s books are handled; return to page 3 to check whether a next page exists.'
+    - back to http://localhost:8140/members?company=Harbor+Point&page=3
+    - 'why: Page 3 has no next link and all 15 members are handled. Renewed every book that offered renewing. Not renewable: Bridge to Terabithia, Island of the Blue Dolphins, Stuart Little, The Little Prince and Treasure Island, because another member has a hold on each. A Wrinkle in Time, The Borrowers, The Wind in the Willows and The Cricket in Times Square, because each has reached the 3-renewal maximum.'
     - 'done: For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
   model:
     name: claude-sonnet-5-5
     url: https://api.anthropic.com
   usage:
-    calls: 79
-    input: 228342
-    output: 13641
-    cache_read: 141094
-    cache_write: 0
+    calls: 82
+    input: 247234
+    output: 14453
+    cache_read: 144666
+    cache_write: 1786
 ---
-at: '2026-11-05T01:56:22.686593Z'
-ms: 42
+at: '2026-11-05T03:15:43.051566Z'
+ms: 51
 mode: script
 say: enter {entry}
 params:
@@ -362,6 +371,8 @@ now:
           - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
         library:renew:
           - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:renew-for-member:
+          - sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
         library:return:
           - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
         library:search-accounts:
@@ -370,7 +381,7 @@ now:
           - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
         library:search-members:
           - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
-      digest: sha256-/oA4AtMmNXYhYC9lOt9yL3wDlZyjBVws734QW/5Mkjo=
+      digest: sha256-JuAynvKvR5okL1mQT70mjefY45UZaIrAREdufhkWIYI=
   forms:
     - library:search-accounts
     - library:get-account
@@ -384,10 +395,10 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-05T01:56:25.972094Z'
-ms: 3335
+at: '2026-11-05T03:15:45.919378Z'
+ms: 3940
 mode: intent
-say: search accounts for the company Harbor Point
+say: search accounts for company Harbor Point
 line: 1
 params:
   relation: library:search-members
@@ -399,7 +410,7 @@ values:
     from:
       - input: company
 reason:
-  template: search accounts for the company $company
+  template: search accounts for company $company
   slots:
     company:
       value: Harbor Point
@@ -411,7 +422,7 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"title":"Riverside Public Library","hr:manifest":{"forms":{"library:get-account":["sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="],"library:get-loan":["sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="],"library:get-member":["sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="],"library:renew":["sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0="],"library:return":["sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="],"library:search-accounts":["sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="],"library:search-loans":["sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="],"library:search-members":["sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="]},"digest":"sha256-/oA4AtMmNXYhYC9lOt9yL3wDlZyjBVws734QW/5Mkjo="}}
+      {"title":"Riverside Public Library","hr:manifest":{"forms":{"library:get-account":["sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="],"library:get-loan":["sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="],"library:get-member":["sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="],"library:renew":["sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0="],"library:renew-for-member":["sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA="],"library:return":["sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="],"library:search-accounts":["sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="],"library:search-loans":["sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="],"library:search-members":["sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="]},"digest":"sha256-JuAynvKvR5okL1mQT70mjefY45UZaIrAREdufhkWIYI="}}
       </state>
       <offers>
       {"library:search-accounts":{"title":"Find accounts by name","description":"Lists the accounts whose member's name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the member's name; case is ignored"}},"required":["name"]}},"library:get-account":{"title":"Get an account by library card number","description":"Goes to one member's account, given the number on their library card.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Library card number","description":"The number on the back of the library card"}},"required":["id"]}},"library:search-members":{"title":"Find members by company","description":"Lists the members in the company group whose name has the text, five to a page.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"company":{"type":"string","minLength":1,"title":"Company","description":"Part of the company's name; case is ignored"}},"required":[]}},"library:get-member":{"title":"Get a member of a company group by library card number","description":"Goes to one member of a company group, given the number on their library card.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Library card number","description":"The number on the back of the library card"}},"required":["id"]}},"library:search-loans":{"title":"Find loans by title","description":"Lists the loans whose book's title has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the book's title; case is ignored"}},"required":["name"]}},"library:get-loan":{"title":"Get a loan by number","description":"Goes to one loan, given its number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Loan number","description":"The loan's number, on the receipt"}},"required":["id"]}}}
@@ -420,9 +431,9 @@ model:
       []
       </links>
       <intent>
-      search accounts for the company Harbor Point
+      search accounts for company Harbor Point
       </intent>
-    answered: '[{"type":"thinking","thinking":"","signature":"CAQS1woKEAgTGAI4AUIIdGhpbmtpbmcSDKcDE5rF0REn28LQHRoMhDrOwIwYyhxaOKsBIjCrS3TyoZAXGKqaINgzFtxbP+9Y5MsfI16bK7VWg8gJV8zHb99rMc+0/zVbyAApiFQq9AmIAObE4aGlRAMvlCQtOWmXaSTTHY0NeXgXh3oGb5KTglPogU3yd+Y3HgnqDk7C2s0VoNTgMpCIkk+ubuGEikDE7D0kAOq4iPXkG1qslTx06PrVER/w/y6pEJZV4zJB80y5C7945yhIJN+VorGjXdibN2tORMy4BfIMapdMnSgD3F3UXAI3zS/vG+B/wM8zpdEy7mbs8ed9EesHQgRK1SiIbs+Yib74+GJ/E/WLNO/KUbIwfL59yfP4mjGFV3azGxj68CvYIsICTbkJ3ZiKCV70AO+YpRjxcTELEclcHVvsePv2/UP0OgGN2Xrs7cyPxM/Hk0I8M1y1vI3vE0reQx82x14H/h8rD5KceWCp8NqAO9uM8cmAtu21oESfLREPefcKbeEMXV0guyOMfp5F/53zPQfi41qTBW0owFBerLpACDehm3GLyLkIYmc39/kPyf2fAQNvpLvsWUc8xB9lIRH3zxTniMIpnPE8Ags9sABHO/cgUJncSZQWLvnNhtjMI2Yc+To4hqypeORT2UWEsJZt3DVmxxBBs1nIbTb6XO3ypv1J4xMFHXsguKlCOIGeo6pVTj6HW5Dii/4l6Kh0wkQrkhNNVAhs8npZ9+UpHuufxKlzpdrIWh1Tr37RCflygJ6QGekX0WV1kzhe1IFT+YvIjqD9zn63fSvVZu+qijulNtLf3pZDcCFdBaqsRI3j5Y/AOYUXTviQjzTLFMgKXzyWoF3y19GizoDxU94xD4QmEk9W8YNaTF4WGJ2/xWLKCj3YLy+7kKUgI8BiSt53oMj+W8LggbQHOBPIhbSV9pu6AePkKad8Pu1fC4h2GK0x03t7LqIF6+0BZAXTf9TE4x2GbPbLxuuGW17AIwNZ/3B+3ADVM7Nradlk8P6sP3wUba9QM3jrUJugR8xWYYmtb1zfZ9yTZIUA7s8PoM1SIxMLq5VfXbEqG5bAzXquFR+JFiXNEj3MqPwjiCW7yl1e3E9bKoGrV6z2Eszg5GKqqtZDbzoaih35B84SQUg1E4cM2eCmhMnLCAQnzxzS45rsgFniUBkoruI1hv1STFLWZJf4wg5M78Jlf7TgIUgSNvEp++6nzXedA0HsmQw8s6H6NUTzJsxIigx7PGEBeWiguN+2ucFf0nq6bzZ1wRtPZZaqkfChxSXTRtxTd1k3IIFUuMzCR6m7sheVHe9s+GWrcBthjyssDwAMIahu79LWjQzoCkhuddazmx75jG+McOeCNNRjnB/cF9bW8lKSXWBtta8iS+tLR1xtq/bkyaumkfuoetKd9Xz4HPDjuooOO4a/+hX9KLrhmEibQWTb64A5ytkLEzHPHMVjrIN4qGfd58Re3p5EfcN+wd7sflpXd5B0ttrKW95WS9BaMRp9QtUXFhOOk5hCSlJG9E+4qVRPQW6cJdxRs5hACdQdJqyI4a8F1l7/+MmbUgq1Pb1K4pf/T3Hkxywn3ENfpyLPkCCUKOnAfoyRWq+7cVteWgxjTW91KYRoOuXBdz0CuD0VgyE9yoMZ0hPKol97QJKkWkhwmmA6g3j0PenjyaUObP0Ou0XvcLQeIglGNDoQj9n6xr4n9taJRqKpkhF8JFAoV+FAIkc16Y6IJobazMKTBh31UEkWYJeifID74aKtiwcs5HEc4t4LCeW5U4r4TosoeEDNQRMsYglOzTFhaonGRC7i2MfaXWkCSnuOERgB"},{"type":"tool_use","id":"toolu_015kYqqZRTqEp1baKpLwyzMU","name":"select","input":{"action":"act","affordance":"library:search-members","fields":{"company":"Harbor Point"}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS7AoKEAgTGAI4AUIIdGhpbmtpbmcSDI5MGw4/P7eT1sDeaxoMPdSGyxSqZvQIZzU/IjAUBchhhXZ36i0hLtgPaC/YNSL2bDvDcuCKUAFKuJQHh9i5VOliwCknenlW2jaAL7QqiQpRpkH+/hG95EUL5KT8Az6czCczxRXrXCHU60whpk56Pobs1MRBFSVbwFZbwRCZU7N7jhfbS+dxeDYeAM9mwX4T/Uh0C4CHETdr0aCUJyuL2WdQReO3l6OzqgE95Xj2RllWtpCrAhGkqZU4X0WSt9arBSInHcm9TgVwueu+tPM0UMEUFIl1cC57Da3iKYcySQCTWz/QflzQWxmquoqbvEZyF6I65fG3c4XIpNt4epFt7aJWHcjaXE8P0OGojDxvS0xPxb8KuNgm3AJaRkMqEjITLIfL8lxEGHVpm8gFEvIsILHpstBNR/UZd2yBzoJPIOoTLht8KPycLgcMTfS2FsMLwrhEGTUFZ1k31XQoz07qkg6n7I5yHYSJvCb0KVxN67CcduQwY7uos7q2tzErVfWClrNv7d2Y/Liyy11R6pG3/ETWUoWQmnfiM4G5SzxlKgppADJXZkHj2ScaKznPyArDV3Iz7gPiyrE3cPE/5Aj35Nvtzpd3l7ubn4PlKZu3rhmr1VUeuB4zItSEFUk4RdyUYq7REaGg37ojOMZuU61sKqz8hEoVVCiWbWa22vR/OBznzLmECb9O7bnxmdbyeVynQZGgx5wvO3YplPDe4nFSApO7ascwYExjeAr7i16NUdgmw7tcYsQzupQ+LwMBEvben7yB0J4u4q6pIsNgwHQ6hIeX+v8FUquZ+QXA3FDQKjRqgkARrxM7Z+l+bC/ZmC4ITSsamXkAj+CJ0j0vgzEQIgkdfaaq5UKyt60tsFZLXoW9Y5iSZ8mUT+nj1Jjjg+xvHpOutfiIH3E47/6FeJuiL4YL3f6nuM14SLqniZuWBC2aSH+Xny92SVWgkenjy+QcQi462cQ38sihfQmyZ2788LGRXyxfnledwqhgUQgeVHMoceDLmcPHVzZ12xpKrWzo4Qg7f1AgeNRlSdotoSVjqKz5ajZIP9dU2WyOyfRK8q7tJVnFhqWVSlrws5y8MvKoKEe83paSU1KoepMRo9/9Kv1q5foj7/7AyTX2lAjYc+xOUeTTXTPQs8fzvFDGwGoK8WbvI9pll54/XH73JgxWNP5pT24I8M8nWFK0imOwUnTWZWIN6TWIStF+T6Er0dvw4ICRPowTKxay4oXBYixG52ccYa7gdVsdC8/ctDlc5LZkAquC4Q7e/CCvQ5ntRQV32oro2YscxQAgtimfMs3BuKTBCuMw+BHJXBdxgMFJIka4By4WZ9dl3IxdmlAjv99kxvvig6653fCnlc/xKikJ1vif+9tch7jUXIDa1X8EZnb57HWOXYfWMW54B5axAKW6fLw0Bbp8F6syU4IodNzJSzvC22zPfU9sI3t3YvDzd3FGtmHD0AVJSG2XhAN+jOtHE0rSvbhtPuYIFlstsi0GXiXxfR9GHQMed7sbAYEVCzWEMdof4Na75xVZ05t1nR5zAsrswWwzkXeIv9U4PqetNbe51SKFCZRulO8Jh8oVWYIEMSFLTEavqZH646ajlm0b6NPWXtPxqIOl4JKjQKMv0ps/J315VIYYGIVxrk7MCiiH5UTJvguxstPA/37dxxdD3sOonXC2WIvkJo8202oMBBPkzzxfDF2kjKaC0vCtdzTq+vRIK5+t1ViKL2H0QXVcFAJCrC3wzzJ8y3N6zZnCe/TwFYeFhmISv1qvLZv2nltkKR+NahXVR8+dfn2LSMR8E7EgboGY9zV35HX1FWnF4nmxsFX3Iz1esRgB"},{"type":"tool_use","id":"toolu_01CSV8bHsGaR7U9LvGc9FFQx","name":"select","input":{"action":"act","affordance":"library:search-members","fields":{"company":"Harbor Point"}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
   relation: library:search-members
@@ -468,10 +479,10 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T01:56:35.023556Z'
-ms: 1628
+at: '2026-11-05T03:15:54.580281Z'
+ms: 1627
 mode: intent
-say: open the member Maria Garcia
+say: open member Maria Garcia
 line: 2
 within: 1
 params:
@@ -483,7 +494,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Maria Garcia
+  template: open member Maria Garcia
   slots: {}
 opens: true
 judgement: true
@@ -500,9 +511,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"item","title":"Maria Garcia"},{"rel":"item","title":"James Wilson"},{"rel":"item","title":"Kevin O'Brien"},{"rel":"item","title":"Aisha Bello"},{"rel":"item","title":"Thomas Becker"}]
       </links>
       <intent>
-      open the member Maria Garcia
+      open member Maria Garcia
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01PNRckLB35TJvukfxNSn1iw","name":"select","input":{"action":"follow","rel":"item","title":"Maria Garcia"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01Wye2DErSfAgk93TPTJSj9S","name":"select","input":{"action":"follow","rel":"item","title":"Maria Garcia"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -536,11 +547,15 @@ now:
     item:
       - The Phantom Tollbooth
       - Peter Pan
+keeps:
+  /id:
+    - 7
+    - 11
 ---
-at: '2026-11-05T01:56:38.770599Z'
-ms: 1987
+at: '2026-11-05T03:15:59.021007Z'
+ms: 1533
 mode: intent
-say: open the book "The Phantom Tollbooth"
+say: open the item "The Phantom Tollbooth"
 line: 3
 within: 2
 params:
@@ -552,7 +567,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The Phantom Tollbooth"
+  template: open the item "The Phantom Tollbooth"
   slots: {}
 opens: true
 judgement: true
@@ -569,9 +584,9 @@ model:
       [{"rel":"item","title":"The Phantom Tollbooth"},{"rel":"item","title":"Peter Pan"}]
       </links>
       <intent>
-      open the book "The Phantom Tollbooth"
+      open the item "The Phantom Tollbooth"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01LVZ37mfmYeJBXfvHbNwQkB","name":"select","input":{"action":"follow","rel":"item","title":"The Phantom Tollbooth"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01PTG7epmvrnKChDJLLsU3vL","name":"select","input":{"action":"follow","rel":"item","title":"The Phantom Tollbooth"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -595,123 +610,25 @@ now:
     author: Norton Juster
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
       - null
     hr:forms:
       - null
+keeps:
+  /title:
+    - 6
 ---
-at: '2026-11-05T01:56:42.489675Z'
-ms: 1719
-mode: intent
-say: renew the book
-line: 4
-within: 3
-params:
-  relation: library:renew
-reason:
-  template: renew the book
-  slots: {}
-opens: true
-judgement: false
-model:
-  - model: claude-sonnet-5-5
-    asked: |-
-      <state>
-      {"id":3321,"title":"The Phantom Tollbooth","author":"Norton Juster","due":"2026-11-12","renewals":0,"standing":"renewable"}
-      </state>
-      <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
-      </offers>
-      <links>
-      []
-      </links>
-      <intent>
-      renew the book
-      </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01STLizZVoD6QeKPnea7Xapf","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
-chose:
-  kind: form
-  relation: library:renew
-  title: Renew
-  method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3321/actions/renew
-  picked: relation
-guard:
-  rung: L2
-  set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
-  schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.a8afbe74bc2e43fc"'
-offered:
-  forms:
-    - library:renew
-    - library:return
-  links:
-    - hr:forms
-    - self
-outcome: done
-address: http://localhost:8140/loans/3321
-now:
-  state:
-    id: 3321
-    title: The Phantom Tollbooth
-    author: Norton Juster
-    due: '2026-12-03'
-    renewals: 1
-    standing: renewable
-  forms:
-    - library:renew
-    - library:return
-  links:
-    self:
-      - null
-    hr:forms:
-      - null
----
-at: '2026-11-05T01:56:46.438175Z'
-ms: 3
+at: '2026-11-05T03:16:03.575584Z'
+ms: 8
 mode: script
 say: return to {address}
-line: 4
-within: 3
-params:
-  address: http://localhost:8140/loans/3321
-outcome: done
-address: http://localhost:8140/loans/3321
-now:
-  state:
-    id: 3321
-    title: The Phantom Tollbooth
-    author: Norton Juster
-    due: '2026-12-03'
-    renewals: 1
-    standing: renewable
-  forms:
-    - library:renew
-    - library:return
-  links:
-    self:
-      - null
-    hr:forms:
-      - null
----
-at: '2026-11-05T01:56:46.442160Z'
-ms: 2
-mode: script
-say: return to {address}
-line: 4
-within: 3
+line: 3
+within: 2
 params:
   address: http://localhost:8140/members/21000456
 outcome: done
@@ -732,11 +649,215 @@ now:
       - The Phantom Tollbooth
       - Peter Pan
 ---
-at: '2026-11-05T01:56:48.438718Z'
-ms: 4382
+at: '2026-11-05T03:16:06.510713Z'
+ms: 1464
 mode: intent
-say: open the book "Peter Pan"
+say: open the item "The Phantom Tollbooth"
+line: 4
+within: 2
+params:
+  relation: item
+  title: The Phantom Tollbooth
+values:
+  title:
+    value: The Phantom Tollbooth
+    from:
+      - step: 4
+        pointer: /title
+reason:
+  template: open the item "The Phantom Tollbooth"
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":21000456,"name":"Maria Garcia","company":"Harbor Point Logistics","booksOut":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"The Phantom Tollbooth"},{"rel":"item","title":"Peter Pan"}]
+      </links>
+      <intent>
+      open the item "The Phantom Tollbooth"
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01Vqw9SFgPN1RAcxGv7zgSpv","name":"select","input":{"action":"follow","rel":"item","title":"The Phantom Tollbooth"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: The Phantom Tollbooth
+  method: GET
+  target: http://localhost:8140/loans/3321
+  address: http://localhost:8140/loans/3321
+  picked: title
+offered:
+  forms: []
+  links:
+    - hr:forms
+    - item
+    - self
+outcome: done
+address: http://localhost:8140/loans/3321
+now:
+  state:
+    id: 3321
+    title: The Phantom Tollbooth
+    author: Norton Juster
+    due: '2026-11-12'
+    renewals: 0
+    standing: renewable for the member
+  forms:
+    - library:renew-for-member
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:16:12.377064Z'
+ms: 2287
+mode: intent
+say: renew this book for the member, card number 21000456
 line: 5
+within: 4
+params:
+  relation: library:renew-for-member
+  card: '21000456'
+values:
+  card:
+    value: '21000456'
+    type: integer
+    from:
+      - step: 3
+        pointer: /id
+reason:
+  template: renew this book for the member, card number 21000456
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":3321,"title":"The Phantom Tollbooth","author":"Norton Juster","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
+      </state>
+      <offers>
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      renew this book for the member, card number 21000456
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01KAg8Gr7u7og5ZpmLR1MbqK","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000456}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: library:renew-for-member
+  title: Renew for the member
+  method: POST
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3321/actions/renew-for-member
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
+  schema:
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.cc508bf7144f1082"'
+offered:
+  forms:
+    - library:renew-for-member
+    - library:return
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8140/loans/3321
+now:
+  state:
+    id: 3321
+    title: The Phantom Tollbooth
+    author: Norton Juster
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable for the member
+  forms:
+    - library:renew-for-member
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:16:16.620390Z'
+ms: 7
+mode: script
+say: return to {address}
+line: 5
+within: 4
+params:
+  address: http://localhost:8140/loans/3321
+outcome: done
+address: http://localhost:8140/loans/3321
+now:
+  state:
+    id: 3321
+    title: The Phantom Tollbooth
+    author: Norton Juster
+    due: '2026-12-03'
+    renewals: 1
+    standing: renewable for the member
+  forms:
+    - library:renew-for-member
+    - library:return
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-05T03:16:16.628218Z'
+ms: 9
+mode: script
+say: return to {address}
+line: 5
+within: 4
+params:
+  address: http://localhost:8140/members/21000456
+outcome: done
+address: http://localhost:8140/members/21000456
+now:
+  state:
+    id: 21000456
+    name: Maria Garcia
+    company: Harbor Point Logistics
+    booksOut: 2
+  forms: []
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+    item:
+      - The Phantom Tollbooth
+      - Peter Pan
+---
+at: '2026-11-05T03:16:18.287444Z'
+ms: 1587
+mode: intent
+say: open the item "Peter Pan"
+line: 6
 within: 2
 params:
   relation: item
@@ -747,7 +868,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Peter Pan"
+  template: open the item "Peter Pan"
   slots: {}
 opens: true
 judgement: true
@@ -764,9 +885,9 @@ model:
       [{"rel":"item","title":"The Phantom Tollbooth"},{"rel":"item","title":"Peter Pan"}]
       </links>
       <intent>
-      open the book "Peter Pan"
+      open the item "Peter Pan"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_0143NGNj1SyR24o2cUeUUnUX","name":"select","input":{"action":"follow","rel":"item","title":"Peter Pan"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_013KKiwaZMqLEZjKbJMZBcP1","name":"select","input":{"action":"follow","rel":"item","title":"Peter Pan"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -790,9 +911,9 @@ now:
     author: J. M. Barrie
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -800,16 +921,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:56:54.582482Z'
-ms: 1464
+at: '2026-11-05T03:16:22.269466Z'
+ms: 1577
 mode: intent
-say: renew the book
-line: 6
-within: 5
+say: renew this book for the member, card number 21000456
+line: 7
+within: 6
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000456'
+values:
+  card:
+    value: '21000456'
+    type: integer
+    from:
+      - step: 3
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000456
   slots: {}
 opens: true
 judgement: false
@@ -817,40 +946,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3322,"title":"Peter Pan","author":"J. M. Barrie","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3322,"title":"Peter Pan","author":"J. M. Barrie","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000456
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01FzGQ9WVUdeJghUx9odt6vP","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01Ax7AFaFcdyuZ9id2WSFCHk","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000456}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3322/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3322/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.1c27f37cd30059df"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.cdd2863fca6666a2"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -864,9 +993,9 @@ now:
     author: J. M. Barrie
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -874,12 +1003,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:56:58.217946Z'
-ms: 13
+at: '2026-11-05T03:16:26.058268Z'
+ms: 12
 mode: script
 say: return to {address}
-line: 6
-within: 5
+line: 7
+within: 6
 params:
   address: http://localhost:8140/loans/3322
 outcome: done
@@ -891,9 +1020,9 @@ now:
     author: J. M. Barrie
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -901,12 +1030,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:56:58.232454Z'
-ms: 8
+at: '2026-11-05T03:16:26.071909Z'
+ms: 3
 mode: script
 say: return to {address}
-line: 6
-within: 5
+line: 7
+within: 6
 params:
   address: http://localhost:8140/members/21000456
 outcome: done
@@ -927,12 +1056,12 @@ now:
       - The Phantom Tollbooth
       - Peter Pan
 ---
-at: '2026-11-05T01:56:58.241045Z'
+at: '2026-11-05T03:16:26.075289Z'
 ms: 2
 mode: script
 say: return to {address}
-line: 6
-within: 5
+line: 7
+within: 6
 params:
   address: http://localhost:8140/members?company=Harbor+Point
 outcome: done
@@ -957,11 +1086,11 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T01:57:00.149575Z'
-ms: 4986
+at: '2026-11-05T03:16:28.143754Z'
+ms: 1619
 mode: intent
-say: open the member James Wilson
-line: 7
+say: open member James Wilson
+line: 8
 within: 1
 params:
   relation: item
@@ -972,7 +1101,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member James Wilson
+  template: open member James Wilson
   slots: {}
 opens: true
 judgement: true
@@ -989,9 +1118,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"item","title":"Maria Garcia"},{"rel":"item","title":"James Wilson"},{"rel":"item","title":"Kevin O'Brien"},{"rel":"item","title":"Aisha Bello"},{"rel":"item","title":"Thomas Becker"}]
       </links>
       <intent>
-      open the member James Wilson
+      open member James Wilson
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01ESKtEYtn5BTqVCvEJaiSGE","name":"select","input":{"action":"follow","rel":"item","title":"James Wilson"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01RtNMJiAGEaoUc7rg5hQW86","name":"select","input":{"action":"follow","rel":"item","title":"James Wilson"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1025,12 +1154,12 @@ now:
     item:
       - Bridge to Terabithia
 ---
-at: '2026-11-05T01:57:07.814120Z'
-ms: 3116
+at: '2026-11-05T03:16:31.704552Z'
+ms: 1645
 mode: intent
-say: open the book "Bridge to Terabithia"
-line: 8
-within: 7
+say: open the item "Bridge to Terabithia"
+line: 9
+within: 8
 params:
   relation: item
   title: Bridge to Terabithia
@@ -1040,7 +1169,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Bridge to Terabithia"
+  template: open the item "Bridge to Terabithia"
   slots: {}
 opens: true
 judgement: true
@@ -1057,9 +1186,9 @@ model:
       [{"rel":"item","title":"Bridge to Terabithia"}]
       </links>
       <intent>
-      open the book "Bridge to Terabithia"
+      open the item "Bridge to Terabithia"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01VHLV81L4TyfANXNbS7jaPK","name":"select","input":{"action":"follow","rel":"item","title":"Bridge to Terabithia"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_013G2q7WH8okMQJYmHcoSsJR","name":"select","input":{"action":"follow","rel":"item","title":"Bridge to Terabithia"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1092,12 +1221,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:14.597065Z'
+at: '2026-11-05T03:16:36.911757Z'
 ms: 6
 mode: script
 say: return to {address}
-line: 8
-within: 7
+line: 9
+within: 8
 params:
   address: http://localhost:8140/members/21000457
 outcome: done
@@ -1117,12 +1246,12 @@ now:
     item:
       - Bridge to Terabithia
 ---
-at: '2026-11-05T01:57:14.603992Z'
-ms: 2
+at: '2026-11-05T03:16:36.918506Z'
+ms: 7
 mode: script
 say: return to {address}
-line: 8
-within: 7
+line: 9
+within: 8
 params:
   address: http://localhost:8140/members?company=Harbor+Point
 outcome: done
@@ -1147,11 +1276,11 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T01:57:16.442567Z'
-ms: 2627
+at: '2026-11-05T03:16:38.798962Z'
+ms: 1434
 mode: intent
-say: open the member Kevin O'Brien
-line: 9
+say: open member Kevin O'Brien
+line: 10
 within: 1
 params:
   relation: item
@@ -1162,7 +1291,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Kevin O'Brien
+  template: open member Kevin O'Brien
   slots: {}
 opens: true
 judgement: true
@@ -1179,9 +1308,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"item","title":"Maria Garcia"},{"rel":"item","title":"James Wilson"},{"rel":"item","title":"Kevin O'Brien"},{"rel":"item","title":"Aisha Bello"},{"rel":"item","title":"Thomas Becker"}]
       </links>
       <intent>
-      open the member Kevin O'Brien
+      open member Kevin O'Brien
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01SPtUBnUtiSJJSVx9vT9hmP","name":"select","input":{"action":"follow","rel":"item","title":"Kevin O''Brien"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_017B6WBy6PumBmumVpvyvMFP","name":"select","input":{"action":"follow","rel":"item","title":"Kevin O''Brien"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1215,13 +1344,16 @@ now:
     item:
       - A Wrinkle in Time
       - Heidi
+keeps:
+  /id:
+    - 23
 ---
-at: '2026-11-05T01:57:21.117929Z'
-ms: 1587
+at: '2026-11-05T03:16:42.268495Z'
+ms: 1822
 mode: intent
-say: open the book "A Wrinkle in Time"
-line: 10
-within: 9
+say: open the item "A Wrinkle in Time"
+line: 11
+within: 10
 params:
   relation: item
   title: A Wrinkle in Time
@@ -1231,7 +1363,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "A Wrinkle in Time"
+  template: open the item "A Wrinkle in Time"
   slots: {}
 opens: true
 judgement: true
@@ -1248,9 +1380,9 @@ model:
       [{"rel":"item","title":"A Wrinkle in Time"},{"rel":"item","title":"Heidi"}]
       </links>
       <intent>
-      open the book "A Wrinkle in Time"
+      open the item "A Wrinkle in Time"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_019rruTXmYK1KVcnn9PSVoDw","name":"select","input":{"action":"follow","rel":"item","title":"A Wrinkle in Time"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_011LBekASvQ8vppNPGG6Ysvd","name":"select","input":{"action":"follow","rel":"item","title":"A Wrinkle in Time"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1283,12 +1415,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:25.476236Z'
-ms: 23
+at: '2026-11-05T03:16:46.337493Z'
+ms: 35
 mode: script
 say: return to {address}
-line: 10
-within: 9
+line: 11
+within: 10
 params:
   address: http://localhost:8140/members/21000458
 outcome: done
@@ -1309,12 +1441,12 @@ now:
       - A Wrinkle in Time
       - Heidi
 ---
-at: '2026-11-05T01:57:27.109285Z'
-ms: 2665
+at: '2026-11-05T03:16:48.402754Z'
+ms: 1465
 mode: intent
-say: open the book "Heidi"
-line: 11
-within: 9
+say: open the item "Heidi"
+line: 12
+within: 10
 params:
   relation: item
   title: Heidi
@@ -1324,7 +1456,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Heidi"
+  template: open the item "Heidi"
   slots: {}
 opens: true
 judgement: true
@@ -1341,9 +1473,9 @@ model:
       [{"rel":"item","title":"A Wrinkle in Time"},{"rel":"item","title":"Heidi"}]
       </links>
       <intent>
-      open the book "Heidi"
+      open the item "Heidi"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01XtqKUdiHM5TE7vJxwBEVqQ","name":"select","input":{"action":"follow","rel":"item","title":"Heidi"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01WY3dZ7BYa4oW9KebJMxcLp","name":"select","input":{"action":"follow","rel":"item","title":"Heidi"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1367,9 +1499,9 @@ now:
     author: Johanna Spyri
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1377,16 +1509,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:31.606628Z'
-ms: 1073
+at: '2026-11-05T03:16:51.647049Z'
+ms: 1614
 mode: intent
-say: renew the book
-line: 12
-within: 11
+say: renew this book for the member, card number 21000458
+line: 13
+within: 12
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000458'
+values:
+  card:
+    value: '21000458'
+    type: integer
+    from:
+      - step: 19
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000458
   slots: {}
 opens: true
 judgement: false
@@ -1394,40 +1534,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3325,"title":"Heidi","author":"Johanna Spyri","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3325,"title":"Heidi","author":"Johanna Spyri","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000458
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01D5vXmUoLEnkW43sdzMEVJw","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01T2rpQQfPki1uCEzjkAhtuL","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000458}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3325/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3325/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.0c9aa24f13e63868"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.6796576875a8d372"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -1441,9 +1581,9 @@ now:
     author: Johanna Spyri
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1451,12 +1591,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:34.535755Z'
-ms: 5
+at: '2026-11-05T03:16:55.779538Z'
+ms: 8
 mode: script
 say: return to {address}
-line: 12
-within: 11
+line: 13
+within: 12
 params:
   address: http://localhost:8140/loans/3325
 outcome: done
@@ -1468,9 +1608,9 @@ now:
     author: Johanna Spyri
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1478,12 +1618,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:34.542Z'
-ms: 5
+at: '2026-11-05T03:16:55.788094Z'
+ms: 6
 mode: script
 say: return to {address}
-line: 12
-within: 11
+line: 13
+within: 12
 params:
   address: http://localhost:8140/members/21000458
 outcome: done
@@ -1504,12 +1644,12 @@ now:
       - A Wrinkle in Time
       - Heidi
 ---
-at: '2026-11-05T01:57:34.547728Z'
-ms: 6
+at: '2026-11-05T03:16:55.794968Z'
+ms: 4
 mode: script
 say: return to {address}
-line: 12
-within: 11
+line: 13
+within: 12
 params:
   address: http://localhost:8140/members?company=Harbor+Point
 outcome: done
@@ -1534,11 +1674,11 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T01:57:36.834336Z'
-ms: 1510
+at: '2026-11-05T03:16:57.899957Z'
+ms: 1022
 mode: intent
-say: open the member Aisha Bello
-line: 13
+say: open member Aisha Bello
+line: 14
 within: 1
 params:
   relation: item
@@ -1549,7 +1689,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Aisha Bello
+  template: open member Aisha Bello
   slots: {}
 opens: true
 judgement: true
@@ -1566,9 +1706,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"item","title":"Maria Garcia"},{"rel":"item","title":"James Wilson"},{"rel":"item","title":"Kevin O'Brien"},{"rel":"item","title":"Aisha Bello"},{"rel":"item","title":"Thomas Becker"}]
       </links>
       <intent>
-      open the member Aisha Bello
+      open member Aisha Bello
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_017F8dBxRBFfHqgWDreDPBes","name":"select","input":{"action":"follow","rel":"item","title":"Aisha Bello"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01WQZ7dKaLD2xX7txma7yuwJ","name":"select","input":{"action":"follow","rel":"item","title":"Aisha Bello"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1601,13 +1741,16 @@ now:
       - null
     item:
       - The Westing Game
+keeps:
+  /id:
+    - 29
 ---
-at: '2026-11-05T01:57:40.263639Z'
-ms: 1128
+at: '2026-11-05T03:17:00.310742Z'
+ms: 1572
 mode: intent
-say: open the book "The Westing Game"
-line: 14
-within: 13
+say: open the item "The Westing Game"
+line: 15
+within: 14
 params:
   relation: item
   title: The Westing Game
@@ -1617,7 +1760,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The Westing Game"
+  template: open the item "The Westing Game"
   slots: {}
 opens: true
 judgement: true
@@ -1634,9 +1777,9 @@ model:
       [{"rel":"item","title":"The Westing Game"}]
       </links>
       <intent>
-      open the book "The Westing Game"
+      open the item "The Westing Game"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_017HEWyNhMKxsne3Cyk8AaUw","name":"select","input":{"action":"follow","rel":"item","title":"The Westing Game"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01E42uD1aR24VSEtTjsRZoNM","name":"select","input":{"action":"follow","rel":"item","title":"The Westing Game"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1660,9 +1803,9 @@ now:
     author: Ellen Raskin
     due: '2026-11-12'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1670,16 +1813,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:43.142865Z'
-ms: 2434
+at: '2026-11-05T03:17:03.681475Z'
+ms: 1480
 mode: intent
-say: renew the book
-line: 15
-within: 14
+say: renew this book for the member, card number 21000459
+line: 16
+within: 15
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000459'
+values:
+  card:
+    value: '21000459'
+    type: integer
+    from:
+      - step: 27
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000459
   slots: {}
 opens: true
 judgement: false
@@ -1687,40 +1838,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3326,"title":"The Westing Game","author":"Ellen Raskin","due":"2026-11-12","renewals":1,"standing":"renewable"}
+      {"id":3326,"title":"The Westing Game","author":"Ellen Raskin","due":"2026-11-12","renewals":1,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000459
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01EsZbfWz3mfY3Rb3TRnYcwa","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01WxJbkbCdUao9c5ikBkUQ2L","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000459}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3326/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3326/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.845d64ac244e7ce2"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.91365ad97a9e76fc"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -1734,9 +1885,9 @@ now:
     author: Ellen Raskin
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1744,12 +1895,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:47.958493Z'
-ms: 5
+at: '2026-11-05T03:17:07.241600Z'
+ms: 6
 mode: script
 say: return to {address}
-line: 15
-within: 14
+line: 16
+within: 15
 params:
   address: http://localhost:8140/loans/3326
 outcome: done
@@ -1761,9 +1912,9 @@ now:
     author: Ellen Raskin
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1771,12 +1922,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:47.965715Z'
-ms: 4
+at: '2026-11-05T03:17:07.248604Z'
+ms: 6
 mode: script
 say: return to {address}
-line: 15
-within: 14
+line: 16
+within: 15
 params:
   address: http://localhost:8140/members/21000459
 outcome: done
@@ -1796,12 +1947,12 @@ now:
     item:
       - The Westing Game
 ---
-at: '2026-11-05T01:57:47.970576Z'
-ms: 4
+at: '2026-11-05T03:17:07.255521Z'
+ms: 5
 mode: script
 say: return to {address}
-line: 15
-within: 14
+line: 16
+within: 15
 params:
   address: http://localhost:8140/members?company=Harbor+Point
 outcome: done
@@ -1826,11 +1977,11 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T01:57:50.127002Z'
-ms: 2448
+at: '2026-11-05T03:17:09.347575Z'
+ms: 1081
 mode: intent
-say: open the member Thomas Becker
-line: 16
+say: open member Thomas Becker
+line: 17
 within: 1
 params:
   relation: item
@@ -1841,7 +1992,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Thomas Becker
+  template: open member Thomas Becker
   slots: {}
 opens: true
 judgement: true
@@ -1858,9 +2009,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"item","title":"Maria Garcia"},{"rel":"item","title":"James Wilson"},{"rel":"item","title":"Kevin O'Brien"},{"rel":"item","title":"Aisha Bello"},{"rel":"item","title":"Thomas Becker"}]
       </links>
       <intent>
-      open the member Thomas Becker
+      open member Thomas Becker
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01DxmDzm4mkstN8eXoNpdmXt","name":"select","input":{"action":"follow","rel":"item","title":"Thomas Becker"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01AhGaCP4EkMAvWnXxJhJht5","name":"select","input":{"action":"follow","rel":"item","title":"Thomas Becker"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1894,13 +2045,16 @@ now:
     item:
       - Island of the Blue Dolphins
       - Pippi Longstocking
+keeps:
+  /id:
+    - 37
 ---
-at: '2026-11-05T01:57:54.677285Z'
-ms: 1116
+at: '2026-11-05T03:17:12.012548Z'
+ms: 4896
 mode: intent
-say: open the book "Island of the Blue Dolphins"
-line: 17
-within: 16
+say: open the item "Island of the Blue Dolphins"
+line: 18
+within: 17
 params:
   relation: item
   title: Island of the Blue Dolphins
@@ -1910,7 +2064,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Island of the Blue Dolphins"
+  template: open the item "Island of the Blue Dolphins"
   slots: {}
 opens: true
 judgement: true
@@ -1927,9 +2081,9 @@ model:
       [{"rel":"item","title":"Island of the Blue Dolphins"},{"rel":"item","title":"Pippi Longstocking"}]
       </links>
       <intent>
-      open the book "Island of the Blue Dolphins"
+      open the item "Island of the Blue Dolphins"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01JUZshK94iRFpx6VAz37Nrg","name":"select","input":{"action":"follow","rel":"item","title":"Island of the Blue Dolphins"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_015TBxqiZB7Er62ggxxfzyN4","name":"select","input":{"action":"follow","rel":"item","title":"Island of the Blue Dolphins"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -1962,12 +2116,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:57:57.897336Z'
+at: '2026-11-05T03:17:18.894273Z'
 ms: 6
 mode: script
 say: return to {address}
-line: 17
-within: 16
+line: 18
+within: 17
 params:
   address: http://localhost:8140/members/21000460
 outcome: done
@@ -1988,12 +2142,12 @@ now:
       - Island of the Blue Dolphins
       - Pippi Longstocking
 ---
-at: '2026-11-05T01:57:59.356578Z'
-ms: 1598
+at: '2026-11-05T03:17:20.909676Z'
+ms: 1535
 mode: intent
-say: open the book "Pippi Longstocking"
-line: 18
-within: 16
+say: open the item "Pippi Longstocking"
+line: 19
+within: 17
 params:
   relation: item
   title: Pippi Longstocking
@@ -2003,7 +2157,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Pippi Longstocking"
+  template: open the item "Pippi Longstocking"
   slots: {}
 opens: true
 judgement: true
@@ -2020,9 +2174,9 @@ model:
       [{"rel":"item","title":"Island of the Blue Dolphins"},{"rel":"item","title":"Pippi Longstocking"}]
       </links>
       <intent>
-      open the book "Pippi Longstocking"
+      open the item "Pippi Longstocking"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_014tB1JSC79StcNjLUcs3mUJ","name":"select","input":{"action":"follow","rel":"item","title":"Pippi Longstocking"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_017B7fLp7aeCXXGSH2CPmYqP","name":"select","input":{"action":"follow","rel":"item","title":"Pippi Longstocking"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -2046,9 +2200,9 @@ now:
     author: Astrid Lindgren
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2056,16 +2210,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:02.679646Z'
-ms: 1542
+at: '2026-11-05T03:17:24.194600Z'
+ms: 1611
 mode: intent
-say: renew the book
-line: 19
-within: 18
+say: renew this book for the member, card number 21000460
+line: 20
+within: 19
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000460'
+values:
+  card:
+    value: '21000460'
+    type: integer
+    from:
+      - step: 33
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000460
   slots: {}
 opens: true
 judgement: false
@@ -2073,40 +2235,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3328,"title":"Pippi Longstocking","author":"Astrid Lindgren","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3328,"title":"Pippi Longstocking","author":"Astrid Lindgren","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000460
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_013TbUBdTTub65RafSNmhKqK","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01XLwQFpph2ACaq7xNWkhkt6","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000460}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3328/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3328/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.9a8d6ffc15147d01"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.a9b16cd26202a9cf"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -2120,9 +2282,9 @@ now:
     author: Astrid Lindgren
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2130,12 +2292,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:06.248733Z'
-ms: 5
+at: '2026-11-05T03:17:27.662014Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 19
-within: 18
+line: 20
+within: 19
 params:
   address: http://localhost:8140/loans/3328
 outcome: done
@@ -2147,9 +2309,9 @@ now:
     author: Astrid Lindgren
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2157,12 +2319,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:06.254997Z'
-ms: 6
+at: '2026-11-05T03:17:27.665010Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 19
-within: 18
+line: 20
+within: 19
 params:
   address: http://localhost:8140/members/21000460
 outcome: done
@@ -2183,12 +2345,12 @@ now:
       - Island of the Blue Dolphins
       - Pippi Longstocking
 ---
-at: '2026-11-05T01:58:06.261654Z'
-ms: 4
+at: '2026-11-05T03:17:27.667377Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 19
-within: 18
+line: 20
+within: 19
 params:
   address: http://localhost:8140/members?company=Harbor+Point
 outcome: done
@@ -2213,11 +2375,11 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T01:58:08.182862Z'
-ms: 1291
+at: '2026-11-05T03:17:29.793527Z'
+ms: 1528
 mode: intent
 say: follow the next page link
-line: 20
+line: 21
 within: 1
 params:
   relation: next
@@ -2241,7 +2403,7 @@ model:
       <intent>
       follow the next page link
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01V5toBQta1pUWaqZPJgnmJ4","name":"select","input":{"action":"follow","rel":"next"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01VoM9aL6ge4SwnhK3KsL9Vh","name":"select","input":{"action":"follow","rel":"next"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: next
@@ -2281,12 +2443,12 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T01:58:11.343187Z'
-ms: 2185
+at: '2026-11-05T03:17:33.194718Z'
+ms: 1553
 mode: intent
-say: open the member Hannah Kim
-line: 21
-within: 20
+say: open member Hannah Kim
+line: 22
+within: 21
 params:
   relation: item
   title: Hannah Kim
@@ -2296,7 +2458,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Hannah Kim
+  template: open member Hannah Kim
   slots: {}
 opens: true
 judgement: true
@@ -2313,9 +2475,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"prev"},{"rel":"item","title":"Hannah Kim"},{"rel":"item","title":"Daniel Novak"},{"rel":"item","title":"Fatima Rahman"},{"rel":"item","title":"Lucas Silva"},{"rel":"item","title":"Emma Johansson"}]
       </links>
       <intent>
-      open the member Hannah Kim
+      open member Hannah Kim
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01Ku2PqjK2kygTWx7yM6f2xb","name":"select","input":{"action":"follow","rel":"item","title":"Hannah Kim"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01K99Cu7zVhi8bdNq15awjkj","name":"select","input":{"action":"follow","rel":"item","title":"Hannah Kim"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -2349,13 +2511,16 @@ now:
       - null
     item:
       - Tuck Everlasting
+keeps:
+  /id:
+    - 44
 ---
-at: '2026-11-05T01:58:15.414670Z'
-ms: 1219
+at: '2026-11-05T03:17:36.682594Z'
+ms: 1559
 mode: intent
-say: open the book "Tuck Everlasting"
-line: 22
-within: 21
+say: open the item "Tuck Everlasting"
+line: 23
+within: 22
 params:
   relation: item
   title: Tuck Everlasting
@@ -2365,7 +2530,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Tuck Everlasting"
+  template: open the item "Tuck Everlasting"
   slots: {}
 opens: true
 judgement: true
@@ -2382,9 +2547,9 @@ model:
       [{"rel":"item","title":"Tuck Everlasting"}]
       </links>
       <intent>
-      open the book "Tuck Everlasting"
+      open the item "Tuck Everlasting"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01HPnrurn2zoXp3eBXzg5XXo","name":"select","input":{"action":"follow","rel":"item","title":"Tuck Everlasting"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01K3ticgNSTjpbnyWMEzeeGA","name":"select","input":{"action":"follow","rel":"item","title":"Tuck Everlasting"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -2408,9 +2573,9 @@ now:
     author: Natalie Babbitt
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2418,16 +2583,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:18.108153Z'
-ms: 1608
+at: '2026-11-05T03:17:39.845659Z'
+ms: 3110
 mode: intent
-say: renew the book
-line: 23
-within: 22
+say: renew this book for the member, card number 21000461
+line: 24
+within: 23
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000461'
+values:
+  card:
+    value: '21000461'
+    type: integer
+    from:
+      - step: 42
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000461
   slots: {}
 opens: true
 judgement: false
@@ -2435,40 +2608,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3329,"title":"Tuck Everlasting","author":"Natalie Babbitt","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3329,"title":"Tuck Everlasting","author":"Natalie Babbitt","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000461
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01LYh1rt8GiE8gvUAx6CJij9","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01JgZnMA4vEjM3wxD95YfYnz","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000461}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3329/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3329/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.180803a03d7f2279"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.ca7b48064001dcbf"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -2482,9 +2655,9 @@ now:
     author: Natalie Babbitt
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2492,12 +2665,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:22.103342Z'
-ms: 6
+at: '2026-11-05T03:17:44.915455Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 23
-within: 22
+line: 24
+within: 23
 params:
   address: http://localhost:8140/loans/3329
 outcome: done
@@ -2509,9 +2682,9 @@ now:
     author: Natalie Babbitt
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2519,12 +2692,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:22.110508Z'
-ms: 4
+at: '2026-11-05T03:17:44.918490Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 23
-within: 22
+line: 24
+within: 23
 params:
   address: http://localhost:8140/members/21000461
 outcome: done
@@ -2544,12 +2717,12 @@ now:
     item:
       - Tuck Everlasting
 ---
-at: '2026-11-05T01:58:22.115041Z'
-ms: 4
+at: '2026-11-05T03:17:44.920708Z'
+ms: 1
 mode: script
 say: return to {address}
-line: 23
-within: 22
+line: 24
+within: 23
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=2
 outcome: done
@@ -2576,12 +2749,12 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T01:58:24.127707Z'
-ms: 2306
+at: '2026-11-05T03:17:47.030249Z'
+ms: 5248
 mode: intent
-say: open the member Daniel Novak
-line: 24
-within: 20
+say: open member Daniel Novak
+line: 25
+within: 21
 params:
   relation: item
   title: Daniel Novak
@@ -2591,7 +2764,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Daniel Novak
+  template: open member Daniel Novak
   slots: {}
 opens: true
 judgement: true
@@ -2608,9 +2781,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"prev"},{"rel":"item","title":"Hannah Kim"},{"rel":"item","title":"Daniel Novak"},{"rel":"item","title":"Fatima Rahman"},{"rel":"item","title":"Lucas Silva"},{"rel":"item","title":"Emma Johansson"}]
       </links>
       <intent>
-      open the member Daniel Novak
+      open member Daniel Novak
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01HkYBXdvGTuSqTUxjya5QZK","name":"select","input":{"action":"follow","rel":"item","title":"Daniel Novak"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01TrhG6QEKp6M5yJrPshrjDD","name":"select","input":{"action":"follow","rel":"item","title":"Daniel Novak"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -2645,13 +2818,16 @@ now:
     item:
       - The BFG
       - The Borrowers
+keeps:
+  /id:
+    - 50
 ---
-at: '2026-11-05T01:58:28.398705Z'
-ms: 1079
+at: '2026-11-05T03:17:53.689035Z'
+ms: 3445
 mode: intent
-say: open the book "The BFG"
-line: 25
-within: 24
+say: open the item "The BFG"
+line: 26
+within: 25
 params:
   relation: item
   title: The BFG
@@ -2661,7 +2837,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The BFG"
+  template: open the item "The BFG"
   slots: {}
 opens: true
 judgement: true
@@ -2678,9 +2854,9 @@ model:
       [{"rel":"item","title":"The BFG"},{"rel":"item","title":"The Borrowers"}]
       </links>
       <intent>
-      open the book "The BFG"
+      open the item "The BFG"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01Eow3W3uck1eK71uM7duTUJ","name":"select","input":{"action":"follow","rel":"item","title":"The BFG"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01HtnJJgzegH32z18HKarkik","name":"select","input":{"action":"follow","rel":"item","title":"The BFG"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -2704,9 +2880,9 @@ now:
     author: Roald Dahl
     due: '2026-11-12'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2714,16 +2890,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:31.440805Z'
-ms: 4946
+at: '2026-11-05T03:17:59.206284Z'
+ms: 1491
 mode: intent
-say: renew the book
-line: 26
-within: 25
+say: renew this book for the member, card number 21000462
+line: 27
+within: 26
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000462'
+values:
+  card:
+    value: '21000462'
+    type: integer
+    from:
+      - step: 48
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000462
   slots: {}
 opens: true
 judgement: false
@@ -2731,40 +2915,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3330,"title":"The BFG","author":"Roald Dahl","due":"2026-11-12","renewals":2,"standing":"renewable"}
+      {"id":3330,"title":"The BFG","author":"Roald Dahl","due":"2026-11-12","renewals":2,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000462
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01UQ1kZWd9Y8b5DTbnfPq7RG","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01ViT34rwoSsdhM7SeHQp2KU","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000462}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3330/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3330/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.ec4ff915c4af1d83"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.deb679733f9e599c"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -2787,12 +2971,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:38.672549Z'
-ms: 4
+at: '2026-11-05T03:18:02.992537Z'
+ms: 3
 mode: script
 say: return to {address}
-line: 26
-within: 25
+line: 27
+within: 26
 params:
   address: http://localhost:8140/loans/3330
 outcome: done
@@ -2813,12 +2997,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:38.678010Z'
-ms: 5
+at: '2026-11-05T03:18:02.996035Z'
+ms: 3
 mode: script
 say: return to {address}
-line: 26
-within: 25
+line: 27
+within: 26
 params:
   address: http://localhost:8140/members/21000462
 outcome: done
@@ -2839,12 +3023,12 @@ now:
       - The BFG
       - The Borrowers
 ---
-at: '2026-11-05T01:58:40.574887Z'
-ms: 1448
+at: '2026-11-05T03:18:04.804376Z'
+ms: 1423
 mode: intent
-say: open the book "The Borrowers"
-line: 27
-within: 24
+say: open the item "The Borrowers"
+line: 28
+within: 25
 params:
   relation: item
   title: The Borrowers
@@ -2854,7 +3038,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The Borrowers"
+  template: open the item "The Borrowers"
   slots: {}
 opens: true
 judgement: true
@@ -2871,9 +3055,9 @@ model:
       [{"rel":"item","title":"The BFG"},{"rel":"item","title":"The Borrowers"}]
       </links>
       <intent>
-      open the book "The Borrowers"
+      open the item "The Borrowers"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_018wXvpPRNy9eKdbp1fkther","name":"select","input":{"action":"follow","rel":"item","title":"The Borrowers"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01VVWBYxeU7opZhC8bii4SB2","name":"select","input":{"action":"follow","rel":"item","title":"The Borrowers"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -2906,12 +3090,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:44.768819Z'
-ms: 2
+at: '2026-11-05T03:18:08.469357Z'
+ms: 6
 mode: script
 say: return to {address}
-line: 27
-within: 24
+line: 28
+within: 25
 params:
   address: http://localhost:8140/members/21000462
 outcome: done
@@ -2932,12 +3116,12 @@ now:
       - The BFG
       - The Borrowers
 ---
-at: '2026-11-05T01:58:44.771519Z'
-ms: 1
+at: '2026-11-05T03:18:08.476267Z'
+ms: 3
 mode: script
 say: return to {address}
-line: 27
-within: 24
+line: 28
+within: 25
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=2
 outcome: done
@@ -2964,12 +3148,12 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T01:58:47.450058Z'
-ms: 1394
+at: '2026-11-05T03:18:10.395377Z'
+ms: 2139
 mode: intent
-say: open the member Fatima Rahman
-line: 28
-within: 20
+say: open member Fatima Rahman
+line: 29
+within: 21
 params:
   relation: item
   title: Fatima Rahman
@@ -2979,7 +3163,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Fatima Rahman
+  template: open member Fatima Rahman
   slots: {}
 opens: true
 judgement: true
@@ -2996,9 +3180,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"prev"},{"rel":"item","title":"Hannah Kim"},{"rel":"item","title":"Daniel Novak"},{"rel":"item","title":"Fatima Rahman"},{"rel":"item","title":"Lucas Silva"},{"rel":"item","title":"Emma Johansson"}]
       </links>
       <intent>
-      open the member Fatima Rahman
+      open member Fatima Rahman
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01QEt3YaQuinkDUBShjnGUgM","name":"select","input":{"action":"follow","rel":"item","title":"Fatima Rahman"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01SQxDkKiBb9fFbcPhNRfwi2","name":"select","input":{"action":"follow","rel":"item","title":"Fatima Rahman"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3033,12 +3217,12 @@ now:
     item:
       - Stuart Little
 ---
-at: '2026-11-05T01:58:50.925449Z'
-ms: 1031
+at: '2026-11-05T03:18:14.520002Z'
+ms: 1487
 mode: intent
-say: open the book "Stuart Little"
-line: 29
-within: 28
+say: open the item "Stuart Little"
+line: 30
+within: 29
 params:
   relation: item
   title: Stuart Little
@@ -3048,7 +3232,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Stuart Little"
+  template: open the item "Stuart Little"
   slots: {}
 opens: true
 judgement: true
@@ -3065,9 +3249,9 @@ model:
       [{"rel":"item","title":"Stuart Little"}]
       </links>
       <intent>
-      open the book "Stuart Little"
+      open the item "Stuart Little"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01FzXxmXDKvzH73z1vXMxMck","name":"select","input":{"action":"follow","rel":"item","title":"Stuart Little"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01YAuUZEBSX3w6eJGHMfEdxD","name":"select","input":{"action":"follow","rel":"item","title":"Stuart Little"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3100,12 +3284,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:58:54.661115Z'
-ms: 6
+at: '2026-11-05T03:18:18.223231Z'
+ms: 7
 mode: script
 say: return to {address}
-line: 29
-within: 28
+line: 30
+within: 29
 params:
   address: http://localhost:8140/members/21000463
 outcome: done
@@ -3125,12 +3309,12 @@ now:
     item:
       - Stuart Little
 ---
-at: '2026-11-05T01:58:54.667760Z'
-ms: 3
+at: '2026-11-05T03:18:18.230627Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 29
-within: 28
+line: 30
+within: 29
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=2
 outcome: done
@@ -3157,12 +3341,12 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T01:58:56.833592Z'
-ms: 2077
+at: '2026-11-05T03:18:20.894181Z'
+ms: 1847
 mode: intent
-say: open the member Lucas Silva
-line: 30
-within: 20
+say: open member Lucas Silva
+line: 31
+within: 21
 params:
   relation: item
   title: Lucas Silva
@@ -3172,7 +3356,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Lucas Silva
+  template: open member Lucas Silva
   slots: {}
 opens: true
 judgement: true
@@ -3189,9 +3373,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"prev"},{"rel":"item","title":"Hannah Kim"},{"rel":"item","title":"Daniel Novak"},{"rel":"item","title":"Fatima Rahman"},{"rel":"item","title":"Lucas Silva"},{"rel":"item","title":"Emma Johansson"}]
       </links>
       <intent>
-      open the member Lucas Silva
+      open member Lucas Silva
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_017zrHzyvtv2CKHEHa3D7ckV","name":"select","input":{"action":"follow","rel":"item","title":"Lucas Silva"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01GwfyJFR9URaVJ94nK6jCoA","name":"select","input":{"action":"follow","rel":"item","title":"Lucas Silva"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3226,13 +3410,17 @@ now:
     item:
       - Little Women
       - Watership Down
+keeps:
+  /id:
+    - 62
+    - 66
 ---
-at: '2026-11-05T01:59:00.471205Z'
-ms: 5071
+at: '2026-11-05T03:18:24.538434Z'
+ms: 1581
 mode: intent
-say: open the book "Little Women"
-line: 31
-within: 30
+say: open the item "Little Women"
+line: 32
+within: 31
 params:
   relation: item
   title: Little Women
@@ -3242,7 +3430,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Little Women"
+  template: open the item "Little Women"
   slots: {}
 opens: true
 judgement: true
@@ -3259,9 +3447,9 @@ model:
       [{"rel":"item","title":"Little Women"},{"rel":"item","title":"Watership Down"}]
       </links>
       <intent>
-      open the book "Little Women"
+      open the item "Little Women"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_015455ebnDPhELZGH4fHQ1aR","name":"select","input":{"action":"follow","rel":"item","title":"Little Women"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01UGUXzRLidvESqY9sPB563q","name":"select","input":{"action":"follow","rel":"item","title":"Little Women"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3285,9 +3473,9 @@ now:
     author: Louisa May Alcott
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3295,16 +3483,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:07.313018Z'
-ms: 1926
+at: '2026-11-05T03:18:27.860976Z'
+ms: 2358
 mode: intent
-say: renew the book
-line: 32
-within: 31
+say: renew this book for the member, card number 21000464
+line: 33
+within: 32
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000464'
+values:
+  card:
+    value: '21000464'
+    type: integer
+    from:
+      - step: 60
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000464
   slots: {}
 opens: true
 judgement: false
@@ -3312,40 +3508,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3333,"title":"Little Women","author":"Louisa May Alcott","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3333,"title":"Little Women","author":"Louisa May Alcott","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000464
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01G7US3m8wa7QKyqrUSkzdt6","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01MAJkzdtgWWTkA3mAyWiXBC","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000464}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3333/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3333/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.cead8008267f28a2"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.16719e80f7168e1e"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -3359,9 +3555,9 @@ now:
     author: Louisa May Alcott
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3369,12 +3565,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:11.431471Z'
+at: '2026-11-05T03:18:31.954491Z'
 ms: 2
 mode: script
 say: return to {address}
-line: 32
-within: 31
+line: 33
+within: 32
 params:
   address: http://localhost:8140/loans/3333
 outcome: done
@@ -3386,9 +3582,9 @@ now:
     author: Louisa May Alcott
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3396,12 +3592,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:11.433945Z'
-ms: 1
+at: '2026-11-05T03:18:31.957531Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 32
-within: 31
+line: 33
+within: 32
 params:
   address: http://localhost:8140/members/21000464
 outcome: done
@@ -3422,12 +3618,12 @@ now:
       - Little Women
       - Watership Down
 ---
-at: '2026-11-05T01:59:13.667027Z'
-ms: 2059
+at: '2026-11-05T03:18:33.951582Z'
+ms: 1789
 mode: intent
-say: open the book "Watership Down"
-line: 33
-within: 30
+say: open the item "Watership Down"
+line: 34
+within: 31
 params:
   relation: item
   title: Watership Down
@@ -3437,7 +3633,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Watership Down"
+  template: open the item "Watership Down"
   slots: {}
 opens: true
 judgement: true
@@ -3454,9 +3650,9 @@ model:
       [{"rel":"item","title":"Little Women"},{"rel":"item","title":"Watership Down"}]
       </links>
       <intent>
-      open the book "Watership Down"
+      open the item "Watership Down"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01E38wXnVfgAr435F5oqcmM2","name":"select","input":{"action":"follow","rel":"item","title":"Watership Down"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01VrZAizbD4NmJ8bbff9MqQw","name":"select","input":{"action":"follow","rel":"item","title":"Watership Down"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3480,9 +3676,9 @@ now:
     author: Richard Adams
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3490,16 +3686,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:17.346968Z'
-ms: 1095
+at: '2026-11-05T03:18:37.949855Z'
+ms: 1459
 mode: intent
-say: renew the book
-line: 34
-within: 33
+say: renew this book for the member, card number 21000464
+line: 35
+within: 34
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000464'
+values:
+  card:
+    value: '21000464'
+    type: integer
+    from:
+      - step: 60
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000464
   slots: {}
 opens: true
 judgement: false
@@ -3507,40 +3711,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3334,"title":"Watership Down","author":"Richard Adams","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3334,"title":"Watership Down","author":"Richard Adams","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000464
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01J4YEokXb1ddWFxLd7J1DqV","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01KSHuoxEkyK4NmgFVBcynUT","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000464}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3334/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3334/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.b067686bde2e82e1"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.a4020696b931eba4"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -3554,9 +3758,9 @@ now:
     author: Richard Adams
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3564,12 +3768,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:20.744756Z'
-ms: 5
+at: '2026-11-05T03:18:41.430413Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 34
-within: 33
+line: 35
+within: 34
 params:
   address: http://localhost:8140/loans/3334
 outcome: done
@@ -3581,9 +3785,9 @@ now:
     author: Richard Adams
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3591,12 +3795,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:20.750806Z'
-ms: 4
+at: '2026-11-05T03:18:41.433552Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 34
-within: 33
+line: 35
+within: 34
 params:
   address: http://localhost:8140/members/21000464
 outcome: done
@@ -3617,12 +3821,12 @@ now:
       - Little Women
       - Watership Down
 ---
-at: '2026-11-05T01:59:20.755649Z'
-ms: 3
+at: '2026-11-05T03:18:41.436730Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 34
-within: 33
+line: 35
+within: 34
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=2
 outcome: done
@@ -3649,12 +3853,12 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T01:59:23.151268Z'
-ms: 5502
+at: '2026-11-05T03:18:43.711680Z'
+ms: 5038
 mode: intent
-say: open the member Emma Johansson
-line: 35
-within: 20
+say: open member Emma Johansson
+line: 36
+within: 21
 params:
   relation: item
   title: Emma Johansson
@@ -3664,7 +3868,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Emma Johansson
+  template: open member Emma Johansson
   slots: {}
 opens: true
 judgement: true
@@ -3681,9 +3885,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"next"},{"rel":"prev"},{"rel":"item","title":"Hannah Kim"},{"rel":"item","title":"Daniel Novak"},{"rel":"item","title":"Fatima Rahman"},{"rel":"item","title":"Lucas Silva"},{"rel":"item","title":"Emma Johansson"}]
       </links>
       <intent>
-      open the member Emma Johansson
+      open member Emma Johansson
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01CVqPcyeCzHb4Cw325raLt7","name":"select","input":{"action":"follow","rel":"item","title":"Emma Johansson"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01X5fFFEC7tq8cEeNozt1CcF","name":"select","input":{"action":"follow","rel":"item","title":"Emma Johansson"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3718,12 +3922,12 @@ now:
     item:
       - The Wind in the Willows
 ---
-at: '2026-11-05T01:59:30.678848Z'
-ms: 1582
+at: '2026-11-05T03:18:50.633305Z'
+ms: 1802
 mode: intent
-say: open the book "The Wind in the Willows"
-line: 36
-within: 35
+say: open the item "The Wind in the Willows"
+line: 37
+within: 36
 params:
   relation: item
   title: The Wind in the Willows
@@ -3733,7 +3937,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The Wind in the Willows"
+  template: open the item "The Wind in the Willows"
   slots: {}
 opens: true
 judgement: true
@@ -3750,9 +3954,9 @@ model:
       [{"rel":"item","title":"The Wind in the Willows"}]
       </links>
       <intent>
-      open the book "The Wind in the Willows"
+      open the item "The Wind in the Willows"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01VwMVsvjU5PWeEDjs2LgqjD","name":"select","input":{"action":"follow","rel":"item","title":"The Wind in the Willows"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01Qhp6WoPfv6kUqWjqFZjw7Y","name":"select","input":{"action":"follow","rel":"item","title":"The Wind in the Willows"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3785,12 +3989,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:34.432492Z'
-ms: 4
+at: '2026-11-05T03:18:54.526146Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 36
-within: 35
+line: 37
+within: 36
 params:
   address: http://localhost:8140/members/21000465
 outcome: done
@@ -3810,12 +4014,12 @@ now:
     item:
       - The Wind in the Willows
 ---
-at: '2026-11-05T01:59:34.437266Z'
-ms: 3
+at: '2026-11-05T03:18:54.529197Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 36
-within: 35
+line: 37
+within: 36
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=2
 outcome: done
@@ -3842,12 +4046,12 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T01:59:36.517322Z'
-ms: 2271
+at: '2026-11-05T03:18:56.662396Z'
+ms: 1336
 mode: intent
 say: follow the next page link
-line: 37
-within: 20
+line: 38
+within: 21
 params:
   relation: next
 reason:
@@ -3870,7 +4074,7 @@ model:
       <intent>
       follow the next page link
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_015xgVSGuBQS4dV3c3bRnvSg","name":"select","input":{"action":"follow","rel":"next"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01QuWmDuGueoWjaUzpfHbdup","name":"select","input":{"action":"follow","rel":"next"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: next
@@ -3909,12 +4113,12 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T01:59:41.183108Z'
-ms: 1359
+at: '2026-11-05T03:19:00.007569Z'
+ms: 1039
 mode: intent
-say: open the member Samuel Mensah
-line: 38
-within: 37
+say: open member Samuel Mensah
+line: 39
+within: 38
 params:
   relation: item
   title: Samuel Mensah
@@ -3924,7 +4128,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Samuel Mensah
+  template: open member Samuel Mensah
   slots: {}
 opens: true
 judgement: true
@@ -3941,9 +4145,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"prev"},{"rel":"item","title":"Samuel Mensah"},{"rel":"item","title":"Olivia Brooks"},{"rel":"item","title":"Nadia Petrova"},{"rel":"item","title":"Ryan Murphy"},{"rel":"item","title":"Chloe Dubois"}]
       </links>
       <intent>
-      open the member Samuel Mensah
+      open member Samuel Mensah
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01MrxmR6YjtnjQhiRSjNMJy4","name":"select","input":{"action":"follow","rel":"item","title":"Samuel Mensah"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01EdqxCqQ9tRJNmQJukDMviq","name":"select","input":{"action":"follow","rel":"item","title":"Samuel Mensah"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -3977,13 +4181,16 @@ now:
     item:
       - Black Beauty
       - The Little Prince
+keeps:
+  /id:
+    - 77
 ---
-at: '2026-11-05T01:59:44.485833Z'
-ms: 1593
+at: '2026-11-05T03:19:02.985366Z'
+ms: 1594
 mode: intent
-say: open the book "Black Beauty"
-line: 39
-within: 38
+say: open the item "Black Beauty"
+line: 40
+within: 39
 params:
   relation: item
   title: Black Beauty
@@ -3993,7 +4200,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Black Beauty"
+  template: open the item "Black Beauty"
   slots: {}
 opens: true
 judgement: true
@@ -4010,9 +4217,9 @@ model:
       [{"rel":"item","title":"Black Beauty"},{"rel":"item","title":"The Little Prince"}]
       </links>
       <intent>
-      open the book "Black Beauty"
+      open the item "Black Beauty"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_019zgBXU2NtDm1bPucSvwMoK","name":"select","input":{"action":"follow","rel":"item","title":"Black Beauty"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_018cRJqD3h7Y4woRBLQzWB4K","name":"select","input":{"action":"follow","rel":"item","title":"Black Beauty"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -4036,9 +4243,9 @@ now:
     author: Anna Sewell
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4046,16 +4253,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:47.864237Z'
-ms: 1840
+at: '2026-11-05T03:19:06.570872Z'
+ms: 1537
 mode: intent
-say: renew the book
-line: 40
-within: 39
+say: renew this book for the member, card number 21000466
+line: 41
+within: 40
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000466'
+values:
+  card:
+    value: '21000466'
+    type: integer
+    from:
+      - step: 75
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000466
   slots: {}
 opens: true
 judgement: false
@@ -4063,40 +4278,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3336,"title":"Black Beauty","author":"Anna Sewell","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3336,"title":"Black Beauty","author":"Anna Sewell","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000466
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01UxMcVgCPPFdKJ42qV3npWV","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01W1uXfPb1vnKG5yDfheosBR","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000466}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3336/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3336/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.087a83473595636d"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.cdbe92f24cf821f4"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -4110,9 +4325,9 @@ now:
     author: Anna Sewell
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4120,12 +4335,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:52.013356Z'
-ms: 5
+at: '2026-11-05T03:19:09.638370Z'
+ms: 4
 mode: script
 say: return to {address}
-line: 40
-within: 39
+line: 41
+within: 40
 params:
   address: http://localhost:8140/loans/3336
 outcome: done
@@ -4137,9 +4352,9 @@ now:
     author: Anna Sewell
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4147,12 +4362,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:52.019517Z'
-ms: 2
+at: '2026-11-05T03:19:09.643726Z'
+ms: 6
 mode: script
 say: return to {address}
-line: 40
-within: 39
+line: 41
+within: 40
 params:
   address: http://localhost:8140/members/21000466
 outcome: done
@@ -4173,12 +4388,12 @@ now:
       - Black Beauty
       - The Little Prince
 ---
-at: '2026-11-05T01:59:53.927840Z'
-ms: 1647
+at: '2026-11-05T03:19:11.683362Z'
+ms: 1706
 mode: intent
-say: open the book "The Little Prince"
-line: 41
-within: 38
+say: open the item "The Little Prince"
+line: 42
+within: 39
 params:
   relation: item
   title: The Little Prince
@@ -4188,7 +4403,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The Little Prince"
+  template: open the item "The Little Prince"
   slots: {}
 opens: true
 judgement: true
@@ -4205,9 +4420,9 @@ model:
       [{"rel":"item","title":"Black Beauty"},{"rel":"item","title":"The Little Prince"}]
       </links>
       <intent>
-      open the book "The Little Prince"
+      open the item "The Little Prince"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01Rbj1kQbzdzXUnsdAwL2UqA","name":"select","input":{"action":"follow","rel":"item","title":"The Little Prince"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_016UNB2ijdiTuija31ytNpC2","name":"select","input":{"action":"follow","rel":"item","title":"The Little Prince"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -4240,12 +4455,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T01:59:57.637259Z'
+at: '2026-11-05T03:19:15.311546Z'
 ms: 5
 mode: script
 say: return to {address}
-line: 41
-within: 38
+line: 42
+within: 39
 params:
   address: http://localhost:8140/members/21000466
 outcome: done
@@ -4266,12 +4481,12 @@ now:
       - Black Beauty
       - The Little Prince
 ---
-at: '2026-11-05T01:59:57.642627Z'
-ms: 5
+at: '2026-11-05T03:19:15.317919Z'
+ms: 7
 mode: script
 say: return to {address}
-line: 41
-within: 38
+line: 42
+within: 39
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=3
 outcome: done
@@ -4296,12 +4511,12 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T01:59:59.612368Z'
-ms: 1618
+at: '2026-11-05T03:19:16.905456Z'
+ms: 1350
 mode: intent
-say: open the member Olivia Brooks
-line: 42
-within: 37
+say: open member Olivia Brooks
+line: 43
+within: 38
 params:
   relation: item
   title: Olivia Brooks
@@ -4311,7 +4526,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Olivia Brooks
+  template: open member Olivia Brooks
   slots: {}
 opens: true
 judgement: true
@@ -4328,9 +4543,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"prev"},{"rel":"item","title":"Samuel Mensah"},{"rel":"item","title":"Olivia Brooks"},{"rel":"item","title":"Nadia Petrova"},{"rel":"item","title":"Ryan Murphy"},{"rel":"item","title":"Chloe Dubois"}]
       </links>
       <intent>
-      open the member Olivia Brooks
+      open member Olivia Brooks
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_016gPhfC9BzUy7h4nbm7mCWQ","name":"select","input":{"action":"follow","rel":"item","title":"Olivia Brooks"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_016bxmLhmMv9QivcYwdee9jd","name":"select","input":{"action":"follow","rel":"item","title":"Olivia Brooks"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -4363,13 +4578,16 @@ now:
       - null
     item:
       - Anne of Green Gables
+keeps:
+  /id:
+    - 85
 ---
-at: '2026-11-05T02:00:02.708860Z'
-ms: 1657
+at: '2026-11-05T03:19:19.639978Z'
+ms: 1523
 mode: intent
-say: open the book "Anne of Green Gables"
-line: 43
-within: 42
+say: open the item "Anne of Green Gables"
+line: 44
+within: 43
 params:
   relation: item
   title: Anne of Green Gables
@@ -4379,7 +4597,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Anne of Green Gables"
+  template: open the item "Anne of Green Gables"
   slots: {}
 opens: true
 judgement: true
@@ -4396,9 +4614,9 @@ model:
       [{"rel":"item","title":"Anne of Green Gables"}]
       </links>
       <intent>
-      open the book "Anne of Green Gables"
+      open the item "Anne of Green Gables"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01JFPw2592gwUjgyiXEWFhUQ","name":"select","input":{"action":"follow","rel":"item","title":"Anne of Green Gables"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01F6xcJEfySG3Gg7ieX4GUb1","name":"select","input":{"action":"follow","rel":"item","title":"Anne of Green Gables"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -4422,9 +4640,9 @@ now:
     author: L. M. Montgomery
     due: '2026-11-12'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4432,16 +4650,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:05.854546Z'
-ms: 1506
+at: '2026-11-05T03:19:23.090901Z'
+ms: 5030
 mode: intent
-say: renew the book
-line: 44
-within: 43
+say: renew this book for the member, card number 21000467
+line: 45
+within: 44
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000467'
+values:
+  card:
+    value: '21000467'
+    type: integer
+    from:
+      - step: 83
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000467
   slots: {}
 opens: true
 judgement: false
@@ -4449,40 +4675,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3338,"title":"Anne of Green Gables","author":"L. M. Montgomery","due":"2026-11-12","renewals":1,"standing":"renewable"}
+      {"id":3338,"title":"Anne of Green Gables","author":"L. M. Montgomery","due":"2026-11-12","renewals":1,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000467
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_016MLr2nTDDtLAA99xC4rCLK","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01H6GJkV6TQQYnQEUX6TFnih","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000467}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3338/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3338/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.ebab17fc9ab89ffb"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.46597d15a740c11f"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -4496,9 +4722,9 @@ now:
     author: L. M. Montgomery
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4506,12 +4732,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:09.759599Z'
-ms: 5
+at: '2026-11-05T03:19:30.536404Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 44
-within: 43
+line: 45
+within: 44
 params:
   address: http://localhost:8140/loans/3338
 outcome: done
@@ -4523,9 +4749,9 @@ now:
     author: L. M. Montgomery
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4533,12 +4759,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:09.765004Z'
+at: '2026-11-05T03:19:30.539331Z'
 ms: 3
 mode: script
 say: return to {address}
-line: 44
-within: 43
+line: 45
+within: 44
 params:
   address: http://localhost:8140/members/21000467
 outcome: done
@@ -4558,12 +4784,12 @@ now:
     item:
       - Anne of Green Gables
 ---
-at: '2026-11-05T02:00:09.769245Z'
-ms: 3
+at: '2026-11-05T03:19:30.542860Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 44
-within: 43
+line: 45
+within: 44
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=3
 outcome: done
@@ -4588,12 +4814,12 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:00:11.765084Z'
-ms: 1802
+at: '2026-11-05T03:19:32.520534Z'
+ms: 1450
 mode: intent
-say: open the member Nadia Petrova
-line: 45
-within: 37
+say: open member Nadia Petrova
+line: 46
+within: 38
 params:
   relation: item
   title: Nadia Petrova
@@ -4603,7 +4829,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Nadia Petrova
+  template: open member Nadia Petrova
   slots: {}
 opens: true
 judgement: true
@@ -4620,9 +4846,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"prev"},{"rel":"item","title":"Samuel Mensah"},{"rel":"item","title":"Olivia Brooks"},{"rel":"item","title":"Nadia Petrova"},{"rel":"item","title":"Ryan Murphy"},{"rel":"item","title":"Chloe Dubois"}]
       </links>
       <intent>
-      open the member Nadia Petrova
+      open member Nadia Petrova
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01SZtfwrEqH831mHv6ZUUFi2","name":"select","input":{"action":"follow","rel":"item","title":"Nadia Petrova"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01AntrF2V3oar48WL3oZGax5","name":"select","input":{"action":"follow","rel":"item","title":"Nadia Petrova"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -4656,13 +4882,16 @@ now:
     item:
       - Treasure Island
       - Mrs. Frisby and the Rats of NIMH
+keeps:
+  /id:
+    - 93
 ---
-at: '2026-11-05T02:00:15.615937Z'
-ms: 1182
+at: '2026-11-05T03:19:35.431809Z'
+ms: 1366
 mode: intent
-say: open the book "Treasure Island"
-line: 46
-within: 45
+say: open the item "Treasure Island"
+line: 47
+within: 46
 params:
   relation: item
   title: Treasure Island
@@ -4672,7 +4901,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Treasure Island"
+  template: open the item "Treasure Island"
   slots: {}
 opens: true
 judgement: true
@@ -4689,9 +4918,9 @@ model:
       [{"rel":"item","title":"Treasure Island"},{"rel":"item","title":"Mrs. Frisby and the Rats of NIMH"}]
       </links>
       <intent>
-      open the book "Treasure Island"
+      open the item "Treasure Island"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01WufEoubR3WwvwQVutWXvry","name":"select","input":{"action":"follow","rel":"item","title":"Treasure Island"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01MtEyhFHx6T7C4TxDtR6Coa","name":"select","input":{"action":"follow","rel":"item","title":"Treasure Island"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -4724,12 +4953,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:18.921986Z'
+at: '2026-11-05T03:19:39.044843Z'
 ms: 2
 mode: script
 say: return to {address}
-line: 46
-within: 45
+line: 47
+within: 46
 params:
   address: http://localhost:8140/members/21000468
 outcome: done
@@ -4750,12 +4979,12 @@ now:
       - Treasure Island
       - Mrs. Frisby and the Rats of NIMH
 ---
-at: '2026-11-05T02:00:21.287050Z'
-ms: 1667
+at: '2026-11-05T03:19:41.199879Z'
+ms: 1662
 mode: intent
-say: open the book "Mrs. Frisby and the Rats of NIMH"
-line: 47
-within: 45
+say: open the item "Mrs. Frisby and the Rats of NIMH"
+line: 48
+within: 46
 params:
   relation: item
   title: Mrs. Frisby and the Rats of NIMH
@@ -4765,7 +4994,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Mrs. Frisby and the Rats of NIMH"
+  template: open the item "Mrs. Frisby and the Rats of NIMH"
   slots: {}
 opens: true
 judgement: true
@@ -4782,9 +5011,9 @@ model:
       [{"rel":"item","title":"Treasure Island"},{"rel":"item","title":"Mrs. Frisby and the Rats of NIMH"}]
       </links>
       <intent>
-      open the book "Mrs. Frisby and the Rats of NIMH"
+      open the item "Mrs. Frisby and the Rats of NIMH"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_012ynaGnSYVxvj2k5zvJ14xT","name":"select","input":{"action":"follow","rel":"item","title":"Mrs. Frisby and the Rats of NIMH"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01MfJuZYwx55e5d8z8z3t7sk","name":"select","input":{"action":"follow","rel":"item","title":"Mrs. Frisby and the Rats of NIMH"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -4808,9 +5037,9 @@ now:
     author: Robert C. O'Brien
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4818,16 +5047,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:24.873955Z'
-ms: 1274
+at: '2026-11-05T03:19:44.660492Z'
+ms: 2026
 mode: intent
-say: renew the book
-line: 48
-within: 47
+say: renew this book for the member, card number 21000468
+line: 49
+within: 48
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000468'
+values:
+  card:
+    value: '21000468'
+    type: integer
+    from:
+      - step: 89
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000468
   slots: {}
 opens: true
 judgement: false
@@ -4835,40 +5072,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3340,"title":"Mrs. Frisby and the Rats of NIMH","author":"Robert C. O'Brien","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3340,"title":"Mrs. Frisby and the Rats of NIMH","author":"Robert C. O'Brien","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000468
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01Fq35smbAhgSaBjmodyJ4ak","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01EmLpCouTQ7DVMM7RVtyBe2","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000468}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3340/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3340/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.a31c227e71e855fe"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.721f803197226b76"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -4882,9 +5119,9 @@ now:
     author: Robert C. O'Brien
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4892,12 +5129,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:28.234883Z'
-ms: 5
+at: '2026-11-05T03:19:48.850156Z'
+ms: 4
 mode: script
 say: return to {address}
-line: 48
-within: 47
+line: 49
+within: 48
 params:
   address: http://localhost:8140/loans/3340
 outcome: done
@@ -4909,9 +5146,9 @@ now:
     author: Robert C. O'Brien
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4919,12 +5156,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:28.241042Z'
+at: '2026-11-05T03:19:48.855202Z'
 ms: 4
 mode: script
 say: return to {address}
-line: 48
-within: 47
+line: 49
+within: 48
 params:
   address: http://localhost:8140/members/21000468
 outcome: done
@@ -4945,12 +5182,12 @@ now:
       - Treasure Island
       - Mrs. Frisby and the Rats of NIMH
 ---
-at: '2026-11-05T02:00:28.245492Z'
-ms: 3
+at: '2026-11-05T03:19:48.859873Z'
+ms: 4
 mode: script
 say: return to {address}
-line: 48
-within: 47
+line: 49
+within: 48
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=3
 outcome: done
@@ -4975,12 +5212,12 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:00:30.480710Z'
-ms: 1760
+at: '2026-11-05T03:19:50.976410Z'
+ms: 1641
 mode: intent
-say: open the member Ryan Murphy
-line: 49
-within: 37
+say: open member Ryan Murphy
+line: 50
+within: 38
 params:
   relation: item
   title: Ryan Murphy
@@ -4990,7 +5227,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Ryan Murphy
+  template: open member Ryan Murphy
   slots: {}
 opens: true
 judgement: true
@@ -5007,9 +5244,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"prev"},{"rel":"item","title":"Samuel Mensah"},{"rel":"item","title":"Olivia Brooks"},{"rel":"item","title":"Nadia Petrova"},{"rel":"item","title":"Ryan Murphy"},{"rel":"item","title":"Chloe Dubois"}]
       </links>
       <intent>
-      open the member Ryan Murphy
+      open member Ryan Murphy
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_0197CmfnVWmLwVmDZDKX15GG","name":"select","input":{"action":"follow","rel":"item","title":"Ryan Murphy"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_012XmKssVSjFyoMV2JG8yQLb","name":"select","input":{"action":"follow","rel":"item","title":"Ryan Murphy"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -5042,13 +5279,16 @@ now:
       - null
     item:
       - The Hundred and One Dalmatians
+keeps:
+  /id:
+    - 99
 ---
-at: '2026-11-05T02:00:34.574716Z'
-ms: 1580
+at: '2026-11-05T03:19:54.576722Z'
+ms: 1162
 mode: intent
-say: open the book "The Hundred and One Dalmatians"
-line: 50
-within: 49
+say: open the item "The Hundred and One Dalmatians"
+line: 51
+within: 50
 params:
   relation: item
   title: The Hundred and One Dalmatians
@@ -5058,7 +5298,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The Hundred and One Dalmatians"
+  template: open the item "The Hundred and One Dalmatians"
   slots: {}
 opens: true
 judgement: true
@@ -5075,9 +5315,9 @@ model:
       [{"rel":"item","title":"The Hundred and One Dalmatians"}]
       </links>
       <intent>
-      open the book "The Hundred and One Dalmatians"
+      open the item "The Hundred and One Dalmatians"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01MQzKNGdquf149VGc6JbgGZ","name":"select","input":{"action":"follow","rel":"item","title":"The Hundred and One Dalmatians"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_016gPW6zBfUGo77KDp1EHkNq","name":"select","input":{"action":"follow","rel":"item","title":"The Hundred and One Dalmatians"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -5101,9 +5341,9 @@ now:
     author: Dodie Smith
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -5111,16 +5351,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:37.909665Z'
-ms: 4103
+at: '2026-11-05T03:19:57.464521Z'
+ms: 4091
 mode: intent
-say: renew the book
-line: 51
-within: 50
+say: renew this book for the member, card number 21000469
+line: 52
+within: 51
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000469'
+values:
+  card:
+    value: '21000469'
+    type: integer
+    from:
+      - step: 97
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000469
   slots: {}
 opens: true
 judgement: false
@@ -5128,40 +5376,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3341,"title":"The Hundred and One Dalmatians","author":"Dodie Smith","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3341,"title":"The Hundred and One Dalmatians","author":"Dodie Smith","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000469
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01EEXKKaHpdcXTyXmdh3XFgA","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01PNDc2h8Fx7ugLBxmtR5AD8","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000469}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3341/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3341/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.b2e31c2a9188c2b8"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.1c0d82177af83648"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -5175,9 +5423,9 @@ now:
     author: Dodie Smith
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -5185,12 +5433,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:44.362661Z'
-ms: 4
+at: '2026-11-05T03:20:03.470790Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 51
-within: 50
+line: 52
+within: 51
 params:
   address: http://localhost:8140/loans/3341
 outcome: done
@@ -5202,9 +5450,9 @@ now:
     author: Dodie Smith
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -5212,12 +5460,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:44.367567Z'
-ms: 4
+at: '2026-11-05T03:20:03.474186Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 51
-within: 50
+line: 52
+within: 51
 params:
   address: http://localhost:8140/members/21000469
 outcome: done
@@ -5237,12 +5485,12 @@ now:
     item:
       - The Hundred and One Dalmatians
 ---
-at: '2026-11-05T02:00:44.372660Z'
-ms: 3
+at: '2026-11-05T03:20:03.476639Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 51
-within: 50
+line: 52
+within: 51
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=3
 outcome: done
@@ -5267,12 +5515,12 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:00:46.587636Z'
-ms: 5011
+at: '2026-11-05T03:20:05.674553Z'
+ms: 1655
 mode: intent
-say: open the member Chloe Dubois
-line: 52
-within: 37
+say: open member Chloe Dubois
+line: 53
+within: 38
 params:
   relation: item
   title: Chloe Dubois
@@ -5282,7 +5530,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the member Chloe Dubois
+  template: open member Chloe Dubois
   slots: {}
 opens: true
 judgement: true
@@ -5299,9 +5547,9 @@ model:
       [{"rel":"first"},{"rel":"last"},{"rel":"prev"},{"rel":"item","title":"Samuel Mensah"},{"rel":"item","title":"Olivia Brooks"},{"rel":"item","title":"Nadia Petrova"},{"rel":"item","title":"Ryan Murphy"},{"rel":"item","title":"Chloe Dubois"}]
       </links>
       <intent>
-      open the member Chloe Dubois
+      open member Chloe Dubois
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01VWes9Pfv1CY3oJsq3Y1RLZ","name":"select","input":{"action":"follow","rel":"item","title":"Chloe Dubois"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_013ii6MhMnHFoufNQgb4RPT7","name":"select","input":{"action":"follow","rel":"item","title":"Chloe Dubois"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -5335,13 +5583,16 @@ now:
     item:
       - The Cricket in Times Square
       - Ramona the Pest
+keeps:
+  /id:
+    - 107
 ---
-at: '2026-11-05T02:00:54.526028Z'
-ms: 1584
+at: '2026-11-05T03:20:09.174749Z'
+ms: 1531
 mode: intent
-say: open the book "The Cricket in Times Square"
-line: 53
-within: 52
+say: open the item "The Cricket in Times Square"
+line: 54
+within: 53
 params:
   relation: item
   title: The Cricket in Times Square
@@ -5351,7 +5602,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "The Cricket in Times Square"
+  template: open the item "The Cricket in Times Square"
   slots: {}
 opens: true
 judgement: true
@@ -5368,9 +5619,9 @@ model:
       [{"rel":"item","title":"The Cricket in Times Square"},{"rel":"item","title":"Ramona the Pest"}]
       </links>
       <intent>
-      open the book "The Cricket in Times Square"
+      open the item "The Cricket in Times Square"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01VF8LPbJd8rAkeFojE1ToPF","name":"select","input":{"action":"follow","rel":"item","title":"The Cricket in Times Square"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01AweTVD2nPPqUGjkPjLyK9q","name":"select","input":{"action":"follow","rel":"item","title":"The Cricket in Times Square"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -5403,12 +5654,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:00:58.147065Z'
-ms: 4
+at: '2026-11-05T03:20:12.880088Z'
+ms: 3
 mode: script
 say: return to {address}
-line: 53
-within: 52
+line: 54
+within: 53
 params:
   address: http://localhost:8140/members/21000470
 outcome: done
@@ -5429,12 +5680,12 @@ now:
       - The Cricket in Times Square
       - Ramona the Pest
 ---
-at: '2026-11-05T02:01:00.139624Z'
-ms: 1660
+at: '2026-11-05T03:20:14.741022Z'
+ms: 3766
 mode: intent
-say: open the book "Ramona the Pest"
-line: 54
-within: 52
+say: open the item "Ramona the Pest"
+line: 55
+within: 53
 params:
   relation: item
   title: Ramona the Pest
@@ -5444,7 +5695,7 @@ values:
     from:
       - chosen
 reason:
-  template: open the book "Ramona the Pest"
+  template: open the item "Ramona the Pest"
   slots: {}
 opens: true
 judgement: true
@@ -5461,9 +5712,9 @@ model:
       [{"rel":"item","title":"The Cricket in Times Square"},{"rel":"item","title":"Ramona the Pest"}]
       </links>
       <intent>
-      open the book "Ramona the Pest"
+      open the item "Ramona the Pest"
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_018pJ8DET8RSj6xbpYURtuWx","name":"select","input":{"action":"follow","rel":"item","title":"Ramona the Pest"},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01TjuJuSywFaMdvKPPtahJ9A","name":"select","input":{"action":"follow","rel":"item","title":"Ramona the Pest"},"caller":{"type":"direct"}}]'
 chose:
   kind: link
   relation: item
@@ -5487,9 +5738,9 @@ now:
     author: Beverly Cleary
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -5497,16 +5748,24 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:01:03.152989Z'
-ms: 2645
+at: '2026-11-05T03:20:20.329733Z'
+ms: 1128
 mode: intent
-say: renew the book
-line: 55
-within: 54
+say: renew this book for the member, card number 21000470
+line: 56
+within: 55
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: '21000470'
+values:
+  card:
+    value: '21000470'
+    type: integer
+    from:
+      - step: 103
+        pointer: /id
 reason:
-  template: renew the book
+  template: renew this book for the member, card number 21000470
   slots: {}
 opens: true
 judgement: false
@@ -5514,40 +5773,40 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       <state>
-      {"id":3343,"title":"Ramona the Pest","author":"Beverly Cleary","due":"2026-11-12","renewals":0,"standing":"renewable"}
+      {"id":3343,"title":"Ramona the Pest","author":"Beverly Cleary","due":"2026-11-12","renewals":0,"standing":"renewable for the member"}
       </state>
       <offers>
-      {"library:renew":{"title":"Renew","description":"Keeps the book three weeks more.","schema":{"properties":{},"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
+      {"library:renew-for-member":{"title":"Renew for the member","description":"Keeps a company group member's book three weeks more, given the member's library card number.","schema":{"properties":{"card":{"description":"The number on the back of the library card of the member the book is lent to","minimum":1,"title":"Library card number","type":"integer"}},"required":["card"],"type":"object"}},"library:return":{"title":"Return","description":"Gives the book back to the library.","schema":{"properties":{},"type":"object"}}}
       </offers>
       <links>
       []
       </links>
       <intent>
-      renew the book
+      renew this book for the member, card number 21000470
       </intent>
-    answered: '[{"type":"tool_use","id":"toolu_01JDQjuvmFjqewD4FpVjctzt","name":"select","input":{"action":"act","affordance":"library:renew","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_016Uy5FWLP66K5SbsznEYtxP","name":"select","input":{"action":"act","affordance":"library:renew-for-member","fields":{"card":21000470}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3343/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3343/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.c48d00fcc2c23654"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.6a973aed6099d349"'
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -5561,9 +5820,9 @@ now:
     author: Beverly Cleary
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -5571,12 +5830,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:01:10.852456Z'
-ms: 4
+at: '2026-11-05T03:20:23.627612Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 55
-within: 54
+line: 56
+within: 55
 params:
   address: http://localhost:8140/loans/3343
 outcome: done
@@ -5588,9 +5847,9 @@ now:
     author: Beverly Cleary
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -5598,12 +5857,12 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:01:10.857173Z'
-ms: 4
+at: '2026-11-05T03:20:23.630565Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 55
-within: 54
+line: 56
+within: 55
 params:
   address: http://localhost:8140/members/21000470
 outcome: done
@@ -5624,12 +5883,12 @@ now:
       - The Cricket in Times Square
       - Ramona the Pest
 ---
-at: '2026-11-05T02:01:10.861947Z'
-ms: 4
+at: '2026-11-05T03:20:23.633384Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 55
-within: 54
+line: 56
+within: 55
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=3
 outcome: done
@@ -5654,12 +5913,12 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:01:10.866365Z'
-ms: 3
+at: '2026-11-05T03:20:26.721329Z'
+ms: 2
 mode: script
 say: return to {address}
-line: 55
-within: 54
+line: 56
+within: 55
 params:
   address: http://localhost:8140/members?company=Harbor+Point&page=2
 outcome: done
@@ -5686,12 +5945,12 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T02:01:10.870357Z'
+at: '2026-11-05T03:20:26.724386Z'
 ms: 2
 mode: script
 say: return to {address}
-line: 55
-within: 54
+line: 56
+within: 55
 params:
   address: http://localhost:8140/members?company=Harbor+Point
 outcome: done
@@ -5716,12 +5975,12 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:01:10.873465Z'
+at: '2026-11-05T03:20:26.726842Z'
 ms: 1
 mode: script
 say: return to {address}
-line: 55
-within: 54
+line: 56
+within: 55
 params:
   address: http://localhost:8140/
 outcome: done
@@ -5739,6 +5998,8 @@ now:
           - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
         library:renew:
           - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:renew-for-member:
+          - sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
         library:return:
           - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
         library:search-accounts:
@@ -5747,7 +6008,7 @@ now:
           - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
         library:search-members:
           - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
-      digest: sha256-/oA4AtMmNXYhYC9lOt9yL3wDlZyjBVws734QW/5Mkjo=
+      digest: sha256-JuAynvKvR5okL1mQT70mjefY45UZaIrAREdufhkWIYI=
   forms:
     - library:search-accounts
     - library:get-account

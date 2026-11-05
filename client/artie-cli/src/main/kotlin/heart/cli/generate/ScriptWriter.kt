@@ -70,7 +70,8 @@ class ScriptWriter(
                 bindings.variables.values.forEach {
                     val declared = derivations.lines(Regex("^\\s*va[rl]\\s+${it.name}\\b"))
                     val line = why.mark(why.answer(it, null), it.declared, listOf(declared))
-                    appendLine("$INDENT$line // step ${it.step}'s ${it.pointer}")
+                    val from = if (it.looped) "each ${it.keptAs}'s" else "step ${it.step}'s"
+                    appendLine("$INDENT$line // $from ${it.pointer}")
                 }
                 if (bindings.variables.isNotEmpty()) appendLine()
                 body.forEach { appendLine(it) }
@@ -146,7 +147,7 @@ class ScriptWriter(
         }
         loop(block) { capture.inputGiven(it) != null }?.let { loop ->
             looped = true
-            return reads(block.keeps, depth) + watched + over(loop, depth)
+            return reads(block.keeps, depth) + watched + bindings.within(loop.scope) { over(loop, depth) }
         }
         val decided = decided(block, capture)
         val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
@@ -264,7 +265,9 @@ internal class Walker(
 ) {
     /** [node]'s block, walked: the resources it keeps, then the steps nested in it. */
     fun walk(node: Node): Block {
-        val keeps = bindings.variables.values.filter { it.step == node.step.number }.distinctBy { it.keptAs }
+        // A loop's member is kept by the loop, not by the visit the value was read at.
+        val keeps = bindings.variables.values.filter { it.step == node.step.number && !it.looped }
+            .distinctBy { it.keptAs }
         // A resource the watch reads again and a value read from it are kept once, by the one name.
         val watched = watch.kept(node.step).takeIf { keeps.isEmpty() }
         return Block(keeps, watched, node.children.mapNotNull(::walked), node.step.items, node.step.relation)

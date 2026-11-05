@@ -9,8 +9,12 @@ internal class Sources(capture: Capture) {
     private val bringing: Set<Int> = capture.steps
         .filter { it.relation != null || it.say.startsWith("enter") }.map { it.number }.toSet()
 
-    /** The source in [from] a script can read again from the earliest step, whatever order the capture lists. */
-    fun first(from: Any?): Pair<Int, String>? = usable(from.list()).firstOrNull()
+    /**
+     * The source in [from] a script can read again from the earliest step, whatever order the capture lists; one at
+     * a step of [preferred] first, a loop's member the script is inside.
+     */
+    fun first(from: Any?, preferred: Set<Int> = emptySet()): Pair<Int, String>? =
+        usable(from.list()).let { all -> all.firstOrNull { it.first in preferred } ?: all.firstOrNull() }
 
     /** Every source in [from] a script can read again, the earliest step first; one step's in the capture's order. */
     fun usable(from: List<*>): List<Pair<Int, String>> = from.mapNotNull { source ->

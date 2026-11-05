@@ -5,14 +5,15 @@ import java.net.URI
 /*
  * A list's members a run visited one by one (spec/PLAN-COST-FOLLOWS-STATES.md, step 3): written one by one, by name,
  * a script serves those members alone. A list the run went through, every member of every page, is written as a
- * whenever over it, which goes through every member it lists, page after page, each time the script runs: each member
+ * for-each over it, which goes through every member it lists, page after page, each time the script runs: each member
  * acted on by what it offers (when-offered), or, where each member is a list of its own, gone through the same way.
+ * A value the run read from a member and sent inside the loop is read from whichever member the loop is at.
  */
 
-/** The link a list names each of its members by (RFC 6573), as `whenever` follows it. */
+/** The link a list names each of its members by (RFC 6573), as `for-each` follows it. */
 private const val ITEM = "item"
 
-/** The link a list names its next page by (RFC 8288), as `whenever` follows it to the list's end. */
+/** The link a list names its next page by (RFC 8288), as `for-each` follows it to the list's end. */
 private const val NEXT = "next"
 
 /**
@@ -36,6 +37,20 @@ internal class Loop(val members: List<Walked.Selection>, val inner: Loop?, priva
     /** The list [opened] made, as this loop over its [members]. */
     fun openedBy(opened: String?) = Loop(members, inner, opened)
 
+    /**
+     * Each member's visit, at every depth, by the name of the loop it is a member of: the steps inside read what the
+     * run read from it by that name. A member whose name a loop inside it reuses is hidden there, so it is in none.
+     */
+    val scope: Map<Int, String>
+        get() {
+            val inside = inner?.scope.orEmpty()
+            return inside + if (name in inside.values) emptyMap() else members.associate { it.step.number to name }
+        }
+
+    /** The acts made on the members of the loop at its heart, in the order the run made them. */
+    val acts: List<Walked.Selection>
+        get() = inner?.acts ?: members.flatMap { it.block.statements }.filterIsInstance<Walked.Selection>()
+
     private companion object {
         const val SEARCH = "search-"
         const val PLURAL_IES = 3
@@ -57,6 +72,7 @@ internal class Loop(val members: List<Walked.Selection>, val inner: Loop?, priva
  */
 internal fun loop(block: Block, chosen: (String) -> Boolean): Loop? =
     pages(block)?.takeUnless { members -> members.any { chosen(title(it)) } }?.let(::over)?.openedBy(block.opener)
+        ?.takeIf(::alike)
 
 /** The acts made on [members], one for each form, in the order the run first made them. */
 internal fun cases(members: List<Walked.Selection>): List<Walked.Selection> =
@@ -65,7 +81,7 @@ internal fun cases(members: List<Walked.Selection>): List<Walked.Selection> =
 /** [members] as one loop: each holding an act or none, alike; or each a list of its own, or nothing, gone through. */
 private fun over(members: List<Walked.Selection>): Loop? = when {
     members.isEmpty() || !members.all(::opened) -> null
-    members.all(::acted) -> Loop(members, null).takeIf { alike(members) }
+    members.all(::acted) -> Loop(members, null)
     else -> listsOf(members)?.let(::over)?.let { Loop(members, it) }
 }
 
@@ -103,11 +119,18 @@ private fun acted(visit: Walked.Selection): Boolean {
     return inside.isEmpty() || act != null && act.call == Call.Act && act.block.statements.isEmpty()
 }
 
-/** Whether every act on the same form sent what every other sent, but its form. */
-private fun alike(members: List<Walked.Selection>): Boolean {
-    val acts = members.flatMap { it.block.statements }.filterIsInstance<Walked.Selection>()
-    val sent = acts.groupBy { it.step.relation }.values.map { same -> same.map { it.step.params - "relation" } }
-    return sent.all { it.distinct().size == 1 }
+/**
+ * Whether every act on the same form of [loop] sent what every other sent, but its form: the same value, or the same
+ * member of the member of a loop it is in, read by the loop's name and the member's pointer.
+ */
+private fun alike(loop: Loop): Boolean {
+    val scope = loop.scope
+    fun sent(step: Step): Map<*, *> = (step.params - "relation").mapValues { (field, value) ->
+        step.values[field].map()["from"].list().firstNotNullOfOrNull { source ->
+            scope[(source.map()["step"] as? Number)?.toInt()]?.let { name -> name + source.map()["pointer"] }
+        } ?: value
+    }
+    return loop.acts.groupBy { it.step.relation }.values.all { same -> same.map { sent(it.step) }.distinct().size == 1 }
 }
 
 /** The title [visit] followed its item link by. */

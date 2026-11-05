@@ -6,7 +6,15 @@ import heart.cli.BadArguments
  * A value a generated script reads from the resource the step that brought it into the run led to, kept by name
  * ([keptAs]) in that step's block: `val number by kept("issue") { long("number") }`, with no var to fill.
  */
-class Variable(val name: String, val step: Int, val pointer: String, val kind: Kind, val keptAs: String) {
+class Variable(
+    val name: String,
+    val step: Int,
+    val pointer: String,
+    val kind: Kind,
+    val keptAs: String,
+    /** Read from whichever member a loop is at, kept by the loop's name ([keptAs]), not by the step it was read at. */
+    val looped: Boolean = false,
+) {
     /** How a script reads it from the kept state: `long("number")`, by member name, or by pointer for nested state. */
     val read: String
         get() {
@@ -72,6 +80,9 @@ class Bindings(
     /** Each input the run sent as an integer, a number or a truth, with that type: a script as data declares it. */
     val inputTypes = linkedMapOf<String, String>()
 
+    /** The steps that visited a loop's members, by the loop's name, while the steps inside the loop are written. */
+    internal var scope: Map<Int, String> = emptyMap()
+
     /** The reference that reads the input [name], sent as a field of [type]; the type noted, if it isn't text. */
     private fun inputReference(name: String, type: String?): String {
         if (type in setOf("integer", "number", "boolean")) inputTypes[name] = checkNotNull(type)
@@ -99,7 +110,8 @@ class Bindings(
         val from = info["from"] as? List<*> ?: emptyList<Any?>()
         val text = value?.toString().orEmpty()
         val input = from.firstNotNullOfOrNull { it.map()["input"]?.toString() }
-        val held = sources.first(from)
+        // Inside a loop, a value its member gave is read from that member, whichever the loop is at.
+        val held = sources.first(from, scope.keys)
         val marked = Marked(source, step, field, why)
         val data = data(value, type)
         return when {
@@ -152,13 +164,15 @@ class Bindings(
         val last = camel(pointer.substringAfterLast('/'))
         val named = last.takeIf { IDENTIFIER.matches(it) } ?: camel(pointer.removePrefix("/").replace('/', '_'))
         // A goal step's name names what is read from where it led: issue's number is issueNumber.
-        val mark = capture.step(step)?.let { capture.marks(it)["as"] }?.toString()
+        // A loop's member is kept by the loop's name; a goal step's name names what is read from where it led.
+        val loop = scope[step]
+        val mark = loop ?: capture.step(step)?.let { capture.marks(it)["as"] }?.toString()
         val given = mark?.let { "$it${named.replaceFirstChar(Char::uppercase)}" }
-        val base = slotted[step to pointer] ?: given ?: named
+        val base = (if (loop == null) slotted[step to pointer] else null) ?: given ?: named
         val name = if (base in taken) "$base$step" else base
         // The resource is kept once, by the name its goal step gave it, else by its first value's name.
         val keptAs = mark ?: variables.values.firstOrNull { it.step == step }?.keptAs ?: name
-        Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)), keptAs)
+        Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)), keptAs, loop != null)
     }
 
     /** Rule 2.2: text the script wrote literally, outside any slot of its reason template, or in its own line. */
@@ -232,6 +246,17 @@ class Bindings(
 }
 
 internal fun Any?.list(): List<*> = this as? List<*> ?: emptyList<Any?>()
+
+/** [write], with each step of [visits] a member of the loop it names: a value read from it is read by that name. */
+internal fun <T> Bindings.within(visits: Map<Int, String>, write: () -> T): T {
+    val outer = scope
+    scope = outer + visits
+    try {
+        return write()
+    } finally {
+        scope = outer
+    }
+}
 
 /**
  * The words [step], kept as a reason step, says, with a script's slots: a goal step marked reasoned in the person's

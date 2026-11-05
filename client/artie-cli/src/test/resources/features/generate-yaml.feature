@@ -294,6 +294,36 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       | yaml | gen.heart.yaml | - for-each: member | - for-each: loan  | - when-offered: | follow: |
       | kts  | gen.heart.kts  | each("member") {   | each("loan") {    | whenOffered(    | follow( |
 
+  Scenario Outline: A value the run read from a loop's member is read from whichever member the loop is at: <form>
+    The library renews a company group member's book for the member, with
+    their card number, which the run read from the member it opened, two
+    loops up. The script reads it from the member each loop is at, by the
+    loop's name, and keeps no member of its own.
+    Given the file "run.trace.yaml" is the capture "library-company.trace.yaml"
+    When artie is run with
+      | argument       |
+      | generate       |
+      | run.trace.yaml |
+      | --out          |
+      | <out>          |
+      | --format       |
+      | <form>         |
+    Then artie exits 0
+    And the file "<out>" has these lines, in order
+      | line      |
+      | <members> |
+      | <books>   |
+      | <act>     |
+    And the file "<out>" mentions '<read>'
+    And the file "<out>" mentions '<card>'
+    And the file "<out>" mentions "<kept>" nowhere
+    And the file "<out>" mentions "21000456" nowhere
+
+    Examples:
+      | form | out            | members            | books            | act                                | read                                          | card               | kept     |
+      | yaml | gen.heart.yaml | - for-each: member | - for-each: loan | - act: library:renew-for-member    | ${member.id}                                  | card: ${member.id} | keep-as: |
+      | kts  | gen.heart.kts  | each("member") {   | each("loan") {   | case("library:renew-for-member") { | val memberId by kept("member") { long("id") } | "card" to memberId | keepAs(  |
+
   Scenario: The company script, held as data, is a script as data
     Given the file "run.trace.yaml" is the capture "library-company.trace.yaml"
     When artie is run with

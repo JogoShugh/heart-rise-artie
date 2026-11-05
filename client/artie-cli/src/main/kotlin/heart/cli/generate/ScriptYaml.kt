@@ -123,7 +123,9 @@ class ScriptYaml(
             val inside = loop.inner?.let(::over) ?: listOf(offered(loop.members))
             return listOf(linkedMapOf("for-each" to loop.name, "then" to inside))
         }
-        loop(block) { capture.inputGiven(it) != null }?.let { return keeps(block) + over(it) }
+        loop(block) { capture.inputGiven(it) != null }?.let { loop ->
+            return keeps(block) + bindings.within(loop.scope) { over(loop) }
+        }
         val decided = decided(block, capture)
         val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
         return keeps(block).filter { it["keep-as"] !in inside } + block.statements.flatMap { walked ->
