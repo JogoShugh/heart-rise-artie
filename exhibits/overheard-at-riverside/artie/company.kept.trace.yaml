@@ -5,8 +5,8 @@ run:
       value: Harbor Point
       given: given
 ---
-at: '2026-11-05T02:09:05.650262Z'
-ms: 49
+at: '2026-11-05T03:30:00.893324Z'
+ms: 51
 mode: script
 say: enter {entry}
 params:
@@ -27,6 +27,8 @@ now:
           - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
         library:renew:
           - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:renew-for-member:
+          - sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
         library:return:
           - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
         library:search-accounts:
@@ -35,7 +37,7 @@ now:
           - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
         library:search-members:
           - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
-      digest: sha256-/oA4AtMmNXYhYC9lOt9yL3wDlZyjBVws734QW/5Mkjo=
+      digest: sha256-JuAynvKvR5okL1mQT70mjefY45UZaIrAREdufhkWIYI=
   forms:
     - library:search-accounts
     - library:get-account
@@ -49,8 +51,8 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-05T02:09:05.706607Z'
-ms: 42
+at: '2026-11-05T03:30:00.952297Z'
+ms: 47
 mode: script
 say: act {relation}, company {company}
 intent: Find the members of the company group Harbor Point
@@ -111,8 +113,8 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:09:05.752211Z'
-ms: 5
+at: '2026-11-05T03:30:01.002832Z'
+ms: 6
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -158,9 +160,13 @@ now:
     item:
       - The Phantom Tollbooth
       - Peter Pan
+keeps:
+  /id:
+    - 5
+    - 9
 ---
-at: '2026-11-05T02:09:05.758160Z'
-ms: 5
+at: '2026-11-05T03:30:01.010567Z'
+ms: 7
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -196,9 +202,9 @@ now:
     author: Norton Juster
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -206,39 +212,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.765339Z'
-ms: 4
+at: '2026-11-05T03:30:01.020169Z'
+ms: 8
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000456
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000456
+values:
+  card:
+    value: 21000456
+    type: integer
+    from:
+      - step: 3
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3321/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3321/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.a8afbe74bc2e43fc"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.cc508bf7144f1082"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -252,9 +266,9 @@ now:
     author: Norton Juster
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -262,7 +276,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.770628Z'
+at: '2026-11-05T03:30:01.030421Z'
 ms: 3
 mode: script
 say: return to {address}
@@ -277,9 +291,9 @@ now:
     author: Norton Juster
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -287,7 +301,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.774368Z'
+at: '2026-11-05T03:30:01.034060Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -311,7 +325,7 @@ now:
       - The Phantom Tollbooth
       - Peter Pan
 ---
-at: '2026-11-05T02:09:05.777045Z'
+at: '2026-11-05T03:30:01.037056Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -348,9 +362,9 @@ now:
     author: J. M. Barrie
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -358,39 +372,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.780893Z'
-ms: 3
+at: '2026-11-05T03:30:01.041100Z'
+ms: 5
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000456
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000456
+values:
+  card:
+    value: 21000456
+    type: integer
+    from:
+      - step: 3
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3322/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3322/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.1c27f37cd30059df"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.cdd2863fca6666a2"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -404,9 +426,9 @@ now:
     author: J. M. Barrie
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -414,8 +436,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.784655Z'
-ms: 2
+at: '2026-11-05T03:30:01.047515Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -429,9 +451,9 @@ now:
     author: J. M. Barrie
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -439,7 +461,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.787128Z'
+at: '2026-11-05T03:30:01.050792Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -463,7 +485,7 @@ now:
       - The Phantom Tollbooth
       - Peter Pan
 ---
-at: '2026-11-05T02:09:05.789482Z'
+at: '2026-11-05T03:30:01.053695Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -491,8 +513,8 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:09:05.791806Z'
-ms: 2
+at: '2026-11-05T03:30:01.056850Z'
+ms: 3
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -538,8 +560,8 @@ now:
     item:
       - Bridge to Terabithia
 ---
-at: '2026-11-05T02:09:05.795416Z'
-ms: 3
+at: '2026-11-05T03:30:01.061071Z'
+ms: 4
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -584,8 +606,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.800311Z'
-ms: 3
+at: '2026-11-05T03:30:01.066457Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -607,7 +629,7 @@ now:
     item:
       - Bridge to Terabithia
 ---
-at: '2026-11-05T02:09:05.803556Z'
+at: '2026-11-05T03:30:01.069543Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -635,8 +657,8 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:09:05.805711Z'
-ms: 2
+at: '2026-11-05T03:30:01.072112Z'
+ms: 3
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -682,8 +704,11 @@ now:
     item:
       - A Wrinkle in Time
       - Heidi
+keeps:
+  /id:
+    - 21
 ---
-at: '2026-11-05T02:09:05.809204Z'
+at: '2026-11-05T03:30:01.076073Z'
 ms: 3
 mode: script
 say: follow {relation}, titled {title}
@@ -729,8 +754,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.813278Z'
-ms: 2
+at: '2026-11-05T03:30:01.080723Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -753,7 +778,7 @@ now:
       - A Wrinkle in Time
       - Heidi
 ---
-at: '2026-11-05T02:09:05.815617Z'
+at: '2026-11-05T03:30:01.084284Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -790,9 +815,9 @@ now:
     author: Johanna Spyri
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -800,39 +825,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.818776Z'
-ms: 3
+at: '2026-11-05T03:30:01.087534Z'
+ms: 4
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000458
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000458
+values:
+  card:
+    value: 21000458
+    type: integer
+    from:
+      - step: 17
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3325/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3325/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.0c9aa24f13e63868"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.6796576875a8d372"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -846,9 +879,9 @@ now:
     author: Johanna Spyri
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -856,7 +889,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.822190Z'
+at: '2026-11-05T03:30:01.092771Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -871,9 +904,9 @@ now:
     author: Johanna Spyri
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -881,7 +914,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.824784Z'
+at: '2026-11-05T03:30:01.095532Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -905,8 +938,8 @@ now:
       - A Wrinkle in Time
       - Heidi
 ---
-at: '2026-11-05T02:09:05.827020Z'
-ms: 1
+at: '2026-11-05T03:30:01.098540Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -933,7 +966,7 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:09:05.829009Z'
+at: '2026-11-05T03:30:01.101552Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -979,8 +1012,11 @@ now:
       - null
     item:
       - The Westing Game
+keeps:
+  /id:
+    - 27
 ---
-at: '2026-11-05T02:09:05.831843Z'
+at: '2026-11-05T03:30:01.105Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -1017,9 +1053,9 @@ now:
     author: Ellen Raskin
     due: '2026-11-12'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1027,39 +1063,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.834834Z'
-ms: 3
+at: '2026-11-05T03:30:01.108642Z'
+ms: 4
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000459
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000459
+values:
+  card:
+    value: 21000459
+    type: integer
+    from:
+      - step: 25
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3326/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3326/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.845d64ac244e7ce2"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.91365ad97a9e76fc"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -1073,9 +1117,9 @@ now:
     author: Ellen Raskin
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1083,7 +1127,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.838792Z'
+at: '2026-11-05T03:30:01.113384Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -1098,9 +1142,9 @@ now:
     author: Ellen Raskin
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1108,7 +1152,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.841265Z'
+at: '2026-11-05T03:30:01.116008Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -1131,8 +1175,8 @@ now:
     item:
       - The Westing Game
 ---
-at: '2026-11-05T02:09:05.843499Z'
-ms: 1
+at: '2026-11-05T03:30:01.118590Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -1159,7 +1203,7 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:09:05.845381Z'
+at: '2026-11-05T03:30:01.120952Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -1206,8 +1250,11 @@ now:
     item:
       - Island of the Blue Dolphins
       - Pippi Longstocking
+keeps:
+  /id:
+    - 35
 ---
-at: '2026-11-05T02:09:05.848321Z'
+at: '2026-11-05T03:30:01.124872Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -1253,7 +1300,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.851043Z'
+at: '2026-11-05T03:30:01.128290Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -1277,7 +1324,7 @@ now:
       - Island of the Blue Dolphins
       - Pippi Longstocking
 ---
-at: '2026-11-05T02:09:05.853261Z'
+at: '2026-11-05T03:30:01.130879Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -1314,9 +1361,9 @@ now:
     author: Astrid Lindgren
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1324,39 +1371,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.856237Z'
-ms: 2
+at: '2026-11-05T03:30:01.133536Z'
+ms: 3
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000460
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000460
+values:
+  card:
+    value: 21000460
+    type: integer
+    from:
+      - step: 31
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3328/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3328/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.9a8d6ffc15147d01"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.a9b16cd26202a9cf"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -1370,9 +1425,9 @@ now:
     author: Astrid Lindgren
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1380,8 +1435,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.859122Z'
-ms: 1
+at: '2026-11-05T03:30:01.138Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -1395,9 +1450,9 @@ now:
     author: Astrid Lindgren
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1405,8 +1460,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.861068Z'
-ms: 1
+at: '2026-11-05T03:30:01.140514Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -1429,8 +1484,8 @@ now:
       - Island of the Blue Dolphins
       - Pippi Longstocking
 ---
-at: '2026-11-05T02:09:05.863166Z'
-ms: 1
+at: '2026-11-05T03:30:01.144594Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -1457,7 +1512,7 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:09:05.864979Z'
+at: '2026-11-05T03:30:01.147094Z'
 ms: 2
 mode: script
 say: follow {relation}
@@ -1504,7 +1559,7 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T02:09:05.867185Z'
+at: '2026-11-05T03:30:01.150176Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -1551,9 +1606,12 @@ now:
       - null
     item:
       - Tuck Everlasting
+keeps:
+  /id:
+    - 42
 ---
-at: '2026-11-05T02:09:05.870128Z'
-ms: 1
+at: '2026-11-05T03:30:01.153308Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -1589,9 +1647,9 @@ now:
     author: Natalie Babbitt
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1599,39 +1657,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.872923Z'
-ms: 2
+at: '2026-11-05T03:30:01.156571Z'
+ms: 4
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000461
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000461
+values:
+  card:
+    value: 21000461
+    type: integer
+    from:
+      - step: 40
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3329/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3329/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.180803a03d7f2279"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.ca7b48064001dcbf"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -1645,9 +1711,9 @@ now:
     author: Natalie Babbitt
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1655,8 +1721,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.875583Z'
-ms: 1
+at: '2026-11-05T03:30:01.161178Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -1670,9 +1736,9 @@ now:
     author: Natalie Babbitt
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1680,8 +1746,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.877553Z'
-ms: 1
+at: '2026-11-05T03:30:01.163922Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -1703,8 +1769,8 @@ now:
     item:
       - Tuck Everlasting
 ---
-at: '2026-11-05T02:09:05.879538Z'
-ms: 1
+at: '2026-11-05T03:30:01.166817Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -1733,8 +1799,8 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T02:09:05.881348Z'
-ms: 1
+at: '2026-11-05T03:30:01.169495Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -1781,9 +1847,12 @@ now:
     item:
       - The BFG
       - The Borrowers
+keeps:
+  /id:
+    - 48
 ---
-at: '2026-11-05T02:09:05.883996Z'
-ms: 1
+at: '2026-11-05T03:30:01.173021Z'
+ms: 3
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -1819,9 +1888,9 @@ now:
     author: Roald Dahl
     due: '2026-11-12'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -1829,39 +1898,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.886258Z'
-ms: 2
+at: '2026-11-05T03:30:01.177172Z'
+ms: 4
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000462
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000462
+values:
+  card:
+    value: 21000462
+    type: integer
+    from:
+      - step: 46
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3330/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3330/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.ec4ff915c4af1d83"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.deb679733f9e599c"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -1884,8 +1961,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.889047Z'
-ms: 1
+at: '2026-11-05T03:30:01.182316Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -1908,8 +1985,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.891150Z'
-ms: 1
+at: '2026-11-05T03:30:01.185613Z'
+ms: 4
 mode: script
 say: return to {address}
 params:
@@ -1932,8 +2009,8 @@ now:
       - The BFG
       - The Borrowers
 ---
-at: '2026-11-05T02:09:05.893214Z'
-ms: 1
+at: '2026-11-05T03:30:01.189893Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -1978,8 +2055,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.895644Z'
-ms: 1
+at: '2026-11-05T03:30:01.193454Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2002,8 +2079,8 @@ now:
       - The BFG
       - The Borrowers
 ---
-at: '2026-11-05T02:09:05.897611Z'
-ms: 1
+at: '2026-11-05T03:30:01.196245Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2032,8 +2109,8 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T02:09:05.899449Z'
-ms: 1
+at: '2026-11-05T03:30:01.198780Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -2080,8 +2157,8 @@ now:
     item:
       - Stuart Little
 ---
-at: '2026-11-05T02:09:05.901947Z'
-ms: 1
+at: '2026-11-05T03:30:01.201712Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -2126,8 +2203,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.904433Z'
-ms: 1
+at: '2026-11-05T03:30:01.204278Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2149,8 +2226,8 @@ now:
     item:
       - Stuart Little
 ---
-at: '2026-11-05T02:09:05.906465Z'
-ms: 1
+at: '2026-11-05T03:30:01.207071Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2179,7 +2256,7 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T02:09:05.908437Z'
+at: '2026-11-05T03:30:01.209546Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -2227,8 +2304,12 @@ now:
     item:
       - Little Women
       - Watership Down
+keeps:
+  /id:
+    - 60
+    - 64
 ---
-at: '2026-11-05T02:09:05.911522Z'
+at: '2026-11-05T03:30:01.212749Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -2265,9 +2346,9 @@ now:
     author: Louisa May Alcott
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2275,39 +2356,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.914411Z'
-ms: 2
+at: '2026-11-05T03:30:01.216024Z'
+ms: 3
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000464
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000464
+values:
+  card:
+    value: 21000464
+    type: integer
+    from:
+      - step: 58
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3333/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3333/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.cead8008267f28a2"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.16719e80f7168e1e"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -2321,9 +2410,9 @@ now:
     author: Louisa May Alcott
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2331,8 +2420,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.917303Z'
-ms: 1
+at: '2026-11-05T03:30:01.220187Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2346,9 +2435,9 @@ now:
     author: Louisa May Alcott
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2356,8 +2445,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.919110Z'
-ms: 1
+at: '2026-11-05T03:30:01.222921Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -2380,7 +2469,7 @@ now:
       - Little Women
       - Watership Down
 ---
-at: '2026-11-05T02:09:05.921090Z'
+at: '2026-11-05T03:30:01.226340Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -2417,9 +2506,9 @@ now:
     author: Richard Adams
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2427,39 +2516,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.924642Z'
-ms: 2
+at: '2026-11-05T03:30:01.229698Z'
+ms: 3
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000464
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000464
+values:
+  card:
+    value: 21000464
+    type: integer
+    from:
+      - step: 58
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3334/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3334/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.b067686bde2e82e1"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.a4020696b931eba4"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -2473,9 +2570,9 @@ now:
     author: Richard Adams
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2483,8 +2580,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.927390Z'
-ms: 1
+at: '2026-11-05T03:30:01.234059Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2498,9 +2595,9 @@ now:
     author: Richard Adams
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2508,8 +2605,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.929293Z'
-ms: 1
+at: '2026-11-05T03:30:01.236794Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -2532,8 +2629,8 @@ now:
       - Little Women
       - Watership Down
 ---
-at: '2026-11-05T02:09:05.930914Z'
-ms: 1
+at: '2026-11-05T03:30:01.240313Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -2562,8 +2659,8 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T02:09:05.932521Z'
-ms: 1
+at: '2026-11-05T03:30:01.243652Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -2610,8 +2707,8 @@ now:
     item:
       - The Wind in the Willows
 ---
-at: '2026-11-05T02:09:05.934897Z'
-ms: 1
+at: '2026-11-05T03:30:01.246510Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -2656,8 +2753,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.937325Z'
-ms: 1
+at: '2026-11-05T03:30:01.249694Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2679,8 +2776,8 @@ now:
     item:
       - The Wind in the Willows
 ---
-at: '2026-11-05T02:09:05.939007Z'
-ms: 1
+at: '2026-11-05T03:30:01.252120Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2709,8 +2806,8 @@ now:
       - Lucas Silva
       - Emma Johansson
 ---
-at: '2026-11-05T02:09:05.940757Z'
-ms: 1
+at: '2026-11-05T03:30:01.254823Z'
+ms: 2
 mode: script
 say: follow {relation}
 params:
@@ -2755,8 +2852,8 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:09:05.942434Z'
-ms: 1
+at: '2026-11-05T03:30:01.257920Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -2802,9 +2899,12 @@ now:
     item:
       - Black Beauty
       - The Little Prince
+keeps:
+  /id:
+    - 75
 ---
-at: '2026-11-05T02:09:05.945022Z'
-ms: 1
+at: '2026-11-05T03:30:01.261047Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -2840,9 +2940,9 @@ now:
     author: Anna Sewell
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2850,39 +2950,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.947869Z'
-ms: 2
+at: '2026-11-05T03:30:01.263956Z'
+ms: 3
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000466
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000466
+values:
+  card:
+    value: 21000466
+    type: integer
+    from:
+      - step: 73
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3336/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3336/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.087a83473595636d"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.cdbe92f24cf821f4"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -2896,9 +3004,9 @@ now:
     author: Anna Sewell
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2906,8 +3014,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.950661Z'
-ms: 1
+at: '2026-11-05T03:30:01.268151Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2921,9 +3029,9 @@ now:
     author: Anna Sewell
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -2931,8 +3039,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.952453Z'
-ms: 1
+at: '2026-11-05T03:30:01.270325Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -2955,8 +3063,8 @@ now:
       - Black Beauty
       - The Little Prince
 ---
-at: '2026-11-05T02:09:05.954142Z'
-ms: 1
+at: '2026-11-05T03:30:01.272957Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3001,8 +3109,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.956503Z'
-ms: 1
+at: '2026-11-05T03:30:01.276350Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3025,7 +3133,7 @@ now:
       - Black Beauty
       - The Little Prince
 ---
-at: '2026-11-05T02:09:05.958377Z'
+at: '2026-11-05T03:30:01.278871Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -3053,8 +3161,8 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:09:05.960863Z'
-ms: 1
+at: '2026-11-05T03:30:01.281372Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3099,8 +3207,11 @@ now:
       - null
     item:
       - Anne of Green Gables
+keeps:
+  /id:
+    - 83
 ---
-at: '2026-11-05T02:09:05.963416Z'
+at: '2026-11-05T03:30:01.284444Z'
 ms: 2
 mode: script
 say: follow {relation}, titled {title}
@@ -3137,9 +3248,9 @@ now:
     author: L. M. Montgomery
     due: '2026-11-12'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3147,39 +3258,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.966367Z'
-ms: 2
+at: '2026-11-05T03:30:01.287569Z'
+ms: 3
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000467
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000467
+values:
+  card:
+    value: 21000467
+    type: integer
+    from:
+      - step: 81
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3338/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3338/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.ebab17fc9ab89ffb"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.46597d15a740c11f"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -3193,9 +3312,9 @@ now:
     author: L. M. Montgomery
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3203,8 +3322,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.968685Z'
-ms: 1
+at: '2026-11-05T03:30:01.291997Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3218,9 +3337,9 @@ now:
     author: L. M. Montgomery
     due: '2026-12-03'
     renewals: 2
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3228,8 +3347,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.970271Z'
-ms: 1
+at: '2026-11-05T03:30:01.294339Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3251,8 +3370,8 @@ now:
     item:
       - Anne of Green Gables
 ---
-at: '2026-11-05T02:09:05.972066Z'
-ms: 1
+at: '2026-11-05T03:30:01.296621Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3279,8 +3398,8 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:09:05.973911Z'
-ms: 1
+at: '2026-11-05T03:30:01.299200Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3326,9 +3445,12 @@ now:
     item:
       - Treasure Island
       - Mrs. Frisby and the Rats of NIMH
+keeps:
+  /id:
+    - 91
 ---
-at: '2026-11-05T02:09:05.976327Z'
-ms: 1
+at: '2026-11-05T03:30:01.302288Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3373,8 +3495,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.978621Z'
-ms: 1
+at: '2026-11-05T03:30:01.305122Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -3397,8 +3519,8 @@ now:
       - Treasure Island
       - Mrs. Frisby and the Rats of NIMH
 ---
-at: '2026-11-05T02:09:05.980371Z'
-ms: 1
+at: '2026-11-05T03:30:01.308402Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3434,9 +3556,9 @@ now:
     author: Robert C. O'Brien
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3444,39 +3566,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.982741Z'
-ms: 2
+at: '2026-11-05T03:30:01.311738Z'
+ms: 3
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000468
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000468
+values:
+  card:
+    value: 21000468
+    type: integer
+    from:
+      - step: 87
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3340/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3340/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.a31c227e71e855fe"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.721f803197226b76"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -3490,9 +3620,9 @@ now:
     author: Robert C. O'Brien
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3500,8 +3630,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.985527Z'
-ms: 1
+at: '2026-11-05T03:30:01.316081Z'
+ms: 3
 mode: script
 say: return to {address}
 params:
@@ -3515,9 +3645,9 @@ now:
     author: Robert C. O'Brien
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3525,8 +3655,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.987369Z'
-ms: 1
+at: '2026-11-05T03:30:01.319658Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3549,8 +3679,8 @@ now:
       - Treasure Island
       - Mrs. Frisby and the Rats of NIMH
 ---
-at: '2026-11-05T02:09:05.989364Z'
-ms: 1
+at: '2026-11-05T03:30:01.322368Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3577,8 +3707,8 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:09:05.990999Z'
-ms: 1
+at: '2026-11-05T03:30:01.325152Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3623,8 +3753,11 @@ now:
       - null
     item:
       - The Hundred and One Dalmatians
+keeps:
+  /id:
+    - 97
 ---
-at: '2026-11-05T02:09:05.993109Z'
+at: '2026-11-05T03:30:01.328201Z'
 ms: 1
 mode: script
 say: follow {relation}, titled {title}
@@ -3661,9 +3794,9 @@ now:
     author: Dodie Smith
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3671,39 +3804,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.995223Z'
-ms: 2
+at: '2026-11-05T03:30:01.330589Z'
+ms: 3
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000469
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000469
+values:
+  card:
+    value: 21000469
+    type: integer
+    from:
+      - step: 95
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3341/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3341/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.b2e31c2a9188c2b8"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.1c0d82177af83648"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -3717,9 +3858,9 @@ now:
     author: Dodie Smith
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3727,8 +3868,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:05.997558Z'
-ms: 3
+at: '2026-11-05T03:30:01.334527Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3742,9 +3883,9 @@ now:
     author: Dodie Smith
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3752,7 +3893,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:06.001552Z'
+at: '2026-11-05T03:30:01.337175Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -3775,8 +3916,8 @@ now:
     item:
       - The Hundred and One Dalmatians
 ---
-at: '2026-11-05T02:09:06.003511Z'
-ms: 1
+at: '2026-11-05T03:30:01.339191Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -3803,8 +3944,8 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:09:06.005076Z'
-ms: 1
+at: '2026-11-05T03:30:01.341857Z'
+ms: 2
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3850,9 +3991,12 @@ now:
     item:
       - The Cricket in Times Square
       - Ramona the Pest
+keeps:
+  /id:
+    - 105
 ---
-at: '2026-11-05T02:09:06.007802Z'
-ms: 4
+at: '2026-11-05T03:30:01.344713Z'
+ms: 1
 mode: script
 say: follow {relation}, titled {title}
 params:
@@ -3897,7 +4041,7 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:06.013116Z'
+at: '2026-11-05T03:30:01.347273Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -3921,7 +4065,7 @@ now:
       - The Cricket in Times Square
       - Ramona the Pest
 ---
-at: '2026-11-05T02:09:06.014892Z'
+at: '2026-11-05T03:30:01.349347Z'
 ms: 1
 mode: script
 say: follow {relation}, titled {title}
@@ -3958,9 +4102,9 @@ now:
     author: Beverly Cleary
     due: '2026-11-12'
     renewals: 0
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -3968,39 +4112,47 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:06.017373Z'
+at: '2026-11-05T03:30:01.351485Z'
 ms: 2
 mode: script
-say: act {relation}
-inferred: renew the book
+say: act {relation}, card {card}
+inferred: renew this book for the member, card number 21000470
 fromIntent: 'For each member, on every page of the results: open the member, and renew each book they have out if renewing is offered; otherwise say why it can''t be renewed'
 params:
-  relation: library:renew
+  relation: library:renew-for-member
+  card: 21000470
+values:
+  card:
+    value: 21000470
+    type: integer
+    from:
+      - step: 101
+        pointer: /id
 opens: true
 chose:
   kind: form
-  relation: library:renew
-  title: Renew
+  relation: library:renew-for-member
+  title: Renew for the member
   method: POST
-  target: /loans/{id}/actions/renew
-  address: http://localhost:8140/loans/3343/actions/renew
+  target: /loans/{id}/actions/renew-for-member
+  address: http://localhost:8140/loans/3343/actions/renew-for-member
   picked: relation
 guard:
   rung: L2
   set:
-    href: http://localhost:8140/affordance-sets/0c4acb672a0d51fd
-    integrity: sha256-DErLZyoNUf2aPuPpSCDmNEFG0ehN1T9EpvX59mdQ2Z0=
-  form: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
-  act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    href: http://localhost:8140/affordance-sets/e425ee854a3ee9ea
+    integrity: sha256-5CXuhUo+6eovFte5/gQLRvn4k/tK2vC/sodJ9bG6+QQ=
+  form: sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
+  act: sha256-ksDKmlLgDWrxpWIPsKiOPKpk9EWBK9ZXyI1SKBMVxUg=
   schema:
-    href: http://localhost:8140/schemas/efddc7bd8bbcef73
-    integrity: sha256-793HvYu873OhTrGs4f/a7IHlGO8eE8HpJx0ListpSkk=
-  if-match: '"seq-1.hsf.L2.c48d00fcc2c23654"'
+    href: http://localhost:8140/schemas/19c8347c0a72993e
+    integrity: sha256-Gcg0fApymT7Bto9g+jVOqI49mn27WJb6KctUyyaxDoE=
+  if-match: '"seq-1.hsf.L2.6a973aed6099d349"'
   checked: lenient
   held: set
 offered:
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     - hr:forms
@@ -4014,9 +4166,9 @@ now:
     author: Beverly Cleary
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4024,8 +4176,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:06.019856Z'
-ms: 1
+at: '2026-11-05T03:30:01.354806Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -4039,9 +4191,9 @@ now:
     author: Beverly Cleary
     due: '2026-12-03'
     renewals: 1
-    standing: renewable
+    standing: renewable for the member
   forms:
-    - library:renew
+    - library:renew-for-member
     - library:return
   links:
     self:
@@ -4049,8 +4201,8 @@ now:
     hr:forms:
       - null
 ---
-at: '2026-11-05T02:09:06.021242Z'
-ms: 1
+at: '2026-11-05T03:30:01.357255Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -4073,7 +4225,7 @@ now:
       - The Cricket in Times Square
       - Ramona the Pest
 ---
-at: '2026-11-05T02:09:06.022753Z'
+at: '2026-11-05T03:30:01.360320Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -4101,8 +4253,8 @@ now:
       - Ryan Murphy
       - Chloe Dubois
 ---
-at: '2026-11-05T02:09:06.024434Z'
-ms: 1
+at: '2026-11-05T03:30:01.362487Z'
+ms: 2
 mode: script
 say: return to {address}
 params:
@@ -4129,7 +4281,7 @@ now:
       - Aisha Bello
       - Thomas Becker
 ---
-at: '2026-11-05T02:09:06.026102Z'
+at: '2026-11-05T03:30:01.364995Z'
 ms: 1
 mode: script
 say: return to {address}
@@ -4150,6 +4302,8 @@ now:
           - sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc=
         library:renew:
           - sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+        library:renew-for-member:
+          - sha256-RqWazXOu1ePHa4LcdalMDolce4vMVyEDYYXtAyscMeA=
         library:return:
           - sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo=
         library:search-accounts:
@@ -4158,7 +4312,7 @@ now:
           - sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU=
         library:search-members:
           - sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
-      digest: sha256-/oA4AtMmNXYhYC9lOt9yL3wDlZyjBVws734QW/5Mkjo=
+      digest: sha256-JuAynvKvR5okL1mQT70mjefY45UZaIrAREdufhkWIYI=
   forms:
     - library:search-accounts
     - library:get-account
