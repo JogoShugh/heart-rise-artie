@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A company of fifteen · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene six · a month later</span><span class="fiction">Fiction</span></header>
+<h2>A company of fifteen</h2>
+<p class="setting">A month later. The library has added company groups, and Harbor Point Logistics has signed up all fifteen of its staff.</p>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Can the assistant renew for the whole company?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Once the model finds the way. It searched the members by company, five to a page, and went through all three pages: every member, every book.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And the script it kept?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Names no one. A loop over every member the search lists, page after page, and inside it, a loop over each member's books. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And Ana's script, from before the company groups?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Still runs. Its forms didn't change.</p></div>
+</div>
+<div class="stats">
+  <div class="stat"><b>79</b><span>model calls, once, to find the way</span></div>
+  <div class="stat"><b>0</b><span>model calls each run after</span></div>
+  <div class="stat"><b>14</b><span>books renewed, each once, across 15 members</span></div>
+</div>
+<pre><code>inputs:
+  company:
+
+steps:
+  - act: library:search-members
+    fields:
+      company: ${company}
+    then:
+      - whenever:              # every member, page after page
+          - whenever:          # every book each one has out
+              - when-offered:
+                  - act: library:renew</code></pre>
+<details class="more"><summary>The run, and the library's release</summary>
+  <ul>
+    <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 79 calls; 369,436 input tokens (228,342 sent, 141,094 read from cache); 13,641 output; 111 steps.</li>
+    <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The same in Kotlin: <code>whenever { whenever { whenOffered … } }</code>.</li>
+    <li><b>Run with no model</b> on a fresh library: 110 steps, the same fourteen books renewed, each once; the nine with a hold waiting or at the limit left.</li>
+    <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. The accounts search is as it was, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>
+  </ul>
+</details>
+</article>
+<nav class="foot"><a href="deck/five-members.html" rel="prev"><small>Back</small><b>Five members, no model</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#company">with heart-ts</a></span>
+<a href="deck/bloat.html" rel="next" data-rel="next"><small>Next</small><b>Isn't hypermedia bloated?</b></a></nav>
+</main></div></body></html>

@@ -1,0 +1,34 @@
+{
+  "name": "company",
+  "title": "A company of fifteen",
+  "part": "Scene six · a month later",
+  "fiction": true,
+  "number": 17,
+  "of": 23,
+  "html": "<h2>A company of fifteen</h2>\n<p class=\"setting\">A month later. The library has added company groups, and Harbor Point Logistics has signed up all fifteen of its staff.</p>\n<div class=\"script\">\n  <div class=\"line\"><span class=\"who priya\">Priya</span><p>Can the assistant renew for the whole company?</p></div>\n  <div class=\"line\"><span class=\"who sam\">Sam</span><p>Once the model finds the way. It searched the members by company, five to a page, and went through all three pages: every member, every book.</p></div>\n  <div class=\"line\"><span class=\"who priya\">Priya</span><p>And the script it kept?</p></div>\n  <div class=\"line\"><span class=\"who sam\">Sam</span><p>Names no one. A loop over every member the search lists, page after page, and inside it, a loop over each member's books. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>\n  <div class=\"line\"><span class=\"who priya\">Priya</span><p>And Ana's script, from before the company groups?</p></div>\n  <div class=\"line\"><span class=\"who sam\">Sam</span><p>Still runs. Its forms didn't change.</p></div>\n</div>\n<div class=\"stats\">\n  <div class=\"stat\"><b>79</b><span>model calls, once, to find the way</span></div>\n  <div class=\"stat\"><b>0</b><span>model calls each run after</span></div>\n  <div class=\"stat\"><b>14</b><span>books renewed, each once, across 15 members</span></div>\n</div>\n<pre><code>inputs:\n  company:\n\nsteps:\n  - act: library:search-members\n    fields:\n      company: ${company}\n    then:\n      - whenever:              # every member, page after page\n          - whenever:          # every book each one has out\n              - when-offered:\n                  - act: library:renew</code></pre>\n<details class=\"more\"><summary>The run, and the library's release</summary>\n  <ul>\n    <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 79 calls; 369,436 input tokens (228,342 sent, 141,094 read from cache); 13,641 output; 111 steps.</li>\n    <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The same in Kotlin: <code>whenever { whenever { whenOffered … } }</code>.</li>\n    <li><b>Run with no model</b> on a fresh library: 110 steps, the same fourteen books renewed, each once; the nine with a hold waiting or at the limit left.</li>\n    <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. The accounts search is as it was, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>\n  </ul>\n</details>\n",
+  "_links": {
+    "self": {
+      "href": "company.json"
+    },
+    "profile": {
+      "href": "https://w3id.org/heart-rise/hal-schema-forms"
+    },
+    "contents": {
+      "href": "contents.json",
+      "title": "Contents"
+    },
+    "prev": {
+      "href": "five-members.json",
+      "title": "Five members, no model"
+    },
+    "next": {
+      "href": "bloat.json",
+      "title": "Isn't hypermedia bloated?"
+    },
+    "alternate": {
+      "href": "company.html",
+      "type": "text/html",
+      "title": "This slide as a plain page"
+    }
+  }
+}

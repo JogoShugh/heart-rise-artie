@@ -1,0 +1,9 @@
+{
+  "name": "five-members",
+  "title": "Five members, no model",
+  "part": "Scene five · the next week",
+  "fiction": true,
+  "number": 16,
+  "of": 23,
+  "html": "<h2>Five members, no model</h2>\n<div class=\"script\">\n  <div class=\"line\"><span class=\"who priya\">Priya</span><p>Does it only work for Ana?</p></div>\n  <div class=\"line\"><span class=\"who sam\">Sam</span><p>It takes a name. Here are five, one after another. The model isn't called once.</p></div>\n</div>\n<div class=\"table-scroll\"><table>\n  <thead><tr><th>Member</th><th>Renewed</th><th>Left, and why</th><th>Model calls</th><th>Time</th></tr></thead>\n  <tbody>\n    <tr><td>Ana Torres</td><td><i>Matilda</i></td><td><i>The Hobbit</i> (hold waiting), <i>Charlotte's Web</i> (renewed the most allowed)</td><td>0</td><td>965 ms</td></tr>\n    <tr><td>David Miller</td><td><i>The Secret Garden</i>, <i>Holes</i></td><td>—</td><td>0</td><td>855 ms</td></tr>\n    <tr><td>Grace Okafor</td><td><i>Hatchet</i></td><td><i>Wonder</i> (hold waiting)</td><td>0</td><td>847 ms</td></tr>\n    <tr><td>Liam Chen</td><td>—</td><td><i>Coraline</i> (renewed the most allowed)</td><td>0</td><td>816 ms</td></tr>\n    <tr><td>Sofia Rossi</td><td><i>The Giver</i>, <i>Number the Stars</i></td><td><i>Frindle</i> (hold waiting)</td><td>0</td><td>828 ms</td></tr>\n  </tbody>\n</table></div>\n<p class=\"note\">Each renewed book is now due 2026-12-03. Each time is the whole run, most of it the client starting up.</p>\n<details class=\"more\"><summary>How it was run</summary>\n  <ul>\n    <li><code>artie/five-members.mjs</code> runs <code>member.heart.yaml</code> once for each name against the running library, and reads each member's books before and after, as plain JSON.</li>\n    <li>Each run's trace is in <code>artie/runs/</code>; the table is <code>artie/five-members.yaml</code>.</li>\n  </ul>\n</details>\n"
+}
