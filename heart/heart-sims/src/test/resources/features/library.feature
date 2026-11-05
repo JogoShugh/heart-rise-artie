@@ -98,6 +98,23 @@ Feature: Riverside Public Library: each loan offers what its state allows, to a 
       | 21000451 | 9999 | 401    |
       | 21000999 | 1234 | 401    |
 
+  Scenario Outline: An agent finds a member by name, and the account links the books they have out: <name>
+    The library opens with five members, each with books in different standings. An agent with the
+    library's token finds any of them by name.
+
+    Given the library as it opens, with its five members
+    When an agent searches the accounts for "<name>"
+    Then it finds exactly one account, "<name>"
+    And that account links <books>
+
+    Examples:
+      | name         | books                                |
+      | Ana Torres   | The Hobbit, Matilda, Charlotte's Web |
+      | David Miller | The Secret Garden, Holes             |
+      | Grace Okafor | Wonder, Hatchet                      |
+      | Liam Chen    | Coraline                             |
+      | Sofia Rossi  | The Giver, Frindle, Number the Stars |
+
   Scenario Outline: An OpenAPI client that follows the affordance link learns what loan <loan> allows now
     The library opts in to the affordance link (SPEC §6.1): a plain JSON answer keeps its body, with
     no controls in it, and names in a Link header the set of forms its state offers. A caller that

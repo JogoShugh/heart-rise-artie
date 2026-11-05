@@ -98,12 +98,10 @@ class HeartLibrary(private val ledger: Ledger) {
 
     private val accounts = HeartResource(
         layers = Layers(accountType),
-        load = { id ->
-            ledger.account().takeIf { it.card == id } ?: throw ResourceNotFoundException("no account $id")
-        },
+        load = { id -> ledger.account(id) ?: throw ResourceNotFoundException("no account $id") },
         perform = { current, _, _ -> Acted(current) },
         find = { name, id ->
-            listOf(ledger.account())
+            ledger.accounts()
                 .filter { id == null || it.card == id }
                 .filter { name == null || it.name.contains(name, ignoreCase = true) }
                 .map { Found(it.card, it.name) }

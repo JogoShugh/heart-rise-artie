@@ -9,6 +9,8 @@ import io.cucumber.java.en.When
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.util.Base64
 import kotlin.test.assertEquals
@@ -65,6 +67,26 @@ class LibrarySteps {
 
     @Then("the loan offers {}")
     fun offers(acts: String) = assertEquals(acts.split(", "), offered(), body())
+
+    @Given("the library as it opens, with its five members")
+    fun opens() = library.reset()
+
+    @When("an agent searches the accounts for {string}")
+    fun searchesAccounts(name: String) {
+        dialect = HSF
+        answer = send(Method.GET, "/accounts?name=${URLEncoder.encode(name, UTF_8)}", ACCEPT.getValue(HSF), AGENT)
+    }
+
+    @Then("it finds exactly one account, {string}")
+    fun findsOne(name: String) {
+        val found = items(json())
+        assertEquals(listOf(name), found.map { it["title"].asText() }, body())
+        answer = send(Method.GET, found.single()["href"].asText(), ACCEPT.getValue(HSF), AGENT)
+    }
+
+    @Then("that account links {}")
+    fun accountLinks(books: String) =
+        assertEquals(books.split(", "), items(json()).map { it["title"].asText() }, body())
 
     @When("an OpenAPI client reads loan {long} as plain JSON")
     fun readsPlain(loan: Long) {
@@ -171,11 +193,18 @@ class LibrarySteps {
 
     private fun json(): JsonNode = mapper.readTree(body())
 
+    /** The links a HAL answer gives under `item`, one or many. */
+    private fun items(node: JsonNode): List<JsonNode> =
+        node["_links"]?.get("item")?.let { if (it.isArray) it.toList() else listOf(it) }.orEmpty()
+
     private companion object {
         const val PIN = "1234"
         const val HSF = "HAL Schema Forms"
         const val HAL_FORMS = "HAL-FORMS"
         const val PROFILE = "<https://w3id.org/heart-rise/hal-schema-forms>"
+
+        /** An agent's credential: the library's Bearer token, not a member's card. */
+        const val AGENT = "Bearer ${HeartLibrary.TOKEN}"
 
         /** The affordance link of a plain JSON answer (SPEC §6.1): the set its state offers. */
         val FORMS_LINK = Regex("<([^>]+)>;\\s*rel=\"https://w3id.org/heart-rise/rels/forms\"")
