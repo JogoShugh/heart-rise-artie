@@ -157,22 +157,35 @@ class Bindings(
         return why.mark(why.kept(step), "act(intent = ${heart.script.kotlinString(words)})", listOf(call))
     }
 
-    /** The variable read from [pointer] in the answer of [step], made the first time it is needed. */
-    fun variable(step: Int, pointer: String): Variable = variables.getOrPut(step to pointer) {
+    /**
+     * The variable read from [pointer] in the answer of [step], made the first time it is needed; one for every member
+     * of a loop, read from whichever member the loop is at.
+     */
+    fun variable(step: Int, pointer: String): Variable = scope[step]?.let { loop ->
+        variables.values.firstOrNull { it.looped && it.keptAs == loop && it.pointer == pointer }
+    } ?: variables.getOrPut(step to pointer) {
+        // A loop's member is kept by the loop's name; a goal step's name names what is read from where it led.
+        val loop = scope[step]
+        val mark = loop ?: capture.step(step)?.let { capture.marks(it)["as"] }?.toString()
+        val name = named(step, pointer, mark, loop != null)
+        // The resource is kept once, by the name its goal step gave it, else by its first value's name.
+        val keptAs = mark ?: variables.values.firstOrNull { it.step == step }?.keptAs ?: name
+        Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)), keptAs, loop != null)
+    }
+
+    /**
+     * The name of the variable read from [pointer] at [step]: its slot's, where a reason step named it and it is read
+     * at that step alone; else [mark], the name of what it is read from, then its member's (issue's number is
+     * issueNumber); else its member's name.
+     */
+    private fun named(step: Int, pointer: String, mark: String?, looped: Boolean): String {
         val taken = variables.values.map { it.name }.toSet() + capture.inputs.keys
         // A member named as no identifier can be (an array's index, `/topics/0`) is named with its parent's name.
         val last = camel(pointer.substringAfterLast('/'))
         val named = last.takeIf { IDENTIFIER.matches(it) } ?: camel(pointer.removePrefix("/").replace('/', '_'))
-        // A goal step's name names what is read from where it led: issue's number is issueNumber.
-        // A loop's member is kept by the loop's name; a goal step's name names what is read from where it led.
-        val loop = scope[step]
-        val mark = loop ?: capture.step(step)?.let { capture.marks(it)["as"] }?.toString()
         val given = mark?.let { "$it${named.replaceFirstChar(Char::uppercase)}" }
-        val base = (if (loop == null) slotted[step to pointer] else null) ?: given ?: named
-        val name = if (base in taken) "$base$step" else base
-        // The resource is kept once, by the name its goal step gave it, else by its first value's name.
-        val keptAs = mark ?: variables.values.firstOrNull { it.step == step }?.keptAs ?: name
-        Variable(name, step, pointer, Variable.Kind.of(capture.step(step)?.read(pointer)), keptAs, loop != null)
+        val base = slotted[step to pointer]?.takeUnless { looped } ?: given ?: named
+        return if (base in taken) "$base$step" else base
     }
 
     /** Rule 2.2: text the script wrote literally, outside any slot of its reason template, or in its own line. */
@@ -219,12 +232,6 @@ class Bindings(
             ?.let { "step ${held.first} holds it at ${held.second}, and at ${it.joinToString(", ")} too" }
     }
 
-    private fun variableAs(variable: Variable, type: String?): String = when {
-        type == "string" && variable.kind != Variable.Kind.TEXT -> "\"$${variable.name}\""
-        type == "integer" && variable.kind == Variable.Kind.TEXT -> "${variable.name}.toLong()"
-        else -> variable.name
-    }
-
     private fun constant(value: Any?, type: String?): String = when {
         value == null -> "null"
         value is Number || value is Boolean -> value.toString()
@@ -247,6 +254,23 @@ class Bindings(
 
 internal fun Any?.list(): List<*> = this as? List<*> ?: emptyList<Any?>()
 
+/**
+ * The titles of the members of the loops [step] is inside, each with the variable that reads it from whichever member
+ * its loop is at: a model's words name a member by its title (`renew this book (Matilda)`), a script by its loop. The
+ * member a step is inside is its loop's last visit before it, as a run goes through one member at a time.
+ */
+internal fun Bindings.titles(capture: Capture, step: Step): Map<String, String> =
+    scope.entries.filter { it.key < step.number }.groupBy({ it.value }, { it.key }).values.mapNotNull { visits ->
+        val visit = capture.step(visits.max())
+        val title = visit?.params?.get("title")?.toString()?.takeIf { it.isNotEmpty() }
+        val member = visit?.state?.entries?.firstOrNull { title != null && it.value == title }?.key?.toString()
+        if (visit == null || title == null || member == null) {
+            null
+        } else {
+            title to variable(visit.number, "/" + member.replace("~", "~0").replace("/", "~1")).name
+        }
+    }.toMap()
+
 /** [write], with each step of [visits] a member of the loop it names: a value read from it is read by that name. */
 internal fun <T> Bindings.within(visits: Map<Int, String>, write: () -> T): T {
     val outer = scope
@@ -265,6 +289,13 @@ internal fun <T> Bindings.within(visits: Map<Int, String>, write: () -> T): T {
 internal fun reasonedWords(capture: Capture, step: Step): String =
     capture.marks(step)["reasoned"]?.toString()?.let { slotted(it, capture.inputs.keys) }
         ?: step.template ?: KotlinText.dollars(step.say)
+
+/** [variable] as a field of [type] takes it. */
+private fun variableAs(variable: Variable, type: String?): String = when {
+    type == "string" && variable.kind != Variable.Kind.TEXT -> "\"$${variable.name}\""
+    type == "integer" && variable.kind == Variable.Kind.TEXT -> "${variable.name}.toLong()"
+    else -> variable.name
+}
 
 /** The input [name] as a field of [type] takes it. */
 private fun inputAs(name: String, type: String?): String = when (type) {

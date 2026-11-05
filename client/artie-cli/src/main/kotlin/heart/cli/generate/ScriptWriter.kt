@@ -229,7 +229,7 @@ class ScriptWriter(
     private fun act(step: Step, pad: String): Pair<List<String>, String?> {
         val relation = why.relation(step, source)
         val arguments = bindings.arguments(step)
-        val intent = said(capture, step, names, arguments)
+        val intent = said(capture, step, names, arguments, bindings.titles(capture, step))
         reviews += arguments.count { it.review != null }
         val sent = arguments.associate { it.field to it.expression }
         val facts = checked(capture, step, sent.keys).takeIf { it.isNotEmpty() }?.joinToString(", ") {
@@ -313,9 +313,9 @@ internal fun reasoned(block: Block): Int = block.statements.sumOf { walked ->
  * A goal run's ([goal]) intent [words], each value an earlier answer gave put as the variable the script reads it
  * from, so the words say what the script does on another run: "get issue ${'$'}{number}", not the number it held.
  */
-private fun spoken(words: String, arguments: List<Argument>, goal: Boolean): String {
+private fun spoken(words: String, named: List<Pair<String, String>>, goal: Boolean): String {
     if (!goal) return words
-    return arguments.flatMap { it.named.entries }.filter { it.key.isNotEmpty() }.fold(words) { said, (text, name) ->
+    return named.filter { it.first.isNotEmpty() }.fold(words) { said, (text, name) ->
         Regex("(?<![\\w$])(?<!\\d\\.)${Regex.escape(text)}(?![\\w])(?!\\.\\d)").replace(said) { "\${$name}" }
     }
 }
@@ -325,8 +325,14 @@ private fun spoken(words: String, arguments: List<Argument>, goal: Boolean): Str
  * step whose job it did, or the script's; else `inferred = "…"`, the words a model chose it by, each value an
  * earlier answer gave put as the variable of [names] the script reads it from ([arguments]). Null when there are none.
  */
-private fun said(capture: Capture, step: Step, names: Set<String>, arguments: List<Argument>): String? {
-    val words = words(capture, step, names, arguments) ?: return null
+private fun said(
+    capture: Capture,
+    step: Step,
+    names: Set<String>,
+    arguments: List<Argument>,
+    titles: Map<String, String> = emptyMap(),
+): String? {
+    val words = words(capture, step, names, arguments, titles) ?: return null
     val from = words.fromIntent?.let { ", fromIntent = " + kotlinString(it) }.orEmpty()
     return words.intent?.let { "intent = " + kotlinString(it) }
         ?: ("inferred = " + kotlinString(words.inferred.orEmpty()) + from)
@@ -338,8 +344,17 @@ private fun said(capture: Capture, step: Step, names: Set<String>, arguments: Li
  */
 internal class Words(val intent: String?, val inferred: String?, val fromIntent: String?)
 
-/** [step]'s words, as [said] writes them: null when there are none. */
-internal fun words(capture: Capture, step: Step, names: Set<String>, arguments: List<Argument>): Words? {
+/**
+ * [step]'s words, as [said] writes them: null when there are none. Inside a loop, a member's title a model's words
+ * name is the variable of [titles] that reads it from whichever member the loop is at.
+ */
+internal fun words(
+    capture: Capture,
+    step: Step,
+    names: Set<String>,
+    arguments: List<Argument>,
+    titles: Map<String, String> = emptyMap(),
+): Words? {
     val goal = capture.source != null
     // A goal run's acts are the planner's, each in its words, but the act that did a step's job has the step's;
     // a script's are its author's, but where it said they were a model's.
@@ -353,7 +368,8 @@ internal fun words(capture: Capture, step: Step, names: Set<String>, arguments: 
     val from = if (goal) capture.marks(step)["fromIntent"]?.toString() else step.fromIntent
     return when {
         person != null -> Words(person, null, null)
-        inferred != null -> Words(null, spoken(inferred, arguments, goal), from)
+        inferred != null ->
+            Words(null, spoken(inferred, arguments.flatMap { it.named.toList() } + titles.toList(), goal), from)
         else -> null
     }
 }

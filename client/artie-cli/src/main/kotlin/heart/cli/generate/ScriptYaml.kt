@@ -197,7 +197,7 @@ class ScriptYaml(
         reviews += arguments.count { it.review != null }
         val act = linkedMapOf<String, Any?>("act" to step.relation)
         if (arguments.isNotEmpty()) act["fields"] = arguments.associate { it.field to noted(it) }
-        words(capture, step, names, arguments)?.let { act.putAll(said(it)) }
+        words(capture, step, names, arguments, bindings.titles(capture, step))?.let { act.putAll(said(it)) }
         val sent = arguments.associate { it.field to it.value }
         checked(capture, step, sent.keys).takeIf { it.isNotEmpty() }?.let { facts ->
             val check = facts.map { mapOf("field" to it.field, "is" to if (it.sent) sent[it.field] else it.value) }

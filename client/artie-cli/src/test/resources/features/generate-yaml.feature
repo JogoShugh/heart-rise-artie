@@ -229,7 +229,7 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
               then:
                 - when-offered:
                     - act: library:renew
-                      inferred: renew this book (Matilda)
+                      inferred: renew this book (${loan.title})
                       from-intent: "For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed"
                       then: []
                   intent: "For each book she has out: renew it if renewing is offered; otherwise say why it can't be renewed"
@@ -261,6 +261,28 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       | form | out            | follows                                                                                 |
       | yaml | gen.heart.yaml | title: ${member}                                                                         |
       | kts  | gen.heart.kts  | follow("item", member, intent = "Find the account of the member named ${member}") {    |
+
+  Scenario Outline: The words a model chose an act by, inside a loop, name the member the loop is at: <form>
+    The model said why it renewed a book with the book's title, Matilda. In
+    a loop over every book, the words read the title of whichever book the
+    loop is at, so no title the run met is written in the script.
+    Given the file "run.trace.yaml" is the capture "library-member.trace.yaml"
+    When artie is run with
+      | argument       |
+      | generate       |
+      | run.trace.yaml |
+      | --out          |
+      | <out>          |
+      | --format       |
+      | <form>         |
+    Then artie exits 0
+    And the file "<out>" mentions '<words>'
+    And the file "<out>" mentions "Matilda" nowhere
+
+    Examples:
+      | form | out            | words                                         |
+      | yaml | gen.heart.yaml | inferred: renew this book (${loan.title})     |
+      | kts  | gen.heart.kts  | inferred = "renew this book (${loanTitle})"   |
 
   Scenario Outline: A list the run went through, page after page, is one loop, and each member's own list is another, as <form>
     A goal run found the members of a company group, five to a page, and

@@ -25,7 +25,7 @@ steps:
             then:
               - when-offered:
                   - act: library:renew
-                    inferred: renew this book (Matilda)
+                    inferred: renew this book (${loan.title})
                     from-intent: "For each book they have out: renew it if renewing is offered; otherwise say why it can't be renewed"
                     then: []
                 intent: "For each book they have out: renew it if renewing is offered; otherwise say why it can't be renewed"
