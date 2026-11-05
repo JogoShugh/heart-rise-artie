@@ -21,7 +21,8 @@ steps:
         title: ${member}
         intent: Find the account of the member named ${member}
         then:
-          - whenever:
+          - for-each: loan
+            then:
               - when-offered:
                   - act: library:renew
                     inferred: renew this book (Matilda)

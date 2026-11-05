@@ -16,8 +16,10 @@ steps:
       company: ${company}
     intent: Find the members of the company group ${company}
     then:
-      - whenever:
-          - whenever:
+      - for-each: member
+        then:
+          - for-each: loan
+            then:
               - when-offered:
                   - act: library:renew
                     inferred: renew the book
