@@ -17,8 +17,16 @@ const out = join(repo, "docs/reports/overheard-at-riverside");
 const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
 const BRAND = "Overheard at Riverside";
 
+// A scene's points: the same slide's topic as plain bullets, in place of its conversation when a reader asks for
+// points. Both are in the slide's HTML; the page shows one (deck.css, data-voice).
+const withPoints = (s) => {
+  if (!s.points) return s;
+  const list = `<ul class="points">${s.points.map((p) => `<li>${p}</li>`).join("")}</ul>\n`;
+  const at = s.html.indexOf('<div class="script">');
+  return { ...s, html: at < 0 ? s.html + list : s.html.slice(0, at) + list + s.html.slice(at) };
+};
 const slides = readdirSync(join(here, "slides")).filter((f) => f.endsWith(".yaml")).sort()
-  .map((f) => parse(readFileSync(join(here, "slides", f), "utf8")));
+  .map((f) => withPoints(parse(readFileSync(join(here, "slides", f), "utf8"))));
 const names = new Set(slides.map((s) => s.name));
 if (names.size !== slides.length) throw new Error("two slides share a name");
 if (new Set(slides.map((s) => s.title)).size !== slides.length) throw new Error("two slides share a title");

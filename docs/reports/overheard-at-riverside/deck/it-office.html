@@ -11,6 +11,7 @@
 <h2>The IT office</h2>
 <figure><img src="media/openapi-list.png" alt="Swagger UI for Riverside Public Library, whose description says which acts a resource allows depends on its state: GET /accounts, GET /accounts/{id}, GET /loans, GET /loans/{id}, POST /loans/{id}/actions/renew, POST /loans/{id}/actions/return." loading="lazy"><figcaption>The library's API as HEART serves it in OpenAPI, shown in Swagger UI: every operation, for every loan alike. It says so itself: which acts a resource allows depends on its state, which the document can only describe in prose.</figcaption></figure>
 <p class="setting">Today. Priya, who builds the library's API, has it on her screen. Sam builds the assistant that renews books for members.</p>
+<ul class="points"><li>A typical JSON API: data in each answer, operations in an OpenAPI document, the same for every state.</li><li>An agent that reads the document learns a rule only when it is refused.</li><li>An OpenAPI document is forms.html with a Try it out button: complete, static, and out of band.</li></ul>
 <div class="script">
   <div class="line"><span class="who priya">Priya</span><p>There's the loans API. Every operation, every field, every status code.</p></div>
   <div class="line"><span class="who sam">Sam</span><p>And renew, for every loan. My agent sent one for <i>The Hobbit</i> and got a 409.</p></div>

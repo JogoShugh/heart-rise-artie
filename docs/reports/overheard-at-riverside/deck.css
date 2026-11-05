@@ -93,6 +93,12 @@ details.more > :not(summary) + :not(summary) { margin-top: 0.6rem; }
 /* The conversations, set as a script */
 .setting { font: italic 500 1rem/1.5 var(--display); color: var(--muted); }
 .script { display: grid; gap: 0.55rem; }
+/* A scene told as points: its topic in plain bullets, in place of the conversation and its setting. */
+.slide .points { display: none; gap: 0.5rem; font: 500 1.08rem/1.5 var(--display); }
+.slide .points li::marker { color: var(--leaf); }
+:root[data-voice="points"] .slide .points { display: grid; }
+:root[data-voice="points"] .script, :root[data-voice="points"] .setting,
+:root[data-voice="points"] .slide .fiction { display: none; }
 .line { display: grid; grid-template-columns: 5.2rem minmax(0, 1fr); gap: 0.8rem; align-items: baseline; }
 .line .who { font: 600 0.72rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--leaf); text-align: right; }
 .line .who.ana { color: var(--hold); }

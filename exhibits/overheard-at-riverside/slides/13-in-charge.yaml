@@ -69,3 +69,7 @@ html: |
   versionOf = { it.version }</code></pre>
     <p class="note">heart-core writes the wire from it. For an API you don't own, the HEART gateway does the same from its OpenAPI description, with your own controls in front.</p>
   </details>
+points:
+  - "The acts are declared once, with what each state offers and why one is absent. HEART serves HTML, HAL-FORMS, HAL Schema Forms and an OpenAPI twin from that one declaration."
+  - "A client that asks for application/json gets what it got before: adopting HEART is backward compatible."
+  - "A form is an offer, not a permission: an act sent anyway is refused with 409 and the reason."

@@ -11,7 +11,8 @@
 <h2>The help line</h2>
 <p class="setting">Fall 1997, a Tuesday evening, in the web that wasn't. Ana Torres has three library books due. She calls Riverside Public Library, and Marcus answers.</p>
 <div class="pair">
-  <div class="script">
+  <ul class="points"><li>A web without forms: every act is documented once, in one page (forms.html), the same for every loan.</li><li>The client builds each request by hand from that page: method, address template, fields.</li><li>Identifiers come out of band: the loan number has to be found elsewhere and typed in.</li></ul>
+<div class="script">
     <div class="line"><span class="who ana">Ana</span><p>I'm trying to renew my books online, and I think I'm doing it wrong.</p></div>
     <div class="line"><span class="who marcus">Marcus</span><p>Do you have forms.html open?</p></div>
     <div class="line"><span class="who ana">Ana</span><p>It says, “To do something, type its address into your browser.” Number three, in capitals: RENEW A LOAN. Method, POST. Address, <code>/cgi-bin/library.cgi/loans/{loanId}/renew</code>.</p></div>

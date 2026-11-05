@@ -53,3 +53,7 @@ html: |
   }</code></pre>
     <p class="note">From <code>live/openapi-client.mjs</code>, an OpenAPI client of the running library service; every exchange is in <code>openapi-optin.capture.yaml</code>. The description's <code>x-heart-affordances</code> names the header, the relation, and how to match.</p>
   </details>
+points:
+  - "A plain JSON answer can carry one Link header that names the form set its state offers."
+  - "An OpenAPI client that reads it sends only what is allowed now; one that ignores it sees no change."
+  - "Each set is fetched once by its address and checked against its integrity."

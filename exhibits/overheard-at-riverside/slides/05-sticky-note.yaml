@@ -19,3 +19,7 @@ html: |
       <li>forms.yaml lists the card and PIN as query parameters of the loans list, so forms.html tells her to type them there.</li>
     </ul>
   </details>
+points:
+  - "The data arrives without controls: loan numbers are text, not links, so the person copies them down."
+  - "Credentials travel in the address, because the documentation says to put them there."
+  - "The person is the integration layer: method, address and body typed exactly as documented."

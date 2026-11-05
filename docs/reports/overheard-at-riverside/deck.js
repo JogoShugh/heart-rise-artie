@@ -211,6 +211,21 @@
   });
   list.addEventListener("click", function () { outline.classList.remove("open"); toggle.setAttribute("aria-expanded", "false"); });
 
+  // How each scene is told: its conversation, or its points as plain bullets. Every scene's HTML holds both.
+  function voice(told) {
+    document.documentElement.dataset.voice = told;
+    document.querySelectorAll("button[data-voice]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.voice === told));
+    });
+    try { localStorage.setItem("overheard-voice", told); } catch (e) { /* kept for this visit only */ }
+  }
+  document.querySelectorAll("button[data-voice]").forEach(function (button) {
+    button.addEventListener("click", function () { voice(button.dataset.voice); });
+  });
+  var told = "talk";
+  try { told = localStorage.getItem("overheard-voice") === "points" ? "points" : "talk"; } catch (e) { /* the conversation, then */ }
+  voice(told);
+
   var kept = "heart";
   try { kept = localStorage.getItem("overheard-mode") === "plain" ? "plain" : "heart"; } catch (e) { /* HEART, then */ }
   start(kept, decodeURIComponent(location.hash.slice(1)));

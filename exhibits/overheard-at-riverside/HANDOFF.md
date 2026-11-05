@@ -4,7 +4,7 @@ Written 2026-11-04 (evening), to pick up later.
 
 ## Where things are
 
-- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 9, 23 slides. It is built from
+- **The deck:** <https://claude.ai/artifact/CpbXk1kmDDH6cPo8mtrLnE>, version 10, 24 slides. It is built from
   `exhibits/overheard-at-riverside/` (`slides/*.yaml`, `page/`, `build.mjs`) into
   `docs/reports/overheard-at-riverside/`. To rebuild, run
   `node build.mjs --artifact <scratch>/overheard-at-riverside.html` in the exhibit folder, then publish that file
@@ -69,7 +69,7 @@ Written 2026-11-04 (evening), to pick up later.
 - **The IT office screenshot** (`exhibits/overheard-at-riverside/media/openapi-list.png`) predates the company
   release. It shows 6 operations; the library now has 8 (search-members, get-member). Re-shoot it, or leave it as
   the moment before the release.
-- **The deck's notes slide** (`slides/23-notes.yaml`) doesn't mention the name and company runs, the generator
+- **The deck's notes slide** (`slides/24-notes.yaml`) doesn't mention the name and company runs, the generator
   changes, or the rung measurements yet.
 - **The ARTIE run report** says "return ×7", meaning ARTIE's return-to steps rather than the Return act. Kept
   scripts note "none of these acts is offered here" where the server's reason would be better.

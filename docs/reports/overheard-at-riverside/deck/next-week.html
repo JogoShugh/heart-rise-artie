@@ -10,8 +10,9 @@
 <article class="slide"><header><span class="part">Scene five · the next week</span><span class="fiction">Fiction</span></header>
 <h2>The next week</h2>
 <p class="setting">Ana comes in to return a book. Sam shows her the assistant; Priya is at the next desk.</p>
+<ul class="points"><li>One goal in plain words, run once with a model (11 calls), found the way for a member.</li><li>The run is kept as a script that takes the member's name; every run after it calls no model.</li><li>The script is pinned by what each form does, not by its address: a moved form is followed, a changed form stops the run.</li><li>The results match the human web: the same renewals and reasons Ana sees on her phone.</li></ul>
 <div class="script">
-  <div class="line"><span class="who sam">Sam</span><p>You told it once: “Renew each of my books that can be renewed, and say why for any that can't.”</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>We told it once, in plain words, what to do for a member: renew each book that can be renewed, and say why for any that can't. Then we gave it your name.</p></div>
   <div class="line"><span class="who ana">Ana</span><p>And?</p></div>
   <div class="line"><span class="who sam">Sam</span><p>It renewed <i>Matilda</i>. It said <i>The Hobbit</i> has no renew form, because a hold is waiting, and that <i>Charlotte's Web</i> was renewed the most allowed.</p></div>
   <div class="line"><span class="who ana">Ana</span><p>That's what my phone says.</p></div>
@@ -28,7 +29,16 @@
   <div class="stat"><b>11</b><span>model calls, once, to find the way</span></div>
   <div class="stat"><b>0</b><span>model calls each run after</span></div>
 </div>
-<details class="more"><summary>The kept script, and the run</summary>
+<div class="pair">
+  <div><span class="label">What they wrote: member.goal.md</span>
+<pre><code>Renew each book a member has out that can be
+renewed, and say why for any that can't.
+
+- Find the account of the member named {member}
+  - For each book they have out: renew it if
+    renewing is offered; otherwise say why it
+    can't be renewed</code></pre></div>
+  <div><span class="label">What ARTIE kept: member.heart.yaml</span>
 <pre><code>inputs:
   member:
 
@@ -43,15 +53,19 @@ steps:
           - for-each: loan
             then:
               - when-offered:
-                  - act: library:renew</code></pre>
+                  - act: library:renew
+                    inferred: renew this book (${loan.title})</code></pre></div>
+</div>
+<details class="more"><summary>The run, and what the script keeps of the goal</summary>
   <ul>
-    <li><b>Kept</b> by <code>artie generate</code> from the run: the member found by the name it is given, then every book their account links, renewed when it offers renew. No name is written in it.</li>
+    <li><b>The goal's words</b> stay in the script, beside the step they asked for: each step's <code>intent</code>, and the model's own words for each act it chose, <code>inferred</code>. No member's name or book's title the run met is written in it.</li>
+    <li><b>Kept</b> by <code>artie generate</code> from the run: the member found by the name it is given, then every book their account links, renewed when it offers renew.</li>
     <li><b>Pinned</b> by what the form does, its act, not its address: a moved form costs no model call; a changed one stops the run.</li>
     <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Ana Torres; 11 calls; 28,359 input tokens (8,713 sent, 17,860 read from cache, 1,786 written to it); 2,108 output.</li>
   </ul>
 </details>
 </article>
-<nav class="foot"><a href="deck/openapi-opt-in.html" rel="prev"><small>Back</small><b>An OpenAPI client can opt in</b></a>
+<nav class="foot"><a href="deck/ai-driven.html" rel="prev"><small>Back</small><b>Some sort of AI-driven</b></a>
 <span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#next-week">with heart-ts</a></span>
 <a href="deck/five-members.html" rel="next" data-rel="next"><small>Next</small><b>Five members, no model</b></a></nav>
 </main></div></body></html>
