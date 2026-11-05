@@ -71,7 +71,7 @@ Feature: Sync at L0: enter a service and read one collapsed response
     When the client enters "http://garden.test/beds/2"
     Then the client holds the ETag "seq-1.hsf.L0"
 
-  Scenario Outline: A response that does not name the hal-schema-forms profile is refused: <case>
+  Scenario Outline: A response that does not name the hal-schema-forms profile is read as data only: <case>
     Given the service answers GET "http://garden.test/beds/9" with:
       """
       200 OK
@@ -80,8 +80,12 @@ Feature: Sync at L0: enter a service and read one collapsed response
 
       id: 9
       """
-    When the client tries to enter "http://garden.test/beds/9"
-    Then the client raised an error mentioning "profile"
+    When the client enters "http://garden.test/beds/9"
+    Then the resource state contains:
+      | key | value |
+      | id  | 9     |
+    And the manifest offers exactly
+      | act |
 
     Examples:
       | case                 | profile header                                                          |
