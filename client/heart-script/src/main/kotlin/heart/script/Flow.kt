@@ -86,5 +86,19 @@ fun Here.members(rel: String = "item", block: Here.() -> Unit) {
     if (held.address != start) held = arrived(step, "\"$rel\"", navigator.visit(start))
 }
 
+/**
+ * Visit each member the held list links under [rel], page after page, as `members` does, each kept as [named] while
+ * [block] runs, however deep: `${named.field}` in a script held as data, `kept(named)` in Kotlin. A loop inside that
+ * keeps the same name hides this one's member only while it runs; after it, the name is this member again.
+ */
+fun Here.each(named: String, rel: String = "item", block: Here.() -> Unit) {
+    val outer = run.kept[named]
+    members(rel) {
+        keepAs(named)
+        block()
+    }
+    if (outer == null) run.kept.remove(named) else run.kept[named] = outer
+}
+
 /** The IANA relation a list's next page is linked by (RFC 8288, RFC 5005). */
 private const val NEXT = "next"

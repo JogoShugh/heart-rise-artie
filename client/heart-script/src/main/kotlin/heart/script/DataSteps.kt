@@ -135,6 +135,9 @@ internal val MAKERS: Map<String, Maker> = linkedMapOf(
         }
     },
     "whenever" to Maker(setOf("whenever")) { step, reading -> whenever { inner(step, "whenever", reading) } },
+    "for-each" to Maker(setOf("for-each", "follow", "then")) { step, reading ->
+        each(step["for-each"].toString(), step["follow"]?.toString() ?: "item") { inner(step, "then", reading) }
+    },
     "has" to Maker(setOf("has")) { step, reading -> has(facts(step["has"], reading)) },
     "made-by" to Maker(setOf("made-by")) { step, reading -> madeBy(reading.text(step["made-by"].toString())) },
     "saying" to Maker(setOf("saying")) { step, reading -> saying(reading.text(step["saying"].toString())) },

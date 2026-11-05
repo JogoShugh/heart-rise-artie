@@ -91,6 +91,7 @@
         { "$ref": "#/$defs/at" },
         { "$ref": "#/$defs/listeners" },
         { "$ref": "#/$defs/whenever" },
+        { "$ref": "#/$defs/for-each" },
         { "$ref": "#/$defs/has" },
         { "$ref": "#/$defs/madeBy" },
         { "$ref": "#/$defs/saying" },
@@ -275,6 +276,15 @@
       "description": "whenever { … }: the steps, for each member of the list held, its turn when it changes.",
       "type": "object", "required": ["whenever"], "additionalProperties": false,
       "properties": { "whenever": { "$ref": "#/$defs/steps" } }
+    },
+    "for-each": {
+      "description": "each(named) { … }: the steps, for each member the list held links under follow (item unless it says), page after page, the member kept by this name while they run: ${name.field}.",
+      "type": "object", "required": ["for-each"], "additionalProperties": false,
+      "properties": {
+        "for-each": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]*$" },
+        "follow": { "$ref": "#/$defs/relation" },
+        "then": { "$ref": "#/$defs/steps" }
+      }
     },
     "has": {
       "type": "object", "required": ["has"], "additionalProperties": false,
