@@ -204,6 +204,172 @@ is the same loop ARTIE runs, and the same one a person runs in a browser.
 - **The deck:** a scene seven, "The library calls back", with its 1997 counterpart: a postcard, addressed in
   Ana's own hand.
 
+## Second pass: merit, caching, location, templates
+
+Written after the author asked whether this is SOAP again.
+
+### Merit, and the death star to avoid
+
+SOAP and WS-* grew into a death star for four reasons:
+
+- an envelope around every message, with headers stacked on it (Addressing, ReliableMessaging, Security,
+  Coordination);
+- every operation tunnelled through POST to one endpoint, so HTTP's methods, status codes and caching did no work;
+- code generated from WSDL on both sides, which welded them together;
+- an orchestration engine in the middle.
+
+RISE, kept as it is here, adds one link, uses HTTP as written (GET, POST, ETag, 202, 409, 412, 422, caching), and
+makes the reply an ordinary HEART resource. It is choreography, not orchestration: each party acts on what it was
+handed. It scales the way webhooks already scale at GitHub and Stripe, with reply shapes that are content-addressed
+and shared.
+
+The death star returns only if the spec mandates any of these:
+
+- reliable-messaging machinery;
+- distributed transactions or sagas;
+- §7.6's fallback agent directory;
+- a fixed security-token format;
+- several callback modes as protocol.
+
+The rule that keeps it out: **anything that can be a resource with forms does not become a keyword.**
+
+### Caching at wake-up: confirmed
+
+A reply form set at L2 is immutable and named by its own digest.
+
+- **On receipt.** The recipient fetches the set and checks its integrity when the request arrives, not when the
+  work is done. If it can't produce what the schema asks for, it refuses then and there (422), not three weeks
+  later.
+- **At wake-up.** The set is a local cache hit. An egress caching proxy can share it across the recipient's whole
+  fleet, as a reverse proxy shares sets among clients.
+- **On the way out.** The only trip across the network is the POST to the originator.
+- **The version tag.** A recipient that doesn't read the reply first has no version to send with `If-Match`. The
+  envelope can carry the reply resource's version. If the originator has cancelled since, the POST gets a 412, and
+  only then does the recipient read. The happy path stays a single trip.
+
+### A changed location
+
+Any change to a set's bytes gives it a new digest automatically. Nothing needs invalidating: the old entry is
+simply no longer referenced.
+
+The per-request reply address therefore stays **out** of the set:
+
+- **A templated target.** The set's target is a template such as `{reply}/actions/deliver`, filled from the
+  envelope, as `hr:templatePointers` fills `{id}` from a loan today.
+- **Moving the inbox is data.** It is a new envelope with the same digest, and the cache stays warm.
+- **Changing the shape is a material change.** A different path pattern, method or schema is a new digest and one
+  cache miss.
+
+This is the same split as the leniency already built: ARTIE pins what a form does, not where it points.
+
+### Templates are forms
+
+Once forms are sent, the template already exists: it is the form's schema, with types, required fields, titles and
+validation. A text blob with placeholders is a weaker form, with untyped slots whose meaning lives out of band, so
+it is better left out.
+
+The hard part is the mapping: turning the recipient's own result into the originator's fields. There are two
+in-band answers:
+
+1. **A shared vocabulary.** Fields are named by profile relations. The recipient maps its data to the vocabulary
+   once, and every originator using those relations works. This is the shared-vocabulary work parked in
+   FIELDING-REVIEW.
+2. **A model once, kept by digest.** The first time a recipient sees a set's digest, a model maps its result onto
+   that schema, and the mapping is kept under the digest.
+   - Same digest means same schema, so the kept mapping is valid by construction and no model is called again.
+   - A new digest means one repair.
+   - This is ARTIE's "find the way once, keep it", with the content address as the key: GenAI at the edge.
+
+Start with the second, which needs no prior agreement between parties. The first makes it cheaper as relations
+come to be shared.
+
+## Many consumers of one event
+
+The question: in event- or message-based integration, one service publishes and N services consume. Does that
+work in a HEART and RISE world, or is out-of-band coupling built into it?
+
+### Where pub/sub hides its coupling
+
+Pub/sub decouples *who*: the publisher doesn't know its consumers. It doesn't decouple *what*. Every consumer
+knows these things out of band:
+
+| What the consumer must know | How it usually knows |
+|---|---|
+| Where to listen: the broker, the topic or stream name | Configuration, a wiki page |
+| What the events mean: "LoanRenewed" | A schema registry, naming conventions |
+| The payload's shape, and how it may evolve | Avro or JSON Schema in a registry, compatibility rules |
+| What it may do in response | Another API, known separately |
+| Order and duplicates | Assumptions, partition keys, idempotency code in every consumer |
+
+A fat event is the Great Divorce again: information with no controls. A consumer that wants to act has to know,
+out of band, which API to call and what is allowed now.
+
+### The HEART answer: the event is a hint, the resource is the truth
+
+PLAN-LISTENERS already settled it: **events are hints, never truth.** A hint says that a resource may have changed.
+The consumer reads the resource and acts only on what it offers now, with its validator. Applied to N consumers,
+that removes most of the table:
+
+- **A thin event.** The event carries a link to the resource, the resource's version after the change, and the
+  kind of change as a relation URI. It doesn't carry the state, and it doesn't need a schema registry.
+- **The read.** Each consumer reads the resource and gets HEART's state and the controls that state allows, with
+  shared form sets by digest. What it can do in response is in that answer, not in another API.
+- **Order and duplicates stop mattering.** A late or repeated hint leads to a read of the *current* state. A
+  consumer that already holds that version gets a 304. Idempotency comes from the version, not from code in every
+  consumer.
+- **N reads, one fetch from the origin.** N consumers read the same version of the same resource. A shared cache,
+  with request collapsing, turns that into one fetch from the publisher. The version in the event lets each reader
+  ask conditionally.
+- **The fat-event option stays, as an optimization.** A publisher may embed the representation, as HAL's
+  `_embedded` does. Its forms stay linked by digest, so even a fat event carries no copied contract.
+
+### What can't be removed, and how small it gets
+
+Some coupling is inherent, and Fielding accepts it: the media type and the meaning of relations. The aim is that
+nothing else is shared out of band.
+
+| Coupling | In a HEART and RISE world |
+|---|---|
+| Where to listen | A link. A collection or resource links its event stream (an `hr:events`-style relation); the consumer finds it from the bookmark, like any link |
+| How to subscribe | A form. "Subscribe" is an act the stream offers, its kinds of event an `hr:options` choice from a list resource, the same mechanism as the problem kinds |
+| What an event means | A relation URI in the publisher's profile (ALPS): `library:renewed`, `library:hold-cleared`. Dereferenceable, so in band; shared vocabulary is the irreducible part |
+| The event envelope | An existing standard, not a new one: CloudEvents. `type` is the relation URI, `subject` or `dataref` the resource's link, an extension carries the version |
+| What the consumer may do next | The forms on the resource it reads |
+| Order and duplicates | The version, plus conditional reads |
+
+### Two delivery shapes, both HEART
+
+1. **Push to subscribers, through a standing envelope.** Subscribing hands the publisher an envelope, as in RISE,
+   but a standing one: the consumer's inbox is a resource that accepts many deliveries.
+   - **States act as backpressure.** The inbox's states are active, paused and cancelled. A paused inbox offers
+     no deliver form, so the publisher's next delivery gets a 409 and stops. The consumer controls the rate by
+     changing its own state.
+   - **Each subscriber can ask for its own shape.** The publisher's mapping is kept by the digest of each
+     subscriber's form set, so a thousand subscribers on the same set cost one mapping.
+   - **The cost** is N deliveries per event. That is fine for tens or hundreds of subscribers, which is webhooks'
+     territory.
+2. **A feed, read by many.** The stream is itself a paged HEART resource, as Atom feeds were for event-driven
+   REST (*REST in Practice*).
+   - **Archived pages never change.** They are named by content and cached for good.
+   - **Only the head page is Layer 1.** It is read with `If-None-Match`, mostly getting 304s.
+   - **Fan-out is the cache's job.** A thousand consumers polling cost the publisher close to one, because caches
+     absorb them.
+   - **Latency.** A push or broker nudge can carry just "the head moved", for consumers that want it sooner. The
+     nudge is a hint; the feed is the truth.
+   - **A broker** fits here as a carrier of hints, never as the system of record for the meaning of events.
+
+### Verdict
+
+It is realistic, and it is less coupled than pub/sub as usually practised. What remains shared:
+
+- the bookmark;
+- the media type (HAL Schema Forms, CloudEvents);
+- the publisher's relation vocabulary, which is in band because each relation is a URI with its meaning behind it.
+
+Topic names, payload schemas, the API for responding, and the ordering rules all come from links, forms and
+versions read at run time. The price is one read per consumer per change, and caching and request collapsing make
+that close to free at the origin.
+
 ## Open questions
 
 1. **What the envelope must hold.** Is it a link only, with everything else optional (as proposed here)? Or
