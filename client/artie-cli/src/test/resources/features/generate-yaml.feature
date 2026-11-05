@@ -259,6 +259,47 @@ Feature: artie generate --format yaml: a run's capture, made a script held as da
       | yaml | gen.heart.yaml | title: ${member}                                                                         |
       | kts  | gen.heart.kts  | follow("item", member, intent = "Find the account of the member named ${member}") {    |
 
+  Scenario Outline: A list the run went through, page after page, is one loop, and each member's own list is another, as <form>
+    A goal run found the members of a company group, five to a page, and
+    went through every member on every page, following each page's next
+    link, and through each member's books, renewing those that offered it.
+    The script names no member, no book and no page: it goes through every
+    member the search lists, on however many pages, and every book each has
+    out, each time it runs. A member with one book is a list of one.
+    Given the file "run.trace.yaml" is the capture "library-company.trace.yaml"
+    When artie is run with
+      | argument       |
+      | generate       |
+      | run.trace.yaml |
+      | --out          |
+      | <out>          |
+      | --format       |
+      | <form>         |
+    Then artie exits 0
+    And the file "<out>" has 2 lines that read "<loop>"
+    And the file "<out>" has 1 line that reads "<offered>"
+    And the file "<out>" mentions "<follow>" nowhere
+    And the file "<out>" mentions "Maria Garcia" nowhere
+    And the file "<out>" mentions "The Westing Game" nowhere
+
+    Examples:
+      | form | out            | loop        | offered         | follow  |
+      | yaml | gen.heart.yaml | - whenever: | - when-offered: | follow: |
+      | kts  | gen.heart.kts  | whenever {  | whenOffered(    | follow( |
+
+  Scenario: The company script, held as data, is a script as data
+    Given the file "run.trace.yaml" is the capture "library-company.trace.yaml"
+    When artie is run with
+      | argument       |
+      | generate       |
+      | run.trace.yaml |
+      | --out          |
+      | gen.heart.yaml |
+      | --format       |
+      | yaml           |
+    Then artie exits 0
+    And the file "gen.heart.yaml" is a script as data, by spec/schemas/heart-script.draft.schema.json
+
   Scenario: An input the run sent as a number is declared with its type
     A script's inputs arrive as text. Where the run sent an input as an
     integer, the Kotlin script says number.toLong(); held as data, the input

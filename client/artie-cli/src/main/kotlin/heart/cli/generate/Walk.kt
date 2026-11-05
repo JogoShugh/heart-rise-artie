@@ -14,6 +14,8 @@ class Block(
     val watched: String?,
     /** The steps nested in it, as the run nested them. */
     val statements: List<Walked>,
+    /** The titles of the items the resource it was opened at linked: the list its follows went through, if any. */
+    val listed: List<String> = emptyList(),
 )
 
 /** One statement of a generated script: a step of the run, and its row. */

@@ -133,12 +133,19 @@ class ScriptWriter(
     private fun block(block: Block, depth: Int): List<String> {
         val pad = INDENT.repeat(depth)
         val watched = block.watched?.let { listOf("${pad}keepAs(\"$it\")") }.orEmpty()
-        // A list's members visited one by one: a whenever, each acted on by what it offers (Members.kt).
-        members(block)?.let { members ->
+        // A list the run went through: a whenever, each member acted on by what it offers, or its own list in turn
+        // (Members.kt), as the script held as data writes it.
+        fun over(loop: Loop, at: Int): List<String> {
+            val padded = INDENT.repeat(at)
+            loop.inner?.let { return listOf("${padded}whenever {") + over(it, at + 1) + "$padded}" }
+            val words = words(capture, loop.members.first().step, names, emptyList())
+                ?.let { it.fromIntent ?: it.intent }
+            val cases = cases(loop.members).map { it.step.relation.orEmpty() to statement(it, at + CASE_DEPTH) }
+            return overMembers(at, words, cases)
+        }
+        loop(block) { capture.inputGiven(it) != null }?.let { loop ->
             looped = true
-            val words = words(capture, members.first().step, names, emptyList())?.let { it.fromIntent ?: it.intent }
-            val cases = cases(members).map { it.step.relation.orEmpty() to statement(it, depth + CASE_DEPTH) }
-            return reads(block.keeps, depth) + watched + overMembers(depth, words, cases)
+            return reads(block.keeps, depth) + watched + over(loop, depth)
         }
         val decided = decided(block, capture)
         val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
@@ -259,7 +266,7 @@ internal class Walker(
         val keeps = bindings.variables.values.filter { it.step == node.step.number }.distinctBy { it.keptAs }
         // A resource the watch reads again and a value read from it are kept once, by the one name.
         val watched = watch.kept(node.step).takeIf { keeps.isEmpty() }
-        return Block(keeps, watched, node.children.mapNotNull(::walked))
+        return Block(keeps, watched, node.children.mapNotNull(::walked), node.step.items)
     }
 
     /** What [node]'s step is in the script: a selection, a sync, a wait or a check; null for none of these. */

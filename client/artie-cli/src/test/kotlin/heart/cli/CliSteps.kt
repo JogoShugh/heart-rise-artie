@@ -126,6 +126,10 @@ class CliSteps(private val script: ScriptSteps) {
         assertEquals(found.sorted(), found, lines.joinToString("\n"))
     }
 
+    @Then("the file {string} mentions {string} nowhere")
+    fun mentionsNowhere(name: String, text: String) =
+        assertEquals(emptyList(), Files.readAllLines(folder.resolve(name)).filter { text in it })
+
     @Then("the file {string} has {int} line(s) that read(s) {string}")
     fun hasCount(name: String, count: Int, line: String) =
         assertEquals(count, Files.readAllLines(folder.resolve(name)).count { it.trim() == line })

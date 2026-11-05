@@ -117,7 +117,10 @@ class ScriptYaml(
      * before it opens a block that might read it.
      */
     private fun steps(block: Block): List<Map<String, Any?>> {
-        members(block)?.let { return keeps(block) + overMembers(it) }
+        // A list the run went through: a whenever over it, with what each member offers, or its own list (Members.kt).
+        fun over(loop: Loop): List<Map<String, Any?>> =
+            listOf(mapOf("whenever" to (loop.inner?.let(::over) ?: listOf(offered(loop.members)))))
+        loop(block) { capture.inputGiven(it) != null }?.let { return keeps(block) + over(it) }
         val decided = decided(block, capture)
         val inside = decided.values.flatten().toSet().takeIf { movable(block, decided.keys) }.orEmpty()
         return keeps(block).filter { it["keep-as"] !in inside } + block.statements.flatMap { walked ->
@@ -126,11 +129,10 @@ class ScriptYaml(
     }
 
     /**
-     * [members] of one list, visited one by one, as a whenever over it: each member acted on by the first of the run's
-     * acts it offers now, in the order the run first made them, else noted; the step's words kept for a member that
-     * offers an act the run never met.
+     * [members] of one list, each acted on by the first of the run's acts it offers now, in the order the run first
+     * made them, else noted; the step's words kept for a member that offers an act the run never met.
      */
-    private fun overMembers(members: List<Walked.Selection>): List<Map<String, Any?>> {
+    private fun offered(members: List<Walked.Selection>): Map<String, Any?> {
         looped = true
         val acts = cases(members).map { case ->
             val act = act(case.step)
@@ -141,7 +143,7 @@ class ScriptYaml(
         words(capture, members.first().step, names, emptyList())?.let { it.fromIntent ?: it.intent }
             ?.let { offered["intent"] = text(it) }
         offered["otherwise"] = listOf(mapOf("note" to "none of these acts is offered here"))
-        return listOf(mapOf("whenever" to listOf(offered)))
+        return offered
     }
 
     private fun keeps(block: Block): List<Map<String, Any?>> =
