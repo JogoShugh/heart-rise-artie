@@ -85,41 +85,39 @@ function notes(n, words) {
   save(doc);
 }
 
-// Slide 30: the task in words, as YAML, and its live run.
+
+// Slide 30: the task as a plain goal, and Claude's run of it.
 {
   const s = load("slides/slide30.xml");
   code(s, 5, [
-    ["I", "# github-task.intent.heart.yaml (excerpt)"],
-    ["P", "steps:"],
-    ["B", "  - intent: open the repository ${owner}/${repo}"],
-    ["P", "    then:"],
-    ["B", "      - intent: open an issue titled \"Crash when a bed …\""],
-    ["P", "        then:"],
-    ["P", "          - keep-as: issue"],
-    ["B", "  - intent: open the branch main of ${owner}/${repo}"],
-    ["P", "    then:"],
-    ["B", "      - intent: start a new branch from here, …"],
-    ["P", "        then:"],
-    ["B", "          - intent: commit a file named …"],
-    ["B", "          - intent: \"open a pull request into main …\""],
-    ["P", "            then:"],
-    ["P", "              - keep-as: pull"],
-    ["P", "              - until:"],
-    ["P", "                  offered: github:merge"],
-    ["B", "              - intent: merge it, squashing its commits"],
-    ["B", "  - intent: open issue ${issue.number} in ${owner}/${repo}"],
-    ["P", "    then:"],
-    ["B", "      - intent: \"comment on it: Fixed in 1.2 by #${pull.number}.\""],
-    ["B", "      - intent: close it, since the fix is done"],
-  ], 1100);
-  place(s, 4, { cy: 4.35 });
-  place(s, 5, { cy: 4.05 });
-  text(s, 31, ["53 s"]);
+    ["I", "# github-task.goal.md: the task in plain words (excerpt)"],
+    ["P", "- In {owner}/{repo}"],
+    ["B", "  - Open an issue titled \"Crash when a bed …\" `as issue`"],
+    ["B", "- Open the branch main of {owner}/{repo}"],
+    ["B", "  - Start a new branch from here, named fix-…-{stamp}"],
+    ["B", "    - Commit a file named fix-steps-{stamp}.md saying …"],
+    ["B", "    - Open a pull request into main titled \"Refuse a …\","],
+    ["B", "      saying it relates to #{issue.number} `as pr`"],
+    ["P", "      - Wait: the pull request can be merged"],
+    ["B", "      - Merge it by squashing its commits"],
+    ["P", "      - Verify: it merged"],
+    ["P", "- On {issue}"],
+    ["B", "  - Comment \"Fixed in 1.2 by #{pr.number}.\""],
+    ["B", "  - Close it the right way: the fix shipped in 1.2"],
+    ["P", "  - Verify:"],
+    ["P", "    - it is closed"],
+    ["P", "    - its reason is completed"],
+  ]);
+  place(s, 4, { cy: 3.85 });
+  place(s, 5, { cy: 3.55 });
+  text(s, 27, ["23"]);
+  text(s, 28, ["model calls: planning, then choosing"]);
+  text(s, 31, ["99 s"]);
   save(s);
-  notes(30, "Real run of github-task.intent.heart.yaml, a script held as data, against JogoShugh/heart-github-test through the gateway, 5 November 2026: issue #2174, PR #2175, 24 steps. artie run runs the YAML directly: no Kotlin, no compiler. Each intent step is one model call (Claude Sonnet 5.5), choosing among the forms and links the gateway offered; ARTIE checked each choice before sending. Two more runs that day took 51 and 54 s, with the same ten choices.");
+  notes(30, "Real run of github-task.goal.md, the task in plain words, against JogoShugh/heart-github-test through the gateway, 5 November 2026: issue #2187, PR #2188, 25 steps, 99 seconds. 23 model calls (Claude Sonnet 5.5): the planner turns each line into moves, and the reasoner chooses among the forms and links the gateway offered; ARTIE checked each choice before sending. No script was written by hand: not Kotlin, not YAML.");
 }
 
-// Slide 31: the kept script as YAML, its lock file, and the replay.
+// Slide 31: the kept script artie generate wrote from that run, as YAML, its lock file, and the replay.
 {
   const s = load("slides/slide31.xml");
   code(s, 5, [
@@ -127,11 +125,11 @@ function notes(n, words) {
     ["B", "- act: github:open-pull-request"],
     ["P", "  fields:"],
     ["P", "    base: main"],
-    ["P", "    title: Refuse a bed with no name (reasoned)"],
+    ["P", "    title: Refuse a bed with no name (steps)"],
     ["P", "    body: \"Relates to #${issue.number}\""],
     ["P", "  then:"],
     ["P", "    - sync: true"],
-    ["P", "    - keep-as: pull"],
+    ["P", "    - keep-as: pr"],
     ["P", "    - until:"],
     ["P", "        offered: github:merge"],
     ["B", "    - act: github:merge"],
@@ -149,75 +147,73 @@ function notes(n, words) {
   place(s, 6, { y: 5.1 });
   place(s, 7, { y: 5.25 });
   cells(s, [
-    [null, "Reasoned", "Replayed"],
-    ["Model calls", "10", "0"],
-    ["Time", "53 s", "32 s"],
-    ["Steps", "24", "28, with 2 more checks"],
+    [null, "From the goal", "Replayed"],
+    ["Model calls", "23", "0"],
+    ["Time", "99 s", "28 s"],
+    ["Steps", "25", "28, with 2 more checks"],
     ["Each act checked", "against offers", "strictly, to lock"],
     ["Values to review", "—", "0 of 19"],
-    ["Live result", "#2174, PR #2175", "#2178, PR #2179"],
+    ["Live result", "#2187, PR #2188", "#2189, PR #2190"],
   ]);
   text(s, 9, ["The lock file pins each form’s integrity, and its act with the target set aside. A strict replay refuses a form no longer offered, or changed in any way."]);
   save(s);
-  notes(31, "artie generate --format yaml read the capture of a reasoned run of this task (issue #2172, PR #2173) and wrote the script as data: every selection named, each value read again as a reference (${issue.number}, ${pull.number}, ${stamp}), 19 fields and 0 to review, with a lock file of what was offered. It ran live with no model, guard strict, 5 November 2026: issue #2178, PR #2179, 32 seconds. After each act that changed what it acted on, the replay checks the change: two more steps than the reasoned run. A run of a YAML script doesn't yet record enough for artie generate to read its values back as references, so the kept script was generated from a run of the same steps written in Kotlin.");
+  notes(31, "artie generate --format yaml read the capture of the goal run on slide 30 and wrote github-task.heart.yaml: every selection named, each value read again as a reference (${issue.number}, ${pr.number}, ${stamp}) from what the goal said and kept (as issue, as pr), 19 fields and 0 to review, with a lock file of what was offered. It ran live with no model, guard strict, 5 November 2026: issue #2189, PR #2190, 28 seconds. After each act that changed what it acted on, the replay checks the change: two more steps than the goal run.");
 }
 
-// Slide 32: the October runs, said as such; the intent rung in YAML's words.
+// Slide 32: the October runs, said as such; the intent rung in plain words.
 {
   const s = load("slides/slide32.xml");
-  text(s, 13, ["Every move said in words (intent:); Claude picks the form and fields from what’s offered."]);
-  text(s, 24, ["All 9 runs finished: 9 issues opened and closed, 9 pull requests merged, every committed file read back from GitHub. Kotlin scripts, 18 October; in YAML on 5 November: 53 s, 32 s and 38 s."]);
+  text(s, 13, ["Every move in plain words; Claude picks the form and fields from what’s offered."]);
+  text(s, 24, ["All 9 runs finished: 9 issues opened and closed, 9 pull requests merged, every committed file read back from GitHub. Kotlin scripts, 18 October; from a plain goal to YAML on 5 November: 99 s, 28 s and 33 s."]);
   save(s);
-  notes(32, "Live runs, 18 October 2026, scratch repository JogoShugh/heart-github-test, with the scripts in Kotlin. Ranges: scripted 17.6-18.2 s, intent 45.9-49.6 s, hybrid 24.2-30.1 s. Reasoner: Claude Sonnet 5.5. In every intent run Claude made the same ten choices. The same three as YAML, one live run each on 5 November 2026: intent 53 s (10 model calls), kept 32 s (0), hybrid 38 s (1). Those times include a walk of three pages of open pull requests the scratch repository now holds.");
+  notes(32, "Live runs, 18 October 2026, scratch repository JogoShugh/heart-github-test, with the scripts in Kotlin. Ranges: scripted 17.6-18.2 s, intent 45.9-49.6 s, hybrid 24.2-30.1 s. Reasoner: Claude Sonnet 5.5. In every intent run Claude made the same ten choices. The same three on 5 November 2026, one live run each, with no script written by hand: the plain goal 99 s (23 model calls, planning and choosing), the kept YAML artie generate wrote from it 28 s (0), and the hybrid 33 s (1). Those times include a walk of the pages of open pull requests and branches the scratch repository now holds.");
 }
 
-// Slide 33: the hybrid as YAML.
+// Slide 33: the hybrid, as the goal marks it.
 {
   const s = load("slides/slide33.xml");
   code(s, 5, [
-    ["I", "# github-task.hybrid.heart.yaml (excerpt)"],
-    ["P", "- act: github:issues-get"],
+    ["I", "# github-task.hybrid.goal.md (excerpt)"],
+    ["P", "- On {issue}"],
+    ["P", "  - Comment \"Fixed in 1.2 by #{pr.number}.\""],
+    ["B", "  - Close it the right way: the fix shipped in 1.2 `reasoned`"],
+    ["I", "# github-task.hybrid.heart.yaml, as artie generate wrote it"],
+    ["P", "- act: github:comment"],
     ["P", "  fields:"],
-    ["P", "    issue_number: ${issue.number}"],
-    ["P", "  then:"],
-    ["P", "    - act: github:comment"],
-    ["P", "      fields:"],
-    ["P", "        body: \"Fixed in 1.2 by #${pull.number}.\""],
-    ["B", "    - intent: \"close it the right way: the fix shipped in 1.2\""],
-    ["P", "    - check:"],
-    ["P", "        - field: state_reason"],
-    ["P", "          is: completed"],
+    ["P", "    body: \"Fixed in 1.2 by #${pr.number}.\""],
+    ["B", "- intent: \"Close it the right way: the fix shipped in 1.2\""],
+    ["B", "  reasoned: true"],
   ], 1100);
-  place(s, 4, { cy: 2.55 });
-  place(s, 5, { cy: 2.25 });
+  place(s, 4, { cy: 2.25 });
+  place(s, 5, { cy: 1.95 });
   cells(s, [
     ["Hybrid run", "Claude chose", "Step time"],
-    ["5 November", "github:close", "9.1 s"],
+    ["5 November", "github:close", "5.8 s"],
   ]);
   keepRows(s, 2);
   text(s, 7, [
-    "GitHub offers three ways to close an issue: close (completed), close-not-planned and close-duplicate. Which one is right is a judgement about what happened, so that one step is left as intent.",
+    "GitHub offers three ways to close an issue: close (completed), close-not-planned and close-duplicate. Which one is right is a judgement about what happened, so the goal marks that one step reasoned, and artie generate keeps it in words.",
     null,
     "Claude chose github:close, and the check confirmed GitHub recorded it as completed. Every other step ran exactly as written, held strictly to the lock file.",
   ]);
   save(s);
-  notes(33, "The hybrid is the kept YAML that artie generate wrote, with one step put back in words: intent: instead of act: github:close. Live, 5 November 2026: issue #2180, PR #2181, 38 s, one model call; the close step took 9.1 s, the model's choice and GitHub's answer together. In October's three Kotlin hybrid runs, the model's one call took 5.5 to 9.8 seconds.");
+  notes(33, "The hybrid comes from the goal: the close step is marked `reasoned`, so artie generate keeps it as a reason step and pins the rest. Goal run: issue #2183, PR #2184. The hybrid replay, live, 5 November 2026: issue #2185, PR #2186, 33 s, one model call; the close step took 5.8 s, the model's choice and GitHub's answer together. In October's three Kotlin hybrid runs, the model's one call took 5.5 to 9.8 seconds.");
 }
 
-// Slide 34: YAML's words for an intent step.
+// Slide 34: the words come first, in a plain goal.
 {
   const s = load("slides/slide34.xml");
-  text(s, 5, [null, "intent: … for each step; the model maps words to the forms offered"]);
-  text(s, 18, ["Hybrid: pin the routine, keep intent: … for the call that needs judgement."]);
+  text(s, 5, [null, "the task in plain words, a goal; the model maps each line to the forms offered"]);
+  text(s, 18, ["Hybrid: pin the routine, mark the one step that needs judgement reasoned."]);
   save(s);
 }
 
-// Slide 37: where the YAML runs are.
+// Slide 37: where the runs are.
 {
   const s = load("slides/slide37.xml");
   text(s, 4, [null, null, null, null, null,
     "Three ways through GitHub: scripted, intent and hybrid runs in Kotlin, 3 live runs each, issues #49–#65 and PRs #50–#66, 18 October 2026; gateway e171027, ARTIE f494ff4, reasoner Claude Sonnet 5.5.",
-    "GitHub preview, as YAML: github-task.intent.heart.yaml (issue #2174, PR #2175), github-task.heart.yaml replayed strictly with its lock file (#2178, PR #2179), and github-task.hybrid.heart.yaml (#2180, PR #2181), on JogoShugh/heart-github-test, 5 November 2026. Scripts and runs: exhibits/github-task-yaml.",
+    "GitHub preview, from a plain goal to YAML: github-task.goal.md (issue #2187, PR #2188), the github-task.heart.yaml artie generate wrote from it, replayed strictly with its lock file (#2189, PR #2190), and the hybrid (#2185, PR #2186), on JogoShugh/heart-github-test, 5 November 2026. Scripts and runs: exhibits/github-task-yaml.",
   ]);
   save(s);
 }

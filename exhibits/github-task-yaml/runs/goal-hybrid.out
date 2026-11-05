@@ -1,0 +1,28 @@
+1 enter https://localhost:8393/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Crash when a bed has no name (steps), body Opened by a HEART script.: new resource
+4 return to https://localhost:8393/repos/JogoShugh/heart-github-test: done
+5 return to https://localhost:8393/: done
+6 act github:repos-get-branch, owner JogoShugh, repo heart-github-test, branch main: done
+7 act github:branch-from-here, name fix-blank-names-steps-1105-170329: new resource
+8 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/fix-blank-names-steps-1105-170329: done
+9 act github:commit-file, path fix-steps-1105-170329.md, message Refuse a bed with no name, content Bed names may not be blank.: done
+10 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/fix-blank-names-steps-1105-170329: done
+11 act github:open-pull-request, base main, title Refuse a bed with no name (steps), body Relates to #2185: new resource
+12 return to https://localhost:8393/repos/JogoShugh/heart-github-test/pulls/2186: done
+13 until: held
+14 act github:merge, merge_method squash: done
+15 check: held
+16 return to https://localhost:8393/repos/JogoShugh/heart-github-test/pulls/2186: done
+17 check: held
+18 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/fix-blank-names-steps-1105-170329: done
+19 return to https://localhost:8393/repos/JogoShugh/heart-github-test/branches/main: done
+20 return to https://localhost:8393/: done
+21 act github:issues-get, owner JogoShugh, repo heart-github-test, issue_number 2185: done
+22 act github:comment, body Fixed in 1.2 by #2186.: new resource
+23 return to https://localhost:8393/repos/JogoShugh/heart-github-test/issues/2185: done
+24 Close it the right way: the fix shipped in 1.2: done
+25 return to https://localhost:8393/repos/JogoShugh/heart-github-test/issues/2185: done
+26 check: held
+27 return to https://localhost:8393/: done
+finished, 27 steps; acted: github:repos-get 1, github:open-issue 1, github:repos-get-branch 1, github:branch-from-here 1, github:commit-file 1, github:open-pull-request 1, github:merge 1, github:issues-get 1, github:comment 1, github:close 1
