@@ -6,7 +6,6 @@ package com.artie.heart
  * responses that name them, and the credentials every service admits.
  */
 internal object OpenApiShapes {
-    const val JSON_SCHEMA_2020_12 = "https://json-schema.org/draft/2020-12/schema"
     private const val JSON = "application/json"
     private const val PROBLEM_JSON = "application/problem+json"
 

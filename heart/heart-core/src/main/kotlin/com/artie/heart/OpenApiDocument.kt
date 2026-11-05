@@ -40,7 +40,7 @@ class OpenApiDocument(
         body = ContentAddress.canonical(
             mapOf(
                 "openapi" to OPENAPI,
-                "jsonSchemaDialect" to OpenApiShapes.JSON_SCHEMA_2020_12,
+                // No jsonSchemaDialect: OpenAPI's default holds every schema here, and every tool reads it.
                 "info" to mapOf(
                     "title" to (title ?: types.first().profile.title),
                     "version" to version,

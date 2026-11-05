@@ -21,6 +21,12 @@ Feature: An OpenAPI 3.1 description of everything a server could ever be asked, 
     And its "info.title" is "Lamps"
     And its "info.version" is "1.0.0"
 
+  Scenario: Its schemas are in OpenAPI's default dialect, so a tool such as Swagger UI reads it as it is
+    OpenAPI 3.1's default dialect is JSON Schema 2020-12 with OpenAPI's own vocabulary. Every
+    schema here is plain 2020-12, valid in it; naming 2020-12 alone added nothing, and Swagger UI
+    warned that it could not read a dialect other than its default.
+    Then it names no "jsonSchemaDialect"
+
   Scenario: It is the same bytes every time, and its validator names them
     When the OpenAPI description of the lamp is rendered at version "1.0.0" again
     Then the two renderings are identical bytes

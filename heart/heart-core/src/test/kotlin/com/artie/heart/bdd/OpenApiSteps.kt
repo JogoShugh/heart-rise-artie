@@ -74,6 +74,9 @@ class OpenApiSteps(private val world: LampWorld) {
     fun member(path: String, value: String) =
         assertEquals(value, path.split('.').fold(json) { at, key -> at.path(key) }.asText())
 
+    @Then("it names no {string}")
+    fun noMember(name: String) = assertTrue(json.path(name).isMissingNode, "it names $name: ${json.path(name)}")
+
     @Then("the two renderings are identical bytes")
     fun identical() = assertEquals(renderings[renderings.size - 2].body, document.body)
 
