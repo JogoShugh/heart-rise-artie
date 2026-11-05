@@ -147,6 +147,59 @@ writeFileSync(join(out, "deck/contents.json"), json({
     item: slides.map((s) => ({ name: s.name, part: s.part, fiction: s.fiction === true, _links: { self: link(s) } })),
   },
 }));
+// The whole deck on one page, both voices behind one switch, for reading with no client; the animations show their
+// stills. And the story read aloud, from aloud/, as a page of its own.
+const asDocument = (page, lang = "en") => {
+  const at = page.search(/<(div|main|header) /);
+  return `<!doctype html>\n<html lang="${lang}"><head><meta charset="utf-8">` +
+    `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n` +
+    `${page.slice(0, at).trim()}\n</head><body>\n${page.slice(at).trim()}\n</body></html>\n`;
+};
+{
+  let part = null;
+  const toc = slides.map((s, i) => {
+    const group = s.part !== part ? `<li class="group">${esc((part = s.part))}</li>` : "";
+    return `${group}<li><a href="#${s.name}"><span class="n">${i + 1}</span><span>${esc(s.title)}</span>` +
+      `${s.fiction ? '<span class="f">Fiction</span>' : ""}</a></li>`;
+  }).join("");
+  const body = slides.map((s, i) => `<article class="slide" id="${s.name}"><header><span class="part">${i + 1} · ${esc(s.part)}</span>` +
+    `${s.fiction ? '<span class="fiction">Fiction</span>' : ""}</header>\n${s.html}</article>`).join("\n");
+  writeFileSync(join(out, "all-slides.html"), `<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${BRAND}, All Slides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+<style>.book .stage { gap: 1.6rem; } .book .slide { min-height: 0; scroll-margin-top: 4.5rem; } .book .outline { display: block; }
+@media (max-width: 56rem) { .book .outline { display: none; } }</style>
+</head><body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><b>${BRAND}</b><span>A fictional conversation · all ${slides.length} slides</span></div>
+  <div class="mode" role="group" aria-label="How each scene is told">
+    <button type="button" data-voice="talk" aria-pressed="true">Conversation</button>
+    <button type="button" data-voice="points" aria-pressed="false">Points</button>
+  </div>
+</div></header>
+<div class="deck book">
+  <nav class="outline" aria-label="Outline"><p class="label">Outline</p><ol>${toc}</ol>
+    <p class="how">The animations show their stills here. They run in <a href="index.html">the HEART deck</a>, where each slide links its script.</p></nav>
+  <main class="stage">
+${body}
+  </main>
+</div>
+<script>
+document.querySelectorAll("button[data-voice]").forEach(function (b) {
+  b.addEventListener("click", function () {
+    document.documentElement.dataset.voice = b.dataset.voice;
+    document.querySelectorAll("button[data-voice]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+  });
+});
+document.documentElement.dataset.voice = "talk";
+</script>
+</body></html>
+`);
+  writeFileSync(join(out, "read-aloud.html"), asDocument(readFileSync(join(here, "aloud/riverside-aloud.html"), "utf8")));
+}
+
 // What the deck's own relation means, where its CURIE points.
 writeFileSync(join(out, "rels.html"), `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">

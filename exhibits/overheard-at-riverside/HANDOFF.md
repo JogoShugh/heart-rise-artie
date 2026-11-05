@@ -10,7 +10,8 @@ Put aside on 2026-11-05. This is where everything stands, how it is built, and w
 | The story, read aloud | <https://claude.ai/artifact/H1jUDom6fenZUKBy9uz1Kz> | Version 1; source `aloud/riverside-aloud.html` |
 | The 1997 report, "The Web That Wasn't" | <https://claude.ai/artifact/2hyYxASNS7JHyQMe1t1vRj> | Version 9; source `docs/reports/the-web-that-wasnt/` |
 | Deck source | `exhibits/overheard-at-riverside/` | `slides/*.yaml`, `page/`, `code/`, `build.mjs` |
-| Deck as built | `docs/reports/overheard-at-riverside/` | Written by `build.mjs`; also served on Pages |
+| Deck as built | `docs/reports/overheard-at-riverside/` | Written by `build.mjs`, with `all-slides.html` (every slide on one page, both voices) and `read-aloud.html` |
+| On Pages | <https://jogoshugh.github.io/heart-rise-artie/reports/overheard-at-riverside/> | Pages serves `docs/` of `claude/auth-branch-4bnmhc`; the reports index groups and dates every report |
 | Commits | branch `claude/auth-branch-4bnmhc` | All local, 173 ahead of origin. Nothing pushed; wait for "Push" |
 
 ## The story, slide by slide

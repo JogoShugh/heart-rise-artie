@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overheard at Riverside, All Slides</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+<style>.book .stage { gap: 1.6rem; } .book .slide { min-height: 0; scroll-margin-top: 4.5rem; } .book .outline { display: block; }
+@media (max-width: 56rem) { .book .outline { display: none; } }</style>
+</head><body>
+<header class="bar"><div class="bar-in">
+  <div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · all 25 slides</span></div>
+  <div class="mode" role="group" aria-label="How each scene is told">
+    <button type="button" data-voice="talk" aria-pressed="true">Conversation</button>
+    <button type="button" data-voice="points" aria-pressed="false">Points</button>
+  </div>
+</div></header>
+<div class="deck book">
+  <nav class="outline" aria-label="Outline"><p class="label">Outline</p><ol><li class="group">Opening</li><li><a href="#overheard"><span class="n">1</span><span>Overheard at Riverside</span></a></li><li><a href="#one-loop"><span class="n">2</span><span>One loop, two readers</span></a></li><li><a href="#heart"><span class="n">3</span><span>HEART, in brief</span></a></li><li class="group">Scene one · 1997</li><li><a href="#help-line"><span class="n">4</span><span>Every act from a manual</span><span class="f">Fiction</span></a></li><li><a href="#sticky-note"><span class="n">5</span><span>The person joins them, by hand</span><span class="f">Fiction</span></a></li><li><a href="#huh"><span class="n">6</span><span>Rules learned by refusal</span><span class="f">Fiction</span></a></li><li class="group">What actually happened</li><li><a href="#marriage"><span class="n">7</span><span>The Marriage of Information and Controls</span></a></li><li class="group">Scene two · today</li><li><a href="#kitchen"><span class="n">8</span><span>The page carries its controls</span><span class="f">Fiction</span></a></li><li class="group">Between the scenes</li><li><a href="#two-webs"><span class="n">9</span><span>The same moment, two webs</span></a></li><li class="group">Scene three · today</li><li><a href="#it-office"><span class="n">10</span><span>The machine web's manual: OpenAPI</span><span class="f">Fiction</span></a></li><li class="group">Between the scenes</li><li><a href="#divorce"><span class="n">11</span><span>The Great Divorce</span></a></li><li><a href="#information-and-controls"><span class="n">12</span><span>Information and Controls</span></a></li><li class="group">Scene four · an hour later</li><li><a href="#whiteboard"><span class="n">13</span><span>Give the answer its controls</span><span class="f">Fiction</span></a></li><li><a href="#in-charge"><span class="n">14</span><span>Declared once, enforced by the server</span><span class="f">Fiction</span></a></li><li><a href="#openapi-opt-in"><span class="n">15</span><span>OpenAPI clients can opt in</span><span class="f">Fiction</span></a></li><li class="group">Scene four · that evening</li><li><a href="#ai-driven"><span class="n">16</span><span>A purpose, not a program</span><span class="f">Fiction</span></a></li><li class="group">Scene five · the next week</li><li><a href="#next-week"><span class="n">17</span><span>Find the way once, then keep it</span><span class="f">Fiction</span></a></li><li><a href="#five-members"><span class="n">18</span><span>The kept script, five members</span><span class="f">Fiction</span></a></li><li class="group">Scene six · a month later</li><li><a href="#company"><span class="n">19</span><span>A release, found once, kept as loops</span><span class="f">Fiction</span></a></li><li><a href="#bloat"><span class="n">20</span><span>Is hypermedia bloated? Measured</span><span class="f">Fiction</span></a></li><li class="group">Closing</li><li><a href="#this-deck"><span class="n">21</span><span>Surprise: this deck is HEART too</span></a></li><li><a href="#upgrade"><span class="n">22</span><span>Upgrading is optional</span></a></li><li><a href="#library-live"><span class="n">23</span><span>The library, live, both ways</span></a></li><li><a href="#one-web"><span class="n">24</span><span>One web</span></a></li><li><a href="#notes"><span class="n">25</span><span>What's fiction, what's real</span></a></li></ol>
+    <p class="how">The animations show their stills here. They run in <a href="index.html">the HEART deck</a>, where each slide links its script.</p></nav>
+  <main class="stage">
+<article class="slide" id="overheard"><header><span class="part">1 · Opening</span></header>
+<h1>Overheard at Riverside</h1>
+<p class="dek">The web that wasn't, and the web we got, told as conversations overheard at one small library.</p>
+<div class="notice">
+  <b>A fictional conversation</b>
+  <p>The four people below are invented, and so is the 1997 web they live through: one where pages never got forms. The library, its rules, the code, every screen and every number come from running demos: a Perl site built for the web that wasn't, and HEART services today.</p>
+</div>
+<div class="cast" aria-label="The people in the story">
+  <div><b>Ana Torres</b><span>A member of Riverside Public Library, with three books out: <i>The Hobbit</i>, <i>Matilda</i> and <i>Charlotte's Web</i>. We meet her in 1997, and again today.</span></div>
+  <div><b>Marcus</b><span>On the library's help line in 1997, talking Ana through a site with no buttons. Still there today.</span></div>
+  <div><b>Priya</b><span>Builds the library's API, today.</span></div>
+  <div><b>Sam</b><span>Builds an assistant that renews library books for members, today.</span></div>
+</div>
+<div class="pair">
+  <figure><img src="media/renew-409.png" alt="1997, the web that wasn't: a renewal typed by hand and refused, 409, a hold is waiting."><figcaption>1997, the web that wasn't</figcaption></figure>
+  <figure><img src="media/hobbit-greyed.png" alt="Today: The Hobbit's Renew button greyed, with the reason, a hold is waiting."><figcaption>Today, the web we got</figcaption></figure>
+</div>
+<p class="note">Move with → and ←, the links below, or the outline. Every slide has its own address.</p>
+</article>
+<article class="slide" id="one-loop"><header><span class="part">2 · Opening</span></header>
+<h2>One loop, two readers</h2>
+<p class="dek">Where this is headed: the way a person uses the web is the way an agent can.</p>
+<div class="key"><span class="h">A person, in a browser</span><span class="a">ARTIE, an agent</span></div>
+<div class="loops">
+  <div class="beat">
+    <div class="step human"><b>Look</b><span>Read the page: what it says, and the buttons it shows.</span></div>
+    <div class="same">the same step</div>
+    <div class="step agent"><b>Sync</b><span>Read the state and the controls offered now, with its version tag.</span></div>
+  </div>
+  <div class="arrow" aria-hidden="true">→</div>
+  <div class="beat">
+    <div class="step human"><b>Think</b><span>Choose what to press.</span></div>
+    <div class="same">the same step</div>
+    <div class="step agent"><b>Reason</b><span>Choose among the offered controls: a model once, then a kept script with none.</span></div>
+  </div>
+  <div class="arrow" aria-hidden="true">→</div>
+  <div class="beat">
+    <div class="step human"><b>Act</b><span>Press it. The next page comes back.</span></div>
+    <div class="same">the same step</div>
+    <div class="step agent"><b>Act</b><span>Send the form, with If-Match. The answer is the next state.</span></div>
+  </div>
+</div>
+<p class="round">↺ round again, from what came back</p>
+<p class="lead">Same server, same answer, same controls. An agent doesn't need a different web; it needs the one people already use.</p>
+<details class="more"><summary>Where the two differ</summary>
+  <ul>
+    <li><b>Seeing and reading:</b> a person sees a grey button; ARTIE reads the same absence as data, with its reason.</li>
+    <li><b>Judgment:</b> a person judges every time; ARTIE asks a model only where judgment is needed, then keeps the way it found.</li>
+    <li><b>Staleness:</b> a person reloads; ARTIE sends back the version it read, and a stale act is refused, 412.</li>
+  </ul>
+</details>
+</article>
+<article class="slide" id="heart"><header><span class="part">3 · Opening</span></header>
+<h2>HEART, in brief</h2>
+<p class="dek">HTTP services that answer the way web pages do: each answer carries its state and the controls that state allows.</p>
+<div class="acronym">
+  <div><span class="letter">H</span><span class="word">Hypermedia</span><span class="means">The controls travel in the answer: links to follow, forms to fill, offered by state.</span></div>
+  <div><span class="letter">E</span><span class="word">Enforced</span><span class="means">The server refuses what it didn't offer (409), what's stale (412) and what doesn't fit (422), each with its reason.</span></div>
+  <div><span class="letter">A</span><span class="word">Agentic</span><span class="means">An agent reads the same answers a person's page is built from.</span></div>
+  <div><span class="letter">R</span><span class="word">Reliable</span><span class="means">Forms are pinned by integrity; a kept script replays with no model, and stops rather than guess.</span></div>
+  <div><span class="letter">T</span><span class="word">Transactions</span><span class="means">Each act is a conditional request on the state you read: If-Match, then the next state.</span></div>
+</div>
+<div class="tabs">
+  <input type="radio" name="heart-tab" id="heart-tab-1" checked><label for="heart-tab-1">Built on standards</label>
+  <input type="radio" name="heart-tab" id="heart-tab-2"><label for="heart-tab-2">Spring HATEOAS</label>
+  <input type="radio" name="heart-tab" id="heart-tab-3"><label for="heart-tab-3">HAL Schema Forms</label>
+  <div class="panel">
+    <ul>
+      <li><b>HAL</b> for links and embedded resources.</li>
+      <li><b>HAL-FORMS</b>, the on-ramp: templates inside each answer.</li>
+      <li><b>JSON Schema 2020-12</b> for what a form takes.</li>
+      <li><b>HTTP as written:</b> ETag and If-Match, Prefer and Preference-Applied, problem details for refusals.</li>
+      <li><b>Profiles:</b> a link with rel="profile", and ALPS for what each relation means.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <ul>
+      <li><b>Today:</b> Spring HATEOAS serves HAL-FORMS, and ARTIE reads it as it is. In Spring's own affordances example, ARTIE lists, creates, updates and deletes employees.</li>
+      <li><b>The other way round:</b> HEART serves HAL-FORMS too, so a Spring HATEOAS client reads a HEART service.</li>
+      <li><b>Planned, not built:</b> one dependency that serves a Spring app's affordances as HAL Schema Forms, with no rewrite.</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <ul>
+      <li><b>Forms as JSON Schema,</b> each with where to send it and how.</li>
+      <li><b>Offered by state,</b> and an absent one says why.</li>
+      <li><b>Choices from state:</b> a field can take its choices from the resource, so a client picks from them instead of guessing.</li>
+      <li><b>Cache-friendly:</b> at L2, one form set per state, linked with an integrity hash, shared by every resource in that state and cached for good.</li>
+    </ul>
+  </div>
+</div>
+</article>
+<article class="slide" id="help-line"><header><span class="part">4 · Scene one · 1997</span><span class="fiction">Fiction</span></header>
+<h2>Every act from a manual</h2>
+<aside class="preamble then"><span class="label">In the web that wasn't</span><p>Ana Torres wants to renew her three library books. The library's site gives her a manual of addresses and a page of numbers. She copies, types and sends, and only then learns whether she was allowed.</p></aside>
+
+<p class="setting">Fall 1997, a Tuesday evening, in the web that wasn't. Ana Torres has three library books due. She calls Riverside Public Library, and Marcus answers.</p>
+<div class="pair">
+  <ul class="points"><li>Fall 1997, in the web that wasn't. Ana Torres has three books due, and calls Marcus on the library's help line: she thinks she's renewing them wrong.</li><li>Marcus sends her to forms.html. It lists every act the site has, the same for every loan, each with a method, an address with {loanId} in it, and what to type.</li><li>Her loan numbers are on another page. To renew, Ana has to find each number there and type it into the address herself.</li><li><b>What it shows:</b> the information is on one page and the controls on another, and Ana is the one who joins them.</li></ul>
+<div class="script">
+    <div class="line"><span class="who ana">Ana</span><p>I'm trying to renew my books online, and I think I'm doing it wrong.</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Do you have forms.html open?</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>It says, “To do something, type its address into your browser.” Number three, in capitals: RENEW A LOAN. Method, POST. Address, <code>/cgi-bin/library.cgi/loans/{loanId}/renew</code>.</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>That's the one. Put your loan number where it says loanId.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>And where do I get my loan number?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>From your loans page. Type its address, with your card number and your PIN on the end.</p></div>
+  </div>
+  <figure><img src="media/forms-html.png" alt="forms.html at RENEW A LOAN: method POST, an address with {loanId}, a body with {card} and {pin}." loading="lazy"><figcaption>forms.html: every operation, for every loan alike, and what to type.</figcaption></figure>
+</div>
+<details class="more"><summary>What's real behind the scene</summary>
+  <ul>
+    <li>A site as 1997 would run it: Apache, and CGI scripts in Perl with CGI.pm.</li>
+    <li>Imagine YAML existed in 1997, and the equivalent of OpenAPI was made then, named <code>forms.yaml</code>. <code>forms.cgi</code> reads it with YAML::XS and writes <code>forms.html</code>, the page people browse it by.</li>
+    <li>WebWalker, the browser of the web that wasn't, has a method menu and a body box, because pages have no forms.</li>
+  </ul>
+</details>
+<details class="more"><summary>The CGI behind forms.html</summary>
+  <p class="note">forms.cgi reads forms.yaml, the OpenAPI of this 1997, and walks every path and method in it. For each it prints the rule, the method, the address with its placeholders, and what to type. Nothing in it knows a loan.</p>
+  <pre class="source"><code>my $n = 0;
+for my $path (sort keys %{ $api-&gt;{paths} }) {
+    for my $method (sort keys %{ $api-&gt;{paths}{$path} }) {
+        my $op = $api-&gt;{paths}{$path}{$method};
+        my @params = map { resolve($_) } @{ $op-&gt;{parameters} || [] };
+        my @query = grep { $_-&gt;{in} eq 'query' } @params;
+        my $address = $server . $path . (@query ? '?' . join('&amp;', map { "$_-&gt;{name}={$_-&gt;{name}}" } @query) : '');
+        my ($type) = keys %{ $op-&gt;{requestBody}{content} || {} };
+        my $schema = $type ? resolve($op-&gt;{requestBody}{content}{$type}{schema}) : undef;
+        my @body = $schema ? @{ $schema-&gt;{required} || [ sort keys %{ $schema-&gt;{properties} } ] } : ();
+        my @fields = ((map { [$_-&gt;{name}, $_-&gt;{description}] } @params),
+                      (map { [$_, $schema-&gt;{properties}{$_}{description}] } @body));
+
+        print h3(++$n . '. ' . uc $op-&gt;{summary});
+        print p(i($op-&gt;{description})) if $op-&gt;{description};
+        my @rows = (Tr(td(b('Method')), td(tt(uc $method))), Tr(td(b('Address')), td(tt(escapeHTML($address)))));
+        push @rows, Tr(td(b('Body')), td(tt(escapeHTML(join '&amp;', map { "$_={$_}" } @body)))) if @body;
+        print table({ -border =&gt; 0, -cellpadding =&gt; 2 }, @rows);
+        print p(b('What to type:')), ul(map { li(tt("{$_-&gt;[0]}") . " -- $_-&gt;[1]") } @fields);
+        print p(b('Answers:')),
+              ul(map { li(tt($_) . " -- $op-&gt;{responses}{$_}{description}") } sort keys %{ $op-&gt;{responses} });
+        print hr();
+    }
+}</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/forms.cgi</code>, lines 30–53</p>
+</details>
+</article>
+<article class="slide" id="sticky-note"><header><span class="part">5 · Scene one · 1997</span><span class="fiction">Fiction</span></header>
+<h2>The person joins them, by hand</h2>
+<div class="pair">
+  <ul class="points"><li>Ana opens her loans page the way forms.html says: her card number and PIN typed on the end of the address, where anyone behind her can read them.</li><li>The page is three loan numbers with titles and due dates. None is a link, so she copies 3310, 3311 and 3312 onto a sticky note.</li><li>Marcus talks her through the rest: POST from WebWalker's method menu, the renew address with the number in it, and her card and PIN in the body box.</li><li><b>What it shows:</b> with no controls in the page, the person carries everything by hand, her PIN included.</li></ul>
+<div class="script">
+    <div class="line"><span class="who ana">Ana</span><p>My PIN goes in the address? Where anyone behind me can read it?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>…That's what forms.html says.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>Fine. Three numbers: 3310, 3311, 3312. They aren't even links. I'm copying them onto a sticky note.</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>That's normal. Now pick POST from the method menu and type the address. In the body box, type card equals your card, ampersand, pin equals your PIN. Exactly as shown.</p></div>
+  </div>
+  <figure><img src="media/loans-data.png" alt="Her loans page: a table of loan numbers, book numbers, titles and due dates, 1997-11-12; no links; her card and PIN in the address." loading="lazy"><figcaption>Her loans: numbers to copy, no links, nothing to press. Her card and PIN ride in the address.</figcaption></figure>
+</div>
+<details class="more"><summary>Why the PIN is in the address</summary>
+  <ul>
+    <li>With no forms, every value travels in an address or a body the person types. Secrets included.</li>
+    <li>forms.yaml lists the card and PIN as query parameters of the loans list, so forms.html tells her to type them there.</li>
+  </ul>
+</details>
+<details class="more"><summary>The CGI behind her loans page, and the PIN in the address</summary>
+  <p class="note">library.cgi reads the card and PIN from the query string, because forms.yaml lists them as query parameters. Then her loans page is a table of numbers: no links, nothing to press.</p>
+  <pre class="source"><code>elsif (($q-&gt;param('card') // '') ne $MEMBER{card} || ($q-&gt;param('pin') // '') ne $MEMBER{pin}) {
+    answer('401 Unauthorized', 'Not signed in', p('Wrong card number or PIN.'));
+}</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi</code>, lines 30–32</p>
+  <pre class="source"><code>sub list {
+    my @rows = (Tr(th(['Loan number', 'Book number', 'Title', 'Due'])));
+    push @rows, Tr(td([$_-&gt;[0], $_-&gt;[1], escapeHTML($_-&gt;[2]), $_-&gt;[7] ? 'returned' : $_-&gt;[4]])) for @loans;
+    answer('200 OK', 'Your loans', table({ -border =&gt; 1, -cellpadding =&gt; 4 }, @rows));
+}</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi</code>, lines 40–44</p>
+</details>
+</article>
+<article class="slide" id="huh"><header><span class="part">6 · Scene one · 1997</span><span class="fiction">Fiction</span></header>
+<h2>Rules learned by refusal</h2>
+<div class="pair">
+  <ul class="points"><li>Ana sends the renewal for <i>The Hobbit</i>. The answer is 409: a hold is waiting, so it can't be renewed. She only finds out after typing it all.</li><li>Marcus tries 3311 for her, and <i>Matilda</i> renews. <i>Charlotte's Web</i> would fail too, renewed three times already, yet forms.html offers renew for all three.</li><li>Ana asks why the page can't show a Renew button on the books she can renew, and say why on the others. Marcus writes “buttons?” on a sticky note. In that world, nobody reads it.</li><li><b>What it shows:</b> a rule kept in prose, away from the page, is learned by refusal.</li></ul>
+<div class="script">
+    <div class="line"><span class="who ana">Ana</span><p>Sent. It says 409. “A hold is waiting for this book, so it can't be renewed.”</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Someone's waiting for <i>The Hobbit</i>.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>Couldn't it have told me before I typed all of it?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>The page doesn't know what you can do. forms.yaml does, the same for every book. Renew is listed for all of them, and the rule is in its description. Try 3311. That's <i>Matilda</i>.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>“Loan 3311 is renewed. It is due 1997-12-03.” And <i>Charlotte's Web</i>?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Renewed three times already. It'll say no.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>Then why does forms.html offer it?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>It offers everything to everyone.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>Why can't the page just show me a Renew button on the books I can renew, and say why on the ones I can't?</p></div>
+    <p class="direction">A long pause.</p>
+    <div class="line"><span class="who marcus">Marcus</span><p>…Huh.</p></div>
+    <p class="direction">He writes “buttons?” on a sticky note. In this world, nobody ever reads it.</p>
+  </div>
+  <figure><img src="media/renew-409.png" alt="WebWalker after a POST typed by hand: 409 Conflict, a hold is waiting for this book." loading="lazy"><figcaption>Typed, sent, refused. Only now does she find out.</figcaption></figure>
+</div>
+<details class="more"><summary>Watch her whole visit</summary>
+  <figure><img src="media/web-that-wasnt.gif" alt="Ana's visit in WebWalker: forms.yaml, forms.html, her loans, a renewal refused 409, then Matilda renewed." loading="lazy"><figcaption>The Perl site, recorded in headless Chrome: forms.yaml, forms.html, her loans, the 409, then <i>Matilda</i>.</figcaption></figure>
+</details>
+<details class="more"><summary>The CGI that said 409</summary>
+  <p class="note">The rules are real, and checked in order: returned already, a hold waiting, renewed the most allowed. Only after all three does it move the due date three weeks on. Ana meets them only after she has sent the request.</p>
+  <pre class="source"><code>sub act {
+    my ($id, $what) = @_;
+    my $loan = find($id) or return answer('404 Not Found', 'No such loan', p("There is no loan $id."));
+    return answer('409 Conflict', 'Cannot do that', p('It was returned already.')) if $loan-&gt;[7];
+    if ($what eq 'return') {
+        $loan-&gt;[7] = 1;
+        save();
+        return answer('200 OK', 'Returned', p("Loan $id is returned. Thank you."));
+    }
+    return answer('409 Conflict', 'Cannot renew', p("A hold is waiting for this book, so it can't be renewed."))
+        if $loan-&gt;[6];
+    return answer('409 Conflict', 'Cannot renew', p("It has been renewed $MOST_RENEWALS times, the most allowed."))
+        if $loan-&gt;[5] &gt;= $MOST_RENEWALS;
+    my ($y, $m, $d) = split /-/, $loan-&gt;[4];
+    my @due = gmtime(timegm(0, 0, 12, $d, $m - 1, $y) + 21 * 86400);
+    $loan-&gt;[4] = sprintf('%04d-%02d-%02d', $due[5] + 1900, $due[4] + 1, $due[3]);
+    $loan-&gt;[5]++;
+    save();
+    answer('200 OK', 'Renewed', p("Loan $id is renewed. It is due $loan-&gt;[4]."));
+}</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi</code>, lines 55–74</p>
+</details>
+</article>
+<article class="slide" id="marriage"><header><span class="part">7 · What actually happened</span></header>
+<h2>The Marriage of Information and Controls</h2>
+<p class="dek">What actually happened, right from the beginning: the page took the controls in. The browser needed no method menu and no body box, and nobody needed a sticky note.</p>
+<div class="morph" data-start="apart" data-cycles='[{"to": "married", "label": "The Marriage", "head": "The Marriage of Information and Controls"}]'>
+  <div class="mo-stage">
+    <section class="mo-scene" data-scene="apart">
+      <h3 class="mo-title">The web that wasn't: two windows, joined by hand</h3>
+      <div class="desk97">
+        <div class="ww-pair">
+          <div class="win">
+            <div class="tk tk-wtitle" data-token="titlebar">WebWalker 1.0 — the browser of the web that wasn't</div>
+            <div class="win-bar"><span>Method:</span><span class="win-box">GET ▾</span><span>Location:</span><span class="tk tk-wbox tk-wloc" data-token="location">/cgi-bin/library.cgi/loans?card=21000451&amp;pin=1234</span></div>
+            <div class="win-bar"><span>Body:</span><span class="win-box win-body">name=value&amp;name=value</span></div>
+            <div class="win-page">
+              <h4>Your loans</h4>
+              <div class="row97 row97-head"><span>Loan</span><span>Title</span><span>Due</span></div>
+              <div class="tk tk-row97" data-token="row-3310"><span>3310</span><span>The Hobbit</span><span>1997-11-12</span></div>
+              <div class="tk tk-row97" data-token="row-3311"><span>3311</span><span>Matilda</span><span>1997-11-12</span></div>
+              <div class="tk tk-row97" data-token="row-3312"><span>3312</span><span>Charlotte's Web</span><span>1997-11-12</span></div>
+            </div>
+            <div class="win-status">Document: Done. 200 OK</div>
+          </div>
+          <p class="ww-gap"><span>Ana joins them, with a sticky note and her own typing</span></p>
+          <div class="win">
+            <div class="tk-wtitle tk-wtitle-off">WebWalker 1.0 — the browser of the web that wasn't</div>
+            <div class="win-bar"><span>Method:</span><span class="win-box">POST ▾</span><span>Location:</span><span class="win-box tk-wloc">/cgi-bin/library.cgi/loans/{loanId}/renew</span></div>
+            <div class="win-bar"><span>Body:</span><span class="win-box win-body">card=21000451&amp;pin=1234</span></div>
+            <div class="win-page">
+              <div class="tk tk-ww-h" data-token="renew">3. RENEW A LOAN</div>
+              <div class="tk tk-ww-rule" data-token="rule">Only while it is renewed fewer than three times and no one's hold is waiting.</div>
+              <div class="ww-def"><b>Method</b> POST<br><b>Address</b> /cgi-bin/library.cgi/loans/{loanId}/renew<br><b>Body</b> card={card}&amp;pin={pin}</div>
+              <div class="tk tk-ww-h" data-token="return">4. RETURN A LOAN</div>
+              <div class="ww-def"><b>Method</b> POST<br><b>Address</b> /cgi-bin/library.cgi/loans/{loanId}/return</div>
+            </div>
+            <div class="win-status">Document: Done. 200 OK</div>
+          </div>
+        </div>
+      </div>
+      <p class="mo-cap">The web that wasn't, in WebWalker: her loans on one page, every act on another, the same for every loan. The browser carries a method menu and a body box, because pages can't. Ana joins the two, by hand.</p>
+    </section>
+    <section class="mo-scene" data-scene="married">
+      <h3 class="mo-title">What actually happened: one page, its information and its controls together</h3>
+      <div class="desk97">
+        <div class="win ns-win">
+          <div class="tk tk-wtitle" data-token="titlebar">Netscape - [Riverside Public Library -- Your loans]</div>
+          <div class="ns-menu">File&nbsp; Edit&nbsp; View&nbsp; Go&nbsp; Bookmarks&nbsp; Options&nbsp; Directory&nbsp; Window&nbsp; Help</div>
+          <div class="ns-tools"><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 10 9 3v4h9v6H9v4z" fill="#24418f"/></svg><span>Back</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M18 10 11 3v4H2v6h9v4z" fill="#24418f"/></svg><span>Forward</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 1 10h3v8h5v-5h2v5h5v-8h3z" fill="#24418f"/></svg><span>Home</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.5 6.5A7 7 0 1 0 17 11" fill="none" stroke="#24418f" stroke-width="2.4"/><path d="M12 2h6v6z" fill="#24418f"/></svg><span>Reload</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="3.5" width="17" height="13" fill="#fff" stroke="#3b3b3b"/><circle cx="6" cy="7.5" r="1.8" fill="#d8a000"/><path d="M3 15l5-5 3 3 2-2 4 4z" fill="#2f7d32"/></svg><span>Images</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1.5 5.5h6l1.5 2h9.5v9h-17z" fill="#e6c25a" stroke="#3b3b3b"/></svg><span>Open</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="2.5" width="10" height="5" fill="#fff" stroke="#3b3b3b"/><rect x="1.5" y="7.5" width="17" height="7" fill="#9a9a9a" stroke="#3b3b3b"/><rect x="5" y="12" width="10" height="5.5" fill="#fff" stroke="#3b3b3b"/></svg><span>Print</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="5.5" cy="12" r="3.8" fill="#bcd" stroke="#3b3b3b" stroke-width="1.6"/><circle cx="14.5" cy="12" r="3.8" fill="#bcd" stroke="#3b3b3b" stroke-width="1.6"/><rect x="8" y="9" width="4" height="3" fill="#3b3b3b"/><rect x="3" y="4" width="4" height="5" fill="#3b3b3b"/><rect x="13" y="4" width="4" height="5" fill="#3b3b3b"/></svg><span>Find</span></span><span class="ns-tool"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 1.5h7l5 5v7l-5 5h-7l-5-5v-7z" fill="#c8102e" stroke="#7a0a1c"/><rect x="5" y="8.7" width="10" height="2.6" fill="#fff"/></svg><span>Stop</span></span><span class="ns-logo" aria-hidden="true">N</span></div>
+          <div class="win-bar"><span>Location:</span><span class="tk tk-wbox tk-wloc" data-token="location">http://www.riverside.lib/cgi-bin/library.cgi/loans</span></div>
+          <div class="ns-dir"><span class="ns-btn">What's New?</span><span class="ns-btn">What's Cool?</span><span class="ns-btn">Destinations</span><span class="ns-btn">Net Search</span><span class="ns-btn">People</span><span class="ns-btn">Software</span></div>
+          <div class="win-page ns-page">
+            <h4>Your loans</h4>
+            <div class="ns-row ns-row-head"><div class="row97 row97-head"><span>Loan</span><span>Title</span><span>Due</span></div><span></span></div>
+            <div class="ns-row">
+              <div class="tk tk-row97" data-token="row-3310"><span>3310</span><span>The Hobbit</span><span>1997-11-12</span></div>
+              <div class="ns-acts"><span class="tk tk-ns-why" data-token="rule">A hold is waiting for this book, so it can't be renewed.</span><span class="tk-nsbtn">Return</span></div>
+            </div>
+            <div class="ns-row">
+              <div class="tk tk-row97" data-token="row-3311"><span>3311</span><span>Matilda</span><span>1997-11-12</span></div>
+              <div class="ns-acts"><span class="tk tk-nsbtn" data-token="renew">Renew</span><span class="tk tk-nsbtn" data-token="return">Return</span></div>
+            </div>
+            <div class="ns-row">
+              <div class="tk tk-row97" data-token="row-3312"><span>3312</span><span>Charlotte's Web</span><span>1997-11-12</span></div>
+              <div class="ns-acts"><span class="tk-ns-why">It has been renewed 3 times, the most allowed.</span><span class="tk-nsbtn">Return</span></div>
+            </div>
+          </div>
+          <div class="win-status">Document: Done</div>
+        </div>
+      </div>
+      <p class="mo-cap">What actually happened, right from the beginning: Netscape Navigator, and a page with forms, written by the same CGI. Each loan carries its own acts, and the reason for the one it can't do. Nothing to copy, nothing to type, and no PIN in the address.</p>
+    </section>
+  </div>
+  <p class="mo-still note">Two stills. Read as HEART, this slide links a script that animates them (<code>deck:code</code>). Plain JSON carries no links, so no code arrives.</p>
+</div>
+<details class="more"><summary>The CGI, as it actually happened</summary>
+  <p class="note">The same Perl, the same loans, rules and reasons as the web that wasn't. Two things differ: her loans page writes a form for each act a loan allows now, and the reason in place of the one it doesn't; and she signs in with a form, so her card and PIN travel in a POST body, never in the address.</p>
+  <div class="code-pair">
+    <div><span class="label">The web that wasn't: numbers to copy</span>
+    <pre class="source"><code>sub list {
+    my @rows = (Tr(th(['Loan number', 'Book number', 'Title', 'Due'])));
+    push @rows, Tr(td([$_-&gt;[0], $_-&gt;[1], escapeHTML($_-&gt;[2]), $_-&gt;[7] ? 'returned' : $_-&gt;[4]])) for @loans;
+    answer('200 OK', 'Your loans', table({ -border =&gt; 1, -cellpadding =&gt; 4 }, @rows));
+}</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi</code>, lines 40–44</p></div>
+    <div><span class="label">What actually happened: each loan with its forms</span>
+    <pre class="source"><code>sub list {
+    my ($said) = @_;
+    my @rows = (Tr(th(['Loan', 'Title', 'Due', ''])));
+    for my $loan (grep { !$_-&gt;[7] } @loans) {
+        my $id = $loan-&gt;[0];
+        my $renew = $loan-&gt;[6] ? i("A hold is waiting for this book, so it can't be renewed.")
+            : $loan-&gt;[5] &gt;= $MOST_RENEWALS ? i("It has been renewed $MOST_RENEWALS times, the most allowed.")
+            : form_for($id, 'renew', 'Renew');
+        push @rows, Tr(td([$id, escapeHTML($loan-&gt;[2]), $loan-&gt;[4], $renew . ' ' . form_for($id, 'return', 'Return')]));
+    }
+    answer('200 OK', 'Your loans', ($said ? p(b($said)) : ()), table({ -border =&gt; 1, -cellpadding =&gt; 4 }, @rows));
+}</code></pre><p class="source-at"><code>exhibits/overheard-at-riverside/married/library.cgi</code>, lines 55–66</p>
+    <pre class="source"><code>sub form_for {
+    my ($id, $what, $label) = @_;
+    return start_form(-method =&gt; 'POST', -action =&gt; "$SCRIPT/loans/$id/$what")
+        . hidden(-name =&gt; 'card', -default =&gt; scalar $q-&gt;param('card'), -override =&gt; 1)
+        . hidden(-name =&gt; 'pin', -default =&gt; scalar $q-&gt;param('pin'), -override =&gt; 1)
+        . submit(-value =&gt; $label) . end_form();
+}</code></pre><p class="source-at"><code>exhibits/overheard-at-riverside/married/library.cgi</code>, lines 69–75</p></div>
+  </div>
+  <span class="label">What it writes for <i>Matilda</i>, run by married/run.sh</span>
+  <pre class="source"><code>&lt;td&gt;3311&lt;/td&gt;
+&lt;td&gt;Matilda&lt;/td&gt;
+&lt;td&gt;1997-11-12&lt;/td&gt;
+&lt;td&gt;
+&lt;form method="post" action="/cgi-bin/library.cgi/loans/3311/renew" enctype="application/x-www-form-urlencoded"&gt;
+&lt;input type="hidden" name="card" value="21000451" &gt;
+&lt;input type="hidden" name="pin" value="1234" &gt;
+&lt;input type="submit" name=".submit" value="Renew" &gt;
+&lt;/form&gt;
+&lt;form method="post" action="/cgi-bin/library.cgi/loans/3311/return" enctype="application/x-www-form-urlencoded"&gt;
+&lt;input type="hidden" name="card" value="21000451" &gt;
+&lt;input type="hidden" name="pin" value="1234" &gt;
+&lt;input type="submit" name=".submit" value="Return" &gt;
+&lt;/form&gt;</code></pre><p class="source-at"><code>exhibits/overheard-at-riverside/married/captures/loans.lines.html</code>, lines 35–48</p>
+  <p class="note">The window around the page is drawn; the page in it is this script's. <code>married/run.sh</code> runs it as Apache would and keeps each answer in <code>married/captures/</code>: the sign-in form, her loans page, <i>Matilda</i> renewed from its own button, and a renewal of <i>The Hobbit</i> sent anyway, refused, 409.</p>
+</details>
+<details class="more"><summary>The animation is code on demand</summary>
+  <ul>
+    <li>This slide's resource links a script under <code>deck:code</code>, with its SHA-256 as <code>integrity</code>. heart-ts loads it, and the browser runs it only if the bytes match.</li>
+    <li>The script knows no slide. This slide's HTML says what moves, and where; the Great Divorce links the same script for its own stills.</li>
+    <li>Switch to Plain JSON at the top: no links, so no code, and the stills one after another.</li>
+  </ul>
+  <blockquote class="fielding"><p>“The final addition to our constraint set for REST comes from the code-on-demand style of Section 3.5.3 (Figure 5-8). REST allows client functionality to be extended by downloading and executing code in the form of applets or scripts. This simplifies clients by reducing the number of features required to be pre-implemented. Allowing features to be downloaded after deployment improves system extensibility. However, it also reduces visibility, and thus is only an optional constraint within REST.”</p>
+  <p>“The notion of an optional constraint may seem like an oxymoron. However, it does have a purpose in the architectural design of a system that encompasses multiple organizational boundaries. It means that the architecture only gains the benefit (and suffers the disadvantages) of the optional constraints when they are known to be in effect for some realm of the overall system. For example, if all of the client software within an organization is known to support Java applets [45], then services within that organization can be constructed such that they gain the benefit of enhanced functionality via downloadable Java classes. At the same time, however, the organization's firewall may prevent the transfer of Java applets from external sources, and thus to the rest of the Web it will appear as if those clients do not support code-on-demand. An optional constraint allows us to design an architecture that supports the desired behavior in the general case, but with the understanding that it may be disabled within some contexts.”</p>
+  <cite>Roy T. Fielding, dissertation, 2000, §5.1.7, Code-On-Demand</cite></blockquote>
+</details>
+<p class="note">Next: today, in the web we got. The page still carries its controls.</p>
+</article>
+<article class="slide" id="kitchen"><header><span class="part">8 · Scene two · today</span><span class="fiction">Fiction</span></header>
+<h2>The page carries its controls</h2>
+<aside class="preamble now"><span class="label">In the web we got</span><p>Ana opens her library account on her phone and taps a book. Its page shows what she can do with it right now; what she can't do is grey, and says why. No manual, nothing typed, no surprises.</p></aside>
+
+<p class="setting">Today. Same library, same card, and somehow the same three books. Ana calls Marcus out of habit.</p>
+<div class="pair">
+  <ul class="points"><li>Today, in the web we got. Same library, same card, the same three books. Ana calls Marcus again, out of habit.</li><li>On her phone, each book's page carries its own buttons. She presses Renew on <i>Matilda</i>, and it's due December third.</li><li><i>The Hobbit</i>'s Renew is grey, and the reason is under it: a hold is waiting. <i>Charlotte's Web</i> says it was renewed the most allowed.</li><li><b>What it shows:</b> the same rules as 1997, now on the page before Ana tries. As Marcus puts it, every page is its own forms.html.</li></ul>
+<div class="script">
+    <div class="line"><span class="who ana">Ana</span><p>Marcus, it's Ana Torres. Remember the sticky notes?</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>I think I still have one.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p>I opened my account on my phone. Three books, with their titles. On <i>Matilda</i>: Renew and Return. I pressed Renew, and it's due December third.</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Nobody types POST anymore.</p></div>
+    <div class="line"><span class="who ana">Ana</span><p><i>The Hobbit</i>'s Renew is grey, and under it: a hold is waiting. <i>Charlotte's Web</i> says it's been renewed the most allowed. Return is still there.</p></div>
+    <div class="line"><span class="who marcus">Marcus</span><p>Same rules as 1997. The page knows them before you try. Every page is its own forms.html now: for just that book, just now.</p></div>
+  </div>
+  <figure><img src="media/heart-html.gif" alt="Ana opens her account, renews Matilda, then finds The Hobbit's Renew greyed with the reason." loading="lazy"><figcaption>HEART's HTML: <i>Matilda</i> renews; <i>The Hobbit</i> says why not.</figcaption></figure>
+</div>
+<details class="more"><summary>Stills, and where the page comes from</summary>
+  <div class="pair">
+    <figure><img src="media/account.png" alt="Ana's account, linking her three books by title." loading="lazy"><figcaption>Her account links each book by title.</figcaption></figure>
+    <figure><img src="media/matilda-offers.png" alt="Matilda, offering Renew and Return." loading="lazy"><figcaption><i>Matilda</i> offers Renew and Return.</figcaption></figure>
+  </div>
+  <p class="note">The library declares its acts once; heart-core serves this HTML from that declaration, beside the JSON faces agents read.</p>
+</details>
+</article>
+<article class="slide" id="two-webs"><header><span class="part">9 · Between the scenes</span></header>
+<h2>The same moment, two webs</h2>
+<div class="pair">
+  <figure><img src="media/renew-409.png" alt="1997: a renewal typed by hand and refused, 409." loading="lazy"><figcaption>1997, the web that wasn't: typed, sent, refused.</figcaption></figure>
+  <figure><img src="media/hobbit-greyed.png" alt="Today: Renew greyed, with the reason, before anything is sent." loading="lazy"><figcaption>Today: Renew greyed, with the reason, before anything is sent.</figcaption></figure>
+</div>
+<ul>
+  <li><b>Same library, same rules:</b> renew is refused while a hold is waiting, or after three renewals.</li>
+  <li><b>The web that wasn't:</b> a document of every address, pages of numbers, a POST typed by hand.</li>
+  <li><b>The web we got:</b> each page carries the controls its state allows.</li>
+</ul>
+</article>
+<article class="slide" id="it-office"><header><span class="part">10 · Scene three · today</span><span class="fiction">Fiction</span></header>
+<h2>The machine web's manual: OpenAPI</h2>
+<aside class="preamble now"><span class="label">On the machine web, today</span><p>Priya builds the library's API; Sam builds an assistant that renews books for members. Sam's code gets the data from one place and a document of every operation from another, the same for every loan, and learns the rules from refusals: Ana's 1997, with better tooling.</p></aside>
+
+<figure><img src="media/openapi-list.png" alt="Swagger UI for Riverside Public Library, whose description says which acts a resource allows depends on its state: GET /accounts, GET /accounts/{id}, GET /loans, GET /loans/{id}, POST /loans/{id}/actions/renew, POST /loans/{id}/actions/return." loading="lazy"><figcaption>The library's API as HEART serves it in OpenAPI, shown in Swagger UI: every operation, for every loan alike. It says so itself: which acts a resource allows depends on its state, which the document can only describe in prose.</figcaption></figure>
+<p class="setting">Today. Priya, who builds the library's API, has it on her screen. Sam builds the assistant that renews books for members.</p>
+<ul class="points"><li>The same day, in the library's IT office. Priya builds its API; Sam builds an assistant that renews books for members.</li><li>Priya shows the loans API in Swagger UI: every operation, for every loan alike. Sam's assistant sent renew for <i>The Hobbit</i> and got a 409, the rule in the operation's prose.</li><li>Sam recognizes forms.html: every address, the same for every loan, found out by trying. Ana's page gives her a grey button; his assistant gets a 409.</li><li><b>What it shows:</b> JSON for the information, OpenAPI for the controls, and the client joining them, as Ana did in 1997.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>There's the loans API. Every operation, every field, every status code.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>And renew, for every loan. My agent sent one for <i>The Hobbit</i> and got a 409.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>The rule's in the description: fewer than three renewals, no hold waiting.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Remember forms.html? Every address, the same for every loan, and you found out by trying.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>…This one has a Try it out button.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Ana's page gives her a grey button with the reason. My agent gets a 409.</p></div>
+</div>
+<details class="more"><summary>Renew, opened, beside 1997's forms.html</summary>
+  <div class="pair">
+    <figure><img src="media/openapi-renew.png" alt="Swagger UI's renew operation: offered while the book is out, renewed fewer than three times, and no one's hold is waiting; an id, an If-Match, Try it out." loading="lazy"><figcaption>Today: renew, its rule in prose, and Try it out.</figcaption></figure>
+    <figure><img src="media/forms-html.png" alt="forms.html at RENEW A LOAN: method POST, an address with {loanId}, a body with {card} and {pin}." loading="lazy"><figcaption>1997: RENEW A LOAN in forms.html, and what to type.</figcaption></figure>
+  </div>
+</details>
+<details class="more"><summary>The two documents behind them</summary>
+  <div class="pair">
+    <div><span class="label">1997: the Perl site's forms.yaml</span>
+<pre><code>/loans/{loanId}/renew:
+  post:
+    summary: Renew a loan
+    description: Only while it is renewed
+      fewer than three times and no one's
+      hold is waiting.
+    responses:
+      '200': renewed
+      '409': it cannot be renewed</code></pre></div>
+    <div><span class="label">Today: heart-core's OpenAPI twin</span>
+<pre><code>/loans/{id}/actions/renew:
+  post:
+    description: Offered while the book is out,
+      renewed fewer than three times, and
+      no one's hold is waiting.
+    requestBody: { $ref: Renew }
+    responses:
+      '200': The loan after the act
+      '409': NotOffered</code></pre></div>
+  </div>
+  <p class="note">Both list renew for every loan, always. forms.yaml is the OpenAPI of the web that wasn't, and forms.html its Swagger UI. Whether this loan can be renewed now, each says only after the call.</p>
+</details>
+</article>
+<article class="slide" id="divorce"><header><span class="part">11 · Between the scenes</span></header>
+<h2>The Great Divorce</h2>
+<p class="dek">What a loan is, and what you can do with it: together on Ana's page, split apart on the machine web, and together again in HAL Schema Forms.</p>
+<div class="morph" data-start="page" data-cycles='[{"to": "apart", "label": "The Divorce", "head": "The Divorce of Information from Controls"}, {"to": "return", "label": "The Return", "head": "The Return of Information and Controls"}]'>
+  <div class="mo-stage">
+    <section class="mo-scene" data-scene="page">
+      <h3 class="mo-title">A page: information and controls together</h3>
+      <div class="dv-browser">
+        <div class="dv-url">library.test/loans/3310</div>
+        <div class="dv-screen">
+          <b class="dv-book">The Hobbit</b>
+          <div class="dv-fields">
+            <div class="tk tk-card" data-token="id"><small>ID</small><span>3310</span></div>
+            <div class="tk tk-card" data-token="title"><small>Title</small><span>The Hobbit</span></div>
+            <div class="tk tk-card" data-token="author"><small>Author</small><span>J. R. R. Tolkien</span></div>
+            <div class="tk tk-card" data-token="due"><small>Due</small><span>2026-11-12</span></div>
+            <div class="tk tk-card" data-token="renewals"><small>Renewals</small><span>0</span></div>
+            <div class="tk tk-card" data-token="standing"><small>Standing</small><span>hold waiting</span></div>
+          </div>
+          <div class="dv-acts">
+            <div class="tk tk-button tk-off" data-token="renew">Renew</div>
+            <div class="tk tk-note" data-token="why">A hold is waiting for this book, so it can't be renewed.</div>
+            <div class="dv-dialog">
+              <div class="tk tk-button" data-token="report">Report a problem</div>
+              <span class="dv-field">Problem</span>
+              <div class="tk tk-select" data-token="problem">It's damaged</div>
+              <span class="dv-field">Comment</span>
+              <div class="tk tk-text" data-token="comment">Up to 200 characters</div>
+            </div>
+            <div class="tk tk-button" data-token="return">Return</div>
+          </div>
+        </div>
+      </div>
+      <p class="mo-cap">Ana's page for <i>The Hobbit</i>. What the loan is, on the left. What she can do with it now, on the right: Renew greyed, with the reason; Report a problem, a choice of the library's kinds and a comment; and Return.</p>
+    </section>
+    <section class="mo-scene" data-scene="apart">
+      <h3 class="mo-title">The Divorce of Information from Controls</h3>
+      <div class="dv-apart">
+        <div class="dv-doc">
+          <span class="dv-label">Information · GET /loans/3310 · application/json</span>
+          <div class="dv-code">
+            <span>{</span>
+            <span class="tk tk-line tk-info i1" data-token="id">"id": 3310,</span>
+            <span class="tk tk-line tk-info i1" data-token="title">"title": "The Hobbit",</span>
+            <span class="tk tk-line tk-info i1" data-token="author">"author": "J. R. R. Tolkien",</span>
+            <span class="tk tk-line tk-info i1" data-token="due">"due": "2026-11-12",</span>
+            <span class="tk tk-line tk-info i1" data-token="renewals">"renewals": 0,</span>
+            <span class="tk tk-line tk-info i1" data-token="standing">"standing": "hold waiting"</span>
+            <span>}</span>
+          </div>
+        </div>
+        <p class="dv-gap"><span>The client joins them, and learns the rules from a 409 and a 422</span></p>
+        <div class="dv-doc">
+          <span class="dv-label">Controls · openapi.json · every loan alike</span>
+          <div class="dv-code">
+            <span>paths:</span>
+            <span class="tk tk-line tk-ctl i1" data-token="renew">/loans/{id}/actions/renew:</span>
+            <span class="i2">post:</span>
+            <span class="tk tk-line tk-said i3" data-token="why">description: Offered while the book is out, renewed fewer than three times, and no one's hold is waiting. Only allowed when standing is renewable.</span>
+            <span class="tk tk-line tk-ctl i1" data-token="report">/loans/{id}/actions/report-problem:</span>
+            <span class="i2">post:</span>
+            <span class="i3">description: … problem: one of the values that /problem-kinds lists.</span>
+            <span class="i3">requestBody: Report-problem</span>
+            <span class="tk tk-line tk-ctl i1" data-token="return">/loans/{id}/actions/return:</span>
+            <span class="i2">post: …</span>
+            <span>components:</span>
+            <span class="i1">schemas:</span>
+            <span class="i2">Report-problem:</span>
+            <span class="i3">required: [problem]</span>
+            <span class="tk tk-line tk-ctl i3" data-token="problem">problem: { type: string, x-heart-options: { link: /problem-kinds, … } }</span>
+            <span class="tk tk-line tk-ctl i3" data-token="comment">comment: { type: string, maxLength: 200 }</span>
+          </div>
+        </div>
+      </div>
+      <p class="mo-cap">The data, alone, says nothing of what it allows. The operations, alone, are the same for every loan: this loan's reason is now a rule in prose, and the problem's choices a sentence about a list the document never describes. The client joins the two each time.</p>
+    </section>
+    <section class="mo-scene" data-scene="return">
+      <h3 class="mo-title">The Return of Information and Controls</h3>
+      <div class="dv-together">
+        <div class="dv-doc">
+          <span class="dv-label">Information and controls · GET /loans/3310 · HAL Schema Forms</span>
+          <div class="dv-code">
+            <span>{</span>
+            <span class="tk tk-line tk-info i1" data-token="id">"id": 3310,</span>
+            <span class="tk tk-line tk-info i1" data-token="title">"title": "The Hobbit",</span>
+            <span class="tk tk-line tk-info i1" data-token="author">"author": "J. R. R. Tolkien",</span>
+            <span class="tk tk-line tk-info i1" data-token="due">"due": "2026-11-12",</span>
+            <span class="tk tk-line tk-info i1" data-token="renewals">"renewals": 0,</span>
+            <span class="tk tk-line tk-info i1" data-token="standing">"standing": "hold waiting",</span>
+            <span class="i1">"_links": { "self": …, "curies": […], "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0", … } },</span>
+            <span class="i1">"_forms": {</span>
+            <span class="tk tk-line tk-ctl i2" data-token="report">"library:report-problem": { "title": "Report a problem", "method": "POST", …</span>
+            <span class="i3">"schema": { "required": ["problem"], "properties": {</span>
+            <span class="tk tk-line tk-ctl i4" data-token="problem">"problem": { "type": "string", "hr:options": { "link": { "href": "/problem-kinds" }, … } },</span>
+            <span class="tk tk-line tk-ctl i4" data-token="comment">"comment": { "type": "string", "maxLength": 200 } } } },</span>
+            <span class="tk tk-line tk-ctl i2" data-token="return">"library:return": { "title": "Return", "method": "POST", … }</span>
+            <span class="i1">}</span>
+            <span>}</span>
+          </div>
+        </div>
+        <div class="dv-side">
+          <div class="dv-doc">
+            <span class="dv-label">What's absent, and why · GET /unavailable/61bc1cd6003e61f0</span>
+            <div class="dv-code">
+              <span>{ "unavailable": [ {</span>
+              <span class="i1">"rel": "/profiles/library#renew",</span>
+              <span class="tk tk-line tk-ctl i1" data-token="renew">"title": "Renew",</span>
+              <span class="tk tk-line tk-said i1" data-token="why">"reason": "A hold is waiting for this book, so it can't be renewed."</span>
+              <span>} ] }</span>
+            </div>
+          </div>
+          <div class="dv-doc">
+            <span class="dv-label">The problem's choices · GET /problem-kinds</span>
+            <div class="dv-code">
+              <span>{ "kinds": [</span>
+              <span class="i1">{ "value": "damaged", "prompt": "It's damaged" },</span>
+              <span class="i1">{ "value": "missing-pages", "prompt": "Pages are missing" },</span>
+              <span class="i1">{ "value": "wrong-book", "prompt": "It's the wrong book" },</span>
+              <span class="i1">{ "value": "lost", "prompt": "I can't find it" } ] }</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="mo-cap">The same page as HAL Schema Forms: the same data; the acts this loan allows now, each form with its fields, the problem's choices linked; and a link to what's absent and why. Nothing is lost, and there is nothing to join.</p>
+    </section>
+  </div>
+  <p class="mo-still note">Three stills. Read as HEART, this slide links a script that animates them (<code>deck:code</code>). Plain JSON carries no links, so no code arrives.</p>
+</div>
+<p class="note">The same script animates the Marriage: code on demand, linked by each slide that uses it. Every value here is from the running library service: its HTML page, its plain JSON, its OpenAPI twin and its HAL Schema Forms answer, trimmed where marked …. Next: Fielding's name for keeping the two together.</p>
+</article>
+<article class="slide" id="information-and-controls"><header><span class="part">12 · Between the scenes</span></header>
+<h2>Information and Controls</h2>
+<p class="dek">Fielding's name for the two kept together is hypertext.</p>
+<blockquote class="fielding">“When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.”<cite>Roy T. Fielding, 2008</cite></blockquote>
+<p class="lead">Hypermedia as the engine of application state, <b>HATEOAS</b>, is the most followed constraint of all time on the human web, and the least followed on the machine web.</p>
+<ul>
+  <li><b>The human web:</b> every page you have ever loaded follows it. It carries what you can do, from where you are, now.</li>
+  <li><b>The machine web, JSON over HTTP:</b> the data in one answer, the operations in a document beside it, the same for every state.</li>
+</ul>
+<details class="more"><summary>Hypertext, briefly: eighty years of one idea</summary>
+  <ul class="timeline">
+    <li><span class="y">1945</span><b>Vannevar Bush, “As We May Think”.</b> The Memex: a desk of documents joined by trails a reader follows and adds to.</li>
+    <li><span class="y">1965</span><b>Ted Nelson coins “hypertext”:</b> text that branches, where the reader chooses the path.</li>
+    <li><span class="y">1968</span><b>Douglas Engelbart's demonstration:</b> links, windows and a mouse, live, with information you could click and change.</li>
+    <li><span class="y">1989–91</span><b>Tim Berners-Lee's Web:</b> a proposal at CERN, then the first browser and server. Any page can link to any other, and one generic program, the browser, can follow them all.</li>
+    <li><span class="y">1993–95</span><b>Forms:</b> Mosaic adds fill-out forms, and HTML 2.0 (RFC 1866) makes them standard. Pages stop only showing and start offering things to do. In this story's 1997, they never came.</li>
+    <li><span class="y">2000</span><b>Fielding's dissertation names the architecture:</b> REST, with hypermedia as the engine of application state. The client moves from state to state by choosing among the controls each answer carries, as every page on the Web already did.</li>
+    <li><span class="y">2008</span><b>Fielding, “REST APIs must be hypertext-driven”:</b> a rebuke to the “REST APIs” that had dropped exactly that.</li>
+  </ul>
+  <p class="note">Bush, The Atlantic, 1945; Nelson, ACM, 1965; Engelbart, 1968; Berners-Lee, “Information Management: A Proposal”, CERN, 1989; HTML 2.0, RFC 1866, 1995; Fielding, dissertation, 2000, and the 2008 post.</p>
+</details>
+<details class="more"><summary>His complaint, 2008, in his words</summary>
+  <blockquote class="fielding"><p>“I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.</p>
+  <p>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?”</p>
+  <cite>The post’s opening</cite></blockquote>
+  <blockquote class="fielding"><p>“A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API).”</p>
+  <cite>From the same post</cite></blockquote>
+  <p class="note">Roy T. Fielding, <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a>, 20 October 2008; the rule itself, dissertation, 2000, §5.1.5.</p>
+</details>
+</article>
+<article class="slide" id="whiteboard"><header><span class="part">13 · Scene four · an hour later</span><span class="fiction">Fiction</span></header>
+<h2>Give the answer its controls</h2>
+<aside class="preamble heart"><span class="label">If the API answered like the page</span><p>Priya wants Sam's assistant to get what Ana's page has. In each answer, the loan and what can be done with it now, and why the rest can't; anything stale or not offered refused with a reason. The assistant would choose among offers, not read a manual.</p></aside>
+
+<p class="setting">The same office, an hour later. Sam has the marker.</p>
+<ul class="points"><li>An hour later, Priya asks what it would take to give the API what Ana's page has. Sam lists six things on the whiteboard.</li><li>The answer links itself and names its vocabulary. The acts arrive as forms, the forms follow the state, and what's absent says why.</li><li>A version tag guards each act, and every loan in the same state links one shared set of forms, fetched once and cached.</li><li><b>What it shows:</b> the data stays as it is; the controls move into the answer, on standards already in use.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>What would it take to give the API what Ana's page has?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Six things. Her page already does every one.</p></div>
+</div>
+<details class="more"><summary>Before: a loan as JSON over HTTP</summary>
+<pre><code>GET /loans/3310   Accept: application/json
+
+{ "id": 3310, "title": "The Hobbit", "author": "J. R. R. Tolkien",
+  "due": "2026-11-12", "renewals": 0, "standing": "hold waiting" }</code></pre>
+  <p class="note">Data only. What can be done is in the OpenAPI document, for every loan alike.</p>
+</details>
+<ol class="steps">
+  <li><b>The answer links itself and names its vocabulary.</b><span>“So <code>library:renew</code> means the same thing to every client.”</span>
+    <details><summary>On the wire</summary>
+<pre><code><span class="add">+ "_links": {
++   "self": { "href": "/loans/3310" },
++   "curies": [ { "name": "library", "href": "/profiles/library#{rel}", "templated": true } ]
++ }</span></code></pre></details></li>
+  <li><b>The acts arrive as forms.</b><span>“Where to send, which method, what to put in: the OpenAPI operation, moved into the loan.”</span>
+    <details><summary>On the wire <small>(Matilda)</small></summary>
+<pre><code><span class="add">+ "_forms": {
++   "library:renew": {
++     "title": "Renew",
++     "_links": { "target": { "href": "/loans/3311/actions/renew" } },
++     "method": "POST",
++     "contentType": "application/json",
++     "schema": { "type": "object", "properties": {} }
++   },
++   "library:return": { … }
++ }</span></code></pre></details></li>
+  <li><b>The forms follow the state.</b><span>“<i>Matilda</i> gets renew and return. <i>The Hobbit</i> gets return only.”</span>
+    <details><summary>On the wire <small>(The Hobbit)</small></summary>
+<pre><code>  "standing": "hold waiting",
+  "_forms": {
+<span class="del">-   "library:renew": { … },</span>
+    "library:return": { … }
+  }</code></pre></details></li>
+  <li><b>What's absent says why.</b><span>“The grey button with its reason, as data.”</span>
+    <details><summary>On the wire</summary>
+<pre><code><span class="add">+ "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0" }</span>
+
+GET /unavailable/61bc1cd6003e61f0
+{ "unavailable": [ { "rel": "/profiles/library#renew", "title": "Renew",
+    "reason": "A hold is waiting for this book, so it can't be renewed." } ] }</code></pre></details></li>
+  <li><b>A version tag guards the act.</b><span>“Send back the tag you read. Stale is refused, 412, not a surprise.”</span>
+    <details><summary>On the wire</summary>
+<pre><code>ETag: "seq-1.hsf.L0.d96396fb7e046607"
+
+POST /loans/3311/actions/renew   If-Match: "seq-0.stale"
+412 Precondition Failed   The act is stale: the state has changed</code></pre></details></li>
+  <li><b>One form set per state, shared.</b><span>“Every loan with a hold waiting links the same set: fetched once, checked by its hash, cached.”</span>
+    <details><summary>On the wire <small>(L2)</small></summary>
+<pre><code><span class="del">- "_forms": { … },</span>
+<span class="add">+ "hr:forms": { "href": "/affordance-sets/31a5b6105822d925",
++               "integrity": "sha256-MaW2EFgi2SXHXtDeNNqfRqaPpMhuPfrUB/RV+oPsfQ8=" }</span></code></pre></details></li>
+</ol>
+</article>
+<article class="slide" id="in-charge"><header><span class="part">14 · Scene four · an hour later</span><span class="fiction">Fiction</span></header>
+<h2>Declared once, enforced by the server</h2>
+<ul class="points"><li>Priya asks whether she has to rewrite the API. Sam says no: she declares the acts once, what each state offers, and why one is missing.</li><li>From that one declaration, HEART serves HTML for Ana, HAL-FORMS and HAL Schema Forms for Sam's assistant, and an OpenAPI twin.</li><li>Apps that ask for application/json get what they always got. An act sent anyway, without its form, is refused, 409, with the reason.</li><li><b>What it shows:</b> a form is an offer, and the server stays in charge, as the library's 1997 CGI did, but now it says so first.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Do I rewrite the API?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>The data stays as it is. You declare the acts once: what each state offers, and why one is missing. HEART serves that as HTML for Ana, as HAL-FORMS and HAL Schema Forms for agents, and as an OpenAPI twin for anyone who still wants one.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And every app already calling us with <code>application/json</code>?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>It gets what it gets today: the loan's data, and no controls. Only a client that asks for HEART gets them.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And a client that ignores the forms and posts renew anyway?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>409, with the reason. A form is an offer. The server stays in charge.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>So the API answers the way the page does.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>The way the web always did, for people.</p></div>
+</div>
+<details class="more"><summary>The same loan, asked two ways, live</summary>
+  <div class="pair">
+    <div><span class="label">An app that asks for application/json, as before</span>
+<pre><code>GET /loans/3310
+Accept: application/json
+
+200 OK   Content-Type: application/json
+
+{ "id": 3310, "title": "The Hobbit",
+  "author": "J. R. R. Tolkien",
+  "due": "2026-11-12", "renewals": 0,
+  "standing": "hold waiting" }</code></pre></div>
+    <div><span class="label">A client that asks for HEART: HAL Schema Forms, at L0</span>
+<pre><code>GET /loans/3310
+Accept: application/hal+json
+Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
+
+200 OK   Content-Type: application/hal+json
+
+{ "id": 3310, "title": "The Hobbit", …,
+  "standing": "hold waiting",
+<span class="add">  "_links": { "self": …, "hr:unavailable": … },
+  "_forms": { "library:return": { … } }</span> }</code></pre></div>
+  </div>
+  <p class="note">From the running library service, by <code>live/upgrade.mjs</code>. Adopting HEART changes nothing for the first: the same data, no controls.</p>
+</details>
+<div class="map">
+  <div><code>one declaration</code><span>Acts, what each state offers, and why one is absent.</span></div>
+  <div><code>HTML</code><span>For Ana in a browser: buttons, greyed with a reason.</span></div>
+  <div><code>HAL-FORMS</code><span>The on-ramp, read by Spring HATEOAS clients and ARTIE.</span></div>
+  <div><code>HAL Schema Forms</code><span>The reference dialect: forms as JSON Schema, shared per state.</span></div>
+  <div><code>OpenAPI twin</code><span>For tools that only read OpenAPI.</span></div>
+</div>
+<details class="more"><summary>What the library declares</summary>
+<pre><code>// its vocabulary
+Profile(name = "library", relations = listOf(Relation("renew", AlpsType.UNSAFE, "Renew", …), …))
+
+// its acts
+acts = listOf(Act("renew", "renew", NO_INPUT), Act("return", "return", NO_INPUT))
+
+// what each state offers
+keyOf = { it.standing }
+offered = { standing -> when (standing) {
+    RENEWABLE -> listOf("renew", "return")
+    RETURNED -> emptyList()
+    else -> listOf("return")
+} }
+
+// why, when it doesn't
+whyAbsent = { standing, _ -> WHY.getValue(standing) }   // ON_HOLD: "A hold is waiting for this book, …"
+
+// the version every act is checked against
+versionOf = { it.version }</code></pre>
+  <p class="note">heart-core writes the wire from it. For an API you don't own, the HEART gateway does the same from its OpenAPI description, with your own controls in front.</p>
+</details>
+<details class="more"><summary>The same rule, in 1997's CGI and in today's declaration</summary>
+  <div class="code-pair">
+    <div><span class="label">1997: checked when the request arrives</span>
+    <pre class="source"><code>return answer('409 Conflict', 'Cannot renew', p("A hold is waiting for this book, so it can't be renewed."))
+    if $loan-&gt;[6];
+return answer('409 Conflict', 'Cannot renew', p("It has been renewed $MOST_RENEWALS times, the most allowed."))
+    if $loan-&gt;[5] &gt;= $MOST_RENEWALS;</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi</code>, lines 64–67</p></div>
+    <div><span class="label">Today: offered by state, and why not, before</span>
+    <pre class="source"><code>private fun offered(standing: String): List&lt;String&gt; = when (standing) {
+    Loan.RENEWABLE -&gt; listOf("renew", "report-problem", "return")
+    Loan.RETURNED -&gt; emptyList()
+    else -&gt; listOf("report-problem", "return")
+}</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 173–177</p>
+    <pre class="source"><code>private val WHY = mapOf(
+    Loan.RENEWABLE to "It can be renewed and returned.",
+    Loan.ON_HOLD to "A hold is waiting for this book, so it can't be renewed.",
+    Loan.AT_LIMIT to "It has been renewed ${Loan.MOST_RENEWALS} times, the most allowed.",
+    Loan.RETURNED to "It was returned.",
+)</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 245–250</p></div>
+  </div>
+  <p class="note">The same three rules. The CGI finds out after the request; the declaration says, for each standing, what is offered and why the rest isn't, so every answer carries it before the request. heart-core still refuses an act it didn't offer, 409, as the CGI did.</p>
+</details>
+</article>
+<article class="slide" id="openapi-opt-in"><header><span class="part">15 · Scene four · an hour later</span><span class="fiction">Fiction</span></header>
+<h2>OpenAPI clients can opt in</h2>
+<ul class="points"><li>Priya asks whether Sam's assistant, which reads OpenAPI, has to switch to HEART to stop guessing.</li><li>Sam says no: each plain JSON answer can carry one more header, a link to the forms that loan allows now. A client that ignores it never notices.</li><li>Opted in, the assistant skips renew for <i>The Hobbit</i> and sends nothing that would be refused.</li><li><b>What it shows:</b> HEART can be taken up one client at a time.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Your agent reads our OpenAPI. Does it have to switch to HEART to stop guessing?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>No. Each plain answer can carry one more header: a link to what this loan allows now. The description already says how to read it.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And a client that doesn't read it?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Never notices. Same body, one header it ignores.</p></div>
+</div>
+<pre><code>GET /loans/3310   Accept: application/json
+
+200 OK   Content-Type: application/json
+<span class="add">Link: &lt;/affordance-sets/76c46cea7232ed43&gt;; rel="https://w3id.org/heart-rise/rels/forms";
+      type="application/hal+json"; integrity="sha256-dsRs6nIy7UNUPi6OIILLINPmCkhlW8yhxdwuxe7pDCI="</span>
+
+{ "id": 3310, "title": "The Hobbit", …, "standing": "hold waiting" }</code></pre>
+<div class="pair">
+  <div class="step human">
+    <b>Reading the description alone</b>
+    <ul>
+      <li><i>The Hobbit</i>: renew and return both look possible.</li>
+      <li>It renews, and learns only after the call: 409, “A hold is waiting for this book, so it can't be renewed.”</li>
+    </ul>
+  </div>
+  <div class="step agent">
+    <b>Opted in to the link</b>
+    <ul>
+      <li><i>The Hobbit</i>: return only. Nothing is sent that would be refused.</li>
+      <li><i>Matilda</i>: renew and return.</li>
+      <li>Each set is fetched once by its address, and checked against its integrity.</li>
+    </ul>
+  </div>
+</div>
+<details class="more"><summary>What opting in takes, in the client</summary>
+<pre><code>// The link the description documents (x-heart-affordances), the set it names,
+// and the operations a form in it matches, by method and path template.
+async function allowedNow(header, candidates) {
+  const link = linked(header);
+  if (!link) return { offered: candidates, from: "no link" };
+  if (!sets.has(link.href)) {
+    const set = await send("GET", link.href, { Accept: link.type });
+    const [algorithm, digest] = link.integrity.split(/-(.*)/s);
+    const intact = createHash(algorithm).update(set.bytes).digest("base64") === digest;
+    if (!intact) throw new Error(`the set at ${link.href} does not match its integrity`);
+    sets.set(link.href, Object.values(set.json._forms));
+  }
+  const forms = sets.get(link.href);
+  return { offered: candidates.filter((op) =&gt; forms.some((f) =&gt;
+    f.method === op.method &amp;&amp; matches(op.path, f._links.target.href))), from: link.href };
+}</code></pre>
+  <p class="note">From <code>live/openapi-client.mjs</code>, an OpenAPI client of the running library service; every exchange is in <code>openapi-optin.capture.yaml</code>. The description's <code>x-heart-affordances</code> names the header, the relation, and how to match.</p>
+</details>
+</article>
+<article class="slide" id="ai-driven"><header><span class="part">16 · Scene four · that evening</span><span class="fiction">Fiction</span></header>
+<h2>A purpose, not a program</h2>
+<p class="setting">That evening. Priya has gone back to the 2008 post the quote on the whiteboard came from, and is reading the replies under it.</p>
+<ul class="points"><li>That evening, Priya reads the replies under Fielding's 2008 post. In one, he says what a client needs once each answer carries its instructions; it is quoted whole on the slide.</li><li>He names three kinds of purpose: user-driven, configuration-driven and AI-driven. Sam matches them: Ana at her page, a kept script, a model.</li><li>So they don't write the assistant a program. They write its purpose, in plain words, in member.goal.md, and let each answer's forms supply the rest.</li><li><b>What it shows:</b> the agent needs a goal, not a program; once it has found the way, what it did can be kept.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Someone asked him about queues, three weeks after the post. Listen to how he ends his answer.</p></div>
+</div>
+<blockquote class="fielding">“If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn’t care if the resource is a distributed queue. It simply doesn’t need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven.”<cite>Roy T. Fielding, a reply under his post, 8 November 2008</cite></blockquote>
+<div class="script">
+  <div class="line"><span class="who sam">Sam</span><p>“Some idea of what it wants to do next.” That's all a client needs?</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>When every answer carries its instructions, yes. And he names three kinds of purpose.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Ana at her page is user-driven. A script is configuration-driven. And a model reading the forms…</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>…is some sort of AI-driven. In 2008. So we don't write the assistant a program. We write it the purpose, in plain words, and the forms tell it the rest.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>And once it has found the way, we keep what it did as a script. The AI-driven run becomes a configuration-driven one.</p></div>
+</div>
+<div class="goal"><span class="label">What they wrote that night: member.goal.md</span>
+<pre><code>Renew each book a member has out that can be renewed, and say why for any that can't.
+
+- Find the account of the member named {member}
+  - For each book they have out: renew it if renewing is offered; otherwise say why it can't be renewed</code></pre></div>
+<details class="more"><summary>He said it more than once, that autumn</summary>
+  <blockquote class="fielding"><p>“When representations are provided in hypertext form with typed relations (using microformats of HTML, RDF in N3 or XML, or even SVG), then automated agents can traverse these applications almost as well as any human. There are plenty of examples in the linked data communities. More important to me is that the same design reflects good human-Web design, and thus we can design the protocols to support both machine and human-driven applications by following the same architectural style.”</p><cite>A reply, 23 October 2008</cite></blockquote>
+  <blockquote class="fielding"><p>“Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.”</p><cite>A reply, 20 October 2008</cite></blockquote>
+  <p class="note">Roy T. Fielding, replies under <a href="https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">“REST APIs must be hypertext-driven”</a>, October and November 2008, quoted as written. The quotes are real; the conversation is not.</p>
+</details>
+<details class="more"><summary>How a goal in plain words runs</summary>
+  <ul>
+    <li><b>The goal:</b> the purpose in a sentence, then an outline of steps. <code>{member}</code> is an input, given on each run.</li>
+    <li><b>The first run:</b> ARTIE reads each answer's forms and asks the model which one serves the step it is on. The model chooses only among what the answer offers.</li>
+    <li><b>Kept:</b> <code>artie generate</code> writes what the run chose as a script, the goal's words beside each step. Runs after it call no model.</li>
+  </ul>
+</details>
+</article>
+<article class="slide" id="next-week"><header><span class="part">17 · Scene five · the next week</span><span class="fiction">Fiction</span></header>
+<h2>Find the way once, then keep it</h2>
+<aside class="preamble heart"><span class="label">With an agent and a goal</span><p>Sam gives the assistant one sentence of purpose and Ana's name. The first time, a model finds the way through the library's answers. After that, a kept script does the same with no model, and stops rather than guess if the library changes.</p></aside>
+
+<p class="setting">Ana comes in to return a book. Sam shows her the assistant; Priya is at the next desk.</p>
+<ul class="points"><li>The next week, Ana comes in to return a book, and Sam shows her the assistant.</li><li>Given the goal and her name, it renewed <i>Matilda</i> and said why it couldn't renew the other two: what her phone says. Finding the way took 11 calls to Claude.</li><li>ARTIE kept what it did as a short script that takes a member's name. Runs since call no model. When Priya moved renew to a new address, the script followed the form.</li><li><b>What it shows:</b> found once with a model, the way is kept, and runs without one.</li></ul>
+<div class="script">
+  <div class="line"><span class="who sam">Sam</span><p>We told it once, in plain words, what to do for a member: renew each book that can be renewed, and say why for any that can't. Then we gave it your name.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>And?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>It renewed <i>Matilda</i>. It said <i>The Hobbit</i> has no renew form, because a hold is waiting, and that <i>Charlotte's Web</i> was renewed the most allowed.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>That's what my phone says.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Same answers, a different client. The first time, the model found the way: eleven calls to Claude. We kept what it did as a short script that takes a member's name. Every run since: no model.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>When the hold on <i>The Hobbit</i> clears, will it renew it?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>If the library offers renew then, yes. It acts on what's offered.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>We moved renew to a new address on Monday. Did it break?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>No. It remembers what the form does, not where it points. Change the form itself, and it stops instead of guessing.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>And <i>Charlotte's Web</i>?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Done renewing. The library offers return.</p></div>
+  <div class="line"><span class="who ana">Ana</span><p>Then I'll bring it back in person. Some things I still like to do by hand.</p></div>
+</div>
+<div class="stats">
+  <div class="stat"><b>11</b><span>model calls, once, to find the way</span></div>
+  <div class="stat"><b>0</b><span>model calls each run after</span></div>
+</div>
+<div class="pair">
+  <div><span class="label">What they wrote: member.goal.md</span>
+<pre><code>Renew each book a member has out that can be
+renewed, and say why for any that can't.
+
+- Find the account of the member named {member}
+  - For each book they have out: renew it if
+    renewing is offered; otherwise say why it
+    can't be renewed</code></pre></div>
+  <div><span class="label">What ARTIE kept: member.heart.yaml</span>
+<pre><code>inputs:
+  member:
+
+steps:
+  - act: library:search-accounts
+    fields:
+      name: ${member}
+    then:
+      - follow: item
+        title: ${member}
+        then:
+          - for-each: loan
+            then:
+              - when-offered:
+                  - act: library:renew
+                    inferred: renew this book (${loan.title})</code></pre></div>
+</div>
+<details class="more"><summary>The run, and what the script keeps of the goal</summary>
+  <ul>
+    <li><b>The goal's words</b> stay in the script, beside the step they asked for: each step's <code>intent</code>, and the model's own words for each act it chose, <code>inferred</code>. No member's name or book's title the run met is written in it.</li>
+    <li><b>Kept</b> by <code>artie generate</code> from the run: the member found by the name it is given, then every book their account links, renewed when it offers renew.</li>
+    <li><b>Pinned</b> by what the form does, its act, not its address: a moved form costs no model call; a changed one stops the run.</li>
+    <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Ana Torres; 11 calls; 28,359 input tokens (8,713 sent, 17,860 read from cache, 1,786 written to it); 2,108 output.</li>
+  </ul>
+</details>
+</article>
+<article class="slide" id="five-members"><header><span class="part">18 · Scene five · the next week</span><span class="fiction">Fiction</span></header>
+<h2>The kept script, five members</h2>
+<ul class="points"><li>Priya asks whether it only works for Ana. Sam runs the kept script for five members, one after another: Ana Torres, David Miller, Grace Okafor, Liam Chen and Sofia Rossi.</li><li>No model is called. Each run renews what each book offers, and notes why the rest can't be renewed.</li><li>The script names no member and no book: the name is an input, and the books come from each member's account.</li><li><b>What it shows:</b> the way Ana's run found works for anyone.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Does it only work for Ana?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>It takes a name. Here are five, one after another. The model isn't called once.</p></div>
+</div>
+<div class="table-scroll"><table>
+  <thead><tr><th>Member</th><th>Renewed</th><th>Left, and why</th><th>Model calls</th><th>Time</th></tr></thead>
+  <tbody>
+    <tr><td>Ana Torres</td><td><i>Matilda</i></td><td><i>The Hobbit</i> (hold waiting), <i>Charlotte's Web</i> (renewed the most allowed)</td><td>0</td><td>965 ms</td></tr>
+    <tr><td>David Miller</td><td><i>The Secret Garden</i>, <i>Holes</i></td><td>—</td><td>0</td><td>855 ms</td></tr>
+    <tr><td>Grace Okafor</td><td><i>Hatchet</i></td><td><i>Wonder</i> (hold waiting)</td><td>0</td><td>847 ms</td></tr>
+    <tr><td>Liam Chen</td><td>—</td><td><i>Coraline</i> (renewed the most allowed)</td><td>0</td><td>816 ms</td></tr>
+    <tr><td>Sofia Rossi</td><td><i>The Giver</i>, <i>Number the Stars</i></td><td><i>Frindle</i> (hold waiting)</td><td>0</td><td>828 ms</td></tr>
+  </tbody>
+</table></div>
+<p class="note">Each renewed book is now due 2026-12-03. Each time is the whole run, most of it the client starting up.</p>
+<details class="more"><summary>How it was run</summary>
+  <ul>
+    <li><code>artie/five-members.mjs</code> runs <code>member.heart.yaml</code> once for each name against the running library, and reads each member's books before and after, as plain JSON.</li>
+    <li>Each run's trace is in <code>artie/runs/</code>; the table is <code>artie/five-members.yaml</code>.</li>
+  </ul>
+</details>
+</article>
+<article class="slide" id="company"><header><span class="part">19 · Scene six · a month later</span><span class="fiction">Fiction</span></header>
+<h2>A release, found once, kept as loops</h2>
+<aside class="preamble heart"><span class="label">When the library changes</span><p>A month later the library ships a release: company groups, results a page at a time, and a new form on every loan. Sam's assistant finds its way through it once. The script it keeps loops over every member and every book, and Ana's script still runs.</p></aside>
+
+<p class="setting">A month later. The library has added company groups, and Harbor Point Logistics has signed up all fifteen of its staff. Every loan can now report a problem, too.</p>
+<ul class="points"><li>A month later, the library adds company groups, and Harbor Point Logistics signs up its fifteen staff. Every loan can now report a problem, too.</li><li>Priya asks whether the assistant can renew for the whole company. With a model, once: 80 calls, three pages of members, 23 books, 14 renewed.</li><li>The script it kept names no one: a loop over the members, page after page, and inside it a loop over each member's books. Ana's script still runs: renew didn't change.</li><li><b>What it shows:</b> a release adds what's new; a script kept against what didn't change keeps running.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Can the assistant renew for the whole company?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Once the model finds the way. It searched the members by company, five to a page, and went through all three pages: every member, every book.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And the script it kept?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Names no one. A loop over every member the search lists, page after page, and inside it a loop over each member's books. If Harbor Point has twenty staff next month, it goes through four pages.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>Every loan has a new form now, for reporting a problem. Did that break Ana's script?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>No. Her script pins renew, and renew didn't change. A new form beside it is one more offer it doesn't need.</p></div>
+</div>
+<div class="stats">
+  <div class="stat"><b>80</b><span>calls to Claude, once, to find the way</span></div>
+  <div class="stat"><b>0</b><span>model calls each run after</span></div>
+  <div class="stat"><b>14</b><span>of the staff's 23 books renewed</span></div>
+</div>
+<div class="pair">
+  <div><span class="label">What they wrote: company.goal.md</span>
+<pre><code>Renew every book the members of a company group
+have out that can be renewed, and say why for
+any that can't.
+
+- Find the members of the company group {company}
+  - For each member, on every page of the results:
+    open the member, and renew each book they have
+    out if renewing is offered; otherwise say why
+    it can't be renewed</code></pre></div>
+  <div><span class="label">What ARTIE kept: company.heart.yaml</span>
+<pre><code>inputs:
+  company:
+
+steps:
+  - act: library:search-members
+    fields:
+      company: ${company}
+    then:
+      - for-each: member     # every member, every page
+        then:
+          - for-each: loan   # every book each has out
+            then:
+              - when-offered:
+                  - act: library:renew</code></pre></div>
+</div>
+<details class="more"><summary>The run, and the library's release</summary>
+  <ul>
+    <li><b>The first run:</b> Claude Sonnet 5.5, ARTIE at L2, for Harbor Point; 80 calls; 372,635 input tokens (229,755 sent, 141,094 read from cache, 1,786 written to it); 13,220 output; 111 steps.</li>
+    <li><b>Kept</b> by <code>artie generate</code>, which writes a list as one loop when the run opened every member of every page, following each page's next link; a member's own list is a loop inside it. The same in Kotlin: <code>each("member") { each("loan") { whenOffered … } }</code>.</li>
+    <li><b>Run with no model</b> on a fresh library: 110 steps. The fifteen have 23 books out: 14 renewable, each renewed once; 5 with a hold waiting and 4 at the limit, left. For the credit union: one renewed, one with a hold.</li>
+    <li><b>The release:</b> <code>search-members</code> finds the members of a company group, five to a page, each page linking the next. Every loan that is out offers <code>report-problem</code>: a kind of problem, from the list the library keeps at <code>/problem-kinds</code>, and a comment. The accounts search and the renew form are as they were, so <code>member.heart.yaml</code>, pinned before the release, ran after it unchanged.</li>
+  </ul>
+</details>
+</article>
+<article class="slide" id="bloat"><header><span class="part">20 · Scene six · a month later</span><span class="fiction">Fiction</span></header>
+<h2>Is hypermedia bloated? Measured</h2>
+<ul class="points"><li>Priya worries about the cost: fifteen people, every book, forms in every answer.</li><li>Sam measures the kept company script. At L0 every loan carries its forms: about 1.9 KB a loan, 118 KB in all.</li><li>At L1 each loan links one shared set per state, fetched once: 56% fewer bytes, each loan's answer 75% smaller, for four more requests.</li><li><b>What it shows:</b> at L2 the schemas are shared too; everything shared is addressed by its content and kept.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Fifteen people, every book, and the forms in every answer. Isn't that a lot of bytes? And a lot of round trips?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>At L0, yes: every loan carries its forms, almost two kilobytes each.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>At L1, a loan carries a link to its forms instead. Every loan in the same state links the same set, at an address that never changes, so the client fetches it once and keeps it.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>How many sets, for the whole company?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>Four. At L2 the schemas move out of the sets too, shared the same way: two more requests, here.</p></div>
+</div>
+<div class="table-scroll"><table>
+  <thead><tr><th>The same run, at</th><th>Requests</th><th>Bytes received</th><th>One loan's answer</th><th>Time on the wire</th></tr></thead>
+  <tbody>
+    <tr><td><b>L0</b>, forms in every answer</td><td>110</td><td>118,348</td><td>1,871 bytes</td><td>246 ms</td></tr>
+    <tr><td><b>L1</b>, forms linked, one set per state</td><td>114: 110 + 4 sets, once each</td><td>52,404 (−56%)</td><td>462 bytes (−75%)</td><td>152 ms</td></tr>
+    <tr><td><b>L2</b>, schemas linked too</td><td>116: + 2 schemas</td><td>51,972</td><td>462 bytes</td><td>154 ms</td></tr>
+  </tbody>
+</table></div>
+<p class="note">The kept company script for Harbor Point, run with no model at each rung, measured from its own exchanges. The times are one machine's loopback: read them as proportions.</p>
+<div class="pair">
+  <div><span class="label">A loan at L0: its forms inside it</span>
+<pre><code>{ "id": 3321, "title": "The Phantom Tollbooth",
+  "standing": "renewable", …,
+  "_links": { "self": …, "hr:unavailable": … },
+  "_forms": {
+    "library:renew": { "title": "Renew", "method": "POST", … },
+    "library:report-problem": {
+      "title": "Report a problem", "method": "POST",
+      "_links": { "target": { "href": "/loans/3321/actions/report-problem" } },
+      "schema": { "required": ["problem"], "properties": {
+        "problem": { "type": "string", "hr:options": { "link": { "href": "/problem-kinds" }, … } },
+        "comment": { "type": "string", "maxLength": 200 } } },
+      "hr:integrity": "sha256-NNKB…" },
+    "library:return": { … }
+  } }</code></pre></div>
+  <div><span class="label">The same loan at L2: a link to the set</span>
+<pre><code>{ "id": 3321, "title": "The Phantom Tollbooth",
+  "standing": "renewable", …,
+  "_links": {
+    "self": { "href": "/loans/3321" },
+    "hr:forms": {
+      "href": "/affordance-sets/292caa98b3e91085",
+      "integrity": "sha256-KSyq…" } } }</code></pre></div>
+</div>
+<details class="more"><summary>The set every renewable loan links, fetched once</summary>
+<pre><code>GET /affordance-sets/292caa98b3e91085
+
+{ "_forms": {
+    "library:renew": { … },
+    "library:report-problem": {
+      "title": "Report a problem", "method": "POST",
+      "_links": { "target": { "href": "/loans/{id}/actions/report-problem", "templated": true } },
+      "hr:templatePointers": { "id": "/id" },
+      "schema": { "$ref": "/schemas/6770c985e2914e09", "hr:integrity": "sha256-Z3DJ…" } },
+    "library:return": { … } } }</code></pre>
+  <ul>
+    <li><b>Shared:</b> the target is a template, filled from each loan's own id, so one set serves every loan in its state.</li>
+    <li><b>Kept for good:</b> its address is its content's digest, so it never changes there; the client checks it against the integrity the loan's link carries.</li>
+    <li><b>Measured by</b> <code>artie/rungs/measure.mjs</code> from <code>L0</code>, <code>L1</code> and <code>L2.trace.yaml</code>; the numbers and these answers in full are in <code>rungs.yaml</code>.</li>
+  </ul>
+</details>
+</article>
+<article class="slide" id="this-deck"><header><span class="part">21 · Closing</span></header>
+<h2>Surprise: this deck is HEART too</h2>
+<p class="dek">You've been using a HEART client the whole time.</p>
+<div class="map">
+  <div><code>contents.json</code><span>The bookmark: the only address this page knows. It embeds every slide, and the outline is drawn from it.</span></div>
+  <div><code>help-line.json</code><span>One slide. Its HTML is the information; its links are the controls: next, prev, contents, and a plain page.</span></div>
+  <div><code>heart-ts</code><span>The second HEART client, built for the browser. → and ← follow next and prev; the outline follows the contents, then an item.</span></div>
+  <div><code>deck:code</code><span>Code on demand: the Marriage and the Great Divorce each link the script that animates them, with its digest. The page knew no animation; heart-ts ran what each slide linked.</span></div>
+  <div><code>no headers, no acts</code><span>A static host can't send the profile header, so each file names its profile in its own links. It takes no POST, so the deck offers no acts; the library shows those.</span></div>
+</div>
+<ul>
+  <li><b>The page knows no slides.</b> Add, cut or reorder them by changing the resources; this page's code doesn't change.</li>
+  <li><b>See for yourself:</b> open “This slide's resource” below any slide: what heart-ts asked, and what it read.</li>
+  <li><b>Without the client,</b> each slide links a plain HTML page of itself, as <code>alternate</code>, typed <code>text/html</code>.</li>
+</ul>
+</article>
+<article class="slide" id="upgrade"><header><span class="part">22 · Closing</span></header>
+<h2>Upgrading is optional</h2>
+<p class="dek">Switch the deck to Plain JSON at the top, then back to HEART. Same slides, same client.</p>
+<div class="pair">
+  <div class="step human">
+    <b>Plain JSON</b>
+    <ul>
+      <li>Each slide is data only: no links, no profile.</li>
+      <li>heart-ts reads it as data only, and offers nothing.</li>
+      <li>So the page has to know the list, build every address from <code>deck/plain/{name}.json</code>, and count to the next one: a client of forms.yaml.</li>
+    </ul>
+  </div>
+  <div class="step agent">
+    <b>HEART</b>
+    <ul>
+      <li>The same data, with its links and its profile.</li>
+      <li>The same client follows them.</li>
+      <li>The page knows one address: the contents.</li>
+    </ul>
+  </div>
+</div>
+<p class="lead">Nothing in the client chose the upgrade. The resources did.</p>
+<details class="more"><summary>And a plain JSON client reading the HEART files?</summary>
+  <ul>
+    <li>It still works. HAL is JSON: the slide's data is all there, and <code>_links</code> is one more member it ignores.</li>
+    <li>So a service can add its controls without breaking the clients it has, and each client takes them up when it is ready.</li>
+  </ul>
+</details>
+</article>
+<article class="slide" id="library-live"><header><span class="part">23 · Closing</span></header>
+<h2>The library, live, both ways</h2>
+<p class="dek">One heart-ts client against Riverside's running library service, recorded.</p>
+<ol class="steps">
+  <li><b>Asked for plain JSON.</b><span><i>The Hobbit</i> comes back as data: its title, due 2026-11-12, standing “hold waiting”. No forms, no links.</span></li>
+  <li><b>It tries to renew.</b><span>“library:renew is not offered now; nothing was sent.” Plain JSON offers no acts.</span></li>
+  <li><b>The same code, asking for HEART.</b><span><i>The Hobbit</i> offers report a problem and return, and not renew.</span></li>
+  <li><b>And <i>Matilda</i></b><span>offers renew, report a problem and return.</span></li>
+  <li><b>A plain JSON parser reads the HEART answer.</b><span>Title, due date and standing are all there; <code>_links</code> and <code>_forms</code> are extra members it ignores. The upgrade breaks no old client.</span></li>
+  <li><b>A browser asks for text/html.</b><span>It gets <i>Matilda</i>'s page, from the same service.</span></li>
+</ol>
+<details class="more"><summary>How the service decides what to send</summary>
+  <ul>
+    <li><code>Accept: application/json</code>: plain JSON, the state with no controls.</li>
+    <li><code>Accept: application/hal+json</code>: HAL Schema Forms.</li>
+    <li><code>Accept: text/html</code>: the page, for people.</li>
+    <li>No Accept, or <code>*/*</code>: one default, HAL-FORMS at L0. HTTP reads a missing Accept as “anything”, so both get the same answer.</li>
+    <li>A client upgrades when it asks for HEART; a service upgrades when it names its profile. Both are optional.</li>
+  </ul>
+  <p class="note">Run by <code>exhibits/overheard-at-riverside/live/upgrade.mjs</code> against heart-sims; every exchange is in <code>upgrade.capture.yaml</code> beside it.</p>
+</details>
+</article>
+<article class="slide" id="one-web"><header><span class="part">24 · Closing</span></header>
+<h2>One web</h2>
+<div class="loops">
+  <div class="beat"><div class="step human"><b>Look</b></div><div class="step agent"><b>Sync</b></div></div>
+  <div class="arrow" aria-hidden="true">→</div>
+  <div class="beat"><div class="step human"><b>Think</b></div><div class="step agent"><b>Reason</b></div></div>
+  <div class="arrow" aria-hidden="true">→</div>
+  <div class="beat"><div class="step human"><b>Act</b></div><div class="step agent"><b>Act</b></div></div>
+</div>
+<p class="lead">In the web that wasn't, the page listed everything and knew nothing. The web we got put the controls in the page. HEART puts them in the API's answers, so an agent gets what Ana gets.</p>
+<p class="dek">Every page is its own forms.html: for just that book, just now.</p>
+</article>
+<article class="slide" id="notes"><header><span class="part">25 · Closing</span></header>
+<h2>What's fiction, what's real</h2>
+<ul>
+  <li><b>Fiction:</b> Ana, Marcus, Priya and Sam, and what they say; the 1997 web without forms, and its browser, WebWalker.</li>
+  <li><b>Real, and running:</b> the Perl site (Apache, CGI.pm, YAML::XS, forms.yaml, forms.html); the HEART library service, with its HTML, HAL-FORMS, HAL Schema Forms and OpenAPI faces; ARTIE's run with Claude and the script it kept.</li>
+  <li><b>Held by tests:</b> a moved form costing no model call, and a changed one stopping the run, in ARTIE's script scenarios; this deck's profile in its own links, plain JSON read as data only, and a service's upgrade to HEART taken up by the same client, in the conformance suite both clients pass.</li>
+  <li><b>Run live:</b> the library both ways, by <code>exhibits/overheard-at-riverside/live/upgrade.mjs</code> against heart-sims.</li>
+  <li><b>History:</b> HTML forms arrived with HTML 2.0, in November 1995, so the real 1997 had them. 409 Conflict arrived with HTTP/1.1, in January 1997.</li>
+  <li><b>Drawn:</b> the browser windows around the pages in the two animations. The pages in them are the services': the Marriage's loans page is written by <code>married/library.cgi</code>, the 1997 CGI with forms in the page, run by <code>married/run.sh</code>; the Divorce's page, JSON, OpenAPI and HAL Schema Forms are the running library's.</li>
+  <li><b>Before and after the release:</b> the scenes before scene six show the library as it was then, recorded then; scene six, the animations and the live slide show it with company groups and Report a problem.</li>
+</ul>
+<details class="more"><summary>Read more</summary>
+  <ul>
+    <li><a href="https://jogoshugh.github.io/heart-rise-artie/reports/the-web-that-wasnt/">The Web That Wasn't</a>: the same story as a report, with levels of detail.</li>
+    <li><a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>: a GitHub pull request, given its controls back, step by step.</li>
+    <li><a href="https://jogoshugh.github.io/heart-rise-artie/reports/architecture/">HEART Architecture</a>: ten diagrams of what is built.</li>
+    <li><b>Sources:</b> <code>exhibits/the-web-that-wasnt</code> (the Perl site, the captures, the ARTIE run) and <code>exhibits/overheard-at-riverside</code> (this deck).</li>
+  </ul>
+</details>
+</article>
+  </main>
+</div>
+<script>
+document.querySelectorAll("button[data-voice]").forEach(function (b) {
+  b.addEventListener("click", function () {
+    document.documentElement.dataset.voice = b.dataset.voice;
+    document.querySelectorAll("button[data-voice]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+  });
+});
+document.documentElement.dataset.voice = "talk";
+</script>
+</body></html>

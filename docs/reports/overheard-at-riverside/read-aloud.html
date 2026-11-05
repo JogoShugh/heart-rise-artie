@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Riverside, Read Aloud</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,500;0,7..72,650;1,7..72,400&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+  /* A story read aloud: one column of text, a player that stays at the top, the paragraph being read lit like a
+     line under a reading lamp. The deck's own palette: leaf green for the way forward, amber for the old web. */
+  :root {
+    --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+    --leaf: #2f7d32; --leaf-bg: #e3f1e2; --amber: #9a5b00; --amber-bg: #fbf1df;
+    --display: "Literata", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+      --leaf: #7fcf83; --leaf-bg: #19281b; --amber: #e8ad57; --amber-bg: #2e2516; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --amber: #e8ad57; --amber-bg: #2e2516; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 400 1.1rem/1.7 var(--display);
+    padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .wrap { max-width: 42rem; margin: 0 auto; padding-block: 1.2rem 5rem; display: grid; gap: 1.4rem; }
+  header.top { display: grid; gap: 0.4rem; }
+  .eyebrow { font: 600 0.72rem/1.2 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+  h1 { margin: 0; font: 650 clamp(1.9rem, 6vw, 2.6rem)/1.1 var(--display); text-wrap: balance; }
+  .dek { margin: 0; color: var(--muted); font-style: italic; }
+
+  .player { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 14px; padding: 0.75rem; display: grid; gap: 0.6rem; box-shadow: 0 6px 18px -14px rgba(0, 0, 0, 0.5); }
+  .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+  button, select { font: 600 0.85rem var(--mono); color: var(--fg); background: var(--bg); border: 1px solid var(--rule);
+    border-radius: 999px; padding: 0.5rem 0.9rem; cursor: pointer; min-height: 2.6rem; }
+  button:focus-visible, select:focus-visible, p.say:focus-visible { outline: 2px solid var(--leaf); outline-offset: 2px; }
+  #play { background: var(--leaf); color: var(--surface); border-color: var(--leaf); min-width: 7.5rem; font-size: 0.95rem; }
+  #play[aria-pressed="true"] { background: var(--leaf-bg); color: var(--leaf); }
+  label.speed { display: flex; align-items: center; gap: 0.4rem; font: 600 0.78rem var(--mono); color: var(--muted); }
+  select { border-radius: 10px; max-width: 100%; }
+  .voice { flex: 1 1 12rem; min-width: 0; }
+  .voice select { width: 100%; }
+  .now { font: 500 0.8rem/1.4 var(--mono); color: var(--muted); min-height: 1.1rem; }
+  .now b { color: var(--leaf); font-weight: 600; }
+  .bar { height: 4px; border-radius: 4px; background: var(--rule); overflow: hidden; }
+  .bar span { display: block; height: 100%; width: 0; background: var(--leaf); transition: width 0.3s ease; }
+  .notice { margin: 0; padding: 0.6rem 0.8rem; border-radius: 10px; background: var(--amber-bg); color: var(--amber); font: 500 0.85rem/1.4 var(--mono); }
+
+  nav.chapters { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  nav.chapters button { font-size: 0.72rem; padding: 0.3rem 0.65rem; min-height: 2rem; color: var(--muted); }
+  nav.chapters button[aria-current="true"] { color: var(--leaf); border-color: var(--leaf); background: var(--leaf-bg); }
+
+  article { display: grid; gap: 2.2rem; }
+  section { display: grid; gap: 0.9rem; }
+  h2 { margin: 0; font: 650 1.45rem/1.25 var(--display); text-wrap: balance; }
+  h2 small { display: block; font: 600 0.7rem/1.4 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--amber); }
+  p.say { margin: 0; padding: 0.15rem 0.5rem; margin-inline: -0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.25s ease; }
+  p.say:hover { background: var(--surface); }
+  p.say.reading { background: var(--leaf-bg); box-shadow: inset 3px 0 0 var(--leaf); }
+  blockquote { margin: 0; }
+  blockquote p.say { font-style: italic; border-left: 3px solid var(--leaf); padding-left: 0.9rem; margin-left: 0; border-radius: 0 8px 8px 0; }
+  .end { color: var(--muted); font-style: italic; }
+  @media (prefers-reduced-motion: reduce) { p.say, .bar span { transition: none; } }
+</style>
+</head><body>
+<div class="wrap">
+  <header class="top">
+    <span class="eyebrow">Overheard at Riverside · for the road</span>
+    <h1>The whole story, read aloud</h1>
+    <p class="dek">The web that wasn't, the web we got, and the workshop where both were put together. The people are invented; the library, its rules, the code and the numbers are real.</p>
+  </header>
+
+  <div class="player" role="region" aria-label="Player">
+    <div class="row">
+      <button id="play" type="button" aria-pressed="false">▶ Play</button>
+      <button id="back" type="button" aria-label="Back one paragraph">⟲ Back</button>
+      <button id="next" type="button" aria-label="Next chapter">Next chapter ⟶</button>
+      <label class="speed" for="rate">Speed
+        <select id="rate">
+          <option value="0.85">0.85×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.15">1.15×</option>
+          <option value="1.3">1.3×</option>
+          <option value="1.5">1.5×</option>
+        </select>
+      </label>
+    </div>
+    <div class="row voice"><label class="speed voice" for="voice">Voice <select id="voice"><option value="">The browser's default voice</option></select></label></div>
+    <div class="bar" aria-hidden="true"><span id="progress"></span></div>
+    <p class="now" id="now" aria-live="polite">Press Play, or tap any paragraph to start there.</p>
+    <p class="notice" id="no-speech" hidden>This browser can't read aloud. Try Chrome, Edge or Safari, or your phone's own read-aloud.</p>
+    <nav class="chapters" id="chapters" aria-label="Chapters"></nav>
+  </div>
+
+  <article id="story">
+    <section data-title="Prologue">
+      <h2><small>Prologue</small>A fork in the road</h2>
+      <p class="say">In 1993, a browser called Mosaic learned to show fill-out forms. Two years later, HTML 2.0 made forms part of the standard. From then on, a web page could do more than show you something. It could offer you something to do: a button to press, a box to type in, an act you could take right there, on the thing you were looking at.</p>
+      <p class="say">This story begins by imagining that it never happened.</p>
+      <p class="say">In the web that wasn't, pages stayed pages. They could show you information, but never offer you an action. If you wanted to do something on a website, you went and read about how to do it somewhere else, and then you did it by hand.</p>
+      <p class="say">Keep that fork in mind. The whole story walks down one road, then the other, and then finds a third.</p>
+    </section>
+
+    <section data-title="1 · The help line">
+      <h2><small>Chapter one</small>The help line, 1997</h2>
+      <p class="say">It's a Tuesday evening in the fall of 1997, in the web that wasn't. Ana Torres has three books out from Riverside Public Library: The Hobbit, Matilda, and Charlotte's Web. All three are due on the twelfth of November. She wants to renew them online, and she suspects she's doing it wrong, so she calls the library. Marcus answers the help line.</p>
+      <p class="say">Her browser is called WebWalker. It looks like any browser of the era: a navy blue title bar and a grey frame. But it has two things ours never needed. There's a menu where you pick the HTTP method yourself, GET or POST, and there's a box labelled Body, where you type what you're sending. In a world without forms, the browser has to give you the controls, because the pages can't.</p>
+      <p class="say">Marcus asks whether she has forms dot html open. She does. It's the library's guide to everything you can do there. Item three, in capitals, says RENEW A LOAN. It gives the method, POST, then an address with a placeholder in curly braces where the loan number goes, then what to put in the body: her card number and her PIN.</p>
+      <p class="say">Here's how that page gets made. On the server, a small Perl CGI script called forms dot cgi reads a description file called forms dot yaml. That file is, for all purposes, the OpenAPI document of 1997. The script walks through every path and every method in it. For each one it prints a heading, the rule in italics, the method, the address with its placeholders, and a list called "What to type." At the bottom it signs off with a line that only this world could produce: "Best viewed in a browser with a method menu and a body box."</p>
+      <p class="say">Every operation, for every loan, alike. The page knows what the library can do in general. It knows nothing about Ana's books.</p>
+      <p class="say">So where does she get her loan number? From her loans page, Marcus says. Type its address, with your card number and your PIN on the end. Ana pauses. Her PIN goes in the address, where anyone behind her can read it? That's what forms dot html says, Marcus answers, a little sheepishly.</p>
+      <p class="say">The loans page is written by a second script, library dot cgi. It checks the card and PIN that arrive in the address, then prints a plain table: loan number, book number, title, due date. Three rows. No links, nothing to press. Ana copies 3310, 3311 and 3312 onto a yellow sticky note.</p>
+      <p class="say">Then she does it. She picks POST from the method menu, types the renew address with 3310 in the braces, types her card and PIN into the body box, and sends.</p>
+      <p class="say">Back comes a 409. "A hold is waiting for this book, so it can't be renewed." Someone is waiting for The Hobbit.</p>
+      <p class="say">On the server, the renew part of library dot cgi checks things in order. Was the book already returned? Is a hold waiting? Has it been renewed three times already? Only if all three answers are no does it move the due date three weeks on and count the renewal. Those rules are real. They just live where Ana can't see them, until after she has tried.</p>
+      <p class="say">"Couldn't it have told me before I typed all that?" she asks.</p>
+      <p class="say">Marcus tries 3311 for her. That's Matilda, and it renews, now due December third. Charlotte's Web would fail too: it's already been renewed three times, the most allowed. Then why does forms dot html offer renewing it? Because it offers everything to everyone.</p>
+      <p class="say">Then Ana asks the question the whole story turns on. "Why can't the page just show me a Renew button on the books I can renew, and say why on the ones I can't?"</p>
+      <p class="say">There's a long pause. Marcus says, "Huh." He writes one word on a sticky note: buttons?</p>
+      <p class="say">In this world, nobody ever reads it.</p>
+    </section>
+
+    <section data-title="Interlude">
+      <h2><small>Interlude</small>What actually happened</h2>
+      <p class="say">Now step off that road and onto the real one.</p>
+      <p class="say">In the world we actually got, someone did read the sticky note, years before Ana ever needed it. The deck shows this as an animation. Two WebWalker windows sit side by side on a teal desktop: her loans page on the left, forms dot html on the right, and a dashed gap between them labelled "Ana joins them, with a sticky note and her own typing."</p>
+      <p class="say">Then the two windows melt into one, and WebWalker turns back into Netscape Navigator. The method menu and the body box are gone. A real toolbar appears: Back, Forward, Home, Reload, Images, Open, Print, Find, Stop, with the big N in the corner. Each loan row slides into a single page. The heading "RENEW A LOAN" flies down and becomes a Renew button on Matilda's row. "RETURN A LOAN" becomes a Return button. The italic rule from forms dot html, "Only while it is renewed fewer than three times and no one's hold is waiting," drifts across and settles beside The Hobbit as plain words: a hold is waiting for this book, so it can't be renewed.</p>
+      <p class="say">The heading reads "The Marriage of Information and Controls." What actually happened, right from the beginning.</p>
+      <p class="say">The code behind this half now runs. It's the same Perl CGI, rewritten the way 1997 actually allowed. You sign in with a little form, your card and your PIN, and press Show my loans, so the PIN travels in the body of the request and never in the address. Then for each loan it prints a row, and at the end of the row, a small HTML form with one button for each act that loan allows: Renew and Return on Matilda. Where renewing isn't allowed, it prints the reason in italics instead: a hold is waiting, on The Hobbit; renewed the most allowed, on Charlotte's Web. When a button is pressed, the server checks the same rules again and answers with the page again, updated. Same library, same rules, same three books. The only difference is where the controls live.</p>
+    </section>
+
+    <section data-title="2 · Ana's kitchen">
+      <h2><small>Chapter two</small>Ana's kitchen, today</h2>
+      <p class="say">Back to the present. Same library, same card, and somehow the same three books. Ana calls Marcus, out of habit.</p>
+      <p class="say">"Remember the sticky notes?"</p>
+      <p class="say">"I think I still have one."</p>
+      <p class="say">She opened her account on her phone. Three books, by title. On Matilda, there's Renew, Return, and now Report a problem. She pressed Renew, and it's due December third. The Hobbit's Renew is grey, and under it: a hold is waiting. Charlotte's Web says it's been renewed the most allowed.</p>
+      <p class="say">"Same rules as 1997," Marcus says. "The page knows them before you try. Every page is its own forms dot html now: for just that book, just now."</p>
+      <p class="say">That line is the thesis. The rules haven't changed. What changed is when they arrive: in the page, before the attempt, and not in a refusal afterwards.</p>
+    </section>
+
+    <section data-title="3 · The IT office">
+      <h2><small>Chapter three</small>The IT office</h2>
+      <p class="say">Same day, different room. Priya builds the library's API. Sam builds an assistant that renews books for members. Priya has the loans API up in Swagger UI: every operation, every field, every status code, and a "Try it out" button.</p>
+      <p class="say">"And renew, for every loan," Sam says. "My agent sent one for The Hobbit and got a 409."</p>
+      <p class="say">"The rule's in the description," Priya says. "Fewer than three renewals, no hold waiting."</p>
+      <p class="say">Sam has seen this before. "Remember forms dot html? Every address, the same for every loan, and you found out by trying." Priya looks at her screen for a moment. "This one has a Try it out button."</p>
+      <p class="say">Ana's page gives her a grey button with a reason. Sam's agent gets a 409.</p>
+      <p class="say">This is where the second animation lives, and it's the one you liked most. It's called the Great Divorce. It opens on Ana's real page for The Hobbit. On the left are six small cards: ID, title, author, due date, renewals, standing. On the right is the action column: Renew in grey, the reason in amber, the Report a problem form with its drop-down of choices and its little comment box, and Return.</p>
+      <p class="say">Then the heading reads "The Divorce of Information from Controls," and the page comes apart. The cards drift left and crystallize, each one sharpening into a line of plain JSON: id 3310, title The Hobbit, and so on. Data only. The controls drift right and turn into OpenAPI. Renew becomes a path. The amber reason, which was about this book, right now, becomes a sentence of prose that applies to every loan. Report a problem becomes a request schema, and its choices shrink to a sentence that points at a list the document never even describes. In the gap between the two halves, in red: the client joins them, and learns the rules from a 409 and a 422.</p>
+      <p class="say">Then the heading changes to "The Return of Information and Controls," and the page comes back together a different way. Every card and every control flows into a single HAL Schema Forms answer. The data is unchanged. The forms this loan allows right now come with their fields. The problem's choices are linked to the library's own list. Beside it sits a link explaining what's missing, and why. Nothing is lost, and there's nothing left to join.</p>
+      <p class="say">Roy Fielding gave this a name long ago. In his words:</p>
+      <blockquote><p class="say">"When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions."</p></blockquote>
+      <p class="say">The human web follows that constraint on every page you've ever loaded. The machine web, JSON over HTTP, mostly dropped it.</p>
+    </section>
+
+    <section data-title="4 · The whiteboard">
+      <h2><small>Chapter four</small>The whiteboard</h2>
+      <p class="say">An hour later, Sam has the marker. Priya asks what it would take to give the API what Ana's page has. Sam says six things, and Ana's page already does every one.</p>
+      <p class="say">First, the answer links itself and names its vocabulary, so that "library renew" means the same thing to every client. Second, the acts arrive as forms: where to send, which method, what to put in. It's the OpenAPI operation, moved inside the loan. Third, the forms follow the state. Matilda gets renew and return. The Hobbit doesn't get renew. Fourth, what's absent says why. It's the grey button and its reason, as data. Fifth, a version tag guards every act. You send back the tag you read, and if the loan has changed since, you get a 412, a clean refusal rather than a surprise. Sixth, every loan in the same state links one shared set of forms, at an address that is a hash of the set's own contents. It's fetched once, checked, and cached for good.</p>
+      <p class="say">Then Priya asks the real question: "Do I rewrite the API?"</p>
+      <p class="say">No. The data stays as it is. She declares the library's acts once, in a small Kotlin declaration for a library called heart-core. It's worth describing, because it's the heart of everything. There's a vocabulary: renew, report a problem, return, each with a title and a sentence about when it's offered. There's a list of acts. There's a function that looks at a loan and names its standing: renewable, hold waiting, renewed the most allowed, or returned. There's a table of what each standing offers. And there's a table of reasons for what each standing doesn't offer: a hold is waiting for this book, so it can't be renewed. That's the whole of it. From that one declaration, heart-core serves HTML for Ana, HAL-FORMS and HAL Schema Forms for agents, and an OpenAPI twin for anyone who still wants one.</p>
+      <p class="say">"And every app already calling us with plain JSON?"</p>
+      <p class="say">It gets exactly what it got before: the data, no controls. Only a client that asks for HEART gets the forms. And a client that ignores the forms and posts renew anyway gets a 409 with the reason. A form is an offer. The server stays in charge.</p>
+      <p class="say">There's one more trick for OpenAPI clients that don't want to switch. Each plain JSON answer can carry a single extra header: a link to the set of forms that loan allows right now, with a hash to check it against. A client that reads the header stops sending things that would be refused. A client that doesn't never notices the header is there.</p>
+    </section>
+
+    <section data-title="5 · AI-driven">
+      <h2><small>Chapter five</small>Some sort of AI-driven</h2>
+      <p class="say">That evening, Priya goes back to Fielding's 2008 post, "REST APIs must be hypertext-driven," and reads the replies underneath. Three weeks after the post, someone asked him about queues. This is how he ended his answer, word for word:</p>
+      <blockquote><p class="say">"If a client is receiving instructions on how to interact with a resource just before acting only on those instructions, then the client doesn't care if the resource is a distributed queue. It simply doesn't need to know how the resource is implemented. All it needs to know is the meaning of those instructions and some idea of what it wants to do next, whether that purpose be user-driven, configuration-driven, or some sort of AI-driven."</p></blockquote>
+      <p class="say">Sam lines them up. Ana at her page is user-driven. A script is configuration-driven. A model reading the forms is some sort of AI-driven. In 2008.</p>
+      <p class="say">So they don't write the assistant a program. They write it a purpose, in plain words, in a file called member goal dot md: renew each book a member has out that can be renewed, and say why for any that can't. Find the account of the member named so-and-so, and for each book they have out, renew it if renewing is offered; otherwise say why.</p>
+    </section>
+
+    <section data-title="6 · ARTIE">
+      <h2><small>Chapter six</small>ARTIE, and the next week</h2>
+      <p class="say">The assistant is called ARTIE. It runs the same loop a person runs. A person looks at the page, thinks, and presses a button. ARTIE syncs: it reads the state, the forms offered now, and the version tag. It reasons: it picks among the offered forms, asking a model only where judgment is needed. Then it acts: it sends the form, with the tag. Whatever comes back is the next state, and round it goes.</p>
+      <p class="say">The next week, Ana comes in to return a book, and Sam shows her the assistant. Given the goal and her name, it found her account, renewed Matilda, and said why it couldn't renew the other two. That's exactly what her phone says. The first run took eleven calls to Claude.</p>
+      <p class="say">Then comes the part that matters for cost and for trust. ARTIE kept what it did, as a script. A command called artie generate reads the run's trace and writes a short YAML file: search the accounts for the member's name, open them, then for each loan, renew it if renewing is offered, and otherwise note why. The name is an input. No member's name and no book's title is written into it. Every run since then calls no model at all.</p>
+      <p class="say">The kept script is pinned by what each form does, not by where it points. When Priya moved renew to a new address, the script just followed the form. If the form itself had changed, it would stop rather than guess.</p>
+      <p class="say">Priya asks whether it only works for Ana. Sam runs it for five members, one after another: Ana Torres, David Miller, Grace Okafor, Liam Chen, and Sofia Rossi. No model. Each run renews what each book offers and notes why the rest can't be renewed. Each run takes under a second, most of it the client starting up.</p>
+    </section>
+
+    <section data-title="7 · The release">
+      <h2><small>Chapter seven</small>A month later: the release</h2>
+      <p class="say">The library ships a release. It adds company groups. Harbor Point Logistics signs up all fifteen of its staff, and a search by company lists members five to a page, each page linking to the next. Every loan also gets a new form: Report a problem.</p>
+      <p class="say">That form has a story of its own, and it's one of the newest pieces. It has two fields. The first, problem, takes one choice, and the choices aren't hard-coded. The form's schema carries an instruction called hr options that says, in effect, "take your choices from the library's list over there, at problem-kinds." That list says: it's damaged, pages are missing, it's the wrong book, I can't find it. Because the form carries the instruction and not the values, the library can add a fifth kind tomorrow without changing a single form, without breaking a single cached set, and without disturbing a single kept script. The server checks the choice against its own copy of the list, so a made-up kind gets a 422 at that exact field. The second field is a comment, optional, up to two hundred characters.</p>
+      <p class="say">To make that show up on Ana's page, heart-core itself had to grow. Its HTML pages now draw an hr options field as a real drop-down, with the server filling in the choices, so a browser never has to go fetch them.</p>
+      <p class="say">There was a detour on the way. For a while, company members' books offered a different act, renew for the member, and its form asked for the member's library card number. Then came a sharp question from the author: wouldn't a linked resource already say which loan it is, right in its address? Is a card number in the body even necessary, in true REST? The honest answer was no. The form's target already named the loan, and the library already knew whose loan it was. The card identified nothing. It was at best a "type it to confirm" check, and weak security. So the card went, and so did that act. Company members' books now renew like anyone's.</p>
+      <p class="say">Then Sam pointed the assistant at the release with a new goal, company goal dot md: renew every book the members of a company group have out, on every page of the results. The model found its way once: eighty calls to Claude, a hundred and eleven steps, three pages, fifteen members, twenty-three books, fourteen of them renewed. The rest were five with a hold waiting and four at the limit, each noted with its reason.</p>
+      <p class="say">What it kept is the best piece of the generator. artie generate noticed that the run opened every member on every page, following each page's next link, so it wrote that as one loop, "for each member." Inside it, it noticed the run went through every book each member had, so it wrote a second loop inside the first, "for each loan." Inside that, it wrote: renew, when offered. The script names no one. If Harbor Point has twenty staff next month, it goes through four pages. Run with no model on a fresh library, it renews the same fourteen.</p>
+      <p class="say">And Ana's script, written before the release? It still runs unchanged. It pins renew, and renew didn't change. A new form sitting beside it is just one more offer it doesn't need.</p>
+    </section>
+
+    <section data-title="8 · Bloat">
+      <h2><small>Chapter eight</small>Isn't hypermedia bloated?</h2>
+      <p class="say">Priya worries about the cost. Fifteen people, every book, forms in every answer. Isn't that a lot of bytes?</p>
+      <p class="say">Sam measures it, using the kept company script at three rungs.</p>
+      <p class="say">At rung zero, every loan answer carries its forms inside it. That's about one point nine kilobytes a loan, and a hundred and eighteen thousand bytes for the whole company.</p>
+      <p class="say">At rung one, each loan carries only a link to its forms. Every loan in the same state links the same set, at an address that never changes, so the client fetches each set once and keeps it. There are four sets for the whole company. Total bytes drop by fifty-six percent, and each loan's answer gets seventy-five percent smaller, at the cost of four extra requests.</p>
+      <p class="say">At rung two, the schemas move out of the sets too, shared the same way, for two more requests. Everything shared is addressed by its own contents and cached for good.</p>
+      <p class="say">So, bloated? Only if you send the same forms over and over. Shared, they're cheaper than the documentation they replace.</p>
+    </section>
+
+    <section data-title="9 · The deck">
+      <h2><small>Chapter nine</small>Surprise: the deck is HEART too</h2>
+      <p class="say">Here's the twist at the end of the deck. You've been using a HEART client the whole time.</p>
+      <p class="say">Each slide is a resource. The page that shows the deck knows exactly one address, the contents. The contents embeds every slide, and the outline is drawn from that. Each slide links to the next, the previous, the contents, and a plain-HTML copy of itself. The arrow keys follow those links. The client doing the following is heart-ts, a second HEART client written in TypeScript and bundled for the browser.</p>
+      <p class="say">There's a switch at the top: Plain JSON or HEART. In Plain JSON mode, the same slides are served as data only, with no links. The page then has to know the list in advance, build every address from a pattern, and count its way to the next slide, exactly like a client of forms dot yaml. Switch back to HEART, and the same client follows links again. Nothing in the client chose the upgrade. The resources did.</p>
+      <p class="say">And the animations are code on demand, the one optional constraint in Fielding's dissertation. The Marriage slide and the Divorce slide each carry a link to one small script, along with that script's hash. The deck page loads it, and the browser refuses to run it if a single byte differs. The script, called morph, knows no slide. Each slide's own HTML says which stills there are, which values fly from one still to the next, and what the headings say. Switch to Plain JSON and there are no links, so no code arrives, and you see the stills one after another. Fielding saw that coming too. An optional constraint, he wrote, "allows us to design an architecture that supports the desired behavior in the general case, but with the understanding that it may be disabled within some contexts."</p>
+    </section>
+
+    <section data-title="Epilogue">
+      <h2><small>Epilogue</small>The workshop</h2>
+      <p class="say">There's one more layer to this story, and you were in it.</p>
+      <p class="say">All of this was built in a workshop at the edge of the present, by an author and a machine collaborator working in turns. The workshop has rules, and they're enforced by real processes with real exit codes. Every change starts as a scenario in plain Gherkin. The scenario has to fail first, for the right reason, and the failure is written to a log before a single line of production code is allowed. Then the code is written, the scenario passes, and the whole suite has to be green before the work can stop. Commits stay local. Nothing is pushed until the author says the word.</p>
+      <p class="say">The collaborator made mistakes, and the workshop caught them. One kept script once had the word Matilda baked into a loop that was supposed to work for any book. "Fix the hard coding," said the author, and now the loop names whichever book it's on. The deck once told the company run as fifty-six model calls, counting steps instead of calls; the new run is told the way Ana's always was, by the API's own count. The Netscape page was first drawn as a sketch; now a real CGI script writes it. And for a while the points version of the deck read like a list of loose remarks. The author said it felt choppy and that the characters had to carry through. That's being fixed right now. Ana, Marcus, Priya and Sam will be introduced at the start in both voices, and every scene's points will tell what happened to them, by name, in order.</p>
+      <p class="say">Somewhere in a drawer of the web that wasn't, there's still a sticky note with one word on it: buttons?</p>
+      <p class="say">In our web, someone read it in 1993. In the API world, people mostly forgot it again. This whole project is an attempt to read it a second time: to put the controls back with the information, for the agents this time, so that a machine gets what Ana gets.</p>
+      <p class="say">Every page is its own forms dot html. For just that book. Just now.</p>
+      <p class="say end">The end, for now.</p>
+    </section>
+  </article>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var synth = window.speechSynthesis;
+  var paragraphs = Array.prototype.slice.call(document.querySelectorAll("p.say"));
+  var sections = Array.prototype.slice.call(document.querySelectorAll("#story section"));
+  var play = document.getElementById("play"), back = document.getElementById("back"), next = document.getElementById("next");
+  var rate = document.getElementById("rate"), voicePick = document.getElementById("voice");
+  var now = document.getElementById("now"), progress = document.getElementById("progress");
+  var chapters = document.getElementById("chapters");
+  var at = 0, playing = false, run = 0, lock = null, voices = [];
+
+  // Each paragraph is spoken in pieces of a sentence or a few, as some browsers stop a long utterance part way.
+  function pieces(text) {
+    var sentences = text.match(/[^.!?]+[.!?]+["”’)]*\s*|[^.!?]+$/g) || [text];
+    var out = [], buf = "";
+    sentences.forEach(function (s) {
+      if ((buf + s).length > 220 && buf) { out.push(buf.trim()); buf = ""; }
+      buf += s;
+    });
+    if (buf.trim()) out.push(buf.trim());
+    return out;
+  }
+
+  function sectionOf(p) { return sections.indexOf(p.closest("section")); }
+
+  chapters.innerHTML = sections.map(function (s, i) {
+    return '<button type="button" data-chapter="' + i + '">' + s.dataset.title + "</button>";
+  }).join("");
+
+  function mark() {
+    paragraphs.forEach(function (p, i) { p.classList.toggle("reading", i === at && (playing || at > 0)); });
+    var chapter = sectionOf(paragraphs[at]);
+    chapters.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-current", String(Number(b.dataset.chapter) === chapter)); });
+    progress.style.width = Math.round((at / (paragraphs.length - 1)) * 100) + "%";
+    now.innerHTML = (playing ? "<b>Reading</b> · " : "Paused · ") + sections[chapter].dataset.title +
+      " · paragraph " + (at + 1) + " of " + paragraphs.length;
+    play.textContent = playing ? "❚❚ Pause" : "▶ Play";
+    play.setAttribute("aria-pressed", String(playing));
+    try { localStorage.setItem("riverside-aloud-at", String(at)); } catch (e) { /* this visit only */ }
+  }
+
+  function keepAwake(on) {
+    if (on && "wakeLock" in navigator && !lock) {
+      navigator.wakeLock.request("screen").then(function (l) { lock = l; l.addEventListener("release", function () { lock = null; }); }, function () {});
+    } else if (!on && lock) { lock.release().catch(function () {}); lock = null; }
+  }
+
+  function speakFrom(index) {
+    var mine = ++run;
+    synth.cancel();
+    at = Math.max(0, Math.min(index, paragraphs.length - 1));
+    playing = true;
+    keepAwake(true);
+    mark();
+    paragraphs[at].scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    var parts = pieces(paragraphs[at].textContent.replace(/\s+/g, " ").trim());
+    var chosen = voices.find(function (v) { return v.voiceURI === voicePick.value; });
+    parts.forEach(function (text, i) {
+      var u = new SpeechSynthesisUtterance(text);
+      u.rate = Number(rate.value);
+      if (chosen) { u.voice = chosen; u.lang = chosen.lang; } else { u.lang = "en-US"; }
+      if (i === parts.length - 1) {
+        u.onend = function () {
+          if (mine !== run || !playing) return;
+          if (at < paragraphs.length - 1) speakFrom(at + 1); else stop(true);
+        };
+      }
+      u.onerror = function (event) { if (mine === run && event.error !== "interrupted" && event.error !== "canceled") stop(); };
+      synth.speak(u);
+    });
+  }
+
+  function stop(finished) {
+    run++;
+    playing = false;
+    synth.cancel();
+    keepAwake(false);
+    if (finished) at = 0;
+    mark();
+  }
+
+  if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+    document.getElementById("no-speech").hidden = false;
+    [play, back, next, rate, voicePick].forEach(function (c) { c.disabled = true; });
+    return;
+  }
+
+  function loadVoices() {
+    voices = synth.getVoices().filter(function (v) { return /^en(-|_|$)/i.test(v.lang); });
+    var keep = voicePick.value;
+    try { keep = keep || localStorage.getItem("riverside-aloud-voice") || ""; } catch (e) { /* none kept */ }
+    voicePick.innerHTML = '<option value="">The browser\'s default voice</option>' + voices.map(function (v) {
+      return '<option value="' + v.voiceURI.replace(/"/g, "&quot;") + '">' + v.name + " (" + v.lang + ")</option>";
+    }).join("");
+    if (voices.some(function (v) { return v.voiceURI === keep; })) voicePick.value = keep;
+  }
+  loadVoices();
+  if ("onvoiceschanged" in synth) synth.onvoiceschanged = loadVoices;
+
+  play.addEventListener("click", function () { if (playing) stop(); else speakFrom(at); });
+  back.addEventListener("click", function () { if (playing) speakFrom(at - 1); else { at = Math.max(0, at - 1); mark(); } });
+  next.addEventListener("click", function () {
+    var chapter = sectionOf(paragraphs[at]);
+    var target = chapter + 1 < sections.length ? paragraphs.indexOf(sections[chapter + 1].querySelector("p.say")) : at;
+    if (playing) speakFrom(target); else { at = target; mark(); }
+  });
+  chapters.addEventListener("click", function (event) {
+    var b = event.target.closest("button[data-chapter]");
+    if (b) speakFrom(paragraphs.indexOf(sections[Number(b.dataset.chapter)].querySelector("p.say")));
+  });
+  paragraphs.forEach(function (p, i) {
+    p.tabIndex = 0;
+    p.addEventListener("click", function () { speakFrom(i); });
+    p.addEventListener("keydown", function (event) { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); speakFrom(i); } });
+  });
+  rate.addEventListener("change", function () { if (playing) speakFrom(at); });
+  voicePick.addEventListener("change", function () {
+    try { localStorage.setItem("riverside-aloud-voice", voicePick.value); } catch (e) { /* this visit only */ }
+    if (playing) speakFrom(at);
+  });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden && playing && !lock) keepAwake(true); });
+
+  try { var kept = Number(localStorage.getItem("riverside-aloud-at")); if (kept > 0 && kept < paragraphs.length) at = kept; } catch (e) { /* from the start */ }
+  mark();
+})();
+</script>
+</body></html>
