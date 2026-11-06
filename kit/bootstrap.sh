@@ -1,11 +1,14 @@
 #!/bin/sh
-# Makes your fork of this repository the kit's target. It builds the kit, then seeds the fork with six issues about
-# its own code, by replaying a kept script with no model: three waiting for triage, and three ready to close, one of
-# each kind. Then the kit's goals work on them (kit/README.md).
-#   kit/bootstrap.sh          the fork is read from git's origin; OWNER and REPO, if set, name another
-# Needs GITHUB_TOKEN: a fine-grained token for the fork alone, with Contents, Issues and Pull requests read and write.
+# Makes a repository of yours the kit's target. It builds the kit, then seeds the repository with six issues about
+# this project's code, by replaying a kept script with no model: three waiting for triage, and three ready to close,
+# one of each kind. Then the kit's goals work on them (kit/README.md).
+#   kit/bootstrap.sh          OWNER and REPO name the repository; unset, it is your fork, read from git's origin
+# Needs GITHUB_TOKEN: a fine-grained token for that repository alone, with Contents, Issues and Pull requests read and
+# write. OWNER, REPO and the token can be in kit/.env (kit/env.example).
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
+# Your keys and repository, from kit/.env when it is there.
+. "$here/env.sh"
 
 slug=$(git -C "$here/.." remote get-url origin | sed -E 's#\.git$##; s#^.*github\.com[:/]##')
 OWNER=${OWNER:-${slug%%/*}}
@@ -40,8 +43,7 @@ echo "Seeding $OWNER/$REPO with six issues, by a kept script, with no model…"
 
 cat <<EOF
 
-Next, in this folder:
-  export OWNER=$OWNER REPO=$REPO ANTHROPIC_API_KEY=…
+Next, in this folder (with ANTHROPIC_API_KEY in kit/.env, or exported):
   kit/try.sh walk triage            Claude labels the three issues waiting for triage; close "Triage watch" to stop
   kit/try.sh walk closeout version=1.0
                                     closes the three ready to close, each its own way; close "Close-out watch" to stop

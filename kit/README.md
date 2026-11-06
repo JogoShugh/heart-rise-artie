@@ -5,40 +5,44 @@ GitHub, through a HEART gateway that reads GitHub's own API description and offe
 only the acts that apply to it now. Everything runs in one Docker container on your machine, and GitHub is called
 with your own token.
 
-Your fork of this repository is what it works on. The bootstrap fills the fork with issues about the repository's
-own code; the goals then triage them, close them, open pull requests, all as you'd see a person do on GitHub.
+A repository of yours is what it works on: an empty one is enough. The bootstrap fills it with issues about this
+project's code; the goals then triage them and close them, as you'd see a person do on GitHub, and one goal ships a
+release across GitHub and two more systems that run in the kit.
 
 A goal is a job written in plain words. Claude walks it once, choosing among what each resource offers. `artie`
 keeps that walk as a script in YAML, and the script then runs again with no model, held strictly to what the walk
 was offered.
 
-## Start
+## Start, on a Mac or Linux machine
 
-1. **Fork this repository** on GitHub, and clone your fork: `gh repo fork JogoShugh/heart-rise-artie --clone`.
-   Turn on its issues, which a new fork has off: `gh repo edit <you>/heart-rise-artie --enable-issues`.
-2. **Make a fine-grained token** for your fork alone, with Contents, Issues and Pull requests set to read and write.
-3. **Have Docker running**, and an Anthropic API key for the goals Claude walks.
-4. **Bootstrap**, from your clone's root. The first run builds the image, which takes a few minutes.
+You need Docker running (Docker Desktop with 8 GB of memory, the default on most Macs), git, and two keys.
 
-```sh
-export GITHUB_TOKEN=…            # the fine-grained token
-kit/bootstrap.sh                 # six issues in your fork, opened by a kept script with no model
-```
-
-The tokens are passed to the container when it starts, never written to disk or into the image.
+1. **Clone this repository:** `git clone https://github.com/JogoShugh/heart-rise-artie.git && cd heart-rise-artie`.
+2. **Make an empty repository** of your own on GitHub for the kit to work on, `kit-trial` say. Its issues are on, as
+   in any new repository; it needs no files.
+3. **Make a fine-grained token** at github.com/settings/personal-access-tokens/new: repository access "Only select
+   repositories", that one; permissions Issues, Pull requests and Contents, read and write.
+4. **Have an Anthropic API key** (console.anthropic.com), for the goals Claude walks.
+5. **Put them in `kit/.env`:** `cp kit/env.example kit/.env`, then fill in `OWNER`, `REPO`, `GITHUB_TOKEN` and
+   `ANTHROPIC_API_KEY`. Git ignores the file and Docker builds never see it; the keys go to the kit's container when
+   it starts, never into the image. Anything you export instead wins over the file.
+6. **Bootstrap:** `kit/bootstrap.sh`. The first run builds the kit's image, about ten minutes; then six issues appear
+   in your repository, opened by a kept script with no model.
 
 ## Then
 
 ```sh
-export OWNER=<you> REPO=heart-rise-artie ANTHROPIC_API_KEY=…
 kit/try.sh walk triage           # Claude labels the three issues waiting for triage
 kit/try.sh keep triage           # triage.heart.yaml and triage.pins.yaml, from that walk
-kit/try.sh replay triage         # the same watch again: Claude only at its one reasoned step
 kit/try.sh walk closeout version=1.0
 kit/try.sh walk hello
+kit/try.sh walk release version=1.1
 ```
 
-A watch keeps going until you close the issue it opened ("Triage watch", "Close-out watch") on GitHub.
+`triage` and `closeout` are watches: each opens an issue ("Triage watch", "Close-out watch") and keeps watching until
+you close it on GitHub. Close it once the issues it works on are done; the run ends within a few seconds. Replay a
+kept goal with `kit/try.sh replay NAME`, after a second `kit/bootstrap.sh` gives triage and closeout new issues.
+
 `kit/try.sh plan NAME` reads and checks a goal and sends nothing. Everything lands in `./work`: the goals, which you
 can edit, the kept scripts, their lock files, and for every run its trace, with each request and answer, and a
 report of it to open in a browser: `work/runs/NAME/run.html`.
@@ -87,7 +91,8 @@ else of GitHub's API; a goal that needs something else finds it isn't offered.
 
 ## Another repository
 
-`OWNER` and `REPO` name any repository your token can write to: `OWNER=you REPO=scratch kit/bootstrap.sh`.
+`OWNER` and `REPO` name any repository your token can write to; a fork of this one works too (turn its issues on
+first: a new fork has them off). Leave both unset and the bootstrap takes your fork from git's origin.
 
 ## Known limits
 

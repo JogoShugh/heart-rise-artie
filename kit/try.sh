@@ -11,6 +11,8 @@
 # Needs OWNER, REPO and GITHUB_TOKEN set, and ANTHROPIC_API_KEY for walk. Goals, scripts and runs are in ./work.
 set -eu
 here=$(cd "$(dirname "$0")" && pwd)
+# Your keys and repository, from kit/.env when it is there.
+. "$here/env.sh"
 work=${WORK:-$PWD/work}
 image=${IMAGE:-heart-kit}
 name=${KIT_NAME:-heart-kit}
