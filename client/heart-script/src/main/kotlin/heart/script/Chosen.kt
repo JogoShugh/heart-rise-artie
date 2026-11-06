@@ -31,6 +31,17 @@ internal fun holds(facts: Map<String, Any?>, held: Representation): Boolean = fa
 }
 
 /**
+ * [facts] as a check made on [held] keeps them: one value said of a member that holds many, a list in its state or a
+ * relation it embeds or links to, is one it includes, as [holds] reads it there, and is kept as a list of that one.
+ * So the script says `has`, never `is`, which reads as the labels being exactly that one.
+ */
+internal fun included(facts: Map<String, Any?>, held: Representation): Map<String, Any?> =
+    facts.mapValues { (member, value) ->
+        val many = member in held.embedded || member in held.links || State(held.state)[member] is JsonArray
+        if (many && value !is List<*>) listOf(value) else value
+    }
+
+/**
  * A step's acts, decided as a chain (spec/PLAN-LISTENERS.md, slice 0): "say why, unless it is said already" is a read,
  * a check and a write. Each [parts] in order; an act that opens leads to the parts after it; a check leaves the parts
  * after it undone where it holds. [complete] once the planner said done; until then, the chain is decided further at

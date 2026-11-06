@@ -323,7 +323,6 @@ internal class StepWatch(
             // Its values from the run's inputs, or as the planner said them: one read again from the member, as the
             // member's own count that happened to equal the planner's, would hold on every member after.
             val inputs = sources(here, why, said()).filterKeys { it.startsWith("input:") }
-            val check = Chain.Check(move.facts.mapValues { (_, value) -> Bound.of(value, inputs) })
             // A check after acts that write, made on what reads among them reached, can keep none of them from being
             // done: it is kept before the first act that writes since the last check, with those reads, so a replay
             // reads, checks, and only then writes.
@@ -334,8 +333,10 @@ internal class StepWatch(
             val moved = writes.isNotEmpty() && plain
             // Kept after the reads, it is made on what the last of them reached, as a replay makes it.
             val on = if (moved) read ?: reached else reached
-            val holds = holds(move.facts, on)
-            refusal(move.facts, on, moved && !holds)?.let { refused ->
+            val facts = included(move.facts, on)
+            val check = Chain.Check(facts.mapValues { (_, value) -> Bound.of(value, inputs) })
+            val holds = holds(facts, on)
+            refusal(facts, on, moved && !holds)?.let { refused ->
                 moves += refused
                 return false
             }
@@ -418,7 +419,7 @@ internal class StepWatch(
      */
     private fun bound(facts: Map<String, Any?>, here: Here, meant: String): Chain.Check {
         val inputs = sources(here, null, meant).filterKeys { it.startsWith("input:") }
-        return Chain.Check(facts.mapValues { (_, value) -> Bound.of(value, inputs) })
+        return Chain.Check(included(facts, here.held).mapValues { (_, value) -> Bound.of(value, inputs) })
     }
 
     /**

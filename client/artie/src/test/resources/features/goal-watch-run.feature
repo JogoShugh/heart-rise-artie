@@ -851,11 +851,16 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
     And at move 6 the planner was shown the resource's "comments" as "1"
     And at move 5 the planner was told the step now is "act: Say on it that the watch has seen it.: one act or more, in order, then done; an act the server answered is done, even where a read just after it doesn't show it yet; the acts after an act that opens are done on what it reached; a check is made on what the act before it reached, and where it holds, the acts after it are left undone: so a check that is to keep an act from being done, such as whether it was said already, comes before that act; whether something was said is checked on the words said, among the titles of what is listed, not on how many there are; a fact names a member of the state, or a relation it links to, its value words a link's title says"
 
-  Scenario: Issues are matched by their labels, and an If that acts closes the one it holds for
+  Scenario Outline: Issues are matched by a label among theirs, and an If that acts closes the one it holds for: <case>
     spec/PLAN-SEED-BENCH.md: a tray is an issue labelled tray, and its stage
     a label. The match is decided on the labels an issue embeds, as on a
     pull request's. The If's check holds on tray 14, transplanted, which is
-    closed; tray 15, still sown, is left open.
+    closed; tray 15, still sown, is left open. Each issue has two labels, so
+    a check holds where its label is among them, not where it is the only
+    one. A planner may say the label as a list or as one value, as a model
+    often does; either way one value checked on a member that holds many is
+    one it includes, and is kept so: `has`, never `is`, which a reader takes
+    to mean the labels are exactly that one.
     Given "acme/rockets" has these issues on the small GitHub
       | number | title                       | state | author |
       | 11     | Tray 14: Red Sails lettuce  | open  | ada    |
@@ -883,8 +888,8 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | act   | open issue 10 of acme/rockets                      | yes   |          |                                     |
       | done  |                                                    |       |          |                                     |
       | act   | list the open issues of acme/rockets labelled tray | yes   |          |                                     |
-      | check |                                                    |       |          | {"github:labels": ["tray"]}         |
-      | check |                                                    |       |          | {"github:labels": ["transplanted"]} |
+      | check |                                                    |       |          | <tray>                              |
+      | check |                                                    |       |          | <transplanted>                      |
       | act   | close it                                           |       |          |                                     |
       | done  |                                                    |       |          |                                     |
       | check |                                                    |       |          | {"state": "closed"}                 |
@@ -910,6 +915,17 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
         - field: github:labels
           has: transplanted
       """
+    And the capture "trays.trace.yaml" keeps, in the watch as data, a step with
+      """yaml
+      has:
+        - field: github:labels
+          has: tray
+      """
+
+    Examples:
+      | case                            | tray                        | transplanted                        |
+      | the label said as a list        | {"github:labels": ["tray"]} | {"github:labels": ["transplanted"]} |
+      | the label said as one value     | {"github:labels": "tray"}   | {"github:labels": "transplanted"}   |
 
   Scenario: A list a step sent is sent again as a list, and a look that fails still keeps what the watch did
     Found by the live seed bench run b1: an alert's chain commented, then
@@ -1537,7 +1553,7 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
                   is: 2
         - done-where:
             - field: item
-              is: Seen by the bench watch.
+              has: Seen by the bench watch.
         - act: github:comment
           fields:
             body: Seen by the bench watch.
