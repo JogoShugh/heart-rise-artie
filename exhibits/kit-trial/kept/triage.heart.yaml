@@ -44,8 +44,9 @@ steps:
           fields:
             owner: ${owner}
             repo: ${repo}
+            state: open
             labels: ${inbox}
-          inferred: list issues in ${owner}/${repo} filtered by label ${inbox}
+          inferred: List open issues in ${owner}/${repo} filtered by label ${inbox}
           from-intent: an issue labelled ${inbox} changes
           then:
             - whenever:

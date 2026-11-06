@@ -38,7 +38,7 @@ COPY kit/workspace /kit/workspace
 COPY --from=description /api.github.com.json /kit/github/api.github.com.json
 COPY kit/goals /kit/goals
 COPY kit/scripts /kit/scripts
-COPY kit/entrypoint.sh /kit/entrypoint.sh
+COPY kit/entrypoint.sh kit/in.sh /kit/
 ENV PATH=/opt/artie/bin:$PATH
 WORKDIR /work
 ENTRYPOINT ["/kit/entrypoint.sh"]

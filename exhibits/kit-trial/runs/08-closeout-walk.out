@@ -1,37 +1,37 @@
 1 enter http://localhost:8392/: done
-2 get repository JogoShugh/heart-github-test: done
+2 get the repository JogoShugh/heart-github-test: done
 3 open an issue titled "Close-out watch" with body "Close this issue to stop the watch.": new resource
 4 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
 5 return to http://localhost:8392/: done
-6 list open issues in JogoShugh/heart-github-test filtered by label ready-to-close: done
+6 list issues for repo JogoShugh/heart-github-test filtered by label ready-to-close: done
 7 return to http://localhost:8392/: done
 8 return to http://localhost:8392/: done
-9 act github:issues-list-for-repo, owner JogoShugh, repo heart-github-test, state open, labels ready-to-close: done
+9 act github:issues-list-for-repo, owner JogoShugh, repo heart-github-test, labels ready-to-close: done
 10 follow item, titled artie says it needs Java 22: done
-11 close it as a duplicate of the README issue about Java 22 (the issue its body says it is the same as): refused
-12 close it as a duplicate: done
-13 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2269: done
-14 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2269: done
-15 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?state=open&labels=ready-to-close: done
-16 follow item, titled Build ARTIE with Gradle 7: done
-17 close it as not planned: done
-18 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2268: done
-19 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2268: done
-20 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?state=open&labels=ready-to-close: done
-21 follow item, titled The kit's hello goal: done
-22 comment on it: Fixed in 1.0.: new resource
-23 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2267: done
-24 close it as completed: done
-25 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2267: done
-26 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2267: done
-27 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?state=open&labels=ready-to-close: done
+11 close it as a duplicate (of the README issue about Java 22, as its body says): done
+12 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2292: done
+13 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2292: done
+14 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=ready-to-close: done
+15 follow item, titled Build ARTIE with Gradle 7: done
+16 close it as not planned: done
+17 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2291: done
+18 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2291: done
+19 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=ready-to-close: done
+20 follow item, titled The kit's hello goal: done
+21 comment on it: Fixed in 1.0.: new resource
+22 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2290: done
+23 close it as completed: done
+24 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2290: done
+25 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2290: done
+26 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=ready-to-close: done
+27 return to http://localhost:8392/: done
 28 return to http://localhost:8392/: done
-29 return to http://localhost:8392/: done
-30 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2273: done
-31 return to http://localhost:8392/: done
-32 act github:issues-list-for-repo, owner JogoShugh, repo heart-github-test, state open, labels ready-to-close: done
+29 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2296: done
+30 return to http://localhost:8392/: done
+31 act github:issues-list-for-repo, owner JogoShugh, repo heart-github-test, labels ready-to-close: done
+32 return to http://localhost:8392/: done
 33 return to http://localhost:8392/: done
-34 return to http://localhost:8392/: done
-35 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2273: done
-36 return to http://localhost:8392/: done
-finished, 36 steps; acted: github:repos-get 1, github:open-issue 1, github:issues-list-for-repo 3, github:close-duplicate 1, github:close-not-planned 1, github:comment 1, github:close 1
+34 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2296: done
+35 return to http://localhost:8392/: done
+report: runs/closeout/index.html
+finished, 35 steps; acted: github:repos-get 1, github:open-issue 1, github:issues-list-for-repo 3, github:close-duplicate 1, github:close-not-planned 1, github:comment 1, github:close 1

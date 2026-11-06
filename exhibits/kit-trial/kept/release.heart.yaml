@@ -56,7 +56,7 @@ steps:
         fields:
           owner: ${owner}
           repo: ${repo}
-        inferred: get the repository ${owner}/${repo}
+        inferred: get repository ${owner}/${repo}
         from-intent: In ${owner}/${repo}
         then:
           - act: github:open-issue

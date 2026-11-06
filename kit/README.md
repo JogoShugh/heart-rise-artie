@@ -40,7 +40,21 @@ kit/try.sh walk hello
 
 A watch keeps going until you close the issue it opened ("Triage watch", "Close-out watch") on GitHub.
 `kit/try.sh plan NAME` reads and checks a goal and sends nothing. Everything lands in `./work`: the goals, which you
-can edit, the kept scripts, their lock files, and a trace of every run in `work/runs/`.
+can edit, the kept scripts, their lock files, and for every run its trace, with each request and answer, and a
+report of it to open in a browser: `work/runs/NAME/run.html`.
+
+## Watch it in a browser
+
+```sh
+kit/try.sh up                    # the systems keep running, and keep their state, until kit/try.sh down
+```
+
+While the kit is up, each command runs in it, so the build and deploy services keep what earlier commands did, and
+each system answers a browser on your machine (`127.0.0.1` only) with HTML: its state, a button for each act it
+offers now, and a greyed one, saying why, for each it won't. The addresses are printed; `KIT_PORTS` moves them
+(`KIT_PORTS="18392 18400 18401 18402"`), in the order gateway, workspace, build, deploy. A browser has to send each
+system its credential, as `Authorization: Bearer …`: your GitHub token to the gateway, `build-token` and
+`deploy-token` to the build and deploy services. A browser sign-in for them is still to come.
 
 ## The goals
 
@@ -56,7 +70,7 @@ can edit, the kept scripts, their lock files, and a trace of every run in `work/
 
 Beside the GitHub gateway, the container runs two more HEART services, simulated and held in memory: a build
 service, a narrow Jenkins with jobs and builds, on `http://localhost:8401`; and a deploy service, a narrow cloud with
-an app, its regions and releases, on `http://localhost:8402`. Each run of the kit starts them afresh.
+an app, its regions and releases, on `http://localhost:8402`. Each command starts them afresh, unless the kit is up.
 
 A goal starts from one address. `release` starts from the workspace, `http://localhost:8400/workspace.json`, a plain
 file that links to GitHub, the release job and the web app (`kit/workspace/`). Crossing from one system to another

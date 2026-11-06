@@ -1,13 +1,14 @@
 1 enter http://localhost:8392/: done
 2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
-3 act github:open-issue, title Hello from ARTIE (1106-1243), body Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.: new resource
+3 act github:open-issue, title Hello from ARTIE (1106-1305), body Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.: new resource
 4 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
 5 return to http://localhost:8392/: done
-6 act github:issues-get, owner JogoShugh, repo heart-github-test, issue_number 2284: done
+6 act github:issues-get, owner JogoShugh, repo heart-github-test, issue_number 2294: done
 7 act github:comment, body Each act here was one this issue offered at that moment.: new resource
-8 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2284: done
+8 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2294: done
 9 act github:close: done
-10 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2284: done
+10 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2294: done
 11 check: held
 12 return to http://localhost:8392/: done
+report: runs/hello-kept/index.html
 finished, 12 steps; acted: github:repos-get 1, github:open-issue 1, github:issues-get 1, github:comment 1, github:close 1

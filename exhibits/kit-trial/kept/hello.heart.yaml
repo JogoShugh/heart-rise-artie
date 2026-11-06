@@ -20,7 +20,7 @@ steps:
     fields:
       owner: ${owner}
       repo: ${repo}
-    inferred: get the repository ${owner}/${repo}
+    inferred: get repository ${owner}/${repo}
     from-intent: In ${owner}/${repo}
     then:
       - act: github:open-issue
@@ -35,7 +35,7 @@ steps:
       owner: ${owner}
       repo: ${repo}
       issue_number: ${issue.number}
-    inferred: get issue ${issue.number} of ${owner}/${repo}
+    inferred: get issue ${issue.number} in ${owner}/${repo}
     from-intent: On {issue}
     then:
       - act: github:comment

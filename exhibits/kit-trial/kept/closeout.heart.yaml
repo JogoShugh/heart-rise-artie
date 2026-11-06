@@ -31,7 +31,7 @@ steps:
     fields:
       owner: ${owner}
       repo: ${repo}
-    inferred: get repository ${owner}/${repo}
+    inferred: get the repository ${owner}/${repo}
     from-intent: In ${owner}/${repo}
     then:
       - act: github:open-issue
@@ -51,9 +51,8 @@ steps:
           fields:
             owner: ${owner}
             repo: ${repo}
-            state: open
             labels: ${label}
-          inferred: list open issues in ${owner}/${repo} filtered by label ${label}
+          inferred: list issues for repo ${owner}/${repo} filtered by label ${label}
           from-intent: an issue labelled ${label} changes
           then:
             - whenever:

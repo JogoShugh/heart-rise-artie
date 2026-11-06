@@ -8,7 +8,6 @@ if [ -z "${GITHUB_TOKEN:-}" ]; then
   echo "Pull requests read and write." >&2
   exit 2
 fi
-export ARTIE_TOKEN_LOCALHOST_8392="$GITHUB_TOKEN"
 
 mkdir -p /work/runs
 for file in /kit/goals/*.goal.md /kit/scripts/*; do
@@ -32,10 +31,9 @@ for service in "8401 build.test build" "8402 deploy.test deploy"; do
   (cd /opt/heart-sims && exec java -cp 'lib/*' com.artie.heart.sims.MainKt "$1" "$2" > "/work/runs/$3.log" 2>&1) &
   shift 3
 done
-export ARTIE_TOKEN_LOCALHOST_8401=build-token ARTIE_TOKEN_LOCALHOST_8402=deploy-token
 
 # The workspace: one resource linking each system's entry point, so one goal can start from one address.
-(exec java -m jdk.httpserver -b 127.0.0.1 -p 8400 -d /kit/workspace > /work/runs/workspace.log 2>&1) &
+(exec java -m jdk.httpserver -b 0.0.0.0 -p 8400 -d /kit/workspace > /work/runs/workspace.log 2>&1) &
 
 up() {
   tries=0
@@ -64,5 +62,4 @@ for release in '1.0 succeeded' '1.1 succeeded' '1.2 failed'; do
   shift 2
 done
 
-cd /work
-exec "$@"
+exec /kit/in.sh "$@"

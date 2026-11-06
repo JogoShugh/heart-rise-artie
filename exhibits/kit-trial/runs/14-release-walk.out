@@ -1,17 +1,18 @@
 1 enter http://localhost:8400/workspace.json: done
-2 Follow the link "The release job, on the build service": done
-3 Queue a build of the release job with version 1.1: refused
-3 Queue a build of the release job, using only the parameters the form's schema defines (no version field).: done
+2 follow the link "The release job, on the build service": done
+3 queue a build of the release job with version 1.1: refused
+3 queue a build of this job, with no extra fields: done
 4 return to http://localhost:8401/jobs/release: done
 5 return to http://localhost:8400/workspace.json: done
-6 Follow the link "The web app, on the deploy service": done
-7 Deploy release 1.1 to the staging environment in region us-east.: done
+6 follow the link "The web app, on the deploy service": done
+7 deploy release 1.1 to staging in region us-east: done
 8 return to http://localhost:8402/apps/web: done
 9 return to http://localhost:8400/workspace.json: done
-10 Follow the link "GitHub": done
-11 get the repository JogoShugh/heart-github-test: done
-12 Open an issue titled "Release 1.1" with body: "Built on the build service and deployed to staging on the deploy service, by one goal across three systems.": new resource
+10 follow the link "GitHub": done
+11 get repository JogoShugh/heart-github-test: done
+12 open an issue titled "Release 1.1" with body: "Built on the build service and deployed to staging on the deploy service, by one goal across three systems.": new resource
 13 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
 14 return to http://localhost:8392/: done
 15 return to http://localhost:8400/workspace.json: done
+report: runs/release/index.html
 finished, 15 steps; acted: ci:build 1, cd:deploy 1, github:repos-get 1, github:open-issue 1
