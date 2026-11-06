@@ -167,9 +167,12 @@ internal class StepWatch(
     /** An If at the member [here]: its check, decided once; when it holds, its words, or leaving the member. */
     private fun given(intent: Step.Intent, condition: String, here: Here): Boolean {
         val facts = decided.ifs.getOrPut(intent) {
-            val told = "if: ${host.fill(condition)}: the check that holds exactly when that is true of the member, " +
-                "and fails on a member it isn't true of; made on this member, then on every member after"
-            bound(decide(intent, here, CHECK, told) { (it as? Move.Check)?.facts }, here, condition)
+            // An If in another's words is that check again: asked twice, a planner may take the second as made.
+            decided.ifs.entries.firstOrNull { (other, _) -> other.condition == condition }?.value ?: run {
+                val told = "if: ${host.fill(condition)}: the check that holds exactly when that is true of the " +
+                    "member, and fails on a member it isn't true of; made on this member, then on every member after"
+                bound(decide(intent, here, CHECK, told) { (it as? Move.Check)?.facts }, here, condition)
+            }
         }
         val holds = facts.passes(sources(here, null), here.held)
         if (holds && intent.leaves) {

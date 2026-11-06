@@ -927,6 +927,63 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
       | the label said as a list        | {"github:labels": ["tray"]} | {"github:labels": ["transplanted"]} |
       | the label said as one value     | {"github:labels": "tray"}   | {"github:labels": "transplanted"}   |
 
+  Scenario: Two Ifs said in the same words are one check, decided once, and each acts where it holds
+    A person writes the same condition on two lines, one act each: comment,
+    then close. Both are the one check, so the planner decides it once, at
+    the first If; asked again for the second, a planner may take it as made
+    already and stop, as the kit's closeout walk did on a new repository.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                        | state | author |
+      | 11     | Tray 14: Red Sails lettuce   | open  | ada    |
+      | 12     | Tray 15: Bright Lights chard | open  | ada    |
+    And issue 11 of "acme/rockets" is labelled "tray" on the small GitHub
+    And issue 11 of "acme/rockets" is labelled "transplanted" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "tray" on the small GitHub
+    And issue 12 of "acme/rockets" is labelled "sown" on the small GitHub
+    And issue 10 of "acme/rockets" is closed on the small GitHub, whatever happens, once its issues are listed 6 times
+    And the file "trays.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      ---
+
+      Close each tray once it is transplanted, saying so.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever an issue labelled tray changes `as tray`
+        - If it's labelled transplanted, comment "Transplanted."
+        - If it's labelled transplanted, close it.
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                              | opens | relation | facts                               |
+      | act   | open issue 10 of acme/rockets                      | yes   |          |                                     |
+      | done  |                                                    |       |          |                                     |
+      | act   | list the open issues of acme/rockets labelled tray | yes   |          |                                     |
+      | check |                                                    |       |          | {"github:labels": ["tray"]}         |
+      | check |                                                    |       |          | {"github:labels": ["transplanted"]} |
+      | act   | comment "Transplanted."                            |       |          |                                     |
+      | done  |                                                    |       |          |                                     |
+      | act   | close it                                           |       |          |                                     |
+      | done  |                                                    |       |          |                                     |
+      | check |                                                    |       |          | {"state": "closed"}                 |
+    And ARTIE's reasoner will choose, in order
+      | form                        | fields                                                                  |
+      | github:issues-get           | {"owner": "acme", "repo": "rockets", "issue_number": 10}                |
+      | github:issues-list-for-repo | {"owner": "acme", "repo": "rockets", "state": "open", "labels": "tray"} |
+      | github:comment              | {"body": "Transplanted."}                                               |
+      | github:close                | {}                                                                      |
+    When the goal "trays.goal.md" runs with ARTIE, captured in "trays.trace.yaml", given
+      | name | value |
+    Then the run finished
+    And issue 11 of "acme/rockets" is now "closed" on the small GitHub
+    And issue 12 of "acme/rockets" is now "open" on the small GitHub
+    And issue 11 of "acme/rockets" now has these comments on the small GitHub
+      | author | body          |
+      | ada    | Transplanted. |
+    And the planner was asked 10 times
+    And ARTIE's reasoner was asked 4 times
+
   Scenario: A list a step sent is sent again as a list, and a look that fails still keeps what the watch did
     Found by the live seed bench run b1: an alert's chain commented, then
     assigned the grower on duty, an input, as the list ["ada"]. Replayed on the
