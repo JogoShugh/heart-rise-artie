@@ -314,7 +314,7 @@ flowchart TD
       <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
 flowchart TD
     A(["A lenient run meets a changed form"]) --&gt; OC{"on-change, in the config&lt;br/&gt;beside the script"}
-    OC -- stop --&gt; STOP["Stop before sending"]
+    OC -- "refuse, the default" --&gt; STOP["Stop before sending"]
     OC -- values --&gt; V{"Same method, and does every&lt;br/&gt;value sent fit the new schema?"}
     V -- yes --&gt; ACT["Act"]
     V -- no --&gt; STOP
