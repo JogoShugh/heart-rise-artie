@@ -1,5 +1,6 @@
-// Edits Take HEART's GitHub slides in place, in the unpacked deck at argv[2]: the Kotlin scripts become the YAML ones,
-// with the YAML runs' numbers. Slide XML is changed by shape id; every other byte stays as it was.
+// Edits Take HEART in place, in the unpacked deck at argv[2]: HATEOAS named the most-followed network constraint, with a
+// slide on the two webs after it; and the GitHub slides, the Kotlin scripts become the YAML ones, with the YAML runs'
+// numbers. Slide XML is changed by shape id; every other byte stays as it was.
 import { readFileSync, writeFileSync } from "node:fs";
 const root = process.argv[2];
 const EMU = 914400;
@@ -18,9 +19,34 @@ function replaceShape(doc, id, change) {
   doc.xml = doc.xml.replace(sp, change(sp));
 }
 // Moves or resizes a shape, in inches; a value left out stays.
-function place(doc, id, { y, cy }) {
-  replaceShape(doc, id, (sp) => sp.replace(/<a:off x="(\d+)" y="(\d+)"\/><a:ext cx="(\d+)" cy="(\d+)"\/>/, (_, x, oy, cx, ocy) =>
-    `<a:off x="${x}" y="${y != null ? Math.round(y * EMU) : oy}"/><a:ext cx="${cx}" cy="${cy != null ? Math.round(cy * EMU) : ocy}"/>`));
+function place(doc, id, { x, y, cx, cy }) {
+  const at = (v, was) => (v != null ? Math.round(v * EMU) : was);
+  replaceShape(doc, id, (sp) => sp.replace(/<a:off x="(\d+)" y="(\d+)"\/><a:ext cx="(\d+)" cy="(\d+)"\/>/, (_, ox, oy, ocx, ocy) =>
+    `<a:off x="${at(x, ox)}" y="${at(y, oy)}"/><a:ext cx="${at(cx, ocx)}" cy="${at(cy, ocy)}"/>`));
+}
+// Takes a shape away.
+function drop(doc, id) {
+  doc.xml = doc.xml.replace(shapeOf(doc, id), "");
+}
+// A copy of a shape under a new id, drawn right after it.
+function clone(doc, id, newId) {
+  const sp = shapeOf(doc, id);
+  doc.xml = doc.xml.replace(sp, sp + sp.replace(/<p:cNvPr id="\d+" /, `<p:cNvPr id="${newId}" `));
+}
+// Every scheme colour [from] in a shape becomes [to].
+function recolor(doc, id, from, to) {
+  replaceShape(doc, id, (sp) => sp.replaceAll(`<a:schemeClr val="${from}"/>`, `<a:schemeClr val="${to}"/>`));
+}
+// A bulleted text shape's paragraphs: a lede in bold with no bullet, then [items], each styled as the shape's first.
+function lede(doc, id, first, items) {
+  replaceShape(doc, id, (sp) => {
+    const p = sp.match(/<a:p>[\s\S]*?<\/a:p>/)[0];
+    const one = (t) => p.replace(/<a:t>[^<]*<\/a:t>/, `<a:t>${esc(t)}</a:t>`);
+    const head = one(first).replace(/<a:pPr[\s\S]*?<\/a:pPr>/,
+      '<a:pPr indent="0" marL="0"><a:spcAft><a:spcPts val="1400"/></a:spcAft><a:buNone/></a:pPr>').replace(/<a:rPr /, '<a:rPr b="1" ');
+    const start = sp.indexOf("<a:p>"), end = sp.lastIndexOf("</a:p>") + "</a:p>".length;
+    return sp.slice(0, start) + head + items.map(one).join("") + sp.slice(end);
+  });
 }
 // A code box's lines, each [style, text]: I a comment, B a line in bold, P plain; styles taken from the box's own lines.
 function code(doc, id, lines, size) {
@@ -84,16 +110,16 @@ function notes(n, words) {
   runs.slice(1).forEach((m) => { doc.xml = doc.xml.replace(m[0], "<a:t></a:t>"); });
   save(doc);
 }
-// A new slide [n], a copy of slide [after] and its notes, shown right after it.
-function addSlideAfter(after, n) {
-  const copy = (from, to, change = (x) => x) =>
-    writeFileSync(`${root}/ppt/${to}`, change(readFileSync(`${root}/ppt/${from}`, "utf8")));
-  copy(`slides/slide${after}.xml`, `slides/slide${n}.xml`);
-  copy(`slides/_rels/slide${after}.xml.rels`, `slides/_rels/slide${n}.xml.rels`,
-    (x) => x.replace(`notesSlide${after}.xml`, `notesSlide${n}.xml`));
-  copy(`notesSlides/notesSlide${after}.xml`, `notesSlides/notesSlide${n}.xml`);
-  copy(`notesSlides/_rels/notesSlide${after}.xml.rels`, `notesSlides/_rels/notesSlide${n}.xml.rels`,
-    (x) => x.replace(`slides/slide${after}.xml`, `slides/slide${n}.xml`));
+// A new slide [n], a copy of slide [from] and its notes, shown right after slide [after].
+function addSlideAfter(after, n, from = after) {
+  const copy = (source, to, change = (x) => x) =>
+    writeFileSync(`${root}/ppt/${to}`, change(readFileSync(`${root}/ppt/${source}`, "utf8")));
+  copy(`slides/slide${from}.xml`, `slides/slide${n}.xml`);
+  copy(`slides/_rels/slide${from}.xml.rels`, `slides/_rels/slide${n}.xml.rels`,
+    (x) => x.replace(`notesSlide${from}.xml`, `notesSlide${n}.xml`));
+  copy(`notesSlides/notesSlide${from}.xml`, `notesSlides/notesSlide${n}.xml`);
+  copy(`notesSlides/_rels/notesSlide${from}.xml.rels`, `notesSlides/_rels/notesSlide${n}.xml.rels`,
+    (x) => x.replace(`slides/slide${from}.xml`, `slides/slide${n}.xml`));
   const rels = load("_rels/presentation.xml.rels");
   const rid = `rId${Math.max(...[...rels.xml.matchAll(/Id="rId(\d+)"/g)].map((m) => Number(m[1]))) + 1}`;
   const before = rels.xml.match(new RegExp(`Id="(rId\\d+)"[^>]*Target="slides/slide${after}.xml"`))[1];
@@ -114,7 +140,72 @@ function addSlideAfter(after, n) {
     .replace(/<Notes>(\d+)<\/Notes>/, (_, k) => `<Notes>${Number(k) + 1}</Notes>`);
   save(app);
 }
+// Each slide's and notes page's number, as shown, so a viewer that doesn't count them again still shows the right one.
+function renumber() {
+  const deck = load("presentation.xml"), rels = load("_rels/presentation.xml.rels");
+  const order = [...deck.xml.matchAll(/<p:sldId id="\d+" r:id="(rId\d+)"\/>/g)]
+    .map((m) => rels.xml.match(new RegExp(`Id="${m[1]}"[^>]*Target="(slides/slide\\d+\\.xml)"`))[1]);
+  order.forEach((path, i) => {
+    const notesPath = readFileSync(`${root}/ppt/${path.replace("slides/", "slides/_rels/")}.rels`, "utf8")
+      .match(/Target="\.\.\/(notesSlides\/notesSlide\d+\.xml)"/)?.[1];
+    for (const part of [path, notesPath].filter(Boolean)) {
+      const doc = load(part);
+      doc.xml = doc.xml.replace(/(type="slidenum">[\s\S]*?<a:t>)\d+(<\/a:t>)/, `$1${i + 1}$2`);
+      save(doc);
+    }
+  });
+}
 
+
+// Slide 6: HATEOAS, the most-followed network constraint of all time.
+{
+  const s = load("slides/slide6.xml");
+  text(s, 3, ["The most-followed network constraint of all time"]);
+  replaceShape(s, 3, (sp) => sp.replaceAll('sz="3600"', 'sz="3400"'));
+  save(s);
+  notes(6, "Quote is verbatim from section 5.1.5. Point at the fourth constraint, HATEOAS: the most-followed network constraint of all time, since every link and every form on the human web follows it. The next slide: why people follow it, why programs mostly don't, and why agents can.");
+}
+
+// Slide 39, shown after 6: most followed on the human web, least on the machine web, and why agents can return to it.
+addSlideAfter(6, 39, 7);
+{
+  const s = load("slides/slide39.xml");
+  text(s, 2, ["ACT III  ·  ONE CONSTRAINT, TWO WEBS"]);
+  text(s, 3, ["Most followed by people, least by programs"]);
+  [4, 5, 6, 7].forEach((id) => drop(s, id));
+  clone(s, 9, 20);
+  clone(s, 12, 21);
+  clone(s, 13, 22);
+  recolor(s, 20, "tx1", "accent1");
+  recolor(s, 21, "accent4", "bg1");
+  const panels = [[8, 10, 11], [9, 12, 13], [20, 21, 22]];
+  panels.forEach(([panel, head, body], i) => {
+    const x = 0.6 + i * (3.87 + 0.25);
+    place(s, panel, { x, y: 1.8, cx: 3.87, cy: 4.25 });
+    place(s, head, { x: x + 0.25, y: 2.0, cx: 3.37, cy: 0.5 });
+    place(s, body, { x: x + 0.25, y: 2.6, cx: 3.37, cy: 3.35 });
+  });
+  text(s, 10, ["On the human web"]);
+  lede(s, 11, "The most followed: every page, every click.", [
+    "Each link and each form is a control the server put next to the information.",
+    "A person reads the controls and chooses, so the browser needs only HTML.",
+    "Sites change their controls daily, and no browser ships an update for it.",
+  ]);
+  text(s, 12, ["On the machine web"]);
+  lede(s, 13, "The least followed: data, no controls.", [
+    "A program couldn’t read “Pay this bill” the way a person can.",
+    "So the controls left the response, for docs and specs a developer reads.",
+    "Clients hard-code addresses, fields and rules, and break when they change.",
+  ]);
+  text(s, 21, ["In the age of agents"]);
+  lede(s, 22, "We can return to it.", [
+    "An agent reads controls as a person does: a link’s title, a form’s fields.",
+    "So the server can put the controls back in the response, as the Web always did.",
+    "And the client stays generic: it does only what’s offered, now.",
+  ]);
+  save(s);
+  notes(39, "On the human web, HATEOAS is followed billions of times a day: each link and form is a control the server sent, and the person supplies the understanding, so one generic browser fits every site. On the machine web it is the least followed: JSON APIs send data without controls, because a program couldn't read them; the controls went into documentation, and clients hard-code them. Agents change that: a model reads a link's title and a form's fields as a person does, so servers can send the controls again and the client stays generic. HEART is that return.");
+}
 
 // Slide 30: the task as a plain goal, and Claude's run of it.
 {
@@ -188,7 +279,7 @@ function addSlideAfter(after, n) {
   ]);
   text(s, 9, ["The lock file pins each form’s integrity, and its act with the target set aside. Given 1.3, the replay commented “Fixed in 1.3 by #2198.”"]);
   save(s);
-  notes(31, "artie generate --format yaml read the capture of the goal run on slide 30 and wrote github-task.heart.yaml: every selection named, and every value that varies read again as a reference: inputs (${owner}, ${repo}, ${stamp}, ${version}) and what the walk found and kept (${issue.number}, ${pr.number}). 19 fields, 0 to review, with a lock file of what was offered. It ran live with no model, guard strict, given version=1.3, 5 November 2026: issue #2197, PR #2198, 27 seconds, 28 steps (after each act that changed what it acted on, the replay checks the change).");
+  notes(31, "artie generate --format yaml read the capture of the goal run on the slide before and wrote github-task.heart.yaml: every selection named, and every value that varies read again as a reference: inputs (${owner}, ${repo}, ${stamp}, ${version}) and what the walk found and kept (${issue.number}, ${pr.number}). 19 fields, 0 to review, with a lock file of what was offered. It ran live with no model, guard strict, given version=1.3, 5 November 2026: issue #2197, PR #2198, 27 seconds, 28 steps (after each act that changed what it acted on, the replay checks the change).");
 }
 
 // Slide 32: the October runs, said as such; the intent rung in plain words.
@@ -268,7 +359,7 @@ addSlideAfter(33, 38);
   notes(33, "The hybrid comes from the goal: the close step is marked `reasoned`, so artie generate keeps it as a reason step and pins the rest. Goal run, version=1.2: issue #2215, PR #2216. The hybrid replay, live, version=1.3, 5 November 2026: issue #2217, PR #2218, 34 s, one model call; the close step took 5.4 s, the model's choice and GitHub's answer together. The next slide removes the judgement: name every case, and let the walk find which.");
 }
 
-// Slide 34 (35 once the new slide is in): the words come first, in a plain goal.
+// Slide 34 (shown 36, after the two new slides): the words come first, in a plain goal.
 {
   const s = load("slides/slide34.xml");
   text(s, 5, [null, "the task in plain words, a goal; the model maps each line to the forms offered"]);
@@ -276,7 +367,7 @@ addSlideAfter(33, 38);
   save(s);
 }
 
-// Slide 37 (38): where the runs are.
+// Slide 37 (shown 39): where the runs are.
 {
   const s = load("slides/slide37.xml");
   text(s, 4, [null, null, null, null, null,
@@ -285,4 +376,5 @@ addSlideAfter(33, 38);
   ]);
   save(s);
 }
+renumber();
 console.log("edited");

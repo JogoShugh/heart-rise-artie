@@ -1,6 +1,6 @@
 # The GitHub task, from a plain goal to YAML
 
-Take HEART, Part 1, slides 30 to 35, with nothing written by hand in Kotlin or YAML. Live on
+Take HEART, Part 1, slides 31 to 36, with nothing written by hand in Kotlin or YAML. Live on
 `JogoShugh/heart-github-test`, through the GitHub gateway on `https://localhost:8393/`, 5 November 2026.
 Reasoner: Claude Sonnet 5.5.
 
@@ -68,6 +68,8 @@ gateway on 8393 is a second one, set as the one on 8392 but with the current tok
 
 ## The deck
 
-`deck/edit.mjs` changes slides 30 to 34 and 37 of the unpacked `Take_HEART_1_1.pptx` and adds the close-out slide
-after the hybrid; the result is `docs/decks/take-heart/Take_HEART_1_2.pptx`. Slide 32 keeps October's Kotlin
+`deck/edit.mjs` changes the unpacked `Take_HEART_1_1.pptx`: slide 6 names HATEOAS the most-followed network constraint
+of all time, and a new slide after it says why on the human web, why it is the least followed on the machine web, and
+why agents can return to it. It changes the GitHub slides (files 30 to 34, and 37) and adds the close-out slide
+after the hybrid; the result is `docs/decks/take-heart/Take_HEART_1_2.pptx`. Slide 33 keeps October's Kotlin
 timings, labelled as such.
