@@ -1,7 +1,7 @@
 # Idea: where HEART fits, fairly — live, transactional systems, beside the agents and knowledge tools people use
 
 Status: idea, 2026-11-06. An outline of an outline: the frame to hold, then the whiteboard session it shapes
-(`spec/HEART-WHITEBOARD.md`, not yet written). Nothing here attacks graph RAG, knowledge bases, or the agents people
+(`heart-whiteboard.md`). Nothing here attacks graph RAG, knowledge bases, or the agents people
 build today. Each is good at its own job. This says which job HEART is for, and how the others sit beside it.
 
 ## The frame
