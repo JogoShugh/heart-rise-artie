@@ -19,5 +19,5 @@ Close each issue that is ready, the way its labels say it ended. Keep watching u
     - If it's labelled {shipped}, comment "Fixed in {version}."
     - If it's labelled {shipped}, close it as completed.
     - If it's labelled {wontfix}, close it as not planned.
-    - If it's labelled {duplicate}, close it as a duplicate.
+    - If it's labelled {duplicate}, close it as a duplicate. The label is enough: name no other issue.
 - Until someone closes {watch}
