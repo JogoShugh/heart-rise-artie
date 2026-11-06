@@ -15,12 +15,14 @@ fun runData(script: Map<*, *>) {
     (script["inputs"] as? Map<*, *>).orEmpty().forEach { (name, input) ->
         val declared = input as? Map<*, *>
         val default = declared?.get("default")
+        val now = (default as? Map<*, *>)?.get("now")?.toString()
         run.declare(
             Declared(
                 name.toString(),
-                default = (default as? String) ?: default?.takeIf { it !is Map<*, *> }?.toString(),
+                // A default { now: PATTERN } is the time now in that pattern, as a generated Kotlin script's is.
+                default = now?.let(::timeNow) ?: default?.takeIf { it !is Map<*, *> }?.toString(),
                 question = declared?.get("question")?.toString(),
-                now = (default as? Map<*, *>)?.get("now")?.toString(),
+                now = now,
                 type = declared?.get("type")?.toString(),
             ),
         )
@@ -29,6 +31,10 @@ fun runData(script: Map<*, *>) {
     val start = script["start"]?.toString() ?: throw ScriptStopped(0, "", "the script names no start")
     heart(Reading(run, null).text(start)) { made(steps, null) }
 }
+
+/** The time now, as [pattern] writes it (java.time's DateTimeFormatter). */
+private fun timeNow(pattern: String): String =
+    java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(pattern))
 
 /** [steps], made in turn where the script stands; [why], the reason a wait gave up, in an Otherwise's steps. */
 internal fun Here.made(steps: List<*>, why: String?) =

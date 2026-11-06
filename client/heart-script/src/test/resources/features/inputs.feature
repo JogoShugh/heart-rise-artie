@@ -76,6 +76,32 @@ Feature: A script's inputs and questions
       | comment: Fixed in 1.2.  |
       | label: needs-info       |
 
+  Scenario: A script held as data fills an input whose default is the time, as a Kotlin script does
+    artie generate writes a fresh value, such as a branch's stamp, as an
+    input whose default is { now: PATTERN }. Held as data, the script runs
+    unattended with that input not given: its value is the time now, in the
+    pattern. This pattern is a literal alone, so the value is the same at
+    any time.
+    When this script held as data runs
+      """yaml
+      heart: 1
+      kind: kept
+      start: scripted://service/
+      inputs:
+        stamp:
+          default:
+            now: "'fix-1'"
+      steps:
+        - act: issues-get
+          fields:
+            number: ${stamp}
+      """
+    Then the script finished
+    And the client was asked, in order
+      | call  | what                        |
+      | enter | scripted://service/         |
+      | act   | issues-get {"number":"fix-1"} |
+
   Scenario: The script's inputs, listed without running it
     When the script's inputs are listed
     Then they are
