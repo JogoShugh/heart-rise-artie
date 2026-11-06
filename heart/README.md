@@ -1,0 +1,167 @@
+# HEART server library
+
+Build a HEART server (`spec/SPEC.md`) by declaring your resources. You write
+the domain code and one declaration; the library serves HAL Schema Forms at
+every rung (and HAL-FORMS, the L0 on-ramp), checks every act, and answers over
+HTTP and CoAP.
+You write no controllers.
+
+**How it works:** [ARCHITECTURE.md](ARCHITECTURE.md) explains HEART with diagrams:
+REST and Fielding's rules in summary, the three layers, every rung from L0 to
+L6, negotiation, acts and refusals, and the bindings. How HEART measures
+against Fielding's rules, in detail: [spec/FIELDING-REVIEW.md](../spec/FIELDING-REVIEW.md).
+
+## Modules
+
+| Module | Purpose |
+|---|---|
+| `heart-core` | HEART without a protocol: the declaration model, HAL Schema Forms rendering (L0–L2), content addressing, schemas generated from input classes, act checks (428 → 412 → 409 → 422), negotiation, service index, JSON Home, search pages |
+| `heart-spring` | HTTP binding on Spring WebFlux. Both dialects rendered by `heart-core` |
+| `heart-coap` | CoAP binding on Eclipse Californium (SPEC §6.0.1), HAL Schema Forms only |
+| `heart-eventsourcing` | Optional event store, in memory or Postgres (R2DBC) |
+| `heart-tck` | Conformance features a server runs against itself |
+| `heart-spring-boot-starter` | `heart-core` + `heart-spring` + WebFlux |
+
+The bindings are Spring Boot auto-configurations: adding the dependency is enough.
+
+## A server in four steps
+
+**1. Depend on the starter** (and `heart-coap` for CoAP).
+
+```kotlin
+implementation("com.artie.heart:heart-spring-boot-starter")
+```
+
+Inside this repo, `includeBuild("../heart")`. Elsewhere, run
+`./gradlew publishToMavenLocal` here and add `mavenLocal()`.
+
+**2. Write each act's input as a class.** Its JSON Schema is generated from
+Jakarta Validation and OpenAPI `@Schema` annotations, and request bodies are
+checked against that same schema.
+
+```kotlin
+@Schema(title = "Dim")
+data class Dim(
+    @field:NotNull @field:Min(1) @field:Max(100)
+    @field:Schema(title = "Brightness", examples = ["50"])
+    val brightness: Int? = null,
+)
+```
+
+**3. Declare the resource type.**
+
+```kotlin
+val lamps = ResourceType<Lamp, String>(
+    collection = "lamps",
+    profile = Profile("home", title = "Lamps", doc = "The acts a lamp offers.", relations = listOf(
+        Relation("switch-on", AlpsType.UNSAFE, "Switch on", "Turns the lamp on.", "Offered while off."),
+        Relation("dim", AlpsType.IDEMPOTENT, "Dim the lamp", "Sets the brightness.", "Offered while on."),
+    )),
+    acts = listOf(
+        Act.of("switchOn", "switch-on", SwitchOn::class.java),
+        Act.of("dim", "dim", Dim::class.java),
+    ),
+    offers = Offers(
+        keys = listOf("ON", "OFF"),
+        offered = { key -> if (key == "ON") listOf("dim") else listOf("switchOn") },
+        whyAbsent = { key, _ -> if (key == "ON") "The lamp is already on." else "Switch it on first." },
+    ),
+    state = StateView(
+        keyOf = { it.status },
+        idOf = { it.id },
+        versionOf = { it.version },
+        bodyOf = { mapOf("id" to it.id, "status" to it.status, "brightness" to it.brightness) },
+    ),
+)
+```
+
+- `profile`: the vocabulary, served as ALPS at `/profiles/home`; forms are keyed `home:dim`.
+- `offers`: which acts each state key allows. It must depend on the key alone,
+  so every lamp in one state shares one affordance set (SPEC §6.9).
+- `versionOf`: changes with every change of state; it is part of the ETag.
+
+**4. Register it as a bean.**
+
+```kotlin
+@Bean
+fun lampResource(store: LampStore): HeartResource<*, *> = HeartResource(
+    layers = Layers(lamps),
+    load = { id -> store.find(id) ?: throw ResourceNotFoundException("no lamp $id") },
+    perform = { lamp, act, input -> Acted(store.apply(lamp, act, input)) },
+)
+```
+
+`perform` runs only after the checks pass. It is given the state the
+client's If-Match was checked against, and acts on that state, never on one
+read again: record the act only if the resource is still at that state
+(an event store's append at the next sequence number does this), and throw
+`ConcurrentWriteException` if another write landed first. It becomes 412.
+`input.bind(Dim::class.java)` gives the body, already valid against the
+act's schema. Every domain proves this with the conformance features.
+
+## What is then served
+
+| Path | Content |
+|---|---|
+| `GET /` | Service index (either dialect), or JSON Home when `Accept` ranks it first |
+| `GET /lamps/{id}` | Layer 1: L0 by default, L1/L2 with `Prefer: forms=link[, schema=link]`; ETag, 304 |
+| `POST /lamps/{id}/actions/{path}` | The act, with `If-Match`; answers the new Layer 1 and `Content-Location` |
+| `POST /actions/{path}` | An act the bookmark offers, with the index's ETag in `If-Match`; it brings a resource into being, so it answers `201`, that resource's Layer 1, and `Location` |
+| `GET /affordance-sets/{address}`, `/schemas/{address}`, `/unavailable/{address}` | Shared layers, immutable, named by SHA-256 |
+| `GET /profiles/home` | ALPS profile |
+
+Refusals are RFC 9457 problems (`precondition-required`, `stale`,
+`not-offered`, `invalid-input`, `rule-refused`). Over CoAP the same paths
+answer on UDP. A rule of your own that a schema cannot say refuses with
+`RuleRefusedException.at("/field", "why")`: a 422 of type `rule-refused`,
+so a client never mistakes it for a body it built wrong.
+
+## Optional
+
+- **Search and lookup**: add `finding = Finding(...)` to the type and
+  `find = { name, id -> ... }` to the resource. The index then offers both
+  forms, and `GET /lamps?name=` returns pages of `item` links.
+- **Acts on the bookmark**: some acts belong to no resource yet, because
+  their result is a new one (installing a lamp, a customer reporting a
+  problem). Add `bookmarkActs = listOf(Act.of("installLamp", "install-lamp",
+  InstallLamp::class.java))` to the type (it needs `finding` too) and
+  `performAtBookmark = { act, input -> Acted(newLamp) }` to the resource. The
+  index offers each as a form on `/actions/install-lamp`. A client sends the
+  index's ETag, as for any act; the answer is `201` with `Location`.
+- **Past**: add `past = ...` to the resource. Then
+  `GET /lamps/{id}?asOf=<instant>` and `GET /lamps/{id}/history` are served.
+  With `heart-eventsourcing`, build it from the type's `EventSourcing`, which
+  names each event by the type stored with it:
+  `past = LAMPS.past(at = { id, t -> store.state(LAMPS, id, asOf = t) }, history = { id -> store.history(LAMPS, id) })`.
+  Without it, give `Past(at = ..., history = ...)` directly, where `history`
+  returns `PastEvent`s.
+
+## Prove it
+
+Add `testImplementation("com.artie.heart:heart-tck")`, register a
+`TckFixture` bean (a resource, an act it offers, an act it does not, a valid
+and an invalid body, a search term), and run the features at
+`classpath:heart/tck` with glue `com.artie.heart.tck`. Fourteen scenarios
+cover the layers, revalidation, every refusal, a write that lands after the
+If-Match check, both dialects, the index and the profile; four more, tagged
+`@bookmark-act`, cover an act the bookmark
+offers. A server whose bookmark offers none filters them out with
+`not @bookmark-act`.
+
+## Configuration
+
+| Property | Default | |
+|---|---|---|
+| `heart.max-rung` | `L2` | Highest rung served |
+| `heart.page-size` | `20` | Items per search page |
+| `heart.title` | first profile's title | API title |
+| `heart.coap.port` | `5683` | `0`: any free port, `-1`: off |
+
+## Working examples
+
+- The lamp: `heart-core/src/testFixtures/.../fixtures/Lamps.kt`, served and
+  checked in `heart-tck/src/test/.../lamp/LampTck.kt`.
+- The garden: `server-spring/src/main/kotlin/com/artie/gardenbed/`
+  (`declaration/GardenBeds.kt`, `config/HeartConfig.kt`).
+
+Build: `./gradlew check` (Java 21; the event-store features need Docker).

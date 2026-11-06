@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Declared once, enforced by the server · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Scene four · an hour later</span><span class="fiction">Fiction</span></header>
+<h2>Declared once, enforced by the server</h2>
+<ul class="points"><li>Priya asks whether she has to rewrite the API. Sam says no: she declares the acts once, what each state offers, and why one is missing.</li><li>From that one declaration, HEART serves HTML for Ana, HAL-FORMS and HAL Schema Forms for Sam's assistant, and an OpenAPI twin.</li><li>Apps that ask for application/json get what they always got. An act sent anyway, without its form, is refused, 409, with the reason.</li><li><b>What it shows:</b> a form is an offer, and the server stays in charge, as the library's 1997 CGI did, but now it says so first.</li></ul>
+<div class="script">
+  <div class="line"><span class="who priya">Priya</span><p>Do I rewrite the API?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>The data stays as it is. You declare the acts once: what each state offers, and why one is missing. HEART serves that as HTML for Ana, as HAL-FORMS and HAL Schema Forms for agents, and as an OpenAPI twin for anyone who still wants one.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And every app already calling us with <code>application/json</code>?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>It gets what it gets today: the loan's data, and no controls. Only a client that asks for HEART gets them.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>And a client that ignores the forms and posts renew anyway?</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>409, with the reason. A form is an offer. The server stays in charge.</p></div>
+  <div class="line"><span class="who priya">Priya</span><p>So the API answers the way the page does.</p></div>
+  <div class="line"><span class="who sam">Sam</span><p>The way the web always did, for people.</p></div>
+</div>
+<details class="more"><summary>The same loan, asked two ways, live</summary>
+  <div class="pair">
+    <div><span class="label">An app that asks for application/json, as before</span>
+<pre><code>GET /loans/3310
+Accept: application/json
+
+200 OK   Content-Type: application/json
+
+{ "id": 3310, "title": "The Hobbit",
+  "author": "J. R. R. Tolkien",
+  "due": "2026-11-12", "renewals": 0,
+  "standing": "hold waiting" }</code></pre></div>
+    <div><span class="label">A client that asks for HEART: HAL Schema Forms, at L0</span>
+<pre><code>GET /loans/3310
+Accept: application/hal+json
+Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
+
+200 OK   Content-Type: application/hal+json
+
+{ "id": 3310, "title": "The Hobbit", …,
+  "standing": "hold waiting",
+<span class="add">  "_links": { "self": …, "hr:unavailable": … },
+  "_forms": { "library:return": { … } }</span> }</code></pre></div>
+  </div>
+  <p class="note">From the running library service, by <code>live/upgrade.mjs</code>. Adopting HEART changes nothing for the first: the same data, no controls.</p>
+</details>
+<div class="map">
+  <div><code>one declaration</code><span>Acts, what each state offers, and why one is absent.</span></div>
+  <div><code>HTML</code><span>For Ana in a browser: buttons, greyed with a reason.</span></div>
+  <div><code>HAL-FORMS</code><span>The on-ramp, read by Spring HATEOAS clients and ARTIE.</span></div>
+  <div><code>HAL Schema Forms</code><span>The reference dialect: forms as JSON Schema, shared per state.</span></div>
+  <div><code>OpenAPI twin</code><span>For tools that only read OpenAPI.</span></div>
+</div>
+<details class="more"><summary>What the library declares</summary>
+<pre><code>// its vocabulary
+Profile(name = "library", relations = listOf(Relation("renew", AlpsType.UNSAFE, "Renew", …), …))
+
+// its acts
+acts = listOf(Act("renew", "renew", NO_INPUT), Act("return", "return", NO_INPUT))
+
+// what each state offers
+keyOf = { it.standing }
+offered = { standing -> when (standing) {
+    RENEWABLE -> listOf("renew", "return")
+    RETURNED -> emptyList()
+    else -> listOf("return")
+} }
+
+// why, when it doesn't
+whyAbsent = { standing, _ -> WHY.getValue(standing) }   // ON_HOLD: "A hold is waiting for this book, …"
+
+// the version every act is checked against
+versionOf = { it.version }</code></pre>
+  <p class="note">heart-core writes the wire from it. For an API you don't own, the HEART gateway does the same from its OpenAPI description, with your own controls in front.</p>
+</details>
+<details class="more"><summary>The same rule, in 1997's CGI and in today's declaration</summary>
+  <div class="code-pair">
+    <div><span class="label">1997: checked when the request arrives</span>
+    <pre class="source"><code>return answer('409 Conflict', 'Cannot renew', p("A hold is waiting for this book, so it can't be renewed."))
+    if $loan-&gt;[6];
+return answer('409 Conflict', 'Cannot renew', p("It has been renewed $MOST_RENEWALS times, the most allowed."))
+    if $loan-&gt;[5] &gt;= $MOST_RENEWALS;</code></pre><p class="source-at"><code>exhibits/the-web-that-wasnt/perl/cgi-bin/library.cgi</code>, lines 64–67</p></div>
+    <div><span class="label">Today: offered by state, and why not, before</span>
+    <pre class="source"><code>private fun offered(standing: String): List&lt;String&gt; = when (standing) {
+    Loan.RENEWABLE -&gt; listOf("renew", "report-problem", "return")
+    Loan.RETURNED -&gt; emptyList()
+    else -&gt; listOf("report-problem", "return")
+}</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 173–177</p>
+    <pre class="source"><code>private val WHY = mapOf(
+    Loan.RENEWABLE to "It can be renewed and returned.",
+    Loan.ON_HOLD to "A hold is waiting for this book, so it can't be renewed.",
+    Loan.AT_LIMIT to "It has been renewed ${Loan.MOST_RENEWALS} times, the most allowed.",
+    Loan.RETURNED to "It was returned.",
+)</code></pre><p class="source-at"><code>heart/heart-sims/src/testFixtures/kotlin/com/artie/heart/sims/library/HeartLibrary.kt</code>, lines 245–250</p></div>
+  </div>
+  <p class="note">The same three rules. The CGI finds out after the request; the declaration says, for each standing, what is offered and why the rest isn't, so every answer carries it before the request. heart-core still refuses an act it didn't offer, 409, as the CGI did.</p>
+</details>
+</article>
+<nav class="foot"><a href="deck/whiteboard.html" rel="prev"><small>Back</small><b>Give the answer its controls</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#in-charge">with heart-ts</a></span>
+<a href="deck/openapi-opt-in.html" rel="next" data-rel="next"><small>Next</small><b>OpenAPI clients can opt in</b></a></nav>
+</main></div></body></html>

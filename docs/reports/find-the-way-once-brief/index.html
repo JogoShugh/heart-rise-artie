@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Find the Way Once, in Brief</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Our Own Controls' column and palette, for the same series: leaf green for right, amber for a note, red for wrong. */
+:root {
+  --bg: #f5f6f3; --surface: #ffffff; --fg: #1b211c; --muted: #58625a; --rule: #d6dcd4;
+  --leaf: #2f7d32; --leaf-bg: #e3f1e2; --hold: #9a5b00; --hold-bg: #fbf1df; --link: #2f5f8f; --code-bg: #eaeee8;
+  --bad: #b3261e; --bad-bg: #fbe4e1; --comment: #6b7a6d;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+    --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+    --bad: #f2a19a; --bad-bg: #3a1d1a; --comment: #8a9a8c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111612; --surface: #18201a; --fg: #e2e9e3; --muted: #9aa69c; --rule: #2a352c;
+  --leaf: #7fcf83; --leaf-bg: #19281b; --hold: #e8ad57; --hold-bg: #2e2516; --link: #8ab8e6; --code-bg: #1c251e;
+  --bad: #f2a19a; --bad-bg: #3a1d1a; --comment: #8a9a8c;
+  color-scheme: dark;
+}
+body {
+  margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 2; background: var(--bg); border-bottom: 1px solid var(--rule); }
+.top-in { max-width: 48rem; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-block: 0.55rem; }
+.eyebrow { font: 600 0.72rem/1.2 var(--body); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.theme { flex: none; font: 600 0.82rem var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 0.35rem 0.8rem; cursor: pointer; }
+.theme:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+main { max-width: 48rem; margin: 0 auto; padding-block: 2.5rem 4rem; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.4rem; }
+h1, h2 { font-family: var(--display); font-weight: 650; line-height: 1.15; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2.3rem, 7vw, 3.3rem); letter-spacing: -0.01em; }
+h2 { font-size: 1.45rem; margin-top: 1.3rem; }
+h3 { font: 600 1rem/1.4 var(--body); margin: 0; }
+p, li { max-width: 70ch; }
+p { margin: 0; }
+.dek { font-family: var(--display); font-weight: 500; font-size: 1.22rem; line-height: 1.5; color: var(--muted); margin-top: -0.5rem; }
+a { color: var(--link); text-underline-offset: 2px; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 0.4rem; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 8px; padding: 0.9rem 1rem; font: 0.78rem/1.6 var(--mono); max-height: 32rem; }
+pre code { background: none; padding: 0; font-size: 1em; overflow-wrap: normal; }
+pre .c { color: var(--comment); font-style: italic; }
+pre .hl { background: var(--hold-bg); color: var(--hold); border-radius: 3px; padding: 0 0.15em; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 36rem; font-size: 0.9rem; line-height: 1.5; }
+th, td { text-align: left; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rule); vertical-align: top; font-variant-numeric: tabular-nums; }
+tr:last-child td, tr:last-child th { border-bottom: 0; }
+thead th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tbody th { font-weight: 600; }
+td.num { text-align: right; white-space: nowrap; }
+.ok { color: var(--leaf); font-weight: 600; }
+.bad { color: var(--bad); font-weight: 600; }
+.mid { color: var(--hold); font-weight: 600; }
+.short { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 1rem 1.2rem; }
+.short ul { gap: 0.55rem; }
+.note { font-size: 0.9rem; color: var(--muted); }
+/* The run-by-run grid: one cell per run, right or wrong, and the model's input tokens for it. */
+table.grid { min-width: 40rem; font-size: 0.8rem; }
+table.grid th, table.grid td { padding: 0.4rem 0.35rem; text-align: center; }
+table.grid tbody th { text-align: left; white-space: nowrap; padding-left: 0.8rem; font-size: 0.85rem; }
+table.grid thead .phase th { text-transform: none; letter-spacing: 0; font-size: 0.78rem; color: var(--fg); border-bottom: 0; padding-bottom: 0; }
+table.grid td span { display: block; border-radius: 6px; padding: 0.3rem 0.1rem; font-family: var(--mono); line-height: 1.3; }
+table.grid td span b { display: block; font-family: var(--body); font-size: 0.95rem; }
+table.grid td.y span { background: var(--leaf-bg); color: var(--leaf); }
+table.grid td.n span { background: var(--bad-bg); color: var(--bad); }
+table.grid td.y.t span { box-shadow: inset 0 0 0 1.5px var(--hold); }
+table.grid .split { border-left: 2px solid var(--rule); }
+details.src { border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+details.src > summary { cursor: pointer; padding: 0.7rem 1rem; list-style: none; font: 600 0.93rem/1.4 var(--body); color: var(--link); }
+details.src > summary::-webkit-details-marker { display: none; }
+details.src > summary::before { content: "+"; display: inline-block; width: 1.2rem; font-family: var(--mono); }
+details.src[open] > summary::before { content: "−"; }
+details.src > summary small { font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+details.src .in { padding: 0 1rem 1rem; display: grid; gap: 0.7rem; min-width: 0; }
+details.src .in > ul { font-size: 0.92rem; line-height: 1.55; }
+.file { font: 500 0.78rem var(--mono); color: var(--muted); margin-bottom: -0.35rem; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.8rem; }
+.pair > div { display: grid; gap: 0.5rem; align-content: start; min-width: 0; }
+.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 0.6rem; overflow-x: auto; }
+.diagram pre.mermaid { background: none; padding: 0; margin: 0; max-height: none; font: 0.85rem/1.4 var(--body); text-align: center; }
+ol.notes { font-size: 0.88rem; line-height: 1.5; gap: 0.25rem; color: var(--muted); }
+ol.notes b { color: var(--fg); }
+.scale { display: grid; gap: 0.7rem; }
+.scale .headline { font-family: var(--display); font-size: 1.15rem; line-height: 1.45; }
+.scale .table-scroll { background: var(--bg); }
+details.more { margin-top: 0.35rem; }
+details.more > summary { cursor: pointer; color: var(--link); font-size: 0.85rem; font-weight: 600; }
+details.more ul { margin-top: 0.35rem; font-size: 0.92rem; line-height: 1.55; color: var(--muted); }
+.scale tr.us th, .scale tr.us td { background: var(--leaf-bg); color: var(--leaf); font-weight: 600; }
+.stack { display: grid; gap: 0.6rem; }
+/* How far a change travels: two stacks of what each layer knows, then one row per change. */
+ol.layers { list-style: none; padding: 0; gap: 0.3rem; }
+ol.layers li { max-width: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 0.45rem 0.7rem; font-size: 0.86rem; line-height: 1.4; color: var(--muted); }
+ol.layers li b { display: block; color: var(--fg); font-size: 0.92rem; }
+ol.layers li.base { background: var(--code-bg); text-align: center; }
+table.ladder { min-width: 44rem; font-size: 0.8rem; }
+table.ladder th, table.ladder td { padding: 0.45rem 0.5rem; }
+table.ladder thead tr.side th { text-transform: none; letter-spacing: 0; font: 600 0.85rem var(--display); color: var(--fg); border-bottom: 0; padding-bottom: 0; }
+table.ladder .split { border-left: 2px solid var(--rule); }
+table.ladder td.y { background: var(--leaf-bg); color: var(--leaf); }
+table.ladder td.m { background: var(--hold-bg); color: var(--hold); }
+table.ladder td.n { background: var(--bad-bg); color: var(--bad); }
+table.ladder td.y, table.ladder td.m, table.ladder td.n { font-weight: 600; }
+.key { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.82rem; color: var(--muted); }
+.key span::before { content: ""; display: inline-block; width: 0.8rem; height: 0.8rem; border-radius: 3px; margin-right: 0.35rem; vertical-align: -0.1rem; }
+.key .y::before { background: var(--leaf-bg); box-shadow: inset 0 0 0 1.5px var(--leaf); }
+.key .m::before { background: var(--hold-bg); box-shadow: inset 0 0 0 1.5px var(--hold); }
+.key .n::before { background: var(--bad-bg); box-shadow: inset 0 0 0 1.5px var(--bad); }
+footer { color: var(--muted); font-size: 0.88rem; border-top: 1px solid var(--rule); padding-top: 1.2rem; display: grid; gap: 0.4rem; }
+footer ul { gap: 0.2rem; }
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <span class="eyebrow">HEART · employees service · 3 November 2026</span>
+  <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+</div></div>
+
+<main>
+  <h1>Find the Way Once, in Brief</h1>
+  <p class="dek">The same business process over many records, run again and again. Find the way once with a model, keep it, and run it with none, held to the controls the server puts in each answer.</p>
+
+  <div class="short scale">
+    <h2 style="margin-top:0">Through a release: two tasks, 20 runs, a teammate's change, a field renamed</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>Right</th><th>Input tokens, 20 runs</th><th>At 1,000,000 runs</th><th>The model</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE alone</th><td>20 of 20</td><td>46,864</td><td>46,864</td><td>at the edges: finding the way, one repair</td></tr>
+        <tr class="us"><th>A harness running ARTIE, code mode on failure</th><td>20 of 20</td><td>56,366</td><td>56,366</td><td>2 runs of 20; ARTIE's own at the release</td></tr>
+        <tr><th>A harness running kept skills, code mode on failure</th><td>20 of 20</td><td>74,415</td><td>74,415</td><td>6 runs of 20: the first, the teammate's change twice, the release</td></tr>
+        <tr><th>Code mode with ARTIE as its tool</th><td>20 of 20</td><td>107,607</td><td>3.08 billion</td><td>every run, choosing a script</td></tr>
+        <tr><th>Code mode, fresh programs</th><td>20 of 20</td><td>158,995</td><td>7.95 billion</td><td>every run</td></tr>
+        <tr><th>Code mode, keeping skills</th><td>20 of 20</td><td>188,747</td><td>8.21 billion</td><td>every run</td></tr>
+        <tr><th>Code mode, kept programs</th><td><span class="bad">12 of 20</span></td><td>16,004</td><td>16,004, <span class="bad">12 runs right</span></td><td>run 1; wrong, silently, after the release</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="short">
+    <h2 style="margin-top:0">Many records, a few states: 90 employees a run</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Client</th><th>Right</th><th>Input tokens a run</th><th>At 1,000,000 runs</th></tr></thead>
+      <tbody>
+        <tr class="us"><th>ARTIE's kept script</th><td>15 of 15</td><td>0 (48,491 once, to find the way)</td><td>48,491</td></tr>
+        <tr class="us"><th>A harness running it for any surname</th><td>15 of 15</td><td>0 (51,254 once)</td><td>51,254</td></tr>
+        <tr><th>A harness running a kept skill</th><td><span class="bad">10 of 15</span></td><td>0 (21,812 once)</td><td>21,812, <span class="bad">wrong at 90</span></td></tr>
+        <tr><th>Code mode with ARTIE as its tool</th><td>15 of 15</td><td>3,513</td><td>3.5 billion</td></tr>
+        <tr><th>Code mode, keeping a skill</th><td>15 of 15</td><td>7,904</td><td>7.9 billion</td></tr>
+        <tr><th>Code mode, fresh programs</th><td>15 of 15</td><td>10,182</td><td>10.2 billion</td></tr>
+        <tr><th>Code mode on HAL-FORMS alone</th><td>15 of 15</td><td>34,722</td><td>34.7 billion</td></tr>
+        <tr><th>Code mode, kept programs</th><td><span class="bad">5 of 15</span></td><td>0 (9,530 once)</td><td>9,530, <span class="bad">wrong past 6</span></td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">5 runs each at 6, 30 and 90 employees; the kept ways found at 6. Wrong runs exited 0: the kept skill guessed the paging at one page and stopped at the first 20 of 90; the kept programs moved the 6 they were written for. ARTIE follows the <code>next</code> link the search answer carries.</p>
+    <p class="note">At 1,000,000 runs: projected from the measured runs, at each client's measured rate. One service, one model (Claude Sonnet 5.5).</p>
+  </div>
+
+  <h2>Why</h2>
+  <ul>
+    <li><b>The controls are in the answer.</b> Each answer carries what is true and what can be done now, so a client finds its way from a bookmark, and a kept way runs again with no model.</li>
+    <li><b>A change is caught before a write.</b> ARTIE holds each act to the form it was offered; a renamed field stops the step, the model repairs it once, and the repair is kept. Kept code wrote on, and was wrong.</li>
+    <li><b>The cost follows the states, not the records.</b> One form set per state, shared by every record in it: three a run, at 6 employees or 90.</li>
+    <li><b>Data, not code.</b> A kept script is YAML a person or a policy can read before it runs: no sandbox, no token in model-written code, and a release is a diff of a few lines.</li>
+    <li><b>Code mode and ARTIE fit together.</b> Code mode reads the task in plain words; ARTIE does the acts. Run by a plain harness, the model is called only when ARTIE fails.</li>
+  </ul>
+
+  <h2>Two architectures</h2>
+  <div class="pair">
+    <div>
+      <h3>A bag of endpoints</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  D["1 Description: every operation"] --> M{{"2 Model writes code"}}
+  M --> P["3 Program builds URLs"]
+  P --> S[("Service")]
+  S -- "4 status, body" --> P
+</pre></div>
+      <ol class="notes">
+        <li>The client is told every operation up front: paths, methods, bodies.</li>
+        <li>The model works out the way and writes the code, every run.</li>
+        <li>The program builds each address itself, from templates and IDs.</li>
+        <li>The server's rules show only after the call.</li>
+      </ol>
+    </div>
+    <div>
+      <h3>Hypermedia</h3>
+      <div class="diagram"><pre class="mermaid">
+flowchart TD
+  B(["1 Bookmark"]) --> R["2 State + controls now"]
+  R --> C{{"3 Client picks a control"}}
+  C -- "act + If-Match" --> S[("Service")]
+  S -- "4 next state or refusal" --> R
+</pre></div>
+      <ol class="notes">
+        <li>The client enters at a bookmark, knowing only media types.</li>
+        <li>Each answer carries what is true now and what can be done now.</li>
+        <li>The client picks a link or a form; an act carries the ETag it read.</li>
+        <li>The server answers with the next state, or refuses with a reason.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>How far a change travels</h2>
+  <div class="pair">
+    <div>
+      <h3>Kept code on endpoints</h3>
+      <ol class="layers">
+        <li><b>Task words</b>what the person asked</li>
+        <li><b>Kept program or skill</b>field names, state rules, paging, IDs</li>
+        <li><b>SDK</b>paths, methods, bodies</li>
+        <li><b>OpenAPI description</b>out of band: true when published</li>
+        <li class="base"><b>Service</b></li>
+      </ol>
+    </div>
+    <div>
+      <h3>ARTIE on hypermedia</h3>
+      <ol class="layers">
+        <li><b>Goal</b>the task, in plain words</li>
+        <li><b>Kept script and pins</b>relations, inputs, each form's digest</li>
+        <li><b>ARTIE</b>the media type, registered relations such as <code>next</code></li>
+        <li><b>Each answer</b>in band: the state, and the controls allowed now</li>
+        <li class="base"><b>Service</b></li>
+      </ol>
+    </div>
+  </div>
+  <div class="table-scroll"><table class="ladder">
+    <thead>
+      <tr class="side"><th></th><th colspan="3">Endpoints</th><th colspan="2" class="split">Hypermedia</th></tr>
+      <tr><th>The change</th><th>Kept programs</th><th>Kept skill, run by a harness</th><th>Task words</th><th class="split">ARTIE's kept script</th><th>Goal</th></tr>
+    </thead>
+    <tbody>
+      <tr><th>Acts moved to new addresses</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="y split">right: the pins hold the act, not its address; no model</td><td></td></tr>
+      <tr><th>Update became a PATCH</th><td class="y">right*</td><td class="y">right*</td><td></td><td class="m split">a new method is a new act: model once, 1,265</td><td></td></tr>
+      <tr><th><code>role</code> renamed <code>position</code></th><td class="n">422, exit 0: wrong</td><td class="m">422, then rewritten; 12,601</td><td></td><td class="m split">stopped before the write, repaired; 3,105</td><td></td></tr>
+      <tr><th>Dismiss needs notice first</th><td class="n">409, exit 0: wrong</td><td class="m">409, then rewritten; 12,507</td><td></td><td class="m split">gave notice, then dismissed; 3,855, each run until a person keeps it</td><td></td></tr>
+      <tr><th>Update needs a reason</th><td class="n">422, exit 0: wrong</td><td class="n">made up a reason, "role change", and kept it; 12,091</td><td class="n">never asked</td><td class="m split">stopped before the write: "What reason should I give…?"</td><td class="m">needs the reason: a person adds it</td></tr>
+      <tr><th>More records than a page</th><td class="n">34 of 90, exit 0</td><td class="n">50 of 90, exit 0</td><td></td><td class="y split">right: follows <code>next</code></td><td></td></tr>
+      <tr><th>A teammate changed him first</th><td class="y">right</td><td class="m">412; rewritten twice; 23,569</td><td></td><td class="y split">412, read again, went on; no model</td><td></td></tr>
+      <tr><th>The task itself changes</th><td class="m">rewritten</td><td class="m">rewritten</td><td class="m">changes</td><td class="m split">found again</td><td class="m">changes</td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><span class="y">right, no model</span><span class="m">the model, or a person, once</span><span class="n">wrong, or made up</span><span>blank: that layer didn't change</span></div>
+  <ul>
+    <li><b>The goal is the stable layer.</b> Of seven changes, one reached it: a reason, which only a person can give. ARTIE stopped and asked; the skill made one up.</li>
+    <li><b>The kept script is the goal's lock file.</b> A release re-records it, and a person reviews the diff; the goal changes when the task does.</li>
+    <li><b>A pin holds what a form does, not where it is.</b> Its act: the method, content type, template pointers and schema, the target set aside. ARTIE never builds an address, so a form the server moves goes on with no model. A new method or a new field is a new act, and stops the step before the write. Strict stops at any change.</li>
+    <li><b>Kept code holds the domain.</b> Field names, the state rules and the paging were the code's own copies; in kept programs, each went wrong without a word.</li>
+  </ul>
+  <details class="more"><summary>More</summary>
+    <ul>
+      <li>Task t1 (hire, promote, dismiss): one run per release, on the way kept before it. The rename and the teammate are from the 20-run sequence; the paging from the runs at 90 employees. Figures are the model's input tokens.</li>
+      <li>* The SDK was generated from the description at the start of every run: code mode at its best. One built once needs a rebuild for each of these.</li>
+      <li>Every release changed the description and the answer; ARTIE itself never changed.</li>
+      <li>A form's own integrity covers its target too (the profile's Rule 10), so a moved form has a new one. The lock file also pins each form's act, the same digest with the target set aside: a lenient run goes past a form whose integrity changed while its act did not, and its trace says it was held by its act. With <code>repin: auto</code>, the new integrity is written into the lock file. A lock file without acts holds to the integrity alone.</li>
+      <li>A repair that makes a new act (give notice) is proposed, not kept, so the model is called each run until a person keeps it.</li>
+    </ul>
+  </details>
+
+  <h2>Fielding, in brief</h2>
+  <ul>
+    <li><b>The principle (2000):</b> REST's least-followed constraint is hypermedia as the engine of application state: the client moves from state to state by choosing among the controls each answer carries.</li>
+    <li><b>Information and controls together:</b> "When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions."</li>
+    <li><b>The complaint (2008):</b> most "REST APIs" are a list of operations a client must know in advance. "That is RPC. It screams RPC."</li>
+    <li><b>Enter knowing almost nothing:</b> "A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types…"</li>
+    <li><b>For change over time:</b> "REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution."</li>
+  </ul>
+  <p class="note">Roy T. Fielding, dissertation, 2000, §5.1.5; "REST APIs must be hypertext-driven" and its comments, 20 October 2008. More: <a href="https://jogoshugh.github.io/heart-rise-artie/reports/information-and-controls/">Information and Controls</a>.</p>
+
+  <details class="src"><summary>Limits <small>said plainly</small></summary>
+    <div class="in">
+      <ul>
+        <li>One service, one model, three tasks; 5 to 10 runs per row.</li>
+        <li>Projections are arithmetic on the measured runs, not runs.</li>
+        <li>A kept script does what its first run did. A goal that asked for less than the task would be kept that way: a person reviews it.</li>
+        <li>The example dismisses people; a gentler domain would carry the same point.</li>
+      </ul>
+    </div>
+  </details>
+
+  <p class="note">The whole story: <a href="https://claude.ai/artifact/UJjeDjCGzWTEczKcPJDFoC">Wayfinding Through Change</a> and <a href="https://claude.ai/artifact/1keHg2DB916cgXdDE8CqZD">Many Records, a Few States</a>.</p>
+</main>
+
+<!-- pages-only: on GitHub Pages the diagrams are drawn by Mermaid; an artifact draws them itself. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+(function () {
+  var root = document.documentElement;
+  var dark = root.dataset.theme === 'dark' ||
+    (root.dataset.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+  mermaid.initialize({ startOnLoad: true, theme: dark ? 'dark' : 'neutral', securityLevel: 'strict',
+    fontFamily: 'IBM Plex Sans, system-ui, sans-serif', flowchart: { useMaxWidth: true } });
+})();
+</script>
+<!-- /pages-only -->
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+})();
+</script>
+</body>
+</html>

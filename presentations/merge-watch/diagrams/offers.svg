@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="offers-title offers-desc">
+<title id="offers-title">The same resource, offering merge or saying why not</title>
+<desc id="offers-desc">A pull request that can merge carries a merge form. A draft carries none, and its why-absent resource says, in the server's words, that a draft can't be merged.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="offers-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="235" y="34" text-anchor="middle">A pull request that can merge</text>
+<text class="h" x="725" y="34" text-anchor="middle">A draft</text>
+<rect class="box" x="20" y="52" width="430" height="300" rx="10"/>
+<rect class="box" x="510" y="52" width="430" height="300" rx="10"/>
+<rect class="hl" x="34" y="98" width="400" height="28" rx="10"/>
+<text class="m" x="40" y="90">_forms:</text>
+<text class="m" x="40" y="116">  github:merge     PUT  merge_method</text>
+<text class="m" x="40" y="142">  github:comment   POST body</text>
+<text class="m" x="40" y="168">  github:close</text>
+<text class="m" x="40" y="194">  github:edit</text>
+<text class="m" x="530" y="90">_forms:</text>
+<text class="m" x="530" y="116">  github:comment   POST body</text>
+<text class="m" x="530" y="142">  github:close</text>
+<text class="m" x="530" y="168">  github:edit</text>
+<rect class="hl" x="524" y="212" width="400" height="112" rx="10"/>
+<text class="m" x="530" y="232">hr:unavailable:</text>
+<text class="m" x="530" y="258">  merge: “A draft can't be merged;</text>
+<text class="m" x="530" y="284">          mark it ready for review</text>
+<text class="m" x="530" y="310">          first.”</text>
+<text class="s" x="480" y="384" text-anchor="middle">Once waits for merge to appear among the forms; the reason is the server's, in its words.</text>
+</svg>

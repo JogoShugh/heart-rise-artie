@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" role="img" aria-labelledby="stacks-title stacks-desc">
+<title id="stacks-title">The browser stack and the agent stack</title>
+<desc id="stacks-desc">A person, a browser, HTML and any website, next to a model, ARTIE, HEART and any HEART service. The browser and ARTIE are generic; each is coupled only to its media type.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="stacks-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="250" y="30" text-anchor="middle">On the Web</text>
+<text class="h" x="710" y="30" text-anchor="middle">With HEART</text>
+<rect class="box" x="100" y="50" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="78" text-anchor="middle">A person</text>
+<text class="s" x="250" y="98" text-anchor="middle">chooses what to do</text>
+<path class="line" d="M250 116 L250 138" marker-end="url(#stacks-head)"/>
+<rect class="box" x="100" y="140" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="168" text-anchor="middle">A browser</text>
+<text class="s" x="250" y="188" text-anchor="middle">generic: knows HTML</text>
+<path class="line" d="M250 206 L250 228" marker-end="url(#stacks-head)"/>
+<rect class="hl" x="100" y="230" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="258" text-anchor="middle">HTML</text>
+<text class="s" x="250" y="278" text-anchor="middle">the media type</text>
+<path class="line" d="M250 296 L250 318" marker-end="url(#stacks-head)"/>
+<rect class="box" x="100" y="320" width="300" height="66" rx="10"/>
+<text class="h" x="250" y="348" text-anchor="middle">Any website</text>
+<text class="s" x="250" y="368" text-anchor="middle">its own resources and rules</text>
+<rect class="box" x="560" y="50" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="78" text-anchor="middle">A model</text>
+<text class="s" x="710" y="98" text-anchor="middle">chooses among what's offered</text>
+<path class="line" d="M710 116 L710 138" marker-end="url(#stacks-head)"/>
+<rect class="box" x="560" y="140" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="168" text-anchor="middle">ARTIE</text>
+<text class="s" x="710" y="188" text-anchor="middle">generic: knows HEART</text>
+<path class="line" d="M710 206 L710 228" marker-end="url(#stacks-head)"/>
+<rect class="hl" x="560" y="230" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="258" text-anchor="middle">HEART</text>
+<text class="s" x="710" y="278" text-anchor="middle">the media type</text>
+<path class="line" d="M710 296 L710 318" marker-end="url(#stacks-head)"/>
+<rect class="box" x="560" y="320" width="300" height="66" rx="10"/>
+<text class="h" x="710" y="348" text-anchor="middle">Any HEART service</text>
+<text class="s" x="710" y="368" text-anchor="middle">its own resources and rules</text>
+<text class="h" x="480" y="89" text-anchor="middle">≈</text>
+<text class="h" x="480" y="179" text-anchor="middle">≈</text>
+<text class="h" x="480" y="269" text-anchor="middle">≈</text>
+<text class="h" x="480" y="359" text-anchor="middle">≈</text>
+<text class="s" x="480" y="424" text-anchor="middle">Each client is coupled to the media type, never to a site.</text>
+</svg>

@@ -1,0 +1,1291 @@
+---
+run:
+  inputs:
+    entry:
+      value: http://localhost:8181/
+      given: default
+      default: http://localhost:8181/
+  usage:
+    calls: 2
+    input: 5045
+    output: 537
+    cache_read: 845
+    cache_write: 845
+---
+at: '2026-10-25T11:20:43.120171Z'
+ms: 96
+mode: script
+say: enter {entry}
+line: 11
+params:
+  entry: http://localhost:8181/
+opens: true
+outcome: done
+address: http://localhost:8181/
+now:
+  state:
+    title: Youth basketball scoring
+  forms:
+    - basketball:search-games
+    - basketball:get-game
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-25T11:20:43.220010Z'
+ms: 178
+mode: script
+say: act {relation}, id {id}
+line: 12
+within: 11
+params:
+  relation: basketball:get-game
+  id: 2
+values:
+  id:
+    value: 2
+    type: integer
+    from:
+      - constant
+opens: true
+chose:
+  kind: form
+  relation: basketball:get-game
+  title: Get a game by its id
+  method: GET
+  target: /games/{id}
+  address: http://localhost:8181/games/2
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-UjVdpj0o7TgdDPcMjlK4MaD8m8CzHqFpXOGFccibEpI=
+offered:
+  forms:
+    - basketball:get-game
+    - basketball:search-games
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8181/games/2
+now:
+  state:
+    id: 2
+    label: Hornets v Comets
+    phase: LIVE
+    period: 2
+    periods: 4
+    possession: home
+    home:
+      name: Hornets
+      score: 2
+      teamFouls: 1
+      inBonus: false
+      players:
+        - number: 5
+          name: Kai
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 8
+          name: Rowan
+          points: 0
+          fouls: 1
+          fouledOut: false
+        - number: 12
+          name: Ellis
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 24
+          name: Harper
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 33
+          name: Finley
+          points: 0
+          fouls: 0
+          fouledOut: false
+    away:
+      name: Comets
+      score: 5
+      teamFouls: 0
+      inBonus: false
+      players:
+        - number: 2
+          name: Logan
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 9
+          name: Parker
+          points: 3
+          fouls: 0
+          fouledOut: false
+        - number: 14
+          name: Reese
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 22
+          name: Skyler
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 31
+          name: Emerson
+          points: 0
+          fouls: 0
+          fouledOut: false
+    scoringPlays:
+      - sequenceNo: 2
+        team: home
+        playerNumber: 24
+        points: 2
+        takenBack: false
+      - sequenceNo: 3
+        team: away
+        playerNumber: 9
+        points: 3
+        takenBack: false
+      - sequenceNo: 7
+        team: away
+        playerNumber: 22
+        points: 2
+        takenBack: false
+  forms:
+    - basketball:score-basket
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:turnover
+    - basketball:call-timeout
+    - basketball:end-period
+    - basketball:correct-score
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /possession:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 9
+  /scoringPlays/0/team:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 9
+  /home/players/1/number:
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+  /home/players/0/number:
+    - 9
+  /away/score:
+    - 9
+---
+at: '2026-10-25T11:20:43.399906Z'
+ms: 79
+mode: script
+say: act {relation}, team {team}, playerNumber {playerNumber}, kind {kind}
+line: 13
+within: 12
+params:
+  relation: basketball:record-foul
+  team: home
+  playerNumber: 8
+  kind: personal
+values:
+  team:
+    value: home
+    type: string
+    from:
+      - step: 2
+        pointer: /possession
+      - step: 2
+        pointer: /scoringPlays/0/team
+  playerNumber:
+    value: 8
+    type: integer
+    from:
+      - step: 2
+        pointer: /home/players/1/number
+  kind:
+    value: personal
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: basketball:record-foul
+  title: Record a foul
+  method: POST
+  target: http://localhost:8181/games/2/actions/record-foul
+  address: http://localhost:8181/games/2/actions/record-foul
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-PWzlBEi9K3xD83kjud//bp5plDxp0T3rIao4hFww4qc=
+  if-match: '"seq-7.hsf.L0.058fde17e5b1e56f"'
+offered:
+  forms:
+    - basketball:call-timeout
+    - basketball:correct-score
+    - basketball:end-period
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:score-basket
+    - basketball:turnover
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8181/games/2
+now:
+  state:
+    id: 2
+    label: Hornets v Comets
+    phase: LIVE
+    period: 2
+    periods: 4
+    possession: home
+    home:
+      name: Hornets
+      score: 2
+      teamFouls: 2
+      inBonus: false
+      players:
+        - number: 5
+          name: Kai
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 8
+          name: Rowan
+          points: 0
+          fouls: 2
+          fouledOut: false
+        - number: 12
+          name: Ellis
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 24
+          name: Harper
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 33
+          name: Finley
+          points: 0
+          fouls: 0
+          fouledOut: false
+    away:
+      name: Comets
+      score: 5
+      teamFouls: 0
+      inBonus: false
+      players:
+        - number: 2
+          name: Logan
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 9
+          name: Parker
+          points: 3
+          fouls: 0
+          fouledOut: false
+        - number: 14
+          name: Reese
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 22
+          name: Skyler
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 31
+          name: Emerson
+          points: 0
+          fouls: 0
+          fouledOut: false
+    scoringPlays:
+      - sequenceNo: 2
+        team: home
+        playerNumber: 24
+        points: 2
+        takenBack: false
+      - sequenceNo: 3
+        team: away
+        playerNumber: 9
+        points: 3
+        takenBack: false
+      - sequenceNo: 7
+        team: away
+        playerNumber: 22
+        points: 2
+        takenBack: false
+  forms:
+    - basketball:score-basket
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:turnover
+    - basketball:call-timeout
+    - basketball:end-period
+    - basketball:correct-score
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /possession:
+    - 4
+    - 5
+    - 6
+    - 7
+    - 9
+  /scoringPlays/0/team:
+    - 4
+    - 5
+    - 6
+    - 7
+    - 9
+  /home/players/1/number:
+    - 4
+    - 5
+    - 6
+    - 7
+  /home/players/0/number:
+    - 9
+  /away/score:
+    - 9
+---
+at: '2026-10-25T11:20:43.485193Z'
+ms: 55
+mode: script
+say: act {relation}, team {team}, playerNumber {playerNumber}, kind {kind}
+line: 13
+within: 12
+params:
+  relation: basketball:record-foul
+  team: home
+  playerNumber: 8
+  kind: personal
+values:
+  team:
+    value: home
+    type: string
+    from:
+      - step: 2
+        pointer: /possession
+      - step: 2
+        pointer: /scoringPlays/0/team
+      - step: 3
+        pointer: /possession
+      - step: 3
+        pointer: /scoringPlays/0/team
+  playerNumber:
+    value: 8
+    type: integer
+    from:
+      - step: 2
+        pointer: /home/players/1/number
+      - step: 3
+        pointer: /home/players/1/number
+  kind:
+    value: personal
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: basketball:record-foul
+  title: Record a foul
+  method: POST
+  target: http://localhost:8181/games/2/actions/record-foul
+  address: http://localhost:8181/games/2/actions/record-foul
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-PWzlBEi9K3xD83kjud//bp5plDxp0T3rIao4hFww4qc=
+  if-match: '"seq-8.hsf.L0.2d9006c56d0a9beb"'
+offered:
+  forms:
+    - basketball:call-timeout
+    - basketball:correct-score
+    - basketball:end-period
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:score-basket
+    - basketball:turnover
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8181/games/2
+now:
+  state:
+    id: 2
+    label: Hornets v Comets
+    phase: LIVE
+    period: 2
+    periods: 4
+    possession: home
+    home:
+      name: Hornets
+      score: 2
+      teamFouls: 3
+      inBonus: false
+      players:
+        - number: 5
+          name: Kai
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 8
+          name: Rowan
+          points: 0
+          fouls: 3
+          fouledOut: false
+        - number: 12
+          name: Ellis
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 24
+          name: Harper
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 33
+          name: Finley
+          points: 0
+          fouls: 0
+          fouledOut: false
+    away:
+      name: Comets
+      score: 5
+      teamFouls: 0
+      inBonus: false
+      players:
+        - number: 2
+          name: Logan
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 9
+          name: Parker
+          points: 3
+          fouls: 0
+          fouledOut: false
+        - number: 14
+          name: Reese
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 22
+          name: Skyler
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 31
+          name: Emerson
+          points: 0
+          fouls: 0
+          fouledOut: false
+    scoringPlays:
+      - sequenceNo: 2
+        team: home
+        playerNumber: 24
+        points: 2
+        takenBack: false
+      - sequenceNo: 3
+        team: away
+        playerNumber: 9
+        points: 3
+        takenBack: false
+      - sequenceNo: 7
+        team: away
+        playerNumber: 22
+        points: 2
+        takenBack: false
+  forms:
+    - basketball:score-basket
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:turnover
+    - basketball:call-timeout
+    - basketball:end-period
+    - basketball:correct-score
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /possession:
+    - 5
+    - 6
+    - 7
+    - 9
+  /scoringPlays/0/team:
+    - 5
+    - 6
+    - 7
+    - 9
+  /home/players/1/number:
+    - 5
+    - 6
+    - 7
+  /home/players/0/number:
+    - 9
+  /away/score:
+    - 9
+---
+at: '2026-10-25T11:20:43.543603Z'
+ms: 126
+mode: script
+say: act {relation}, team {team}, playerNumber {playerNumber}, kind {kind}
+line: 13
+within: 12
+params:
+  relation: basketball:record-foul
+  team: home
+  playerNumber: 8
+  kind: personal
+values:
+  team:
+    value: home
+    type: string
+    from:
+      - step: 2
+        pointer: /possession
+      - step: 2
+        pointer: /scoringPlays/0/team
+      - step: 3
+        pointer: /possession
+      - step: 3
+        pointer: /scoringPlays/0/team
+      - step: 4
+        pointer: /possession
+      - step: 4
+        pointer: /scoringPlays/0/team
+  playerNumber:
+    value: 8
+    type: integer
+    from:
+      - step: 2
+        pointer: /home/players/1/number
+      - step: 3
+        pointer: /home/players/1/number
+      - step: 4
+        pointer: /home/players/1/number
+  kind:
+    value: personal
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: basketball:record-foul
+  title: Record a foul
+  method: POST
+  target: http://localhost:8181/games/2/actions/record-foul
+  address: http://localhost:8181/games/2/actions/record-foul
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-PWzlBEi9K3xD83kjud//bp5plDxp0T3rIao4hFww4qc=
+  if-match: '"seq-9.hsf.L0.b26a9113fedb2b8a"'
+offered:
+  forms:
+    - basketball:call-timeout
+    - basketball:correct-score
+    - basketball:end-period
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:score-basket
+    - basketball:turnover
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8181/games/2
+now:
+  state:
+    id: 2
+    label: Hornets v Comets
+    phase: LIVE
+    period: 2
+    periods: 4
+    possession: home
+    home:
+      name: Hornets
+      score: 2
+      teamFouls: 4
+      inBonus: false
+      players:
+        - number: 5
+          name: Kai
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 8
+          name: Rowan
+          points: 0
+          fouls: 4
+          fouledOut: false
+        - number: 12
+          name: Ellis
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 24
+          name: Harper
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 33
+          name: Finley
+          points: 0
+          fouls: 0
+          fouledOut: false
+    away:
+      name: Comets
+      score: 5
+      teamFouls: 0
+      inBonus: false
+      players:
+        - number: 2
+          name: Logan
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 9
+          name: Parker
+          points: 3
+          fouls: 0
+          fouledOut: false
+        - number: 14
+          name: Reese
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 22
+          name: Skyler
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 31
+          name: Emerson
+          points: 0
+          fouls: 0
+          fouledOut: false
+    scoringPlays:
+      - sequenceNo: 2
+        team: home
+        playerNumber: 24
+        points: 2
+        takenBack: false
+      - sequenceNo: 3
+        team: away
+        playerNumber: 9
+        points: 3
+        takenBack: false
+      - sequenceNo: 7
+        team: away
+        playerNumber: 22
+        points: 2
+        takenBack: false
+  forms:
+    - basketball:score-basket
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:turnover
+    - basketball:call-timeout
+    - basketball:end-period
+    - basketball:correct-score
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /possession:
+    - 6
+    - 7
+    - 9
+  /scoringPlays/0/team:
+    - 6
+    - 7
+    - 9
+  /home/players/1/number:
+    - 6
+    - 7
+  /home/players/0/number:
+    - 9
+  /away/score:
+    - 9
+---
+at: '2026-10-25T11:20:43.672788Z'
+ms: 48
+mode: script
+say: act {relation}, team {team}, playerNumber {playerNumber}, kind {kind}
+line: 13
+within: 12
+params:
+  relation: basketball:record-foul
+  team: home
+  playerNumber: 8
+  kind: personal
+values:
+  team:
+    value: home
+    type: string
+    from:
+      - step: 2
+        pointer: /possession
+      - step: 2
+        pointer: /scoringPlays/0/team
+      - step: 3
+        pointer: /possession
+      - step: 3
+        pointer: /scoringPlays/0/team
+      - step: 4
+        pointer: /possession
+      - step: 4
+        pointer: /scoringPlays/0/team
+      - step: 5
+        pointer: /possession
+      - step: 5
+        pointer: /scoringPlays/0/team
+  playerNumber:
+    value: 8
+    type: integer
+    from:
+      - step: 2
+        pointer: /home/players/1/number
+      - step: 3
+        pointer: /home/players/1/number
+      - step: 4
+        pointer: /home/players/1/number
+      - step: 5
+        pointer: /home/players/1/number
+  kind:
+    value: personal
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: basketball:record-foul
+  title: Record a foul
+  method: POST
+  target: http://localhost:8181/games/2/actions/record-foul
+  address: http://localhost:8181/games/2/actions/record-foul
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-PWzlBEi9K3xD83kjud//bp5plDxp0T3rIao4hFww4qc=
+  if-match: '"seq-10.hsf.L0.718dde75800de826"'
+offered:
+  forms:
+    - basketball:call-timeout
+    - basketball:correct-score
+    - basketball:end-period
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:score-basket
+    - basketball:turnover
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8181/games/2
+now:
+  state:
+    id: 2
+    label: Hornets v Comets
+    phase: LIVE
+    period: 2
+    periods: 4
+    possession: home
+    home:
+      name: Hornets
+      score: 2
+      teamFouls: 5
+      inBonus: false
+      players:
+        - number: 5
+          name: Kai
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 8
+          name: Rowan
+          points: 0
+          fouls: 5
+          fouledOut: true
+        - number: 12
+          name: Ellis
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 24
+          name: Harper
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 33
+          name: Finley
+          points: 0
+          fouls: 0
+          fouledOut: false
+    away:
+      name: Comets
+      score: 5
+      teamFouls: 0
+      inBonus: false
+      players:
+        - number: 2
+          name: Logan
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 9
+          name: Parker
+          points: 3
+          fouls: 0
+          fouledOut: false
+        - number: 14
+          name: Reese
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 22
+          name: Skyler
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 31
+          name: Emerson
+          points: 0
+          fouls: 0
+          fouledOut: false
+    scoringPlays:
+      - sequenceNo: 2
+        team: home
+        playerNumber: 24
+        points: 2
+        takenBack: false
+      - sequenceNo: 3
+        team: away
+        playerNumber: 9
+        points: 3
+        takenBack: false
+      - sequenceNo: 7
+        team: away
+        playerNumber: 22
+        points: 2
+        takenBack: false
+  forms:
+    - basketball:score-basket
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:turnover
+    - basketball:call-timeout
+    - basketball:end-period
+    - basketball:correct-score
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+keeps:
+  /possession:
+    - 7
+    - 9
+  /scoringPlays/0/team:
+    - 7
+    - 9
+  /home/players/1/number:
+    - 7
+  /home/teamFouls:
+    - 9
+  /home/players/0/number:
+    - 9
+  /home/players/1/fouls:
+    - 9
+  /away/score:
+    - 9
+---
+at: '2026-10-25T11:20:43.724906Z'
+ms: 0
+mode: script
+say: act {relation}, team {team}, playerNumber {playerNumber}, kind {kind}
+line: 16
+within: 12
+params:
+  relation: basketball:record-foul
+  team: home
+  playerNumber: 8
+  kind: personal
+values:
+  team:
+    value: home
+    type: string
+    from:
+      - step: 2
+        pointer: /possession
+      - step: 2
+        pointer: /scoringPlays/0/team
+      - step: 3
+        pointer: /possession
+      - step: 3
+        pointer: /scoringPlays/0/team
+      - step: 4
+        pointer: /possession
+      - step: 4
+        pointer: /scoringPlays/0/team
+      - step: 5
+        pointer: /possession
+      - step: 5
+        pointer: /scoringPlays/0/team
+      - step: 6
+        pointer: /possession
+      - step: 6
+        pointer: /scoringPlays/0/team
+  playerNumber:
+    value: 8
+    type: integer
+    from:
+      - step: 2
+        pointer: /home/players/1/number
+      - step: 3
+        pointer: /home/players/1/number
+      - step: 4
+        pointer: /home/players/1/number
+      - step: 5
+        pointer: /home/players/1/number
+      - step: 6
+        pointer: /home/players/1/number
+  kind:
+    value: personal
+    type: string
+    from:
+      - constant
+chose:
+  kind: form
+  relation: basketball:record-foul
+  title: Record a foul
+  method: POST
+  target: http://localhost:8181/games/2/actions/record-foul
+  address: http://localhost:8181/games/2/actions/record-foul
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-PWzlBEi9K3xD83kjud//bp5plDxp0T3rIao4hFww4qc=
+  if-match: '"seq-11.hsf.L0.3582ce61885efb2e"'
+offered:
+  forms:
+    - basketball:call-timeout
+    - basketball:correct-score
+    - basketball:end-period
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:score-basket
+    - basketball:turnover
+  links:
+    - hr:unavailable
+    - self
+outcome: refused
+address: http://localhost:8181/games/2
+refused:
+  kind: not a choice
+  by: the client
+  detail: 'playerNumber: 8 is not one of the choices'
+---
+at: '2026-10-25T11:20:43.729406Z'
+ms: 3855
+mode: intent
+say: record a personal foul on Rowan of the Hornets
+line: 21
+within: 12
+params: {}
+reason:
+  template: record a personal foul on Rowan of the Hornets
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":2,"label":"Hornets v Comets","phase":"LIVE","period":2,"periods":4,"possession":"home","home":{"name":"Hornets","score":2,"teamFouls":5,"inBonus":false,"players":[{"number":5,"name":"Kai","points":0,"fouls":0,"fouledOut":false},{"number":8,"name":"Rowan","points":0,"fouls":5,"fouledOut":true},{"number":12,"name":"Ellis","points":0,"fouls":0,"fouledOut":false},{"number":24,"name":"Harper","points":2,"fouls":0,"fouledOut":false},{"number":33,"name":"Finley","points":0,"fouls":0,"fouledOut":false}]},"away":{"name":"Comets","score":5,"teamFouls":0,"inBonus":false,"players":[{"number":2,"name":"Logan","points":0,"fouls":0,"fouledOut":false},{"number":9,"name":"Parker","points":3,"fouls":0,"fouledOut":false},{"number":14,"name":"Reese","points":0,"fouls":0,"fouledOut":false},{"number":22,"name":"Skyler","points":2,"fouls":0,"fouledOut":false},{"number":31,"name":"Emerson","points":0,"fouls":0,"fouledOut":false}]},"scoringPlays":[{"sequenceNo":2,"team":"home","playerNumber":24,"points":2,"takenBack":false},{"sequenceNo":3,"team":"away","playerNumber":9,"points":3,"takenBack":false},{"sequenceNo":7,"team":"away","playerNumber":22,"points":2,"takenBack":false}]}
+      </state>
+      <offers>
+      {"basketball:score-basket":{"title":"Score a basket","description":"Two or three points for a player; the ball goes to the other team.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"playerNumber":{"description":"The player's shirt number Choices: when team is home: 5 (Kai), 12 (Ellis), 24 (Harper), 33 (Finley); when team is away: 2 (Logan), 9 (Parker), 14 (Reese), 22 (Skyler), 31 (Emerson)","examples":[23],"maximum":99,"minimum":0,"title":"Player","type":"integer","enum":[5,12,24,33,2,9,14,22,31]},"points":{"description":"2 for a basket inside the arc, 3 from beyond it","examples":[2],"maximum":3,"minimum":2,"title":"Points","type":"integer"},"team":{"description":"Which team: home or away","enum":["home","away"],"title":"Team","type":"string"}},"required":["playerNumber","points","team"],"title":"Score a basket","type":"object","$id":"/schemas/c52732457a6afbdc"}},"basketball:free-throw":{"title":"Free throw","description":"One point for a player when it goes in.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"made":{"description":"Whether the free throw went in","title":"Made","type":"boolean"},"playerNumber":{"description":"The player's shirt number Choices: when team is home: 5 (Kai), 12 (Ellis), 24 (Harper), 33 (Finley); when team is away: 2 (Logan), 9 (Parker), 14 (Reese), 22 (Skyler), 31 (Emerson)","examples":[7],"maximum":99,"minimum":0,"title":"Player","type":"integer","enum":[5,12,24,33,2,9,14,22,31]},"team":{"description":"Which team: home or away","enum":["home","away"],"title":"Team","type":"string"}},"required":["made","playerNumber","team"],"title":"Free throw","type":"object","$id":"/schemas/af32961d71db4ec4"}},"basketball:record-foul":{"title":"Record a foul","description":"A foul by a player. Five and the player is out.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"kind":{"description":"The kind of foul","enum":["personal","shooting","technical"],"title":"Kind","type":"string"},"playerNumber":{"description":"The shirt number of the player who fouled Choices: when team is home: 5 (Kai), 12 (Ellis), 24 (Harper), 33 (Finley); when team is away: 2 (Logan), 9 (Parker), 14 (Reese), 22 (Skyler), 31 (Emerson)","examples":[11],"maximum":99,"minimum":0,"title":"Player","type":"integer","enum":[5,12,24,33,2,9,14,22,31]},"team":{"description":"The team of the player who fouled","enum":["home","away"],"title":"Team","type":"string"}},"required":["kind","playerNumber","team"],"title":"Record a foul","type":"object","$id":"/schemas/00b7ff8c228634a2"}},"basketball:turnover":{"title":"Turnover","description":"The team with the ball loses it to the other team.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"reason":{"description":"How the ball was lost","enum":["steal","out-of-bounds","travel","double-dribble"],"title":"Reason","type":"string"},"team":{"description":"The team that lost the ball","enum":["home","away"],"title":"Team","type":"string"}},"required":["reason","team"],"title":"Turnover","type":"object","$id":"/schemas/0e175bbf1ff87f82"}},"basketball:call-timeout":{"title":"Call a timeout","description":"Stops play until play resumes.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"team":{"description":"The team calling it","enum":["home","away"],"title":"Team","type":"string"}},"required":["team"],"title":"Call a timeout","type":"object","$id":"/schemas/b3ce02f6c81f449e"}},"basketball:end-period":{"title":"End the period","description":"Ends the period being played.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{},"title":"No input","type":"object","$id":"/schemas/918328d16ee20da5"}},"basketball:correct-score":{"title":"Take back a scoring play","description":"Removes a basket or free throw recorded by mistake.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"sequenceNo":{"description":"The sequence number of the scoring play to take back","examples":[2],"minimum":1,"title":"Play","type":"integer"}},"required":["sequenceNo"],"title":"Take back a scoring play","type":"object","$id":"/schemas/f3a7adcf31e3913d"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      record a personal foul on Rowan of the Hornets
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQS1wgKEAgTGAI4AUIIdGhpbmtpbmcSDOZ056E5EcmVP5e1KxoMyBkdafF1RrtUNr95IjCUPUEv7Lm7BEP5UG5Bx67OaJAUIILwl8OmsZkCYmevMup7CuGnH5/f/YBk8MhTEvwq9Acx15EFjrF8mckO4tbNxiyzME+1gzHsTF/h8ek8ePvuwHuht/aa4DQEOrLjgKwjCc6DbXcxI2o7qK45nM6gVS7R9IQt7mztSNvR4sKJdl7st5i7YABYuIaegOF2lj7zReJ/+23WyZ8Jrhq3I8mOfnzX0qOJUBQ5kQ5CfqzMFDaT3RwbQCzSez1IQQe6YF+0DG5S0kw75o8L92NcMHapd27CyxfR/H5WbsnFUQSw+8/iXwhrEQm0O3zb2Zx0P+sDBFIPOw0QonHF9XOrxpU319tv3MAHUua9dKRgnNxJd/axZj7XGCXSIjyp19j0YI1/7/+zqqKO0tVWbnPcSYkQAfzZcP8BG9RwHqlqVyKNIZ3y1t0cG33p/rcwtRoqihUU84JIZUVjHXt/6rB0Nxs9IkgqWh8sgi7WzjA1V/KDNcgZCoS3PsMYonma81KeNZWuptUgJ/iMR3YbLLU8pWrWqz9x68Fdh/A/fCg2jlPTn4hltKCD9b1fN0gbykSk+45BwHIMHALvY9vv/08EFHMLjns8VuWzj/YF60j+ea2jEN3qkBqfUOqFx4jRPcdsgS/Hj7LxbsCOKIokFnaByrGtcC3bWztgCwhG6Fh9MQsEecRasU1Q6PACgfsYYTokIpu4OpJo/tq5JhPhKQtOyWTopzgRU2B1RdGXFCfxWAIwds1uD73jgMt+8c0wKZ6fn/M0U50jHoc9uW4LK48qtjLmezES18VhpOBN44pEOFYKiijnYkg/F46X1ZYNzyRXFmOYdSZX5bNabci5I4KvCosOZrwciecMBxjgwXUZBH6brQ6gmXIvOfcNuVILuSa2JxxL24FM7jHdIy9FiPkNkOJ2qznvQzRiGCzEzyrQLbwBo2MFBiGO6v235zF2Mq+8az92x8jI2hSui9Ky2TUQRiy7uQP96OJR6KT+MHFHQD0wF2ml4C82F15Si04pSRyVjkfoLlQbRWIX5RSpz60ng6QlC7Yz2+zhRSwpRpWPRU337HOhZRt7DHq1RJuEeQH79ONvtFgT2mytGj4De0uFBPmRJ8Y1pRnykobLadobQC5cKp5i7xchNmq9uf70vok76bAvd8Pku5IGPAuAsBTJgSEX5dIF8IvUf+2SRc5sqbLkee0iyj2GnX6LYX4Qwg8euzpIkJsW3AR7Nj3ti1IKNFfLlspeUtSL7yzlK/RacGgrCLRJqu4Ia/BMvooZbTty7i6MKzcQ4VvlzK4erJchj0Cs58i835N/S7e4xHtreR5z/pNZ6rMvv6vsmo7wlvntZN1R/i2DcMa1R7rU5T8mVfDxOlaQg0rWnybiA2EVyYOY5wcpa/kxD72SDbz3o6LWoxpx4GaZ0N1fGAE="},{"type":"text","text":"I can''t record that foul. Rowan (#8) has already fouled out with 5 fouls, so he can''t be chosen for a foul. Did you mean a different Hornets player: Kai (5), Ellis (12), Harper (24) or Finley (33)?"},{"type":"tool_use","id":"toolu_01By8wrVeZ81GnwjMhwoUyMo","name":"select","input":{"action":"clarify","question":"Rowan (#8) has already fouled out with 5 fouls, so a foul can''t be recorded on him. Did you mean a different Hornets player: Kai (5), Ellis (12), Harper (24) or Finley (33)?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: http://localhost:8181/games/2
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: 'Rowan (#8) has already fouled out with 5 fouls, so a foul can''t be recorded on him. Did you mean a different Hornets player: Kai (5), Ellis (12), Harper (24) or Finley (33)?'
+---
+at: '2026-10-25T11:20:47.591011Z'
+ms: 1586
+mode: intent
+say: record a personal foul on Kai of the Hornets
+line: 25
+within: 12
+params:
+  relation: basketball:record-foul
+  kind: personal
+  playerNumber: '5'
+  team: home
+values:
+  kind:
+    value: personal
+    type: string
+    from:
+      - words
+  playerNumber:
+    value: '5'
+    type: integer
+    from:
+      - step: 2
+        pointer: /home/players/0/number
+      - step: 2
+        pointer: /away/score
+      - step: 3
+        pointer: /home/players/0/number
+      - step: 3
+        pointer: /away/score
+      - step: 4
+        pointer: /home/players/0/number
+      - step: 4
+        pointer: /away/score
+      - step: 5
+        pointer: /home/players/0/number
+      - step: 5
+        pointer: /away/score
+      - step: 6
+        pointer: /home/teamFouls
+      - step: 6
+        pointer: /home/players/0/number
+      - step: 6
+        pointer: /home/players/1/fouls
+      - step: 6
+        pointer: /away/score
+  team:
+    value: home
+    type: string
+    from:
+      - step: 2
+        pointer: /possession
+      - step: 2
+        pointer: /scoringPlays/0/team
+      - step: 3
+        pointer: /possession
+      - step: 3
+        pointer: /scoringPlays/0/team
+      - step: 4
+        pointer: /possession
+      - step: 4
+        pointer: /scoringPlays/0/team
+      - step: 5
+        pointer: /possession
+      - step: 5
+        pointer: /scoringPlays/0/team
+      - step: 6
+        pointer: /possession
+      - step: 6
+        pointer: /scoringPlays/0/team
+reason:
+  template: record a personal foul on Kai of the Hornets
+  slots: {}
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":2,"label":"Hornets v Comets","phase":"LIVE","period":2,"periods":4,"possession":"home","home":{"name":"Hornets","score":2,"teamFouls":5,"inBonus":false,"players":[{"number":5,"name":"Kai","points":0,"fouls":0,"fouledOut":false},{"number":8,"name":"Rowan","points":0,"fouls":5,"fouledOut":true},{"number":12,"name":"Ellis","points":0,"fouls":0,"fouledOut":false},{"number":24,"name":"Harper","points":2,"fouls":0,"fouledOut":false},{"number":33,"name":"Finley","points":0,"fouls":0,"fouledOut":false}]},"away":{"name":"Comets","score":5,"teamFouls":0,"inBonus":false,"players":[{"number":2,"name":"Logan","points":0,"fouls":0,"fouledOut":false},{"number":9,"name":"Parker","points":3,"fouls":0,"fouledOut":false},{"number":14,"name":"Reese","points":0,"fouls":0,"fouledOut":false},{"number":22,"name":"Skyler","points":2,"fouls":0,"fouledOut":false},{"number":31,"name":"Emerson","points":0,"fouls":0,"fouledOut":false}]},"scoringPlays":[{"sequenceNo":2,"team":"home","playerNumber":24,"points":2,"takenBack":false},{"sequenceNo":3,"team":"away","playerNumber":9,"points":3,"takenBack":false},{"sequenceNo":7,"team":"away","playerNumber":22,"points":2,"takenBack":false}]}
+      </state>
+      <offers>
+      {"basketball:score-basket":{"title":"Score a basket","description":"Two or three points for a player; the ball goes to the other team.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"playerNumber":{"description":"The player's shirt number Choices: when team is home: 5 (Kai), 12 (Ellis), 24 (Harper), 33 (Finley); when team is away: 2 (Logan), 9 (Parker), 14 (Reese), 22 (Skyler), 31 (Emerson)","examples":[23],"maximum":99,"minimum":0,"title":"Player","type":"integer","enum":[5,12,24,33,2,9,14,22,31]},"points":{"description":"2 for a basket inside the arc, 3 from beyond it","examples":[2],"maximum":3,"minimum":2,"title":"Points","type":"integer"},"team":{"description":"Which team: home or away","enum":["home","away"],"title":"Team","type":"string"}},"required":["playerNumber","points","team"],"title":"Score a basket","type":"object","$id":"/schemas/c52732457a6afbdc"}},"basketball:free-throw":{"title":"Free throw","description":"One point for a player when it goes in.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"made":{"description":"Whether the free throw went in","title":"Made","type":"boolean"},"playerNumber":{"description":"The player's shirt number Choices: when team is home: 5 (Kai), 12 (Ellis), 24 (Harper), 33 (Finley); when team is away: 2 (Logan), 9 (Parker), 14 (Reese), 22 (Skyler), 31 (Emerson)","examples":[7],"maximum":99,"minimum":0,"title":"Player","type":"integer","enum":[5,12,24,33,2,9,14,22,31]},"team":{"description":"Which team: home or away","enum":["home","away"],"title":"Team","type":"string"}},"required":["made","playerNumber","team"],"title":"Free throw","type":"object","$id":"/schemas/af32961d71db4ec4"}},"basketball:record-foul":{"title":"Record a foul","description":"A foul by a player. Five and the player is out.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"kind":{"description":"The kind of foul","enum":["personal","shooting","technical"],"title":"Kind","type":"string"},"playerNumber":{"description":"The shirt number of the player who fouled Choices: when team is home: 5 (Kai), 12 (Ellis), 24 (Harper), 33 (Finley); when team is away: 2 (Logan), 9 (Parker), 14 (Reese), 22 (Skyler), 31 (Emerson)","examples":[11],"maximum":99,"minimum":0,"title":"Player","type":"integer","enum":[5,12,24,33,2,9,14,22,31]},"team":{"description":"The team of the player who fouled","enum":["home","away"],"title":"Team","type":"string"}},"required":["kind","playerNumber","team"],"title":"Record a foul","type":"object","$id":"/schemas/00b7ff8c228634a2"}},"basketball:turnover":{"title":"Turnover","description":"The team with the ball loses it to the other team.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"reason":{"description":"How the ball was lost","enum":["steal","out-of-bounds","travel","double-dribble"],"title":"Reason","type":"string"},"team":{"description":"The team that lost the ball","enum":["home","away"],"title":"Team","type":"string"}},"required":["reason","team"],"title":"Turnover","type":"object","$id":"/schemas/0e175bbf1ff87f82"}},"basketball:call-timeout":{"title":"Call a timeout","description":"Stops play until play resumes.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"team":{"description":"The team calling it","enum":["home","away"],"title":"Team","type":"string"}},"required":["team"],"title":"Call a timeout","type":"object","$id":"/schemas/b3ce02f6c81f449e"}},"basketball:end-period":{"title":"End the period","description":"Ends the period being played.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{},"title":"No input","type":"object","$id":"/schemas/918328d16ee20da5"}},"basketball:correct-score":{"title":"Take back a scoring play","description":"Removes a basket or free throw recorded by mistake.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","properties":{"sequenceNo":{"description":"The sequence number of the scoring play to take back","examples":[2],"minimum":1,"title":"Play","type":"integer"}},"required":["sequenceNo"],"title":"Take back a scoring play","type":"object","$id":"/schemas/f3a7adcf31e3913d"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      record a personal foul on Kai of the Hornets
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_019jmij1MRHX4gvHBhNYmwmA","name":"select","input":{"action":"act","affordance":"basketball:record-foul","fields":{"kind":"personal","playerNumber":5,"team":"home"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: basketball:record-foul
+  title: Record a foul
+  method: POST
+  target: http://localhost:8181/games/2/actions/record-foul
+  address: http://localhost:8181/games/2/actions/record-foul
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-PWzlBEi9K3xD83kjud//bp5plDxp0T3rIao4hFww4qc=
+  if-match: '"seq-11.hsf.L0.3582ce61885efb2e"'
+offered:
+  forms:
+    - basketball:call-timeout
+    - basketball:correct-score
+    - basketball:end-period
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:score-basket
+    - basketball:turnover
+  links:
+    - hr:unavailable
+    - self
+outcome: done
+address: http://localhost:8181/games/2
+now:
+  state:
+    id: 2
+    label: Hornets v Comets
+    phase: LIVE
+    period: 2
+    periods: 4
+    possession: home
+    home:
+      name: Hornets
+      score: 2
+      teamFouls: 6
+      inBonus: false
+      players:
+        - number: 5
+          name: Kai
+          points: 0
+          fouls: 1
+          fouledOut: false
+        - number: 8
+          name: Rowan
+          points: 0
+          fouls: 5
+          fouledOut: true
+        - number: 12
+          name: Ellis
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 24
+          name: Harper
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 33
+          name: Finley
+          points: 0
+          fouls: 0
+          fouledOut: false
+    away:
+      name: Comets
+      score: 5
+      teamFouls: 0
+      inBonus: false
+      players:
+        - number: 2
+          name: Logan
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 9
+          name: Parker
+          points: 3
+          fouls: 0
+          fouledOut: false
+        - number: 14
+          name: Reese
+          points: 0
+          fouls: 0
+          fouledOut: false
+        - number: 22
+          name: Skyler
+          points: 2
+          fouls: 0
+          fouledOut: false
+        - number: 31
+          name: Emerson
+          points: 0
+          fouls: 0
+          fouledOut: false
+    scoringPlays:
+      - sequenceNo: 2
+        team: home
+        playerNumber: 24
+        points: 2
+        takenBack: false
+      - sequenceNo: 3
+        team: away
+        playerNumber: 9
+        points: 3
+        takenBack: false
+      - sequenceNo: 7
+        team: away
+        playerNumber: 22
+        points: 2
+        takenBack: false
+  forms:
+    - basketball:score-basket
+    - basketball:free-throw
+    - basketball:record-foul
+    - basketball:turnover
+    - basketball:call-timeout
+    - basketball:end-period
+    - basketball:correct-score
+  links:
+    self:
+      - null
+    hr:unavailable:
+      - null
+---
+at: '2026-10-25T11:20:49.181856Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 12
+within: 11
+params:
+  address: http://localhost:8181/
+outcome: done
+address: http://localhost:8181/
+now:
+  state:
+    title: Youth basketball scoring
+  forms:
+    - basketball:search-games
+    - basketball:get-game
+  links:
+    self:
+      - null
+    service-desc:
+      - null

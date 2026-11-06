@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 410" role="img" aria-labelledby="mapping-title mapping-desc">
+<title id="mapping-title">HTML and HEART, element for element</title>
+<desc id="mapping-desc">An HTML link with a rel is a HEART link by relation; an HTML form is a HEART form with method and target; an input's constraints are a JSON Schema; and where HTML shows no button, HEART offers no form and says why.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="mapping-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="385" y="34" text-anchor="middle">HTML · for a browser</text>
+<text class="h" x="765" y="34" text-anchor="middle">HEART · for an agent</text>
+<text class="t" x="40" y="90" text-anchor="start">A link</text>
+<text class="s" x="40" y="110" text-anchor="start">by relation</text>
+<rect class="box" x="210" y="60" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="87" text-anchor="start">&lt;a rel=&quot;author&quot;</text>
+<text class="m" x="226" y="107" text-anchor="start">   href=&quot;/users/ana&quot;&gt;</text>
+<path class="line" d="M564 92 L586 92" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="60" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="87" text-anchor="start">&quot;_links&quot;: { &quot;author&quot;:</text>
+<text class="m" x="606" y="107" text-anchor="start">  { &quot;href&quot;: &quot;/users/ana&quot; } }</text>
+<text class="t" x="40" y="174" text-anchor="start">An action</text>
+<text class="s" x="40" y="194" text-anchor="start">method and target</text>
+<rect class="box" x="210" y="144" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="171" text-anchor="start">&lt;form method=&quot;post&quot;</text>
+<text class="m" x="226" y="191" text-anchor="start">  action=&quot;/pulls/20/merge&quot;&gt;</text>
+<path class="line" d="M564 176 L586 176" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="144" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="171" text-anchor="start">&quot;_forms&quot;: { &quot;github:merge&quot;: {</text>
+<text class="m" x="606" y="191" text-anchor="start">  &quot;method&quot;: &quot;PUT&quot;, … } }</text>
+<text class="t" x="40" y="258" text-anchor="start">Its inputs</text>
+<text class="s" x="40" y="278" text-anchor="start">what to send</text>
+<rect class="box" x="210" y="228" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="255" text-anchor="start">&lt;input name=&quot;title&quot; required</text>
+<text class="m" x="226" y="275" text-anchor="start">  maxlength=&quot;256&quot;&gt;</text>
+<path class="line" d="M564 260 L586 260" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="228" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="255" text-anchor="start">&quot;title&quot;: { &quot;type&quot;: &quot;string&quot;,</text>
+<text class="m" x="606" y="275" text-anchor="start">  &quot;maxLength&quot;: 256 }</text>
+<text class="t" x="40" y="342" text-anchor="start">Not possible now</text>
+<text class="s" x="40" y="362" text-anchor="start">and why</text>
+<rect class="box" x="210" y="312" width="350" height="64" rx="10"/>
+<text class="m" x="226" y="339" text-anchor="start">(the button isn't there)</text>
+<path class="line" d="M564 344 L586 344" marker-end="url(#mapping-head)"/>
+<rect class="hl" x="590" y="312" width="350" height="64" rx="10"/>
+<text class="m" x="606" y="339" text-anchor="start">(no form; hr:unavailable</text>
+<text class="m" x="606" y="359" text-anchor="start"> says why)</text>
+</svg>

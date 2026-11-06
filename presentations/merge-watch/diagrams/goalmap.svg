@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 470" role="img" aria-labelledby="goalmap-title goalmap-desc">
+<title id="goalmap-title">Each line of the goal, and what the run does with it</title>
+<desc id="goalmap-desc">Whenever visits pull requests new or changed; If leaves held ones, saying so once; Once waits for merge to be offered; Or give up ends the wait; Otherwise, marked reasoned, asks the model each time; Until ends the watch.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="goalmap-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="250" y="30" text-anchor="middle">The goal says</text>
+<text class="h" x="730" y="30" text-anchor="middle">The run does</text>
+<rect class="box" x="20" y="52" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="84">Whenever a pull request labelled {label} changes</text>
+<path class="line" d="M492 79 L538 79" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="52" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="75" text-anchor="middle">Visit each one new or changed</text>
+<text class="s" x="740" y="94" text-anchor="middle">since the last look</text>
+<rect class="box" x="20" y="120" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="152">If it's labelled {hold}, leave it, and say so once.</text>
+<path class="line" d="M492 147 L538 147" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="120" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="143" text-anchor="middle">A check: where it holds,</text>
+<text class="s" x="740" y="162" text-anchor="middle">leave the pull request, noted once</text>
+<rect class="box" x="20" y="188" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="220">Once it can be merged, merge it by squashing.</text>
+<path class="line" d="M492 215 L538 215" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="188" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="211" text-anchor="middle">Wait until the server offers merge,</text>
+<text class="s" x="740" y="230" text-anchor="middle">then act on it</text>
+<rect class="box" x="20" y="256" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="288">Or give up after 3 minutes.</text>
+<path class="line" d="M492 283 L538 283" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="256" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="279" text-anchor="middle">End that wait</text>
+<text class="s" x="740" y="298" text-anchor="middle">after 3 minutes</text>
+<rect class="hl" x="20" y="324" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="356">Otherwise, tell its author … `reasoned`</text>
+<path class="line" d="M492 351 L538 351" marker-end="url(#goalmap-head)"/>
+<rect class="hl" x="540" y="324" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="347" text-anchor="middle">Ask the model, each give-up,</text>
+<text class="s" x="740" y="366" text-anchor="middle">with the server's reason</text>
+<rect class="box" x="20" y="392" width="470" height="54" rx="10"/>
+<text class="m" x="36" y="424">Until someone closes {watch}</text>
+<path class="line" d="M492 419 L538 419" marker-end="url(#goalmap-head)"/>
+<rect class="box" x="540" y="392" width="400" height="54" rx="10"/>
+<text class="t" x="740" y="415" text-anchor="middle">Read the watch's issue each look;</text>
+<text class="s" x="740" y="434" text-anchor="middle">stop when it is closed</text>
+</svg>

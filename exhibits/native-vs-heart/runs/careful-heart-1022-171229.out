@@ -1,0 +1,40 @@
+1 enter https://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Crash when a bed has no name (1022-171229), body a bed with a blank name crashes the garden: new resource
+4 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/552: done
+5 act github:label, labels [bug]: done
+6 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/552: done
+7 act github:assign, assignees [JogoShugh]: done
+8 return to https://localhost:8392/repos/JogoShugh/heart-github-test/issues/552: done
+9 check: held
+10 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+11 act github:open-issue, title Test blank bed names (1022-171229), body part of #552: new resource
+12 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+13 act github:open-issue, title Garden crashes on an empty bed name (1022-171229), body seen on the demo garden: new resource
+14 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+15 follow github:repos-list-branches: done
+16 follow item, titled main: done
+17 act github:branch-from-here, name fix-blank-names-1022-171229: new resource
+18 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171229: done
+19 act github:commit-file, path fix-1022-171229.md, message Refuse a bed with no name, content Bed names may not be blank.: done
+20 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171229: done
+21 act github:commit-file, path test-1022-171229.md, message Test that a blank bed name is refused, content A bed with a blank name is refused.: done
+22 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171229: done
+23 act github:open-pull-request, base main, title Refuse a bed with no name (1022-171229), body fixes #552: new resource
+24 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/555: done
+25 act github:edit, body fixes #552
+
+Reviewer: please add a migration note before this goes in. and is tested by #553: done
+26 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/555: done
+27 until: held
+28 act github:merge, merge_method squash, commit_title Refuse a bed with no name (#555): done
+29 return to https://localhost:8392/repos/JogoShugh/heart-github-test/pulls/555: done
+30 check: held
+31 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/fix-blank-names-1022-171229: done
+32 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches/main: done
+33 return to https://localhost:8392/repos/JogoShugh/heart-github-test/branches: done
+34 return to https://localhost:8392/repos/JogoShugh/heart-github-test: done
+35 return to https://localhost:8392/: done
+36 act github:issues-get, owner JogoShugh, repo heart-github-test, issue_number 552: done
+37 act github:add-sub-issue, sub_issue_id 5987540993: refused
+stopped at step 22, "github:add-sub-issue": guard, refused by the client: "github:add-sub-issue is offered in another set: pinned sha256-ofqOEjf+BDhfudqRP1SnJgHpZUleKf6YeibKODntxz0=, offered sha256-arnMDvWbdVeCghaxE4orD/rzQIV9qNqcEylfNqS+25w="

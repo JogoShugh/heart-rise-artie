@@ -1,0 +1,214 @@
+# Jenkins remote API, as seen from curl on 2026-10-29.
+# Jenkins 2.580.2 (lts-jdk21), plugins: cloudbees-folder, workflow-aggregator, job-dsl, configuration-as-code.
+# Basic auth with a user API token on every request. Bodies are the answers, trimmed only by the tree parameter.
+exchanges:
+  - name: read the folder
+    request:
+      method: GET
+      url: http://localhost:8080/job/services/api/json?tree=name,_class,jobs[name,_class,url]
+    response:
+      status: 200
+      headers:
+        Content-Type: application/json;charset=utf-8
+        X-Jenkins: 2.580.2
+        note: no ETag, no Cache-Control, no Last-Modified; If-None-Match is ignored (200)
+      body:
+        _class: com.cloudbees.hudson.plugins.folder.Folder
+        name: services
+        jobs:
+          - _class: org.jenkinsci.plugins.workflow.job.WorkflowJob
+            name: build-service
+            url: http://localhost:8080/job/services/job/build-service/
+  - name: read the job, with its parameters
+    request:
+      method: GET
+      url: http://localhost:8080/job/services/job/build-service/api/json?tree=name,_class,buildable,inQueue,nextBuildNumber,property[parameterDefinitions[name,type,defaultParameterValue[value]]]
+    response:
+      status: 200
+      body:
+        _class: org.jenkinsci.plugins.workflow.job.WorkflowJob
+        name: build-service
+        buildable: true
+        nextBuildNumber: 1
+        property:
+          - _class: hudson.model.ParametersDefinitionProperty
+            parameterDefinitions:
+              - _class: hudson.model.StringParameterDefinition
+                defaultParameterValue:
+                  _class: hudson.model.StringParameterValue
+                  value: api
+                name: SERVICE
+                type: StringParameterDefinition
+        inQueue: false
+  - name: start the job with a parameter
+    request:
+      method: POST
+      url: http://localhost:8080/job/services/job/build-service/buildWithParameters?SERVICE=payments
+    response:
+      status: 201
+      headers:
+        Location: http://localhost:8080/queue/item/1/
+        Content-Length: "0"
+      note: |
+        Without credentials: 403. With the password as Basic auth and no crumb: 403.
+        With the API token as Basic auth and no crumb: 201. An unknown job: 404.
+  - name: read the queue item at once (quiet period)
+    request:
+      method: GET
+      url: http://localhost:8080/queue/item/1/api/json
+    response:
+      status: 200
+      body:
+        _class: hudson.model.Queue$WaitingItem
+        actions:
+          - _class: hudson.model.ParametersAction
+            parameters:
+              - _class: hudson.model.StringParameterValue
+                name: SERVICE
+                value: payments
+          - _class: hudson.model.CauseAction
+            causes:
+              - _class: hudson.model.Cause$UserIdCause
+                shortDescription: Started by user admin
+                userId: admin
+                userName: admin
+        blocked: false
+        buildable: false
+        id: 1
+        inQueueSince: 1793314587475
+        params: |-
+        
+          SERVICE=payments
+        stuck: false
+        task:
+          _class: org.jenkinsci.plugins.workflow.job.WorkflowJob
+          name: build-service
+          url: http://localhost:8080/job/services/job/build-service/
+          color: notbuilt
+        url: queue/item/1/
+        why: In the quiet period. Expires in 4.8 sec
+        timestamp: 1793314592468
+  - name: read the queue item once the build started (about 8 seconds later)
+    request:
+      method: GET
+      url: http://localhost:8080/queue/item/1/api/json
+    response:
+      status: 200
+      note: _class turns from Queue$WaitingItem to Queue$LeftItem; executable appears with the build's number and url
+      body:
+        _class: hudson.model.Queue$LeftItem
+        actions:
+          - _class: hudson.model.ParametersAction
+            parameters:
+              - _class: hudson.model.StringParameterValue
+                name: SERVICE
+                value: payments
+          - _class: hudson.model.CauseAction
+            causes:
+              - _class: hudson.model.Cause$UserIdCause
+                shortDescription: Started by user admin
+                userId: admin
+                userName: admin
+        blocked: false
+        buildable: false
+        id: 1
+        inQueueSince: 1793314587475
+        params: |-
+        
+          SERVICE=payments
+        stuck: false
+        task:
+          _class: org.jenkinsci.plugins.workflow.job.WorkflowJob
+          name: build-service
+          url: http://localhost:8080/job/services/job/build-service/
+          color: notbuilt_anime
+        url: queue/item/1/
+        why: null
+        cancelled: false
+        executable:
+          _class: org.jenkinsci.plugins.workflow.job.WorkflowRun
+          number: 1
+          url: http://localhost:8080/job/services/job/build-service/1/
+  - name: read the build while it runs
+    request:
+      method: GET
+      url: http://localhost:8080/job/services/job/build-service/1/api/json?tree=number,building,result,timestamp,duration,estimatedDuration,url,queueId
+    response:
+      status: 200
+      body:
+        _class: org.jenkinsci.plugins.workflow.job.WorkflowRun
+        building: true
+        duration: 0
+        estimatedDuration: -1
+        number: 1
+        queueId: 1
+        result: null
+        timestamp: 1793314594476
+        url: http://localhost:8080/job/services/job/build-service/1/
+  - name: read the build when it has finished
+    request:
+      method: GET
+      url: http://localhost:8080/job/services/job/build-service/1/api/json?tree=number,building,result,timestamp,duration,estimatedDuration,url,queueId,actions[parameters[name,value]]
+    response:
+      status: 200
+      body:
+        _class: org.jenkinsci.plugins.workflow.job.WorkflowRun
+        actions:
+          - _class: hudson.model.ParametersAction
+            parameters:
+              - _class: hudson.model.StringParameterValue
+                name: SERVICE
+                value: payments
+          - _class: hudson.model.CauseAction
+          - _class: org.jenkinsci.plugins.workflow.libs.LibrariesAction
+          - {}
+          - {}
+          - _class: org.jenkinsci.plugins.displayurlapi.actions.RunDisplayAction
+          - _class: org.jenkinsci.plugins.pipeline.modeldefinition.actions.RestartDeclarativePipelineAction
+          - {}
+          - _class: org.jenkinsci.plugins.workflow.job.views.FlowGraphAction
+          - {}
+          - {}
+        building: false
+        duration: 22645
+        estimatedDuration: 22645
+        number: 1
+        queueId: 1
+        result: SUCCESS
+        timestamp: 1793314594476
+        url: http://localhost:8080/job/services/job/build-service/1/
+  - name: the folder rollup, after one success and one failure
+    request:
+      method: GET
+      url: http://localhost:8080/job/services/api/json?tree=name,url,jobs[name,url,color,inQueue,lastBuild[number,result,timestamp,duration,building],lastSuccessfulBuild[number,timestamp],lastFailedBuild[number,timestamp],lastCompletedBuild[number,result]]
+    response:
+      status: 200
+      body:
+        _class: com.cloudbees.hudson.plugins.folder.Folder
+        name: services
+        url: http://localhost:8080/job/services/
+        jobs:
+          - _class: org.jenkinsci.plugins.workflow.job.WorkflowJob
+            name: build-service
+            url: http://localhost:8080/job/services/job/build-service/
+            color: red
+            lastBuild:
+              _class: org.jenkinsci.plugins.workflow.job.WorkflowRun
+              building: false
+              duration: 18984
+              number: 2
+              result: FAILURE
+              timestamp: 1793314624747
+            lastCompletedBuild:
+              _class: org.jenkinsci.plugins.workflow.job.WorkflowRun
+              number: 2
+              result: FAILURE
+            lastFailedBuild:
+              _class: org.jenkinsci.plugins.workflow.job.WorkflowRun
+              number: 2
+              timestamp: 1793314624747
+            lastSuccessfulBuild:
+              _class: org.jenkinsci.plugins.workflow.job.WorkflowRun
+              number: 1
+              timestamp: 1793314594476
+            inQueue: false

@@ -1,0 +1,28 @@
+1 send GET https://api.github.com/repos/JogoShugh/heart-github-test/branches/deps-main: done
+2 send POST https://api.github.com/repos/JogoShugh/heart-github-test/git/refs: done
+3 send GET https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps.txt?ref=deps/left-pad-95042.0.0-1105-110904: done
+4 send PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps.txt: done
+5 send POST https://api.github.com/repos/JogoShugh/heart-github-test/pulls: done
+6 send POST https://api.github.com/repos/JogoShugh/heart-github-test/issues/2129/labels: done
+finished, 6 steps
+1 send GET https://api.github.com/repos/JogoShugh/heart-github-test/branches/deps-main: done
+2 send POST https://api.github.com/repos/JogoShugh/heart-github-test/git/refs: done
+3 send GET https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt?ref=deps/left-pad-95055.0.1-1105-110917: refused
+4 send PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt: refused
+stopped at step 4, "PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt": the server answered 500: 
+1 send GET https://api.github.com/repos/JogoShugh/heart-github-test/branches/deps-main: done
+2 send POST https://api.github.com/repos/JogoShugh/heart-github-test/git/refs: done
+3 send GET https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt?ref=deps/left-pad-95067.0.1-1105-110929: refused
+4 send PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt: refused
+stopped at step 4, "PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt": the server answered 500: 
+1 send GET https://api.github.com/repos/JogoShugh/heart-github-test/branches/deps-main: done
+2 send POST https://api.github.com/repos/JogoShugh/heart-github-test/git/refs: done
+3 send GET https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt?ref=deps/left-pad-95078.0.1-1105-110941: refused
+4 send PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt: done
+5 send POST https://api.github.com/repos/JogoShugh/heart-github-test/pulls: refused
+stopped at step 5, "POST https://api.github.com/repos/JogoShugh/heart-github-test/pulls": the server answered 500: 
+1 send GET https://api.github.com/repos/JogoShugh/heart-github-test/branches/deps-main: done
+2 send POST https://api.github.com/repos/JogoShugh/heart-github-test/git/refs: done
+3 send GET https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt?ref=deps/left-pad-95091.0.1-1105-110954: refused
+4 send PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt: refused
+stopped at step 4, "PUT https://api.github.com/repos/JogoShugh/heart-github-test/contents/deps-draft.txt": the server answered 500: 

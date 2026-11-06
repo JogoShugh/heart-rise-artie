@@ -1,0 +1,132 @@
+{
+  "base": "https://w3id.org/heart-rise",
+  "identifiers": [
+    {
+      "path": "",
+      "kind": "Profile",
+      "title": "HEART",
+      "definition": "The parent profile of HEART (Hypermedia Engine for Agentic Resource Transitions). A response names it beside the concrete dialect profile, in Link: rel=\"profile\". It is never negotiated alone. A client that knows it knows that the response follows HEART's rules: state and legal acts in one representation, acts conditional on the representation's validator, and shared layers checked by integrity.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#61-media-type-dialects-and-profile-negotiation"
+      ]
+    },
+    {
+      "path": "hal-schema-forms",
+      "kind": "Profile",
+      "title": "HAL Schema Forms, HEART profile",
+      "definition": "HAL Schema Forms (https://github.com/jbadeau/hal-schema-forms) with HEART's additions: template pointers, integrity on shared links, schemas by $ref, forms named by link relation and described by ALPS, and refusals as problem details. An L0 response stays valid upstream HAL Schema Forms. Media type application/hal+json.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/HAL-SCHEMA-FORMS-HR.md"
+      ]
+    },
+    {
+      "path": "hal-forms",
+      "kind": "Profile",
+      "title": "HAL-FORMS, HEART on-ramp",
+      "definition": "HAL-FORMS (application/prs.hal-forms+json) as HEART's on-ramp dialect, served at L0 only. Its templates are keyed by act name, and it is computed from the same legality decision as HAL Schema Forms, so both dialects always offer the same acts.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#61-media-type-dialects-and-profile-negotiation"
+      ]
+    },
+    {
+      "path": "rels/forms",
+      "kind": "Link relation",
+      "title": "forms",
+      "definition": "Links a resource's state (Layer 1) to its affordance set: the forms legal in its current state, shared by every resource in that state. The link carries integrity, a W3C Subresource Integrity value, and the client checks the set's bytes against it before use. Written as the CURIE hr:forms.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/HAL-SCHEMA-FORMS-HR.md",
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#69-affordance-target-uris-the-sharing-property-and-content-addressed-hygiene"
+      ]
+    },
+    {
+      "path": "rels/unavailable",
+      "kind": "Link relation",
+      "title": "unavailable",
+      "definition": "Links to a list of the acts that are not offered in this state, each with the server's reason. A client fetches it only when someone asks why an act is missing, checks it against the link's integrity, and never acts on what it lists. Written as the CURIE hr:unavailable.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#612-explaining-absence-added-2026-10-10"
+      ]
+    },
+    {
+      "path": "rels/form",
+      "kind": "Link relation",
+      "title": "form",
+      "definition": "From an act's target to its form, where the form already lives: in the owning resource's shared affordance set, by a JSON Pointer fragment, with the set's integrity and the form's own. Served on the act's target when it is read, so the target has a representation of its own while the form stays shared. Written as the CURIE hr:form.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#62-compliant-server-behaviour"
+      ]
+    },
+    {
+      "path": "problems/stale",
+      "kind": "Problem type",
+      "title": "The act is stale: the state has changed",
+      "definition": "412. The act's If-Match no longer names the resource's current representation: someone else changed it first. The client re-reads the resource and decides again. It never resends the act.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#62-compliant-server-behaviour"
+      ]
+    },
+    {
+      "path": "problems/not-offered",
+      "kind": "Problem type",
+      "title": "The act is not offered in the resource's current state",
+      "definition": "409. The act is not legal in the resource's current state, however current the client's view. The client re-reads, and does not retry.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#62-compliant-server-behaviour"
+      ]
+    },
+    {
+      "path": "problems/invalid-input",
+      "kind": "Problem type",
+      "title": "The body does not match the form's schema",
+      "definition": "422. The body breaks the form's JSON Schema. The problem lists each violation with a JSON Pointer. Not retried.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#62-compliant-server-behaviour"
+      ]
+    },
+    {
+      "path": "problems/rule-refused",
+      "kind": "Problem type",
+      "title": "A rule of the resource refuses the act",
+      "definition": "422. The body satisfies the schema, but a rule of the resource that the schema cannot express refuses it, in the rule's own words, with a JSON Pointer. Not retried.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#62-compliant-server-behaviour"
+      ]
+    },
+    {
+      "path": "problems/precondition-required",
+      "kind": "Problem type",
+      "title": "If-Match is required",
+      "definition": "428. An act was sent without If-Match. Every HEART act is conditional on the representation the client read.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#62-compliant-server-behaviour"
+      ]
+    },
+    {
+      "path": "problems/not-authenticated",
+      "kind": "Problem type",
+      "title": "A credential is needed",
+      "definition": "401. The resource needs a Basic or Bearer credential the service admits; the response offers a WWW-Authenticate challenge for each. A wrong credential is answered exactly as a missing one.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#613-credentials-added-2026-10-14"
+      ]
+    },
+    {
+      "path": "spec",
+      "kind": "Document",
+      "title": "The HEART specification",
+      "definition": "The specification a service's home document names as describedBy.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md"
+      ]
+    },
+    {
+      "path": "vars",
+      "kind": "Variables",
+      "title": "Home document variables",
+      "definition": "The home document names each template variable by a URI under /vars/: {noun}-id and {noun}-name, such as /vars/bed-id. Each is the identifier, or the name, of one resource of the type the noun names.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/SPEC.md#611-entry-point-added-2026-10-08"
+      ]
+    }
+  ]
+}

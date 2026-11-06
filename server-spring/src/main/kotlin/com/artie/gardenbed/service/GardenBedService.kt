@@ -1,0 +1,101 @@
+package com.artie.gardenbed.service
+
+import com.artie.gardenbed.declaration.dto.HarvestResult
+import com.artie.gardenbed.domain.GARDEN_BEDS
+import com.artie.gardenbed.domain.GardenBedAggregate
+import com.artie.gardenbed.domain.GardenBedEvent
+import com.artie.gardenbed.domain.GardenBedState
+import com.artie.gardenbed.repository.GardenBedAggregateRepository
+import com.artie.heart.ResourceNotFoundException
+import com.artie.heart.RuleRefusedException
+import com.artie.heart.eventsourcing.EventStore
+import com.artie.heart.eventsourcing.Recorded
+import kotlinx.coroutines.flow.toList
+import org.springframework.stereotype.Service
+import java.time.Instant
+
+/** 404, as heart-core names it, so every binding answers it the same way. */
+class BedNotFoundException(id: Long) : ResourceNotFoundException("No garden bed with id $id")
+
+/** 404 for a time before the bed was built: it had no state then. */
+class NotBuiltYetException(id: Long, asOf: Instant) : ResourceNotFoundException("Bed $id was not built yet at $asOf")
+
+@Service
+class GardenBedService(
+    private val aggregates: GardenBedAggregateRepository,
+    private val events: EventStore,
+) {
+
+    private suspend fun requireAggregate(id: Long): GardenBedAggregate =
+        aggregates.findById(id) ?: throw BedNotFoundException(id)
+
+    private suspend fun state(bed: GardenBedAggregate, asOf: Instant? = null): GardenBedState =
+        events.state(GARDEN_BEDS, checkNotNull(bed.id), asOf)
+            .copy(label = bed.label, widthFt = bed.widthFt, lengthFt = bed.lengthFt)
+
+    /** The bookmark's act: a new bed, empty, with its name and size; returns its state. */
+    suspend fun buildBed(label: String, widthFt: Int, lengthFt: Int): GardenBedState =
+        state(aggregates.save(GardenBedAggregate(label = label, widthFt = widthFt, lengthFt = lengthFt)))
+
+    /** Beds whose label contains [name], ignoring case, and whose id is [id], in id order. Null matches all. */
+    suspend fun findBeds(name: String?, id: Long? = null): List<GardenBedAggregate> =
+        aggregates.findAll().toList()
+            .filter { name == null || it.label.contains(name, ignoreCase = true) }
+            .filter { id == null || it.id == id }
+            .sortedBy { it.id }
+
+    /** Bed [id]'s state now, or as of [asOf]. Before it was built there was no bed: 404. */
+    suspend fun currentState(id: Long, asOf: Instant? = null): GardenBedState {
+        val bed = requireAggregate(id)
+        if (asOf != null && asOf < bed.createdAt) throw NotBuiltYetException(id, asOf)
+        return state(bed, asOf)
+    }
+
+    /** 404s if the bed doesn't exist, even with zero events. */
+    suspend fun history(id: Long): List<Recorded<GardenBedEvent>> {
+        requireAggregate(id)
+        return events.history(GARDEN_BEDS, id)
+    }
+
+    /**
+     * Every act has the same shape. It is given [bed], the state the client's
+     * ETag was checked against, which the HEART library has already found
+     * offers this act. The act builds its event from that state and appends
+     * it at the number after it. If another write took that number first,
+     * the bed has moved on, and the event store refuses it: a stale act, 412.
+     */
+    suspend fun sowSeed(bed: GardenBedState, seedType: String, depthCm: Int?): GardenBedState =
+        act(bed) { GardenBedEvent.SeedSown(seedType, depthCm) }
+
+    /**
+     * The bed's rule, which no schema can say: water that would push its
+     * moisture past the most it holds is refused.
+     */
+    suspend fun waterCell(bed: GardenBedState, milliliters: Int): GardenBedState {
+        val room = bed.waterRoom()
+        if (milliliters > room) {
+            throw RuleRefusedException.at("/milliliters", "The bed would be waterlogged: at most $room ml now.")
+        }
+        return act(bed) { GardenBedEvent.CellWatered(milliliters) }
+    }
+
+    suspend fun harvest(bed: GardenBedState): Pair<GardenBedState, HarvestResult> {
+        val result = HarvestResult(bed.growthPoints * YIELD_PER_POINT, bed.cropName ?: "unknown crop")
+        return act(bed) { GardenBedEvent.BedHarvested(result.yieldGrams, result.cropName) } to result
+    }
+
+    /**
+     * Records [event] on [bed], at the number after the state it was given,
+     * and returns the new state. An act with no rule of its own beyond its
+     * offer, such as a thaw, and the weather (GardenWeather) record directly.
+     */
+    suspend fun act(bed: GardenBedState, event: (GardenBedState) -> GardenBedEvent): GardenBedState {
+        events.append(GARDEN_BEDS, bed.id, bed.lastSequenceNo + 1, event(bed))
+        return currentState(bed.id)
+    }
+
+    private companion object {
+        /** The same arbitrary yield formula as before. */
+        const val YIELD_PER_POINT = 4
+    }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "garden-care-suite",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "One regression suite for every garden dashboard, run as a black box over HTTP.",
+  "scripts": {
+    "test": "cucumber-js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "10.8.0"
+  }
+}

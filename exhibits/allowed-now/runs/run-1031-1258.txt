@@ -1,0 +1,18 @@
+## What GitHub says about #1874 and #1876
+#1874 mergeable_state: clean mergeable: true
+#1876 mergeable_state: clean mergeable: true
+
+## The extra header, through the proxy
+Link: </allowed-now/repos/JogoShugh/heart-github-test/pulls/1874>; rel="https://jogoshugh.github.io/heart-rise-artie/rels/allowed-now"
+
+## What the link answers
+{"allowed":["pulls/update-branch"],"notAllowed":{"pulls/merge":"The branch is behind its base; update it first."}}
+
+## API_URL=http://localhost:8400 npm run merge -- JogoShugh heart-github-test 1874
+#1874 not merged: The branch is behind its base; update it first.
+
+## API_URL=http://localhost:8400 npm run merge -- JogoShugh heart-github-test 1876
+#1876 merged
+
+## npm run merge -- JogoShugh heart-github-test 1874   (straight to GitHub)
+#1874 merged

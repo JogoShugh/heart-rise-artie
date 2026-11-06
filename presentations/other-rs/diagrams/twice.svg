@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-labelledby="twice-title twice-desc">
+<title id="twice-title">Ask every time, or decide once and replay</title>
+<desc id="twice-desc">Asked again for the same pull request, a model may answer differently each call. Decided once and kept, the same decision is replayed for every later pull request and look, and the server checks it each time.</desc>
+<style>.box{fill:var(--d-panel,#FFFFFF);stroke:var(--d-line,#C9C2B4);stroke-width:1.5}
+.hl{fill:var(--d-accent-soft,#F6E3C2);stroke:var(--d-accent,#B86E12);stroke-width:2}
+.ghost{fill:none;stroke:var(--d-line,#C9C2B4);stroke-width:1.5;stroke-dasharray:6 5}
+.t{font:500 16px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.h{font:600 18px var(--d-font,system-ui,sans-serif);fill:var(--d-ink,#1A1F27)}
+.s{font:400 14px var(--d-font,system-ui,sans-serif);fill:var(--d-muted,#5A6370)}
+.m{font:400 13px var(--d-mono,ui-monospace,monospace);fill:var(--d-ink,#1A1F27);white-space:pre}
+.a{fill:var(--d-accent,#B86E12)}
+.line{stroke:var(--d-muted,#5A6370);stroke-width:1.75;fill:none}
+.dash{stroke:var(--d-muted,#5A6370);stroke-width:1.5;fill:none;stroke-dasharray:5 5}
+.accline{stroke:var(--d-accent,#B86E12);stroke-width:2;fill:none}
+.head{fill:var(--d-muted,#5A6370)}</style>
+<defs><marker id="twice-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path class="head" d="M0 0 L10 5 L0 10 z"/></marker></defs>
+<text class="h" x="240" y="30" text-anchor="middle">Ask the model every time</text>
+<text class="h" x="720" y="30" text-anchor="middle">Decide once, replay</text>
+<path class="dash" d="M480 20 L480 380"/>
+<rect class="box" x="30" y="150" width="140" height="64" rx="10"/>
+<text class="h" x="100" y="177" text-anchor="middle">Same input</text>
+<text class="s" x="100" y="197" text-anchor="middle">same pull request</text>
+<rect class="box" x="290" y="60" width="160" height="56" rx="10"/>
+<text class="h" x="370" y="83" text-anchor="middle">Call 1</text>
+<text class="s" x="370" y="103" text-anchor="middle">merge, squash</text>
+<path class="line" d="M170 182 L288 88" marker-end="url(#twice-head)"/>
+<rect class="hl" x="290" y="160" width="160" height="56" rx="10"/>
+<text class="h" x="370" y="183" text-anchor="middle">Call 2</text>
+<text class="s" x="370" y="203" text-anchor="middle">comment first</text>
+<path class="line" d="M170 182 L288 188" marker-end="url(#twice-head)"/>
+<rect class="box" x="290" y="260" width="160" height="56" rx="10"/>
+<text class="h" x="370" y="283" text-anchor="middle">Call 3</text>
+<text class="s" x="370" y="303" text-anchor="middle">merge, rebase</text>
+<path class="line" d="M170 182 L288 288" marker-end="url(#twice-head)"/>
+<text class="s" x="240" y="370" text-anchor="middle">Each call may answer differently (an illustration)</text>
+<rect class="hl" x="500" y="60" width="180" height="60" rx="10"/>
+<text class="h" x="590" y="85" text-anchor="middle">First time</text>
+<text class="s" x="590" y="105" text-anchor="middle">the model decides</text>
+<path class="line" d="M680 90 L728 90" marker-end="url(#twice-head)"/>
+<rect class="box" x="730" y="60" width="200" height="60" rx="10"/>
+<text class="h" x="830" y="85" text-anchor="middle">Kept</text>
+<text class="s" x="830" y="105" text-anchor="middle">github:merge, squash</text>
+<rect class="box" x="730" y="170" width="200" height="50" rx="10"/>
+<text class="h" x="830" y="190" text-anchor="middle">Pull request 2</text>
+<text class="s" x="830" y="210" text-anchor="middle">same decision</text>
+<path class="line" d="M830 154 L830 170" marker-end="url(#twice-head)"/>
+<rect class="box" x="730" y="236" width="200" height="50" rx="10"/>
+<text class="h" x="830" y="256" text-anchor="middle">Pull request 3</text>
+<text class="s" x="830" y="276" text-anchor="middle">same decision</text>
+<path class="line" d="M830 220 L830 236" marker-end="url(#twice-head)"/>
+<rect class="box" x="730" y="302" width="200" height="50" rx="10"/>
+<text class="h" x="830" y="322" text-anchor="middle">Look 151</text>
+<text class="s" x="830" y="342" text-anchor="middle">same decision</text>
+<path class="line" d="M830 286 L830 302" marker-end="url(#twice-head)"/>
+<text class="s" x="720" y="390" text-anchor="middle">The server re-checks each replay against what it offers now</text>
+</svg>

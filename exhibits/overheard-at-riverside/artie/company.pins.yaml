@@ -1,0 +1,21 @@
+# What company.heart.yaml was recorded against, from company.trace.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L2
+digest: sha256-viVvUdXDJxsJSdeEfpXwMcaD/BvyU7VOTC/AOkeeKRA=
+forms:
+  library:search-members:
+    integrity: sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc=
+    act: sha256-/50a/XL6rQnGSnjrMrUsHbt42BMdurLB0H/Cj/3PrbI=
+    method: GET
+    sets: []
+  library:renew:
+    integrity: sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0=
+    act: sha256-XFhnjOYiXremG4VaoYZQ8C2H1ezQExQRPFbg/+i78yo=
+    method: POST
+    sets:
+      - sha256-KSyqmLPpEIUShmbh56sFkbeUpMBwByEanJ0flLRJycU=
+links:
+  item: ''
+  next: ''

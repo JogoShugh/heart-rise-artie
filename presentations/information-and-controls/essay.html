@@ -1,0 +1,373 @@
+<header class="masthead">
+<p class="kicker">HEART and ARTIE · before the merge watch</p>
+<h1>Information and Controls</h1>
+<p class="dek">How the Web put what is true and what can be done in the same answer, how APIs split them apart, and how HEART puts them back together, shown on one GitHub pull request.</p>
+<p class="howto">Each section is short. The technical detail sits under <b>Technical detail</b> at its end; <b>Show all detail</b> above opens every one. Code is shown as the servers sent it, abridged; diffs show lines removed in red and added in green.</p>
+</header>
+
+<section id="controls">
+<h2><span class="num">1</span>Information and controls</h2>
+<p>Every answer a server gives can carry two things: what is true now, and what can be done now. Fielding’s definition of hypertext is about keeping them together.</p>
+<blockquote>When I say hypertext, I mean the simultaneous presentation of information and controls such that the information becomes the affordance through which the user (or automaton) obtains choices and selects actions.<cite>Roy T. Fielding, comment on “REST APIs must be hypertext-driven”, 2008</cite></blockquote>
+<ul class="obs">
+<li><b>Information:</b> the pull request is open, it bumps left-pad to 6.0.1, its author is JogoShugh.</li>
+<li><b>Controls:</b> it can be merged, commented on, closed, edited, right now.</li>
+<li><b>Together</b>, they guide whoever reads them step by step: each answer offers the next moves, and the moves change as the state changes.</li>
+<li><b>“Or automaton”:</b> the reader may be a person, an AI agent, or a plain script. Fielding meant all of them.</li>
+<li>This page follows one pull request, #825 on a scratch repository, from the Web’s way, through the JSON API era, to HEART. The next page, <i>One Goal, Decided Once</i>, puts it to work.</li>
+</ul>
+</section>
+
+<section id="browser">
+<h2><span class="num">2</span>The browser: a generic client with a deliberate coupling</h2>
+<p>A browser is generic, but it isn’t uncoupled. It is tightly coupled to media types, and to nothing else.</p>
+<!--diagram:coupling-->
+<ul class="obs">
+<li>It knows <b>HTML</b> (text, links, forms), <b>PNG and JPEG</b> (images), <b>CSS</b> (presentation), and <b>JavaScript</b>, which REST calls code on demand.</li>
+<li>It knows nothing about any site. Not banks, not wikis, not shops. Each site sends its own controls, in those formats.</li>
+<li>That coupling is the design, not a flaw: it is why one program works with every site, including sites written after it shipped.</li>
+<li>A generic API client can work the same way: coupled to a media type, not to an API, and usable by a person, an agent or a script.</li>
+</ul>
+<blockquote>Think of it in terms of the Web. How many Web browsers are aware of the distinction between an online-banking resource and a Wiki resource? None of them. They don’t need to be aware of the resource types. What they need to be aware of is the potential state transitions — the links and forms — and what semantics/actions are implied by traversing those links. A browser represents them as distinct UI controls so that a user can see potential transitions and anticipate the effect of chosen actions. A spider can follow them to the extent that the relationships are known to be safe. Typed relations, specific media types, and action-specific elements provide the guidance needed for automated agents.<cite>Roy T. Fielding, comment, 2008</cite></blockquote>
+<blockquote>Of course the client has prior knowledge. Every protocol, every media type definition, every URI scheme, and every link relationship type constitutes prior knowledge that the client must know (or learn) in order to make use of that knowledge. REST doesn’t eliminate the need for a clue. What REST does is concentrate that need for prior knowledge into readily standardizable forms. That is the essential distinction between data-oriented and control-oriented integration.<cite>Roy T. Fielding, comment, 2008</cite></blockquote>
+<details class="deep"><summary>Technical detail: code on demand, REST’s one optional constraint</summary>
+<blockquote>REST allows client functionality to be extended by downloading and executing code in the form of applets or scripts. This simplifies clients by reducing the number of features required to be pre-implemented. Allowing features to be downloaded after deployment improves system extensibility. However, it also reduces visibility, and thus is only an optional constraint within REST.<cite>Roy T. Fielding, dissertation, 2000, §5.1.7</cite></blockquote>
+<ul class="obs">
+<li>JavaScript is the browser’s code on demand: a site extends the client at run time. It is optional, and the Web works without it.</li>
+<li>Fielding’s sixth rule (section 4) names it too: a client’s knowledge of media types “may be improved on-the-fly (e.g., code-on-demand).”</li>
+<li>HEART uses no code on demand. Everything a client needs arrives as data in the media type: links, forms, JSON Schemas, reasons.</li>
+</ul>
+<pre><code data-lang="http">GET /repos/JogoShugh/heart-github-test/pulls/825 HTTP/1.1
+Accept: application/hal+json
+
+HTTP/1.1 200 OK
+Content-Type: application/hal+json
+Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile"
+Vary: Accept, Prefer, Accept-Profile</code></pre>
+<p>The only things the client is coupled to: HTTP, the HAL media type, the HEART profile, JSON Schema, and problem details for refusals. All standardizable, as Fielding put it.</p>
+</details>
+</section>
+
+<section id="web">
+<h2><span class="num">3</span>When the Web had controls</h2>
+<p>Picture pull request #825 as a classic web app would serve it: a page with its information and, in the same page, the forms that act on it.</p>
+<pre><code data-lang="html">&lt;h1&gt;Bump left-pad from 1.0.0 to 6.0.1&lt;/h1&gt;
+&lt;p&gt;Open · by &lt;a href="/JogoShugh"&gt;JogoShugh&lt;/a&gt; · label &lt;a href="/labels/demo"&gt;demo&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="/pulls/825/commits"&gt;Commits&lt;/a&gt; · &lt;a href="/pull/825.diff"&gt;Diff&lt;/a&gt;&lt;/p&gt;
+
+&lt;form method="post" action="/pulls/825/merge"&gt;
+  &lt;select name="merge_method"&gt;
+    &lt;option&gt;merge&lt;/option&gt; &lt;option selected&gt;squash&lt;/option&gt; &lt;option&gt;rebase&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;button&gt;Merge&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;form method="post" action="/pulls/825/comments"&gt;
+  &lt;textarea name="body" required&gt;&lt;/textarea&gt;
+  &lt;button&gt;Comment&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<p>Now the same page for a draft. The server leaves the merge form out, and says why in its place:</p>
+<pre><code data-lang="html" class="diff">  &lt;h1&gt;Bump left-pad from 1.0.0 to 5.0.2&lt;/h1&gt;
+- &lt;form method="post" action="/pulls/823/merge"&gt;
+-   &lt;select name="merge_method"&gt; … &lt;/select&gt;
+-   &lt;button&gt;Merge&lt;/button&gt;
+- &lt;/form&gt;
++ &lt;p class="why"&gt;A draft can't be merged; mark it ready for review first.&lt;/p&gt;
+  &lt;form method="post" action="/pulls/823/comments"&gt; … &lt;/form&gt;</code></pre>
+<ul class="obs">
+<li>The browser knows nothing of pull requests, drafts or merging. It renders what came.</li>
+<li>The form says the method, the address and the fields. The browser builds the request from it; it never builds an address itself.</li>
+<li>The controls follow the state: present when merging is possible, absent with a reason when it isn’t.</li>
+<li>A person reads the reason. A spider skips the form. Nobody needs the server’s rules in advance.</li>
+</ul>
+</section>
+
+<section id="fielding">
+<h2><span class="num">4</span>Fielding’s 2008 complaint, and his six rules</h2>
+<p>By 2008 “REST API” meant almost any HTTP interface with JSON. Fielding objected, in public, and listed what a REST API must do.</p>
+<blockquote>I am getting frustrated by the number of people calling any HTTP-based interface a REST API. Today’s example is the SocialSite REST API. That is RPC. It screams RPC. There is so much coupling on display that it should be given an X rating.<cite>Roy T. Fielding, “REST APIs must be hypertext-driven”, 20 October 2008</cite></blockquote>
+<blockquote>What needs to be done to make the REST architectural style clear on the notion that hypertext is a constraint? In other words, if the engine of application state (and hence the API) is not being driven by hypertext, then it cannot be RESTful and cannot be a REST API. Period. Is there some broken manual somewhere that needs to be fixed?<cite>Fielding, 2008</cite></blockquote>
+<p>“API designers, please note the following rules before calling your creation a REST API.” Each rule as he wrote it, then what it means for pull request #825:</p>
+<ol class="rules">
+<li><blockquote>A REST API should not be dependent on any single communication protocol, though its successful mapping to a given protocol may be dependent on the availability of metadata, choice of methods, etc. In general, any protocol element that uses a URI for identification must allow any URI scheme to be used for the sake of that identification. [Failure here implies that identification is not separated from interaction.]</blockquote>
+<p>For #825: its links may point anywhere, with any scheme: a web page, a diff, a <code>git:</code> address. The client follows by relation, not by assuming every link is the same API over HTTP.</p></li>
+<li><blockquote>A REST API should not contain any changes to the communication protocols aside from filling-out or fixing the details of underspecified bits of standard protocols, such as HTTP’s PATCH method or Link header field. Workarounds for broken implementations (such as those browsers stupid enough to believe that HTML defines HTTP’s method set) should be defined separately, or at least in appendices, with an expectation that the workaround will eventually be obsolete. [Failure here implies that the resource interfaces are object-specific, not generic.]</blockquote>
+<p>For #825: merge is plain HTTP: a <code>PUT</code>, a precondition (<code>If-Match</code>), standard status codes. No custom headers, no verbs in the body.</p></li>
+<li><blockquote>A REST API should spend almost all of its descriptive effort in defining the media type(s) used for representing resources and driving application state, or in defining extended relation names and/or hypertext-enabled mark-up for existing standard media types. Any effort spent describing what methods to use on what URIs of interest should be entirely defined within the scope of the processing rules for a media type (and, in most cases, already defined by existing media types). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]</blockquote>
+<p>For #825: the method for merging, and its fields, should come from the media type’s form, not from a page of documentation about <code>PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge</code>.</p></li>
+<li><blockquote>A REST API must not define fixed resource names or hierarchies (an obvious coupling of client and server). Servers must have the freedom to control their own namespace. Instead, allow servers to instruct clients on how to construct appropriate URIs, such as is done in HTML forms and URI templates, by defining those instructions within media types and link relations. [Failure here implies that clients are assuming a resource structure due to out-of band information, such as a domain-specific standard, which is the data-oriented equivalent to RPC’s functional coupling].</blockquote>
+<p>For #825: the client should never assemble <code>/pulls/825/merge</code> from a pattern. The address arrives in the form.</p></li>
+<li><blockquote>A REST API should never have “typed” resources that are significant to the client. Specification authors may use resource types for describing server implementation behind the interface, but those types must be irrelevant and invisible to the client. The only types that are significant to a client are the current representation’s media type and standardized relation names. [ditto]</blockquote>
+<p>For #825: the client needn’t know it holds “a pull request”. It holds a HEART representation offering a form named <code>github:merge</code>.</p></li>
+<li><blockquote>A REST API should be entered with no prior knowledge beyond the initial URI (bookmark) and set of standardized media types that are appropriate for the intended audience (i.e., expected to be understood by any client that might use the API). From that point on, all application state transitions must be driven by client selection of server-provided choices that are present in the received representations or implied by the user’s manipulation of those representations. The transitions may be determined (or limited by) the client’s knowledge of media types and resource communication mechanisms, both of which may be improved on-the-fly (e.g., code-on-demand). [Failure here implies that out-of-band information is driving interaction instead of hypertext.]</blockquote>
+<p>For #825: one bookmark, the gateway’s address, and from there every step chosen from what the answers offer.</p></li>
+</ol>
+<blockquote>There are probably other rules that I am forgetting, but the above are the rules related to the hypertext constraint that are most often violated within so-called REST APIs. Please try to adhere to them or choose some other buzzword for your API.<cite>Fielding, 2008</cite></blockquote>
+<details class="deep"><summary>Technical detail: more from his comments on that post</summary>
+<blockquote>Hypertext does not need to be HTML on a browser. Machines can follow links when they understand the data format and relationship types.</blockquote>
+<blockquote>A truly RESTful API looks like hypertext. Every addressable unit of information carries an address, either explicitly (e.g., link and id attributes) or implicitly (e.g., derived from the media type definition and representation structure). Query results are represented by a list of links with summary information, not by arrays of object representations (query is not a substitute for identification of resources). Resource representations are self-descriptive: the client does not need to know if a resource is OpenSocialist because it is just acting on the representations received.</blockquote>
+<blockquote>You should not be building clients that are dependent on the resource naming structure. There is simply no need to do so — the hypertext sends the client directly to the desired application state.</blockquote>
+<blockquote>REST is software design on the scale of decades: every detail is intended to promote software longevity and independent evolution. Many of the constraints are directly opposed to short-term efficiency. Unfortunately, people are fairly good at short-term design, and usually awful at long-term design. Most don’t think they need to design past the current release.<cite>Roy T. Fielding, comments on “REST APIs must be hypertext-driven”, October 2008</cite></blockquote>
+</details>
+</section>
+
+<section id="bag">
+<h2><span class="num">5</span>The big bag of endpoints</h2>
+<p>Here is pull request #825 as GitHub’s REST API returns it. It is rich information, and it carries no controls.</p>
+<pre><code data-lang="json">{
+  "url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/825",
+  "html_url": "https://github.com/JogoShugh/heart-github-test/pull/825",
+  "diff_url": "https://github.com/JogoShugh/heart-github-test/pull/825.diff",
+  "issue_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/825",
+  "number": 825,
+  "state": "open",
+  "title": "Bump left-pad from 1.0.0 to 6.0.1 (1026-090655)",
+  "user": { "login": "JogoShugh", "url": "https://api.github.com/users/JogoShugh", … 12 *_url in all },
+  "labels": [ { "name": "demo", "url": "https://api.github.com/repos/…/labels/demo" } ],
+  "draft": false,
+  "commits_url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/825/commits",
+  "comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/825/comments",
+  "head": { "sha": "a712a489f97688df42d118607ee780817d112d8e", … },
+  "base": { "ref": "deps-main", "repo": { "open_issues": 161, "pushed_at": "2026-10-26T13:06:57Z", … 43 *_url } },
+  "mergeable": true,
+  "rebaseable": true,
+  "mergeable_state": "clean"
+}</code></pre>
+<!--diagram:bag-->
+<ul class="obs">
+<li><b>159 addresses</b>, every one of them plain data. None says which method, which fields, or whether it is allowed now.</li>
+<li><b>No merge control.</b> Merging is <code>PUT /repos/{owner}/{repo}/pulls/{pull_number}/merge</code>, an address the client builds from the documentation: one of 823 paths in GitHub’s description.</li>
+<li>To do “merge it once it can be merged”, the client must already know every rule below, and keep up when GitHub changes them.</li>
+</ul>
+<h3 class="step">What a client has to know, before it can merge</h3>
+<p><b>Draft or not.</b> A draft can’t be merged, yet GitHub calls draft #823 mergeable and clean:</p>
+<pre><code data-lang="json">{ "number": 823, "draft": true, "mergeable": true, "mergeable_state": "clean" }</code></pre>
+<p><b>Mergeable can be unknown.</b> For a moment after any change, GitHub hasn’t worked it out yet; the client must look again:</p>
+<pre><code data-lang="json">{ "mergeable": null, "rebaseable": null, "mergeable_state": "unknown" }</code></pre>
+<p><b>The states aren’t listed.</b> GitHub’s own description of <code>mergeable_state</code> gives a type and one example, no list of values:</p>
+<pre><code data-lang="json">"mergeable_state": { "type": "string", "example": "clean" }</code></pre>
+<p><b>The request.</b> Built by hand, with the head’s commit to guard against a moving branch:</p>
+<pre><code data-lang="http">PUT /repos/JogoShugh/heart-github-test/pulls/825/merge
+{ "merge_method": "squash", "sha": "a712a489f97688df42d118607ee780817d112d8e" }</code></pre>
+<p><b>The answers.</b> Each to be understood in advance, as the description words them:</p>
+<pre><code data-lang="http">200 if merge was successful
+405 Method Not Allowed if merge cannot be performed
+409 Conflict if sha was provided and pull request head did not match
+422 Validation failed
+403 Forbidden · 404 Resource not found</code></pre>
+<p><b>Listing by label.</b> GitHub’s pull request list has no label filter. A client must list <em>issues</em> by label, keep those that are pull requests, and follow each one’s <code>pull_request.url</code>:</p>
+<pre><code data-lang="http">GET /repos/{owner}/{repo}/pulls      ?state, head, base, sort, direction, per_page, page
+GET /repos/{owner}/{repo}/issues     ?labels=dependencies   → keep items with "pull_request"</code></pre>
+<p><b>Permissions.</b> Whether the caller may merge at all is in another resource, the repository, under <code>permissions.push</code>; and branch protection can still refuse.</p>
+<details class="deep"><summary>Technical detail: even the documentation moves</summary>
+<p>GitHub’s description of the merge endpoint now opens with a note:</p>
+<blockquote>We recommend using the asynchronous merge API instead. This endpoint does not support stacked pull requests or merging with a merge queue.<cite>GitHub REST API description, “Merge a pull request”</cite></blockquote>
+<ul class="obs">
+<li>A client built last year against this endpoint is now on the old way. Nothing in the answers told it so.</li>
+<li>Every rule above lives in a client’s code, an SDK, or a model’s training, frozen when it was written.</li>
+</ul>
+</details>
+</section>
+
+<section id="cost">
+<h2><span class="num">6</span>What losing the controls cost</h2>
+<p>Taking the controls out of the answer didn’t remove them. It moved them, and each move cost something.</p>
+<!--diagram:drift-->
+<ul class="obs">
+<li><b>The rules drifted.</b> Into interface files, then documentation, then descriptions and generated SDKs, then a model’s training. Each copy is frozen earlier than the last.</li>
+<li><b>The coupling moved.</b> A browser is coupled to a handful of shared media types. An API client is coupled to one API, every path and rule of it.</li>
+<li><b>The generic client vanished.</b> One SDK per API; now one set of agent tools per API. The islands from before the Web, back again.</li>
+</ul>
+<!--diagram:splinter-->
+<ul class="obs">
+<li><b>Standards splintered.</b> HAL, HAL-FORMS, Siren, Collection+JSON, JSON:API, Hydra, UBER: good formats, each with links and some with forms, and none adopted everywhere.</li>
+<li><b>The description won instead.</b> OpenAPI succeeded by describing the bag of endpoints well. It made clients easier to generate, and kept them specific to one API.</li>
+<li><b>Agents inherited it.</b> An agent today gets a list of tools per API, written from the same descriptions, with the same frozen rules.</li>
+</ul>
+</section>
+
+<section id="people">
+<h2><span class="num">7</span>The people who kept it alive</h2>
+<p>Through the JSON years, a few people kept building the case, and the tools, for controls in the answer.</p>
+<ul class="obs">
+<li><b>Mike Amundsen</b> defined <b>H-Factors</b> around 2010–2011, a way to measure “the level of hypermedia support and sophistication of a media-type”: links of several kinds, and control data for reads, updates and methods. He designed <b>Collection+JSON</b> (2011) and, with Irakli Nadareishvili, <b>UBER</b>; co-authored <b>ALPS</b> with Leonard Richardson and Mark Foster; and wrote the <b>HAL-FORMS</b> specification, the forms layer for HAL.</li>
+<li>His books carry the argument: <i>Building Hypermedia APIs with HTML5 and Node</i> (2011), <i>RESTful Web APIs</i> with Leonard Richardson (2013), <i>RESTful Web Clients: Enabling Reuse Through Hypermedia</i> (2017), <i>Design and Build Great Web APIs</i> (2020), and <i>RESTful Web API Patterns and Practices Cookbook</i> (2022). In 2016 he live-coded a hypermedia client on stage: “From Zero to Hyper in 30 minutes”.</li>
+<li><b>Mike Kelly</b> published HAL as an Internet-Draft in 2012: links and embedded resources in JSON, the base HEART builds on.</li>
+<li><b>Spring HATEOAS</b>, led by <b>Oliver Drotbohm</b> with <b>Greg Turnquist</b>, made hypermedia ordinary in Java: HAL, HAL-FORMS, Collection+JSON, UBER and ALPS built in, with Siren and JSON:API from the community. The Spring team is now at Broadcom.</li>
+<li><b>Adib Saikali</b>, a Distinguished Engineer at Broadcom, has taken this to agents. His 2026 talk <i>REST is for Agents: Rediscovering Spring HATEOAS</i> (Spring I/O; Toronto Java Users Group) shows an agent guided through money transfers by the API’s own links and forms. His webinar <i>Extend Your Existing APIs for Agentic Workflows with Spring HATEOAS</i> argues that a tool list says what an agent <em>can</em> do, while hypermedia lets the server say what is allowed <em>now</em>.</li>
+<li>HEART stands on their work: HAL as the base, forms as in HAL-FORMS, and the same conviction that the server should guide the client, step by step.</li>
+</ul>
+</section>
+
+<section id="rebuild">
+<h2><span class="num">8</span>Rebuilding the controls, step by step</h2>
+<p>Now the same pull request, #825, as the HEART gateway serves it, built up one change at a time from GitHub’s answer. Each step is a diff, and each answers one of Fielding’s rules.</p>
+
+<h3 class="step">Step 1 · Addresses leave the data and become links (rules 4 and 6)</h3>
+<pre><code data-lang="json" class="diff">  "number": 825,
+  "state": "open",
+- "url": "https://api.github.com/repos/JogoShugh/heart-github-test/pulls/825",
+- "html_url": "https://github.com/JogoShugh/heart-github-test/pull/825",
+- "comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/825/comments",
+- "diff_url": "https://github.com/JogoShugh/heart-github-test/pull/825.diff",
++ "_links": {
++   "self": { "href": "/repos/JogoShugh/heart-github-test/pulls/825" },
++   "alternate": { "href": "https://github.com/JogoShugh/heart-github-test/pull/825", "type": "text/html" },
++   "github:issues-list-comments": {
++     "href": "/repos/JogoShugh/heart-github-test/issues/825/comments", "type": "application/hal+json" },
++   "github:diff": { "href": "https://github.com/JogoShugh/heart-github-test/pull/825.diff", "type": "text/x-diff" }
++ }</code></pre>
+<ul class="obs">
+<li>Every address becomes a link with a relation and a media type. None is left in the state.</li>
+<li>Links the gateway serves point at the gateway; a web page stays GitHub’s, typed <code>text/html</code>.</li>
+</ul>
+
+<h3 class="step">Step 2 · Related things are embedded as resources of their own</h3>
+<pre><code data-lang="json" class="diff">- "user": { "login": "JogoShugh", "url": "https://api.github.com/users/JogoShugh", … },
+- "labels": [ { "name": "demo", "url": "https://api.github.com/repos/…/labels/demo" } ],
++ "_embedded": {
++   "author": { "login": "JogoShugh", "_links": { "self": { "href": "/users/JogoShugh" } } },
++   "github:labels": [ { "name": "demo", "_links": { "self": { … } } } ],
++   "github:base-repo": { "name": "heart-github-test", "full_name": "JogoShugh/heart-github-test",
++                         "default_branch": "main", "_links": { "self": { "href": "/repos/JogoShugh/heart-github-test" } } }
++ }</code></pre>
+<ul class="obs">
+<li>GitHub’s <code>user</code> becomes IANA’s <code>author</code> relation: a client knows who made it without knowing GitHub’s names.</li>
+<li>The repository is embedded by what names it. Its counts, which change with everything in the repository, are one link away.</li>
+</ul>
+
+<h3 class="step">Step 3 · The actions arrive as forms (rules 3 and 4)</h3>
+<pre><code data-lang="json" class="diff">+ "_forms": {
++   "github:merge": {
++     "title": "Merge",
++     "description": "Merge the pull request into its base branch.",
++     "_links": { "target": { "href": "/repos/JogoShugh/heart-github-test/pulls/825/actions/merge" } },
++     "method": "PUT",
++     "contentType": "application/json",
++     "schema": {
++       "type": "object", "additionalProperties": false,
++       "properties": {
++         "merge_method": { "type": "string", "enum": ["merge", "squash", "rebase"],
++                           "description": "The merge method to use." },
++         "commit_title": { "type": "string", "description": "Title for the automatic commit message." },
++         "commit_message": { "type": "string", "description": "Extra detail to append to automatic commit message." }
++       }
++     }
++   },
++   "github:comment": { "method": "POST", … "required": ["body"] … },
++   "github:close": { … }, "github:edit": { … }, "github:request-review": { … }, "github:update-branch": { … }
++ }</code></pre>
+<ul class="obs">
+<li>Method, target and fields are in the answer. The client builds nothing; the form is the instruction.</li>
+<li>No <code>sha</code> field: the gateway takes the head’s commit from the state the client’s request names (step 5).</li>
+</ul>
+
+<h3 class="step">Step 4 · The forms follow the state</h3>
+<p>The same answer for draft #823. GitHub calls it mergeable and clean; the gateway knows a draft can’t be merged, and doesn’t offer it:</p>
+<pre><code data-lang="json" class="diff">  "_forms": {
+-   "github:merge": { "method": "PUT", … },
+    "github:comment": { … }, "github:close": { … }, "github:edit": { … }
+  },
+  "_links": {
++   "hr:unavailable": { "href": "/unavailable/ec82898fc179bc85", "type": "application/json" },
+    …
+  }</code></pre>
+<pre><code data-lang="json">GET /unavailable/ec82898fc179bc85
+
+{ "unavailable": [
+    { "rel": "/profiles/github#merge", "title": "Merge",
+      "reason": "A draft can't be merged; mark it ready for review first." },
+    { "rel": "/profiles/github#reopen", "title": "Reopen",
+      "reason": "The pull request is already open." } ] }</code></pre>
+<ul class="obs">
+<li>This is the HTML page from section 3, as JSON: the merge form gone, the reason in its place.</li>
+<li>A person sees no Merge button. An agent can’t choose it. A script waiting for it keeps waiting, and can pass the reason on.</li>
+</ul>
+
+<h3 class="step">Step 5 · A version tag guards the act</h3>
+<pre><code data-lang="http">GET /repos/JogoShugh/heart-github-test/pulls/825
+→ 200 OK   ETag: "seq-0.hsf.L0.ca86bad8d04b304a"
+
+PUT /repos/JogoShugh/heart-github-test/pulls/825/actions/merge
+If-Match: "seq-0.hsf.L0.ca86bad8d04b304a"
+{ "merge_method": "squash" }
+→ 200 OK                        when #825 is as it was read
+→ 412 Precondition Failed      when it has changed since</code></pre>
+<ul class="obs">
+<li>The act names the exact state it was chosen from. A merge is never applied to a state nobody saw.</li>
+<li>The gateway binds GitHub’s <code>sha</code> from that same state: the client sends no commit hash, and knows no rule about it.</li>
+</ul>
+
+<h3 class="step">Step 6 · The answer describes itself (rules 3 and 5)</h3>
+<pre><code data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/hal+json
+ETag: "seq-0.hsf.L0.ca86bad8d04b304a"
+Cache-Control: no-cache
+Link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
+Vary: Accept, Prefer, Accept-Profile</code></pre>
+<ul class="obs">
+<li>The media type and the profile say how to read all of it. That is the whole of the client’s prior knowledge.</li>
+<li>Nothing says “pull request”. The client sees forms and links, as a browser sees a page.</li>
+</ul>
+<details class="deep"><summary>Technical detail: the rules, mapped</summary>
+<div class="table"><table>
+<tr><th>Fielding’s rule</th><th>In the HEART answer for #825</th></tr>
+<tr><td>1. Any URI scheme</td><td>Links keep their own schemes and types: <code>text/html</code>, <code>text/x-diff</code>, gateway resources.</td></tr>
+<tr><td>2. No protocol changes</td><td>Plain <code>GET</code>/<code>PUT</code>/<code>POST</code>, <code>If-Match</code>, <code>412</code>, <code>428</code>, problem details.</td></tr>
+<tr><td>3. Describe the media type</td><td>Methods and fields live in each form; the profile defines how to read forms.</td></tr>
+<tr><td>4. No fixed names</td><td>Every address arrives in a link or a form’s target.</td></tr>
+<tr><td>5. No typed resources</td><td>The client sees a HEART representation and relation names, never “pull request”.</td></tr>
+<tr><td>6. Enter from a bookmark</td><td>One URI, the gateway’s index; every step after it is chosen from what was offered.</td></tr>
+</table></div>
+</details>
+</section>
+
+<section id="readers">
+<h2><span class="num">9</span>One client, for a person, an agent and a script</h2>
+<p>With the controls back in the answer, one generic client serves every kind of reader, the way one browser serves every visitor.</p>
+<!--diagram:walk-->
+<!--diagram:readers-->
+<ul class="obs">
+<li><b>A person</b> sees the merge form as a button, and the reason as text when it is missing.</li>
+<li><b>An AI agent</b> is shown the offered forms and links, by name and title, and chooses among them. It can’t choose what isn’t offered.</li>
+<li><b>A script</b> replays a kept choice: <code>act("github:merge", "merge_method" to "squash")</code>, which acts only where the form is offered now.</li>
+<li>The server’s rules hold for all three, because all three act through the same controls. That is Fielding’s “user (or automaton)”, taken literally.</li>
+</ul>
+</section>
+
+<section id="next">
+<h2><span class="num">10</span>What controls make possible: a goal in plain words</h2>
+<p>When the server says what can be done, and why not, a person can write a whole job in plain words. This is the goal the next page runs:</p>
+<pre><code data-lang="goal">Merge dependency bumps once they can be merged. Keep watching until the watch's issue is closed.
+
+- In {owner}/{repo}
+  - Open an issue titled "Merge watch", saying "Close this issue to stop the watch." `as watch`
+  - Whenever a pull request labelled {label} changes `as pr`
+    - If it's labelled {hold}, leave it, and say so once.
+    - Once it can be merged, merge it by squashing.
+      Or give up after 3 minutes.
+      Otherwise, tell its author in one friendly sentence why it wasn't merged and what to do next. `reasoned`
+- Until someone closes {watch}</code></pre>
+<ul class="obs">
+<li><b>“Once it can be merged”</b> is step 4: wait until the merge form appears. No rule about drafts, conflicts or <code>mergeable_state</code>.</li>
+<li><b>“merge it by squashing”</b> is step 3: the form’s <code>merge_method</code>, from its enum.</li>
+<li><b>“tell its author … why it wasn’t merged”</b> is step 4’s reason, in the server’s words, passed to the model.</li>
+<li><b>“labelled {label}”</b> and <b>“labelled {hold}”</b> are checks on the embedded labels from step 2.</li>
+<li><b>“Until someone closes {watch}”</b> reads the issue again by the link the server gave when it was created.</li>
+<li>None of it names an endpoint. Every problem from section 5 is gone from the goal, because the answers carry it.</li>
+</ul>
+<p class="handoff">Next: <b>One Goal, Decided Once</b>. The model decides these steps once, they run as a script, and the model returns only where the words say <code>reasoned</code>.</p>
+</section>
+
+<footer class="sources">
+<h2>Sources</h2>
+<ul>
+<li>Roy T. Fielding, <i>Architectural Styles and the Design of Network-based Software Architectures</i>, UC Irvine, 2000, §5.1.5 and §5.1.7.</li>
+<li>Roy T. Fielding, “REST APIs must be hypertext-driven”, Untangled, 20 October 2008, and his comments there.</li>
+<li>Mike Amundsen, “H Factor” (amundsen.com/hypermedia/hfactor, archived 2011); HAL-FORMS (rwcbook.github.io/hal-forms); Collection+JSON (2011); ALPS, draft-amundsen-richardson-foster-alps; his books as listed.</li>
+<li>Mike Kelly, JSON Hypertext Application Language, draft-kelly-json-hal-00 (2012) to -11 (2023).</li>
+<li>Spring HATEOAS reference documentation (Oliver Drotbohm, Greg Turnquist, Jay Bryant), media types §4.</li>
+<li>Adib Saikali, “REST is for Agents: Rediscovering Spring HATEOAS”, Spring I/O 2026; “Extend Your Existing APIs for Agentic Workflows with Spring HATEOAS”, Tanzu webinar, 25 March 2026.</li>
+<li>GitHub REST API description (github/rest-api-description), “Merge a pull request”, and live answers for pull requests #823 and #825 on JogoShugh/heart-github-test, 26 October 2026; the HEART gateway’s answers for the same.</li>
+</ul>
+</footer>

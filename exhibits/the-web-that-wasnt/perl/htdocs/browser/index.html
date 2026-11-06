@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WebWalker 1.0</title>
+<!--
+  A prop for "The Web That Wasn't": the browser of a world with no form controls in pages. Every browser there
+  has a method menu and a body box, and people type addresses and URL-encoded bodies by hand. WebWalker is
+  fictional. It sends what is typed to the Riverside Public Library server beside it and shows the answer.
+-->
+<style>
+  body { margin: 0; background: #008080; font: 13px "MS Sans Serif", Tahoma, Geneva, sans-serif; }
+  .window { margin: 24px auto; max-width: 980px; background: #c0c0c0; border: 2px solid; border-color: #fff #404040 #404040 #fff; }
+  .title { background: linear-gradient(90deg, #000080, #1084d0); color: #fff; font-weight: bold; padding: 4px 8px; }
+  .bar { display: flex; gap: 6px; align-items: center; padding: 6px 8px; border-bottom: 1px solid #808080; }
+  .bar label { white-space: nowrap; }
+  select, input, textarea, button { font: inherit; }
+  input#location { flex: 1; padding: 2px 4px; border: 2px inset #fff; font-family: "Courier New", monospace; }
+  textarea#body { flex: 1; height: 38px; border: 2px inset #fff; font-family: "Courier New", monospace; }
+  button { background: #c0c0c0; border: 2px outset #fff; padding: 2px 14px; }
+  button:active { border-style: inset; }
+  iframe { display: block; width: 100%; height: 470px; border: 2px inset #fff; background: #fff; box-sizing: border-box; }
+  .status { padding: 3px 8px; border-top: 1px solid #fff; font-family: "Courier New", monospace; }
+  .status b { color: #800000; }
+</style>
+</head>
+<body>
+<div class="window">
+  <div class="title">WebWalker 1.0 &mdash; the browser of the web that wasn't</div>
+  <div class="bar">
+    <label for="method">Method:</label>
+    <select id="method"><option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option></select>
+    <label for="location">Location:</label>
+    <input id="location" value="/" spellcheck="false">
+    <button id="go">Go</button>
+  </div>
+  <div class="bar">
+    <label for="body">Body:</label>
+    <textarea id="body" spellcheck="false" placeholder="name=value&amp;name=value (POST and PUT only)"></textarea>
+  </div>
+  <iframe id="page" title="The page"></iframe>
+  <div class="status" id="status">Document: Done.</div>
+</div>
+<script>
+  const $ = (id) => document.getElementById(id);
+  async function go() {
+    const method = $("method").value;
+    const sends = method === "POST" || method === "PUT";
+    $("status").textContent = `Contacting host: ${method} ${$("location").value} ...`;
+    const answer = await fetch($("location").value, {
+      method,
+      body: sends ? $("body").value : undefined,
+      headers: sends ? { "Content-Type": "application/x-www-form-urlencoded" } : {},
+    });
+    const text = await answer.text();
+    const html = (answer.headers.get("Content-Type") || "").includes("text/html");
+    const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+    $("page").srcdoc = html ? text : `<pre style="font: 13px 'Courier New', monospace; margin: 8px">${escaped}</pre>`;
+    const failed = answer.status >= 400;
+    $("status").innerHTML = `Document: Done. ${failed ? "<b>" : ""}${answer.status} ${answer.statusText}${failed ? "</b>" : ""}`;
+  }
+  $("go").addEventListener("click", go);
+  $("location").addEventListener("keydown", (e) => { if (e.key === "Enter") go(); });
+  go();
+</script>
+</body>
+</html>

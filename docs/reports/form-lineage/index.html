@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Form Lineage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,650&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* One column, read top to bottom: a section per rung, then the guard, then the tests. */
+:root { --bg: #f6f7f5; --surface: #ffffff; --fg: #1b2420; --muted: #5b6862; --rule: #d9e0dc;
+  --fresh: #2f6f3f; --fixed: #1f5a8a; --stop: #b4403a;
+  --display: "Literata", Georgia, serif; --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #121816; --surface: #1a211e; --fg: #e3eae6;
+  --muted: #9aa9a2; --rule: #2c3833; --fresh: #9fd6ac; --fixed: #8cc0ea; --stop: #e58a84; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #121816; --surface: #1a211e; --fg: #e3eae6; --muted: #9aa9a2; --rule: #2c3833;
+  --fresh: #9fd6ac; --fixed: #8cc0ea; --stop: #e58a84; color-scheme: dark; }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); margin: 0; }
+main { max-width: 46rem; margin: 0 auto; padding-block: 1.5rem 4rem; display: grid; gap: 1.6rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font: 650 2rem/1.15 var(--display); margin: 0; text-wrap: balance; }
+h2 { font: 650 1.35rem/1.25 var(--display); margin: 0; text-wrap: balance; }
+section { display: grid; gap: .6rem; min-width: 0; }
+p, ul, ol { margin: 0; }
+ul, ol { padding-left: 1.3rem; display: grid; gap: .3rem; }
+.lede { color: var(--muted); }
+.rule { background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--fresh);
+  border-radius: 8px; padding: .8rem 1rem; }
+.rule b { color: var(--fresh); }
+.diagram { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: .8rem;
+  overflow-x: auto; }
+.diagram pre.mermaid { margin: 0; background: transparent; }
+code { font: .88em var(--mono); }
+.label { font: 600 .72rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.fresh { color: var(--fresh); font-weight: 600; }
+.fixed { color: var(--fixed); font-weight: 600; }
+.stop { color: var(--stop); font-weight: 600; }
+.cases { display: grid; gap: .6rem; }
+.case { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: .7rem 1rem;
+  display: grid; gap: .25rem; }
+.case h3 { font: 600 1rem var(--body); margin: 0; }
+footer { color: var(--muted); font-size: .85rem; }
+header { display: flex; flex-wrap: wrap; gap: .6rem 1rem; justify-content: space-between; align-items: start; }
+header > div { min-width: 0; flex: 1 1 20rem; }
+.theme { display: flex; gap: .3rem; }
+.theme button { font: 500 .85rem var(--body); background: var(--surface); color: var(--fg); border: 1px solid var(--rule);
+  border-radius: 6px; padding: .3rem .7rem; cursor: pointer; }
+.theme button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+/* Diagrams: boxes top to bottom, an edge label between each level. */
+.flow { display: grid; justify-items: center; gap: 0; }
+.node { border: 2px solid var(--rule); border-radius: 8px; background: var(--bg); padding: .5rem .8rem;
+  text-align: center; max-width: 100%; min-width: 0; }
+.node b { display: block; font: 600 .95rem var(--body); }
+.node span { display: block; font: .8rem var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.node.fresh { border-color: var(--fresh); }
+.node.fixed { border-color: var(--fixed); }
+.node.stop { border-color: var(--stop); color: var(--stop); }
+.node.ask { border-style: dashed; border-color: var(--fg); }
+.edge { display: grid; justify-items: center; color: var(--muted); font-size: .8rem; text-align: center;
+  padding: .15rem 0; }
+.edge::before, .edge::after { content: ""; width: 2px; height: .7rem; background: var(--rule); }
+.edge::after { height: .5rem; }
+.edge i { font-style: normal; padding: .1rem .4rem; }
+.pair { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; width: 100%; }
+.pair > * { flex: 1 1 12rem; }
+.col { display: grid; justify-items: center; align-content: start; }
+.branch { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .4rem .6rem; }
+.branch .no { color: var(--stop); font-size: .8rem; }
+.split { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; width: 100%; }
+.split > .col { flex: 1 1 14rem; border: 1px dashed var(--rule); border-radius: 8px; padding: .6rem; }
+.split h4 { margin: 0 0 .3rem; font: 600 .75rem var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<main>
+  <header>
+    <div><h1>Form Lineage</h1>
+    <p class="lede">How a script's act always traces back to the resource's current state, at each rung, and how the lenient and strict guards decide.</p></div>
+    <div class="theme" role="group" aria-label="Theme"><button type="button" id="th-light" data-th="light">Light</button><button type="button" id="th-dark" data-th="dark">Dark</button></div>
+  </header>
+
+  <div class="rule">
+    <b>The one rule.</b> Every form a run uses comes from the resource it just read. That read is never cached:
+    the resource answers <code>no-cache</code>. Everything below the resource is content-addressed and cached for a
+    year, and it is only reached through the link the fresh resource gives right now.
+  </div>
+
+  <section>
+    <p class="label">Key</p>
+    <p><span class="fresh">Green</span>: read fresh every time. <span class="fixed">Blue</span>: immutable, cached, its address is its hash. <span class="stop">Red</span>: the run stops.</p>
+  </section>
+
+  <section>
+    <h2>Rung L0: forms inline</h2>
+    <div class="diagram"><div class="flow">
+      <div class="node fresh"><b>Issue resource</b><span>no-cache, read every step</span></div>
+      <div class="edge"><i>contains</i></div>
+      <div class="pair">
+        <div class="node fresh"><b>Form github:comment</b><span>its own hr:integrity</span></div>
+        <div class="node fresh"><b>Form github:close</b><span>its own hr:integrity</span></div>
+      </div>
+    </div></div>
+    <ul>
+      <li>The forms arrive inside the fresh resource, whole.</li>
+      <li>Each form carries its own integrity.</li>
+      <li>There is no set, so there is no set hash.</li>
+      <li>The guard checks the form's integrity only.</li>
+      <li>Nothing is cached, so the lineage is trivially fresh.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Rung L1: forms in a linked set, schemas inline</h2>
+    <div class="diagram"><div class="flow">
+      <div class="node fresh"><b>Issue resource</b><span>no-cache, read every step</span></div>
+      <div class="edge"><i>hr:forms link, carrying the set's integrity</i></div>
+      <div class="node fixed"><b>Affordance set</b><span>/affordance-sets/{hash}</span><span>immutable, one year</span></div>
+      <div class="edge"><i>contains</i></div>
+      <div class="pair">
+        <div class="node fixed"><b>Form github:comment</b><span>hr:integrity, schema inline</span></div>
+        <div class="node fixed"><b>Form github:close</b><span>hr:integrity, schema inline</span></div>
+      </div>
+    </div></div>
+    <ul>
+      <li>The fresh resource holds one link to the set, with the set's hash.</li>
+      <li>The set lives at its own address, named by its hash.</li>
+      <li>The client fetches a set once, then reuses it from cache.</li>
+      <li>The client checks the set's bytes against the hash in the link.</li>
+      <li>Each form inside the set carries its own integrity.</li>
+      <li>Any change to any form in the set gives a new set hash, so a new address.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Rung L2: forms in a linked set, schemas linked too</h2>
+    <div class="diagram"><div class="flow">
+      <div class="node fresh"><b>Issue resource</b><span>no-cache, read every step</span></div>
+      <div class="edge"><i>hr:forms link, carrying the set's integrity</i></div>
+      <div class="node fixed"><b>Affordance set</b><span>/affordance-sets/{hash}</span><span>immutable, one year</span></div>
+      <div class="edge"><i>contains</i></div>
+      <div class="pair">
+        <div class="col">
+          <div class="node fixed"><b>Form github:comment</b><span>hr:integrity</span></div>
+          <div class="edge"><i>$ref with the schema's integrity</i></div>
+          <div class="node fixed"><b>Schema</b><span>/schemas/{hash}</span><span>immutable</span></div>
+        </div>
+        <div class="col">
+          <div class="node fixed"><b>Form github:close</b><span>hr:integrity</span></div>
+          <div class="edge"><i>$ref with the schema's integrity</i></div>
+          <div class="node fixed"><b>Schema</b><span>/schemas/{hash}</span><span>immutable</span></div>
+        </div>
+      </div>
+    </div></div>
+    <ul>
+      <li>The same as L1, except each schema moves to its own address.</li>
+      <li>The set holds each schema's hash.</li>
+      <li>A schema change gives a new schema hash, so new set bytes, so a new set hash in the resource.</li>
+      <li>Schemas can be shared between sets.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Why a cached form can't go stale</h2>
+    <ol>
+      <li>The run reads the resource fresh.</li>
+      <li>The resource names the set it offers right now, by hash.</li>
+      <li>If the cache holds that hash, those bytes are exactly that set. The address is the content.</li>
+      <li>If the cache doesn't hold it, the client fetches it and checks the bytes against the hash.</li>
+      <li>The guard looks for the target form in that set, the current one.</li>
+    </ol>
+    <p>An old set in the cache is never used unless the fresh resource names it again. The server owes nothing at an old address: the client always reaches a set or schema through the fresh resource, which names only what it serves now.</p>
+  </section>
+
+  <section>
+    <h2>The guard, before every act</h2>
+    <p>From <code>client/artie/src/main/kotlin/heart/ScriptGuard.kt</code>, lines 23 to 31.</p>
+    <div class="diagram"><div class="flow">
+      <div class="node fresh"><b>Read the resource fresh</b></div>
+      <div class="edge"><i>then</i></div>
+      <div class="node"><b>Find the target form in the set it names now</b></div>
+      <div class="edge"><i>then</i></div>
+      <div class="branch"><div class="node ask"><b>Is the form there?</b></div><span class="no">no: stop</span></div>
+      <div class="edge"><i>yes</i></div>
+      <div class="branch"><div class="node ask"><b>Does its integrity equal the pin?</b></div><span class="no">no: stop</span></div>
+      <div class="edge"><i>yes</i></div>
+      <div class="split">
+        <div class="col"><h4>Lenient</h4>
+          <div class="node ask"><b>Set seen before for this form?</b></div>
+          <div class="edge"><i>yes</i></div>
+          <div class="node"><b>Act</b></div>
+          <div class="edge"><i>no</i></div>
+          <div class="node"><b>Warn and act</b><span>re-pin after the run if repin: auto</span></div>
+        </div>
+        <div class="col"><h4>Strict</h4>
+          <div class="node ask"><b>Set seen before for this form?</b></div>
+          <div class="edge"><i>yes</i></div>
+          <div class="node"><b>Act</b></div>
+          <div class="edge"><i>no</i></div>
+          <div class="node stop"><b>Stop</b></div>
+        </div>
+      </div>
+    </div></div>
+    <ul>
+      <li>Both modes always check the target form's own integrity.</li>
+      <li>Lenient stops only when the target form changed or is gone.</li>
+      <li>Strict also stops when the set changed for any reason: a form added, dropped, or changed.</li>
+      <li>At L0 there is no set, so strict skips the set check there.</li>
+      <li>Pins are per form. Each form keeps its own list of sets it was seen in.</li>
+      <li>Re-pinning happens once, after the run, and only for acts that were done.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>What the tests prove</h2>
+    <p>From <code>client/artie/src/test/resources/features/script-replay.feature</code>: a fake GitHub behind the real gateway, at L2. A script reads issue 11, comments, then closes it. Then the fake's forms change.</p>
+    <div class="cases">
+      <div class="case"><h3>Close now takes a milestone</h3>
+        <p>Our close form changed.</p>
+        <p>Lenient: <span class="stop">stops at the close</span>. Strict: <span class="stop">stops earlier, at the comment</span>, because the set changed.</p>
+        <p>The issue stays open.</p></div>
+      <div class="case"><h3>An unrelated edit form changes</h3>
+        <p>The set changed, our forms didn't.</p>
+        <p>Lenient: finishes, issue closed. Strict: <span class="stop">stops at the comment</span>, issue open.</p></div>
+      <div class="case"><h3>Forms change in the middle of the run</h3>
+        <p>The comment goes through with the old forms. The gateway changes right after it.</p>
+        <p>If close changed: both modes <span class="stop">stop at the close</span>. If only the set changed: lenient finishes, strict <span class="stop">stops at the close</span>.</p>
+        <p>The close is checked against the set the issue offers now, not the one from before the comment.</p></div>
+      <div class="case"><h3>The same form, used twice, renamed in between</h3>
+        <p>On two fresh issues, the script comments twice. The first comment goes through with the comment form as recorded.</p>
+        <p>The gateway then renames the comment's field from body to content, as an API's next version might. It does this with a new connector setting: <code>rename: { content: body }</code>.</p>
+        <p>The second comment: both modes <span class="stop">stop</span>. The guard reports that github:comment changed, with the pinned hash and the offered one. Nothing is sent, and only the first comment exists.</p>
+        <p>Found on the way: the client used to check the fields against the new schema before asking the guard. It now asks the guard first, so the refusal names the real cause.</p></div>
+      <div class="case"><h3>Live: the real gateway, the comment renamed</h3>
+        <p>The live GitHub gateway restarted on a copy of its connector that renames the comment's body to content. The pinned script ran against the scratch repository.</p>
+        <p>It opened the issue, branched, committed, opened and merged the pull request. At the comment, both modes <span class="stop">stopped</span>: github:comment changed. Nothing was sent.</p>
+        <p>Lenient: issue #123, pull request #124. Strict: #125, #126. The offered hash matched the in-process test's exactly.</p></div>
+      <div class="case"><h3>What counts as a change</h3>
+        <p>Any change to what the form does changes its hash: a field added, even an optional one; a field dropped or renamed; a new method or target. Both modes stop.</p>
+        <p>A new title or description does not count. Wording is left out of the hash on purpose, so a reworded form is the same form.</p>
+        <p>By default, that's where it ends. With <code>on-change: values</code>, a lenient run looks closer, as the next two cards show.</p></div>
+      <div class="case"><h3>With on-change: values</h3>
+        <p>The config beside the script says <code>on-change: values</code>. When a form changed, a lenient run checks what it is about to send, not the whole schema.</p>
+        <p>It acts only if three things hold. The method is the one the lock file pins. Every field sent is one the new form names. Every field the new form requires is sent.</p>
+        <p>Close takes an optional milestone: lenient finishes, issue closed. The trace says close was held by its values.</p>
+        <p>Close now requires a reason: <span class="stop">stops at the close</span>, "reason is required".</p>
+        <p>Comment's body renamed to content: <span class="stop">stops at the comment</span>, "content is required; body is not in the schema".</p>
+        <p>Lock file says close was a DELETE: <span class="stop">stops at the close</span>, "pinned DELETE, offered POST".</p>
+        <p>Strict: <span class="stop">stops at the comment</span>, as before. A changed form means a changed set.</p>
+        <p>With <code>repin: auto</code>, the changed form's new hash, method and set go into the lock file. A strict run afterwards finishes.</p></div>
+      <div class="case"><h3>Live: close takes a milestone, held by its values</h3>
+        <p>The live gateway restarted on a copy of its connector where close takes an optional milestone. The lock file was regenerated, now with each form's method. The config said <code>on-change: values</code> and <code>repin: auto</code>.</p>
+        <p>Lenient: finished. Close was held by its values, the comment by its form, the rest by their set. The run re-pinned close and comment. Issue #127, pull request #128.</p>
+        <p>Strict, on the re-pinned lock file: finished, every act held by its set or form. Issue #129, pull request #130.</p></div>
+      <div class="case"><h3>Nothing changes</h3>
+        <p>Strict: finishes, issue closed.</p></div>
+      <div class="case"><h3>Re-pin after the unrelated change</h3>
+        <p>Lenient run with <code>repin: auto</code>: finishes, adds the new set for comment and close. A strict run afterwards: finishes.</p>
+        <p>With <code>propose</code>, <code>never</code>, or <code>--no-repin</code>: nothing written. A strict run afterwards: <span class="stop">stops</span>.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Not built yet</h2>
+    <ul>
+      <li>When the set hash matches, ARTIE still checks the form. Skipping it would be faster, not safer.</li>
+      <li>The service index stays at L0 by design. Its version tag isn't pinned yet.</li>
+      <li>Step 6, falling back to a step's intent words when the guard stops, is parked as an idea.</li>
+    </ul>
+  </section>
+
+  <footer>Checked against the live GitHub gateway at L0, L1 and L2 on Oct 19, 2026.</footer>
+</main>
+<script>
+(() => {
+  const set = (t) => {
+    document.documentElement.dataset.theme = t;
+    document.querySelectorAll(".theme button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.th === t)));
+    try { localStorage.setItem("fl-theme", t); } catch (e) { /* works without it */ }
+  };
+  let start = "light";
+  try { start = localStorage.getItem("fl-theme") || "light"; } catch (e) { /* light */ }
+  document.querySelectorAll(".theme button").forEach((b) => b.addEventListener("click", () => set(b.dataset.th)));
+  set(start);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+package steps
+
+import com.artie.heart.gateway.fixtures.GitHubGateway
+import heart.ArtieNavigator
+import heart.ScriptGuard
+import heart.cli.arguments
+import heart.cli.config
+import heart.cli.generate.generate
+import heart.cli.keep
+import heart.cli.lockFile
+import heart.cli.lockName
+import heart.cli.repin
+import io.cucumber.datatable.DataTable
+import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
+import org.yaml.snakeyaml.Yaml
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.test.assertEquals
+
+/**
+ * script-replay.feature: a script run with ARTIE against the GitHub gateway, artie generate's script and lock file
+ * made from its capture, and that script run in turn, in a folder of the scenario's own.
+ */
+class ReplaySteps(
+    private val ctx: ClientContext,
+    private val scripts: ScriptSteps,
+    private val gateway: GitHubGatewaySteps,
+) {
+    /** The scenario's own folder: its scripts, goal files, captures and lock files. */
+    internal val folder: Path = Files.createTempDirectory("artie-replay")
+
+    @Given("the script {string} is")
+    fun scriptIs(name: String, text: String) {
+        Files.writeString(folder.resolve(name), text)
+    }
+
+    @Given("{string} ran with ARTIE, captured in {string}, given")
+    @When("{string} runs with ARTIE, captured in {string}, given")
+    fun runs(script: String, capture: String, table: DataTable) = run(script, capture, table, guard = null)
+
+    @When("{string} runs with ARTIE, held {string} to its lock file, captured in {string}, given")
+    fun runsGuarded(script: String, mode: String, capture: String, table: DataTable) =
+        run(script, capture, table, guard = mode)
+
+    @When("{string} runs with ARTIE, held {string} to its lock file, with no-repin, captured in {string}, given")
+    fun runsGuardedNoRepin(script: String, mode: String, capture: String, table: DataTable) =
+        run(script, capture, table, guard = mode, options = listOf("--no-repin"))
+
+    @Given("the file {string} is")
+    fun fileIs(name: String, text: String) {
+        Files.writeString(folder.resolve(name), text)
+    }
+
+    /** What the run said about its lock file after it ran, as artie run says it. */
+    private var aboutPins = listOf<String>()
+
+    /** A run as artie run makes it: its arguments read, its config and lock file found beside the script. */
+    private fun run(
+        script: String,
+        capture: String,
+        table: DataTable,
+        guard: String?,
+        options: List<String> = emptyList(),
+    ) {
+        val file = folder.resolve(script)
+        val guarded = guard?.let { listOf("--guard", it) }.orEmpty()
+        val asked = arguments(listOf("run", script) + guarded + options)
+        val config = config(asked, folder, file)
+        val held = guard?.let {
+            val lock = lockFile(asked, folder, file, config)
+            ScriptGuard(
+                checkNotNull(lock.pins) { "no lock file beside $script" },
+                strict = lock.guard == "strict",
+                values = config.onChange == "values",
+            )
+        }
+        val given = table.asMaps().associate { it.getValue("name") to it.getValue("value") }
+        val asData = script.endsWith(".heart.yaml")
+        val navigator = ArtieNavigator(ctx.client, scripts.reasoner(), guard = held)
+        val fallsBack = config.onChange == "intent"
+        val run = scripts.run(Files.readString(file), navigator, given, asData, fallsBack)
+        Files.writeString(folder.resolve(capture), run.traceYaml())
+        aboutPins = if (guard == null) emptyList() else repin(asked, folder, file, config, run.traceYaml())
+        val finished = scripts.stoppedMessage() == null
+        aboutKept = keep(file, folder.resolve(lockName(asked, file)), config, run.traceYaml(), finished)
+    }
+
+    /** What the run said about its kept script after it ran, as artie run says it. */
+    private var aboutKept = listOf<String>()
+
+    /** Each script artie generated as data, and its lock file, as generated. */
+    private val generatedText = mutableMapOf<String, String>()
+
+    @Then("about its kept script, the run said {string}")
+    fun saidAboutKept(said: String) = assertEquals(said, aboutKept.joinToString("; "))
+
+    @Then("{string} changed only in these lines")
+    fun changedLines(script: String, table: DataTable) {
+        val was = generatedText.getValue(script).lines()
+        val now = Files.readString(folder.resolve(script)).lines()
+        assertEquals(was.size, now.size, "the number of lines changed:\n${now.joinToString("\n")}")
+        val changed = was.zip(now).filter { (a, b) -> a != b }
+            .map { (a, b) -> mapOf("was" to a.trim(), "now" to b.trim()) }
+        assertEquals(table.asMaps(), changed)
+    }
+
+    @Then("{string} and its lock file are as artie generated them")
+    fun asGenerated(script: String) {
+        val pins = heart.cli.scriptName(script) + ".pins.yaml"
+        assertEquals(generatedText.getValue(script), Files.readString(folder.resolve(script)))
+        assertEquals(generatedText.getValue(pins), Files.readString(folder.resolve(pins)))
+    }
+
+    @Then("the run captured in {string} held its acts by")
+    fun heldBy(capture: String, table: DataTable) {
+        val held = Yaml().loadAll(Files.readString(folder.resolve(capture))).toList().drop(1)
+            .map { it as Map<*, *> }
+            .mapNotNull { step ->
+                val guard = step["guard"] as? Map<*, *> ?: return@mapNotNull null
+                val relation = (step["chose"] as? Map<*, *>)?.get("relation")
+                    ?: (step["params"] as? Map<*, *>)?.get("relation")
+                mapOf("relation" to "$relation", "held" to "${guard["held"]}")
+            }
+        assertEquals(table.asMaps(), held)
+    }
+
+    @Then("about its pins, the run said {string}")
+    fun saidAboutPins(said: String) = assertEquals(said, aboutPins.joinToString("; "))
+
+    @Given("artie generated {string} from {string} and {string}")
+    fun generated(script: String, capture: String, source: String) {
+        val said = ByteArrayOutputStream()
+        generate(listOf("generate", capture, "--out", script, "--script", source), folder, PrintStream(said, true))
+    }
+
+    @Given("artie generated {string} as data from {string} and {string}")
+    fun generatedAsData(script: String, capture: String, source: String) {
+        val said = ByteArrayOutputStream()
+        val args = listOf("generate", capture, "--out", script, "--script", source, "--format", "yaml")
+        generate(args, folder, PrintStream(said, true))
+        val pins = heart.cli.scriptName(script) + ".pins.yaml"
+        listOf(script, pins).forEach { generatedText[it] = Files.readString(folder.resolve(it)) }
+    }
+
+    @Then("the script {string} reads, the same run as {string} written as data")
+    fun readsAsData(script: String, kts: String, text: String) {
+        val beside = "\nwritten as Kotlin:\n" + Files.readString(folder.resolve(kts))
+        assertEquals(text, Files.readString(folder.resolve(script)).trimEnd(), beside)
+    }
+
+    @Given("the gateway's issue forms change: {}")
+    fun formsChange(change: String) {
+        ctx.inProcess = changed(change)
+    }
+
+    /**
+     * The change made in the middle of a run: the gateway serves its forms as shipped until it has answered the
+     * comment, and changed from the next request on, so the run's later steps meet the new forms.
+     */
+    @Given("the gateway's issue forms change once the comment is made: {}")
+    fun formsChangeMidRun(change: String) {
+        val before = checkNotNull(ctx.inProcess) { "no gateway in process" }
+        val after = changed(change)
+        var serving: heart.Transport = before
+        ctx.inProcess = object : heart.Transport {
+            override fun send(request: heart.HeartRequest): heart.HeartResponse {
+                val answer = serving.send(request)
+                if (request.method == "POST" && request.url.endsWith("/actions/comment") && answer.status in OK) {
+                    serving = after
+                }
+                return answer
+            }
+        }
+    }
+
+    /** The gateway in process on a copy of the shipped GitHub connector, its issue resource changed by [change]. */
+    private fun changed(change: String): InProcessTransport {
+        val (was, now) = CHANGES.getValue(change)
+        val shipped = Path.of("..", "..", "heart", "heart-gateway", "connectors", "github")
+        val connector = Files.createTempDirectory("github-connector")
+        Files.list(shipped).use { files -> files.forEach { Files.copy(it, connector.resolve(it.fileName)) } }
+        val issue = connector.resolve("issue.resource.yaml")
+        val text = Files.readString(issue)
+        check(was in text) { "issue.resource.yaml has no \"$was\" to change" }
+        Files.writeString(issue, text.replaceFirst(was, now))
+        return InProcessTransport(GitHubGateway.handler(gateway.github, connector))
+    }
+
+    @Given("the lock file {string} pins {string} to the method {string}")
+    fun pinsMethod(lock: String, relation: String, method: String) {
+        val file = folder.resolve(lock)
+        val text = Files.readString(file)
+        val at = Regex("(?m)^  ${Regex.escape(relation)}:\\n    integrity: .*\\n(    act: .*\\n)?    method: .*$")
+            .find(text)
+        val was = checkNotNull(at) { "$lock pins no method for $relation" }.value
+        Files.writeString(file, text.replace(was, was.substringBeforeLast("method: ") + "method: $method"))
+    }
+
+    @Then("the lock file {string} pins the act of {string} as issue {int} offers it now")
+    fun pinsAct(lock: String, relation: String, number: Int) {
+        val forms = Yaml().load<Map<String, Any?>>(Files.readString(folder.resolve(lock)))["forms"] as Map<*, *>
+        val client = ctx.newClient(ctx.dialect, ctx.rung)
+        val issue = client.enter("https://github.gateway.test/repos/acme/rockets/issues/$number")
+        val offered = checkNotNull(issue.affordance(relation)) { "issue $number offers no $relation" }
+        assertEquals(heart.FormAct.of(offered), (forms[relation] as Map<*, *>)["act"])
+    }
+
+    @Then("the lock file {string} pins rung {string}")
+    fun lockRung(lock: String, rung: String) =
+        assertEquals(rung, Yaml().load<Map<String, Any?>>(Files.readString(folder.resolve(lock)))["rung"])
+
+    @Then("the run captured in {string} made the selections the run captured in {string} made, with these values")
+    fun sameSelections(made: String, from: String, table: DataTable) {
+        val values = table.asMaps().map { it.getValue("was") to it.getValue("now") }
+        val expected = selections(from).map { line ->
+            values.fold(line) { text, (was, now) ->
+                Regex("(?<![\\w.])${Regex.escape(was)}(?![\\w])").replace(text, now)
+            }
+        }
+        assertEquals(expected, selections(made))
+    }
+
+    /** Each selection a capture made, in order: its relation and the values it sent, as text. */
+    private fun selections(capture: String): List<String> =
+        Yaml().loadAll(Files.readString(folder.resolve(capture))).toList().drop(1)
+            .map { it as Map<*, *> }
+            .mapNotNull { step -> (step["params"] as? Map<*, *>)?.takeIf { "relation" in it } }
+            .map { params -> params.entries.joinToString(", ") { (k, v) -> "$k=$v" } }
+
+    private companion object {
+        /** The statuses of an act that was done. */
+        val OK = 200..299
+
+        /** Each change to the issue resource the gateway serves: the connector's text, and what it becomes. */
+        val CHANGES = mapOf(
+            "nothing" to ("noun: issue" to "noun: issue"),
+            "close takes a milestone" to (
+                "    body: { state: closed, state_reason: completed }\n" to
+                    "    body: { state: closed, state_reason: completed }\n    fields: [milestone]\n"
+                ),
+            "edit takes no body" to ("fields: [title, body]" to "fields: [title]"),
+            "close requires a reason" to (
+                "    body: { state: closed, state_reason: completed }\n" to
+                    "    body: { state: closed, state_reason: completed }\n    inputs: { reason: { type: string } }\n"
+                ),
+            "comment's body is renamed content" to (
+                "    fields: [body]\n" to "    fields: [content]\n    rename: { content: body }\n"
+                ),
+        )
+    }
+}

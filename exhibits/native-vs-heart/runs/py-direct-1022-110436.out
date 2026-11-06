@@ -1,0 +1,24 @@
+GET /repos/JogoShugh/heart-github-test/git/ref/heads/main
+POST /repos/JogoShugh/heart-github-test/issues
+POST /repos/JogoShugh/heart-github-test/issues
+POST /repos/JogoShugh/heart-github-test/issues
+POST /repos/JogoShugh/heart-github-test/git/refs
+PUT /repos/JogoShugh/heart-github-test/contents/fix-1022-110436.md
+PUT /repos/JogoShugh/heart-github-test/contents/test-1022-110436.md
+POST /repos/JogoShugh/heart-github-test/pulls
+PATCH /repos/JogoShugh/heart-github-test/pulls/323
+GET /repos/JogoShugh/heart-github-test/pulls/323
+PUT /repos/JogoShugh/heart-github-test/pulls/323/merge
+GET /repos/JogoShugh/heart-github-test/pulls/323/merge
+POST /repos/JogoShugh/heart-github-test/issues/320/sub_issues
+POST /repos/JogoShugh/heart-github-test/issues/320/comments
+PATCH /repos/JogoShugh/heart-github-test/issues/320
+PUT /repos/JogoShugh/heart-github-test/issues/320/lock
+POST /repos/JogoShugh/heart-github-test/issues/321/comments
+PATCH /repos/JogoShugh/heart-github-test/issues/321
+POST /repos/JogoShugh/heart-github-test/issues/322/comments
+PATCH /repos/JogoShugh/heart-github-test/issues/322
+GET /repos/JogoShugh/heart-github-test/issues/320
+GET /repos/JogoShugh/heart-github-test/issues/321
+GET /repos/JogoShugh/heart-github-test/issues/322
+done: crash #320, test #321, duplicate #322, pull request #323

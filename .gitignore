@@ -3,6 +3,8 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+# Source in any source set is never output, though its package is named build (heart-sims' build service).
+!**/src/*/**/build/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
@@ -43,3 +45,22 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+.claude/tdd-events.log
+.claude/settings.local.json
+
+# Buster is a standalone repo with its own history and gates.
+buster/
+
+### Development credentials (scripts/dev-credentials.sh) ###
+server-spring/.env
+domains/*/.env
+# Any .env, anywhere: they hold or fetch credentials.
+.env
+
+# Python bytecode (the live scripts)
+__pycache__/
+
+### heart-script runs: traces written by artie run ###
+client/scripts/runs/
+# What the kit writes when run from the repository root: goals, kept scripts, runs.
+/work/

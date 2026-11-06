@@ -1,0 +1,162 @@
+---
+run:
+  inputs:
+    owner:
+      value: JogoShugh
+      given: given
+      question: Whose repository?
+    repo:
+      value: heart-github-test
+      given: default
+      default: heart-github-test
+      question: Which repository?
+  usage:
+    calls: 1
+    input: 5920
+    output: 113
+    cache_read: 0
+    cache_write: 918
+---
+at: '2026-10-28T01:49:46.915398Z'
+ms: 1069
+mode: script
+say: enter {entry}
+line: 12
+params:
+  entry: https://localhost:8392/
+opens: true
+outcome: done
+address: https://localhost:8392/
+now:
+  state:
+    title: GitHub v3 REST API
+    hr:manifest:
+      forms:
+        github:add-sub-issue:
+          - sha256-CP30wrvSlg+x9cHdEAsLY7mNqe2ooV3jA3MIzZYKhP0=
+        github:assign:
+          - sha256-VscVtuEo5Tk2ZKoux1zt3PeDF2khsJ/DkO2uKd3V7GQ=
+        github:branch-from-here:
+          - sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo=
+        github:close:
+          - sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
+          - sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ=
+        github:close-duplicate:
+          - sha256-8xYNSPPYgL5MSeRaWzu7n/xQ4HcNumYS0qQV34gRiQI=
+        github:close-not-planned:
+          - sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04=
+        github:comment:
+          - sha256-hBIa40tU8EJokuebe8npx54kItbP3z/jGbJW8FsL26c=
+          - sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk=
+        github:commit-file:
+          - sha256-VU+w5uVUgaj2J43DM9jlUCmIZ1jNGPlRKajRrAlQN9Y=
+        github:edit:
+          - sha256-E4H5hyCvQ41/jggcRbdnIzO2KJ7hF8mZFzQ5WTIcjEE=
+          - sha256-PPOR0s5dm5evRf0IV5+78ZnwNxK8GtbKkmEJJlgFdB0=
+          - sha256-jV1Vwq/GYsRwOu5Btre2AF+MZ5QM6cr7vIATp0lgwnc=
+        github:issues-get:
+          - sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
+        github:issues-get-comment:
+          - sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk=
+        github:issues-list-comments:
+          - sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY=
+        github:issues-list-for-repo:
+          - sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+        github:label:
+          - sha256-8R+R85FzQjiJVpZak/M1sl6QjftjUVxwEERrkW5FzPc=
+        github:lock:
+          - sha256-0Qx8Y7uXinYvK/l+ZHWQZXllV0ZEbKtebqCkP3RRTUk=
+        github:merge:
+          - sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk=
+        github:open-issue:
+          - sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI=
+        github:open-pull-request:
+          - sha256-PE4HJf8D9pKBuS8GjywYA5kUlxGDtzJU9LtqfoDdBMI=
+        github:pulls-get:
+          - sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE=
+        github:pulls-list:
+          - sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk=
+        github:remove-sub-issue:
+          - sha256-OmMvnlrMxK3VgvnyR9Boq72C5LK1WBqnkUU3+82t9Ac=
+        github:reopen:
+          - sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=
+          - sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU=
+        github:repos-get:
+          - sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+        github:repos-get-branch:
+          - sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg=
+        github:repos-list-branches:
+          - sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc=
+        github:repos-list-for-user:
+          - sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54=
+        github:request-review:
+          - sha256-B44QtOvTiCXyIHeLBhLV4dTAQT4IA7rQ6TxMzv2FQlc=
+        github:set-milestone:
+          - sha256-Cz3Pt5WA54VdrWrOZ1rm348aG0ySukdEgiNuzt1hims=
+        github:unassign:
+          - sha256-HjlVP3VFvX/IUvovwAeLMKUsMn8aVStBNa5hFXgCuAk=
+        github:unlabel:
+          - sha256-pINd//jITYqjkEyig0cZqL3w1dTiYSeYl/6e0A4I97E=
+        github:unlock:
+          - sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0=
+        github:update-branch:
+          - sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8=
+      digest: sha256-1r9JNk4HrXPfetDNdbqjTEHRiSI81y0GwcOdCRlc36M=
+  forms:
+    - github:pulls-list
+    - github:pulls-get
+    - github:issues-list-for-repo
+    - github:issues-get
+    - github:repos-list-for-user
+    - github:repos-get
+    - github:issues-list-comments
+    - github:issues-get-comment
+    - github:repos-list-branches
+    - github:repos-get-branch
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-10-28T01:49:48.012501Z'
+ms: 1939
+mode: intent
+say: In JogoShugh/heart-github-test
+line: 13
+within: 12
+params: {}
+reason:
+  template: In ${owner}/${repo}
+  slots:
+    owner:
+      value: JogoShugh
+      from:
+        - input: owner
+    repo:
+      value: heart-github-test
+      from:
+        - input: repo
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"GitHub v3 REST API","hr:manifest":{"forms":{"github:add-sub-issue":["sha256-CP30wrvSlg+x9cHdEAsLY7mNqe2ooV3jA3MIzZYKhP0="],"github:assign":["sha256-VscVtuEo5Tk2ZKoux1zt3PeDF2khsJ/DkO2uKd3V7GQ="],"github:branch-from-here":["sha256-e2NdEf2RyJ6Zvzgy0CVpSmUFcrtwqTMU4+Kq/kYoMNo="],"github:close":["sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=","sha256-dszY3fG/vPt5O7CJVE8gM6UIghyyl2WeQBlAIM8z5MQ="],"github:close-duplicate":["sha256-8xYNSPPYgL5MSeRaWzu7n/xQ4HcNumYS0qQV34gRiQI="],"github:close-not-planned":["sha256-QV4YZ6N8Y5PKUw4lOTiSdgYQKTpIHvRoFrWRJl7P/04="],"github:comment":["sha256-hBIa40tU8EJokuebe8npx54kItbP3z/jGbJW8FsL26c=","sha256-rEchf4MSX+3aH4c5JE6jPFuMsn5M7PMYR4os6ETeizk="],"github:commit-file":["sha256-VU+w5uVUgaj2J43DM9jlUCmIZ1jNGPlRKajRrAlQN9Y="],"github:edit":["sha256-E4H5hyCvQ41/jggcRbdnIzO2KJ7hF8mZFzQ5WTIcjEE=","sha256-PPOR0s5dm5evRf0IV5+78ZnwNxK8GtbKkmEJJlgFdB0=","sha256-jV1Vwq/GYsRwOu5Btre2AF+MZ5QM6cr7vIATp0lgwnc="],"github:issues-get":["sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc="],"github:issues-get-comment":["sha256-vAgzZigesBmb6MHS+KqgnPGemSFfdKyNnM82gRNizpk="],"github:issues-list-comments":["sha256-V8sKWLJhvnoVEBN1raYqfImYa0pqJnly1X8LAhA8zWY="],"github:issues-list-for-repo":["sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw="],"github:label":["sha256-8R+R85FzQjiJVpZak/M1sl6QjftjUVxwEERrkW5FzPc="],"github:lock":["sha256-0Qx8Y7uXinYvK/l+ZHWQZXllV0ZEbKtebqCkP3RRTUk="],"github:merge":["sha256-CY/mjcpRO2grR/xbdjTqaUXZFQaG/Q9F8YHBJMIkiIk="],"github:open-issue":["sha256-7nm0xX/JP+BNMWY1bYbDj/IscGf8ariWZljqVz35xqI="],"github:open-pull-request":["sha256-PE4HJf8D9pKBuS8GjywYA5kUlxGDtzJU9LtqfoDdBMI="],"github:pulls-get":["sha256-48fAcZLZ228oe7X9Wd+E3dgaJKVXSqDXhMMzkNnCThE="],"github:pulls-list":["sha256-FY1PFQTdShpl5pV0PsmaXXnhMjITXQaoOK86e9QDgpk="],"github:remove-sub-issue":["sha256-OmMvnlrMxK3VgvnyR9Boq72C5LK1WBqnkUU3+82t9Ac="],"github:reopen":["sha256-KbRYrINXhZEbj6CYO2cCIQ9pAIv4/W6gPEFcBsZ58MI=","sha256-d526f8dUBytgayLwUYC1mdJbq1S8vEv0gUnNrWu60JU="],"github:repos-get":["sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go="],"github:repos-get-branch":["sha256-njUFP/+ajxPXjHsEYWRoO+vyjcTvQaLTl484EUHUwdg="],"github:repos-list-branches":["sha256-MsVyC5pG2EqHrhuwBGwTKV9M+qxBR03aD4Wo0g831Vc="],"github:repos-list-for-user":["sha256-bnE9/fKjnegXInhVWZ0y3hCdWikd7I2FnBSrHHPwq54="],"github:request-review":["sha256-B44QtOvTiCXyIHeLBhLV4dTAQT4IA7rQ6TxMzv2FQlc="],"github:set-milestone":["sha256-Cz3Pt5WA54VdrWrOZ1rm348aG0ySukdEgiNuzt1hims="],"github:unassign":["sha256-HjlVP3VFvX/IUvovwAeLMKUsMn8aVStBNa5hFXgCuAk="],"github:unlabel":["sha256-pINd//jITYqjkEyig0cZqL3w1dTiYSeYl/6e0A4I97E="],"github:unlock":["sha256-99Gt/+YUFdx99Yjbf5bCLG3AvDQX2G0HVPWY/mWlOZ0="],"github:update-branch":["sha256-CJxBg7jv/f4i+RhIBbeZvzhT7VYV7P7YqRQ12Gj98j8="]},"digest":"sha256-1r9JNk4HrXPfetDNdbqjTEHRiSI81y0GwcOdCRlc36M="}}
+      </state>
+      <offers>
+      {"github:pulls-list":{"title":"List pull requests","description":"Lists pull requests in a specified repository.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Either `open`, `closed`, or `all` to filter by state."},"sort":{"type":"string","default":"created","enum":["created","updated","popularity","long-running"],"title":"Sort","description":"What to sort results by. `popularity` will sort by the number of comments. `long-running` will sort by date created and will limit the results to pull requests that have been open for more than a month and have had activity within the past month."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The direction of the sort. Default: `desc` when sort is `created` or sort is not specified, otherwise `asc`."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"}},"required":["owner","repo"]}},"github:pulls-get":{"title":"Get a pull request","description":"Draft pull requests are available in public repositories with GitHub Free and GitHub Free for organizations, GitHub Pro, and legacy per-repository billing plans, and in public and private repositories with GitHub Team and GitHub Enterprise Cloud. For more information, see [GitHub's products](https://docs.github.com/github/getting-started-with-github/githubs-products) in the GitHub Help documentation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"pull_number":{"type":"integer","title":"Pull_number","description":"The number that identifies the pull request."}},"required":["owner","repo","pull_number"]}},"github:issues-list-for-repo":{"title":"List repository issues","description":"List issues in a repository. Only open issues will be listed. Pull requests are left out: list them with github:pulls-list, which filters by labels too.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"state":{"type":"string","default":"open","enum":["open","closed","all"],"title":"State","description":"Indicates the state of the issues to return."},"labels":{"type":"string","title":"Labels","description":"A list of comma separated label names. Example: `bug,ui,@high`"},"assignee":{"type":"string","title":"Assignee","description":"Can be the name of a user. Pass in `none` for issues with no assigned user, and `*` for issues assigned to any user."},"creator":{"type":"string","title":"Creator","description":"The user that created the issue."},"mentioned":{"type":"string","title":"Mentioned","description":"A user that's mentioned in the issue."},"milestone":{"type":"string","title":"Milestone","description":"If an `integer` is passed, it should refer to a milestone by its `number` field. If the string `*` is passed, issues with any milestone are accepted. If the string `none` is passed, issues without milestones are returned."},"sort":{"type":"string","default":"created","enum":["created","updated","comments"],"title":"Sort","description":"What to sort results by."},"direction":{"type":"string","default":"desc","enum":["asc","desc"],"title":"Direction","description":"The direction to sort the results by."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo"]}},"github:issues-get":{"title":"Get an issue","description":"The API returns a [`301 Moved Permanently` status](https://docs.github.com/rest/guides/best-practices-for-using-the-rest-api#follow-redirects) if the issue was\n[transferred](https://docs.github.com/articles/transferring-an-issue-to-another-repository/) to another repository. If\nthe issue was transferred to or deleted from a repository where the authenticated user lacks read access, the API\nreturns a `404 Not Found` status. If the issue was deleted from a repository where the authenticated user has read\naccess, the API returns a `410 Gone` status. To receive webhook events for transferred and deleted issues, subscribe\nto the [`issues`](https://docs.github.com/webhooks/event-payloads/#issues) webhook.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."}},"required":["owner","repo","issue_number"]}},"github:repos-list-for-user":{"title":"List repositories for a user","description":"Lists public repositories for the specified user.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"username":{"type":"string","title":"Username","description":"The handle for the GitHub user account."},"type":{"type":"string","default":"owner","enum":["all","owner","member"],"title":"Type","description":"Limit results to repositories of the specified type."},"sort":{"type":"string","default":"full_name","enum":["created","updated","pushed","full_name"],"title":"Sort","description":"The property to sort the results by."},"direction":{"type":"string","enum":["asc","desc"],"title":"Direction","description":"The order to sort by. Default: `asc` when using `full_name`, otherwise `desc`."}},"required":["username"]}},"github:repos-get":{"title":"Get a repository","description":"The `parent` and `source` objects are present when the repository is a fork. `parent` is the repository this repository was forked from, `source` is the ultimate source for the network.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."}},"required":["owner","repo"]}},"github:issues-list-comments":{"title":"List issue comments","description":"You can use the REST API to list comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"issue_number":{"type":"integer","title":"Issue_number","description":"The number that identifies the issue."},"since":{"type":"string","format":"date-time","title":"Since","description":"Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`."}},"required":["owner","repo","issue_number"]}},"github:issues-get-comment":{"title":"Get an issue comment","description":"You can use the REST API to get comments on issues and pull requests. Every pull request is an issue, but not every issue is a pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"comment_id":{"type":"integer","format":"int64","title":"Comment_id","description":"The unique identifier of the comment."}},"required":["owner","repo","comment_id"]}},"github:repos-list-branches":{"title":"List branches","description":"List branches","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"protected":{"type":"boolean","title":"Protected","description":"Setting to `true` returns only branches protected by branch protections or rulesets. When set to `false`, only unprotected branches are returned. Omitting this parameter returns all branches."}},"required":["owner","repo"]}},"github:repos-get-branch":{"title":"Get a branch","description":"Get a branch","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"owner":{"type":"string","title":"Owner","description":"The account owner of the repository. The name is not case sensitive."},"repo":{"type":"string","title":"Repo","description":"The name of the repository without the `.git` extension. The name is not case sensitive."},"branch":{"type":"string","title":"Branch","description":"The name of the branch. Cannot contain wildcard characters. To use wildcard characters in branch names, use [the GraphQL API](https://docs.github.com/graphql)."}},"required":["owner","repo","branch"]}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      In JogoShugh/heart-github-test
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01FJChZSuPeXt4GQJcH8mDoU","name":"select","input":{"action":"clarify","question":"What would you like to do in JogoShugh/heart-github-test (e.g., list pull requests, list issues, view branches, or get repository details)?"},"caller":{"type":"direct"}}]'
+outcome: refused
+address: https://localhost:8392/
+refused:
+  kind: unclear to the reasoner
+  by: the client
+  detail: What would you like to do in JogoShugh/heart-github-test (e.g., list pull requests, list issues, view branches, or get repository details)?

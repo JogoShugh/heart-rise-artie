@@ -1,0 +1,2 @@
+Hires an employee with a position (API body field is "position", response shows "role"), updates their position using a fresh etag + If-Match, then dismisses another employee found by name search (must match exactly one) using If-Match.
+Arguments: first, last, role, new_role, dismiss_name.

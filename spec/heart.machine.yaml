@@ -1,0 +1,565 @@
+# HEART, machine-readable.
+# A structured description of the HEART protocol (Hypermedia Engine for Agent Reasoning and Transactions),
+# its HTTP and CoAP bindings, the HEART gateway that presents OpenAPI-described APIs as HEART services,
+# the reference client ARTIE, and the heart-script DSL. Written for another AI to read and act on.
+# Every claim carries a `source` (repo-relative file and section, or source file) where it was read.
+# Normative words (MUST, SHALL, SHOULD, MAY) are the spec's own. Where the spec and the code disagree,
+# or the spec disagrees with itself, the item is listed under `open_issues` rather than resolved.
+
+meta:
+  name: HEART
+  expansion: Hypermedia Engine for Agent Reasoning and Transactions
+  also_written: H.E.A.R.T.
+  family_profile_uri: https://w3id.org/heart-rise
+  written: "2026-10-18"
+  repository_paths:
+    spec: spec/SPEC.md
+    hal_schema_forms_rules: spec/HAL-SCHEMA-FORMS-HR.md
+    gateway_plan: spec/PLAN-OPENAPI-GATEWAY.md
+    gateway_code: heart/heart-gateway/src/main/kotlin/com/artie/heart/gateway/
+    gateway_connector_example: heart/heart-gateway/connectors/github/
+    client_code: client/artie/src/main/kotlin/heart/
+    script_dsl_code: client/heart-script/src/main/kotlin/heart/script/
+    script_cli_code: client/artie-cli/src/main/kotlin/heart/cli/
+    script_plan: spec/PLAN-ARTIE-SCRIPTS.md
+  how_to_use: >
+    Read `thesis` and `roles` first. To build a HEART server, read `core`, `bindings.http`, `representation`,
+    `server`, `ladder`. To build a HEART client or agent, add `client` and `sync_reason_act`. To put an existing
+    OpenAPI API behind HEART, read `gateway`. To script a HEART client, read `heart_script`.
+  status_of_parts:
+    core_and_http_binding: implemented (heart library, server-spring garden, domains)
+    coap_binding: implemented (coap and coaps, DTLS pre-shared keys)
+    gateway: implemented (convention mode and declared connector mode; GitHub connector live)
+    client_artie: implemented
+    heart_script: implemented (DSL, test add-on, artie run CLI)
+    rise: on hold since 2026-10-09; nothing implemented
+    amqp_binding: idea only (spec/ideas/amqp-binding.md, spec/ideas/amqp-binding-vision.md)
+
+thesis:
+  claims:
+  - A HEART service tells a client, in each representation, which acts the resource's current state allows (as forms with JSON Schema), and why the others are absent. The client never constructs URIs; it selects among server-provided forms and links.
+  - Reasoning (for example by an LLM) is confined to one step that outputs a selection only (a form name with field values, a link by relation and title, or a question). Deterministic code resolves targets, methods, validators and credentials.
+  - Every act is conditional on the validator the client holds (If-Match). Stale views, illegal acts and invalid input are distinct refusals by meaning.
+  - The protocol core is independent of any single transfer protocol; HTTP and CoAP are bindings. (Fielding, "REST APIs must be hypertext-driven", 2008, first rule.)
+  source: spec/SPEC.md §1-§4, §6.0, §6.8
+
+roles:
+  server: "Serves resources as HEART representations (state + forms + links), enforces conditional acts and legality. Reference implementations: heart library (heart-core, heart-spring, heart-coap, heart-http4k), garden server (server-spring)."
+  client: "Enters at one bookmark URI, syncs, selects, acts. Reference: ARTIE (client/artie)."
+  reasoner: Optional component inside a client that chooses one selection from the offered forms and links; never sees URIs, methods, headers or credentials.
+  gateway: A HEART server whose resources are projections of an upstream API described by OpenAPI, plus a declarative connector. heart/heart-gateway.
+  script: A heart-script program (Kotlin script, .kts) that drives any HEART client through the Navigator contract. client/heart-script.
+  mcp_bridge: mcp/ exposes a HEART client to MCP hosts with six fixed tools heart_look, heart_act, heart_follow, heart_describe, heart_explain, heart_back.
+  source: spec/SPEC.md §8.1, §9; repository layout
+
+# ---------------------------------------------------------------------------------------------------------
+# The protocol core, independent of binding.
+# ---------------------------------------------------------------------------------------------------------
+core:
+  identification_rules:   # spec/SPEC.md §6.0, decided 2026-10-10
+    - Every link, form target, profile, relation and integrity-carrying reference is a URI. Any URI scheme MAY appear in any of them.
+    - A client SHALL choose how to interact with a URI by its scheme, through the binding registered for that scheme.
+    - A relative reference is resolved against its base (RFC 3986) and takes the base's scheme.
+    - A client SHALL refuse a URI whose scheme it has no binding for, before sending anything. It SHALL NOT rewrite the URI to another scheme.
+    - A form's `method` names an interaction in the vocabulary of the binding its target selects. HAL Schema Forms and HAL-FORMS write HTTP method names; another binding maps them or refuses a method it cannot carry.
+  concepts:   # spec/SPEC.md §6.0 table
+    - {id: "read", meaning: "Get the current representation of a resource"}
+    - {id: "requested_rendering", meaning: "The dialect, profile and rung the client asks for"}
+    - {id: "applied_rendering", meaning: "The dialect, profile and rung the response is in"}
+    - {id: "validator", meaning: "An opaque value naming one representation of one state"}
+    - {id: "never_fresh", meaning: "Layer 1 is never reused unchecked, by anyone on the path"}
+    - {id: "unchanged", meaning: "The held representation is still current"}
+    - {id: "immutable", meaning: "A shared layer never changes at its URI"}
+    - {id: "integrity", meaning: "The bytes of a shared layer are the ones the linking representation vouched for"}
+    - {id: "act", meaning: "A state-changing request, conditional on the validator held"}
+    - {id: "act_done", meaning: "The act succeeded; the answer is the resource's new representation"}
+    - {id: "new_resource", meaning: "The act brought a resource into being, named by the answer; the body represents the new resource or the one acted on, and says which. The client holds the new resource next, reading it unless the body is it. (decided 2026-10-17)"}
+    - {id: "precondition_required", meaning: "The act carried no validator"}
+    - {id: "stale", meaning: "The validator is not current"}
+    - {id: "not_offered", meaning: "The act is not legal in the current state"}
+    - {id: "invalid_input", meaning: "The input does not satisfy the form's schema"}
+    - {id: "refusal_detail", meaning: "Why, in a machine-readable body"}
+    - {id: "service_description", meaning: "What the service offers, from its bookmark"}
+    - {id: "client_identity_and_trace", meaning: "Who is asking, and which of its requests an event is about"}
+  source: spec/SPEC.md §6.0
+
+bindings:
+  http:   # spec/SPEC.md §6.0 table; §6.1-§6.12 are the HTTP binding
+    schemes: [http, https]
+    read: GET
+    requested_rendering: [Accept, Accept-Profile, Prefer]
+    applied_rendering: [Content-Type, 'Link: <profile>; rel="profile"', Preference-Applied]
+    validator: strong ETag
+    never_fresh: "request and response Cache-Control: no-cache"
+    unchanged: If-None-Match -> 304
+    immutable: "Cache-Control: max-age=31536000, immutable"
+    integrity: link `integrity` value (hypertext, protocol-independent); Repr-Digest optional
+    act: the form's method, with If-Match
+    act_done: 2xx, Content-Location names the resource
+    new_resource: 201, Location names the new resource; Content-Location names what the body represents
+    precondition_required: 428
+    stale: 412
+    not_offered: 409
+    invalid_input: 422
+    refusal_detail: application/problem+json (RFC 9457)
+    service_description: application/json-home
+    client_identity_and_trace: [User-Agent, traceparent]
+  coap:   # spec/SPEC.md §6.0.1, decided 2026-10-10; coaps built 2026-10-15
+    schemes: [coap, coaps]
+    transport: UDP (coap, port 5683, loopback only in the reference server); DTLS 1.2 with a pre-shared key per client (coaps)
+    read: GET (0.01) -> 2.05 Content
+    requested_rendering: Accept option (Content-Format); option 65000 Accept-Profile; option 65004 Prefer
+    applied_rendering: Content-Format option; option 65008 Profile; option 65012 Preference-Applied
+    validator: ETag option = first 8 bytes of SHA-256 over the HTTP binding's ETag value (CoAP allows at most 8 bytes)
+    never_fresh: response Max-Age 0; request option 65003 No-Cache (critical, unsafe-to-forward)
+    unchanged: request ETag option -> 2.03 Valid
+    immutable: Max-Age 31536000
+    act: POST (0.02) with If-Match (the 8-byte validator)
+    act_done: 2.04 Changed; the body's self link names the resource (no Content-Location in CoAP)
+    new_resource: 2.01 Created with Location-Path; the body's self link says what it represents
+    precondition_required: 4.00 Bad Request with problem type precondition-required (CoAP has no 4.28)
+    stale: 4.12 Precondition Failed
+    not_offered: 4.09 Conflict (RFC 8132)
+    invalid_input: 4.22 Unprocessable Entity (RFC 8132)
+    refusal_detail: RFC 9457 problem details as JSON
+    service_description: GET / with Accept = the json-home Content-Format
+    client_identity_and_trace: option 65020 traceparent; no User-Agent
+    large_bodies: block-wise transfer (RFC 7959)
+    experimental_content_formats: {65000: "application/hal+json", 65001: "application/schema+json", 65002: "application/problem+json", 65003: "application/json-home", 65004: "application/alps+json"}
+    note: Options and Content-Formats are from the experimental ranges; to be registered with IANA if the binding is adopted.
+  amqp:
+    status: idea, not built
+    sketch: Request/response by reply-to and correlation-id; resource URI in `to`; method in the request's `subject`, status in the answer's `subject` (the Qpid Dispatch Router HTTP-over-AMQP convention); validator = the HTTP ETag whole in application-properties.
+    source: spec/ideas/amqp-binding.md, spec/ideas/amqp-binding-vision.md
+
+# ---------------------------------------------------------------------------------------------------------
+# What a representation looks like (HTTP binding).
+# ---------------------------------------------------------------------------------------------------------
+representation:
+  dialects:   # spec/SPEC.md §6.1
+    - id: hal-schema-forms
+      role: reference dialect
+      media_type: application/hal+json
+      profile: https://w3id.org/heart-rise/hal-schema-forms
+      forms_key: _forms
+      schema: full JSON Schema (draft 2020-12)
+      rungs: L0-L6
+      upstream: https://github.com/jbadeau/hal-schema-forms
+    - id: hal-forms
+      role: on-ramp dialect
+      media_type: application/prs.hal-forms+json
+      profile: https://w3id.org/heart-rise/hal-forms
+      forms_key: _templates
+      schema: inline `properties` array (name, type, required, readOnly, prompt, min, max, options ...)
+      rungs: L0 only; a server SHALL ignore forms=link and schema=link for it and SHALL NOT list them in Preference-Applied
+  negotiation_example:
+    request: ["Accept: application/hal+json", "Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>"]
+    response: ["Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"']
+  family_profile: https://w3id.org/heart-rise is never sent in Accept-Profile; MAY appear as a second Link rel=profile.
+  curies:
+    hr: {href: "https://w3id.org/heart-rise/rels/{rel}", templated: true}
+    domain_example: {name: garden, href: "/profiles/garden#{rel}", templated: true}
+  relations:
+    hr:forms: Layer 1 -> its affordance set (rungs L1, L2)
+    hr:unavailable: the explanation of absent acts (§6.12)
+    item: a collection member (RFC 6573), titled
+    paging: [next, prev, first, last]
+  form_names: _forms keys are link relation types (URI or CURIE, for example garden:water-cell); compare after CURIE expansion. Each SHOULD identify an ALPS descriptor whose type (safe, unsafe, idempotent) agrees with the method.
+  example_hal_schema_forms_L0:   # read from the garden server over HTTP, 2026-10-17
+    headers:
+      Content-Type: application/hal+json
+      ETag: '"seq-1.hsf.L0.ea3c9ce48a4d50b2"'
+      Cache-Control: no-cache
+      Link: '<https://w3id.org/heart-rise/hal-schema-forms>; rel="profile", <https://w3id.org/heart-rise>; rel="profile"'
+      Vary: Accept, Prefer, Accept-Profile
+    body:
+      id: 9
+      label: Bed over coaps
+      status: PLANTED
+      cropName: basil
+      moistureLevel: 0
+      _links:
+        self: {href: "/beds/9"}
+        curies:
+          - {name: garden, href: "/profiles/garden#{rel}", templated: true}
+          - {name: hr, href: "https://w3id.org/heart-rise/rels/{rel}", templated: true}
+        hr:unavailable: {href: /unavailable/1648f3dc5307f159, type: application/json, integrity: "sha256-Fkjz3FMH8VnKolwCT8ID7fvf1jvy2LKP83Ge1Xk4UOA="}
+      _forms:
+        garden:water-cell:
+          title: Water the bed
+          description: Pours water into every cell of a planted bed. Enough water makes it ready to harvest.
+          _links: {target: {href: /beds/9/actions/water-cell}}
+          method: POST
+          contentType: application/json
+          schema:
+            $schema: https://json-schema.org/draft/2020-12/schema
+            $id: /schemas/7f232c04c52671dd
+            title: Water Cell
+            type: object
+            required: [milliliters]
+            properties:
+              milliliters: {type: "integer", minimum: 1, maximum: 1000, title: "Water per cell", description: "Millilitres of water poured into each cell", examples: [250]}
+  layers:   # spec/SPEC.md §6.1, §6.5
+    L1_resource: the resource representation; stable URL; Cache-Control no-cache; ETag on every response; 304 honoured
+    L2_affordance_set: the forms for a state; one URL per distinct body; public, max-age=31536000, immutable
+    L3_schema: a form's JSON Schema; one URL per distinct body; public, max-age=31536000, immutable
+    vary: Layer 1 only (Accept, Prefer, Accept-Profile as applicable); L2 and L3 SHALL NOT send Vary
+  source: spec/SPEC.md §6.1; spec/HAL-SCHEMA-FORMS-HR.md
+
+hal_schema_forms_rules:   # spec/HAL-SCHEMA-FORMS-HR.md
+  - {rule: 1, name: "templatePointers", text: "hr:templatePointers maps a target template's variables to JSON Pointers into the owning resource. Resolution order: pointer, then a form field of the same name, then a top-level property. A value must be a string or number, else no request."}
+  - {rule: 2, name: "integrity", text: "`integrity` (on links) and `hr:integrity` (on schema $refs) use SRI syntax (sha256|sha384|sha512 + '-' + base64 full digest). Hash before parsing; mismatch is refused. A server SHALL send them; a client refuses links lacking them; a client reads nothing from a URI."}
+  - {rule: 3, name: schema reference, text: "At L2 a form's schema MAY be {$ref, hr:integrity}; an older {$id} MAY be accepted."}
+  - {rule: 4, name: "Repr-Digest", text: "Repr-Digest SHOULD be sent on L2/L3; a client SHOULD check it and SHALL NOT require it."}
+  - {rule: 5, name: "words", text: "Every form and property SHOULD have a title and a description (with units); schemas SHOULD declare $schema."}
+  - {rule: 6, name: "relation names", text: "_forms keys are link relation types (URI or CURIE); expand before comparing; SHOULD identify an ALPS descriptor whose type agrees with the method."}
+  - {rule: 7, name: "no instance identifiers", text: "Forms SHALL carry a title and SHOULD carry a description; properties SHOULD carry title, description, examples; forms carry no instance identifiers."}
+  - {rule: 8, name: "hr:options", text: "A property's hr:options gives choices that depend on state (fixed choices stay JSON Schema enum): exactly one of pointer (into the owning resource; may be a Level 1 template over other form properties) or link ({href, templated}, variables from templatePointers then form properties, read as Layer 1); items, valueField/promptField (default value/prompt), where (equality), minItems/maxItems. A client offers only the resolved choices and SHALL NOT send if a required property has none; a server refuses a value outside them with 422 invalid-input."}
+
+# ---------------------------------------------------------------------------------------------------------
+# Server and client duties (HTTP binding).
+# ---------------------------------------------------------------------------------------------------------
+server:   # spec/SPEC.md §6.2
+  must:
+    - Serve L0, L1 and L2 of the reference dialect (L0 only is not compliant).
+    - Default to L0 without Prefer.
+    - "Layer 1: Cache-Control: no-cache and a correct ETag; honour If-None-Match with 304."
+    - "Layer 2 and 3: Cache-Control: public, max-age=31536000, immutable."
+    - Reject transitions not in the current affordance set.
+    - Require If-Match on acts; 412 on mismatch, 428 when absent.
+    - Send Link rel=profile on every Layer 1 response; echo honoured Prefer tokens in Preference-Applied.
+    - Serve both dialects from one source of truth for legality.
+    - Keep declared former act paths answering identically.
+  etag: Strong, one per representation (dialect + rung); changes when the bytes change. Reference format ends with the first 16 hex digits of SHA-256 over RFC 8785 canonical JSON, for example "seq-5.hsf.L2.e8e98768123683fa". If-Match uses strong comparison; `*` matches any.
+  if_match_scope: Compared with the owning resource's representation selected by the act's own Accept, Accept-Profile and Prefer; a client SHALL resend the sync's negotiation headers on the act.
+  act_evaluation_order: [no If-Match -> 428, mismatch -> 412, act not in the current set -> 409, body fails the schema -> 422]
+  act_success: The body is the owning resource's new representation; Content-Location names the owning resource.
+  problem_types:   # base https://w3id.org/heart-rise/problems/ ; members type, title, status required; MAY add detail, instance
+    - {status: 428, type: "precondition-required"}
+    - {status: 412, type: "stale"}
+    - {status: 409, type: not-offered, members: {rel: URI reference resolved against the request URL}}
+    - {status: 422, type: invalid-input, members: {violations: "[{pointer: RFC 6901 pointer into the request body, message}]"}}
+    - {status: 422, type: rule-refused, members: {violations: as invalid-input}, meaning: "the body satisfied the schema, but a rule of the resource refused it"}
+    - {status: 401, type: "not-authenticated", source: "spec/SPEC.md §6.13"}
+  problem_distinction: Clients tell refusals apart by type and status, never by title or detail.
+  other_statuses: {403: "authorisation only; do not retry", 404: "gone; re-enter from the bookmark", 405: "client defect"}
+  content_addressing:   # §6.5
+    algorithm: SHA-256 over the full served bytes, RFC 8785 canonical JSON
+    naming: The server's choice; the reference server uses the first 16 hex digits of the digest as the last path segment (/affordance-sets/e16765e81df9b76f). A client SHALL NOT read meaning from a URI.
+    not_capabilities: Content addresses are guessable; they are not bearer capabilities.
+  sharing:   # §6.9
+    templated_profile: Targets are RFC 6570 Level 1 templates; an affordance set carries no instance identity; every variable resolves from Layer 1. Then a set is a function of state, dialect, rung and behaviour, and is shared across resources in the same state.
+    concrete_profile: Fully resolved hrefs; one set per resource. Its L2 SHALL be Cache-Control private, unless all identifiers are 128-bit random.
+  source: spec/SPEC.md §6.2, §6.5, §6.9
+
+client:   # spec/SPEC.md §6.3
+  rules:
+    - Enter with one bookmark URI.
+    - Choose the dialect by Accept only; the rung by Prefer tokens or none.
+    - Cache L2/L3 by plain RFC 9111 rules.
+    - "Every Layer 1 request: Cache-Control: no-cache, and If-None-Match once an ETag is held."
+    - If-Match with the current Layer 1 ETag on every act; an act right after a sync needs no second read.
+    - Reason only over the current affordance set.
+    - Never construct or guess URIs; expand RFC 6570 templates as the form declares.
+    - "On 409: re-sync and re-derive. On 412: re-sync and discard the pending act; never resubmit it. On 428: re-issue conditionally, once."
+    - Compare form names after CURIE expansion.
+    - Verify integrity before parsing a linked layer; refuse a link without one.
+  source: spec/SPEC.md §6.3
+
+sync_reason_act:   # spec/SPEC.md §6.7, §6.8
+  sync: Read Layer 1 (no-cache, conditional); follow the affordance-set link (L1, L2); fetch schemas (L2) in parallel, deduplicated by URL. Do not reason until the set is fully resolved. Keep the Layer 1 ETag.
+  reason:
+    output_space: [form name with field values (validated against the schema), link by relation and title, a question to the user]
+    reasoner_sees: links by relation and title (never href); forms by relation, title, description and schema with annotations; MAY ask for an ALPS descriptor or the §6.12 explanation, which deterministic code fetches
+    reasoner_never: targets, methods, hrefs, headers, preconditions, credentials; it SHALL NOT emit any of them
+    ambiguity: seek clarification rather than guess
+  act: Deterministic code resolves the target, expands the template, attaches If-Match and credentials, submits, then restarts the cycle.
+  source: spec/SPEC.md §6.7, §6.8
+
+ladder:   # spec/SPEC.md §6.10
+  L0: Collapsed; forms and schemas inline; no Prefer; one hop. HEART-shaped, not conformance.
+  L1: "Prefer: forms=link. Two hops: the affordance set by link, schemas embedded."
+  L2: "Prefer: forms=link, schema=link. Three hops: schema $ref + hr:integrity. The reference rung; the minimum for compliance."
+  L3: Caching proof. Two resources in the same state get the same affordance-set URL; the origin is hit once (templated profile, same rung).
+  L4: Concurrency and errors. 412 and 409 distinct, plus 428.
+  L5: Cross-dialect. The same legality decision through HAL-FORMS L0 and HAL Schema Forms at any rung.
+  L6: Reasoning (optional). The reasoner outputs a selection only.
+  applied: The server SHALL list honoured tokens in Preference-Applied; the client takes the rung from it (none = L0; forms=link = L1; forms=link, schema=link = L2). Absence is not failure.
+  other_prefer_tokens: {behaviour: "interactive (default) | autonomous", domain: "<URI>"}
+  source: spec/SPEC.md §6.4, §6.10, §6.11.1
+
+entry_point:   # spec/SPEC.md §6.11
+  service_index: A Layer 1 resource (no-cache, ETag, Link rel=profile). Its forms are inline at every rung (it ignores Prefer). Safe GET forms such as searchBeds -> /beds{?name} and getBed -> /beds/{id} (no body, no If-Match).
+  collections: Members linked by `item` with titles; paging by next, prev, first, last; a count; page size from heart.page-size (default 20).
+  bookmark_acts: The index may offer acts at /actions/{path}; If-Match is the index's ETag; the result is 201.
+  json_home: "GET / with Accept: application/json-home; resources with hrefTemplate; hints (allow, formats, accept-prefer [forms=link, schema=link], precondition-req [etag]). Hints are advisory."
+  source: spec/SPEC.md §6.11
+
+explaining_absence:   # spec/SPEC.md §6.12
+  link: hr:unavailable with integrity; in the affordance set's _links at L1/L2, in Layer 1's _links at L0
+  body_example: {unavailable: [{rel: /profiles/garden#harvest, title: Harvest the bed, reason: The bed is not ready to harvest.}]}
+  rules:
+    - A function of state only; immutable and shared; no instance identifiers.
+    - Fetched only when the client asks why.
+    - Verify integrity.
+    - A client SHALL NOT act on relations found there.
+    - No link means the client SHALL NOT infer a reason.
+  source: spec/SPEC.md §6.12
+
+credentials:   # spec/SPEC.md §6.13
+  schemes:
+    - Basic (RFC 7617), in Authorization
+    - Bearer (RFC 6750), in Authorization
+    - DTLS 1.2 pre-shared key per client, for coaps
+    - OIDC, later
+  core_rule: No model is ever shown a credential.
+  server: States, acts and the bookmark require a credential; a configuration with none SHALL NOT start; shared content-addressed layers and ALPS MAY be public; 401 with problem type not-authenticated and WWW-Authenticate per scheme; a wrong credential is treated as a missing one.
+  client: Added below the cache; scoped to one origin; never plain HTTP beyond the machine; refuse URIs with userinfo; one retry after 401 only if the credential changed. Sources in order - environment (ARTIE_TOKEN_<HOST>_<PORT>, ARTIE_USER_..., ARTIE_PASSWORD_..., ARTIE_PSK_IDENTITY_..., ARTIE_PSK_KEY_...), the credentials file (~/.artie/credentials or ARTIE_HOME), Vault (ARTIE_VAULT_ADDR).
+  source: spec/SPEC.md §6.13; client/artie/src/main/kotlin/heart/EnvironmentCredentials.kt, Credentials.kt
+
+rise:
+  status: on hold since 2026-10-09; nothing implemented
+  idea: Client and server are roles that reverse when a recipient's work completes; an envelope with reply-to, callback-mode (push | poll), template-rel, template-schema, template-fields.
+  source: spec/SPEC.md §7
+
+prior_art:   # spec/SPEC.md §8, one line each
+  - {name: "MCP", relation: "Scoped to a server, not to resource state; composes with HEART through the mcp/ bridge"}
+  - {name: "HAL+JSON and HAL Schema Forms", relation: "Base of the reference dialect; HAL is the expired draft-kelly-json-hal"}
+  - {name: "HAL-FORMS (Amundsen)", relation: "The on-ramp dialect"}
+  - {name: "Tool search / deferred tool loading", relation: "Wins on token cost; HEART wins on legality; not exclusive"}
+  - {name: "ALPS", relation: "Relation URIs SHOULD identify ALPS descriptors; ALPS describes, never grants"}
+  - {name: "W3C Content Negotiation by Profile", relation: "Accept-Profile and Link rel=profile; a working draft"}
+  - {name: "RFC 7240 Prefer", relation: "Unregistered tokens forms, schema, behaviour, domain"}
+  - {name: "RFC 8785 JCS", relation: "Canonical JSON for content addresses and ETags"}
+  - {name: "RFC 6570 URI Template", relation: "Level 1 by default"}
+  - {name: "RFC 9110 conditional requests", relation: "Used unmodified; HEART makes every act conditional and tells 409 from 412"}
+
+# ---------------------------------------------------------------------------------------------------------
+# The gateway: an OpenAPI-described API presented as a HEART service.
+# ---------------------------------------------------------------------------------------------------------
+gateway:
+  purpose: A service that only publishes OpenAPI, presented to HEART clients as a HEART server. Relations are named in one profile; the HEART library (heart-http4k) serves the resources, so representations, ETags, conditional acts, refusals, dialects and rungs are exactly as in `server`.
+  source: heart/heart-gateway/src/main/kotlin/com/artie/heart/gateway/Gateway.kt, Main.kt
+  configuration_driven: >
+    Yes. No code per upstream: an OpenAPI description plus, for upstreams whose paths are not HEART-shaped,
+    a connector folder of YAML (connector.yaml, <noun>.resource.yaml, <noun>.reader.yaml, optional JSONata files).
+  startup:
+    - Read the environment (GatewayConfig).
+    - Fetch the OpenAPI description once (HTTP(S) with the upstream's credential, or a file); 3.0 and 3.1, parsed with swagger-parser, fully resolved. Every operation needs an operationId.
+    - Load the connector if set; slice the description to the connector's `include` operations.
+    - Build the resource types; serve with Jetty.
+    - Checks at start (fail fast) - included operations exist; every operationId named exists; every reader's path is a known item path; every name in a reader is a known act.
+  environment:   # GatewayConfig.kt; error messages name the variable, never its value
+    UPSTREAM_URL: {required: true, meaning: "The upstream's base URL (trailing / trimmed)"}
+    UPSTREAM_SPEC: {default: "$UPSTREAM_URL/openapi.json", meaning: "The OpenAPI description, an http(s) URL (fetched with the upstream credential) or a file path"}
+    GATEWAY_CONNECTOR: {required: false, meaning: "Path of the connector folder"}
+    GATEWAY_PROFILE: {required: "unless a connector sets `profile`", meaning: "The profile name relations are prefixed with"}
+    PORT: {default: 8090}
+    UPSTREAM_AUTH:
+      none: no credential (default)
+      bearer: needs UPSTREAM_TOKEN
+      basic: needs UPSTREAM_USER and UPSTREAM_PASSWORD
+      caller: forward each caller's own Authorization to the upstream; the upstream judges it
+    HEART_AUTH_BASIC_USERS: Who may call the gateway (Basic); ignored when UPSTREAM_AUTH=caller
+    HEART_AUTH_BEARER_TOKENS: Who may call the gateway (Bearer, token hashes); ignored when UPSTREAM_AUTH=caller
+  modes:
+    convention:   # Gateway.kt, GatewaySpec.kt
+      when: The upstream's paths already follow HEART's conventions; no connector needed (GATEWAY_PROFILE required).
+      path_conventions:
+        "GET /{collection}/{id}": reads a member
+        "GET /{collection}": "searches (expects {items: [{id, title}], count}, pages by ?page=N)"
+        "POST /{collection}/{id}/actions/{path}": an act
+        "POST /actions/{path}": a bookmark act, of the collection named by the operation's first tag
+      noun: the read operation's operationId minus a "get" prefix, first letter lowercased
+      excluded: deprecated operations; methods other than GET and POST
+      ids: numeric /id
+      what_is_allowed: >
+        From the upstream's own standard signals only, in this order - a HEART affordance link
+        (Link rel=https://w3id.org/heart-rise/rels/forms) or OData 4.01 "#Ns.Action" annotations.
+        Otherwise the gateway fails: it never guesses what is allowed.
+    declared:   # DeclaredResource.kt, Connector.kt
+      when: The upstream's paths are not HEART's (for example GitHub). One resource type per <noun>.resource.yaml; what is allowed comes from readers, falling back to the standard signals.
+  connector_yaml:   # Connector.kt
+    profile: {type: "string", required: true, meaning: "Profile and relation namespace (github -> github:close)"}
+    include: {type: "list of operationId", required: false, meaning: "Only these operations are kept; the description is sliced before parsing (components stay). Included operations no act uses become relations: safe if GET, else unsafe."}
+    headers: {type: "map string->string", meaning: "Sent on every upstream call (for example X-GitHub-Api-Version)"}
+    resources: {type: "list of file name", meaning: "<noun>.resource.yaml files"}
+    readers: {type: "ordered list of file name", meaning: "*.reader.yaml files; the first whose `matches` holds reads an answer. Every reader file in the folder must be listed, and every listed one must exist."}
+  resource_yaml:   # ResourceDeclaration.kt, ActDeclaration.kt, DeclaredResource.kt, ActSchema.kt
+    noun: {type: "string", required: true}
+    collection: {type: "string", required: true}
+    read: {type: "operationId", required: true, meaning: "The resource lives at this operation's path, filled from its state; reading it is a GET of that path."}
+    search: {type: "operationId", meaning: "The list operation. Its path variables, then the read's variables, then `filters`, become the search form's fields (titles from names; descriptions and schemas from the OpenAPI parameters). Expects a bare JSON array; follows Link rel=next."}
+    pointers: {type: "map path-variable -> JSON Pointer", meaning: "Where each read path variable is in the state"}
+    address: {type: "JSON Pointer", meaning: "The item's own URL in its state (for example /url); path variables are matched from it, replacing `pointers`."}
+    filters: {type: "list of query parameter name", meaning: "Search form fields sent as name=value"}
+    title: {type: "JSON Pointer", meaning: "A listed item's title (default: its read path)"}
+    skip: {type: "conditions (rule syntax)", meaning: "A listed item is dropped if all hold"}
+    lists: {type: "list of operationId", meaning: "Members of this resource served as sub-collections under it (an issue's sub-issues)"}
+    links: {type: "list of operationId", meaning: "Lists under this resource that another resource file searches by, linked by relation (an issue's comments)"}
+    facts: {type: "map name -> {operation, pointers}", meaning: "Other GETs filled from the state, fetched on every read; their bodies are available to reader rules as `name:/pointer`."}
+    acts:
+      shape: "map actName -> act"
+      relation: "profile:actName, shared across resources; internal name <noun>-<actName>"
+      act:
+        operation: {type: "operationId", required: true}
+        title: {type: "string", required: true}
+        description: {type: "string", required: true}
+        body: {type: "map", meaning: "Fixed body members, merged first"}
+        fields: {type: "list of name", meaning: "The only fields the client fills. Each is a body property (or an object branch of oneOf/anyOf), or a path parameter the state doesn't fill (put in the path)."}
+        bind: {type: "map body-field -> state JSON Pointer", meaning: "Filled from the checked state, never by the client (for example the head SHA a merge must match)"}
+        stale: {type: "HTTP status", meaning: "This upstream status means the view was stale -> 412"}
+        refused: {type: "HTTP status", meaning: "This upstream status means not offered now -> 409, with the upstream's own words"}
+        creates: {type: "noun", meaning: "The upstream answer is a resource of that declared type; the gateway answers 201 with Location = its item path"}
+      form_schema: "$schema 2020-12, type object, title = act title, properties = fields, required = required body fields and path fields, additionalProperties false; a body's anyOf/oneOf kept when every branch is an object whose required names only declared fields."
+  reader_yaml:   # Connector.kt, Rule.kt, Signals.kt
+    matches: {body: "{pointer: value | null} (null = present)", mediaType: case-insensitive, path: the OpenAPI path template, all_must_hold: true}
+    allowed:
+      one_signal_by_precedence: [table, odata, names, booleans, links, jsonata, always]
+      table: "<pointer> + rows: {value: {allow: [acts], absent: {act: reason}}}; the row is chosen by the pointer's value as text (booleans as \"true\"/\"false\"); a value with no row is an error"
+      odata: "<namespace>; \"#Ns.Act\": {} means allowed; advertisement members removed from the state"
+      names: "<pointer> to an array of allowed names"
+      booleans: "<pointer> to an object; true members are allowed"
+      links: "<pointer> to an array of {rel}"
+      jsonata: "<file beside the reader>; 100 ms timeout, max depth 64; result = allowed names"
+      always: "[acts] allowed in every state"
+      map: "{upstreamName: operationId}, used by names, booleans, links, odata"
+    rules: "[{when: {term: test}, absent: {act: reason}}] - each rule whose conditions all hold removes its acts, with its reason"
+    hide: "list of JSON Pointers removed from the state"
+    terms: {"/ptr": "a pointer into the answer body", "fact:/ptr": "a pointer into the named fact"}
+    tests: {"<json value>": present and equal (null matches present-and-null), "{present: bool}": presence, "{not: v}": missing or not equal, "{same-as: term}": equal to another term, "{not-same-as: term}": missing or not equal to another term}
+    order: The signal gives allowed acts and reasons; then each rule whose conditions hold, in order, removes its acts; for reasons, the earlier one wins.
+    naming: In declared mode readers name acts by relation (the resource file's act key); in convention mode by operationId.
+  request_mapping:
+    read: GET of the read path filled from the state or address; state = upstream JSON minus hidden members; facts fetched too.
+    act_declared: "1. re-read the item; if its state differs from the state the client's ETag names -> stale (412). 2. body = fixed body + client fields (minus path fields) + bound values. 3. call the operation's method and path (a DELETE with body {} is sent with none). 4. re-read the item (the operation's answer may not be the resource) and answer with it, or 201 with Location for `creates`."
+    act_convention: "re-read (check-then-act), then POST /{collection}/{id}/actions/{path}; bookmark acts POST /actions/{path}"
+    upstream_status_mapping:   # Upstream.kt, in this order
+      - {when: "the act's `stale` status", heart: "stale (412)"}
+      - {when: "the act's `refused` status", heart: "not offered (409), the upstream's words as the reason"}
+      - {when: 401, heart: "not authenticated"}
+      - {when: 403, heart: "forbidden"}
+      - {when: 404, heart: "not found"}
+      - {when: 409, heart: "not offered"}
+      - {when: 412, heart: "stale"}
+      - {when: "problem type .../rule-refused", heart: "rule-refused (422) with violations"}
+      - {when: 422, heart: "invalid-input (422) with violations, or the whole detail"}
+      - {when: "other", heart: "server error (IllegalStateException; rendering unclear)"}
+    detail_source: "`detail`, else `message` (GitHub), else the status"
+    offers_and_reasons: "An offer key is the allowed act names in declared order (plus the content address of the reasons, when there are any); the first answer with a key supplies its reasons. Default reason: \"The upstream doesn't allow it in the resource's current state.\""
+    etag: "Made by the HEART library from the representation's digest (the gateway's version is constant 0), so the body itself tells states apart."
+    profile: "Profile(profile, info.title, info.description, relations); relation id = the x-heart-relation extension, else the operationId kebab-cased (pulls/merge -> pulls-merge); title = summary; doc = description's first paragraph or summary; served as ALPS."
+  credentials_and_caching:
+    caller_forwarding: With UPSTREAM_AUTH=caller each request's Authorization is forwarded; the upstream's 401/403 become HEART refusals; a request with no credential is refused 401 before the upstream is asked.
+    copies: "Upstream GET answers with an ETag are cached per (SHA-256 of the Authorization value, URI); re-reads send If-None-Match; a 304 returns the cached copy; LRU capacity 1000; one caller's copy never answers another."
+    affordance_links: Affordance sets from upstream links are cached by href.
+  limits:
+    - "Concurrency: without the upstream's own If-Match, a write that lands between the re-read and the act can't be caught; a connector's `bind` + `stale` is the upstream-side guard where the API has one (GitHub's merge sha)."
+    - A state table is early binding and can drift from the upstream's own rules.
+    - Not supported - CoAP front door for the gateway, hr:options, Swagger 2.0, writing back to the spec, a separate call for what is allowed (Jira transitions).
+    - The description is read once at start; no periodic revalidation.
+  plan_vs_code:   # spec/PLAN-OPENAPI-GATEWAY.md compared with the code, 2026-10-18
+    - {item: "caller forwarding", plan: "left out of the first version", code: "implemented (UPSTREAM_AUTH=caller)"}
+    - {item: "permissive mode", plan: "offer everything, profile https://w3id.org/heart-rise/gateway/permissive", code: "not implemented; an unread answer is an error"}
+    - {item: "passing the client's If-Match upstream", plan: "translate when the upstream supports it", code: "not implemented; always check-then-act"}
+    - {item: "traceparent passthrough", code: "not found"}
+    - {item: "502/504 for upstream failures", code: "not found"}
+    - {item: "OpenAPI links objects", code: "not used"}
+  example_connector:   # heart/heart-gateway/connectors/github/ (abridged)
+    connector.yaml:
+      profile: github
+      include: [pulls/list, pulls/get, pulls/update, pulls/merge, pulls/update-branch, pulls/request-reviewers, issues/list-for-repo, issues/get, issues/create, issues/update, issues/lock, issues/unlock, issues/add-labels, issues/remove-label, issues/add-assignees, issues/remove-assignees, issues/list-comments, issues/get-comment, issues/update-comment, issues/create-comment, issues/list-sub-issues, issues/add-sub-issue, issues/remove-sub-issue, repos/get, users/get-authenticated]
+      headers: {X-GitHub-Api-Version: "2022-11-28"}
+      resources: [pull.resource.yaml, issue.resource.yaml, repository.resource.yaml, comment.resource.yaml]
+      readers: [pull.reader.yaml, issue.reader.yaml, repository.reader.yaml, comment.reader.yaml]
+    pull.resource.yaml:
+      noun: pull
+      collection: pulls
+      read: pulls/get
+      search: pulls/list
+      pointers: {owner: "/base/repo/owner/login", repo: "/base/repo/name", pull_number: "/number"}
+      filters: [state, sort, direction]
+      title: /title
+      acts:
+        close: {operation: pulls/update, title: Close, description: "Close it; a pull request unmerged, an issue as completed.", body: {state: closed}}
+        merge: {operation: pulls/merge, title: Merge, description: Merge the pull request into its base branch., fields: [merge_method, commit_title, commit_message], bind: {sha: /head/sha}, stale: 409, refused: 405}
+      facts:
+        repository: {operation: repos/get, pointers: {owner: /base/repo/owner/login, repo: /base/repo/name}}
+    pull.reader.yaml:
+      matches: {path: "/repos/{owner}/{repo}/pulls/{pull_number}"}
+      allowed:
+        table: /state
+        rows:
+          open: {allow: [close, merge, edit, request-review, update-branch], absent: {reopen: The pull request is already open.}}
+          closed: {allow: [reopen, edit], absent: {close: The pull request is already closed., merge: "A closed pull request can't be merged; reopen it first."}}
+        rules:
+          - {when: {"repository:/permissions/push": false}, absent: {close: "You can't push to this repository.", merge: "You can't push to this repository."}}
+          - {when: {/draft: true}, absent: {merge: "A draft can't be merged; mark it ready for review first."}}
+    run: "UPSTREAM_URL=https://api.github.com UPSTREAM_SPEC=<api.github.com.json> GATEWAY_CONNECTOR=<connectors/github> UPSTREAM_AUTH=caller PORT=8392 heart-gateway"
+  to_add_another_upstream:
+    - Get its OpenAPI description (3.0 or 3.1) with operationIds.
+    - If its paths follow the conventions and it publishes affordance links or OData actions, run in convention mode with GATEWAY_PROFILE.
+    - Otherwise write a connector - connector.yaml (profile, include, headers, resources, readers); one <noun>.resource.yaml per resource (read, search, pointers or address, acts with operation, fields, bind, stale, refused, creates, facts); one <noun>.reader.yaml per resource (matches.path, allowed signal, rules with reasons).
+    - Write a reason for every absent act; never leave legality to guesswork.
+    - The gateway checks the connector at start; fix what it names.
+    - "Worked plans: spec/PLAN-GITHUB-PULLS.md, spec/PLAN-GITHUB-ISSUES.md; parked idea: spec/ideas/jenkins-gateway.md (no OpenAPI published, so one is written for the slice used)."
+
+# ---------------------------------------------------------------------------------------------------------
+# The reference client and the script DSL.
+# ---------------------------------------------------------------------------------------------------------
+artie:
+  bindings: {http: "HttpBinding", https: "HttpBinding", coap: "CoapBinding", coaps: "CoapBinding with pre-shared keys (registered by the provider a script host finds)"}
+  binding_choice: per request, from that request's own URI scheme; a scheme with no binding is refused before sending
+  outcome_model: "Bindings fill a protocol-free Outcome (Done with received, code, newResource, represents; refusals); the core never sees a status code or header; a binding's own code is only reported."
+  agent: ArtieAgent runs Sync-Reason-Act with a Reasoner (ClaudeReasoner for Claude); every selection is checked against the manifest and the form's schema (and hr:options choices) before anything is sent.
+  model_key: "ANTHROPIC_API_KEY in the environment first, else the Bearer entry for https://api.anthropic.com in the credentials file; said aloud as its source, never its value."
+  source: client/artie/src/main/kotlin/heart/
+
+heart_script:
+  what: A Kotlin internal DSL, run as .kts scripts, that drives any HEART client through a contract (Navigator) found by ServiceLoader. HEART semantics only - no protocol, no domain, not CRUD.
+  contract:   # client/heart-script/src/main/kotlin/heart/script/Navigator.kt
+    Navigator: [enter(entry), act(rel, fields), follow(rel, title), visit(address), why(rel), describe(rel), reason(intent)]
+    Answer: [Done(now), NewResource(now), Refused(kind, by, detail)]
+    Refusal_kinds: [not offered, stale, invalid input, precondition required, not authenticated, forbidden, not found, not a choice, no binding, integrity mismatch, unreachable, no reasoner, unclear to the reasoner]
+    Side: [the client, the server]
+    ClientSettings: {rung: "L0 | L1 | L2 | null", reasoner: "claude | null"}
+  verbs:
+    heart(entry) { }: Enter at the bookmark; the only address a script knows.
+    act(relation, field to value ...): Select a form. Refused by the client, before sending, if the manifest doesn't offer it or the fields break the form's schema.
+    follow(relation, title): Select a link; refused by the client if absent.
+    reason("words"): One step chosen by the client's reasoner from what is offered (a form with fields, or a link); checked, then made; traced as an intent. Needs the run to allow a reasoner.
+    block: "After act, follow or reason: visit what the step led to, run the block there, then return to where the script was and read it again. Without a block the client moves and stays."
+    check(condition) { message }: An assertion; a failure stops the script.
+    until(tries, every) { condition }: Read again until the condition holds.
+    members(rel) { }: Visit each item link in turn, page after page by next.
+    state["/pointer"]: Read the held state by JSON Pointer; missing is null.
+    offers(rel), links(rel), why(rel), describe(rel), note(text), held: Introspection and remarks.
+    inputs: "val x by input(), input(default = ...), input(question = ...); inline ask(question, default). Nothing asks a person without --interactive; required inputs are checked before the first request."
+    expect(kind) { }: In heart-script-test only - the first step in the block must answer kind (Done, NewResource, Unchanged, NotOffered, Stale, InvalidInput, ...); a mismatch is a test failure.
+  example: |
+    val owner by input()
+    val repo by input()
+    val number by input()
+    heart("http://localhost:8392/") {
+        act("github:issues-get", "owner" to owner, "repo" to repo, "issue_number" to number.toInt())
+        check(state["/state"] == "open") { "the issue should be open" }
+        act("github:comment", "body" to "Fixed in 1.2.") {
+            act("github:edit", "body" to "Fixed in 1.2. (edited)")
+        }
+        expect(NotOffered) { act("github:reopen") }
+    }
+  cli:   # client/artie-cli
+    usage: "artie run <script.kts> [name=value ...] [--inputs file.json|yaml] [--inputs-of] [--interactive] [--entry uri] [--rung L0|L1|L2] [--reasoner claude] [--trace file] [--report dir] [--quiet | --output json]"
+    exit_codes: {0: "every step done; in a test every expectation met", 1: "a test expectation or check not met", 2: "stopped before the first request (missing input, bad arguments, no binding for the entry, reason(...) without --reasoner)", 3: "HEART refused a step (the refusing side named)", 4: "the client failed (unreachable, integrity mismatch)", 5: "an error in the script's own code"}
+    requires: Java 22 or newer
+  trace_step: "{at, ms, mode: script|intent, say (a sentence with {name} per value), params, outcome: done|new resource|refused|held|failed, expect?, address, now: {state, forms, links}, refused?: {kind, by, detail}}"
+  demonstrated: "The same garden script ran unchanged over coap, coaps and http, with only its entry input differing (docs/reports/heart-script-garden/both.html); one garden task ran scripted, reasoned by Claude, and hybrid (docs/reports/garden-three-ways/)."
+  source: client/heart-script, client/heart-script-test, client/artie-cli, spec/PLAN-ARTIE-SCRIPTS.md
+
+open_issues:
+  - {topic: "problem types", detail: "spec/SPEC.md §6.2 says HEART defines five problem types; §6.13 adds a sixth, not-authenticated (401)."}
+  - {topic: "201 Content-Location", detail: "§6.2 says a 201 names the new resource in both Location and Content-Location; §6.0 (decided 2026-10-17) says Content-Location names whatever the body represents, which may be the resource acted on. §6.0 is the later decision."}
+  - {topic: "Vary", detail: "§6.10.6 says Vary: Accept, Accept-Profile; §6.1 says Vary: Accept, Prefer, Accept-Profile; each 'as applicable'."}
+  - {topic: "HAL-FORMS internals", detail: "The spec files do not define the internal structure of a HAL-FORMS _templates entry beyond referencing the HAL-FORMS spec."}
+  - {topic: "gateway plan vs code", detail: "See gateway.plan_vs_code."}
+  - {topic: "DSL checks and blocks after reason", detail: "Under discussion; see spec/ideas/script-checks-and-reason-blocks.md. Not decided."}

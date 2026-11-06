@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Great Divorce · Overheard at Riverside</title>
+<base href="../">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,500;0,7..72,650;1,7..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="deck.css">
+</head><body>
+<header class="bar"><div class="bar-in"><div class="brand"><b>Overheard at Riverside</b><span>A fictional conversation · plain page</span></div></div></header>
+<div class="deck" style="grid-template-columns: minmax(0, 1fr)"><main class="stage">
+<article class="slide"><header><span class="part">Between the scenes</span></header>
+<h2>The Great Divorce</h2>
+<p class="dek">What a loan is, and what you can do with it: together on Ana's page, split apart on the machine web, and together again in HAL Schema Forms.</p>
+<div class="morph" data-start="page" data-cycles='[{"to": "apart", "label": "The Divorce", "head": "The Divorce of Information from Controls"}, {"to": "return", "label": "The Return", "head": "The Return of Information and Controls"}]'>
+  <div class="mo-stage">
+    <section class="mo-scene" data-scene="page">
+      <h3 class="mo-title">A page: information and controls together</h3>
+      <div class="dv-browser">
+        <div class="dv-url">library.test/loans/3310</div>
+        <div class="dv-screen">
+          <b class="dv-book">The Hobbit</b>
+          <div class="dv-fields">
+            <div class="tk tk-card" data-token="id"><small>ID</small><span>3310</span></div>
+            <div class="tk tk-card" data-token="title"><small>Title</small><span>The Hobbit</span></div>
+            <div class="tk tk-card" data-token="author"><small>Author</small><span>J. R. R. Tolkien</span></div>
+            <div class="tk tk-card" data-token="due"><small>Due</small><span>2026-11-12</span></div>
+            <div class="tk tk-card" data-token="renewals"><small>Renewals</small><span>0</span></div>
+            <div class="tk tk-card" data-token="standing"><small>Standing</small><span>hold waiting</span></div>
+          </div>
+          <div class="dv-acts">
+            <div class="tk tk-button tk-off" data-token="renew">Renew</div>
+            <div class="tk tk-note" data-token="why">A hold is waiting for this book, so it can't be renewed.</div>
+            <div class="dv-dialog">
+              <div class="tk tk-button" data-token="report">Report a problem</div>
+              <span class="dv-field">Problem</span>
+              <div class="tk tk-select" data-token="problem">It's damaged</div>
+              <span class="dv-field">Comment</span>
+              <div class="tk tk-text" data-token="comment">Up to 200 characters</div>
+            </div>
+            <div class="tk tk-button" data-token="return">Return</div>
+          </div>
+        </div>
+      </div>
+      <p class="mo-cap">Ana's page for <i>The Hobbit</i>. What the loan is, on the left. What she can do with it now, on the right: Renew greyed, with the reason; Report a problem, a choice of the library's kinds and a comment; and Return.</p>
+    </section>
+    <section class="mo-scene" data-scene="apart">
+      <h3 class="mo-title">The Divorce of Information from Controls</h3>
+      <div class="dv-apart">
+        <div class="dv-doc">
+          <span class="dv-label">Information · GET /loans/3310 · application/json</span>
+          <div class="dv-code">
+            <span>{</span>
+            <span class="tk tk-line tk-info i1" data-token="id">"id": 3310,</span>
+            <span class="tk tk-line tk-info i1" data-token="title">"title": "The Hobbit",</span>
+            <span class="tk tk-line tk-info i1" data-token="author">"author": "J. R. R. Tolkien",</span>
+            <span class="tk tk-line tk-info i1" data-token="due">"due": "2026-11-12",</span>
+            <span class="tk tk-line tk-info i1" data-token="renewals">"renewals": 0,</span>
+            <span class="tk tk-line tk-info i1" data-token="standing">"standing": "hold waiting"</span>
+            <span>}</span>
+          </div>
+        </div>
+        <p class="dv-gap"><span>The client joins them, and learns the rules from a 409 and a 422</span></p>
+        <div class="dv-doc">
+          <span class="dv-label">Controls · openapi.json · every loan alike</span>
+          <div class="dv-code">
+            <span>paths:</span>
+            <span class="tk tk-line tk-ctl i1" data-token="renew">/loans/{id}/actions/renew:</span>
+            <span class="i2">post:</span>
+            <span class="tk tk-line tk-said i3" data-token="why">description: Offered while the book is out, renewed fewer than three times, and no one's hold is waiting. Only allowed when standing is renewable.</span>
+            <span class="tk tk-line tk-ctl i1" data-token="report">/loans/{id}/actions/report-problem:</span>
+            <span class="i2">post:</span>
+            <span class="i3">description: … problem: one of the values that /problem-kinds lists.</span>
+            <span class="i3">requestBody: Report-problem</span>
+            <span class="tk tk-line tk-ctl i1" data-token="return">/loans/{id}/actions/return:</span>
+            <span class="i2">post: …</span>
+            <span>components:</span>
+            <span class="i1">schemas:</span>
+            <span class="i2">Report-problem:</span>
+            <span class="i3">required: [problem]</span>
+            <span class="tk tk-line tk-ctl i3" data-token="problem">problem: { type: string, x-heart-options: { link: /problem-kinds, … } }</span>
+            <span class="tk tk-line tk-ctl i3" data-token="comment">comment: { type: string, maxLength: 200 }</span>
+          </div>
+        </div>
+      </div>
+      <p class="mo-cap">The data, alone, says nothing of what it allows. The operations, alone, are the same for every loan: this loan's reason is now a rule in prose, and the problem's choices a sentence about a list the document never describes. The client joins the two each time.</p>
+    </section>
+    <section class="mo-scene" data-scene="return">
+      <h3 class="mo-title">The Return of Information and Controls</h3>
+      <div class="dv-together">
+        <div class="dv-doc">
+          <span class="dv-label">Information and controls · GET /loans/3310 · HAL Schema Forms</span>
+          <div class="dv-code">
+            <span>{</span>
+            <span class="tk tk-line tk-info i1" data-token="id">"id": 3310,</span>
+            <span class="tk tk-line tk-info i1" data-token="title">"title": "The Hobbit",</span>
+            <span class="tk tk-line tk-info i1" data-token="author">"author": "J. R. R. Tolkien",</span>
+            <span class="tk tk-line tk-info i1" data-token="due">"due": "2026-11-12",</span>
+            <span class="tk tk-line tk-info i1" data-token="renewals">"renewals": 0,</span>
+            <span class="tk tk-line tk-info i1" data-token="standing">"standing": "hold waiting",</span>
+            <span class="i1">"_links": { "self": …, "curies": […], "hr:unavailable": { "href": "/unavailable/61bc1cd6003e61f0", … } },</span>
+            <span class="i1">"_forms": {</span>
+            <span class="tk tk-line tk-ctl i2" data-token="report">"library:report-problem": { "title": "Report a problem", "method": "POST", …</span>
+            <span class="i3">"schema": { "required": ["problem"], "properties": {</span>
+            <span class="tk tk-line tk-ctl i4" data-token="problem">"problem": { "type": "string", "hr:options": { "link": { "href": "/problem-kinds" }, … } },</span>
+            <span class="tk tk-line tk-ctl i4" data-token="comment">"comment": { "type": "string", "maxLength": 200 } } } },</span>
+            <span class="tk tk-line tk-ctl i2" data-token="return">"library:return": { "title": "Return", "method": "POST", … }</span>
+            <span class="i1">}</span>
+            <span>}</span>
+          </div>
+        </div>
+        <div class="dv-side">
+          <div class="dv-doc">
+            <span class="dv-label">What's absent, and why · GET /unavailable/61bc1cd6003e61f0</span>
+            <div class="dv-code">
+              <span>{ "unavailable": [ {</span>
+              <span class="i1">"rel": "/profiles/library#renew",</span>
+              <span class="tk tk-line tk-ctl i1" data-token="renew">"title": "Renew",</span>
+              <span class="tk tk-line tk-said i1" data-token="why">"reason": "A hold is waiting for this book, so it can't be renewed."</span>
+              <span>} ] }</span>
+            </div>
+          </div>
+          <div class="dv-doc">
+            <span class="dv-label">The problem's choices · GET /problem-kinds</span>
+            <div class="dv-code">
+              <span>{ "kinds": [</span>
+              <span class="i1">{ "value": "damaged", "prompt": "It's damaged" },</span>
+              <span class="i1">{ "value": "missing-pages", "prompt": "Pages are missing" },</span>
+              <span class="i1">{ "value": "wrong-book", "prompt": "It's the wrong book" },</span>
+              <span class="i1">{ "value": "lost", "prompt": "I can't find it" } ] }</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="mo-cap">The same page as HAL Schema Forms: the same data; the acts this loan allows now, each form with its fields, the problem's choices linked; and a link to what's absent and why. Nothing is lost, and there is nothing to join.</p>
+    </section>
+  </div>
+  <p class="mo-still note">Three stills. Read as HEART, this slide links a script that animates them (<code>deck:code</code>). Plain JSON carries no links, so no code arrives.</p>
+</div>
+<p class="note">The same script animates the Marriage: code on demand, linked by each slide that uses it. Every value here is from the running library service: its HTML page, its plain JSON, its OpenAPI twin and its HAL Schema Forms answer, trimmed where marked …. Next: Fielding's name for keeping the two together.</p>
+</article>
+<nav class="foot"><a href="deck/it-office.html" rel="prev"><small>Back</small><b>The machine web's manual: OpenAPI</b></a>
+<span class="where"><a href="deck/contents.html">Contents</a> · <a href="index.html#divorce">with heart-ts</a></span>
+<a href="deck/information-and-controls.html" rel="next" data-rel="next"><small>Next</small><b>Information and Controls</b></a></nav>
+</main></div></body></html>

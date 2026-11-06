@@ -1,0 +1,61 @@
+# A branch: read by repos/get-branch, a repository's listed by repos/list-branches
+# (spec/ideas/github-branches-and-new-pulls.md). New branches, commits and pull requests come from
+# acts a branch offers, never from a bare create.
+noun: branch
+collection: branches
+read: repos/get-branch
+search: repos/list-branches
+# A branch names its repository only in its own address: the gateway reads the read's path variables from
+# it, and keeps them in the state as hr:address.
+address: /_links/self
+# GitHub lists branches without their own address: each names only its branch; the list's path, the rest.
+listed: { branch: /name }
+title: /name
+filters: [protected]
+acts:
+  branch-from-here:
+    operation: git/create-ref
+    title: Branch from here
+    description: Start a new branch at this branch's latest commit.
+    # The client names the branch; GitHub takes a full ref.
+    inputs:
+      name:
+        type: string
+        minLength: 1
+        title: Name
+        description: The new branch's name, such as fix-blank-names.
+    body: { ref: "refs/heads/{name}" }
+    bind: { sha: /commit/sha }
+    # GitHub answers with the git ref, not the branch: the new branch is at this address.
+    creates: branch
+    at: /repos/{owner}/{repo}/branches/{name}
+  commit-file:
+    operation: repos/create-or-update-file-contents
+    title: Commit a file
+    description: Add a file to this branch, as a new commit.
+    fields: [path, message, content]
+    # The client writes the file's text; GitHub takes it base64-encoded.
+    encode: { content: base64 }
+    bind: { branch: /name }
+    # GitHub's own word for path is "path parameter"; a person filling the form needs more.
+    describe:
+      path:
+        title: File path
+        description: Where the file goes, from the repository's root, such as docs/NOTES.md.
+  open-pull-request:
+    operation: pulls/create
+    title: Open a pull request
+    description: Propose this branch's changes to another branch, named as base.
+    fields: [title, body, base, draft]
+    bind: { head: /name }
+    # GitHub's words for base run to three sentences, and draft's hold a link to its help.
+    describe:
+      body:
+        description: What the pull request changes, and why.
+      base:
+        title: Base branch
+        description: The branch to merge into, such as main.
+      draft:
+        description: Open it as a draft, not yet ready to merge.
+    # GitHub answers with the new pull request; the gateway answers 201, with its address in Location.
+    creates: pull

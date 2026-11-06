@@ -1,0 +1,352 @@
+---
+run:
+  inputs:
+    triage:
+      value: '794'
+      given: given
+      question: The triage issue?
+    scan:
+      value: '793'
+      given: given
+      question: The scan issue?
+    owner:
+      value: JogoShugh
+      given: given
+      question: Whose repository?
+    repo:
+      value: heart-github-test
+      given: default
+      default: heart-github-test
+      question: Which repository?
+    stamp:
+      value: '012419'
+      given: default
+      default: '012419'
+    watch:
+      value: '792'
+      given: given
+      question: The watch's issue?
+    out:
+      value: runs/play-l1.yaml
+      given: given
+      question: Where to write what happened?
+---
+at: '2026-10-25T05:24:29.339859Z'
+ms: 889
+mode: script
+say: send {method} {url}
+line: 44
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+    from:
+      - parts:
+          '794':
+            input: triage
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+---
+at: '2026-10-25T05:24:39.323684Z'
+ms: 794
+mode: script
+say: send {method} {url}
+line: 38
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+    from:
+      - parts:
+          '793':
+            input: scan
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+---
+at: '2026-10-25T05:24:59.317918Z'
+ms: 1067
+mode: script
+say: send {method} {url}
+line: 44
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+    from:
+      - parts:
+          '794':
+            input: triage
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+---
+at: '2026-10-25T05:25:09.324074Z'
+ms: 888
+mode: script
+say: send {method} {url}
+line: 40
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+---
+at: '2026-10-25T05:25:29.323773Z'
+ms: 879
+mode: script
+say: send {method} {url}
+line: 44
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+    from:
+      - parts:
+          '794':
+            input: triage
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+---
+at: '2026-10-25T05:25:39.321854Z'
+ms: 945
+mode: script
+say: send {method} {url}
+line: 39
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+    from:
+      - parts:
+          '793':
+            input: scan
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+---
+at: '2026-10-25T05:25:59.323723Z'
+ms: 720
+mode: script
+say: send {method} {url}
+line: 44
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+    from:
+      - parts:
+          '794':
+            input: triage
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+---
+at: '2026-10-25T05:26:09.320549Z'
+ms: 923
+mode: script
+say: send {method} {url}
+line: 40
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues
+---
+at: '2026-10-25T05:26:29.323880Z'
+ms: 767
+mode: script
+say: send {method} {url}
+line: 44
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+    from:
+      - parts:
+          '794':
+            input: triage
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+---
+at: '2026-10-25T05:26:39.322941Z'
+ms: 896
+mode: script
+say: send {method} {url}
+line: 38
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+    from:
+      - parts:
+          '793':
+            input: scan
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/793/comments
+---
+at: '2026-10-25T05:26:59.319169Z'
+ms: 736
+mode: script
+say: send {method} {url}
+line: 44
+within: 30
+params:
+  method: POST
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+values:
+  method:
+    value: POST
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+    from:
+      - parts:
+          '794':
+            input: triage
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/794/comments
+---
+at: '2026-10-25T05:27:39.315973Z'
+ms: 1027
+mode: script
+say: send {method} {url}
+line: 52
+within: 30
+params:
+  method: PATCH
+  url: https://api.github.com/repos/JogoShugh/heart-github-test/issues/792
+values:
+  method:
+    value: PATCH
+    from:
+      - constant
+  url:
+    value: https://api.github.com/repos/JogoShugh/heart-github-test/issues/792
+    from:
+      - parts:
+          JogoShugh:
+            input: owner
+          heart-github-test:
+            input: repo
+          '792':
+            input: watch
+outcome: done
+address: https://api.github.com/repos/JogoShugh/heart-github-test/issues/792

@@ -1,0 +1,387 @@
+---
+run:
+  inputs: {}
+  source: |-
+    act(intent = "Search employees with the name Baggins")
+    act(intent = """open item "Frodo Baggins"""")
+    act(intent = """update the employee's role to "ring bearer, retired"""")
+  marks:
+    '1':
+      intent: Find the employees named Baggins
+    '2':
+      intent: Open Frodo Baggins
+    '3':
+      intent: Change his role to "ring bearer, retired"
+  moves:
+    - 'why: Search employees by name Baggins to find Frodo.'
+    - 'Search employees with the name Baggins: acted staff:search-employees, done, at http://localhost:8099/employees?name=Baggins'
+    - 'why: The search for Baggins returned both employees, Frodo and Bilbo, so the step''s work is done.'
+    - 'done: Find the employees named Baggins'
+    - 'why: Open Frodo Baggins from the search results list.'
+    - 'open item "Frodo Baggins": followed item, done, at http://localhost:8099/employees/1'
+    - 'why: Frodo Baggins''s resource (employees/1) is open, so the step "Open Frodo Baggins" is done.'
+    - 'done: Open Frodo Baggins'
+    - 'why: Frodo is held and staff:update is offered; update his role.'
+    - 'update the employee''s role to "ring bearer, retired": acted staff:update, done, at http://localhost:8099/employees/1'
+    - 'why: The update was made and state shows role "ring bearer, retired", so the step is done.'
+    - 'done: Change his role to "ring bearer, retired"'
+  model:
+    name: claude-sonnet-5-5
+    url: https://api.anthropic.com
+  usage:
+    calls: 6
+    input: 3576
+    output: 738
+    cache_read: 10716
+    cache_write: 0
+---
+at: '2026-11-02T10:44:19.460702Z'
+ms: 49
+mode: script
+say: enter {entry}
+params:
+  entry: http://localhost:8099/
+opens: true
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null
+---
+at: '2026-11-02T10:44:21.560108Z'
+ms: 2108
+mode: intent
+say: Search employees with the name Baggins
+line: 1
+params:
+  relation: staff:search-employees
+  name: Baggins
+values:
+  name:
+    value: Baggins
+    type: string
+    from:
+      - words
+reason:
+  template: Search employees with the name Baggins
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"title":"Employees","hr:manifest":{"forms":{"staff:dismiss":["sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04="],"staff:get-employee":["sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY="],"staff:hire":["sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM="],"staff:search-employees":["sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4="],"staff:update":["sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM="]},"digest":"sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc="}}
+      </state>
+      <offers>
+      {"staff:search-employees":{"title":"Find employees by name","description":"Lists the employees whose name has the text.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"name":{"type":"string","minLength":1,"title":"Name","description":"Part of the employee's first or last name; case is ignored"}},"required":["name"]}},"staff:get-employee":{"title":"Get an employee by number","description":"Goes to one employee, given their number.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"id":{"type":"integer","minimum":1,"title":"Employee number","description":"The employee's number"}},"required":["id"]}},"staff:hire":{"title":"Hire an employee","description":"Hires someone, in a role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object","$id":"/schemas/10847085ef79da90"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      Search employees with the name Baggins
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_011GPehURGRXmGWV9W8uHVek","name":"select","input":{"action":"act","affordance":"staff:search-employees","fields":{"name":"Baggins"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:search-employees
+  title: Find employees by name
+  method: GET
+  target: /employees{?name}
+  address: http://localhost:8099/employees?name=Baggins
+  picked: relation
+guard:
+  rung: L0
+  form: sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+offered:
+  forms:
+    - staff:get-employee
+    - staff:hire
+    - staff:search-employees
+  links:
+    - self
+    - service-desc
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T10:44:27.063801Z'
+ms: 5359
+mode: intent
+say: open item "Frodo Baggins"
+line: 2
+within: 1
+params:
+  relation: item
+  title: Frodo Baggins
+values:
+  title:
+    value: Frodo Baggins
+    from:
+      - words
+reason:
+  template: open item "Frodo Baggins"
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"count":2}
+      </state>
+      <offers>
+      {}
+      </offers>
+      <links>
+      [{"rel":"item","title":"Frodo Baggins"},{"rel":"item","title":"Bilbo Baggins"}]
+      </links>
+      <intent>
+      open item "Frodo Baggins"
+      </intent>
+    answered: '[{"type":"tool_use","id":"toolu_01Kx7qkPRWXmmLntCJQJmQVK","name":"select","input":{"action":"follow","rel":"item","title":"Frodo Baggins"},"caller":{"type":"direct"}}]'
+chose:
+  kind: link
+  relation: item
+  title: Frodo Baggins
+  method: GET
+  target: http://localhost:8099/employees/1
+  address: http://localhost:8099/employees/1
+  picked: title
+offered:
+  forms: []
+  links:
+    - item
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+keeps:
+  /firstName:
+    - 4
+  /lastName:
+    - 4
+---
+at: '2026-11-02T10:44:36.502197Z'
+ms: 3090
+mode: intent
+say: update the employee's role to "ring bearer, retired"
+line: 3
+within: 2
+params:
+  relation: staff:update
+  firstName: Frodo
+  lastName: Baggins
+  role: ring bearer, retired
+values:
+  firstName:
+    value: Frodo
+    type: string
+    from:
+      - step: 3
+        pointer: /firstName
+      - words
+  lastName:
+    value: Baggins
+    type: string
+    from:
+      - step: 3
+        pointer: /lastName
+      - words
+  role:
+    value: ring bearer, retired
+    type: string
+    from:
+      - words
+reason:
+  template: update the employee's role to "ring bearer, retired"
+  slots: {}
+opens: true
+judgement: false
+model:
+  - model: claude-sonnet-5-5
+    asked: |-
+      <state>
+      {"id":1,"firstName":"Frodo","lastName":"Baggins","role":"keeper of the Red Book","status":"working"}
+      </state>
+      <offers>
+      {"staff:dismiss":{"title":"Dismiss the employee","description":"Dismisses the employee, who stays on record.","schema":{"properties":{},"type":"object"}},"staff:update":{"title":"Update the employee","description":"Sets the employee's name and role.","schema":{"properties":{"firstName":{"minLength":1,"type":"string"},"lastName":{"minLength":1,"type":"string"},"role":{"minLength":1,"type":"string"}},"required":["firstName","lastName","role"],"type":"object"}}}
+      </offers>
+      <links>
+      []
+      </links>
+      <intent>
+      update the employee's role to "ring bearer, retired"
+      </intent>
+    answered: '[{"type":"thinking","thinking":"","signature":"CAQSjQcKEAgTGAI4AUIIdGhpbmtpbmcSDH1iCo18x6RcMVyKMxoMsy5uDzF4mIizIWJWIjCBYTt1TYghkMwpgLTTfw6p6URxzmqdTSz+K0CetpEg7hJDcGJ3+CD3ducs1Sr6omAqqgb8Y7BUn9IGEH27AGOBg5Orc/JLxXNyK1XeBmf4WO7Sxyp3eBj9AX5rzzV9alTynxcU7/Re1AEaZgzvCmjlzDh0zmpPzM4Q1ZaAS7aiqmtQg8XwirAwrnB1xVMDSLt4LQqkdw1o8wlbinZKD/ml9fL1YfaxuqXeTMHAInXBqbLmCU4Ir+rFnXmAhd6nVwJ5OTxRAllyQskqSI1si+Bi87MpcjdS0YHbIX81X5dsvT0IqRN+FTrXVG+i8FzHYg6t3+C5fetaUiLJf+Djk37HdOPUW8NnRH5dycRwISySXlpB0ak/SQqi3N3pfszEbF1YTzZluE+3Stke6NrSwDJTrPIwCXXtqUcG9w1pecSVjY6k20Es2H4yHXiJjM9z1aSVZqWqqv9q+62Vf3FzRx2htPNqojKsazC9u/tiVxlSomg3ekKev12/PafLVi+LtUthEcnVZApMMhVUcJQvJmyD1dLHnfUUtbHv4MJBs6cfYdV4iVbhkPAPG+4mjM4M1LfxUt/rN2PNfIMSiUJ2QiuirNY9rh6T/RS20h+NoF+F9V3Q8Pjbpv2Z+4MkcQT+I9R0DxuVInHtwIRqSBFTIfuhCLJMctK/y8n0nHnOcEKgczco0Pguy22b9uqMxqxOC6FmqKENbEjw/klPZBufcgZRFyaxBSLuFHyetFr5gqd5nOTXSWcrMaro11gEE8mgiJ91t7drbU8QJ4WnTTBt/k0EAfHHiS7Q4IvgakkWn7/AC1OMy7ZHE72A1lH0PfWEHRLIAEqSZaiLIoCyd20/iJpT5A7ZRSZyJVT7h9Sxn5jYJOz2aKw2+VIv42CwcqjaBWHaGwDkv9jE7q/XArqio5cTJ+mGOC6tJyieYK5kZP+oBwJdZfQCGnxvzIAxjNR14dqWbU0uXNr6CcUFOWEtq1mRFPCMCZ0kdk1jUV4Y/QUhqtgPs0ZGqWGDhvfB7+6R5PQMvXPtqv4Nv8jWaeM9IkTiWahGJOpJFvlQTAl0R1a9/Cvgd0Ce72p9PGyeoZEzbUmp9bN4hczVL+9FonzKIPLB0ygLizth1vWUpKooOYnpXaWOG0N2+mF6+KdN6w8YAQ=="},{"type":"tool_use","id":"toolu_017NGqn86vHWnJGveqNh1iG9","name":"select","input":{"action":"act","affordance":"staff:update","fields":{"firstName":"Frodo","lastName":"Baggins","role":"ring bearer, retired"}},"caller":{"type":"direct"}}]'
+chose:
+  kind: form
+  relation: staff:update
+  title: Update the employee
+  method: PUT
+  target: /employees/{id}/actions/update
+  address: http://localhost:8099/employees/1/actions/update
+  picked: relation
+guard:
+  rung: L2
+  set:
+    href: http://localhost:8099/affordance-sets/2f822c4fedc9305e
+    integrity: sha256-L4IsT+3JMF7FkiZiOo5FNb4K09jXdn540JG40N0KBl0=
+  form: sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+  schema:
+    href: http://localhost:8099/schemas/10847085ef79da90
+    integrity: sha256-EIRwhe952pCvx2vksT8Issz2idIy/CqfSgMzYcQqrxE=
+  if-match: '"seq-1.hsf.L2.a903f9549f3b7164"'
+offered:
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    - hr:forms
+    - self
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer, retired
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T10:44:41.265203Z'
+ms: 5
+mode: script
+say: return to {address}
+line: 3
+within: 2
+params:
+  address: http://localhost:8099/employees/1
+outcome: done
+address: http://localhost:8099/employees/1
+now:
+  state:
+    id: 1
+    firstName: Frodo
+    lastName: Baggins
+    role: ring bearer, retired
+    status: working
+  forms:
+    - staff:dismiss
+    - staff:update
+  links:
+    self:
+      - null
+    hr:forms:
+      - null
+---
+at: '2026-11-02T10:44:41.271469Z'
+ms: 4
+mode: script
+say: return to {address}
+line: 3
+within: 2
+params:
+  address: http://localhost:8099/employees?name=Baggins
+outcome: done
+address: http://localhost:8099/employees?name=Baggins
+now:
+  state:
+    count: 2
+  forms: []
+  links:
+    self:
+      - null
+    item:
+      - Frodo Baggins
+      - Bilbo Baggins
+---
+at: '2026-11-02T10:44:41.276175Z'
+ms: 2
+mode: script
+say: return to {address}
+line: 3
+within: 2
+params:
+  address: http://localhost:8099/
+outcome: done
+address: http://localhost:8099/
+now:
+  state:
+    title: Employees
+    hr:manifest:
+      forms:
+        staff:dismiss:
+          - sha256-RCPaBDx/wfQR3NoHV9kNVrnI60BAs7roIvgkVObtQ04=
+        staff:get-employee:
+          - sha256-SzmOXKHtcFkJ9bDvh2HTB7yqmM5Bd1iWbBfC8vBQTOY=
+        staff:hire:
+          - sha256-mxzDdaZ5uWQZym5N0CeCQJmwV5+6/n1nuFh1b9SiqSM=
+        staff:search-employees:
+          - sha256-t+rCt7YESKWKhKwR2Vpo42+D+Im3WJU7iiC2QIqaPd4=
+        staff:update:
+          - sha256-nDPgojalfd6JLwxvs8HzrKNxAd2695KS3XIU19cpreM=
+      digest: sha256-Ex2wMcTtBBbUXam2gBecq4hHrvBPJXiUEc/mqP+z/Yc=
+  forms:
+    - staff:search-employees
+    - staff:get-employee
+    - staff:hire
+  links:
+    self:
+      - null
+    service-desc:
+      - null

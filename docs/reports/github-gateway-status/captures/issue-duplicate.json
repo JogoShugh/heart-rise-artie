@@ -1,0 +1,693 @@
+{
+ "name": "duplicate",
+ "path": "/repos/JogoShugh/heart-github-test/issues/14",
+ "github": {
+  "request": {
+   "method": "GET",
+   "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14",
+   "headers": {
+    "Authorization": "Bearer <token>",
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "private, max-age=60, s-maxage=60",
+    "Vary": "Accept, Authorization, Cookie, X-GitHub-OTP,Accept-Encoding, Accept, X-Requested-With",
+    "ETag": "\"1dc9b56a403896fb7bb07b5511eebe7607db3b5ab169bc6bf34c36555cc4618c\"",
+    "x-github-api-version-selected": "2022-11-28"
+   },
+   "body": {
+    "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14",
+    "repository_url": "https://api.github.com/repos/JogoShugh/heart-github-test",
+    "labels_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/labels{/name}",
+    "comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/comments",
+    "events_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/events",
+    "html_url": "https://github.com/JogoShugh/heart-github-test/issues/14",
+    "id": 5899166203,
+    "node_id": "I_kwDOVM7WJc8AAAABX54h-w",
+    "number": 14,
+    "title": "Weed the paths, all of them",
+    "user": {
+     "login": "JogoShugh",
+     "id": 1863005,
+     "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+     "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+     "gravatar_id": "",
+     "url": "https://api.github.com/users/JogoShugh",
+     "html_url": "https://github.com/JogoShugh",
+     "followers_url": "https://api.github.com/users/JogoShugh/followers",
+     "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+     "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+     "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+     "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+     "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+     "repos_url": "https://api.github.com/users/JogoShugh/repos",
+     "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+     "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+     "type": "User",
+     "user_view_type": "public",
+     "site_admin": false
+    },
+    "labels": [],
+    "state": "closed",
+    "locked": false,
+    "assignees": [],
+    "milestone": null,
+    "comments": 1,
+    "created_at": "2026-10-17T14:07:27Z",
+    "updated_at": "2026-10-17T14:09:10Z",
+    "closed_at": "2026-10-17T14:09:10Z",
+    "assignee": null,
+    "author_association": "OWNER",
+    "active_lock_reason": null,
+    "sub_issues_summary": {
+     "total": 0,
+     "completed": 0,
+     "percent_completed": 0
+    },
+    "issue_dependencies_summary": {
+     "blocked_by": 0,
+     "total_blocked_by": 0,
+     "blocking": 0,
+     "total_blocking": 0
+    },
+    "body": "Changed straight on GitHub.",
+    "closed_by": {
+     "login": "JogoShugh",
+     "id": 1863005,
+     "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+     "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+     "gravatar_id": "",
+     "url": "https://api.github.com/users/JogoShugh",
+     "html_url": "https://github.com/JogoShugh",
+     "followers_url": "https://api.github.com/users/JogoShugh/followers",
+     "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+     "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+     "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+     "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+     "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+     "repos_url": "https://api.github.com/users/JogoShugh/repos",
+     "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+     "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+     "type": "User",
+     "user_view_type": "public",
+     "site_admin": false
+    },
+    "reactions": {
+     "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/reactions",
+     "total_count": 0,
+     "+1": 0,
+     "-1": 0,
+     "laugh": 0,
+     "hooray": 0,
+     "confused": 0,
+     "heart": 0,
+     "rocket": 0,
+     "eyes": 0
+    },
+    "timeline_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/timeline",
+    "performed_via_github_app": null,
+    "state_reason": "duplicate",
+    "pinned_comment": null
+   }
+  }
+ },
+ "heart": {
+  "request": {
+   "method": "GET",
+   "url": "http://localhost:8392/repos/JogoShugh/heart-github-test/issues/14",
+   "headers": {
+    "Authorization": "Bearer <token>",
+    "Accept": "application/hal+json"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "Content-Type": "application/hal+json",
+    "ETag": "\"seq-0.hsf.L0.570ef530acbab63b\"",
+    "Cache-Control": "no-cache",
+    "Link": "<https://w3id.org/heart-rise/hal-schema-forms>; rel=\"profile\", <https://w3id.org/heart-rise>; rel=\"profile\"",
+    "Vary": "Accept, Prefer, Accept-Profile"
+   },
+   "body": {
+    "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14",
+    "repository_url": "https://api.github.com/repos/JogoShugh/heart-github-test",
+    "labels_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/labels{/name}",
+    "comments_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/comments",
+    "events_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/events",
+    "html_url": "https://github.com/JogoShugh/heart-github-test/issues/14",
+    "id": 5899166203,
+    "node_id": "I_kwDOVM7WJc8AAAABX54h-w",
+    "number": 14,
+    "title": "Weed the paths, all of them",
+    "user": {
+     "login": "JogoShugh",
+     "id": 1863005,
+     "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+     "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+     "gravatar_id": "",
+     "url": "https://api.github.com/users/JogoShugh",
+     "html_url": "https://github.com/JogoShugh",
+     "followers_url": "https://api.github.com/users/JogoShugh/followers",
+     "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+     "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+     "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+     "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+     "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+     "repos_url": "https://api.github.com/users/JogoShugh/repos",
+     "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+     "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+     "type": "User",
+     "user_view_type": "public",
+     "site_admin": false
+    },
+    "labels": [],
+    "state": "closed",
+    "locked": false,
+    "assignees": [],
+    "milestone": null,
+    "comments": 1,
+    "created_at": "2026-10-17T14:07:27Z",
+    "updated_at": "2026-10-17T14:09:10Z",
+    "closed_at": "2026-10-17T14:09:10Z",
+    "assignee": null,
+    "author_association": "OWNER",
+    "active_lock_reason": null,
+    "sub_issues_summary": {
+     "total": 0,
+     "completed": 0,
+     "percent_completed": 0
+    },
+    "issue_dependencies_summary": {
+     "blocked_by": 0,
+     "total_blocked_by": 0,
+     "blocking": 0,
+     "total_blocking": 0
+    },
+    "body": "Changed straight on GitHub.",
+    "closed_by": {
+     "login": "JogoShugh",
+     "id": 1863005,
+     "node_id": "MDQ6VXNlcjE4NjMwMDU=",
+     "avatar_url": "https://avatars.githubusercontent.com/u/1863005?v=4",
+     "gravatar_id": "",
+     "url": "https://api.github.com/users/JogoShugh",
+     "html_url": "https://github.com/JogoShugh",
+     "followers_url": "https://api.github.com/users/JogoShugh/followers",
+     "following_url": "https://api.github.com/users/JogoShugh/following{/other_user}",
+     "gists_url": "https://api.github.com/users/JogoShugh/gists{/gist_id}",
+     "starred_url": "https://api.github.com/users/JogoShugh/starred{/owner}{/repo}",
+     "subscriptions_url": "https://api.github.com/users/JogoShugh/subscriptions",
+     "organizations_url": "https://api.github.com/users/JogoShugh/orgs",
+     "repos_url": "https://api.github.com/users/JogoShugh/repos",
+     "events_url": "https://api.github.com/users/JogoShugh/events{/privacy}",
+     "received_events_url": "https://api.github.com/users/JogoShugh/received_events",
+     "type": "User",
+     "user_view_type": "public",
+     "site_admin": false
+    },
+    "reactions": {
+     "url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/reactions",
+     "total_count": 0,
+     "+1": 0,
+     "-1": 0,
+     "laugh": 0,
+     "hooray": 0,
+     "confused": 0,
+     "heart": 0,
+     "rocket": 0,
+     "eyes": 0
+    },
+    "timeline_url": "https://api.github.com/repos/JogoShugh/heart-github-test/issues/14/timeline",
+    "performed_via_github_app": null,
+    "state_reason": "duplicate",
+    "pinned_comment": null,
+    "hr:address": {
+     "owner": "JogoShugh",
+     "repo": "heart-github-test",
+     "issue_number": "14"
+    },
+    "_links": {
+     "self": {
+      "href": "/repos/JogoShugh/heart-github-test/issues/14"
+     },
+     "curies": [
+      {
+       "name": "github",
+       "href": "/profiles/github#{rel}",
+       "templated": true
+      },
+      {
+       "name": "hr",
+       "href": "https://w3id.org/heart-rise/rels/{rel}",
+       "templated": true
+      }
+     ],
+     "hr:unavailable": {
+      "href": "/unavailable/33188e7ae1d1fa78",
+      "type": "application/json",
+      "integrity": "sha256-MxiOeuHR+njxfMweSf3drXVjDyWLjkpnBua7yTvJOHc="
+     },
+     "github:issues-list-sub-issues": {
+      "href": "/repos/JogoShugh/heart-github-test/issues/14/sub_issues"
+     },
+     "github:issues-list-comments": {
+      "href": "/repos/JogoShugh/heart-github-test/issues/14/comments"
+     }
+    },
+    "_forms": {
+     "github:reopen": {
+      "title": "Reopen",
+      "description": "Open it again.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/reopen"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {},
+       "required": [],
+       "title": "Reopen",
+       "type": "object",
+       "$id": "/schemas/ea900f9397f7ba77"
+      }
+     },
+     "github:edit": {
+      "title": "Edit",
+      "description": "Change its title or description.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/edit"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "body": {
+         "description": "The contents of the issue.",
+         "nullable": true,
+         "type": "string"
+        },
+        "title": {
+         "description": "The title of the issue.",
+         "nullable": true,
+         "oneOf": [
+          {
+           "type": "string"
+          },
+          {
+           "type": "integer"
+          }
+         ]
+        }
+       },
+       "required": [],
+       "title": "Edit",
+       "type": "object",
+       "$id": "/schemas/d61e20a252e0f581"
+      }
+     },
+     "github:lock": {
+      "title": "Lock the conversation",
+      "description": "Limit the conversation to collaborators, for a reason.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/lock"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "lock_reason": {
+         "description": "The reason for locking the issue or pull request conversation. Lock will fail if you don't use one of these reasons:  \n * `off-topic`  \n * `too heated`  \n * `resolved`  \n * `spam`",
+         "enum": [
+          "off-topic",
+          "too heated",
+          "resolved",
+          "spam"
+         ],
+         "type": "string"
+        }
+       },
+       "required": [],
+       "title": "Lock the conversation",
+       "type": "object",
+       "$id": "/schemas/47182d56d09bd086"
+      }
+     },
+     "github:label": {
+      "title": "Label",
+      "description": "Add labels to the issue.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/label"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "labels": {
+         "description": "The labels to add to the issue's existing labels. You can also pass an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. To replace all of the labels for an issue, use \"[Set labels for an issue](https://docs.github.com/rest/issues/labels#set-labels-for-an-issue).\"",
+         "items": {
+          "oneOf": [
+           {
+            "type": "string"
+           },
+           {
+            "properties": {
+             "confidence": {
+              "description": "The confidence level for this label choice.",
+              "enum": [
+               "low",
+               "medium",
+               "high"
+              ],
+              "type": "string"
+             },
+             "name": {
+              "description": "The name of the label to add.",
+              "type": "string"
+             },
+             "rationale": {
+              "description": "Optional reasoning for adding this label.",
+              "type": "string"
+             },
+             "suggest": {
+              "description": "If `true`, the label is stored as a pending suggestion for human review rather than applied directly.",
+              "type": "boolean"
+             }
+            },
+            "required": [
+             "name"
+            ],
+            "type": "object"
+           }
+          ]
+         },
+         "minItems": 1,
+         "type": "array"
+        }
+       },
+       "required": [],
+       "title": "Label",
+       "type": "object",
+       "$id": "/schemas/518ccfba3b53293d"
+      }
+     },
+     "github:unlabel": {
+      "title": "Remove a label",
+      "description": "Take one label off the issue, by its name.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/unlabel"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "name": {
+         "description": "",
+         "type": "string"
+        }
+       },
+       "required": [
+        "name"
+       ],
+       "title": "Remove a label",
+       "type": "object",
+       "$id": "/schemas/3777b6bc8dbfa84d"
+      }
+     },
+     "github:assign": {
+      "title": "Assign",
+      "description": "Assign people to the issue.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/assign"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "assignees": {
+         "description": "Usernames of people to assign this issue to. _NOTE: Only users with push access can add assignees to an issue. Assignees are silently ignored otherwise._",
+         "items": {
+          "oneOf": [
+           {
+            "type": "string"
+           },
+           {
+            "properties": {
+             "confidence": {
+              "description": "The confidence level for this assignee choice.",
+              "enum": [
+               "low",
+               "medium",
+               "high"
+              ],
+              "type": "string"
+             },
+             "login": {
+              "description": "The login of the user to assign.",
+              "type": "string"
+             },
+             "rationale": {
+              "description": "Optional reasoning for adding this assignee.",
+              "type": "string"
+             },
+             "suggest": {
+              "description": "If `true`, the assignee is stored as a pending suggestion for human review rather than applied directly.",
+              "type": "boolean"
+             }
+            },
+            "required": [
+             "login"
+            ],
+            "type": "object"
+           }
+          ]
+         },
+         "type": "array"
+        }
+       },
+       "required": [],
+       "title": "Assign",
+       "type": "object",
+       "$id": "/schemas/526745cba616cfce"
+      }
+     },
+     "github:unassign": {
+      "title": "Unassign",
+      "description": "Take people off the issue.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/unassign"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "assignees": {
+         "description": "Usernames of assignees to remove from an issue. _NOTE: Only users with push access can remove assignees from an issue. Assignees are silently ignored otherwise._",
+         "items": {
+          "type": "string"
+         },
+         "type": "array"
+        }
+       },
+       "required": [],
+       "title": "Unassign",
+       "type": "object",
+       "$id": "/schemas/429721b29668b57d"
+      }
+     },
+     "github:set-milestone": {
+      "title": "Set the milestone",
+      "description": "Put the issue in a milestone, by its number, or take it out with null.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/set-milestone"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "milestone": {
+         "nullable": true,
+         "oneOf": [
+          {
+           "type": "string"
+          },
+          {
+           "description": "The `number` of the milestone to associate this issue with or use `null` to remove the current milestone. Only users with push access can set the milestone for issues. Without push access to the repository, milestone changes are silently dropped.",
+           "type": "integer"
+          }
+         ]
+        }
+       },
+       "required": [],
+       "title": "Set the milestone",
+       "type": "object",
+       "$id": "/schemas/0aab70769078db23"
+      }
+     },
+     "github:comment": {
+      "title": "Comment",
+      "description": "Add a comment to the issue's conversation.",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/comment"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "body": {
+         "description": "The contents of the comment.",
+         "type": "string"
+        }
+       },
+       "required": [
+        "body"
+       ],
+       "title": "Comment",
+       "type": "object",
+       "$id": "/schemas/ed35e5c584ac8de1"
+      }
+     },
+     "github:add-sub-issue": {
+      "title": "Add a sub-issue",
+      "description": "Make another issue a sub-issue of this one, named by its id (not its number).",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/add-sub-issue"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "replace_parent": {
+         "description": "Option that, when true, instructs the operation to replace the sub-issues current parent issue",
+         "type": "boolean"
+        },
+        "sub_issue_id": {
+         "description": "The id of the sub-issue to add. The sub-issue must belong to the same repository owner as the parent issue",
+         "type": "integer"
+        }
+       },
+       "required": [
+        "sub_issue_id"
+       ],
+       "title": "Add a sub-issue",
+       "type": "object",
+       "$id": "/schemas/b1651a34a9b03777"
+      }
+     },
+     "github:remove-sub-issue": {
+      "title": "Remove a sub-issue",
+      "description": "Take a sub-issue off this issue, named by its id (not its number).",
+      "_links": {
+       "target": {
+        "href": "/repos/JogoShugh/heart-github-test/issues/14/actions/remove-sub-issue"
+       }
+      },
+      "method": "POST",
+      "contentType": "application/json",
+      "schema": {
+       "$schema": "https://json-schema.org/draft/2020-12/schema",
+       "additionalProperties": false,
+       "properties": {
+        "sub_issue_id": {
+         "description": "The id of the sub-issue to remove",
+         "type": "integer"
+        }
+       },
+       "required": [
+        "sub_issue_id"
+       ],
+       "title": "Remove a sub-issue",
+       "type": "object",
+       "$id": "/schemas/8badeeff25d5b120"
+      }
+     }
+    }
+   }
+  }
+ },
+ "explanation": {
+  "request": {
+   "method": "GET",
+   "url": "http://localhost:8392/unavailable/33188e7ae1d1fa78",
+   "headers": {
+    "Accept": "application/json"
+   }
+  },
+  "response": {
+   "status": 200,
+   "headers": {
+    "Content-Type": "application/json",
+    "Cache-Control": "public, max-age=31536000, immutable"
+   },
+   "body": {
+    "unavailable": [
+     {
+      "reason": "The issue is already closed.",
+      "rel": "/profiles/github#close",
+      "title": "Close"
+     },
+     {
+      "reason": "The issue is already closed.",
+      "rel": "/profiles/github#close-not-planned",
+      "title": "Close as not planned"
+     },
+     {
+      "reason": "The issue is already closed.",
+      "rel": "/profiles/github#close-duplicate",
+      "title": "Close as a duplicate"
+     },
+     {
+      "reason": "The conversation isn't locked.",
+      "rel": "/profiles/github#unlock",
+      "title": "Unlock the conversation"
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,57 @@
+{
+  "stack": "gradle-kotlin + node-typescript",
+  "prodPatterns": [
+    "server-spring/src/main/kotlin/*.kt",
+    "client/*/src/main/kotlin/*.kt",
+    "heart/*/src/main/kotlin/*.kt",
+    "domains/*/src/main/kotlin/*.kt",
+    "implementations/heart-ts/src/*.ts"
+  ],
+  "prodExcludePatterns": [
+    "*.d.ts"
+  ],
+  "featurePatterns": [
+    "server-spring/src/test/resources/features/*.feature",
+    "client/*/src/test/resources/features/*.feature",
+    "heart/*/src/test/resources/features/*.feature",
+    "heart/heart-tck/src/main/resources/heart/tck/*.feature",
+    "domains/*/src/test/resources/features/*.feature",
+    "implementations/conformance/features/*.feature"
+  ],
+  "lintPatterns": [
+    "server-spring/*.kt",
+    "server-spring/*.kts",
+    "client/*.kt",
+    "client/*.kts",
+    "heart/*.kt",
+    "heart/*.kts",
+    "domains/*.kt",
+    "domains/*.kts",
+    "implementations/heart-ts/*.ts",
+    "implementations/heart-ts/eslint.config.mjs",
+    "implementations/heart-ts/tsconfig*.json"
+  ],
+  "lintCommand": "(cd implementations/heart-ts && npx eslint . && npx tsc --noEmit) && export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew detekt --console=plain -q) && (cd server-spring && ./gradlew detekt --console=plain -q) && (cd client && ./gradlew detekt --console=plain -q) && (cd domains/basketball && ./gradlew detekt --console=plain -q) && (cd domains/tickets && ./gradlew detekt --console=plain -q)",
+  "checkCommand": ".claude/bdd-gates/bdd-run.sh && (cd implementations/heart-ts && npx eslint . && npx tsc --noEmit && npx depcruise src && npx knip && npx c8 check-coverage) && export JAVA_HOME=$HOME/.sdkman/candidates/java/21.0.12-graal; (cd heart && ./gradlew check --console=plain) && (cd server-spring && ./gradlew check --console=plain) && (cd client && ./gradlew check --console=plain) && (cd domains/basketball && ./gradlew check --console=plain) && (cd domains/tickets && ./gradlew check --console=plain)",
+  "bddCommand": "(cd implementations/heart-ts && npx tsc && npx c8 -- bash -c 'cd ../conformance && npx cucumber-js')",
+  "bddLogging": "gradle native, node wrapper",
+  "bddRawCommandRegex": "(^|[;&|(][[:space:]]*)([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+)*((npx[[:space:]]+)?([^[:space:];&|]*/)?cucumber-js|(npx[[:space:]]+)?c8[[:space:]]+(-[^[:space:]]*[[:space:]]+)*(bash|sh|npx|cucumber-js)|npm[[:space:]]+(run[[:space:]]+)?(test|t))([[:space:];&|)]|$)",
+  "testPatterns": [
+    "src/test/*",
+    "*/src/test/*",
+    "src/testFixtures/*",
+    "*/src/testFixtures/*",
+    "implementations/conformance/features/support/*",
+    "implementations/conformance/fixtures/*"
+  ],
+  "protectedFiles": [
+    "eslint.config.mjs",
+    ".dependency-cruiser.cjs",
+    ".c8rc.json",
+    "knip.json",
+    "stryker.config.json",
+    "tsconfig.strict.json",
+    "detekt.yml",
+    "detekt-baseline.xml"
+  ]
+}
