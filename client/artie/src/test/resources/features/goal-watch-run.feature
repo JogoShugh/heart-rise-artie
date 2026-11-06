@@ -502,24 +502,43 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
         reasoned: true
       """
 
-  Scenario: A planner that stops while a watch decides ends the run, saying why, rather than looking again
-    A failed look is tried again at the next; a decision the planner won't
-    make would only be asked again, and again.
+  Scenario Outline: A planner that stops where a check is decided is told what the check is, once; a second stop ends the run: <case>
+    A planner that misreads a step may stop where a check is decided, its
+    own words saying the member matches: the kit's triage walk did, at the
+    first issue of the list it had just reached. The first stop is refused,
+    and the planner told what the check is for. A second stop ends the run,
+    saying why, rather than looking again: a failed look is tried again at
+    the next, and a decision the planner won't make would only be asked
+    again, and again.
     Given the planner will move
-      | move  | words                                        | opens | relation | facts |
-      | act   | open issue 10 of acme/rockets                | yes   |          |       |
-      | done  |                                              |       |          |       |
-      | act   | list the open pull requests of acme/rockets  | yes   |          |       |
-      | stop  | I can't tell which pull requests match       |       |          |       |
+      | move   | words                                       | opens | relation     | facts         |
+      | act    | open issue 10 of acme/rockets               | yes   |              |               |
+      | done   |                                             |       |              |               |
+      | act    | list the open pull requests of acme/rockets | yes   |              |               |
+      | stop   | I can't tell which pull requests match      |       |              |               |
+      | <then> | <then words>                                |       |              | <then facts>  |
+      | wait   |                                             |       | github:merge |               |
+      | act    | merge it by squashing                       |       |              |               |
+      | done   |                                             |       |              |               |
+      | check  |                                             |       |              | {"state": "closed"} |
+      | act    | close it                                    |       |              |               |
+      | done   |                                             |       |              |               |
     And ARTIE's reasoner will choose, in order
       | form              | fields                                                   |
       | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
       | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+      | github:merge      | {"merge_method": "squash"}                               |
+      | github:close      | {}                                                       |
     When the goal "merge.goal.md" runs with ARTIE, captured in "merge.trace.yaml", given
       | name  | value      |
       | label | dependabot |
-    Then the goal run stopped, saying "I can't tell which pull requests match"
-    And the planner was asked 4 times
+    Then the <outcome>
+    And the planner was told "stop: refused once, this step decides a check: name the facts that hold on a member it is true of, even where they fail on this one; stop again to end the run"
+
+    Examples:
+      | case                                | then  | then words                             | then facts                        | outcome                                                           |
+      | it makes the check when asked again | check |                                        | {"github:labels": ["dependabot"]} | run finished                                                      |
+      | it stops again                      | stop  | I can't tell which pull requests match |                                   | goal run stopped, saying "I can't tell which pull requests match" |
 
   Scenario Outline: A planner that stops at a Once is told the step waits, once; a second stop ends the run: <case>
     At a Once the planner names the act the step waits for, which need not
