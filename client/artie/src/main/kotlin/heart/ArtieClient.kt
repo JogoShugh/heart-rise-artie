@@ -237,8 +237,10 @@ class ArtieClient(
      */
     private fun sync(url: String, received: Received? = null, named: Boolean = false): HeartRepresentation {
         val layer1Received = received ?: bindings.forUri(url).read(url, asking).received(url)
-        // A client reads whichever dialect comes back, by its media type; else the one it asked for.
-        val dialect = Dialect.entries.firstOrNull { it.mediaType == layer1Received.mediaType } ?: asking.dialect
+        // A client reads whichever HEART dialect comes back, by its media type; else the one it asked for. Plain JSON
+        // says no dialect: a static host serves every .json file as it, so the profile the body names decides.
+        val dialect = Dialect.entries.firstOrNull { it.heart && it.mediaType == layer1Received.mediaType }
+            ?: asking.dialect
         val layer1 = HeartResponseParser.parse(layer1Received, url, dialect, named = url.takeIf { named })
         // SPEC §6.11.1: the rung is the one the representation says it is at, read
         // before any link is followed. At L0 there is no set, whatever the body links.

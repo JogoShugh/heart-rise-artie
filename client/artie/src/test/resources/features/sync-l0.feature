@@ -92,3 +92,27 @@ Feature: Sync at L0: enter a service and read one collapsed response
       | another profile      | Link: <https://w3id.org/heart-rise/hal-forms>; rel="profile" |
       | no profile link      | Link: </beds/9>; rel="self"                                             |
       | withdrawn media-type | X-Note: profile only in Content-Type parameter                          |
+
+  Scenario: A file a static host serves as plain JSON, naming the profile in its own links, is read with its links
+    A static file host, such as GitHub Pages, sends no Link header and serves
+    a .json file as application/json. A resource it serves that names the
+    hal-schema-forms profile in its own _links.profile is HEART all the same
+    (SPEC §6.1): its links are read, as they would be from a HEART service.
+    Given the service answers GET "http://files.test/workspace.json" with:
+      """
+      200 OK
+      Content-Type: application/json
+
+      title: Workspace
+      _links:
+        self: {href: /workspace.json}
+        profile: {href: "https://w3id.org/heart-rise/hal-schema-forms"}
+        item:
+          - {href: "http://garden.test/beds/2", title: Bed 2}
+          - {href: "http://garden.test/beds/3", title: Bed 3}
+      """
+    When the client enters "http://files.test/workspace.json"
+    Then the resource state contains:
+      | key   | value     |
+      | title | Workspace |
+    And the resource links to "item" titled "Bed 2, Bed 3"
