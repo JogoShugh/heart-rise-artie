@@ -107,6 +107,9 @@ first, since a new fork has them off. With both unset, the bootstrap takes your 
 
 ## When something stops
 
+- A walk stopped partway: Claude finds the way afresh each walk, and now and then stops. Close the watch issue it
+  opened, if any ("Triage watch", "Close-out watch"), and walk the goal again. A replay of a kept script runs the
+  same way every time.
 - `missing input: …`: give it as `name=value` after the goal's name.
 - `stopped … by its guard`: the replay found a form that differs from the pins, and sent nothing. Walk the goal
   again and keep it, or replay with `--guard lenient`.
