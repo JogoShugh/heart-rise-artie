@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ARTIE Kit Trial</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+:root { --bg: #f5f4ee; --fg: #1d2722; --muted: #5a6a61; --accent: #2f7d5b; --gold: #a7781c; --card: #fffdf8;
+  --rule: #dedbd0; --sheet: #fffefa; --chip: #e5f1ea; --chip-fg: #1f5c41; --warn: #fbf1d6; --warn-fg: #7a5711;
+  --walk: #2f7d5b; --replay: #c99a2e; --code: #f0efe7; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #131915; --fg: #e5ebe7; --muted: #9db0a5;
+  --accent: #6cc59a; --gold: #e3b341; --card: #1b231f; --rule: #2c3832; --sheet: #f7f5ee; --chip: #1f3a2d; --chip-fg: #a8e3c6;
+  --warn: #3a3018; --warn-fg: #f0d58c; --walk: #6cc59a; --replay: #e3b341; --code: #222c27; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg: #131915; --fg: #e5ebe7; --muted: #9db0a5; --accent: #6cc59a; --gold: #e3b341; --card: #1b231f;
+  --rule: #2c3832; --sheet: #f7f5ee; --chip: #1f3a2d; --chip-fg: #a8e3c6; --warn: #3a3018; --warn-fg: #f0d58c; --walk: #6cc59a;
+  --replay: #e3b341; --code: #222c27; color-scheme: dark; }
+body { background: var(--bg); color: var(--fg); margin: 0; font: 16px/1.55 "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 40px 72px; display: grid; gap: 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.kicker { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1, h2, h3 { font-family: "Source Serif 4", Georgia, serif; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.1; margin-top: 8px; }
+h2 { font-size: clamp(24px, 3vw, 30px); border-top: 2px solid var(--fg); padding-top: 12px; margin-bottom: 14px; }
+h3 { font-size: 20px; }
+.lede { font-size: 18px; max-width: 66ch; margin: 14px 0 0; }
+code { font-family: "IBM Plex Mono", Menlo, monospace; font-size: .9em; }
+a { color: var(--accent); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.tile { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px; }
+.tile .n { font-family: "Source Serif 4", Georgia, serif; font-size: 36px; line-height: 1; color: var(--accent); }
+.tile .what { font-weight: 600; margin-top: 6px; }
+.tile .sub { color: var(--muted); font-size: 13px; }
+.cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (max-width: 820px) { .cols { grid-template-columns: 1fr; } }
+.steps ol { margin: 0; padding-left: 20px; display: grid; gap: 10px; }
+.note, .small, .sub2 { color: var(--muted); font-size: 14px; }
+.sub2 { margin: -6px 0 12px; }
+.sheet { background: var(--sheet); border-radius: 10px; padding: 12px; overflow-x: auto; min-width: 0; }
+.sheet pre.mermaid { margin: 0; text-align: center; color: #1d2722; font: 15px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif; white-space: normal; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--card); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+td.r, th.r { text-align: right; white-space: nowrap; }
+td.num { color: var(--muted); font-family: "IBM Plex Mono", Menlo, monospace; }
+tr.refused td { background: var(--warn); }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--warn-fg); }
+.chart { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 16px; max-width: 640px; }
+.chart svg { width: 100%; height: auto; display: block; }
+.b-label { font: 600 14px "IBM Plex Mono", Menlo, monospace; fill: var(--fg); }
+.b-num { font: 12px "IBM Plex Sans", Arial, sans-serif; fill: var(--muted); }
+.b-walk { fill: var(--walk); } .b-replay { fill: var(--replay); }
+.legend { font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; } .sw.walk { background: var(--walk); } .sw.replay { background: var(--replay); margin-left: 10px; }
+.goal, .fix { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 16px 18px; margin-bottom: 14px; display: grid; gap: 8px; min-width: 0; }
+.goal p, .fix p { margin: 0; max-width: 72ch; }
+.goal ul { margin: 0; padding-left: 20px; }
+details summary { cursor: pointer; color: var(--accent); font-weight: 500; }
+pre.code { background: var(--code); border-radius: 8px; padding: 12px; overflow-x: auto; font: 12.5px/1.45 "IBM Plex Mono", Menlo, monospace; margin: 8px 0 0; }
+code.commit { background: var(--chip); color: var(--chip-fg); padding: 1px 6px; border-radius: 5px; font-size: 12px; }
+ul { padding-left: 20px; } li { margin: 4px 0; }
+</style>
+</head><body>
+<div class="wrap">
+<header class="hero">
+  <div class="kicker">HEART · ARTIE · 6 November 2026</div>
+  <h1>The kit, tried end to end</h1>
+  <p class="lede">ARTIE on a coworker's own GitHub with nothing to install but Docker: his fork seeded with issues about the repository's own code, four goals walked by Claude, kept as YAML, and replayed, one of them across three systems. Every run below was live, on <code>JogoShugh/heart-github-test</code>, standing in for a fork.</p>
+</header>
+
+<section class="tiles"><div class="tile"><div class="n">18</div><div class="what">commands run</div><div class="sub">from bootstrap to the last replay</div></div><div class="tile"><div class="n">26</div><div class="what">issues on GitHub</div><div class="sub">opened, labelled, commented on, closed</div></div><div class="tile"><div class="n">4</div><div class="what">goals kept as YAML</div><div class="sub">hello, triage, closeout, release</div></div><div class="tile"><div class="n">3</div><div class="what">systems in one goal</div><div class="sub">GitHub, a build service, a deploy service</div></div><div class="tile"><div class="n">0</div><div class="what">model calls</div><div class="sub">in 4 of the 5 replays; 3 in triage's, by design</div></div><div class="tile"><div class="n">3</div><div class="what">bugs fixed test first</div><div class="sub">found while building and running the kit</div></div></section>
+
+<section>
+  <h2>How your coworker uses it</h2>
+  <div class="cols">
+    <div class="steps">
+      <ol>
+        <li><b>Fork and clone.</b> <code>gh repo fork JogoShugh/heart-rise-artie --clone</code>, then turn on the fork's issues, which a new fork has off.</li>
+        <li><b>A fine-grained token</b> for the fork alone: Contents, Issues and Pull requests, read and write. An Anthropic key for the walks.</li>
+        <li><b>Bootstrap.</b> <code>kit/bootstrap.sh</code> builds the image the first time, finds the fork from git's origin, checks its issues are on, and opens six issues by replaying a kept script, with no model.</li>
+        <li><b>Walk, keep, replay.</b> <code>kit/try.sh walk triage</code>, <code>keep triage</code>, <code>replay triage</code>. Everything lands in <code>./work</code>: goals to edit, kept scripts, lock files, traces.</li>
+      </ol>
+      <p class="note">Tokens are passed to the container when it starts, never written to disk or into the image. Inside, the gateway calls GitHub as him, with his own token; it and <code>artie</code> share the container, so no certificate is needed.</p>
+    </div>
+    <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722"}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 60, "messageMargin": 30}}}%%
+sequenceDiagram
+    actor F as Your coworker
+    participant K as kit/try.sh, on his machine
+    participant A as artie, in the container
+    participant G as GitHub gateway, in the container
+    participant H as GitHub: his fork
+    F-&gt;&gt;K: kit/bootstrap.sh
+    K-&gt;&gt;H: is it his fork, are issues on?
+    K-&gt;&gt;A: artie run seed.heart.yaml, no model
+    A-&gt;&gt;G: open six issues, each as offered
+    G-&gt;&gt;H: as him, with his own token
+    F-&gt;&gt;K: kit/try.sh walk triage
+    A-&gt;&gt;A: Claude chooses at each step, among what is offered
+    A-&gt;&gt;G: label each issue as its words say
+    F-&gt;&gt;K: kit/try.sh keep triage
+    K-&gt;&gt;A: artie generate --format yaml
+    A--&gt;&gt;F: work/triage.heart.yaml and work/triage.pins.yaml
+    F-&gt;&gt;K: kit/try.sh replay triage
+    A-&gt;&gt;G: the same watch, held strictly to the lock file: Claude only at the step marked reasoned</pre></div>
+  </div>
+</section>
+
+<section>
+  <h2>What runs in the container</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Address</th><th>What</th><th>Credential</th></tr></thead>
+    <tbody>
+      <tr><td><code>http://localhost:8392</code></td><td>The HEART gateway for GitHub: GitHub's OpenAPI description and the GitHub connector; each issue and pull request offers only the acts that apply to it now.</td><td>His GitHub token, forwarded to GitHub</td></tr>
+      <tr><td><code>http://localhost:8401</code></td><td>A build service, simulated: a narrow Jenkins, event-sourced, its jobs' parameters the schema of their build act.</td><td>A test token</td></tr>
+      <tr><td><code>http://localhost:8402</code></td><td>A deploy service, simulated: a narrow cloud, one app with its regions and releases; deploy offered while idle, its choices from state.</td><td>A test token</td></tr>
+      <tr><td><code>http://localhost:8400/workspace.json</code></td><td>The workspace: a plain file linking GitHub, the release job and the web app, so a goal starts from one address.</td><td>None</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2>Every run</h2>
+  <div class="tablewrap"><table class="runs">
+    <thead><tr><th>#</th><th>Command</th><th class="r">Seconds</th><th class="r">Model calls</th><th>What it did</th></tr></thead>
+    <tbody><tr class="ok"><td class="num">01</td><td><code>kit/bootstrap.sh</code></td><td class="r">16</td><td class="r">0</td><td>Six issues from the kept seed script: <a href="https://github.com/JogoShugh/heart-github-test/issues/2238">#2238</a>–2243</td></tr><tr class="ok"><td class="num">02</td><td><code>try.sh plan hello</code></td><td class="r">3</td><td class="r">0</td><td>Read and checked the goal; nothing sent</td></tr><tr class="ok"><td class="num">03</td><td><code>try.sh walk hello</code></td><td class="r">48</td><td class="r">11 + 5</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/2244">#2244</a> opened, commented on, closed as completed</td></tr><tr class="ok"><td class="num">04</td><td><code>try.sh keep hello</code></td><td class="r">3</td><td class="r">0</td><td>hello.heart.yaml, 0 values to review; 5 forms pinned</td></tr><tr class="ok"><td class="num">05</td><td><code>try.sh replay hello</code></td><td class="r">16</td><td class="r">0</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/2245">#2245</a>, the same, held strictly to the lock file</td></tr><tr class="ok"><td class="num">06</td><td><code>try.sh walk triage</code></td><td class="r">110</td><td class="r">11 + 7</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/2238">#2238</a> bug, <a href="https://github.com/JogoShugh/heart-github-test/issues/2239">#2239</a> question, <a href="https://github.com/JogoShugh/heart-github-test/issues/2240">#2240</a> enhancement, each then triaged; watch <a href="https://github.com/JogoShugh/heart-github-test/issues/2246">#2246</a></td></tr><tr class="ok"><td class="num">07</td><td><code>try.sh keep triage</code></td><td class="r">2</td><td class="r">0</td><td>The labelling step kept as a reason step; the rest pinned</td></tr><tr class="ok"><td class="num">08</td><td><code>kit/bootstrap.sh</code></td><td class="r">17</td><td class="r">0</td><td>Six more: <a href="https://github.com/JogoShugh/heart-github-test/issues/2247">#2247</a>–2252</td></tr><tr class="ok"><td class="num">09</td><td><code>try.sh replay triage</code></td><td class="r">79</td><td class="r">0 + 3</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/2247">#2247</a> bug, <a href="https://github.com/JogoShugh/heart-github-test/issues/2248">#2248</a> question, <a href="https://github.com/JogoShugh/heart-github-test/issues/2249">#2249</a> enhancement; triaged ones left alone; watch <a href="https://github.com/JogoShugh/heart-github-test/issues/2253">#2253</a></td></tr><tr class="ok"><td class="num">10</td><td><code>try.sh walk closeout version=1.0</code></td><td class="r">173</td><td class="r">21 + 7</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/2241">#2241</a>, <a href="https://github.com/JogoShugh/heart-github-test/issues/2250">#2250</a> completed, “Fixed in 1.0.”; <a href="https://github.com/JogoShugh/heart-github-test/issues/2242">#2242</a>, <a href="https://github.com/JogoShugh/heart-github-test/issues/2251">#2251</a> not planned; <a href="https://github.com/JogoShugh/heart-github-test/issues/2243">#2243</a>, <a href="https://github.com/JogoShugh/heart-github-test/issues/2252">#2252</a> duplicate; watch <a href="https://github.com/JogoShugh/heart-github-test/issues/2254">#2254</a></td></tr><tr class="ok"><td class="num">11</td><td><code>try.sh keep closeout</code></td><td class="r">3</td><td class="r">0</td><td>Each case a given: on the labels, its close pinned</td></tr><tr class="ok"><td class="num">12</td><td><code>kit/bootstrap.sh</code></td><td class="r">17</td><td class="r">0</td><td>Six more: <a href="https://github.com/JogoShugh/heart-github-test/issues/2255">#2255</a>–2260</td></tr><tr class="ok"><td class="num">13</td><td><code>try.sh replay closeout version=1.1</code></td><td class="r">48</td><td class="r">0</td><td><a href="https://github.com/JogoShugh/heart-github-test/issues/2258">#2258</a> completed, “Fixed in 1.1.”; <a href="https://github.com/JogoShugh/heart-github-test/issues/2259">#2259</a> not planned; <a href="https://github.com/JogoShugh/heart-github-test/issues/2260">#2260</a> duplicate; watch <a href="https://github.com/JogoShugh/heart-github-test/issues/2261">#2261</a></td></tr><tr class="ok"><td class="num">14</td><td><code>try.sh plan release</code></td><td class="r">3</td><td class="r">0</td><td>Read and checked the goal; nothing sent</td></tr><tr class="ok"><td class="num">15</td><td><code>try.sh walk release version=1.1</code></td><td class="r">53</td><td class="r">15 + 7</td><td>Build queued; 1.1 deployed to staging, us-east; <a href="https://github.com/JogoShugh/heart-github-test/issues/2262">#2262</a> “Release 1.1”</td></tr><tr class="ok"><td class="num">16</td><td><code>try.sh keep release</code></td><td class="r">3</td><td class="r">0</td><td>release.heart.yaml, 1 value to review: the region</td></tr><tr class="ok"><td class="num">17</td><td><code>try.sh replay release version=1.0</code></td><td class="r">6</td><td class="r">0</td><td>The same three systems, release 1.0; <a href="https://github.com/JogoShugh/heart-github-test/issues/2263">#2263</a> “Release 1.0”</td></tr><tr class="refused"><td class="num">18</td><td><code>try.sh replay release version=1.2</code></td><td class="r">3</td><td class="r">0</td><td><span class="badge">refused, as it should be</span> Refused before the deploy: “release: 1.2 is not one of the choices”. 1.2 failed, so it isn't offered</td></tr></tbody>
+  </table></div>
+  <ul class="small">
+    <li>Model calls are the planner's decisions plus the reasoner's choices, counted from each run's trace.</li>
+    <li>A watch ends when someone closes its issue; the trial's helper closed each once every issue it watched was done.</li>
+    <li>Run 13 was started twice: the first stopped at its first read, GitHub answering the gateway 500, and sent nothing.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Walk, then replay</h2>
+  <p class="sub2">Each goal walked once by Claude, then its kept script run again: seconds, and model calls.</p>
+  <div class="chart"><svg viewBox="0 0 560 250" role="img" aria-label="Walk and replay seconds and model calls per goal"><g>
+      <text x="0" y="35" class="b-label">hello</text>
+      <rect x="92" y="18" width="106" height="18" rx="3" class="b-walk"/>
+      <text x="204" y="32" class="b-num">48 s · 16 calls</text>
+      <rect x="92" y="40" width="35" height="18" rx="3" class="b-replay"/>
+      <text x="133" y="54" class="b-num">16 s · 0 calls</text>
+    </g><g>
+      <text x="0" y="93" class="b-label">triage</text>
+      <rect x="92" y="76" width="243" height="18" rx="3" class="b-walk"/>
+      <text x="341" y="90" class="b-num">110 s · 18 calls</text>
+      <rect x="92" y="98" width="175" height="18" rx="3" class="b-replay"/>
+      <text x="273" y="112" class="b-num">79 s · 3 calls</text>
+    </g><g>
+      <text x="0" y="151" class="b-label">closeout</text>
+      <rect x="92" y="134" width="383" height="18" rx="3" class="b-walk"/>
+      <text x="481" y="148" class="b-num">173 s · 28 calls</text>
+      <rect x="92" y="156" width="106" height="18" rx="3" class="b-replay"/>
+      <text x="204" y="170" class="b-num">48 s · 0 calls</text>
+    </g><g>
+      <text x="0" y="209" class="b-label">release</text>
+      <rect x="92" y="192" width="117" height="18" rx="3" class="b-walk"/>
+      <text x="215" y="206" class="b-num">53 s · 22 calls</text>
+      <rect x="92" y="214" width="13" height="18" rx="3" class="b-replay"/>
+      <text x="111" y="228" class="b-num">6 s · 0 calls</text>
+    </g></svg><div class="legend"><span class="sw walk"></span>walked by Claude <span class="sw replay"></span>replayed from the kept YAML</div></div>
+</section>
+
+<section>
+  <h2>The goals</h2>
+  <article class="goal">
+    <h3><code>hello</code></h3>
+    <p>Opens an issue, comments on it, and closes it as completed: the smallest walk, to see each act on GitHub.</p>
+    <ul><li>Walk: 48 s, 11 planner decisions and 5 reasoner choices; <a href="https://github.com/JogoShugh/heart-github-test/issues/2244">#2244</a>.</li><li>Kept: 0 values to review; 5 forms pinned.</li><li>Replay: 16 s, no model, strict; <a href="https://github.com/JogoShugh/heart-github-test/issues/2245">#2245</a>, the same three acts.</li></ul>
+    <details><summary>The goal, as written</summary><pre class="code">---
+start: http://localhost:8392/
+inputs:
+  owner: { question: "Whose repository?" }
+  repo:  { question: "Which repository?" }
+  stamp: { default: { now: MMdd-HHmm } }
+---
+
+A first run: one issue opened, commented on and closed, so each act can be seen on GitHub.
+
+- In {owner}/{repo}
+  - Open an issue titled "Hello from ARTIE ({stamp})", saying "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway." `as issue`
+- On {issue}
+  - Comment "Each act here was one this issue offered at that moment."
+  - Close it as completed
+  - Verify:
+    - it is closed
+    - its reason is completed
+</pre></details>
+    <details><summary>What artie generate kept</summary><pre class="code">steps:
+  - act: github:repos-get
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+    inferred: get repository ${owner}/${repo}
+    from-intent: In ${owner}/${repo}
+    then:
+      - act: github:open-issue
+        fields:
+          title: Hello from ARTIE (${stamp})
+          body: Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.
+        intent: Open an issue titled "Hello from ARTIE (${stamp})", saying "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."
+        then:
+          - keep-as: issue
+  - act: github:issues-get
+    fields:
+      owner: ${owner}
+      repo: ${repo}
+      issue_number: ${issue.number}
+    inferred: get issue ${issue.number} of ${owner}/${repo}
+    from-intent: On {issue}
+    then:
+      - act: github:comment
+        fields:
+          body: Each act here was one this issue offered at that moment.
+        intent: Comment "Each act here was one this issue offered at that moment."
+        then: []
+      - act: github:close
+        intent: Close it as completed
+        then:
+          - check:
+              - field: state
+                is: closed</pre></details>
+  </article><article class="goal">
+    <h3><code>triage</code></h3>
+    <p>A watch over issues labelled needs-triage: each gets bug, question or enhancement, chosen by Claude from its own words, then triaged. The labelling step is marked reasoned, so it stays the model's in the kept script.</p>
+    <ul><li>Walk: 110 s; <a href="https://github.com/JogoShugh/heart-github-test/issues/2238">#2238</a> bug, <a href="https://github.com/JogoShugh/heart-github-test/issues/2239">#2239</a> question, <a href="https://github.com/JogoShugh/heart-github-test/issues/2240">#2240</a> enhancement.</li><li>Kept: the labelling step a reason step, the rest pinned.</li><li>Replay on three new issues: 79 s, 3 model calls, one per issue; <a href="https://github.com/JogoShugh/heart-github-test/issues/2247">#2247</a> bug, <a href="https://github.com/JogoShugh/heart-github-test/issues/2248">#2248</a> question, <a href="https://github.com/JogoShugh/heart-github-test/issues/2249">#2249</a> enhancement. The already triaged ones were left alone.</li></ul>
+    <details><summary>The goal, as written</summary><pre class="code">---
+start: http://localhost:8392/
+inputs:
+  owner: { question: "Whose repository?" }
+  repo:  { question: "Which repository?" }
+  inbox: { default: needs-triage, question: "Which label marks an issue waiting for triage?" }
+  done:  { default: triaged, question: "Which label marks an issue as triaged?" }
+---
+
+Triage each issue waiting for it: one label for what it is, chosen from its own words, then marked triaged. Keep
+watching until the watch's issue is closed.
+
+- In {owner}/{repo}
+  - Open an issue titled "Triage watch", saying "Close this issue to stop the triage watch." `as watch`
+  - Whenever an issue labelled {inbox} changes `as issue`
+    - If it's labelled {done}, leave it.
+    - Label it bug, question or enhancement, whichever its words say it is. `reasoned`
+    - Label it {done}.
+- Until someone closes {watch}
+</pre></details>
+    <details><summary>What artie generate kept</summary><pre class="code">  - watch:
+      until:
+        - at: watch
+          field: state
+          is: closed
+      steps:
+        - act: github:issues-list-for-repo
+          fields:
+            owner: ${owner}
+            repo: ${repo}
+            labels: ${inbox}
+          inferred: list issues in ${owner}/${repo} filtered by label ${inbox}
+          from-intent: an issue labelled ${inbox} changes
+          then:
+            - whenever:
+                - has:
+                    - field: github:labels
+                      is: ${inbox}
+                - leave-where:
+                    say: leave it.
+                    facts:
+                      - field: github:labels
+                        is: ${done}
+                - intent: Label it bug, question or enhancement, whichever its words say it is.
+                  reasoned: true
+                - act: github:label
+                  fields:
+                    labels:
+                      - ${done}
+                  intent: Label it ${done}.
+                  then: []
+</pre></details>
+  </article><article class="goal">
+    <h3><code>closeout</code></h3>
+    <p>A watch over issues labelled ready-to-close: each is closed the way its labels say. Each If is decided once on the walk, then kept as facts on the issue's labels, so the replay needs no model.</p>
+    <ul><li>Walk, release 1.0: 173 s; two of each case: completed with “Fixed in 1.0.”, not planned, duplicate.</li><li>Kept: four given: blocks, each a close pinned.</li><li>Replay, release 1.1: 48 s, no model; <a href="https://github.com/JogoShugh/heart-github-test/issues/2258">#2258</a> completed with “Fixed in 1.1.”, <a href="https://github.com/JogoShugh/heart-github-test/issues/2259">#2259</a> not planned, <a href="https://github.com/JogoShugh/heart-github-test/issues/2260">#2260</a> duplicate.</li></ul>
+    <details><summary>The goal, as written</summary><pre class="code">---
+start: http://localhost:8392/
+inputs:
+  owner:     { question: "Whose repository?" }
+  repo:      { question: "Which repository?" }
+  version:   { question: "Which release ships the fixes?" }
+  label:     { default: ready-to-close, question: "Which label marks an issue ready to close?" }
+  shipped:   { default: shipped, question: "Which label means its fix shipped?" }
+  wontfix:   { default: wontfix, question: "Which label means it won't be done?" }
+  duplicate: { default: duplicate, question: "Which label means it repeats another issue?" }
+---
+
+Close each issue that is ready, the way its labels say it ended. Keep watching until the watch's issue is closed.
+
+- In {owner}/{repo}
+  - Open an issue titled "Close-out watch", saying "Close this issue to stop the watch." `as watch`
+  - Whenever an issue labelled {label} changes `as issue`
+    - If it's closed, leave it.
+    - If it's labelled {shipped}, comment "Fixed in {version}."
+    - If it's labelled {shipped}, close it as completed.
+    - If it's labelled {wontfix}, close it as not planned.
+    - If it's labelled {duplicate}, close it as a duplicate.
+- Until someone closes {watch}
+</pre></details>
+    <details><summary>What artie generate kept</summary><pre class="code">            - whenever:
+                - has:
+                    - field: github:labels
+                      has: ${label}
+                - leave-where:
+                    say: leave it.
+                    facts:
+                      - field: state
+                        is: closed
+                - given:
+                    - field: github:labels
+                      has: ${shipped}
+                  then:
+                    - act: github:comment
+                      fields:
+                        body: Fixed in ${version}.
+                      intent: comment "Fixed in ${version}."
+                      then: []
+                - given:
+                    - field: github:labels
+                      has: ${shipped}
+                  then:
+                    - act: github:close
+                      intent: close it as completed.
+                      then: []
+                - given:
+                    - field: github:labels
+                      has: ${wontfix}
+                  then:
+                    - act: github:close-not-planned
+                      intent: close it as not planned.
+                      then: []
+                - given:
+                    - field: github:labels
+                      has: ${duplicate}
+                  then:
+                    - act: github:close-duplicate
+                      intent: close it as a duplicate.
+                      then: []
+</pre></details>
+  </article><article class="goal">
+    <h3><code>release</code></h3>
+    <p>Across three systems that know nothing of each other, from one workspace file: a build queued on the build service, the release deployed to staging on the deploy service, the release recorded on GitHub.</p>
+    <ul><li>Walk, release 1.1: 53 s. The first try queued the build with version 1.1, refused as invalid input, since version isn't in the job's schema; the planner queued it with no fields.</li><li>The deploy took its region and release from the choices the deploy service offered: us-east, the one available in staging; 1.1, a release that succeeded.</li><li>Replay, release 1.0: 6 s, no model, all three systems; <a href="https://github.com/JogoShugh/heart-github-test/issues/2263">#2263</a>.</li><li>Replay, release 1.2: refused by the client before the deploy, “release: 1.2 is not one of the choices”. The build step before it had already queued a build.</li></ul>
+    <details><summary>The goal, as written</summary><pre class="code">---
+start: http://localhost:8400/workspace.json
+inputs:
+  owner:   { question: "Whose repository?" }
+  repo:    { question: "Which repository?" }
+  version: { default: "1.1", question: "Which release ships?" }
+---
+
+Ship a release across three systems that know nothing of each other: a build queued on the build service, the
+release deployed to staging on the deploy service, and the release recorded on GitHub.
+
+- Follow the link to the release job, on the build service
+  - Queue a build of it
+- Follow the link to the web app, on the deploy service
+  - Deploy release {version} to an available region of staging
+- Follow the link to GitHub
+  - In {owner}/{repo}
+    - Open an issue titled "Release {version}", saying "Built on the build service and deployed to staging on the deploy service, by one goal across three systems."
+</pre></details>
+    <details><summary>What artie generate kept</summary><pre class="code">steps:
+  - follow: item
+    title: The release job, on the build service
+    intent: Follow the link to the release job, on the build service
+    then:
+      - act: ci:build
+        intent: Queue a build of it
+        then: []
+  - follow: item
+    title: The web app, on the deploy service
+    intent: Follow the link to the web app, on the deploy service
+    then:
+      - decide:
+          steps:
+            - keep-as: name
+            - act: cd:deploy
+              fields:
+                environment: staging
+                region: ${name.regions.staging.0.name} # review: step 6 holds it at /regions/staging/0/name, and at /regions/production/0/name too
+                release: ${version}
+              intent: Deploy release ${version} to an available region of staging
+              then:
+                - check:
+                    - field: status
+                      is: deploying
+                    - field: environment
+                      is: staging
+                    - field: region
+                      is: ${name.regions.staging.0.name}
+                    - field: release
+                      is: ${version}
+  - follow: item
+    title: GitHub
+    intent: Follow the link to GitHub
+    then:
+      - act: github:repos-get
+        fields:
+          owner: ${owner}
+          repo: ${repo}
+        inferred: get the repository ${owner}/${repo}
+        from-intent: In ${owner}/${repo}
+        then:
+          - act: github:open-issue
+            fields:
+              title: Release ${version}
+              body: Built on the build service and deployed to staging on the deploy service, by one goal across three systems.
+            intent: Open an issue titled "Release ${version}", saying "Built on the build service and deployed to staging on the deploy service, by one goal across three systems."
+            then: []
+</pre></details>
+  </article>
+</section>
+
+<section>
+  <h2>Across three systems</h2>
+  <p class="sub2">The release walk, as it crossed: each system reached by a link, each act on what that system offered then.</p>
+  <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722"}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 60, "messageMargin": 30}}}%%
+sequenceDiagram
+    participant A as artie
+    participant W as Workspace file :8400
+    participant B as Build service :8401
+    participant D as Deploy service :8402
+    participant G as GitHub gateway :8392
+    A-&gt;&gt;W: GET /workspace.json
+    W--&gt;&gt;A: links: GitHub, the release job, the web app
+    A-&gt;&gt;B: follow the release job, then queue a build, If-Match
+    B--&gt;&gt;A: 200 the job, one more build queued
+    A-&gt;&gt;D: follow the web app
+    D--&gt;&gt;A: deploy offered, idle: region from the app's available regions, release from the succeeded ones
+    A-&gt;&gt;D: deploy 1.1 to staging, us-east, If-Match
+    D--&gt;&gt;A: 200 the app, deploying
+    A-&gt;&gt;G: follow GitHub, then open an issue "Release 1.1"
+    G--&gt;&gt;A: 201 the issue, as GitHub answered</pre></div>
+</section>
+
+<section>
+  <h2>Found and fixed on the way</h2>
+  <p class="sub2">Each found while building and running the kit, each fixed with a failing scenario first, its red run logged before any change to ARTIE's code.</p>
+  <article class="fix"><h3>A reasoned step under a Whenever was decided once <code class="commit">d7cda53</code></h3><p>The first triage walk labelled all three issues enhancement: a watch decided each step at the first member and replayed it, so the first issue's judgement was every issue's. A step marked reasoned is now the model's at every member, as a reasoned Otherwise already was; the watch kept as data and as Kotlin asks it there too. Feature first: goal-watch-run.feature, a scripted planner and reasoner; red logged, then green.</p></article><article class="fix"><h3>A static file's links were ignored <code class="commit">d270136</code></h3><p>The release walk stopped at once: “The workspace has no links.” A static server sends the workspace as application/json, and ARTIE took that media type as plain JSON before the body could say it names the HEART profile in _links.profile, which SPEC §6.1 allows exactly for static hosts. The media type now picks only a HEART dialect. Feature first: sync-l0.feature.</p></article><article class="fix"><h3>A kept script's time default gave no value <code class="commit">e45fb45</code></h3><p>Checking the README's quick start: a generated YAML script with stamp: default: { now: MMdd-HHmmss } stopped with “missing input: stamp”. A script held as data now fills it with the time now, as Kotlin scripts and goals do. Feature first: inputs.feature.</p></article>
+  <p class="small">Building the kit turned up two of its own: a Java 22 toolchain the Docker build needed, and an ignore rule that dropped a source package named <code>build</code>.</p>
+</section>
+
+<section>
+  <h2>Known limits</h2>
+  <ul>
+    <li><b>Triage matches exact labels.</b> The walk decided the watch's check as labels <i>is</i> needs-triage, not <i>has</i>: an issue with another label besides isn't triaged by the replay.</li>
+    <li><b>The release region is read from state.</b> The kept release script reads it at <code>regions.staging.0</code>, which <code>artie generate</code> marks for review, not from the deploy form's choices.</li>
+    <li><b>A refused step comes after the steps before it.</b> Replaying release 1.2 queued a build before the deploy was refused.</li>
+    <li><b>The build and deploy services are simulated</b> and held in memory: each run of the kit starts them afresh.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Also done today</h2>
+  <ul><li><code class="commit">c385c95</code> SPEC 0.5 brought up to date: the status as built, non-goals that §6.12 and §6.13 now cover, 409 only ever a fresh act outside the manifest, the L6 diagram with If-Match, RISE relations under hr:, a new §9.4 on scripts and replay, §12 and §13.</li><li><code class="commit">d54d57e</code> ARTIE's README rewritten around goals kept as YAML: the chain, goals and watches, kept scripts as data, lock files, guards and the config, levels of care; Kotlin as one section; Java 22.</li><li><code class="commit">5a7ab1a</code> HEART and ARTIE in 16 sequence and decision diagrams (docs/reports/heart-artie-diagrams), with c8fa3a3 naming on-change's default as refuse.</li><li><code class="commit">7b7961b</code> The kit (kit/) and this trial's record (exhibits/kit-trial).</li></ul>
+  <p class="small">All committed on <code>claude/auth-branch-4bnmhc</code>, not pushed. The kit's files: <code>kit/</code>; the record: <code>exhibits/kit-trial/</code>, with every run's output and trace.</p>
+</section>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });</script>
+</body></html>
