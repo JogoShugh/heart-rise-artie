@@ -43,9 +43,9 @@ echo "Seeding $OWNER/$REPO with six issues, by a kept script, with no model…"
 
 cat <<EOF
 
-Next, in this folder (with ANTHROPIC_API_KEY in kit/.env, or exported):
-  kit/try.sh walk triage            Claude labels the three issues waiting for triage; close "Triage watch" to stop
-  kit/try.sh walk closeout version=1.0
-                                    closes the three ready to close, each its own way; close "Close-out watch" to stop
-  kit/try.sh keep triage            then replay it, with no model but its one reasoned step: kit/try.sh replay triage
+Next, in this folder (kit/README.md, under Run):
+  kit/try.sh walk hello                  opens an issue, comments on it, closes it
+  kit/try.sh walk triage                 labels the three needs-triage issues; close "Triage watch" on GitHub to end
+  kit/try.sh walk closeout version=1.0   closes the three ready-to-close issues; close "Close-out watch" to end
+  kit/try.sh walk release version=1.1    queues a build, deploys it, records the release on GitHub
 EOF
