@@ -158,6 +158,7 @@ internal class StepWatch(
         when {
             condition != null -> return given(intent, condition, here)
             once != null -> waited(intent, once, here)
+            intent.reasoned -> judged(listOf(host.fill(intent.words)), here, host, moves, "")
             else -> perform(intent, ACT, here, null)
         }
         return true
@@ -175,6 +176,8 @@ internal class StepWatch(
             // Said once for each member it leaves.
             val first = here.run.watching.leave(here.held.address)
             if (first) here.note("Left ${here.held.address}: ${host.fill(intent.words)}")
+        } else if (holds && intent.reasoned) {
+            judged(listOf(host.fill(intent.words)), here, host, moves, "")
         } else if (holds) {
             perform(intent, ACT, here, null)
         }
@@ -193,7 +196,11 @@ internal class StepWatch(
             giveUp = once.giveUp?.after ?: 10.minutes,
             otherwise = { why ->
                 intent.otherwise?.let {
-                    if (it.reasoned) judged(it, this, why, host, moves) else perform(intent, OTHERWISE, this, why)
+                    if (it.reasoned) {
+                        judged(gaveUpIntents(host.fill(it.words), why), this, host, moves, "otherwise: ")
+                    } else {
+                        perform(intent, OTHERWISE, this, why)
+                    }
                 }
             },
         ) { perform(intent, ACT, this, null) }
@@ -486,13 +493,15 @@ internal fun gaveUpIntents(words: String, why: String?): List<String> {
 private const val THEN = ", then "
 
 /**
- * A reasoned Otherwise at [here]: the reasoner asked, in its words with the server's reason [why], every time;
- * nothing kept to replay. One decision at a time, as the planner is asked, by the run's [host]; [moves] is told.
+ * A step marked reasoned, at [here]: the reasoner asked in each of its [asked] words, every time, and nothing kept to
+ * replay. A reasoned Otherwise is asked in its words with the server's reason; a reasoned step under a Whenever, a
+ * judgement about each member, in its own. One decision at a time, as the planner is asked, by the run's [host];
+ * [moves] is told, each move after [part].
  */
-private fun judged(otherwise: Otherwise, here: Here, why: String?, host: StepWatch.Host, moves: MutableList<String>) =
+private fun judged(asked: List<String>, here: Here, host: StepWatch.Host, moves: MutableList<String>, part: String) =
     synchronized(host) {
-        gaveUpIntents(host.fill(otherwise.words), why).forEach { words ->
-            moves += "otherwise: asked the reasoner, as the step is marked reasoned: $words"
+        asked.forEach { words ->
+            moves += "${part}asked the reasoner, as the step is marked reasoned: $words"
             here.act(intent = words)
         }
     }

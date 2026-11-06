@@ -65,18 +65,23 @@ internal class WatchData(
                 intent.condition == null -> out += plain(intent)
                 check == null -> Unit
                 intent.leaves -> return out + left(intent, check) + children(steps.drop(at + 1))
-                else -> out += mapOf("given" to factData(check.facts), "then" to chains.chain(intent, ACTED))
+                else -> out += mapOf("given" to factData(check.facts), "then" to acted(intent))
             }
         }
         return out
     }
+
+    /** What a step does at a member: its chain of acts, as decided; or, marked reasoned, its words, for the model. */
+    private fun acted(intent: Step.Intent): List<DataStep> =
+        if (intent.reasoned) listOf(mapOf("intent" to words.spoken(intent.words), "reasoned" to true))
+        else chains.chain(intent, ACTED)
 
     private fun left(intent: Step.Intent, check: Chain.Check): DataStep =
         mapOf("leave-where" to mapOf("say" to words.fill(intent.words), "facts" to factData(check.facts)))
 
     /** A step with no If: a Once, or a chain of acts. */
     private fun plain(intent: Step.Intent): List<DataStep> =
-        intent.once?.let { waited(intent, it) } ?: chains.chain(intent, ACTED)
+        intent.once?.let { waited(intent, it) } ?: acted(intent)
 
     /** A Once: its wait for the act decided, its act's chain, and its Otherwise's, told why the wait gave up. */
     private fun waited(intent: Step.Intent, once: Once): List<DataStep> {

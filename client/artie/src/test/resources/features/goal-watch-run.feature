@@ -348,6 +348,89 @@ Feature: A goal that keeps watching runs: each step decided once, then replayed 
                             reasoned: true
       """
 
+  Scenario: A step under a Whenever marked reasoned is the model's at every member, asked again each time and never replayed
+    A judgement about each member, such as what its title says, can't be
+    decided once and replayed: the second member's comment isn't the first
+    one's. So a step marked reasoned is no chain the planner decides: at each
+    member the reasoner is asked, in the step's words, and chooses afresh,
+    as at a reasoned Otherwise. The watch kept as data asks the reasoner
+    there too.
+    Given "acme/rockets" has these issues on the small GitHub
+      | number | title                  | state | author |
+      | 1      | Bump left-pad to 1.0.1 | open  | ada    |
+      | 2      | Bump left-pad to 1.0.2 | open  | ada    |
+      | 3      | Bump left-pad to 1.0.3 | open  | ada    |
+    And issue 10 of "acme/rockets" is closed on the small GitHub once issue 1 has a new comment
+    And the file "say.goal.md" is
+      """
+      ---
+      start: https://github.gateway.test/
+      inputs:
+        label: dependabot
+      ---
+
+      Say, on each pull request labelled {label}, what it bumps.
+
+      - Open issue 10 of acme/rockets `as watch`
+      - Whenever a pull request labelled {label} changes `as pr`
+        - Comment on it, in one sentence, what its title says it bumps. `reasoned`
+      - Until {watch} is closed
+      """
+    And the planner will move
+      | move  | words                                       | opens | relation | facts                             |
+      | act   | open issue 10 of acme/rockets               | yes   |          |                                   |
+      | done  |                                             |       |          |                                   |
+      | act   | list the open pull requests of acme/rockets | yes   |          |                                   |
+      | check |                                             |       |          | {"github:labels": ["dependabot"]} |
+      | check |                                             |       |          | {"state": "closed"}               |
+    And ARTIE's reasoner will choose, in order
+      | form              | fields                                                   |
+      | github:issues-get | {"owner": "acme", "repo": "rockets", "issue_number": 10} |
+      | github:pulls-list | {"owner": "acme", "repo": "rockets", "state": "open"}    |
+      | github:comment    | {"body": "It bumps left-pad to 1.0.3."}                  |
+      | github:comment    | {"body": "It bumps left-pad to 1.0.2."}                  |
+      | github:comment    | {"body": "It bumps left-pad to 1.0.1."}                  |
+    When the goal "say.goal.md" runs with ARTIE, captured in "say.trace.yaml", given
+      | name  | value      |
+      | label | dependabot |
+    Then the run finished
+    And issue 3 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                        |
+      | ada    | It bumps left-pad to 1.0.3. |
+    And issue 2 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                        |
+      | ada    | It bumps left-pad to 1.0.2. |
+    And issue 1 of "acme/rockets" now has these comments on the small GitHub
+      | author | body                        |
+      | ada    | It bumps left-pad to 1.0.1. |
+    And the planner was asked 5 times
+    And ARTIE's reasoner was asked 5 times
+    And ARTIE's reasoner was last asked to "Comment on it, in one sentence, what its title says it bumps."
+    And the capture "say.trace.yaml" keeps a watch script with a line with "act(intent = \"Comment on it, in one sentence, what its title says it bumps.\")"
+    And the capture "say.trace.yaml" keeps the watch as data
+      """yaml
+      - watch:
+          until:
+            - at: watch
+              field: state
+              is: closed
+          steps:
+            - act: github:pulls-list
+              fields:
+                owner: acme
+                repo: rockets
+                state: open
+              inferred: list the open pull requests of acme/rockets
+              from-intent: a pull request labelled ${label} changes
+              then:
+                - whenever:
+                    - has:
+                        - field: github:labels
+                          has: ${label}
+                    - intent: Comment on it, in one sentence, what its title says it bumps.
+                      reasoned: true
+      """
+
   Scenario: A reasoned Otherwise in parts, each after ", then", is one act of the model's each, in order
     The reasoner chooses one act at a time. An Otherwise that says two
     things, "label it, then tell its author why", is two parts, each asked

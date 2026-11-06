@@ -129,7 +129,7 @@ internal class WatchScript(
                     left(intent, check, steps.drop(at + 1), depth)
                     return
                 }
-                else -> out.open(depth, "given { ${facts(check.facts)} } then") { chains.chain(intent, ACT, it) }
+                else -> out.open(depth, "given { ${facts(check.facts)} } then") { plain(intent, it) }
             }
         }
     }
@@ -141,10 +141,17 @@ internal class WatchScript(
         children(rest, depth)
     }
 
-    /** A step with no If: a Once, or a chain of acts. */
+    /** What a step does at a member: a Once; its words, for the model, when marked reasoned; or a chain of acts. */
     private fun plain(intent: Step.Intent, depth: Int) {
         val once = intent.once
-        if (once != null) waited(intent, once, depth) else chains.chain(intent, ACT, depth)
+        when {
+            once != null -> waited(intent, once, depth)
+            intent.reasoned -> {
+                val asked = kotlinString(words.spoken(intent.words), slots = true)
+                out.line(depth, "act(intent = $asked)")
+            }
+            else -> chains.chain(intent, ACT, depth)
+        }
     }
 
     /** A Once: its wait for the act decided, its act's chain, and its Otherwise's, told why the wait gave up. */
