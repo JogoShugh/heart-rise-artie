@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HEART and ARTIE</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+:root {
+  --bg: #f5f4ee; --fg: #1d2722; --muted: #5a6a61; --accent: #2f7d5b; --gold: #a7781c;
+  --card: #fffdf8; --rule: #dedbd0; --sheet: #fffefa; --chip: #e5f1ea; --chip-fg: #1f5c41;
+  --gold-chip: #fbf1d6; --gold-chip-fg: #7a5711;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131915; --fg: #e5ebe7; --muted: #9db0a5; --accent: #6cc59a; --gold: #e3b341;
+    --card: #1b231f; --rule: #2c3832; --sheet: #f7f5ee; --chip: #1f3a2d; --chip-fg: #a8e3c6;
+    --gold-chip: #3a3018; --gold-chip-fg: #f0d58c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131915; --fg: #e5ebe7; --muted: #9db0a5; --accent: #6cc59a; --gold: #e3b341;
+  --card: #1b231f; --rule: #2c3832; --sheet: #f7f5ee; --chip: #1f3a2d; --chip-fg: #a8e3c6;
+  --gold-chip: #3a3018; --gold-chip-fg: #f0d58c; color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); margin: 0;
+  font: 16px/1.55 "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.kicker { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+h1, h2, h3 { font-family: "Source Serif 4", Georgia, "Times New Roman", serif; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.1; margin-top: 8px; }
+.lede { font-size: 18px; max-width: 64ch; color: var(--fg); margin: 14px 0 0; }
+nav.parts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+nav.parts a { text-decoration: none; padding: 6px 12px; border-radius: 999px; background: var(--chip); color: var(--chip-fg); font-weight: 500; font-size: 14px; }
+section.part { margin-top: 56px; display: grid; gap: 28px; }
+section.part > header { border-top: 2px solid var(--fg); padding-top: 14px; display: grid; gap: 6px; }
+h2 { font-size: clamp(26px, 3.4vw, 34px); }
+section.part > header p { margin: 0; max-width: 66ch; color: var(--muted); }
+figure { margin: 0; background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 18px 14px; display: grid; gap: 10px; min-width: 0; }
+.fighead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+.num { font-family: "IBM Plex Mono", Menlo, monospace; font-size: 13px; color: var(--muted); }
+h3 { font-size: 22px; }
+.kind { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; }
+.kind.Sequence { background: var(--chip); color: var(--chip-fg); }
+.kind.Decision { background: var(--gold-chip); color: var(--gold-chip-fg); }
+figcaption { color: var(--muted); max-width: 70ch; margin: 0; }
+.sheet { background: var(--sheet); border-radius: 8px; padding: 12px; overflow-x: auto; min-width: 0; }
+.sheet pre.mermaid { margin: 0; background: transparent; text-align: center; white-space: normal; color: #1d2722; font: 15px/1.3 "Helvetica Neue", Helvetica, Arial, sans-serif; }
+.sheet svg { display: inline-block; height: auto; }
+footer { margin-top: 56px; border-top: 1px solid var(--rule); padding-top: 16px; color: var(--muted); font-size: 14px; display: grid; gap: 6px; }
+footer code, figcaption code { font-family: "IBM Plex Mono", Menlo, monospace; font-size: .92em; }
+@media (max-width: 560px) { figure { padding: 14px 12px 12px; } .lede { font-size: 16px; } }
+</style>
+</head><body>
+<div class="wrap">
+  <div class="kicker">Fielding, hypermedia and the generic client</div>
+  <h1>HEART and ARTIE</h1>
+  <p class="lede">The Web put controls next to information, so one browser fits every site. HEART does the same for programs and agents: each representation carries the acts legal on it now. ARTIE is the generic client that reads them, and turns one reasoned walk into a script that replays with no model.</p>
+  <nav class="parts"><a href="#heart">Part 1: What HEART is</a><a href="#artie">Part 2: How ARTIE scripts and replays</a></nav>
+  <section class="part" id="heart">
+    <header><div class="kicker">Part 1</div><h2>What HEART is</h2><p>A media type and its rules, so a resource's representation carries the acts legal on it now. Absence is the enforcement.</p></header>
+    <figure>
+      <div class="fighead"><span class="num">1.1</span><h3>Enter with one address</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>Like a browser, ARTIE knows one URI and the media type. Every other address arrives in a link or a form.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    participant C as Generic client (ARTIE)
+    participant S as HEART service
+    C-&gt;&gt;S: GET / (the bookmark)&lt;br/&gt;Accept: application/hal+json
+    S--&gt;&gt;C: 200 the service index, with its GET forms: searchBeds, getBed&lt;br/&gt;Link: heart-rise/hal-schema-forms, rel="profile"
+    C-&gt;&gt;S: GET /beds?name=herbs, the target filled from the form's own field
+    S--&gt;&gt;C: 200 a collection: item links, each with a title
+    C-&gt;&gt;S: GET /beds/2, followed by relation and title
+    S--&gt;&gt;C: 200 the bed's state, and the forms legal now&lt;br/&gt;ETag "seq-5.hsf.L0.…", Cache-Control: no-cache
+    Note over C,S: The client was told one URI. It never built one.</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">1.2</span><h3>What the client receives</h3><span class="kind Decision">Decision</span></div>
+      <figcaption>Dialect by Accept, rung by Prefer. Preference-Applied says what was served. An answer that names no profile, in a Link header or its own _links.profile, is data only.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+flowchart TD
+    A(["A representation arrives"]) --&gt; P{"Does it name&lt;br/&gt;a HEART profile?"}
+    P -- no --&gt; D["Data only: no forms, links or embedded resources taken.&lt;br/&gt;Nothing can be acted on or followed from it"]
+    P -- yes --&gt; DI{"Dialect, chosen by Accept"}
+    DI -- HAL-FORMS --&gt; HF["L0 only: _templates inline.&lt;br/&gt;The on-ramp that Spring HATEOAS and others give for free"]
+    DI -- HAL Schema Forms --&gt; PA{"Preference-Applied"}
+    PA -- none --&gt; L0["L0: state, forms and schemas in one answer"]
+    PA -- "forms=link" --&gt; L1["L1: forms by link, schemas inside them"]
+    PA -- "forms=link, schema=link" --&gt; L2["L2: forms and schemas by link, immutable,&lt;br/&gt;shared by every resource in the same state"]</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">1.3</span><h3>Three layers, shared by state</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>Layer 1 changes and is always revalidated. Layers 2 and 3 never change at their address, so every resource in the same state shares them.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    participant C as ARTIE
+    participant K as HTTP cache
+    participant S as HEART service
+    C-&gt;&gt;S: GET /beds/1&lt;br/&gt;Prefer: forms=link, schema=link · Cache-Control: no-cache
+    S--&gt;&gt;C: 200 Layer 1: state, and an hr:forms link with its integrity&lt;br/&gt;Preference-Applied: forms=link, schema=link
+    C-&gt;&gt;K: GET /affordance-sets/X
+    K-&gt;&gt;S: miss
+    S--&gt;&gt;K: 200 Layer 2: the forms, each schema by link&lt;br/&gt;public, max-age=31536000, immutable
+    K--&gt;&gt;C: the forms, bytes checked against the link's integrity
+    C-&gt;&gt;K: GET each schema, in parallel, one request per URL
+    K-&gt;&gt;S: miss
+    S--&gt;&gt;K: 200 Layer 3: JSON Schema, immutable
+    K--&gt;&gt;C: the schemas, each checked against its integrity
+    C-&gt;&gt;S: GET /beds/3, another bed in the same state
+    S--&gt;&gt;C: 200 Layer 1: hr:forms link to /affordance-sets/X
+    C-&gt;&gt;K: GET /affordance-sets/X
+    K--&gt;&gt;C: hit: the service is not asked
+    C-&gt;&gt;S: GET /beds/1 again, If-None-Match
+    S--&gt;&gt;C: 304: nothing changed, nothing more to fetch</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">1.4</span><h3>Act on what's offered</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>Every act is conditional. Its answer is the resource's new representation, whose ETag is the next act's precondition.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    participant C as ARTIE
+    participant S as HEART service
+    participant O as Someone else
+    C-&gt;&gt;S: GET /beds/2
+    S--&gt;&gt;C: 200 state, forms: water and harvest · ETag "seq-5…"
+    alt nothing moved in between
+        C-&gt;&gt;S: POST /beds/2/actions/water-cell · If-Match "seq-5…"&lt;br/&gt;milliliters = 250
+        S--&gt;&gt;C: 200 the bed's new representation&lt;br/&gt;Content-Location /beds/2 · ETag "seq-6…"
+    else someone else acted first
+        O-&gt;&gt;S: an act lands: the bed is now at seq-6
+        C-&gt;&gt;S: POST /beds/2/actions/water-cell · If-Match "seq-5…"
+        S--&gt;&gt;C: 412, problem type stale
+        C-&gt;&gt;S: GET /beds/2, sync again
+        Note over C: The pending act is dropped. The intent is judged again, against the new state.
+    end
+    Note over C,S: An act that brings a resource into being answers 201, with Location naming it.&lt;br/&gt;There is no create operation: only the domain's own acts.</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">1.5</span><h3>The service checks an act</h3><span class="kind Decision">Decision</span></div>
+      <figcaption>One fixed order, so each refusal has exactly one meaning. If-Match is compared whole with the ETag of the representation the act's own Accept, Accept-Profile and Prefer select, so a race always shows as 412, never as 409.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+flowchart TD
+    A(["An act arrives at a form's target"]) --&gt; B{"If-Match sent?"}
+    B -- no --&gt; R428["428 precondition-&lt;br/&gt;required"]
+    B -- yes --&gt; C{"Does If-Match equal&lt;br/&gt;the current ETag?"}
+    C -- no --&gt; R412["412 stale"]
+    C -- yes --&gt; D{"Offered by the owning&lt;br/&gt;resource now?"}
+    D -- no --&gt; R409["409 not-offered,&lt;br/&gt;naming its relation"]
+    D -- yes --&gt; E{"Does the body fit&lt;br/&gt;the form's schema&lt;br/&gt;and choices?"}
+    E -- no --&gt; R422a["422 invalid-input,&lt;br/&gt;a pointer per violation"]
+    E -- yes --&gt; F{"Does a rule of the&lt;br/&gt;resource refuse it?"}
+    F -- yes --&gt; R422b["422 rule-refused, saying why"]
+    F -- no --&gt; G{"Did it bring a&lt;br/&gt;resource into being?"}
+    G -- yes --&gt; R201["201: Location names&lt;br/&gt;the new resource"]
+    G -- no --&gt; R200["200: the new&lt;br/&gt;representation"]</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">1.6</span><h3>The client reads the answer</h3><span class="kind Decision">Decision</span></div>
+      <figcaption>Refusals are RFC 9457 problem details. The client tells them apart by status and type, never by reading prose.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+flowchart TD
+    A(["The answer to an act"]) --&gt; B{"Status"}
+    B -- 2xx --&gt; OK["Hold the new representation and its ETag.&lt;br/&gt;On 201, hold the new resource: read it, unless the body is it"]
+    B -- 412 stale --&gt; S["Sync again. Drop the pending act.&lt;br/&gt;Judge the intent again against the new state"]
+    B -- 409 not-offered --&gt; N["Sync again. The act may no longer exist.&lt;br/&gt;Never retry it blindly"]
+    B -- 428 --&gt; P["Send it again, with If-Match"]
+    B -- 422 --&gt; T{"Problem type"}
+    T -- invalid-input --&gt; I["The values were wrong for the form.&lt;br/&gt;Never send them again unchanged"]
+    T -- rule-refused --&gt; RR["The form was used right.&lt;br/&gt;Report the reason; choose other values or another act"]
+    B -- 401 --&gt; AU["Ask the credential source once for a renewed credential"]</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">1.7</span><h3>Why is it absent?</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>Leaving an act out prevents the call. The service may also say why, so an agent never has to invent a reason.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    actor U as Person
+    participant C as ARTIE
+    participant S as HEART service
+    U-&gt;&gt;C: Why can't I harvest bed 2?
+    Note over C: harvest is not among the forms held
+    C-&gt;&gt;S: GET the affordance set's hr:unavailable link
+    S--&gt;&gt;C: 200 the acts absent in this state, each with a reason&lt;br/&gt;immutable, shared by every resource in the state
+    Note over C: bytes checked against the link's integrity
+    C--&gt;&gt;U: The crop is not ready: growth is below 100 points.
+    Note over U,S: A reference for answering, never a manifest: ARTIE acts on nothing it finds there.</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">1.8</span><h3>HEART in front of an API you don't own</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>The gateway reads an OpenAPI description once and serves HEART, with the same checks, and the upstream's own operations behind them.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    participant C as ARTIE
+    participant G as HEART gateway
+    participant U as Upstream JSON API (GitHub)
+    Note over G: From the OpenAPI description and a connector:&lt;br/&gt;which members are links, and when each operation is legal
+    C-&gt;&gt;G: GET an issue
+    G-&gt;&gt;U: GET the issue, the upstream's own operation
+    U--&gt;&gt;G: 200 plain JSON
+    G--&gt;&gt;C: 200 state, links, and the forms legal now&lt;br/&gt;an open issue offers comment and close · a closed one, reopen
+    C-&gt;&gt;G: POST to the close form's target · If-Match
+    G-&gt;&gt;G: 428, 412, 409, 422: checked as any HEART service
+    G-&gt;&gt;U: PATCH the issue to closed, the upstream's method
+    U--&gt;&gt;G: 200
+    G--&gt;&gt;C: 200 the issue's new representation: it now offers reopen</pre></div>
+    </figure>
+  </section>
+  <section class="part" id="artie">
+    <header><div class="kicker">Part 2</div><h2>How ARTIE scripts and replays</h2><p>ARTIE is to HEART what a browser is to HTML. A model may choose among what's offered; one reasoned walk becomes a script that replays with no model, held to what it was recorded against.</p></header>
+    <figure>
+      <div class="fighead"><span class="num">2.1</span><h3>Reason and Act, kept apart</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>The model's whole output is a selection. Deterministic code does everything that reaches the wire.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    actor U as Person
+    participant A as ARTIE (deterministic)
+    participant M as Reasoner (a model)
+    participant S as HEART service
+    U-&gt;&gt;A: water bed 2, about 500 ml
+    A-&gt;&gt;S: GET /beds/2, the sync
+    S--&gt;&gt;A: state, forms, ETag
+    A-&gt;&gt;M: the words, the state, each form by relation, title,&lt;br/&gt;description and schema, each link by relation and title
+    Note over M: Never shown a URI, a method, a header, an ETag or a credential
+    M--&gt;&gt;A: a selection: act garden:water, milliliters = 500
+    A-&gt;&gt;A: Is it offered? Does it fit the schema?&lt;br/&gt;If not, it is refused before anything is sent
+    A-&gt;&gt;A: fill the target template · attach If-Match ·&lt;br/&gt;add the credential below the cache
+    A-&gt;&gt;S: POST /beds/2/actions/water-cell · If-Match
+    S--&gt;&gt;A: 200 the new representation</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">2.2</span><h3>From a goal in words to a kept script</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>Claude walks the goal once. artie generate keeps the walk as YAML, every act pinned, so the next run needs no model.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    actor P as Author
+    participant A as artie run
+    participant M as Claude: planner and reasoner
+    participant S as HEART gateway
+    participant G as artie generate
+    P-&gt;&gt;A: github-task.goal.md: plain words, inputs,&lt;br/&gt;and what to keep: as issue, as pr
+    loop each line of the goal
+        A-&gt;&gt;M: the line, and what the resource offers now
+        M--&gt;&gt;A: moves: follow, act, wait, check
+        A-&gt;&gt;S: sync, then act · If-Match
+        S--&gt;&gt;A: the new representation
+    end
+    A-&gt;&gt;G: the run's capture: each selection, where each value came from, what was offered
+    G--&gt;&gt;P: github-task.heart.yaml, the kept script&lt;br/&gt;github-task.pins.yaml, its lock file
+    Note over P,G: Nobody wrote Kotlin or YAML. What varies stays an input or a reference to what the walk kept.
+    P-&gt;&gt;A: artie run github-task.heart.yaml version=1.3 --guard strict
+    A-&gt;&gt;S: the same selections, held to the lock file, with no model</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">2.3</span><h3>What artie generate keeps</h3><span class="kind Decision">Decision</span></div>
+      <figcaption>Each step of the walk becomes data. Only what the author marked for judgement still calls a model.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+flowchart TD
+    A(["A step of the captured walk"]) --&gt; B{"Marked reasoned&lt;br/&gt;in the goal?"}
+    B -- yes --&gt; R["A reason step: its words, reasoned: true.&lt;br/&gt;The hybrid: the model chooses there, on every run"]
+    B -- no --&gt; W{"A condition in&lt;br/&gt;a watch: If …?"}
+    W -- yes --&gt; F{"Did the walk&lt;br/&gt;meet this case?"}
+    F -- yes --&gt; GV["given: the facts the model decided, on the resource's state,&lt;br/&gt;with the act pinned. Replayed with no model"]
+    F -- no --&gt; WD["Stays in words, for the model"]
+    W -- no --&gt; K["Pinned: the act by relation, with its fields"]
+    K --&gt; V{"Where did each&lt;br/&gt;value come from?"}
+    V -- an input --&gt; I["A reference to the input: the version, the owner"]
+    V -- an earlier answer --&gt; E["A reference to what the walk kept: the issue's number"]
+    V -- the words alone --&gt; L["The value, as the goal said it"]
+    K --&gt; CH["After the act, a check of what it changed,&lt;br/&gt;leaving out times and hashes"]</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">2.4</span><h3>Replay with no model</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>Every act is held to the lock file first. A run that can't hold stops before it sends.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    participant A as artie run, a kept script
+    participant L as Lock file
+    participant S as HEART service
+    A-&gt;&gt;L: read each form's integrity, its act with the target set aside, and the sets it was offered in
+    loop each step
+        A-&gt;&gt;S: sync the resource: 304 when unchanged
+        S--&gt;&gt;A: state, and the affordance set, checked by integrity
+        A-&gt;&gt;A: find the step's form by relation
+        A-&gt;&gt;L: the guard: compare with what was pinned
+        alt the guard holds
+            A-&gt;&gt;S: act · If-Match · fields from inputs and kept references
+            S--&gt;&gt;A: the new representation
+            A-&gt;&gt;A: check what the act changed, as recorded
+        else the guard refuses
+            Note over A,S: Nothing is sent. The run stops, or repairs the step if the config beside the script allows.
+        end
+    end</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">2.5</span><h3>The guard, before every act</h3><span class="kind Decision">Decision</span></div>
+      <figcaption>The service names what it offers by content, so drift is stated, not guessed. Strict holds to the exact set; lenient to the form.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+flowchart TD
+    A(["Before every act"]) --&gt; O{"Is the step's relation&lt;br/&gt;offered now?"}
+    O -- no --&gt; STOP["Stop before sending"]
+    O -- yes --&gt; M{"--guard"}
+    M -- strict --&gt; S1{"Same form integrity,&lt;br/&gt;in a set recorded for it?"}
+    S1 -- yes --&gt; ACT["Act"]
+    S1 -- no --&gt; STOP
+    M -- lenient --&gt; L1{"Same form integrity?"}
+    L1 -- yes --&gt; ACT2["Act. If the set changed around it,&lt;br/&gt;repin: auto records the new set,&lt;br/&gt;so a strict run holds as well"]
+    L1 -- no --&gt; T{"Only its target changed?&lt;br/&gt;The act, target set aside,&lt;br/&gt;is as pinned"}
+    T -- yes --&gt; ACT
+    T -- no --&gt; CH(["The form changed: see on-change"])</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">2.6</span><h3>When the form changed</h3><span class="kind Decision">Decision</span></div>
+      <figcaption>The config beside the script says what a lenient run does with a changed form. Nothing is sent that the new form doesn't allow.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+flowchart TD
+    A(["A lenient run meets a changed form"]) --&gt; OC{"on-change, in the config&lt;br/&gt;beside the script"}
+    OC -- stop --&gt; STOP["Stop before sending"]
+    OC -- values --&gt; V{"Same method, and does every&lt;br/&gt;value sent fit the new schema?"}
+    V -- yes --&gt; ACT["Act"]
+    V -- no --&gt; STOP
+    OC -- intent --&gt; RS["The step's words go to the reasoner,&lt;br/&gt;with the form as offered now"]
+    RS --&gt; ACT2["Act on its selection,&lt;br/&gt;checked as any selection is"]
+    ACT2 --&gt; KEEP{"keep: auto, the run finished,&lt;br/&gt;and every value sent&lt;br/&gt;is the script's own?"}
+    KEEP -- yes --&gt; KS["The repair is written into&lt;br/&gt;the script and its lock file"]
+    KEEP -- no --&gt; PR["Proposed, or not kept"]</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">2.7</span><h3>A repair that's kept</h3><span class="kind Sequence">Sequence</span></div>
+      <figcaption>When a form changes, one step goes back to the model. The fix is written back, and the next run needs no model.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+sequenceDiagram
+    participant A as artie run · lenient · on-change: intent · keep: auto
+    participant M as Reasoner
+    participant S as GitHub gateway
+    Note over S: The comment form renamed its field body to content
+    A-&gt;&gt;S: sync issue 7 of acme/lasers
+    S--&gt;&gt;A: github:comment's integrity changed
+    A-&gt;&gt;M: the step's words, "Say it is fixed in 1.2",&lt;br/&gt;and the comment form as offered now
+    M--&gt;&gt;A: act github:comment, content = "Fixed in 1.2 for lasers."
+    A-&gt;&gt;S: act · If-Match
+    S--&gt;&gt;A: the comment is added
+    A-&gt;&gt;A: kept: body becomes content in the script, the repository&lt;br/&gt;still an input, the lock file pinned again
+    Note over A,S: The next run, on acme/masers, runs the repaired script with no model call</pre></div>
+    </figure>
+    <figure>
+      <div class="fighead"><span class="num">2.8</span><h3>A watch, every case named</h3><span class="kind Decision">Decision</span></div>
+      <figcaption>Each If was decided once by Claude on the walk, then kept as a given on the issue's labels. The replay needs no model.</figcaption>
+      <div class="sheet"><pre class="mermaid">%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#e5f1ea", "primaryBorderColor": "#2f7d5b", "primaryTextColor": "#1d2722", "secondaryColor": "#fbf1d6", "tertiaryColor": "#f3f4ef", "lineColor": "#4c5f55", "textColor": "#1d2722", "actorBkg": "#e5f1ea", "actorBorder": "#2f7d5b", "actorTextColor": "#1d2722", "signalColor": "#33463c", "signalTextColor": "#1d2722", "labelBoxBkgColor": "#fbf1d6", "labelBoxBorderColor": "#c99a2e", "labelTextColor": "#1d2722", "loopTextColor": "#1d2722", "noteBkgColor": "#fbf1d6", "noteBorderColor": "#c99a2e", "noteTextColor": "#1d2722", "activationBkgColor": "#d3e9dc", "edgeLabelBackground": "#ffffff", "clusterBkg": "#f3f4ef"}, "flowchart": {"useMaxWidth": false, "htmlLabels": false, "curve": "basis", "nodeSpacing": 30, "rankSpacing": 40, "padding": 12}, "sequence": {"useMaxWidth": true, "wrap": true, "actorMargin": 70, "noteMargin": 10, "messageMargin": 34}}}%%
+flowchart TD
+    W(["Whenever an issue labelled ready-to-close changes"]) --&gt; C{"Is it closed?"}
+    C -- yes --&gt; LV["Leave it"]
+    C -- no --&gt; SH{"Labelled shipped?"}
+    SH -- yes --&gt; CM["Comment: Fixed in the release given.&lt;br/&gt;Close it as completed"]
+    SH -- no --&gt; WF{"Labelled wontfix?"}
+    WF -- yes --&gt; NP["Close it as not planned"]
+    WF -- no --&gt; DU{"Labelled duplicate?"}
+    DU -- yes --&gt; DP["Close it as a duplicate"]
+    DU -- no --&gt; NO["No case applies: nothing is done"]
+    U(["Until someone closes the watch's own issue"]) -.-&gt; W</pre></div>
+    </figure>
+  </section>
+  <footer>
+    <div>From <code>spec/SPEC.md</code> (0.5, §6.0 to §6.13), <code>spec/HAL-SCHEMA-FORMS-HR.md</code>, <code>spec/ideas/replay-guards-lenient-strict.md</code>, and ARTIE's features <code>script-replay.feature</code> and <code>script-keeps-repair.feature</code>. The GitHub examples are from <code>exhibits/github-task-yaml</code>.</div>
+  </footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });</script>
+</body></html>
