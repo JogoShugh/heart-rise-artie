@@ -2,9 +2,9 @@
 ## With ARTIE Reference Client Implementation
 
 **Version:** 0.5 — Working Draft (remaining proposals are marked `[0.5]` inline)
-**Status (updated 2026-10-09):** The H.E.A.R.T. mechanism, from L0 to L2, is implemented and tested against a live server, in both dialects: the reference server (`server-spring`), the ARTIE client, and live scenarios against servers capped at L0, L1 and L2 (`scripts/live-client-check.sh`). L3 caching is shown live with two clients sharing one cache. L6 reasoning is built and tested with a scripted reasoner, but has not been run with a real model. RISE (§7) is not built. See `spec/CONFORMANCE-GAPS.md`.
+**Status (updated 2026-11-05):** The H.E.A.R.T. mechanism, from L0 to L2, is implemented and tested against live servers, in both dialects: the reference server (`server-spring`), the server library and its gateway in front of GitHub (`heart/`), the ARTIE client, a second client written from this specification (`implementations/heart-ts`), and live scenarios against servers capped at L0, L1 and L2 (`scripts/live-client-check.sh`). L3 caching is shown live with two clients sharing one cache. L6 reasoning runs live with a real model (Claude), and ARTIE keeps a reasoned run as a script that replays with no model (§9.4). The HTTP and CoAP bindings (§6.0) and an MCP bridge (§8.1) are built. RISE (§7) is on hold and not built. See `spec/CONFORMANCE-GAPS.md`.
 **Author:** Joshua Gough
-**Date:** October 2026 (0.4: August 2026)
+**Date:** November 2026 (0.4: August 2026)
 
 **Proposed in 0.5** (editor's proposals; none is accepted until the author removes its `[0.5]` marker):
 
@@ -187,10 +187,10 @@ This has a cost, and the document should be read as accepting it: a manifest tha
 - Replacing AsyncAPI, OpenAPI, gRPC, or MCP in their existing use cases
 - Defining a general purpose agent framework
 - Solving hallucination in the semantic reasoning step — H.E.A.R.T. constrains structural hallucination only
-- Explaining *why* an affordance is absent (see §12 — models reason poorly from absence, and this is a known open edge)
+- Inferring *why* an affordance is absent. A server may say why (§6.12); a client SHALL NOT infer a reason from absence alone
 - Prescribing server implementation technology
 - YAML and Markdown serialisation profiles (deferred to V2)
-- Authentication and authorisation mechanisms — but note that §6.9.4 imposes a caching-confidentiality requirement that is not optional, because it arises from the caching design itself rather than from an access-control policy
+- Authorisation policy: who may do what. Credentials are defined (§6.13), and §6.9.4 imposes a caching-confidentiality requirement that is not optional, because it arises from the caching design itself rather than from an access-control policy
 - Rate limiting and throttling
 - Multi-agent coordination beyond two-party RISE
 
@@ -404,7 +404,7 @@ Business rules SHALL be enforced through affordance presence and absence. An act
 | 403 Forbidden | The principal is not permitted to act on this resource at all. Reserved for authorisation; not used for state-dependent business rules. | Do not retry. |
 | 404 Not Found | The resource no longer exists. | Abandon; re-enter from bookmark. |
 | 405 Method Not Allowed | Client used the wrong HTTP method for the given affordance. | Client defect. |
-| **409 Conflict** | The transition is **not legal from the current state**. Either the resource moved since sync, or the client submitted an affordance absent from the current manifest. | Re-sync. The affordance may legitimately no longer exist. |
+| **409 Conflict** | The transition is **not legal from the current state**: the client acted, with a fresh `ETag`, on an affordance absent from the manifest that went with it. A resource that moved since sync is `412`, never `409` (evaluation order, below). | Re-sync. The affordance may legitimately no longer exist. |
 | **412 Precondition Failed** | `If-Match` mismatch — someone else's write landed first. The act is stale. | Re-sync from scratch. **SHALL NOT** resubmit the stale act; the intent must be re-derived against the new state. |
 | 422 Unprocessable Content | The body cannot be processed. Either it fails schema validation (required field missing, type mismatch): `invalid-input`. Or it satisfies the schema but a rule of the resource that a schema cannot say refuses it, such as assigning a ticket to the agent who already has it: `rule-refused` (added 2026-10-11). | `invalid-input`: client or schema defect; do not retry unmodified. `rule-refused`: the form was used correctly; report the reason, and choose different values or another act. |
 | **428 Precondition Required** | The state-changing request arrived without `If-Match`. | Re-issue conditionally. |
@@ -465,7 +465,7 @@ A successful act's response is the owning resource's new representation, rendere
 3. The affordance is not in the owning resource's current affordance set: `409`.
 4. The body fails schema validation: `422`.
 
-Under this order, a resource that moved between sync and act always yields `412`, because its `ETag` changed. So `409` reaches a client only when it acted on a fresh precondition but outside the manifest that went with it. That is a client defect or a server-side legality bug, never a race. The `409` row of the table above should be read with that narrower meaning. Its phrase "the resource moved since sync" applies only to servers that do not require `If-Match`, which 0.4 no longer permits.
+Under this order, a resource that moved between sync and act always yields `412`, because its `ETag` changed. So `409` reaches a client only when it acted on a fresh precondition but outside the manifest that went with it. That is a client defect or a server-side legality bug, never a race, and it is the only meaning the `409` row of the table above gives it.
 
 ### 6.3 Compliant Client Behaviour
 
@@ -570,7 +570,7 @@ Caching is a property of the rung. At L0 nothing is cacheable — the whole resp
 
 One piece of genuine client-side state remains, unrelated to caching:
 
-**Agent directory.** Maps rel name to agent endpoint URI. Populated from affordances with the `heart:agent` rel (§7.6). Used by RISE fallback selection. This is a real client-side registry — not a cache, but a directory of known agents.
+**Agent directory.** Maps rel name to agent endpoint URI. Populated from affordances with the `hr:agent` rel (§7.6). Used by RISE fallback selection. This is a real client-side registry — not a cache, but a directory of known agents.
 
 ### 6.7 Sync Behaviour
 
@@ -803,7 +803,7 @@ sequenceDiagram
 
 L4 is the rung that makes H.E.A.R.T. safe under concurrency, and it is independent of the rendering ladder — an L0 server can and should implement it.
 
-The two codes are not interchangeable. `412` says *your intent was valid but the world moved*: the client re-syncs and must re-derive intent, because the user's original instruction may now mean something different or nothing at all. `409` says *this was never legal here*: the affordance is absent from the current manifest, either because the resource moved or because the client acted on a manifest it did not revalidate. A client that blindly retries a `412` overwrites someone else's write; a client that treats `409` as transient loops. §6.2 sets out the full table, including `428` for an act sent without `If-Match` at all.
+The two codes are not interchangeable. `412` says *your intent was valid but the world moved*: the client re-syncs and must re-derive intent, because the user's original instruction may now mean something different or nothing at all. `409` says *this was never legal here*: the affordance is absent from the manifest that went with the client's fresh `ETag`. A resource that moved shows as `412`, never `409` (§6.2, evaluation order). A client that blindly retries a `412` overwrites someone else's write; a client that treats `409` as transient loops. §6.2 sets out the full table, including `428` for an act sent without `If-Match` at all.
 
 The second exchange in the diagram is worth reading carefully: the client holds a fresh `ETag` and still receives `409`. That is correct and expected — freshness of state does not imply legality of transition. Sowing a seed into an occupied bed is illegal regardless of how current the client's view is.
 
@@ -849,14 +849,14 @@ sequenceDiagram
     User->>Client: "water bed 2, about 500ml"
 
     Client->>Server: GET /beds/2
-    Server-->>Client: 200 OK<br/>current manifest, embedded
+    Server-->>Client: 200 OK, ETag "seq-5…"<br/>current manifest, embedded
 
     Client->>Reason: intent + current manifest
-    Reason-->>Client: { affordance: "waterCell",<br/>fields: { milliliters: 500 } }
+    Reason-->>Client: { affordance: "garden:water",<br/>fields: { milliliters: 500 } }
     Note right of Reason: selection only —<br/>never constructs a URI itself
 
-    Client->>Server: POST /beds/2/actions/water-cell<br/>{ "milliliters": 500 }
-    Server-->>Client: 200 OK
+    Client->>Server: POST /beds/2/actions/water-cell<br/>If-Match: "seq-5…"<br/>{ "milliliters": 500 }
+    Server-->>Client: 200 OK, ETag "seq-6…"
 ```
 
 L6 is where the agentic case is made, and it is deliberately the thinnest rung in the ladder. The model receives the intent and the manifest; it returns an affordance name and field values; the client validates those values against the schema, resolves the target URI, expands any template, attaches `If-Match`, and submits. The model does not see a URI, does not choose a method, and does not touch the network.
@@ -1032,18 +1032,18 @@ A RISE compliant recipient SHALL:
 
 Link relation types must be either registered in IANA's Link Relation Types registry or expressed as URIs (RFC 8288 §2.1.2). 0.3's `reply-to`, `error-reply`, and `progress` are neither — they are bare tokens colliding with a namespace H.E.A.R.T. does not own. All core RISE relations are therefore prefixed in 0.4:
 
-- `heart:agent` — identifies an agent endpoint available for async work or fallback; stored in the agent directory (§6.6)
-- `heart:reply-to` — success callback shape
-- `heart:error-reply` — failure callback shape
-- `heart:progress` — optional intermediate status update
-- `heart:result` — polling resource affordance indicating a completed async result is available
+- `hr:agent` — identifies an agent endpoint available for async work or fallback; stored in the agent directory (§6.6)
+- `hr:reply-to` — success callback shape
+- `hr:error-reply` — failure callback shape
+- `hr:progress` — optional intermediate status update
+- `hr:result` — polling resource affordance indicating a completed async result is available
 
-In the HAL Schema Forms dialect these are CURIEs and the representation SHALL include a `curies` link defining the `heart` prefix, without which they do not resolve to URIs and the RFC 8288 problem returns unsolved:
+In the HAL Schema Forms dialect these are CURIEs and the representation SHALL include a `curies` link defining the `hr` prefix, without which they do not resolve to URIs and the RFC 8288 problem returns unsolved. It is the prefix and namespace H.E.A.R.T.'s own relations use (`hr:forms`, `hr:unavailable`, §6.1, §6.12); earlier drafts wrote these as `heart:` (changed 2026-11-05):
 
 ```json
 "_links": {
   "curies": [{
-    "name": "heart",
+    "name": "hr",
     "href": "https://w3id.org/heart-rise/rels/{rel}",
     "templated": true
   }]
@@ -1062,7 +1062,7 @@ A RISE compliant originator SHALL:
 
 - Define a non-response window after which fallback is triggered
 - Select a fallback recipient from the agent directory (§6.6)
-- Populate its agent directory during the sync step of any H.E.A.R.T. session returning `heart:agent` affordances
+- Populate its agent directory during the sync step of any H.E.A.R.T. session returning `hr:agent` affordances
 - Reuse the original envelope unchanged for the fallback request
 - Accept a callback from the fallback recipient in the same declared template shape
 - Record fallback provenance in the result
@@ -1073,7 +1073,7 @@ A fallback recipient is selected by matching `template-rel` — any registered a
 
 **Push mode.** The originator exposes a live endpoint, populates `reply-to`, and sets `callback-mode: push`. The recipient POSTs the result directly to `reply-to` on completion. Preferred when the originator is a server-side process or long-running service.
 
-**Poll mode.** The originator cannot expose a live endpoint (edge, serverless, mobile, browser). It omits `reply-to` and sets `callback-mode: poll`. The recipient's `202` SHALL include a `Location` header pointing to a polling resource, which is a standard H.E.A.R.T. resource at any rung. The originator polls it using the Sync-Reason-Act cycle. When work is complete, the polling resource's manifest SHALL include a `heart:result` affordance, which the originator exercises to retrieve the completed work. The polling resource SHALL remain available for at least the declared non-response window.
+**Poll mode.** The originator cannot expose a live endpoint (edge, serverless, mobile, browser). It omits `reply-to` and sets `callback-mode: poll`. The recipient's `202` SHALL include a `Location` header pointing to a polling resource, which is a standard H.E.A.R.T. resource at any rung. The originator polls it using the Sync-Reason-Act cycle. When work is complete, the polling resource's manifest SHALL include a `hr:result` affordance, which the originator exercises to retrieve the completed work. The polling resource SHALL remain available for at least the declared non-response window.
 
 Poll interval is not prescribed. The originator SHOULD use exponential backoff. The polling resource SHOULD return `Retry-After` as a hint.
 
@@ -1081,7 +1081,7 @@ Poll interval is not prescribed. The originator SHOULD use exponential backoff. 
 
 ### 7.8 Shared Caching
 
-The HTTP cache (§6.6) SHALL be shared between H.E.A.R.T. and RISE processing. A schema cached during a H.E.A.R.T. sync SHALL be available to RISE envelope processing without re-fetch, and vice versa — both are the same content-addressed URLs behind the same cache. The agent directory (§6.6) remains a distinct, non-cache partition, populated only via `heart:agent` affordances.
+The HTTP cache (§6.6) SHALL be shared between H.E.A.R.T. and RISE processing. A schema cached during a H.E.A.R.T. sync SHALL be available to RISE envelope processing without re-fetch, and vice versa — both are the same content-addressed URLs behind the same cache. The agent directory (§6.6) remains a distinct, non-cache partition, populated only via `hr:agent` affordances.
 
 Where a RISE recipient is a different process from the originator, note that it holds a *different* cache, and the `template-schema` URL is the whole mechanism by which the two agree on the schema without shared state. This works precisely because content addresses are global and portable, and it is one of the clearer wins of the 0.3 model over 0.2's opaque fingerprints. It also depends on both parties operating at L2 — see §7.2.
 
@@ -1181,9 +1181,10 @@ ARTIE SHALL:
 - Keep the Reason step's output confined to a selection, with URI resolution, template expansion, and precondition attachment in deterministic code (§6.8, §6.10.7)
 - Place the manifest at the tail of the cacheable prompt region and hold the prefix byte-stable (§6.8)
 - Operate in interactive mode, seeking clarification on ambiguous intent
-- Support RISE envelope construction and callback reception in both push and poll modes
-- Demonstrate correct fallback behaviour on recipient timeout
+- Support RISE envelope construction and callback reception in both push and poll modes (on hold with RISE, §7)
+- Demonstrate correct fallback behaviour on recipient timeout (on hold with RISE, §7)
 - Produce the §10 measurements, stating the rung and reporting cache-read and cache-write tokens separately
+- Keep a reasoned run as a script that replays with no model, held to what the run was offered (§9.4)
 
 ARTIE SHALL also be demonstrable **without an LLM**, driving both reference domains from scripted intent, to establish that L6 is genuinely optional.
 
@@ -1215,6 +1216,24 @@ All protocol behaviour SHALL be demonstrable via in-memory simulation with no ex
 | L6 | Reason output constrained to a selection; an affordance name absent from the manifest is rejected deterministically before any request is issued; scripted-intent run completes both domains with no LLM present |
 | — | `Cache-Control` verification: concrete-profile Layer 2 responses are `private` unless identifiers meet the §6.9.4 entropy exemption |
 | — | RISE fallback path completion, push and poll modes, with configurable recipient timeouts |
+
+### 9.4 Scripts and replay (added 2026-11-05)
+
+ARTIE keeps a reasoned run so that it can run again with no model. Nothing here changes the protocol: a script is a client's record of its selections, and every act it replays is checked by the server like any other act (§6.2).
+
+- **The goal.** A person writes the task in plain words (`.goal.md`): its lines, its inputs, and what to keep from the walk (`as issue`). `artie run --reasoner` walks it. A planner turns each line into moves, and the Reason step chooses among what each representation offers (§6.8).
+- **The capture.** The run records each selection; where each value came from (an input, an earlier answer, or the goal's own words); and what was offered: each form's integrity (HAL-SCHEMA-FORMS-HR Rule 10) and the set it was offered in.
+- **The kept script.** `artie generate` writes the walk as data, in YAML (`kind: kept`). Each act is named by its relation, and each field is an input, a reference to what the walk kept, or a value from the goal's words. A step the goal marks `reasoned` stays a reason step, so the Reason step chooses there on every run. In a watch, each condition the Reason step decided is kept as facts on the resource's state (`given:`), with the act pinned. A case the walk never met stays in words.
+- **The lock file.** Beside the script, ARTIE keeps what the script was recorded against: for each form, its integrity, its integrity with the target set aside, its method, and the sets it was offered in.
+- **The guard.** Before every act, the replay holds the form it is about to use to the lock file. `strict` acts only on the same form, in a set recorded for it. `lenient`, the default, acts on the same form in any set, or on the same act whose target alone changed. When the guard refuses, the run stops before anything is sent.
+- **A changed form.** A config beside the script may let a lenient run go on:
+  - `on-change: values` acts when the method is unchanged and every value the script sends fits the new schema;
+  - `on-change: intent` gives that one step's words to the Reason step, with the form as offered now;
+  - `keep: auto` writes a repair that worked back into the script and its lock file, but only when every value it sent is the script's own;
+  - `repin: auto` records a new set whose forms held, so that a strict run holds as well.
+- **Checks.** After each act, the replay checks what the act changed, as the walk recorded it, leaving out values that differ on every run, such as times and hashes.
+
+Scripts may also be written by hand in Kotlin (`.kts`); the guard and the lock file are the same for both.
 
 ---
 
@@ -1273,7 +1292,7 @@ ARTIE interacts correctly with both reference domains from bookmark entry with n
 - LLM provider selection
 - Server implementation framework
 - Transport layer below HTTP
-- Authentication and authorisation mechanisms — excepting the caching-confidentiality requirement in §6.9.4, which is a property of the caching design and is normative in V1
+- Authorisation policy. Credentials are defined in §6.13; the caching-confidentiality requirement in §6.9.4 is a property of the caching design and is normative in V1
 - Rate limiting and throttling
 - Multi-agent coordination beyond two-party RISE
 - Rungs above L6; the ladder is closed at seven levels for V1
@@ -1294,8 +1313,8 @@ ARTIE interacts correctly with both reference domains from bookmark entry with n
 - **Tracking connegp and PROF-IETF status (new).** Two foundations §6.1 now depends on are moving targets: connegp's §13.2 Feature at Risk covering response-side `Link: rel="profile"`, and the not-yet-submitted PROF-IETF Internet-Draft covering `Accept-Profile` itself (§8.6). Revisit this section when either publishes — a PROF-IETF submission in particular could change `Accept-Profile`'s syntax out from under §6.1's examples.
 - IANA registration path: media type(s), the `forms`/`schema`/`behaviour`/`domain` preference tokens, the core link relation types, and (pending PROF-IETF's own submission) whatever registry it establishes for profile URIs. One workstream, not several.
 - Formal rel name vocabulary governance; versioning strategy for the core media type.
-- Whether `heart:agent` plus the agent directory suffices for multi-party RISE.
-- **MCP Bridge Specification.** A canonical mapping exposing a H.E.A.R.T. entrypoint through a single generic MCP tool (e.g. `execute_heart_transition`), letting existing MCP hosts navigate H.E.A.R.T. servers without context bloat. More tractable under 2026-07-28's per-request model than under the session model 0.3 assumed.
+- Whether `hr:agent` plus the agent directory suffices for multi-party RISE.
+- **MCP bridge specification.** A bridge is built (§8.1): six fixed tools, with the state-scoped part in each result, so existing MCP hosts navigate H.E.A.R.T. servers without context bloat. Still open: whether to specify that mapping canonically, so that other clients can offer the same tools.
 - Cache persistence across devices for a single logical agent identity.
 
 ---
@@ -1310,7 +1329,7 @@ This protocol suite is grounded in Roy Fielding's work in two distinct places, w
 
 | Fielding's rule | Where H.E.A.R.T. addresses it |
 |---|---|
-| A REST API should not be dependent on any single communication protocol | §11 (transport below HTTP out of scope for V1 — a partial answer, not a complete one) |
+| A REST API should not be dependent on any single communication protocol | §6.0: a protocol-neutral core, with a binding chosen by URI scheme. HTTP and CoAP (§6.0.1) are defined. |
 | A REST API should not contain any changes to the communication protocols aside from filling out standard extension points | §6.4 (`Prefer`), §6.2 (`If-Match`/`412`), §6.1 (`Accept-Profile`/`Link: rel="profile"` per connegp, replacing 0.3's private `profile` media-type parameter). The replacement is a genuine improvement — it fills a standard extension point instead of inventing one — but §8.6 sets out why the point it fills is itself pre-Recommendation and, for `Accept-Profile`, pre-submission; "filling a standard extension point" is not yet the same claim as "resting on a finished standard." |
 | A REST API should spend almost all of its descriptive effort in defining the media type(s) used | §6.1, §6.5, §6.9, §6.10 |
 | A REST API must not define fixed resource names or hierarchies | §6.3, §6.9.1 |
