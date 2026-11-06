@@ -1,0 +1,24 @@
+Seeding JogoShugh/heart-github-test with six issues, by a kept script, with no model…
+1 enter http://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title artie needs Java 22, but client/README.md says 21, body Built and run as the README says, artie stops: it needs Java 22 or newer., labels [needs-triage]: new resource
+4 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 act github:open-issue, title How do I point artie at a gateway on another port?, body The goals start at http://localhost:8392/. Mine runs elsewhere., labels [needs-triage]: new resource
+6 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+7 act github:open-issue, title A gateway connector for Jira, body The gateway reads any OpenAPI description. A connector for Jira Cloud would let one goal work across GitHub and Jira., labels [needs-triage]: new resource
+8 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+9 act github:open-issue, title The kit's hello goal, body A first goal that opens, comments on and closes one issue., labels [ready-to-close, shipped]: new resource
+10 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+11 act github:open-issue, title Build ARTIE with Gradle 7, body The build needs Gradle 8., labels [ready-to-close, wontfix]: new resource
+12 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+13 act github:open-issue, title artie says it needs Java 22, body Same as the README issue about Java 22., labels [ready-to-close, duplicate]: new resource
+14 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+15 return to http://localhost:8392/: done
+finished, 15 steps; acted: github:repos-get 1, github:open-issue 6
+
+Next, in this folder:
+  export OWNER=JogoShugh REPO=heart-github-test ANTHROPIC_API_KEY=…
+  kit/try.sh walk triage            Claude labels the three issues waiting for triage; close "Triage watch" to stop
+  kit/try.sh walk closeout version=1.0
+                                    closes the three ready to close, each its own way; close "Close-out watch" to stop
+  kit/try.sh keep triage            then replay it, with no model but its one reasoned step: kit/try.sh replay triage

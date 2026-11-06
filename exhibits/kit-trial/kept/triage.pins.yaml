@@ -1,0 +1,29 @@
+# What triage.heart.yaml was recorded against, from runs/triage.trace.yaml. artie run holds the script to it before every act:
+# --guard lenient (the default) refuses a form no longer offered, or whose integrity changed, unless only its
+# target did (its act, the form with its target set aside, as pinned); --guard strict refuses any change, and
+# one offered in a set not recorded for it.
+rung: L0
+digest: sha256-QsWI9v+o4XD7iqtfp2egEOpIJInwQ+hewTt94zNBUHo=
+forms:
+  github:repos-get:
+    integrity: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
+    act: sha256-PrNDFZycQXO0vDomT70X2hUukyXEia4UgE6Z7EXsru0=
+    method: GET
+    sets: []
+  github:open-issue:
+    integrity: sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
+    act: sha256-zSq9d1NxXf4kXLKZaTlHo/9x0j+E3X2SJkMhbOdk21U=
+    method: POST
+    sets: []
+  github:issues-list-for-repo:
+    integrity: sha256-Lp18wE9gCGmNDc2Yg8qA3XoI3BgSmBH25RYQsk2A3pw=
+    act: sha256-WV/FeJ6AMPMTjvsVDy30xRDyo3pSHmdF4WdSTYowpRM=
+    method: GET
+    sets: []
+  github:label:
+    integrity: sha256-nqi9U5+4g9uaqXFnO1p0Z4wSlTjkFoR0BfZS/OuN2XU=
+    act: sha256-52QH/EEb/wie75haftuFgclmhGpgn+V7v/mFQQwxhrU=
+    method: POST
+    sets: []
+links:
+  item: ''
