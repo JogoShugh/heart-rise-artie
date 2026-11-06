@@ -1,0 +1,10 @@
+start http://localhost:8392/
+inputs owner, repo, stamp
+context: A first run: one issue opened, commented on and closed, so each act can be seen on GitHub.
+line 11: In {owner}/{repo}
+line 12:   Open an issue titled "Hello from ARTIE ({stamp})", saying "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway." (as issue)
+line 13: On {issue}
+line 14:   Comment "Each act here was one this issue offered at that moment."
+line 15:   Close it as completed
+line 16:   verify: it is closed; its reason is completed
+a goal in steps: 6 steps, nothing sent

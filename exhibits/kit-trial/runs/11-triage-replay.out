@@ -1,0 +1,78 @@
+1 enter http://localhost:8392/: done
+2 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+3 act github:open-issue, title Triage watch, body Close this issue to stop the triage watch.: new resource
+4 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 return to http://localhost:8392/: done
+6 return to http://localhost:8392/: done
+7 act github:issues-list-for-repo, owner JogoShugh, repo heart-github-test, labels needs-triage: done
+8 follow item, titled A gateway connector for Jira: done
+9 Label it bug, question or enhancement, whichever its words say it is.: done
+10 act github:label, labels [triaged]: done
+11 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2276: done
+12 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2276: done
+13 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+14 follow item, titled How do I point artie at a gateway on another port?: done
+15 Label it bug, question or enhancement, whichever its words say it is.: done
+16 act github:label, labels [triaged]: done
+17 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2275: done
+18 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2275: done
+19 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+20 follow item, titled artie needs Java 22, but client/README.md says 21: done
+21 Label it bug, question or enhancement, whichever its words say it is.: done
+22 act github:label, labels [triaged]: done
+23 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2274: done
+24 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2274: done
+25 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+26 follow item, titled A gateway connector for Jira: done
+27 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+28 follow item, titled How do I point artie at a gateway on another port?: done
+29 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+30 follow item, titled artie needs Java 22, but client/README.md says 21: done
+31 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+32 follow item, titled A gateway connector for Jira: done
+33 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+34 follow item, titled How do I point artie at a gateway on another port?: done
+35 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+36 follow item, titled artie needs Java 22, but client/README.md says 21: done
+37 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+38 follow item, titled A gateway connector for Jira: done
+39 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+40 follow item, titled How do I point artie at a gateway on another port?: done
+41 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+42 follow item, titled artie needs Java 22, but client/README.md says 21: done
+43 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+44 return to http://localhost:8392/: done
+45 return to http://localhost:8392/: done
+46 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2280: done
+47 return to http://localhost:8392/: done
+48 return to http://localhost:8392/: done
+49 act github:issues-list-for-repo, owner JogoShugh, repo heart-github-test, labels needs-triage: done
+50 follow item, titled A gateway connector for Jira: done
+51 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+52 follow item, titled How do I point artie at a gateway on another port?: done
+53 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+54 follow item, titled artie needs Java 22, but client/README.md says 21: done
+55 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+56 follow item, titled A gateway connector for Jira: done
+57 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+58 follow item, titled How do I point artie at a gateway on another port?: done
+59 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+60 follow item, titled artie needs Java 22, but client/README.md says 21: done
+61 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+62 follow item, titled A gateway connector for Jira: done
+63 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+64 follow item, titled How do I point artie at a gateway on another port?: done
+65 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+66 follow item, titled artie needs Java 22, but client/README.md says 21: done
+67 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+68 follow item, titled A gateway connector for Jira: done
+69 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+70 follow item, titled How do I point artie at a gateway on another port?: done
+71 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+72 follow item, titled artie needs Java 22, but client/README.md says 21: done
+73 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues?labels=needs-triage: done
+74 return to http://localhost:8392/: done
+75 return to http://localhost:8392/: done
+76 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2280: done
+77 return to http://localhost:8392/: done
+finished, 77 steps; acted: github:repos-get 1, github:open-issue 1, github:issues-list-for-repo 2, github:label 6

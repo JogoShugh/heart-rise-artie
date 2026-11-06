@@ -1,0 +1,13 @@
+1 enter http://localhost:8392/: done
+2 get the repository JogoShugh/heart-github-test: done
+3 open an issue titled "Hello from ARTIE (1106-1225)" with body: Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.: new resource
+4 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+5 return to http://localhost:8392/: done
+6 get issue 2270 of JogoShugh/heart-github-test: done
+7 comment on it: Each act here was one this issue offered at that moment.: new resource
+8 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2270: done
+9 close it as completed: done
+10 return to http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2270: done
+11 check: held
+12 return to http://localhost:8392/: done
+finished, 12 steps; acted: github:repos-get 1, github:open-issue 1, github:issues-get 1, github:comment 1, github:close 1

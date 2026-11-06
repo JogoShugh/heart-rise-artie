@@ -46,8 +46,8 @@ can edit, the kept scripts, their lock files, and a trace of every run in `work/
 
 | Goal | What it does |
 |---|---|
-| `seed` | What the bootstrap ran: six issues, three labelled `needs-triage`, three `ready-to-close` with one of `shipped`, `wontfix` or `duplicate`. Kept as `seed.heart.yaml`, so it runs with no model. |
-| `triage` | A watch. Each issue labelled `needs-triage` gets one label, `bug`, `question` or `enhancement`, chosen by Claude from the issue's words, and then `triaged`. That one step is marked `reasoned`, so a replay still asks Claude there and pins everything else. |
+| `seed` | What the bootstrap ran: six issues, three labelled `needs-triage` (one also `documentation`), three `ready-to-close` with one of `shipped`, `wontfix` or `duplicate`. Kept as `seed.heart.yaml`, so it runs with no model. |
+| `triage` | A watch. Each issue with `needs-triage` among its labels gets one label, `bug`, `question` or `enhancement`, chosen by Claude from the issue's words, and then `triaged`. That one step is marked `reasoned`, so a replay still asks Claude there and pins everything else. |
 | `closeout` | A watch. Each issue labelled `ready-to-close` is closed the way its labels say: `shipped` as completed, with a comment naming the release; `wontfix` as not planned; `duplicate` as a duplicate. Each case is decided once on the walk and kept as facts on the issue's labels, so the replay needs no model. Give `version=`. |
 | `hello` | Opens an issue, comments on it and closes it as completed. |
 | `release` | Across three systems that know nothing of each other: queues a build of the release job on the build service, deploys the release to an available region of staging on the deploy service, and records it on GitHub. Give `version=`: 1.0 and 1.1 succeeded; 1.2 failed, so the deploy service doesn't offer it. |
@@ -77,9 +77,8 @@ else of GitHub's API; a goal that needs something else finds it isn't offered.
 
 ## Known limits
 
-- The kept `triage` watch matches an issue whose labels are exactly `needs-triage`; one with another label besides
-  isn't triaged by the replay.
 - The kept `release` script reads the deploy region from the app's state, and marks that value for review.
+- A `release` replay refused at the deploy has queued its build already.
 
 The trial these goals were run in, with every run's output: `exhibits/kit-trial/`.
 

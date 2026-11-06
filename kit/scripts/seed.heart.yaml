@@ -26,7 +26,8 @@ steps:
           body: "Built and run as the README says, artie stops: it needs Java 22 or newer."
           labels:
             - needs-triage
-        intent: "Open an issue titled \"artie needs Java 22, but client/README.md says 21\", saying \"Built and run as the README says, artie stops: it needs Java 22 or newer.\", labelled needs-triage"
+            - documentation
+        intent: "Open an issue titled \"artie needs Java 22, but client/README.md says 21\", saying \"Built and run as the README says, artie stops: it needs Java 22 or newer.\", labelled needs-triage and documentation"
         then: []
       - act: github:open-issue
         fields:

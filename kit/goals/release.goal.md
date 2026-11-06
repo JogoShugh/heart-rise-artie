@@ -11,7 +11,7 @@ release deployed to staging on the deploy service, and the release recorded on G
 
 - Follow the link to the release job, on the build service
   - Queue a build of it
-- Follow the link to the web app, on the deploy service
+- Follow the link to the web app, on the deploy service `as app`
   - Deploy release {version} to an available region of staging
 - Follow the link to GitHub
   - In {owner}/{repo}
