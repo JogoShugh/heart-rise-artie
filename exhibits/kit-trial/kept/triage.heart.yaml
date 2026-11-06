@@ -2,7 +2,7 @@
 # Every selection as that run made it, nested as it nested; an act it left to the model stays in words.
 # What it was offered is pinned in triage.pins.yaml, held to before every act.
 # 1 act in the watch calls the model each time one is reached: artie run needs --reasoner.
-#   artie run triage.heart.yaml owner=JogoShugh repo=heart-github-test --reasoner claude
+#   artie run triage.heart.yaml owner=JogoShugh repo=heart-kit-test --reasoner claude
 heart: 1
 kind: kept
 start: http://localhost:8392/
@@ -46,7 +46,7 @@ steps:
             repo: ${repo}
             state: open
             labels: ${inbox}
-          inferred: List open issues in ${owner}/${repo} filtered by label ${inbox}
+          inferred: list open issues in ${owner}/${repo} filtered by label ${inbox}
           from-intent: an issue labelled ${inbox} changes
           then:
             - whenever:

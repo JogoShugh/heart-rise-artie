@@ -217,20 +217,20 @@ run:
       given: given
       question: Whose repository?
     repo:
-      value: heart-github-test
+      value: heart-kit-test
       given: given
       question: Which repository?
     stamp:
-      value: 1106-1304
+      value: 1106-2218
       given: default
-      default: 1106-1304
+      default: 1106-2218
       now: MMdd-HHmm
   source: |-
-    act(intent = "get repository $owner/$repo")
+    act(intent = "get the repository $owner/$repo")
     act(intent = """Open a new issue titled "Hello from ARTIE ($stamp)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."""")
-    act(intent = "get issue 2293 in $owner/$repo")
+    act(intent = "get issue 120 of $owner/$repo")
     act(intent = "comment on it: Each act here was one this issue offered at that moment.")
-    act(intent = "close it as completed")
+    act(intent = "Close it as completed")
     check("state" to "closed", "state_reason" to "completed")
   marks:
     '1':
@@ -245,48 +245,48 @@ run:
     '5':
       intent: Close it as completed
   moves:
-    - 'why: Step only names a place; open the repository via repos-get.'
-    - 'get repository JogoShugh/heart-github-test: acted github:repos-get, done, at http://localhost:8392/repos/JogoShugh/heart-github-test'
-    - 'why: The repository resource is held, so the step that names the place is complete.'
-    - 'done: In JogoShugh/heart-github-test'
-    - 'why: The repository is held and offers github:open-issue, which is the act this step needs.'
-    - 'Open a new issue titled "Hello from ARTIE (1106-1304)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.": acted github:open-issue, new resource, at http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293'
-    - 'why: The open-issue act created issue 2293 with the requested title and body, so the step is complete.'
-    - 'done: Open an issue titled "Hello from ARTIE (1106-1304)", saying "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."'
-    - 'why: Step names the issue as a place; open it with issues-get from the start.'
-    - 'get issue 2293 in JogoShugh/heart-github-test: acted github:issues-get, done, at http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293'
-    - 'why: The issue 2293 is held; the step that names the place is complete.'
-    - 'done: On http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293'
-    - 'why: The issue is held and offers github:comment, which is the act this step needs.'
-    - 'comment on it: Each act here was one this issue offered at that moment.: acted github:comment, new resource, at http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6685477379'
-    - 'why: The comment act created a comment whose body matches the requested text, so the step is done.'
+    - 'why: Step names the repository; open it by owner and repo via repos-get.'
+    - 'get the repository JogoShugh/heart-kit-test: acted github:repos-get, done, at http://localhost:8392/repos/JogoShugh/heart-kit-test'
+    - 'why: The repository JogoShugh/heart-kit-test is held, so the step that only names a place is complete.'
+    - 'done: In JogoShugh/heart-kit-test'
+    - 'why: The repository is held and offers github:open-issue, so I''ll open the issue with the given title and body.'
+    - 'Open a new issue titled "Hello from ARTIE (1106-2218)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.": acted github:open-issue, new resource, at http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120'
+    - 'why: The act created issue 120 with the requested title and body, so the step''s work is complete.'
+    - 'done: Open an issue titled "Hello from ARTIE (1106-2218)", saying "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."'
+    - 'why: The step names the issue; open it with issues-get by owner, repo and number 120.'
+    - 'get issue 120 of JogoShugh/heart-kit-test: acted github:issues-get, done, at http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120'
+    - 'why: Issue 120 is held after the get, so the step that names it is complete; sub-steps come next.'
+    - 'done: On http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120'
+    - 'why: Issue 120 is held and offers github:comment, so I''ll add the requested comment.'
+    - 'comment on it: Each act here was one this issue offered at that moment.: acted github:comment, new resource, at http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/comments/6697258974'
+    - 'why: The comment was created with the requested body, so the step''s work is complete.'
     - 'done: Comment "Each act here was one this issue offered at that moment."'
-    - 'why: The issue is held and offers github:close, which closes an issue as completed.'
-    - 'close it as completed: acted github:close, done, at http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293'
-    - 'why: The close act ran and the issue state is closed with state_reason completed, so the step is done.'
+    - 'why: Issue 120 is held and offers github:close, which closes an issue as completed.'
+    - 'Close it as completed: acted github:close, done, at http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120'
+    - 'why: The close act succeeded: issue 120 now has state closed with state_reason completed, so the step is done.'
     - 'done: Close it as completed'
-    - 'why: The held issue''s state is closed and state_reason is completed, so I''m checking both.'
+    - 'why: The held issue''s state is closed and state_reason is completed, so check both facts.'
     - checked {state=closed, state_reason=completed}
   model:
     name: claude-sonnet-5-5
     url: https://api.anthropic.com
   usage:
     calls: 11
-    input: 21001
-    output: 1589
+    input: 21100
+    output: 1547
     cache_read: 16074
     cache_write: 3566
 ---
-at: '2026-11-06T13:04:25.123344553Z'
-ms: 51
+at: '2026-11-06T22:18:50.442547547Z'
+ms: 54
 mode: script
 say: enter {entry}
 params:
   entry: http://localhost:8392/
 opens: true
 exchanges:
-  - at: '2026-11-06T13:04:25.129097012Z'
-    ms: 34
+  - at: '2026-11-06T22:18:50.447758922Z'
+    ms: 36
     request:
       method: GET
       url: http://localhost:8392/
@@ -295,14 +295,14 @@ exchanges:
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-ca834ee1ac1006a7-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-8c6e4c53de9ad6a7-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:25 GMT
+        date: Fri, 06 Nov 2026 22:18:50 GMT
         etag: '"index-hsf-edf1ad4b815ba429"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -872,15 +872,15 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-06T13:04:28.545350972Z'
-ms: 2337
+at: '2026-11-06T22:18:52.692540340Z'
+ms: 1962
 mode: intent
-say: get repository JogoShugh/heart-github-test
+say: get the repository JogoShugh/heart-kit-test
 line: 1
 params:
   relation: github:repos-get
   owner: JogoShugh
-  repo: heart-github-test
+  repo: heart-kit-test
 values:
   owner:
     value: JogoShugh
@@ -888,19 +888,19 @@ values:
     from:
       - input: owner
   repo:
-    value: heart-github-test
+    value: heart-kit-test
     type: string
     from:
       - input: repo
 reason:
-  template: get repository $owner/$repo
+  template: get the repository $owner/$repo
   slots:
     owner:
       value: JogoShugh
       from:
         - input: owner
     repo:
-      value: heart-github-test
+      value: heart-kit-test
       from:
         - input: repo
 opens: true
@@ -918,23 +918,23 @@ model:
       []
       &lt;/links&gt;
       &lt;intent&gt;
-      get repository JogoShugh/heart-github-test
+      get the repository JogoShugh/heart-kit-test
       &lt;/intent&gt;
-    answered: '[{"type":"tool_use","id":"toolu_01Hw1JPDBftjTnVUmTNjVafs","name":"select","input":{"action":"act","affordance":"github:repos-get","fields":{"owner":"JogoShugh","repo":"heart-github-test"}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01KA6JbLWAWeRyPZehSBN8bD","name":"select","input":{"action":"act","affordance":"github:repos-get","fields":{"owner":"JogoShugh","repo":"heart-kit-test"}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
   relation: github:repos-get
   title: Get a repository
   method: GET
   target: /repos/{owner}/{repo}
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test
   picked: relation
 guard:
   rung: L0
   form: sha256-Yze4SmWrjszXwXcvmOltk7ILgcC0YZsTYYqUicgv1Go=
   act: sha256-PrNDFZycQXO0vDomT70X2hUukyXEia4UgE6Z7EXsru0=
 exchanges:
-  - at: '2026-11-06T13:04:25.179261512Z'
+  - at: '2026-11-06T22:18:50.502160256Z'
     ms: 3
     request:
       method: GET
@@ -942,14 +942,14 @@ exchanges:
       headers:
         Accept: application/alps+json
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-851c54077216e4fc-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-725132ab174048ae-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: public, max-age=86400
         content-type: application/alps+json
-        date: Fri, 06 Nov 2026 13:04:25 GMT
+        date: Fri, 06 Nov 2026 22:18:50 GMT
         etag: '"alps-52cd2f12e6b8d7d3"'
         server: Jetty(12.0.16)
         transfer-encoding: chunked
@@ -3397,7 +3397,7 @@ exchanges:
               doc:
                 format: text
                 value: A link GitHub gives as blog.
-  - at: '2026-11-06T13:04:28.546395555Z'
+  - at: '2026-11-06T22:18:52.693565840Z'
     ms: 2
     request:
       method: GET
@@ -3408,54 +3408,54 @@ exchanges:
         Cache-Control: no-cache
         If-None-Match: '"index-hsf-edf1ad4b815ba429"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-a96fe5bf28c2e698-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-fb00dcb2aa4bae77-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:04:28 GMT
+        date: Fri, 06 Nov 2026 22:18:52 GMT
         etag: '"index-hsf-edf1ad4b815ba429"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
         vary: Accept, Accept-Profile
-  - at: '2026-11-06T13:04:30.577676167Z'
-    ms: 284
+  - at: '2026-11-06T22:18:54.369763299Z'
+    ms: 269
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-f559f90ddb8c437f-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-62d05a9c1a6d78bc-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:30 GMT
-        etag: '"seq-0.hsf.L0.de08db0721cfbd15"'
+        date: Fri, 06 Nov 2026 22:18:54 GMT
+        etag: '"seq-0.hsf.L0.05d9b60b3fea70e1"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 1422841381
-        node_id: R_kgDOVM7WJQ
-        name: heart-github-test
-        full_name: JogoShugh/heart-github-test
+        id: 1448564023
+        node_id: R_kgDOVldVNw
+        name: heart-kit-test
+        full_name: JogoShugh/heart-kit-test
         private: false
         description: null
         fork: false
-        created_at: '2026-10-17T01:37:34Z'
-        updated_at: '2026-11-05T23:08:20Z'
-        pushed_at: '2026-11-05T23:08:15Z'
+        created_at: '2026-11-06T17:40:53Z'
+        updated_at: '2026-11-06T17:40:59Z'
+        pushed_at: '2026-11-06T17:40:55Z'
         homepage: null
-        size: 1654
+        size: 14
         stargazers_count: 0
         watchers_count: 0
         language: null
@@ -3469,8 +3469,7 @@ exchanges:
         mirror_url: null
         archived: false
         disabled: false
-        open_issues_count: 647
-        license: null
+        open_issues_count: 6
         allow_forking: true
         is_template: false
         web_commit_signoff_required: false
@@ -3479,7 +3478,7 @@ exchanges:
         topics: []
         visibility: public
         forks: 0
-        open_issues: 647
+        open_issues: 6
         watchers: 0
         default_branch: main
         permissions:
@@ -3491,7 +3490,7 @@ exchanges:
         allow_squash_merge: true
         allow_merge_commit: true
         allow_rebase_merge: true
-        allow_auto_merge: true
+        allow_auto_merge: false
         delete_branch_on_merge: false
         allow_update_branch: false
         use_squash_pr_title_as_default: false
@@ -3499,25 +3498,14 @@ exchanges:
         squash_merge_commit_title: COMMIT_OR_PR_TITLE
         merge_commit_message: PR_TITLE
         merge_commit_title: MERGE_MESSAGE
-        security_and_analysis:
-          secret_scanning:
-            status: enabled
-          secret_scanning_push_protection:
-            status: enabled
-          dependabot_security_updates:
-            status: disabled
-          secret_scanning_non_provider_patterns:
-            status: disabled
-          secret_scanning_validity_checks:
-            status: disabled
         network_count: 0
         subscribers_count: 0
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
+          repo: heart-kit-test
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -3530,150 +3518,150 @@ exchanges:
             type: application/json
             integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
           github:repos-list-branches:
-            href: /repos/JogoShugh/heart-github-test/branches
+            href: /repos/JogoShugh/heart-kit-test/branches
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test
+            href: https://github.com/JogoShugh/heart-kit-test
             type: text/html
           github:forks:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/forks
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/forks
             type: application/vnd.github+json
           github:keys:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/keys{/key_id}
             type: application/vnd.github+json
             templated: true
           github:collaborators:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/collaborators{/collaborator}
             type: application/vnd.github+json
             templated: true
           github:teams:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/teams
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/teams
             type: application/vnd.github+json
           github:hooks:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/hooks
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/hooks
             type: application/vnd.github+json
           github:issue-events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/events{/number}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/events
             type: application/vnd.github+json
           github:assignees:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/assignees{/user}
             type: application/vnd.github+json
             templated: true
           github:branches:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/branches{/branch}
             type: application/vnd.github+json
             templated: true
           github:tags:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/tags
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/tags
             type: application/vnd.github+json
           github:blobs:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/blobs{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-tags:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/tags{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-refs:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/refs{/sha}
             type: application/vnd.github+json
             templated: true
           github:trees:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/trees{/sha}
             type: application/vnd.github+json
             templated: true
           github:statuses:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/statuses/{sha}
             type: application/vnd.github+json
             templated: true
           github:languages:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/languages
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/languages
             type: application/vnd.github+json
           github:stargazers:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/stargazers
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/stargazers
             type: application/vnd.github+json
           github:contributors:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/contributors
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/contributors
             type: application/vnd.github+json
           github:subscribers:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/subscribers
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/subscribers
             type: application/vnd.github+json
           github:subscription:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/subscription
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/subscription
             type: application/vnd.github+json
           github:commits:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/commits{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-commits:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/commits{/sha}
             type: application/vnd.github+json
             templated: true
           github:comments:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/comments{/number}
             type: application/vnd.github+json
             templated: true
           github:issue-comment:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/comments{/number}
             type: application/vnd.github+json
             templated: true
           github:contents:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/contents/{+path}
             type: application/vnd.github+json
             templated: true
           github:compare:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/compare/{base}...{head}
             type: application/vnd.github+json
             templated: true
           github:merges:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/merges
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/merges
             type: application/vnd.github+json
           github:archive:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/{archive_format}{/ref}
             type: application/vnd.github+json
             templated: true
           github:downloads:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/downloads
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/downloads
             type: application/vnd.github+json
           github:issues:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues{/number}
             type: application/vnd.github+json
             templated: true
           github:pulls:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/pulls{/number}
             type: application/vnd.github+json
             templated: true
           github:milestones:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/milestones{/number}
             type: application/vnd.github+json
             templated: true
           github:notifications:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/notifications{?since,all,participating}
             type: application/vnd.github+json
             templated: true
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:releases:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/releases{/id}
             type: application/vnd.github+json
             templated: true
           github:deployments:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/deployments
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/deployments
             type: application/vnd.github+json
           github:git:
-            href: git://github.com/JogoShugh/heart-github-test.git
+            href: git://github.com/JogoShugh/heart-kit-test.git
           github:ssh:
-            href: ssh://git@github.com/JogoShugh/heart-github-test.git
+            href: ssh://git@github.com/JogoShugh/heart-kit-test.git
           github:clone:
-            href: https://github.com/JogoShugh/heart-github-test.git
+            href: https://github.com/JogoShugh/heart-kit-test.git
             type: text/html
           github:svn:
-            href: https://github.com/JogoShugh/heart-github-test
+            href: https://github.com/JogoShugh/heart-kit-test
             type: text/html
         _embedded:
           github:owner:
@@ -3726,13 +3714,21 @@ exchanges:
               github:received-events:
                 href: https://api.github.com/users/JogoShugh/received_events
                 type: application/vnd.github+json
+          license:
+            key: agpl-3.0
+            name: GNU Affero General Public License v3.0
+            spdx_id: AGPL-3.0
+            node_id: MDc6TGljZW5zZTE=
+            _links:
+              self:
+                href: https://api.github.com/licenses/agpl-3.0
         _forms:
           github:open-issue:
             title: Open an issue
             description: Open a new issue in this repository.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/actions/open-issue
+                href: /repos/JogoShugh/heart-kit-test/actions/open-issue
             method: POST
             contentType: application/json
             schema:
@@ -3803,21 +3799,21 @@ offered:
     - self
     - service-desc
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test
 now:
   state:
-    id: 1422841381
-    node_id: R_kgDOVM7WJQ
-    name: heart-github-test
-    full_name: JogoShugh/heart-github-test
+    id: 1448564023
+    node_id: R_kgDOVldVNw
+    name: heart-kit-test
+    full_name: JogoShugh/heart-kit-test
     private: false
     description: null
     fork: false
-    created_at: '2026-10-17T01:37:34Z'
-    updated_at: '2026-11-05T23:08:20Z'
-    pushed_at: '2026-11-05T23:08:15Z'
+    created_at: '2026-11-06T17:40:53Z'
+    updated_at: '2026-11-06T17:40:59Z'
+    pushed_at: '2026-11-06T17:40:55Z'
     homepage: null
-    size: 1654
+    size: 14
     stargazers_count: 0
     watchers_count: 0
     language: null
@@ -3831,8 +3827,7 @@ now:
     mirror_url: null
     archived: false
     disabled: false
-    open_issues_count: 647
-    license: null
+    open_issues_count: 6
     allow_forking: true
     is_template: false
     web_commit_signoff_required: false
@@ -3841,7 +3836,7 @@ now:
     topics: []
     visibility: public
     forks: 0
-    open_issues: 647
+    open_issues: 6
     watchers: 0
     default_branch: main
     permissions:
@@ -3853,7 +3848,7 @@ now:
     allow_squash_merge: true
     allow_merge_commit: true
     allow_rebase_merge: true
-    allow_auto_merge: true
+    allow_auto_merge: false
     delete_branch_on_merge: false
     allow_update_branch: false
     use_squash_pr_title_as_default: false
@@ -3861,22 +3856,11 @@ now:
     squash_merge_commit_title: COMMIT_OR_PR_TITLE
     merge_commit_message: PR_TITLE
     merge_commit_title: MERGE_MESSAGE
-    security_and_analysis:
-      secret_scanning:
-        status: enabled
-      secret_scanning_push_protection:
-        status: enabled
-      dependabot_security_updates:
-        status: disabled
-      secret_scanning_non_provider_patterns:
-        status: disabled
-      secret_scanning_validity_checks:
-        status: disabled
     network_count: 0
     subscribers_count: 0
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
+      repo: heart-kit-test
   forms:
     - github:open-issue
   links:
@@ -3979,6 +3963,13 @@ now:
           type: User
           user_view_type: public
           site_admin: false
+    license:
+      - title: null
+        state:
+          key: agpl-3.0
+          name: GNU Affero General Public License v3.0
+          spdx_id: AGPL-3.0
+          node_id: MDc6TGljZW5zZTE=
 keeps:
   /hr:address/owner:
     - 6
@@ -3989,22 +3980,22 @@ keeps:
   /hr:address/repo:
     - 6
 ---
-at: '2026-11-06T13:04:35.148214711Z'
-ms: 3820
+at: '2026-11-06T22:18:58.609228260Z'
+ms: 4015
 mode: intent
-say: 'Open a new issue titled "Hello from ARTIE (1106-1304)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."'
+say: 'Open a new issue titled "Hello from ARTIE (1106-2218)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."'
 line: 2
 within: 1
 params:
   relation: github:open-issue
-  title: Hello from ARTIE (1106-1304)
+  title: Hello from ARTIE (1106-2218)
   body: Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.
 values:
   title:
-    value: Hello from ARTIE (1106-1304)
+    value: Hello from ARTIE (1106-2218)
     from:
       - parts:
-          '1106-1304':
+          '1106-2218':
             input: stamp
   body:
     value: Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.
@@ -4015,7 +4006,7 @@ reason:
   template: 'Open a new issue titled "Hello from ARTIE ($stamp)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."'
   slots:
     stamp:
-      value: 1106-1304
+      value: 1106-2218
       from:
         - input: stamp
 opens: true
@@ -4024,25 +4015,25 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       &lt;state&gt;
-      {"id":1422841381,"node_id":"R_kgDOVM7WJQ","name":"heart-github-test","full_name":"JogoShugh/heart-github-test","private":false,"description":null,"fork":false,"created_at":"2026-10-17T01:37:34Z","updated_at":"2026-11-05T23:08:20Z","pushed_at":"2026-11-05T23:08:15Z","homepage":null,"size":1654,"stargazers_count":0,"watchers_count":0,"language":null,"has_issues":true,"has_projects":true,"has_downloads":false,"has_wiki":true,"has_pages":false,"has_discussions":false,"forks_count":0,"mirror_url":null,"archived":false,"disabled":false,"open_issues_count":647,"license":null,"allow_forking":true,"is_template":false,"web_commit_signoff_required":false,"has_pull_requests":true,"pull_request_creation_policy":"all","topics":[],"visibility":"public","forks":0,"open_issues":647,"watchers":0,"default_branch":"main","permissions":{"admin":true,"maintain":true,"push":true,"triage":true,"pull":true},"allow_squash_merge":true,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_auto_merge":true,"delete_branch_on_merge":false,"allow_update_branch":false,"use_squash_pr_title_as_default":false,"squash_merge_commit_message":"COMMIT_MESSAGES","squash_merge_commit_title":"COMMIT_OR_PR_TITLE","merge_commit_message":"PR_TITLE","merge_commit_title":"MERGE_MESSAGE","security_and_analysis":{"secret_scanning":{"status":"enabled"},"secret_scanning_push_protection":{"status":"enabled"},"dependabot_security_updates":{"status":"disabled"},"secret_scanning_non_provider_patterns":{"status":"disabled"},"secret_scanning_validity_checks":{"status":"disabled"}},"network_count":0,"subscribers_count":0,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test"}}
+      {"id":1448564023,"node_id":"R_kgDOVldVNw","name":"heart-kit-test","full_name":"JogoShugh/heart-kit-test","private":false,"description":null,"fork":false,"created_at":"2026-11-06T17:40:53Z","updated_at":"2026-11-06T17:40:59Z","pushed_at":"2026-11-06T17:40:55Z","homepage":null,"size":14,"stargazers_count":0,"watchers_count":0,"language":null,"has_issues":true,"has_projects":true,"has_downloads":false,"has_wiki":true,"has_pages":false,"has_discussions":false,"forks_count":0,"mirror_url":null,"archived":false,"disabled":false,"open_issues_count":6,"allow_forking":true,"is_template":false,"web_commit_signoff_required":false,"has_pull_requests":true,"pull_request_creation_policy":"all","topics":[],"visibility":"public","forks":0,"open_issues":6,"watchers":0,"default_branch":"main","permissions":{"admin":true,"maintain":true,"push":true,"triage":true,"pull":true},"allow_squash_merge":true,"allow_merge_commit":true,"allow_rebase_merge":true,"allow_auto_merge":false,"delete_branch_on_merge":false,"allow_update_branch":false,"use_squash_pr_title_as_default":false,"squash_merge_commit_message":"COMMIT_MESSAGES","squash_merge_commit_title":"COMMIT_OR_PR_TITLE","merge_commit_message":"PR_TITLE","merge_commit_title":"MERGE_MESSAGE","network_count":0,"subscribers_count":0,"hr:address":{"owner":"JogoShugh","repo":"heart-kit-test"}}
       &lt;/state&gt;
       &lt;offers&gt;
       {"github:open-issue":{"title":"Open an issue","description":"Open a new issue in this repository.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"assignees":{"description":"Logins for Users to assign to this issue. _NOTE: Only users with push access can set assignees for new issues. Assignees are silently dropped otherwise._","items":{"type":"string"},"title":"Assignees","type":"array"},"body":{"description":"The contents of the issue.","title":"Body","type":"string"},"labels":{"description":"Labels to associate with this issue. _NOTE: Only users with push access can set labels for new issues. Labels are silently dropped otherwise._","items":{"oneOf":[{"type":"string"},{"properties":{"color":{"nullable":true,"type":"string"},"description":{"nullable":true,"type":"string"},"id":{"type":"integer"},"name":{"type":"string"}},"type":"object"}]},"title":"Labels","type":"array"},"milestone":{"nullable":true,"oneOf":[{"type":"string"},{"description":"The `number` of the milestone to associate this issue with. _NOTE: Only users with push access can set the milestone for new issues. The milestone is silently dropped otherwise._","type":"integer"}],"title":"Milestone"},"title":{"description":"The title of the issue.","oneOf":[{"type":"string"},{"type":"integer"}],"title":"Title"}},"required":["title"],"title":"Open an issue","type":"object","$id":"/schemas/a6135350178a1927"}}}
       &lt;/offers&gt;
       &lt;links&gt;
-      [{"rel":"github:repos-list-branches"},{"rel":"github:owner","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}}]
+      [{"rel":"github:repos-list-branches"},{"rel":"github:owner","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}},{"rel":"license","state":{"key":"agpl-3.0","name":"GNU Affero General Public License v3.0","spdx_id":"AGPL-3.0","node_id":"MDc6TGljZW5zZTE="}}]
       &lt;/links&gt;
       &lt;intent&gt;
-      Open a new issue titled "Hello from ARTIE (1106-1304)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."
+      Open a new issue titled "Hello from ARTIE (1106-2218)" with body: "Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."
       &lt;/intent&gt;
-    answered: '[{"type":"tool_use","id":"toolu_01BTnoJHehgWpGWzSdde8k24","name":"select","input":{"action":"act","affordance":"github:open-issue","fields":{"title":"Hello from ARTIE (1106-1304)","body":"Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_015XgkkNEaBK7BYSwyeBxpbd","name":"select","input":{"action":"act","affordance":"github:open-issue","fields":{"title":"Hello from ARTIE (1106-2218)","body":"Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway."}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
   relation: github:open-issue
   title: Open an issue
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+  target: http://localhost:8392/repos/JogoShugh/heart-kit-test/actions/open-issue
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test/actions/open-issue
   picked: relation
   not sent:
     - assignees
@@ -4052,73 +4043,73 @@ guard:
   rung: L0
   form: sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
   act: sha256-zSq9d1NxXf4kXLKZaTlHo/9x0j+E3X2SJkMhbOdk21U=
-  if-match: '"seq-0.hsf.L0.de08db0721cfbd15"'
+  if-match: '"seq-0.hsf.L0.05d9b60b3fea70e1"'
 exchanges:
-  - at: '2026-11-06T13:04:35.148654586Z'
-    ms: 449
+  - at: '2026-11-06T22:18:58.609783135Z'
+    ms: 266
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.de08db0721cfbd15"'
+        If-None-Match: '"seq-0.hsf.L0.05d9b60b3fea70e1"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-b048fa1f7b6c2fb9-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-72cbf1217160913f-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:04:35 GMT
-        etag: '"seq-0.hsf.L0.de08db0721cfbd15"'
+        date: Fri, 06 Nov 2026 22:18:58 GMT
+        etag: '"seq-0.hsf.L0.05d9b60b3fea70e1"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         vary: Accept, Prefer, Accept-Profile
-  - at: '2026-11-06T13:04:37.147701795Z'
-    ms: 1284
+  - at: '2026-11-06T22:19:00.606185052Z'
+    ms: 1469
     request:
       method: POST
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/actions/open-issue
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/actions/open-issue
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Content-Type: application/json
-        If-Match: '"seq-0.hsf.L0.de08db0721cfbd15"'
+        If-Match: '"seq-0.hsf.L0.05d9b60b3fea70e1"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-2dde9b0e63a89579-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-e4f9497747c7fdd4-01
         User-Agent: ARTIE/0.5
       body:
-        title: Hello from ARTIE (1106-1304)
+        title: Hello from ARTIE (1106-2218)
         body: Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.
     response:
       status: 201
       headers:
         cache-control: no-cache
-        content-location: /repos/JogoShugh/heart-github-test
+        content-location: /repos/JogoShugh/heart-kit-test
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:37 GMT
-        etag: '"seq-0.hsf.L0.8851b7ba43d2637e"'
+        date: Fri, 06 Nov 2026 22:19:00 GMT
+        etag: '"seq-0.hsf.L0.58918a903306493c"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
-        location: /repos/JogoShugh/heart-github-test/issues/2293
+        location: /repos/JogoShugh/heart-kit-test/issues/120
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 1422841381
-        node_id: R_kgDOVM7WJQ
-        name: heart-github-test
-        full_name: JogoShugh/heart-github-test
+        id: 1448564023
+        node_id: R_kgDOVldVNw
+        name: heart-kit-test
+        full_name: JogoShugh/heart-kit-test
         private: false
         description: null
         fork: false
-        created_at: '2026-10-17T01:37:34Z'
-        updated_at: '2026-11-05T23:08:20Z'
-        pushed_at: '2026-11-05T23:08:15Z'
+        created_at: '2026-11-06T17:40:53Z'
+        updated_at: '2026-11-06T17:40:59Z'
+        pushed_at: '2026-11-06T17:40:55Z'
         homepage: null
-        size: 1654
+        size: 14
         stargazers_count: 0
         watchers_count: 0
         language: null
@@ -4132,8 +4123,7 @@ exchanges:
         mirror_url: null
         archived: false
         disabled: false
-        open_issues_count: 648
-        license: null
+        open_issues_count: 7
         allow_forking: true
         is_template: false
         web_commit_signoff_required: false
@@ -4142,7 +4132,7 @@ exchanges:
         topics: []
         visibility: public
         forks: 0
-        open_issues: 648
+        open_issues: 7
         watchers: 0
         default_branch: main
         permissions:
@@ -4154,7 +4144,7 @@ exchanges:
         allow_squash_merge: true
         allow_merge_commit: true
         allow_rebase_merge: true
-        allow_auto_merge: true
+        allow_auto_merge: false
         delete_branch_on_merge: false
         allow_update_branch: false
         use_squash_pr_title_as_default: false
@@ -4162,25 +4152,14 @@ exchanges:
         squash_merge_commit_title: COMMIT_OR_PR_TITLE
         merge_commit_message: PR_TITLE
         merge_commit_title: MERGE_MESSAGE
-        security_and_analysis:
-          secret_scanning:
-            status: enabled
-          secret_scanning_push_protection:
-            status: enabled
-          dependabot_security_updates:
-            status: disabled
-          secret_scanning_non_provider_patterns:
-            status: disabled
-          secret_scanning_validity_checks:
-            status: disabled
         network_count: 0
         subscribers_count: 0
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
+          repo: heart-kit-test
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -4193,150 +4172,150 @@ exchanges:
             type: application/json
             integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
           github:repos-list-branches:
-            href: /repos/JogoShugh/heart-github-test/branches
+            href: /repos/JogoShugh/heart-kit-test/branches
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test
+            href: https://github.com/JogoShugh/heart-kit-test
             type: text/html
           github:forks:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/forks
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/forks
             type: application/vnd.github+json
           github:keys:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/keys{/key_id}
             type: application/vnd.github+json
             templated: true
           github:collaborators:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/collaborators{/collaborator}
             type: application/vnd.github+json
             templated: true
           github:teams:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/teams
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/teams
             type: application/vnd.github+json
           github:hooks:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/hooks
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/hooks
             type: application/vnd.github+json
           github:issue-events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/events{/number}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/events
             type: application/vnd.github+json
           github:assignees:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/assignees{/user}
             type: application/vnd.github+json
             templated: true
           github:branches:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/branches{/branch}
             type: application/vnd.github+json
             templated: true
           github:tags:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/tags
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/tags
             type: application/vnd.github+json
           github:blobs:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/blobs{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-tags:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/tags{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-refs:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/refs{/sha}
             type: application/vnd.github+json
             templated: true
           github:trees:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/trees{/sha}
             type: application/vnd.github+json
             templated: true
           github:statuses:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/statuses/{sha}
             type: application/vnd.github+json
             templated: true
           github:languages:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/languages
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/languages
             type: application/vnd.github+json
           github:stargazers:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/stargazers
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/stargazers
             type: application/vnd.github+json
           github:contributors:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/contributors
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/contributors
             type: application/vnd.github+json
           github:subscribers:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/subscribers
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/subscribers
             type: application/vnd.github+json
           github:subscription:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/subscription
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/subscription
             type: application/vnd.github+json
           github:commits:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/commits{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-commits:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/commits{/sha}
             type: application/vnd.github+json
             templated: true
           github:comments:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/comments{/number}
             type: application/vnd.github+json
             templated: true
           github:issue-comment:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/comments{/number}
             type: application/vnd.github+json
             templated: true
           github:contents:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/contents/{+path}
             type: application/vnd.github+json
             templated: true
           github:compare:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/compare/{base}...{head}
             type: application/vnd.github+json
             templated: true
           github:merges:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/merges
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/merges
             type: application/vnd.github+json
           github:archive:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/{archive_format}{/ref}
             type: application/vnd.github+json
             templated: true
           github:downloads:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/downloads
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/downloads
             type: application/vnd.github+json
           github:issues:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues{/number}
             type: application/vnd.github+json
             templated: true
           github:pulls:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/pulls{/number}
             type: application/vnd.github+json
             templated: true
           github:milestones:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/milestones{/number}
             type: application/vnd.github+json
             templated: true
           github:notifications:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/notifications{?since,all,participating}
             type: application/vnd.github+json
             templated: true
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:releases:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/releases{/id}
             type: application/vnd.github+json
             templated: true
           github:deployments:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/deployments
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/deployments
             type: application/vnd.github+json
           github:git:
-            href: git://github.com/JogoShugh/heart-github-test.git
+            href: git://github.com/JogoShugh/heart-kit-test.git
           github:ssh:
-            href: ssh://git@github.com/JogoShugh/heart-github-test.git
+            href: ssh://git@github.com/JogoShugh/heart-kit-test.git
           github:clone:
-            href: https://github.com/JogoShugh/heart-github-test.git
+            href: https://github.com/JogoShugh/heart-kit-test.git
             type: text/html
           github:svn:
-            href: https://github.com/JogoShugh/heart-github-test
+            href: https://github.com/JogoShugh/heart-kit-test
             type: text/html
         _embedded:
           github:owner:
@@ -4389,13 +4368,21 @@ exchanges:
               github:received-events:
                 href: https://api.github.com/users/JogoShugh/received_events
                 type: application/vnd.github+json
+          license:
+            key: agpl-3.0
+            name: GNU Affero General Public License v3.0
+            spdx_id: AGPL-3.0
+            node_id: MDc6TGljZW5zZTE=
+            _links:
+              self:
+                href: https://api.github.com/licenses/agpl-3.0
         _forms:
           github:open-issue:
             title: Open an issue
             description: Open a new issue in this repository.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/actions/open-issue
+                href: /repos/JogoShugh/heart-kit-test/actions/open-issue
             method: POST
             contentType: application/json
             schema:
@@ -4450,42 +4437,42 @@ exchanges:
               type: object
               '$id': /schemas/a6135350178a1927
             hr:integrity: sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
-  - at: '2026-11-06T13:04:38.432519712Z'
-    ms: 534
+  - at: '2026-11-06T22:19:02.076465303Z'
+    ms: 546
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-bb345d2846ca2103-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-10544b3424e1cab8-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:38 GMT
-        etag: '"seq-0.hsf.L0.c211739e634cb745"'
+        date: Fri, 06 Nov 2026 22:19:02 GMT
+        etag: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 6243160543
-        node_id: I_kwDOVM7WJc8AAAABdB8R3w
-        number: 2293
-        title: Hello from ARTIE (1106-1304)
+        id: 6251643718
+        node_id: I_kwDOVldVN88AAAABdKCDRg
+        number: 120
+        title: Hello from ARTIE (1106-2218)
         labels: []
         state: open
         locked: false
         assignees: []
         milestone: null
         comments: 0
-        created_at: '2026-11-06T13:04:38Z'
-        updated_at: '2026-11-06T13:04:38Z'
+        created_at: '2026-11-06T22:19:01Z'
+        updated_at: '2026-11-06T22:19:01Z'
         closed_at: null
         assignee: null
         author_association: OWNER
@@ -4516,11 +4503,11 @@ exchanges:
         pinned_comment: null
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
-          issue_number: '2293'
+          repo: heart-kit-test
+          issue_number: '120'
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test/issues/2293
+            href: /repos/JogoShugh/heart-kit-test/issues/120
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -4533,30 +4520,30 @@ exchanges:
             type: application/json
             integrity: sha256-EV8YpuFGuCJveeMnIpniRvldqQMzFkZq28qY4PXNI2s=
           github:issues-list-sub-issues:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/sub_issues
+            href: /repos/JogoShugh/heart-kit-test/issues/120/sub_issues
           github:issues-list-comments:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/comments
+            href: /repos/JogoShugh/heart-kit-test/issues/120/comments
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:repos-get:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/events
             type: application/vnd.github+json
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test/issues/2293
+            href: https://github.com/JogoShugh/heart-kit-test/issues/120
             type: text/html
           github:reactions:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/reactions
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/reactions
             type: application/vnd.github+json
           github:timeline:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/timeline
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/timeline
             type: application/vnd.github+json
         _embedded:
           author:
@@ -4615,7 +4602,7 @@ exchanges:
             description: Close it; a pull request unmerged, an issue as completed.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -4632,7 +4619,7 @@ exchanges:
             description: Close the issue as something that won't be done.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close-not-planned
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close-not-planned
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -4649,7 +4636,7 @@ exchanges:
             description: Close the issue as a duplicate of another, named by its id.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close-duplicate
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close-duplicate
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -4670,7 +4657,7 @@ exchanges:
             description: Change its title or description.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/edit
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/edit
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -4699,7 +4686,7 @@ exchanges:
             description: Limit the conversation to collaborators, for a reason.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/lock
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/lock
             method: PUT
             contentType: application/json
             schema:
@@ -4730,7 +4717,7 @@ exchanges:
             description: Add labels to the pull request.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/label
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/label
             method: POST
             contentType: application/json
             schema:
@@ -4775,7 +4762,7 @@ exchanges:
             description: Take one label off the issue, by its name.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unlabel{?name}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unlabel{?name}
                 templated: true
             method: DELETE
             schema:
@@ -4797,7 +4784,7 @@ exchanges:
             description: Assign people to the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/assign
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/assign
             method: POST
             contentType: application/json
             schema:
@@ -4841,7 +4828,7 @@ exchanges:
             description: Take people off the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unassign{?assignees}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unassign{?assignees}
                 templated: true
             method: DELETE
             schema:
@@ -4864,7 +4851,7 @@ exchanges:
             description: Put the issue in a milestone, by its number, or take it out with null.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/set-milestone
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/set-milestone
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -4888,7 +4875,7 @@ exchanges:
             description: Add a comment to the pull request's conversation.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/comment
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/comment
             method: POST
             contentType: application/json
             schema:
@@ -4910,7 +4897,7 @@ exchanges:
             description: Make another issue a sub-issue of this one, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/add-sub-issue
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/add-sub-issue
             method: POST
             contentType: application/json
             schema:
@@ -4936,7 +4923,7 @@ exchanges:
             description: Take a sub-issue off this issue, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/remove-sub-issue{?sub_issue_id}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/remove-sub-issue{?sub_issue_id}
                 templated: true
             method: DELETE
             schema:
@@ -5002,21 +4989,21 @@ offered:
     - hr:unavailable
     - self
 outcome: new resource
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 now:
   state:
-    id: 6243160543
-    node_id: I_kwDOVM7WJc8AAAABdB8R3w
-    number: 2293
-    title: Hello from ARTIE (1106-1304)
+    id: 6251643718
+    node_id: I_kwDOVldVN88AAAABdKCDRg
+    number: 120
+    title: Hello from ARTIE (1106-2218)
     labels: []
     state: open
     locked: false
     assignees: []
     milestone: null
     comments: 0
-    created_at: '2026-11-06T13:04:38Z'
-    updated_at: '2026-11-06T13:04:38Z'
+    created_at: '2026-11-06T22:19:01Z'
+    updated_at: '2026-11-06T22:19:01Z'
     closed_at: null
     assignee: null
     author_association: OWNER
@@ -5047,8 +5034,8 @@ now:
     pinned_comment: null
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
-      issue_number: '2293'
+      repo: heart-kit-test
+      issue_number: '120'
   forms:
     - github:close
     - github:close-not-planned
@@ -5107,52 +5094,52 @@ keeps:
   /hr:address/issue_number:
     - 6
 ---
-at: '2026-11-06T13:04:40.719841255Z'
-ms: 254
+at: '2026-11-06T22:19:04.636240679Z'
+ms: 250
 mode: script
 say: return to {address}
 line: 2
 within: 1
 params:
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test
 exchanges:
-  - at: '2026-11-06T13:04:40.720747088Z'
-    ms: 252
+  - at: '2026-11-06T22:19:04.636751554Z'
+    ms: 248
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.de08db0721cfbd15"'
+        If-None-Match: '"seq-0.hsf.L0.05d9b60b3fea70e1"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-929429a4661a05c6-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-0802b3d7c9cf53cd-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:40 GMT
-        etag: '"seq-0.hsf.L0.8851b7ba43d2637e"'
+        date: Fri, 06 Nov 2026 22:19:04 GMT
+        etag: '"seq-0.hsf.L0.58918a903306493c"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 1422841381
-        node_id: R_kgDOVM7WJQ
-        name: heart-github-test
-        full_name: JogoShugh/heart-github-test
+        id: 1448564023
+        node_id: R_kgDOVldVNw
+        name: heart-kit-test
+        full_name: JogoShugh/heart-kit-test
         private: false
         description: null
         fork: false
-        created_at: '2026-10-17T01:37:34Z'
-        updated_at: '2026-11-05T23:08:20Z'
-        pushed_at: '2026-11-05T23:08:15Z'
+        created_at: '2026-11-06T17:40:53Z'
+        updated_at: '2026-11-06T17:40:59Z'
+        pushed_at: '2026-11-06T17:40:55Z'
         homepage: null
-        size: 1654
+        size: 14
         stargazers_count: 0
         watchers_count: 0
         language: null
@@ -5166,8 +5153,7 @@ exchanges:
         mirror_url: null
         archived: false
         disabled: false
-        open_issues_count: 648
-        license: null
+        open_issues_count: 7
         allow_forking: true
         is_template: false
         web_commit_signoff_required: false
@@ -5176,7 +5162,7 @@ exchanges:
         topics: []
         visibility: public
         forks: 0
-        open_issues: 648
+        open_issues: 7
         watchers: 0
         default_branch: main
         permissions:
@@ -5188,7 +5174,7 @@ exchanges:
         allow_squash_merge: true
         allow_merge_commit: true
         allow_rebase_merge: true
-        allow_auto_merge: true
+        allow_auto_merge: false
         delete_branch_on_merge: false
         allow_update_branch: false
         use_squash_pr_title_as_default: false
@@ -5196,25 +5182,14 @@ exchanges:
         squash_merge_commit_title: COMMIT_OR_PR_TITLE
         merge_commit_message: PR_TITLE
         merge_commit_title: MERGE_MESSAGE
-        security_and_analysis:
-          secret_scanning:
-            status: enabled
-          secret_scanning_push_protection:
-            status: enabled
-          dependabot_security_updates:
-            status: disabled
-          secret_scanning_non_provider_patterns:
-            status: disabled
-          secret_scanning_validity_checks:
-            status: disabled
         network_count: 0
         subscribers_count: 0
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
+          repo: heart-kit-test
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -5227,150 +5202,150 @@ exchanges:
             type: application/json
             integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
           github:repos-list-branches:
-            href: /repos/JogoShugh/heart-github-test/branches
+            href: /repos/JogoShugh/heart-kit-test/branches
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test
+            href: https://github.com/JogoShugh/heart-kit-test
             type: text/html
           github:forks:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/forks
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/forks
             type: application/vnd.github+json
           github:keys:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/keys{/key_id}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/keys{/key_id}
             type: application/vnd.github+json
             templated: true
           github:collaborators:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/collaborators{/collaborator}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/collaborators{/collaborator}
             type: application/vnd.github+json
             templated: true
           github:teams:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/teams
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/teams
             type: application/vnd.github+json
           github:hooks:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/hooks
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/hooks
             type: application/vnd.github+json
           github:issue-events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/events{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/events{/number}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/events
             type: application/vnd.github+json
           github:assignees:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/assignees{/user}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/assignees{/user}
             type: application/vnd.github+json
             templated: true
           github:branches:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/branches{/branch}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/branches{/branch}
             type: application/vnd.github+json
             templated: true
           github:tags:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/tags
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/tags
             type: application/vnd.github+json
           github:blobs:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/blobs{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/blobs{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-tags:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/tags{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/tags{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-refs:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/refs{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/refs{/sha}
             type: application/vnd.github+json
             templated: true
           github:trees:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/trees{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/trees{/sha}
             type: application/vnd.github+json
             templated: true
           github:statuses:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/statuses/{sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/statuses/{sha}
             type: application/vnd.github+json
             templated: true
           github:languages:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/languages
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/languages
             type: application/vnd.github+json
           github:stargazers:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/stargazers
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/stargazers
             type: application/vnd.github+json
           github:contributors:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/contributors
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/contributors
             type: application/vnd.github+json
           github:subscribers:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/subscribers
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/subscribers
             type: application/vnd.github+json
           github:subscription:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/subscription
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/subscription
             type: application/vnd.github+json
           github:commits:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/commits{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/commits{/sha}
             type: application/vnd.github+json
             templated: true
           github:git-commits:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/git/commits{/sha}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/git/commits{/sha}
             type: application/vnd.github+json
             templated: true
           github:comments:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/comments{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/comments{/number}
             type: application/vnd.github+json
             templated: true
           github:issue-comment:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/comments{/number}
             type: application/vnd.github+json
             templated: true
           github:contents:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/contents/{+path}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/contents/{+path}
             type: application/vnd.github+json
             templated: true
           github:compare:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/compare/{base}...{head}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/compare/{base}...{head}
             type: application/vnd.github+json
             templated: true
           github:merges:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/merges
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/merges
             type: application/vnd.github+json
           github:archive:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/{archive_format}{/ref}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/{archive_format}{/ref}
             type: application/vnd.github+json
             templated: true
           github:downloads:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/downloads
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/downloads
             type: application/vnd.github+json
           github:issues:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues{/number}
             type: application/vnd.github+json
             templated: true
           github:pulls:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/pulls{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/pulls{/number}
             type: application/vnd.github+json
             templated: true
           github:milestones:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/milestones{/number}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/milestones{/number}
             type: application/vnd.github+json
             templated: true
           github:notifications:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/notifications{?since,all,participating}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/notifications{?since,all,participating}
             type: application/vnd.github+json
             templated: true
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:releases:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/releases{/id}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/releases{/id}
             type: application/vnd.github+json
             templated: true
           github:deployments:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/deployments
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/deployments
             type: application/vnd.github+json
           github:git:
-            href: git://github.com/JogoShugh/heart-github-test.git
+            href: git://github.com/JogoShugh/heart-kit-test.git
           github:ssh:
-            href: ssh://git@github.com/JogoShugh/heart-github-test.git
+            href: ssh://git@github.com/JogoShugh/heart-kit-test.git
           github:clone:
-            href: https://github.com/JogoShugh/heart-github-test.git
+            href: https://github.com/JogoShugh/heart-kit-test.git
             type: text/html
           github:svn:
-            href: https://github.com/JogoShugh/heart-github-test
+            href: https://github.com/JogoShugh/heart-kit-test
             type: text/html
         _embedded:
           github:owner:
@@ -5423,13 +5398,21 @@ exchanges:
               github:received-events:
                 href: https://api.github.com/users/JogoShugh/received_events
                 type: application/vnd.github+json
+          license:
+            key: agpl-3.0
+            name: GNU Affero General Public License v3.0
+            spdx_id: AGPL-3.0
+            node_id: MDc6TGljZW5zZTE=
+            _links:
+              self:
+                href: https://api.github.com/licenses/agpl-3.0
         _forms:
           github:open-issue:
             title: Open an issue
             description: Open a new issue in this repository.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/actions/open-issue
+                href: /repos/JogoShugh/heart-kit-test/actions/open-issue
             method: POST
             contentType: application/json
             schema:
@@ -5485,21 +5468,21 @@ exchanges:
               '$id': /schemas/a6135350178a1927
             hr:integrity: sha256-DkhI+JBXfAJQrcEsPIy8+AzCiYOtFzSaKOQ0N/UXTxI=
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test
 now:
   state:
-    id: 1422841381
-    node_id: R_kgDOVM7WJQ
-    name: heart-github-test
-    full_name: JogoShugh/heart-github-test
+    id: 1448564023
+    node_id: R_kgDOVldVNw
+    name: heart-kit-test
+    full_name: JogoShugh/heart-kit-test
     private: false
     description: null
     fork: false
-    created_at: '2026-10-17T01:37:34Z'
-    updated_at: '2026-11-05T23:08:20Z'
-    pushed_at: '2026-11-05T23:08:15Z'
+    created_at: '2026-11-06T17:40:53Z'
+    updated_at: '2026-11-06T17:40:59Z'
+    pushed_at: '2026-11-06T17:40:55Z'
     homepage: null
-    size: 1654
+    size: 14
     stargazers_count: 0
     watchers_count: 0
     language: null
@@ -5513,8 +5496,7 @@ now:
     mirror_url: null
     archived: false
     disabled: false
-    open_issues_count: 648
-    license: null
+    open_issues_count: 7
     allow_forking: true
     is_template: false
     web_commit_signoff_required: false
@@ -5523,7 +5505,7 @@ now:
     topics: []
     visibility: public
     forks: 0
-    open_issues: 648
+    open_issues: 7
     watchers: 0
     default_branch: main
     permissions:
@@ -5535,7 +5517,7 @@ now:
     allow_squash_merge: true
     allow_merge_commit: true
     allow_rebase_merge: true
-    allow_auto_merge: true
+    allow_auto_merge: false
     delete_branch_on_merge: false
     allow_update_branch: false
     use_squash_pr_title_as_default: false
@@ -5543,22 +5525,11 @@ now:
     squash_merge_commit_title: COMMIT_OR_PR_TITLE
     merge_commit_message: PR_TITLE
     merge_commit_title: MERGE_MESSAGE
-    security_and_analysis:
-      secret_scanning:
-        status: enabled
-      secret_scanning_push_protection:
-        status: enabled
-      dependabot_security_updates:
-        status: disabled
-      secret_scanning_non_provider_patterns:
-        status: disabled
-      secret_scanning_validity_checks:
-        status: disabled
     network_count: 0
     subscribers_count: 0
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
+      repo: heart-kit-test
   forms:
     - github:open-issue
   links:
@@ -5661,8 +5632,15 @@ now:
           type: User
           user_view_type: public
           site_admin: false
+    license:
+      - title: null
+        state:
+          key: agpl-3.0
+          name: GNU Affero General Public License v3.0
+          spdx_id: AGPL-3.0
+          node_id: MDc6TGljZW5zZTE=
 ---
-at: '2026-11-06T13:04:40.975036213Z'
+at: '2026-11-06T22:19:04.887685054Z'
 ms: 2
 mode: script
 say: return to {address}
@@ -5671,7 +5649,7 @@ within: 1
 params:
   address: http://localhost:8392/
 exchanges:
-  - at: '2026-11-06T13:04:40.975251755Z'
+  - at: '2026-11-06T22:19:04.887915096Z'
     ms: 1
     request:
       method: GET
@@ -5682,14 +5660,14 @@ exchanges:
         Cache-Control: no-cache
         If-None-Match: '"index-hsf-edf1ad4b815ba429"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-dafaf4e590a0c523-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-3f16f50a9680003f-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:04:40 GMT
+        date: Fri, 06 Nov 2026 22:19:04 GMT
         etag: '"index-hsf-edf1ad4b815ba429"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
@@ -5789,16 +5767,16 @@ now:
     service-desc:
       - null
 ---
-at: '2026-11-06T13:04:44.665073840Z'
-ms: 2485
+at: '2026-11-06T22:19:07.084325514Z'
+ms: 3143
 mode: intent
-say: get issue 2293 in JogoShugh/heart-github-test
+say: get issue 120 of JogoShugh/heart-kit-test
 line: 3
 params:
   relation: github:issues-get
   owner: JogoShugh
-  repo: heart-github-test
-  issue_number: '2293'
+  repo: heart-kit-test
+  issue_number: '120'
 values:
   owner:
     value: JogoShugh
@@ -5814,7 +5792,7 @@ values:
       - step: 3
         pointer: /_embedded/author/0/login
   repo:
-    value: heart-github-test
+    value: heart-kit-test
     type: string
     from:
       - input: repo
@@ -5825,7 +5803,7 @@ values:
       - step: 3
         pointer: /hr:address/repo
   issue_number:
-    value: '2293'
+    value: '120'
     type: integer
     from:
       - step: 3
@@ -5833,14 +5811,14 @@ values:
       - step: 3
         pointer: /hr:address/issue_number
 reason:
-  template: get issue 2293 in $owner/$repo
+  template: get issue 120 of $owner/$repo
   slots:
     owner:
       value: JogoShugh
       from:
         - input: owner
     repo:
-      value: heart-github-test
+      value: heart-kit-test
       from:
         - input: repo
 opens: true
@@ -5858,24 +5836,24 @@ model:
       []
       &lt;/links&gt;
       &lt;intent&gt;
-      get issue 2293 in JogoShugh/heart-github-test
+      get issue 120 of JogoShugh/heart-kit-test
       &lt;/intent&gt;
-    answered: '[{"type":"tool_use","id":"toolu_01Whtwx2U32CpiuqV2n8TDAt","name":"select","input":{"action":"act","affordance":"github:issues-get","fields":{"owner":"JogoShugh","repo":"heart-github-test","issue_number":2293}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01LnyrbLHJvm17eJwMg5osXB","name":"select","input":{"action":"act","affordance":"github:issues-get","fields":{"owner":"JogoShugh","repo":"heart-kit-test","issue_number":120}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
   relation: github:issues-get
   title: Get an issue
   method: GET
   target: /repos/{owner}/{repo}/issues/{issue_number}
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
   picked: relation
 guard:
   rung: L0
   form: sha256-hwRq6AIWh7eUchg4nVtnuBRhCi/R37GCqMGaMPwJ0fc=
   act: sha256-x8jmTSymRfcuYSw09AZQT7LEHzZXzjMSqOposPPBSlI=
 exchanges:
-  - at: '2026-11-06T13:04:44.665517465Z'
-    ms: 4
+  - at: '2026-11-06T22:19:07.084673347Z'
+    ms: 3
     request:
       method: GET
       url: http://localhost:8392/
@@ -5885,38 +5863,38 @@ exchanges:
         Cache-Control: no-cache
         If-None-Match: '"index-hsf-edf1ad4b815ba429"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-75256e0d2c30065d-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-25befe1f19b4f5b9-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:04:44 GMT
+        date: Fri, 06 Nov 2026 22:19:07 GMT
         etag: '"index-hsf-edf1ad4b815ba429"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)
         vary: Accept, Accept-Profile
-  - at: '2026-11-06T13:04:46.339533424Z'
-    ms: 810
+  - at: '2026-11-06T22:19:09.287721292Z'
+    ms: 939
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.c211739e634cb745"'
+        If-None-Match: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-695bddf81e8e2228-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-55c64861d636697c-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:04:46 GMT
-        etag: '"seq-0.hsf.L0.c211739e634cb745"'
+        date: Fri, 06 Nov 2026 22:19:09 GMT
+        etag: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         vary: Accept, Prefer, Accept-Profile
@@ -5936,21 +5914,21 @@ offered:
     - self
     - service-desc
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 now:
   state:
-    id: 6243160543
-    node_id: I_kwDOVM7WJc8AAAABdB8R3w
-    number: 2293
-    title: Hello from ARTIE (1106-1304)
+    id: 6251643718
+    node_id: I_kwDOVldVN88AAAABdKCDRg
+    number: 120
+    title: Hello from ARTIE (1106-2218)
     labels: []
     state: open
     locked: false
     assignees: []
     milestone: null
     comments: 0
-    created_at: '2026-11-06T13:04:38Z'
-    updated_at: '2026-11-06T13:04:38Z'
+    created_at: '2026-11-06T22:19:01Z'
+    updated_at: '2026-11-06T22:19:01Z'
     closed_at: null
     assignee: null
     author_association: OWNER
@@ -5981,8 +5959,8 @@ now:
     pinned_comment: null
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
-      issue_number: '2293'
+      repo: heart-kit-test
+      issue_number: '120'
   forms:
     - github:close
     - github:close-not-planned
@@ -6030,8 +6008,8 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-11-06T13:04:51.049438468Z'
-ms: 5238
+at: '2026-11-06T22:19:13.974816253Z'
+ms: 5595
 mode: intent
 say: 'comment on it: Each act here was one this issue offered at that moment.'
 line: 4
@@ -6054,7 +6032,7 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       &lt;state&gt;
-      {"id":6243160543,"node_id":"I_kwDOVM7WJc8AAAABdB8R3w","number":2293,"title":"Hello from ARTIE (1106-1304)","labels":[],"state":"open","locked":false,"assignees":[],"milestone":null,"comments":0,"created_at":"2026-11-06T13:04:38Z","updated_at":"2026-11-06T13:04:38Z","closed_at":null,"assignee":null,"author_association":"OWNER","active_lock_reason":null,"sub_issues_summary":{"total":0,"completed":0,"percent_completed":0},"issue_dependencies_summary":{"blocked_by":0,"total_blocked_by":0,"blocking":0,"total_blocking":0},"body":"Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.","closed_by":null,"reactions":{"total_count":0,"+1":0,"-1":0,"laugh":0,"hooray":0,"confused":0,"heart":0,"rocket":0,"eyes":0},"performed_via_github_app":null,"state_reason":null,"pinned_comment":null,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","issue_number":"2293"}}
+      {"id":6251643718,"node_id":"I_kwDOVldVN88AAAABdKCDRg","number":120,"title":"Hello from ARTIE (1106-2218)","labels":[],"state":"open","locked":false,"assignees":[],"milestone":null,"comments":0,"created_at":"2026-11-06T22:19:01Z","updated_at":"2026-11-06T22:19:01Z","closed_at":null,"assignee":null,"author_association":"OWNER","active_lock_reason":null,"sub_issues_summary":{"total":0,"completed":0,"percent_completed":0},"issue_dependencies_summary":{"blocked_by":0,"total_blocked_by":0,"blocking":0,"total_blocking":0},"body":"Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.","closed_by":null,"reactions":{"total_count":0,"+1":0,"-1":0,"laugh":0,"hooray":0,"confused":0,"heart":0,"rocket":0,"eyes":0},"performed_via_github_app":null,"state_reason":null,"pinned_comment":null,"hr:address":{"owner":"JogoShugh","repo":"heart-kit-test","issue_number":"120"}}
       &lt;/state&gt;
       &lt;offers&gt;
       {"github:close":{"title":"Close","description":"Close it; a pull request unmerged, an issue as completed.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Close","type":"object","$id":"/schemas/91c3b4ed90232223"}},"github:close-not-planned":{"title":"Close as not planned","description":"Close the issue as something that won't be done.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Close as not planned","type":"object","$id":"/schemas/a9667ab9ed4dbb72"}},"github:close-duplicate":{"title":"Close as a duplicate","description":"Close the issue as a duplicate of another, named by its id.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"duplicate_issue_id":{"description":"The ID of the issue that this issue duplicates, used when marking this issue as a duplicate with `status: Duplicate` or `state_reason: duplicate`. The issue must exist and be accessible to the authenticated user.","title":"Duplicate issue id","type":"integer"}},"required":[],"title":"Close as a duplicate","type":"object","$id":"/schemas/f31d9d3811609c2b"}},"github:edit":{"title":"Edit","description":"Change its title or description.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the issue.","nullable":true,"title":"Body","type":"string"},"title":{"description":"The title of the issue.","nullable":true,"oneOf":[{"type":"string"},{"type":"integer"}],"title":"Title"}},"required":[],"title":"Edit","type":"object","$id":"/schemas/a23cfe5431819313"}},"github:lock":{"title":"Lock the conversation","description":"Limit the conversation to collaborators, for a reason.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"lock_reason":{"description":"The reason for locking the issue or pull request conversation. Lock will fail if you don't use one of these reasons:  \n * `off-topic`  \n * `too heated`  \n * `resolved`  \n * `spam`","enum":["off-topic","too heated","resolved","spam"],"title":"Lock reason","type":"string"}},"required":[],"title":"Lock the conversation","type":"object","$id":"/schemas/1fb33aaa0438290c"}},"github:label":{"title":"Label","description":"Add labels to the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"labels":{"description":"The labels to add to the issue's existing labels. You can also pass an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. To replace all of the labels for an issue, use \"[Set labels for an issue](https://docs.github.com/rest/issues/labels#set-labels-for-an-issue).\"","items":{"oneOf":[{"type":"string"},{"properties":{"confidence":{"description":"The confidence level for this label choice.","enum":["low","medium","high"],"type":"string"},"name":{"description":"The name of the label to add.","type":"string"},"rationale":{"description":"Optional reasoning for adding this label.","type":"string"},"suggest":{"description":"If `true`, the label is stored as a pending suggestion for human review rather than applied directly.","type":"boolean"}},"required":["name"],"type":"object"}]},"minItems":1,"title":"Labels","type":"array"}},"required":[],"title":"Label","type":"object","$id":"/schemas/6657324c8d4f4e78"}},"github:unlabel":{"title":"Remove a label","description":"Take one label off the issue, by its name.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"name":{"description":"","title":"Name","type":"string"}},"required":["name"],"title":"Remove a label","type":"object","$id":"/schemas/a8ccf489ea642354"}},"github:assign":{"title":"Assign","description":"Assign people to the issue.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"assignees":{"description":"Usernames of people to assign this issue to. _NOTE: Only users with push access can add assignees to an issue. Assignees are silently ignored otherwise._","items":{"oneOf":[{"type":"string"},{"properties":{"confidence":{"description":"The confidence level for this assignee choice.","enum":["low","medium","high"],"type":"string"},"login":{"description":"The login of the user to assign.","type":"string"},"rationale":{"description":"Optional reasoning for adding this assignee.","type":"string"},"suggest":{"description":"If `true`, the assignee is stored as a pending suggestion for human review rather than applied directly.","type":"boolean"}},"required":["login"],"type":"object"}]},"title":"Assignees","type":"array"}},"required":[],"title":"Assign","type":"object","$id":"/schemas/6a5a3e0d382d8d64"}},"github:unassign":{"title":"Unassign","description":"Take people off the issue.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"assignees":{"description":"Usernames of assignees to remove from an issue. _NOTE: Only users with push access can remove assignees from an issue. Assignees are silently ignored otherwise._","items":{"type":"string"},"title":"Assignees","type":"array"}},"required":[],"title":"Unassign","type":"object","$id":"/schemas/31bb1111f9c64b4f"}},"github:set-milestone":{"title":"Set the milestone","description":"Put the issue in a milestone, by its number, or take it out with null.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"milestone":{"nullable":true,"oneOf":[{"type":"string"},{"description":"The `number` of the milestone to associate this issue with or use `null` to remove the current milestone. Only users with push access can set the milestone for issues. Without push access to the repository, milestone changes are silently dropped.","type":"integer"}],"title":"Milestone"}},"required":[],"title":"Set the milestone","type":"object","$id":"/schemas/9e5640dc1f794335"}},"github:comment":{"title":"Comment","description":"Add a comment to the pull request's conversation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the comment.","title":"Body","type":"string"}},"required":["body"],"title":"Comment","type":"object","$id":"/schemas/5cc19958fe9e94c5"}},"github:add-sub-issue":{"title":"Add a sub-issue","description":"Make another issue a sub-issue of this one, named by its id (not its number).","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"replace_parent":{"description":"Option that, when true, instructs the operation to replace the sub-issues current parent issue","title":"Replace parent","type":"boolean"},"sub_issue_id":{"description":"The id of the sub-issue to add. The sub-issue must belong to the same repository owner as the parent issue","title":"Sub issue id","type":"integer"}},"required":["sub_issue_id"],"title":"Add a sub-issue","type":"object","$id":"/schemas/62501a57bfd8fa3e"}},"github:remove-sub-issue":{"title":"Remove a sub-issue","description":"Take a sub-issue off this issue, named by its id (not its number).","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"sub_issue_id":{"description":"The id of the sub-issue to remove","title":"Sub issue id","type":"integer"}},"required":["sub_issue_id"],"title":"Remove a sub-issue","type":"object","$id":"/schemas/1d913285052342b2"}}}
@@ -6065,56 +6043,56 @@ model:
       &lt;intent&gt;
       comment on it: Each act here was one this issue offered at that moment.
       &lt;/intent&gt;
-    answered: '[{"type":"tool_use","id":"toolu_012XQhr62ow7i3KHTAXkZqPP","name":"select","input":{"action":"act","affordance":"github:comment","fields":{"body":"Each act here was one this issue offered at that moment."}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_01Qn1rbLCzhoXp9Do611XND7","name":"select","input":{"action":"act","affordance":"github:comment","fields":{"body":"Each act here was one this issue offered at that moment."}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
   relation: github:comment
   title: Comment
   method: POST
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293/actions/comment
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293/actions/comment
+  target: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120/actions/comment
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120/actions/comment
   picked: relation
 guard:
   rung: L0
   form: sha256-08T8PWyl0IdsZy4XIsN5chguUtsDboWOuXjwV87JE0k=
   act: sha256-hlKO8GQge5XCho1Q3O2p3EQT4tMnMfv7zt+tYAinXwc=
-  if-match: '"seq-0.hsf.L0.c211739e634cb745"'
+  if-match: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
 exchanges:
-  - at: '2026-11-06T13:04:51.049914551Z'
-    ms: 914
+  - at: '2026-11-06T22:19:13.975276461Z'
+    ms: 620
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.c211739e634cb745"'
+        If-None-Match: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-c895698e58066a83-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-03cc025023062026-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:04:51 GMT
-        etag: '"seq-0.hsf.L0.c211739e634cb745"'
+        date: Fri, 06 Nov 2026 22:19:13 GMT
+        etag: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         vary: Accept, Prefer, Accept-Profile
-  - at: '2026-11-06T13:04:53.162459427Z'
-    ms: 2572
+  - at: '2026-11-06T22:19:16.222282087Z'
+    ms: 2619
     request:
       method: POST
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293/actions/comment
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120/actions/comment
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Content-Type: application/json
-        If-Match: '"seq-0.hsf.L0.c211739e634cb745"'
+        If-Match: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-951c894a52c835cc-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-48a757a9db4f8cb2-01
         User-Agent: ARTIE/0.5
       body:
         body: Each act here was one this issue offered at that moment.
@@ -6122,28 +6100,28 @@ exchanges:
       status: 201
       headers:
         cache-control: no-cache
-        content-location: /repos/JogoShugh/heart-github-test/issues/2293
+        content-location: /repos/JogoShugh/heart-kit-test/issues/120
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:53 GMT
-        etag: '"seq-0.hsf.L0.6f8efcc059f73b28"'
+        date: Fri, 06 Nov 2026 22:19:16 GMT
+        etag: '"seq-0.hsf.L0.ce5e9c3c80061937"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
-        location: /repos/JogoShugh/heart-github-test/issues/comments/6685477379
+        location: /repos/JogoShugh/heart-kit-test/issues/comments/6697258974
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 6243160543
-        node_id: I_kwDOVM7WJc8AAAABdB8R3w
-        number: 2293
-        title: Hello from ARTIE (1106-1304)
+        id: 6251643718
+        node_id: I_kwDOVldVN88AAAABdKCDRg
+        number: 120
+        title: Hello from ARTIE (1106-2218)
         labels: []
         state: open
         locked: false
         assignees: []
         milestone: null
         comments: 1
-        created_at: '2026-11-06T13:04:38Z'
-        updated_at: '2026-11-06T13:04:55Z'
+        created_at: '2026-11-06T22:19:01Z'
+        updated_at: '2026-11-06T22:19:18Z'
         closed_at: null
         assignee: null
         author_association: OWNER
@@ -6174,11 +6152,11 @@ exchanges:
         pinned_comment: null
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
-          issue_number: '2293'
+          repo: heart-kit-test
+          issue_number: '120'
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test/issues/2293
+            href: /repos/JogoShugh/heart-kit-test/issues/120
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -6191,30 +6169,30 @@ exchanges:
             type: application/json
             integrity: sha256-EV8YpuFGuCJveeMnIpniRvldqQMzFkZq28qY4PXNI2s=
           github:issues-list-sub-issues:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/sub_issues
+            href: /repos/JogoShugh/heart-kit-test/issues/120/sub_issues
           github:issues-list-comments:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/comments
+            href: /repos/JogoShugh/heart-kit-test/issues/120/comments
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:repos-get:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/events
             type: application/vnd.github+json
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test/issues/2293
+            href: https://github.com/JogoShugh/heart-kit-test/issues/120
             type: text/html
           github:reactions:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/reactions
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/reactions
             type: application/vnd.github+json
           github:timeline:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/timeline
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/timeline
             type: application/vnd.github+json
         _embedded:
           author:
@@ -6273,7 +6251,7 @@ exchanges:
             description: Close it; a pull request unmerged, an issue as completed.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -6290,7 +6268,7 @@ exchanges:
             description: Close the issue as something that won't be done.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close-not-planned
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close-not-planned
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -6307,7 +6285,7 @@ exchanges:
             description: Close the issue as a duplicate of another, named by its id.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close-duplicate
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close-duplicate
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -6328,7 +6306,7 @@ exchanges:
             description: Change its title or description.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/edit
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/edit
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -6357,7 +6335,7 @@ exchanges:
             description: Limit the conversation to collaborators, for a reason.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/lock
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/lock
             method: PUT
             contentType: application/json
             schema:
@@ -6388,7 +6366,7 @@ exchanges:
             description: Add labels to the pull request.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/label
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/label
             method: POST
             contentType: application/json
             schema:
@@ -6433,7 +6411,7 @@ exchanges:
             description: Take one label off the issue, by its name.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unlabel{?name}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unlabel{?name}
                 templated: true
             method: DELETE
             schema:
@@ -6455,7 +6433,7 @@ exchanges:
             description: Assign people to the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/assign
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/assign
             method: POST
             contentType: application/json
             schema:
@@ -6499,7 +6477,7 @@ exchanges:
             description: Take people off the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unassign{?assignees}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unassign{?assignees}
                 templated: true
             method: DELETE
             schema:
@@ -6522,7 +6500,7 @@ exchanges:
             description: Put the issue in a milestone, by its number, or take it out with null.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/set-milestone
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/set-milestone
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -6546,7 +6524,7 @@ exchanges:
             description: Add a comment to the pull request's conversation.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/comment
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/comment
             method: POST
             contentType: application/json
             schema:
@@ -6568,7 +6546,7 @@ exchanges:
             description: Make another issue a sub-issue of this one, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/add-sub-issue
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/add-sub-issue
             method: POST
             contentType: application/json
             schema:
@@ -6594,7 +6572,7 @@ exchanges:
             description: Take a sub-issue off this issue, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/remove-sub-issue{?sub_issue_id}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/remove-sub-issue{?sub_issue_id}
                 templated: true
             method: DELETE
             schema:
@@ -6611,34 +6589,34 @@ exchanges:
               type: object
               '$id': /schemas/1d913285052342b2
             hr:integrity: sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
-  - at: '2026-11-06T13:04:55.735321845Z'
-    ms: 551
+  - at: '2026-11-06T22:19:18.841736088Z'
+    ms: 727
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6685477379
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/comments/6697258974
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-f2888772010edfa1-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-25b8bab4f22bf762-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:55 GMT
-        etag: '"seq-0.hsf.L0.ddbcf51074f5abfb"'
+        date: Fri, 06 Nov 2026 22:19:18 GMT
+        etag: '"seq-0.hsf.L0.a6a984a76fa15589"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 6685477379
-        node_id: IC_kwDOVM7WJc8AAAABjnxKAw
-        created_at: '2026-11-06T13:04:55Z'
-        updated_at: '2026-11-06T13:04:55Z'
+        id: 6697258974
+        node_id: IC_kwDOVldVN88AAAABjzAP3g
+        created_at: '2026-11-06T22:19:18Z'
+        updated_at: '2026-11-06T22:19:18Z'
         author_association: OWNER
         body: Each act here was one this issue offered at that moment.
         reactions:
@@ -6656,11 +6634,11 @@ exchanges:
         pin: null
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
-          comment_id: '6685477379'
+          repo: heart-kit-test
+          comment_id: '6697258974'
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test/issues/comments/6685477379
+            href: /repos/JogoShugh/heart-kit-test/issues/comments/6697258974
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -6673,14 +6651,14 @@ exchanges:
             type: application/json
             integrity: sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo=
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test/issues/2293#issuecomment-6685477379
+            href: https://github.com/JogoShugh/heart-kit-test/issues/120#issuecomment-6697258974
             type: text/html
           github:issues-get:
-            href: /repos/JogoShugh/heart-github-test/issues/2293
+            href: /repos/JogoShugh/heart-kit-test/issues/120
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:reactions:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/comments/6685477379/reactions
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/comments/6697258974/reactions
             type: application/vnd.github+json
         _embedded:
           author:
@@ -6739,7 +6717,7 @@ exchanges:
             description: Change its title or description.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/comments/6685477379/actions/edit
+                href: /repos/JogoShugh/heart-kit-test/issues/comments/6697258974/actions/edit
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -6783,13 +6761,13 @@ offered:
     - hr:unavailable
     - self
 outcome: new resource
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/comments/6685477379
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/comments/6697258974
 now:
   state:
-    id: 6685477379
-    node_id: IC_kwDOVM7WJc8AAAABjnxKAw
-    created_at: '2026-11-06T13:04:55Z'
-    updated_at: '2026-11-06T13:04:55Z'
+    id: 6697258974
+    node_id: IC_kwDOVldVN88AAAABjzAP3g
+    created_at: '2026-11-06T22:19:18Z'
+    updated_at: '2026-11-06T22:19:18Z'
     author_association: OWNER
     body: Each act here was one this issue offered at that moment.
     reactions:
@@ -6807,8 +6785,8 @@ now:
     pin: null
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
-      comment_id: '6685477379'
+      repo: heart-kit-test
+      comment_id: '6697258974'
   forms:
     - github:edit
   links:
@@ -6834,52 +6812,52 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-11-06T13:04:58.239007388Z'
-ms: 746
+at: '2026-11-06T22:19:21.474287214Z'
+ms: 620
 mode: script
 say: return to {address}
 line: 4
 within: 3
 params:
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 exchanges:
-  - at: '2026-11-06T13:04:58.239348888Z'
-    ms: 745
+  - at: '2026-11-06T22:19:21.474671173Z'
+    ms: 619
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.c211739e634cb745"'
+        If-None-Match: '"seq-0.hsf.L0.1c0f9ed070674b3b"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-f8addaf298541621-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-bb28b1b208460f5e-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:04:58 GMT
-        etag: '"seq-0.hsf.L0.6f8efcc059f73b28"'
+        date: Fri, 06 Nov 2026 22:19:21 GMT
+        etag: '"seq-0.hsf.L0.ce5e9c3c80061937"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 6243160543
-        node_id: I_kwDOVM7WJc8AAAABdB8R3w
-        number: 2293
-        title: Hello from ARTIE (1106-1304)
+        id: 6251643718
+        node_id: I_kwDOVldVN88AAAABdKCDRg
+        number: 120
+        title: Hello from ARTIE (1106-2218)
         labels: []
         state: open
         locked: false
         assignees: []
         milestone: null
         comments: 1
-        created_at: '2026-11-06T13:04:38Z'
-        updated_at: '2026-11-06T13:04:55Z'
+        created_at: '2026-11-06T22:19:01Z'
+        updated_at: '2026-11-06T22:19:18Z'
         closed_at: null
         assignee: null
         author_association: OWNER
@@ -6910,11 +6888,11 @@ exchanges:
         pinned_comment: null
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
-          issue_number: '2293'
+          repo: heart-kit-test
+          issue_number: '120'
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test/issues/2293
+            href: /repos/JogoShugh/heart-kit-test/issues/120
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -6927,30 +6905,30 @@ exchanges:
             type: application/json
             integrity: sha256-EV8YpuFGuCJveeMnIpniRvldqQMzFkZq28qY4PXNI2s=
           github:issues-list-sub-issues:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/sub_issues
+            href: /repos/JogoShugh/heart-kit-test/issues/120/sub_issues
           github:issues-list-comments:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/comments
+            href: /repos/JogoShugh/heart-kit-test/issues/120/comments
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:repos-get:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/events
             type: application/vnd.github+json
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test/issues/2293
+            href: https://github.com/JogoShugh/heart-kit-test/issues/120
             type: text/html
           github:reactions:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/reactions
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/reactions
             type: application/vnd.github+json
           github:timeline:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/timeline
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/timeline
             type: application/vnd.github+json
         _embedded:
           author:
@@ -7009,7 +6987,7 @@ exchanges:
             description: Close it; a pull request unmerged, an issue as completed.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7026,7 +7004,7 @@ exchanges:
             description: Close the issue as something that won't be done.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close-not-planned
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close-not-planned
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7043,7 +7021,7 @@ exchanges:
             description: Close the issue as a duplicate of another, named by its id.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/close-duplicate
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/close-duplicate
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7064,7 +7042,7 @@ exchanges:
             description: Change its title or description.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/edit
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/edit
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7093,7 +7071,7 @@ exchanges:
             description: Limit the conversation to collaborators, for a reason.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/lock
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/lock
             method: PUT
             contentType: application/json
             schema:
@@ -7124,7 +7102,7 @@ exchanges:
             description: Add labels to the pull request.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/label
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/label
             method: POST
             contentType: application/json
             schema:
@@ -7169,7 +7147,7 @@ exchanges:
             description: Take one label off the issue, by its name.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unlabel{?name}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unlabel{?name}
                 templated: true
             method: DELETE
             schema:
@@ -7191,7 +7169,7 @@ exchanges:
             description: Assign people to the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/assign
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/assign
             method: POST
             contentType: application/json
             schema:
@@ -7235,7 +7213,7 @@ exchanges:
             description: Take people off the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unassign{?assignees}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unassign{?assignees}
                 templated: true
             method: DELETE
             schema:
@@ -7258,7 +7236,7 @@ exchanges:
             description: Put the issue in a milestone, by its number, or take it out with null.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/set-milestone
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/set-milestone
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7282,7 +7260,7 @@ exchanges:
             description: Add a comment to the pull request's conversation.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/comment
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/comment
             method: POST
             contentType: application/json
             schema:
@@ -7304,7 +7282,7 @@ exchanges:
             description: Make another issue a sub-issue of this one, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/add-sub-issue
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/add-sub-issue
             method: POST
             contentType: application/json
             schema:
@@ -7330,7 +7308,7 @@ exchanges:
             description: Take a sub-issue off this issue, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/remove-sub-issue{?sub_issue_id}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/remove-sub-issue{?sub_issue_id}
                 templated: true
             method: DELETE
             schema:
@@ -7348,21 +7326,21 @@ exchanges:
               '$id': /schemas/1d913285052342b2
             hr:integrity: sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 now:
   state:
-    id: 6243160543
-    node_id: I_kwDOVM7WJc8AAAABdB8R3w
-    number: 2293
-    title: Hello from ARTIE (1106-1304)
+    id: 6251643718
+    node_id: I_kwDOVldVN88AAAABdKCDRg
+    number: 120
+    title: Hello from ARTIE (1106-2218)
     labels: []
     state: open
     locked: false
     assignees: []
     milestone: null
     comments: 1
-    created_at: '2026-11-06T13:04:38Z'
-    updated_at: '2026-11-06T13:04:55Z'
+    created_at: '2026-11-06T22:19:01Z'
+    updated_at: '2026-11-06T22:19:18Z'
     closed_at: null
     assignee: null
     author_association: OWNER
@@ -7393,8 +7371,8 @@ now:
     pinned_comment: null
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
-      issue_number: '2293'
+      repo: heart-kit-test
+      issue_number: '120'
   forms:
     - github:close
     - github:close-not-planned
@@ -7442,16 +7420,16 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-11-06T13:05:00.668841333Z'
-ms: 7112
+at: '2026-11-06T22:19:23.653518382Z'
+ms: 6592
 mode: intent
-say: close it as completed
+say: Close it as completed
 line: 5
 within: 3
 params:
   relation: github:close
 reason:
-  template: close it as completed
+  template: Close it as completed
   slots: {}
 opens: true
 judgement: false
@@ -7459,7 +7437,7 @@ model:
   - model: claude-sonnet-5-5
     asked: |-
       &lt;state&gt;
-      {"id":6243160543,"node_id":"I_kwDOVM7WJc8AAAABdB8R3w","number":2293,"title":"Hello from ARTIE (1106-1304)","labels":[],"state":"open","locked":false,"assignees":[],"milestone":null,"comments":1,"created_at":"2026-11-06T13:04:38Z","updated_at":"2026-11-06T13:04:55Z","closed_at":null,"assignee":null,"author_association":"OWNER","active_lock_reason":null,"sub_issues_summary":{"total":0,"completed":0,"percent_completed":0},"issue_dependencies_summary":{"blocked_by":0,"total_blocked_by":0,"blocking":0,"total_blocking":0},"body":"Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.","closed_by":null,"reactions":{"total_count":0,"+1":0,"-1":0,"laugh":0,"hooray":0,"confused":0,"heart":0,"rocket":0,"eyes":0},"performed_via_github_app":null,"state_reason":null,"pinned_comment":null,"hr:address":{"owner":"JogoShugh","repo":"heart-github-test","issue_number":"2293"}}
+      {"id":6251643718,"node_id":"I_kwDOVldVN88AAAABdKCDRg","number":120,"title":"Hello from ARTIE (1106-2218)","labels":[],"state":"open","locked":false,"assignees":[],"milestone":null,"comments":1,"created_at":"2026-11-06T22:19:01Z","updated_at":"2026-11-06T22:19:18Z","closed_at":null,"assignee":null,"author_association":"OWNER","active_lock_reason":null,"sub_issues_summary":{"total":0,"completed":0,"percent_completed":0},"issue_dependencies_summary":{"blocked_by":0,"total_blocked_by":0,"blocking":0,"total_blocking":0},"body":"Opened by ARTIE, a generic client that reads what GitHub offers through a HEART gateway.","closed_by":null,"reactions":{"total_count":0,"+1":0,"-1":0,"laugh":0,"hooray":0,"confused":0,"heart":0,"rocket":0,"eyes":0},"performed_via_github_app":null,"state_reason":null,"pinned_comment":null,"hr:address":{"owner":"JogoShugh","repo":"heart-kit-test","issue_number":"120"}}
       &lt;/state&gt;
       &lt;offers&gt;
       {"github:close":{"title":"Close","description":"Close it; a pull request unmerged, an issue as completed.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Close","type":"object","$id":"/schemas/91c3b4ed90232223"}},"github:close-not-planned":{"title":"Close as not planned","description":"Close the issue as something that won't be done.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{},"required":[],"title":"Close as not planned","type":"object","$id":"/schemas/a9667ab9ed4dbb72"}},"github:close-duplicate":{"title":"Close as a duplicate","description":"Close the issue as a duplicate of another, named by its id.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"duplicate_issue_id":{"description":"The ID of the issue that this issue duplicates, used when marking this issue as a duplicate with `status: Duplicate` or `state_reason: duplicate`. The issue must exist and be accessible to the authenticated user.","title":"Duplicate issue id","type":"integer"}},"required":[],"title":"Close as a duplicate","type":"object","$id":"/schemas/f31d9d3811609c2b"}},"github:edit":{"title":"Edit","description":"Change its title or description.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the issue.","nullable":true,"title":"Body","type":"string"},"title":{"description":"The title of the issue.","nullable":true,"oneOf":[{"type":"string"},{"type":"integer"}],"title":"Title"}},"required":[],"title":"Edit","type":"object","$id":"/schemas/a23cfe5431819313"}},"github:lock":{"title":"Lock the conversation","description":"Limit the conversation to collaborators, for a reason.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"lock_reason":{"description":"The reason for locking the issue or pull request conversation. Lock will fail if you don't use one of these reasons:  \n * `off-topic`  \n * `too heated`  \n * `resolved`  \n * `spam`","enum":["off-topic","too heated","resolved","spam"],"title":"Lock reason","type":"string"}},"required":[],"title":"Lock the conversation","type":"object","$id":"/schemas/1fb33aaa0438290c"}},"github:label":{"title":"Label","description":"Add labels to the pull request.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"labels":{"description":"The labels to add to the issue's existing labels. You can also pass an `array` of labels directly, but GitHub recommends passing an object with the `labels` key. To replace all of the labels for an issue, use \"[Set labels for an issue](https://docs.github.com/rest/issues/labels#set-labels-for-an-issue).\"","items":{"oneOf":[{"type":"string"},{"properties":{"confidence":{"description":"The confidence level for this label choice.","enum":["low","medium","high"],"type":"string"},"name":{"description":"The name of the label to add.","type":"string"},"rationale":{"description":"Optional reasoning for adding this label.","type":"string"},"suggest":{"description":"If `true`, the label is stored as a pending suggestion for human review rather than applied directly.","type":"boolean"}},"required":["name"],"type":"object"}]},"minItems":1,"title":"Labels","type":"array"}},"required":[],"title":"Label","type":"object","$id":"/schemas/6657324c8d4f4e78"}},"github:unlabel":{"title":"Remove a label","description":"Take one label off the issue, by its name.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"name":{"description":"","title":"Name","type":"string"}},"required":["name"],"title":"Remove a label","type":"object","$id":"/schemas/a8ccf489ea642354"}},"github:assign":{"title":"Assign","description":"Assign people to the issue.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"assignees":{"description":"Usernames of people to assign this issue to. _NOTE: Only users with push access can add assignees to an issue. Assignees are silently ignored otherwise._","items":{"oneOf":[{"type":"string"},{"properties":{"confidence":{"description":"The confidence level for this assignee choice.","enum":["low","medium","high"],"type":"string"},"login":{"description":"The login of the user to assign.","type":"string"},"rationale":{"description":"Optional reasoning for adding this assignee.","type":"string"},"suggest":{"description":"If `true`, the assignee is stored as a pending suggestion for human review rather than applied directly.","type":"boolean"}},"required":["login"],"type":"object"}]},"title":"Assignees","type":"array"}},"required":[],"title":"Assign","type":"object","$id":"/schemas/6a5a3e0d382d8d64"}},"github:unassign":{"title":"Unassign","description":"Take people off the issue.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"assignees":{"description":"Usernames of assignees to remove from an issue. _NOTE: Only users with push access can remove assignees from an issue. Assignees are silently ignored otherwise._","items":{"type":"string"},"title":"Assignees","type":"array"}},"required":[],"title":"Unassign","type":"object","$id":"/schemas/31bb1111f9c64b4f"}},"github:set-milestone":{"title":"Set the milestone","description":"Put the issue in a milestone, by its number, or take it out with null.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"milestone":{"nullable":true,"oneOf":[{"type":"string"},{"description":"The `number` of the milestone to associate this issue with or use `null` to remove the current milestone. Only users with push access can set the milestone for issues. Without push access to the repository, milestone changes are silently dropped.","type":"integer"}],"title":"Milestone"}},"required":[],"title":"Set the milestone","type":"object","$id":"/schemas/9e5640dc1f794335"}},"github:comment":{"title":"Comment","description":"Add a comment to the pull request's conversation.","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"body":{"description":"The contents of the comment.","title":"Body","type":"string"}},"required":["body"],"title":"Comment","type":"object","$id":"/schemas/5cc19958fe9e94c5"}},"github:add-sub-issue":{"title":"Add a sub-issue","description":"Make another issue a sub-issue of this one, named by its id (not its number).","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"replace_parent":{"description":"Option that, when true, instructs the operation to replace the sub-issues current parent issue","title":"Replace parent","type":"boolean"},"sub_issue_id":{"description":"The id of the sub-issue to add. The sub-issue must belong to the same repository owner as the parent issue","title":"Sub issue id","type":"integer"}},"required":["sub_issue_id"],"title":"Add a sub-issue","type":"object","$id":"/schemas/62501a57bfd8fa3e"}},"github:remove-sub-issue":{"title":"Remove a sub-issue","description":"Take a sub-issue off this issue, named by its id (not its number).","schema":{"$schema":"https://json-schema.org/draft/2020-12/schema","additionalProperties":false,"properties":{"sub_issue_id":{"description":"The id of the sub-issue to remove","title":"Sub issue id","type":"integer"}},"required":["sub_issue_id"],"title":"Remove a sub-issue","type":"object","$id":"/schemas/1d913285052342b2"}}}
@@ -7468,86 +7446,86 @@ model:
       [{"rel":"github:issues-list-sub-issues"},{"rel":"github:issues-list-comments"},{"rel":"github:repos-get"},{"rel":"author","state":{"login":"JogoShugh","id":1863005,"node_id":"MDQ6VXNlcjE4NjMwMDU=","gravatar_id":"","type":"User","user_view_type":"public","site_admin":false}}]
       &lt;/links&gt;
       &lt;intent&gt;
-      close it as completed
+      Close it as completed
       &lt;/intent&gt;
-    answered: '[{"type":"tool_use","id":"toolu_016hDFS3HXF4NvgNjquebC16","name":"select","input":{"action":"act","affordance":"github:close","fields":{}},"caller":{"type":"direct"}}]'
+    answered: '[{"type":"tool_use","id":"toolu_013kkvFJ3KaCMYBgpdm2X6us","name":"select","input":{"action":"act","affordance":"github:close","fields":{}},"caller":{"type":"direct"}}]'
 chose:
   kind: form
   relation: github:close
   title: Close
   method: PATCH
-  target: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293/actions/close
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293/actions/close
+  target: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120/actions/close
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120/actions/close
   picked: relation
 guard:
   rung: L0
   form: sha256-Vhf+JqTaO2qITze8s3NVBqXJ60qv88r2hleJ6Ctc5fY=
   act: sha256-BmEM+73tFo+qErhHcbEIRKAfY2IvtjU0a8yaCOUTgfs=
-  if-match: '"seq-0.hsf.L0.6f8efcc059f73b28"'
+  if-match: '"seq-0.hsf.L0.ce5e9c3c80061937"'
 exchanges:
-  - at: '2026-11-06T13:05:00.669247250Z'
-    ms: 904
+  - at: '2026-11-06T22:19:23.653961841Z'
+    ms: 619
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.6f8efcc059f73b28"'
+        If-None-Match: '"seq-0.hsf.L0.ce5e9c3c80061937"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-ff4752fc8b84cfeb-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-a532bd5512a59824-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:05:00 GMT
-        etag: '"seq-0.hsf.L0.6f8efcc059f73b28"'
+        date: Fri, 06 Nov 2026 22:19:23 GMT
+        etag: '"seq-0.hsf.L0.ce5e9c3c80061937"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         vary: Accept, Prefer, Accept-Profile
-  - at: '2026-11-06T13:05:03.226069126Z'
-    ms: 4553
+  - at: '2026-11-06T22:19:25.888527217Z'
+    ms: 4356
     request:
       method: PATCH
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293/actions/close
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120/actions/close
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Content-Type: application/merge-patch+json
-        If-Match: '"seq-0.hsf.L0.6f8efcc059f73b28"'
+        If-Match: '"seq-0.hsf.L0.ce5e9c3c80061937"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-17311586d110b4b7-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-919ef060c415b3c1-01
         User-Agent: ARTIE/0.5
       body: {}
     response:
       status: 200
       headers:
         cache-control: no-cache
-        content-location: /repos/JogoShugh/heart-github-test/issues/2293
+        content-location: /repos/JogoShugh/heart-kit-test/issues/120
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:05:03 GMT
-        etag: '"seq-0.hsf.L0.01759e916c14cf96"'
+        date: Fri, 06 Nov 2026 22:19:25 GMT
+        etag: '"seq-0.hsf.L0.5bfef55d0031d1f2"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 6243160543
-        node_id: I_kwDOVM7WJc8AAAABdB8R3w
-        number: 2293
-        title: Hello from ARTIE (1106-1304)
+        id: 6251643718
+        node_id: I_kwDOVldVN88AAAABdKCDRg
+        number: 120
+        title: Hello from ARTIE (1106-2218)
         labels: []
         state: closed
         locked: false
         assignees: []
         milestone: null
         comments: 1
-        created_at: '2026-11-06T13:04:38Z'
-        updated_at: '2026-11-06T13:05:05Z'
-        closed_at: '2026-11-06T13:05:05Z'
+        created_at: '2026-11-06T22:19:01Z'
+        updated_at: '2026-11-06T22:19:27Z'
+        closed_at: '2026-11-06T22:19:27Z'
         assignee: null
         author_association: OWNER
         active_lock_reason: null
@@ -7576,11 +7554,11 @@ exchanges:
         pinned_comment: null
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
-          issue_number: '2293'
+          repo: heart-kit-test
+          issue_number: '120'
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test/issues/2293
+            href: /repos/JogoShugh/heart-kit-test/issues/120
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -7593,30 +7571,30 @@ exchanges:
             type: application/json
             integrity: sha256-MxiOeuHR+njxfMweSf3drXVjDyWLjkpnBua7yTvJOHc=
           github:issues-list-sub-issues:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/sub_issues
+            href: /repos/JogoShugh/heart-kit-test/issues/120/sub_issues
           github:issues-list-comments:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/comments
+            href: /repos/JogoShugh/heart-kit-test/issues/120/comments
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:repos-get:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/events
             type: application/vnd.github+json
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test/issues/2293
+            href: https://github.com/JogoShugh/heart-kit-test/issues/120
             type: text/html
           github:reactions:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/reactions
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/reactions
             type: application/vnd.github+json
           github:timeline:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/timeline
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/timeline
             type: application/vnd.github+json
         _embedded:
           author:
@@ -7725,7 +7703,7 @@ exchanges:
             description: Open it again.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/reopen
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/reopen
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7742,7 +7720,7 @@ exchanges:
             description: Change its title or description.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/edit
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/edit
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7771,7 +7749,7 @@ exchanges:
             description: Limit the conversation to collaborators, for a reason.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/lock
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/lock
             method: PUT
             contentType: application/json
             schema:
@@ -7802,7 +7780,7 @@ exchanges:
             description: Add labels to the pull request.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/label
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/label
             method: POST
             contentType: application/json
             schema:
@@ -7847,7 +7825,7 @@ exchanges:
             description: Take one label off the issue, by its name.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unlabel{?name}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unlabel{?name}
                 templated: true
             method: DELETE
             schema:
@@ -7869,7 +7847,7 @@ exchanges:
             description: Assign people to the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/assign
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/assign
             method: POST
             contentType: application/json
             schema:
@@ -7913,7 +7891,7 @@ exchanges:
             description: Take people off the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unassign{?assignees}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unassign{?assignees}
                 templated: true
             method: DELETE
             schema:
@@ -7936,7 +7914,7 @@ exchanges:
             description: Put the issue in a milestone, by its number, or take it out with null.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/set-milestone
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/set-milestone
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -7960,7 +7938,7 @@ exchanges:
             description: Add a comment to the pull request's conversation.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/comment
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/comment
             method: POST
             contentType: application/json
             schema:
@@ -7982,7 +7960,7 @@ exchanges:
             description: Make another issue a sub-issue of this one, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/add-sub-issue
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/add-sub-issue
             method: POST
             contentType: application/json
             schema:
@@ -8008,7 +7986,7 @@ exchanges:
             description: Take a sub-issue off this issue, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/remove-sub-issue{?sub_issue_id}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/remove-sub-issue{?sub_issue_id}
                 templated: true
             method: DELETE
             schema:
@@ -8052,22 +8030,22 @@ offered:
     - hr:unavailable
     - self
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 now:
   state:
-    id: 6243160543
-    node_id: I_kwDOVM7WJc8AAAABdB8R3w
-    number: 2293
-    title: Hello from ARTIE (1106-1304)
+    id: 6251643718
+    node_id: I_kwDOVldVN88AAAABdKCDRg
+    number: 120
+    title: Hello from ARTIE (1106-2218)
     labels: []
     state: closed
     locked: false
     assignees: []
     milestone: null
     comments: 1
-    created_at: '2026-11-06T13:04:38Z'
-    updated_at: '2026-11-06T13:05:05Z'
-    closed_at: '2026-11-06T13:05:05Z'
+    created_at: '2026-11-06T22:19:01Z'
+    updated_at: '2026-11-06T22:19:27Z'
+    closed_at: '2026-11-06T22:19:27Z'
     assignee: null
     author_association: OWNER
     active_lock_reason: null
@@ -8096,8 +8074,8 @@ now:
     pinned_comment: null
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
-      issue_number: '2293'
+      repo: heart-kit-test
+      issue_number: '120'
   forms:
     - github:reopen
     - github:edit
@@ -8153,53 +8131,53 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-11-06T13:05:10.341124046Z'
-ms: 758
+at: '2026-11-06T22:19:32.105297928Z'
+ms: 630
 mode: script
 say: return to {address}
 line: 5
 within: 3
 params:
-  address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+  address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 exchanges:
-  - at: '2026-11-06T13:05:10.341500088Z'
-    ms: 757
+  - at: '2026-11-06T22:19:32.105599470Z'
+    ms: 629
     request:
       method: GET
-      url: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+      url: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
       headers:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        If-None-Match: '"seq-0.hsf.L0.6f8efcc059f73b28"'
+        If-None-Match: '"seq-0.hsf.L0.ce5e9c3c80061937"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-1e468ac60d0e5afa-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-edcbf69375600b77-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:05:10 GMT
-        etag: '"seq-0.hsf.L0.01759e916c14cf96"'
+        date: Fri, 06 Nov 2026 22:19:32 GMT
+        etag: '"seq-0.hsf.L0.5bfef55d0031d1f2"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
         transfer-encoding: chunked
         vary: Accept, Prefer, Accept-Profile
       body:
-        id: 6243160543
-        node_id: I_kwDOVM7WJc8AAAABdB8R3w
-        number: 2293
-        title: Hello from ARTIE (1106-1304)
+        id: 6251643718
+        node_id: I_kwDOVldVN88AAAABdKCDRg
+        number: 120
+        title: Hello from ARTIE (1106-2218)
         labels: []
         state: closed
         locked: false
         assignees: []
         milestone: null
         comments: 1
-        created_at: '2026-11-06T13:04:38Z'
-        updated_at: '2026-11-06T13:05:05Z'
-        closed_at: '2026-11-06T13:05:05Z'
+        created_at: '2026-11-06T22:19:01Z'
+        updated_at: '2026-11-06T22:19:27Z'
+        closed_at: '2026-11-06T22:19:27Z'
         assignee: null
         author_association: OWNER
         active_lock_reason: null
@@ -8228,11 +8206,11 @@ exchanges:
         pinned_comment: null
         hr:address:
           owner: JogoShugh
-          repo: heart-github-test
-          issue_number: '2293'
+          repo: heart-kit-test
+          issue_number: '120'
         _links:
           self:
-            href: /repos/JogoShugh/heart-github-test/issues/2293
+            href: /repos/JogoShugh/heart-kit-test/issues/120
           curies:
             - name: github
               href: /profiles/github#{rel}
@@ -8245,30 +8223,30 @@ exchanges:
             type: application/json
             integrity: sha256-MxiOeuHR+njxfMweSf3drXVjDyWLjkpnBua7yTvJOHc=
           github:issues-list-sub-issues:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/sub_issues
+            href: /repos/JogoShugh/heart-kit-test/issues/120/sub_issues
           github:issues-list-comments:
-            href: /repos/JogoShugh/heart-github-test/issues/2293/comments
+            href: /repos/JogoShugh/heart-kit-test/issues/120/comments
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:repos-get:
-            href: /repos/JogoShugh/heart-github-test
+            href: /repos/JogoShugh/heart-kit-test
             type: application/hal+json
             profile: https://w3id.org/heart-rise/hal-schema-forms
           github:labels:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/labels{/name}
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/labels{/name}
             type: application/vnd.github+json
             templated: true
           github:events:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/events
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/events
             type: application/vnd.github+json
           alternate:
-            href: https://github.com/JogoShugh/heart-github-test/issues/2293
+            href: https://github.com/JogoShugh/heart-kit-test/issues/120
             type: text/html
           github:reactions:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/reactions
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/reactions
             type: application/vnd.github+json
           github:timeline:
-            href: https://api.github.com/repos/JogoShugh/heart-github-test/issues/2293/timeline
+            href: https://api.github.com/repos/JogoShugh/heart-kit-test/issues/120/timeline
             type: application/vnd.github+json
         _embedded:
           author:
@@ -8377,7 +8355,7 @@ exchanges:
             description: Open it again.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/reopen
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/reopen
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -8394,7 +8372,7 @@ exchanges:
             description: Change its title or description.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/edit
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/edit
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -8423,7 +8401,7 @@ exchanges:
             description: Limit the conversation to collaborators, for a reason.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/lock
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/lock
             method: PUT
             contentType: application/json
             schema:
@@ -8454,7 +8432,7 @@ exchanges:
             description: Add labels to the pull request.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/label
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/label
             method: POST
             contentType: application/json
             schema:
@@ -8499,7 +8477,7 @@ exchanges:
             description: Take one label off the issue, by its name.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unlabel{?name}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unlabel{?name}
                 templated: true
             method: DELETE
             schema:
@@ -8521,7 +8499,7 @@ exchanges:
             description: Assign people to the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/assign
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/assign
             method: POST
             contentType: application/json
             schema:
@@ -8565,7 +8543,7 @@ exchanges:
             description: Take people off the issue.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/unassign{?assignees}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/unassign{?assignees}
                 templated: true
             method: DELETE
             schema:
@@ -8588,7 +8566,7 @@ exchanges:
             description: Put the issue in a milestone, by its number, or take it out with null.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/set-milestone
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/set-milestone
             method: PATCH
             contentType: application/merge-patch+json
             schema:
@@ -8612,7 +8590,7 @@ exchanges:
             description: Add a comment to the pull request's conversation.
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/comment
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/comment
             method: POST
             contentType: application/json
             schema:
@@ -8634,7 +8612,7 @@ exchanges:
             description: Make another issue a sub-issue of this one, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/add-sub-issue
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/add-sub-issue
             method: POST
             contentType: application/json
             schema:
@@ -8660,7 +8638,7 @@ exchanges:
             description: Take a sub-issue off this issue, named by its id (not its number).
             _links:
               target:
-                href: /repos/JogoShugh/heart-github-test/issues/2293/actions/remove-sub-issue{?sub_issue_id}
+                href: /repos/JogoShugh/heart-kit-test/issues/120/actions/remove-sub-issue{?sub_issue_id}
                 templated: true
             method: DELETE
             schema:
@@ -8678,22 +8656,22 @@ exchanges:
               '$id': /schemas/1d913285052342b2
             hr:integrity: sha256-d5OIy4OmApRPHr+rJCgXz9rzrpTaHenGEwY3cltVcRY=
 outcome: done
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 now:
   state:
-    id: 6243160543
-    node_id: I_kwDOVM7WJc8AAAABdB8R3w
-    number: 2293
-    title: Hello from ARTIE (1106-1304)
+    id: 6251643718
+    node_id: I_kwDOVldVN88AAAABdKCDRg
+    number: 120
+    title: Hello from ARTIE (1106-2218)
     labels: []
     state: closed
     locked: false
     assignees: []
     milestone: null
     comments: 1
-    created_at: '2026-11-06T13:04:38Z'
-    updated_at: '2026-11-06T13:05:05Z'
-    closed_at: '2026-11-06T13:05:05Z'
+    created_at: '2026-11-06T22:19:01Z'
+    updated_at: '2026-11-06T22:19:27Z'
+    closed_at: '2026-11-06T22:19:27Z'
     assignee: null
     author_association: OWNER
     active_lock_reason: null
@@ -8722,8 +8700,8 @@ now:
     pinned_comment: null
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
-      issue_number: '2293'
+      repo: heart-kit-test
+      issue_number: '120'
   forms:
     - github:reopen
     - github:edit
@@ -8779,7 +8757,7 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-11-06T13:05:13.182009631Z'
+at: '2026-11-06T22:19:34.431632179Z'
 ms: 0
 mode: script
 say: check
@@ -8796,22 +8774,22 @@ params:
       held: completed
       holds: true
 outcome: held
-address: http://localhost:8392/repos/JogoShugh/heart-github-test/issues/2293
+address: http://localhost:8392/repos/JogoShugh/heart-kit-test/issues/120
 now:
   state:
-    id: 6243160543
-    node_id: I_kwDOVM7WJc8AAAABdB8R3w
-    number: 2293
-    title: Hello from ARTIE (1106-1304)
+    id: 6251643718
+    node_id: I_kwDOVldVN88AAAABdKCDRg
+    number: 120
+    title: Hello from ARTIE (1106-2218)
     labels: []
     state: closed
     locked: false
     assignees: []
     milestone: null
     comments: 1
-    created_at: '2026-11-06T13:04:38Z'
-    updated_at: '2026-11-06T13:05:05Z'
-    closed_at: '2026-11-06T13:05:05Z'
+    created_at: '2026-11-06T22:19:01Z'
+    updated_at: '2026-11-06T22:19:27Z'
+    closed_at: '2026-11-06T22:19:27Z'
     assignee: null
     author_association: OWNER
     active_lock_reason: null
@@ -8840,8 +8818,8 @@ now:
     pinned_comment: null
     hr:address:
       owner: JogoShugh
-      repo: heart-github-test
-      issue_number: '2293'
+      repo: heart-kit-test
+      issue_number: '120'
   forms:
     - github:reopen
     - github:edit
@@ -8897,8 +8875,8 @@ now:
           user_view_type: public
           site_admin: false
 ---
-at: '2026-11-06T13:05:13.182632923Z'
-ms: 4
+at: '2026-11-06T22:19:34.432307304Z'
+ms: 3
 mode: script
 say: return to {address}
 line: 6
@@ -8906,8 +8884,8 @@ within: 3
 params:
   address: http://localhost:8392/
 exchanges:
-  - at: '2026-11-06T13:05:13.182943048Z'
-    ms: 3
+  - at: '2026-11-06T22:19:34.432682846Z'
+    ms: 2
     request:
       method: GET
       url: http://localhost:8392/
@@ -8917,14 +8895,14 @@ exchanges:
         Cache-Control: no-cache
         If-None-Match: '"index-hsf-edf1ad4b815ba429"'
         Authorization: &lt;token&gt;
-        traceparent: 00-2622a8b983b17e8009e5eda10f9241a2-5b9d274a67c3ea8b-01
+        traceparent: 00-a16581d7bd2de9af557fbc6ddcf9b6f6-de11c39c509f49e1-01
         User-Agent: ARTIE/0.5
     response:
       status: 304
       headers:
         cache-control: no-cache
         content-length: '0'
-        date: Fri, 06 Nov 2026 13:05:13 GMT
+        date: Fri, 06 Nov 2026 22:19:34 GMT
         etag: '"index-hsf-edf1ad4b815ba429"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile", &lt;/openapi.json&gt;; rel="service-desc"; type="application/vnd.oai.openapi+json;version=3.1"
         server: Jetty(12.0.16)

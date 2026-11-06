@@ -191,7 +191,7 @@ details.jv[open] > summary { margin-bottom: 0.5rem; }
 # What it was offered is pinned in release.pins.yaml, held to before every act.
 # After an act, what it changed is checked: the run stops where that no longer holds.
 # A value marked "review:" holds a value the reasoner chose: check it before keeping the script.
-#   artie run release.heart.yaml owner=JogoShugh repo=heart-github-test version=1.1
+#   artie run release.heart.yaml owner=JogoShugh repo=heart-kit-test version=1.1
 heart: 1
 kind: kept
 start: http://localhost:8400/workspace.json
@@ -244,7 +244,7 @@ steps:
         fields:
           owner: ${owner}
           repo: ${repo}
-        inferred: get repository ${owner}/${repo}
+        inferred: get the repository ${owner}/${repo}
         from-intent: In ${owner}/${repo}
         then:
           - act: github:open-issue
@@ -267,7 +267,7 @@ run:
       default: '1.1'
       question: Which release ships?
 ---
-at: '2026-11-06T13:21:52.478017302Z'
+at: '2026-11-06T22:32:56.606704717Z'
 ms: 48
 mode: script
 say: enter {entry}
@@ -275,8 +275,8 @@ params:
   entry: http://localhost:8400/workspace.json
 opens: true
 exchanges:
-  - at: '2026-11-06T13:21:52.481856135Z'
-    ms: 32
+  - at: '2026-11-06T22:32:56.610569050Z'
+    ms: 33
     request:
       method: GET
       url: http://localhost:8400/workspace.json
@@ -284,15 +284,15 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        traceparent: 00-c8021da7356e65e00f85945b08f6c95a-7bbc4b86f5d66759-01
+        traceparent: 00-ed73618d0e453e84adf721a0bab75dbb-a01ee752b8a6ef64-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         content-length: '875'
         content-type: application/json
-        date: Fri, 06 Nov 2026 13:21:52 GMT
-        last-modified: Fri, 6 Nov 2026 04:30:18 GMT
+        date: Fri, 06 Nov 2026 22:32:56 GMT
+        last-modified: Fri, 6 Nov 2026 21:24:21 GMT
       body:
         title: Workspace
         about: 'What one goal may work across, in three systems that know nothing of each other: each a link to where it starts.'
@@ -331,7 +331,7 @@ now:
       - The release job, on the build service
       - The web app, on the deploy service
 ---
-at: '2026-11-06T13:21:52.532794802Z'
+at: '2026-11-06T22:32:56.662286759Z'
 ms: 12
 mode: script
 say: follow {relation}, titled {title}
@@ -356,8 +356,8 @@ chose:
 guard:
   checked: strict
 exchanges:
-  - at: '2026-11-06T13:21:52.534246135Z'
-    ms: 9
+  - at: '2026-11-06T22:32:56.663411509Z'
+    ms: 10
     request:
       method: GET
       url: http://localhost:8401/jobs/release
@@ -366,14 +366,14 @@ exchanges:
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
-        traceparent: 00-c8021da7356e65e00f85945b08f6c95a-f2f171c7f4a71759-01
+        traceparent: 00-ed73618d0e453e84adf721a0bab75dbb-0bacb20c2c09a40e-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:21:52 GMT
+        date: Fri, 06 Nov 2026 22:32:56 GMT
         etag: '"seq-1.hsf.L0.51024539dad9932a"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
@@ -431,8 +431,8 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-06T13:21:52.547939802Z'
-ms: 53
+at: '2026-11-06T22:32:56.678475967Z'
+ms: 60
 mode: script
 say: act {relation}
 intent: Queue a build of it
@@ -455,8 +455,8 @@ guard:
   checked: strict
   held: form
 exchanges:
-  - at: '2026-11-06T13:21:52.582021677Z'
-    ms: 18
+  - at: '2026-11-06T22:32:56.716597509Z'
+    ms: 21
     request:
       method: POST
       url: http://localhost:8401/jobs/release/actions/build
@@ -466,7 +466,7 @@ exchanges:
         Content-Type: application/json
         If-Match: '"seq-1.hsf.L0.51024539dad9932a"'
         Authorization: &lt;token&gt;
-        traceparent: 00-c8021da7356e65e00f85945b08f6c95a-269ea30a44932125-01
+        traceparent: 00-ed73618d0e453e84adf721a0bab75dbb-6adf30373779cffb-01
         User-Agent: ARTIE/0.5
       body: {}
     response:
@@ -475,7 +475,7 @@ exchanges:
         cache-control: no-cache
         content-location: /jobs/release
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:21:52 GMT
+        date: Fri, 06 Nov 2026 22:32:56 GMT
         etag: '"seq-2.hsf.L0.4ae573702edfbaec"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
@@ -533,15 +533,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-06T13:21:52.602863677Z'
-ms: 6
+at: '2026-11-06T22:32:56.740044009Z'
+ms: 5
 mode: script
 say: return to {address}
 params:
   address: http://localhost:8401/jobs/release
 exchanges:
-  - at: '2026-11-06T13:21:52.603251594Z'
-    ms: 5
+  - at: '2026-11-06T22:32:56.740542675Z'
+    ms: 4
     request:
       method: GET
       url: http://localhost:8401/jobs/release
@@ -551,14 +551,14 @@ exchanges:
         Cache-Control: no-cache
         If-None-Match: '"seq-1.hsf.L0.51024539dad9932a"'
         Authorization: &lt;token&gt;
-        traceparent: 00-c8021da7356e65e00f85945b08f6c95a-a940eb801a8d2ef9-01
+        traceparent: 00-ed73618d0e453e84adf721a0bab75dbb-c7c7ed546f748ae5-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:21:52 GMT
+        date: Fri, 06 Nov 2026 22:32:56 GMT
         etag: '"seq-2.hsf.L0.4ae573702edfbaec"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
@@ -610,15 +610,15 @@ now:
     hr:unavailable:
       - null
 ---
-at: '2026-11-06T13:21:52.609483510Z'
+at: '2026-11-06T22:32:56.746750384Z'
 ms: 2
 mode: script
 say: return to {address}
 params:
   address: http://localhost:8400/workspace.json
 exchanges:
-  - at: '2026-11-06T13:21:52.609702469Z'
-    ms: 1
+  - at: '2026-11-06T22:32:56.746983009Z'
+    ms: 2
     request:
       method: GET
       url: http://localhost:8400/workspace.json
@@ -626,15 +626,15 @@ exchanges:
         Accept: application/hal+json
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
-        traceparent: 00-c8021da7356e65e00f85945b08f6c95a-1db482f6e19d498d-01
+        traceparent: 00-ed73618d0e453e84adf721a0bab75dbb-cb2db97bc3a2e34b-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         content-length: '875'
         content-type: application/json
-        date: Fri, 06 Nov 2026 13:21:52 GMT
-        last-modified: Fri, 6 Nov 2026 04:30:18 GMT
+        date: Fri, 06 Nov 2026 22:32:56 GMT
+        last-modified: Fri, 6 Nov 2026 21:24:21 GMT
       body:
         title: Workspace
         about: 'What one goal may work across, in three systems that know nothing of each other: each a link to where it starts.'
@@ -673,8 +673,8 @@ now:
       - The release job, on the build service
       - The web app, on the deploy service
 ---
-at: '2026-11-06T13:21:52.612226760Z'
-ms: 11
+at: '2026-11-06T22:32:56.749717259Z'
+ms: 13
 mode: script
 say: follow {relation}, titled {title}
 intent: Follow the link to the web app, on the deploy service
@@ -698,8 +698,8 @@ chose:
 guard:
   checked: strict
 exchanges:
-  - at: '2026-11-06T13:21:52.612495594Z'
-    ms: 10
+  - at: '2026-11-06T22:32:56.749999884Z'
+    ms: 12
     request:
       method: GET
       url: http://localhost:8402/apps/web
@@ -708,14 +708,14 @@ exchanges:
         Accept-Profile: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
-        traceparent: 00-c8021da7356e65e00f85945b08f6c95a-a2823e3befbe542c-01
+        traceparent: 00-ed73618d0e453e84adf721a0bab75dbb-d7e231fcf0663425-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/hal+json
-        date: Fri, 06 Nov 2026 13:21:52 GMT
+        date: Fri, 06 Nov 2026 22:32:56 GMT
         etag: '"seq-5.hsf.L0.618721b71eb8e461"'
         link: &lt;https://w3id.org/heart-rise/hal-schema-forms&gt;; rel="profile", &lt;https://w3id.org/heart-rise&gt;; rel="profile"
         server: Jetty(12.0.16)
@@ -862,8 +862,8 @@ keeps:
   /regions/production/0/name:
     - 7
 ---
-at: '2026-11-06T13:21:52.625826844Z'
-ms: 5
+at: '2026-11-06T22:32:56.765667300Z'
+ms: 7
 mode: script
 say: act {relation}, environment {environment}, region {region}, release {release}
 intent: Deploy release 1.2 to an available region of staging
@@ -907,7 +907,7 @@ guard:
   checked: strict
   held: form
 exchanges:
-  - at: '2026-11-06T13:21:52.627928969Z'
+  - at: '2026-11-06T22:32:56.768109967Z'
     ms: 3
     request:
       method: GET
@@ -916,14 +916,14 @@ exchanges:
         Accept: application/json
         Cache-Control: no-cache
         Authorization: &lt;token&gt;
-        traceparent: 00-c8021da7356e65e00f85945b08f6c95a-1ea6809fb6537faa-01
+        traceparent: 00-ed73618d0e453e84adf721a0bab75dbb-ee5d7056da069c95-01
         User-Agent: ARTIE/0.5
     response:
       status: 200
       headers:
         cache-control: no-cache
         content-type: application/json
-        date: Fri, 06 Nov 2026 13:21:52 GMT
+        date: Fri, 06 Nov 2026 22:32:56 GMT
         etag: '"list-c51427ed939dce4f"'
         server: Jetty(12.0.16)
         transfer-encoding: chunked

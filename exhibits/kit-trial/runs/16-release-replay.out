@@ -9,9 +9,9 @@
 9 return to http://localhost:8402/apps/web: done
 10 return to http://localhost:8400/workspace.json: done
 11 follow item, titled GitHub: done
-12 act github:repos-get, owner JogoShugh, repo heart-github-test: done
+12 act github:repos-get, owner JogoShugh, repo heart-kit-test: done
 13 act github:open-issue, title Release 1.0, body Built on the build service and deployed to staging on the deploy service, by one goal across three systems.: new resource
-14 return to http://localhost:8392/repos/JogoShugh/heart-github-test: done
+14 return to http://localhost:8392/repos/JogoShugh/heart-kit-test: done
 15 return to http://localhost:8392/: done
 16 return to http://localhost:8400/workspace.json: done
 report: runs/release-kept/index.html
