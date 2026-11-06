@@ -10,6 +10,7 @@ internal class Checked(val field: String, val sent: Boolean, val value: Any?)
  * the act sent (among [sent]) is checked by the same value or reference the act sends; one it changed to text or a
  * truth, by that value. A number or a time it changed to may differ every run, so it isn't checked unless the act
  * sent it. A form whose method only reads (a search) leads elsewhere, and has nothing to compare: no address is.
+ * A member the run checks itself right after the act is left to that check, so the script says it once.
  * Both writers check the same members: the Kotlin script and the script held as data.
  */
 internal fun checked(capture: Capture, step: Step, sent: Set<String>): List<Checked> {
@@ -17,11 +18,15 @@ internal fun checked(capture: Capture, step: Step, sent: Set<String>): List<Chec
     // The held resource's next state has the members it had: an answer with others is another resource's.
     val before = capture.step(step.number - 1)?.state
         ?.takeIf { held -> changes && step.state.keys.all { it in held.keys } } ?: return emptyList()
+    val next = generateSequence(step.number + 1) { it + 1 }.map { capture.step(it) }.takeWhile { it != null }
+        .filterNotNull().firstOrNull { !it.say.startsWith("return to") }
+    val checkedNext = next?.takeIf { it.say == "check" }?.params?.get("facts").list()
+        .mapNotNull { it.map()["member"]?.toString() }.toSet()
     return step.state.entries.mapNotNull { (member, after) ->
         val field = member.toString()
         val repeats = (after is String && !TIME.containsMatchIn(after) && !HASH.matches(after)) || after is Boolean
         when {
-            before[member] == after -> null
+            before[member] == after || field in checkedNext -> null
             field in sent -> Checked(field, true, null)
             repeats -> Checked(field, false, after)
             else -> null
