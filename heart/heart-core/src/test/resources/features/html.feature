@@ -31,6 +31,34 @@ Feature: HTML for people, rendered from the declaration
       | head   |
     And the acts stand in a column beside the state
 
+  Scenario: A structure in the state is laid out as one: an object as titled pairs, a list of objects as a table
+    The author, 2026-11-07: the deploy service's regions showed as compact
+    JSON in one tile. An object's members are titled pairs, as the state's
+    own are; a list of objects is a table, a column for each member.
+    When the representation {"name":"web","regions":{"staging":[{"name":"us-east","label":"US East","available":true},{"name":"eu-west","label":"EU West","available":false}],"production":[{"name":"us-east","label":"US East","available":true}]},"_links":{"self":{"href":"/apps/web"}}} is rendered as HTML
+    Then the member "regions" shows these pairs
+      | member     | label      |
+      | staging    | Staging    |
+      | production | Production |
+    And the pair "staging" of "regions" is a table
+      | Name    | Label   | Available |
+      | us-east | US East | true      |
+      | eu-west | EU West | false     |
+    And the pair "production" of "regions" is a table
+      | Name    | Label   | Available |
+      | us-east | US East | true      |
+    And no member's value is shown as JSON
+
+  Scenario: A list of objects that differ has a column for each member any of them has, at any depth
+    An item without a member leaves its cell empty; an object inside an item
+    is laid out as pairs in its cell.
+    When the representation {"title":"Bump left-pad","checks":[{"name":"build","status":"passed","by":{"login":"miller"}},{"name":"lint","status":"failed","detail":"2 warnings"}],"_links":{"self":{"href":"/pulls/1873"}}} is rendered as HTML
+    Then the member "checks" is a table
+      | Name  | Status | By           | Detail     |
+      | build | passed | Login miller |            |
+      | lint  | failed |              | 2 warnings |
+    And no member's value is shown as JSON
+
   Scenario: Each act is a button in the type's order, offered or greyed with the server's reason
     An act listed as unavailable keeps its place and stays focusable, so a
     keyboard reaches it and a person learns why. An act neither offered nor

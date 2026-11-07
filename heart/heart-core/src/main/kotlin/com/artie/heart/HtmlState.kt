@@ -1,7 +1,5 @@
 package com.artie.heart
 
-import com.fasterxml.jackson.databind.ObjectMapper
-
 /**
  * What a resource is, laid out for a person: its links, its state and its embedded resources. A member's label is
  * its name titled ([FieldTitle]), with the name itself on hover. The first [SHOWN] members are shown; the rest are
@@ -63,7 +61,7 @@ internal object HtmlState {
         members.joinToString("") { (name, value) ->
             "<div class=\"member${if (wide(value)) " wide" else ""}\">" +
                 "<dt${Html.attr("title", name)}>${Html.text(FieldTitle.of(name.toString()))}</dt>" +
-                "<dd>${shown(value)}</dd></div>"
+                "<dd>${HtmlValues.shown(value)}</dd></div>"
         } + "</dl>"
 
     /** Whether [value] needs a whole row: a structure, or text longer than a tile holds. */
@@ -76,14 +74,6 @@ internal object HtmlState {
 
     /** The most characters a tile shows without crowding it; longer text takes a whole row. */
     private const val TILE = 32
-
-    /** A value as text: a scalar as it is, a list of scalars joined, anything else as compact JSON. */
-    private fun shown(value: Any?): String = when {
-        value == null -> "<span class=\"none\">none</span>"
-        value is List<*> && value.all { it !is Map<*, *> && it !is List<*> } -> Html.text(value.joinToString(", "))
-        value is Map<*, *> || value is List<*> -> "<code>${Html.text(MAPPER.writeValueAsString(value))}</code>"
-        else -> Html.text(value)
-    }
 
     /** What names [item] for a person: its title, name, login or label, else its first words. */
     private fun named(item: Map<*, *>): Any? = NAMING.firstNotNullOfOrNull { item[it] }
@@ -99,6 +89,4 @@ internal object HtmlState {
         is Map<*, *> -> listOf(value)
         else -> emptyList()
     }
-
-    private val MAPPER = ObjectMapper()
 }

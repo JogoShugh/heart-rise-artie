@@ -8,7 +8,7 @@ package com.artie.heart
  */
 object HtmlView {
     /** The renderer's version, part of what the HTML's validator names: a release that renders anew changes it. */
-    const val VERSION = "1"
+    const val VERSION = "2"
 
     /** The validator's tag, beside the dialects' `hf` and `hsf`. */
     const val ETAG_TAG = "html"

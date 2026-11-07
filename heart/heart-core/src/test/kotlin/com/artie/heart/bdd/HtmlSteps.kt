@@ -163,8 +163,42 @@ class HtmlSteps(private val world: LampWorld) {
     @Then("the members laid out a whole row wide are")
     fun wideMembers(table: DataTable) = assertEquals(
         table.asMaps().map { it.getValue("member") },
-        page.select("dl.state .member.wide dt").map { it.attr("title") },
+        page.select("dl.state > .member.wide > dt").map { it.attr("title") },
     )
+
+    @Then("the member {string} shows these pairs")
+    fun pairs(member: String, table: DataTable) = assertEquals(
+        table.asMaps(),
+        pairsOf(valueOf(member)).map { mapOf("member" to it.attr("title"), "label" to it.text()) },
+    )
+
+    @Then("the pair {string} of {string} is a table")
+    fun pairTable(pair: String, member: String, table: DataTable) {
+        val term = checkNotNull(pairsOf(valueOf(member)).firstOrNull { it.attr("title") == pair }) { pair }
+        assertTable(table, checkNotNull(term.nextElementSibling()) { pair })
+    }
+
+    @Then("the member {string} is a table")
+    fun memberTable(member: String, table: DataTable) = assertTable(table, valueOf(member))
+
+    @Then("no member's value is shown as JSON")
+    fun noJson() = assertTrue(page.select("dl.state code").isEmpty(), page.select("dl.state").outerHtml())
+
+    /** The value shown for the state's [member]. */
+    private fun valueOf(member: String): Element =
+        checkNotNull(page.selectFirst("dl.state dt[title=$member]")?.nextElementSibling()) { member }
+
+    /** The terms of the pairs a value shows, in order. */
+    private fun pairsOf(value: Element): List<Element> =
+        checkNotNull(value.selectFirst("> dl.nested")) { value.outerHtml() }.select("> div > dt")
+
+    /** [value]'s table, as a browser shows it: its heading row, then each row, cell by cell. */
+    private fun assertTable(expected: DataTable, value: Element) {
+        val shown = checkNotNull(value.selectFirst("> table.nested")) { value.outerHtml() }
+        val rows = listOf(shown.select("> thead > tr > th").map { it.text() }) +
+            shown.select("> tbody > tr").map { row -> row.select("> td").map { it.text() } }
+        assertEquals(expected.asLists().map { row -> row.map { it.orEmpty() } }, rows)
+    }
 
     @Then("the acts stand in a column beside the state")
     fun actsBeside() {

@@ -37,6 +37,15 @@ dl.state .member { display: grid; gap: 2px; align-content: start; padding: 10px 
 dl.state .member.wide { grid-column: 1 / -1; }
 dl.state dt { color: var(--muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.05em; }
 dl.state dd { margin: 0; min-width: 0; word-break: break-word; font-size: 1.02rem; }
+dl.nested { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; margin: 4px 0 0; }
+dl.nested > div { display: contents; }
+dl.nested dt { padding-top: 3px; }
+dl.nested dd { margin: 0; min-width: 0; font-size: 0.95rem; }
+table.nested { display: block; overflow-x: auto; max-width: 100%; border-collapse: collapse; font-size: 0.92rem; margin-top: 2px; }
+table.nested th { text-align: left; color: var(--muted); font-weight: 600; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 4px 14px 4px 0; border-bottom: 1px solid var(--rule); }
+table.nested td { padding: 4px 14px 4px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.nested tbody tr:last-child td { border-bottom: 0; }
+ol.nested { margin: 0; padding-left: 20px; }
 dl.state code { font: 0.85em var(--mono); white-space: pre-wrap; word-break: break-all; }
 .none { color: var(--muted); font-style: italic; }
 details.more summary { cursor: pointer; color: var(--accent); }
