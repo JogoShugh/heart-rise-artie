@@ -10,6 +10,8 @@ import heart.IntegrityCheck
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.format.NamedTextColor
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -65,6 +67,15 @@ class DialogSteps(private val play: Play) {
         shown.buttons.map { listOf(it.label, if (it.greyed) "greyed" else "offered", it.hover.orEmpty()) },
     )
 
+    @Then("Minecraft draws the buttons' labels as")
+    fun labelsDrawn(table: DataTable) = assertEquals(
+        table.asMaps().map { row -> listOf(row["button"], row["colour"]) },
+        shown.buttons.map { button ->
+            val label = Look.label(button) as TextComponent
+            listOf(label.content(), label.color()?.let { NamedTextColor.namedColor(it.value()) }?.let(::colour))
+        },
+    )
+
     @Then("its inputs are")
     fun inputs(table: DataTable) = assertEquals(
         table.asMaps(),
@@ -96,5 +107,9 @@ class DialogSteps(private val play: Play) {
 
     private companion object {
         val SAFE = setOf("GET", "HEAD")
+
+        /** A colour's name as a person writes it: `dark_gray` is "dark grey". */
+        fun colour(named: NamedTextColor): String? =
+            NamedTextColor.NAMES.key(named)?.replace('_', ' ')?.replace("gray", "grey")
     }
 }

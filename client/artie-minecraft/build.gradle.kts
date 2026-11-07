@@ -27,6 +27,8 @@ dependencies {
     testImplementation("io.cucumber:cucumber-picocontainer:$cucumberVersion")
     // The simulated deploy service, in memory.
     testImplementation(testFixtures("com.artie.heart:heart-sims"))
+    // The text a dialog draws is Adventure's, which needs no server: the scenarios read its colours.
+    testImplementation("io.papermc.paper:paper-api:26.3.build.244-stable")
 }
 
 tasks.test {

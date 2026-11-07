@@ -10,7 +10,8 @@ Feature: A HEART resource as a Minecraft dialog
   offer. An act is sent with If-Match, and its answer is the next dialog. An
   act refused because the resource changed is said in plain words, the
   refusal itself on hover; any other refusal is shown in the server's words.
-  Here a player opens the deploy service's app "web".
+  Drawn in Minecraft, a greyed act's label is dark grey, as plain as a button
+  that is off. Here a player opens the deploy service's app "web".
 
   Background:
     Given the deploy service's app "web" has the regions
@@ -38,6 +39,13 @@ Feature: A HEART resource as a Minecraft dialog
       | Deploy                | offered | Deploys a release of the app to a region of an environment. |
       | Scale the app         | offered | Sets how many instances the app runs on.                     |
       | Cancel the deployment | greyed  | No deployment is in progress.                                |
+
+  Scenario: Drawn in Minecraft, the absent act's label is dark grey
+    Then Minecraft draws the buttons' labels as
+      | button                | colour    |
+      | Deploy                | white     |
+      | Scale the app         | white     |
+      | Cancel the deployment | dark grey |
 
   Scenario: A greyed act's button sends nothing: it reads the app again, which may offer the act by then
     When someone else starts deploying "web"
