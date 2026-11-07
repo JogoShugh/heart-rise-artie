@@ -4,8 +4,8 @@ import kotlinx.serialization.json.JsonObject
 
 /**
  * A dialog as Minecraft shows one (Java Edition 1.21.6 and later): a title, lines of text, titled values, the
- * inputs a player fills in, and buttons. It knows nothing of any domain: what it holds comes from the
- * representation.
+ * inputs a player fills in, and buttons; and beside it, in the sidebar, the resource it is [about]. It knows
+ * nothing of any domain: what it holds comes from the representation.
  */
 data class Dialog(
     val title: String,
@@ -13,10 +13,14 @@ data class Dialog(
     val inputs: List<Input> = emptyList(),
     val buttons: List<Button>,
     val facts: List<Fact> = emptyList(),
+    val about: Panel? = null,
 )
 
 /** A value and its title, as a member of the state or a field filled in so far. */
 data class Fact(val label: String, val value: String)
+
+/** A resource as the sidebar shows it: its title, and its state as titled values. */
+data class Panel(val title: String, val facts: List<Fact>)
 
 /** One input a player fills in; what the player entered comes back by [key]. */
 sealed interface Input {

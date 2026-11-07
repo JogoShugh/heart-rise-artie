@@ -16,10 +16,13 @@ import io.papermc.paper.registry.data.dialog.body.DialogBody
 import io.papermc.paper.registry.data.dialog.input.DialogInput
 import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput.OptionEntry
 import io.papermc.paper.registry.data.dialog.type.DialogType
+import io.papermc.paper.scoreboard.numbers.NumberFormat
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickCallback
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.scoreboard.Criteria
+import org.bukkit.scoreboard.DisplaySlot
 import io.papermc.paper.dialog.Dialog as PaperDialog
 
 /**
@@ -65,8 +68,26 @@ class ArtiePlugin : JavaPlugin() {
                 val shown = runCatching { render(player, session, dialog) }
                     .getOrElse { render(player, session, failure(it)) }
                 player.showDialog(shown)
+                dialog.about?.let { sidebar(player, it) }
             })
         })
+    }
+
+    /**
+     * [panel] in [player]'s sidebar, a scoreboard of their own: its title on top, then a line apiece, left-aligned,
+     * with no score numbers. Minecraft shows at most [SIDEBAR_LINES]; the sidebar stays when the dialog closes.
+     */
+    private fun sidebar(player: Player, panel: Panel) {
+        val board = server.scoreboardManager.newScoreboard
+        val objective = board.registerNewObjective("artie", Criteria.DUMMY, Component.text(panel.title))
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR)
+        objective.numberFormat(NumberFormat.blank())
+        Look.sidebar(panel).take(SIDEBAR_LINES).forEachIndexed { index, line ->
+            val score = objective.getScore("line-$index")
+            score.score = SIDEBAR_LINES - index
+            score.customName(line)
+        }
+        player.scoreboard = board
     }
 
     private fun failure(failed: Throwable): Dialog {
@@ -133,5 +154,8 @@ class ArtiePlugin : JavaPlugin() {
 
         /** How wide a button is (1 to 1024): Minecraft's own default, so two stand side by side. */
         const val BUTTON_WIDTH = 150
+
+        /** How many lines Minecraft shows in the sidebar. */
+        const val SIDEBAR_LINES = 15
     }
 }

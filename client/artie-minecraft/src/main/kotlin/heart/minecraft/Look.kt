@@ -17,6 +17,14 @@ internal object Look {
         .filter { it.isNotEmpty() }
         .map { lines -> Component.join(JoinConfiguration.newlines(), lines.map(Component::text)) }
 
+    /** [panel]'s lines in the sidebar, left-aligned, one a value: its title grey and the value white. */
+    fun sidebar(panel: Panel): List<Component> = panel.facts.map {
+        Component.text()
+            .append(Component.text("${it.label}: ", NamedTextColor.GRAY))
+            .append(Component.text(it.value, NamedTextColor.WHITE))
+            .build()
+    }
+
     /** A button's label: white, as Minecraft draws one; dark grey when greyed, as plain as a button that is off. */
     fun label(button: Button): Component =
         Component.text(button.label, if (button.greyed) NamedTextColor.DARK_GRAY else NamedTextColor.WHITE)

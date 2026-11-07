@@ -10,8 +10,10 @@ import heart.IntegrityCheck
 import io.cucumber.datatable.DataTable
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
 import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextColor
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -58,6 +60,27 @@ class DialogSteps(private val play: Play) {
     @Then("it shows")
     fun shows(table: DataTable) = assertEquals(table.asLists(), shown.facts.map { listOf(it.label, it.value) })
 
+    @Then("the dialog shows no text")
+    fun noText() = assertEquals(emptyList(), shown.body + shown.facts.map { it.label }, "$shown")
+
+    @Then("the sidebar, titled {string}, shows")
+    fun sidebar(title: String, table: DataTable) {
+        sidebarTitled(title)
+        assertEquals(table.asLists(), panel().facts.map { listOf(it.label, it.value) })
+    }
+
+    @Then("the sidebar is titled {string}")
+    fun sidebarTitled(title: String) = assertEquals(title, panel().title)
+
+    @Then("Minecraft draws the sidebar's line {string} as")
+    fun sidebarLine(label: String, table: DataTable) {
+        val lines = Look.sidebar(panel()).map { spans(it) }
+        val line = lines.firstOrNull { it.firstOrNull()?.first() == "$label:" } ?: error("no line $label in $lines")
+        assertEquals(table.asMaps().map { row -> listOf(row["text"], row["colour"]) }, line)
+    }
+
+    private fun panel() = shown.about ?: error("the sidebar shows nothing for $shown")
+
     @Then("its buttons are")
     fun buttons(table: DataTable) = assertEquals(table.asList(), shown.buttons.map { it.label })
 
@@ -72,7 +95,7 @@ class DialogSteps(private val play: Play) {
         table.asMaps().map { row -> listOf(row["button"], row["colour"]) },
         shown.buttons.map { button ->
             val label = Look.label(button) as TextComponent
-            listOf(label.content(), label.color()?.let { NamedTextColor.namedColor(it.value()) }?.let(::colour))
+            listOf(label.content(), colour(label.color()))
         },
     )
 
@@ -108,8 +131,16 @@ class DialogSteps(private val play: Play) {
     private companion object {
         val SAFE = setOf("GET", "HEAD")
 
-        /** A colour's name as a person writes it: `dark_gray` is "dark grey". */
-        fun colour(named: NamedTextColor): String? =
-            NamedTextColor.NAMES.key(named)?.replace('_', ' ')?.replace("gray", "grey")
+        /** Each piece of [text]'s words, trimmed, and the colour it is drawn in, its own or the one it inherits. */
+        fun spans(text: Component, inherited: TextColor? = null): List<List<String?>> {
+            val drawn = text.color() ?: inherited
+            val words = (text as? TextComponent)?.content()?.trim()?.takeIf { it.isNotEmpty() }
+            val own = words?.let { listOf(listOf(it, colour(drawn))) }
+            return own.orEmpty() + text.children().flatMap { spans(it, drawn) }
+        }
+
+        /** A colour's name as a person writes it: `dark_gray` is "dark grey"; none when it has no name. */
+        fun colour(drawn: TextColor?): String? = drawn?.let { NamedTextColor.namedColor(it.value()) }
+            ?.let { NamedTextColor.NAMES.key(it) }?.replace('_', ' ')?.replace("gray", "grey")
     }
 }

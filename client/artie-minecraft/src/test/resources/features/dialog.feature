@@ -1,8 +1,9 @@
 Feature: A HEART resource as a Minecraft dialog
   A Minecraft dialog knows buttons and inputs, as a browser knows links and
-  forms. ARTIE reads the resource, and the dialog shows what the
-  representation holds: its state as titled values, and a button for every
-  act, as the web view has one. An act on offer says what it does on hover;
+  forms. ARTIE reads the resource, and Minecraft shows what the
+  representation holds: its state as titled values in the sidebar, beside
+  the dialog, and in the dialog a button for every act, as the web view has
+  one. The sidebar stays on the resource while its acts' forms are filled in. An act on offer says what it does on hover;
   an absent act's button is greyed and says why, and pressing it only reads
   the resource again. Each act's form is a dialog of inputs. A dialog cannot
   change while it is open, so a property whose choices depend on another
@@ -10,8 +11,10 @@ Feature: A HEART resource as a Minecraft dialog
   offer. An act is sent with If-Match, and its answer is the next dialog. An
   act refused because the resource changed is said in plain words, the
   refusal itself on hover; any other refusal is shown in the server's words.
-  Drawn in Minecraft, a greyed act's label is dark grey, as plain as a button
-  that is off. Here a player opens the deploy service's app "web".
+  Drawn in Minecraft, a value's title is grey and the value white, as
+  Minecraft's own panels show them, and a greyed act's label is dark grey, as
+  plain as a button that is off. Here a player opens the deploy service's app
+  "web".
 
   Background:
     Given the deploy service's app "web" has the regions
@@ -26,9 +29,10 @@ Feature: A HEART resource as a Minecraft dialog
       | web | 1.2     | failed    |
     When a player opens the app "web"
 
-  Scenario: The app, idle: its state as titled values, the acts on offer, and the absent act greyed with why
+  Scenario: The app, idle: its state in the sidebar, the acts on offer, and the absent act greyed with why
     Then the dialog is titled "web"
-    And it shows
+    And the dialog shows no text
+    And the sidebar, titled "web", shows
       | Id       | 1                   |
       | Name     | web                 |
       | Status   | idle                |
@@ -40,8 +44,12 @@ Feature: A HEART resource as a Minecraft dialog
       | Scale the app         | offered | Sets how many instances the app runs on.                     |
       | Cancel the deployment | greyed  | No deployment is in progress.                                |
 
-  Scenario: Drawn in Minecraft, the absent act's label is dark grey
-    Then Minecraft draws the buttons' labels as
+  Scenario: Drawn in Minecraft: in the sidebar each title grey and its value white; the absent act's label dark grey
+    Then Minecraft draws the sidebar's line "Replicas" as
+      | text      | colour |
+      | Replicas: | grey   |
+      | 1         | white  |
+    And Minecraft draws the buttons' labels as
       | button                | colour    |
       | Deploy                | white     |
       | Scale the app         | white     |
@@ -79,6 +87,7 @@ Feature: A HEART resource as a Minecraft dialog
     And the player fills in, and presses "Next"
       | environment | staging |
     Then the dialog is titled "Deploy"
+    And the sidebar is titled "web"
     And its body reads
       | Deploys a release of the app to a region of an environment. |
       | Step 2 of 2                                                  |
@@ -120,7 +129,7 @@ Feature: A HEART resource as a Minecraft dialog
       | method | path                     | body                                                         |
       | POST   | /apps/web/actions/deploy | {"environment":"staging","region":"us-east","release":"1.1"} |
     And the dialog is titled "web"
-    And it shows
+    And the sidebar, titled "web", shows
       | Id          | 1                   |
       | Name        | web                 |
       | Status      | deploying           |

@@ -39,12 +39,13 @@ class DialogSession(private val client: HeartRiseClient) {
         return FormSteps(form, client.choices(rel))
     }
 
+    /** [rep] as a dialog of its acts, its state beside it in the sidebar. */
     private fun resource(rep: HeartRepresentation) = Dialog(
         title = titleOf(rep),
         body = emptyList(),
-        facts = rep.state.mapNotNull { (name, value) -> fact(name, value) },
         buttons = rep.affordances.map { (rel, form) -> Button(form.title ?: rel, Press.Open(rel), form.description) } +
             absent(rep),
+        about = panel(rep),
     )
 
     /** The resource read again: after a refusal, the state is what the next dialog shows. */
@@ -71,6 +72,7 @@ class DialogSession(private val client: HeartRiseClient) {
             facts = filled.entries.map { (name, value) -> Fact(steps.label(name), text(value)) },
             inputs = steps.steps[step].map { steps.input(it, filled) },
             buttons = listOf(next, Button("Back", Press.Back)),
+            about = panel(held),
         )
     }
 
@@ -86,6 +88,7 @@ class DialogSession(private val client: HeartRiseClient) {
             "$name changed since you looked",
             listOf("${press.title} was not done: $name changed after this dialog opened."),
             buttons = listOf(Button("See it now", Press.Read, stale.message)),
+            about = panel(held),
         )
     } catch (refused: ActRefused) {
         notice("${press.title} was refused", refused.message.orEmpty())
@@ -95,7 +98,7 @@ class DialogSession(private val client: HeartRiseClient) {
 
     /** What the server said, and a button to read the resource again. */
     private fun notice(title: String, said: String) =
-        Dialog(title, listOf(said), buttons = listOf(Button("OK", Press.Read)))
+        Dialog(title, listOf(said), buttons = listOf(Button("OK", Press.Read)), about = client.current?.let(::panel))
 
     /**
      * A greyed button for each act that is absent, saying why, as the representation's `hr:unavailable` says.
@@ -113,6 +116,10 @@ class DialogSession(private val client: HeartRiseClient) {
             ?: listOf("title", "name").firstNotNullOfOrNull { (rep.state[it] as? JsonPrimitive)?.takeUnless(::isNull) }
                 ?.content
             ?: rep.url
+
+        /** [rep] as the sidebar shows it: its title, and each member of its state, titled. */
+        fun panel(rep: HeartRepresentation) =
+            Panel(titleOf(rep), rep.state.mapNotNull { (name, value) -> fact(name, value) })
 
         /** One member of the state, titled: a value as it reads, an object by its names; none when null. */
         fun fact(name: String, value: JsonElement): Fact? = when (value) {
