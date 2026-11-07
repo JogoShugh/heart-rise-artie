@@ -1,6 +1,9 @@
-# Plan: the Garden, square-foot gardening on HEART
+# Idea: the Garden, square-foot gardening on HEART
 
-Drafted 2026-11-07, not built. A HEART domain for people who grow food in square-foot beds: a backyard or
+**Status:** idea only, saved 2026-11-07. Drafted as a plan the same day, then kept as an idea at the author's
+word. Nothing is built. Not to be started before the author asks.
+
+A HEART domain for people who grow food in square-foot beds: a backyard or
 front-yard gardener alone, or a community garden group. Organic by default; veganic is an option a garden or a
 bed sets. Decisions marked **D?** are the author's; each carries a recommendation.
 
@@ -10,8 +13,11 @@ bed sets. Decisions marked **D?** are the author's; each carries a recommendatio
   square-foot cells, and each `BedCell` is the aggregate root with its own event stream (stream id = cell id).
   Its care actions are plant, water, fertilize, mulch and harvest; its soil rules (`BedCell.targets`) say
   planting needs an empty cell and a harvest applies only where that plant grows. It has HAL Schema Forms
-  work and SSE (`SseBedEventPublisher`). It is not built on the HEART library. This plan borrows its model
+  work and SSE (`SseBedEventPublisher`). It is not built on the HEART library. This idea borrows its model
   and vocabulary and leaves that repository untouched.
+- **The garden-bed service** (`server-spring`, `com.artie.gardenbed`) is HEART's first small example: the
+  whole bed is the aggregate, with one crop, moisture and growth points, on `PostgresEventStore`. It has no
+  cells, no care schedule and no growing standard. This idea is a separate domain beside it (**D?**).
 - **The tickets domain** (`domains/tickets`) is the shape to copy: Spring Boot, `heart-spring-boot-starter`,
   `heart-eventsourcing` with `PostgresEventStore`, Flyway, Testcontainers, no controllers, its own feature
   file plus the HEART conformance features.
@@ -129,7 +135,7 @@ Today (what's due, overdue first), the bed map (the grid), a cell's history acro
 - **Concurrency:** every act carries `If-Match`. Two people harvest one square, claim one rota task or lend
   one tool: the second is refused (412) and reads the new state.
 
-### What the plan may ask of HEART itself
+### What the garden may ask of HEART itself
 
 Each is its own decision; none blocks phase 1.
 
@@ -184,14 +190,17 @@ Small steps; the author picks each next one. Each starts with its feature, seen 
 6. StarbornAG: stay separate, with this service as the HEART version it could move onto later? Recommended:
    yes.
 7. The HEART asks above, each when its phase needs it.
+8. The garden-bed service in `server-spring`: keep it as HEART's small example beside this domain, or retire
+   it once this one covers what it shows? Recommended: keep it; it stays small on purpose.
 
-## An idea, not planned: Minecraft
+## A further idea: Minecraft
 
 The proof of concept (`docs/reports/minecraft-poc/`) shows HEART resources as dialogs in plain Minecraft.
 The garden would fit it well: one cell as one block (crop growth stage and soil moisture from the cell's
 state), a bed as a patch of farmland, a compost bin as a composter, a rain barrel as a cauldron. Breaking a
 ripe crop would be the harvest act, a bucket on dry soil the water act, a right-click the cell's dialog; a
-gesture whose act isn't offered would be cancelled, with the reason shown. Not part of this plan.
+gesture whose act isn't offered would be cancelled, with the reason shown. The walkable-world version, and the
+question of who knows that a bed is farmland, is its own idea: `spec/ideas/minecraft-garden.md`.
 
 ## Not in scope
 
