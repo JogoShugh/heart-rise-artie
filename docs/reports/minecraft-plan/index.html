@@ -195,6 +195,22 @@ details ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
   </section>
 
   <section>
+    <h2>The course, mapped to the phases</h2>
+    <p class="section-lede">stxphen's <a href="https://youtube.com/playlist?list=PL3Cdwhu_4crm-taHKMt9PDZ0zQn5U6o-y">Minecraft Plugin Development (Kotlin)</a>, 90 videos, current to 1.21.9. Watch 1 to 6, then 24, 51 and 52: that is enough for phases 0 to 2.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Phase</th><th>Videos</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><span class="phase">0 · Spike</span></td><td>1 First Plugin · 3 Commands · 4 Command Arguments · <b>51 Dialogs (1.21.7+)</b>, 39 minutes</td><td>A plugin, the <code>/artie</code> command, and the dialog API the plan is built on</td></tr>
+        <tr><td><span class="phase">1 · Read</span></td><td><b>24 Scheduler (Runnables)</b> · 38 Custom JSON Files</td><td>Reading resources off the main thread and showing the dialog back on it; JSON in a plugin</td></tr>
+        <tr><td><span class="phase">2 · Act</span></td><td>51 Dialogs again · 50 Anvil Text Input</td><td>Reading a dialog's inputs; a fallback for long text</td></tr>
+        <tr><td><span class="phase">3 · Goals</span></td><td><b>52 PROJECT: AI Chat (ChatGPT)</b> · 42 Setting Permissions</td><td>A plugin calling a model over HTTP, the shape of a goal walk from the game; who may run what</td></tr>
+        <tr><td><span class="phase">Later</span></td><td>60 Arena Signs · 33 Display Entities (1.19.4+) · 23 Custom GUIs · 47 Pagination (GUI)</td><td>A sign that holds an address; a resource's state floating over a block; long lists, such as issues, as a chest menu</td></tr>
+      </tbody>
+    </table></div>
+    <p class="note">Not needed for this plan: the minigame videos (53 to 64), Velocity (65 to 73), Folia (82 and 83) and the Windows server setup (81). On the Mac the server is <code>java -jar paper.jar</code> on Java 25.</p>
+  </section>
+
+  <section>
     <h2>Limits, and what the plan does about each</h2>
     <div class="scroll"><table>
       <thead><tr><th>Limit</th><th>What the plan does</th></tr></thead>
@@ -233,6 +249,7 @@ details ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
   <section class="sources">
     <h3>Sources</h3>
     <ul>
+      <li><a href="https://youtube.com/playlist?list=PL3Cdwhu_4crm-taHKMt9PDZ0zQn5U6o-y">stxphen: Minecraft Plugin Development (Kotlin)</a></li>
       <li><a href="https://docs.papermc.io/paper/dev/dialogs/">Paper: Dialog API</a></li>
       <li><a href="https://jd.papermc.io/paper/1.21.11/io/papermc/paper/dialog/DialogResponseView.html">Paper javadoc: DialogResponseView</a></li>
       <li><a href="https://minecraft.wiki/w/Dialog">Minecraft Wiki: Dialog</a></li>
