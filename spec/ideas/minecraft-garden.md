@@ -1,7 +1,9 @@
 # Idea: the garden as a walkable Minecraft world, from a Paper plugin
 
 **Status:** idea only, parked 2026-10-30. Raised by the author while learning Paper plugins in Kotlin with their son.
-Nothing is built. Not to be started before the author asks.
+Not to be started before the author asks. Since 2026-11-07 a proof of concept exists beside it: `client/artie-minecraft`
+shows the deploy simulator's app as a written book, its acts' forms as dialogs (docs/reports/minecraft-poc). The
+garden world itself is not built. How it could look better is the last section.
 
 ## In one sentence
 
@@ -99,3 +101,70 @@ look yet.
 
 Commands, events (a right-click on a block), inventory menus, the schedulers (sync and async) and placing blocks. The
 author's Paper course covers these; the plugin can wait until it has.
+
+## A look of its own: a resource pack the plugin builds
+
+Raised by the author on 2026-11-07, after the proof of concept's screens: other servers have much cleaner UIs. What
+the plugin shows now is a written book (title, a link per act, the state below) and dialogs for forms. The author is
+fine with the book for now; it is plain, not pretty.
+
+### Where the plain screens stop
+
+Minecraft draws only what it knows: dialogs, books, chest menus, the sidebar, boss bar and action bar, and text.
+The server sends instructions for those, never pixels. Without more, each has fixed limits:
+
+| Screen | Limit met |
+|---|---|
+| Dialog (1.21.6) | Every line centred; no background or layout; the ⚠ "custom screen" button always there |
+| Sidebar | Under an open dialog, its buttons cover it |
+| Chest menu | Items in a grid; the author found the vanilla look awful |
+| Written book | Java shows one page at a time (Bedrock shows two); left-aligned and readable, but plain |
+
+Floating panels in the world are out: blocks will be linked to web resources instead.
+
+### How the clean UIs are made
+
+The polished servers send a **resource pack**: pictures, fonts and models the game downloads when the player joins,
+with no mod. The pictures appear inside the ordinary screens:
+
+- **Glyphs.** A picture is mapped to a character of a font, so it can stand anywhere text stands: titles, books,
+  lore, chat. A full-size glyph in a chest menu's title, shifted with negative-space characters, becomes the menu's
+  background ([Oraxen glyphs](https://docs.oraxen.com/configuration/glyphs/),
+  [Spigot: Custom Inventory UIs](https://www.spigotmc.org/threads/custom-inventory-uis-updated.635897/)). The title
+  must be white or it tints the picture; height is set per glyph by the font's ascent.
+- **Libraries for Paper:**
+  - [InventoryMenuAPI](https://github.com/Le0onKR/InventoryMenuAPI): menus with pack-made titles;
+  - [brikster/glyphs](https://github.com/brikster/glyphs): bitmap glyphs and GUI helpers;
+  - Nova on InvUI draws a menu's background as one large glyph
+    ([GuiTexture](https://docs.xenondevs.xyz/nova/addon/guis/guitextures/)).
+- **Overlays on the screen.** [BetterHud](https://www.mintlify.com/toxicity188/BetterHud) builds its pack from its
+  settings when the server starts and sends it as players join: custom HUD pictures and text, no floating panels.
+  Its stated versions differ by source; 26.3 is unconfirmed.
+- **Items with their own picture.** Since 1.21.4, an item's `item_model` component names a model in the pack
+  without replacing a vanilla item
+  ([datapack.wiki](https://datapack.wiki/guide/adding-new-features/custom-items/models)). A dialog's `item` body shows
+  an item, so a dialog can show any icon the pack has ([Minecraft Wiki: Dialog](https://minecraft.wiki/w/Dialog)).
+- **Making and serving the pack from code.** The [creative](https://docsearch.algolia.com/mcp/docs/repo/unnamed/creative)
+  library writes a pack in Java, and its creative-server module serves it over HTTP from inside a plugin
+  ([Creative Central](https://modrinth.com/mod/central) is a plugin built on it). Packs can also restyle the book's
+  page (`textures/gui/book.png`) and the buttons' sprites.
+
+### The proposal
+
+The plugin is the browser; the pack is its stylesheet. A first step keeps the book and dialogs and gives them a pack
+the plugin builds and serves itself:
+
+1. A clean font, and the book's page and the buttons restyled.
+2. A few glyphs for what every resource has: on offer, not now, read again, close.
+3. The pack sent to each player as they join, from the plugin's own small HTTP server.
+
+Nothing in it is about deploying, so the garden gets the same look. Domain looks (a carrot for a crop) belong to the
+server, through the linked view of option C above, which can name pictures from a pack the server serves. Fancier
+screens build on the same pack: a HUD panel, menus with their own background.
+
+### Not yet checked
+
+- Whether dialogs draw glyphs from a pack's font as books and menus do. Text components carry a `font`, so they
+  should; to be seen in the game.
+- How far restyled buttons change Minecraft's other menus while the pack is on.
+- Whether a player sees the pack prompt each time, and what happens when they decline it.
