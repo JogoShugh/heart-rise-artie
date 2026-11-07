@@ -53,13 +53,24 @@ class DialogSteps(private val play: Play) {
     @Then("its body reads")
     fun body(table: DataTable) = assertEquals(table.asList(), shown.body)
 
+    @Then("it shows")
+    fun shows(table: DataTable) = assertEquals(table.asLists(), shown.facts.map { listOf(it.label, it.value) })
+
     @Then("its buttons are")
     fun buttons(table: DataTable) = assertEquals(table.asList(), shown.buttons.map { it.label })
+
+    @Then("its buttons, offered or greyed, are")
+    fun buttonsShown(table: DataTable) = assertEquals(
+        table.asMaps().map { row -> listOf(row["button"], row["shown"], row["on hover"].orEmpty()) },
+        shown.buttons.map { listOf(it.label, if (it.greyed) "greyed" else "offered", it.hover.orEmpty()) },
+    )
 
     @Then("its inputs are")
     fun inputs(table: DataTable) = assertEquals(
         table.asMaps(),
-        shown.inputs.map { mapOf("input" to it.key, "kind" to if (it is OptionInput) "single option" else "text") },
+        shown.inputs.map {
+            mapOf("input" to it.key, "label" to it.label, "kind" to if (it is OptionInput) "single option" else "text")
+        },
     )
 
     @Then("the choices for {string} are")

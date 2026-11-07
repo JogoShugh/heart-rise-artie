@@ -3,15 +3,20 @@ package heart.minecraft
 import kotlinx.serialization.json.JsonObject
 
 /**
- * A dialog as Minecraft shows one (Java Edition 1.21.6 and later): a title, lines of text, the inputs a player
- * fills in, and buttons. It knows nothing of any domain: what it holds comes from the representation.
+ * A dialog as Minecraft shows one (Java Edition 1.21.6 and later): a title, lines of text, titled values, the
+ * inputs a player fills in, and buttons. It knows nothing of any domain: what it holds comes from the
+ * representation.
  */
 data class Dialog(
     val title: String,
     val body: List<String>,
     val inputs: List<Input> = emptyList(),
     val buttons: List<Button>,
+    val facts: List<Fact> = emptyList(),
 )
+
+/** A value and its title, as a member of the state or a field filled in so far. */
+data class Fact(val label: String, val value: String)
 
 /** One input a player fills in; what the player entered comes back by [key]. */
 sealed interface Input {
@@ -28,8 +33,11 @@ data class OptionInput(override val key: String, override val label: String, val
 /** One option: the [id] that comes back, and what the player is [shown]. */
 data class Option(val id: String, val shown: String)
 
-/** One button: its label, and what pressing it does. */
-data class Button(val label: String, val press: Press)
+/**
+ * One button: its label, what pressing it does, and what it says on [hover]. A [greyed] button stands for an act
+ * not on offer: it is shown so the player sees the act and why, and pressing it only reads the resource again.
+ */
+data class Button(val label: String, val press: Press, val hover: String? = null, val greyed: Boolean = false)
 
 /** What a button does. The fields [Press.Next] and [Press.Send] carry were filled in by the dialogs before. */
 sealed interface Press {

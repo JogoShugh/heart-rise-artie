@@ -38,7 +38,7 @@ internal class FormSteps(form: AffordanceForm, private val choices: FormChoices?
     /** The input for the property [name], with [filled] what the steps before filled in. */
     fun input(name: String, filled: JsonObject): Input {
         val property = properties.getValue(name)
-        val label = (property["title"] as? JsonPrimitive)?.content ?: name
+        val label = label(name)
         val closed = closedSet(name, filled)
         return if (closed != null) {
             OptionInput(name, label, closed.map { Option(idOf(it.value), it.prompt) })
@@ -46,6 +46,10 @@ internal class FormSteps(form: AffordanceForm, private val choices: FormChoices?
             TextInput(name, label, (property["maxLength"] as? JsonPrimitive)?.intOrNull ?: TEXT_LENGTH)
         }
     }
+
+    /** What the property [name] is called for a person: its schema's title, else a title written from its name. */
+    fun label(name: String): String =
+        (properties[name]?.get("title") as? JsonPrimitive)?.content ?: FieldTitle.of(name)
 
     /** [filled] and what the player entered in [values], each as the JSON its property takes; empty text left out. */
     fun filled(filled: JsonObject, values: Map<String, String>): JsonObject {

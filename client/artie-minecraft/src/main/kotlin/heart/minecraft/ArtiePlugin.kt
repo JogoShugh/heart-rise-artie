@@ -17,7 +17,9 @@ import io.papermc.paper.registry.data.dialog.input.DialogInput
 import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput.OptionEntry
 import io.papermc.paper.registry.data.dialog.type.DialogType
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.JoinConfiguration
 import net.kyori.adventure.text.event.ClickCallback
+import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import io.papermc.paper.dialog.Dialog as PaperDialog
@@ -84,22 +86,36 @@ class ArtiePlugin : JavaPlugin() {
                         if (dialog.buttons.isEmpty()) DialogBase.DialogAfterAction.CLOSE
                         else DialogBase.DialogAfterAction.WAIT_FOR_RESPONSE,
                     )
-                    .body(dialog.body.map { line -> DialogBody.plainMessage(Component.text(line), WIDTH) })
+                    .body(body(dialog))
                     .inputs(dialog.inputs.map(::input))
                     .build(),
             )
             .type(type(player, session, dialog))
     }
 
-    /** One button for each of [dialog]'s, in a column; with none, a notice the player closes. */
+    /**
+     * [dialog]'s text, then its titled values, each as one block of lines: Minecraft spaces blocks apart, and lines
+     * of one block close together. A value's title is gold, the value white, so each line reads at a glance.
+     */
+    private fun body(dialog: Dialog): List<DialogBody> = listOf(
+        dialog.body.map { Component.text(it) },
+        dialog.facts.map { Component.text("${it.label}: ", NamedTextColor.GOLD).append(Component.text(it.value)) },
+    ).filter { it.isNotEmpty() }
+        .map { lines -> DialogBody.plainMessage(Component.join(JoinConfiguration.newlines(), lines), WIDTH) }
+
+    /** [dialog]'s buttons, two to a row when there are more than one; with none, a notice the player closes. */
     private fun type(player: Player, session: DialogSession, dialog: Dialog): DialogType =
         if (dialog.buttons.isEmpty()) {
             DialogType.notice()
         } else {
-            DialogType.multiAction(dialog.buttons.map { button(player, session, dialog, it) }).columns(1).build()
+            DialogType.multiAction(dialog.buttons.map { button(player, session, dialog, it) })
+                .columns(if (dialog.buttons.size > 1) 2 else 1).build()
         }
 
-    /** A button that sends back what the player entered in [dialog]'s inputs, once. */
+    /**
+     * A button that sends back what the player entered in [dialog]'s inputs, once, and says on hover what it does.
+     * A greyed one is grey, as Minecraft shows a button that is off; on hover it says why.
+     */
     private fun button(player: Player, session: DialogSession, dialog: Dialog, button: Button): ActionButton {
         val pressed = DialogAction.customClick(
             { response, _ ->
@@ -108,7 +124,8 @@ class ArtiePlugin : JavaPlugin() {
             },
             ClickCallback.Options.builder().uses(1).build(),
         )
-        return ActionButton.create(Component.text(button.label), null, BUTTON_WIDTH, pressed)
+        val label = Component.text(button.label, if (button.greyed) NamedTextColor.GRAY else null)
+        return ActionButton.create(label, button.hover?.let(Component::text), BUTTON_WIDTH, pressed)
     }
 
     private fun input(input: Input): DialogInput = when (input) {
@@ -127,7 +144,7 @@ class ArtiePlugin : JavaPlugin() {
         /** How wide a line of text or an input is, in Minecraft's units (it allows 1 to 1024). */
         const val WIDTH = 300
 
-        /** How wide a button is (1 to 1024; Minecraft's own default is 150). */
-        const val BUTTON_WIDTH = 200
+        /** How wide a button is (1 to 1024): Minecraft's own default, so two stand side by side. */
+        const val BUTTON_WIDTH = 150
     }
 }

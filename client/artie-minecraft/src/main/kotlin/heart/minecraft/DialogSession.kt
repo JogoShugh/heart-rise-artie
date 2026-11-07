@@ -5,6 +5,7 @@ import heart.ActRefused
 import heart.HeartRepresentation
 import heart.HeartRiseClient
 import heart.ReadRefused
+import heart.StaleAct
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -13,9 +14,10 @@ import kotlinx.serialization.json.JsonPrimitive
 
 /**
  * One player's way through HEART resources, a dialog at a time. ARTIE reads and acts; each answer is the next
- * dialog. A resource is its state as lines of text, a line for each act that is absent and why, and a button for
- * each act on offer. An act's form is a dialog of inputs, or a few, one step at a time (see [FormSteps]). An act is
- * sent as ARTIE sends one, with If-Match; a refusal is a notice in the server's words.
+ * dialog. A resource is its state as titled values, a button for each act on offer, saying what it does, and a
+ * greyed button for each act that is absent, saying why. An act's form is a dialog of inputs, or a few, one step at
+ * a time (see [FormSteps]). An act is sent as ARTIE sends one, with If-Match. A refusal because the resource changed
+ * is said in plain words; any other is a notice in the server's words.
  */
 class DialogSession(private val client: HeartRiseClient) {
     private val held get() = checkNotNull(client.current) { "no resource is open" }
@@ -39,8 +41,10 @@ class DialogSession(private val client: HeartRiseClient) {
 
     private fun resource(rep: HeartRepresentation) = Dialog(
         title = titleOf(rep),
-        body = rep.state.mapNotNull { (name, value) -> line(name, value) } + absent(rep),
-        buttons = rep.affordances.map { (rel, form) -> Button(form.title ?: rel, Press.Open(rel)) },
+        body = emptyList(),
+        facts = rep.state.mapNotNull { (name, value) -> fact(name, value) },
+        buttons = rep.affordances.map { (rel, form) -> Button(form.title ?: rel, Press.Open(rel), form.description) } +
+            absent(rep),
     )
 
     /** The resource read again: after a refusal, the state is what the next dialog shows. */
@@ -50,28 +54,39 @@ class DialogSession(private val client: HeartRiseClient) {
         notice("Not read", refused.message.orEmpty())
     }
 
-    /** Step [step] of [rel]'s form, with [filled] what the steps before it filled in. */
+    /** Step [step] of [rel]'s form, under what the steps before it filled in, [filled]. */
     private fun form(rel: String, filled: JsonObject, step: Int): Dialog {
         val form = checkNotNull(held.affordance(rel)) { "$rel is not offered now" }
         val steps = steps(rel)
         val title = form.title ?: rel
-        val so = filled.entries.joinToString(", ") { (name, value) -> "$name ${text(value)}" }
-        val progress = "Step ${step + 1} of ${steps.steps.size}" + (if (so.isEmpty()) "" else ": $so")
         val next = if (step == steps.steps.lastIndex) {
             Button(title, Press.Send(rel, title, filled))
         } else {
             Button("Next", Press.Next(rel, filled, step + 1))
         }
+        val progress = "Step ${step + 1} of ${steps.steps.size}".takeIf { steps.steps.size > 1 }
         return Dialog(
             title = title,
-            body = listOfNotNull(form.description, progress.takeIf { steps.steps.size > 1 }),
+            body = listOfNotNull(form.description, progress),
+            facts = filled.entries.map { (name, value) -> Fact(steps.label(name), text(value)) },
             inputs = steps.steps[step].map { steps.input(it, filled) },
             buttons = listOf(next, Button("Back", Press.Back)),
         )
     }
 
+    /**
+     * [press]'s act, sent. A resource that changed since the player looked refuses it (412); ARTIE has read it
+     * again, and the player is told so plainly, with the refusal itself on hover.
+     */
     private fun send(press: Press.Send, filled: JsonObject): Dialog = try {
         resource(client.act(press.rel, filled))
+    } catch (stale: StaleAct) {
+        val name = titleOf(held)
+        Dialog(
+            "$name changed since you looked",
+            listOf("${press.title} was not done: $name changed after this dialog opened."),
+            buttons = listOf(Button("See it now", Press.Read, stale.message)),
+        )
     } catch (refused: ActRefused) {
         notice("${press.title} was refused", refused.message.orEmpty())
     } catch (refused: AccessRefused) {
@@ -82,11 +97,14 @@ class DialogSession(private val client: HeartRiseClient) {
     private fun notice(title: String, said: String) =
         Dialog(title, listOf(said), buttons = listOf(Button("OK", Press.Read)))
 
-    /** One line for each act that is absent, and why, as the representation's `hr:unavailable` says. */
-    private fun absent(rep: HeartRepresentation): List<String> {
+    /**
+     * A greyed button for each act that is absent, saying why, as the representation's `hr:unavailable` says.
+     * Pressing one reads the resource again: the act may be on offer by then.
+     */
+    private fun absent(rep: HeartRepresentation): List<Button> {
         val said = rep.manifest.unavailable?.let { client.listReader(it.href) } as? JsonObject
         return ((said?.get("unavailable") as? JsonArray) ?: JsonArray(emptyList())).mapNotNull { it as? JsonObject }
-            .map { "${text(it["title"] ?: it["rel"])}: ${text(it["reason"])}" }
+            .map { Button(text(it["title"] ?: it["rel"]), Press.Read, text(it["reason"]), greyed = true) }
     }
 
     private companion object {
@@ -96,13 +114,13 @@ class DialogSession(private val client: HeartRiseClient) {
                 ?.content
             ?: rep.url
 
-        /** One member of the state as a line: a value as it reads, an object by its names; none when null. */
-        fun line(name: String, value: JsonElement): String? = when (value) {
+        /** One member of the state, titled: a value as it reads, an object by its names; none when null. */
+        fun fact(name: String, value: JsonElement): Fact? = when (value) {
             is JsonNull -> null
-            is JsonPrimitive -> "$name: ${value.content}"
-            is JsonObject -> "$name: ${value.keys.joinToString(", ")}"
-            is JsonArray -> "$name: ${value.size} items"
-        }
+            is JsonPrimitive -> value.content
+            is JsonObject -> value.keys.joinToString(", ")
+            is JsonArray -> "${value.size} items"
+        }?.let { Fact(FieldTitle.of(name), it) }
 
         fun text(value: JsonElement?): String = (value as? JsonPrimitive)?.content ?: "$value"
 
