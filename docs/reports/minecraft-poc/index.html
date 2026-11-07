@@ -10,7 +10,7 @@
   --bg: #f2f3ec; --fg: #1d231f; --muted: #5b675e; --accent: #3a7a33; --earth: #87592c; --card: #fffffa;
   --rule: #d9d9cb; --chip: #e2eedc; --chip-fg: #285a22; --code: #ecebe1; --pre: #f7f6ee;
   --aside: #fff6e3; --aside-edge: #d39a2c; --aside-fg: #6b4a0f; --concept: #e9f1fb; --concept-edge: #4f7fbf; --concept-fg: #23476f;
-  --k: #8a3b8f; --s: #2f7a3a; --t: #275f9b; --c: #7a8178; --n: #a2561b; --a: #8a5a00; --m: #5d6a2a;
+  --bar: rgba(242, 243, 236, 0.92); --k: #8a3b8f; --s: #2f7a3a; --t: #275f9b; --c: #7a8178; --n: #a2561b; --a: #8a5a00; --m: #5d6a2a;
   --display: "Source Serif 4", Georgia, serif; --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --mono: "IBM Plex Mono", Menlo, monospace; --pixel: "Pixelify Sans", "IBM Plex Mono", Menlo, monospace;
 }
@@ -18,12 +18,12 @@
   --bg: #121714; --fg: #e2e8e2; --muted: #9daf9f; --accent: #7cc56e; --earth: #d29a5f; --card: #19201b;
   --rule: #2b372e; --chip: #1f331d; --chip-fg: #b2e3a6; --code: #1e2620; --pre: #161c18;
   --aside: #2a2213; --aside-edge: #b9842a; --aside-fg: #f0d29a; --concept: #17222f; --concept-edge: #5d8fd0; --concept-fg: #b9d3f3;
-  --k: #d59be0; --s: #95d48a; --t: #8cbcf0; --c: #8a948b; --n: #f0ad73; --a: #e8c06a; --m: #c3cf8a; color-scheme: dark; } }
+  --bar: rgba(18, 23, 20, 0.92); --k: #d59be0; --s: #95d48a; --t: #8cbcf0; --c: #8a948b; --n: #f0ad73; --a: #e8c06a; --m: #c3cf8a; color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #121714; --fg: #e2e8e2; --muted: #9daf9f; --accent: #7cc56e; --earth: #d29a5f; --card: #19201b;
   --rule: #2b372e; --chip: #1f331d; --chip-fg: #b2e3a6; --code: #1e2620; --pre: #161c18;
   --aside: #2a2213; --aside-edge: #b9842a; --aside-fg: #f0d29a; --concept: #17222f; --concept-edge: #5d8fd0; --concept-fg: #b9d3f3;
-  --k: #d59be0; --s: #95d48a; --t: #8cbcf0; --c: #8a948b; --n: #f0ad73; --a: #e8c06a; --m: #c3cf8a; color-scheme: dark; }
+  --bar: rgba(18, 23, 20, 0.92); --k: #d59be0; --s: #95d48a; --t: #8cbcf0; --c: #8a948b; --n: #f0ad73; --a: #e8c06a; --m: #c3cf8a; color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body);
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 64px; }
@@ -98,9 +98,33 @@ pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: norm
 .loop li { counter-increment: s; display: grid; grid-template-columns: 2rem 1fr; gap: 8px; }
 .loop li::before { content: counter(s); font: 600 0.8rem var(--mono); color: var(--chip-fg); background: var(--chip); border-radius: 50%; width: 1.6rem; height: 1.6rem; display: grid; place-items: center; }
 .sources { font-size: 0.86rem; }
+/* The toolbar every report shares: how much detail, and light or dark. */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap; padding: 10px 0; background: var(--bar); backdrop-filter: blur(6px); border-bottom: 1px solid var(--rule); }
+.seg { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.seg-label { font: 600 0.74rem var(--mono); text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-right: 6px; }
+.seg button, .theme { font: 600 0.82rem var(--mono); color: var(--fg); background: var(--card);
+  border: 1px solid var(--rule); border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+.seg button[aria-checked="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.seg button:focus-visible, .theme:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+/* Story shows no code; Code adds the excerpts and their notes; Bodies adds what was read, opened. */
+body:not([data-detail="1"]):not([data-detail="2"]) :is(.code, .kotlin-notes) { display: none; }
+body:not([data-detail="2"]) .bodies { display: none; }
+body[data-detail="1"] .only-story, body[data-detail="2"] .only-story { display: none; }
+.only-story { font-size: 0.88rem; color: var(--muted); }
+
 </style>
 
 <div class="wrap">
+  <div class="bar" role="toolbar" aria-label="View">
+    <div class="seg" role="radiogroup" aria-label="Detail">
+      <span class="seg-label">Detail</span>
+      <button type="button" data-level="0" role="radio">Story</button>
+      <button type="button" data-level="1" role="radio">Code</button>
+      <button type="button" data-level="2" role="radio">Bodies</button>
+    </div>
+    <button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button>
+  </div>
   <header class="hero">
     <div class="kicker"><span>HEART · ARTIE · Proof of concept · 7 November 2026</span><span class="draft">Draft</span></div>
     <h1>ARTIE in Minecraft, working</h1>
@@ -136,7 +160,7 @@ pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: norm
       <figure><img src="img/4-deploying.jpg" alt="Dialog showing release 1.1, replicas 1, regions, 'Deploy: A deployment is in progress.', 'Scale the app: A deployment is in progress.', and one button, Cancel the deployment." loading="lazy">
         <figcaption><span class="n">4 · Deploy, sent</span><span>The answer is the next dialog: deploying. Only Cancel is on offer; Deploy and Scale say why not.</span><span class="chips"><span class="chip">the answer drives the next step</span></span></figcaption></figure>
       <figure><img src="img/5-browser.jpg" alt="The same app in a browser at localhost:8403/apps/web: tiles for id, name, status deploying, environment, region, release, replicas, regions as raw JSON; buttons Deploy, Cancel the deployment, Scale the app." loading="lazy">
-        <figcaption><span class="n">5 · The browser</span><span>The same resource as <code>text/html</code>: the same acts, the absent ones greyed with their reasons. The regions show as raw JSON, the next thing to fix.</span><span class="chips"><span class="chip">content negotiation</span></span></figcaption></figure>
+        <figcaption><span class="n">5 · The browser</span><span>The same resource as <code>text/html</code>: the same acts, the absent ones greyed with their reasons.</span><span class="chips"><span class="chip">content negotiation</span></span></figcaption></figure>
       <figure><img src="img/6-browser-cancel.jpg" alt="Browser dialog Cancel the deployment: 'Cancels the deployment under way.', a Reason field, buttons Cancel and Cancel the deployment." loading="lazy">
         <figcaption><span class="n">6 · Cancel, in the browser</span><span>The cancel form: one field, <code>reason</code>, from the same schema the dialog uses.</span><span class="chips"><span class="chip">one form, many renderings</span></span></figcaption></figure>
       <figure><img src="img/8-json.jpg" alt="Terminal showing the HAL Schema Forms JSON: _links with self, curies and hr:unavailable, and _forms with cd:cancel, method DELETE, target /apps/web/actions/cancel{?reason}, schema with reason string." loading="lazy">
@@ -182,6 +206,7 @@ pre code { background: none; padding: 0; font-size: inherit; overflow-wrap: norm
   <section>
     <h2>The Kotlin that makes it work</h2>
     <p class="section-lede">Four files in <code>client/artie-minecraft</code>. One models a dialog; one maps what ARTIE read to dialogs; one asks a form in steps; one is the Paper plugin. ARTIE, the client the rest of the project uses, does the HTTP.</p>
+    <p class="only-story">Set Detail to Code to see each excerpt, with notes on its Kotlin.</p>
 
     <h3>1 · A dialog, as data</h3>
     <div class="split">
@@ -466,6 +491,7 @@ sealed interface Press {
 
   <section>
     <h2>The server side: one resource, negotiated</h2>
+    <p class="only-story">Set Detail to Code for the server's Kotlin, and to Bodies for what it answered.</p>
     <div class="concept"><b>Concept: content negotiation</b><span>One resource, several representations. The client says what it can read in <code>Accept</code>; the server picks. ARTIE asks for <code>application/hal+json</code> and gets HAL Schema Forms. A browser asks for <code>text/html</code> and gets HTML with the same acts as buttons. Neither is told about the other.</span></div>
     <div class="split">
       <div class="code"><span class="where">heart/heart-core/src/main/kotlin/com/artie/heart/Negotiation.kt, lines 12–15</span><pre><code class="language-kotlin">enum class Dialect(val mediaType: String, val profile: String, val etagTag: String) {
@@ -573,10 +599,12 @@ sealed interface Press {
         <tr><td>Absent acts</td><td><code>hr:unavailable</code> link, two reasons</td><td>Deploy and Scale, greyed, reason on press</td><td>Two lines of text with the reasons</td></tr>
         <tr><td>The cancel form</td><td><code>DELETE</code>, target <code>…/cancel{?reason}</code>, schema</td><td>A dialog with a Reason field</td><td>A dialog with a reason input</td></tr>
         <tr><td>Validator</td><td>ETag <code>…hsf.L0…</code></td><td>Its own ETag (<code>html</code>), sent by its forms</td><td>ARTIE's ETag, as <code>If-Match</code></td></tr>
-        <tr><td>Nested state (<code>regions</code>)</td><td>Objects and arrays, as they are</td><td>Compact JSON in one tile</td><td>Its names: staging, production</td></tr>
+        <tr><td>Nested state (<code>regions</code>)</td><td>Objects and arrays, as they are</td><td>Titled pairs; a table for each environment</td><td>Its names: staging, production</td></tr>
       </tbody>
     </table></div>
-    <details><summary>The HAL Schema Forms representation, read while deploying</summary><pre><code class="language-json">{
+    <figure><img src="img/10-web-today.png" alt="The app web as text/html: tiles for id, name, status idle, environment, region, release, replicas, and Regions laid out as Staging and Production, each a table of name, label and available; buttons Deploy, Cancel the deployment greyed, Scale the app." loading="lazy">
+      <figcaption><span class="n">text/html, read with the current heart-core</span><span>Any structure in the state is laid out as one, at any depth: an object as titled pairs, a list of objects as a table with a column for each member.</span></figcaption></figure>
+    <details class="bodies"><summary>The HAL Schema Forms representation, read while deploying</summary><pre><code class="language-json">{
     &quot;id&quot;: 1,
     &quot;name&quot;: &quot;web&quot;,
     &quot;status&quot;: &quot;deploying&quot;,
@@ -651,7 +679,7 @@ sealed interface Press {
         }
     }
 }</code></pre></details>
-    <details><summary>Why the other acts are absent (<code>hr:unavailable</code>)</summary><pre><code class="language-json">{
+    <details class="bodies"><summary>Why the other acts are absent (<code>hr:unavailable</code>)</summary><pre><code class="language-json">{
     &quot;unavailable&quot;: [
         {
             &quot;reason&quot;: &quot;A deployment is in progress.&quot;,
@@ -665,7 +693,7 @@ sealed interface Press {
         }
     ]
 }</code></pre></details>
-    <details><summary>The HTML's acts, read while deploying</summary><pre><code class="language-html">&lt;aside class=&quot;side&quot; aria-label=&quot;Acts&quot;&gt;
+    <details class="bodies"><summary>The HTML's acts, read while deploying</summary><pre><code class="language-html">&lt;aside class=&quot;side&quot; aria-label=&quot;Acts&quot;&gt;
 &lt;div class=&quot;acts&quot; role=&quot;toolbar&quot; aria-label=&quot;Acts&quot;&gt;
 &lt;button type=&quot;button&quot; class=&quot;act&quot; data-rel=&quot;cd:deploy&quot; aria-disabled=&quot;true&quot; aria-describedby=&quot;why-cd-deploy&quot;&gt;Deploy&lt;/button&gt;
 &lt;span class=&quot;why&quot; id=&quot;why-cd-deploy&quot; hidden&gt;A deployment is in progress.&lt;/span&gt;
@@ -692,6 +720,7 @@ sealed interface Press {
     </ul>
 
     <h3>What the server might answer (hand-written, unchecked against the game)</h3>
+    <p class="only-story">Set Detail to Code to see the two dialogs, as JSON.</p>
     <div class="split">
       <div class="code"><span class="where">The app, deploying</span><pre><code class="language-json">{
   &quot;type&quot;: &quot;minecraft:multi_action&quot;,
@@ -769,7 +798,7 @@ sealed interface Press {
   <section>
     <h2>Rough edges, and what's next</h2>
     <ul class="tight">
-      <li><b>Nested state.</b> The browser shows <code>regions</code> as compact JSON; the dialog shows only its names. Next: a clean, generic rendering in the web view first.</li>
+      <li><b>Nested state in the dialog</b> shows only its names (regions: staging, production). The web view lays any structure out as titled pairs and tables; the dialog could do the same with lines.</li>
       <li><b>Labels</b> are raw property names (<code>reason</code>, <code>region</code>); "release: Release 1.0" says release twice. A schema's <code>title</code> would fix both.</li>
       <li><b>Absent acts</b> are lines in Minecraft and greyed buttons in the browser. A Minecraft button can carry a tooltip; it could hold the reason.</li>
       <li><b>The refusal names the act by its relation</b>, <code>cd:cancel</code>. Its title would read better, with the server's detail after it.</li>
@@ -806,5 +835,36 @@ sealed interface Press {
 <script>
   try { hljs.highlightAll(); } catch (e) { /* plain text still reads */ }
 </script>
+<script>// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+</script>
+<script>(function () {
+  var key = 'heart-report-detail', level = '0';
+  try { var kept = localStorage.getItem(key); if (kept === '0' || kept === '1' || kept === '2') level = kept; } catch (e) {}
+  function set(to) {
+    level = to; document.body.dataset.detail = to;
+    document.querySelectorAll('.seg button').forEach(function (b) { b.setAttribute('aria-checked', String(b.dataset.level === to)); });
+    if (to === '2') document.querySelectorAll('details.bodies').forEach(function (d) { d.open = true; });
+    try { localStorage.setItem(key, to); } catch (e) {}
+  }
+  document.querySelectorAll('.seg button').forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.level); }); });
+  set(level);
+})();</script>
 
 </html>
