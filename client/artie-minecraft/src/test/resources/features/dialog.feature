@@ -1,19 +1,17 @@
-Feature: A HEART resource as a Minecraft dialog
-  A Minecraft dialog knows buttons and inputs, as a browser knows links and
-  forms. ARTIE reads the resource, and Minecraft shows what the
-  representation holds: its state as titled values in the sidebar, beside
-  the dialog, and in the dialog a button for every act, as the web view has
-  one. The sidebar stays on the resource while its acts' forms are filled in. An act on offer says what it does on hover;
-  an absent act's button is greyed and says why, and pressing it only reads
-  the resource again. Each act's form is a dialog of inputs. A dialog cannot
-  change while it is open, so a property whose choices depend on another
-  field is asked for after that field. The choices are only the ones on
-  offer. An act is sent with If-Match, and its answer is the next dialog. An
-  act refused because the resource changed is said in plain words, the
-  refusal itself on hover; any other refusal is shown in the server's words.
-  Drawn in Minecraft, a value's title is grey and the value white, as
-  Minecraft's own panels show them, and a greyed act's label is dark grey, as
-  plain as a button that is off. Here a player opens the deploy service's app
+Feature: A HEART resource in Minecraft, as a book and dialogs
+  Minecraft has written books, whose text a player can click, and dialogs,
+  with buttons and inputs, as a browser has links and forms. ARTIE reads the
+  resource, and Minecraft opens it as a book: its title, a link for every act,
+  as the web view has a button for every act, and its state as titled values.
+  An act on offer says on hover what it does; an absent act's link is grey and
+  says why, and clicking it only reads the resource again. Each act's form is
+  a dialog of inputs. A dialog cannot change while it is open, so a property
+  whose choices depend on another field is asked for after that field. The
+  choices are only the ones on offer. An act is sent with If-Match, and its
+  answer is the next book. An act refused because the resource changed is
+  said in plain words, the refusal itself on hover; any other refusal is shown
+  in the server's words. A book's page holds fourteen lines, so a long state
+  goes on over the next page. Here a player opens the deploy service's app
   "web".
 
   Background:
@@ -29,33 +27,44 @@ Feature: A HEART resource as a Minecraft dialog
       | web | 1.2     | failed    |
     When a player opens the app "web"
 
-  Scenario: The app, idle: its state in the sidebar, the acts on offer, and the absent act greyed with why
-    Then the dialog is titled "web"
-    And the dialog shows no text
-    And the sidebar, titled "web", shows
-      | Id       | 1                   |
-      | Name     | web                 |
-      | Status   | idle                |
-      | Replicas | 1                   |
-      | Regions  | staging, production |
+  Scenario: The app, idle: a book of its acts, the absent one greyed with why, and its state
+    Then Minecraft opens it as a book titled "web"
     And its buttons, offered or greyed, are
       | button                | shown   | on hover                                                     |
       | Deploy                | offered | Deploys a release of the app to a region of an environment. |
       | Scale the app         | offered | Sets how many instances the app runs on.                     |
       | Cancel the deployment | greyed  | No deployment is in progress.                                |
+    And the state shown is
+      | Id       | 1                   |
+      | Name     | web                 |
+      | Status   | idle                |
+      | Replicas | 1                   |
+      | Regions  | staging, production |
 
-  Scenario: Drawn in Minecraft: in the sidebar each title grey and its value white; the absent act's label dark grey
-    Then Minecraft draws the sidebar's line "Replicas" as
-      | text      | colour |
-      | Replicas: | grey   |
-      | 1         | white  |
-    And Minecraft draws the buttons' labels as
-      | button                | colour    |
-      | Deploy                | white     |
-      | Scale the app         | white     |
-      | Cancel the deployment | dark grey |
+  Scenario: The book's page: the title, a link for each act, the absent one grey, then the state
+    Then the book's first page reads
+      | web                          |
+      |                              |
+      | Deploy                       |
+      | Scale the app                |
+      | Cancel the deployment        |
+      |                              |
+      | Id: 1                        |
+      | Name: web                    |
+      | Status: idle                 |
+      | Replicas: 1                  |
+      | Regions: staging, production |
+    And Minecraft draws the book's links as
+      | link                  | colour    | underlined |
+      | Deploy                | dark blue | yes        |
+      | Scale the app         | dark blue | yes        |
+      | Cancel the deployment | grey      | no         |
+    And Minecraft draws the book's line "Replicas" as
+      | text      | colour    |
+      | Replicas: | dark grey |
+      | 1         | black     |
 
-  Scenario: A greyed act's button sends nothing: it reads the app again, which may offer the act by then
+  Scenario: A greyed act's link sends nothing: it reads the app again, which may offer the act by then
     When someone else starts deploying "web"
     And the player presses "Cancel the deployment"
     Then its buttons, offered or greyed, are
@@ -67,7 +76,7 @@ Feature: A HEART resource as a Minecraft dialog
 
   Scenario: Deploy asks for the environment first, since the region's choices depend on it
     When the player presses "Deploy"
-    Then the dialog is titled "Deploy"
+    Then Minecraft opens a dialog titled "Deploy"
     And its body reads
       | Deploys a release of the app to a region of an environment. |
       | Step 1 of 2                                                  |
@@ -86,8 +95,7 @@ Feature: A HEART resource as a Minecraft dialog
     When the player presses "Deploy"
     And the player fills in, and presses "Next"
       | environment | staging |
-    Then the dialog is titled "Deploy"
-    And the sidebar is titled "web"
+    Then Minecraft opens a dialog titled "Deploy"
     And its body reads
       | Deploys a release of the app to a region of an environment. |
       | Step 2 of 2                                                  |
@@ -111,14 +119,14 @@ Feature: A HEART resource as a Minecraft dialog
   Scenario: Back returns to the app, with nothing sent
     When the player presses "Deploy"
     And the player presses "Back"
-    Then the dialog is titled "web"
+    Then Minecraft opens it as a book titled "web"
     And its buttons are
       | Deploy                |
       | Scale the app         |
       | Cancel the deployment |
     And the deploy service received no acts
 
-  Scenario: Deploying sends the act with If-Match, and the next dialog is the app as the answer left it
+  Scenario: Deploying sends the act with If-Match, and the next book is the app as the answer left it, over two pages
     When the player presses "Deploy"
     And the player fills in, and presses "Next"
       | environment | staging |
@@ -128,8 +136,8 @@ Feature: A HEART resource as a Minecraft dialog
     Then the deploy service's acts, each sent with If-Match, were
       | method | path                     | body                                                         |
       | POST   | /apps/web/actions/deploy | {"environment":"staging","region":"us-east","release":"1.1"} |
-    And the dialog is titled "web"
-    And the sidebar, titled "web", shows
+    And Minecraft opens it as a book titled "web"
+    And the state shown is
       | Id          | 1                   |
       | Name        | web                 |
       | Status      | deploying           |
@@ -143,6 +151,9 @@ Feature: A HEART resource as a Minecraft dialog
       | Cancel the deployment | offered | Cancels the deployment under way. |
       | Deploy                | greyed  | A deployment is in progress.      |
       | Scale the app         | greyed  | A deployment is in progress.      |
+    And the book's second page reads
+      | Replicas: 1                  |
+      | Regions: staging, production |
 
   Scenario: Cancelling, with a reason, brings the app back to idle
     When the player presses "Deploy"
@@ -152,13 +163,13 @@ Feature: A HEART resource as a Minecraft dialog
       | region  | us-east |
       | release | 1.1     |
     And the player presses "Cancel the deployment"
-    Then the dialog is titled "Cancel the deployment"
+    Then Minecraft opens a dialog titled "Cancel the deployment"
     And its inputs are
       | input  | label  | kind |
       | reason | Reason | text |
     When the player fills in, and presses "Cancel the deployment"
       | reason | wrong release |
-    Then the dialog is titled "web"
+    Then Minecraft opens it as a book titled "web"
     And its buttons are
       | Deploy                |
       | Scale the app         |
@@ -178,7 +189,7 @@ Feature: A HEART resource as a Minecraft dialog
     Then the deploy service's acts, each sent with If-Match, were
       | method | path                    | body           |
       | PUT    | /apps/web/actions/scale | {"replicas":3} |
-    And the dialog is titled "web"
+    And Minecraft opens it as a book titled "web"
 
   Scenario: Someone deployed first: the app changed since the player looked, so the act was not done, and is not resent
     When the player presses "Deploy"
@@ -188,7 +199,7 @@ Feature: A HEART resource as a Minecraft dialog
     And the player fills in, and presses "Deploy"
       | region  | us-east |
       | release | 1.1     |
-    Then the dialog is titled "web changed since you looked"
+    Then Minecraft opens it as a book titled "web changed since you looked"
     And its body reads
       | Deploy was not done: web changed after this dialog opened. |
     And its buttons, offered or greyed, are
@@ -198,7 +209,7 @@ Feature: A HEART resource as a Minecraft dialog
       | method | path                     | body                                                         |
       | POST   | /apps/web/actions/deploy | {"environment":"staging","region":"us-east","release":"1.1"} |
     When the player presses "See it now"
-    Then the dialog is titled "web"
+    Then Minecraft opens it as a book titled "web"
     And its buttons, offered or greyed, are
       | button                | shown   | on hover                          |
       | Cancel the deployment | offered | Cancels the deployment under way. |

@@ -16,26 +16,26 @@ import io.papermc.paper.registry.data.dialog.body.DialogBody
 import io.papermc.paper.registry.data.dialog.input.DialogInput
 import io.papermc.paper.registry.data.dialog.input.SingleOptionDialogInput.OptionEntry
 import io.papermc.paper.registry.data.dialog.type.DialogType
-import io.papermc.paper.scoreboard.numbers.NumberFormat
+import net.kyori.adventure.inventory.Book
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickCallback
+import net.kyori.adventure.text.event.ClickEvent
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.scoreboard.Criteria
-import org.bukkit.scoreboard.DisplaySlot
 import io.papermc.paper.dialog.Dialog as PaperDialog
 
 /**
- * ARTIE in Minecraft, as a Paper server plugin. `/artie [address]` opens a HEART resource as a dialog, the one in
- * config.yml when no address is given. Each player has a session of their own: their own ARTIE, holding the
- * resource they are on. A press goes back to the server with what the player entered; ARTIE reads and acts off the
- * main thread, and the answer comes back as the next dialog. Credentials come from the environment, as ARTIE's
- * always do: ARTIE_TOKEN_LOCALHOST_8402 for http://localhost:8402.
+ * ARTIE in Minecraft, as a Paper server plugin. `/artie [address]` opens a HEART resource as a written book, the
+ * one in config.yml when no address is given; an act's form opens as a dialog. Each player has a session of their
+ * own: their own ARTIE, holding the resource they are on. A click or a press goes back to the server with what the
+ * player entered; ARTIE reads and acts off the main thread, and the answer comes back as the next book or dialog.
+ * Credentials come from the environment, as ARTIE's always do: ARTIE_TOKEN_LOCALHOST_8402 for
+ * http://localhost:8402.
  */
 class ArtiePlugin : JavaPlugin() {
     override fun onEnable() {
         saveDefaultConfig()
-        registerCommand("artie", "Opens a HEART resource as a dialog: /artie [address]", Open())
+        registerCommand("artie", "Opens a HEART resource as a book: /artie [address]", Open())
     }
 
     private inner class Open : BasicCommand {
@@ -65,29 +65,28 @@ class ArtiePlugin : JavaPlugin() {
         server.scheduler.runTaskAsynchronously(this, Runnable {
             val dialog = runCatching(work).getOrElse(::failure)
             server.scheduler.runTask(this, Runnable {
-                val shown = runCatching { render(player, session, dialog) }
-                    .getOrElse { render(player, session, failure(it)) }
-                player.showDialog(shown)
-                dialog.about?.let { sidebar(player, it) }
+                runCatching { show(player, session, dialog) }.getOrElse { show(player, session, failure(it)) }
             })
         })
     }
 
-    /**
-     * [panel] in [player]'s sidebar, a scoreboard of their own: its title on top, then a line apiece, left-aligned,
-     * with no score numbers. Minecraft shows at most [SIDEBAR_LINES]; the sidebar stays when the dialog closes.
-     */
-    private fun sidebar(player: Player, panel: Panel) {
-        val board = server.scoreboardManager.newScoreboard
-        val objective = board.registerNewObjective("artie", Criteria.DUMMY, Component.text(panel.title))
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR)
-        objective.numberFormat(NumberFormat.blank())
-        Look.sidebar(panel).take(SIDEBAR_LINES).forEachIndexed { index, line ->
-            val score = objective.getScore("line-$index")
-            score.score = SIDEBAR_LINES - index
-            score.customName(line)
+    /** [dialog] before [player]: a written book when there is nothing to fill in, else a dialog of inputs. */
+    private fun show(player: Player, session: DialogSession, dialog: Dialog) =
+        if (Look.isBook(dialog)) {
+            player.openBook(book(player, session, dialog))
+        } else {
+            player.showDialog(render(player, session, dialog))
         }
-        player.scoreboard = board
+
+    /** [dialog] as a written book, each link sending its press back once. */
+    private fun book(player: Player, session: DialogSession, dialog: Dialog): Book {
+        val lines = Look.lines(dialog) { button ->
+            ClickEvent.callback(
+                ClickCallback { later(player, session) { session.press(button, emptyMap()) } },
+                ClickCallback.Options.builder().uses(1).build(),
+            )
+        }
+        return Book.book(Component.text(dialog.title), Component.text("ARTIE"), Look.pages(lines))
     }
 
     private fun failure(failed: Throwable): Dialog {
@@ -154,8 +153,5 @@ class ArtiePlugin : JavaPlugin() {
 
         /** How wide a button is (1 to 1024): Minecraft's own default, so two stand side by side. */
         const val BUTTON_WIDTH = 150
-
-        /** How many lines Minecraft shows in the sidebar. */
-        const val SIDEBAR_LINES = 15
     }
 }

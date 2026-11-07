@@ -12,8 +12,10 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextComponent
+import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.format.NamedTextColor
 import net.kyori.adventure.text.format.TextColor
+import net.kyori.adventure.text.format.TextDecoration
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -51,8 +53,17 @@ class DialogSteps(private val play: Play) {
         shown = session.press(button, values)
     }
 
-    @Then("the dialog is titled {string}")
-    fun titled(title: String) = assertEquals(title, shown.title, "$shown")
+    @Then("Minecraft opens it as a book titled {string}")
+    fun book(title: String) {
+        assertTrue(Look.isBook(shown), "not a book: $shown")
+        assertEquals(title, shown.title, "$shown")
+    }
+
+    @Then("Minecraft opens a dialog titled {string}")
+    fun dialog(title: String) {
+        assertTrue(!Look.isBook(shown), "not a dialog: $shown")
+        assertEquals(title, shown.title, "$shown")
+    }
 
     @Then("its body reads")
     fun body(table: DataTable) = assertEquals(table.asList(), shown.body)
@@ -60,26 +71,37 @@ class DialogSteps(private val play: Play) {
     @Then("it shows")
     fun shows(table: DataTable) = assertEquals(table.asLists(), shown.facts.map { listOf(it.label, it.value) })
 
-    @Then("the dialog shows no text")
-    fun noText() = assertEquals(emptyList(), shown.body + shown.facts.map { it.label }, "$shown")
-
-    @Then("the sidebar, titled {string}, shows")
-    fun sidebar(title: String, table: DataTable) {
-        sidebarTitled(title)
-        assertEquals(table.asLists(), panel().facts.map { listOf(it.label, it.value) })
+    @Then("the state shown is")
+    fun state(table: DataTable) {
+        val about = shown.about ?: error("no resource shown in $shown")
+        assertEquals(table.asLists(), about.facts.map { listOf(it.label, it.value) })
     }
 
-    @Then("the sidebar is titled {string}")
-    fun sidebarTitled(title: String) = assertEquals(title, panel().title)
+    @Then("the book's {word} page reads")
+    fun page(which: String, table: DataTable) {
+        val pages = Look.pages(Look.lines(shown)).map { Look.plain(it).split("\n") }
+        val page = pages.getOrNull(PAGES.indexOf(which)) ?: error("no $which page in $pages")
+        assertEquals(table.asList().map { it.orEmpty() }, page)
+    }
 
-    @Then("Minecraft draws the sidebar's line {string} as")
-    fun sidebarLine(label: String, table: DataTable) {
-        val lines = Look.sidebar(panel()).map { spans(it) }
+    @Then("Minecraft draws the book's links as")
+    fun links(table: DataTable) {
+        val links = Look.lines(shown) { ClickEvent.runCommand("/press") }.filter { it.clickEvent() != null }
+        assertEquals(
+            table.asMaps().map { row -> listOf(row["link"], row["colour"], row["underlined"]) },
+            links.map { link ->
+                val underlined = link.decoration(TextDecoration.UNDERLINED) == TextDecoration.State.TRUE
+                listOf(Look.plain(link), colour(link.color()), if (underlined) "yes" else "no")
+            },
+        )
+    }
+
+    @Then("Minecraft draws the book's line {string} as")
+    fun line(label: String, table: DataTable) {
+        val lines = Look.lines(shown).map { spans(it) }
         val line = lines.firstOrNull { it.firstOrNull()?.first() == "$label:" } ?: error("no line $label in $lines")
         assertEquals(table.asMaps().map { row -> listOf(row["text"], row["colour"]) }, line)
     }
-
-    private fun panel() = shown.about ?: error("the sidebar shows nothing for $shown")
 
     @Then("its buttons are")
     fun buttons(table: DataTable) = assertEquals(table.asList(), shown.buttons.map { it.label })
@@ -90,14 +112,6 @@ class DialogSteps(private val play: Play) {
         shown.buttons.map { listOf(it.label, if (it.greyed) "greyed" else "offered", it.hover.orEmpty()) },
     )
 
-    @Then("Minecraft draws the buttons' labels as")
-    fun labelsDrawn(table: DataTable) = assertEquals(
-        table.asMaps().map { row -> listOf(row["button"], row["colour"]) },
-        shown.buttons.map { button ->
-            val label = Look.label(button) as TextComponent
-            listOf(label.content(), colour(label.color()))
-        },
-    )
 
     @Then("its inputs are")
     fun inputs(table: DataTable) = assertEquals(
@@ -130,6 +144,9 @@ class DialogSteps(private val play: Play) {
 
     private companion object {
         val SAFE = setOf("GET", "HEAD")
+
+        /** A book's pages, as a scenario names them. */
+        val PAGES = listOf("first", "second", "third")
 
         /** Each piece of [text]'s words, trimmed, and the colour it is drawn in, its own or the one it inherits. */
         fun spans(text: Component, inherited: TextColor? = null): List<List<String?>> {

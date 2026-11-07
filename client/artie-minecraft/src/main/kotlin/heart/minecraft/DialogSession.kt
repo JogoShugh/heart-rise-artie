@@ -39,7 +39,7 @@ class DialogSession(private val client: HeartRiseClient) {
         return FormSteps(form, client.choices(rel))
     }
 
-    /** [rep] as a dialog of its acts, its state beside it in the sidebar. */
+    /** [rep]: its acts, and its state. */
     private fun resource(rep: HeartRepresentation) = Dialog(
         title = titleOf(rep),
         body = emptyList(),
@@ -117,7 +117,7 @@ class DialogSession(private val client: HeartRiseClient) {
                 ?.content
             ?: rep.url
 
-        /** [rep] as the sidebar shows it: its title, and each member of its state, titled. */
+        /** [rep] as a player sees it: its title, and each member of its state, titled. */
         fun panel(rep: HeartRepresentation) =
             Panel(titleOf(rep), rep.state.mapNotNull { (name, value) -> fact(name, value) })
 

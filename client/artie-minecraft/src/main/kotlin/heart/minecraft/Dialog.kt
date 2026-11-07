@@ -3,9 +3,10 @@ package heart.minecraft
 import kotlinx.serialization.json.JsonObject
 
 /**
- * A dialog as Minecraft shows one (Java Edition 1.21.6 and later): a title, lines of text, titled values, the
- * inputs a player fills in, and buttons; and beside it, in the sidebar, the resource it is [about]. It knows
- * nothing of any domain: what it holds comes from the representation.
+ * What Minecraft shows a player at a step: a title, lines of text, titled values, the inputs a player fills in,
+ * buttons, and the resource it is [about], whose state shows after the buttons. With nothing to fill in it opens as
+ * a written book, else as a dialog (Java Edition 1.21.6 and later). It knows nothing of any domain: what it holds
+ * comes from the representation.
  */
 data class Dialog(
     val title: String,
@@ -19,7 +20,7 @@ data class Dialog(
 /** A value and its title, as a member of the state or a field filled in so far. */
 data class Fact(val label: String, val value: String)
 
-/** A resource as the sidebar shows it: its title, and its state as titled values. */
+/** A resource as a player sees it: its title, and its state as titled values. */
 data class Panel(val title: String, val facts: List<Fact>)
 
 /** One input a player fills in; what the player entered comes back by [key]. */
