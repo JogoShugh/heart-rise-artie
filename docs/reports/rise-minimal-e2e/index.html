@@ -1,0 +1,855 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body style="margin:0">
+<title>RISE Minimal, End to End</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* The look every generated report shares: tokens for light and dark, type, the column, tiles, tags, tables,
+   disclosures and the theme switch. A generator inlines this first, then only what its own page adds. */
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1b2330; --muted: #5d6879; --rule: #dde2ea; --track: #eef1f5;
+  --accent: #4b4fc4;
+  --good: #1f7a3a; --good-bg: #e3f3e7; --safe: #2b5fa8; --safe-bg: #e3ecf8;
+  --warn: #8a5a00; --warn-bg: #fbf0d9; --bad: #b3261e; --bad-bg: #fbe4e2; --quiet-bg: #eceff3;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --panel: #1a2029; --ink: #e5e9f0; --muted: #9aa5b6; --rule: #2c3442; --track: #232a35;
+  --accent: #8f93f2;
+  --good: #6fd08c; --good-bg: #183223; --safe: #8fb6f0; --safe-bg: #1a2a42;
+  --warn: #f0c060; --warn-bg: #3a2e12; --bad: #ff8a80; --bad-bg: #42201d; --quiet-bg: #232a35; color-scheme: dark }
+
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1100px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 30px; line-height: 1.15; } h2 { font-size: 21px; } h3 { font-size: 18px; }
+h4 { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+p { margin: 0; max-width: 72ch; }
+section { display: grid; gap: 12px; min-width: 0; }
+.sub, .none { color: var(--muted); font-size: 13px; }
+.mono { font-family: var(--mono); font-size: 13px; }
+.num { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* The title row: title and lede on the left, the theme switch on the right. */
+.top { display: flex; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.top > div { min-width: 0; }
+.lede { color: var(--muted); margin-top: 6px; }
+.theme { flex: none; font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-radius: 16px; padding: 6px 12px; cursor: pointer; }
+
+/* Tones: a class that sets --c and --cbg, for tiles, tags and borders. */
+.good { --c: var(--good); --cbg: var(--good-bg); } .safe { --c: var(--safe); --cbg: var(--safe-bg); }
+.warn { --c: var(--warn); --cbg: var(--warn-bg); } .bad { --c: var(--bad); --cbg: var(--bad-bg); }
+.quiet { --c: var(--muted); --cbg: var(--quiet-bg); }
+.tag { display: inline-block; font-size: 13px; padding: 1px 8px; border-radius: 10px; margin: 0 4px 4px 0;
+  color: var(--c, var(--muted)); background: var(--cbg, var(--quiet-bg)); white-space: nowrap; text-decoration: none; }
+
+/* Tiles: a number or a word on top, a label, a line under; a button tile filters. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+.tile { text-align: left; font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule);
+  border-top: 3px solid var(--c, var(--rule)); border-radius: 6px; padding: 12px 16px; display: grid; gap: 2px; }
+.tile b { font: 600 24px/1.2 var(--display); color: var(--c, var(--ink)); }
+.tile .name { font: 500 13px var(--mono); color: var(--muted); }
+button.tile { cursor: pointer; }
+button.tile[aria-pressed="true"] { background: var(--cbg, var(--panel)); }
+.chipbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.chipbar button { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink);
+  border-radius: 12px; padding: 2px 10px; cursor: pointer; }
+
+/* Tables, each in its own sideways scroll. */
+.scroll { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+thead th { font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+tbody tr:last-child > * { border-bottom: 0; }
+
+/* Disclosures, and the source a page shows of itself. */
+details.box { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+details.box > summary { cursor: pointer; padding: 10px 14px; font-weight: 500; }
+details.box > .scroll { border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+pre.src { margin: 0; padding: 14px 16px; font: 12.5px/1.5 var(--mono); color: var(--ink); white-space: pre; }
+
+.theme:focus-visible, summary:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+/* This page's own. */
+/* The JSON viewer (json-view.js): collapsed boxes, line diffs, unchanged runs folded behind buttons. */
+/* A column of boxes. */
+.stack { display: grid; gap: 0.5rem; min-width: 0; }
+details.jv { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 0.45rem 0.75rem; min-width: 0; }
+details.jv > summary { cursor: pointer; font-size: 0.9rem; }
+details.jv[open] > summary { margin-bottom: 0.5rem; }
+.jv-body { display: grid; gap: 0.35rem; min-width: 0; }
+.jv-label { margin: 0; font: 500 0.75rem var(--mono); color: var(--muted); white-space: pre; }
+.jv-doc { margin: 0; overflow-x: auto; background: var(--code-bg); border-radius: 6px; padding: 0.5rem 0.6rem;
+  font: 0.78rem/1.45 var(--mono); }
+.jv-doc .ln { display: block; white-space: pre; }
+.jv-doc .ln.add { background: color-mix(in srgb, var(--leaf) 16%, transparent); }
+.jv-doc .ln.del { background: color-mix(in srgb, var(--gate) 16%, transparent); }
+.jv-doc .ln.note { color: var(--muted); }
+.jv-gap, .jv-full { font: 500 0.75rem var(--mono); color: var(--muted); background: none; border: 1px dashed var(--rule);
+  border-radius: 4px; padding: 0.1rem 0.5rem; margin: 0.15rem 0; cursor: pointer; }
+.jv-gap { display: block; }
+.jv-gap:hover, .jv-full:hover { color: var(--fg); border-style: solid; }
+.jv-tools { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem; }
+.jv-full[disabled] { opacity: 0.5; cursor: default; }
+.jv-req { margin: 0 0 0.35rem; font-size: 0.82rem; overflow-x: auto; white-space: nowrap; }
+.jv-req .who { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; margin-right: 0.4rem; }
+/* Reply envelope, end to end: the standards tags, the template and the steps. */
+/* The JSON viewer's tokens, from the shared report palette. */
+:root { --surface: var(--panel); --code-bg: var(--track); --leaf: var(--good); --gate: var(--bad); --fg: var(--ink); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+#reply { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; min-width: 0; }
+.block { display: grid; gap: 12px; min-width: 0; }
+.block > h2 { margin-bottom: 0; }
+
+/* The status tags: codified, proposed, de facto, thesis, ours. */
+.tag { display: inline-block; font: 600 10.5px/1.5 var(--mono); letter-spacing: .05em; text-transform: uppercase;
+  padding: 1px 6px; border-radius: 4px; white-space: normal; vertical-align: 1px; }
+.tag-codified { color: var(--good); background: var(--good-bg); }
+.tag-proposed { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.tag-defacto { color: var(--warn); background: var(--warn-bg); }
+.tag-thesis { color: var(--safe); background: color-mix(in srgb, var(--safe) 14%, transparent); }
+.tag-ours { color: var(--muted); background: var(--quiet-bg); border: 1px solid var(--rule); }
+ul.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+ul.legend li { font-size: 14px; }
+ul.points { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 84ch; }
+ul.points li { font-size: 15px; }
+code { font: 12.5px var(--mono); overflow-wrap: anywhere; }
+
+/* Tables scroll inside themselves on a phone. */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); }
+.tbl-wrap table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl-wrap th, .tbl-wrap td { text-align: left; vertical-align: top; padding: 8px 10px; border-top: 1px solid var(--rule); min-width: 9ch; }
+.tbl-wrap thead th { border-top: 0; font: 500 11.5px var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--track); }
+.tbl-wrap td:first-child code { white-space: nowrap; }
+/* On a phone each row stacks, one labelled block per cell. */
+@media (max-width: 720px) {
+  .tbl-wrap { overflow-x: visible; }
+  .tbl-wrap table, .tbl-wrap tbody, .tbl-wrap tr, .tbl-wrap td { display: block; width: 100%; }
+  .tbl-wrap thead { display: none; }
+  .tbl-wrap tr { box-sizing: border-box; padding: 8px 12px; border-top: 1px solid var(--rule); display: grid; gap: 4px; }
+  .tbl-wrap tbody tr:first-child { border-top: 0; }
+  .tbl-wrap th, .tbl-wrap td { min-width: 0; border-top: 0; padding: 0; overflow-wrap: anywhere; }
+  .tbl-wrap td::before { content: attr(data-label); display: block; font: 500 10.5px var(--mono); letter-spacing: .05em;
+    text-transform: uppercase; color: var(--muted); }
+  .tbl-wrap td:first-child code { white-space: normal; }
+}
+
+/* The steps. */
+.bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.bar .sub { margin-right: 4px; color: var(--muted); font: 500 12px var(--mono); }
+.btn { font: 500 12px var(--mono); border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 12px;
+  padding: 3px 10px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font: 500 13px var(--mono); color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 14px;
+  padding: 2px 10px; text-decoration: none; }
+.chip:hover { border-color: var(--accent); }
+@media (min-width: 900px) {
+  .step { scroll-margin-top: 16px; }
+}
+.step { display: grid; gap: 10px; min-width: 0; padding: 14px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+.step > h3 { margin: 0; }
+.step > .lede { color: var(--ink); font-size: 15px; }
+.exchange { display: grid; gap: 6px; min-width: 0; }
+pre.line { margin: 0; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--ink);
+  background: var(--track); border-radius: 6px; padding: 8px 10px; }
+pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent); }
+.note { color: var(--muted); font-size: 14px; margin: 0; }
+.here { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: 0; font-size: 13px; }
+.here-label { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.chip-std { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; background: var(--track); border-radius: 6px; padding: 2px 6px; }
+
+/* The rule ids: R, A, S, H. */
+.rule { font: 600 10.5px/1.5 var(--mono); padding: 1px 6px; border-radius: 4px; background: var(--track); color: var(--ink); white-space: nowrap; }
+.rule-R { color: var(--accent); }
+.rule-A { color: var(--safe); }
+.rule-S { color: var(--warn); }
+.rule-H { color: var(--good); }
+ul.obs { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14.5px; min-width: 0; }
+ul.obs li { min-width: 0; overflow-wrap: anywhere; }
+ul.legend li { font-size: 14px; }
+
+/* The sequence, as text: one line per message, in order. */
+pre.seq { margin: 0; font: 12.5px/1.6 var(--mono); white-space: pre; overflow-x: auto; background: var(--track); border-radius: 6px; padding: 10px 12px; color: var(--ink); }
+p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: var(--muted); text-transform: uppercase; }
+</style>
+<div class="wrap">
+  <div class="top"><div>
+    <h1>The minimal RISE flow, every message in order</h1>
+    <p class="lede">Envisioned, not built. Slice 1 of RISE, RESTful: a caller's reply, one job, progress, a signed outcome, then the refusals that follow. Each numbered step is one request and its response, headers and body. Act bodies are application/hal+json under the profile. The envelope rides in the request's _links. Keys, digests and times are made up.</p>
+  </div><button class="theme" id="theme" type="button" aria-label="Switch between light and dark">◐ Dark</button></div>
+<div id="minimal"></div>
+</div>
+<script>
+// The light and dark switch every generated report shares: a button with id "theme" switches the page's
+// data-theme; the viewer's system theme holds until they choose, and the choice is kept in this browser where it can.
+(function () {
+  var root = document.documentElement, button = document.getElementById('theme'), key = 'heart-report-theme';
+  if (!button) return;
+  function current() {
+    return root.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  function label() { button.textContent = current() === 'dark' ? '◑ Light' : '◐ Dark'; }
+  try { var kept = localStorage.getItem(key); if (kept === 'light' || kept === 'dark') root.dataset.theme = kept; } catch (e) {}
+  label();
+  button.addEventListener('click', function () {
+    root.dataset.theme = current() === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem(key, root.dataset.theme); } catch (e) {}
+    label();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', label);
+})();
+// One viewer for every JSON example in the reports. A <details class="jv"> names its documents by the ids of
+// <script type="application/json"> blocks: data-a alone shows one document; data-a and data-b show what b
+// changes of a, as a line diff with a few lines of context. Nothing renders until the reader opens it; the
+// unchanged lines and the whole documents appear only on a click.
+(() => {
+  const CONTEXT = 3;   // unchanged lines kept around each change
+  const PREVIEW = 14;  // lines of a lone document shown before "show all"
+  const CHANGE = 24;   // a run of changed lines longer than this shows its first FIRST lines, the rest on a click
+  const FIRST = 16;
+  const cache = new Map();
+
+  const linesOf = (value) => (typeof value === "string" ? value : JSON.stringify(value, null, 2)).split("\n");
+  const doc = (id) => {
+    if (!cache.has(id)) cache.set(id, linesOf(JSON.parse(document.getElementById(id).textContent)));
+    return cache.get(id);
+  };
+
+  const el = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  };
+
+  // Lines of a and b, each marked " " (both), "-" (a only) or "+" (b only): a longest common subsequence
+  // after trimming the common head and tail, which is most of a JSON answer.
+  const diff = (a, b) => {
+    let head = 0;
+    while (head < a.length && head < b.length && a[head] === b[head]) head++;
+    let tail = 0;
+    while (tail < a.length - head && tail < b.length - head && a[a.length - 1 - tail] === b[b.length - 1 - tail]) tail++;
+    const x = a.slice(head, a.length - tail), y = b.slice(head, b.length - tail);
+    const n = x.length, m = y.length, w = m + 1;
+    const table = new Uint32Array((n + 1) * w);
+    for (let i = n - 1; i >= 0; i--)
+      for (let j = m - 1; j >= 0; j--)
+        table[i * w + j] = x[i] === y[j] ? table[(i + 1) * w + j + 1] + 1 : Math.max(table[(i + 1) * w + j], table[i * w + j + 1]);
+    const out = a.slice(0, head).map((line) => [" ", line]);
+    let i = 0, j = 0;
+    while (i < n && j < m) {
+      if (x[i] === y[j]) { out.push([" ", x[i]]); i++; j++; }
+      else if (table[(i + 1) * w + j] >= table[i * w + j + 1]) out.push(["-", x[i++]]);
+      else out.push(["+", y[j++]]);
+    }
+    while (i < n) out.push(["-", x[i++]]);
+    while (j < m) out.push(["+", y[j++]]);
+    return out.concat(a.slice(a.length - tail).map((line) => [" ", line]));
+  };
+
+  const row = ([mark, line]) => el("span", { " ": "ln", "-": "ln del", "+": "ln add" }[mark], `${mark} ${line}`);
+
+  // The diff with each long run of unchanged lines folded into a button that unfolds it.
+  const diffView = (a, b) => {
+    const lines = diff(a, b), pre = el("pre", "jv-doc");
+    if (!lines.some(([mark]) => mark !== " ")) pre.append(el("span", "ln note", "  (no difference)"));
+    let k = 0;
+    while (k < lines.length) {
+      if (lines[k][0] !== " ") {
+        let end = k;
+        while (end < lines.length && lines[end][0] !== " ") end++;
+        const run = lines.slice(k, end);
+        if (run.length <= CHANGE) run.forEach((l) => pre.append(row(l)));
+        else {
+          run.slice(0, FIRST).forEach((l) => pre.append(row(l)));
+          const rest = run.slice(FIRST);
+          const more = el("button", "jv-gap", `⋯ ${rest.length} more changed lines`);
+          more.type = "button";
+          more.addEventListener("click", () => more.replaceWith(...rest.map(row)));
+          pre.append(more);
+        }
+        k = end;
+        continue;
+      }
+      let end = k;
+      while (end < lines.length && lines[end][0] === " ") end++;
+      const first = k === 0, last = end === lines.length;
+      const keepHead = first ? 0 : CONTEXT, keepTail = last ? 0 : CONTEXT;
+      if (end - k <= keepHead + keepTail + 1) { lines.slice(k, end).forEach((l) => pre.append(row(l))); }
+      else {
+        lines.slice(k, k + keepHead).forEach((l) => pre.append(row(l)));
+        const hidden = lines.slice(k + keepHead, end - keepTail);
+        const gap = el("button", "jv-gap", `⋯ ${hidden.length} unchanged lines`);
+        gap.type = "button";
+        gap.addEventListener("click", () => gap.replaceWith(...hidden.map(row)));
+        pre.append(gap);
+        lines.slice(end - keepTail, end).forEach((l) => pre.append(row(l)));
+      }
+      k = end;
+    }
+    return pre;
+  };
+
+  // A lone document: its first lines, the rest on a click.
+  const docView = (lines) => {
+    const pre = el("pre", "jv-doc");
+    lines.slice(0, PREVIEW).forEach((line) => pre.append(el("span", "ln", line)));
+    if (lines.length > PREVIEW) {
+      const more = el("button", "jv-gap", `⋯ ${lines.length - PREVIEW} more lines`);
+      more.type = "button";
+      more.addEventListener("click", () => more.replaceWith(...lines.slice(PREVIEW).map((l) => el("span", "ln", l))));
+      pre.append(more);
+    }
+    return pre;
+  };
+
+  // "Show all": a whole document, on demand.
+  const fullButton = (label, lines, host) => {
+    const button = el("button", "jv-full", `${label} in full (${lines.length} lines)`);
+    button.type = "button";
+    button.addEventListener("click", () => {
+      const pre = el("pre", "jv-doc");
+      lines.forEach((line) => pre.append(el("span", "ln", line)));
+      button.disabled = true;
+      host.append(el("p", "jv-label", `${label}, in full`), pre);
+    });
+    return button;
+  };
+
+  const render = (box) => {
+    const body = el("div", "jv-body"), tools = el("div", "jv-tools");
+    const a = doc(box.dataset.a), labelA = box.dataset.labelA || "document";
+    if (box.dataset.b) {
+      const b = doc(box.dataset.b), labelB = box.dataset.labelB || "after";
+      body.append(el("p", "jv-label", `− ${labelA}   + ${labelB}`), diffView(a, b));
+      tools.append(fullButton(labelA, a, body), fullButton(labelB, b, body));
+    } else {
+      body.append(el("p", "jv-label", labelA), docView(a));
+    }
+    // Before the box's tail (a nested box, such as why the rest are absent), if it has one.
+    const tail = box.querySelector(":scope > .jv-tail");
+    box.insertBefore(body, tail);
+    if (tools.childElementCount) box.insertBefore(tools, tail);
+  };
+
+  // For other scripts (run-report.js): a box for documents already in hand, rendered when opened like any other.
+  let made = 0;
+  window.JsonView = {
+    box({ a, b, labelA, labelB, summary, lead }) {
+      const box = el("details", "jv");
+      const id = (value) => { const key = `jvm${made++}`; cache.set(key, linesOf(value)); return key; };
+      box.dataset.a = id(a);
+      if (b !== undefined) box.dataset.b = id(b);
+      if (labelA) box.dataset.labelA = labelA;
+      if (labelB) box.dataset.labelB = labelB;
+      const head = el("summary");
+      head.innerHTML = summary;
+      box.append(head);
+      if (lead) box.append(lead);
+      return box;
+    },
+  };
+
+  // toggle doesn't bubble, but a capturing listener on the document sees every one.
+  document.addEventListener("toggle", (event) => {
+    const box = event.target;
+    if (box.classList && box.classList.contains("jv") && box.open && !box.dataset.rendered) {
+      box.dataset.rendered = "1";
+      render(box);
+    }
+  }, true);
+})();
+// RISE minimal, end to end, envisioned: every request and response, in order. Data only; page.js renders it.
+// Representations are HAL Schema Forms (SPEC §6.1). Act bodies are application/hal+json under the profile. The envelope
+// rides in the request's _links (SPEC §7.2 proposes a _rise member instead; the author decides). Keys, digests, times and
+// identities are made up.
+(() => {
+  const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
+  const PROFILE_LINK = `Link: <${PROFILE}>; rel="profile"`;
+  const ACCEPT = ["Accept: application/hal+json", `Accept-Profile: <${PROFILE}>`];
+  const REQ = ["Content-Type: application/hal+json", ...ACCEPT];
+  const CURIES = {
+    curies: [
+      { name: "hr", href: "https://w3id.org/heart-rise/rels/{rel}", templated: true },
+      { name: "job", href: "https://target.example/rels/{rel}", templated: true },
+    ],
+  };
+  const READ = (tag) => ["Content-Type: application/hal+json", PROFILE_LINK, "Vary: Accept, Prefer, Accept-Profile", "Cache-Control: no-cache", `ETag: "${tag}"`];
+  const BODY = ["Content-Type: application/hal+json", PROFILE_LINK];
+  const ACT = (tag) => ["Content-Type: application/hal+json", PROFILE_LINK, `ETag: "${tag}"`, "Cache-Control: no-store"];
+  const IF_MATCH = (tag) => `If-Match: "${tag}"`;
+  const PROBLEM = ["Content-Type: application/problem+json"];
+  const DIGEST = "Content-Digest: sha-256=:bW9jay1kaWdlc3Q=:";
+  const SIG_INPUT = 'Signature-Input: sig1=("@method" "@target-uri" "content-digest" "if-match");created=1794153600;keyid="target-2026-11";alg="ed25519"';
+  const SIG = "Signature: sig1=:MEUCIQDk3Vb0xKqy8w==:";
+
+  // Validators, as the representations name them: seq-<version>.hsf.L2.<digest>.
+  const ENTRY = "seq-1.hsf.L2.a3f0b8c2d6e1974f";
+  const KEYS_T = "seq-1.hsf.L2.5b9e1d4a7c2f0e83";
+  const KEYS_C = "seq-1.hsf.L2.7d2a6f0c9e4b1358";
+  const REPLY1 = "seq-1.hsf.L2.4c8a1d7e0b3f9265";
+  const REPLY2 = "seq-2.hsf.L2.b07e5a2c9d1f4863";
+  const REPLY3 = "seq-3.hsf.L2.e9d2c6f1a4b08537";
+  const REPLY_URL = "https://caller.example/replies/r-7f3";
+
+  const RULES = [
+    ["R1", "Every resource has its own URI. Creation returns 201 with Location."],
+    ["R2", "A reply's state is a GET-able representation."],
+    ["R3", "GET and HEAD never change state."],
+    ["R4", "A state change is a POST to a form target named in the representation. The client builds no URL."],
+    ["R5", "Acts go to resource URIs, never to one RPC endpoint."],
+    ["R6", "Representations are application/hal+json. Errors are application/problem+json. Bare application/json is not used."],
+    ["R7", "Responses carry a strong ETag. Writes carry If-Match. A write without it is 428."],
+    ["R8", "The client knows only the entry link and relation names."],
+    ["R9", "The representation offers only the acts available now."],
+    ["R10", "Stateless: each request carries all it needs."],
+    ["R11", "A callback stands alone: its own Date and signature window."],
+    ["R12", "Reads carry ETag and Cache-Control: no-cache."],
+    ["R13", "Acts are not cacheable."],
+    ["R14", "Client and server share only links and standard names."],
+    ["R15", "Intermediaries are transparent. Nothing needs the path."],
+    ["R16", "Negotiation: Accept and Accept-Profile on requests; Link rel=\"profile\" and Vary on every read."],
+    ["A1", "The caller lists the levels it accepts. The responder reports the levels it applied."],
+    ["S1", "Send once: the answer is not stored on the reply. The digest records what was sent."],
+    ["S2", "Send once: the representation says hr:delivery once."],
+    ["S3", "Send once: the deliver response is not cacheable."],
+    ["H1", "Held: the responder keeps the answer as a resource, and the reply links to it."],
+  ];
+
+  // The forms the reply offers while awaiting. Schemas shortened to the members that matter here.
+  const OPEN_FORMS = {
+    "hr:progress": {
+      method: "POST",
+      _links: { target: { href: `${REPLY_URL}/actions/progress` } },
+      contentType: "application/hal+json",
+      schema: { required: ["percent"], properties: { percent: { type: "integer", minimum: 0, maximum: 100 }, note: { type: "string" } } },
+    },
+    "hr:outcome": {
+      method: "POST",
+      _links: { target: { href: `${REPLY_URL}/actions/outcome` } },
+      contentType: "application/hal+json",
+      schema: {
+        required: ["outcome"],
+        properties: { outcome: { enum: ["completed", "failed"] }, result: { type: "object" }, problem: { type: "object" } },
+      },
+    },
+  };
+
+  const REPLY_AWAITING = { state: "awaiting", _links: { ...CURIES, self: { href: REPLY_URL } }, _forms: OPEN_FORMS };
+  const REPLY_PROGRESS = {
+    state: "awaiting",
+    progress: { percent: 40, note: "3 of 8 resized" },
+    _links: { ...CURIES, self: { href: REPLY_URL } },
+    _forms: OPEN_FORMS,
+  };
+  const REPLY_ANSWERED = {
+    state: "answered",
+    outcome: "completed",
+    result: { href: "https://target.example/images/cover-800.jpg" },
+    _links: { ...CURIES, self: { href: REPLY_URL } },
+    _forms: {},
+  };
+
+  // Target's entry: the job form, and the link to Target's signing key.
+  const ENTRY_BODY = {
+    _links: { ...CURIES, "hr:keys": { href: "https://target.example/keys", type: "application/jwk-set+json" } },
+    _forms: {
+      "job:assign": {
+        method: "POST",
+        _links: { target: { href: "https://target.example/jobs" } },
+        contentType: "application/hal+json",
+        schema: {
+          required: ["job"],
+          properties: {
+            _links: {
+              type: "object",
+              properties: {
+                "hr:reply-to": { type: "object", required: ["href"] },
+                "hr:keys": { type: "object", required: ["href", "type"] },
+              },
+            },
+            job: { type: "string" },
+            modules: { type: "array", items: { enum: ["signed"] } },
+          },
+        },
+      },
+    },
+  };
+
+  // The caller's request body: its reply and its key, as links; the job; the modules it accepts.
+  const ACT_BODY = {
+    _links: {
+      ...CURIES,
+      "hr:reply-to": { href: REPLY_URL },
+      "hr:keys": { href: "https://caller.example/keys", type: "application/jwk-set+json" },
+    },
+    job: "resize-cover-photo",
+    modules: ["signed"],
+  };
+
+  const JOB_BODY = {
+    state: "working",
+    _links: {
+      ...CURIES,
+      self: { href: "https://target.example/jobs/j-88" },
+      "hr:reply-to": { href: REPLY_URL },
+      "hr:keys": { href: "https://caller.example/keys", type: "application/jwk-set+json" },
+    },
+  };
+
+  const KEYS_CALLER = { keys: [{ kty: "OKP", crv: "X25519", kid: "caller-2026-11", use: "enc", x: "…" }] };
+  const KEYS_TARGET = { keys: [{ kty: "OKP", crv: "Ed25519", kid: "target-2026-11", use: "sig", x: "…" }] };
+  const PROGRESS_BODY = { percent: 40, note: "3 of 8 resized" };
+  const OUTCOME_BODY = { outcome: "completed", result: { href: "https://target.example/images/cover-800.jpg" } };
+  const PROBLEM_REPLY = { title: "Not offered", status: 409, detail: "Reply r-7f3 is answered. hr:outcome is not offered." };
+  const PROBLEM_JOB = { title: "Not offered", status: 409, detail: "Reply r-7f3 already has job j-88." };
+
+  const STEPS = [
+    {
+      id: "m1",
+      title: "Caller creates its reply",
+      note: "The reply exists before Target hears of it. Target can only send to an address that is already live.",
+      exchanges: [{
+        from: "Caller", to: "Caller",
+        line: "POST https://caller.example/replies",
+        headers: [...ACCEPT],
+        res: { line: "201 Created", headers: [`Location: ${REPLY_URL}`, ...READ(REPLY1)], body: REPLY_AWAITING },
+      }],
+      obs: [
+        { t: "Creation answers 201 with Location. The reply is a resource with its own URI.", r: ["R1"] },
+        { t: "State is a GET-able representation, so Target can read it before it sends.", r: ["R2"] },
+        { t: "Only the acts that fit the state are offered: progress and outcome, while awaiting.", r: ["R9"] },
+      ],
+    },
+    {
+      id: "m2",
+      title: "Caller publishes its encryption key",
+      note: "Served as its own resource. Slice 1 reads it nowhere.",
+      exchanges: [{
+        from: "Caller", to: "Caller",
+        line: "GET https://caller.example/keys",
+        headers: ["Accept: application/jwk-set+json"],
+        res: {
+          line: "200 OK",
+          headers: ["Content-Type: application/jwk-set+json", "Cache-Control: no-cache", `ETag: "${KEYS_C}"`],
+          body: KEYS_CALLER,
+        },
+      }],
+      obs: [
+        { t: "X25519 key with use enc. It waits for encryption (decision 2).", r: [] },
+        { t: "A JWK Set has its own registered media type (RFC 7517). It is not HAL, so R6's hal+json rule does not cover it. Stated here, not hidden.", r: ["R6"] },
+        { t: "Read like any resource: strong ETag, revalidated on every read.", r: ["R7", "R12"] },
+      ],
+    },
+    {
+      id: "m3",
+      title: "Caller reads Target's entry",
+      note: "The job form comes from the entry. Caller builds no URL.",
+      exchanges: [{
+        from: "Caller", to: "Target",
+        line: "GET https://target.example/",
+        headers: [...ACCEPT],
+        res: { line: "200 OK", headers: READ(ENTRY), body: ENTRY_BODY },
+      }],
+      obs: [
+        { t: "The act is a form under its relation name, job:assign. Caller finds it by name.", r: ["R8", "R4"] },
+        { t: "The form's schema declares _links. Target checks the caller's links against it.", r: ["R14"] },
+        { t: "Target's signing key is linked as hr:keys. Caller uses it at step 9.", r: [] },
+      ],
+    },
+    {
+      id: "m4",
+      title: "Caller sends the job, with its reply and key as links",
+      note: "The request body is a HAL representation. Its links are Caller's own, sent to Target.",
+      exchanges: [{
+        from: "Caller", to: "Target",
+        line: "POST https://target.example/jobs",
+        headers: [...REQ, IF_MATCH(ENTRY)],
+        body: ACT_BODY,
+        bodyLabel: "Request body: the job, its reply and its key, as links",
+        res: { line: "202 Accepted", headers: ["Location: https://target.example/jobs/j-88", ...BODY], body: JOB_BODY },
+      }],
+      obs: [
+        { t: "Body is application/hal+json under the profile (decision 1, decided).", r: ["R6"] },
+        { t: "Accepted, not finished. The Location is the job. Caller does not have to read it.", r: ["R1"] },
+        { t: "If-Match is the entry's tag from step 3. A stale tag gets 412.", r: ["R7"] },
+        { t: "Target stores Caller's links and links them back on the job. Both sides use the same pattern.", r: ["R14"] },
+        { t: "Caller's key is passed, not read. Signing uses only Target's key in slice 1 (decision 2).", r: [] },
+        { t: "Envelope placement is open: this report puts it in _links; SPEC §7.2 proposes a _rise member (decision 3).", r: [] },
+      ],
+    },
+    {
+      id: "m5",
+      title: "Target reads the reply before it sends",
+      note: "Target sends only to a form it has just read.",
+      exchanges: [{
+        from: "Target", to: "Caller",
+        line: `GET ${REPLY_URL}`,
+        headers: [...ACCEPT],
+        res: { line: "200 OK", headers: READ(REPLY1), body: REPLY_AWAITING },
+      }],
+      obs: [
+        { t: "The reply is awaiting. Both acts are offered.", r: ["R9"] },
+        { t: "Reads carry no-cache and a strong ETag, so Target always sees the current state.", r: ["R12", "R7"] },
+      ],
+    },
+    {
+      id: "m6",
+      title: "Target reports progress",
+      note: "Progress does not end the job. The reply stays awaiting.",
+      exchanges: [{
+        from: "Target", to: "Caller",
+        line: `POST ${REPLY_URL}/actions/progress`,
+        headers: [...REQ, IF_MATCH(REPLY1)],
+        body: PROGRESS_BODY,
+        bodyLabel: "Request body: progress",
+        res: { line: "200 OK", headers: ACT(REPLY2), body: REPLY_PROGRESS },
+      }],
+      obs: [
+        { t: "The act goes to the form target the reply names. Target builds no URL.", r: ["R4"] },
+        { t: "Each change moves the ETag. Now seq-2.", r: ["R7"] },
+        { t: "The act response is not cacheable.", r: ["R13"] },
+        { t: "A lost progress costs nothing. The next progress replaces it.", r: [] },
+      ],
+    },
+    {
+      id: "m7",
+      title: "Target reads the reply again",
+      note: "The ETag moved after progress. The outcome must carry the new one.",
+      exchanges: [{
+        from: "Target", to: "Caller",
+        line: `GET ${REPLY_URL}`,
+        headers: [...ACCEPT],
+        res: { line: "200 OK", headers: READ(REPLY2), body: REPLY_PROGRESS },
+      }],
+      obs: [
+        { t: "An outcome sent with the old tag gets 412.", r: ["R7"] },
+      ],
+    },
+    {
+      id: "m8",
+      title: "Target sends the outcome, signed",
+      note: "The reply moves to answered. Its forms go.",
+      exchanges: [{
+        from: "Target", to: "Caller",
+        line: `POST ${REPLY_URL}/actions/outcome`,
+        headers: [...REQ, IF_MATCH(REPLY2), DIGEST, SIG_INPUT, SIG],
+        body: OUTCOME_BODY,
+        bodyLabel: "Request body: the outcome and its result",
+        res: { line: "200 OK", headers: ACT(REPLY3), body: REPLY_ANSWERED },
+      }],
+      obs: [
+        { t: "Signed with Target's Ed25519 key (RFC 9421). The signature covers method, target URI, digest and If-Match.", r: [] },
+        { t: "Content-Digest covers the body (RFC 9530). Change one byte and the signature fails.", r: [] },
+        { t: "Answered: outcome is gone from _forms. Nothing more can be sent.", r: ["R9", "S1", "S2"] },
+        { t: "The response is not cacheable.", r: ["S3", "R13"] },
+        { t: "result is free-shaped. Here a URL. A paint job would send a color. Caller reads the shape from the job's form.", r: [] },
+      ],
+    },
+    {
+      id: "m9",
+      title: "Caller checks the signature",
+      note: "Caller reads Target's key once, from the hr:keys link in step 3. Then it verifies locally.",
+      exchanges: [{
+        from: "Caller", to: "Target",
+        line: "GET https://target.example/keys",
+        headers: ["Accept: application/jwk-set+json"],
+        res: {
+          line: "200 OK",
+          headers: ["Content-Type: application/jwk-set+json", "Cache-Control: no-cache", `ETag: "${KEYS_T}"`],
+          body: KEYS_TARGET,
+        },
+      }],
+      obs: [
+        { t: "Revalidated on each use with If-None-Match. A 304 costs little.", r: ["R12"] },
+        { t: "Signature passes: accept the outcome. Fails: refuse it. Nothing is sent back.", r: [] },
+        { t: "Target fetched nothing from Caller in slice 1, so no caller-supplied URL has been fetched yet.", r: [] },
+      ],
+    },
+    {
+      id: "m10",
+      title: "Target repeats the outcome, and is refused",
+      note: "A retry after a lost response. Refused by state, not applied twice.",
+      exchanges: [{
+        from: "Target", to: "Caller",
+        line: `POST ${REPLY_URL}/actions/outcome`,
+        headers: [...REQ, IF_MATCH(REPLY3), DIGEST, SIG_INPUT, SIG],
+        body: OUTCOME_BODY,
+        bodyLabel: "Request body: the outcome again",
+        res: { line: "409 Conflict", headers: PROBLEM, body: PROBLEM_REPLY },
+      }],
+      obs: [
+        { t: "Once answered, the form is gone. Its target answers 409, not a second send.", r: ["S1", "S2", "R9"] },
+        { t: "Convention, not a new standard: Target reads 409 on an answered reply with the same outcome as success.", r: [] },
+      ],
+    },
+    {
+      id: "m11",
+      title: "Caller retries the job, and is refused",
+      note: "A retry after a lost response. One reply serves one job.",
+      exchanges: [{
+        from: "Caller", to: "Target",
+        line: "POST https://target.example/jobs",
+        headers: [...REQ, IF_MATCH(ENTRY)],
+        body: ACT_BODY,
+        bodyLabel: "Request body: the job again",
+        res: { line: "409 Conflict", headers: PROBLEM, body: PROBLEM_JOB },
+      }],
+      obs: [
+        { t: "Refused by state: the reply already has job j-88. No second job exists.", r: ["R9"] },
+        { t: "Caller keeps the job it has, j-88. It does not send again.", r: [] },
+      ],
+    },
+  ];
+
+  const OPEN = [
+    "Decision 1, act body media type: application/hal+json (option B). Decided.",
+    "Decision 2, encryption: carry Caller's key unused in slice 1, or add JWE (RFC 7516) now. The author decides.",
+    "Decision 3, envelope placement: _links in the request (this report) or a _rise body member (SPEC §7.2). The author decides.",
+    "Decision 4, relation names hr:progress, hr:outcome, hr:reply-to, hr:keys. Not yet checked against the IANA registry.",
+    "Decision 5, where a job declares its result shape. Proposed: on the job form.",
+  ];
+
+  const OUT_OF_SLICE = [
+    "Held mode (H1): Target keeps the outcome and the reply links to it. Slice 1 sends it.",
+    "History: progress and outcome events as a collection, linked as hr:history. Slice 1 keeps the latest state only.",
+    "Job retry: job:retry on a failed job. A domain act on the job, not part of RISE.",
+    "Caller cancel: an act on the job, not on the reply.",
+    "Input relation hr:input: Target asks Caller something. Same pattern, another relation on the reply.",
+    "Encryption: JWE (RFC 7516) to Caller's key. Slice 1 carries the key and does not use it.",
+    "Fetching a key a caller supplied. None in slice 1. When it arrives: https only, a short timeout, no private addresses.",
+    "Expiry: the reply expires, its forms go, a late outcome is refused.",
+    "Other modules: ce (CloudEvents headers), otel (trace context), amqp (broker binding).",
+    "HAL-FORMS _templates alongside _forms. Same forms, another rendering.",
+    "SPEC §7.2 envelope fields template-rel, template-schema and template-fields. This design does not carry them yet.",
+  ];
+
+  window.MINIMAL = { RULES, STEPS, OPEN, OUT_OF_SLICE };
+})();
+// RISE minimal, end to end: the renderer. The data is in minimal.js.
+(() => {
+  const W = window.MINIMAL;
+  const host = document.getElementById("minimal");
+
+  const el = (tag, cls, text) => {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined && text !== null) node.textContent = text;
+    return node;
+  };
+
+  const rule = (id) => el("span", `rule rule-${id[0]}`, id);
+
+  // Numbers: one per step, in order.
+  const numbered = W.STEPS.map((s, i) => ({ ...s, n: String(i + 1) }));
+
+  // ---- The sequence, drawn from the same exchanges: sender on the left, receiver on the right.
+  const diagram = () => {
+    const sec = el("section", "block");
+    sec.append(el("h2", null, "Sequence"));
+    const lines = [];
+    numbered.forEach((s) => {
+      s.exchanges.forEach((x) => {
+        lines.push(`${s.n.padEnd(4)}${x.from} --- ${x.line} --> ${x.to}`);
+        lines.push(`${"".padEnd(4)}${x.to} --- ${x.res.line} --> ${x.from}`);
+      });
+    });
+    sec.append(el("pre", "seq", lines.join("\n")));
+    sec.append(el("p", "note", "Each numbered pair is one request, then its response. Read the pairs in order."));
+    return sec;
+  };
+
+  // ---- The rules, by id.
+  const rules = () => {
+    const sec = el("section", "block");
+    sec.append(el("h2", null, "Rules"));
+    const ul = el("ul", "legend");
+    W.RULES.forEach(([id, text]) => {
+      const li = el("li");
+      li.append(rule(id), el("span", null, ` ${text}`));
+      ul.append(li);
+    });
+    sec.append(ul);
+    return sec;
+  };
+
+  // ---- Each step: its note, its pairs, headers and body, then the observations.
+  const steps = () => {
+    const sec = el("section", "block");
+    sec.append(el("h2", null, "Messages, in order"));
+    const bar = el("div", "bar");
+    const open = el("button", "btn", "Open every body");
+    const close = el("button", "btn", "Close every body");
+    open.type = close.type = "button";
+    const setAll = (state) => document.querySelectorAll("details.jv").forEach((d) => { d.open = state; });
+    open.addEventListener("click", () => setAll(true));
+    close.addEventListener("click", () => setAll(false));
+    bar.append(el("span", "sub", "Bodies:"), open, close);
+    sec.append(bar);
+
+    numbered.forEach((s) => {
+      const block = el("article", "step");
+      block.id = s.id;
+      block.append(el("h3", null, `${s.n}. ${s.title}`));
+      if (s.note) block.append(el("p", "note", s.note));
+      s.exchanges.forEach((x) => {
+        const ex = el("div", "exchange");
+        ex.append(el("p", "dir", `Request: ${x.from} to ${x.to}`));
+        ex.append(el("pre", "line", [x.line, ...(x.headers || [])].join("\n")));
+        if (x.body !== undefined) ex.append(window.JsonView.box({ a: x.body, summary: x.bodyLabel || "Request body" }));
+        ex.append(el("p", "dir", `Response: ${x.to} to ${x.from}`));
+        ex.append(el("pre", "line res", [x.res.line, ...(x.res.headers || [])].join("\n")));
+        ex.append(window.JsonView.box({ a: x.res.body, summary: "Response body" }));
+        block.append(ex);
+      });
+      if (s.obs.length) {
+        const obs = el("ul", "obs");
+        s.obs.forEach((o) => {
+          const li = el("li");
+          li.append(el("span", null, o.t), " ");
+          o.r.forEach((id) => li.append(rule(id), " "));
+          obs.append(li);
+        });
+        block.append(obs);
+      }
+      sec.append(block);
+    });
+    return sec;
+  };
+
+  // ---- What is still open, in the order the messages raise it.
+  const decisions = () => {
+    const sec = el("section", "block");
+    sec.append(el("h2", null, "Open decisions"));
+    const ul = el("ul", "points");
+    W.OPEN.forEach((t) => ul.append(el("li", null, t)));
+    sec.append(ul);
+    return sec;
+  };
+
+  // ---- What slice 1 leaves out.
+  const outOfSlice = () => {
+    const sec = el("section", "block");
+    sec.append(el("h2", null, "Left out of slice 1"));
+    const ul = el("ul", "points");
+    W.OUT_OF_SLICE.forEach((t) => ul.append(el("li", null, t)));
+    sec.append(ul);
+    return sec;
+  };
+
+  host.append(diagram(), rules(), steps(), decisions(), outOfSlice());
+})();
+</script>
+</body></html>
