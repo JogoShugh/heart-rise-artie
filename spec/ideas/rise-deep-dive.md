@@ -3,8 +3,10 @@
 **Status:** an exploration, 2026-11-07, for the author to prioritize. Nothing here is built, and SPEC §7 is unchanged.
 It reviews §7, `rise-awakening.md` and the fictional "Rest, then RISE" talk, then works through four questions the
 author raised: clients sending hypermedia, self-registering subscribers, the DDD context-map patterns that come with
-publish and subscribe, and whether RISE needs HAL-FORMS `_templates`. It ends with the smallest working prototype,
-over a dynamic webhook and over AMQP.
+publish and subscribe, and whether RISE needs HAL-FORMS `_templates`. It proposes the smallest working prototype,
+over a dynamic webhook and over AMQP, then narrows the dynamic webhook (the envelope, mappings kept by digest pair,
+when to fail), places it beside RFC 7240's `respond-async`, and envisions RISE as an extension of the W3C's Linked
+Data Notifications, WebSub and ActivityPub rather than a parallel invention.
 
 ## Where things stand
 
@@ -260,13 +262,15 @@ fixtures, and gives the library a wake-up hook that the module fills with ARTIE.
 1. The inbox and the reply resource, in heart-core terms (states, offers, reasons). Feature first.
 2. The library's act with `_rise`, the watch, and the hold-clearing control.
 3. The wake-up: read the reply link, act `deliver` with `If-Match`, mark the watch delivered.
-4. A scenario, in Gherkin tables:
+4. A mapping written by hand, kept under its digest pair (§7): a second envelope with the same reply form set uses
+   it; a changed form set finds none, and the watch says so.
+5. A scenario, in Gherkin tables:
    - ARTIE opens a reply and asks the library to tell it when renewable;
    - the hold clears;
    - the reply reads `answered`, with `loan` and `standing`;
    - delivering again is refused, 409, "answered at …";
    - the watch reads `delivered`.
-5. Live: the library and the inbox on two ports, ARTIE in a terminal, curl for the second delivery.
+6. Live: the library and the inbox on two ports, ARTIE in a terminal, curl for the second delivery.
 
 Everything is HTTP on localhost, and nothing is registered anywhere: the address arrives with the request.
 
@@ -294,14 +298,243 @@ variation B as its broker twin. Not tonight.
 The stamp beyond an unguessable reply address; signatures; by-value envelopes; progress; the 202 path; AMQP 1.0;
 SSE; publish and subscribe; any spec text.
 
-## 7. Decisions for the author
+## 7. The dynamic webhook, narrowed
+
+Worked through with the author on 2026-11-07.
+
+### The envelope
+
+The originator acts on a form of the recipient's whose input includes hypermedia: the envelope. The envelope links
+the **reply resource**, not a bare form address, because reading the resource gives its state (still awaiting?), its
+forms and a validator. Beside the link rides the reply's form set, with its integrity, exactly as HEART servers send
+integrity today:
+
+```json
+"_rise": { "_links": {
+  "hr:reply-to": { "href": "https://assistant.example/replies/7f3a" },
+  "hr:forms":    { "href": "https://assistant.example/forms/9c41…", "integrity": "sha256-…" } } }
+```
+
+- **The recipient checks its cache by the digest**, and fetches the set only on a miss.
+- **The per-request address stays out of the digest.** The set's target is a pattern, `{reply}/actions/deliver`,
+  filled from the envelope. If each reply's own URL were inside the set, every request would have a new digest, and
+  neither the cache nor a kept mapping would ever be reused.
+- **A digest proves bytes, not senders.** Who sent the envelope is the stamp's job: a token, or signed requests.
+
+### The mapping, found once and kept by a digest pair
+
+The recipient's own result and the originator's reply fields won't line up one to one. A model can map them; a person
+approves; later calls reuse the mapping with no model. It is ARTIE's "find the way once, keep it", on the way back.
+
+- **The key is a pair:**
+  - the originator's reply form set digest (the target shape);
+  - the recipient's own source shape: the act it was called through, with a version of its own model.
+
+  A change on either side is a new pair and one repair.
+- **The mapping is data, never code.** Pointers into the recipient's representation, value tables and constants, so
+  a person can read and approve it and running it needs no model:
+
+  ```json
+  { "reply": "sha256-9c41…", "source": "library:tell-me-when-renewable@sha256-77ab…",
+    "fields": {
+      "loan":     { "from": "/_links/self/href" },
+      "standing": { "from": "/standing", "values": { "renewable": "renewable", "held": "waiting" } } } }
+  ```
+
+- **Approval is an act.** The mapping is a resource on the recipient: proposed, approved, retired. While proposed it
+  offers approve and reject, to a person or to a policy. Every later envelope with the same pair finds it approved.
+- **Checked mechanically first.** Before anyone approves it, the mapping's output from the current data must satisfy
+  the reply form's schema.
+- **Mapping is not disclosure.** One approved mapping serves every originator using that form set. Whether *this*
+  originator may receive a field is a separate decision, per originator.
+- **A form that changes mid-wait.** The originator may redeploy between request and reply. A reply resource keeps the
+  form set it was created with, so its contract holds for its lifetime.
+
+### When to fail
+
+Asynchronous work can take a long time, and whether a reply can be filled is often unknowable until the work is
+done. The rule: **fail early only when it is certain; otherwise accept, and fail late with a reason.**
+
+| When | What is checked | On failure |
+|---|---|---|
+| The envelope arrives | A scheme the recipient can deliver to; a form set it can fetch, whose integrity holds; a required reply field with no possible source, ever | 422 at once, at `/_rise` |
+| Any time before the first delivery | The mapping for the digest pair: found, or proposed by a model and approved | The task waits: "Waiting for its mapping to be approved" |
+| The work is done | The mapping run on the result, checked against the reply schema | The answer goes to `hr:error-reply`, with the reason |
+| Delivery | The reply still awaiting, its validator current | 409 or 412: read again; never resent blind |
+
+## 8. Synchronous or asynchronous: RFC 7240
+
+`Prefer: respond-async` is IETF, not W3C: RFC 7240, "Prefer Header for HTTP" (2014). It also defines `wait=N`,
+`return=minimal|representation` and `handling=strict|lenient`.
+
+- **`respond-async`:** the client would rather not wait. The server answers `202 Accepted` with `Location` at a
+  status resource, and says so with `Preference-Applied: respond-async`. It may ignore the preference, so a client
+  handles both 200 and 202.
+- **`respond-async, wait=10`:** the client will wait up to ten seconds for the answer itself, then wants the 202.
+- **HEART already speaks it:** `Prefer` and `Preference-Applied` choose the rung (SPEC §6.11.1), and the gateway's
+  hub holds reads with `Prefer: wait=N`.
+
+What it settles in RISE:
+
+- **Poll mode is RFC 7240.** `Prefer: respond-async` with no envelope: a 202 and the task at `Location`, read until it
+  offers `hr:result`. RISE needs no word of its own for it.
+- **Push mode is what RFC 7240 lacks.** It never says where to send a result. The envelope adds only that. Both go
+  together: `Prefer: respond-async` and a `_rise` link.
+- **Synchronous or asynchronous is the client's preference on one act**, as §7.2's "the schema SHALL NOT require
+  `_rise`" already wants.
+- **Two kinds of 2xx:**
+  - an act whose whole point is a later answer ("tell me when renewable") brings a watch into being: 201, the watch
+    at `Location`;
+  - an ordinary act run asynchronously (a slow deploy) is 202 by `respond-async`, and needs heart-core to learn 202.
+
+## 9. The W3C's social web standards
+
+All three came from the W3C Social Web Working Group (2014–2018).
+
+### Linked Data Notifications (W3C Recommendation, 2017)
+
+Any resource can have an inbox, found by a link.
+
+- Roles: sender, receiver (the inbox), consumer.
+- The target links its inbox: `Link: </articles/42/inbox>; rel="http://www.w3.org/ns/ldp#inbox"`, or `ldp:inbox` in
+  the body.
+- The sender POSTs a notification (JSON-LD by default); the receiver answers `201` with the notification's own
+  `Location`, or `202` if it is processed later.
+- A GET on the inbox lists its notifications (`ldp:contains`); each is a resource.
+- An inbox may link the rules for what it accepts (`ldp:constrainedBy`), such as a shape: the nearest thing to a form.
+- In use: Solid pods, dokieli, COAR Notify (repositories and peer-review services).
+
+It has no states, no validators, and no forms saying what is accepted now.
+
+### WebSub (W3C Recommendation, 2018; formerly PubSubHubbub)
+
+Subscribers register themselves; the publisher is configured for none of them.
+
+- Roles: publisher, subscriber, hub. A topic links its hub: `Link: <https://hub.example/>; rel="hub"` and its own
+  `rel="self"`.
+- The subscriber POSTs `hub.mode=subscribe`, `hub.topic`, `hub.callback`, `hub.lease_seconds` and `hub.secret` to
+  the hub, which answers `202` and goes to verify.
+- **Verification of intent:** the hub GETs the callback with a `hub.challenge`, which the subscriber must echo, so
+  no one can subscribe somebody else's address.
+- **Leases:** a subscription expires unless renewed.
+- **Delivery:** the hub POSTs the new content to each callback, signed with the secret (`X-Hub-Signature: sha256=…`),
+  and retries failures. Unsubscribing is verified the same way.
+- In use: YouTube's push notifications, WordPress, Superfeedr, and formerly Twitch's webhooks.
+
+The subscription is not a resource (it can't be read, paused, or asked why it lapsed); the `hub.*` names are known
+in advance rather than offered as a form; deliveries carry whole content.
+
+### ActivityPub (W3C Recommendation, 2018)
+
+The fediverse's protocol: Mastodon, Pixelfed, PeerTube, Lemmy, partly Threads, WordPress through a plugin.
+
+- Every actor is a resource with an `inbox`, an `outbox`, and `followers` and `following` collections; the vocabulary
+  is ActivityStreams 2.0 (`Create`, `Follow`, `Accept`, `Reject`, `Undo`, `Announce`…).
+- **Self-registration is following.** A server POSTs `Follow` to the library's inbox, carrying its actor's link; the
+  library reads that actor to find its inbox, and answers `Accept` or `Reject`. An account may approve followers by
+  hand (`manuallyApprovesFollowers`). From then on the library delivers each new activity to every follower's inbox,
+  one POST per server through `sharedInbox`. `Undo` of the `Follow` unsubscribes.
+- Security is outside the spec: servers sign requests with HTTP Signatures, moving to RFC 9421.
+
+Activity types are fixed. Nothing says, as a form, what an actor accepts now, and nothing guards a delivery with a
+version or a state.
+
+### Side by side
+
+| | LDN | WebSub | ActivityPub | HEART and RISE |
+|---|---|---|---|---|
+| Finding the inbox | `ldp:inbox` link | `hub` link | `inbox` in the actor | `hr:reply-to` link |
+| Who holds the subscribers | — | The hub | The publisher (`followers`) | The publisher, as subscription resources |
+| Registering | — | POST of `hub.*` fields | `Follow`, then `Accept` | A `subscribe` act, offered as a form |
+| Checking the address | — | Challenge echo | Read the actor | Read before you send |
+| Approval | — | By the publisher, optionally | By hand, optionally | A pending state, with approve offered |
+| Expiry | — | Leases | — | Leases, with renew offered |
+| A delivery carries | Any notification | Whole content, HMAC-signed | An activity, signed by convention | A thin hint, or a reply filled from a form |
+| What is accepted | `constrainedBy` link | — | Fixed vocabulary | A form, by state, its schema by digest |
+| Guards on delivery | — | — | — | `If-Match`; 409, 412 |
+
+## 10. How RISE extends them
+
+The W3C standardized inboxes found by links, self-registering subscribers, checks of intent, leases and
+approval-gated following eight years ago, and they run at fediverse scale. RISE should not invent these again. It
+should **extend them, so that every RISE party also speaks the standard, and a party that speaks only the standard
+still works.** What RISE adds is HEART's part: forms by state, validators, and form sets by digest.
+
+```
+RISE, a HEART profile: forms by state · validators · form sets by digest · client-sent envelopes
+ ├─ request and reply   RFC 7240 respond-async (poll) + the _rise envelope (push) → a reply resource
+ ├─ subscriptions       WebSub's hub, leases, check of intent, signatures → subscription resources
+ ├─ inboxes             LDN's inbox by link, notifications as resources → inboxes with state
+ └─ federation          ActivityPub's actors and Follow/Accept → topics that are also actors
+bindings (SPEC §6.0): HTTP · CoAP · AMQP
+```
+
+### Over LDN: an inbox with state and forms
+
+- **Every RISE reply resource and standing inbox is also an LDN inbox.** It links itself as `ldp:inbox` beside
+  `hr:reply-to`, and lists what it has received (`ldp:contains`), each delivery a resource of its own.
+- **`ldp:constrainedBy` points at the deliver form's set**, by digest. An LDN sender learns there are rules; a HEART
+  sender gets them as a form.
+- **Two kinds of sender, one inbox:**
+  - a plain LDN sender POSTs a notification without reading, and the inbox accepts it while active, refuses it with a
+    reason while paused or answered;
+  - a HEART sender reads first, follows the `deliver` form, and sends `If-Match`.
+- **Decision:** whether an inbox takes those blind appends. An append changes only the inbox's contents, not its
+  control state, so the inbox can check active or paused itself, and HEART's 428 need not apply to that one target.
+
+### Over WebSub: subscriptions you can read
+
+- **The hub's representation offers `subscribe` as a form** whose fields are WebSub's own (`hub.topic`,
+  `hub.callback`, `hub.lease_seconds`, `hub.secret`) in WebSub's own encoding, form-encoded. A WebSub subscriber
+  posts it unchanged, without reading the form; a HEART client finds the same act from the form.
+- **The `202` gains a `Location`:** the subscription as a resource, which WebSub lacks. Its states are pending
+  verification, active, paused, expired, denied; it offers renew, pause, resume and cancel by state, with reasons for
+  the rest.
+- **Verification of intent, two ways:** the challenge echo for WebSub subscribers; read before you send for HEART
+  ones, whose callback answers as an inbox awaiting deliveries.
+- **Deliveries may be thin.** A hint (link, version, relation, as CloudEvents fields) instead of the whole content,
+  still signed with the subscriber's secret. A HEART subscriber reads the resource for the truth and the controls.
+- **Backpressure, which WebSub lacks:** a paused inbox offers no deliver form, so the hub's next delivery gets a 409
+  and waits. Leases stay, with renew offered as the end approaches.
+
+### Over ActivityPub: topics that are actors
+
+- **A topic can be an ActivityPub actor** (a `Service`), with an inbox, an outbox and its followers. A `Follow` that
+  arrives becomes a subscription, pending until accepted; approving it is the act that sends `Accept`.
+- **What a follower receives** is an `Announce` or `Update` whose object is a link to the changed resource. Fediverse
+  software shows it as a post; a HEART client reads the resource, its state and its controls.
+- **The actor offers its acts as forms.** `follow` is offered while the actor takes followers, and absent with a
+  reason ("This account isn't taking followers") when not: what ActivityPub can't say today.
+- **Request and reply over ActivityPub:** an activity can carry a `_rise` envelope as an extension member, since
+  ActivityStreams is JSON-LD and takes extensions by context.
+- **Clients sending hypermedia is native there.** ActivityPub's client-to-server side already posts activities full
+  of links to an outbox. RISE adds the forms that say what each side accepts.
+
+### Over RFC 7240: the status resource is a task with forms
+
+`respond-async`'s status resource becomes the RISE task: working, done, cancelled, failed, offering cancel while it
+still can and `hr:result` once done, with reasons for what's absent. The poll is an ordinary HEART read with
+`If-None-Match`, or held by `Prefer: wait=N`.
+
+### What RISE adds, in five lines
+
+1. **Forms by state** on every inbox, subscription, task and actor: what each accepts now, and why not otherwise.
+2. **Validators on delivery:** exactly once from at least once, and backpressure as a state.
+3. **Form sets by digest:** reply shapes the originator decides, with mappings kept by digest pair, so customer-defined
+   replies cost one model call per pair, not one per delivery.
+4. **Clients sending hypermedia** as a first principle, with read before you send as the general check of intent.
+5. **Compatibility as a rule:** a RISE party also speaks LDN, WebSub or ActivityPub where it plays that role, so
+   adoption needs no one else to change first.
+
+## 11. Decisions for the author
 
 Each has a recommendation.
 
 1. **The envelope:** one link by reference first, by value later. *Recommended.*
 2. **Where it travels:** the `_rise` body member, declared in the act's schema so the form says the act takes one.
    *Recommended.*
-3. **201 with a watch, instead of 202,** for now: no new heart-core status handling. *Recommended.*
+3. **201 with a watch for "tell me when" acts; 202 by `respond-async` for ordinary acts run asynchronously** (§8),
+   the second once heart-core learns 202. *Recommended.*
 4. **Read before you send:** a SHALL. *Recommended.*
 5. **AMQP tonight:** 0-9-1 on the local RabbitMQ 3.13, headers for method and status. *Recommended*; 1.0 next.
 6. **Where the prototype lives:** `client/artie-rise`. *Recommended.* The gates need no change: the client build is
@@ -311,3 +544,11 @@ Each has a recommendation.
 8. **HAL-FORMS:** nothing RISE-specific; the reply resource negotiates as any resource does. *Recommended.*
 9. **SPEC §7.6, the fallback directory:** drop it from RISE. *Recommended.*
 10. **Client-sent hypermedia:** RISE's second principle in §7.1. *Recommended.*
+11. **When to fail:** early only when certain, late with a reason otherwise (§7). *Recommended.*
+12. **Mappings:** data kept by digest pair, approved as an act, separate from what each originator may receive (§7).
+    *Recommended; hand-written in the first slice, proposed by a model in the next.*
+13. **Poll mode is RFC 7240's `respond-async`;** RISE defines only the push address (§8). *Recommended.*
+14. **Compatibility as a rule:** RISE inboxes are LDN inboxes, RISE hubs take WebSub subscriptions, RISE topics may be
+    ActivityPub actors (§10). *Recommended as the direction; LDN first, being the smallest.*
+15. **Blind appends from LDN senders** to an active inbox, exempt from 428 on that one target (§10). *To decide; the
+    prototype doesn't need it.*
