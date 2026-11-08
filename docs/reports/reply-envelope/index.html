@@ -360,6 +360,9 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
 // Reply envelope, end to end: the data. Every name is tagged with where its standard comes from (see LEGEND).
 // Digests, keys, times and identities are made up; the shapes are the ones the design proposes.
 (() => {
+  // HEART representations: HAL Schema Forms, the reference dialect (SPEC §6.1). The hr prefix is declared in curies.
+  const CURIES = { curies: [{ name: "hr", href: "https://w3id.org/heart-rise/rels/{rel}", templated: true }] };
+
   // The caller's template: its own message, with the standard names left null for the responder to fill.
   const template = () => ({
     id: null,
@@ -411,7 +414,8 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
     { key: "WWW-Authenticate", does: "Tells a refused sender how to authenticate. Required on a 401.", tags: [{ k: "codified", note: "RFC 9110 §11.6.1" }, { k: "ours", note: "scheme Signature" }], src: "The rule is RFC 9110. The scheme name Signature is ours; no registered scheme is assumed." },
     { key: "status codes", does: "200, 201, 401, 409, 412, 413 and 428 in this design.", tags: [{ k: "codified", note: "RFC 9110 §15; 428 from RFC 6585" }], src: "RFC 9110 names 413 Content Too Large." },
     { key: "_links", does: "Links to related resources, by relation name.", tags: [{ k: "defacto", note: "HAL" }], src: "HAL is an IETF Internet-Draft that expired. Widely used; no RFC." },
-    { key: "_forms", does: "The forms (acts) a resource offers: method, target, and the schema of the input.", tags: [{ k: "defacto", note: "HAL-FORMS" }], src: "HAL-FORMS is a written community spec. HEART's _forms follows it, with HEART's additions." },
+    { key: "application/hal+json", does: "The media type of every HEART representation, with its profile link: heart-rise/hal-schema-forms.", tags: [{ k: "defacto", note: "HAL" }, { k: "ours", note: "profile" }], src: "HAL is an IETF Internet-Draft that expired. The profile URI is HEART's; the client selects it with Accept-Profile and the server names it in Link rel=\"profile\"." },
+    { key: "_forms", does: "The forms (acts) a resource offers: method, target, contentType and the schema of the input.", tags: [{ k: "defacto", note: "HAL Schema Forms" }, { k: "ours", note: "HEART's reference dialect" }], src: "HAL Schema Forms is a community spec. HEART's reference dialect uses its _forms key, with HEART's additions." },
     { key: "JSON Schema", does: "Describes the properties of the input, including which names are fillable.", tags: [{ k: "proposed", note: "draft 2020-12" }], src: "An IETF Internet-Draft, in wide use. Check its current status before citing it as a standard." },
     { key: "hr: relations", does: "hr:reply-to, hr:keys, hr:loan, hr:deliver: relation names.", tags: [{ k: "ours" }], src: "HEART's own prefix. Not registered anywhere." },
   ];
@@ -432,7 +436,7 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["null-fill", "correlation", "expires", "_forms", "JSON Schema", "Location", "status codes", "_links", "time", "id", "subject", "outcome", "result", "source"],
       exchanges: [{
         line: "POST https://assistant.example/replies",
-        headers: ["Content-Type: application/json"],
+        headers: ["Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
         body: { template: template(), expires: "2026-11-15T09:00:00Z" },
         bodyLabel: "Request body: the template and the expiry",
         res: {
@@ -442,7 +446,7 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
             state: "awaiting",
             expires: "2026-11-15T09:00:00Z",
             template: template(),
-            _links: { self: { href: "https://assistant.example/replies/7f3a" } },
+            _links: { ...CURIES, self: { href: "https://assistant.example/replies/7f3a" } },
             _forms: {
               "hr:deliver": {
                 method: "POST",
@@ -473,14 +477,14 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["Location", "_links", "hr: relations", "status codes"],
       exchanges: [{
         line: "POST https://library.example/loans/L-40219/actions/tell-me-when-renewable",
-        headers: ["Content-Type: application/json"],
-        body: { _rise: { _links: { "hr:reply-to": { href: "https://assistant.example/replies/7f3a" } } } },
+        headers: ["Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
+        body: { _rise: { _links: { ...CURIES, "hr:reply-to": { href: "https://assistant.example/replies/7f3a" } } } },
         res: {
           line: "201 Created",
           headers: ["Location: https://library.example/watches/w-88"],
           body: {
             state: "waiting",
-            _links: {
+            _links: { ...CURIES,
               self: { href: "https://library.example/watches/w-88" },
               "hr:loan": { href: "https://library.example/loans/L-40219" },
               "hr:keys": { href: "https://library.example/keys" },
@@ -505,10 +509,10 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["ETag", "If-Match", "Date", "_forms", "status codes"],
       exchanges: [{
         line: "GET https://assistant.example/replies/7f3a",
-        headers: ["Accept: application/json"],
+        headers: ["Accept: application/hal+json", "Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>"],
         res: {
           line: "200 OK",
-          headers: ["ETag: \"rep-1\""],
+          headers: ["ETag: \"seq-1.hsf.L2.c4b8a0e62d9f1137\""],
           body: { state: "awaiting", expires: "2026-11-15T09:00:00Z", template: template() },
         },
       }],
@@ -522,10 +526,10 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       exchanges: [{
         line: "POST https://assistant.example/replies/7f3a/actions/deliver",
         headers: [
-          "If-Match: \"rep-1\"",
+          "If-Match: \"seq-1.hsf.L2.c4b8a0e62d9f1137\"",
           "Date: Sun, 08 Nov 2026 15:40:12 GMT",
           "traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01",
-          "Content-Type: application/json",
+          "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"',
           "Content-Digest: sha-256=:bW9jay1kaWdlc3Q=:",
           "Signature-Input: sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\" \"traceparent\");created=1794152412;expires=1794152712;keyid=\"lib-2026-11\";alg=\"ed25519\";tag=\"heart-reply\"",
           "Signature: sig1=:bW9jay1zaWduYXR1cmU=:",
@@ -543,7 +547,7 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
         bodyLabel: "Request body: the caller's template, filled",
         res: {
           line: "200 OK",
-          headers: ["ETag: \"rep-2\""],
+          headers: ["ETag: \"seq-2.hsf.L2.19d6e3f0a8c57b24\""],
           body: { state: "answered", id: "lib-dlv-90211", time: "2026-11-08T15:40:12Z" },
         },
       }],
@@ -556,10 +560,10 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["JWK", "Signature-Input", "Content-Digest", "ETag", "_links"],
       exchanges: [{
         line: "GET https://library.example/keys",
-        headers: ["Accept: application/json"],
+        headers: ["Accept: application/hal+json", "Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>"],
         res: {
           line: "200 OK",
-          headers: ["ETag: \"keys-3\""],
+          headers: ["ETag: \"seq-3.hsf.L2.7a1e5c0d9b2f4863\""],
           body: { keys: [{ kty: "OKP", crv: "Ed25519", kid: "lib-2026-11", x: "bW9jay1wdWJsaWMta2V5" }] },
         },
       }],
@@ -573,9 +577,9 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       exchanges: [{
         line: "POST https://assistant.example/replies/7f3a/actions/deliver",
         headers: [
-          "If-Match: \"rep-1\"",
+          "If-Match: \"seq-1.hsf.L2.c4b8a0e62d9f1137\"",
           "Date: Sun, 08 Nov 2026 15:46:12 GMT",
-          "Content-Type: application/json",
+          "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"',
           "Content-Digest: sha-256=:bW9jay1kaWdlc3Q=:",
           "Signature-Input: sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\" \"traceparent\");created=1794152772;expires=1794153072;keyid=\"lib-2026-11\";alg=\"ed25519\";tag=\"heart-reply\"",
         ],
@@ -587,7 +591,7 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
             type: "https://w3id.org/heart-rise/problems/validator-stale",
             title: "The reply changed since you read it",
             status: 412,
-            detail: "The reply's ETag is now \"rep-2\".",
+            detail: "The reply's ETag is now \"seq-2.hsf.L2.19d6e3f0a8c57b24\".",
           },
         },
       }],
@@ -600,10 +604,10 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["ETag", "id"],
       exchanges: [{
         line: "GET https://assistant.example/replies/7f3a",
-        headers: ["Accept: application/json"],
+        headers: ["Accept: application/hal+json", "Accept-Profile: <https://w3id.org/heart-rise/hal-schema-forms>"],
         res: {
           line: "200 OK",
-          headers: ["ETag: \"rep-2\""],
+          headers: ["ETag: \"seq-2.hsf.L2.19d6e3f0a8c57b24\""],
           body: { state: "answered", id: "lib-dlv-90211", time: "2026-11-08T15:40:12Z" },
         },
       }],
@@ -616,7 +620,7 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["If-Match", "problem", "status codes", "id", "outcome"],
       exchanges: [{
         line: "POST https://assistant.example/replies/7f3a/actions/deliver",
-        headers: ["If-Match: \"rep-2\"", "Content-Type: application/json"],
+        headers: ["If-Match: \"seq-2.hsf.L2.19d6e3f0a8c57b24\"", "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
         body: {
           id: "lib-dlv-90419",
           time: "2026-11-08T16:02:55Z",
@@ -646,7 +650,7 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["expires", "problem", "status codes", "If-Match"],
       exchanges: [{
         line: "POST https://assistant.example/replies/7f40/actions/deliver",
-        headers: ["If-Match: \"rep-4\"", "Content-Type: application/json"],
+        headers: ["If-Match: \"seq-4.hsf.L2.6a3f1e8d0c9b5277\"", "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
         body: { id: "lib-dlv-90533", time: "2026-11-15T09:20:00Z", source: "https://library.example/riverside", subject: "https://library.example/loans/L-40219", outcome: "done", correlation: "asst-req-5522" },
         bodyLabel: "Request body (signature headers omitted here)",
         res: {
@@ -670,8 +674,8 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       exchanges: [{
         line: "POST https://assistant.example/replies/7f41/actions/deliver",
         headers: [
-          "If-Match: \"rep-1\"",
-          "Content-Type: application/json",
+          "If-Match: \"seq-1.hsf.L2.c4b8a0e62d9f1137\"",
+          "Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"',
           "Content-Digest: sha-256=:bm90LXRoZS1kaWdlc3Q=:",
           "Signature-Input: sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\" \"traceparent\");created=1794152412;expires=1794152712;keyid=\"lib-2026-11\";alg=\"ed25519\";tag=\"heart-reply\"",
           "Signature: sig1=:bm90LXRoZS1yaWdodC1rZXk=:",
@@ -696,7 +700,7 @@ pre.line.res { background: var(--quiet-bg); border-left: 3px solid var(--accent)
       std: ["problem", "status codes"],
       exchanges: [{
         line: "POST https://assistant.example/replies",
-        headers: ["Content-Type: application/json"],
+        headers: ["Content-Type: application/hal+json", 'Link: <https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"'],
         body: { template: { ...template(), note: "Ana: (5,000 characters, shortened in this report)" }, expires: "2026-11-15T09:00:00Z" },
         bodyLabel: "Request body, shortened for this report",
         res: {

@@ -21,8 +21,9 @@
   const SOURCE = "library:tell-me-when-renewable@sha256-d6qrW1sZ…u8Lk0=";
   const T = (h, m, s = 0, d = 7, mo = 11) =>
     `2026-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}Z`;
-  const HAL = { Accept: "application/hal+json" };
-  const JSONC = { "Content-Type": "application/json" };
+  const PROFILE = { Link: '<https://w3id.org/heart-rise/hal-schema-forms>; rel="profile"' };
+  const HAL = { Accept: "application/hal+json", "Accept-Profile": "<https://w3id.org/heart-rise/hal-schema-forms>" };
+  const JSONC = { "Content-Type": "application/hal+json", ...PROFILE };
   const etag = (tag) => ({ ETag: `"${tag}"` });
   const ifMatch = (tag) => ({ "If-Match": `"${tag}"` });
   const ifNone = (tag) => ({ "If-None-Match": `"${tag}"` });
@@ -54,7 +55,7 @@
         title: "Tell me when I can renew",
         description: "Watches this loan and answers once it can be renewed. Give a reply link in _rise to be told; leave it out and read the watch instead.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/loans/3310/actions/tell-me-when-renewable" } },
         schema: { type: "object", properties: { _rise: riseField } },
       },
@@ -121,7 +122,7 @@
         title: "Bring a copy from another branch",
         description: "Sends a copy on the van to the branch you pick it up at. Usually a day.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/titles/hobbit/actions/bring-a-copy" } },
         schema: {
           type: "object", required: ["from", "pickUpAt"],
@@ -135,7 +136,7 @@
         title: "Tell me about changes",
         description: "Sends a short notice each time one of the chosen kinds of change happens: to your inbox, or to a queue the library makes for you. Lasts the days you ask, up to 90, unless renewed.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/titles/hobbit/actions/subscribe" } },
         schema: {
           type: "object", required: ["kinds"],
@@ -206,7 +207,7 @@
         title: "Open a reply",
         description: "Brings a reply into being: a resource another service answers once, through the form its shape gives it. Its address goes in a _rise envelope.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/inbox/actions/open-reply" } },
         schema: {
           type: "object", required: ["about", "shape"],
@@ -282,7 +283,7 @@
         title: "Deliver the answer",
         description: "Answers this reply, once: the loan, and whether Ana can renew it now.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/replies/{id}/actions/deliver", templated: true } },
         "hr:templatePointers": { id: "/id" },
         schema,
@@ -291,7 +292,7 @@
         title: "Say how it's going",
         description: "A short note while the answer isn't ready. The reply stays awaiting.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/replies/{id}/actions/progress", templated: true } },
         "hr:templatePointers": { id: "/id" },
         schema: { type: "object", required: ["note"], properties: { note: { type: "string", title: "Note", maxLength: 280 } } },
@@ -300,7 +301,7 @@
         title: "Say it can't be answered",
         description: "Ends the reply without an answer, with the reason Ana will read.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/replies/{id}/actions/fail", templated: true } },
         "hr:templatePointers": { id: "/id" },
         schema: { type: "object", required: ["reason"], properties: { reason: { type: "string", title: "Reason", maxLength: 280 } } },
@@ -367,7 +368,7 @@
         title: "Reject",
         description: "A model proposes again, told why.",
         method: "POST",
-        contentType: "application/json",
+        contentType: "application/hal+json",
         _links: { target: { href: "/mappings/12/actions/reject" } },
         schema: { type: "object", required: ["why"], properties: { why: { type: "string", title: "Why", maxLength: 280 } } },
       },
@@ -420,7 +421,7 @@
   const act = (id, rel, title, extra = {}) => ({
     [`hr:${rel}`]: { title, method: "POST", ...extra, _links: { target: { href: `/subscriptions/${id}/actions/${rel}` } } },
   });
-  const leaseForm = { contentType: "application/json", schema: { type: "object", properties: { leaseDays: { type: "integer", title: "For how many days", minimum: 1, maximum: 90, default: 30 } } } };
+  const leaseForm = { contentType: "application/hal+json", schema: { type: "object", properties: { leaseDays: { type: "integer", title: "For how many days", minimum: 1, maximum: 90, default: 30 } } } };
   const unavail = (path) => ({ "hr:unavailable": { href: path, integrity: SRI.unavailable } });
   const clubReply = { "hr:reply-to": { href: "https://club.example/inbox/hobbit" } };
 
@@ -485,7 +486,7 @@
     lanes: ["artie", "inbox", "library"],
     steps: [
       { from: "artie", to: "library", line: "GET /loans/3310", h: { ...HAL, Authorization: "Bearer <token>" } },
-      { from: "library", to: "artie", line: "200 OK", h: { "Content-Type": "application/hal+json", ...etag("v4"), "Cache-Control": "no-cache" }, body: loanHeld, key: "loan4",
+      { from: "library", to: "artie", line: "200 OK", h: { "Content-Type": "application/hal+json", ...PROFILE, ...etag("v4"), "Cache-Control": "no-cache" }, body: loanHeld, key: "loan4",
         note: "Hold waiting: renew is absent, tell-me-when-renewable is offered, and its schema takes a _rise envelope." },
       { from: "artie", to: "inbox", line: "GET /inbox", h: HAL },
       { from: "inbox", to: "artie", line: "200 OK", h: etag("i2"), body: inbox },
@@ -539,7 +540,7 @@
       { from: "inbox", to: "library", line: "412 Precondition Failed", h: PROBLEM, body: problem("stale", "The reply changed since it was read", 412) },
       { from: "library", to: "inbox", line: "GET /replies/7f3a", h: HAL },
       { from: "inbox", to: "library", line: "200 OK", h: etag("r2"), body: replyAnswered },
-      { from: "library", to: "inbox", line: "GET /unavailable/0d5f7a1e", h: { Accept: "application/json" } },
+      { from: "library", to: "inbox", line: "GET /unavailable/0d5f7a1e", h: HAL },
       { from: "inbox", to: "library", line: "200 OK", h: { "Cache-Control": "public, max-age=31536000, immutable" }, body: unavailableAnswered },
       { at: "library", note: "Answered, by itself at 21:31. Watch 88 is recorded delivered; nothing is resent." },
       { section: "A script that doesn't read" },
@@ -740,7 +741,7 @@
       { from: "broker", to: "library", kind: "amqp", line: "basic.deliver", body: amqpMsg("basic.deliver", { routing_key: "amq.rabbitmq.reply-to.g1hkAA…", properties: "as published" }) },
       { section: "Deliver, as a message" },
       { from: "library", to: "broker", kind: "amqp", line: "basic.publish  POST …/deliver",
-        body: amqpMsg("basic.publish", { exchange: "", routing_key: "assistant.heart", properties: { message_id: "lib-5522", reply_to: "amq.rabbitmq.reply-to", content_type: "application/json", headers: { "heart-method": "POST", "heart-target": "/replies/7f3a/actions/deliver", "if-match": "\"r1\"" } }, body: { loan: "https://library.example/loans/3310", standing: "renewable" } }) },
+        body: amqpMsg("basic.publish", { exchange: "", routing_key: "assistant.heart", properties: { message_id: "lib-5522", reply_to: "amq.rabbitmq.reply-to", content_type: "application/hal+json", headers: { "heart-method": "POST", "heart-target": "/replies/7f3a/actions/deliver", "if-match": "\"r1\"" } }, body: { loan: "https://library.example/loans/3310", standing: "renewable" } }) },
       { from: "broker", to: "inbox", kind: "amqp", line: "basic.deliver", body: amqpMsg("basic.deliver", { consumer_tag: "inbox-front-door", delivery_tag: 42, redelivered: false, properties: "as published" }) },
       { from: "inbox", to: "broker", kind: "amqp", line: "basic.publish  200 OK",
         body: amqpMsg("basic.publish", { exchange: "", routing_key: "amq.rabbitmq.reply-to.g1hkAA…", properties: { correlation_id: "lib-5522", content_type: "application/hal+json", headers: { "heart-status": 200, etag: "\"r2\"" } }, body: replyAnswered }) },
@@ -925,7 +926,7 @@
     ],
     lanes: ["reader", "hub", "library"],
     steps: [
-      { from: "reader", to: "library", line: "GET /titles/hobbit/events", h: { Accept: "application/json" } },
+      { from: "reader", to: "library", line: "GET /titles/hobbit/events", h: HAL },
       { from: "library", to: "reader", line: "200 OK", h: { ...etag("e40"), Link: "<https://hub.library.example/>; rel=\"hub\", <https://library.example/titles/hobbit/events>; rel=\"self\"" }, body: feedOld },
       { from: "reader", to: "hub", line: "GET /", h: HAL, note: "Optional: a WebSub subscriber skips this read." },
       { from: "hub", to: "reader", line: "200 OK", h: etag("h4"), body: hubRep },
@@ -941,9 +942,9 @@
         body: form("hub.mode=publish\n&hub.url=https%3A%2F%2Flibrary.example%2Ftitles%2Fhobbit%2Fevents"),
         note: "A ping, as most hubs take one; the Recommendation leaves how a publisher tells its hub open." },
       { from: "hub", to: "library", line: "204 No Content" },
-      { from: "hub", to: "library", line: "GET /titles/hobbit/events", h: { Accept: "application/json", ...ifNone("e40") } },
+      { from: "hub", to: "library", line: "GET /titles/hobbit/events", h: { ...HAL, ...ifNone("e40") } },
       { from: "library", to: "hub", line: "200 OK", h: etag("e41"), body: feedNew },
-      { from: "hub", to: "reader", line: "POST /websub/42", h: { "Content-Type": "application/json", Link: "<https://hub.library.example/>; rel=\"hub\", <https://library.example/titles/hobbit/events>; rel=\"self\"", "X-Hub-Signature": "sha256=3f1c9a…b07e" }, body: feedNew },
+      { from: "hub", to: "reader", line: "POST /websub/42", h: { "Content-Type": "application/hal+json", ...PROFILE, Link: "<https://hub.library.example/>; rel=\"hub\", <https://library.example/titles/hobbit/events>; rel=\"self\"", "X-Hub-Signature": "sha256=3f1c9a…b07e" }, body: feedNew },
       { from: "reader", to: "hub", line: "204 No Content" },
       { section: "What WebSub can't do: read the subscription" },
       { from: "reader", to: "hub", line: "GET /subscriptions/77", h: HAL },
