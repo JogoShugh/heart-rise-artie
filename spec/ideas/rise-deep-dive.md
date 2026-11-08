@@ -8,6 +8,9 @@ over a dynamic webhook and over AMQP, then narrows the dynamic webhook (the enve
 when to fail), places it beside RFC 7240's `respond-async`, and envisions RISE as an extension of the W3C's Linked
 Data Notifications, WebSub and ActivityPub rather than a parallel invention.
 
+**Mockup:** every variation below as messages with their headers and JSON, in `docs/reports/rise-flows/` (built from
+`flows.js` by `build.sh`).
+
 ## Where things stand
 
 - **SPEC §7** is on hold since 2026-10-09. It has a flat five-field envelope (`reply-to`, `callback-mode`,
