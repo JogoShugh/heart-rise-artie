@@ -14,7 +14,7 @@ trap 'rm -f "$page"' EXIT
 
 TITLE="RISE Minimal, End to End" \
 HEADING="The minimal RISE flow, every message in order" \
-LEDE="Envisioned, not built. Slice 1 of RISE, RESTful: a caller's reply, one job, progress, a signed outcome, then the refusals that follow. Each numbered step is one request and its response, headers and body. Act bodies are application/hal+json under the profile. The envelope rides in the request's _links. Keys, digests and times are made up." \
+LEDE="Envisioned, not built. Slice 1 of RISE, RESTful: a caller's reply, one job, progress, a signed outcome, then the refusals that follow. Each numbered step is one request and its response, headers and body. Act bodies are application/hal+json under the profile. The envelope is the request's own _links, with no _rise member. Keys, digests and times are made up." \
 awk -v base="$assets/report-base.css" -v jvcss="$assets/json-view.css" -v style="$here/page.css" \
     -v theme="$assets/theme-switch.js" -v jvjs="$assets/json-view.js" -v data="$here/minimal.js" -v pagejs="$here/page.js" '
   function emit(file,   line) { while ((getline line < file) > 0) print line; close(file) }

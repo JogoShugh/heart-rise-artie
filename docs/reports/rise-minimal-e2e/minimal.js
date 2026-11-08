@@ -1,7 +1,7 @@
 // RISE minimal, end to end, envisioned: every request and response, in order. Data only; page.js renders it.
 // Representations are HAL Schema Forms (SPEC §6.1). Act bodies are application/hal+json under the profile. The envelope
-// rides in the request's _links (SPEC §7.2 proposes a _rise member instead; the author decides). Keys, digests, times and
-// identities are made up.
+// is the request's own _links, with hr: relations. There is no _rise member: underscore names belong to the format only.
+// Keys, digests, times and identities are made up.
 (() => {
   const PROFILE = "https://w3id.org/heart-rise/hal-schema-forms";
   const PROFILE_LINK = `Link: <${PROFILE}>; rel="profile"`;
@@ -214,7 +214,7 @@
         { t: "If-Match is the entry's tag from step 3. A stale tag gets 412.", r: ["R7"] },
         { t: "Target stores Caller's links and links them back on the job. Both sides use the same pattern.", r: ["R14"] },
         { t: "Caller's key is passed, not read. Signing uses only Target's key in slice 1 (decision 2).", r: [] },
-        { t: "Envelope placement is open: this report puts it in _links; SPEC §7.2 proposes a _rise member (decision 3).", r: [] },
+        { t: "No wrapper. The envelope is the request's own _links, and modules is a plain property the schema declares (decision 3).", r: ["R14"] },
       ],
     },
     {
@@ -344,7 +344,7 @@
   const OPEN = [
     "Decision 1, act body media type: application/hal+json (option B). Decided.",
     "Decision 2, encryption: carry Caller's key unused in slice 1, or add JWE (RFC 7516) now. The author decides.",
-    "Decision 3, envelope placement: _links in the request (this report) or a _rise body member (SPEC §7.2). The author decides.",
+    "Decision 3, envelope placement: decided, no _rise member. The envelope is top-level _links with hr: relations. modules is a plain property the act's schema declares. SPEC §7.2 needs rewriting to match.",
     "Decision 4, relation names hr:progress, hr:outcome, hr:reply-to, hr:keys. Not yet checked against the IANA registry.",
     "Decision 5, where a job declares its result shape. Proposed: on the job form.",
   ];
