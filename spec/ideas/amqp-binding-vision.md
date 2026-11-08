@@ -245,4 +245,29 @@ document chose. The script never says AMQP, CoAP or HTTP, before or after.
   whether an act happened. Reads are safe to repeat. Acts need either a read before retrying,
   which the validator makes safe (a repeat is refused as stale if the first one happened), or
   an idempotency key.
-- **Which AMQP.** 1.0 (OASIS) throughout; 0-9-1 brokers aren't covered.
+- **Which AMQP.** 1.0 (OASIS) throughout. 0-9-1, the protocol RabbitMQ 3.13 speaks natively, is mapped in the
+  section below.
+
+## AMQP 0-9-1 on RabbitMQ 3.13
+
+0-9-1 has no `to`, `subject` or `application-properties`. Its message carries the basic properties (`reply_to`,
+`correlation_id`, `message_id`, `type`, `content_type`, `user_id`, `expiration`) and a free `headers` table. The
+binding puts what 1.0 keeps in `subject`, `to` and `application-properties` into `headers`, under the same names:
+
+| Concept | 0-9-1 |
+|---|---|
+| Method | `heart-method` header |
+| Target | `heart-target` header, the full resource URI |
+| Status, in the answer | `heart-status` header, the number, as in 1.0 |
+| Validator | `if-match` header, the ETag whole |
+| Reply | `reply_to`: an exclusive reply queue, or `amq.rabbitmq.reply-to` (RabbitMQ's direct reply-to) |
+| Correlation | `correlation_id` = the request's `message_id` |
+| Expiry | `expiration` is relative, in milliseconds, as a string. An absolute time goes in a `heart-expires` header, which the consumer checks. |
+| Identity | `user_id`; RabbitMQ refuses a message whose `user_id` isn't the connection's user |
+
+Notes:
+- With `amq.rabbitmq.reply-to`, the reply consumer must be on the channel that published the request. Test it
+  with Testcontainers, not from memory.
+- A redelivered request sets `redelivered`. An act repeated this way gets 412 at its second run, because
+  `if-match` no longer matches. Reads repeat freely.
+- Header names are lower case and exact. HEART does not type header values; numbers travel as decimal strings.
