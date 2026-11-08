@@ -15,19 +15,41 @@
   // Numbers: one per step, in order.
   const numbered = W.STEPS.map((s, i) => ({ ...s, n: String(i + 1) }));
 
-  // ---- The sequence, drawn from the same exchanges: sender on the left, receiver on the right.
+  // ---- The sequence, drawn as lanes: the caller on the left, the target on the right. Each message is a row.
+  // A request's arrow runs from its sender's lane to its receiver's; the response runs back, dashed.
+  const lane = (s, text, from, to, response) => {
+    const row = el("div", `lane-row${response ? " res" : ""}`);
+    const num = el("a", "lane-n", s.n);
+    num.href = `#${s.id}`;
+    const track = el("div", "lane-track");
+    if (from === to) {
+      track.append(el("span", `lane-label self-${from === "Caller" ? "left" : "right"}`, text));
+    } else {
+      track.append(el("span", "lane-label", text));
+      const arrow = el("span", `arrow dir-${from === "Caller" ? "right" : "left"}`);
+      track.append(arrow);
+    }
+    row.append(num, track);
+    return row;
+  };
+
   const diagram = () => {
     const sec = el("section", "block");
     sec.append(el("h2", null, "Sequence"));
-    const lines = [];
+    const grid = el("div", "lanes");
+    const head = el("div", "lane-row lane-head");
+    const names = el("div", "lane-names");
+    names.append(el("span", null, "Caller"), el("span", null, "Target"));
+    head.append(el("span", "lane-n"), names);
+    grid.append(head);
     numbered.forEach((s) => {
       s.exchanges.forEach((x) => {
-        lines.push(`${s.n.padEnd(4)}${x.from} --- ${x.line} --> ${x.to}`);
-        lines.push(`${"".padEnd(4)}${x.to} --- ${x.res.line} --> ${x.from}`);
+        grid.append(lane(s, x.line, x.from, x.to, false));
+        grid.append(lane(s, x.res.line, x.to, x.from, true));
       });
     });
-    sec.append(el("pre", "seq", lines.join("\n")));
-    sec.append(el("p", "note", "Each numbered pair is one request, then its response. Read the pairs in order."));
+    sec.append(grid);
+    sec.append(el("p", "note", "Solid arrow: request. Dashed arrow: response. Each number links to its step below."));
     return sec;
   };
 
