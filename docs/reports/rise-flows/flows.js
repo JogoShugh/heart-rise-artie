@@ -1101,8 +1101,26 @@
     },
   };
 
+  // Each flow in plain English: a headline and a few short sentences, no jargon.
+  const PLAIN = {
+    webhook: ["Leave your number", "You ask the library to call you when your book can be renewed, and you hand them a card that says exactly where to call. When it's ready, they check the card still works, then call once. You renew. Done."],
+    again: ["No double calls", "If the library forgets it already called and calls again, your line says \"already answered\" and they hang up. Only one answer ever gets in, no matter how many times anyone tries."],
+    mapping: ["Learn the form once", "Your card says how you want the answer written. The first time, the library's helper works out how to fill it in, and a librarian signs off. After that, they fill it in the same way every time. No thinking, no cost."],
+    fail: ["Say no only when sure", "If the library knows for sure it can't do it, it says no on the spot. If it can't know yet, it says yes, and if it goes wrong later, it tells you exactly why."],
+    poll: ["Keep checking", "No card this time. The library gives you a ticket, and you keep asking \"is it ready?\" Each time, they hold the line a minute in case it happens while you wait."],
+    async: ["Take a number", "For a slow job, like bringing a book over from another branch, the library says \"we're on it\" and gives you a ticket to check. You can call it off until the book is on the van."],
+    amqp: ["Same call, by courier", "Same as leaving your number, but the messages go by courier instead of a direct line. Same checks, same single answer."],
+    subscribe: ["Sign up for alerts", "A book club signs itself up to hear when a copy is back. The library checks the club's mailbox is real, sends a short \"it's back\" note each time, waits when the club says pause, and stops when the sign-up runs out."],
+    broker: ["Tune in to the station", "The library broadcasts on a channel it tells everyone about. The club tunes in by itself. The library never knows who's listening."],
+    queues: ["A mailbox of your own", "The club signs up, and the library opens a mailbox just for the club at the post office and hands over the key. Cancel, and the box is closed."],
+    feed: ["Read the notice board", "The library keeps a board of what changed, newest first. Anyone can look. Nobody signs up."],
+    websub: ["The alert service everyone already uses", "Lots of websites already use one standard alert service. The library runs one that works the usual way, and adds a page where you can see your sign-up and pause it."],
+    ldn: ["A mailbox anyone can find", "Every answer card is also a mailbox that older systems know how to drop notes in. A note is just a note: only the proper form counts as the answer."],
+    activitypub: ["Follow it like an account", "The book is an account you can follow from apps like Mastodon. A librarian approves you, and you get a post each time a copy comes back."],
+  };
+
   window.RISE = {
-    LANES, FLOWS, OVERVIEW, STATES, RELATIONS,
+    LANES, FLOWS, OVERVIEW, STATES, RELATIONS, PLAIN,
     PIECES: [
       { title: "The envelope's schema", text: "Every act that takes _rise refers to it by $ref, with hr:integrity, so the form itself says the act can answer later.", doc: ENVELOPE_SCHEMA },
       { title: "A thin hint", text: "What a subscriber's inbox receives: CloudEvents' own attributes, with the resource's version after the change as an etag extension.", doc: hint("evt-90211", T(15, 2, 44, 8), "t10") },

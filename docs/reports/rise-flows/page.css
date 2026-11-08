@@ -92,3 +92,21 @@ pre.lines b.st { color: var(--c); }
 .msg-sec { scroll-margin-top: 16px; padding-top: 8px; }
 .piece-lead { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
 .flow h3 { margin-top: 6px; }
+
+/* In plain English: a row per flow, its name then a few sentences; stacked on a phone. */
+.plain { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.plain > .lede { color: var(--muted); }
+.plain h4 { margin-top: 6px; }
+.rows { display: grid; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; min-width: 0; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr); gap: 18px; padding: 12px 14px;
+  border-top: 1px solid var(--rule); }
+.row-head { border-top: 0; padding-block: 8px; font: 500 11.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.row-flow { display: grid; gap: 3px; align-content: start; color: var(--ink); text-decoration: none; }
+.row-flow:hover b { color: var(--accent); text-decoration: underline; }
+.card-flow { font: 500 11.5px var(--mono); color: var(--accent); }
+.row-flow b { font: 600 17px/1.25 var(--display); }
+.plain-text { font-size: 14.5px; color: var(--ink); }
+@media (max-width: 720px) {
+  .row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .row-head { display: none; }
+}

@@ -198,6 +198,24 @@ pre.lines b.st { color: var(--c); }
 .msg-sec { scroll-margin-top: 16px; padding-top: 8px; }
 .piece-lead { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
 .flow h3 { margin-top: 6px; }
+
+/* In plain English: a row per flow, its name then a few sentences; stacked on a phone. */
+.plain { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.plain > .lede { color: var(--muted); }
+.plain h4 { margin-top: 6px; }
+.rows { display: grid; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; min-width: 0; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr); gap: 18px; padding: 12px 14px;
+  border-top: 1px solid var(--rule); }
+.row-head { border-top: 0; padding-block: 8px; font: 500 11.5px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.row-flow { display: grid; gap: 3px; align-content: start; color: var(--ink); text-decoration: none; }
+.row-flow:hover b { color: var(--accent); text-decoration: underline; }
+.card-flow { font: 500 11.5px var(--mono); color: var(--accent); }
+.row-flow b { font: 600 17px/1.25 var(--display); }
+.plain-text { font-size: 14.5px; color: var(--ink); }
+@media (max-width: 720px) {
+  .row { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .row-head { display: none; }
+}
 </style>
 <div class="wrap">
   <div class="top"><div>
@@ -1489,8 +1507,26 @@ pre.lines b.st { color: var(--c); }
     },
   };
 
+  // Each flow in plain English: a headline and a few short sentences, no jargon.
+  const PLAIN = {
+    webhook: ["Leave your number", "You ask the library to call you when your book can be renewed, and you hand them a card that says exactly where to call. When it's ready, they check the card still works, then call once. You renew. Done."],
+    again: ["No double calls", "If the library forgets it already called and calls again, your line says \"already answered\" and they hang up. Only one answer ever gets in, no matter how many times anyone tries."],
+    mapping: ["Learn the form once", "Your card says how you want the answer written. The first time, the library's helper works out how to fill it in, and a librarian signs off. After that, they fill it in the same way every time. No thinking, no cost."],
+    fail: ["Say no only when sure", "If the library knows for sure it can't do it, it says no on the spot. If it can't know yet, it says yes, and if it goes wrong later, it tells you exactly why."],
+    poll: ["Keep checking", "No card this time. The library gives you a ticket, and you keep asking \"is it ready?\" Each time, they hold the line a minute in case it happens while you wait."],
+    async: ["Take a number", "For a slow job, like bringing a book over from another branch, the library says \"we're on it\" and gives you a ticket to check. You can call it off until the book is on the van."],
+    amqp: ["Same call, by courier", "Same as leaving your number, but the messages go by courier instead of a direct line. Same checks, same single answer."],
+    subscribe: ["Sign up for alerts", "A book club signs itself up to hear when a copy is back. The library checks the club's mailbox is real, sends a short \"it's back\" note each time, waits when the club says pause, and stops when the sign-up runs out."],
+    broker: ["Tune in to the station", "The library broadcasts on a channel it tells everyone about. The club tunes in by itself. The library never knows who's listening."],
+    queues: ["A mailbox of your own", "The club signs up, and the library opens a mailbox just for the club at the post office and hands over the key. Cancel, and the box is closed."],
+    feed: ["Read the notice board", "The library keeps a board of what changed, newest first. Anyone can look. Nobody signs up."],
+    websub: ["The alert service everyone already uses", "Lots of websites already use one standard alert service. The library runs one that works the usual way, and adds a page where you can see your sign-up and pause it."],
+    ldn: ["A mailbox anyone can find", "Every answer card is also a mailbox that older systems know how to drop notes in. A note is just a note: only the proper form counts as the answer."],
+    activitypub: ["Follow it like an account", "The book is an account you can follow from apps like Mastodon. A librarian approves you, and you get a post each time a copy comes back."],
+  };
+
   window.RISE = {
-    LANES, FLOWS, OVERVIEW, STATES, RELATIONS,
+    LANES, FLOWS, OVERVIEW, STATES, RELATIONS, PLAIN,
     PIECES: [
       { title: "The envelope's schema", text: "Every act that takes _rise refers to it by $ref, with hr:integrity, so the form itself says the act can answer later.", doc: ENVELOPE_SCHEMA },
       { title: "A thin hint", text: "What a subscriber's inbox receives: CloudEvents' own attributes, with the resource's version after the change as an etag extension.", doc: hint("evt-90211", T(15, 2, 44, 8), "t10") },
@@ -1502,7 +1538,7 @@ pre.lines b.st { color: var(--c); }
 // Draws window.RISE (flows.js): the overview, a chip per flow, and the chosen flow as a lane diagram above its
 // messages, each with its lines and its body in the shared JSON viewer (json-view.js).
 (() => {
-  const { LANES, FLOWS, OVERVIEW, STATES, RELATIONS, PIECES } = window.RISE;
+  const { LANES, FLOWS, OVERVIEW, STATES, RELATIONS, PIECES, PLAIN } = window.RISE;
   const byId = Object.fromEntries(FLOWS.map((f) => [f.id, f]));
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
@@ -1561,6 +1597,34 @@ pre.lines b.st { color: var(--c); }
     table.append(body);
     wrap.append(table);
     return wrap;
+  };
+
+  // ---- Each flow in plain English, a row each, grouped as the flows are.
+  const plain = () => {
+    const section = el("section", "plain");
+    section.append(el("h2", null, "In plain English"),
+      el("p", "lede", "Every variation in a few short sentences, no jargon: a library, a book, and people who want to know when something happens."));
+    let group = "", rows;
+    FLOWS.forEach((flow) => {
+      if (flow.alias || !PLAIN[flow.id]) return;
+      if (flow.group !== group) {
+        group = flow.group;
+        section.append(el("h4", null, group));
+        rows = el("div", "rows");
+        const head = el("div", "row row-head");
+        ["Variation", "Plain English"].forEach((h) => head.append(el("span", null, h)));
+        rows.append(head);
+        section.append(rows);
+      }
+      const [headline, text] = PLAIN[flow.id];
+      const row = el("div", "row");
+      const name = el("a", "row-flow");
+      name.href = `#${flow.id}`;
+      name.append(el("span", "card-flow", flow.short), el("b", null, headline));
+      row.append(name, el("p", "plain-text", text));
+      rows.append(row);
+    });
+    return section;
   };
 
   // ---- The chips: one per flow, grouped, and the shared pieces.
@@ -1775,7 +1839,7 @@ pre.lines b.st { color: var(--c); }
 
   // ---- Routing by bare #token.
   const host = document.getElementById("rise");
-  host.append(el("h2", "over-h", "Every variation at a glance"), overview());
+  host.append(plain(), el("h2", "over-h", "Every variation at a glance"), overview());
   const nav = chips();
   host.append(nav);
   const slot = el("div", "slot");

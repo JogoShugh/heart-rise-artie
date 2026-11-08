@@ -1,7 +1,7 @@
 // Draws window.RISE (flows.js): the overview, a chip per flow, and the chosen flow as a lane diagram above its
 // messages, each with its lines and its body in the shared JSON viewer (json-view.js).
 (() => {
-  const { LANES, FLOWS, OVERVIEW, STATES, RELATIONS, PIECES } = window.RISE;
+  const { LANES, FLOWS, OVERVIEW, STATES, RELATIONS, PIECES, PLAIN } = window.RISE;
   const byId = Object.fromEntries(FLOWS.map((f) => [f.id, f]));
   const el = (tag, cls, text) => {
     const node = document.createElement(tag);
@@ -60,6 +60,34 @@
     table.append(body);
     wrap.append(table);
     return wrap;
+  };
+
+  // ---- Each flow in plain English, a row each, grouped as the flows are.
+  const plain = () => {
+    const section = el("section", "plain");
+    section.append(el("h2", null, "In plain English"),
+      el("p", "lede", "Every variation in a few short sentences, no jargon: a library, a book, and people who want to know when something happens."));
+    let group = "", rows;
+    FLOWS.forEach((flow) => {
+      if (flow.alias || !PLAIN[flow.id]) return;
+      if (flow.group !== group) {
+        group = flow.group;
+        section.append(el("h4", null, group));
+        rows = el("div", "rows");
+        const head = el("div", "row row-head");
+        ["Variation", "Plain English"].forEach((h) => head.append(el("span", null, h)));
+        rows.append(head);
+        section.append(rows);
+      }
+      const [headline, text] = PLAIN[flow.id];
+      const row = el("div", "row");
+      const name = el("a", "row-flow");
+      name.href = `#${flow.id}`;
+      name.append(el("span", "card-flow", flow.short), el("b", null, headline));
+      row.append(name, el("p", "plain-text", text));
+      rows.append(row);
+    });
+    return section;
   };
 
   // ---- The chips: one per flow, grouped, and the shared pieces.
@@ -274,7 +302,7 @@
 
   // ---- Routing by bare #token.
   const host = document.getElementById("rise");
-  host.append(el("h2", "over-h", "Every variation at a glance"), overview());
+  host.append(plain(), el("h2", "over-h", "Every variation at a glance"), overview());
   const nav = chips();
   host.append(nav);
   const slot = el("div", "slot");
