@@ -290,7 +290,7 @@ For standard relations, the watch could also be offered on the reply as `monitor
 
 ### 5.3 Rules for the back-link
 
-- Supplied in the `inReplyTo` field of the first act. On later acts it MUST equal the recorded value. A different value is 409 with an `hr:unavailable` reason.
+- Supplied as `_links.hr:in-reply-to` in the first act. On later acts it MUST equal the recorded value. A different value is 409 with an `hr:unavailable` reason.
 - Accepted only on a correctly signed act. Unsigned or wrongly signed acts are already 401, as in steps 9 and 11.
 - Once recorded, it appears in the reply's `_links` as `hr:in-reply-to` in every state, including after completion.
 
