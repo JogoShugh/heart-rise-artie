@@ -342,20 +342,27 @@
     },
     {
       id: "m10",
-      title: "Target repeats the result, and is refused",
-      note: "A retry after a lost response. Refused by state, not applied twice.",
+      title: "Target repeats the result, after a lost response",
+      note: "The same result again changes nothing. A different result after answered is refused, because the outcome is final.",
       exchanges: [{
         from: "Target", to: "Caller",
         line: `PUT ${REPLY_URL}/actions/completed`,
         headers: [...REQ, IF_MATCH(REPLY3), DIGEST, SIG_INPUT, SIG],
         body: COMPLETED_BODY,
-        bodyLabel: "Request body: the result again",
+        bodyLabel: "Request body: the same result again",
+        res: { line: "200 OK", headers: ACT(REPLY3), body: REPLY_ANSWERED },
+      }, {
+        from: "Target", to: "Caller",
+        line: `PUT ${REPLY_URL}/actions/completed`,
+        headers: [...REQ, IF_MATCH(REPLY3), DIGEST, SIG_INPUT, SIG],
+        body: { result: { href: "https://target.example/images/cover-900.jpg" } },
+        bodyLabel: "Request body: a different result",
         res: { line: "409 Conflict", headers: PROBLEM, body: PROBLEM_REPLY },
       }],
       obs: [
-        { t: "Once answered, the form is gone. Its target answers 409, not a second send.", r: ["S1", "S2", "R9"] },
-        { t: "The same method as the first send. PUT is idempotent (RFC 9110), so the method makes the repeat safe. The state rule still refuses it.", r: [] },
-        { t: "Whether an identical repeat is replayed as 200 or refused as 409 is decision 8. This report shows the refusal.", r: [] },
+        { t: "Same result: 200, and the state does not change. PUT is idempotent (RFC 9110), so the repeat is safe by method.", r: ["S1"] },
+        { t: "Different result: 409. The outcome is final, and the reply offers no form to send it again.", r: ["S1", "S2", "R9"] },
+        { t: "A replay needs a small record of what was accepted. The record is the open part of decision 8.", r: [] },
       ],
     },
     {
@@ -439,7 +446,7 @@
     "Decision 4, relation names hr:progress, hr:completed, hr:failed, hr:reply-to, hr:keys. Not yet checked against the IANA registry.",
     "Decision 5, where a job declares its result shape: decided. On the job form.",
     "Decision 6, outcome: decided. Split into hr:completed and hr:failed, each a form offered only while awaiting, instead of one hr:outcome with an outcome field. The failure body is application/problem+json. Relations, not keys.",
-    "Decision 8, methods: progress, completed and failed are PUT, because PUT is idempotent (RFC 9110). The job is POST, since it creates a job. Open: whether an identical repeat is replayed as 200 or refused as 409. See spec/ideas/replay-guards-lenient-strict.md.",
+    "Decision 8, methods and repeats: decided. Progress, completed and failed are PUT, because PUT is idempotent (RFC 9110). The job is POST, since it creates a job. An identical repeat is replayed as 200 with no change. A different result after answered is 409. The replay needs a small record of what was accepted; see spec/ideas/replay-guards-lenient-strict.md.",
     "Decision 7, answers by type: decided. A reader trusts the Content-Type of an answer, never what it asked for. A sender reads the status first, and parses a body only when it knows the type.",
   ];
 
