@@ -433,12 +433,12 @@
 
   const OPEN = [
     "Decision 1, act body media type: application/hal+json (option B). Decided.",
-    "Decision 2, encryption: carry Caller's key unused in slice 1, or add JWE (RFC 7516) now. The author decides.",
+    "Decision 2, encryption: decided. Caller's key is carried unused in slice 1. Encryption (JWE, RFC 7516) comes in the next phase.",
     "Decision 3, envelope placement: decided, no _rise member. The envelope is top-level _links with hr: relations. modules is a plain property the act's schema declares. SPEC §7.2 needs rewriting to match.",
     "Decision 4, relation names hr:progress, hr:completed, hr:failed, hr:reply-to, hr:keys. Not yet checked against the IANA registry.",
-    "Decision 5, where a job declares its result shape. Proposed: on the job form.",
+    "Decision 5, where a job declares its result shape: decided. On the job form.",
     "Decision 6, outcome: decided. Split into hr:completed and hr:failed, each a form offered only while awaiting, instead of one hr:outcome with an outcome field. The failure body is application/problem+json. Relations, not keys.",
-    "Decision 7, answers by type: proposed. A reader trusts the Content-Type of an answer, never what it asked for. A sender reads the status first, and parses a body only when it knows the type. The author decides.",
+    "Decision 7, answers by type: decided. A reader trusts the Content-Type of an answer, never what it asked for. A sender reads the status first, and parses a body only when it knows the type.",
   ];
 
   const OUT_OF_SLICE = [
