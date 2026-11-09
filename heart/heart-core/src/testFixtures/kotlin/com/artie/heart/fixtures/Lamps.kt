@@ -18,7 +18,15 @@ import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 
 /** A lamp: the smallest resource type with an act that needs a body and acts that do not. */
-data class Lamp(val id: Long, val status: String, val brightness: Int, val version: Int)
+data class Lamp(
+    val id: Long,
+    val status: String,
+    val brightness: Int,
+    val version: Int,
+    /** The last act that took effect on this lamp, and its body: what a repeat of it is checked against. */
+    val lastAct: String? = null,
+    val lastBody: String? = null,
+)
 
 /** A lamp as its body reads, for the schema of its state: every field always there. */
 @Schema(title = "Lamp")
@@ -124,6 +132,10 @@ object Lamps {
             keyField = "status",
         ),
         bookmarkActs = listOf(Act.of("installLamp", "install-lamp", InstallLamp::class.java)),
+        // The same switch-on again, with the body it took effect with, is a replay: answered, not refused.
+        replays = { lamp, act, body ->
+            act == "switchOn" && lamp.status == "ON" && body != null && lamp.lastAct == act && lamp.lastBody == body
+        },
         finding = Finding(
             noun = "lamp",
             search = Named("searchLamps", "search-lamps"),

@@ -25,4 +25,10 @@ class LampWorld {
     fun lampIs(id: Long, status: String, version: Int) {
         lamps[id] = Lamp(id, status, brightness = 50, version = version)
     }
+
+    /** The act that took effect on the lamp last: a switch-on with [body], as an earlier request made it. */
+    @Given("lamp {long} was switched on with the body {string}")
+    fun lampSwitchedOn(id: Long, body: String) {
+        lamps[id] = lamps.getValue(id).copy(lastAct = "switchOn", lastBody = body)
+    }
 }

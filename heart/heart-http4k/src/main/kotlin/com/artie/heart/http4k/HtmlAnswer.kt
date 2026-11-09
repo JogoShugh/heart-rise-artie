@@ -50,10 +50,11 @@ internal class HtmlAnswer<S, K>(
      */
     fun act(act: Act, request: Request, locate: suspend () -> S): Response {
         val done = runBlocking {
-            val checked = pipeline.check(act.name, request.header(IF_MATCH), locate) { current, held ->
+            val sent = input(act, request)
+            val checked = pipeline.check(act.name, request.header(IF_MATCH), locate, sent) { current, held ->
                 StateETag.matches(held, etag(current))
             }
-            pipeline.run(act.name, input(act, request), checked) { input -> resource.perform(checked, act.name, input) }
+            pipeline.run(act.name, sent, checked) { input -> resource.perform(checked, act.name, input) }
         }
         val title = layers.type.profile.relation(act.relation).title
         val answered = done.headers.entries.fold(Response(Status.OK)) { r, (name, value) -> r.header(name, value) }

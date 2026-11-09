@@ -46,7 +46,9 @@ class ActSteps(private val world: LampWorld) {
         }
         outcome = runCatching {
             runBlocking {
-                pipeline.check(act, sent, { world.lamps.getValue(id) }) { lamp, v -> v == "v${lamp.version}" }
+                pipeline.check(act, sent, { world.lamps.getValue(id) }, body = body) { lamp, v ->
+                    v == "v${lamp.version}"
+                }
                 pipeline.run(act, body) { input ->
                     if (concurrentWriter) throw ConcurrentWriteException("lamp $id was written first")
                     val lamp = world.lamps.getValue(id)
@@ -54,7 +56,7 @@ class ActSteps(private val world: LampWorld) {
                         "dim" -> lamp.copy(brightness = checkNotNull(input.bind(Dim::class.java).brightness))
                         "switchOff" -> lamp.copy(status = "OFF")
                         else -> lamp.copy(status = "ON")
-                    }.let { it.copy(version = it.version + 1) }
+                    }.let { it.copy(version = it.version + 1, lastAct = act, lastBody = body) }
                 }
             }
         }
@@ -124,8 +126,11 @@ class ActSteps(private val world: LampWorld) {
     }
 
     @Then("lamp {long} is {string} with brightness {int} at version {int}")
-    fun lampIs(id: Long, status: String, brightness: Int, version: Int) =
-        assertEquals(Lamp(id, status, brightness, version), world.lamps.getValue(id))
+    fun lampIs(id: Long, status: String, brightness: Int, version: Int) {
+        // The lamp's record of its last act is not part of what the scenarios describe; the state is.
+        val state = world.lamps.getValue(id).copy(lastAct = null, lastBody = null)
+        assertEquals(Lamp(id, status, brightness, version), state)
+    }
 
     private inline fun <reified T : Throwable> refusedAs(): T {
         val failure = checkNotNull(outcome).exceptionOrNull()

@@ -149,10 +149,10 @@ class HeartResourceHandler<S, K>(
         val rung = limits.rung(dialect, request)
         val variables = variables(request)
         val ifMatch = request.headers().firstHeader(HttpHeaders.IF_MATCH)
-        val checked = pipeline.check(act.name, ifMatch, { resource.locate(variables) }) { current, held ->
+        val body = input(act, request)
+        val checked = pipeline.check(act.name, ifMatch, { resource.locate(variables) }, body) { current, held ->
             StateETag.matches(held, Rendered(current, dialect, rung).etag)
         }
-        val body = input(act, request)
         // The act is performed on the state whose ETag matched, so a write since is stale (SPEC §6.2).
         val done = pipeline.run(act.name, body, checked) { input -> resource.perform(checked, act.name, input) }
         return Rendered(done.state, dialect, rung).respond(
