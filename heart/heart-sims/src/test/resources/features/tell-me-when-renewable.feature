@@ -14,3 +14,13 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
     When Ana asks to be told when loan 3310 can be renewed, with reply r-7f3 and her key
     Then the library answers 201 with a watch that is awaiting
     And the library's entry offers the request, with its reply and key as links
+
+  Scenario Outline: The library reports progress while the hold is in line
+    When the library reports progress of <percent> percent on reply r-7f3, with the note "<note>"
+    Then reply r-7f3 is awaiting at <percent> percent
+    And reply r-7f3 offers progress, completed and failed
+
+    Examples:
+      | percent | note                             |
+      | 0       | one ahead in the hold queue      |
+      | 50      | the hold is with the next reader |

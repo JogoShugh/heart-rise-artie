@@ -287,16 +287,14 @@ class LibrarySteps {
 
     // Ana's request to be told when a loan can be renewed (tell-me-when-renewable.feature). Phase 1: the request, its
     // watch, and the entry's form. The reply resource and the library's answers come in later phases.
-    private val repliesAwaiting = mutableSetOf<String>()
+    private val caller = CallerService()
 
     @Given("Ana's reply {word} is awaiting")
-    fun replyAwaiting(reply: String) {
-        repliesAwaiting += reply
-    }
+    fun replyAwaiting(reply: String) = caller.open(reply)
 
     @When("Ana asks to be told when loan {long} can be renewed, with reply {word} and her key")
     fun asksToBeTold(loan: Long, reply: String) {
-        assertTrue(reply in repliesAwaiting, "no awaiting reply $reply")
+        assertTrue(caller.has(reply), "no awaiting reply $reply")
         val read = send(Method.GET, "/", ACCEPT.getValue(HSF))
         val entry = mapper.readTree(read.bodyString())
         val form = checkNotNull(entry["_forms"]?.get("library:tell-me-when-renewable")) { "no entry form: $entry" }
@@ -328,6 +326,36 @@ class LibrarySteps {
         assertEquals("awaiting", watch["standing"].asText(), watch.toString())
     }
 
+    /** The library's own Bearer token at Ana's replies, and what it sends a reply. */
+    @When("the library reports progress of {int} percent on reply {word}, with the note {string}")
+    fun libraryReportsProgress(percent: Int, reply: String, note: String) {
+        val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
+        val form = mapper.readTree(read.bodyString())["_forms"]["hr:progress"]
+        val target = java.net.URI(form["_links"]["target"]["href"].asText()).path
+        answer = caller.handler(
+            request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
+                .header("If-Match", read.header("ETag"))
+                .header("Content-Type", "application/hal+json")
+                .body(mapper.writeValueAsString(mapOf("percent" to percent, "note" to note))),
+        )
+    }
+
+    @Then("reply {word} is awaiting at {int} percent")
+    fun replyAwaitingAt(reply: String, percent: Int) {
+        val now = mapper.readTree(replyBody(reply))
+        assertEquals("awaiting", now["state"].asText(), now.toString())
+        assertEquals(percent, now["percent"].asInt(), now.toString())
+    }
+
+    @Then("reply {word} offers progress, completed and failed")
+    fun replyOffers(reply: String) {
+        val forms = mapper.readTree(replyBody(reply))["_forms"]
+        assertTrue(listOf("hr:progress", "hr:completed", "hr:failed").all { forms.has(it) }, forms.toString())
+    }
+
+    private fun replyBody(reply: String): String =
+        caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH)).bodyString()
+
     @Then("the library's entry offers the request, with its reply and key as links")
     fun entryOffersRequest() {
         val entry = mapper.readTree(send(Method.GET, "/", ACCEPT.getValue(HSF)).bodyString())
@@ -344,6 +372,9 @@ class LibrarySteps {
 
         /** An agent's credential: the library's Bearer token, not a member's card. */
         const val AGENT = "Bearer ${HeartLibrary.TOKEN}"
+
+        /** The library's credential at Ana's replies. */
+        const val REPLY_AUTH = "Bearer ${CallerService.LIBRARY_TOKEN}"
 
         /** The affordance link of a plain JSON answer (SPEC §6.1): the set its state offers. */
         val FORMS_LINK = Regex("<([^>]+)>;\\s*rel=\"https://w3id.org/heart-rise/rels/forms\"")
