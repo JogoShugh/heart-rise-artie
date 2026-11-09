@@ -6,9 +6,75 @@ Source material:
 - SPEC.md §6–7 and §13.
 - Roy Fielding, [REST APIs must be hypertext-driven](https://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven) (2008).
 
-Limits: the saved report holds only step summaries, not request or answer bodies. Statements about specific
-schemas (e.g. fields typed as bare `object`) come from discussion, not from reading the bodies. Each such
-statement should be checked against the implementation.
+Limits: a second save of the report includes every request body and the start of every answer body. Long
+answers are still cut short in the page ("⋯ 94 more lines"), so the `_forms` / `_schema` blocks were not
+captured. Statements about form schemas (e.g. fields typed as bare `object`) still come from discussion and
+should be checked against the implementation. §0 lists what the bodies confirm or correct.
+
+---
+
+## 0. What the request and answer bodies show
+
+**Already in place (good, and stronger than the first reading assumed):**
+
+- **Full URI handover.** The watch request carries the reply as a HAL link, not an id. The library's address
+  for Ana comes entirely from this link, so the rule 4 check in §2 is satisfied:
+  ```json
+  { "loan": 3310,
+    "_links": {
+      "hr:reply-to": { "href": "https://caller.example/replies/r-7f3",
+                       "type": "application/hal+json",
+                       "profile": "https://w3id.org/heart-rise/hal-schema-forms" },
+      "hr:keys":     { "href": "https://caller.example/keys",
+                       "type": "application/jwk-set+json" } } }
+  ```
+- **Keys by link.** `hr:keys` → a JWK Set. The verifying key is discovered through hypermedia, not configured.
+- **Conditional requests.** Every act sends `If-Match` with the ETag just read.
+- **Problem Details on 409.** The 409 body is RFC 9457 with a `type` URI under `https://w3id.org/heart-rise/problems/`
+  and a `rel` naming the refused relation.
+- **CURIEs exist.** `hr` → `/profiles/hr#{rel}` and `library` → `/profiles/library#{rel}`.
+- **Specific results.** The `hr:completed` request body has specific fields
+  (`{"result": {"loan": 3310, "renewableFrom": "2026-12-03"}}`). Whether the *form* declares them, or only
+  `object`, cannot be seen in the save.
+- **PUT for progress.** `hr:progress` is sent as PUT with `{percent, note}`. Each update replaces both, so the
+  nullable `note` defaulting to `null` (§2.2) is exactly what keeps an omitted note from surviving silently.
+- **Replay keeps its ETag.** The identical replay (step 15) returns the *same* ETag (`seq-4…`): no change is
+  recorded, which matches the rule proposed in §2.3.
+
+**New findings from the bodies:**
+
+1. **The `hr` CURIE is relative, so `hr:completed` names a different relation on every server.**
+   `/profiles/hr#{rel}` expands against whichever host serves the response. On `caller.example` it becomes
+   `https://caller.example/profiles/hr#completed`; on the library it becomes another URI. Under RFC 8288 those are
+   *two different relation types*. `hr` is the shared RISE vocabulary, so its CURIE must be absolute and the same
+   everywhere, for example `https://w3id.org/heart-rise/rels#{rel}`. You already use `w3id.org/heart-rise` for the
+   profile and the problem types. `library:` can stay server-local; it is the library's own domain vocabulary.
+   The 409's `"rel": "/profiles/hr#completed"` should then be the absolute URI too.
+2. **`If-Match` is sent to a different resource than the one its ETag came from.** The ETag is read from
+   `/replies/r-7f3`, but the act goes to `PUT /replies/r-7f3/actions/progress` with that ETag. RFC 9110 evaluates
+   `If-Match` against the *target* resource, here the action URI. Strictly, that is a private reading of a standard
+   header (rule 2). Two clean fixes:
+   - point the form at the reply itself, e.g. `PATCH /replies/r-7f3` with `application/merge-patch+json` for
+     progress. This is the PATCH change being made in the other session, and it makes `If-Match` correct for free;
+   - or state in the `hr` profile that an action resource shares its parent's validator. That works, but it is a
+     documented extension rather than plain HTTP.
+
+   The same applies to `POST /actions/tell-me-when-renewable` carrying the entry's ETag.
+3. **The 401 answers lack `WWW-Authenticate`.** RFC 9110 requires a 401 to carry `WWW-Authenticate`; the trace shows
+   none. Add a challenge, plus `Accept-Signature` (RFC 9421 §5.1) to say which signature is expected. Also give the
+   401 body a `type` URI like the 409's; today it has only `title` and `status`.
+4. **The failure body is half Problem Details.** `hr:failed` sends `{"title": "No hold record for loan 3310"}`.
+   Make it a full RFC 9457 object (`type`, `title`, `detail`) and say so in the `hr:failed` relation document.
+5. **No back-link yet.** The watch has 4 links (self, curies, presumably `hr:reply-to`, `hr:keys`). The reply has only
+   self and curies. The `hr:in-reply-to` proposal in §5 stands. The bodies show the natural way to send it: in the
+   callback body's `_links`, the same way Ana sent `hr:reply-to` (see §5.1).
+6. **The entry offers `service-desc` → `/openapi.json`.** That is a legitimate, registered relation. Per Fielding it
+   must stay *documentation*: if a client needs the OpenAPI file to act, that is the out-of-band coupling rule 3
+   warns against. Worth one sentence in the profile.
+7. **The trace shows relative addresses on Ana's side.** The library is handed
+   `https://caller.example/replies/r-7f3`, but the trace shows `GET /replies/r-7f3`. If the harness rewrites the
+   host, record the absolute URI in the trace, so the "Hypermedia" tile can prove the library used exactly the
+   address it was given.
 
 ---
 
@@ -171,7 +237,7 @@ This keeps the loose coupling you want: extra fields are allowed and ignored. Th
 
 | Form | Field | Required | Why |
 |---|---|---|---|
-| all three | `inReplyTo` (URI) | first act yes; then must match | Back-link to the recipient's work resource (§5). |
+| all three | `_links.hr:in-reply-to` (URI) | first act yes; then must match | Back-link to the recipient's work resource (§5). |
 | `hr:progress` | `percent` (0–100) | yes | Already present per the run. |
 | `hr:progress` | `message` | no (nullable) | Human/LLM-readable status. |
 | `hr:progress` | `expectedBy` (date-time) | no | Lets the originator decide when fallback (§7.6) should fire. |
@@ -192,7 +258,15 @@ Signatures and keys belong in headers (RFC 9421 `Signature` / `Signature-Input`)
 
 Today the link points one way. The library's watch knows Ana's reply (`reply-to`), but Ana's reply knows nothing about the watch. While Ana's reply sits waiting, nothing on it says *who is working on it* or *where to look*.
 
-Proposal: when the library first acts on the reply (its first `hr:progress`, or the terminal act if there is no progress), it submits its own work-resource URI. The reply then exposes it as a link:
+Proposal: when the library first acts on the reply (its first `hr:progress`, or the terminal act if there is no progress), it submits its own work-resource URI. It sends it the same way Ana sent `hr:reply-to`, as a HAL link in the body:
+
+```json
+{ "percent": 0, "note": null,
+  "_links": { "hr:in-reply-to": { "href": "https://library.example/watches/1",
+                                  "type": "application/hal+json" } } }
+```
+
+The reply then exposes it as a link:
 
 ```
 /watches/1  ──hr:reply-to──▶  /replies/r-7f3      (given by Ana when creating the watch)
@@ -242,7 +316,7 @@ Noted, not designed:
 1. **Write the relation documents** (§3.2) for `hr:reply-to`, `hr:progress`, `hr:completed`, `hr:failed`, `hr:unavailable`, `hr:in-reply-to`. Publish them at the CURIE address.
 2. **Add the `curies` link** to every HEART response and make the profile URI dereference to a profile document that lists the vocabulary.
 3. **Replace bare `object` schemas** on the reply's forms with originator-specific, open schemas (§4).
-4. **Add `inReplyTo`** to the three reply forms, and the `hr:in-reply-to` link to the reply (§5). Add run steps for:
+4. **Add `_links.hr:in-reply-to`** to the three reply forms, and the `hr:in-reply-to` link to the reply (§5). Add run steps for:
    - the back-link appearing after the first act;
    - a mismatched back-link being refused with 409.
 5. **Adopt RFC 9457 Problem Details** for `hr:failed` and for 4xx bodies.
@@ -252,4 +326,8 @@ Noted, not designed:
    - SPEC §7.5: replace the old vocabulary with the table in §3.3.
    - Write down the replay rule (§2.3).
 7. **Use the PUT → PATCH change as a conformance test** (§2.1): no client code change should be needed.
-8. **Confirm** that the reply is passed to the library as a full URI, not an id (rule 4 check in §2).
+8. ~~Confirm the reply is passed as a full URI.~~ Confirmed by the bodies (§0).
+9. **Make the `hr` CURIE absolute and identical on every server** (§0 finding 1).
+10. **Fix `If-Match` targeting** (§0 finding 2): preferably by pointing progress at the reply itself with PATCH.
+11. **Add `WWW-Authenticate` / `Accept-Signature` to 401s**, and `type` URIs to the 401 and `hr:failed` problem bodies
+    (§0 findings 3–4).
