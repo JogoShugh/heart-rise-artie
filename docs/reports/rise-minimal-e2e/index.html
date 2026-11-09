@@ -467,19 +467,19 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
   // The forms the reply offers while awaiting. Schemas shortened to the members that matter here.
   const OPEN_FORMS = {
     "hr:progress": {
-      method: "POST",
+      method: "PUT",
       _links: { target: { href: `${REPLY_URL}/actions/progress` } },
       contentType: "application/hal+json",
       schema: { required: ["percent"], properties: { percent: { type: "integer", minimum: 0, maximum: 100 }, note: { type: "string" } } },
     },
     "hr:completed": {
-      method: "POST",
+      method: "PUT",
       _links: { target: { href: `${REPLY_URL}/actions/completed` } },
       contentType: "application/hal+json",
       schema: { required: ["result"], properties: { result: { type: "object" } } },
     },
     "hr:failed": {
-      method: "POST",
+      method: "PUT",
       _links: { target: { href: `${REPLY_URL}/actions/failed` } },
       contentType: "application/problem+json",
       schema: {
@@ -666,7 +666,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       note: "Progress does not end the job. The reply stays awaiting.",
       exchanges: [{
         from: "Target", to: "Caller",
-        line: `POST ${REPLY_URL}/actions/progress`,
+        line: `PUT ${REPLY_URL}/actions/progress`,
         headers: [...REQ, IF_MATCH(REPLY1)],
         body: PROGRESS_BODY,
         bodyLabel: "Request body: progress",
@@ -699,7 +699,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       note: "The reply moves to answered. Its forms go. The form used is the outcome: hr:completed here, not a field.",
       exchanges: [{
         from: "Target", to: "Caller",
-        line: `POST ${REPLY_URL}/actions/completed`,
+        line: `PUT ${REPLY_URL}/actions/completed`,
         headers: [...REQ, IF_MATCH(REPLY2), DIGEST, SIG_INPUT, SIG],
         body: COMPLETED_BODY,
         bodyLabel: "Request body: the result",
@@ -739,7 +739,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       note: "A retry after a lost response. Refused by state, not applied twice.",
       exchanges: [{
         from: "Target", to: "Caller",
-        line: `POST ${REPLY_URL}/actions/completed`,
+        line: `PUT ${REPLY_URL}/actions/completed`,
         headers: [...REQ, IF_MATCH(REPLY3), DIGEST, SIG_INPUT, SIG],
         body: COMPLETED_BODY,
         bodyLabel: "Request body: the result again",
@@ -747,7 +747,8 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       }],
       obs: [
         { t: "Once answered, the form is gone. Its target answers 409, not a second send.", r: ["S1", "S2", "R9"] },
-        { t: "Convention, not a new standard: Target reads 409 on an answered reply with the same result as success.", r: [] },
+        { t: "The same method as the first send. PUT is idempotent (RFC 9110), so the method makes the repeat safe. The state rule still refuses it.", r: [] },
+        { t: "Whether an identical repeat is replayed as 200 or refused as 409 is decision 8. This report shows the refusal.", r: [] },
       ],
     },
     {
@@ -793,7 +794,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       note: "The form posts text, not JSON. heart-core types each field by the act's schema, then runs the usual checks. The refusal comes back as a box, with the same 409.",
       exchanges: [{
         from: "Caller", to: "Caller",
-        line: `POST ${REPLY_URL}/actions/completed`,
+        line: `PUT ${REPLY_URL}/actions/completed`,
         headers: ["Content-Type: application/x-www-form-urlencoded", "Accept: text/html", `If-Match: "${HTML_REPLY}"`, "HX-Request: true"],
         body: "result.href=https%3A%2F%2Ftarget.example%2Fimages%2Fcover-800.jpg",
         bodyLabel: "Form body: the same field, form-encoded",
@@ -801,7 +802,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       }],
       obs: [
         { t: "Refused by state, as the program's repeat was in step 10. Only the body differs: a box, not problem+json.", r: ["S1", "R9"] },
-        { t: "The program path stays JSON. Form encoding exists only for browsers.", r: ["R6"] },
+        { t: "htmx sends the PUT. A plain HTML form could send only GET or POST. The program path stays JSON.", r: ["R6"] },
       ],
     },
     {
@@ -810,7 +811,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       note: "An alternative to step 8. The caller's answer is HTML, not JSON. Target reads the status first, and parses the body only if it knows the type.",
       exchanges: [{
         from: "Target", to: "Caller",
-        line: `POST ${REPLY_URL}/actions/completed`,
+        line: `PUT ${REPLY_URL}/actions/completed`,
         headers: [...REQ, IF_MATCH(REPLY2), DIGEST, SIG_INPUT, SIG],
         body: COMPLETED_BODY,
         bodyLabel: "Request body: the result",
@@ -831,6 +832,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     "Decision 4, relation names hr:progress, hr:completed, hr:failed, hr:reply-to, hr:keys. Not yet checked against the IANA registry.",
     "Decision 5, where a job declares its result shape: decided. On the job form.",
     "Decision 6, outcome: decided. Split into hr:completed and hr:failed, each a form offered only while awaiting, instead of one hr:outcome with an outcome field. The failure body is application/problem+json. Relations, not keys.",
+    "Decision 8, methods: progress, completed and failed are PUT, because PUT is idempotent (RFC 9110). The job is POST, since it creates a job. Open: whether an identical repeat is replayed as 200 or refused as 409. See spec/ideas/replay-guards-lenient-strict.md.",
     "Decision 7, answers by type: decided. A reader trusts the Content-Type of an answer, never what it asked for. A sender reads the status first, and parses a body only when it knows the type.",
   ];
 
@@ -838,7 +840,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     "Held mode (H1): Target keeps the outcome and the reply links to it. Slice 1 sends it.",
     "History: progress and outcome events as a collection, linked as hr:history. Slice 1 keeps the latest state only.",
     "Job retry: job:retry on a failed job. A domain act on the job, not part of RISE.",
-    "Caller cancel: an act on the job, not on the reply.",
+    "Caller cancel: DELETE on the job, not an act on the reply.",
     "Input relation hr:input: Target asks Caller something. Same pattern, another relation on the reply.",
     "Encryption: JWE (RFC 7516) to Caller's key. Slice 1 carries the key and does not use it.",
     "Fetching a key a caller supplied. None in slice 1. When it arrives: https only, a short timeout, no private addresses.",
