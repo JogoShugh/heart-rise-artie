@@ -91,11 +91,13 @@ sandbox. They do not resolve yet; the plan is w3id redirects to GitHub Pages (se
     but answers carry plain `Content-Type: application/hal+json`, with no `Content-Profile`, no `profile`
     parameter and no `Link: rel="profile"`. SPEC §6.1 requires the profile on the media type. Self-descriptive
     messages mean the answer has to say what it is.
-11. **The entry's `hr:manifest` lists forms the entry does not offer.** `library:renew`, `library:return` and
-    `library:report-problem` have fingerprints in the manifest, but no form in `_forms` (9 forms, 12 manifest
-    entries). If the manifest is "what you may do now", it must match `_forms`. If it is "the vocabulary this server
-    knows", rename it and say so. Otherwise a client may reason over acts that are not offered, which is the thing
-    HEART exists to prevent.
+11. **The `hr:manifest` is a fingerprint index, not the offered forms, and that is by design.** It lists
+    fingerprints for every affordance, including `library:renew`, `library:return` and `library:report-problem`, which
+    are not offered at the entry. That is fine, as long as the profile says the manifest means "known affordances,
+    by fingerprint", not "what you may do now". What is missing is the hypermedia path from a fingerprint to its
+    schema. The service index should link to an affordance set resource (the L2 level), which in turn links to each
+    schema by its `$id`. Then a client with a registry miss *follows a link* to the schema instead of knowing where
+    schemas live.
 12. **Still no back-link, and the watch is a dead end.** The reply's links are `self`, `curies` and `hr:unavailable`.
     The watch offers no forms (`_forms: {}`) and links only to Ana's reply and keys. The `hr:in-reply-to` proposal
     in §5 stands, and finding 4 adds a second reason for it. A future compensating form (cancel the watch) would
@@ -344,6 +346,22 @@ Noted, not designed:
 
 ---
 
+## 7a. Short list: one line each on why it matters to Fielding
+
+1. **w3id → GitHub Pages redirects, plus a page for every `hr:` relation:** puts the descriptive effort into published relation definitions, which is rule 3.
+2. **One absolute `hr` CURIE in every response that uses it:** each relation then has one global name, the URI that RFC 8288 makes the real name.
+3. **Forms and client agree on content type:** the client does what the form says, which is rule 6's "every transition comes from the representation".
+4. **Name the result fields in Ana's `hr:completed` form:** the library learns what to send from the hypermedia, not from out-of-band knowledge.
+5. **Nullable `note`, and completion clears progress:** a PUT then means exactly what HTTP says, a full replacement, so nothing about the protocol is reinterpreted.
+6. **Keep the failure problem in the reply:** the resource's representation tells the whole truth about its state, so no side channel is needed.
+7. **Answers state their profile:** messages describe themselves, so a client never has to assume what it received.
+8. **Service index → affordance set (L2) → schemas by `$id`:** a registry miss is solved by following links, not by knowing where schemas live.
+9. **PATCH on the reply itself for progress:** `If-Match` and the method apply to the resource they name, so there is no private reading of standard HTTP (rule 2).
+10. **401 with `WWW-Authenticate` and `Accept-Signature`:** the server says how to authenticate, using standard headers, instead of the client knowing in advance.
+11. **Library publishes its own `hr:keys`:** the verifying key is found by following links, not arranged out of band.
+12. **`hr:in-reply-to` back-link:** each side holds the other's address only because it was handed over, which is rule 4, and it opens the path to keys and future compensation.
+13. **SPEC.md matches the run:** the written contract describes the real media type and vocabulary, the documentation Fielding says should carry the weight.
+
 ## 7. To-do list
 
 Ordered by how much each item matters for Fielding's rules. Each § reference is to the finding that explains it.
@@ -362,7 +380,7 @@ Ordered by how much each item matters for Fielding's rules. Each § reference is
    `/profiles/hr#{rel}`, add `hr` to the entry, and make the 409's `rel` absolute.
 4. **Say the profile in every answer** (§0 finding 10): `Content-Profile`, or a `profile` parameter on the
    media type, or `Link: rel="profile"`.
-5. **Make `hr:manifest` match `_forms`, or rename it** (§0 finding 11).
+5. **Link the service index to an affordance set that links to every schema by `$id`** (§0 finding 11).
 
 **Forms say what to send, and the client obeys (rules 3 and 6)**
 
