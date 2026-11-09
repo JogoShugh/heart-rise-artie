@@ -1,5 +1,7 @@
 package com.artie.heart.sims.library
 
+import com.artie.heart.Signatures
+import com.artie.heart.Signed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.datatable.DataTable
@@ -360,6 +362,7 @@ class LibrarySteps {
     private val formTargets = mutableMapOf<String, String>()
     private var lastResult: Map<String, Any?>? = null
     private var lastSigned: Signed? = null
+    private var lastSent: String? = null
     private var lastContentType: String? = null
     private var replyBeforeRepeat: String? = null
     private var noHoldRecorded: Long? = null
@@ -371,16 +374,16 @@ class LibrarySteps {
         val target = formTargets[relation] ?: java.net.URI(
             mapper.readTree(read.bodyString())["_forms"]["hr:$relation"]["_links"]["target"]["href"].asText(),
         ).path.also { formTargets[relation] = it }
-        val digest = Signatures.contentDigest(sent)
-        val signed = Signatures.sign("PUT", "https://caller.example$target", digest, ifMatch, SIGNED_AT)
+        val signed = LibraryKey.signer.sign("PUT", "https://caller.example$target", sent, ifMatch, SIGNED_AT)
         lastSigned = signed
+        lastSent = sent
         lastContentType = contentType
         answer = caller.handler(
             request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
                 .header("If-Match", ifMatch)
                 .header("Content-Type", contentType)
-                .header("Content-Digest", digest)
-                .header("Signature-Input", "sig1=${Signatures.params(SIGNED_AT)}")
+                .header("Content-Digest", signed.contentDigest)
+                .header("Signature-Input", "sig1=${signed.params}")
                 .header("Signature", "sig1=:${signed.signature}:")
                 .body(sent),
         )
@@ -429,7 +432,7 @@ class LibrarySteps {
     @Then("the result is signed with the library's key")
     fun resultSigned() {
         val signed = checkNotNull(lastSigned) { "no result was sent" }
-        assertTrue(Signatures.verify(signed, LibraryKey.pair.public), signed.toString())
+        assertTrue(Signatures.verify(signed, checkNotNull(lastSent), LibraryKey.pair.public), signed.toString())
     }
 
     @Then("reply {word} offers nothing more")
