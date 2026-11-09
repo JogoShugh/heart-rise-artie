@@ -456,13 +456,19 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       contentType: "application/hal+json",
       schema: { required: ["percent"], properties: { percent: { type: "integer", minimum: 0, maximum: 100 }, note: { type: "string" } } },
     },
-    "hr:outcome": {
+    "hr:completed": {
       method: "POST",
-      _links: { target: { href: `${REPLY_URL}/actions/outcome` } },
+      _links: { target: { href: `${REPLY_URL}/actions/completed` } },
       contentType: "application/hal+json",
+      schema: { required: ["result"], properties: { result: { type: "object" } } },
+    },
+    "hr:failed": {
+      method: "POST",
+      _links: { target: { href: `${REPLY_URL}/actions/failed` } },
+      contentType: "application/problem+json",
       schema: {
-        required: ["outcome"],
-        properties: { outcome: { enum: ["completed", "failed"] }, result: { type: "object" }, problem: { type: "object" } },
+        required: ["title"],
+        properties: { type: { type: "string", format: "uri" }, title: { type: "string" }, status: { type: "integer" }, detail: { type: "string" } },
       },
     },
   };
@@ -476,8 +482,6 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
   };
   const REPLY_ANSWERED = {
     state: "answered",
-    outcome: "completed",
-    result: { href: "https://target.example/images/cover-800.jpg" },
     _links: { ...CURIES, self: { href: REPLY_URL } },
     _forms: {},
   };
@@ -547,8 +551,8 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
   const KEYS_CALLER = { keys: [{ kty: "OKP", crv: "X25519", kid: "caller-2026-11", use: "enc", x: "…" }] };
   const KEYS_TARGET = { keys: [{ kty: "OKP", crv: "Ed25519", kid: "target-2026-11", use: "sig", x: "…" }] };
   const PROGRESS_BODY = { percent: 40, note: "3 of 8 resized" };
-  const OUTCOME_BODY = { outcome: "completed", result: { href: "https://target.example/images/cover-800.jpg" } };
-  const PROBLEM_REPLY = { title: "Not offered", status: 409, detail: "Reply r-7f3 is answered. hr:outcome is not offered." };
+  const COMPLETED_BODY = { result: { href: "https://target.example/images/cover-800.jpg" } };
+  const PROBLEM_REPLY = { title: "Not offered", status: 409, detail: "Reply r-7f3 is answered. hr:completed is not offered." };
   const PROBLEM_JOB = { title: "Not offered", status: 409, detail: "Reply r-7f3 already has job j-88." };
 
   const STEPS = [
@@ -565,7 +569,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       obs: [
         { t: "Creation answers 201 with Location. The reply is a resource with its own URI.", r: ["R1"] },
         { t: "State is a GET-able representation, so Target can read it before it sends.", r: ["R2"] },
-        { t: "Only the acts that fit the state are offered: progress and outcome, while awaiting.", r: ["R9"] },
+        { t: "Only the acts that fit the state are offered: progress, completed and failed, while awaiting.", r: ["R9"] },
       ],
     },
     {
@@ -636,7 +640,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
         res: { line: "200 OK", headers: READ(REPLY1), body: REPLY_AWAITING },
       }],
       obs: [
-        { t: "The reply is awaiting. Both acts are offered.", r: ["R9"] },
+        { t: "The reply is awaiting. Progress, completed and failed are offered.", r: ["R9"] },
         { t: "Reads carry no-cache and a strong ETag, so Target always sees the current state.", r: ["R12", "R7"] },
       ],
     },
@@ -675,20 +679,20 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     },
     {
       id: "m8",
-      title: "Target sends the outcome, signed",
-      note: "The reply moves to answered. Its forms go.",
+      title: "Target sends the result, signed",
+      note: "The reply moves to answered. Its forms go. The form used is the outcome: hr:completed here, not a field.",
       exchanges: [{
         from: "Target", to: "Caller",
-        line: `POST ${REPLY_URL}/actions/outcome`,
+        line: `POST ${REPLY_URL}/actions/completed`,
         headers: [...REQ, IF_MATCH(REPLY2), DIGEST, SIG_INPUT, SIG],
-        body: OUTCOME_BODY,
-        bodyLabel: "Request body: the outcome and its result",
+        body: COMPLETED_BODY,
+        bodyLabel: "Request body: the result",
         res: { line: "200 OK", headers: ACT(REPLY3), body: REPLY_ANSWERED },
       }],
       obs: [
         { t: "Signed with Target's Ed25519 key (RFC 9421). The signature covers method, target URI, digest and If-Match.", r: [] },
         { t: "Content-Digest covers the body (RFC 9530). Change one byte and the signature fails.", r: [] },
-        { t: "Answered: outcome is gone from _forms. Nothing more can be sent.", r: ["R9", "S1", "S2"] },
+        { t: "Answered: hr:completed and hr:failed are both gone from _forms. Nothing more can be sent. The reply keeps its state, not the result.", r: ["R9", "S1", "S2"] },
         { t: "The response is not cacheable.", r: ["S3", "R13"] },
         { t: "result is free-shaped. Here a URL. A paint job would send a color. Caller reads the shape from the job's form.", r: [] },
       ],
@@ -715,19 +719,19 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     },
     {
       id: "m10",
-      title: "Target repeats the outcome, and is refused",
+      title: "Target repeats the result, and is refused",
       note: "A retry after a lost response. Refused by state, not applied twice.",
       exchanges: [{
         from: "Target", to: "Caller",
-        line: `POST ${REPLY_URL}/actions/outcome`,
+        line: `POST ${REPLY_URL}/actions/completed`,
         headers: [...REQ, IF_MATCH(REPLY3), DIGEST, SIG_INPUT, SIG],
-        body: OUTCOME_BODY,
-        bodyLabel: "Request body: the outcome again",
+        body: COMPLETED_BODY,
+        bodyLabel: "Request body: the result again",
         res: { line: "409 Conflict", headers: PROBLEM, body: PROBLEM_REPLY },
       }],
       obs: [
         { t: "Once answered, the form is gone. Its target answers 409, not a second send.", r: ["S1", "S2", "R9"] },
-        { t: "Convention, not a new standard: Target reads 409 on an answered reply with the same outcome as success.", r: [] },
+        { t: "Convention, not a new standard: Target reads 409 on an answered reply with the same result as success.", r: [] },
       ],
     },
     {
@@ -753,8 +757,9 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     "Decision 1, act body media type: application/hal+json (option B). Decided.",
     "Decision 2, encryption: carry Caller's key unused in slice 1, or add JWE (RFC 7516) now. The author decides.",
     "Decision 3, envelope placement: decided, no _rise member. The envelope is top-level _links with hr: relations. modules is a plain property the act's schema declares. SPEC §7.2 needs rewriting to match.",
-    "Decision 4, relation names hr:progress, hr:outcome, hr:reply-to, hr:keys. Not yet checked against the IANA registry.",
+    "Decision 4, relation names hr:progress, hr:completed, hr:failed, hr:reply-to, hr:keys. Not yet checked against the IANA registry.",
     "Decision 5, where a job declares its result shape. Proposed: on the job form.",
+    "Decision 6, outcome: decided. Split into hr:completed and hr:failed, each a form offered only while awaiting, instead of one hr:outcome with an outcome field. The failure body is application/problem+json. Relations, not keys.",
   ];
 
   const OUT_OF_SLICE = [
@@ -765,6 +770,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     "Input relation hr:input: Target asks Caller something. Same pattern, another relation on the reply.",
     "Encryption: JWE (RFC 7516) to Caller's key. Slice 1 carries the key and does not use it.",
     "Fetching a key a caller supplied. None in slice 1. When it arrives: https only, a short timeout, no private addresses.",
+    "Failure path: hr:failed with an application/problem+json body. Its form is shown; the exchange is not walked in this report.",
     "Expiry: the reply expires, its forms go, a late outcome is refused.",
     "Other modules: ce (CloudEvents headers), otel (trace context), amqp (broker binding).",
     "HAL-FORMS _templates alongside _forms. Same forms, another rendering.",
@@ -778,8 +784,8 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     lede: "A critique of this design, in our voice. Fielding's sentences are quoted from his post, roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven. The judgements are ours, not his.",
     paras: [
       "What holds first. The design is driven by hypertext. The caller learns where to send from the entry's form. The target learns where to deliver from the reply it reads first, and what it may send from that reply's forms. Nothing is hard-coded on the target beyond what the caller sent. The post says that if the engine of application state is not driven by hypertext, the API cannot be RESTful. Here the engine is the forms, so this part passes.",
-      "The weakest step is 10. The target reads a 409 on an answered reply with the same outcome as success. No representation says so. The target knows it because this report says so, which is out-of-band information. The post is blunt on that point: \"Failure here implies that out-of-band information is driving interaction instead of hypertext.\" The fix is to put the answer in the refusal. The 409 body links to the outcome already recorded, so the target reads the result rather than infers it.",
-      "The relation names are not yet defined. hr:progress, hr:outcome, hr:reply-to and hr:keys appear in forms and links, but their meaning lives here, in this report. The post asks that a REST API \"spend almost all of its descriptive effort in defining the media type(s) used for representing\" resources, and extended relation names with it. Each name needs a published definition, an ALPS descriptor or profile text, before the design is done. Until then a client reads the name and has to guess.",
+      "The weakest step is 10. The target reads a 409 on an answered reply with the same result as success. No representation says so. The target knows it because this report says so, which is out-of-band information. The post is blunt on that point: \"Failure here implies that out-of-band information is driving interaction instead of hypertext.\" The fix is to put the answer in the refusal. The 409 body links to the outcome already recorded, so the target reads the result rather than infers it.",
+      "The relation names are not yet defined. hr:progress, hr:completed, hr:failed, hr:reply-to and hr:keys appear in forms and links, but their meaning lives here, in this report. The post asks that a REST API \"spend almost all of its descriptive effort in defining the media type(s) used for representing\" resources, and extended relation names with it. Each name needs a published definition, an ALPS descriptor or profile text, before the design is done. Until then a client reads the name and has to guess.",
       "modules sits in the form, so a reader sees it before it acts. Good. But the reply does not say which modules it applied. A client reads the reply and cannot tell whether the outcome is signed unless it remembers what it asked for. The reply should report the modules it applied, as the level report does (A1). Otherwise the answer depends on memory the representation does not carry.",
       "The target uses no fixed path for the callback. It follows the link the caller sent. The cost falls on the caller. To receive a result, the caller must run a hypermedia server with a reply resource, forms and validators. That is more than a webhook receiver. It is the price of symmetry, and the spec should say so rather than leave it implied. The post opens with the entry rule: a REST API should be entered \"with no prior knowledge beyond the initial URI (bookmark)\". A caller that takes callbacks needs its own entry point too.",
       "Signature and digest are message integrity. They are real protections, and the post says nothing about them. They do not make a message more hypermedia, and the design should not claim they do. Trust is weaker than the signature suggests. The anchor today is the link the caller sent, plus the caller's own word about its key. Nothing checks that the key at that link belongs to the caller. That is an identity question, separate from the REST constraints, and it stays open.",
