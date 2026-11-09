@@ -97,6 +97,11 @@ class Ledger {
 
     fun get(id: Long): Loan? = loans[id]
 
+    /** The loan [id] with no hold waiting for it any more, when there was one. */
+    fun releaseHold(id: Long) {
+        loans[id]?.let { replace(it, it.copy(holdWaiting = false, version = it.version + 1)) }
+    }
+
     /** Every loan, in loan-number order. */
     fun all(): List<Loan> = loans.values.toList()
 

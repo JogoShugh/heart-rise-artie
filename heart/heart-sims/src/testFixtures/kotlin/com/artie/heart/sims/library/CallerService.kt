@@ -18,6 +18,8 @@ import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartHttp
 import com.artie.heart.http4k.HeartSettings
 import com.artie.heart.sims.Tokens
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.HttpHandler
 import java.util.concurrent.ConcurrentHashMap
 
@@ -30,6 +32,7 @@ data class Reply(
     val standing: String = AWAITING,
     val percent: Int? = null,
     val note: String? = null,
+    val result: Map<String, Any?>? = null,
     val version: Int = 1,
 ) {
     val number: Long get() = reference.removePrefix("r-").toLong(16)
@@ -47,6 +50,7 @@ data class Reply(
  */
 class CallerService {
     private val store = ConcurrentHashMap<String, Reply>()
+    private val mapper = ObjectMapper()
 
     /** Opens the reply named [reference], awaiting. */
     fun open(reference: String) {
@@ -66,6 +70,15 @@ class CallerService {
         return next
     }
 
+    /**
+     * Whether [act] with [body] repeats the result the reply already has: the same completed result, sent again, changes
+     * nothing (decision 8: the repeat is answered as the first was). A different result is not a repeat.
+     */
+    private fun repeats(current: Reply, act: String, body: String?): Boolean {
+        if (act != "completed" || current.standing != Reply.COMPLETED || body == null) return false
+        return mapper.readTree(body)["result"]?.let { mapper.convertValue(it, RESULT) } == current.result
+    }
+
     /** The state after [act], with its checked [input]: progress keeps the reply awaiting; a result or a failure answers it. */
     private fun next(current: Reply, act: String, input: ActInput): Reply = when (act) {
         "progress" -> current.copy(
@@ -73,7 +86,11 @@ class CallerService {
             note = input.json["note"]?.asText(),
             version = current.version + 1,
         )
-        "completed" -> current.copy(standing = Reply.COMPLETED, version = current.version + 1)
+        "completed" -> current.copy(
+            standing = Reply.COMPLETED,
+            result = mapper.convertValue(input.json["result"], RESULT),
+            version = current.version + 1,
+        )
         else -> current.copy(standing = Reply.FAILED, version = current.version + 1)
     }
 
@@ -100,11 +117,13 @@ class CallerService {
                     "state" to reply.standing,
                     "percent" to reply.percent,
                     "note" to reply.note,
+                    "result" to reply.result,
                 ).filterValues { it != null }
             },
             keyField = "state",
             itemPath = ItemPath("/replies/{reply}", mapOf("reply" to "/reply")),
         ),
+        replays = { current, act, body -> repeats(current, act, body) },
     )
 
     private val replies = HeartResource(
@@ -112,7 +131,10 @@ class CallerService {
         loadAt = { variables ->
             reply(variables.getValue("reply")) ?: throw ResourceNotFoundException("no reply ${variables["reply"]}")
         },
-        perform = { current, act, input -> Acted(replace(current, next(current, act, input))) },
+        perform = { current, act, input ->
+            if (repeats(current, act, mapper.writeValueAsString(input.json))) Acted(current)
+            else Acted(replace(current, next(current, act, input)))
+        },
     )
 
     /** The caller's HEART service: the replies, served to the library's Bearer token. */
@@ -125,6 +147,9 @@ class CallerService {
     companion object {
         /** The Bearer token the library presents to Ana's replies. */
         const val LIBRARY_TOKEN = "riverside-library-reply-token"
+
+        /** A result as plain values, which heart-core canonicalises for the validator (JCS). */
+        private val RESULT = object : TypeReference<Map<String, Any?>>() {}
 
         private const val PROGRESS_INPUT = """{"type": "object", "required": ["percent"], "properties": {""" +
             """"percent": {"type": "integer", "minimum": 0, "maximum": 100}, """ +

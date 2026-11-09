@@ -41,13 +41,21 @@ class ActPipeline<S, K>(
      * A validator is whatever the binding carries: an HTTP If-Match value,
      * CoAP If-Match options. Returns the state checked.
      */
-    suspend fun <V : Any> check(act: String, validator: V?, current: suspend () -> S, matches: (S, V) -> Boolean): S {
+    suspend fun <V : Any> check(
+        act: String,
+        validator: V?,
+        current: suspend () -> S,
+        body: String? = null,
+        matches: (S, V) -> Boolean,
+    ): S {
         require(!type.atBookmark(act)) { "$act is offered by the bookmark; use checkAtBookmark" }
         // With no validator asked for and none sent, the act is checked against the state as it is now.
         var state: S? = if (validator == null && !validatorRequired) current() else null
         steps(act, validator, { held -> current().also { state = it }.let { matches(it, held) } }) {
-            val key = type.state.keyOf(checkNotNull(state))
-            if (act in type.offers.offered(key)) null else type.offers.whyAbsent(key, act)
+            val now = checkNotNull(state)
+            val key = type.state.keyOf(now)
+            val replayed = type.replays?.invoke(now, act, body) == true
+            if (act in type.offers.offered(key) || replayed) null else type.offers.whyAbsent(key, act)
         }
         return checkNotNull(state)
     }
@@ -66,7 +74,7 @@ class ActPipeline<S, K>(
         validator: String?,
         current: suspend () -> S,
         matches: (S, String) -> Boolean,
-    ): S = if (validator == null) checkOffered(act, current) else check(act, validator, current, matches)
+    ): S = if (validator == null) checkOffered(act, current) else check(act, validator, current, matches = matches)
 
     suspend fun checkOffered(act: String, current: suspend () -> S): S {
         require(!type.atBookmark(act)) { "$act is offered by the bookmark" }

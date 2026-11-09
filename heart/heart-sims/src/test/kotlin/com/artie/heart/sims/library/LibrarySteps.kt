@@ -356,6 +356,86 @@ class LibrarySteps {
     private fun replyBody(reply: String): String =
         caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH)).bodyString()
 
+    // What the library knows across its answers to one reply: its completed form, and the last result it sent.
+    private var completedTarget: String? = null
+    private var lastResult: Map<String, Any?>? = null
+    private var lastSigned: Signed? = null
+    private var replyBeforeRepeat: String? = null
+
+    /** The library reads the reply, then sends [result] on its completed form, signed (RFC 9421). */
+    private fun libraryCompletes(reply: String, result: Map<String, Any?>) {
+        val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
+        val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
+        val target = completedTarget ?: java.net.URI(
+            mapper.readTree(read.bodyString())["_forms"]["hr:completed"]["_links"]["target"]["href"].asText(),
+        ).path.also { completedTarget = it }
+        val sent = mapper.writeValueAsString(mapOf("result" to result))
+        val digest = Signatures.contentDigest(sent)
+        val signed = Signatures.sign("PUT", "https://caller.example$target", digest, ifMatch, SIGNED_AT)
+        lastSigned = signed
+        lastResult = result
+        answer = caller.handler(
+            request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
+                .header("If-Match", ifMatch)
+                .header("Content-Type", "application/hal+json")
+                .header("Content-Digest", digest)
+                .header("Signature-Input", "sig1=${Signatures.params(SIGNED_AT)}")
+                .header("Signature", "sig1=:${signed.signature}:")
+                .body(sent),
+        )
+    }
+
+    @Given("the hold on loan {long} has been returned")
+    fun holdReturned(loan: Long) = library.releaseHold(loan)
+
+    @When("the library sends the result on reply {word}: loan {long} can be renewed from {word}")
+    fun libraryAnswers(reply: String, loan: Long, from: String) =
+        libraryCompletes(reply, mapOf("loan" to loan, "renewableFrom" to from))
+
+    @Then("reply {word} is answered as completed")
+    fun answeredCompleted(reply: String) {
+        val now = mapper.readTree(replyBody(reply))
+        assertEquals("completed", now["state"].asText(), now.toString())
+    }
+
+    @Then("the result is signed with the library's key")
+    fun resultSigned() {
+        val signed = checkNotNull(lastSigned) { "no result was sent" }
+        assertTrue(Signatures.verify(signed, LibraryKey.pair.public), signed.toString())
+    }
+
+    @Then("reply {word} offers nothing more")
+    fun offersNothing(reply: String) {
+        val forms = mapper.readTree(replyBody(reply))["_forms"]
+        assertTrue(forms == null || forms.size() == 0, forms.toString())
+    }
+
+    @Given("reply {word} is answered as completed, with loan {long} renewable from {word}")
+    fun answeredWithResult(reply: String, loan: Long, from: String) =
+        libraryCompletes(reply, mapOf("loan" to loan, "renewableFrom" to from))
+
+    @When("the library sends the same result again on reply {word}")
+    fun sendsSameAgain(reply: String) {
+        replyBeforeRepeat = replyBody(reply)
+        libraryCompletes(reply, checkNotNull(lastResult) { "no result was sent" })
+    }
+
+    @Then("the library is answered {int}")
+    fun libraryAnswered(status: Int) = assertEquals(status, answer?.status?.code, body())
+
+    @Then("reply {word} is unchanged")
+    fun replyUnchanged(reply: String) = assertEquals(checkNotNull(replyBeforeRepeat), replyBody(reply))
+
+    @When("the library sends a different result on reply {word}: loan {long} renewable from {word}")
+    fun sendsDifferent(reply: String, loan: Long, from: String) =
+        libraryCompletes(reply, mapOf("loan" to loan, "renewableFrom" to from))
+
+    @Then("the library is refused with {int}")
+    fun libraryRefused(status: Int) = assertEquals(status, answer?.status?.code, body())
+
+    @Then("the refusal says hr:completed is not offered")
+    fun refusalSays() = assertTrue(body().contains("hr:completed is not offered"), body())
+
     @Then("the library's entry offers the request, with its reply and key as links")
     fun entryOffersRequest() {
         val entry = mapper.readTree(send(Method.GET, "/", ACCEPT.getValue(HSF)).bodyString())
@@ -375,6 +455,9 @@ class LibrarySteps {
 
         /** The library's credential at Ana's replies. */
         const val REPLY_AUTH = "Bearer ${CallerService.LIBRARY_TOKEN}"
+
+        /** The instant the library's results are signed at: fixed, so a signature is the same on every run. */
+        const val SIGNED_AT = 1794153600L
 
         /** The affordance link of a plain JSON answer (SPEC §6.1): the set its state offers. */
         val FORMS_LINK = Regex("<([^>]+)>;\\s*rel=\"https://w3id.org/heart-rise/rels/forms\"")

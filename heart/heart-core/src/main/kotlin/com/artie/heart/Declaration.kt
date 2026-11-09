@@ -259,6 +259,12 @@ class ResourceType<S, K>(
     val bookmarkActs: List<Act> = emptyList(),
     val subCollections: Map<String, UriTemplate> = emptyMap(),
     val embedded: List<Embedded> = emptyList(),
+    /**
+     * Whether an act the state no longer offers is a repeat of one that already took effect, with the same [body]
+     * (SPEC §6.2, decision 8): if so, it is answered as the first was, not refused. Checked after the validator, so a
+     * stale repeat is still refused (412). None by default: a type with no replays refuses every act not offered.
+     */
+    val replays: ((state: S, act: String, body: String?) -> Boolean)? = null,
 ) {
     /** Every act declared, the resources' and the bookmark's. */
     val allActs: List<Act> = acts + bookmarkActs

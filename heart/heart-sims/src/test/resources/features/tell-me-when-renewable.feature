@@ -24,3 +24,22 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
       | percent | note                             |
       | 0       | one ahead in the hold queue      |
       | 50      | the hold is with the next reader |
+
+  Scenario: The hold clears, and the library sends the result, signed
+    Given the hold on loan 3310 has been returned
+    When the library sends the result on reply r-7f3: loan 3310 can be renewed from 2026-12-03
+    Then reply r-7f3 is answered as completed
+    And the result is signed with the library's key
+    And reply r-7f3 offers nothing more
+
+  Scenario: The same result sent again changes nothing
+    Given reply r-7f3 is answered as completed, with loan 3310 renewable from 2026-12-03
+    When the library sends the same result again on reply r-7f3
+    Then the library is answered 200
+    And reply r-7f3 is unchanged
+
+  Scenario: A different result after the answer is refused
+    Given reply r-7f3 is answered as completed, with loan 3310 renewable from 2026-12-03
+    When the library sends a different result on reply r-7f3: loan 3310 renewable from 2026-12-10
+    Then the library is refused with 409
+    And the refusal says hr:completed is not offered

@@ -134,7 +134,7 @@ class ResourceHandler<S, K>(
         val variables = variables(request)
         val done = runBlocking {
             val read = suspend { resource.locate(variables) }
-            val checked = pipeline.check(act.name, request.header(IF_MATCH), read) { current, held ->
+            val checked = pipeline.check(act.name, request.header(IF_MATCH), read, body(request)) { current, held ->
                 StateETag.matches(held, Rendered(current, dialect, rung).etag)
             }
             // The act is performed on the state whose ETag matched, so a write since is stale (SPEC §6.2).

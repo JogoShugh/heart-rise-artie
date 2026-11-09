@@ -19,6 +19,9 @@ class LibraryService {
     /** Ana's loans are [loans] from now on, until a reset. */
     fun lend(loans: List<Loan>) = ledger.lend(loans)
 
+    /** The hold on loan [id] has been returned: nothing is waiting for the book any more. */
+    fun releaseHold(id: Long) = ledger.releaseHold(id)
+
     /** The loan [id] as it is now; null when there is none. */
     fun loan(id: Long): Loan? = ledger.get(id)
 
