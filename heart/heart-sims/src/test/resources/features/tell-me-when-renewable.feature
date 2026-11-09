@@ -43,3 +43,9 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
     When the library sends a different result on reply r-7f3: loan 3310 renewable from 2026-12-10
     Then the library is refused with 409
     And the refusal says hr:completed is not offered
+
+  Scenario: The library cannot find the hold, and says so as a failure
+    Given the library has no record of the hold on loan 3310
+    When the library sends the failure on reply r-7f3: "No hold record for loan 3310"
+    Then reply r-7f3 is answered as failed
+    And the failure is a problem document, application/problem+json

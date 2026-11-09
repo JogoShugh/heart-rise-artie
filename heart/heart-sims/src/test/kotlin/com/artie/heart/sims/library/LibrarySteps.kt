@@ -357,33 +357,61 @@ class LibrarySteps {
         caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH)).bodyString()
 
     // What the library knows across its answers to one reply: its completed form, and the last result it sent.
-    private var completedTarget: String? = null
+    private val formTargets = mutableMapOf<String, String>()
     private var lastResult: Map<String, Any?>? = null
     private var lastSigned: Signed? = null
+    private var lastContentType: String? = null
     private var replyBeforeRepeat: String? = null
+    private var noHoldRecorded: Long? = null
 
-    /** The library reads the reply, then sends [result] on its completed form, signed (RFC 9421). */
-    private fun libraryCompletes(reply: String, result: Map<String, Any?>) {
+    /** The library reads the reply, then sends [sent] on its [relation] form as [contentType], signed (RFC 9421). */
+    private fun libraryAnswers(reply: String, relation: String, sent: String, contentType: String) {
         val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
         val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
-        val target = completedTarget ?: java.net.URI(
-            mapper.readTree(read.bodyString())["_forms"]["hr:completed"]["_links"]["target"]["href"].asText(),
-        ).path.also { completedTarget = it }
-        val sent = mapper.writeValueAsString(mapOf("result" to result))
+        val target = formTargets[relation] ?: java.net.URI(
+            mapper.readTree(read.bodyString())["_forms"]["hr:$relation"]["_links"]["target"]["href"].asText(),
+        ).path.also { formTargets[relation] = it }
         val digest = Signatures.contentDigest(sent)
         val signed = Signatures.sign("PUT", "https://caller.example$target", digest, ifMatch, SIGNED_AT)
         lastSigned = signed
-        lastResult = result
+        lastContentType = contentType
         answer = caller.handler(
             request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
                 .header("If-Match", ifMatch)
-                .header("Content-Type", "application/hal+json")
+                .header("Content-Type", contentType)
                 .header("Content-Digest", digest)
                 .header("Signature-Input", "sig1=${Signatures.params(SIGNED_AT)}")
                 .header("Signature", "sig1=:${signed.signature}:")
                 .body(sent),
         )
     }
+
+    /** The library sends [result] on the completed form. */
+    private fun libraryCompletes(reply: String, result: Map<String, Any?>) {
+        lastResult = result
+        libraryAnswers(reply, "completed", mapper.writeValueAsString(mapOf("result" to result)), "application/hal+json")
+    }
+
+    @Given("the library has no record of the hold on loan {long}")
+    fun noHoldRecord(loan: Long) {
+        // The library's record of the hold is gone; the failure below says so.
+        noHoldRecorded = loan
+    }
+
+    @When("the library sends the failure on reply {word}: {string}")
+    fun libraryFails(reply: String, title: String) {
+        checkNotNull(noHoldRecorded) { "the library still has its record of the hold" }
+        libraryAnswers(reply, "failed", mapper.writeValueAsString(mapOf("title" to title)), "application/problem+json")
+    }
+
+    @Then("reply {word} is answered as failed")
+    fun answeredFailed(reply: String) {
+        val now = mapper.readTree(replyBody(reply))
+        assertEquals("failed", now["state"].asText(), now.toString())
+    }
+
+    @Then("the failure is a problem document, {word}")
+    fun failureIsProblem(mediaType: String) = assertEquals(mediaType, lastContentType)
 
     @Given("the hold on loan {long} has been returned")
     fun holdReturned(loan: Long) = library.releaseHold(loan)
