@@ -496,8 +496,23 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
             _links: {
               type: "object",
               properties: {
-                "hr:reply-to": { type: "object", required: ["href"] },
-                "hr:keys": { type: "object", required: ["href", "type"] },
+                "hr:reply-to": {
+                  type: "object",
+                  required: ["href", "type", "profile"],
+                  properties: {
+                    href: { type: "string", format: "uri" },
+                    type: { const: "application/hal+json" },
+                    profile: { enum: ["https://w3id.org/heart-rise/hal-schema-forms", "https://w3id.org/heart-rise/hal-forms"] },
+                  },
+                },
+                "hr:keys": {
+                  type: "object",
+                  required: ["href", "type"],
+                  properties: {
+                    href: { type: "string", format: "uri" },
+                    type: { const: "application/jwk-set+json" },
+                  },
+                },
               },
             },
             job: { type: "string" },
@@ -512,7 +527,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
   const ACT_BODY = {
     _links: {
       ...CURIES,
-      "hr:reply-to": { href: REPLY_URL },
+      "hr:reply-to": { href: REPLY_URL, type: "application/hal+json", profile: PROFILE },
       "hr:keys": { href: "https://caller.example/keys", type: "application/jwk-set+json" },
     },
     job: "resize-cover-photo",
@@ -524,7 +539,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
     _links: {
       ...CURIES,
       self: { href: "https://target.example/jobs/j-88" },
-      "hr:reply-to": { href: REPLY_URL },
+      "hr:reply-to": { href: REPLY_URL, type: "application/hal+json", profile: PROFILE },
       "hr:keys": { href: "https://caller.example/keys", type: "application/jwk-set+json" },
     },
   };
@@ -585,7 +600,7 @@ p.dir { margin: 0; font: 500 11.5px var(--mono); letter-spacing: .04em; color: v
       }],
       obs: [
         { t: "The act is a form under its relation name, job:assign. Caller finds it by name.", r: ["R8", "R4"] },
-        { t: "The form's schema declares _links. Target checks the caller's links against it.", r: ["R14"] },
+        { t: "The form's schema declares _links, with hints. The reply link carries its media type and profile, so Target knows what to read and which dialect to ask for before it sends.", r: ["R14", "R16"] },
         { t: "Target's signing key is linked as hr:keys. Caller uses it at step 9.", r: [] },
       ],
     },
