@@ -26,6 +26,8 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-suite")
     testImplementation(kotlin("test"))
     testImplementation("com.fasterxml.jackson.core:jackson-databind")
+    // The RISE library's run trace is written as YAML, for the run report (RiseTrace.kt).
+    testImplementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2")
 }
 
 kotlin {
