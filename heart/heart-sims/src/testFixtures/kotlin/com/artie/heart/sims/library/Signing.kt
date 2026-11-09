@@ -11,4 +11,7 @@ object LibraryKey {
 
     /** The library's signer: its requests are signed with [pair], under [KEY_ID]. */
     val signer: Signer by lazy { Signer(pair.private, KEY_ID) }
+
+    /** A signer that claims the library's keyid with a key of its own: what a forged result is signed with. */
+    val otherSigner: Signer by lazy { Signer(KeyPairGenerator.getInstance("Ed25519").generateKeyPair().private, KEY_ID) }
 }

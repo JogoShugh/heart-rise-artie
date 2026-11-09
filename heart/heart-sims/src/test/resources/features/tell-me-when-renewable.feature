@@ -44,6 +44,17 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
     Then the library is refused with 409
     And the refusal says hr:completed is not offered
 
+  Scenario Outline: A result the library's key did not sign is refused, and the reply stays awaiting
+    Given the hold on loan 3310 has been returned
+    When the library sends the result on reply r-7f3 <signature>: loan 3310 can be renewed from 2026-12-03
+    Then the library is refused with 401
+    And reply r-7f3 is still awaiting
+
+    Examples:
+      | signature               |
+      | signed with another key |
+      | unsigned                |
+
   Scenario: The library cannot find the hold, and says so as a failure
     Given the library has no record of the hold on loan 3310
     When the library sends the failure on reply r-7f3: "No hold record for loan 3310"

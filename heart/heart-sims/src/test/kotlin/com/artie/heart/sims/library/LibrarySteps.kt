@@ -2,6 +2,7 @@ package com.artie.heart.sims.library
 
 import com.artie.heart.Signatures
 import com.artie.heart.Signed
+import com.artie.heart.Signer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.datatable.DataTable
@@ -331,15 +332,8 @@ class LibrarySteps {
     /** The library's own Bearer token at Ana's replies, and what it sends a reply. */
     @When("the library reports progress of {int} percent on reply {word}, with the note {string}")
     fun libraryReportsProgress(percent: Int, reply: String, note: String) {
-        val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
-        val form = mapper.readTree(read.bodyString())["_forms"]["hr:progress"]
-        val target = java.net.URI(form["_links"]["target"]["href"].asText()).path
-        answer = caller.handler(
-            request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
-                .header("If-Match", read.header("ETag"))
-                .header("Content-Type", "application/hal+json")
-                .body(mapper.writeValueAsString(mapOf("percent" to percent, "note" to note))),
-        )
+        val sent = mapper.writeValueAsString(mapOf("percent" to percent, "note" to note))
+        libraryAnswers(reply, "progress", sent, "application/hal+json")
     }
 
     @Then("reply {word} is awaiting at {int} percent")
@@ -367,25 +361,38 @@ class LibrarySteps {
     private var replyBeforeRepeat: String? = null
     private var noHoldRecorded: Long? = null
 
-    /** The library reads the reply, then sends [sent] on its [relation] form as [contentType], signed (RFC 9421). */
-    private fun libraryAnswers(reply: String, relation: String, sent: String, contentType: String) {
+    /**
+     * The library reads the reply, then sends [sent] on its [relation] form as [contentType], signed by [signer] (RFC
+     * 9421), or unsigned when it has none.
+     */
+    private fun libraryAnswers(
+        reply: String,
+        relation: String,
+        sent: String,
+        contentType: String,
+        signer: Signer? = LibraryKey.signer,
+    ) {
         val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
         val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
         val target = formTargets[relation] ?: java.net.URI(
             mapper.readTree(read.bodyString())["_forms"]["hr:$relation"]["_links"]["target"]["href"].asText(),
         ).path.also { formTargets[relation] = it }
-        val signed = LibraryKey.signer.sign("PUT", "https://caller.example$target", sent, ifMatch, SIGNED_AT)
+        val signed = signer?.sign("PUT", "https://caller.example$target", sent, ifMatch, SIGNED_AT)
         lastSigned = signed
         lastSent = sent
         lastContentType = contentType
+        val act = request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
+            .header("If-Match", ifMatch)
+            .header("Content-Type", contentType)
         answer = caller.handler(
-            request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
-                .header("If-Match", ifMatch)
-                .header("Content-Type", contentType)
-                .header("Content-Digest", signed.contentDigest)
-                .header("Signature-Input", "sig1=${signed.params}")
-                .header("Signature", "sig1=:${signed.signature}:")
-                .body(sent),
+            if (signed == null) {
+                act.body(sent)
+            } else {
+                act.header("Content-Digest", signed.contentDigest)
+                    .header("Signature-Input", "sig1=${signed.params}")
+                    .header("Signature", "sig1=:${signed.signature}:")
+                    .body(sent)
+            },
         )
     }
 
@@ -466,6 +473,19 @@ class LibrarySteps {
 
     @Then("the refusal says hr:completed is not offered")
     fun refusalSays() = assertTrue(body().contains("hr:completed is not offered"), body())
+
+    @When(
+        """^the library sends the result on reply (\S+) """ +
+            """(signed with another key|unsigned): loan (\d+) can be renewed from (\S+)$""",
+    )
+    fun libraryAnswersUnvouched(reply: String, how: String, loan: Long, from: String) {
+        val sent = mapper.writeValueAsString(mapOf("result" to mapOf("loan" to loan, "renewableFrom" to from)))
+        val signer = if (how == "unsigned") null else LibraryKey.otherSigner
+        libraryAnswers(reply, "completed", sent, "application/hal+json", signer)
+    }
+
+    @Then("reply {word} is still awaiting")
+    fun stillAwaiting(reply: String) = assertEquals("awaiting", mapper.readTree(replyBody(reply))["state"].asText())
 
     @Then("the library's entry offers the request, with its reply and key as links")
     fun entryOffersRequest() {
