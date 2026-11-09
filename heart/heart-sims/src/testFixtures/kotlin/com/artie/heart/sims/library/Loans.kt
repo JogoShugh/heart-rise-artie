@@ -65,12 +65,28 @@ data class Member(val card: Long, val name: String, val company: String? = null)
 class Ledger {
     private val members = ConcurrentSkipListMap<Long, Member>()
     private val loans = ConcurrentSkipListMap<Long, Loan>()
+    private val watches = ConcurrentSkipListMap<Long, Watch>()
 
-    /** Back to the seed: five members, Ana Torres's three books among their loans. */
+    /** Back to the seed: five members, Ana Torres's three books among their loans, and no watches. */
     fun reset() {
         members.clear()
         MEMBERS.forEach { members[it.card] = it }
+        watches.clear()
         lend(SEED)
+    }
+
+    /** The watch [id] as it is now; null when there is none. */
+    fun watch(id: Long): Watch? = watches[id]
+
+    /** Every watch, in number order. */
+    fun watches(): List<Watch> = watches.values.toList()
+
+    /** A new watch for [loan], answering to [reply] with [keys]; it takes the next number. */
+    fun request(loan: Long, reply: String, keys: String): Watch {
+        val last = if (watches.isEmpty()) 0L else watches.lastKey()
+        val watch = Watch(last + 1L, loan, reply, keys)
+        watches[watch.id] = watch
+        return watch
     }
 
     /** Only [lent], in place of every loan there was. */

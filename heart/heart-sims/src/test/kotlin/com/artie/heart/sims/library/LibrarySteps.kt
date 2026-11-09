@@ -285,6 +285,57 @@ class LibrarySteps {
     private fun items(node: JsonNode): List<JsonNode> =
         node["_links"]?.get("item")?.let { if (it.isArray) it.toList() else listOf(it) }.orEmpty()
 
+    // Ana's request to be told when a loan can be renewed (tell-me-when-renewable.feature). Phase 1: the request, its
+    // watch, and the entry's form. The reply resource and the library's answers come in later phases.
+    private val repliesAwaiting = mutableSetOf<String>()
+
+    @Given("Ana's reply {word} is awaiting")
+    fun replyAwaiting(reply: String) {
+        repliesAwaiting += reply
+    }
+
+    @When("Ana asks to be told when loan {long} can be renewed, with reply {word} and her key")
+    fun asksToBeTold(loan: Long, reply: String) {
+        assertTrue(reply in repliesAwaiting, "no awaiting reply $reply")
+        val read = send(Method.GET, "/", ACCEPT.getValue(HSF))
+        val entry = mapper.readTree(read.bodyString())
+        val form = checkNotNull(entry["_forms"]?.get("library:tell-me-when-renewable")) { "no entry form: $entry" }
+        val sent = mapOf(
+            "loan" to loan,
+            "_links" to mapOf(
+                "hr:reply-to" to mapOf(
+                    "href" to "https://caller.example/replies/$reply",
+                    "type" to "application/hal+json",
+                    "profile" to "https://w3id.org/heart-rise/hal-schema-forms",
+                ),
+                "hr:keys" to mapOf("href" to "https://caller.example/keys", "type" to "application/jwk-set+json"),
+            ),
+        )
+        val target = form["_links"]["target"]["href"].asText()
+        answer = library.handler(
+            request(Method.POST, target, ACCEPT.getValue(HSF), basic(HeartLibrary.CARD, PIN))
+                .header("If-Match", read.header("ETag"))
+                .header("Content-Type", "application/hal+json")
+                .body(mapper.writeValueAsString(sent)),
+        )
+    }
+
+    @Then("the library answers {int} with a watch that is awaiting")
+    fun answersWatch(status: Int) {
+        assertEquals(status, answer?.status?.code, body())
+        val location = checkNotNull(answer?.header("Location")) { "no Location: ${body()}" }
+        val watch = mapper.readTree(send(Method.GET, location, ACCEPT.getValue(HSF)).bodyString())
+        assertEquals("awaiting", watch["standing"].asText(), watch.toString())
+    }
+
+    @Then("the library's entry offers the request, with its reply and key as links")
+    fun entryOffersRequest() {
+        val entry = mapper.readTree(send(Method.GET, "/", ACCEPT.getValue(HSF)).bodyString())
+        val form = checkNotNull(entry["_forms"]?.get("library:tell-me-when-renewable")) { "no entry form: $entry" }
+        val links = form["schema"]["properties"]["_links"]["properties"]
+        assertTrue(links.has("hr:reply-to") && links.has("hr:keys"), form.toString())
+    }
+
     private companion object {
         const val PIN = "1234"
         const val HSF = "HAL Schema Forms"

@@ -103,6 +103,58 @@ class HeartLibrary(private val ledger: Ledger) {
         ),
     )
 
+    // Ana's request to be told when a loan can be renewed: the library's entry brings a watch into being (201).
+    private val watchType = ResourceType(
+        collection = "watches",
+        profile = PROFILE,
+        acts = emptyList(),
+        offers = Offers(keys = listOf(Watch.AWAITING), offered = { emptyList() }, whyAbsent = { _, _ -> "" }),
+        state = StateView<Watch, String>(
+            keyOf = { it.standing },
+            idOf = { it.id },
+            versionOf = { it.version },
+            bodyOf = { linkedMapOf("id" to it.id, "loan" to it.loan, "standing" to it.standing) },
+            // The reply and the key the request named, kept as links, so the library answers the caller later.
+            hypermediaOf = { watch ->
+                Hypermedia(
+                    links = mapOf(
+                        "hr:reply-to" to mapOf("href" to watch.reply),
+                        "hr:keys" to mapOf("href" to watch.keys),
+                    ),
+                )
+            },
+            keyField = "standing",
+        ),
+        finding = Finding(
+            noun = "watch",
+            search = Named("searchWatches", "search-watches"),
+            lookup = Named("getWatch", "get-watch"),
+            idTitle = "Watch number",
+            idDescription = "The watch's number, in its Location",
+        ),
+        bookmarkActs = listOf(Act("tell-me-when-renewable", "tell-me-when-renewable", TELL_INPUT)),
+    )
+
+    private val watches = HeartResource(
+        layers = Layers(watchType),
+        load = { id -> ledger.watch(id) ?: throw ResourceNotFoundException("no watch $id") },
+        perform = { current, _, _ -> Acted(current) },
+        find = { _, id ->
+            ledger.watches()
+                .filter { id == null || it.id == id }
+                .map { Found(it.id, "Loan ${it.loan}") }
+        },
+        performAtBookmark = { _, input ->
+            val links = input.json["_links"]
+            val watch = ledger.request(
+                loan = input.json["loan"].asLong(),
+                reply = links["hr:reply-to"]["href"].asText(),
+                keys = links["hr:keys"]["href"].asText(),
+            )
+            Acted(watch, created = "/watches/${watch.id}")
+        },
+    )
+
     private val accounts = HeartResource(
         layers = Layers(accountType),
         load = { id -> ledger.account(id) ?: throw ResourceNotFoundException("no account $id") },
@@ -158,7 +210,7 @@ class HeartLibrary(private val ledger: Ledger) {
     )
 
     val handler: HttpHandler = HeartHttp(
-        listOf(accounts, members, loans),
+        listOf(accounts, members, loans, watches),
         Credentials.parse(users = "$CARD:$PIN_HASH", tokens = Tokens.sha256(TOKEN)),
         // The affordance link: each plain JSON answer names the set its state offers, for OpenAPI clients that opt in.
         HeartSettings(
@@ -213,6 +265,41 @@ class HeartLibrary(private val ledger: Ledger) {
             """"problem": {"type": "string", "title": "Problem", "description": "What is wrong with the book"}, """ +
             """"comment": {"type": "string", "maxLength": 200, "title": "Comment", """ +
             """"description": "Anything the desk should know, in a sentence or two"}}}"""
+
+        /**
+         * Telling Ana when a loan can be renewed: the loan, and the reply and the key the library answers with, as links
+         * (SPEC §7.2 names them; the request carries them in _links, as the envelope).
+         */
+        private const val TELL_INPUT = """{
+  "type": "object",
+  "required": ["loan", "_links"],
+  "properties": {
+    "loan": {"type": "integer", "title": "Loan number"},
+    "_links": {
+      "type": "object",
+      "required": ["hr:reply-to", "hr:keys"],
+      "properties": {
+        "hr:reply-to": {
+          "type": "object",
+          "required": ["href", "type", "profile"],
+          "properties": {
+            "href": {"type": "string", "format": "uri"},
+            "type": {"const": "application/hal+json"},
+            "profile": {"enum": ["https://w3id.org/heart-rise/hal-schema-forms", "https://w3id.org/heart-rise/hal-forms"]}
+          }
+        },
+        "hr:keys": {
+          "type": "object",
+          "required": ["href", "type"],
+          "properties": {
+            "href": {"type": "string", "format": "uri"},
+            "type": {"const": "application/jwk-set+json"}
+          }
+        }
+      }
+    }
+  }
+}"""
 
         /** Where the library lists the kinds of problem a member can report. */
         private const val PROBLEM_KINDS_PATH = "/problem-kinds"
@@ -298,6 +385,21 @@ class HeartLibrary(private val ledger: Ledger) {
                     "get-loan", AlpsType.SAFE, "Get a loan by number",
                     "Goes to one loan, given its number.",
                     "A safe lookup; the result is the loan, with what may be done now.",
+                ),
+                Relation(
+                    "tell-me-when-renewable", AlpsType.UNSAFE, "Tell me when renewable",
+                    "Brings a watch into being: the library tells the caller when the loan can be renewed.",
+                    "Offered at the library's entry. The request names the loan, its reply and its key as links.",
+                ),
+                Relation(
+                    "search-watches", AlpsType.SAFE, "Find watches",
+                    "Lists the watches the library holds.",
+                    "A safe search; each result links to the watch.",
+                ),
+                Relation(
+                    "get-watch", AlpsType.SAFE, "Get a watch by number",
+                    "Goes to one watch, given its number.",
+                    "A safe lookup; the watch keeps its reply and key as links.",
                 ),
             ),
         )
