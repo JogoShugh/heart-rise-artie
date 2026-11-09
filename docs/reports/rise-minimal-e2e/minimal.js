@@ -51,7 +51,7 @@
     ["R1", "Every resource has its own URI. Creation returns 201 with Location."],
     ["R2", "A reply's state is a GET-able representation."],
     ["R3", "GET and HEAD never change state."],
-    ["R4", "A state change is a POST to a form target named in the representation. The client builds no URL."],
+    ["R4", "A state change is an act: a request to the form target named in the representation, with the method the form names (POST, PUT, PATCH or DELETE). The client builds no URL."],
     ["R5", "Acts go to resource URIs, never to one RPC endpoint."],
     ["R6", "Representations are application/hal+json. Errors are application/problem+json. Bare application/json is not used."],
     ["R7", "Responses carry a strong ETag. Writes carry If-Match. A write without it is 428."],
