@@ -363,5 +363,21 @@
     "SPEC §7.2 envelope fields template-rel, template-schema and template-fields. This design does not carry them yet.",
   ];
 
-  window.MINIMAL = { RULES, STEPS, OPEN, OUT_OF_SLICE };
+  // Our review of the design, long form. Each paragraph tests one part against a sentence from Roy Fielding's post
+  // "REST APIs must be hypertext-driven" (20 October 2008). The quotes are his. The judgements are ours.
+  const REVIEW = {
+    heading: "Review against the 2008 constraints",
+    lede: "A critique of this design, in our voice. Fielding's sentences are quoted from his post, roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven. The judgements are ours, not his.",
+    paras: [
+      "What holds first. The design is driven by hypertext. The caller learns where to send from the entry's form. The target learns where to deliver from the reply it reads first, and what it may send from that reply's forms. Nothing is hard-coded on the target beyond what the caller sent. The post says that if the engine of application state is not driven by hypertext, the API cannot be RESTful. Here the engine is the forms, so this part passes.",
+      "The weakest step is 10. The target reads a 409 on an answered reply with the same outcome as success. No representation says so. The target knows it because this report says so, which is out-of-band information. The post is blunt on that point: \"Failure here implies that out-of-band information is driving interaction instead of hypertext.\" The fix is to put the answer in the refusal. The 409 body links to the outcome already recorded, so the target reads the result rather than infers it.",
+      "The relation names are not yet defined. hr:progress, hr:outcome, hr:reply-to and hr:keys appear in forms and links, but their meaning lives here, in this report. The post asks that a REST API \"spend almost all of its descriptive effort in defining the media type(s) used for representing\" resources, and extended relation names with it. Each name needs a published definition, an ALPS descriptor or profile text, before the design is done. Until then a client reads the name and has to guess.",
+      "modules sits in the form, so a reader sees it before it acts. Good. But the reply does not say which modules it applied. A client reads the reply and cannot tell whether the outcome is signed unless it remembers what it asked for. The reply should report the modules it applied, as the level report does (A1). Otherwise the answer depends on memory the representation does not carry.",
+      "The target uses no fixed path for the callback. It follows the link the caller sent. The cost falls on the caller. To receive a result, the caller must run a hypermedia server with a reply resource, forms and validators. That is more than a webhook receiver. It is the price of symmetry, and the spec should say so rather than leave it implied. The post opens with the entry rule: a REST API should be entered \"with no prior knowledge beyond the initial URI (bookmark)\". A caller that takes callbacks needs its own entry point too.",
+      "Signature and digest are message integrity. They are real protections, and the post says nothing about them. They do not make a message more hypermedia, and the design should not claim they do. Trust is weaker than the signature suggests. The anchor today is the link the caller sent, plus the caller's own word about its key. Nothing checks that the key at that link belongs to the caller. That is an identity question, separate from the REST constraints, and it stays open.",
+      "What we would change, in order: put the outcome link in the 409 body; publish a definition for each hr: relation; have the reply report the modules it applied; state the caller's server cost in the spec; and split integrity from identity in the security section. None of these changes the shape of the messages shown above. They change what the messages say to a client that has not read this report.",
+    ],
+  };
+
+  window.MINIMAL = { RULES, STEPS, OPEN, OUT_OF_SLICE, REVIEW };
 })();

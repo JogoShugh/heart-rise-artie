@@ -74,6 +74,10 @@ ul.obs { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 14.5
 ul.obs li { min-width: 0; overflow-wrap: anywhere; }
 ul.legend li { font-size: 14px; }
 
+/* The review: long-form paragraphs, kept near 68 characters wide. */
+p.long { margin: 0; max-width: 68ch; font-size: 15.5px; line-height: 1.62; color: var(--ink); overflow-wrap: anywhere; }
+.review { gap: 14px; }
+
 /* The sequence, as lanes: the caller and the target, one row per message. Lifelines sit at 25% and 75% of each track. */
 .lanes { display: grid; gap: 2px; min-width: 0; font-size: 13px; }
 .lane-row { display: grid; grid-template-columns: 2.6em minmax(0, 1fr); align-items: stretch; min-width: 0; }

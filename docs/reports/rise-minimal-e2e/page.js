@@ -131,5 +131,14 @@
     return sec;
   };
 
-  host.append(diagram(), rules(), steps(), decisions(), outOfSlice());
+  // ---- The long-form review: our critique, quoting the post, in paragraphs.
+  const review = () => {
+    const sec = el("section", "block review");
+    sec.append(el("h2", null, W.REVIEW.heading));
+    sec.append(el("p", "note", W.REVIEW.lede));
+    W.REVIEW.paras.forEach((t) => sec.append(el("p", "long", t)));
+    return sec;
+  };
+
+  host.append(diagram(), rules(), steps(), decisions(), review(), outOfSlice());
 })();
