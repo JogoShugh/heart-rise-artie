@@ -90,10 +90,14 @@
         const ex = el("div", "exchange");
         ex.append(el("p", "dir", `Request: ${x.from} to ${x.to}`));
         ex.append(el("pre", "line", [x.line, ...(x.headers || [])].join("\n")));
-        if (x.body !== undefined) ex.append(window.JsonView.box({ a: x.body, summary: x.bodyLabel || "Request body" }));
+        if (x.body !== undefined) {
+          if (typeof x.body === "string") ex.append(el("pre", "line", x.body));
+          else ex.append(window.JsonView.box({ a: x.body, summary: x.bodyLabel || "Request body" }));
+        }
         ex.append(el("p", "dir", `Response: ${x.to} to ${x.from}`));
         ex.append(el("pre", "line res", [x.res.line, ...(x.res.headers || [])].join("\n")));
-        ex.append(window.JsonView.box({ a: x.res.body, summary: "Response body" }));
+        if (typeof x.res.body === "string") ex.append(el("pre", "line res html", x.res.body));
+        else ex.append(window.JsonView.box({ a: x.res.body, summary: "Response body" }));
         block.append(ex);
       });
       if (s.obs.length) {
