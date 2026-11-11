@@ -108,11 +108,14 @@ class GuardSteps(private val ctx: ClientContext, private val scripts: ScriptStep
         }
     }
 
-    /** The bookmark's forms, pinned as offered now: offered inline, by the bookmark, in no set. */
-    private fun bookmark(): Map<String, Pair<String, String?>> =
-        read("/").getValue("_forms").jsonObject.mapValues { (_, form) ->
-            form.jsonObject.getValue("hr:integrity").jsonPrimitive.content to null
+    /** The bookmark's forms, pinned as offered now: at L2 in the set the bookmark links, as a resource's are. */
+    private fun bookmark(): Map<String, Pair<String, String?>> {
+        val link = read("/").getValue("_links").jsonObject.getValue("hr:forms").jsonObject
+        val set = link.getValue("integrity").jsonPrimitive.content
+        return read(link.getValue("href").jsonPrimitive.content).getValue("_forms").jsonObject.mapValues { (_, form) ->
+            form.jsonObject.getValue("hr:integrity").jsonPrimitive.content to set
         }
+    }
 
     @Then("the run finished")
     fun finished() = assertEquals(null, scripts.stoppedMessage(), "the run stopped")

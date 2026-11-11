@@ -89,9 +89,10 @@ Feature: A generated script makes the same requests, holds to its lock file, and
 
   Scenario Outline: A guarded run records what held each act: its set, or its form alone
     An act offered in a set the lock file recorded for it is held by the
-    set, which covers every form in it. One whose set is new, or that comes
-    with no set (the service index's lookup forms are inline at every rung),
-    is held by its own form's integrity alone.
+    set, which covers every form in it. One whose set is new is held by its
+    own form's integrity alone. The service index is a resource like any
+    other: at L2 its lookup forms are in the set it links, which the issue
+    forms' change leaves as it was.
     Given the gateway's issue forms change: <change>
     When "gen.kts" runs with ARTIE, held "lenient" to its lock file, captured in "gen.trace.yaml", given
       | name   | value   |
@@ -100,7 +101,7 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | number | 11      |
     Then the run captured in "gen.trace.yaml" held its acts by
       | relation          | held   |
-      | github:issues-get | form   |
+      | github:issues-get | set    |
       | github:comment    | <held> |
       | github:close      | <held> |
 
@@ -278,7 +279,7 @@ Feature: A generated script makes the same requests, holds to its lock file, and
       | number | 11      |
     Then the run captured in "gen.trace.yaml" held its acts by
       | relation          | held   |
-      | github:issues-get | form   |
+      | github:issues-get | set    |
       | github:comment    | form   |
       | github:close      | values |
     And about its pins, the run said "re-pinned github:comment: offered in a new set; re-pinned github:close: changed, and what the script sends still fits it"

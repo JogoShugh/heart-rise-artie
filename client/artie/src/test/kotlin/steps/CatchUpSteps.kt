@@ -31,9 +31,11 @@ class CatchUpSteps(
         val link = pull.getValue("_links").jsonObject.getValue("hr:forms").jsonObject
         val set = read(link.getValue("href").jsonPrimitive.content)
         val form = set.getValue("_forms").jsonObject.getValue(relation).jsonObject
-        val bookmark = read("/").getValue("_forms").jsonObject.mapValues { (_, offered) ->
-            offered.jsonObject.getValue("hr:integrity").jsonPrimitive.content to null
-        }
+        // At L2 the bookmark's forms are in the set it links, as a resource's are.
+        val entry = read("/").getValue("_links").jsonObject.getValue("hr:forms").jsonObject
+        val entrySet = entry.getValue("integrity").jsonPrimitive.content
+        val bookmark = read(entry.getValue("href").jsonPrimitive.content).getValue("_forms").jsonObject
+            .mapValues { (_, offered) -> offered.jsonObject.getValue("hr:integrity").jsonPrimitive.content to entrySet }
         ctx.guard = guard
         ctx.pins = bookmark + (relation to (form.getValue("hr:integrity").jsonPrimitive.content to
             link.getValue("integrity").jsonPrimitive.content))
