@@ -32,6 +32,18 @@ Feature: HEART conformance over HTTP, for any declared resource type
       | "/" as hal-schema-forms                               | https://w3id.org/heart-rise/hal-schema-forms |
       | "/" with Accept "application/prs.hal-forms+json"      | https://w3id.org/heart-rise/hal-forms        |
 
+  Scenario: Every answer names the formats it is served in, and an Accept the server can't serve is told them
+    When a client gets the resource as hal-schema-forms
+    Then the response links these alternates
+      | type                           | profile                                      |
+      | application/hal+json           | https://w3id.org/heart-rise/hal-schema-forms |
+      | application/prs.hal-forms+json | https://w3id.org/heart-rise/hal-forms        |
+      | text/html                      |                                              |
+      | application/json               |                                              |
+    When a client gets "/" with Accept "application/xml"
+    Then the response status is 406
+    And the refusal lists the same alternates
+
   Scenario Outline: L<n> links to a shared affordance set whose bytes match the link's integrity
     When a client gets the resource as hal-schema-forms with Prefer "<prefer>"
     Then the response status is 200

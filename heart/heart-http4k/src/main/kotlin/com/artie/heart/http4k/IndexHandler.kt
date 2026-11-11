@@ -1,5 +1,6 @@
 package com.artie.heart.http4k
 
+import com.artie.heart.Alternates
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.FieldTitle
@@ -50,7 +51,10 @@ class IndexHandler(
                 }
                 layer1(answer, dialect)
                     // RFC 8631: the OpenAPI description, for a client that knows only this address.
-                    .replaceHeader(LINK, "${Negotiation.profileLinks(dialect)}, $SERVICE_DESC_LINK")
+                    .replaceHeader(
+                        LINK,
+                        "${Negotiation.profileLinks(dialect)}, ${Alternates.links("/")}, $SERVICE_DESC_LINK",
+                    )
             }
         }
     }
@@ -104,7 +108,7 @@ class IndexHandler(
 
     private fun layer1(response: Response, dialect: Dialect): Response =
         response.replaceHeader("Cache-Control", "no-cache")
-            .replaceHeader(LINK, Negotiation.profileLinks(dialect))
+            .replaceHeader(LINK, "${Negotiation.profileLinks(dialect)}, ${Alternates.links("/")}")
             .replaceHeader(Negotiation.CONTENT_PROFILE, Negotiation.contentProfile(dialect))
             .replaceHeader(VARY, "$ACCEPT, ${Negotiation.ACCEPT_PROFILE}")
 

@@ -62,7 +62,11 @@ class ServiceIndex(
         mapper.writeValueAsString(HomeDocument(found, this.title, serviceDesc).at(maxRung))
 
     /** The index's own links: itself and, when served, the OpenAPI description and the keys the server signs with. */
-    private fun links(): Map<String, Any> = mapOf("self" to mapOf("href" to "/")) + listOfNotNull(
+    private fun links(): Map<String, Any> = mapOf(
+        "self" to mapOf("href" to "/"),
+        // The formats every resource here is served in, listed once, at the entry.
+        "alternate" to Alternates.of("/"),
+    ) + listOfNotNull(
         serviceDesc?.let { SERVICE_DESC to mapOf("href" to it, "type" to OpenApiDocument.MEDIA_TYPE) },
         if (publishesKeys) "hr:keys" to mapOf("href" to Signatures.KEYS, "type" to Signatures.JWK_SET) else null,
     )

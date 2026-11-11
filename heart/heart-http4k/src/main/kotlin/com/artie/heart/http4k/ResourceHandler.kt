@@ -4,6 +4,7 @@ import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.ActRequests
 import com.artie.heart.ActTargets
+import com.artie.heart.Alternates
 import com.artie.heart.Acted
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
@@ -212,7 +213,7 @@ class ResourceHandler<S, K>(
             .body(mapper.writeValueAsString(type.state.bodyOf(state)))
 
     /** One representation of one state: its validator, its headers and its body. */
-    private inner class Rendered(state: S, private val dialect: Dialect, private val rung: Rung) {
+    private inner class Rendered(private val state: S, private val dialect: Dialect, private val rung: Rung) {
         /** Layer 1 in the negotiated dialect, both rendered by heart-core from the declaration. */
         private val body: Any = when (dialect) {
             Dialect.JSONSCHEMA -> resource.layers.layer1(state, rung)
@@ -228,6 +229,7 @@ class ResourceHandler<S, K>(
                 // SPEC §6.1/§6.2: Layer 1 is revalidated on every request, never stored fresh.
                 .header("Cache-Control", "no-cache")
                 .header(LINK, Negotiation.profileLinks(dialect))
+                .header(LINK, Alternates.links(resource.location(state)))
                 .header(Negotiation.CONTENT_PROFILE, Negotiation.contentProfile(dialect))
                 .header(VARY, vary(dialect))
                 // RFC 7240: confirms what was honoured; the payload alone may not say.

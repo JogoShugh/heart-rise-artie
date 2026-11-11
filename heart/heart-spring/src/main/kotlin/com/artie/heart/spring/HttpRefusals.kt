@@ -5,6 +5,7 @@ import com.artie.heart.CallerForbiddenException
 import com.artie.heart.CallerUnauthorizedException
 import com.artie.heart.HtmlProblem
 import com.artie.heart.MalformedActBodyException
+import com.artie.heart.Alternates
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
 import com.artie.heart.PROBLEM_TYPES
@@ -80,12 +81,16 @@ object HttpRefusals {
             HttpStatus.UNPROCESSABLE_ENTITY, "rule-refused", "A rule of the resource refuses the act",
             mapOf("violations" to failure.violations),
         )
+        // RFC 9110 §15.5.7: a 406 lists the formats the resource is served in.
+        is NotAcceptableException -> Refusal(
+            HttpStatus.NOT_ACCEPTABLE, "not-acceptable", "Accept names no format this server produces",
+            mapOf("alternates" to Alternates.FORMATS),
+        )
         else -> null
     }
 
     private fun plainError(failure: Throwable): HttpStatus? = when (failure) {
         is ResourceNotFoundException -> HttpStatus.NOT_FOUND
-        is NotAcceptableException -> HttpStatus.NOT_ACCEPTABLE
         is MalformedActBodyException, is BadRequestException -> HttpStatus.BAD_REQUEST
         else -> null
     }

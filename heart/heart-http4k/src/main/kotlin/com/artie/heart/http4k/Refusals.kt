@@ -1,5 +1,6 @@
 package com.artie.heart.http4k
 
+import com.artie.heart.Alternates
 import com.artie.heart.BadRequestException
 import com.artie.heart.CallerForbiddenException
 import com.artie.heart.CallerUnauthorizedException
@@ -57,7 +58,11 @@ object Refusals {
         is StaleWriteConflict ->
             problem(Status.PRECONDITION_FAILED, "stale", "The act is stale: the state has changed", failure, mapper)
         is ResourceNotFoundException -> error(Status.NOT_FOUND, failure, mapper)
-        is NotAcceptableException -> error(Status.NOT_ACCEPTABLE, failure, mapper)
+        // RFC 9110 §15.5.7: a 406 lists the formats the resource is served in.
+        is NotAcceptableException -> problem(
+            Status.NOT_ACCEPTABLE, "not-acceptable", "Accept names no format this server produces", failure, mapper,
+            mapOf("alternates" to Alternates.FORMATS),
+        )
         is MalformedActBodyException, is BadRequestException -> error(Status.BAD_REQUEST, failure, mapper)
         else -> ofAct(failure, mapper)
     }

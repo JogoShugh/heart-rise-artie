@@ -1,5 +1,6 @@
 package com.artie.heart.spring
 
+import com.artie.heart.Alternates
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.FieldTitle
@@ -46,7 +47,10 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
                 answer(request, index.validator(dialect), dialect.mediaType, index.body(dialect)) {
                     layer1(it, dialect)
                     // RFC 8631: the OpenAPI description, for a client that knows only this address.
-                    it.set(HttpHeaders.LINK, "${HttpNegotiation.profileLinks(dialect)}, $SERVICE_DESC_LINK")
+                    it.set(
+                        HttpHeaders.LINK,
+                        "${HttpNegotiation.profileLinks(dialect)}, ${Alternates.links("/")}, $SERVICE_DESC_LINK",
+                    )
                 }
             }
         }
@@ -116,7 +120,7 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
 
     private fun layer1(headers: HttpHeaders, dialect: Dialect) {
         headers.cacheControl = "no-cache"
-        headers.set(HttpHeaders.LINK, HttpNegotiation.profileLinks(dialect))
+        headers.set(HttpHeaders.LINK, "${HttpNegotiation.profileLinks(dialect)}, ${Alternates.links("/")}")
         HttpNegotiation.contentProfile(headers, dialect)
         headers.set(HttpHeaders.VARY, "${HttpHeaders.ACCEPT}, ${HttpNegotiation.ACCEPT_PROFILE}")
     }

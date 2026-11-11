@@ -4,6 +4,7 @@ import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.ActRequests
 import com.artie.heart.ActTargets
+import com.artie.heart.Alternates
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
@@ -238,6 +239,7 @@ class HeartResourceHandler<S, K>(
             // SPEC §6.1/§6.2: Layer 1 is revalidated on every request, never stored fresh.
             headers.cacheControl = "no-cache"
             headers.set(HttpHeaders.LINK, HttpNegotiation.profileLinks(dialect))
+            headers.add(HttpHeaders.LINK, Alternates.links(resource.location(state)))
             HttpNegotiation.contentProfile(headers, dialect)
             headers.set(HttpHeaders.VARY, vary(dialect))
             // RFC 7240: confirms what was honoured; the payload alone may not say.

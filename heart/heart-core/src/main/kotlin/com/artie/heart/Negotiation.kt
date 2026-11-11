@@ -48,7 +48,7 @@ object Negotiation {
         return when {
             named.isNotEmpty() -> named.best().first
             acceptLeavesItOpen -> byProfile(acceptProfile) ?: DEFAULT_DIALECT
-            else -> throw NotAcceptableException("Accept names no dialect this server produces: ${Dialect.entries}")
+            else -> throw NotAcceptableException("Accept names no format this server produces")
         }
     }
 
@@ -107,4 +107,27 @@ object Negotiation {
             val q = parts.drop(1).firstOrNull { it.startsWith("q=") }?.removePrefix("q=")?.toDoubleOrNull() ?: 1.0
             Ranked(parts.first(), q, index)
         }
+}
+
+/**
+ * Every format a resource is served in, each with the profile that says how to read it, where there is one: both
+ * HEART dialects, HTML for people, and plain JSON, the OpenAPI twin's. Every answer names them as `alternate` links,
+ * the index lists them once, and a 406 lists them, so a client never guesses what it may ask for.
+ */
+object Alternates {
+    val FORMATS: List<Map<String, String>> = listOf(
+        mapOf("type" to Dialect.JSONSCHEMA.mediaType, "profile" to Dialect.JSONSCHEMA.profile),
+        mapOf("type" to Dialect.HALFORMS.mediaType, "profile" to Dialect.HALFORMS.profile),
+        mapOf("type" to Negotiation.HTML),
+        mapOf("type" to Negotiation.PLAIN_JSON),
+    )
+
+    /** The resource at [href] in each of its formats, as one Link header value (RFC 8288 `alternate`). */
+    fun links(href: String): String = FORMATS.joinToString(", ") { format ->
+        val profile = format["profile"]?.let { "; profile=\"$it\"" }.orEmpty()
+        "<$href>; rel=\"alternate\"; type=\"${format["type"]}\"$profile"
+    }
+
+    /** The resource at [href] in each of its formats, as HAL links. */
+    fun of(href: String): List<Map<String, String>> = FORMATS.map { mapOf("href" to href) + it }
 }
