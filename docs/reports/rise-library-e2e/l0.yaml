@@ -1,5 +1,5 @@
 steps:
-- at: "2026-11-11T06:25:16.862497Z"
+- at: "2026-11-11T11:49:20.117773Z"
   mode: "script"
   say: "Ana reads the library's entry, as HAL Schema Forms"
   params: {}
@@ -14,7 +14,7 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"index-hsf-e666c99bd6bab702\""
+      ETag: "\"index-hsf-79cc72e04de15146\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
     body:
@@ -69,7 +69,8 @@ steps:
                 description: "Part of the member's name; case is ignored"
             required:
             - "name"
-          hr:integrity: "sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="
+            $id: "/schemas/7422cba42ff7be42"
+          hr:integrity: "sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI="
         library:get-account:
           _links:
             target:
@@ -90,7 +91,8 @@ steps:
                 description: "The number on the back of the library card"
             required:
             - "id"
-          hr:integrity: "sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="
+            $id: "/schemas/40b74bc3707cee77"
+          hr:integrity: "sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4="
         library:search-members:
           _links:
             target:
@@ -110,7 +112,8 @@ steps:
                 title: "Company"
                 description: "Part of the company's name; case is ignored"
             required: []
-          hr:integrity: "sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="
+            $id: "/schemas/a2986fb239a54937"
+          hr:integrity: "sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18="
         library:get-member:
           _links:
             target:
@@ -131,7 +134,8 @@ steps:
                 description: "The number on the back of the library card"
             required:
             - "id"
-          hr:integrity: "sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="
+            $id: "/schemas/40b74bc3707cee77"
+          hr:integrity: "sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y="
         library:search-loans:
           _links:
             target:
@@ -151,7 +155,8 @@ steps:
                 description: "Part of the book's title; case is ignored"
             required:
             - "name"
-          hr:integrity: "sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="
+            $id: "/schemas/98632b086d33c1e3"
+          hr:integrity: "sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4="
         library:get-loan:
           _links:
             target:
@@ -171,7 +176,8 @@ steps:
                 description: "The loan's number, on the receipt"
             required:
             - "id"
-          hr:integrity: "sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="
+            $id: "/schemas/761d57bbd45669f6"
+          hr:integrity: "sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y="
         library:search-watches:
           _links:
             target:
@@ -191,7 +197,8 @@ steps:
                 description: ""
             required:
             - "name"
-          hr:integrity: "sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g="
+            $id: "/schemas/5eb1c52f6c703873"
+          hr:integrity: "sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno="
         library:get-watch:
           _links:
             target:
@@ -211,7 +218,8 @@ steps:
                 description: "The watch's number, in its Location"
             required:
             - "id"
-          hr:integrity: "sha256-HehVbRBB2+7tl0d6s3KNl5J4e1VLDO21aUP8s2rAel4="
+            $id: "/schemas/57dc13e999ed7322"
+          hr:integrity: "sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs="
         library:tell-me-when-renewable:
           _links:
             target:
@@ -270,13 +278,13 @@ steps:
           hr:cancel:
           - "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
           library:get-account:
-          - "sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="
+          - "sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4="
           library:get-loan:
-          - "sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="
+          - "sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y="
           library:get-member:
-          - "sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="
+          - "sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y="
           library:get-watch:
-          - "sha256-HehVbRBB2+7tl0d6s3KNl5J4e1VLDO21aUP8s2rAel4="
+          - "sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs="
           library:renew:
           - "sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0="
           library:report-problem:
@@ -284,20 +292,20 @@ steps:
           library:return:
           - "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
           library:search-accounts:
-          - "sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="
+          - "sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI="
           library:search-loans:
-          - "sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="
+          - "sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4="
           library:search-members:
-          - "sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="
+          - "sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18="
           library:search-watches:
-          - "sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g="
+          - "sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno="
           library:tell-me-when-renewable:
           - "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
-        digest: "sha256-1leoxsXzkQ14Bcdd6GFTxC0WxteTbl6xL0bfLWP2hPU="
+        digest: "sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs="
   expect: 200
   ms: 3
   entry: true
-- at: "2026-11-11T06:25:16.885932Z"
+- at: "2026-11-11T11:49:20.139278Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, unsigned"
   params:
@@ -310,7 +318,7 @@ steps:
       Authorization: "Basic <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      If-Match: "\"index-hsf-79cc72e04de15146\""
       Content-Type: "application/json"
     body:
       loan: 3310
@@ -336,7 +344,7 @@ steps:
       detail: "Each act here is signed by the key ana-2026-11."
   expect: 401
   ms: 2
-- at: "2026-11-11T06:25:16.897975Z"
+- at: "2026-11-11T11:49:20.149995Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed\
     \ with her key"
@@ -350,12 +358,12 @@ steps:
       Authorization: "Basic <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      If-Match: "\"index-hsf-79cc72e04de15146\""
       Content-Type: "application/json"
       Content-Digest: "sha-256=:s+ZjKMzznK0xomAGvTZsgX5uvMUwD9sZgzg0+d6qs4A=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:zE16LbQbMTYhM69ouS5eOusZNXbWysZpdfFvrsJkZ/IZKPycryzluHNuwDtVo8Os8GTHEhuOGkomU1cZJaIvDw==:"
+      Signature: "sig1=:Xu4GeSWVKEgYPbI0LGHHQlcGGa6NAUigIohdRcnXud91q2t7LOyxxEA8xxGdsYaQCy6hwYHiBYphjY3ah7vvDQ==:"
     body:
       loan: 3310
       _links:
@@ -418,7 +426,7 @@ steps:
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
   ms: 4
-- at: "2026-11-11T06:25:16.904001Z"
+- at: "2026-11-11T11:49:20.156131Z"
   mode: "script"
   say: "Ana reads her watch: its keys, its reply, and her cancel"
   params: {}
@@ -480,8 +488,8 @@ steps:
             $id: "/schemas/35f65fac527144fc"
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
-  ms: 2
-- at: "2026-11-11T06:25:16.907096Z"
+  ms: 3
+- at: "2026-11-11T11:49:20.160499Z"
   mode: "script"
   say: "The library reads Ana's reply {reply}, linked from the watch, for its forms"
   params:
@@ -647,7 +655,7 @@ steps:
           hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
   expect: 200
   ms: 6
-- at: "2026-11-11T06:25:16.921579Z"
+- at: "2026-11-11T11:49:20.174382Z"
   mode: "script"
   say: "The library reports progress of {percent} percent, naming the watch it answers\
     \ for"
@@ -832,8 +840,8 @@ steps:
             $id: "/schemas/3b56ba1aaf3f6c04"
           hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
   expect: 200
-  ms: 10
-- at: "2026-11-11T06:25:16.933892Z"
+  ms: 8
+- at: "2026-11-11T11:49:20.184286Z"
   mode: "script"
   say: "An answer that names another watch, {watch}, is sent"
   params:
@@ -872,8 +880,8 @@ steps:
         \ http://localhost:8140/watches/1"
       rel: "hr:in-reply-to"
   expect: 409
-  ms: 3
-- at: "2026-11-11T06:25:16.938578Z"
+  ms: 4
+- at: "2026-11-11T11:49:20.190095Z"
   mode: "script"
   say: "A result signed with another key, claiming the library's keyid, is sent"
   params:
@@ -891,7 +899,7 @@ steps:
       Content-Digest: "sha-256=:DM73mHpUssFOVNR4oyVKhIeNRaD2EWV4DWzxhvMREho=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:0fWNhK6TNeP4t8hwlRprHUWWx5Uu/p1gnbkMEbj3ICxyce63xcf9oMhXz5QlMmqu+zGennld4pfxxyZH6Py4CA==:"
+      Signature: "sig1=:OQ0s8OYfKsDZmRG3uXIkMbVV81aybA+HxNWCH9xdoxQ9sJ1/8GjFENmbr8h4lpIaJ76rWzSr3FeWy4RS973oCA==:"
     body:
       state: "completed"
       result:
@@ -914,8 +922,8 @@ steps:
       status: 401
       detail: "Each act here is signed by the key library-2026-11."
   expect: 401
-  ms: 2
-- at: "2026-11-11T06:25:16.941685Z"
+  ms: 3
+- at: "2026-11-11T11:49:20.193483Z"
   mode: "script"
   say: "An unsigned result is sent"
   params:
@@ -952,8 +960,8 @@ steps:
       status: 401
       detail: "Each act here is signed by the key library-2026-11."
   expect: 401
-  ms: 3
-- at: "2026-11-11T06:25:16.946646Z"
+  ms: 2
+- at: "2026-11-11T11:49:20.198334Z"
   mode: "script"
   say: "The hold is returned, and the library sends the result, signed"
   params:
@@ -1013,8 +1021,8 @@ steps:
           type: "application/hal+json"
       _forms: {}
   expect: 200
-  ms: 8
-- at: "2026-11-11T06:25:16.957894Z"
+  ms: 7
+- at: "2026-11-11T11:49:20.208212Z"
   mode: "script"
   say: "The same result is sent again, and is answered as the first was"
   params:
@@ -1074,8 +1082,8 @@ steps:
           type: "application/hal+json"
       _forms: {}
   expect: 200
-  ms: 4
-- at: "2026-11-11T06:25:16.963384Z"
+  ms: 3
+- at: "2026-11-11T11:49:20.212721Z"
   mode: "script"
   say: "A different result is sent, after the answer"
   params:
@@ -1116,7 +1124,7 @@ steps:
       rel: "https://w3id.org/heart-rise/rels/completed"
   expect: 409
   ms: 3
-- at: "2026-11-11T06:25:16.967468Z"
+- at: "2026-11-11T11:49:20.216894Z"
   mode: "script"
   say: "Ana reads her watch after the answer: no cancel, and why"
   params: {}
@@ -1160,8 +1168,8 @@ steps:
           type: "application/jwk-set+json"
       _forms: {}
   expect: 200
-  ms: 2
-- at: "2026-11-11T06:25:16.96973Z"
+  ms: 1
+- at: "2026-11-11T11:49:20.218726Z"
   mode: "script"
   say: "Ana reads why the watch offers no cancel"
   params: {}
@@ -1183,8 +1191,8 @@ steps:
         rel: "https://w3id.org/heart-rise/rels/cancel"
         title: "Cancel the request"
   expect: 200
-  ms: 1
-- at: "2026-11-11T06:25:16.971191Z"
+  ms: 0
+- at: "2026-11-11T11:49:20.219951Z"
   mode: "script"
   say: "Ana cancels anyway, by the form she read before"
   params:
@@ -1212,8 +1220,8 @@ steps:
         \ so there is nothing to cancel."
       rel: "https://w3id.org/heart-rise/rels/cancel"
   expect: 409
-  ms: 2
-- at: "2026-11-11T06:25:16.973479Z"
+  ms: 1
+- at: "2026-11-11T11:49:20.221632Z"
   mode: "script"
   say: "The library reads the reply's history, by the link its last answer gave"
   params:
@@ -1238,7 +1246,7 @@ steps:
         up:
           href: "/replies/r-7f3"
       changes:
-      - at: "2026-11-11T06:25:16.931653Z"
+      - at: "2026-11-11T11:49:20.182370Z"
         replaced: "\"seq-1.hsf.L0.4b9d1ff05d6161a9\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1246,7 +1254,7 @@ steps:
         _links:
           self:
             href: "/replies/r-7f3/history#change-1"
-      - at: "2026-11-11T06:25:16.954409Z"
+      - at: "2026-11-11T11:49:20.204959Z"
         replaced: "\"seq-2.hsf.L0.0cb81f356edf7db1\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1257,8 +1265,8 @@ steps:
           predecessor-version:
             href: "/replies/r-7f3/history#change-1"
   expect: 200
-  ms: 0
-- at: "2026-11-11T06:25:16.975378Z"
+  ms: 1
+- at: "2026-11-11T11:49:20.223834Z"
   mode: "script"
   say: "Ana asks again, with reply {reply}, on the entry's ETag she already holds"
   params:
@@ -1271,12 +1279,12 @@ steps:
       Authorization: "Basic <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      If-Match: "\"index-hsf-79cc72e04de15146\""
       Content-Type: "application/json"
       Content-Digest: "sha-256=:PnKsFTa90OfGC3aDSn1I7x3tmoNapyP654RlVZixTeg=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:FDBWlWS99pB8iv3tSkw2J0QUUlkc+ZRiSLsAzkRptjaM1HM5tN17U8onF9/b/JEpnzbOmKap5Iw4PlReqXp1AA==:"
+      Signature: "sig1=:gIeiHeXQdyrIgEjGgmCwp8fJpIKrMCyR6i+OVW+x/A2whgrbmwjUU+fYDb8gpPOZGw1N59FZ/VyKxlzyFfCtDg==:"
     body:
       loan: 3310
       _links:
@@ -1339,7 +1347,7 @@ steps:
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
   ms: 3
-- at: "2026-11-11T06:25:16.979572Z"
+- at: "2026-11-11T11:49:20.228172Z"
   mode: "script"
   say: "Ana reads her second watch"
   params: {}
@@ -1402,7 +1410,7 @@ steps:
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
   ms: 2
-- at: "2026-11-11T06:25:16.981947Z"
+- at: "2026-11-11T11:49:20.230487Z"
   mode: "script"
   say: "The library reads Ana's reply {reply} for its forms"
   params:
@@ -1567,8 +1575,8 @@ steps:
             $id: "/schemas/3b56ba1aaf3f6c04"
           hr:integrity: "sha256-qqKB8OT+lCxISpxnfev1gx+hr8Oee1Ji2BwZKrQxjPw="
   expect: 200
-  ms: 6
-- at: "2026-11-11T06:25:16.989036Z"
+  ms: 5
+- at: "2026-11-11T11:49:20.23663Z"
   mode: "script"
   say: "The failure is sent as a merge patch, not the problem document its form asks\
     \ for"
@@ -1611,7 +1619,7 @@ steps:
       - "application/problem+json"
   expect: 415
   ms: 3
-- at: "2026-11-11T06:25:16.992996Z"
+- at: "2026-11-11T11:49:20.240666Z"
   mode: "script"
   say: "The library has no record of the hold, and sends the failure as a problem\
     \ document"
@@ -1671,8 +1679,8 @@ steps:
           title: "No hold record for loan 3310"
       _forms: {}
   expect: 200
-  ms: 7
-- at: "2026-11-11T06:25:17.002716Z"
+  ms: 6
+- at: "2026-11-11T11:49:20.248861Z"
   mode: "script"
   say: "Ana asks a third time, with reply {reply}"
   params:
@@ -1685,12 +1693,12 @@ steps:
       Authorization: "Basic <token>"
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      If-Match: "\"index-hsf-e666c99bd6bab702\""
+      If-Match: "\"index-hsf-79cc72e04de15146\""
       Content-Type: "application/json"
       Content-Digest: "sha-256=:+75gt6d0BEiabrFAYwmyfjkVRAAEjcJnN/UJhfEBOvQ=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:tQ6VhfaHMYZ0Qk87MQoxfkFD/ZYCGGAqd/v/jnVfQyYRVzgWGHYY3Ln0ihSL4c/lKZXu7ZVBsrG29dVODRpODQ==:"
+      Signature: "sig1=:uaH/Gyf/1hCUUhGWEze+4LZdKXExawkyEIhjSxEY014PuY5SbkwtIWfak8FDUW/bJZcZOwPwxks5CwCPeUMNCQ==:"
     body:
       loan: 3310
       _links:
@@ -1753,7 +1761,7 @@ steps:
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 201
   ms: 3
-- at: "2026-11-11T06:25:17.007139Z"
+- at: "2026-11-11T11:49:20.2531Z"
   mode: "script"
   say: "Ana reads her third watch, which offers {relation}"
   params:
@@ -1816,8 +1824,8 @@ steps:
             $id: "/schemas/35f65fac527144fc"
           hr:integrity: "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
   expect: 200
-  ms: 2
-- at: "2026-11-11T06:25:17.009544Z"
+  ms: 1
+- at: "2026-11-11T11:49:20.255329Z"
   mode: "script"
   say: "Ana cancels the request, by the watch's form"
   params:
@@ -1865,8 +1873,8 @@ steps:
           type: "application/jwk-set+json"
       _forms: {}
   expect: 200
-  ms: 3
-- at: "2026-11-11T06:25:17.012913Z"
+  ms: 2
+- at: "2026-11-11T11:49:20.258127Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HTML"
   params:
@@ -1979,8 +1987,8 @@ steps:
       \ failed</button></div></form></dialog></main><div id=\"announce\" class=\"\
       announce\" role=\"status\" aria-live=\"polite\"></div></body></html>\n"
   expect: 200
-  ms: 9
-- at: "2026-11-11T06:25:17.022283Z"
+  ms: 7
+- at: "2026-11-11T11:49:20.265743Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HAL-FORMS"
   params:
@@ -2074,7 +2082,7 @@ steps:
             type: "text"
   expect: 200
   ms: 3
-- at: "2026-11-11T06:25:17.025569Z"
+- at: "2026-11-11T11:49:20.269727Z"
   mode: "script"
   say: "Ana's reply {reply}, asked for as XML, which it is not served in"
   params:

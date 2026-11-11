@@ -150,7 +150,8 @@ private class RiseRun(private val prefer: String?, private val live: Boolean) {
 
     /** Ana asks the entry's form for news of loan 3310 on [reply], signed by [signer]; the watch's address, if made. */
     private fun ask(entry: JsonNode, reply: String, signer: Signer?, expect: Int, say: String): String {
-        val form = entry["_forms"]["library:tell-me-when-renewable"]
+        // As the entry handed it over: in it at L0, in the set it links at L2.
+        val form = forms.getValue("/" to "tell-me-when-renewable")
         val body = json(
             mapOf(
                 "loan" to LOAN,

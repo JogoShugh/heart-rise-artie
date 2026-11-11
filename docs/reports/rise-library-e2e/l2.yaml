@@ -1,5 +1,5 @@
 steps:
-- at: "2026-11-11T06:25:17.183606Z"
+- at: "2026-11-11T11:49:20.486529Z"
   mode: "script"
   say: "Ana reads the library's entry, as HAL Schema Forms"
   params: {}
@@ -15,10 +15,10 @@ steps:
   response:
     status: 200
     headers:
-      ETag: "\"index-hsf-4ef3b2d889cf4f0b\""
+      ETag: "\"index-hsf-b4aa5facac883596\""
       Content-Type: "application/hal+json"
       Content-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
-      Preference-Applied: "schema=link"
+      Preference-Applied: "forms=link, schema=link"
     body:
       title: "Riverside Public Library"
       _links:
@@ -51,194 +51,23 @@ steps:
         hr:affordances:
           href: "/affordances"
           type: "application/hal+json"
-      _forms:
-        library:search-accounts:
-          _links:
-            target:
-              href: "/accounts{?name}"
-              templated: true
-          method: "GET"
-          title: "Find accounts by name"
-          description: "Lists the accounts whose member's name has the text."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              name:
-                type: "string"
-                minLength: 1
-                title: "Name"
-                description: "Part of the member's name; case is ignored"
-            required:
-            - "name"
-          hr:integrity: "sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="
-        library:get-account:
-          _links:
-            target:
-              href: "/accounts/{id}"
-              templated: true
-          method: "GET"
-          title: "Get an account by library card number"
-          description: "Goes to one member's account, given the number on their library\
-            \ card."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Library card number"
-                description: "The number on the back of the library card"
-            required:
-            - "id"
-          hr:integrity: "sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="
-        library:search-members:
-          _links:
-            target:
-              href: "/members{?company}"
-              templated: true
-          method: "GET"
-          title: "Find members by company"
-          description: "Lists the members in the company group whose name has the\
-            \ text, five to a page."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              company:
-                type: "string"
-                minLength: 1
-                title: "Company"
-                description: "Part of the company's name; case is ignored"
-            required: []
-          hr:integrity: "sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="
-        library:get-member:
-          _links:
-            target:
-              href: "/members/{id}"
-              templated: true
-          method: "GET"
-          title: "Get a member of a company group by library card number"
-          description: "Goes to one member of a company group, given the number on\
-            \ their library card."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Library card number"
-                description: "The number on the back of the library card"
-            required:
-            - "id"
-          hr:integrity: "sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="
-        library:search-loans:
-          _links:
-            target:
-              href: "/loans{?name}"
-              templated: true
-          method: "GET"
-          title: "Find loans by title"
-          description: "Lists the loans whose book's title has the text."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              name:
-                type: "string"
-                minLength: 1
-                title: "Name"
-                description: "Part of the book's title; case is ignored"
-            required:
-            - "name"
-          hr:integrity: "sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="
-        library:get-loan:
-          _links:
-            target:
-              href: "/loans/{id}"
-              templated: true
-          method: "GET"
-          title: "Get a loan by number"
-          description: "Goes to one loan, given its number."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Loan number"
-                description: "The loan's number, on the receipt"
-            required:
-            - "id"
-          hr:integrity: "sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="
-        library:search-watches:
-          _links:
-            target:
-              href: "/watches{?name}"
-              templated: true
-          method: "GET"
-          title: "Find watches"
-          description: "Lists the watches the library holds."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              name:
-                type: "string"
-                minLength: 1
-                title: "Name"
-                description: ""
-            required:
-            - "name"
-          hr:integrity: "sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g="
-        library:get-watch:
-          _links:
-            target:
-              href: "/watches/{id}"
-              templated: true
-          method: "GET"
-          title: "Get a watch by number"
-          description: "Goes to one watch, given its number."
-          schema:
-            $schema: "https://json-schema.org/draft/2020-12/schema"
-            type: "object"
-            properties:
-              id:
-                type: "integer"
-                minimum: 1
-                title: "Watch number"
-                description: "The watch's number, in its Location"
-            required:
-            - "id"
-          hr:integrity: "sha256-HehVbRBB2+7tl0d6s3KNl5J4e1VLDO21aUP8s2rAel4="
-        library:tell-me-when-renewable:
-          _links:
-            target:
-              href: "/actions/tell-me-when-renewable"
-          method: "POST"
-          contentType: "application/json"
-          title: "Tell me when renewable"
-          description: "Brings a watch into being: the library tells the caller when\
-            \ the loan can be renewed."
-          schema:
-            $ref: "/schemas/2af51786a9d2f804"
-            hr:integrity: "sha256-KvUXhqnS+ASUQNsuaI7N7gxYSgRcahT6dc51jQxJvcA="
-          hr:integrity: "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
+        hr:forms:
+          href: "/affordance-sets/38ed4c96a89f0680"
+          type: "application/hal+json"
+          profile: "https://w3id.org/heart-rise/hal-schema-forms"
+          integrity: "sha256-OO1MlqifBoCG+V9lYByf83cmOoCUf75taO/frDYwjWE="
       hr:manifest:
         forms:
           hr:cancel:
           - "sha256-j/8+uDMcxsGLU5kykqmrpMyGVkT2Z/Nyk4b+73TkyUg="
           library:get-account:
-          - "sha256-u6y726V+Ubm3wk3zbScGAP1RnefFhIaN3rrPDEdXzr0="
+          - "sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4="
           library:get-loan:
-          - "sha256-Bz1M3dK896FRfWic5LpAPr7FJ+Ek3BQ6kKs+m8cVfD8="
+          - "sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y="
           library:get-member:
-          - "sha256-cqABq+QGaiZyCGr0tTpEX7NCjNUpJFatpaafhSAc4fc="
+          - "sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y="
           library:get-watch:
-          - "sha256-HehVbRBB2+7tl0d6s3KNl5J4e1VLDO21aUP8s2rAel4="
+          - "sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs="
           library:renew:
           - "sha256-YdL5t/euNBufsWOj4hp2WoKWjWPQlQGvS4SAc3aQi/0="
           library:report-problem:
@@ -246,20 +75,386 @@ steps:
           library:return:
           - "sha256-cQ6M9yPIzjqDMonAZZR1yJmmnp4s6klYxdVoJe56tLo="
           library:search-accounts:
-          - "sha256-kSp5SsnhzuCw2LoCFdlce0MTRVQocmu39jIcWgpeVnM="
+          - "sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI="
           library:search-loans:
-          - "sha256-TqsWR9ZxJUZSMuRjb+XvIiUDWC1qFhwOLUumxDl0PrU="
+          - "sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4="
           library:search-members:
-          - "sha256-zAnGZyo71Wodcly72LoiEDYPbeYgtOuuzFtO95C+buc="
+          - "sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18="
           library:search-watches:
-          - "sha256-2yobtIXyUq2XWIROrft3DpPzBOtSD/yJSvNcYEcSE5g="
+          - "sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno="
           library:tell-me-when-renewable:
           - "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
-        digest: "sha256-1leoxsXzkQ14Bcdd6GFTxC0WxteTbl6xL0bfLWP2hPU="
+        digest: "sha256-xhq/0eTIMxgY5IITL1h3D06M472+TCfXUlTkzzFDKHs="
   expect: 200
   ms: 1
   entry: true
-- at: "2026-11-11T06:25:17.185951Z"
+- at: "2026-11-11T11:49:20.488574Z"
+  mode: "script"
+  say: "{party} follows {relation} to the shared affordance set it names"
+  params:
+    party: "Ana"
+    relation: "hr:forms"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/affordance-sets/38ed4c96a89f0680"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/hal+json"
+    body:
+      _forms:
+        library:get-account:
+          _links:
+            target:
+              href: "/accounts/{id}"
+              templated: true
+          description: "Goes to one member's account, given the number on their library\
+            \ card."
+          hr:integrity: "sha256-3rDl1dEtkP3/y4xg7E87BTsXN0/63JxVXpWpHwI9mh4="
+          method: "GET"
+          schema:
+            $ref: "/schemas/40b74bc3707cee77"
+            hr:integrity: "sha256-QLdLw3B87nfnH3pxwfUD0rI/8PggZ1t6q0NqsPa4ldc="
+          title: "Get an account by library card number"
+        library:get-loan:
+          _links:
+            target:
+              href: "/loans/{id}"
+              templated: true
+          description: "Goes to one loan, given its number."
+          hr:integrity: "sha256-Xu++bzJ9BJlFHIMOTIolQe85+DdjumgwJhQbhdBE19Y="
+          method: "GET"
+          schema:
+            $ref: "/schemas/761d57bbd45669f6"
+            hr:integrity: "sha256-dh1Xu9RWafbO2LOOjzmVZGzesrFvOWJJssh1OPekBsE="
+          title: "Get a loan by number"
+        library:get-member:
+          _links:
+            target:
+              href: "/members/{id}"
+              templated: true
+          description: "Goes to one member of a company group, given the number on\
+            \ their library card."
+          hr:integrity: "sha256-IYUM1lsAf4psynXU9CMkoIEOa9OanccaXmU48TmXr+Y="
+          method: "GET"
+          schema:
+            $ref: "/schemas/40b74bc3707cee77"
+            hr:integrity: "sha256-QLdLw3B87nfnH3pxwfUD0rI/8PggZ1t6q0NqsPa4ldc="
+          title: "Get a member of a company group by library card number"
+        library:get-watch:
+          _links:
+            target:
+              href: "/watches/{id}"
+              templated: true
+          description: "Goes to one watch, given its number."
+          hr:integrity: "sha256-EcwWz1Hj09ot6o7zALOE0MUCzYcRQe848Bte7yur8zs="
+          method: "GET"
+          schema:
+            $ref: "/schemas/57dc13e999ed7322"
+            hr:integrity: "sha256-V9wT6ZntcyII0cy71O+gavzT30Q3EKyTEyXYmYMEhXY="
+          title: "Get a watch by number"
+        library:search-accounts:
+          _links:
+            target:
+              href: "/accounts{?name}"
+              templated: true
+          description: "Lists the accounts whose member's name has the text."
+          hr:integrity: "sha256-7IvOf7kcUQbF4TmRBuMV65mAms7ZoT0vOx7YIvPAnzI="
+          method: "GET"
+          schema:
+            $ref: "/schemas/7422cba42ff7be42"
+            hr:integrity: "sha256-dCLLpC/3vkLzxEyiEVgleppdfhpCjrJHdyYRxXMSlPs="
+          title: "Find accounts by name"
+        library:search-loans:
+          _links:
+            target:
+              href: "/loans{?name}"
+              templated: true
+          description: "Lists the loans whose book's title has the text."
+          hr:integrity: "sha256-7YgmepeFBW45pPEa/bp8R3kPDMRwAFR0FIJN/kpf9q4="
+          method: "GET"
+          schema:
+            $ref: "/schemas/98632b086d33c1e3"
+            hr:integrity: "sha256-mGMrCG0zweM3OiICCgafmzBCLiOYnuDCJ94N1wtBV6Y="
+          title: "Find loans by title"
+        library:search-members:
+          _links:
+            target:
+              href: "/members{?company}"
+              templated: true
+          description: "Lists the members in the company group whose name has the\
+            \ text, five to a page."
+          hr:integrity: "sha256-zNjxzpnMoVKi970TL4RtDZAnDqYWhT1Wy/n7xUF1w18="
+          method: "GET"
+          schema:
+            $ref: "/schemas/a2986fb239a54937"
+            hr:integrity: "sha256-ophvsjmlSTdghYiCIpUQY9vdGg8wnmLADP2riKW3cog="
+          title: "Find members by company"
+        library:search-watches:
+          _links:
+            target:
+              href: "/watches{?name}"
+              templated: true
+          description: "Lists the watches the library holds."
+          hr:integrity: "sha256-d/F6t3iPWqYntsUKtVIicuZxnWS61Rf36xxvX6Xnbno="
+          method: "GET"
+          schema:
+            $ref: "/schemas/5eb1c52f6c703873"
+            hr:integrity: "sha256-XrHFL2xwOHNOrf/kepL5UFZTJRaKdoL1nAIbLR/PTkM="
+          title: "Find watches"
+        library:tell-me-when-renewable:
+          _links:
+            target:
+              href: "/actions/tell-me-when-renewable"
+          contentType: "application/json"
+          description: "Brings a watch into being: the library tells the caller when\
+            \ the loan can be renewed."
+          hr:integrity: "sha256-Lb8dpVzNF2dsOgs4MYRKU+HlM2v1i7u0e32P6Uf0TDU="
+          method: "POST"
+          schema:
+            $ref: "/schemas/2af51786a9d2f804"
+            hr:integrity: "sha256-KvUXhqnS+ASUQNsuaI7N7gxYSgRcahT6dc51jQxJvcA="
+          title: "Tell me when renewable"
+      _links:
+        curies:
+        - href: "/profiles/library#{rel}"
+          name: "library"
+          templated: true
+        - href: "https://w3id.org/heart-rise/rels/{rel}"
+          name: "hr"
+          templated: true
+  expect: 200
+  ms: 1
+- at: "2026-11-11T11:49:20.491605Z"
+  mode: "script"
+  say: "{party} reads the schema {relation} links by $ref"
+  params:
+    party: "Ana"
+    relation: "library:get-account"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/schemas/40b74bc3707cee77"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      $schema: "https://json-schema.org/draft/2020-12/schema"
+      properties:
+        id:
+          description: "The number on the back of the library card"
+          minimum: 1
+          title: "Library card number"
+          type: "integer"
+      required:
+      - "id"
+      type: "object"
+  expect: 200
+  ms: 1
+- at: "2026-11-11T11:49:20.493233Z"
+  mode: "script"
+  say: "{party} reads the schema {relation} links by $ref"
+  params:
+    party: "Ana"
+    relation: "library:get-loan"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/schemas/761d57bbd45669f6"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      $schema: "https://json-schema.org/draft/2020-12/schema"
+      properties:
+        id:
+          description: "The loan's number, on the receipt"
+          minimum: 1
+          title: "Loan number"
+          type: "integer"
+      required:
+      - "id"
+      type: "object"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T11:49:20.494195Z"
+  mode: "script"
+  say: "{party} reads the schema {relation} links by $ref"
+  params:
+    party: "Ana"
+    relation: "library:get-watch"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/schemas/57dc13e999ed7322"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      $schema: "https://json-schema.org/draft/2020-12/schema"
+      properties:
+        id:
+          description: "The watch's number, in its Location"
+          minimum: 1
+          title: "Watch number"
+          type: "integer"
+      required:
+      - "id"
+      type: "object"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T11:49:20.495334Z"
+  mode: "script"
+  say: "{party} reads the schema {relation} links by $ref"
+  params:
+    party: "Ana"
+    relation: "library:search-accounts"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/schemas/7422cba42ff7be42"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      $schema: "https://json-schema.org/draft/2020-12/schema"
+      properties:
+        name:
+          description: "Part of the member's name; case is ignored"
+          minLength: 1
+          title: "Name"
+          type: "string"
+      required:
+      - "name"
+      type: "object"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T11:49:20.496345Z"
+  mode: "script"
+  say: "{party} reads the schema {relation} links by $ref"
+  params:
+    party: "Ana"
+    relation: "library:search-loans"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/schemas/98632b086d33c1e3"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      $schema: "https://json-schema.org/draft/2020-12/schema"
+      properties:
+        name:
+          description: "Part of the book's title; case is ignored"
+          minLength: 1
+          title: "Name"
+          type: "string"
+      required:
+      - "name"
+      type: "object"
+  expect: 200
+  ms: 1
+- at: "2026-11-11T11:49:20.497635Z"
+  mode: "script"
+  say: "{party} reads the schema {relation} links by $ref"
+  params:
+    party: "Ana"
+    relation: "library:search-members"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/schemas/a2986fb239a54937"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      $schema: "https://json-schema.org/draft/2020-12/schema"
+      properties:
+        company:
+          description: "Part of the company's name; case is ignored"
+          minLength: 1
+          title: "Company"
+          type: "string"
+      required: []
+      type: "object"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T11:49:20.498768Z"
+  mode: "script"
+  say: "{party} reads the schema {relation} links by $ref"
+  params:
+    party: "Ana"
+    relation: "library:search-watches"
+  request:
+    method: "GET"
+    url: "http://localhost:8140/schemas/5eb1c52f6c703873"
+    headers:
+      Authorization: "Basic <token>"
+      Accept: "application/hal+json"
+      Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
+      Prefer: "forms=link, schema=link"
+    body: null
+  response:
+    status: 200
+    headers:
+      Content-Type: "application/schema+json"
+    body:
+      $schema: "https://json-schema.org/draft/2020-12/schema"
+      properties:
+        name:
+          description: ""
+          minLength: 1
+          title: "Name"
+          type: "string"
+      required:
+      - "name"
+      type: "object"
+  expect: 200
+  ms: 0
+- at: "2026-11-11T11:49:20.499736Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -321,8 +516,8 @@ steps:
       - "_links"
       type: "object"
   expect: 200
-  ms: 1
-- at: "2026-11-11T06:25:17.188298Z"
+  ms: 0
+- at: "2026-11-11T11:49:20.501434Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, unsigned"
   params:
@@ -336,7 +531,7 @@ steps:
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
       Prefer: "forms=link, schema=link"
-      If-Match: "\"index-hsf-4ef3b2d889cf4f0b\""
+      If-Match: "\"index-hsf-b4aa5facac883596\""
       Content-Type: "application/json"
     body:
       loan: 3310
@@ -361,8 +556,8 @@ steps:
       status: 401
       detail: "Each act here is signed by the key ana-2026-11."
   expect: 401
-  ms: 0
-- at: "2026-11-11T06:25:17.19023Z"
+  ms: 1
+- at: "2026-11-11T11:49:20.503703Z"
   mode: "script"
   say: "Ana asks to be told when loan {loan} can be renewed, with reply {reply}, signed\
     \ with her key"
@@ -377,12 +572,12 @@ steps:
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
       Prefer: "forms=link, schema=link"
-      If-Match: "\"index-hsf-4ef3b2d889cf4f0b\""
+      If-Match: "\"index-hsf-b4aa5facac883596\""
       Content-Type: "application/json"
       Content-Digest: "sha-256=:s+ZjKMzznK0xomAGvTZsgX5uvMUwD9sZgzg0+d6qs4A=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:xT9rVOhhpNPoBd3BamjW8Ru0yPus3H1VStjuRdDMC15XBtxsYP0XqpyJtG6Wu6CrTQh710zPZfRMEv1uvdcmAA==:"
+      Signature: "sig1=:6our7qzxHuw+zxzr9QKgKpuY9f50tgkkmEU6zyOgvrgehfok3XjC1lqvFEBQ/H4stjR5kWGhhjJmwCXIN/TrBw==:"
     body:
       loan: 3310
       _links:
@@ -428,7 +623,7 @@ steps:
           type: "application/jwk-set+json"
   expect: 201
   ms: 2
-- at: "2026-11-11T06:25:17.193847Z"
+- at: "2026-11-11T11:49:20.507462Z"
   mode: "script"
   say: "Ana reads her watch: its keys, its reply, and her cancel"
   params: {}
@@ -475,7 +670,7 @@ steps:
           type: "application/jwk-set+json"
   expect: 200
   ms: 1
-- at: "2026-11-11T06:25:17.195728Z"
+- at: "2026-11-11T11:49:20.508956Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -525,8 +720,8 @@ steps:
           integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
           type: "application/json"
   expect: 200
-  ms: 1
-- at: "2026-11-11T06:25:17.197243Z"
+  ms: 0
+- at: "2026-11-11T11:49:20.51Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -553,8 +748,8 @@ steps:
       - "standing"
       type: "object"
   expect: 200
-  ms: 1
-- at: "2026-11-11T06:25:17.198456Z"
+  ms: 0
+- at: "2026-11-11T11:49:20.511062Z"
   mode: "script"
   say: "The library reads Ana's reply {reply}, linked from the watch, for its forms"
   params:
@@ -596,7 +791,7 @@ steps:
           type: "application/hal+json"
   expect: 200
   ms: 3
-- at: "2026-11-11T06:25:17.202023Z"
+- at: "2026-11-11T11:49:20.514714Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -672,8 +867,8 @@ steps:
           integrity: "sha256-/IH1RQiOqCXMAYtmTb42Vm1Fj21KDI/B08De6+IfJFo="
           type: "application/json"
   expect: 200
-  ms: 0
-- at: "2026-11-11T06:25:17.203353Z"
+  ms: 1
+- at: "2026-11-11T11:49:20.516012Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -731,7 +926,7 @@ steps:
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-11T06:25:17.204573Z"
+- at: "2026-11-11T11:49:20.517061Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -781,7 +976,7 @@ steps:
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-11T06:25:17.205677Z"
+- at: "2026-11-11T11:49:20.51831Z"
   mode: "script"
   say: "{party} reads the schema {relation} links by $ref"
   params:
@@ -832,7 +1027,7 @@ steps:
       type: "object"
   expect: 200
   ms: 0
-- at: "2026-11-11T06:25:17.208866Z"
+- at: "2026-11-11T11:49:20.521373Z"
   mode: "script"
   say: "The library reports progress of {percent} percent, naming the watch it answers\
     \ for"
@@ -894,7 +1089,7 @@ steps:
           type: "application/hal+json"
   expect: 200
   ms: 4
-- at: "2026-11-11T06:25:17.21393Z"
+- at: "2026-11-11T11:49:20.526847Z"
   mode: "script"
   say: "An answer that names another watch, {watch}, is sent"
   params:
@@ -935,7 +1130,7 @@ steps:
       rel: "hr:in-reply-to"
   expect: 409
   ms: 2
-- at: "2026-11-11T06:25:17.217437Z"
+- at: "2026-11-11T11:49:20.53029Z"
   mode: "script"
   say: "A result signed with another key, claiming the library's keyid, is sent"
   params:
@@ -954,7 +1149,7 @@ steps:
       Content-Digest: "sha-256=:DM73mHpUssFOVNR4oyVKhIeNRaD2EWV4DWzxhvMREho=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:Vtx9si5wmRGemUEedYjysphoDc5T7OMcj2my8ju20Lf75jt+Ne7cfE7gKJrLxxt/4HPg9/sRfU0Z0HZZB+jhAg==:"
+      Signature: "sig1=:T01MEdk/1TdmTqduN5yG8OxuDdasGGA+BFIC8wC/SZLb9gQoJDY5MwHbOcsZ597KtS4QMxpoqQuXUt4y+oJqBA==:"
     body:
       state: "completed"
       result:
@@ -978,7 +1173,7 @@ steps:
       detail: "Each act here is signed by the key library-2026-11."
   expect: 401
   ms: 2
-- at: "2026-11-11T06:25:17.220179Z"
+- at: "2026-11-11T11:49:20.533044Z"
   mode: "script"
   say: "An unsigned result is sent"
   params:
@@ -1017,7 +1212,7 @@ steps:
       detail: "Each act here is signed by the key library-2026-11."
   expect: 401
   ms: 1
-- at: "2026-11-11T06:25:17.223402Z"
+- at: "2026-11-11T11:49:20.536596Z"
   mode: "script"
   say: "The hold is returned, and the library sends the result, signed"
   params:
@@ -1079,8 +1274,8 @@ steps:
           href: "/replies/r-7f3/history"
           type: "application/hal+json"
   expect: 200
-  ms: 4
-- at: "2026-11-11T06:25:17.228179Z"
+  ms: 3
+- at: "2026-11-11T11:49:20.540446Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -1111,8 +1306,8 @@ steps:
           integrity: "sha256-znHADUzxtJ+uhI/xjQiNaP8KufWAMoKU5MFN/+LV5fA="
           type: "application/json"
   expect: 200
-  ms: 0
-- at: "2026-11-11T06:25:17.230551Z"
+  ms: 1
+- at: "2026-11-11T11:49:20.542992Z"
   mode: "script"
   say: "The same result is sent again, and is answered as the first was"
   params:
@@ -1175,7 +1370,7 @@ steps:
           type: "application/hal+json"
   expect: 200
   ms: 3
-- at: "2026-11-11T06:25:17.234751Z"
+- at: "2026-11-11T11:49:20.547341Z"
   mode: "script"
   say: "A different result is sent, after the answer"
   params:
@@ -1217,7 +1412,7 @@ steps:
       rel: "https://w3id.org/heart-rise/rels/completed"
   expect: 409
   ms: 2
-- at: "2026-11-11T06:25:17.237712Z"
+- at: "2026-11-11T11:49:20.550213Z"
   mode: "script"
   say: "Ana reads her watch after the answer: no cancel, and why"
   params: {}
@@ -1264,7 +1459,7 @@ steps:
           type: "application/jwk-set+json"
   expect: 200
   ms: 1
-- at: "2026-11-11T06:25:17.2393Z"
+- at: "2026-11-11T11:49:20.551716Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -1299,7 +1494,7 @@ steps:
           type: "application/json"
   expect: 200
   ms: 0
-- at: "2026-11-11T06:25:17.240218Z"
+- at: "2026-11-11T11:49:20.55259Z"
   mode: "script"
   say: "Ana reads why the watch offers no cancel"
   params: {}
@@ -1323,7 +1518,7 @@ steps:
         title: "Cancel the request"
   expect: 200
   ms: 0
-- at: "2026-11-11T06:25:17.241325Z"
+- at: "2026-11-11T11:49:20.553751Z"
   mode: "script"
   say: "Ana cancels anyway, by the form she read before"
   params:
@@ -1353,7 +1548,7 @@ steps:
       rel: "https://w3id.org/heart-rise/rels/cancel"
   expect: 409
   ms: 1
-- at: "2026-11-11T06:25:17.243212Z"
+- at: "2026-11-11T11:49:20.555715Z"
   mode: "script"
   say: "The library reads the reply's history, by the link its last answer gave"
   params:
@@ -1379,7 +1574,7 @@ steps:
         up:
           href: "/replies/r-7f3"
       changes:
-      - at: "2026-11-11T06:25:17.212404Z"
+      - at: "2026-11-11T11:49:20.525562Z"
         replaced: "\"seq-1.hsf.L2.5e0d3ef00d010615\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1387,7 +1582,7 @@ steps:
         _links:
           self:
             href: "/replies/r-7f3/history#change-1"
-      - at: "2026-11-11T06:25:17.227535Z"
+      - at: "2026-11-11T11:49:20.539774Z"
         replaced: "\"seq-2.hsf.L2.e896230df81cdbe1\""
         signatureInput: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
           );created=1794153600;keyid=\"library-2026-11\";alg=\"ed25519\""
@@ -1399,7 +1594,7 @@ steps:
             href: "/replies/r-7f3/history#change-1"
   expect: 200
   ms: 0
-- at: "2026-11-11T06:25:17.244896Z"
+- at: "2026-11-11T11:49:20.557492Z"
   mode: "script"
   say: "Ana asks again, with reply {reply}, on the entry's ETag she already holds"
   params:
@@ -1413,12 +1608,12 @@ steps:
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
       Prefer: "forms=link, schema=link"
-      If-Match: "\"index-hsf-4ef3b2d889cf4f0b\""
+      If-Match: "\"index-hsf-b4aa5facac883596\""
       Content-Type: "application/json"
       Content-Digest: "sha-256=:PnKsFTa90OfGC3aDSn1I7x3tmoNapyP654RlVZixTeg=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:BnNzEcdoe25A01siq2b32jG5kIBs/2EDw1I73UpvV/zvIInVkYmFo9YqmI7gyR1FMontJqj8sF3lgUyuCFjaDQ==:"
+      Signature: "sig1=:u3qNmdnFpA9LBGWanS/61PXTtpzIgvrIc2kzCSKT1BCvxIDLnSerSIj68vcK8QoRcuWGu9TY6XlyOYN+Ab0qCQ==:"
     body:
       loan: 3310
       _links:
@@ -1464,7 +1659,7 @@ steps:
           type: "application/jwk-set+json"
   expect: 201
   ms: 2
-- at: "2026-11-11T06:25:17.248531Z"
+- at: "2026-11-11T11:49:20.560495Z"
   mode: "script"
   say: "Ana reads her second watch"
   params: {}
@@ -1511,7 +1706,7 @@ steps:
           type: "application/jwk-set+json"
   expect: 200
   ms: 1
-- at: "2026-11-11T06:25:17.249981Z"
+- at: "2026-11-11T11:49:20.561757Z"
   mode: "script"
   say: "The library reads Ana's reply {reply} for its forms"
   params:
@@ -1552,8 +1747,8 @@ steps:
           href: "/replies/r-b04/history"
           type: "application/hal+json"
   expect: 200
-  ms: 2
-- at: "2026-11-11T06:25:17.253169Z"
+  ms: 3
+- at: "2026-11-11T11:49:20.565724Z"
   mode: "script"
   say: "The failure is sent as a merge patch, not the problem document its form asks\
     \ for"
@@ -1597,7 +1792,7 @@ steps:
       - "application/problem+json"
   expect: 415
   ms: 2
-- at: "2026-11-11T06:25:17.256747Z"
+- at: "2026-11-11T11:49:20.569045Z"
   mode: "script"
   say: "The library has no record of the hold, and sends the failure as a problem\
     \ document"
@@ -1659,8 +1854,8 @@ steps:
           type: "https://riverside-library.example/problems/no-hold-record"
           title: "No hold record for loan 3310"
   expect: 200
-  ms: 4
-- at: "2026-11-11T06:25:17.261193Z"
+  ms: 3
+- at: "2026-11-11T11:49:20.573031Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -1691,8 +1886,8 @@ steps:
           integrity: "sha256-DPNO7cGEGqTGKniDIVzWdvWnmmL0PhHJEXHIy+iib3k="
           type: "application/json"
   expect: 200
-  ms: 1
-- at: "2026-11-11T06:25:17.263639Z"
+  ms: 0
+- at: "2026-11-11T11:49:20.575357Z"
   mode: "script"
   say: "Ana asks a third time, with reply {reply}"
   params:
@@ -1706,12 +1901,12 @@ steps:
       Accept: "application/hal+json"
       Accept-Profile: "<https://w3id.org/heart-rise/hal-schema-forms>"
       Prefer: "forms=link, schema=link"
-      If-Match: "\"index-hsf-4ef3b2d889cf4f0b\""
+      If-Match: "\"index-hsf-b4aa5facac883596\""
       Content-Type: "application/json"
       Content-Digest: "sha-256=:+75gt6d0BEiabrFAYwmyfjkVRAAEjcJnN/UJhfEBOvQ=:"
       Signature-Input: "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\"\
         );created=1794153600;keyid=\"ana-2026-11\";alg=\"ed25519\""
-      Signature: "sig1=:Lejh7mjzXEpI6Q+OGlPwae/wucb2fr4g8UHSLRPDCYKCqNor4QKdK/s9y45c9RGkkZ1EGvnOa9kbnK1ucAv1AQ==:"
+      Signature: "sig1=:zwLyBtLZZ1q2T6uCFaQLTYPvQJKkPDuOO11NVjsUdoqnkuJMitp0NwCjrxEeYf9dn/bnEKG845GcUWc8SiINDA==:"
     body:
       loan: 3310
       _links:
@@ -1757,7 +1952,7 @@ steps:
           type: "application/jwk-set+json"
   expect: 201
   ms: 2
-- at: "2026-11-11T06:25:17.267402Z"
+- at: "2026-11-11T11:49:20.578212Z"
   mode: "script"
   say: "Ana reads her third watch, which offers {relation}"
   params:
@@ -1805,7 +2000,7 @@ steps:
           type: "application/jwk-set+json"
   expect: 200
   ms: 1
-- at: "2026-11-11T06:25:17.26908Z"
+- at: "2026-11-11T11:49:20.579636Z"
   mode: "script"
   say: "Ana cancels the request, by the watch's form"
   params:
@@ -1855,8 +2050,8 @@ steps:
           href: "/keys"
           type: "application/jwk-set+json"
   expect: 200
-  ms: 1
-- at: "2026-11-11T06:25:17.271196Z"
+  ms: 2
+- at: "2026-11-11T11:49:20.582422Z"
   mode: "script"
   say: "{party} follows {relation} to the shared affordance set it names"
   params:
@@ -1891,7 +2086,7 @@ steps:
           type: "application/json"
   expect: 200
   ms: 0
-- at: "2026-11-11T06:25:17.272081Z"
+- at: "2026-11-11T11:49:20.583375Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HTML"
   params:
@@ -2005,8 +2200,8 @@ steps:
       \ failed</button></div></form></dialog></main><div id=\"announce\" class=\"\
       announce\" role=\"status\" aria-live=\"polite\"></div></body></html>\n"
   expect: 200
-  ms: 7
-- at: "2026-11-11T06:25:17.280118Z"
+  ms: 8
+- at: "2026-11-11T11:49:20.592029Z"
   mode: "script"
   say: "Ana's reply {reply}, read as HAL-FORMS"
   params:
@@ -2100,8 +2295,8 @@ steps:
             required: false
             type: "text"
   expect: 200
-  ms: 3
-- at: "2026-11-11T06:25:17.283859Z"
+  ms: 2
+- at: "2026-11-11T11:49:20.59488Z"
   mode: "script"
   say: "Ana's reply {reply}, asked for as XML, which it is not served in"
   params:
