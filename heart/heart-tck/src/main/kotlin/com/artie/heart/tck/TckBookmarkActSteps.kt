@@ -1,6 +1,7 @@
 package com.artie.heart.tck
 
 import com.artie.heart.Dialect
+import com.artie.heart.Rung
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -27,9 +28,10 @@ class TckBookmarkActSteps(private val fixture: TckFixture, private val world: Tc
         assertEquals("/actions/${act.path}", form.path("_links").path("target").path("href").asText())
     }
 
-    @When("^the client sends the bookmark act with (its valid body|its invalid body) and ($VALIDATORS)$")
-    fun send(body: String, validator: String) {
+    @When("^the client sends the bookmark act with (its valid body|its invalid body) and ($VALIDATORS)(, both at L2)?$")
+    fun send(body: String, validator: String, l2: String?) {
         countBefore = count()
+        val headers = if (l2 == null) headers else headers + (PREFER to Rung.L2.preferenceApplied.orEmpty())
         val index = world.get("/", headers).responseHeaders.eTag
         val ifMatch = when (validator) {
             "no If-Match" -> emptyMap()
@@ -66,5 +68,6 @@ class TckBookmarkActSteps(private val fixture: TckFixture, private val world: Tc
 
     private companion object {
         const val VALIDATORS = "no If-Match|an If-Match that is stale|the index's ETag"
+        const val PREFER = "Prefer"
     }
 }

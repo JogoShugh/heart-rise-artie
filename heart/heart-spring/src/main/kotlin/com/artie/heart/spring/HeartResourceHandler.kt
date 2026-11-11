@@ -186,8 +186,9 @@ class HeartResourceHandler<S, K>(
         }
         val dialect = HttpNegotiation.dialect(request.headers().asHttpHeaders())
         val rung = limits.rung(dialect, request)
+        // The index as this request selects it: at L2, its act forms link their schemas; its own ETag.
         pipeline.checkAtBookmark(name, request.headers().firstHeader(HttpHeaders.IF_MATCH)) { held ->
-            StateETag.matches(held, index.validator(dialect))
+            StateETag.matches(held, index.validator(dialect, rung))
         }
         val body = request.awaitBodyOrNull<String>()
         val done = pipeline.run(name, body) { input -> checkNotNull(resource.performAtBookmark)(name, input) }

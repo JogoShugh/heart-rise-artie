@@ -9,6 +9,7 @@ import com.artie.heart.HeartResource
 import com.artie.heart.HtmlList
 import com.artie.heart.HtmlView
 import com.artie.heart.Negotiation
+import com.artie.heart.Rung
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.SERVICE_DESC
 import com.artie.heart.ItemPath
@@ -45,18 +46,22 @@ class IndexHandler(
                 Published.revalidated(request, index.homeValidator(limits.maxRung), Negotiation.JSON_HOME) {
                     index.home(limits.maxRung)
                 }.replaceHeader(VARY, ACCEPT).replaceHeader(LINK, SERVICE_DESC_LINK)
-            else -> dialect(request).let { dialect ->
-                val answer = Published.revalidated(request, index.validator(dialect), dialect.mediaType) {
-                    index.body(dialect)
-                }
-                layer1(answer, dialect)
-                    // RFC 8631: the OpenAPI description, for a client that knows only this address.
-                    .replaceHeader(
-                        LINK,
-                        "${Negotiation.profileLinks(dialect)}, ${Alternates.links("/")}, $SERVICE_DESC_LINK",
-                    )
-            }
+            else -> inDialect(request, dialect(request))
         }
+    }
+
+    /** The index in [dialect], at the rung [request] prefers: at L2 its act forms link their schemas. */
+    private fun inDialect(request: Request, dialect: Dialect): Response {
+        // HAL-FORMS is the L0 on-ramp: it ignores layering preferences.
+        val rung = if (dialect == Dialect.JSONSCHEMA) limits.cap(Rung.fromPrefer(request.header(PREFER))) else Rung.L0
+        val answer = Published.revalidated(request, index.validator(dialect, rung), dialect.mediaType) {
+            index.body(dialect, rung)
+        }
+        return layer1(answer, dialect)
+            // RFC 8631: the OpenAPI description, for a client that knows only this address.
+            .replaceHeader(LINK, "${Negotiation.profileLinks(dialect)}, ${Alternates.links("/")}, $SERVICE_DESC_LINK")
+            .replaceHeader(VARY, "$ACCEPT, $PREFER, ${Negotiation.ACCEPT_PROFILE}")
+            .let { if (rung == Rung.L2) it.replaceHeader(PREFERENCE_APPLIED, SCHEMA_LINK) else it }
     }
 
     /** The index's affordances, linked from it as `hr:affordances`: revalidated, in HAL Schema Forms. */
@@ -118,5 +123,8 @@ class IndexHandler(
     private companion object {
         const val SERVICE_DESC_LINK =
             "<${OpenApiDocument.PATH}>; rel=\"$SERVICE_DESC\"; type=\"${OpenApiDocument.MEDIA_TYPE}\""
+
+        /** RFC 7240: what the index honours of L2. Its forms stay in it; their schemas are linked. */
+        const val SCHEMA_LINK = "schema=link"
     }
 }

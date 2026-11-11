@@ -176,8 +176,9 @@ class ResourceHandler<S, K>(
         val dialect = dialect(request)
         val rung = limits.rung(dialect, request)
         val done = runBlocking {
+            // The index as this request selects it: at L2, its act forms link their schemas; its own ETag.
             pipeline.checkAtBookmark(name, request.header(IF_MATCH)) { held ->
-                StateETag.matches(held, index.validator(dialect))
+                StateETag.matches(held, index.validator(dialect, rung))
             }
             pipeline.run(name, body(request)) { input -> perform(name, input) }
         }

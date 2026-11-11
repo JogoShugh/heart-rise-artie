@@ -217,6 +217,13 @@ Feature: HEART conformance over HTTP, for any declared resource type
     And the new resource can be read where Location says
 
   @bookmark-act
+  Scenario: At L2, the bookmark's act is conditional on the index as it was served at L2
+    The index served at L2 links its act forms' schemas, so it is another representation, with its own ETag.
+    A client that read it at L2 acts on that ETag, sending the same Prefer.
+    When the client sends the bookmark act with its valid body and the index's ETag, both at L2
+    Then the response status is 201
+
+  @bookmark-act
   Scenario Outline: A refused act on the bookmark is a problem of type <type>, and adds no resource
     When the client sends the bookmark act with <body> and <validator>
     Then the response status is <status>

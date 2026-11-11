@@ -10,6 +10,7 @@ import com.artie.heart.HtmlList
 import com.artie.heart.HtmlView
 import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
+import com.artie.heart.Rung
 import com.artie.heart.SERVICE_DESC
 import com.artie.heart.Search
 import com.artie.heart.SearchPages
@@ -43,16 +44,24 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
                     it.set(HttpHeaders.LINK, SERVICE_DESC_LINK)
                 }
             }
-            else -> HttpNegotiation.dialect(headers).let { dialect ->
-                answer(request, index.validator(dialect), dialect.mediaType, index.body(dialect)) {
-                    layer1(it, dialect)
-                    // RFC 8631: the OpenAPI description, for a client that knows only this address.
-                    it.set(
-                        HttpHeaders.LINK,
-                        "${HttpNegotiation.profileLinks(dialect)}, ${Alternates.links("/")}, $SERVICE_DESC_LINK",
-                    )
-                }
-            }
+            else -> inDialect(request, HttpNegotiation.dialect(headers))
+        }
+    }
+
+    /** The index in [dialect], at the rung [request] prefers: at L2 its act forms link their schemas. */
+    private suspend fun inDialect(request: ServerRequest, dialect: Dialect): ServerResponse {
+        // HAL-FORMS is the L0 on-ramp: it ignores layering preferences.
+        val prefer = request.headers().firstHeader(HttpNegotiation.PREFER)
+        val rung = if (dialect == Dialect.JSONSCHEMA) limits.cap(Rung.fromPrefer(prefer)) else Rung.L0
+        return answer(request, index.validator(dialect, rung), dialect.mediaType, index.body(dialect, rung)) {
+            layer1(it, dialect)
+            // RFC 8631: the OpenAPI description, for a client that knows only this address.
+            val links = "${HttpNegotiation.profileLinks(dialect)}, ${Alternates.links("/")}, $SERVICE_DESC_LINK"
+            it.set(HttpHeaders.LINK, links)
+            val varies = listOf(HttpHeaders.ACCEPT, HttpNegotiation.PREFER, HttpNegotiation.ACCEPT_PROFILE)
+            it.set(HttpHeaders.VARY, varies.joinToString())
+            // RFC 7240: what the index honours of L2. Its forms stay in it; their schemas are linked.
+            if (rung == Rung.L2) it.set("Preference-Applied", "schema=link")
         }
     }
 

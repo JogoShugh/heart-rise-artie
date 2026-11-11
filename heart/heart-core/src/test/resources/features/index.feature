@@ -21,6 +21,13 @@ Feature: The service index, the home document and search pages, from the declara
     When the service index is rendered in HAL Schema Forms
     Then the index links "hr:keys" to "/keys", as "application/jwk-set+json"
 
+  Scenario: Asked for schemas by link, the index's act forms link each schema by $ref, pinned by its integrity
+    HAL-SCHEMA-FORMS-HR Rule 3. A schema in place names itself with $id; a schema held elsewhere is linked
+    only by $ref, with hr:integrity beside it. At L2 the index's forms link theirs, as a resource's do.
+    When the service index is rendered in HAL Schema Forms at L2
+    Then every act form it offers links its schema by $ref, with the integrity of the schema served there
+    And no form it offers names a schema in place with $id
+
   Scenario: In HAL Schema Forms, the index offers a search form and a lookup form per type
     When the service index is rendered in HAL Schema Forms
     Then the index is titled "Lamps" and links "self" to "/"

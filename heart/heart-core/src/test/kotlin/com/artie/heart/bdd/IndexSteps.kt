@@ -47,6 +47,31 @@ class IndexSteps(private val world: LampWorld) {
         json = mapper.readTree(index.body(Dialect.JSONSCHEMA))
     }
 
+    @When("the service index is rendered in HAL Schema Forms at L2")
+    fun indexSchemaFormsL2() {
+        json = mapper.readTree(index.body(Dialect.JSONSCHEMA, Rung.L2))
+    }
+
+    @Then("every act form it offers links its schema by \$ref, with the integrity of the schema served there")
+    fun actFormsLinkSchemas() {
+        val acts = json.path("_forms").properties().filter { (_, form) -> form.path("method").asText() != "GET" }
+        assertTrue(acts.isNotEmpty(), "no act forms: $json")
+        acts.forEach { (key, form) ->
+            val schema = form.path("schema")
+            assertEquals(setOf("\$ref", "hr:integrity"), schema.fieldNames().asSequence().toSet(), "$key: $schema")
+            // What is served at the address: the schema the index holds in place at L0, without the $id that names it.
+            val inPlace = mapper.readTree(index.body(Dialect.JSONSCHEMA)).path("_forms").path(key).path("schema")
+            assertEquals(schema.path("\$ref").asText(), inPlace.path("\$id").asText(), key)
+            val served = ContentAddress.canonical(mapper.convertValue(inPlace, Map::class.java) - "\$id")
+            assertEquals(ContentAddress.integrity(served), schema.path("hr:integrity").asText(), key)
+        }
+    }
+
+    @Then("no form it offers names a schema in place with \$id")
+    fun noId() = json.path("_forms").properties().forEach { (key, form) ->
+        assertFalse(form.path("schema").has("\$id"), "$key: ${form.path("schema")}")
+    }
+
     @When("the service index is rendered in HAL-FORMS")
     fun indexHalForms() {
         json = mapper.readTree(index.body(Dialect.HALFORMS))

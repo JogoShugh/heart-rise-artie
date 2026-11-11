@@ -13,7 +13,7 @@ Feature: The bookmark and the searches, served over HTTP from the declarations
     Then the response status is 200
     And the response has Content-Type "<type>"
     And the response has Cache-Control "no-cache"
-    And the response has Vary "Accept, Accept-Profile"
+    And the response has Vary "Accept, Prefer, Accept-Profile"
     And the response has an ETag
 
     Examples:
