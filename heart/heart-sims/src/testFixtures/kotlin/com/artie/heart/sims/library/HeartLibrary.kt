@@ -26,7 +26,12 @@ import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartHttp
 import com.artie.heart.http4k.HeartSettings
 import com.artie.heart.sims.Tokens
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
+import org.http4k.core.Method
+import org.http4k.core.then
+import java.security.PublicKey
 
 /**
  * Riverside Public Library, the library of "The Web That Wasn't", declared once for heart-core: a member's account,
@@ -35,7 +40,13 @@ import org.http4k.core.HttpHandler
  * HTML to a person in a browser, HAL-FORMS, HAL Schema Forms, a profile and an OpenAPI twin. Ana Torres signs in
  * with her library card number and PIN; an agent, with the library's Bearer token.
  */
-class HeartLibrary(private val ledger: Ledger) {
+class HeartLibrary(
+    private val ledger: Ledger,
+    /** The keys at a `hr:keys` address, by key id: how the library reads the keys a request names. */
+    private val keysAt: (String) -> Map<String, PublicKey> = { emptyMap() },
+) {
+    private val mapper = ObjectMapper()
+
     private val type = ResourceType(
         collection = "loans",
         profile = PROFILE,
@@ -211,7 +222,29 @@ class HeartLibrary(private val ledger: Ledger) {
         },
     )
 
-    val handler: HttpHandler = HeartHttp(
+    /**
+     * Refuses, with 401, a request to be told that its sender did not sign with a key of the set its envelope names
+     * (`hr:keys`, read by [keysAt]): so a watch answers only the party whose keys it was asked with.
+     */
+    private fun signedRequests(): Filter = Filter { next ->
+        { request ->
+            if (request.method != Method.POST || request.uri.path != TELL_ME) {
+                next(request)
+            } else {
+                val keys = runCatching {
+                    keysAt(mapper.readTree(request.bodyString())["_links"]["hr:keys"]["href"].asText())
+                }.getOrDefault(emptyMap())
+                val key = SignedRequests.keyIdOf(request)?.let { keys[it] }
+                if (key != null && SignedRequests.signedBy(request, ORIGIN, key)) {
+                    next(request)
+                } else {
+                    SignedRequests.unauthorized(request, "Riverside Public Library", keys.keys.firstOrNull() ?: "")
+                }
+            }
+        }
+    }
+
+    val handler: HttpHandler = signedRequests().then(HeartHttp(
         listOf(accounts, members, loans, watches),
         Credentials.parse(users = "$CARD:$PIN_HASH", tokens = Tokens.sha256(TOKEN)),
         // The affordance link: each plain JSON answer names the set its state offers, for OpenAPI clients that opt in.
@@ -222,7 +255,7 @@ class HeartLibrary(private val ledger: Ledger) {
             listings = listOf(Listing(PROBLEM_KINDS_PATH, "kinds") { PROBLEM_KINDS }),
             keys = mapOf(LibraryKey.KEY_ID to LibraryKey.pair.public),
         ),
-    )
+    ))
 
     /** The acts each standing offers, in the order of their relations, so every rung lists them alike. */
     private fun offered(standing: String): List<String> = when (standing) {
@@ -254,6 +287,12 @@ class HeartLibrary(private val ledger: Ledger) {
     }.orEmpty()
 
     companion object {
+        /** Where the library is: the origin its signed target URIs, and its watches' absolute addresses, name. */
+        const val ORIGIN = "https://riverside-library.example"
+
+        /** Where a caller asks to be told when a loan can be renewed: the entry's act. */
+        const val TELL_ME = "/actions/tell-me-when-renewable"
+
         /** Ana Torres's library card number; her PIN is 1234, kept only as its bcrypt hash. */
         const val CARD = "21000451"
         private const val PIN_HASH = "\$2y\$10\$poLdiGaLqp2v7aGDsC72r.ToVv5GgwfArGnIGmJB7fkFhQiPXgwYy"

@@ -13,6 +13,7 @@ import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
 import java.net.URLEncoder
+import java.security.PublicKey
 import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.util.Base64
@@ -21,7 +22,7 @@ import kotlin.test.assertTrue
 
 /** library.feature: Riverside Public Library, read and acted on in memory, as each dialect's client would. */
 class LibrarySteps {
-    private val library = LibraryService()
+    private val library = LibraryService(keysAt = ::keysAt)
     private val mapper = ObjectMapper()
     private var answer: Response? = null
     private var dialect = HSF
@@ -295,8 +296,19 @@ class LibrarySteps {
     @Given("Ana's reply {word} is awaiting")
     fun replyAwaiting(reply: String) = caller.open(reply)
 
-    @When("Ana asks to be told when loan {long} can be renewed, with reply {word} and her key")
-    fun asksToBeTold(loan: Long, reply: String) {
+    /** The keys at [href], one of Ana's addresses, read as the JWK Set her service publishes there. */
+    private fun keysAt(href: String): Map<String, PublicKey> {
+        val read = caller.handler(Request(Method.GET, java.net.URI(href).path))
+        return mapper.readTree(read.bodyString())["keys"].associate { jwk ->
+            jwk["kid"].asText() to Signatures.keyOf(mapper.convertValue(jwk, Map::class.java))
+        }
+    }
+
+    @Then("the library holds no watch")
+    fun noWatch() = assertTrue(library.watches().isEmpty(), library.watches().toString())
+
+    @When("""^Ana asks to be told when loan (\d+) can be renewed, with reply (\S+) and her key(?:, (.+))?$""")
+    fun asksToBeTold(loan: Long, reply: String, signature: String?) {
         assertTrue(caller.has(reply), "no awaiting reply $reply")
         val read = send(Method.GET, "/", ACCEPT.getValue(HSF))
         val entry = mapper.readTree(read.bodyString())
@@ -314,12 +326,19 @@ class LibrarySteps {
         )
         val target = form["_links"]["target"]["href"].asText()
         val method = Method.valueOf(form["method"].asText())
-        answer = library.handler(
-            request(method, target, ACCEPT.getValue(HSF), basic(HeartLibrary.CARD, PIN))
-                .header("If-Match", read.header("ETag"))
-                .header("Content-Type", form["contentType"].asText())
-                .body(mapper.writeValueAsString(sent)),
-        )
+        val body = mapper.writeValueAsString(sent)
+        val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
+        val ask = request(method, target, ACCEPT.getValue(HSF), basic(HeartLibrary.CARD, PIN))
+            .header("If-Match", ifMatch)
+            .header("Content-Type", form["contentType"].asText())
+        // Ana signs her request with the key her envelope's hr:keys names, unless the scenario says otherwise.
+        val signer = when (signature) {
+            null -> AnaKey.signer
+            "signed with another key" -> AnaKey.otherSigner
+            else -> null
+        }
+        val signed = signer?.sign(method.name, HeartLibrary.ORIGIN + target, body, ifMatch, SIGNED_AT)
+        answer = library.handler(if (signed == null) ask.body(body) else signedRequest(ask, signed, body))
     }
 
     @Then("the library's entry and the watch both link {string} to the library's key set")
