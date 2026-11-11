@@ -69,6 +69,13 @@ class RuleRefusedException(val violations: List<Violation>) :
 /** 400: the body is not JSON at all. */
 class MalformedActBodyException(message: String, cause: Throwable) : RuntimeException(message, cause)
 
+/**
+ * 415: the body is of a type the act does not take. [accepted] is what it does take, for the answer's
+ * `Accept-Patch` (RFC 5789) or `Accept-Post`, so the client can send it again as it should have.
+ */
+class UnsupportedMediaTypeException(message: String, val method: String, val accepted: List<String>) :
+    RuntimeException(message)
+
 /** Path segments as a JSON Pointer, escaping `~` and `/` (RFC 6901 §3). */
 fun pointerOf(segments: List<String>): String =
     segments.joinToString("") { "/" + it.replace("~", "~0").replace("/", "~1") }

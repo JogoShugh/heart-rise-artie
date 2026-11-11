@@ -15,6 +15,20 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
     Then the library answers 201 with a watch that is awaiting
     And the library's entry offers the request, with its reply and key as links
 
+  Scenario: Ana's reply takes the library's acts at its own address, by PATCH, as its forms say
+    When the library reads Ana's reply r-7f3
+    Then each of the reply's forms targets the reply's own address
+      | form         | method | content type                 |
+      | hr:progress  | PATCH  | application/merge-patch+json |
+      | hr:completed | PATCH  | application/merge-patch+json |
+      | hr:failed    | PATCH  | application/problem+json     |
+    And the reply accepts patches as "application/merge-patch+json, application/problem+json"
+
+  Scenario: An act at the reply's old act address finds nothing
+    When the library sends progress of 10 percent to "/replies/r-7f3/actions/progress"
+    Then the library is refused with 404
+    And reply r-7f3 is still awaiting
+
   Scenario Outline: The library reports progress while the hold is in line
     When the library reports progress of <percent> percent on reply r-7f3, with the note "<note>"
     Then reply r-7f3 is awaiting at <percent> percent

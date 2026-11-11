@@ -85,6 +85,10 @@ class Profile(
  * its schema carries them as `hr:options`, and a value outside them is refused.
  * [method] is the HTTP method the act is served by (SPEC §6.2): POST, the
  * default, PUT, PATCH or DELETE, as its relation's ALPS type agrees.
+ * An act [atItem] is served at its resource's own address, not under
+ * `actions/`: a PATCH of the resource itself, told from the resource's other
+ * acts there by the `state` its schema fixes (see [ItemActs]). [bodyType]
+ * names the body it takes when that is not the method's own.
  */
 // A declaration names each of its parts once, by name; grouping them would only rename them.
 @Suppress("LongParameterList")
@@ -97,17 +101,22 @@ data class Act(
     val formerPaths: List<String> = emptyList(),
     val options: Map<String, Options> = emptyMap(),
     val method: String = POST,
+    val atItem: Boolean = false,
+    val bodyType: String? = null,
 ) {
     /** This act with choices for some of its properties: its schema carries them as `hr:options`. */
     fun withOptions(choices: Map<String, Options>): Act =
         copy(schema = Options.merged(schema, choices), options = options + choices)
 
-    /** Whether a request to [segment] reaches this act: its path, or one it was served at before. */
-    fun answersAt(segment: String): Boolean = segment == path || segment in formerPaths
+    /** Whether a request to [segment] under `actions/` reaches this act: its path, or one it was served at before. */
+    fun answersAt(segment: String): Boolean = !atItem && (segment == path || segment in formerPaths)
+
+    /** The act's target, for the resource at [item]: the resource itself, or its act under `actions/`. */
+    fun target(item: String): String = if (atItem) item else "$item/actions/$path"
 
     /** The body the act takes: a JSON Merge Patch for a PATCH (RFC 7396), JSON otherwise; none for a DELETE. */
     val contentType: String?
-        get() = when (method) {
+        get() = bodyType ?: when (method) {
             DELETE -> null
             PATCH -> MERGE_PATCH
             else -> JSON

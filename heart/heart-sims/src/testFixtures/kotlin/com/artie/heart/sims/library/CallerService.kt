@@ -34,7 +34,7 @@ class CallerService(private val libraryKey: PublicKey = LibraryKey.pair.public) 
     /** The caller's HEART service: the replies, served to the library's Bearer token, each act signed by the library. */
     val handler: HttpHandler = signedActs().then(
         HeartHttp(
-            listOf(Replies.resource(store)),
+            listOf(Replies.resource(store, RENEWABLE)),
             Credentials.parse(users = "", tokens = Tokens.sha256(LIBRARY_TOKEN)),
             HeartSettings(title = "Ana's replies", realm = Replies.PROFILE.name),
         ),
@@ -69,5 +69,10 @@ class CallerService(private val libraryKey: PublicKey = LibraryKey.pair.public) 
     companion object {
         /** The Bearer token the library presents to Ana's replies. */
         const val LIBRARY_TOKEN = "riverside-library-reply-token"
+
+        /** The result Ana's replies want: which loan, and from when it can be renewed. The library fills it in. */
+        const val RENEWABLE = """{"type": "object", "required": ["loan", "renewableFrom"], "properties": {""" +
+            """"loan": {"type": "integer"}, "renewableFrom": {"type": "string", "format": "date"}}, """ +
+            """"additionalProperties": true}"""
     }
 }

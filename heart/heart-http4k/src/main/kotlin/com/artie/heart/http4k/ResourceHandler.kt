@@ -8,6 +8,7 @@ import com.artie.heart.Acted
 import com.artie.heart.BadRequestException
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
+import com.artie.heart.ItemActs
 import com.artie.heart.Negotiation
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.Rung
@@ -90,8 +91,20 @@ class ResourceHandler<S, K>(
         }
     }
 
+    /**
+     * An act: at `actions/{path}`, the act served there; at the resource's own address (a PATCH of it), the one
+     * its body's `state` names, under the same checks, or 405 where it takes none by that method.
+     */
     fun act(request: Request): Response {
-        val act = type.acts.firstOrNull { it.answersAt(checkNotNull(request.path("path"))) }
+        val segment = request.path("path") ?: return when {
+            ItemActs.of(type, request.method.name).isEmpty() ->
+                Response(Status.METHOD_NOT_ALLOWED).header(ALLOW, "GET, HEAD")
+            else -> actHeart(
+                ItemActs.choose(type, request.method.name, request.header(CONTENT_TYPE), body(request)),
+                request,
+            )
+        }
+        val act = type.acts.firstOrNull { it.answersAt(segment) }
         val plainJson = Negotiation.wantsPlainJson(request.header(ACCEPT))
         return when {
             act == null -> Response(Status.NOT_FOUND)
@@ -219,6 +232,8 @@ class ResourceHandler<S, K>(
                 .header(VARY, vary(dialect))
                 // RFC 7240: confirms what was honoured; the payload alone may not say.
                 .let { r -> rung.preferenceApplied?.let { r.header(PREFERENCE_APPLIED, it) } ?: r }
+                // RFC 5789 §3.1: a resource that takes PATCH says the types it takes.
+                .let { r -> ItemActs.acceptPatch(type)?.let { r.header(ACCEPT_PATCH, it) } ?: r }
 
         fun respond(response: Response): Response =
             headers(response.header(CONTENT_TYPE, dialect.mediaType)).body(mapper.writeValueAsString(body))
@@ -276,6 +291,7 @@ class ResourceHandler<S, K>(
 }
 
 internal const val ACCEPT = "Accept"
+internal const val ACCEPT_PATCH = "Accept-Patch"
 internal const val ALLOW = "Allow"
 internal const val CONTENT_TYPE = "Content-Type"
 internal const val CONTENT_LOCATION = "Content-Location"

@@ -332,8 +332,39 @@ class LibrarySteps {
     /** The library's own Bearer token at Ana's replies, and what it sends a reply. */
     @When("the library reports progress of {int} percent on reply {word}, with the note {string}")
     fun libraryReportsProgress(percent: Int, reply: String, note: String) {
-        val sent = mapper.writeValueAsString(mapOf("percent" to percent, "note" to note))
-        libraryAnswers(reply, "progress", sent, "application/hal+json")
+        val sent = mapper.writeValueAsString(mapOf("state" to "awaiting", "percent" to percent, "note" to note))
+        libraryAnswers(reply, "progress", sent)
+    }
+
+    @When("the library reads Ana's reply {word}")
+    fun libraryReads(reply: String) {
+        answer = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
+    }
+
+    @Then("each of the reply's forms targets the reply's own address")
+    fun formsTargetReply(table: DataTable) {
+        val read = mapper.readTree(body())
+        val self = read["_links"]["self"]["href"].asText()
+        table.asMaps().forEach { row ->
+            val form = checkNotNull(read["_forms"]?.get(row.getValue("form"))) { "no ${row["form"]}: $read" }
+            assertEquals(self, form["_links"]["target"]["href"].asText(), row.toString())
+            assertEquals(row.getValue("method"), form["method"].asText(), row.toString())
+            assertEquals(row.getValue("content type"), form["contentType"].asText(), row.toString())
+        }
+    }
+
+    @Then("the reply accepts patches as {string}")
+    fun acceptsPatches(types: String) = assertEquals(types, answer?.header("Accept-Patch"), body())
+
+    @When("the library sends progress of {int} percent to {string}")
+    fun progressTo(percent: Int, path: String) {
+        val reply = path.substringBefore("/actions")
+        val read = caller.handler(request(Method.GET, reply, ACCEPT.getValue(HSF), REPLY_AUTH))
+        val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
+        val sent = mapper.writeValueAsString(mapOf("percent" to percent))
+        val signed = LibraryKey.signer.sign("PUT", "https://caller.example$path", sent, ifMatch, SIGNED_AT)
+        val put = request(Method.PUT, path, ACCEPT.getValue(HSF), REPLY_AUTH).header("If-Match", ifMatch)
+        answer = caller.handler(signedRequest(put.header("Content-Type", "application/json"), signed, sent))
     }
 
     @Then("reply {word} is awaiting at {int} percent")
@@ -352,8 +383,11 @@ class LibrarySteps {
     private fun replyBody(reply: String): String =
         caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH)).bodyString()
 
-    // What the library knows across its answers to one reply: its completed form, and the last result it sent.
-    private val formTargets = mutableMapOf<String, String>()
+    /** What the library read of a form on Ana's reply: where it sends, by which method, as which type. */
+    private data class ReplyForm(val target: String, val method: Method, val contentType: String)
+
+    // What the library knows across its answers to one reply: its forms, and the last result it sent.
+    private val replyForms = mutableMapOf<String, ReplyForm>()
     private var lastResult: Map<String, Any?>? = null
     private var lastSigned: Signed? = null
     private var lastSent: String? = null
@@ -362,44 +396,41 @@ class LibrarySteps {
     private var noHoldRecorded: Long? = null
 
     /**
-     * The library reads the reply, then sends [sent] on its [relation] form as [contentType], signed by [signer] (RFC
-     * 9421), or unsigned when it has none.
+     * The library reads the reply, then sends [sent] on its [relation] form, by the form's method, to its target, as
+     * its content type, signed by [signer] (RFC 9421), or unsigned when it has none.
      */
-    private fun libraryAnswers(
-        reply: String,
-        relation: String,
-        sent: String,
-        contentType: String,
-        signer: Signer? = LibraryKey.signer,
-    ) {
+    private fun libraryAnswers(reply: String, relation: String, sent: String, signer: Signer? = LibraryKey.signer) {
         val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
         val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
-        val target = formTargets[relation] ?: java.net.URI(
-            mapper.readTree(read.bodyString())["_forms"]["hr:$relation"]["_links"]["target"]["href"].asText(),
-        ).path.also { formTargets[relation] = it }
-        val signed = signer?.sign("PUT", "https://caller.example$target", sent, ifMatch, SIGNED_AT)
+        // A repeat goes to the form the first answer found: an answered reply offers no form for it any more.
+        val form = replyForms.getOrPut(relation) {
+            val found = mapper.readTree(read.bodyString())["_forms"]["hr:$relation"]
+            ReplyForm(
+                java.net.URI(found["_links"]["target"]["href"].asText()).path,
+                Method.valueOf(found["method"].asText()),
+                found["contentType"].asText(),
+            )
+        }
+        val signed = signer?.sign(form.method.name, "https://caller.example${form.target}", sent, ifMatch, SIGNED_AT)
         lastSigned = signed
         lastSent = sent
-        lastContentType = contentType
-        val act = request(Method.PUT, target, ACCEPT.getValue(HSF), REPLY_AUTH)
+        lastContentType = form.contentType
+        val act = request(form.method, form.target, ACCEPT.getValue(HSF), REPLY_AUTH)
             .header("If-Match", ifMatch)
-            .header("Content-Type", contentType)
-        answer = caller.handler(
-            if (signed == null) {
-                act.body(sent)
-            } else {
-                act.header("Content-Digest", signed.contentDigest)
-                    .header("Signature-Input", "sig1=${signed.params}")
-                    .header("Signature", "sig1=:${signed.signature}:")
-                    .body(sent)
-            },
-        )
+            .header("Content-Type", form.contentType)
+        answer = caller.handler(if (signed == null) act.body(sent) else signedRequest(act, signed, sent))
     }
+
+    private fun signedRequest(request: Request, signed: Signed, sent: String): Request =
+        request.header("Content-Digest", signed.contentDigest)
+            .header("Signature-Input", "sig1=${signed.params}")
+            .header("Signature", "sig1=:${signed.signature}:")
+            .body(sent)
 
     /** The library sends [result] on the completed form. */
     private fun libraryCompletes(reply: String, result: Map<String, Any?>) {
         lastResult = result
-        libraryAnswers(reply, "completed", mapper.writeValueAsString(mapOf("result" to result)), "application/hal+json")
+        libraryAnswers(reply, "completed", mapper.writeValueAsString(mapOf("state" to "completed", "result" to result)))
     }
 
     @Given("the library has no record of the hold on loan {long}")
@@ -411,7 +442,8 @@ class LibrarySteps {
     @When("the library sends the failure on reply {word}: {string}")
     fun libraryFails(reply: String, title: String) {
         checkNotNull(noHoldRecorded) { "the library still has its record of the hold" }
-        libraryAnswers(reply, "failed", mapper.writeValueAsString(mapOf("title" to title)), "application/problem+json")
+        val problem = mapOf("state" to "failed", "type" to NO_HOLD_RECORD, "title" to title)
+        libraryAnswers(reply, "failed", mapper.writeValueAsString(problem))
     }
 
     @Then("reply {word} is answered as failed")
@@ -479,9 +511,10 @@ class LibrarySteps {
             """(signed with another key|unsigned): loan (\d+) can be renewed from (\S+)$""",
     )
     fun libraryAnswersUnvouched(reply: String, how: String, loan: Long, from: String) {
-        val sent = mapper.writeValueAsString(mapOf("result" to mapOf("loan" to loan, "renewableFrom" to from)))
+        val result = mapOf("loan" to loan, "renewableFrom" to from)
+        val sent = mapper.writeValueAsString(mapOf("state" to "completed", "result" to result))
         val signer = if (how == "unsigned") null else LibraryKey.otherSigner
-        libraryAnswers(reply, "completed", sent, "application/hal+json", signer)
+        libraryAnswers(reply, "completed", sent, signer)
     }
 
     @Then("reply {word} is still awaiting")
@@ -503,6 +536,9 @@ class LibrarySteps {
 
         /** An agent's credential: the library's Bearer token, not a member's card. */
         const val AGENT = "Bearer ${HeartLibrary.TOKEN}"
+
+        /** The library's own problem type: it has no record of the hold a request asked about. */
+        const val NO_HOLD_RECORD = "https://riverside-library.example/problems/no-hold-record"
 
         /** The library's credential at Ana's replies. */
         const val REPLY_AUTH = "Bearer ${CallerService.LIBRARY_TOKEN}"

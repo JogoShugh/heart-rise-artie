@@ -146,7 +146,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
                 put("title", type.profile.relation(act.relation).title)
                 put("method", act.method)
                 act.contentType?.let { put("contentType", it) }
-                put("target", "$item/actions/${act.path}")
+                put("target", act.target(item))
                 // HAL-SCHEMA-FORMS-HR Rule 8: each property's choices for this state, as HAL-FORMS options.
                 put(
                     "properties",
@@ -182,7 +182,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
             // HAL-SCHEMA-FORMS-HR Rule 3: a reference, pinned by the schema's integrity.
             mapOf("\$ref" to id, "hr:integrity" to ContentAddress.integrity(body))
         }
-        val target = "${type.itemPath.template}/actions/${act.path}${act.querySuffix}"
+        val target = act.target(type.itemPath.template) + act.querySuffix
         return buildMap {
             put("title", relation.title)
             put("description", relation.description)

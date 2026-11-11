@@ -1,12 +1,14 @@
 package com.artie.heart
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Ana's reply: a caller's own resource, where the answers to its request land (RISE, spec/ideas/rise-deep-dive.md).
  * Its reference is the name the request gave it, such as `r-7f3`; its number is that name's hexadecimal part.
+ * A failed reply keeps the failure's problem document, so its owner can see why.
  */
 data class Reply(
     val reference: String,
@@ -14,6 +16,7 @@ data class Reply(
     val percent: Int? = null,
     val note: String? = null,
     val result: Map<String, Any?>? = null,
+    val problem: Map<String, Any?>? = null,
     val version: Int = 1,
 ) {
     val number: Long get() = reference.removePrefix("r-").toLong(HEX)
@@ -48,22 +51,37 @@ class ReplyStore {
 }
 
 /**
- * The reply resource. While it awaits, it takes progress, then one answer: its result, or a failure. A repeat of the
- * result it has is replayed (SPEC §6.2, decision 8); any other act on an answered reply is not offered.
+ * The reply resource. While it awaits, it takes progress, then one answer: its result, or a failure. Each is a
+ * PATCH of the reply itself, whose `state` names the act: progress a JSON Merge Patch (RFC 7396) that keeps the
+ * reply awaiting, the result one that completes it, the failure an RFC 9457 problem document that fails it. A
+ * repeat of the result it has is replayed (SPEC §6.2, decision 8); any other act on an answered reply is not
+ * offered.
  */
 object Replies {
     private val mapper = ObjectMapper()
 
-    /** A result as plain values, which heart-core canonicalises for the validator (JCS). */
-    private val RESULT = object : TypeReference<Map<String, Any?>>() {}
+    /** A result or a problem as plain values, which heart-core canonicalises for the validator (JCS). */
+    private val PLAIN = object : TypeReference<Map<String, Any?>>() {}
 
-    private const val PROGRESS_INPUT = """{"type": "object", "required": ["percent", "note"], "properties": {""" +
-        """"percent": {"type": "integer", "minimum": 0, "maximum": 100}, """ +
-        """"note": {"type": ["string", "null"]}}}"""
-    private const val COMPLETED_INPUT = """{"type": "object", "required": ["result"], "properties": {""" +
-        """"result": {"type": "object"}}}"""
-    private const val FAILED_INPUT = """{"type": "object", "required": ["title"], "properties": {""" +
-        """"title": {"type": "string"}, "detail": {"type": "string"}}}"""
+    /** Any result at all: the shape of a reply whose owner names none. */
+    const val ANY_RESULT = """{"type": "object"}"""
+
+    /** The problem document a failure is sent as (RFC 9457). */
+    const val PROBLEM = "application/problem+json"
+
+    private const val FULL = 100
+
+    private const val PROGRESS_INPUT = """{"type": "object", "required": ["state", "percent"], "properties": {""" +
+        """"state": {"const": "awaiting"}, "percent": {"type": "integer", "minimum": 0, "maximum": 100}, """ +
+        """"note": {"type": ["string", "null"], "default": null}}}"""
+    private const val FAILED_INPUT = """{"type": "object", "required": ["state", "type", "title"], "properties": {""" +
+        """"state": {"const": "failed"}, "type": {"type": "string", "format": "uri"}, "title": {"type": "string"}, """ +
+        """"detail": {"type": "string"}}}"""
+
+    /** The result form's schema: the shape the reply's owner names for the [result] it wants. */
+    private fun completedInput(result: String) =
+        """{"type": "object", "required": ["state", "result"], "properties": {"state": {"const": "completed"}, """ +
+            """"result": $result, "note": {"type": ["string", "null"]}}}"""
 
     /** The profile of the reply: RISE's relations for what a reply takes, named `hr:`. */
     val PROFILE = Profile(
@@ -72,32 +90,33 @@ object Replies {
         doc = "A caller's reply: the answers to its request, while it awaits them.",
         relations = listOf(
             Relation(
-                "progress", AlpsType.IDEMPOTENT, "Report progress",
+                "progress", AlpsType.UNSAFE, "Report progress",
                 "Tells the caller how far the work has got.",
-                "Offered while the reply is awaiting. A PUT replaces the whole progress, percent and note; a repeat " +
-                    "writes the same progress again.",
+                "Offered while the reply is awaiting. A JSON Merge Patch of the reply: a note left out stays, a " +
+                    "null note is cleared.",
             ),
             Relation(
-                "completed", AlpsType.IDEMPOTENT, "Report completed",
+                "completed", AlpsType.UNSAFE, "Report completed",
                 "Sends the result: the work is done.",
-                "Offered while the reply is awaiting; the reply is answered after.",
+                "Offered while the reply is awaiting; the reply is answered after, at 100 percent. The same result " +
+                    "again is answered as the first was; a different one is not offered.",
             ),
             Relation(
-                "failed", AlpsType.IDEMPOTENT, "Report failed",
+                "failed", AlpsType.UNSAFE, "Report failed",
                 "Says the work failed, with a problem document.",
-                "Offered while the reply is awaiting; the reply is answered after.",
+                "Offered while the reply is awaiting; the reply is answered after, and keeps the problem.",
             ),
         ),
         vocabulary = "$HEART_RISE_PROFILE/rels/",
     )
 
-    private val type = ResourceType(
+    private fun type(result: String) = ResourceType(
         collection = "replies",
         profile = PROFILE,
         acts = listOf(
-            Act("progress", "progress", PROGRESS_INPUT, method = Act.PUT),
-            Act("completed", "completed", COMPLETED_INPUT, method = Act.PUT),
-            Act("failed", "failed", FAILED_INPUT, method = Act.PUT),
+            Act("progress", "progress", PROGRESS_INPUT, method = Act.PATCH, atItem = true),
+            Act("completed", "completed", completedInput(result), method = Act.PATCH, atItem = true),
+            Act("failed", "failed", FAILED_INPUT, method = Act.PATCH, atItem = true, bodyType = PROBLEM),
         ),
         offers = Offers(
             keys = listOf(Reply.AWAITING, Reply.COMPLETED, Reply.FAILED),
@@ -121,13 +140,19 @@ object Replies {
             },
             keyField = "state",
             itemPath = ItemPath("/replies/{reply}", mapOf("reply" to "/reply")),
+            hypermediaOf = { reply ->
+                reply.problem?.let { Hypermedia(embedded = mapOf("problem" to it)) } ?: Hypermedia.NONE
+            },
         ),
         replays = { current, act, body -> repeats(current, act, body) },
     )
 
-    /** The reply resource over [store]: each act's state is replaced in it, or replayed when it repeats. */
-    fun resource(store: ReplyStore): HeartResource<Reply, String> = HeartResource(
-        layers = Layers(type),
+    /**
+     * The reply resource over [store], whose owner wants a [result] of this shape (a JSON Schema): each act's state
+     * is replaced in it, or replayed when it repeats.
+     */
+    fun resource(store: ReplyStore, result: String = ANY_RESULT): HeartResource<Reply, String> = HeartResource(
+        layers = Layers(type(result)),
         loadAt = { variables ->
             store.get(variables.getValue("reply"))
                 ?: throw ResourceNotFoundException("no reply ${variables["reply"]}")
@@ -136,7 +161,7 @@ object Replies {
             if (repeats(current, act, mapper.writeValueAsString(input.json))) {
                 Acted(current)
             } else {
-                Acted(store.replace(current, next(current, act, input)))
+                Acted(store.replace(current, next(current, act, input.json)))
             }
         },
     )
@@ -147,21 +172,32 @@ object Replies {
      */
     private fun repeats(current: Reply, act: String, body: String?): Boolean {
         if (act != "completed" || current.standing != Reply.COMPLETED || body == null) return false
-        return mapper.readTree(body)["result"]?.let { mapper.convertValue(it, RESULT) } == current.result
+        return mapper.readTree(body)["result"]?.let { mapper.convertValue(it, PLAIN) } == current.result
     }
 
-    /** The state after [act] with its checked [input]: progress keeps it awaiting; a result or failure answers it. */
-    private fun next(current: Reply, act: String, input: ActInput): Reply = when (act) {
+    /**
+     * The state after [act] with its checked [patch]: progress is merged and keeps it awaiting; a result completes
+     * it at 100 percent, with no note unless it sends one; a failure fails it, keeping the problem it was sent as.
+     */
+    private fun next(current: Reply, act: String, patch: JsonNode): Reply = when (act) {
         "progress" -> current.copy(
-            percent = input.json["percent"].asInt(),
-            note = input.json["note"]?.takeUnless { it.isNull }?.asText(),
+            percent = patch["percent"].asInt(),
+            note = if (patch.has("note")) text(patch["note"]) else current.note,
             version = current.version + 1,
         )
         "completed" -> current.copy(
             standing = Reply.COMPLETED,
-            result = mapper.convertValue(input.json["result"], RESULT),
+            percent = FULL,
+            note = text(patch["note"]),
+            result = mapper.convertValue(patch["result"], PLAIN),
             version = current.version + 1,
         )
-        else -> current.copy(standing = Reply.FAILED, version = current.version + 1)
+        else -> current.copy(
+            standing = Reply.FAILED,
+            problem = mapper.convertValue<Map<String, Any?>>(patch, PLAIN) - ItemActs.STATE,
+            version = current.version + 1,
+        )
     }
+
+    private fun text(node: JsonNode?): String? = node?.takeUnless { it.isNull }?.asText()
 }

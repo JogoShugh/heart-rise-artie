@@ -37,9 +37,11 @@ internal class OpenApiType(
         val collection = "/${type.collection}"
         val item = type.itemPath.template
         type.finding?.let { put(it.collectionPath ?: collection, mapOf("get" to search(it))) }
-        put(item, mapOf("get" to read()))
+        // Acts at the item itself share its address: one operation per method, its body any of theirs.
+        val atItem = type.acts.filter { it.atItem }.groupBy { it.method.lowercase() }
+        put(item, mapOf("get" to read()) + atItem.mapValues { (_, acts) -> itemActs(acts) })
         if (keepsPast) put("$item/history", mapOf("get" to history()))
-        type.acts.forEach { act ->
+        type.acts.filterNot { it.atItem }.forEach { act ->
             val method = act.method.lowercase()
             put("$item/actions/${act.path}", mapOf(method to act(act)))
             // A path the act moved from still answers; it is its own operation, deprecated.
@@ -136,6 +138,20 @@ internal class OpenApiType(
             act.contentType?.let { operation + ("requestBody" to OpenApiShapes.requestBody(inputName(act), it)) }
                 ?: operation
         }.named(act.relation)
+    }
+
+    /** The [acts] at the item by one method, as one operation: each body type takes any of their schemas. */
+    private val itemActs: (List<Act>) -> Map<String, Any> = { acts ->
+        val content = acts.groupBy { checkNotNull(it.contentType) }.mapValues { (_, same) ->
+            val refs = same.map { OpenApiShapes.ref(inputName(it)) }
+            mapOf("schema" to (refs.singleOrNull() ?: mapOf("oneOf" to refs)))
+        }
+        act(acts.first()) + mapOf(
+            "operationId" to acts.joinToString("Or") { it.name },
+            "summary" to acts.joinToString(", ") { type.profile.relation(it.relation).title },
+            "description" to acts.joinToString("\n\n") { "${type.profile.relation(it.relation).doc} ${onlyWhen(it)}" },
+            "requestBody" to mapOf("required" to true, "content" to content),
+        )
     }
 
     private fun bookmarkAct(act: Act): Map<String, Any> {

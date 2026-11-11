@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import org.http4k.core.Filter
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method.GET
+import org.http4k.core.Method.PATCH
 import org.http4k.core.Method.POST
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -107,6 +108,8 @@ class HeartHttp(
                 searchedAt bind GET to { indexHandler.search(resource, it) }
             },
             item bind GET to handler::read,
+            // An act at the resource itself, such as a reply's PATCH: the one its body's state names.
+            item bind PATCH to handler::act,
         ) + resource.lists.keys.map { relation ->
             resource.layers.type.subCollections.getValue(relation) bind GET to {
                 indexHandler.listed(resource, relation, it)

@@ -12,6 +12,7 @@ import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.RuleRefusedException
 import com.artie.heart.StaleWriteConflict
 import com.artie.heart.UnprocessableContentException
+import com.artie.heart.UnsupportedMediaTypeException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.http4k.core.Filter
 import org.http4k.core.Response
@@ -54,6 +55,14 @@ object Refusals {
             problem(Status.PRECONDITION_REQUIRED, "precondition-required", "If-Match is required", failure, mapper)
         is StaleWriteConflict ->
             problem(Status.PRECONDITION_FAILED, "stale", "The act is stale: the state has changed", failure, mapper)
+        is ResourceNotFoundException -> error(Status.NOT_FOUND, failure, mapper)
+        is NotAcceptableException -> error(Status.NOT_ACCEPTABLE, failure, mapper)
+        is MalformedActBodyException, is BadRequestException -> error(Status.BAD_REQUEST, failure, mapper)
+        else -> ofAct(failure, mapper)
+    }
+
+    /** The answer for an act [failure] refuses for what it asks or sends, or null when it is no such refusal. */
+    private fun ofAct(failure: Throwable, mapper: ObjectMapper): Response? = when (failure) {
         is NotOfferedException -> problem(
             Status.CONFLICT, "not-offered", "The act is not offered in the resource's current state", failure, mapper,
             listOfNotNull(failure.rel?.let { "rel" to it }).toMap(),
@@ -66,9 +75,11 @@ object Refusals {
             Status.UNPROCESSABLE_ENTITY, "rule-refused", "A rule of the resource refuses the act", failure, mapper,
             mapOf("violations" to failure.violations),
         )
-        is ResourceNotFoundException -> error(Status.NOT_FOUND, failure, mapper)
-        is NotAcceptableException -> error(Status.NOT_ACCEPTABLE, failure, mapper)
-        is MalformedActBodyException, is BadRequestException -> error(Status.BAD_REQUEST, failure, mapper)
+        // RFC 5789 §2.2: a 415 to a PATCH says, in Accept-Patch, the types the resource takes.
+        is UnsupportedMediaTypeException -> problem(
+            Status.UNSUPPORTED_MEDIA_TYPE, "unsupported-media-type", "The body is not of a type the act takes",
+            failure, mapper, mapOf("accepted" to failure.accepted),
+        ).header(if (failure.method == "PATCH") "Accept-Patch" else "Accept-Post", failure.accepted.joinToString(", "))
         else -> null
     }
 
