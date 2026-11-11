@@ -10,10 +10,16 @@ Feature: Ana's reply takes the library's answer once, and a repeat of that answe
     And reply r-7f3 is now <state>
 
     Examples:
-      | act       | body                              | state     |
-      | progress  | {"percent": 40}                   | awaiting  |
-      | completed | {"result": {"loan": 3310}}        | completed |
-      | failed    | {"title": "No hold on loan 3310"} | failed    |
+      | act       | body                                                  | state     |
+      | progress  | {"percent": 40, "note": "one ahead in the hold queue"} | awaiting  |
+      | completed | {"result": {"loan": 3310}}                            | completed |
+      | failed    | {"title": "No hold on loan 3310"}                     | failed    |
+
+  Scenario: Progress without its note is refused as invalid at the note, so each progress is the whole of it
+    Given reply r-7f3 is awaiting
+    When a client acts on reply r-7f3 with "progress", validator current, and body {"percent": 40}
+    Then the reply act is refused as invalid at "/note"
+    And reply r-7f3 is now awaiting
 
   Scenario: A repeat of the result the reply has is replayed, not refused
     Given reply r-7f3 is awaiting

@@ -57,9 +57,9 @@ object Replies {
     /** A result as plain values, which heart-core canonicalises for the validator (JCS). */
     private val RESULT = object : TypeReference<Map<String, Any?>>() {}
 
-    private const val PROGRESS_INPUT = """{"type": "object", "required": ["percent"], "properties": {""" +
+    private const val PROGRESS_INPUT = """{"type": "object", "required": ["percent", "note"], "properties": {""" +
         """"percent": {"type": "integer", "minimum": 0, "maximum": 100}, """ +
-        """"note": {"type": "string"}}}"""
+        """"note": {"type": ["string", "null"]}}}"""
     private const val COMPLETED_INPUT = """{"type": "object", "required": ["result"], "properties": {""" +
         """"result": {"type": "object"}}}"""
     private const val FAILED_INPUT = """{"type": "object", "required": ["title"], "properties": {""" +
@@ -74,7 +74,8 @@ object Replies {
             Relation(
                 "progress", AlpsType.IDEMPOTENT, "Report progress",
                 "Tells the caller how far the work has got.",
-                "Offered while the reply is awaiting. A PUT replaces the progress; a repeat changes nothing.",
+                "Offered while the reply is awaiting. A PUT replaces the whole progress, percent and note; a repeat " +
+                    "writes the same progress again.",
             ),
             Relation(
                 "completed", AlpsType.IDEMPOTENT, "Report completed",
@@ -152,7 +153,7 @@ object Replies {
     private fun next(current: Reply, act: String, input: ActInput): Reply = when (act) {
         "progress" -> current.copy(
             percent = input.json["percent"].asInt(),
-            note = input.json["note"]?.asText(),
+            note = input.json["note"]?.takeUnless { it.isNull }?.asText(),
             version = current.version + 1,
         )
         "completed" -> current.copy(

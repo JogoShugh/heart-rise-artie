@@ -4,6 +4,7 @@ import com.artie.heart.ActPipeline
 import com.artie.heart.NotOfferedException
 import com.artie.heart.Replies
 import com.artie.heart.ReplyStore
+import com.artie.heart.UnprocessableContentException
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
@@ -40,6 +41,13 @@ class ReplySteps {
         val failure = checkNotNull(checkNotNull(outcome).exceptionOrNull()) { "the act was not refused" }
         check(failure is NotOfferedException) { "expected NotOfferedException, got $failure" }
         assertEquals(resource.layers.type.profile.reference(curie.substringAfter(':')), failure.rel)
+    }
+
+    @Then("""^the reply act is refused as invalid at "([^"]+)"$""")
+    fun invalid(pointer: String) {
+        val failure = checkNotNull(checkNotNull(outcome).exceptionOrNull()) { "the act was not refused" }
+        check(failure is UnprocessableContentException) { "expected UnprocessableContentException, got $failure" }
+        assertEquals(listOf(pointer), failure.violations.map { it.pointer }.distinct())
     }
 
     @Then("""^reply (r-\w+) is now (\w+)$""")
