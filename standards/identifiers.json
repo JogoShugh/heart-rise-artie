@@ -57,6 +57,141 @@
       ]
     },
     {
+      "path": "rels/affordances",
+      "kind": "Link relation",
+      "title": "affordances",
+      "definition": "From a service's index to its affordances: every form the service can offer, keyed by the form's integrity (hr:integrity) as the index's hr:manifest names it, each with its relation and a describedby link to the JSON Schema it uses where that schema is served apart. A client that meets an integrity it has not seen follows links from the index to the schema and never knows a schema's address in advance. Read with GET; revalidated with its ETag; open to the same callers as the index. Written as the CURIE hr:affordances.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-tck/src/main/resources/heart/tck/conformance.feature"
+      ]
+    },
+    {
+      "path": "rels/keys",
+      "kind": "Link relation",
+      "title": "keys",
+      "definition": "To the JWK Set (RFC 7517, application/jwk-set+json) of Ed25519 keys (RFC 8037) that the linking party signs with, by key id. A service that signs links it from its index and serves it open to every caller, cached a day. In a RISE request's envelope it names the keys the caller signed the request with; on a watch it names the keys the service signs its answers with, the ones the caller checks them by. A verifier takes keys only from the link of the resource it trusts, never from a link the signed message carries. Written as the CURIE hr:keys.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/test/resources/features/tell-me-when-renewable.feature"
+      ]
+    },
+    {
+      "path": "rels/reply-to",
+      "kind": "Link relation",
+      "title": "reply-to",
+      "definition": "In a RISE request's envelope, the caller's own reply resource: where the service answers later, by the reply's forms. Its type and profile say how to read the reply. Required with hr:keys in the envelope of a request such as a library's tell-me-when-renewable. A watch the request brings into being links it too. Written as the CURIE hr:reply-to.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/ideas/rise-deep-dive.md"
+      ]
+    },
+    {
+      "path": "rels/progress",
+      "kind": "Link relation",
+      "title": "progress",
+      "definition": "On a reply, while it awaits: report how far the work has got. A PATCH of the reply itself, application/merge-patch+json, with If-Match the reply's ETag, signed (RFC 9421, with Content-Digest). Minimum schema: state, the const awaiting; percent, an integer from 0 to 100; note, a string or null, where a note left out stays and null clears it; _links with hr:in-reply-to. 200 with the reply; 401 unsigned or badly signed; 409 not offered once the reply is answered, or link-conflict for another request; 412 stale; 422 invalid. Each progress is a change and is recorded in the reply's version-history. Written as the CURIE hr:progress.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/reply.feature"
+      ]
+    },
+    {
+      "path": "rels/completed",
+      "kind": "Link relation",
+      "title": "completed",
+      "definition": "On a reply, while it awaits: send the result; the reply is answered, at 100 percent, with no note unless one is sent. A PATCH of the reply itself, application/merge-patch+json, with If-Match, signed. Minimum schema: state, the const completed; result, in the shape the reply's owner names in its schema; _links with hr:in-reply-to. Replay: the same result sent again after the answer is answered 200 with the same ETag and records nothing; a different one is 409 not-offered. Other answers: 401, 412, 422 as for progress. The answered reply offers no forms and says why in hr:unavailable. Written as the CURIE hr:completed.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/reply.feature"
+      ]
+    },
+    {
+      "path": "rels/failed",
+      "kind": "Link relation",
+      "title": "failed",
+      "definition": "On a reply, while it awaits: say the work failed. A PATCH of the reply itself whose body is an RFC 9457 problem document, application/problem+json, with If-Match, signed. Minimum schema: state, the const failed; type, a URI; title; detail, optional; _links with hr:in-reply-to. The reply is answered and keeps the problem under _embedded.problem, so its owner sees why. A body sent as merge-patch is refused 415 with Accept-Patch. Written as the CURIE hr:failed.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/reply.feature"
+      ]
+    },
+    {
+      "path": "rels/in-reply-to",
+      "kind": "Link relation",
+      "title": "in-reply-to",
+      "definition": "From an answer, and from the reply it lands on, to the request it answers: the absolute address of the watch whose 201 created it. The service sends it in each answer's _links; the reply keeps the first one and links it in every state after. An answer that names another request is refused 409 link-conflict and changes nothing. Trust rule: it must equal the Location of the 201 the caller received, and the caller checks answers' signatures with keys from that watch's hr:keys, never from a link the signer supplied. Written as the CURIE hr:in-reply-to.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/test/resources/features/the-library-answers-ana.feature"
+      ]
+    },
+    {
+      "path": "rels/cancel",
+      "kind": "Link relation",
+      "title": "cancel",
+      "definition": "On a RISE request's watch, while it awaits its answer: withdraw it, so no answer will come. A PATCH of the watch itself, application/merge-patch+json, with If-Match, whose standing is the const cancelled. 200 with the watch, cancelled. Once the service has answered, the watch offers no hr:cancel, its hr:unavailable says why, and a cancel sent anyway is 409 not-offered. A domain whose acts have side effects offers a compensating form here instead. Written as the CURIE hr:cancel.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/test/resources/features/the-library-answers-ana.feature"
+      ]
+    },
+    {
+      "path": "rels/integrity",
+      "kind": "Member",
+      "title": "integrity",
+      "definition": "A form's own integrity: over what the form does, its target, template pointers, method, content type and its schema's integrity, in canonical form; not its title or description. On every form, the index's among them, so a client that pins a form notices when what it does changes. Written hr:integrity.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/spec/HAL-SCHEMA-FORMS-HR.md"
+      ]
+    },
+    {
+      "path": "rels/manifest",
+      "kind": "Member",
+      "title": "manifest",
+      "definition": "A member of a service's index: by relation, the integrity of every form the service can offer, the index's own and every resource type's acts, and a digest over that list that changes when any form does. Known from the declarations, with nothing read. hr:affordances lists the same forms by integrity, with the way to each schema. Written hr:manifest.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/index.feature"
+      ]
+    },
+    {
+      "path": "problems/signature-required",
+      "kind": "Problem type",
+      "title": "A signature is required",
+      "definition": "401: the act carries no signature where the resource takes only signed acts (RFC 9421 over Content-Digest, RFC 9530). The answer says how to sign: WWW-Authenticate names the Signature scheme, declared by the HAL Schema Forms profile, and Accept-Signature names the components, @method, @target-uri, content-digest and if-match, and the key id to sign with.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/test/resources/features/the-library-answers-ana.feature"
+      ]
+    },
+    {
+      "path": "problems/invalid-signature",
+      "kind": "Problem type",
+      "title": "The signature does not verify",
+      "definition": "401: the act carries a signature, but it does not verify by the key it names, from the keys the resource trusts for it: the body was changed after signing, or another key made it. The answer carries WWW-Authenticate and Accept-Signature, as for signature-required.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/test/resources/features/the-library-answers-ana.feature"
+      ]
+    },
+    {
+      "path": "problems/link-conflict",
+      "kind": "Problem type",
+      "title": "The act names another resource than the state keeps",
+      "definition": "409: the act names, under the relation in rel, another resource than the one the resource already keeps there, such as an answer on a reply that names another request than the one the reply answers. Nothing changes.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/reply.feature"
+      ]
+    },
+    {
+      "path": "problems/unsupported-media-type",
+      "kind": "Problem type",
+      "title": "The body is not of a type the act takes",
+      "definition": "415: the act's body is of another type than the act takes, such as a failure sent as merge-patch rather than as a problem document. accepted lists the types the resource takes, as does Accept-Patch (RFC 5789) for a PATCH, or Accept-Post for a POST.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-core/src/test/resources/features/reply.feature"
+      ]
+    },
+    {
+      "path": "problems/not-acceptable",
+      "kind": "Problem type",
+      "title": "Accept names no format this server produces",
+      "definition": "406: Accept names none of the formats a resource is served in. alternates lists them, each its media type and, where it has one, its profile: HAL Schema Forms, HAL-FORMS, HTML and plain JSON. Every answer names the same formats as alternate links.",
+      "see": [
+        "https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-tck/src/main/resources/heart/tck/conformance.feature"
+      ]
+    },
+    {
       "path": "problems/stale",
       "kind": "Problem type",
       "title": "The act is stale: the state has changed",

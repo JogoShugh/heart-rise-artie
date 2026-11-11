@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>in-reply-to · HEART identifiers</title><link rel="stylesheet" href="../../style.css"></head>
+<body><main><span class="kind">Link relation</span>
+<h1>in-reply-to</h1>
+<p><code>https://w3id.org/heart-rise/rels/in-reply-to</code></p>
+<p>From an answer, and from the reply it lands on, to the request it answers: the absolute address of the watch whose 201 created it. The service sends it in each answer&#x27;s _links; the reply keeps the first one and links it in every state after. An answer that names another request is refused 409 link-conflict and changes nothing. Trust rule: it must equal the Location of the 201 the caller received, and the caller checks answers&#x27; signatures with keys from that watch&#x27;s hr:keys, never from a link the signer supplied. Written as the CURIE hr:in-reply-to.</p>
+<h2>Defined in</h2><ul><li><a href="https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/test/resources/features/the-library-answers-ana.feature">https://github.com/JogoShugh/heart-rise-artie/blob/main/heart/heart-sims/src/test/resources/features/the-library-answers-ana.feature</a></li></ul>
+<footer>HEART identifiers, built from <code>standards/identifiers.json</code>. Index: <a href="../../">https://w3id.org/heart-rise</a></footer>
+</main></body></html>
