@@ -58,16 +58,17 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
     Then the library is refused with 409
     And the refusal says hr:completed is not offered
 
-  Scenario Outline: A result the library's key did not sign is refused, and the reply stays awaiting
+  Scenario Outline: A result the library's key did not sign is refused, saying why and how to sign, and the reply stays awaiting
     Given the hold on loan 3310 has been returned
     When the library sends the result on reply r-7f3 <signature>: loan 3310 can be renewed from 2026-12-03
-    Then the library is refused with 401
+    Then the library is refused with 401, as the problem "<problem>"
+    And the refusal asks for a Signature, over "@method" "@target-uri" "content-digest" "if-match", by the key "library-2026-11"
     And reply r-7f3 is still awaiting
 
     Examples:
-      | signature               |
-      | signed with another key |
-      | unsigned                |
+      | signature               | problem                                                       |
+      | signed with another key | https://w3id.org/heart-rise/problems/invalid-signature        |
+      | unsigned                | https://w3id.org/heart-rise/problems/signature-required       |
 
   Scenario: The library cannot find the hold, and says so as a failure
     Given the library has no record of the hold on loan 3310

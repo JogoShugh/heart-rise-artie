@@ -503,6 +503,19 @@ class LibrarySteps {
     @Then("the library is refused with {int}")
     fun libraryRefused(status: Int) = assertEquals(status, answer?.status?.code, body())
 
+    @Then("the library is refused with {int}, as the problem {string}")
+    fun libraryRefusedAs(status: Int, type: String) {
+        assertEquals(status, answer?.status?.code, body())
+        assertEquals(type, mapper.readTree(body())["type"].asText(), body())
+    }
+
+    @Then("the refusal asks for a Signature, over {string} {string} {string} {string}, by the key {string}")
+    fun asksForSignature(method: String, target: String, digest: String, ifMatch: String, key: String) {
+        assertTrue(answer?.header("WWW-Authenticate").orEmpty().startsWith("Signature "), body())
+        val components = listOf(method, target, digest, ifMatch).joinToString(" ") { "\"$it\"" }
+        assertEquals("sig1=($components);keyid=\"$key\";alg=\"ed25519\"", answer?.header("Accept-Signature"))
+    }
+
     @Then("the refusal says hr:completed is not offered")
     fun refusalSays() = assertTrue(body().contains("hr:completed is not offered"), body())
 

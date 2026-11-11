@@ -1,6 +1,7 @@
 package com.artie.heart.sims.library
 
 import com.artie.heart.Replies
+import com.artie.heart.PROBLEM_TYPES
 import com.artie.heart.ReplyStore
 import com.artie.heart.Signatures
 import com.artie.heart.Signed
@@ -36,14 +37,21 @@ class CallerService(private val libraryKey: PublicKey = LibraryKey.pair.public) 
         HeartHttp(
             listOf(Replies.resource(store, RENEWABLE)),
             Credentials.parse(users = "", tokens = Tokens.sha256(LIBRARY_TOKEN)),
-            HeartSettings(title = "Ana's replies", realm = Replies.PROFILE.name),
+            HeartSettings(title = REALM, realm = Replies.PROFILE.name),
         ),
     )
 
-    /** Refuses, with 401, every request that is not a GET and whose signature does not verify (RFC 9421, RFC 9530). */
+    /**
+     * Refuses, with 401, every request that is not a GET and whose signature does not verify (RFC 9421, RFC 9530):
+     * as `signature-required` when it carries none, `invalid-signature` when it carries one that does not verify.
+     */
     private fun signedActs(): Filter = Filter { next ->
         { request ->
-            if (request.method == Method.GET || signedBy(request)) next(request) else unauthorized()
+            when {
+                request.method == Method.GET || signedBy(request) -> next(request)
+                request.header("Signature") == null -> unauthorized("signature-required", "A signature is required")
+                else -> unauthorized("invalid-signature", "The signature does not verify")
+            }
         }
     }
 
@@ -62,11 +70,27 @@ class CallerService(private val libraryKey: PublicKey = LibraryKey.pair.public) 
         return Signatures.verify(signed, request.bodyString(), libraryKey)
     }
 
-    private fun unauthorized(): Response = Response(Status.UNAUTHORIZED)
+    /**
+     * 401 as an RFC 9457 problem of [type], saying how to authenticate: by the Signature scheme the profile declares,
+     * over the components and by the key RFC 9421's Accept-Signature names.
+     */
+    private fun unauthorized(type: String, title: String): Response = Response(Status.UNAUTHORIZED)
         .header("Content-Type", "application/problem+json")
-        .body("""{"title": "The signature does not verify", "status": 401}""")
+        .header("WWW-Authenticate", "Signature realm=\"$REALM\"")
+        .header("Accept-Signature", ACCEPT_SIGNATURE)
+        .body(
+            """{"type": "$PROBLEM_TYPES$type", "title": "$title", "status": 401, """ +
+                """"detail": "Each act on a reply is signed by the library's key, ${LibraryKey.KEY_ID}."}""",
+        )
 
     companion object {
+        private const val REALM = "Ana's replies"
+
+        /** RFC 9421 §5.1: what a signature on a reply's act covers, and the key it is made with. */
+        val ACCEPT_SIGNATURE =
+            "sig1=(\"@method\" \"@target-uri\" \"content-digest\" \"if-match\");" +
+                "keyid=\"${LibraryKey.KEY_ID}\";alg=\"ed25519\""
+
         /** The Bearer token the library presents to Ana's replies. */
         const val LIBRARY_TOKEN = "riverside-library-reply-token"
 
