@@ -130,11 +130,24 @@
     const tail = box.querySelector(":scope > .jv-tail");
     box.insertBefore(body, tail);
     if (tools.childElementCount) box.insertBefore(tools, tail);
+    if (unfolded) body.querySelectorAll("button.jv-gap").forEach((gap) => gap.click());
+  };
+
+  // Every line at once: each box rendered from now on shows its folded lines, and each box already rendered is
+  // rendered again, so turning it off folds them back.
+  let unfolded = false;
+  const setUnfolded = (on, scope = document) => {
+    unfolded = on;
+    scope.querySelectorAll("details.jv[data-rendered]").forEach((box) => {
+      box.querySelectorAll(":scope > .jv-body, :scope > .jv-tools").forEach((n) => n.remove());
+      render(box);
+    });
   };
 
   // For other scripts (run-report.js): a box for documents already in hand, rendered when opened like any other.
   let made = 0;
   window.JsonView = {
+    setUnfolded,
     box({ a, b, labelA, labelB, summary, lead }) {
       const box = el("details", "jv");
       const id = (value) => { const key = `jvm${made++}`; cache.set(key, linesOf(value)); return key; };

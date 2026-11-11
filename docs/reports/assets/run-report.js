@@ -258,9 +258,10 @@
   };
   const applyAll = (scope) => kinds.forEach(([k]) => k !== "steps" && apply(scope, k));
 
-  const bar = el("div", "rr-toggles");
+  const bar = el("div", "rr-toggles"), inputs = {};
   kinds.forEach(([kind, label]) => {
     const wrap = el("label", "rr-toggle"), input = el("input");
+    inputs[kind] = input;
     input.type = "checkbox";
     input.checked = state[kind];
     input.addEventListener("change", () => {
@@ -275,6 +276,20 @@
     wrap.append(input, document.createTextNode(` ${label}`));
     bar.append(wrap);
   });
+
+  // One tap for everything: every step and body open, every folded line shown. Off folds the lines back.
+  const unfold = el("label", "rr-toggle"), unfoldInput = el("input");
+  unfoldInput.type = "checkbox";
+  unfoldInput.addEventListener("change", () => {
+    if (unfoldInput.checked) {
+      kinds.forEach(([kind]) => { state[kind] = true; inputs[kind].checked = true; });
+      root.querySelectorAll("details.rr-step").forEach((n) => { n.open = true; });
+      applyAll(root);
+    }
+    window.JsonView.setUnfolded(unfoldInput.checked, root);
+  });
+  unfold.append(unfoldInput, document.createTextNode(" Every line, in full"));
+  bar.append(unfold);
 
   // ---- Summary tiles: the run at a glance; a tile that can filters the rows to its steps. ----
   const pathOf = (url) => { try { const u = new URL(url, "http://x"); return u.pathname + u.search; } catch { return url; } };
