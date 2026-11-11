@@ -81,6 +81,17 @@ Feature: Ana's reply takes the library's answer once, and a repeat of that answe
       | hr:completed | /replies/r-7f3 | PATCH  | application/merge-patch+json |
       | hr:failed    | /replies/r-7f3 | PATCH  | application/problem+json     |
 
+  Scenario: The hr vocabulary describes the links a request and its answers carry, beside its acts
+    Then the hr profile describes these
+      | descriptor  | type   |
+      | progress    | unsafe |
+      | completed   | unsafe |
+      | failed      | unsafe |
+      | cancel      | unsafe |
+      | reply-to    | safe   |
+      | keys        | safe   |
+      | in-reply-to | safe   |
+
   Scenario: The reply names its relations by the one hr vocabulary, at its absolute address
     Given reply r-7f3 is awaiting
     Then reply r-7f3 declares exactly one CURIE "hr", at "https://w3id.org/heart-rise/rels/{rel}"

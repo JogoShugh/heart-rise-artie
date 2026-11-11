@@ -1,5 +1,6 @@
 package com.artie.heart.bdd
 
+import com.artie.heart.Replies
 import com.artie.heart.Reply
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.datatable.DataTable
@@ -29,6 +30,12 @@ class ReplyViewSteps(private val world: ReplyWorld) {
     fun links(reference: String, rel: String, href: String) {
         val link = (layer1(reference)["_links"] as Map<*, *>)[rel] as? Map<*, *>
         assertEquals(href, link?.get("href"), layer1(reference).toString())
+    }
+
+    @Then("^the hr profile describes these$")
+    fun describes(table: DataTable) {
+        val descriptors = ((Replies.PROFILE.alps["alps"] as Map<*, *>)["descriptor"] as List<*>).map { it as Map<*, *> }
+        assertEquals(table.asLists().drop(1), descriptors.map { listOf(it["id"], it["type"]) })
     }
 
     @Then("""^reply (r-\w+) offers these forms$""")
