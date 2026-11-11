@@ -9,6 +9,13 @@ Feature: The service index, the home document and search pages, from the declara
     Given a lamp resource type declared with the profile "home"
     And lamps 1 to 5 exist
 
+  Scenario: The index declares the hr CURIE it names its members and links by, once, at its absolute address
+    When the service index is rendered in HAL Schema Forms
+    Then the index declares these CURIEs
+      | name | href                                    |
+      | home | /profiles/home#{rel}                    |
+      | hr   | https://w3id.org/heart-rise/rels/{rel} |
+
   Scenario: In HAL Schema Forms, the index offers a search form and a lookup form per type
     When the service index is rendered in HAL Schema Forms
     Then the index is titled "Lamps" and links "self" to "/"

@@ -67,7 +67,8 @@ class ServiceIndex(
         }.toMap()
         return mapOf(
             "title" to title,
-            "_links" to links() + ("curies" to found.flatMap { it.profile.curies }.distinct()),
+            // The forms' hr:integrity and the hr:manifest member are named by heart-core's hr vocabulary.
+            "_links" to links() + ("curies" to (found.flatMap { it.profile.curies } + Layers.HR_CURIE).distinct()),
             "_forms" to forms,
             MANIFEST to manifest(forms, types),
         )

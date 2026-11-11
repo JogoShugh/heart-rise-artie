@@ -40,6 +40,12 @@ class IndexSteps(private val world: LampWorld) {
         json = mapper.readTree(index.body(Dialect.HALFORMS))
     }
 
+    @Then("the index declares these CURIEs")
+    fun curies(table: DataTable) {
+        val declared = json.path("_links").path("curies").map { it.path("name").asText() to it.path("href").asText() }
+        assertEquals(table.asMaps().map { it.getValue("name") to it.getValue("href") }, declared)
+    }
+
     @Then("the index is titled {string} and links {string} to {string}")
     fun titled(title: String, rel: String, href: String) {
         assertEquals(title, json.path("title").asText())
