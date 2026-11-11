@@ -6,8 +6,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 /**
  * Acts served at a resource's own address (an [Act] declared `atItem`), such as a reply's progress, result and
  * failure, each a PATCH of the reply. They share the address and the method, so a request says which it makes by
- * the `state` its body names: the one each act's schema fixes with a `const`. The body must be of the type that
- * act takes; any other is refused 415, saying what the resource takes.
+ * the state its body names, in the member the resource's state is keyed by (`state` for a reply, `standing` for a
+ * watch): the one each act's schema fixes with a `const`. The body must be of the type that act takes; any other
+ * is refused 415, saying what the resource takes.
  */
 object ItemActs {
     /** The member of a body that names the act it makes. */
@@ -29,9 +30,10 @@ object ItemActs {
      */
     fun choose(type: ResourceType<*, *>, method: String, contentType: String?, body: String?): Act {
         val acts = of(type, method)
-        val named = body?.let { runCatching { mapper.readTree(it) }.getOrNull() }?.get(STATE)?.asText()
-        val act = acts.firstOrNull { stateOf(it) == named } ?: throw UnprocessableContentException(
-            listOf(Violation("/$STATE", "names none of ${acts.mapNotNull(::stateOf).joinToString()}")),
+        val field = fieldOf(type)
+        val named = body?.let { runCatching { mapper.readTree(it) }.getOrNull() }?.get(field)?.asText()
+        val act = acts.firstOrNull { stateOf(it, field) == named } ?: throw UnprocessableContentException(
+            listOf(Violation("/$field", "names none of ${acts.mapNotNull { stateOf(it, field) }.joinToString()}")),
         )
         val sent = contentType?.substringBefore(';')?.trim()?.lowercase()
         if (sent != act.contentType) {
@@ -45,8 +47,11 @@ object ItemActs {
         return act
     }
 
-    /** The state [act]'s schema fixes, if it fixes one. */
-    private fun stateOf(act: Act): String? =
-        mapper.readTree(act.schema).path("properties").path(STATE).path("const").takeUnless(JsonNode::isMissingNode)
+    /** The member that names the act: the one the resource's state is keyed by, or `state`. */
+    private fun fieldOf(type: ResourceType<*, *>): String = type.state.keyField ?: STATE
+
+    /** The value [act]'s schema fixes for [field], if it fixes one. */
+    private fun stateOf(act: Act, field: String): String? =
+        mapper.readTree(act.schema).path("properties").path(field).path("const").takeUnless(JsonNode::isMissingNode)
             ?.asText()
 }

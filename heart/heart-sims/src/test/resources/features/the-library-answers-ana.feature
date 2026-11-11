@@ -81,6 +81,20 @@ Feature: The library answers Ana on her reply, and Ana checks each answer by the
       | signed with another key | https://w3id.org/heart-rise/problems/invalid-signature  |
       | unsigned                | https://w3id.org/heart-rise/problems/signature-required |
 
+  Scenario: While the library has not answered, Ana can cancel her request
+    When Ana reads her watch
+    Then the watch offers "hr:cancel", a PATCH of the watch itself
+    When Ana cancels her watch
+    Then Ana's watch is cancelled
+
+  Scenario: Once the library has answered, the request can't be cancelled, and the watch says why
+    Given the hold on loan 3310 has been returned
+    And the library sends the result on reply r-7f3: loan 3310 can be renewed from 2026-12-03
+    When Ana reads her watch
+    Then the watch offers no "hr:cancel", and says why: "The library has answered this request, so there is nothing to cancel."
+    When Ana cancels her watch
+    Then the library is refused with 409
+
   Scenario: The library cannot find the hold, and says so as a failure
     Given the library has no record of the hold on loan 3310
     When the library sends the failure on reply r-7f3: "No hold record for loan 3310"

@@ -89,6 +89,15 @@ class Ledger {
         return watch
     }
 
+    /** [watch], cancelled by its caller. */
+    fun cancel(watch: Watch): Watch = moved(watch, Watch.CANCELLED)
+
+    /** The watch [id], answered: the library has sent its result or its failure. */
+    fun answered(id: Long): Watch = moved(checkNotNull(watches[id]) { "no watch $id" }, Watch.ANSWERED)
+
+    private fun moved(watch: Watch, standing: String): Watch =
+        watch.copy(standing = standing, version = watch.version + 1).also { watches[it.id] = it }
+
     /** Only [lent], in place of every loan there was. */
     fun lend(lent: List<Loan>) {
         loans.clear()

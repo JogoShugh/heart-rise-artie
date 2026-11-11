@@ -93,7 +93,7 @@ object Replies {
         """{"type": "object", "required": ["state", "result"], "properties": {"state": {"const": "completed"}, """ +
             """"result": $result, "note": {"type": ["string", "null"]}, $LINKS}}"""
 
-    /** The profile of the reply: RISE's relations for what a reply takes, named `hr:`. */
+    /** RISE's vocabulary, named `hr:`: what a reply takes, and the cancelling of the request it answers. */
     val PROFILE = Profile(
         name = "hr",
         title = "H.E.A.R.T. RISE, a reply",
@@ -115,6 +115,12 @@ object Replies {
                 "failed", AlpsType.UNSAFE, "Report failed",
                 "Says the work failed, with a problem document.",
                 "Offered while the reply is awaiting; the reply is answered after, and keeps the problem.",
+            ),
+            // Not a reply's: the request's own, which a service that takes requests borrows (Profile.borrowed).
+            Relation(
+                "cancel", AlpsType.UNSAFE, "Cancel the request",
+                "Withdraws a request before it is answered: no answer will come.",
+                "Offered while the request awaits its answer; after it, the request says why it can't be cancelled.",
             ),
         ),
         vocabulary = "$HEART_RISE_PROFILE/rels/",

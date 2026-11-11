@@ -23,6 +23,9 @@ class LibraryService(keysAt: (String) -> Map<String, PublicKey> = { emptyMap() }
     /** The hold on loan [id] has been returned: nothing is waiting for the book any more. */
     fun releaseHold(id: Long) = ledger.releaseHold(id)
 
+    /** The library has sent its one answer on watch [id]'s reply. */
+    fun answered(id: Long) = ledger.answered(id)
+
     /** The watches the library holds, as they are now. */
     fun watches(): List<Watch> = ledger.watches()
 

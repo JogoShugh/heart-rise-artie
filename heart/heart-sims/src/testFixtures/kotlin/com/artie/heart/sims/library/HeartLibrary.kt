@@ -16,6 +16,7 @@ import com.artie.heart.Options
 import com.artie.heart.Pick
 import com.artie.heart.Profile
 import com.artie.heart.Relation
+import com.artie.heart.Replies
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.ResourceType
 import com.artie.heart.SearchField
@@ -119,8 +120,19 @@ class HeartLibrary(
     private val watchType = ResourceType(
         collection = "watches",
         profile = PROFILE,
-        acts = emptyList(),
-        offers = Offers(keys = listOf(Watch.AWAITING), offered = { emptyList() }, whyAbsent = { _, _ -> "" }),
+        // Cancelling is a PATCH of the watch itself, whose standing says it is cancelled.
+        acts = listOf(Act("cancel", "cancel", CANCEL_INPUT, method = Act.PATCH, atItem = true)),
+        offers = Offers(
+            keys = listOf(Watch.AWAITING, Watch.ANSWERED, Watch.CANCELLED),
+            offered = { standing -> if (standing == Watch.AWAITING) listOf("cancel") else emptyList() },
+            whyAbsent = { standing, _ ->
+                if (standing == Watch.ANSWERED) {
+                    "The library has answered this request, so there is nothing to cancel."
+                } else {
+                    "The request is already cancelled."
+                }
+            },
+        ),
         state = StateView<Watch, String>(
             keyOf = { it.standing },
             idOf = { it.id },
@@ -151,7 +163,7 @@ class HeartLibrary(
     private val watches = HeartResource(
         layers = Layers(watchType),
         load = { id -> ledger.watch(id) ?: throw ResourceNotFoundException("no watch $id") },
-        perform = { current, _, _ -> Acted(current) },
+        perform = { current, _, _ -> Acted(ledger.cancel(current)) },
         find = { _, id ->
             ledger.watches()
                 .filter { id == null || it.id == id }
@@ -312,6 +324,10 @@ class HeartLibrary(
          * Telling Ana when a loan can be renewed: the loan, and the reply and the key the library answers with, as links
          * (SPEC §7.2 names them; the request carries them in _links, as the envelope).
          */
+        /** A JSON Merge Patch of a watch that withdraws it: its standing becomes cancelled. */
+        private const val CANCEL_INPUT =
+            """{"type": "object", "required": ["standing"], "properties": {"standing": {"const": "cancelled"}}}"""
+
         private const val TELL_INPUT = """{
   "type": "object",
   "required": ["loan", "_links"],
@@ -441,9 +457,11 @@ class HeartLibrary(
                 Relation(
                     "get-watch", AlpsType.SAFE, "Get a watch by number",
                     "Goes to one watch, given its number.",
-                    "A safe lookup; the watch keeps its reply and key as links.",
+                    "A safe lookup; the watch links its reply and the keys the library signs its answers with.",
                 ),
             ),
+            // A watch is a RISE request: it is cancelled by RISE's own hr:cancel.
+            borrowed = listOf(Replies.PROFILE),
         )
     }
 }

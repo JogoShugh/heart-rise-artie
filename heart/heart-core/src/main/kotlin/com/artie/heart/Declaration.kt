@@ -33,22 +33,34 @@ class Profile(
      * relations are `https://w3id.org/heart-rise/rels/{rel}` wherever they are served.
      */
     private val vocabulary: String? = null,
+    /**
+     * Vocabularies whose relations this one's acts use as they are, named by their own CURIEs: a library's watch
+     * is cancelled by RISE's `hr:cancel`, not by a `library:` relation of its own.
+     */
+    private val borrowed: List<Profile> = emptyList(),
 ) {
     val path: String = "/profiles/$name"
 
     private val byId: Map<String, Relation> = relations.associateBy { it.id }
 
-    /** The `_links.curies` entry every representation with relation-named forms declares. */
+    /** The `_links.curies` entries every representation with relation-named forms declares. */
     val curies: List<Map<String, Any>> =
-        listOf(mapOf("name" to name, "href" to (vocabulary ?: "$path#") + "{rel}", "templated" to true))
+        listOf(mapOf("name" to name, "href" to (vocabulary ?: "$path#") + "{rel}", "templated" to true)) +
+            borrowed.flatMap { it.curies }
 
-    fun relation(id: String): Relation = byId[id] ?: throw IllegalArgumentException("no relation $id in $name")
+    /** The vocabulary relation [id] is in: this one, or the borrowed one that has it. */
+    private fun owner(id: String): Profile =
+        if (id in byId) this else borrowed.firstOrNull { id in it.byId } ?: throw IllegalArgumentException(
+            "no relation $id in $name",
+        )
+
+    fun relation(id: String): Relation = owner(id).byId.getValue(id)
 
     /** A form's key in `_forms`: the CURIE of relation [id]. */
-    fun key(id: String): String = "$name:$id"
+    fun key(id: String): String = owner(id).let { "${it.name}:$id" }
 
     /** Relation [id] as a URI reference, resolved against the request URL. */
-    fun reference(id: String): String = (vocabulary ?: "$path#") + id
+    fun reference(id: String): String = owner(id).let { (it.vocabulary ?: "${it.path}#") + id }
 
     /** The ALPS profile document (draft-amundsen-richardson-foster-alps). */
     val alps: Map<String, Any> = mapOf(

@@ -296,6 +296,7 @@ class LibrarySteps {
 
     /** The watch the library brought into being for Ana's request, as the 201's Location named it, absolute. */
     private var anaWatch: String? = null
+    private var watchRead: Response? = null
 
     @Given("Ana's reply {word} is awaiting")
     fun replyAwaiting(reply: String) = caller.open(reply)
@@ -324,6 +325,54 @@ class LibrarySteps {
     fun linksAnaWatch(reply: String, rel: String) {
         val read = mapper.readTree(replyBody(reply))
         assertEquals(checkNotNull(anaWatch), read["_links"][rel]?.get("href")?.asText(), read.toString())
+    }
+
+    @When("Ana reads her watch")
+    fun readsWatch() {
+        answer = send(Method.GET, java.net.URI(checkNotNull(anaWatch)).path, ACCEPT.getValue(HSF))
+        watchRead = answer
+    }
+
+    @Then("the watch offers {string}, a PATCH of the watch itself")
+    fun watchOffers(rel: String) {
+        val read = mapper.readTree(body())
+        val form = checkNotNull(read["_forms"]?.get(rel)) { "no $rel: $read" }
+        assertEquals(read["_links"]["self"]["href"].asText(), form["_links"]["target"]["href"].asText())
+        assertEquals("PATCH", form["method"].asText())
+    }
+
+    @Then("the watch offers no {string}, and says why: {string}")
+    fun watchSaysWhy(rel: String, why: String) {
+        val read = mapper.readTree(body())
+        assertTrue(read["_forms"]?.has(rel) != true, read.toString())
+        val explanation = send(Method.GET, read["_links"]["hr:unavailable"]["href"].asText(), "application/json")
+        val absent = mapper.readTree(explanation.bodyString())["unavailable"]
+        val reference = Replies.PROFILE.reference(rel.substringAfter(':'))
+        assertEquals(why, absent.single { it["rel"].asText() == reference }["reason"].asText(), absent.toString())
+    }
+
+    @When("Ana cancels her watch")
+    fun cancelsWatch() {
+        val read = checkNotNull(watchRead) { "Ana has not read her watch" }
+        val seen = mapper.readTree(read.bodyString())
+        // By the form when the watch offers it; else as a client that remembers it would, at the watch itself.
+        val form = seen["_forms"]?.get("hr:cancel")
+        val target = form?.get("_links")?.get("target")?.get("href")?.asText()
+            ?: seen["_links"]["self"]["href"].asText()
+        val method = form?.get("method")?.asText()?.let(Method::valueOf) ?: Method.PATCH
+        val type = form?.get("contentType")?.asText() ?: "application/merge-patch+json"
+        answer = library.handler(
+            request(method, target, ACCEPT.getValue(HSF), basic(HeartLibrary.CARD, PIN))
+                .header("If-Match", checkNotNull(read.header("ETag")))
+                .header("Content-Type", type)
+                .body("""{"standing": "cancelled"}"""),
+        )
+    }
+
+    @Then("Ana's watch is cancelled")
+    fun watchCancelled() {
+        assertEquals(200, answer?.status?.code, body())
+        assertEquals("cancelled", mapper.readTree(body())["standing"].asText(), body())
     }
 
     @Then("reply {word} shows the failure's problem, {string}")
@@ -519,7 +568,11 @@ class LibrarySteps {
             .header("If-Match", ifMatch)
             .header("Content-Type", form.contentType)
         answer = caller.handler(if (signed == null) act.body(sent) else signedRequest(act, signed, sent))
-        answer?.takeIf { it.status.successful }?.header("ETag")?.let { etags[reply] = it }
+        answer?.takeIf { it.status.successful }?.let { done ->
+            done.header("ETag")?.let { etags[reply] = it }
+            // The library's one answer is sent: its watch is answered, and can't be cancelled after.
+            if (relation != "progress") library.answered(inReplyTo.substringAfterLast('/').toLong())
+        }
     }
 
     @Then("the library read Ana's reply once, for both answers")
