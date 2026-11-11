@@ -2,6 +2,7 @@ package com.artie.heart.http4k
 
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
+import com.artie.heart.IndexContent
 import com.artie.heart.Layers
 import com.artie.heart.Listing
 import com.artie.heart.OpenApiDocument
@@ -23,7 +24,8 @@ import org.http4k.core.queries
  * (HAL-SCHEMA-FORMS-HR Rule 8).
  */
 class Published(layers: List<Layers<*, *>>, private val document: OpenApiDocument, private val mapper: ObjectMapper) {
-    private val content = SharedContent(layers)
+    // The service index's own set and schemas are served beside the types'.
+    private val content = SharedContent(layers, IndexContent(layers.map { it.type }))
     private val profiles: Map<String, String> = layers.map { it.type.profile }.associateBy { it.name }
         .mapValues { (_, profile) -> mapper.writeValueAsString(profile.alps) }
 

@@ -50,7 +50,7 @@ class IndexHandler(
         }
     }
 
-    /** The index in [dialect], at the rung [request] prefers: at L2 its act forms link their schemas. */
+    /** The index in [dialect], at the rung [request] prefers: at L1 and L2 it links its affordance set. */
     private fun inDialect(request: Request, dialect: Dialect): Response {
         // HAL-FORMS is the L0 on-ramp: it ignores layering preferences.
         val rung = if (dialect == Dialect.JSONSCHEMA) limits.cap(Rung.fromPrefer(request.header(PREFER))) else Rung.L0
@@ -61,7 +61,9 @@ class IndexHandler(
             // RFC 8631: the OpenAPI description, for a client that knows only this address.
             .replaceHeader(LINK, "${Negotiation.profileLinks(dialect)}, ${Alternates.links("/")}, $SERVICE_DESC_LINK")
             .replaceHeader(VARY, "$ACCEPT, $PREFER, ${Negotiation.ACCEPT_PROFILE}")
-            .let { if (rung == Rung.L2) it.replaceHeader(PREFERENCE_APPLIED, SCHEMA_LINK) else it }
+            .let { answered ->
+                rung.preferenceApplied?.let { answered.replaceHeader(PREFERENCE_APPLIED, it) } ?: answered
+            }
     }
 
     /** The index's affordances, linked from it as `hr:affordances`: revalidated, in HAL Schema Forms. */
@@ -123,8 +125,5 @@ class IndexHandler(
     private companion object {
         const val SERVICE_DESC_LINK =
             "<${OpenApiDocument.PATH}>; rel=\"$SERVICE_DESC\"; type=\"${OpenApiDocument.MEDIA_TYPE}\""
-
-        /** RFC 7240: what the index honours of L2. Its forms stay in it; their schemas are linked. */
-        const val SCHEMA_LINK = "schema=link"
     }
 }

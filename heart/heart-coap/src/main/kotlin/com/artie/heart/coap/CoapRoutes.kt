@@ -6,6 +6,7 @@ import com.artie.heart.ActRequests
 import com.artie.heart.ActTargets
 import com.artie.heart.Dialect
 import com.artie.heart.HeartResource
+import com.artie.heart.IndexContent
 import com.artie.heart.Layers
 import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.Rung
@@ -38,7 +39,7 @@ internal class CoapRoutes(
     private val replies = CoapReplies(mapper)
     private val types: Map<String, Typed> = resources.associate { it.layers.type.collection to typed(it, mapper) }
     private val layers: List<Layers<*, *>> = resources.map { it.layers }
-    private val content = SharedContent(layers)
+    private val content = SharedContent(layers, IndexContent(layers.map { it.type }))
     private val profiles: Map<String, String> = layers.map { it.type.profile }.distinctBy { it.name }
         .associate { it.name to mapper.writeValueAsString(it.alps) }
 

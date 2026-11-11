@@ -153,6 +153,25 @@ Feature: HEART conformance over HTTP, for any declared resource type
     Then the response status is 200
     And the home document names the resource's collection
 
+  Scenario Outline: Asked for forms by link at L<n>, the bookmark holds none and links its shared affordance set
+    The bookmark is a resource like any other: at L1 and L2 its forms are in a content-addressed set, linked by
+    hr:forms with the set's integrity. At L2 each form there links its schema by $ref, beside its hr:integrity.
+    When a client gets "/" as hal-schema-forms with Prefer "<prefer>"
+    Then the response status is 200
+    And Preference-Applied is "<prefer>"
+    And the response has no inline forms
+    When the client follows the "hr:forms" link
+    Then the response status is 200
+    And the response has Cache-Control "public, max-age=31536000, immutable"
+    And the body matches the integrity of the link that led to it
+    And the index offers the type's search and lookup forms
+    And every schema the set links by $ref is served there, matching its integrity
+
+    Examples:
+      | n | prefer                  |
+      | 1 | forms=link              |
+      | 2 | forms=link, schema=link |
+
   Scenario: The bookmark links its affordances, from which each form's schema is reached by links alone
     The manifest names every form by its integrity. A client that has not seen a form's schema finds it by
     following links, from the bookmark to its affordances, then by the form's integrity to the schema, and
@@ -218,7 +237,7 @@ Feature: HEART conformance over HTTP, for any declared resource type
 
   @bookmark-act
   Scenario: At L2, the bookmark's act is conditional on the index as it was served at L2
-    The index served at L2 links its act forms' schemas, so it is another representation, with its own ETag.
+    The index served at L2 links its affordance set, so it is another representation, with its own ETag.
     A client that read it at L2 acts on that ETag, sending the same Prefer.
     When the client sends the bookmark act with its valid body and the index's ETag, both at L2
     Then the response status is 201

@@ -48,7 +48,7 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
         }
     }
 
-    /** The index in [dialect], at the rung [request] prefers: at L2 its act forms link their schemas. */
+    /** The index in [dialect], at the rung [request] prefers: at L1 and L2 it links its affordance set. */
     private suspend fun inDialect(request: ServerRequest, dialect: Dialect): ServerResponse {
         // HAL-FORMS is the L0 on-ramp: it ignores layering preferences.
         val prefer = request.headers().firstHeader(HttpNegotiation.PREFER)
@@ -60,8 +60,8 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
             it.set(HttpHeaders.LINK, links)
             val varies = listOf(HttpHeaders.ACCEPT, HttpNegotiation.PREFER, HttpNegotiation.ACCEPT_PROFILE)
             it.set(HttpHeaders.VARY, varies.joinToString())
-            // RFC 7240: what the index honours of L2. Its forms stay in it; their schemas are linked.
-            if (rung == Rung.L2) it.set("Preference-Applied", "schema=link")
+            // RFC 7240: what the index honours, as a resource does.
+            rung.preferenceApplied?.let { applied -> it.set("Preference-Applied", applied) }
         }
     }
 
