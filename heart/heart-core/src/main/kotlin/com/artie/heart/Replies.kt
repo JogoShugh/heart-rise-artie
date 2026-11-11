@@ -88,6 +88,7 @@ object Replies {
                 "Offered while the reply is awaiting; the reply is answered after.",
             ),
         ),
+        vocabulary = "$HEART_RISE_PROFILE/rels/",
     )
 
     private val type = ResourceType(

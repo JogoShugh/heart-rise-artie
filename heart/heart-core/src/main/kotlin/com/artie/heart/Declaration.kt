@@ -23,13 +23,24 @@ data class Relation(
  * One table serves the forms, the index, the ALPS document and problem
  * bodies, so they cannot disagree about what a relation is called or means.
  */
-class Profile(val name: String, val title: String, val doc: String, val relations: List<Relation>) {
+class Profile(
+    val name: String,
+    val title: String,
+    val doc: String,
+    val relations: List<Relation>,
+    /**
+     * Where the relations are named, when it is a shared vocabulary rather than this server's own: the `hr`
+     * relations are `https://w3id.org/heart-rise/rels/{rel}` wherever they are served.
+     */
+    private val vocabulary: String? = null,
+) {
     val path: String = "/profiles/$name"
 
     private val byId: Map<String, Relation> = relations.associateBy { it.id }
 
     /** The `_links.curies` entry every representation with relation-named forms declares. */
-    val curies: List<Map<String, Any>> = listOf(mapOf("name" to name, "href" to "$path#{rel}", "templated" to true))
+    val curies: List<Map<String, Any>> =
+        listOf(mapOf("name" to name, "href" to (vocabulary ?: "$path#") + "{rel}", "templated" to true))
 
     fun relation(id: String): Relation = byId[id] ?: throw IllegalArgumentException("no relation $id in $name")
 
@@ -37,7 +48,7 @@ class Profile(val name: String, val title: String, val doc: String, val relation
     fun key(id: String): String = "$name:$id"
 
     /** Relation [id] as a URI reference, resolved against the request URL. */
-    fun reference(id: String): String = "$path#$id"
+    fun reference(id: String): String = (vocabulary ?: "$path#") + id
 
     /** The ALPS profile document (draft-amundsen-richardson-foster-alps). */
     val alps: Map<String, Any> = mapOf(

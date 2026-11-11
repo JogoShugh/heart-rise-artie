@@ -72,7 +72,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
         if (rendering == null) {
             body["_links"] = mapOf(
                 "self" to self,
-                "curies" to type.profile.curies + HR_CURIE,
+                "curies" to (type.profile.curies + HR_CURIE).distinct(),
                 // SPEC §6.12: at L0 the set is embedded, so its explanation link is in Layer 1.
                 UNAVAILABLE_REL to explanationLink(key),
             ) + collections
@@ -84,7 +84,7 @@ class Layers<S, K>(val type: ResourceType<S, K>) {
             body["_links"] = mapOf(
                 "self" to self,
                 // SPEC §6.1: the rel is $HEART_RISE_PROFILE/rels/forms, written as the CURIE hr:forms.
-                "curies" to (if (named) type.profile.curies else emptyList()) + HR_CURIE,
+                "curies" to ((if (named) type.profile.curies else emptyList()) + HR_CURIE).distinct(),
                 FORMS_REL to mapOf(
                     "href" to AFFORDANCE_SETS + ContentAddress.address(set),
                     "type" to Dialect.JSONSCHEMA.mediaType,

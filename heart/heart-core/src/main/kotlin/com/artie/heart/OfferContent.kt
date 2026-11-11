@@ -56,7 +56,7 @@ internal class OfferContent<K>(
             val set = ContentAddress.canonical(
                 mapOf(
                     "_links" to mapOf(
-                        "curies" to type.profile.curies + Layers.HR_CURIE,
+                        "curies" to (type.profile.curies + Layers.HR_CURIE).distinct(),
                         Layers.UNAVAILABLE_REL to link(explanation),
                     ),
                     "_forms" to forms(type.offers.offered(key), rendering == SetRendering.EMBEDDED_SCHEMAS),

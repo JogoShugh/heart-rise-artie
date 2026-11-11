@@ -43,6 +43,20 @@ class ReplySteps {
         assertEquals(resource.layers.type.profile.reference(curie.substringAfter(':')), failure.rel)
     }
 
+    @Then("""^the reply act is refused as not offered at "([^"]+)"$""")
+    fun notOfferedAt(relation: String) {
+        val failure = checkNotNull(checkNotNull(outcome).exceptionOrNull()) { "the act was not refused" }
+        check(failure is NotOfferedException) { "expected NotOfferedException, got $failure" }
+        assertEquals(relation, failure.rel)
+    }
+
+    @Then("""^reply (r-\w+) declares exactly one CURIE "(\w+)", at "([^"]+)"$""")
+    fun curie(reference: String, name: String, href: String) {
+        val body = resource.layers.layer1(checkNotNull(store.get(reference)) { "no reply $reference" })
+        val curies = (body["_links"] as Map<*, *>)["curies"] as List<*>
+        assertEquals(listOf(href), curies.map { it as Map<*, *> }.filter { it["name"] == name }.map { it["href"] })
+    }
+
     @Then("""^the reply act is refused as invalid at "([^"]+)"$""")
     fun invalid(pointer: String) {
         val failure = checkNotNull(checkNotNull(outcome).exceptionOrNull()) { "the act was not refused" }

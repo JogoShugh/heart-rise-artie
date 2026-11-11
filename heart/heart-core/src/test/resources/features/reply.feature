@@ -21,6 +21,16 @@ Feature: Ana's reply takes the library's answer once, and a repeat of that answe
     Then the reply act is refused as invalid at "/note"
     And reply r-7f3 is now awaiting
 
+  Scenario: The reply names its relations by the one hr vocabulary, at its absolute address
+    Given reply r-7f3 is awaiting
+    Then reply r-7f3 declares exactly one CURIE "hr", at "https://w3id.org/heart-rise/rels/{rel}"
+
+  Scenario: A refusal names the relation it refused by its absolute address
+    Given reply r-7f3 is awaiting
+    And reply r-7f3 was completed with the body {"result": {"loan": 3310}}
+    When a client acts on reply r-7f3 with "failed", validator current, and body {"title": "No hold on loan 3310"}
+    Then the reply act is refused as not offered at "https://w3id.org/heart-rise/rels/failed"
+
   Scenario: A repeat of the result the reply has is replayed, not refused
     Given reply r-7f3 is awaiting
     And reply r-7f3 was completed with the body {"result": {"loan": 3310, "renewableFrom": "2026-11-18"}}
