@@ -23,7 +23,19 @@ class IndexSteps(private val world: LampWorld) {
     private val mapper = ObjectMapper()
     private var found: List<Found> = emptyList()
     private var json: JsonNode = mapper.createObjectNode()
-    private val index get() = ServiceIndex(listOf(world.type))
+    private var publishesKeys = false
+    private val index get() = ServiceIndex(listOf(world.type), publishesKeys = publishesKeys)
+
+    @Given("the server publishes the keys it signs with")
+    fun publishesKeys() {
+        publishesKeys = true
+    }
+
+    @Then("the index links {string} to {string}, as {string}")
+    fun links(rel: String, href: String, type: String) {
+        val link = json.path("_links").path(rel)
+        assertEquals(href to type, link.path("href").asText() to link.path("type").asText())
+    }
 
     @Given("lamps {int} to {int} exist")
     fun lampsExist(from: Int, to: Int) {

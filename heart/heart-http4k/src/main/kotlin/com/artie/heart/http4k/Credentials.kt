@@ -7,6 +7,7 @@ import com.artie.heart.Layers
 import com.artie.heart.Negotiation
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.PROBLEM_TYPES
+import com.artie.heart.Signatures
 import org.http4k.core.Filter
 import org.http4k.core.Method
 import org.http4k.core.Request
@@ -105,6 +106,8 @@ class Credentials private constructor(
             Regex("^${Regex.escape(OpenApiDocument.PATH)}$"),
             Regex("^${Regex.escape(SwaggerUi.PATH)}$"),
             Regex("^${Regex.escape(SwaggerUi.FILES)}/[A-Za-z0-9_-]+(\\.[A-Za-z0-9]+)+$"),
+            // The keys a service signs with: whoever checks its signatures reads them, credential or not.
+            Regex("^${Regex.escape(Signatures.KEYS)}$"),
         )
         private val PROBLEM =
             """{"type":"${PROBLEM_TYPES}not-authenticated","title":"A credential is needed",""" +

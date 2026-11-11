@@ -10,6 +10,7 @@ import com.artie.heart.Layers
 import com.artie.heart.Listing
 import com.artie.heart.OpenApiDocument
 import com.artie.heart.ServiceIndex
+import com.artie.heart.Signatures
 import com.artie.heart.ServingLimits
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -27,13 +28,17 @@ import org.http4k.routing.RoutingHttpHandler
 import org.http4k.routing.bind
 import org.http4k.routing.path
 import org.http4k.routing.routes
+import java.security.PublicKey
 
 /**
  * How a HEART server over http4k describes itself: its title (by default, its
  * first profile's), its OpenAPI `info.version`, how much it serves, the lists
  * a domain declares for its forms' choices, the realm of its challenges (by
- * default, its first profile's name), and the JSON mapper for bodies.
+ * default, its first profile's name), the JSON mapper for bodies, and the keys
+ * it signs with.
  */
+// Settings name each of their parts once, by name, each with its default; grouping them would only rename them.
+@Suppress("LongParameterList")
 class HeartSettings(
     val title: String? = null,
     val openApiVersion: String = OpenApiDocument.DEFAULT_VERSION,
@@ -41,6 +46,8 @@ class HeartSettings(
     val listings: List<Listing> = emptyList(),
     val realm: String? = null,
     val mapper: ObjectMapper = defaultMapper(),
+    /** The keys the service signs with, by key id: served at `/keys` as a JWK Set and linked from the index. */
+    val keys: Map<String, PublicKey> = emptyMap(),
 ) {
     companion object {
         /** Jackson as Spring Boot sets it up, so both bindings write and read bodies alike. */
@@ -67,7 +74,13 @@ class HeartHttp(
     extra: List<RoutingHttpHandler> = emptyList(),
 ) : HttpHandler {
     private val layers = resources.map { it.layers }
-    private val index = ServiceIndex(layers.map { it.type }, settings.title, serviceDesc = OpenApiDocument.PATH)
+    private val index = ServiceIndex(
+        layers.map { it.type },
+        settings.title,
+        serviceDesc = OpenApiDocument.PATH,
+        publishesKeys = settings.keys.isNotEmpty(),
+    )
+    private val keySet = settings.mapper.writeValueAsString(Signatures.keySet(settings.keys))
     private val document =
         OpenApiDocument(resources, settings.title, settings.openApiVersion, settings.limits.affordanceLinks)
     private val published = Published(layers, document, settings.mapper)
@@ -87,6 +100,14 @@ class HeartHttp(
     private fun shared(listings: List<Listing>): List<RoutingHttpHandler> = listOf(
         "/" bind GET to indexHandler::index,
         AFFORDANCES bind GET to indexHandler::affordances,
+        Signatures.KEYS bind GET to {
+            if (index.publishesKeys) {
+                Response(Status.OK).header("Content-Type", Signatures.JWK_SET)
+                    .header("Cache-Control", "public, max-age=86400").body(keySet)
+            } else {
+                Response(Status.NOT_FOUND)
+            }
+        },
         OpenApiDocument.PATH bind GET to published::openApi,
         SwaggerUi.PATH bind GET to SwaggerUi::page,
         SwaggerUi.files(),

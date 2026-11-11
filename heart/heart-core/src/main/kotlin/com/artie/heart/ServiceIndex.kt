@@ -27,6 +27,8 @@ class ServiceIndex(
      * from the index and the home document as `service-desc` (RFC 8631).
      */
     private val serviceDesc: String? = null,
+    /** Whether the server signs, and so publishes the keys it signs with, linked as `hr:keys`. */
+    val publishesKeys: Boolean = false,
 ) {
     private val found: List<ResourceType<*, *>> = types.filter { it.finding != null }
     private val mapper = ObjectMapper()
@@ -59,9 +61,11 @@ class ServiceIndex(
     fun home(maxRung: Rung): String =
         mapper.writeValueAsString(HomeDocument(found, this.title, serviceDesc).at(maxRung))
 
-    /** The index's own links: itself and, when served, the OpenAPI description. */
-    private fun links(): Map<String, Any> = mapOf("self" to mapOf("href" to "/")) +
-        listOfNotNull(serviceDesc?.let { SERVICE_DESC to mapOf("href" to it, "type" to OpenApiDocument.MEDIA_TYPE) })
+    /** The index's own links: itself and, when served, the OpenAPI description and the keys the server signs with. */
+    private fun links(): Map<String, Any> = mapOf("self" to mapOf("href" to "/")) + listOfNotNull(
+        serviceDesc?.let { SERVICE_DESC to mapOf("href" to it, "type" to OpenApiDocument.MEDIA_TYPE) },
+        if (publishesKeys) "hr:keys" to mapOf("href" to Signatures.KEYS, "type" to Signatures.JWK_SET) else null,
+    )
 
     fun homeValidator(maxRung: Rung): String = "\"index-home-${ContentAddress.address(home(maxRung))}\""
 

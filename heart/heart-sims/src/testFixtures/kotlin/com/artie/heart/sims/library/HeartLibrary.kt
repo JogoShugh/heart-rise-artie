@@ -20,6 +20,7 @@ import com.artie.heart.ResourceNotFoundException
 import com.artie.heart.ResourceType
 import com.artie.heart.SearchField
 import com.artie.heart.ServingLimits
+import com.artie.heart.Signatures
 import com.artie.heart.StateView
 import com.artie.heart.http4k.Credentials
 import com.artie.heart.http4k.HeartHttp
@@ -114,12 +115,13 @@ class HeartLibrary(private val ledger: Ledger) {
             idOf = { it.id },
             versionOf = { it.version },
             bodyOf = { linkedMapOf("id" to it.id, "loan" to it.loan, "standing" to it.standing) },
-            // The reply and the key the request named, kept as links, so the library answers the caller later.
+            // The reply the request named, so the library answers the caller later; and the keys the library signs
+            // those answers with, which the caller checks them by.
             hypermediaOf = { watch ->
                 Hypermedia(
                     links = mapOf(
                         "hr:reply-to" to mapOf("href" to watch.reply),
-                        "hr:keys" to mapOf("href" to watch.keys),
+                        "hr:keys" to mapOf("href" to Signatures.KEYS, "type" to Signatures.JWK_SET),
                     ),
                 )
             },
@@ -218,6 +220,7 @@ class HeartLibrary(private val ledger: Ledger) {
             realm = PROFILE.name,
             limits = ServingLimits(pageSize = PAGE_SIZE, affordanceLinks = true),
             listings = listOf(Listing(PROBLEM_KINDS_PATH, "kinds") { PROBLEM_KINDS }),
+            keys = mapOf(LibraryKey.KEY_ID to LibraryKey.pair.public),
         ),
     )
 

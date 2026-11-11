@@ -16,6 +16,11 @@ Feature: The service index, the home document and search pages, from the declara
       | home | /profiles/home#{rel}                    |
       | hr   | https://w3id.org/heart-rise/rels/{rel} |
 
+  Scenario: A server that signs links the keys it signs with from its index
+    Given the server publishes the keys it signs with
+    When the service index is rendered in HAL Schema Forms
+    Then the index links "hr:keys" to "/keys", as "application/jwk-set+json"
+
   Scenario: In HAL Schema Forms, the index offers a search form and a lookup form per type
     When the service index is rendered in HAL Schema Forms
     Then the index is titled "Lamps" and links "self" to "/"

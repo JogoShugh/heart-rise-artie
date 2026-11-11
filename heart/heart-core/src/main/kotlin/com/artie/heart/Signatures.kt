@@ -1,10 +1,13 @@
 package com.artie.heart
 
+import java.security.KeyFactory
 import java.security.MessageDigest
 import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.Signature
+import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
+import java.util.HexFormat
 
 /**
  * One signed request: the components it covers, the parameters they are signed with, and the signature over them
@@ -54,9 +57,41 @@ object Signatures {
             verify(Base64.getDecoder().decode(signed.signature))
         }
     }
+
+    /** Where a HEART service that signs publishes the keys it signs with, linked from its index as `hr:keys`. */
+    const val KEYS = "/keys"
+
+    /** The media type of a set of keys (RFC 7517 §8.5). */
+    const val JWK_SET = "application/jwk-set+json"
+
+    /** [key] as a JWK (RFC 7517, RFC 8037): an OKP key on Ed25519, named [keyId], for signatures. */
+    fun jwk(key: PublicKey, keyId: String): Map<String, String> = linkedMapOf(
+        "kty" to "OKP",
+        "crv" to ALGORITHM,
+        "kid" to keyId,
+        "alg" to "EdDSA",
+        "use" to "sig",
+        "x" to Base64.getUrlEncoder().withoutPadding().encodeToString(raw(key)),
+    )
+
+    /** The keys, by key id, as a JWK Set (RFC 7517 §5). */
+    fun keySet(keys: Map<String, PublicKey>): Map<String, Any> = mapOf("keys" to keys.map { (id, key) -> jwk(key, id) })
+
+    /** The Ed25519 public key a JWK names (RFC 8037 §2); refused when it names another kind of key. */
+    fun keyOf(jwk: Map<*, *>): PublicKey {
+        require(jwk["kty"] == "OKP" && jwk["crv"] == ALGORITHM) { "not an Ed25519 key: $jwk" }
+        val raw = Base64.getUrlDecoder().decode(jwk["x"].toString())
+        return KeyFactory.getInstance(ALGORITHM).generatePublic(X509EncodedKeySpec(X509_PREFIX + raw))
+    }
 }
 
 private const val ALGORITHM = "Ed25519"
+
+/** An Ed25519 public key's X.509 encoding: this fixed prefix (RFC 8410), then the key's 32 bytes. */
+private val X509_PREFIX = HexFormat.of().parseHex("302a300506032b6570032100")
+
+/** The key's bytes, as RFC 8037 §2 writes them in `x`: its X.509 encoding without the prefix. */
+private fun raw(key: PublicKey): ByteArray = key.encoded.copyOfRange(X509_PREFIX.size, key.encoded.size)
 
 /** The signature base of RFC 9421 §2.5: the covered components, then the parameters signed with. */
 private fun signatureBase(

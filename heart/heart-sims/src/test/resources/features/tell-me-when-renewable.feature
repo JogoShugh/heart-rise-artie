@@ -15,6 +15,11 @@ Feature: Riverside Public Library tells Ana when a held loan can be renewed
     Then the library answers 201 with a watch that is awaiting
     And the library's entry offers the request, with its reply and key as links
 
+  Scenario: The library publishes the key it signs with, and links it from its entry and from each watch
+    When Ana asks to be told when loan 3310 can be renewed, with reply r-7f3 and her key
+    Then the library's entry and the watch both link "hr:keys" to the library's key set
+    And the library's key set holds the key "library-2026-11", which verifies the library's signatures
+
   Scenario: Ana's reply takes the library's acts at its own address, by PATCH, as its forms say
     When the library reads Ana's reply r-7f3
     Then each of the reply's forms targets the reply's own address

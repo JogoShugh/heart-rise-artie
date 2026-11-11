@@ -313,12 +313,33 @@ class LibrarySteps {
             ),
         )
         val target = form["_links"]["target"]["href"].asText()
+        val method = Method.valueOf(form["method"].asText())
         answer = library.handler(
-            request(Method.POST, target, ACCEPT.getValue(HSF), basic(HeartLibrary.CARD, PIN))
+            request(method, target, ACCEPT.getValue(HSF), basic(HeartLibrary.CARD, PIN))
                 .header("If-Match", read.header("ETag"))
-                .header("Content-Type", "application/hal+json")
+                .header("Content-Type", form["contentType"].asText())
                 .body(mapper.writeValueAsString(sent)),
         )
+    }
+
+    @Then("the library's entry and the watch both link {string} to the library's key set")
+    fun linksKeys(rel: String) {
+        val location = checkNotNull(answer?.header("Location")) { "no Location: ${body()}" }
+        val entry = mapper.readTree(send(Method.GET, "/", ACCEPT.getValue(HSF)).bodyString())
+        val watch = mapper.readTree(send(Method.GET, location, ACCEPT.getValue(HSF)).bodyString())
+        listOf(entry, watch).forEach { read ->
+            assertEquals(Signatures.KEYS, read["_links"][rel]?.get("href")?.asText(), read.toString())
+        }
+    }
+
+    @Then("the library's key set holds the key {string}, which verifies the library's signatures")
+    fun keySetHolds(keyId: String) {
+        // Read with no credential at all: whoever checks the library's signatures reads its keys.
+        val read = library.handler(Request(Method.GET, Signatures.KEYS))
+        assertEquals(Signatures.JWK_SET, read.header("Content-Type"), read.bodyString())
+        val jwk = mapper.readTree(read.bodyString())["keys"].single { it["kid"].asText() == keyId }
+        val signed = LibraryKey.signer.sign("PATCH", "https://caller.example/replies/r-7f3", "{}", "\"v1\"", SIGNED_AT)
+        assertTrue(Signatures.verify(signed, "{}", Signatures.keyOf(mapper.convertValue(jwk, Map::class.java))))
     }
 
     @Then("the library answers {int} with a watch that is awaiting")
