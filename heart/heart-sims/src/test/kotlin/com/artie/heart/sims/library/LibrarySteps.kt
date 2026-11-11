@@ -469,6 +469,8 @@ class LibrarySteps {
 
     // What the library knows across its answers to one reply: its forms, and the last result it sent.
     private val replyForms = mutableMapOf<String, ReplyForm>()
+    private val etags = mutableMapOf<String, String>()
+    private var replyReads = 0
     private var lastResult: Map<String, Any?>? = null
     private var lastSigned: Signed? = null
     private var lastSent: String? = null
@@ -493,17 +495,22 @@ class LibrarySteps {
             mapper.readValue(fields, Map::class.java) +
                 ("_links" to mapOf(Replies.IN_REPLY_TO to mapOf("href" to inReplyTo, "type" to HAL))),
         )
-        val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
-        val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
-        // A repeat goes to the form the first answer found: an answered reply offers no form for it any more.
-        val form = replyForms.getOrPut(relation) {
-            val found = mapper.readTree(read.bodyString())["_forms"]["hr:$relation"]
-            ReplyForm(
-                java.net.URI(found["_links"]["target"]["href"].asText()).path,
-                Method.valueOf(found["method"].asText()),
-                found["contentType"].asText(),
-            )
+        // The library acts on the ETag its last answer gave; it reads the reply only for a form it has not found.
+        val ifMatch = etags[reply]?.takeIf { relation in replyForms } ?: run {
+            val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
+            replyReads += 1
+            // A repeat goes to the form the first answer found: an answered reply offers no form for it any more.
+            replyForms.getOrPut(relation) {
+                val found = mapper.readTree(read.bodyString())["_forms"]["hr:$relation"]
+                ReplyForm(
+                    java.net.URI(found["_links"]["target"]["href"].asText()).path,
+                    Method.valueOf(found["method"].asText()),
+                    found["contentType"].asText(),
+                )
+            }
+            checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
         }
+        val form = replyForms.getValue(relation)
         val signed = signer?.sign(form.method.name, "https://caller.example${form.target}", sent, ifMatch, SIGNED_AT)
         lastSigned = signed
         lastSent = sent
@@ -512,7 +519,11 @@ class LibrarySteps {
             .header("If-Match", ifMatch)
             .header("Content-Type", form.contentType)
         answer = caller.handler(if (signed == null) act.body(sent) else signedRequest(act, signed, sent))
+        answer?.takeIf { it.status.successful }?.header("ETag")?.let { etags[reply] = it }
     }
+
+    @Then("the library read Ana's reply once, for both answers")
+    fun readOnce() = assertEquals(1, replyReads)
 
     /** The library's watch for the request that named reply [reply], as its absolute address. */
     private fun libraryWatch(reply: String): String {

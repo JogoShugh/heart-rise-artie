@@ -38,6 +38,12 @@ Feature: The library answers Ana on her reply, and Ana checks each answer by the
       | 0       | one ahead in the hold queue      |
       | 50      | the hold is with the next reader |
 
+  Scenario: The library acts on the ETag its last answer gave, and reads the reply only to find its forms
+    When the library reports progress of 0 percent on reply r-7f3, with the note "one ahead in the hold queue"
+    And the library reports progress of 50 percent on reply r-7f3, with the note "the hold is with the next reader"
+    Then the library read Ana's reply once, for both answers
+    And reply r-7f3 is awaiting at 50 percent
+
   Scenario: An answer that names another watch than Ana's is refused, and changes nothing
     When the library reports progress of 50 percent on reply r-7f3, for the watch "https://riverside-library.example/watches/99"
     Then the library is refused with 409
