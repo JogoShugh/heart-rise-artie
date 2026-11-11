@@ -19,4 +19,8 @@ object HttpNegotiation {
     fun wantsHtml(headers: HttpHeaders): Boolean = Negotiation.wantsHtml(headers.getFirst(HttpHeaders.ACCEPT))
 
     fun profileLinks(dialect: Dialect): String = Negotiation.profileLinks(dialect)
+
+    /** Sets the profile a response in [dialect] is in: Content-Profile, the answer to Accept-Profile. */
+    fun contentProfile(headers: HttpHeaders, dialect: Dialect) =
+        headers.set(Negotiation.CONTENT_PROFILE, Negotiation.contentProfile(dialect))
 }

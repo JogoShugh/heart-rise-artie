@@ -23,6 +23,10 @@ class TckHeaderSteps(private val world: TckWorld) {
         assertTrue("<$profile>; rel=\"profile\"" in link, link)
     }
 
+    @Then("the response states its profile {string}")
+    fun contentProfile(profile: String) =
+        assertEquals("<$profile>", world.last.responseHeaders.getFirst("Content-Profile"))
+
     @Then("Preference-Applied is {string}")
     fun preferenceApplied(value: String) =
         assertEquals(value, world.last.responseHeaders.getFirst("Preference-Applied"))

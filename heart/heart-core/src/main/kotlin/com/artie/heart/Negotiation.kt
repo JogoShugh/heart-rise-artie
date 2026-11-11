@@ -34,6 +34,7 @@ class NotAcceptableException(message: String) : RuntimeException(message)
 object Negotiation {
     val DEFAULT_DIALECT = Dialect.HALFORMS
     const val ACCEPT_PROFILE = "Accept-Profile"
+    const val CONTENT_PROFILE = "Content-Profile"
     const val JSON_HOME = "application/json-home"
     const val PLAIN_JSON = "application/json"
 
@@ -85,6 +86,9 @@ object Negotiation {
      *  profile, then the parent for hierarchy discovery (§6.1), as a Link header value. */
     fun profileLinks(dialect: Dialect): String =
         "<${dialect.profile}>; rel=\"profile\", <$HEART_RISE_PROFILE>; rel=\"profile\""
+
+    /** The profile a response in [dialect] is in, as a Content-Profile value: the answer to Accept-Profile. */
+    fun contentProfile(dialect: Dialect): String = "<${dialect.profile}>"
 
     private fun byProfile(acceptProfile: String?): Dialect? =
         ranked(acceptProfile.orEmpty())

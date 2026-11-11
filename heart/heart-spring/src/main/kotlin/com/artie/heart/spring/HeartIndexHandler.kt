@@ -109,6 +109,7 @@ class HeartIndexHandler(private val index: ServiceIndex, private val limits: Ser
     private fun layer1(headers: HttpHeaders, dialect: Dialect) {
         headers.cacheControl = "no-cache"
         headers.set(HttpHeaders.LINK, HttpNegotiation.profileLinks(dialect))
+        HttpNegotiation.contentProfile(headers, dialect)
         headers.set(HttpHeaders.VARY, "${HttpHeaders.ACCEPT}, ${HttpNegotiation.ACCEPT_PROFILE}")
     }
 }

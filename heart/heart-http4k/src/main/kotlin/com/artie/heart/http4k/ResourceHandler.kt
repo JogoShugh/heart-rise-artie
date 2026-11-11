@@ -215,6 +215,7 @@ class ResourceHandler<S, K>(
                 // SPEC §6.1/§6.2: Layer 1 is revalidated on every request, never stored fresh.
                 .header("Cache-Control", "no-cache")
                 .header(LINK, Negotiation.profileLinks(dialect))
+                .header(Negotiation.CONTENT_PROFILE, Negotiation.contentProfile(dialect))
                 .header(VARY, vary(dialect))
                 // RFC 7240: confirms what was honoured; the payload alone may not say.
                 .let { r -> rung.preferenceApplied?.let { r.header(PREFERENCE_APPLIED, it) } ?: r }

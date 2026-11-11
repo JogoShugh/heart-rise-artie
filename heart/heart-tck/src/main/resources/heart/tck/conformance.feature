@@ -19,17 +19,18 @@ Feature: HEART conformance over HTTP, for any declared resource type
     And the response does not offer the absent act
 
   Scenario Outline: An answer states the profile it is in, as Content-Profile, beside its profile link: <what>
-    RFC 9110 has the client name a profile in Accept-Profile; the answer says which one it got, so a client
-    never has to infer it from the body.
-    When a client gets <what> as hal-schema-forms
+    The client names a profile in Accept-Profile; the answer says which one it got, so a client never has to
+    infer it from the body.
+    When a client gets <what>
     Then the response status is 200
-    And the response states its profile "https://w3id.org/heart-rise/hal-schema-forms"
-    And the response links its profile "https://w3id.org/heart-rise/hal-schema-forms"
+    And the response states its profile "<profile>"
+    And the response links its profile "<profile>"
 
     Examples:
-      | what         |
-      | the resource |
-      | "/"          |
+      | what                                                  | profile                                      |
+      | the resource as hal-schema-forms                      | https://w3id.org/heart-rise/hal-schema-forms |
+      | "/" as hal-schema-forms                               | https://w3id.org/heart-rise/hal-schema-forms |
+      | "/" with Accept "application/prs.hal-forms+json"      | https://w3id.org/heart-rise/hal-forms        |
 
   Scenario Outline: L<n> links to a shared affordance set whose bytes match the link's integrity
     When a client gets the resource as hal-schema-forms with Prefer "<prefer>"

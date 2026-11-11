@@ -97,6 +97,7 @@ class IndexHandler(
     private fun layer1(response: Response, dialect: Dialect): Response =
         response.replaceHeader("Cache-Control", "no-cache")
             .replaceHeader(LINK, Negotiation.profileLinks(dialect))
+            .replaceHeader(Negotiation.CONTENT_PROFILE, Negotiation.contentProfile(dialect))
             .replaceHeader(VARY, "$ACCEPT, ${Negotiation.ACCEPT_PROFILE}")
 
     private fun dialect(request: Request): Dialect =

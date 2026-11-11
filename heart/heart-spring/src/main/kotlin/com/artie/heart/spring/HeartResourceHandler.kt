@@ -238,6 +238,7 @@ class HeartResourceHandler<S, K>(
             // SPEC §6.1/§6.2: Layer 1 is revalidated on every request, never stored fresh.
             headers.cacheControl = "no-cache"
             headers.set(HttpHeaders.LINK, HttpNegotiation.profileLinks(dialect))
+            HttpNegotiation.contentProfile(headers, dialect)
             headers.set(HttpHeaders.VARY, vary(dialect))
             // RFC 7240: confirms what was honoured; the payload alone may not say.
             rung.preferenceApplied?.let { headers.set(PREFERENCE_APPLIED, it) }
