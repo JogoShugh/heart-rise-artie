@@ -3,6 +3,7 @@ package com.artie.heart.http4k
 import com.artie.heart.BadRequestException
 import com.artie.heart.CallerForbiddenException
 import com.artie.heart.CallerUnauthorizedException
+import com.artie.heart.LinkConflictException
 import com.artie.heart.MalformedActBodyException
 import com.artie.heart.NotAcceptableException
 import com.artie.heart.NotOfferedException
@@ -74,6 +75,10 @@ object Refusals {
         is RuleRefusedException -> problem(
             Status.UNPROCESSABLE_ENTITY, "rule-refused", "A rule of the resource refuses the act", failure, mapper,
             mapOf("violations" to failure.violations),
+        )
+        is LinkConflictException -> problem(
+            Status.CONFLICT, "link-conflict", "The act names another resource than the state keeps", failure, mapper,
+            mapOf("rel" to failure.rel),
         )
         // RFC 5789 §2.2: a 415 to a PATCH says, in Accept-Patch, the types the resource takes.
         is UnsupportedMediaTypeException -> problem(

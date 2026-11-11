@@ -1,5 +1,6 @@
 package com.artie.heart.sims.library
 
+import com.artie.heart.Replies
 import com.artie.heart.Signatures
 import com.artie.heart.Signed
 import com.artie.heart.Signer
@@ -291,10 +292,45 @@ class LibrarySteps {
 
     // Ana's request to be told when a loan can be renewed (tell-me-when-renewable.feature). Phase 1: the request, its
     // watch, and the entry's form. The reply resource and the library's answers come in later phases.
-    private val caller = CallerService()
+    private val caller = CallerService(watchKeys = ::watchKeys)
+
+    /** The watch the library brought into being for Ana's request, as the 201's Location named it, absolute. */
+    private var anaWatch: String? = null
 
     @Given("Ana's reply {word} is awaiting")
     fun replyAwaiting(reply: String) = caller.open(reply)
+
+    @Given("Ana has asked to be told when loan {long} can be renewed, with reply {word}")
+    fun hasAsked(loan: Long, reply: String) {
+        asksToBeTold(loan, reply, null)
+        assertEquals(201, answer?.status?.code, body())
+    }
+
+    /** The keys Ana's watch at [watch] links as `hr:keys`: read from the watch, never from an answer. */
+    private fun watchKeys(watch: String): Map<String, PublicKey> {
+        val read = mapper.readTree(send(Method.GET, java.net.URI(watch).path, ACCEPT.getValue(HSF)).bodyString())
+        val keys = library.handler(Request(Method.GET, read["_links"]["hr:keys"]["href"].asText()))
+        return mapper.readTree(keys.bodyString())["keys"].associate { jwk ->
+            jwk["kid"].asText() to Signatures.keyOf(mapper.convertValue(jwk, Map::class.java))
+        }
+    }
+
+    @When("the library reports progress of {int} percent on reply {word}, for the watch {string}")
+    fun progressForWatch(percent: Int, reply: String, watch: String) =
+        libraryAnswers(reply, "progress", mapper.writeValueAsString(mapOf("state" to "awaiting", "percent" to percent)),
+            watch = watch)
+
+    @Then("reply {word} links {string} to Ana's watch")
+    fun linksAnaWatch(reply: String, rel: String) {
+        val read = mapper.readTree(replyBody(reply))
+        assertEquals(checkNotNull(anaWatch), read["_links"][rel]?.get("href")?.asText(), read.toString())
+    }
+
+    @Then("reply {word} shows the failure's problem, {string}")
+    fun showsProblem(reply: String, title: String) {
+        val read = mapper.readTree(replyBody(reply))
+        assertEquals(title, read["_embedded"]?.get("problem")?.get("title")?.asText(), read.toString())
+    }
 
     /** The keys at [href], one of Ana's addresses, read as the JWK Set her service publishes there. */
     private fun keysAt(href: String): Map<String, PublicKey> {
@@ -339,6 +375,11 @@ class LibrarySteps {
         }
         val signed = signer?.sign(method.name, HeartLibrary.ORIGIN + target, body, ifMatch, SIGNED_AT)
         answer = library.handler(if (signed == null) ask.body(body) else signedRequest(ask, signed, body))
+        // Ana keeps the watch her request created: she checks every answer on her reply by it.
+        answer?.takeIf { it.status.code == 201 }?.header("Location")?.let { location ->
+            anaWatch = HeartLibrary.ORIGIN + location
+            caller.asked(reply, HeartLibrary.ORIGIN + location)
+        }
     }
 
     @Then("the library's entry and the watch both link {string} to the library's key set")
@@ -439,7 +480,19 @@ class LibrarySteps {
      * The library reads the reply, then sends [sent] on its [relation] form, by the form's method, to its target, as
      * its content type, signed by [signer] (RFC 9421), or unsigned when it has none.
      */
-    private fun libraryAnswers(reply: String, relation: String, sent: String, signer: Signer? = LibraryKey.signer) {
+    private fun libraryAnswers(
+        reply: String,
+        relation: String,
+        fields: String,
+        signer: Signer? = LibraryKey.signer,
+        watch: String? = null,
+    ) {
+        // Each answer names the watch it answers for: the library's own, for the request that named this reply.
+        val inReplyTo = watch ?: libraryWatch(reply)
+        val sent = mapper.writeValueAsString(
+            mapper.readValue(fields, Map::class.java) +
+                ("_links" to mapOf(Replies.IN_REPLY_TO to mapOf("href" to inReplyTo, "type" to HAL))),
+        )
         val read = caller.handler(request(Method.GET, "/replies/$reply", ACCEPT.getValue(HSF), REPLY_AUTH))
         val ifMatch = checkNotNull(read.header("ETag")) { "no ETag: ${read.bodyString()}" }
         // A repeat goes to the form the first answer found: an answered reply offers no form for it any more.
@@ -459,6 +512,12 @@ class LibrarySteps {
             .header("If-Match", ifMatch)
             .header("Content-Type", form.contentType)
         answer = caller.handler(if (signed == null) act.body(sent) else signedRequest(act, signed, sent))
+    }
+
+    /** The library's watch for the request that named reply [reply], as its absolute address. */
+    private fun libraryWatch(reply: String): String {
+        val watch = library.watches().single { it.reply.endsWith("/replies/$reply") }
+        return "${HeartLibrary.ORIGIN}/watches/${watch.id}"
     }
 
     private fun signedRequest(request: Request, signed: Signed, sent: String): Request =
@@ -584,6 +643,7 @@ class LibrarySteps {
     private companion object {
         const val PIN = "1234"
         const val HSF = "HAL Schema Forms"
+        const val HAL = "application/hal+json"
         const val HAL_FORMS = "HAL-FORMS"
         const val PROFILE = "<https://w3id.org/heart-rise/hal-schema-forms>"
 

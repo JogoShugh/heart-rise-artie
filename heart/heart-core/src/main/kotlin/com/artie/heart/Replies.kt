@@ -17,6 +17,8 @@ data class Reply(
     val note: String? = null,
     val result: Map<String, Any?>? = null,
     val problem: Map<String, Any?>? = null,
+    /** The request the reply answers, as its first answer named it (`hr:in-reply-to`). */
+    val inReplyTo: String? = null,
     val version: Int = 1,
 ) {
     val number: Long get() = reference.removePrefix("r-").toLong(HEX)
@@ -71,17 +73,25 @@ object Replies {
 
     private const val FULL = 100
 
+    /** The link to the request an answer answers. */
+    const val IN_REPLY_TO = "hr:in-reply-to"
+
+    /** An answer's links: the request it answers, which the reply keeps from the first answer on. */
+    private const val LINKS = """"_links": {"type": "object", "properties": {"$IN_REPLY_TO": {"type": "object", """ +
+        """"required": ["href"], "properties": {"href": {"type": "string", "format": "uri"}, """ +
+        """"type": {"type": "string"}}}}}"""
+
     private const val PROGRESS_INPUT = """{"type": "object", "required": ["state", "percent"], "properties": {""" +
         """"state": {"const": "awaiting"}, "percent": {"type": "integer", "minimum": 0, "maximum": 100}, """ +
-        """"note": {"type": ["string", "null"], "default": null}}}"""
+        """"note": {"type": ["string", "null"], "default": null}, $LINKS}}"""
     private const val FAILED_INPUT = """{"type": "object", "required": ["state", "type", "title"], "properties": {""" +
         """"state": {"const": "failed"}, "type": {"type": "string", "format": "uri"}, "title": {"type": "string"}, """ +
-        """"detail": {"type": "string"}}}"""
+        """"detail": {"type": "string"}, $LINKS}}"""
 
     /** The result form's schema: the shape the reply's owner names for the [result] it wants. */
     private fun completedInput(result: String) =
         """{"type": "object", "required": ["state", "result"], "properties": {"state": {"const": "completed"}, """ +
-            """"result": $result, "note": {"type": ["string", "null"]}}}"""
+            """"result": $result, "note": {"type": ["string", "null"]}, $LINKS}}"""
 
     /** The profile of the reply: RISE's relations for what a reply takes, named `hr:`. */
     val PROFILE = Profile(
@@ -140,8 +150,12 @@ object Replies {
             },
             keyField = "state",
             itemPath = ItemPath("/replies/{reply}", mapOf("reply" to "/reply")),
+            // The request the reply answers, from its first answer on; and a failure's problem, embedded.
             hypermediaOf = { reply ->
-                reply.problem?.let { Hypermedia(embedded = mapOf("problem" to it)) } ?: Hypermedia.NONE
+                Hypermedia(
+                    links = listOfNotNull(reply.inReplyTo?.let { IN_REPLY_TO to mapOf("href" to it) }).toMap(),
+                    embedded = listOfNotNull(reply.problem?.let { "problem" to it }).toMap(),
+                )
             },
         ),
         replays = { current, act, body -> repeats(current, act, body) },
@@ -179,7 +193,26 @@ object Replies {
      * The state after [act] with its checked [patch]: progress is merged and keeps it awaiting; a result completes
      * it at 100 percent, with no note unless it sends one; a failure fails it, keeping the problem it was sent as.
      */
-    private fun next(current: Reply, act: String, patch: JsonNode): Reply = when (act) {
+    private fun next(current: Reply, act: String, patch: JsonNode): Reply =
+        answering(current, patch).let { kept -> stated(kept, act, patch) }
+
+    /**
+     * [current], keeping the request [patch] names it answers: the first answer's, from then on. An answer that
+     * names another request is refused, and changes nothing.
+     */
+    private fun answering(current: Reply, patch: JsonNode): Reply {
+        val named = patch.path("_links").path(IN_REPLY_TO).path("href").takeUnless { it.isMissingNode }?.asText()
+        return when {
+            named == null || named == current.inReplyTo -> current
+            current.inReplyTo == null -> current.copy(inReplyTo = named)
+            else -> throw LinkConflictException(
+                IN_REPLY_TO,
+                "reply ${current.reference} answers ${current.inReplyTo}, not $named",
+            )
+        }
+    }
+
+    private fun stated(current: Reply, act: String, patch: JsonNode): Reply = when (act) {
         "progress" -> current.copy(
             percent = patch["percent"].asInt(),
             note = if (patch.has("note")) text(patch["note"]) else current.note,
@@ -194,7 +227,8 @@ object Replies {
         )
         else -> current.copy(
             standing = Reply.FAILED,
-            problem = mapper.convertValue<Map<String, Any?>>(patch, PLAIN) - ItemActs.STATE,
+            // The problem as it was sent, without what made it an act: its state and its links.
+            problem = mapper.convertValue<Map<String, Any?>>(patch, PLAIN) - ItemActs.STATE - "_links",
             version = current.version + 1,
         )
     }

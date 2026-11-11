@@ -25,6 +25,12 @@ class ReplyViewSteps(private val world: ReplyWorld) {
         assertEquals(mapper.readValue(problem, Map::class.java), embedded)
     }
 
+    @Then("""^reply (r-\w+) links "([^"]+)" to "([^"]+)"$""")
+    fun links(reference: String, rel: String, href: String) {
+        val link = (layer1(reference)["_links"] as Map<*, *>)[rel] as? Map<*, *>
+        assertEquals(href, link?.get("href"), layer1(reference).toString())
+    }
+
     @Then("""^reply (r-\w+) offers these forms$""")
     fun offersForms(reference: String, table: DataTable) {
         val forms = layer1(reference)["_forms"] as Map<*, *>

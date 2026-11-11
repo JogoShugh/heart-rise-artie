@@ -28,7 +28,7 @@ class RiseTrace {
     private val steps = mutableListOf<Map<String, Any?>>()
     private val targets = mutableMapOf<String, String>()
     private val library = LibraryService()
-    private val caller = CallerService()
+    private val caller = CallerService(watchKeys = { mapOf(LibraryKey.KEY_ID to LibraryKey.pair.public) })
 
     /** What the library sends on a [relation] of Ana's reply: its [body], its [contentType], how it is signed. */
     private class Answer(

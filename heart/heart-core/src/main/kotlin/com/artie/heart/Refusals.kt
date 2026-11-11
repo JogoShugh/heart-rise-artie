@@ -38,6 +38,12 @@ open class ConcurrentWriteException(message: String) : RuntimeException(message)
  */
 open class NotOfferedException(message: String, val rel: String? = null) : RuntimeException(message)
 
+/**
+ * 409, link-conflict: the act names, under [rel], another resource than the one the state already keeps there,
+ * such as an answer on a reply that names another request than the one it answers.
+ */
+class LinkConflictException(val rel: String, message: String) : RuntimeException(message)
+
 /** 400: a request a binding cannot read, such as an instant that is not ISO 8601. */
 class BadRequestException(message: String) : RuntimeException(message)
 

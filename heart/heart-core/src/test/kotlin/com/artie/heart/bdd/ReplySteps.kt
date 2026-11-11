@@ -3,6 +3,7 @@ package com.artie.heart.bdd
 import com.artie.heart.Act
 import com.artie.heart.ActPipeline
 import com.artie.heart.ItemActs
+import com.artie.heart.LinkConflictException
 import com.artie.heart.NotOfferedException
 import com.artie.heart.Replies
 import com.artie.heart.ReplyStore
@@ -90,6 +91,9 @@ class ReplySteps(private val world: ReplyWorld) {
 
     @Then("""^the reply act is refused as not offered at "([^"]+)"$""")
     fun notOfferedAt(relation: String) = assertEquals(relation, world.refused<NotOfferedException>().rel)
+
+    @Then("""^the reply act is refused as a conflict over "([^"]+)"$""")
+    fun conflict(rel: String) = assertEquals(rel, world.refused<LinkConflictException>().rel)
 
     @Then("""^the reply act is refused as invalid at "([^"]+)"$""")
     fun invalid(pointer: String) = assertEquals(
