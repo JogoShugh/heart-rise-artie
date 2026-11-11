@@ -3,11 +3,14 @@ package com.artie.heart.bdd
 import com.artie.heart.ContentAddress
 import com.artie.heart.Dialect
 import com.artie.heart.Found
+import com.artie.heart.IndexContent
 import com.artie.heart.JsonTrees
+import com.artie.heart.Layers
 import com.artie.heart.Rung
 import com.artie.heart.Search
 import com.artie.heart.SearchPages
 import com.artie.heart.ServiceIndex
+import com.artie.heart.SharedContent
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.cucumber.datatable.DataTable
@@ -47,29 +50,52 @@ class IndexSteps(private val world: LampWorld) {
         json = mapper.readTree(index.body(Dialect.JSONSCHEMA))
     }
 
-    @When("the service index is rendered in HAL Schema Forms at L2")
-    fun indexSchemaFormsL2() {
-        json = mapper.readTree(index.body(Dialect.JSONSCHEMA, Rung.L2))
+    @When("the service index is rendered in HAL Schema Forms at {word}")
+    fun indexSchemaFormsAt(rung: String) {
+        json = mapper.readTree(index.body(Dialect.JSONSCHEMA, Rung.valueOf(rung)))
     }
 
-    @Then("every act form it offers links its schema by \$ref, with the integrity of the schema served there")
-    fun actFormsLinkSchemas() {
-        val acts = json.path("_forms").properties().filter { (_, form) -> form.path("method").asText() != "GET" }
-        assertTrue(acts.isNotEmpty(), "no act forms: $json")
-        acts.forEach { (key, form) ->
-            val schema = form.path("schema")
-            assertEquals(setOf("\$ref", "hr:integrity"), schema.fieldNames().asSequence().toSet(), "$key: $schema")
-            // What is served at the address: the schema the index holds in place at L0, without the $id that names it.
-            val inPlace = mapper.readTree(index.body(Dialect.JSONSCHEMA)).path("_forms").path(key).path("schema")
-            assertEquals(schema.path("\$ref").asText(), inPlace.path("\$id").asText(), key)
-            val served = ContentAddress.canonical(mapper.convertValue(inPlace, Map::class.java) - "\$id")
-            assertEquals(ContentAddress.integrity(served), schema.path("hr:integrity").asText(), key)
-        }
+    /** What the server serves apart, the index's among every type's: sets and schemas by address. */
+    private val shared get() = SharedContent(listOf(world.layers), IndexContent(listOf(world.type)))
+
+    @Then("it holds no forms of its own")
+    fun noForms() = assertFalse(json.has("_forms"), "forms in the index: ${json.path("_forms")}")
+
+    @Then("it links {string} to its affordance set, served at that address, with the set's integrity")
+    fun linksSet(rel: String) {
+        val link = json.path("_links").path(rel)
+        val href = link.path("href").asText()
+        assertTrue(href.startsWith(Layers.AFFORDANCE_SETS), "$rel: $link")
+        val set = checkNotNull(shared.affordanceSets[href.removePrefix(Layers.AFFORDANCE_SETS)]) { "not served: $href" }
+        assertEquals(ContentAddress.integrity(set), link.path("integrity").asText(), rel)
+        val said = link.path("type").asText() to link.path("profile").asText()
+        assertEquals(Dialect.JSONSCHEMA.mediaType to Dialect.JSONSCHEMA.profile, said, rel)
+        json = mapper.readTree(set)
     }
 
-    @Then("no form it offers names a schema in place with \$id")
-    fun noId() = json.path("_forms").properties().forEach { (key, form) ->
-        assertFalse(form.path("schema").has("\$id"), "$key: ${form.path("schema")}")
+    @Then("every form it holds names its schema with \$id, and the schema is served at that address")
+    fun formsNameSchemas() = eachForm { key, schema ->
+        val id = schema.path("\$id").asText()
+        assertTrue(id.startsWith(Layers.SCHEMAS), "$key: $schema")
+        val served = checkNotNull(shared.schemas[id.removePrefix(Layers.SCHEMAS)]) { "$key: not served: $id" }
+        assertEquals(ContentAddress.canonical(mapper.convertValue(schema, Map::class.java) - "\$id"), served, key)
+    }
+
+    @Then("every form in that set names its schema with \$id, and the schema is served at that address")
+    fun setFormsNameSchemas() = formsNameSchemas()
+
+    @Then("every form in that set links its schema by \$ref, with the integrity of the schema served there")
+    fun setFormsLinkSchemas() = eachForm { key, schema ->
+        assertEquals(setOf("\$ref", "hr:integrity"), schema.fieldNames().asSequence().toSet(), "$key: $schema")
+        val ref = schema.path("\$ref").asText()
+        val served = checkNotNull(shared.schemas[ref.removePrefix(Layers.SCHEMAS)]) { "$key: not served: $ref" }
+        assertEquals(ContentAddress.integrity(served), schema.path("hr:integrity").asText(), key)
+    }
+
+    private fun eachForm(check: (String, JsonNode) -> Unit) {
+        val forms = json.path("_forms").properties()
+        assertTrue(forms.isNotEmpty(), "no forms: $json")
+        forms.forEach { (key, form) -> check(key, form.path("schema")) }
     }
 
     @When("the service index is rendered in HAL-FORMS")

@@ -17,7 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
  * - the pages of a search, which list matches under the IANA `item` relation
  *   (RFC 6573), titled, and page with first, last, next and prev (RFC 5005).
  *
- * The index ignores `Prefer`: its forms are inline at every rung.
+ * At L0 the index holds its forms, each schema in place and named by `$id`. Asked for forms by link (L1, L2), it
+ * holds none and links its affordance set by `hr:forms`, as a resource does ([IndexContent]).
  */
 class ServiceIndex(
     internal val types: List<ResourceType<*, *>>,
@@ -34,33 +35,35 @@ class ServiceIndex(
     private val mapper = ObjectMapper()
     val title: String = title ?: types.first().profile.title
 
-    /** The index's own forms in HAL Schema Forms, keyed by relation, self-describing (Rules 6 and 7). */
-    private val indexForms: Map<String, Map<String, Any>> = found.flatMap { type ->
-        val finding = checkNotNull(type.finding)
-        val forms = FindingForms(type)
-        listOf(
-            type.profile.key(finding.search.relation) to
-                schemaForm(type, forms.searchTarget, finding.search.relation, forms.searchSchema),
-            type.profile.key(finding.lookup.relation) to
-                schemaForm(type, forms.lookupTarget, finding.lookup.relation, forms.lookupSchema),
-        ) + type.bookmarkActs.map { type.profile.key(it.relation) to actForm(type, it) }
-    }.toMap()
+    private val content = IndexContent(types)
+    private val indexForms: Map<String, Map<String, Any>> = content.forms
 
     private val bodies: Map<Dialect, String> = mapOf(
-        Dialect.JSONSCHEMA to mapper.writeValueAsString(schemaFormsIndex(indexForms)),
+        Dialect.JSONSCHEMA to mapper.writeValueAsString(schemaFormsIndex(mapOf("_forms" to indexForms))),
         Dialect.HALFORMS to mapper.writeValueAsString(halFormsIndex()),
     )
 
-    /** At L2 (SPEC §6.10.3), each act form's schema linked by `$ref`, pinned by its integrity (Rule 3). */
-    private val linkedBody: String =
-        mapper.writeValueAsString(schemaFormsIndex(indexForms.mapValues { linked(it.value) }))
+    /** At L1 and L2 (SPEC §6.10), no forms: a link to the set that holds them, with what its bytes hash to. */
+    private val linkedBodies: Map<SetRendering, String> = SetRendering.entries.associateWith { rendering ->
+        val set = content.set(rendering)
+        val link = mapOf(
+            "href" to Layers.AFFORDANCE_SETS + ContentAddress.address(set),
+            "type" to Dialect.JSONSCHEMA.mediaType,
+            "profile" to Dialect.JSONSCHEMA.profile,
+            "integrity" to ContentAddress.integrity(set),
+        )
+        mapper.writeValueAsString(schemaFormsIndex(emptyMap(), mapOf(Layers.FORMS_REL to link)))
+    }
 
-    /**
-     * The index in [dialect], at [rung]. Its forms are in it at every rung: at L2 in HAL Schema Forms, an act
-     * form's schema is linked by `$ref` rather than held in place.
-     */
-    fun body(dialect: Dialect, rung: Rung = Rung.L0): String =
-        if (dialect == Dialect.JSONSCHEMA && rung == Rung.L2) linkedBody else bodies.getValue(dialect)
+    /** The index in [dialect], at [rung]: in HAL Schema Forms at L1 and L2, its forms by link. */
+    fun body(dialect: Dialect, rung: Rung = Rung.L0): String {
+        val rendering = rung.setRendering
+        return if (dialect == Dialect.JSONSCHEMA && rendering != null) {
+            linkedBodies.getValue(rendering)
+        } else {
+            bodies.getValue(dialect)
+        }
+    }
 
     /** The index's validator in [dialect] at [rung]: it changes only when the body does. */
     fun validator(dialect: Dialect, rung: Rung = Rung.L0): String =
@@ -85,15 +88,17 @@ class ServiceIndex(
     /** The index's affordances, served at [AFFORDANCES] and linked from the index as `hr:affordances`. */
     fun affordances(): String = mapper.writeValueAsString(affordancesOf(indexForms, types))
 
-    private fun schemaFormsIndex(forms: Map<String, Map<String, Any>>): Map<String, Any> = mapOf(
-        "title" to title,
-        // The forms' hr:integrity and the hr:manifest member are named by heart-core's hr vocabulary.
-        "_links" to links() + ("curies" to (found.flatMap { it.profile.curies } + Layers.HR_CURIE).distinct()) +
-            (AFFORDANCES_REL to mapOf("href" to AFFORDANCES, "type" to Dialect.JSONSCHEMA.mediaType)),
-        "_forms" to forms,
-        // The same at every rung: a form's integrity covers its schema's integrity, held in place or linked.
-        MANIFEST to manifest(indexForms, types),
-    )
+    /** The index in HAL Schema Forms: its links, with [setLink] when its forms are linked, then [forms], if held. */
+    private fun schemaFormsIndex(forms: Map<String, Any>, setLink: Map<String, Any> = emptyMap()): Map<String, Any> =
+        mapOf(
+            "title" to title,
+            // The forms' hr:integrity and the hr:manifest member are named by heart-core's hr vocabulary.
+            "_links" to links() + ("curies" to (found.flatMap { it.profile.curies } + Layers.HR_CURIE).distinct()) +
+                (AFFORDANCES_REL to mapOf("href" to AFFORDANCES, "type" to Dialect.JSONSCHEMA.mediaType)) + setLink,
+        ) + forms + mapOf(
+            // The same at every rung: a form's integrity covers its schema's integrity, held in place or linked.
+            MANIFEST to manifest(indexForms, types),
+        )
 
     /** The type that declares the index's act at [path], if any, and the act. */
     fun actAt(path: String): Pair<ResourceType<*, *>, Act>? =
@@ -144,32 +149,76 @@ class ServiceIndex(
 
 }
 
+/**
+ * The index's forms and what is served apart for them, the same for every binding (SPEC §6.10): the forms keyed by
+ * relation, self-describing (Rules 6 and 7), each schema named by `$id`; the canonical schemas, for `/schemas/`; and
+ * the index's affordance set in each rendering, for `/affordance-sets/`. Known from the declarations alone.
+ */
+class IndexContent(types: List<ResourceType<*, *>>) {
+    private val found = types.filter { it.finding != null }
+
+    val forms: Map<String, Map<String, Any>> = found.flatMap { type ->
+        val finding = checkNotNull(type.finding)
+        val forms = FindingForms(type)
+        listOf(
+            type.profile.key(finding.search.relation) to
+                schemaForm(type, forms.searchTarget, finding.search.relation, forms.searchSchema),
+            type.profile.key(finding.lookup.relation) to
+                schemaForm(type, forms.lookupTarget, finding.lookup.relation, forms.lookupSchema),
+        ) + type.bookmarkActs.map { type.profile.key(it.relation) to actForm(type, it) }
+    }.toMap()
+
+    /** Address -> canonical schema, each where its form's `$id` names it. */
+    val schemas: Map<String, String> =
+        SharedContent.named(forms.values.map { ContentAddress.canonical(schemaOf(it) - "\$id") })
+
+    private val sets: Map<SetRendering, String> = SetRendering.entries.associateWith { rendering ->
+        val held = if (rendering == SetRendering.SCHEMA_POINTERS) forms.mapValues { linked(it.value) } else forms
+        val curies = (found.flatMap { it.profile.curies } + Layers.HR_CURIE).distinct()
+        ContentAddress.canonical(mapOf("_links" to mapOf("curies" to curies), "_forms" to held))
+    }
+
+    /** The index's affordance set at [rendering], in canonical form. */
+    fun set(rendering: SetRendering): String = sets.getValue(rendering)
+
+    /** Address -> canonical set, in both renderings. */
+    val affordanceSets: Map<String, String> = SharedContent.named(sets.values)
+}
+
+private fun schemaOf(form: Map<String, Any>): Map<*, *> = form.getValue("schema") as Map<*, *>
+
+/** [schema] as a form holds it in place: named by `$id`, the address its canonical text is served at (Rule 3). */
+private fun named(schema: Map<String, Any?>): Map<String, Any?> = LinkedHashMap(schema).apply {
+    put("\$id", Layers.SCHEMAS + ContentAddress.address(ContentAddress.canonical(schema)))
+}
+
 /** One of the index's GET forms: a search or a lookup, its target a template its own fields fill. */
 private fun schemaForm(
     type: ResourceType<*, *>,
     target: String,
     relation: String,
     schema: Map<String, Any>,
-): Map<String, Any> = mapOf(
-    "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
-    "method" to "GET",
-    "title" to type.profile.relation(relation).title,
-    "description" to type.profile.relation(relation).description,
-    "schema" to schema,
-    // HAL-SCHEMA-FORMS-HR Rule 10: the bookmark's forms are pinned as a resource's are.
-    FORM_INTEGRITY to FormIntegrity.of(target, "GET", FormIntegrity.ofSchema(schema)),
-)
+): Map<String, Any> {
+    val inline = named(schema)
+    return mapOf(
+        "_links" to mapOf("target" to mapOf("href" to target, "templated" to true)),
+        "method" to "GET",
+        "title" to type.profile.relation(relation).title,
+        "description" to type.profile.relation(relation).description,
+        "schema" to inline,
+        // HAL-SCHEMA-FORMS-HR Rule 10: pinned as a resource's forms are, over the schema as the client reads it.
+        FORM_INTEGRITY to FormIntegrity.of(target, "GET", FormIntegrity.ofSchema(inline)),
+    )
+}
 
 /**
- * [form] with its schema linked rather than held in place (HAL-SCHEMA-FORMS-HR Rule 3): a schema that names itself
- * with `$id` becomes a `$ref` to that address, with the integrity of the schema served there. A schema with no
- * `$id`, such as a search's, is not served apart, so it stays in place.
+ * [form] with its schema linked rather than held in place (HAL-SCHEMA-FORMS-HR Rule 3): its `$id` becomes a `$ref`
+ * to that address, with the integrity of the schema served there.
  */
 private fun linked(form: Map<String, Any>): Map<String, Any> {
-    val schema = form["schema"] as? Map<*, *>
-    val id = schema?.get("\$id") as? String ?: return form
+    val schema = schemaOf(form)
     val served = ContentAddress.canonical(schema - "\$id")
-    return form + ("schema" to mapOf("\$ref" to id, FORM_INTEGRITY to ContentAddress.integrity(served)))
+    return form + ("schema" to mapOf("\$ref" to schema["\$id"], FORM_INTEGRITY to ContentAddress.integrity(served)))
 }
 
 /** Where the index's affordances are served, and the relation the index links them by. */
@@ -215,10 +264,8 @@ const val SERVICE_DESC = "service-desc"
  * rung), named by content.
  */
 private fun actForm(type: ResourceType<*, *>, act: Act): Map<String, Any> {
-    val schema = ContentAddress.canonicalText(act.schema)
     @Suppress("UNCHECKED_CAST")
-    val inline = LinkedHashMap(JsonTrees.plain(schema) as Map<String, Any?>)
-    inline["\$id"] = Layers.SCHEMAS + ContentAddress.address(schema)
+    val inline = named(JsonTrees.plain(ContentAddress.canonicalText(act.schema)) as Map<String, Any?>)
     val relation = type.profile.relation(act.relation)
     return mapOf(
         "_links" to mapOf("target" to mapOf("href" to ACTIONS + act.path)),

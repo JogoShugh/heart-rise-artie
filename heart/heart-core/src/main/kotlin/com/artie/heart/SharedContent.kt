@@ -6,11 +6,19 @@ package com.artie.heart
  * share a body, which is then held once; two different bodies with one
  * address are refused when the server starts.
  */
-class SharedContent(layers: List<Layers<*, *>>) {
+class SharedContent(
+    layers: List<Layers<*, *>>,
+    /** The service index's own sets and schemas, when this server serves an index: beside the types' (§6.10). */
+    index: IndexContent? = null,
+) {
+    private val indexSets = index?.affordanceSets?.values.orEmpty()
+    private val indexSchemas = index?.schemas?.values.orEmpty()
+
     /** With open offers, a set first rendered after start is found in the type that rendered it. */
-    val affordanceSets: Map<String, String> =
-        Growing(named(layers.flatMap { it.affordanceSets.values })) { layers.map { it.affordanceSets } }
-    val schemas: Map<String, String> = named(layers.flatMap { it.schemas.values })
+    val affordanceSets: Map<String, String> = Growing(
+        named(layers.flatMap { it.affordanceSets.values } + indexSets),
+    ) { layers.map { it.affordanceSets } }
+    val schemas: Map<String, String> = named(layers.flatMap { it.schemas.values } + indexSchemas)
     val explanations: Map<String, String> =
         Growing(named(layers.flatMap { it.explanations.values })) { layers.map { it.explanations } }
 

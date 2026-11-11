@@ -21,12 +21,24 @@ Feature: The service index, the home document and search pages, from the declara
     When the service index is rendered in HAL Schema Forms
     Then the index links "hr:keys" to "/keys", as "application/jwk-set+json"
 
-  Scenario: Asked for schemas by link, the index's act forms link each schema by $ref, pinned by its integrity
-    HAL-SCHEMA-FORMS-HR Rule 3. A schema in place names itself with $id; a schema held elsewhere is linked
-    only by $ref, with hr:integrity beside it. At L2 the index's forms link theirs, as a resource's do.
-    When the service index is rendered in HAL Schema Forms at L2
-    Then every act form it offers links its schema by $ref, with the integrity of the schema served there
-    And no form it offers names a schema in place with $id
+  Scenario: At L0 every form the index offers names its schema with $id, and the schema is served there
+    HAL-SCHEMA-FORMS-HR Rule 3: a schema in place names itself with $id, the address it is served at apart.
+    When the service index is rendered in HAL Schema Forms
+    Then every form it holds names its schema with $id, and the schema is served at that address
+
+  Scenario Outline: Asked for forms by link, the index holds no forms and links its affordance set, as a resource does
+    SPEC §6.10. The entry is a resource like any other: at L1 and L2 its forms are in a shared, content-addressed
+    set linked by hr:forms with that set's integrity. At L2 each form there links its schema by $ref, with
+    hr:integrity beside it (Rule 3); at L1 each holds its schema in place, named by $id.
+    When the service index is rendered in HAL Schema Forms at <rung>
+    Then it holds no forms of its own
+    And it links "hr:forms" to its affordance set, served at that address, with the set's integrity
+    And every form in that set <schemas>
+
+    Examples:
+      | rung | schemas                                                                 |
+      | L1   | names its schema with $id, and the schema is served at that address    |
+      | L2   | links its schema by $ref, with the integrity of the schema served there |
 
   Scenario: In HAL Schema Forms, the index offers a search form and a lookup form per type
     When the service index is rendered in HAL Schema Forms
